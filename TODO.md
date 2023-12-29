@@ -15,12 +15,11 @@
   - [TODO] Migrate all the logic from enpoints to its own file to be reused by
     pages and endpoint
 
-
 # EXPLORER:
 
 - [DONE] Retrieve images from the static/stamps folder
 - [DONE] new images are not being updated.... need to restart the container to
-be updated, asking for solutions to this...
+  be updated, asking for solutions to this...
 - [WIP] Balance page
 - [WIP] Wallet integration:
   - [DONE] Unisat
@@ -31,3 +30,14 @@ be updated, asking for solutions to this...
 - [TODO] Work on index page
 - [TODO] Work on stamp page
 - [TODO] tons of work...
+
+# SRC20:
+
+- GET[tx_hash] return src20 transaction info (fromAddress, toAddress, op,
+  validity)
+- GET[address][tick] return balance for this address and tick
+  - remove cpid from the result(is noise for them)
+- GET[block_index] return all valid tx for src20 in that block
+- POST[{ "method": "mint"|"transfer"|"deploy", params: [] }]
+  - check if is a valid posible tx
+  - create unsigned transaction

@@ -35,7 +35,7 @@ export const get_suffix_from_mimetype = (mimetype: string) => {
   return suffix;
 };
 
-export const short_address = (address: string, number=6) => {
+export const short_address = (address: string, number = 6) => {
   return address.slice(0, number) + "..." + address.slice(-number);
 };
 
@@ -50,5 +50,12 @@ export const generateRandomNumber = (min: number, max: number) => {
 };
 
 export const getSupply = (supply: number, divisible: boolean) => {
+  if (typeof supply === "bigint") {
+    return divisible
+      ? (supply / 100000000n).toString()
+      : BigInt(supply).toString();
+  } else if (typeof supply === "string") {
+    supply = parseInt(supply);
+  }
   return divisible ? (supply / 100000000).toFixed(2) : supply;
 };
