@@ -5,17 +5,28 @@ import {
   get_sends_by_block_index_with_client,
   get_last_block_with_client,
   get_related_blocks_with_client,
+  get_block_info_by_hash_with_client,
+  get_related_blocks_by_hash_with_client,
 } from "$lib/database/index.ts";
 
-export async function api_get_block(block_index: number) {
+import { categorizeInput } from "$lib/utils/util.ts";
+
+
+export async function api_get_block(block_index_or_hash: number | string) {
   try {
     const client = await connectDb();
     if (!client) {
       throw new Error("Could not connect to database");
     }
-    const block_info = await get_block_info_with_client(client, block_index);
+    let block_info;
+    const cat = categorizeInput(block_index_or_hash)
+    if (cat === "number") {
+      block_info = await get_block_info_with_client(client, block_index_or_hash);
+    } else if (cat === "hex_string") {
+      block_info = await get_block_info_by_hash_with_client(client, block_index_or_hash);
+    }
     if (!block_info || !block_info?.rows?.length) {
-      throw new Error(`Block: ${block_index} not found`);
+      throw new Error(`Block: ${block_index_or_hash} not found`);
     }
     const last_block = await get_last_block_with_client(client);
     if (!last_block || !last_block?.rows?.length) {
@@ -23,12 +34,12 @@ export async function api_get_block(block_index: number) {
     }
     const issuances = await get_issuances_by_block_index_with_client(
       client,
-      block_index,
+      block_index_or_hash,
     );
 
     const sends = await get_sends_by_block_index_with_client(
       client,
-      block_index,
+      block_index_or_hash,
     );
     const response = {
       block_info: block_info.rows[0],
@@ -44,13 +55,19 @@ export async function api_get_block(block_index: number) {
   }
 }
 
-export const api_get_related_blocks = async (block_index: number) => {
+export const api_get_related_blocks = async (block_index_or_hash: number | string) => {
   try {
     const client = await connectDb();
     if (!client) {
       throw new Error("Could not connect to database");
     }
-    const blocks = await get_related_blocks_with_client(client, block_index);
+    let blocks;
+    const cat = categorizeInput(block_index_or_hash)
+    if (cat === "number") {
+      blocks = await get_related_blocks_with_client(client, block_index_or_hash);
+    } else if (cat === "hex_string") {
+      blocks = await get_related_blocks_by_hash_with_client(client, block_index_or_hash);
+    }
     const last_block = await get_last_block_with_client(client);
     if (!last_block || !last_block?.rows?.length) {
       throw new Error("Could not get last block");

@@ -59,3 +59,29 @@ export const getSupply = (supply: number, divisible: boolean) => {
   }
   return divisible ? (supply / 100000000).toFixed(2) : supply;
 };
+
+
+export function isIntOr32ByteHex(value: string) {
+  // Check if the value is an integer or a numeric string that can be converted to an integer
+  const isInt = Number.isInteger(value) || (typeof value === 'string' && Number.isInteger(Number(value)));
+
+  // Check if the value is a string representing a 32-byte hex (64 characters)
+  const is32ByteHex = typeof value === 'string' && /^[0-9a-fA-F]{64}$/.test(value);
+
+  return isInt || is32ByteHex;
+}
+
+export function categorizeInput(value: string | number): "number" | "hex_string" | "none" {
+  // Check if the value is a strictly numeric string or a number
+  if ((typeof value === 'string' && /^\d+$/.test(value)) || Number.isInteger(value)) {
+      return "number";
+  }
+  
+  // Check if the value is a string representing a hexadecimal string
+  if (typeof value === 'string' && /^[0-9a-fA-F]+$/.test(value)) {
+      return "hex_string";
+  }
+
+  // If neither, return "none"
+  return "none";
+}

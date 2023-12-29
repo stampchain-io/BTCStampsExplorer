@@ -5,7 +5,7 @@ import { get_balances } from "utils/xcp.ts"
 import { handleSqlQueryWithCache } from "utils/cache.ts"
 import { TTL_CACHE } from "utils/constants.ts";
 
-
+//------------------Blocks by index------------------
 export const get_block_info_with_client = async (
   client: Client,
   block_index: number,
@@ -161,6 +161,145 @@ export const get_sends_by_block_index_with_client = async (
     "never"
   );
 };
+
+//------------------Blocks by hash------------------
+export const get_block_info_by_hash_with_client = async (
+  client: Client,
+  block_hash: string,
+) => {
+  return await handleSqlQueryWithCache(
+    client,
+    `
+    SELECT * FROM blocks
+    WHERE block_hash = ?;
+    `,
+    [block_hash],
+    "never"
+  );
+};
+const get_block_index_by_hash_with_client = async (
+  client: Client,
+  block_hash: string,
+) => {
+  const result = await handleSqlQueryWithCache(
+    client,
+    `
+    SELECT block_index
+    FROM blocks
+    WHERE block_hash = ?;
+    `,
+    [block_hash],
+    "never"
+  );
+  return result?.rows?.[0]?.block_index;
+};
+
+
+
+export const get_related_blocks_by_hash_with_client = async (
+  client: Client,
+  block_hash: string,
+) => {
+  const block_index = await get_block_index_by_hash_with_client(client, block_hash);
+  const blocks = await handleSqlQueryWithCache(
+    client,
+    `
+    SELECT * FROM blocks
+    WHERE block_index >= ? - 2
+    AND block_index <= ? + 2
+    ORDER BY block_index DESC;
+    `,
+    [block_index, block_index],
+    0
+  );
+  const populated = blocks?.rows?.map(async (block) => {
+    const issuances_from_block = await handleSqlQueryWithCache(
+      client,
+      `
+      SELECT COUNT(*) AS issuances
+      FROM ${STAMP_TABLE}
+      WHERE block_index = ?;
+      `,
+      [block.block_index],
+      "never"
+    );
+
+    const sends_from_block = await handleSqlQueryWithCache(
+      client,
+      `
+      SELECT COUNT(*) AS sends
+      FROM sends
+      WHERE block_index = ?;
+      `,
+      [block.block_index],
+      "never"
+    );
+
+    return {
+      ...block,
+      issuances: issuances_from_block.rows[0]["issuances"] ?? 0,
+      sends: sends_from_block.rows[0]["sends"] ?? 0,
+    };
+  });
+  const result = await Promise.all(populated.reverse());
+  return result;
+};
+
+export const get_issuances_by_block_hash_with_client = async (
+  client: Client,
+  block_hash: string,
+) => {
+  return await handleSqlQueryWithCache(
+    client,
+    `
+    SELECT st.*, num.stamp AS stamp, num.is_btc_stamp AS is_btc_stamp
+    FROM ${STAMP_TABLE} st
+    LEFT JOIN (
+        SELECT cpid, stamp, is_btc_stamp
+        FROM ${STAMP_TABLE}
+        WHERE stamp IS NOT NULL
+        AND is_btc_stamp IS NOT NULL
+    ) num ON st.cpid = num.cpid
+    WHERE st.block_hash = ?
+    ORDER BY st.tx_index;
+    `,
+    [block_hash],
+    "never"
+  );
+};
+
+export const get_sends_by_block_hash_with_client = async (
+  client: Client,
+  block_hash: string,
+) => {
+  const block_index = await get_block_index_by_hash_with_client(client, block_hash);
+  return await handleSqlQueryWithCache(
+    client,
+    `
+    SELECT s.*, st.*
+    FROM sends s
+    JOIN ${STAMP_TABLE} st ON s.cpid = st.cpid
+    WHERE s.block_index = ?
+      AND st.is_valid_base64 = true
+      AND st.block_index = (SELECT MIN(block_index) 
+                            FROM ${STAMP_TABLE} 
+                            WHERE cpid = s.cpid 
+                              AND is_valid_base64 = 1)
+    ORDER BY s.tx_index;
+    `,
+    [block_index],
+    "never"
+  );
+};
+
+
+
+
+
+
+
+
+// -------------Stamps--------------
 
 export const get_issuances_by_stamp_with_client = async (
   client: Client,
