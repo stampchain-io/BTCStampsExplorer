@@ -38,13 +38,23 @@ export default function StampPage(props: CursedPageProps) {
   const { stamps, total, page, pages, page_size } = props.data;
   return (
     <div class="w-full flex flex-col items-center">
-      <PageControl page={page} pages={pages} page_size={page_size} />
+      <PageControl
+        page={page}
+        pages={pages}
+        page_size={page_size}
+        type={"cursed"}
+      />
       <Partial name="stamps">
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out">
           {stamps.map((stamp: StampRow) => <StampCard stamp={stamp} />)}
         </div>
       </Partial>
-      <PageControl page={page} pages={pages} page_size={page_size} />
+      <PageControl
+        page={page}
+        pages={pages}
+        page_size={page_size}
+        type={"cursed"}
+      />
     </div>
   );
 }
