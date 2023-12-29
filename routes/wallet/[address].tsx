@@ -3,7 +3,6 @@ import { StampCard } from "$components/StampCard.tsx";
 import BtcAddressInfo from "$components/BtcAddressInfo.tsx";
 import { SRC20BalanceTable } from "$components/SRC20BalanceTable.tsx";
 
-
 type WalletPageProps = {
   params: {
     stamps: any[];
@@ -20,7 +19,7 @@ export const handler: Handlers<any> = {
       stamps,
       src20,
       btc,
-    }
+    };
     return await ctx.render(data);
   },
 };
@@ -37,15 +36,12 @@ export default function Wallet(props: WalletPageProps) {
         <div class="max-h-[400px] overflow-auto">
           <SRC20BalanceTable src20Balances={src20} />
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out max-h-[600px] overflow-auto">
-          {
-            stamps.sort((a, b) => a.stamp - b.stamp).map((stamp: any) => (
-              <StampCard stamp={stamp} />
-            ))
-          }
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-4 py-6 transition-opacity duration-700 ease-in-out max-h-[600px] overflow-auto">
+          {stamps.sort((a, b) => a.stamp - b.stamp).map((stamp: any) => (
+            <StampCard stamp={stamp} />
+          ))}
         </div>
       </div>
-
     </div>
-  )
-};
+  );
+}

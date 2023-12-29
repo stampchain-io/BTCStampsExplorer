@@ -101,6 +101,8 @@ export function StampCard(
             <p class="truncate text-[13px] rounded-lg uppercase">
               {stamp.ident && stamp.ident === "SRC-20"
                 ? "SRC-20"
+                : stamp.ident && stamp.ident === "SRC-721"
+                ? "SRC-721"
                 : stamp.stamp_mimetype.split("/")[1]}
             </p>
           </div>

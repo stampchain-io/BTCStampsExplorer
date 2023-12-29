@@ -10,7 +10,7 @@ interface BlockHeaderTableProps {
     block_info: BlockInfo;
     issuances: StampRow[];
     sends: SendRow[];
-  }
+  };
 }
 
 export default function BlockHeaderTable(props: BlockHeaderTableProps) {
@@ -24,17 +24,29 @@ export default function BlockHeaderTable(props: BlockHeaderTableProps) {
             <th scope="row" class="whitespace-nowrap px-6 py-3">Block Index</th>
             <td class="whitespace-nowrap">{block_info.block_index}</td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">Block Hash</th>
-            <td class="whitespace-nowrap">{short_address(block_info.block_hash)}</td>
+            <td class="whitespace-nowrap">
+              {short_address(block_info.block_hash)}
+            </td>
             <th scope="row" class="px-6 py-3">Time</th>
-            <td class="whitespace-nowrap">{dayjs(Number(block_info.block_time)).fromNow()}</td>
+            <td class="whitespace-nowrap">
+              {dayjs(Number(block_info.block_time)).fromNow()}
+            </td>
           </tr>
           <tr class="border-b">
             <th scope="row" class="whitespace-nowrap px-6 py-3">Ledger Hash</th>
-            <td class="whitespace-nowrap">{short_address(block_info.ledger_hash)}</td>
+            <td class="whitespace-nowrap">
+              {short_address(block_info.ledger_hash)}
+            </td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">Txlist Hash</th>
-            <td class="whitespace-nowrap">{short_address(block_info.txlist_hash)}</td>
+            <td class="whitespace-nowrap">
+              {short_address(block_info.txlist_hash)}
+            </td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">Txlist Hash</th>
-            <td class="whitespace-nowrap">{short_address(block_info.messages_hash)}</td>
+            <td class="whitespace-nowrap">
+              {block_info.messages_hash
+                ? short_address(block_info.messages_hash)
+                : "null"}
+            </td>
           </tr>
           <tr class="border-b">
             <th scope="row" class="px-6 py-3">Issuances</th>
@@ -45,5 +57,5 @@ export default function BlockHeaderTable(props: BlockHeaderTableProps) {
         </tbody>
       </table>
     </div>
-  )
+  );
 }
