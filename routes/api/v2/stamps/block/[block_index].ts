@@ -1,18 +1,13 @@
 import { HandlerContext } from "$fresh/server.ts";
-import {
-  connectDb,
-  get_block_info_with_client,
-  get_last_block_with_client,
-  get_stamps_by_block_index_with_client,
- } from "$lib/database/index.ts";
+import { connectDb, CommonClass } from "$lib/database/index.ts";
 
 export const handler = async (_req: Request, ctx: HandlerContext): Response => {
   const { block_index } = ctx.params;
   try {
     const client = await connectDb();
-    const block_info = await get_block_info_with_client(client, block_index);
-    const data = await get_stamps_by_block_index_with_client(client, block_index);
-    const last_block = await get_last_block_with_client(client);
+    const block_info = await CommonClass.get_block_info_with_client(client, block_index);
+    const data = await CommonClass.get_stamps_by_block_index_with_client(client, block_index);
+    const last_block = await CommonClass.get_last_block_with_client(client);
     let body = JSON.stringify({
       block_info: block_info.rows[0],
       data: data.rows,

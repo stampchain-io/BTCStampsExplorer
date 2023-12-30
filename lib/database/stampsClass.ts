@@ -1,12 +1,12 @@
 import { Client } from "$mysql/mod.ts";
 import {
-  get_issuances_by_identifier_with_client,
-  get_issuances_by_stamp_with_client,
+  CommonClass,
   summarize_issuances,
 } from './index.ts';
 import { STAMP_TABLE, TTL_CACHE } from "constants"
-import { SUBPROTOCOLS } from "utils/protocol.ts"
-import { handleSqlQueryWithCache } from "utils/cache.ts"
+import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "../utils/protocol.ts"
+import { handleSqlQueryWithCache } from "../utils/cache.ts"
+
 
 export class StampsClass {
 
@@ -138,9 +138,9 @@ export class StampsClass {
   static async get_stamp_with_client(client: Client, id: string){
     let data;
     if (!isNaN(Number(id))) {
-      data = await get_issuances_by_stamp_with_client(client, Number(id));
+      data = await CommonClass.get_issuances_by_stamp_with_client(client, Number(id));
     } else {
-      data = await get_issuances_by_identifier_with_client(client, id);
+      data = await CommonClass.get_issuances_by_identifier_with_client(client, id);
     }
     if (!data) return null;
     const stamp = summarize_issuances(data.rows);

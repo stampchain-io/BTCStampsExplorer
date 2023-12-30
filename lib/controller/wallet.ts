@@ -1,17 +1,10 @@
-import {
-  connectDb,
-  get_src20_balance_by_address_and_tick_with_client,
-  get_src20_balance_by_address_with_client,
-  get_stamp_balances_by_address_with_client,
-  get_valid_src20_tx_by_tx_hash_with_client,
-} from "$lib/database/index.ts";
-
-import { getBtcAddressInfo } from "utils/btc.ts";
+import { connectDb, Src20Class, CommonClass } from "$lib/database/index.ts";
+import { getBtcAddressInfo } from "../utils/btc.ts";
 
 export const api_get_stamp_balance = async (address: string, limit = 1000, page = 1) => {
   try {
     const client = await connectDb();
-    const balances = await get_stamp_balances_by_address_with_client(
+    const balances = await CommonClass.get_stamp_balances_by_address_with_client(
       client,
       address,
       limit,
@@ -28,7 +21,7 @@ export const api_get_stamp_balance = async (address: string, limit = 1000, page 
 export const api_get_src20_valid_tx = async (tx_hash: string) => {
   try {
     const client = await connectDb();
-    const tx_data = await get_valid_src20_tx_by_tx_hash_with_client(
+    const tx_data = await Src20Class.get_valid_src20_tx_by_tx_hash_with_client(
       client,
       tx_hash,
     );
@@ -43,7 +36,7 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
 export const api_get_src20_balance = async (address: string) => {
   try {
     const client = await connectDb();
-    const balances = await get_src20_balance_by_address_with_client(
+    const balances = await Src20Class.get_src20_balance_by_address_with_client(
       client,
       address,
     );
@@ -61,7 +54,7 @@ export const api_get_src20_balance_by_tick = async (
 ) => {
   try {
     const client = await connectDb();
-    const balances = await get_src20_balance_by_address_and_tick_with_client(
+    const balances = await Src20Class.get_src20_balance_by_address_and_tick_with_client(
       client,
       address,
       tick,
@@ -78,13 +71,13 @@ export const api_get_balance = async (address: string, limit = 1000, page = 1) =
   try {
     const client = await connectDb();
     const btcInfo = await getBtcAddressInfo(address);
-    const stamps = await get_stamp_balances_by_address_with_client(
+    const stamps = await CommonClass.get_stamp_balances_by_address_with_client(
       client,
       address,
       limit,
       page
     );
-    const src20 = await get_src20_balance_by_address_with_client(
+    const src20 = await Src20Class.get_src20_balance_by_address_with_client(
       client,
       address,
     );

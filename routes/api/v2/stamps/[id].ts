@@ -1,7 +1,7 @@
 import { HandlerContext } from "$fresh/server.ts";
 import {
   connectDb,
-  get_last_block_with_client,
+  CommonClass,
   summarize_issuances,
 } from "$lib/database/index.ts";
 import { api_get_stamp } from "$lib/controller/stamp.ts";
@@ -11,7 +11,7 @@ export const handler = async (_req: Request, ctx: HandlerContext): Response => {
   try {
     const client = await connectDb();
     const data = await api_get_stamp(id);
-    const last_block = await get_last_block_with_client(client);
+    const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
     let body = JSON.stringify({
       data: data,
