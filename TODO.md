@@ -12,8 +12,9 @@
   - [WIP]related blocks to show previous and next block for a given one
   - [DONE]add to block queries to be able to search by hash
 - [TODO] Other endpoints:
-  - [TODO] Migrate all the logic from enpoints to its own file to be reused by
+  - [DOING] Migrate all the logic from enpoints to its own file to be reused by
     pages and endpoint
+    - this is done for /stamps and /stamps/balance/[address]
 
 # EXPLORER:
 

@@ -36,8 +36,8 @@ export const get_total_stamps_by_ident_with_client = async (client: Client, iden
   );
 };
 
-export const get_stamps_by_page_with_client = async (client: Client, limit = 1000, page = 0) => {
-  const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+export const get_stamps_by_page_with_client = async (client: Client, limit = 1000, page = 1) => {
+  const offset = (page - 1) * limit;
   return await handleSqlQueryWithCache(
     client,
     `
@@ -55,7 +55,7 @@ export const get_stamps_by_page_with_client = async (client: Client, limit = 100
 
 export const get_resumed_stamps_by_page_with_client = async (client: Client, limit = 1000, page = 1, order = "DESC") => {
   order = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-  const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+  const offset = (page - 1) * limit;
   return await handleSqlQueryWithCache(
     client,
     `
@@ -87,8 +87,8 @@ export const get_stamps_by_block_index_with_client = async (client: Client, bloc
   );
 };
 
-export const get_stamps_by_ident_with_client = async (client: Client, ident: SUBPROTOCOLS, limit = 1000, page = 0) => {
-  const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+export const get_stamps_by_ident_with_client = async (client: Client, ident: SUBPROTOCOLS, limit = 1000, page = 1) => {
+  const offset = (page - 1) * limit;
   return await handleSqlQueryWithCache(
     client,
     `
