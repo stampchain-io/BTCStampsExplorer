@@ -15,6 +15,7 @@
   - [DOING] Migrate all the logic from enpoints to its own file to be reused by
     pages and endpoint
     - this is done for /stamps and /stamps/balance/[address]
+- [DONE] create classes for database functions - will make importing/exporting easier and faster
 
 # EXPLORER:
 
