@@ -85,3 +85,14 @@ export function categorizeInput(value: string | number): "number" | "hex_string"
   // If neither, return "none"
   return "none";
 }
+
+
+export function paginate(total: number, page = 1, limit = 10) {
+  const totalPages = Math.ceil(total / limit);
+  return {
+      page,
+      limit,
+      totalPages,
+      total
+  };
+}

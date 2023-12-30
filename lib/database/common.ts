@@ -358,9 +358,93 @@ export const get_issuances_by_identifier_with_client = async (
   return issuances;
 };
 
+export const get_total_stamp_balance_with_client = async (client: Client, address: string) => {
+  try{
+    const xcp_balances = await get_balances(address);
+    const assets = xcp_balances.map(balance => balance.cpid);
+    const query = `
+      SELECT 
+        COUNT(*) AS total
+      FROM 
+        ${STAMP_TABLE} st
+      LEFT JOIN 
+        creator cr ON st.creator = cr.address
+      WHERE 
+        st.cpid IN (${assets.map(() => `?`).join(',')})
+    `;
+    const balances = await handleSqlQueryWithCache(client, query, assets, TTL_CACHE);
+    return(balances);
+  } catch (error) {
+    console.error("Error getting balances: ", error);
+    return [];
+  }
+};
+
+
+
 export const get_stamp_balances_by_address_with_client = async (
+  client: Client, address: string, limit = 1000, page = 1, order = "DESC"
+) => {
+  const offset = (page - 1) * limit;
+  try {
+    const xcp_balances = await get_balances(address);
+    const assets = xcp_balances.map(balance => balance.cpid);
+
+    const query = `
+      SELECT 
+        st.cpid, 
+        st.stamp, 
+        st.stamp_base64, 
+        st.stamp_url, 
+        st.stamp_mimetype, 
+        st.tx_hash, 
+        st.is_btc_stamp, 
+        st.divisible, 
+        st.supply, 
+        st.locked, 
+        st.creator, 
+        cr.creator AS creator_name
+      FROM 
+        ${STAMP_TABLE} st
+      LEFT JOIN 
+        creator cr ON st.creator = cr.address
+      WHERE 
+        st.cpid IN (${assets.map(() => `?`).join(',')})
+      ORDER BY 
+        st.cpid ${order}
+      LIMIT 
+        ${limit}
+      OFFSET 
+        ${offset}
+    `;
+    const balances = await handleSqlQueryWithCache(client, query, assets, TTL_CACHE);
+
+    const grouped = balances.rows.reduce((acc, cur) => {
+      acc[cur.cpid] = acc[cur.cpid] || [];
+      acc[cur.cpid].push(cur);
+      return acc;
+    }, {});
+
+    const summarized = Object.keys(grouped).map(key => summarize_issuances(grouped[key]));
+
+    return summarized.map(summary => {
+      const xcp_balance = xcp_balances.find(balance => balance.cpid === summary.cpid);
+      return {
+        ...summary,
+        balance: xcp_balance ? xcp_balance.quantity : 0,
+      };
+    });
+  } catch (error) {
+    console.error("Error getting balances: ", error);
+    return [];
+  }
+};
+
+export const old_get_stamp_balances_by_address_with_client = async (
   client: Client,
-  address: string
+  address: string,
+  limit = 1000,
+  page = 1,
 ) => {
   try {
     const xcp_balances = await get_balances(address);

@@ -8,12 +8,14 @@ import {
 
 import { getBtcAddressInfo } from "utils/btc.ts";
 
-export const api_get_stamp_balance = async (address: string) => {
+export const api_get_stamp_balance = async (address: string, limit = 1000, page = 1) => {
   try {
     const client = await connectDb();
     const balances = await get_stamp_balances_by_address_with_client(
       client,
       address,
+      limit,
+      page
     );
     await client.close();
     return balances;
@@ -32,7 +34,7 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
     );
     await client.close();
     return tx_data.rows[0];
-  } catch (error) {
+  } catch (error) { 
     console.error(error);
     throw error;
   }
@@ -72,13 +74,15 @@ export const api_get_src20_balance_by_tick = async (
   }
 };
 
-export const api_get_balance = async (address: string) => {
+export const api_get_balance = async (address: string, limit = 1000, page = 1) => {
   try {
     const client = await connectDb();
     const btcInfo = await getBtcAddressInfo(address);
     const stamps = await get_stamp_balances_by_address_with_client(
       client,
       address,
+      limit,
+      page
     );
     const src20 = await get_src20_balance_by_address_with_client(
       client,

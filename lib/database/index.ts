@@ -13,6 +13,7 @@ export {
   get_stamp_balances_by_address_with_client,
   get_block_info_by_hash_with_client,
   get_related_blocks_by_hash_with_client,
+  get_total_stamp_balance_with_client,
 } from "./common.ts";
 
 export {
