@@ -1,14 +1,4 @@
-import {
-  connectDb,
-  get_block_info_with_client,
-  get_issuances_by_block_index_with_client,
-  get_sends_by_block_index_with_client,
-  get_last_block_with_client,
-  get_related_blocks_with_client,
-  get_block_info_by_hash_with_client,
-  get_related_blocks_by_hash_with_client,
-} from "$lib/database/index.ts";
-
+import { connectDb, CommonClass } from "$lib/database/index.ts";
 import { categorizeInput } from "$lib/utils/util.ts";
 
 
@@ -21,23 +11,23 @@ export async function api_get_block(block_index_or_hash: number | string) {
     let block_info;
     const cat = categorizeInput(block_index_or_hash)
     if (cat === "number") {
-      block_info = await get_block_info_with_client(client, block_index_or_hash);
+      block_info = await CommonClass.get_block_info_with_client(client, block_index_or_hash);
     } else if (cat === "hex_string") {
-      block_info = await get_block_info_by_hash_with_client(client, block_index_or_hash);
+      block_info = await CommonClass.get_block_info_by_hash_with_client(client, block_index_or_hash);
     }
     if (!block_info || !block_info?.rows?.length) {
       throw new Error(`Block: ${block_index_or_hash} not found`);
     }
-    const last_block = await get_last_block_with_client(client);
+    const last_block = await CommonClass.get_last_block_with_client(client);
     if (!last_block || !last_block?.rows?.length) {
       throw new Error("Could not get last block");
     }
-    const issuances = await get_issuances_by_block_index_with_client(
+    const issuances = await CommonClass.get_issuances_by_block_index_with_client(
       client,
       block_index_or_hash,
     );
 
-    const sends = await get_sends_by_block_index_with_client(
+    const sends = await CommonClass.get_sends_by_block_index_with_client(
       client,
       block_index_or_hash,
     );
@@ -64,11 +54,11 @@ export const api_get_related_blocks = async (block_index_or_hash: number | strin
     let blocks;
     const cat = categorizeInput(block_index_or_hash)
     if (cat === "number") {
-      blocks = await get_related_blocks_with_client(client, block_index_or_hash);
+      blocks = await CommonClass.get_related_blocks_with_client(client, block_index_or_hash);
     } else if (cat === "hex_string") {
-      blocks = await get_related_blocks_by_hash_with_client(client, block_index_or_hash);
+      blocks = await CommonClass.get_related_blocks_by_hash_with_client(client, block_index_or_hash);
     }
-    const last_block = await get_last_block_with_client(client);
+    const last_block = await CommonClass.get_last_block_with_client(client);
     if (!last_block || !last_block?.rows?.length) {
       throw new Error("Could not get last block");
     }
@@ -90,7 +80,7 @@ export const api_get_last_block = async () => {
     if (!client) {
       throw new Error("Could not connect to database");
     }
-    const last_block = await get_last_block_with_client(client);
+    const last_block = await CommonClass.get_last_block_with_client(client);
     if (!last_block || !last_block?.rows?.length) {
       throw new Error("Could not get last block");
     }

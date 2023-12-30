@@ -1,10 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
-import {
-  connectDb,
-  get_stamps_by_ident_with_client,
-  get_last_block_with_client,
-  get_total_stamps_by_ident_with_client,
-} from "$lib/database/index.ts";
+import { connectDb, StampsClass, CommonClass } from "$lib/database/index.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
 
 export const handler = async (req: Request, ctx: HandlerContext): Response => {
@@ -18,9 +13,9 @@ export const handler = async (req: Request, ctx: HandlerContext): Response => {
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 0;
     const client = await connectDb();
-    const data = await get_stamps_by_ident_with_client(client, ident.toUpperCase(), limit, page);
-    const total = await get_total_stamps_by_ident_with_client(client, ident.toUpperCase());
-    const last_block = await get_last_block_with_client(client);
+    const data = await StampsClass.get_stamps_by_ident_with_client(client, ident.toUpperCase(), limit, page);
+    const total = await StampsClass.get_total_stamps_by_ident_with_client(client, ident.toUpperCase());
+    const last_block = await CommonClass.get_last_block_with_client(client);
     let body = JSON.stringify({
       ident: ident.toUpperCase(),
       data: data.rows,

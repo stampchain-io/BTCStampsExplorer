@@ -1,24 +1,15 @@
-import {
-  connectDb,
-  get_stamp_with_client,
-  get_resumed_stamps_by_page_with_client,
-  get_total_stamps_with_client,
-  get_cpid_from_identifier_with_client,
-  get_sends_for_cpid_with_client,
-} from "$lib/database/index.ts";
-
-
-import { get_holders} from "utils/xcp.ts"
+import { connectDb, StampsClass, CommonClass } from "../database/index.ts";
+import { get_holders} from "../utils/xcp.ts"
 
 export async function api_get_stamps(page = 0, page_size = 1000, order: "DESC"|"ASC"="DESC") {
   try {
     const client = await connectDb();
-    const stamps = await get_resumed_stamps_by_page_with_client(client, page_size, page, order);
+    const stamps = await StampsClass.get_resumed_stamps_by_page_with_client(client, page_size, page, order);
     if (!stamps) {
       client.close();
       throw new Error("No stamps found");
     }
-    const total = await get_total_stamps_with_client(client);
+    const total = await StampsClass.get_total_stamps_with_client(client);
     client.close();
     return {
       stamps: stamps.rows,
@@ -36,16 +27,16 @@ export async function api_get_stamps(page = 0, page_size = 1000, order: "DESC"|"
 export async function api_get_stamp(id: string) {
   try {
     const client = await connectDb();
-    const stamp = await get_stamp_with_client(client, id);
+    const stamp = await StampsClass.get_stamp_with_client(client, id);
     if (!stamp) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
-    const total = await get_total_stamps_with_client(client);
-    const cpid_result = await get_cpid_from_identifier_with_client(client, id);
+    const total = await StampsClass.get_total_stamps_with_client(client);
+    const cpid_result = await StampsClass.get_cpid_from_identifier_with_client(client, id);
     const cpid = cpid_result.rows[0].cpid;
 
     const holders = await get_holders(cpid);
-    const sends = await get_sends_for_cpid_with_client(client, cpid);
+    const sends = await CommonClass.get_sends_for_cpid_with_client(client, cpid);
     return {
       stamp: stamp,
       holders: holders.map((holder: any) => {

@@ -1,12 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { api_get_stamp_balance } from "$lib/controller/wallet.ts";
-import {
-  connectDb,
-  handleQueryWithClient,
-  get_last_block_with_client,
-  get_total_stamp_balance_with_client,
-  get_stamps_by_page_with_client,
-} from "$lib/database/index.ts";
+import { connectDb, CommonClass, StampsClass } from "$lib/database/index.ts";
 import { paginate } from "$lib/utils/util.ts";
 
 
@@ -29,8 +23,8 @@ export const handler = async (_req: Request, ctx: HandlerContext): Response => {
     
     const data = await api_get_stamp_balance(address, limit, page);
     const client = await connectDb();
-    const total = (await get_total_stamp_balance_with_client(client, address)).rows[0]["total"] || 0;
-    const last_block = await get_last_block_with_client(client);
+    const total = (await StampsClass.get_total_stamp_balance_with_client(client, address)).rows[0]["total"] || 0;
+    const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
 
     const pagination = paginate(total, page, limit);

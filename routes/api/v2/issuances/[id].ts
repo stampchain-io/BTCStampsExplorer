@@ -1,10 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
-import {
-  connectDb,
-  get_last_block_with_client,
-  get_issuances_by_stamp_with_client,
-  get_issuances_by_identifier_with_client,
-} from "$lib/database/index.ts";
+import { connectDb, CommonClass, StampsClass } from "$lib/database/index.ts";
 
 export const handler = async (_req: Request, ctx: HandlerContext): Response => {
   const { id } = ctx.params;
@@ -12,11 +7,11 @@ export const handler = async (_req: Request, ctx: HandlerContext): Response => {
     const client = await connectDb();
     let data;
     if (Number.isInteger(Number(id))) {
-      data = await get_issuances_by_stamp_with_client(client, id)
+      data = await StampsClass.get_issuances_by_stamp_with_client(client, id)
     } else {
-      data = await get_issuances_by_identifier_with_client(client, id);
+      data = await StampsClass.get_issuances_by_identifier_with_client(client, id);
     }
-    const last_block = await get_last_block_with_client(client);
+    const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
     let body = JSON.stringify({
       data: data.rows,

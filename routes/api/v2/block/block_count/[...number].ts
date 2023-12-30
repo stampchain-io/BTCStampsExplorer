@@ -3,7 +3,7 @@ import {
   Handlers,
   Request,
 } from "$fresh/server.ts";
-import { get_last_x_blocks_with_client, connectDb } from "$lib/database/index.ts";
+import { CommonClass, connectDb } from "$lib/database/index.ts";
 
 export const handler: Handlers = {
   async GET(_req: Request, ctx: HandlerContext) {
@@ -20,7 +20,7 @@ export const handler: Handlers = {
     
     try {
       const client = await connectDb();
-      const lastBlocks = await get_last_x_blocks_with_client(client, number);
+      const lastBlocks = await CommonClass.get_last_x_blocks_with_client(client, number);
       await client.close();
       return new Response(JSON.stringify(lastBlocks), {
         headers: {

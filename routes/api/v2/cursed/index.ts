@@ -1,11 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
-import {
-  connectDb,
-  handleQueryWithClient,
-  get_last_block_with_client,
-  get_total_cursed_with_client,
-  get_cursed_by_page_with_client,
- } from "$lib/database/index.ts";
+import { connectDb, CommonClass, CursedClass } from "$lib/database/index.ts";
+
 
 export const handler = async (req: Request, _ctx: HandlerContext): Response => {
   try {
@@ -14,9 +9,9 @@ export const handler = async (req: Request, _ctx: HandlerContext): Response => {
     const page = Number(url.searchParams.get("page")) || 0;
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
     const client = await connectDb();
-    const data = await get_cursed_by_page_with_client(client, limit, page);
-    const last_block = await get_last_block_with_client(client);
-    const total = await get_total_cursed_with_client(client);
+    const data = await CursedClass.get_cursed_by_page_with_client(client, limit, page);
+    const last_block = await CommonClass.get_last_block_with_client(client);
+    const total = await CursedClass.get_total_cursed_with_client(client);
     client.close();
     let body = JSON.stringify({
       data: data.rows,
