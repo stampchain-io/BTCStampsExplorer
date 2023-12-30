@@ -1,5 +1,10 @@
 export { connectDb, handleQuery, handleQueryWithClient } from "./db.ts";
 
+export { CommonClass } from "./commonClass.ts";
+export { CursedClass } from "./cursedClass.ts";
+export { Src20Class } from "./src20Class.ts";
+export { StampsClass } from "./stampsClass.ts";
+
 export {
   get_block_info_with_client,
   get_issuances_by_block_index_with_client,
@@ -15,6 +20,8 @@ export {
   get_related_blocks_by_hash_with_client,
   get_total_stamp_balance_with_client,
 } from "./common.ts";
+
+
 
 export {
   get_cpid_from_identifier_with_client,
