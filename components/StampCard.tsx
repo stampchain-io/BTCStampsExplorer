@@ -53,12 +53,7 @@ export function StampCard(
       <div class="flex grow flex-col pt-2.5 font-title text-[13px] font-medium text-text">
         <div class="flex justify-between">
           <h3 class="text-[15px] font-medium text-text-strong">
-            {stamp.stamp && stamp.stamp >= 0 ? `#${stamp.stamp}` : "CURSED"}
-            {
-              /* TODO: change this when we have cursed numbering
-              `#${stamp.stamp}`
-            */
-            }
+            {`#${stamp.stamp}`}
           </h3>
           <h3 class="truncate text-[12px] text-text">
             {stamp.creator_name
