@@ -16,7 +16,7 @@ import * as $api_v2_issuances_id_ from "./routes/api/v2/issuances/[id].ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
 import * as $api_v2_src20_index from "./routes/api/v2/src20/index.ts";
-import * as $api_v2_src20_tick_tick_deploys from "./routes/api/v2/src20/tick/[tick]/deploys.ts";
+import * as $api_v2_src20_tick_tick_deploy from "./routes/api/v2/src20/tick/[tick]/deploy.ts";
 import * as $api_v2_src20_tick_tick_index from "./routes/api/v2/src20/tick/[tick]/index.ts";
 import * as $api_v2_src20_tick_index from "./routes/api/v2/src20/tick/index.ts";
 import * as $api_v2_src20_tx_tx_hash_ from "./routes/api/v2/src20/tx/[tx_hash].ts";
@@ -67,8 +67,8 @@ const manifest = {
     "./routes/api/v2/src20/balance/[address]/[tick].ts":
       $api_v2_src20_balance_address_tick_,
     "./routes/api/v2/src20/index.ts": $api_v2_src20_index,
-    "./routes/api/v2/src20/tick/[tick]/deploys.ts":
-      $api_v2_src20_tick_tick_deploys,
+    "./routes/api/v2/src20/tick/[tick]/deploy.ts":
+      $api_v2_src20_tick_tick_deploy,
     "./routes/api/v2/src20/tick/[tick]/index.ts": $api_v2_src20_tick_tick_index,
     "./routes/api/v2/src20/tick/index.ts": $api_v2_src20_tick_index,
     "./routes/api/v2/src20/tx/[tx_hash].ts": $api_v2_src20_tx_tx_hash_,
