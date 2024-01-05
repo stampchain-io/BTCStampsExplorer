@@ -10,7 +10,7 @@ export const handler = async (_req: Request, ctx: HandlerContext): Response => {
         client,
         tick,
       );
-    const mint_status = Src20Class
+    const mint_status = await Src20Class
       .get_src20_minting_progress_by_tick_with_client(
         client,
       );

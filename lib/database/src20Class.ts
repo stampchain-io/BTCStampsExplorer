@@ -355,6 +355,8 @@ export class Src20Class {
       [tick],
       "never",
     );
+
+
     const total_mints = parseInt(total_mints_data.rows[0]["total"]);
 
     const max_supply = BigInt(max_supply_data.rows[0]["max"]);
@@ -368,7 +370,10 @@ export class Src20Class {
       [tick],
       "never",
     );
-    const total_minted = BigInt(total_minted_data.rows[0]["total"]);
+
+    const total_minted_integer = parseInt(total_minted_data.rows[0]["total"]);
+    const total_minted = BigInt(total_minted_integer);
+    
     return {
       max_supply,
       total_minted,
