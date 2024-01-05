@@ -15,8 +15,16 @@ export const handler = async (req: Request, ctx: HandlerContext): Response => {
         limit,
         page,
       );
+    const mint_status = Src20Class
+      .get_src20_minting_progress_by_tick_with_client(
+        client,
+        tick,
+      );
     const body = JSON.stringify({
-      data: deployment.rows[0],
+      data: {
+        ...deployment.rows[0],
+        mint_status,
+      },
     });
     return new Response(body);
   } catch {
