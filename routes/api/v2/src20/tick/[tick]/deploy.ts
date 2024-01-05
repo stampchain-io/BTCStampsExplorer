@@ -1,5 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { connectDb, Src20Class } from "$lib/database/index.ts";
+import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
 import { jsonStringifyBigInt } from "utils/util.ts";
 
 export const handler = async (_req: Request, ctx: HandlerContext): Response => {
@@ -16,10 +16,13 @@ export const handler = async (_req: Request, ctx: HandlerContext): Response => {
         client,
         tick,
       );
+    const last_block = await CommonClass.get_last_block_with_client(client);
+
     const body = jsonStringifyBigInt({
       data: {
         ...deployment.rows[0],
         mint_status,
+        last_block: last_block.rows[0]["last_block"],
       },
     });
     return new Response(body);
