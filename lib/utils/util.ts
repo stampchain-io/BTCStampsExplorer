@@ -96,3 +96,12 @@ export function paginate(total: number, page = 1, limit = 10) {
       total
   };
 }
+
+export function jsonStrinifyBigInt(obj: any) {
+  return JSON.stringify(obj, (key, value) => {
+      if (typeof value === 'bigint') {
+          return value.toString();
+      }
+      return value;
+  });
+}
