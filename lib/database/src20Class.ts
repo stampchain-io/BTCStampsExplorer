@@ -1,6 +1,7 @@
 import { Client } from "$mysql/mod.ts";
 import { SRC20_BALANCE_TABLE, SRC20_TABLE, TTL_CACHE } from "constants";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
+import { divideBigInts } from "utils/bigInt.ts";
 
 export class Src20Class {
   static async get_total_valid_src20_tx_with_client(client: Client) {
@@ -102,7 +103,7 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        AND op = ?
+        WHERE op = ?
         ORDER BY tx_index
         ${limit ? `LIMIT ? OFFSET ?` : ""};
         `,
@@ -336,14 +337,17 @@ export class Src20Class {
     const max_supply_data = await handleSqlQueryWithCache(
       client,
       `
-        SELECT max
+        SELECT max, deci
         FROM ${SRC20_TABLE}
         WHERE tick = ?
         AND op = 'DEPLOY';
         `,
       [tick],
-      "never",
+      0,
     );
+    const max_supply = BigInt(max_supply_data.rows[0]["max"]);
+    const dec = parseInt(max_supply_data.rows[0]["deci"]);
+
     const total_mints_data = await handleSqlQueryWithCache(
       client,
       `
@@ -353,13 +357,11 @@ export class Src20Class {
         AND op = 'MINT';
         `,
       [tick],
-      "never",
+      0,
     );
-
 
     const total_mints = parseInt(total_mints_data.rows[0]["total"]);
 
-    const max_supply = BigInt(max_supply_data.rows[0]["max"]);
     const total_minted_data = await handleSqlQueryWithCache(
       client,
       `
@@ -368,19 +370,22 @@ export class Src20Class {
         WHERE tick = ?
         `,
       [tick],
-      "never",
+      0,
     );
 
     const total_minted_integer = parseInt(total_minted_data.rows[0]["total"]);
     const total_minted = BigInt(total_minted_integer);
-    
+
     return {
-      max_supply,
-      total_minted,
-      total_mints,
+      max_supply: max_supply.toString(),
+      total_minted: total_minted.toString(),
+      total_mints: total_mints,
       progress: `${
-        parseFloat(((total_minted / max_supply) * BigInt(100)).toString())
-          .toFixed(2)
+        parseFloat(
+          (divideBigInts(total_minted, max_supply, dec) * 100)
+            .toString(),
+        )
+          .toFixed(3)
       }%`,
     };
   }

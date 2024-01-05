@@ -1,5 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { connectDb, Src20Class } from "$lib/database/index.ts";
+import { jsonStringifyBigInt } from "utils/util.ts";
 
 export const handler = async (_req: Request, ctx: HandlerContext): Response => {
   const { tick } = ctx.params;
@@ -13,15 +14,17 @@ export const handler = async (_req: Request, ctx: HandlerContext): Response => {
     const mint_status = await Src20Class
       .get_src20_minting_progress_by_tick_with_client(
         client,
+        tick,
       );
-    const body = JSON.stringify({
+    const body = jsonStringifyBigInt({
       data: {
         ...deployment.rows[0],
         mint_status,
       },
     });
     return new Response(body);
-  } catch {
+  } catch (error) {
+    console.error(error);
     const body = JSON.stringify({ error: `Error: Internal server error` });
     return new Response(body);
   }

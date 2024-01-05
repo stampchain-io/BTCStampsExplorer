@@ -1,6 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
-import { paginate } from "$lib/utils/util.ts";
+import { jsonStringifyBigInt, paginate } from "utils/util.ts";
 
 export const handler = async (req: Request, _ctx: HandlerContext): Response => {
   try {
@@ -21,15 +21,16 @@ export const handler = async (req: Request, _ctx: HandlerContext): Response => {
     const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
 
-    const pagination = paginate(total, page, limit);
+    const pagination = paginate(total.rows[0]["total"], page, limit);
 
-    const body = JSON.stringify({
+    const body = jsonStringifyBigInt({
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
       data: data.rows,
     });
     return new Response(body);
-  } catch {
+  } catch (error) {
+    console.error(error);
     const body = JSON.stringify({ error: `Error: Internal server error` });
     return new Response(body);
   }
