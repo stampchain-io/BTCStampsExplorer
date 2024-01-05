@@ -364,7 +364,6 @@ export class Src20Class {
         SELECT SUM(amt) as total
         FROM ${SRC20_BALANCE_TABLE}
         WHERE tick = ?
-        AND op = 'MINT';
         `,
       [tick],
       "never",
