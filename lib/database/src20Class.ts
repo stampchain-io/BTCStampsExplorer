@@ -328,4 +328,56 @@ export class Src20Class {
       1000 * 60 * 2,
     );
   }
+
+  static async get_src20_minting_progress_by_tick_with_client(
+    client: Client,
+    tick: string,
+  ) {
+    const max_supply_data = await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT max
+        FROM ${SRC20_TABLE}
+        WHERE tick = ?
+        AND op = 'DEPLOY';
+        `,
+      [tick],
+      "never",
+    );
+    const total_mints_data = await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT COUNT(*) as total
+        FROM ${SRC20_TABLE}
+        WHERE tick = ?
+        AND op = 'MINT';
+        `,
+      [tick],
+      "never",
+    );
+    const total_mints = parseInt(total_mints_data.rows[0]["total"]);
+
+    const max_supply = BigInt(max_supply_data.rows[0]["max"]);
+    const total_minted_data = await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT SUM(amt) as total
+        FROM ${SRC20_BALANCE_TABLE}
+        WHERE tick = ?
+        AND op = 'MINT';
+        `,
+      [tick],
+      "never",
+    );
+    const total_minted = BigInt(total_minted_data.rows[0]["total"]);
+    return {
+      max_supply,
+      total_minted,
+      total_mints,
+      progress: `${
+        parseFloat(((total_minted / max_supply) * BigInt(100)).toString())
+          .toFixed(2)
+      }%`,
+    };
+  }
 }
