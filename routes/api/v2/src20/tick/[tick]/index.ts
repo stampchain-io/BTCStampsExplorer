@@ -1,6 +1,7 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { connectDb, Src20Class } from "$lib/database/index.ts";
-import { jsonStrinifyBigInt } from "$lib/utils/util.ts";
+import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
+import { paginate } from "utils/util.ts";
+import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
 
 export const handler = async (req: Request, ctx: HandlerContext): Response => {
   const { tick } = ctx.params;
@@ -11,27 +12,30 @@ export const handler = async (req: Request, ctx: HandlerContext): Response => {
     const client = await connectDb();
     const deployment = await Src20Class
       .get_valid_src20_tx_by_tick_with_client(
-        client, 
+        client,
         tick,
         limit,
         page,
       );
-      console.log({...deployment.rows[0]})
+    const total = await Src20Class.get_total_valid_src20_tx_by_tick_with_client(
+      client,
+      tick,
+    );
+    const last_block = await CommonClass.get_last_block_with_client(client);
+    const pagination = paginate(total.rows[0]["total"], page, limit);
     const mint_status = await Src20Class
       .get_src20_minting_progress_by_tick_with_client(
         client,
         tick,
       );
-      //console.log(mint_status)
-    const body = jsonStrinifyBigInt({
-      data: {
-        ...deployment.rows[0],
-        mint_status,
-      },
+    const body = JSON.stringify({
+      data: deployment.rows,
+      mint_status: mint_status,
+      ...pagination,
+      last_block: last_block.rows[0]["last_block"],
     });
-    //console.log(body)
     return new Response(body);
-  } catch(error) {
+  } catch (error) {
     console.log(error);
     const body = JSON.stringify({ error: `Error: Internal server error` });
     return new Response(body);
