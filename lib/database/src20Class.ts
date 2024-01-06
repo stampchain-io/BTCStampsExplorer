@@ -387,4 +387,45 @@ export class Src20Class {
       decimals,
     };
   }
+
+
+  static async get_src20_minting_progress_by_tick_with_client_new(client: Client, tick: string) {
+    const query = `
+        SELECT 
+            src.max,
+            src.deci,
+            COUNT(CASE WHEN src.op = 'MINT' THEN 1 ELSE NULL END) as total_mints,
+            SUM(CASE WHEN balance.tick = ? THEN balance.amt ELSE 0 END) as total_minted
+        FROM 
+            ${SRC20_TABLE} as src
+            LEFT JOIN ${SRC20_BALANCE_TABLE} as balance ON src.tick = balance.tick
+        WHERE 
+            src.tick = ?
+            AND src.op = 'DEPLOY'
+        GROUP BY 
+            src.max, src.deci;
+    `;
+
+    const data = await handleSqlQueryWithCache(client, query, [tick, tick], 0);
+
+    if (data.rows.length === 0) {
+        return null;
+    }
+
+    const row = data.rows[0];
+    const max_supply = new BigFloat(row["max"]);
+    const decimals = parseInt(row["deci"]);
+    const total_mints = parseInt(row["total_mints"]);
+    const total_minted = new BigFloat(row["total_minted"] || 0); 
+    const progress = parseFloat(total_minted.div(max_supply).mul(100)).toFixed(3);
+
+    return {
+        max_supply: max_supply.toString(),
+        total_minted: total_minted.toString(),
+        total_mints: total_mints,
+        progress,
+        decimals,
+    };
+}
+
 }
