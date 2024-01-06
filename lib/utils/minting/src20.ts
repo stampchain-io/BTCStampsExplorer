@@ -3,9 +3,10 @@
 import * as bitcoin from "bitcoin";
 import { crypto } from "crypto";
 import { address_from_pubkeyhash, scramble } from "utils/minting/utils.ts";
+import { connectDb, Src20Class } from "$lib/database/index.ts";
 
 interface SRC20Input {
-  networ: string;
+  network: string;
   utxos: any[];
   changeAddress: string;
   toAddress: string;
@@ -13,6 +14,28 @@ interface SRC20Input {
   transferString: string;
   action: string;
   publicKey: string;
+}
+
+interface IMintSRC20 {
+  recipient: string;
+  tick: string;
+  amount: string;
+}
+
+async function mintSRC20({
+  recipient,
+  tick,
+  amount,
+}: IMintSRC20) {
+  try {
+    const client = await connectDb();
+    const minting_status = await Src20Class
+      .get_src20_minting_progress_by_tick_with_client(
+        client,
+        tick,
+      );
+  } catch (error) {
+  }
 }
 
 export const prepareSendSrc20 = async ({
@@ -25,7 +48,7 @@ export const prepareSendSrc20 = async ({
   transferString,
   action,
   publicKey,
-}) => {
+}: SRC20Input) => {
   const psbtNetwork = network === "testnet"
     ? bitcoin.networks.testnet
     : bitcoin.networks.bitcoin;
