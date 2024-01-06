@@ -1,7 +1,7 @@
 import { Client } from "$mysql/mod.ts";
 import { SRC20_BALANCE_TABLE, SRC20_TABLE, TTL_CACHE } from "constants";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
-import { divideBigInts } from "utils/bigInt.ts";
+import { BigFloat } from "bigfloat/mod.ts";
 
 export class Src20Class {
   static async get_total_valid_src20_tx_with_client(client: Client) {
@@ -345,8 +345,8 @@ export class Src20Class {
       [tick],
       0,
     );
-    const max_supply = BigInt(max_supply_data.rows[0]["max"]);
-    const dec = parseInt(max_supply_data.rows[0]["deci"]);
+    const max_supply = new BigFloat(max_supply_data.rows[0]["max"]);
+    const decimals = parseInt(max_supply_data.rows[0]["deci"]);
 
     const total_mints_data = await handleSqlQueryWithCache(
       client,
@@ -373,20 +373,18 @@ export class Src20Class {
       0,
     );
 
-    const total_minted_integer = parseInt(total_minted_data.rows[0]["total"]);
-    const total_minted = BigInt(total_minted_integer);
+    const total_minted = new BigFloat(total_minted_data.rows[0]["total"]);
+
+    const progress = parseFloat(
+      total_minted.div(max_supply).mul(100),
+    ).toFixed(3);
 
     return {
       max_supply: max_supply.toString(),
       total_minted: total_minted.toString(),
       total_mints: total_mints,
-      progress: `${
-        parseFloat(
-          (divideBigInts(total_minted, max_supply, dec) * 100)
-            .toString(),
-        )
-          .toFixed(3)
-      }%`,
+      progress,
+      decimals,
     };
   }
 }
