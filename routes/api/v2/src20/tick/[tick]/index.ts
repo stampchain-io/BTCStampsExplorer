@@ -24,7 +24,7 @@ export const handler = async (req: Request, ctx: HandlerContext): Response => {
     const last_block = await CommonClass.get_last_block_with_client(client);
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const mint_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client(
+      .get_src20_minting_progress_by_tick_with_client_new(
         client,
         tick,
       );
