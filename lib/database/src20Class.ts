@@ -337,7 +337,7 @@ export class Src20Class {
     const max_supply_data = await handleSqlQueryWithCache(
       client,
       `
-        SELECT max, deci
+        SELECT max, deci, lim
         FROM ${SRC20_TABLE}
         WHERE tick = ?
         AND op = 'DEPLOY';
@@ -347,6 +347,7 @@ export class Src20Class {
     );
     const max_supply = new BigFloat(max_supply_data.rows[0]["max"]);
     const decimals = parseInt(max_supply_data.rows[0]["deci"]);
+    const limit = parseInt(max_supply_data.rows[0]["lim"]);
 
     const total_mints_data = await handleSqlQueryWithCache(
       client,
@@ -385,6 +386,7 @@ export class Src20Class {
       total_mints: total_mints,
       progress,
       decimals,
+      limit,
     };
   }
 }
