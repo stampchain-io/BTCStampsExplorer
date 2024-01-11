@@ -1,6 +1,7 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { connectDb, Src20Class } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
+import { convertToEmoji } from "utils/util.ts";
 
 export const handler = async (req: Request, ctx: HandlerContext): Response => {
   const { block_index } = ctx.params;
@@ -24,7 +25,16 @@ export const handler = async (req: Request, ctx: HandlerContext): Response => {
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const body = JSON.stringify({
       ...pagination,
-      data: valid_src20_txs_in_block.rows,
+      data: valid_src20_txs_in_block.rows.map((tx) => {
+        console.log(convertToEmoji(tx.tick), tx.tick);
+        return {
+          ...tx,
+          tick: convertToEmoji(tx.tick),
+          amt: tx.amt ? tx.amt.toString() : null,
+          lim: tx.lim ? tx.lim.toString() : null,
+          max: tx.max ? tx.max.toString() : null,
+        };
+      }),
     });
     return new Response(body);
   } catch {
