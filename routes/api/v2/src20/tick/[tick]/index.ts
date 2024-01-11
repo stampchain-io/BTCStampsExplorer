@@ -1,7 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
-import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
 
 export const handler = async (req: Request, ctx: HandlerContext): Response => {
   const { tick } = ctx.params;
