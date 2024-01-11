@@ -16,6 +16,39 @@ export class Src20Class {
     );
   }
 
+  static async get_total_valid_src20_tx_from_block_with_client(
+    client: Client,
+    block_index: number,
+  ) {
+    return await handleSqlQueryWithCache(
+      client,
+      `
+    SELECT COUNT(*) AS total
+    FROM ${SRC20_TABLE}
+    WHERE block_index = ?
+    `,
+      [block_index],
+      1000 * 60 * 2,
+    );
+  }
+
+  static async get_total_valid_src20_tx_from_block_by_tick_with_client(
+    client: Client,
+    block_index: number,
+    tick: string,
+  ) {
+    return await handleSqlQueryWithCache(
+      client,
+      `
+    SELECT COUNT(*) AS total
+    FROM ${SRC20_TABLE}
+    WHERE block_index = ? AND tick = ?
+    `,
+      [block_index, tick],
+      1000 * 60 * 2,
+    );
+  }
+
   static async get_valid_src20_tx_with_client(
     client: Client,
     limit = 1000,
@@ -40,6 +73,67 @@ export class Src20Class {
         ${limit ? `LIMIT ? OFFSET ?` : ""};
         `,
       [limit, offset],
+      1000 * 60 * 2,
+    );
+  }
+
+  static async get_valid_src20_tx_from_block_with_client(
+    client: Client,
+    block_index: number,
+    limit = 1000,
+    page = 0,
+  ) {
+    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    return await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT 
+            src20.*,
+            creator_info.creator as creator_name,
+            destination_info.creator as destination_name
+        FROM
+            SRC20Valid src20
+        LEFT JOIN 
+            creator creator_info ON src20.creator = creator_info.address
+        LEFT JOIN
+            creator destination_info ON src20.destination = destination_info.address
+        WHERE src20.block_index = ?
+        ORDER BY
+            src20.tx_index
+        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        `,
+      [block_index, limit, offset],
+      1000 * 60 * 2,
+    );
+  }
+
+  static async get_valid_src20_tx_from_block_by_tick_with_client(
+    client: Client,
+    block_index: number,
+    tick: string,
+    limit = 1000,
+    page = 0,
+  ) {
+    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    return await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT 
+            src20.*,
+            creator_info.creator as creator_name,
+            destination_info.creator as destination_name
+        FROM
+            SRC20Valid src20
+        LEFT JOIN 
+            creator creator_info ON src20.creator = creator_info.address
+        LEFT JOIN
+            creator destination_info ON src20.destination = destination_info.address
+        WHERE src20.block_index = ? AND src20.tick = ?
+        ORDER BY
+            src20.tx_index
+        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        `,
+      [block_index, tick, limit, offset],
       1000 * 60 * 2,
     );
   }
