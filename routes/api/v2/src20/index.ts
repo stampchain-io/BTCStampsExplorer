@@ -1,7 +1,7 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
 import { BigFloat } from "bigfloat/mod.ts";
-import { paginate } from "$lib/utils/util.ts";
+import { convertToEmoji, paginate } from "utils/util.ts";
 
 export const handler = async (req: Request, _ctx: HandlerContext): Response => {
   try {
@@ -27,6 +27,7 @@ export const handler = async (req: Request, _ctx: HandlerContext): Response => {
       data: data.rows.map((row) => {
         return {
           ...row,
+          tick: convertToEmoji(row.tick),
           max: row.max ? new BigFloat(row.max).toString() : null,
           lim: row.lim ? new BigFloat(row.lim).toString() : null,
           amt: row.amt ? new BigFloat(row.amt).toString() : null,

@@ -42,7 +42,7 @@ export class Src20Class {
       `
     SELECT COUNT(*) AS total
     FROM ${SRC20_TABLE}
-    WHERE block_index = ? AND tick = ?
+    WHERE block_index = ? AND tick = CONVERT(? USING utf8mb4) COLLATE utf8mb4_0900_as_ci
     `,
       [block_index, tick],
       1000 * 60 * 2,
@@ -63,7 +63,7 @@ export class Src20Class {
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
-            SRC20Valid src20
+            ${SRC20_TABLE} src20
         LEFT JOIN 
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN 
@@ -92,7 +92,7 @@ export class Src20Class {
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM
-            SRC20Valid src20
+            ${SRC20_TABLE} src20
         LEFT JOIN 
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN
@@ -123,12 +123,12 @@ export class Src20Class {
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM
-            SRC20Valid src20
+            ${SRC20_TABLE} src20
         LEFT JOIN 
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN
             creator destination_info ON src20.destination = destination_info.address
-        WHERE src20.block_index = ? AND src20.tick = ?
+        WHERE src20.block_index = ? AND src20.tick = CONVERT(? USING utf8mb4) COLLATE utf8mb4_0900_as_ci
         ORDER BY
             src20.tx_index
         ${limit ? `LIMIT ? OFFSET ?` : ""};
@@ -142,12 +142,13 @@ export class Src20Class {
     client: Client,
     tick: string,
   ) {
+    console.log({ tick });
     return await handleSqlQueryWithCache(
       client,
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        WHERE tick = ?
+        WHERE tick COLLATE utf8mb4_0900_as_ci = ?
         `,
       [tick],
       1000 * 60 * 2,
@@ -169,13 +170,13 @@ export class Src20Class {
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
-            SRC20Valid src20
+            ${SRC20_TABLE} src20
         LEFT JOIN 
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            src20.tick = ?
+            src20.tick COLLATE utf8mb4_0900_as_ci = ?
         ORDER BY 
             src20.tx_index
         ${limit ? `LIMIT ? OFFSET ?` : ""};
