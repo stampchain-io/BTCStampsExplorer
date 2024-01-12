@@ -26,7 +26,6 @@ export const handler = async (req: Request, ctx: HandlerContext): Response => {
     const body = JSON.stringify({
       ...pagination,
       data: valid_src20_txs_in_block.rows.map((tx) => {
-        console.log(convertToEmoji(tx.tick), tx.tick);
         return {
           ...tx,
           tick: convertToEmoji(tx.tick),
