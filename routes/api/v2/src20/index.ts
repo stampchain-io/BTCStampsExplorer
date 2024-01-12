@@ -25,6 +25,7 @@ export const handler = async (req: Request, _ctx: HandlerContext): Response => {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
       data: data.rows.map((row) => {
+        console.log(row.tick, convertToEmoji(row.tick));
         return {
           ...row,
           tick: convertToEmoji(row.tick),

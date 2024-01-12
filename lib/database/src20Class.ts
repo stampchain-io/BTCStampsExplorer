@@ -114,6 +114,7 @@ export class Src20Class {
     limit = 1000,
     page = 0,
   ) {
+    console.log("tick", tick);
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
     return await handleSqlQueryWithCache(
       client,
@@ -142,7 +143,6 @@ export class Src20Class {
     client: Client,
     tick: string,
   ) {
-    console.log({ tick });
     return await handleSqlQueryWithCache(
       client,
       `
