@@ -40,7 +40,7 @@ export const SUPPORTED_UNICODE = new Set(
 );
 
 export const get_suffix_from_mimetype = (mimetype: string) => {
-  if (!mimetype) return "text";
+  if (!mimetype) return "json";
   const suffix = mimetype.split("/")[1];
   if (suffix === "svg+xml") return "svg";
   if (!suffix) return "json";
