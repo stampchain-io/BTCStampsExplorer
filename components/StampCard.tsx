@@ -98,7 +98,9 @@ export function StampCard(
                 ? "SRC-20"
                 : stamp.ident && stamp.ident === "SRC-721"
                 ? "SRC-721"
-                : stamp.stamp_mimetype.split("/")[1]}
+                : stamp.stamp_mimetype
+                ? stamp.stamp_mimetype.split("/")[1]
+                : "TEXT"}
             </p>
           </div>
         </div>
