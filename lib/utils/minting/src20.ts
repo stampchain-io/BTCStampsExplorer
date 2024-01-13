@@ -49,9 +49,10 @@ async function checkDeployedTick(
 ) {
   try {
     const token_status = await Src20Class
-      .get_total_valid_src20_tx_by_tick_with_client(
+      .get_total_valid_src20_tx_by_tick_with_op_with_client(
         client,
         tick,
+        "DEPLOY",
       );
     console.log(token_status.rows[0]["total"]);
     if (!token_status.rows[0]["total"]) {
@@ -69,9 +70,11 @@ async function checkDeployedTick(
 }
 
 export async function mintSRC20({
-  recipient,
+  toAddress,
+  changeAddress,
+  feeRate,
   tick,
-  amount,
+  amt,
 }: IMintSRC20) {
   try {
     const client = await connectDb();
@@ -79,22 +82,34 @@ export async function mintSRC20({
     const mint_info = await checkMintedOut(
       client,
       tick,
-      amount,
+      amt,
     );
     if (mint_info.minted_out === true) {
       throw new Error("Minted out");
     }
-    if (new BigFloat(amount).gt(mint_info.lim)) {
-      amount = mint_info.lim;
+    if (new BigFloat(amt).gt(mint_info.lim)) {
+      amt = mint_info.lim;
     }
     const src20_mint_obj = {
       op: "MINT",
       p: "SRC-20",
       tick: tick,
-      amt: amount,
+      amt: amt,
     };
-    const src20_string = JSON.stringify(src20_mint_obj, null, 2);
-    console.log(src20_string);
+    const transferString = JSON.stringify(src20_mint_obj, null, 2);
+    const utxos = await getUTXOForAddress(toAddress);
+    const publicKey = await get_public_key_from_address(toAddress);
+    const prepare: IPrepareSRC20TX = {
+      network: bitcoin.networks.bitcoin,
+      utxos,
+      changeAddress,
+      toAddress,
+      feeRate,
+      transferString,
+      publicKey,
+    };
+    const psbtHex = await prepareSendSrc20(prepare);
+    return psbtHex;
   } catch (error) {
     console.error(error);
     throw new Error("Error: Internal server error");
@@ -145,7 +160,7 @@ export async function deploySRC20({
     return psbtHex;
   } catch (error) {
     console.error(error);
-    throw new Error("Error: Internal server error");
+    return null;
   }
 }
 

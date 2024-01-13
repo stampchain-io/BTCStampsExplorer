@@ -1,6 +1,11 @@
 import { deploySRC20 } from "utils/minting/src20.ts";
+import { HandlerContext, Handlers } from "$fresh/runtime.ts";
 
 interface TX {
+  hex: string;
+}
+interface TXError {
+  error: string;
 }
 
 interface inputData {
@@ -15,12 +20,11 @@ interface inputData {
   amt?: number | string;
 }
 
-export const handler: Handlers<TX | null> = {
-  async POST(req, ctx) {
+export const handler: Handlers<TX | TXError> = {
+  async POST(req: Request, _ctx: HandlerContext) {
     const body: inputData = await req.json();
-    console.log(body);
     if (body.op.toLowerCase() === "deploy") {
-      const response = await deploySRC20({
+      const hex = await deploySRC20({
         toAddress: body.toAddress,
         changeAddress: body.changeAddress,
         tick: body.tick,
@@ -29,7 +33,30 @@ export const handler: Handlers<TX | null> = {
         lim: body.lim,
         dec: body.dec,
       });
-      return new Response(JSON.stringify(response));
+      if (hex === null) {
+        return new Response(JSON.stringify({
+          error:
+            `Error: Tick ${body.tick} already exists or error generating tx`,
+        }));
+      }
+      return new Response(JSON.stringify({
+        hex,
+      }));
+    }
+
+    if (body.op.toLowerCase() === "mint") {
+      const hex = await deploySRC20({
+        toAddress: body.toAddress,
+        changeAddress: body.changeAddress,
+        tick: body.tick,
+        feeRate: body.feeRate,
+        max: body.max,
+        lim: body.lim,
+        dec: body.dec,
+      });
+      return new Response(JSON.stringify({
+        hex,
+      }));
     }
   },
 };
