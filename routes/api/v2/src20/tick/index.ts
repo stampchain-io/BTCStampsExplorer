@@ -26,7 +26,14 @@ export const handler = async (req: Request, _ctx: HandlerContext): Response => {
     const body = jsonStringifyBigInt({
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
-      data: data.rows,
+      data: data.rows.map((row) => {
+        return {
+          ...row,
+          max: row.max ? row.max.toString() : null,
+          lim: row.lim ? row.lim.toString() : null,
+          amt: row.amt ? row.amt.toString() : null,
+        };
+      }),
     });
     return new Response(body);
   } catch (error) {

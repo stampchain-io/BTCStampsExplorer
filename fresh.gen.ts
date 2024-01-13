@@ -15,6 +15,8 @@ import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
 import * as $api_v2_issuances_id_ from "./routes/api/v2/issuances/[id].ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
+import * as $api_v2_src20_block_block_index_tick_ from "./routes/api/v2/src20/block/[block_index]/[tick].ts";
+import * as $api_v2_src20_block_block_index_index from "./routes/api/v2/src20/block/[block_index]/index.ts";
 import * as $api_v2_src20_index from "./routes/api/v2/src20/index.ts";
 import * as $api_v2_src20_tick_tick_deploy from "./routes/api/v2/src20/tick/[tick]/deploy.ts";
 import * as $api_v2_src20_tick_tick_index from "./routes/api/v2/src20/tick/[tick]/index.ts";
@@ -30,6 +32,7 @@ import * as $block_index from "./routes/block/index.tsx";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
 import * as $index from "./routes/index.tsx";
+import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
@@ -66,6 +69,10 @@ const manifest = {
       $api_v2_src20_balance_address_,
     "./routes/api/v2/src20/balance/[address]/[tick].ts":
       $api_v2_src20_balance_address_tick_,
+    "./routes/api/v2/src20/block/[block_index]/[tick].ts":
+      $api_v2_src20_block_block_index_tick_,
+    "./routes/api/v2/src20/block/[block_index]/index.ts":
+      $api_v2_src20_block_block_index_index,
     "./routes/api/v2/src20/index.ts": $api_v2_src20_index,
     "./routes/api/v2/src20/tick/[tick]/deploy.ts":
       $api_v2_src20_tick_tick_deploy,
@@ -84,6 +91,7 @@ const manifest = {
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/cursed/index.tsx": $cursed_index,
     "./routes/index.tsx": $index,
+    "./routes/s/[...id].tsx": $s_id_,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/index.tsx": $stamp_index,
     "./routes/wallet/[address].tsx": $wallet_address_,

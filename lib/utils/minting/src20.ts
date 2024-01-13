@@ -1,13 +1,14 @@
-//import * as bitcoin from "npm:@scure/btc-signer@1.1.1";
-//import { Transaction } from "npm:@scure/btc-signer@1.1.1";
 import * as bitcoin from "bitcoin";
 import { crypto } from "crypto";
+import { BigFloat } from "bigfloat/mod.ts";
+import { Client } from "$mysql/mod.ts";
+
 import { address_from_pubkeyhash, scramble } from "utils/minting/utils.ts";
 import { connectDb, Src20Class } from "$lib/database/index.ts";
 
 interface SRC20Input {
   network: string;
-  utxos: any[];
+  utxos: unknown[];
   changeAddress: string;
   toAddress: string;
   feeRate: number;
@@ -22,6 +23,31 @@ interface IMintSRC20 {
   amount: string;
 }
 
+async function checkMintedOut(
+  client: Client,
+  tick: string,
+  amount: string,
+) {
+  try {
+    const mint_status = await Src20Class
+      .get_src20_minting_progress_by_tick_with_client(
+        client,
+        tick,
+      );
+    if (!mint_status) {
+      throw new Error("Tick not found");
+    }
+    const { max_supply, total_minted } = mint_status;
+    if (BigFloat(total_minted).add(BigFloat(amount)).gt(max_supply)) {
+      return { ...mint_status, minted_out: true };
+    }
+    return { ...mint_status, minted_out: false };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error: Internal server error");
+  }
+}
+
 async function mintSRC20({
   recipient,
   tick,
@@ -29,24 +55,39 @@ async function mintSRC20({
 }: IMintSRC20) {
   try {
     const client = await connectDb();
-    const minting_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client(
-        client,
-        tick,
-      );
+
+    const mint_info = await checkMintedOut(
+      client,
+      tick,
+      amount,
+    );
+    if (mint_info.minted_out === true) {
+      throw new Error("Minted out");
+    }
+    if (new BigFloat(amount).gt(mint_info.lim)) {
+      amount = mint_info.lim;
+    }
+    const src20_mint_obj = {
+      op: "MINT",
+      p: "SRC-20",
+      tick: tick,
+      amt: amount,
+    };
+    const src20_string = JSON.stringify(src20_mint_obj, null, 2);
+    console.log(src20_string);
   } catch (error) {
+    console.error(error);
+    throw new Error("Error: Internal server error");
   }
 }
 
 export const prepareSendSrc20 = async ({
-  //wallet,
   network,
   utxos,
   changeAddress,
   toAddress,
   feeRate,
   transferString,
-  action,
   publicKey,
 }: SRC20Input) => {
   const psbtNetwork = network === "testnet"
@@ -169,6 +210,5 @@ export const prepareSendSrc20 = async ({
   });
 
   const psbtHex = psbt.toHex();
-  //const txId = await signAndPushPsbt(wallet, psbtHex, changeAddress, publicKey);
-  return txId;
+  return psbtHex;
 };

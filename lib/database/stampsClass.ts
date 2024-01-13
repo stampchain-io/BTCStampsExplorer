@@ -1,16 +1,12 @@
 import { Client } from "$mysql/mod.ts";
-import {
-  CommonClass,
-  summarize_issuances,
-} from './index.ts';
-import { STAMP_TABLE, TTL_CACHE } from "constants"
-import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "../utils/protocol.ts"
-import { handleSqlQueryWithCache } from "../utils/cache.ts"
-
+import { CommonClass, summarize_issuances } from "./index.ts";
+import { STAMP_TABLE, TTL_CACHE } from "constants";
+import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "../utils/protocol.ts";
+import { handleSqlQueryWithCache } from "../utils/cache.ts";
+import { get_suffix_from_mimetype, getMimeType } from "utils/util.ts";
 
 export class StampsClass {
-
-  static async get_total_stamps_with_client(client: Client){
+  static async get_total_stamps_with_client(client: Client) {
     return await handleSqlQueryWithCache(
       client,
       `
@@ -19,11 +15,14 @@ export class StampsClass {
       WHERE is_btc_stamp IS NOT NULL;
       `,
       [],
-      1000 * 60 * 2
+      1000 * 60 * 2,
     );
-  };
+  }
 
-  static async get_total_stamps_by_ident_with_client(client: Client, ident: SUBPROTOCOLS){
+  static async get_total_stamps_by_ident_with_client(
+    client: Client,
+    ident: SUBPROTOCOLS,
+  ) {
     return await handleSqlQueryWithCache(
       client,
       `
@@ -33,11 +32,15 @@ export class StampsClass {
       AND is_btc_stamp IS NOT NULL;
       `,
       [ident],
-      1000 * 60 * 2
+      1000 * 60 * 2,
     );
-  };
+  }
 
-  static async get_stamps_by_page_with_client(client: Client, limit = 1000, page = 1){
+  static async get_stamps_by_page_with_client(
+    client: Client,
+    limit = 1000,
+    page = 1,
+  ) {
     const offset = (page - 1) * limit;
     return await handleSqlQueryWithCache(
       client,
@@ -50,12 +53,17 @@ export class StampsClass {
         LIMIT ? OFFSET ?;
       `,
       [limit, offset],
-      1000 * 60 * 2
+      1000 * 60 * 2,
     );
-  };
+  }
 
-  static async get_resumed_stamps_by_page_with_client(client: Client, limit = 1000, page = 1, order = "DESC"){
-    order = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+  static async get_resumed_stamps_by_page_with_client(
+    client: Client,
+    limit = 1000,
+    page = 1,
+    order = "DESC",
+  ) {
+    order = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
     const offset = (page - 1) * limit;
     return await handleSqlQueryWithCache(
       client,
@@ -68,11 +76,14 @@ export class StampsClass {
       LIMIT ? OFFSET ?;
       `,
       [limit, offset],
-      1000 * 60 * 2
+      1000 * 60 * 2,
     );
-  };
+  }
 
-  static async get_stamps_by_block_index_with_client(client: Client, block_index: number){
+  static async get_stamps_by_block_index_with_client(
+    client: Client,
+    block_index: number,
+  ) {
     return await handleSqlQueryWithCache(
       client,
       `
@@ -84,11 +95,16 @@ export class StampsClass {
       ORDER BY stamp
       `,
       [block_index],
-      "never"
+      "never",
     );
-  };
+  }
 
-  static async get_stamps_by_ident_with_client(client: Client, ident: SUBPROTOCOLS, limit = 1000, page = 1){
+  static async get_stamps_by_ident_with_client(
+    client: Client,
+    ident: SUBPROTOCOLS,
+    limit = 1000,
+    page = 1,
+  ) {
     const offset = (page - 1) * limit;
     return await handleSqlQueryWithCache(
       client,
@@ -102,11 +118,11 @@ export class StampsClass {
       LIMIT ? OFFSET ?;
       `,
       [ident, limit, offset],
-      1000 * 60 * 2
+      1000 * 60 * 2,
     );
-  };
+  }
 
-  static async get_stamp_by_stamp_with_client(client: Client, stamp: number){
+  static async get_stamp_by_stamp_with_client(client: Client, stamp: number) {
     return await handleSqlQueryWithCache(
       client,
       `
@@ -117,11 +133,14 @@ export class StampsClass {
       ORDER BY st.tx_index;
       `,
       [stamp],
-      TTL_CACHE
+      TTL_CACHE,
     );
-  };
+  }
 
-  static async get_stamp_by_identifier_with_client(client: Client, identifier: string){
+  static async get_stamp_by_identifier_with_client(
+    client: Client,
+    identifier: string,
+  ) {
     return await handleSqlQueryWithCache(
       client,
       `
@@ -131,23 +150,51 @@ export class StampsClass {
       WHERE (st.cpid = ? OR st.tx_hash = ? OR st.stamp_hash = ?);
       `,
       [identifier, identifier, identifier],
-      TTL_CACHE
+      TTL_CACHE,
     );
-  };
+  }
 
-  static async get_stamp_with_client(client: Client, id: string){
+  static async get_stamp_file_by_identifier_with_client(
+    client: Client,
+    identifier: string,
+  ) {
+    const data = await handleSqlQueryWithCache(
+      client,
+      `
+      SELECT tx_hash, stamp_hash, stamp_mimetype, cpid
+      FROM ${STAMP_TABLE}
+      WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?) AND stamp IS NOT NULL;
+      `,
+      [identifier, identifier, identifier],
+      TTL_CACHE,
+    );
+    if (!data) return null;
+    const ext = get_suffix_from_mimetype(data.rows[0].stamp_mimetype);
+    return `${data.rows[0].tx_hash}.${ext}`;
+  }
+
+  static async get_stamp_with_client(client: Client, id: string) {
     let data;
     if (!isNaN(Number(id))) {
-      data = await CommonClass.get_issuances_by_stamp_with_client(client, Number(id));
+      data = await CommonClass.get_issuances_by_stamp_with_client(
+        client,
+        Number(id),
+      );
     } else {
-      data = await CommonClass.get_issuances_by_identifier_with_client(client, id);
+      data = await CommonClass.get_issuances_by_identifier_with_client(
+        client,
+        id,
+      );
     }
     if (!data) return null;
     const stamp = summarize_issuances(data.rows);
     return stamp;
   }
 
-  static async get_cpid_from_identifier_with_client(client: Client, identifier: string){
+  static async get_cpid_from_identifier_with_client(
+    client: Client,
+    identifier: string,
+  ) {
     if (!isNaN(Number(identifier))) {
       return await handleSqlQueryWithCache(
         client,
@@ -156,7 +203,7 @@ export class StampsClass {
         WHERE stamp = ?;
         `,
         [identifier],
-        "never"
+        "never",
       );
     }
     return await handleSqlQueryWithCache(
@@ -166,8 +213,7 @@ export class StampsClass {
       WHERE (cpid = ? OR tx_hash = ?);
       `,
       [identifier, identifier],
-      "never"
+      "never",
     );
-  };
-
+  }
 }
