@@ -12,14 +12,13 @@ interface BlockSendsTableProps {
     block_info: BlockInfo;
     issuances: StampRow[];
     sends: SendRow[];
-  }
+  };
 }
 
 export default function BlockSendsTable(props: BlockSendsTableProps) {
   const { block_info, sends } = props.block;
 
   return (
-
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg max-h-96">
       <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
@@ -44,7 +43,11 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
         </thead>
         <tbody>
           {sends.map((send: SendRow) => {
-            const kind = send.is_btc_stamp ? "stamp" : send.cpid.startsWith("A") ? "cursed" : "named"
+            const kind = send.is_btc_stamp
+              ? "stamp"
+              : send.cpid.startsWith("A")
+              ? "cursed"
+              : "named";
 
             return (
               <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
@@ -54,7 +57,7 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
                   </a>
                 </td>
                 <td class="px-6 py-4">
-                  {send.stamp >= 0 ? send.stamp : "CURSED"}
+                  {send.stamp}
                 </td>
                 <td class="px-6 py-4">
                   <StampKind kind={kind} />
@@ -75,22 +78,21 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
                 </td>
                 <td class="px-6 py-4 text-sm">{send.quantity}</td>
                 <td class="px-6 py-4 text-sm">
-                  {
-                    send.satoshirate ?
-                      `${send.satoshirate / 100000000} BTC` :
-                      '0 BTC'
-                  }
+                  {send.satoshirate
+                    ? `${send.satoshirate / 100000000} BTC`
+                    : "0 BTC"}
                 </td>
                 <td class="px-6 py-4 text-sm">{send.memo}</td>
                 <td class="px-6 py-4 text-sm">{short_address(send.tx_hash)}</td>
                 <td class="px-6 py-4 text-sm">{send.tx_index}</td>
-                <td class="px-6 py-4 text-sm">{dayjs(Number(block_info.block_time)).fromNow()}</td>
+                <td class="px-6 py-4 text-sm">
+                  {dayjs(Number(block_info.block_time)).fromNow()}
+                </td>
               </tr>
             );
           })}
         </tbody>
       </table>
     </div>
-
-  )
+  );
 }

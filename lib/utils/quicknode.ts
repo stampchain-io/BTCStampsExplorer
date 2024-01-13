@@ -12,7 +12,6 @@ export const fetch_quicknode = async (
   retries = 0,
 ) => {
   try {
-    console.log(method, params);
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
     const body = JSON.stringify({
@@ -25,9 +24,7 @@ export const fetch_quicknode = async (
       body: body,
       redirect: "follow",
     };
-    console.log("options", options);
     const response = await fetch(QUICKNODE_URL, options);
-    console.log("response", response);
     if (!response.ok) {
       throw new Error(
         `Error: response for method: ${method} at ${QUICKNODE_ENDPOINT} unsuccessful. Response: ${response.status}`,
@@ -66,7 +63,6 @@ async function get_raw_tx(txHash: string) {
     if (!result) {
       throw new Error(`Error: No result for txHash: ${txHash}`);
     }
-    console.log("get_raw_tx", result);
     return result.result;
   } catch (error) {
     console.error(`ERROR: Error getting raw tx:`, error);
@@ -79,7 +75,6 @@ async function get_decoded_tx(txHex: string) {
   const params = [txHex];
   try {
     const result = await fetch_quicknode(method, params);
-    console.log("decode_tx", result);
     return result.result;
   } catch (error) {
     console.error(`ERROR: Error getting decoded tx:`, error);
@@ -88,7 +83,6 @@ async function get_decoded_tx(txHex: string) {
 }
 
 export async function get_transaction(txHash: string) {
-  console.log("get_transaction", txHash);
   const hex = await get_raw_tx(txHash);
   const tx_data = await get_decoded_tx(hex);
   return { ...tx_data, hex };
