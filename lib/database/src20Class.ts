@@ -155,6 +155,23 @@ export class Src20Class {
     );
   }
 
+  static async get_total_valid_src20_deploy_tx_by_tick_with_client(
+    client: Client,
+    tick: string,
+  ) {
+    return await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT COUNT(*) AS total
+        FROM ${SRC20_TABLE}
+        WHERE tick COLLATE utf8mb4_0900_as_ci = ?
+        AND op = 'DEPLOY'
+        `,
+      [tick],
+      1000 * 60 * 2,
+    );
+  }
+
   static async get_valid_src20_tx_by_tick_with_client(
     client: Client,
     tick: string,

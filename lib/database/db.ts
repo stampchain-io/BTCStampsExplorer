@@ -1,15 +1,5 @@
-import { load } from "$std/dotenv/mod.ts";
 import { Client } from "$mysql/mod.ts";
-
-// Load .env file
-const env_file = Deno.env.get("ENV") === "development"
-  ? "./.env.development.local"
-  : "./.env";
-
-const conf = await load({
-  envPath: env_file,
-  export: true,
-});
+import { conf } from "utils/config.ts";
 
 const maxRetries = parseInt(conf.DB_MAX_RETRIES) || 5;
 const retryInterval = 500;
