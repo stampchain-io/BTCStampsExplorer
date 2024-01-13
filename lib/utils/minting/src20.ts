@@ -132,7 +132,6 @@ export async function deploySRC20({
     //TODO: check if toAddress is the one how pay the party
     const utxos = await getUTXOForAddress(toAddress);
     const publicKey = await get_public_key_from_address(toAddress);
-    console.log(transferString);
     const prepare: IPrepareSRC20TX = {
       network: bitcoin.networks.bitcoin,
       utxos,
@@ -143,7 +142,6 @@ export async function deploySRC20({
       publicKey,
     };
     const psbtHex = await prepareSendSrc20(prepare);
-    console.log(psbtHex);
     return psbtHex;
   } catch (error) {
     console.error(error);
@@ -280,7 +278,6 @@ export const prepareSendSrc20 = async ({
   });
 
   const psbtHex = psbt.toHex();
-  console.log(psbtHex);
   // note!!!!!
   // -- selectSrc20UTXOs needs to be updated to properly estimate fee before going live!
   // -- getTransaction needs to be updated, should use local node probably before going live!
