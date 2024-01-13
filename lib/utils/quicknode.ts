@@ -1,9 +1,7 @@
 import { conf } from "utils/config.ts";
 import { MAX_XCP_RETRIES } from "utils/constants.ts";
 
-//const { QUICKNODE_ENDPOINT, QUICKNODE_API_KEY } = conf;
-const QUICKNODE_ENDPOINT = "https://restless-fittest-cloud.btc.quiknode.pro";
-const QUICKNODE_API_KEY = "bcd1571a0d975dadf4d8be878ebcc15b2bc7fae4";
+const { QUICKNODE_ENDPOINT, QUICKNODE_API_KEY } = conf;
 
 const QUICKNODE_URL = `${QUICKNODE_ENDPOINT}/${QUICKNODE_API_KEY}`;
 export const fetch_quicknode = async (
