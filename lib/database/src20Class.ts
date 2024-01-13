@@ -16,6 +16,39 @@ export class Src20Class {
     );
   }
 
+  static async get_total_valid_src20_tx_from_block_with_client(
+    client: Client,
+    block_index: number,
+  ) {
+    return await handleSqlQueryWithCache(
+      client,
+      `
+    SELECT COUNT(*) AS total
+    FROM ${SRC20_TABLE}
+    WHERE block_index = ?
+    `,
+      [block_index],
+      1000 * 60 * 2,
+    );
+  }
+
+  static async get_total_valid_src20_tx_from_block_by_tick_with_client(
+    client: Client,
+    block_index: number,
+    tick: string,
+  ) {
+    return await handleSqlQueryWithCache(
+      client,
+      `
+    SELECT COUNT(*) AS total
+    FROM ${SRC20_TABLE}
+    WHERE block_index = ? AND tick = CONVERT(? USING utf8mb4) COLLATE utf8mb4_0900_as_ci
+    `,
+      [block_index, tick],
+      1000 * 60 * 2,
+    );
+  }
+
   static async get_valid_src20_tx_with_client(
     client: Client,
     limit = 1000,
@@ -30,7 +63,7 @@ export class Src20Class {
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
-            SRC20Valid src20
+            ${SRC20_TABLE} src20
         LEFT JOIN 
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN 
@@ -44,6 +77,68 @@ export class Src20Class {
     );
   }
 
+  static async get_valid_src20_tx_from_block_with_client(
+    client: Client,
+    block_index: number,
+    limit = 1000,
+    page = 0,
+  ) {
+    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    return await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT 
+            src20.*,
+            creator_info.creator as creator_name,
+            destination_info.creator as destination_name
+        FROM
+            ${SRC20_TABLE} src20
+        LEFT JOIN 
+            creator creator_info ON src20.creator = creator_info.address
+        LEFT JOIN
+            creator destination_info ON src20.destination = destination_info.address
+        WHERE src20.block_index = ?
+        ORDER BY
+            src20.tx_index
+        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        `,
+      [block_index, limit, offset],
+      1000 * 60 * 2,
+    );
+  }
+
+  static async get_valid_src20_tx_from_block_by_tick_with_client(
+    client: Client,
+    block_index: number,
+    tick: string,
+    limit = 1000,
+    page = 0,
+  ) {
+    console.log("tick", tick);
+    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    return await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT 
+            src20.*,
+            creator_info.creator as creator_name,
+            destination_info.creator as destination_name
+        FROM
+            ${SRC20_TABLE} src20
+        LEFT JOIN 
+            creator creator_info ON src20.creator = creator_info.address
+        LEFT JOIN
+            creator destination_info ON src20.destination = destination_info.address
+        WHERE src20.block_index = ? AND src20.tick = CONVERT(? USING utf8mb4) COLLATE utf8mb4_0900_as_ci
+        ORDER BY
+            src20.tx_index
+        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        `,
+      [block_index, tick, limit, offset],
+      1000 * 60 * 2,
+    );
+  }
+
   static async get_total_valid_src20_tx_by_tick_with_client(
     client: Client,
     tick: string,
@@ -53,7 +148,7 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        WHERE tick = ?
+        WHERE tick COLLATE utf8mb4_0900_as_ci = ?
         `,
       [tick],
       1000 * 60 * 2,
@@ -75,13 +170,13 @@ export class Src20Class {
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
-            SRC20Valid src20
+            ${SRC20_TABLE} src20
         LEFT JOIN 
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            src20.tick = ?
+            src20.tick COLLATE utf8mb4_0900_as_ci = ?
         ORDER BY 
             src20.tx_index
         ${limit ? `LIMIT ? OFFSET ?` : ""};
@@ -337,7 +432,7 @@ export class Src20Class {
     const max_supply_data = await handleSqlQueryWithCache(
       client,
       `
-        SELECT max, deci
+        SELECT max, deci, lim
         FROM ${SRC20_TABLE}
         WHERE tick = ?
         AND op = 'DEPLOY';
@@ -347,6 +442,7 @@ export class Src20Class {
     );
     const max_supply = new BigFloat(max_supply_data.rows[0]["max"]);
     const decimals = parseInt(max_supply_data.rows[0]["deci"]);
+    const limit = parseInt(max_supply_data.rows[0]["lim"]);
 
     const total_mints_data = await handleSqlQueryWithCache(
       client,
@@ -385,6 +481,7 @@ export class Src20Class {
       total_mints: total_mints,
       progress,
       decimals,
+      limit,
     };
   }
 
