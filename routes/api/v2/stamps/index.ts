@@ -1,9 +1,11 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { connectDb, StampsClass, CommonClass } from "$lib/database/index.ts";
 import { paginate } from "$lib/utils/util.ts";
+import { PaginatedStampResponseBody, ErrorResponseBody, PaginatedRequest } from "$fresh/globals.d.ts";
 
 
-export const handler = async (req: Request, _ctx: HandlerContext): Response => {
+
+export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Promise<Response> => {
   try {
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
@@ -16,15 +18,15 @@ export const handler = async (req: Request, _ctx: HandlerContext): Response => {
 
     const pagination = paginate(total, page, limit);
 
-    let body = JSON.stringify({
+    const body: PaginatedStampResponseBody = {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
       data: data.rows,
-    });
-    return new Response(body);
+    };
+    return new Response(JSON.stringify(body));
   } catch {
-    let body = JSON.stringify({ error: `Error: Internal server error` });
-    return new Response(body);
+    const body: ErrorResponseBody = { error: `Error: Internal server error` };
+    return new Response(JSON.stringify(body));
   }
 };
  

@@ -1,3 +1,8 @@
+import { HandlerContext } from "$fresh/server.ts";
+
+
+// General Types ---------------------------------------------------------------
+
 type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
 
 interface BlockRow {
@@ -80,7 +85,75 @@ interface SRC20Balance {
   cpid: string;
   p: string;
   tick: string;
-  amt: number;
+  amt: number; 
   block_time: Date;
   last_update: number;
+}
+
+
+// Request Types ---------------------------------------------------------------
+
+export interface PaginationQueryParams {
+  limit?: number;
+  page?: number;
+}
+
+export interface PaginatedRequest extends Request {
+  query: PaginationQueryParams;
+}
+
+
+
+
+// Response Types --------------------------------------------------------------
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  totalPages: number;
+  total: number;
+}
+
+export interface PaginatedStampResponseBody extends Pagination {
+  last_block: number;
+  data: StampRow[];
+}
+
+
+
+export interface IdResponseBody {
+  data: StampRow;
+  last_block: number;
+}
+
+export interface PaginatedIdResponseBody extends Pagination {
+  ident: string | null;
+  last_block: number;
+  data: StampRow[];
+}
+
+
+
+
+export interface ErrorResponseBody {
+  error: string;
+}
+
+export type PaginatedResponseBody = PaginatedStampResponseBody | ErrorResponseBody;
+
+
+
+
+// Handler Contexts ------------------------------------------------------------
+
+export interface IdHandlerContext extends HandlerContext {
+  params: {
+    id: string | number | null; 
+  };
+}
+
+export interface IdentHandlerContext extends HandlerContext {
+  params: {
+    id: string | null; 
+  };
 }

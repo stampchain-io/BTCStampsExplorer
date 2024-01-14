@@ -12,6 +12,7 @@ import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
 import * as $api_v2_cursed_ident_ident_ from "./routes/api/v2/cursed/ident/[ident].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
+import * as $api_v2_interfaces from "./routes/api/v2/interfaces.ts";
 import * as $api_v2_issuances_id_ from "./routes/api/v2/issuances/[id].ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
@@ -31,6 +32,7 @@ import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
+import * as $docs_index from "./routes/docs/index.ts";
 import * as $index from "./routes/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
@@ -64,6 +66,7 @@ const manifest = {
       $api_v2_cursed_block_block_index_,
     "./routes/api/v2/cursed/ident/[ident].ts": $api_v2_cursed_ident_ident_,
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
+    "./routes/api/v2/interfaces.ts": $api_v2_interfaces,
     "./routes/api/v2/issuances/[id].ts": $api_v2_issuances_id_,
     "./routes/api/v2/src20/balance/[address].ts":
       $api_v2_src20_balance_address_,
@@ -90,6 +93,7 @@ const manifest = {
     "./routes/block/index.tsx": $block_index,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/cursed/index.tsx": $cursed_index,
+    "./routes/docs/index.ts": $docs_index,
     "./routes/index.tsx": $index,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/stamp/[id].tsx": $stamp_id_,

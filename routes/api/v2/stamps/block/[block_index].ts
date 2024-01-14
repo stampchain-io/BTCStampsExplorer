@@ -1,6 +1,8 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { connectDb, CommonClass } from "$lib/database/index.ts";
 
+
+
 export const handler = async (_req: Request, ctx: HandlerContext): Response => {
   const { block_index } = ctx.params;
   try {
