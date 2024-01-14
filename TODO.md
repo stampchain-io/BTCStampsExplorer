@@ -16,6 +16,8 @@
     pages and endpoint
     - this is done for /stamps and /stamps/balance/[address]
 - [DONE] create classes for database functions - will make importing/exporting easier and faster
+- [TODO] /stamps/block and /stamps/balance and /block_count doesnt work
+- [TODO] /stamps/block and /stamps/balance and /balance and /cursed pagination
 
 # EXPLORER:
 
@@ -32,6 +34,7 @@
 - [TODO] Work on index page
 - [TODO] Work on stamp page
 - [TODO] tons of work...
+
 
 # SRC20:
 
