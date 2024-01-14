@@ -8,17 +8,8 @@
     "preview": "deno run -A main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update ."
   },
-  "lint": {
-    "rules": {
-      "tags": [
-        "fresh",
-        "recommended"
-      ]
-    }
-  },
-  "exclude": [
-    "**/_fresh/*"
-  ],
+  "lint": { "rules": { "tags": ["fresh", "recommended"] } },
+  "exclude": ["**/_fresh/*"],
   "nodeModulesDir": true,
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.6.1/",
@@ -46,11 +37,11 @@
     "constants": "./lib/utils/constants.ts",
     "utils/": "./lib/utils/",
     "store/": "./lib/store/",
+    "swagger-ui-react": "npm:swagger-ui-react@5.11.0",
+    "deno_swagger_doc": "https://deno.land/x/deno_swagger_doc/mod.ts",
+    "js-yml": "https://deno.land/x/js_yaml_port/js-yaml.js",
     "hooks/": "./islands/hooks/",
     "$/": "./"
   },
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact"
-  }
+  "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" }
 }

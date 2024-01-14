@@ -101,7 +101,7 @@ export function categorizeInput(
   }
 
   // If neither, return "none"
-  return "none";
+  return "none"; 
 }
 
 export function paginate(total: number, page = 1, limit = 10) {
