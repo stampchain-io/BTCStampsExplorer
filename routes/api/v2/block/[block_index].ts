@@ -1,8 +1,16 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { api_get_block } from "$lib/controller/block.ts";
 import { isIntOr32ByteHex } from "$lib/utils/util.ts";
+import {
+  BlockHandlerContext,
+  BlockInfoResponseBody,
+  ErrorResponseBody,
+} from "globals";
 
-export const handler = async (_req: Request, ctx: HandlerContext) => {
+export const handler = async (
+  _req: Request,
+  ctx: BlockHandlerContext,
+): Promise<Response> => {
   const block_index_or_hash = ctx.params.block_index;
 
   if (!isIntOr32ByteHex(block_index_or_hash)) {
@@ -20,7 +28,7 @@ export const handler = async (_req: Request, ctx: HandlerContext) => {
   }
 
   try {
-    const response = await api_get_block(block_index_or_hash);
+    const response: BlockInfoResponseBody = await api_get_block(block_index_or_hash);
     const body = JSON.stringify(response);
     return new Response(body);
   } catch {

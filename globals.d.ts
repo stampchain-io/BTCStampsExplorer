@@ -18,7 +18,7 @@ interface BlockRow {
   issuances?: number;
   sends?: number;
 }
-interface StampRow {
+interface StampRow { 
   stamp: number | null;
   block_index: number;
   cpid: string;
@@ -121,7 +121,7 @@ export interface PaginatedStampResponseBody extends Pagination {
 
 
 
-export interface IdResponseBody {
+export interface StampResponseBody {
   data: StampRow;
   last_block: number;
 }
@@ -142,18 +142,41 @@ export interface ErrorResponseBody {
 export type PaginatedResponseBody = PaginatedStampResponseBody | ErrorResponseBody;
 
 
+export interface BlockInfoResponseBody { 
+  block_info: BlockRow;
+  issuances: StampRow[];
+  sends: SendRow[];
+  last_block: number;
+}
+
+export interface BlockRelatedResponseBody { 
+  blocks: BlockRow[];
+  last_block: number;
+}
 
 
 // Handler Contexts ------------------------------------------------------------
 
 export interface IdHandlerContext extends HandlerContext {
   params: {
-    id: string | number | null; 
+    id: string | number; 
   };
 }
 
 export interface IdentHandlerContext extends HandlerContext {
   params: {
-    id: string | null; 
+    id: string; 
+  };
+}
+
+export interface BlockHandlerContext extends HandlerContext { 
+  params: {
+    block_index: number | number;
+  };
+}
+
+export interface AddressHandlerContext extends HandlerContext { 
+  params: {
+    address: string;
   };
 }

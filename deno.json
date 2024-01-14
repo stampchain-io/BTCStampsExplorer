@@ -37,10 +37,8 @@
     "constants": "./lib/utils/constants.ts",
     "utils/": "./lib/utils/",
     "store/": "./lib/store/",
-    "swagger-ui-react": "npm:swagger-ui-react@5.11.0",
-    "deno_swagger_doc": "https://deno.land/x/deno_swagger_doc/mod.ts",
-    "js-yml": "https://deno.land/x/js_yaml_port/js-yaml.js",
     "hooks/": "./islands/hooks/",
+    "globals": "./globals.d.ts",
     "$/": "./"
   },
   "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" }

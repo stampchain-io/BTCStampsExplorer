@@ -5,45 +5,27 @@ import {
 } from "$lib/database/index.ts";
 import { api_get_related_blocks } from "$lib/controller/block.ts";
 import { isIntOr32ByteHex } from "$lib/utils/util.ts";
+import { BlockRelatedResponseBody, ErrorResponseBody, BlockHandlerContext} from "globals";
 
 export const handler: Handlers = {
-  async GET(_req: Request, ctx: HandlerContext) {
+  async GET(_req: Request, ctx: BlockHandlerContext) {
     const block_index_or_hash = ctx.params.block_index;
 
     if (!isIntOr32ByteHex(block_index_or_hash)) {
-      return new Response(
-        JSON.stringify({
-          error: "Invalid argument provided. Must be an integer or 32 byte hex string.",
-        }),
-        {
-          status: 400, // Bad Request
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const body: ErrorResponseBody = {
+        error: "Invalid argument provided. Must be an integer or 32 byte hex string.",
+      };
+      return new Response(JSON.stringify(body));
     }
 
     try {
-      const blocks = await api_get_related_blocks(block_index_or_hash);
-      return new Response(JSON.stringify(blocks), {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const blocks: BlockRelatedResponseBody = await api_get_related_blocks(block_index_or_hash);
+      return new Response(JSON.stringify(blocks))
     } catch (error) {
-      console.error("Failed to get last blocks:", error);
-      return new Response(
-        JSON.stringify({
-          error: "Failed to retrieve blocks from the database.",
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const body: ErrorResponseBody = {
+        error: `Related blocks not found`,
+      };
+      return new Response(JSON.stringify(body));
     }
   },
 };
