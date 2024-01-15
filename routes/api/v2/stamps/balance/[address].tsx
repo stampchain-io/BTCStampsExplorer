@@ -6,40 +6,35 @@ import {
   AddressHandlerContext,
   ErrorResponseBody,
   PaginatedRequest,
-  PaginatedStampResponseBody,
+  PaginatedStampBalanceResponseBody,
 } from "globals";
 
 export const handler = async (
   _req: PaginatedRequest,
   ctx: AddressHandlerContext,
-): Promise<Response> => {
+): Promise<PaginatedStampBalanceResponseBody> => {
   const { address } = ctx.params;
-  // try {
-  //   const stamps = await api_get_stamp_balance(address);
-  //   const body = JSON.stringify({
-  //     data: stamps,
-  //   });
-  //   return new Response(body);
-  // } catch {
-  //   const body = JSON.stringify({ error: `Error: Internal server error` });
-  //   return new Response(body);
-  // }
   try {
     const url = new URL(_req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
 
-    const data = await api_get_stamp_balance(address, limit, page);
     const client = await connectDb();
+    const data = await CommonClass.get_stamp_balances_by_address_with_client(
+      client,
+      address,
+      limit,
+      page,
+    );
     const total =
-      (await StampsClass.get_total_stamp_balance_with_client(client, address))
+      (await CommonClass.get_total_stamp_balance_with_client(client, address))
         .rows[0]["total"] || 0;
     const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
 
     const pagination = paginate(total, page, limit);
 
-    const body: PaginatedStampResponseBody = {
+    const body: PaginatedStampBalanceResponseBody = {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
       data: data,

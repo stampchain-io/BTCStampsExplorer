@@ -1,6 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
 
-
 // General Types ---------------------------------------------------------------
 
 type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
@@ -18,7 +17,7 @@ interface BlockRow {
   issuances?: number;
   sends?: number;
 }
-interface StampRow { 
+interface StampRow {
   stamp: number | null;
   block_index: number;
   cpid: string;
@@ -48,8 +47,8 @@ interface StampRow {
 interface SendRow {
   from: string;
   to: string;
-  cpid: string|null;
-  tick: string|null;
+  cpid: string | null;
+  tick: string | null;
   memo: string;
   quantity: BigInt;
   tx_hash: string;
@@ -85,11 +84,26 @@ interface SRC20Balance {
   cpid: string;
   p: string;
   tick: string;
-  amt: number; 
+  amt: number;
   block_time: Date;
   last_update: number;
 }
 
+interface StampBalance {
+  cpid: string;
+  stamp: number;
+  stamp_base64: string;
+  stamp_url: string;
+  stamp_mimetype: string;
+  tx_hash: string;
+  is_btc_stamp: 0 | 1 | boolean | null;
+  divisible: 0 | 1;
+  supply: number | string;
+  locked: 0 | 1 | boolean;
+  creator: string;
+  creator_name: string | null;
+  balance: number | string;
+}
 
 // Request Types ---------------------------------------------------------------
 
@@ -101,9 +115,6 @@ export interface PaginationQueryParams {
 export interface PaginatedRequest extends Request {
   query: PaginationQueryParams;
 }
-
-
-
 
 // Response Types --------------------------------------------------------------
 
@@ -119,7 +130,10 @@ export interface PaginatedStampResponseBody extends Pagination {
   data: StampRow[];
 }
 
-
+export interface PaginatedStampBalanceResponseBody extends Pagination {
+  last_block: number;
+  data: StampBalance[];
+}
 
 export interface StampResponseBody {
   data: StampRow;
@@ -132,50 +146,47 @@ export interface PaginatedIdResponseBody extends Pagination {
   data: StampRow[];
 }
 
-
-
-
 export interface ErrorResponseBody {
   error: string;
 }
 
-export type PaginatedResponseBody = PaginatedStampResponseBody | ErrorResponseBody;
+export type PaginatedResponseBody =
+  | PaginatedStampResponseBody
+  | ErrorResponseBody;
 
-
-export interface BlockInfoResponseBody { 
+export interface BlockInfoResponseBody {
   block_info: BlockRow;
   issuances: StampRow[];
   sends: SendRow[];
   last_block: number;
 }
 
-export interface BlockRelatedResponseBody { 
+export interface BlockRelatedResponseBody {
   blocks: BlockRow[];
   last_block: number;
 }
-
 
 // Handler Contexts ------------------------------------------------------------
 
 export interface IdHandlerContext extends HandlerContext {
   params: {
-    id: string | number; 
+    id: string | number;
   };
 }
 
 export interface IdentHandlerContext extends HandlerContext {
   params: {
-    id: string; 
+    id: string;
   };
 }
 
-export interface BlockHandlerContext extends HandlerContext { 
+export interface BlockHandlerContext extends HandlerContext {
   params: {
     block_index: number | number;
   };
 }
 
-export interface AddressHandlerContext extends HandlerContext { 
+export interface AddressHandlerContext extends HandlerContext {
   params: {
     address: string;
   };
