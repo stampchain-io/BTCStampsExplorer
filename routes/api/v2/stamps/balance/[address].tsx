@@ -12,7 +12,7 @@ import {
 export const handler = async (
   _req: PaginatedRequest,
   ctx: AddressHandlerContext,
-): Promise<PaginatedStampBalanceResponseBody> => {
+): Promise<Response> => {
   const { address } = ctx.params;
   try {
     const url = new URL(_req.url);
@@ -33,7 +33,7 @@ export const handler = async (
     client.close();
 
     const pagination = paginate(total, page, limit);
-
+ 
     const body: PaginatedStampBalanceResponseBody = {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],

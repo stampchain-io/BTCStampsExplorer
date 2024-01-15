@@ -17,7 +17,7 @@
     - this is done for /stamps and /stamps/balance/[address]
 - [DONE] create classes for database functions - will make importing/exporting easier and faster
 - [TODO] /stamps/block and /stamps/balance and /block_count doesnt work
-- [TODO] /stamps/block and /stamps/balance and /balance and /cursed pagination
+- [TODO] /balance and /cursed pagination
 
 # EXPLORER:
 
@@ -46,3 +46,42 @@
 - POST[{ "method": "mint"|"transfer"|"deploy", params: [] }]
   - check if is a valid posible tx
   - create unsigned transaction
+
+
+# OPENAPI
+
+## stamps
+[x] /stamps/index
+[x] /stamps/[id]
+[x] /stamps/ident/[ident]
+[x] /stamps/block/[block_index]
+[x] /stamps/balance/[address]
+
+## cursed
+[] /cursed/index
+[] /cursed/[id]
+[] /cursed/ident
+[] /cursed/block/[block_index]
+[] /cursed/balance/[address]
+
+## issuances
+[x] /issuances/[id]
+
+## block
+[x] /block/[block_index]
+[x] /block/related/[block_index]
+[x] /block/block_count/[...number]
+
+## balance
+[x] /balance/address
+
+## src20
+[] /src20/index
+[] /src20/tx/[tx_hash]
+[] /src20/tick
+[] /src20/tick/[tick]
+[] /src20/tick/[tick]/deploy
+[] /src20/block/[block_index]
+[] /src/block/[block_index]/[tick]
+[] /src20/balance/[address]
+[] /src20/balance/[address]/[tick]

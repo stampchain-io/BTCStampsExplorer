@@ -68,6 +68,14 @@ interface BlockInfo {
   sends: SendRow[];
 }
 
+interface BtcInfo {
+  address: string;
+  balance: number;
+  txCount: number;
+  unconfirmedBalance: number;
+  unconfirmedTxCount: number;
+}
+
 interface XCPParams {
   filters?: {
     field: string;
@@ -135,11 +143,26 @@ export interface PaginatedStampBalanceResponseBody extends Pagination {
   data: StampBalance[];
 }
 
+export interface StampsAndSrc20{
+  stamps: StampRow[];
+  src20: SRC20Balance[];
+}
+
+export interface PaginatedBalanceResponseBody extends Pagination {
+  last_block: number;
+  btc: BtcInfo;
+  data: StampsAndSrc20[]
+}
+
 export interface StampResponseBody {
   data: StampRow;
   last_block: number;
 }
 
+export interface StampsResponseBody {
+  data: StampRow[];
+  last_block: number;
+}
 export interface PaginatedIdResponseBody extends Pagination {
   ident: string | null;
   last_block: number;
@@ -153,6 +176,7 @@ export interface ErrorResponseBody {
 export type PaginatedResponseBody =
   | PaginatedStampResponseBody
   | ErrorResponseBody;
+  
 
 export interface BlockInfoResponseBody {
   block_info: BlockRow;
@@ -165,6 +189,14 @@ export interface BlockRelatedResponseBody {
   blocks: BlockRow[];
   last_block: number;
 }
+
+export interface StampBlockResponseBody {
+  block_info: BlockRow;
+  data: StampRow[];
+  last_block: number;
+
+}
+
 
 // Handler Contexts ------------------------------------------------------------
 
@@ -182,7 +214,7 @@ export interface IdentHandlerContext extends HandlerContext {
 
 export interface BlockHandlerContext extends HandlerContext {
   params: {
-    block_index: number | number;
+    block_index: number | string;
   };
 }
 

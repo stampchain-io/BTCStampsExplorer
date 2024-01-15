@@ -22,8 +22,8 @@ export const handler = async (
     const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
     const body: StampResponseBody = {
-      data: data,
       last_block: last_block.rows[0]["last_block"],
+      data: data,
     };
     return new Response(JSON.stringify(body));
   } catch {

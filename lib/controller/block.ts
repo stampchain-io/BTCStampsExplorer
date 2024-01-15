@@ -32,10 +32,10 @@ export async function api_get_block(block_index_or_hash: number | string) {
       block_index_or_hash,
     );
     const response = {
+      last_block: last_block.rows[0]["last_block"],
       block_info: block_info.rows[0],
       issuances: issuances.rows,
       sends: sends.rows,
-      last_block: last_block.rows[0]["last_block"],
     };
     client.close();
     return response;
@@ -63,8 +63,8 @@ export const api_get_related_blocks = async (block_index_or_hash: number | strin
       throw new Error("Could not get last block");
     }
     const response = {
-      blocks,
       last_block: last_block.rows[0]["last_block"],
+      blocks,
     };
     client.close();
     return response;
