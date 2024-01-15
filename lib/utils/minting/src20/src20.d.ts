@@ -1,15 +1,3 @@
-interface UTXO {
-  txid: string;
-  vout: number;
-  status: {
-    confirmed: boolean;
-    block_height: number;
-    block_hash: string;
-    block_time: number;
-  };
-  value: number;
-}
-
 type INETWORK = "mainnet" | "testnet";
 
 interface VOUT {
@@ -29,9 +17,11 @@ interface SRC20Input {
 }
 
 interface IMintSRC20 {
-  recipient: string;
+  toAddress: string;
+  changeAddress: string;
+  feeRate: number;
   tick: string;
-  amount: string;
+  amt: string;
 }
 
 interface IDeploySRC20 {
