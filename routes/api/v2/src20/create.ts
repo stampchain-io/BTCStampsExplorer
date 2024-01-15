@@ -1,4 +1,4 @@
-import { deploySRC20 } from "utils/minting/src20.ts";
+import { deploySRC20 } from "utils/minting/src20/index.ts";
 import { HandlerContext, Handlers } from "$fresh/runtime.ts";
 
 interface TX {
