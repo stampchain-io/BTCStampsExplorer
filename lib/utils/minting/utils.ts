@@ -1,6 +1,9 @@
+import * as bitcore from "npm:bitcore";
+
 export function scramble(key, str) {
   const s = [];
   let j = 0,
+    i = 0,
     x,
     res = "";
   for (let i = 0; i < 256; i++) {
@@ -25,9 +28,31 @@ export function scramble(key, str) {
   return res;
 }
 
+export function hex2bin(hex) {
+  var bytes = [];
+  var str;
+  for (var i = 0; i < hex.length - 1; i += 2) {
+    var ch = parseInt(hex.substr(i, 2), 16);
+    bytes.push(ch);
+  }
+  str = String.fromCharCode.apply(String, bytes);
+  return str;
+}
+
+export function bin2hex(s) {
+  // http://kevin.vanzonneveld.net
+  var i, l, o = "", n;
+  s += "";
+  for (i = 0, l = s.length; i < l; i++) {
+    n = s.charCodeAt(i).toString(16);
+    o += n.length < 2 ? "0" + n : n;
+  }
+  return o;
+}
+
 export function address_from_pubkeyhash(pubkeyhash) {
-  const publicKey = new bitcore.PublicKey(pubkeyhash);
-  const address = bitcore.Address.fromPublicKey(publicKey);
+  const publicKey = new bitcore.default.PublicKey(pubkeyhash);
+  const address = bitcore.default.Address.fromPublicKey(publicKey);
 
   return address.toString();
 }
