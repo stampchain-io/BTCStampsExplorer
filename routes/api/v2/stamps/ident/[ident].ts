@@ -7,6 +7,7 @@ import {
   PaginatedIdResponseBody,
   PaginatedRequest,
 } from "globals";
+import { paginate } from "../../../../../lib/utils/util.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -34,14 +35,13 @@ export const handler = async (
       client,
       ident.toUpperCase(),
     );
+    const pagination = paginate(total, page, limit);
     const last_block = await CommonClass.get_last_block_with_client(client);
     const body: PaginatedIdResponseBody = {
+      ...pagination,
+      last_block: last_block.rows[0]["last_block"],
       ident: ident.toUpperCase(),
       data: data.rows,
-      limit,
-      page,
-      total: total.rows[0]["total"],
-      last_block: last_block.rows[0]["last_block"],
     };
     return new Response(JSON.stringify(body));
   } catch {

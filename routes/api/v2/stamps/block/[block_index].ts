@@ -4,7 +4,7 @@ import { api_get_block } from "$lib/controller/block.ts";
 
 import {
   BlockHandlerContext,
-  BlockInfoResponseBody,
+  StampBlockResponseBody,
   ErrorResponseBody,
 } from "globals";
 
@@ -23,12 +23,11 @@ export const handler = async (
       client,
       block_index,
     );
-    console.log(data);
     const last_block = await CommonClass.get_last_block_with_client(client);
-    const body = {
+    const body: StampBlockResponseBody = {
+      last_block: last_block.rows[0]["last_block"],
       block_info: block_info.rows[0],
       data: data.rows,
-      last_block: last_block.rows[0]["last_block"],
     };
     return new Response(JSON.stringify(body));
   } catch {

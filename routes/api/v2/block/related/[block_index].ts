@@ -17,7 +17,7 @@ export const handler: Handlers = {
       };
       return new Response(JSON.stringify(body));
     }
-
+ 
     try {
       const blocks: BlockRelatedResponseBody = await api_get_related_blocks(block_index_or_hash);
       return new Response(JSON.stringify(blocks))

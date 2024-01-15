@@ -1,5 +1,6 @@
 import { connectDb, Src20Class, CommonClass } from "$lib/database/index.ts";
 import { getBtcAddressInfo } from "../utils/btc.ts";
+import { paginate } from "../utils/util.ts";
 
 export const api_get_stamp_balance = async (address: string, limit = 1000, page = 1) => {
   try {
@@ -68,8 +69,14 @@ export const api_get_src20_balance_by_tick = async (
 };
 
 export const api_get_balance = async (address: string, limit = 1000, page = 1) => {
+  
   try {
     const client = await connectDb();
+    const total =
+      (await CommonClass.get_total_stamp_balance_with_client(client, address))
+        .rows[0]["total"] || 0;
+    const pagination = paginate(total, page, limit);
+
     const btcInfo = await getBtcAddressInfo(address);
     const stamps = await CommonClass.get_stamp_balances_by_address_with_client(
       client,
@@ -83,9 +90,13 @@ export const api_get_balance = async (address: string, limit = 1000, page = 1) =
     );
     await client.close();
     return {
-      stamps,
-      src20: src20.rows,
+      ...pagination,
       btc: btcInfo,
+      data:{
+      stamps: stamps,
+      src20: src20.rows,
+      }
+      
     };
   } catch (error) {
     console.error(error);

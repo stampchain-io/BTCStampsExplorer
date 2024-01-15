@@ -3,7 +3,7 @@ import { CommonClass, connectDb, StampsClass } from "$lib/database/index.ts";
 import {
   ErrorResponseBody,
   IdHandlerContext,
-  StampResponseBody,
+  StampsResponseBody,
 } from "globals";
 
 export const handler = async (
@@ -24,11 +24,11 @@ export const handler = async (
     }
     const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
-    const body: StampResponseBody = JSON.stringify({
-      data: data.rows,
+    const body: StampsResponseBody = {
       last_block: last_block.rows[0]["last_block"],
-    });
-    return new Response(body);
+      data: data.rows,
+    };
+    return new Response(JSON.stringify(body));
   } catch (error) {
     // console.log(error)
     const body: ErrorResponseBody = { error: `Error: Internal server error` };

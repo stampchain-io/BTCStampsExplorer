@@ -32,7 +32,7 @@ export const handler = async (
     const body = JSON.stringify(response);
     return new Response(body);
   } catch {
-    const body = JSON.stringify({ error: `Block: ${block_index_or_hash} not found` });
-    return new Response(body);
+    const body = { error: `Block: ${block_index_or_hash} not found` };
+    return new Response(JSON.stringify(body));
   }
 };

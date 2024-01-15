@@ -402,7 +402,7 @@ export class CommonClass {
           st.stamp_url, 
           st.stamp_mimetype, 
           st.tx_hash, 
-          st.is_btc_stamp, 
+          st.is_btc_stamp,  
           st.divisible, 
           st.supply, 
           st.locked, 

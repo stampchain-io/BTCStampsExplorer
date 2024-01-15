@@ -4,37 +4,30 @@ import {
   Request,
 } from "$fresh/server.ts";
 import { CommonClass, connectDb } from "$lib/database/index.ts";
+import { BlockInfo, ErrorResponseBody, IdHandlerContext} from "globals";
 
 export const handler: Handlers = {
-  async GET(_req: Request, ctx: HandlerContext) {
-    let number = ctx.params.number ? parseInt(ctx.params.number) : 1;
+  async GET(_req: Request, ctx: IdHandlerContext) {
+    const number = ctx.params.number ? parseInt(ctx.params.number) : 1;
 
     if (Number.isNaN(number) || number < 1 || number > 100) {
-      return new Response(JSON.stringify({ error: "Invalid number provided. Must be a number between 1 and 100." }), {
-        status: 400, // Bad Request
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const body: ErrorResponseBody = { error: "Invalid number provided. Must be a number between 1 and 100." }
+      return new Response(JSON.stringify(body));
     }
     
     try {
       const client = await connectDb();
       const lastBlocks = await CommonClass.get_last_x_blocks_with_client(client, number);
       await client.close();
-      return new Response(JSON.stringify(lastBlocks), {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const body: BlockInfo = lastBlocks
+      return new Response(JSON.stringify(body));
     } catch (error) {
       console.error('Failed to get last blocks:', error);
-      return new Response(JSON.stringify({ error: "Failed to retrieve blocks from the database." }), {
-        status: 500, // Internal Server Error
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const body: ErrorResponseBody = {
+        error: `Related blocks not found`,
+      };
+      return new Response(JSON.stringify(body));
+    
     }
   },
 };
