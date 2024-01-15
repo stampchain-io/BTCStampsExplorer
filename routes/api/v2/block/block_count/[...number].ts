@@ -6,6 +6,33 @@ import {
 import { CommonClass, connectDb } from "$lib/database/index.ts";
 import { BlockInfo, ErrorResponseBody, IdHandlerContext} from "globals";
 
+
+/**
+ * @swagger
+ * /api/v2/block/block_count/{number}:
+ *   get:
+ *     summary: Get last blocks
+ *     parameters:
+ *       - in: path
+ *         name: number
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The number of last blocks
+ *     responses:
+ *       '200':
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/BlockInfo'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
 export const handler: Handlers = {
   async GET(_req: Request, ctx: IdHandlerContext) {
     const number = ctx.params.number ? parseInt(ctx.params.number) : 1;

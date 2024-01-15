@@ -7,6 +7,33 @@ import { api_get_related_blocks } from "$lib/controller/block.ts";
 import { isIntOr32ByteHex } from "$lib/utils/util.ts";
 import { BlockRelatedResponseBody, ErrorResponseBody, BlockHandlerContext} from "globals";
 
+
+/**
+ * @swagger
+ * /api/v2/block/related/{block_index}:
+ *   get:
+ *     summary: Get related blocks by block index or block hash
+ *     parameters:
+ *       - in: path
+ *         name: block_index
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The block index or block hash
+ *     responses:
+ *       '200':
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/BlockRelatedResponseBody'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
 export const handler: Handlers = {
   async GET(_req: Request, ctx: BlockHandlerContext) {
     const block_index_or_hash = ctx.params.block_index;

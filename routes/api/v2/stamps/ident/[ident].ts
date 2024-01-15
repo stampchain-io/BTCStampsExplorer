@@ -9,6 +9,52 @@ import {
 } from "globals";
 import { paginate } from "../../../../../lib/utils/util.ts";
 
+
+/**
+ * @swagger
+ * /api/v2/stamps/ident/{ident}:
+ *   get:
+ *     summary: Get stamps by ident
+ *     description: Retrieve stamps based on the provided ident
+ *     parameters:
+ *       - in: path
+ *         name: ident
+ *         required: true
+ *         description: The ident value
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: limit
+ *         description: The maximum number of stamps to retrieve (default: 1000)
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: page
+ *         description: The page number of stamps to retrieve (default: 0)
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       '200':
+ *         description: Successful response with the paginated stamps
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedIdResponseBody'
+ *       '404':
+ *         description: Stamps with the provided ident not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
+
+
 export const handler = async (
   req: PaginatedRequest,
   ctx: IdentHandlerContext,

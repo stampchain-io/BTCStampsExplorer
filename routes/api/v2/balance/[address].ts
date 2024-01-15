@@ -7,6 +7,33 @@ import {
   PaginatedBalanceResponseBody,
 } from "globals";
 
+
+/**
+ * @swagger
+ * /api/v2/balance/{address}:
+ *   get:
+ *     summary: Get balance by address
+ *     parameters:
+ *       - in: path
+ *         name: address
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The address of the wallet
+ *     responses:
+ *       '200':
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedBalanceResponseBody'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
 export const handler = async (_req: PaginatedRequest, ctx: AddressHandlerContext): Promise<Response> => {
   const { address } = ctx.params;
   try {

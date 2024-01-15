@@ -2,8 +2,51 @@ import { HandlerContext } from "$fresh/server.ts";
 import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { convertToEmoji, paginate } from "utils/util.ts";
+import {
+  ErrorResponseBody,
+  PaginatedRequest,
+  PaginatedSrc20ResponseBody,
+} from "globals";
 
-export const handler = async (req: Request, _ctx: HandlerContext): Response => {
+
+/**
+ * @swagger
+ * /api/v2/src20:
+ *   get:
+ *     summary: Get paginated valid src20 transactions
+ *     description: Retrieve paginated valid src20 transactions with optional limit and page parameters
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1000
+ *         description: The maximum number of transactions to retrieve per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: The page number of transactions to retrieve
+ *     responses:
+ *       '200':
+ *         description: Successful response with paginated src20 transactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
+
+
+export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Promise<Response> => {
   try {
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
@@ -19,13 +62,11 @@ export const handler = async (req: Request, _ctx: HandlerContext): Response => {
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
-
     const pagination = paginate(total.rows[0].total, page, limit);
-    const body = JSON.stringify({
+    const body: PaginatedSrc20ResponseBody = {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
-      data: data.rows.map((row) => {
-        console.log(row.tick, convertToEmoji(row.tick));
+      data: data.rows.map((row: any) => {
         return {
           ...row,
           tick: convertToEmoji(row.tick),
@@ -34,11 +75,10 @@ export const handler = async (req: Request, _ctx: HandlerContext): Response => {
           amt: row.amt ? new BigFloat(row.amt).toString() : null,
         };
       }),
-    });
-    return new Response(body);
+    };
+    return new Response(JSON.stringify(body));
   } catch (error) {
-    console.error(error);
-    const body = JSON.stringify({ error: `Error: Internal server error` });
-    return new Response(body);
+    const body: ErrorResponseBody = { error: `Error: Internal server error` };
+    return new Response(JSON.stringify(body));
   }
 };

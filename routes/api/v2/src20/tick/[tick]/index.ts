@@ -2,22 +2,69 @@ import { HandlerContext } from "$fresh/server.ts";
 import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
+import { BigFloat } from "bigfloat/mod.ts";
+import {
+  ErrorResponseBody,
+  PaginatedRequest,
+  PaginatedTickResponseBody,
+  TickHandlerContext,
+} from "globals";
+import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
 
-export const handler = async (req: Request, ctx: HandlerContext): Response => {
-  const { tick: tick_before_conversion } = ctx.params;
+/**
+ * @swagger
+ * /api/v2/src20/tick/{tick}:
+ *   get:
+ *     summary: Get paginated tick data
+ *     description: Retrieve paginated tick data for a specific tick
+ *     parameters:
+ *       - in: path
+ *         name: tick
+ *         required: true
+ *         description: Tick value
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: limit
+ *         description: Number of records per page (default: 1000)
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: page
+ *         description: Page number (default: 1)
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       '200':
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedTickResponseBody'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
+
+export const handler = async (req: PaginatedRequest, ctx: TickHandlerContext): Promise<Response> => {
+  let { tick } = ctx.params;
   try {
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
     const client = await connectDb();
-    const tick = convertEmojiToTick(tick_before_conversion);
+    tick = convertEmojiToTick(tick);
     const src20_txs = await Src20Class
       .get_valid_src20_tx_by_tick_with_client(
         client,
         tick,
-        limit,
+        limit, 
         page,
       );
+
     const total = await Src20Class.get_total_valid_src20_tx_by_tick_with_client(
       client,
       tick,
@@ -29,29 +76,30 @@ export const handler = async (req: Request, ctx: HandlerContext): Response => {
         client,
         tick,
       );
-    const body = JSON.stringify({
-      data: src20_txs.rows.map((tx) => {
+    const body: PaginatedTickResponseBody = {
+      ...pagination,
+      last_block: last_block.rows[0]["last_block"],
+      mint_status: {
+        ...mint_status,
+        max_supply: mint_status.max_supply ? mint_status.max_supply.toString() : null,
+        total_minted: mint_status.total_minted ? mint_status.total_minted.toString() : null,
+        limit: mint_status.limit ? mint_status.limit.toString() : null,
+      },
+      data: src20_txs.rows.map((tx: any) => {
         return {
           ...tx,
           tick: convertToEmoji(tx.tick),
-          amt: tx.amt ? tx.amt.toString() : null,
-          lim: tx.lim ? tx.lim.toString() : null,
-          max: tx.max ? tx.max.toString() : null,
+          max: tx.max ? new BigFloat(tx.max).toString() : null,
+          lim: tx.lim ? new BigFloat(tx.lim).toString() : null,
+          amt: tx.amt ? new BigFloat(tx.amt).toString() : null,
         };
       }),
-      mint_status: {
-        ...mint_status,
-        max_supply: mint_status.max_supply.toString(),
-        total_minted: mint_status.total_minted.toString(),
-        limit: mint_status.limit.toString(),
-      },
-      ...pagination,
-      last_block: last_block.rows[0]["last_block"],
-    });
-    return new Response(body);
+    };
+
+    return new Response(jsonStringifyBigInt(body));
   } catch (error) {
-    console.log(error);
-    const body = JSON.stringify({ error: `Error: Internal server error` });
-    return new Response(body);
+
+    const body: ErrorResponseBody = { error: `Error: Internal server error` };
+    return new Response(JSON.stringify(body));
   }
 };

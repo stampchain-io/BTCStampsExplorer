@@ -76,12 +76,13 @@
 [x] /balance/address
 
 ## src20
-[] /src20/index
-[] /src20/tx/[tx_hash]
-[] /src20/tick
-[] /src20/tick/[tick]
-[] /src20/tick/[tick]/deploy
-[] /src20/block/[block_index]
-[] /src/block/[block_index]/[tick]
-[] /src20/balance/[address]
-[] /src20/balance/[address]/[tick]
+[x] /src20/index
+[] /src20/create
+[x] /src20/tx/[tx_hash]
+[x] /src20/tick
+[x] /src20/tick/[tick]
+[x] /src20/tick/[tick]/deploy
+[x] /src20/block/[block_index]
+[x] /src/block/[block_index]/[tick]
+[x] /src20/balance/[address]
+[x] /src20/balance/[address]/[tick]

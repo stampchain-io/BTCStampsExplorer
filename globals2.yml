@@ -1,0 +1,595 @@
+components:
+  schemas:
+    SUBPROTOCOLS:
+      type: string
+      enum:
+        - STAMP
+        - SRC-20
+        - SRC-721
+    BlockRow:
+      type: object
+      properties:
+        block_index:
+          type: number
+        block_hash:
+          type: string
+        block_time:
+          oneOf:
+            - type: number
+            - type: string
+              format: date-time
+        previous_block_hash:
+          type: string
+        difficulty:
+          type: number
+        ledger_hash:
+          type: string
+        txlist_hash:
+          type: string
+        messages_hash:
+          type: string
+        indexed:
+          type: number
+        issuances:
+          type: number
+        sends:
+          type: number
+    StampRow:
+      type: object
+      properties:
+        stamp:
+          oneOf:
+            - type: number
+            - type: null
+        block_index:
+          type: number
+        cpid:
+          type: string
+        asset_longname:
+          oneOf:
+            - type: string
+            - type: null
+        creator:
+          type: string
+        divisible:
+          type: number
+        keyburn:
+          oneOf:
+            - type: number
+            - type: null
+        locked:
+          type: number
+        message_index:
+          type: number
+        stamp_base64:
+          type: string
+        stamp_mimetype:
+          type: string
+        stamp_url:
+          type: string
+        supply:
+          type: number
+        timestamp:
+          type: string
+          format: date-time
+        tx_hash:
+          type: string
+        tx_index:
+          type: number
+        src_data:
+          type: null
+        ident:
+          $ref: "#/components/schemas/SUBPROTOCOLS"
+        creator_name:
+          oneOf:
+            - type: string
+            - type: null
+        stamp_gen:
+          type: null
+        stamp_hash:
+          type: string
+        is_btc_stamp:
+          oneOf:
+            - type: number
+            - type: null
+        is_reissue:
+          oneOf:
+            - type: number
+            - type: null
+        file_hash:
+          type: string
+    SendRow:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        cpid:
+          oneOf:
+            - type: string
+            - type: null
+        tick:
+          oneOf:
+            - type: string
+            - type: null
+        memo:
+          type: string
+        quantity:
+          type: string
+          format: int64
+        tx_hash:
+          type: string
+        tx_index:
+          type: number
+        block_index:
+          type: number
+    HolderRow:
+      type: object
+      properties:
+        address:
+          type: string
+        quantity:
+          type: number
+        divisible:
+          type: number
+    BlockInfo:
+      type: object
+      properties:
+        block_info:
+          $ref: "#/components/schemas/BlockRow"
+        issuances:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
+        sends:
+          type: array
+          items:
+            $ref: "#/components/schemas/SendRow"
+    BtcInfo:
+      type: object
+      properties:
+        address:
+          type: string
+        balance:
+          type: number
+        txCount:
+          type: number
+        unconfirmedBalance:
+          type: number
+        unconfirmedTxCount:
+          type: number
+    XCPParams:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              op:
+                type: string
+              value:
+                type: string
+        address:
+          type: string
+        asset:
+          type: string
+    SRC20Balance:
+      type: object
+      properties:
+        id:
+          type: string
+        address:
+          type: string
+        cpid:
+          type: string
+        p:
+          type: string
+        tick:
+          type: string
+        amt:
+          type: number
+        block_time:
+          type: string
+          format: date-time
+        last_update:
+          type: number
+    Src20Detail:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+        tx_index:
+          type: number
+        block_index:
+          type: number
+        p:
+          type: string
+        op:
+          type: string
+        tick:
+          type: string
+        creator:
+          type: string
+        amt:
+          oneOf:
+            - type: number
+            - type: null
+        deci:
+          type: number
+        lim:
+          type: string
+        max:
+          type: string
+        destination:
+          type: string
+        block_time:
+          type: string
+        status:
+          oneOf:
+            - type: object
+            - type: null
+        creator_name:
+          oneOf:
+            - type: string
+            - type: null
+        destination_name:
+          type: string
+    StampBalance:
+      type: object
+      properties:
+        cpid:
+          type: string
+        stamp:
+          type: number
+        stamp_base64:
+          type: string
+        stamp_url:
+          type: string
+        stamp_mimetype:
+          type: string
+        tx_hash:
+          type: string
+        is_btc_stamp:
+          oneOf:
+            - type: number
+            - type: boolean
+            - type: null
+        divisible:
+          type: number
+        supply:
+          oneOf:
+            - type: number
+            - type: string
+        locked:
+          oneOf:
+            - type: number
+            - type: boolean
+        creator:
+          type: string
+        creator_name:
+          oneOf:
+            - type: string
+            - type: null
+        balance:
+          oneOf:
+            - type: number
+            - type: string
+    MintStatus:
+      type: object
+      properties:
+        max_supply:
+          type: string
+        total_minted:
+          type: string
+        total_mints:
+          type: number
+        progress:
+          type: string
+        decimals:
+          type: number
+        limit:
+          oneOf:
+            - type: number
+            - type: null
+    PaginationQueryParams:
+      type: object
+      properties:
+        limit:
+          type: number
+        page:
+          type: number
+    PaginatedRequest:
+      type: object
+      properties:
+        query:
+          $ref: "#/components/schemas/PaginationQueryParams"
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+        limit:
+          type: number
+        totalPages:
+          type: number
+        total:
+          type: number
+    PaginatedStampResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
+    PaginatedStampBalanceResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampBalance"
+    PaginatedSrc20ResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Src20Detail"
+    PaginatedTickResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        mint_status:
+          $ref: "#/components/schemas/MintStatus"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Src20Detail"
+    TickResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        mint_status:
+          $ref: "#/components/schemas/MintStatus"
+        data:
+          $ref: "#/components/schemas/Src20Detail"
+    StampsAndSrc20:
+      type: object
+      properties:
+        stamps:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
+        src20:
+          type: array
+          items:
+            $ref: "#/components/schemas/SRC20Balance"
+    Src20ResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          $ref: "#/components/schemas/Src20Detail"
+    Src20BalanceResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Src20Detail"
+    PaginatedBalanceResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        btc:
+          $ref: "#/components/schemas/BtcInfo"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampsAndSrc20"
+    StampResponseBody:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/StampRow"
+        last_block:
+          type: number
+    StampsResponseBody:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
+        last_block:
+          type: number
+    PaginatedIdResponseBody:
+      type: object
+      properties:
+        ident:
+          oneOf:
+            - type: string
+            - type: null
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
+    ErrorResponseBody:
+      type: object
+      properties:
+        error:
+          type: string
+    PaginatedResponseBody:
+      oneOf:
+        - $ref: "#/components/schemas/PaginatedStampResponseBody"
+        - $ref: "#/components/schemas/ErrorResponseBody"
+    BlockInfoResponseBody:
+      type: object
+      properties:
+        block_info:
+          $ref: "#/components/schemas/BlockRow"
+        issuances:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
+        sends:
+          type: array
+          items:
+            $ref: "#/components/schemas/SendRow"
+        last_block:
+          type: number
+    BlockRelatedResponseBody:
+      type: object
+      properties:
+        blocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockRow"
+        last_block:
+          type: number
+    StampBlockResponseBody:
+      type: object
+      properties:
+        block_info:
+          $ref: "#/components/schemas/BlockRow"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
+        last_block:
+          type: number
+    IdHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            id:
+              oneOf:
+                - type: string
+                - type: number
+    IdentHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            ident:
+              type: string
+    BlockHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            block_index:
+              oneOf:
+                - type: number
+                - type: string
+    AddressHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            address:
+              type: string
+    TxHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            tx_hash:
+              type: string
+    TickHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            tick:
+              oneOf:
+                - type: string
+                - type: number
+    BlockTickHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            block_index:
+              oneOf:
+                - type: number
+                - type: string
+            tick:
+              oneOf:
+                - type: string
+                - type: number
+    AddressTickHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            address:
+              type: string
+            tick:
+              oneOf:
+                - type: string
+                - type: number
+    TX:
+      type: object
+      properties:
+        hex:
+          type: string
+    TXError:
+      type: object
+      properties:
+        error:
+          type: string
+    InputData:
+      type: object
+      properties:
+        op:
+          type: string
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        tick:
+          type: string
+        feeRate:
+          type: number
+        max:
+          oneOf:
+            - type: number
+            - type: string
+        lim:
+          oneOf:
+            - type: number
+            - type: string
+        dec:
+          type: number
+        amt:
+          oneOf:
+            - type: number
+            - type: string
