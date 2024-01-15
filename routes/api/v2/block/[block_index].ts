@@ -7,6 +7,33 @@ import {
   ErrorResponseBody,
 } from "globals";
 
+
+/**
+ * @swagger
+ * /api/v2/block/{block_index}:
+ *   get:
+ *     summary: Get block info by block index or block hash
+ *     parameters:
+ *       - in: path
+ *         name: block_index
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The block index or block hash
+ *     responses:
+ *       '200':
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/BlockInfoResponseBody'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
 export const handler = async (
   _req: Request,
   ctx: BlockHandlerContext,

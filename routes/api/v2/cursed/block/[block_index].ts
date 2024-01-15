@@ -6,6 +6,33 @@ import {
   ErrorResponseBody,
 } from "globals";
 
+
+/**
+ * @swagger
+ * /api/v2/cursed/block/{block_index}:
+ *   get:
+ *     summary: Get cursed stamps by block index
+ *     parameters:
+ *       - in: path
+ *         name: block_index
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The block index
+ *     responses:
+ *       '200':
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/StampBlockResponseBody'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
 export const handler = async (
   _req: Request,
   ctx: BlockHandlerContext,

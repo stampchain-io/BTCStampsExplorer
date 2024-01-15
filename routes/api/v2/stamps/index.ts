@@ -7,6 +7,39 @@ import {
   PaginatedStampResponseBody,
 } from "globals";
 
+/**
+ * @swagger
+ * /api/v2/stamps:
+ *   get:
+ *     summary: Get paginated stamps
+ *     description: Retrieve a paginated list of stamps.
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: The maximum number of stamps to return per page. Defaults to 1000.
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The page number to retrieve. Defaults to 1.
+ *     responses:
+ *       '200':
+ *         description: Successful response with paginated stamps.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedStampResponseBody'
+ *       '500':
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
+
+
 export const handler = async (
   req: PaginatedRequest,
   _ctx: HandlerContext,

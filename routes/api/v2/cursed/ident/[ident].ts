@@ -9,6 +9,43 @@ import {
 } from "globals";
 import { paginate } from "../../../../../lib/utils/util.ts";
 
+
+/**
+ * @swagger
+ * /api/v2/cursed/ident/{ident}:
+ *   get:
+ *     summary: Get paginated cursed stamps by ident
+ *     parameters:
+ *       - in: path
+ *         name: ident
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ident of the stamp
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: The maximum number of stamps to retrieve (default: 1000)
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The page number of the results (default: 0)
+ *     responses:
+ *       '200':
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedIdResponseBody'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
 export const handler = async (req: PaginatedRequest, ctx: IdentHandlerContext): Promise<Response> => {
   const { ident } = ctx.params;
   if (!PROTOCOL_IDENTIFIERS.includes(ident.toUpperCase())) {

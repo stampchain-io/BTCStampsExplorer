@@ -1,30 +1,52 @@
 import { deploySRC20 } from "utils/minting/src20/index.ts";
 import { HandlerContext, Handlers } from "$fresh/runtime.ts";
+import {
+  TX,
+  TXError,
+  InputData,
+} from "globals";
 
-interface TX {
-  hex: string;
-}
-interface TXError {
-  error: string;
-}
 
-interface inputData {
-  op: string;
-  toAddress: string;
-  changeAddress: string;
-  tick: string;
-  feeRate: number;
-  max?: number | string;
-  lim?: number | string;
-  dec?: number;
-  amt?: number | string;
-}
+
+/**
+ * @swagger
+ * /api/v2/src20/create:
+ *   post:
+ *     summary: Create a new SRC20 token or mint additional tokens.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/InputData'
+ *     responses:
+ *       '200':
+ *         description: Successful response with the hex value.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 hex:
+ *                   type: string
+ *                   description: The hex value.
+ *       '400':
+ *         description: Bad request error response.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: The error message.
+ */
 
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, _ctx: HandlerContext) {
-    const body: inputData = await req.json();
+    const body: InputData = await req.json();
     if (body.op.toLowerCase() === "deploy") {
-      const hex = await deploySRC20({
+      const hex: string = await deploySRC20({
         toAddress: body.toAddress,
         changeAddress: body.changeAddress,
         tick: body.tick,
@@ -45,7 +67,7 @@ export const handler: Handlers<TX | TXError> = {
     }
 
     if (body.op.toLowerCase() === "mint") {
-      const hex = await deploySRC20({
+      const hex: string = await deploySRC20({
         toAddress: body.toAddress,
         changeAddress: body.changeAddress,
         tick: body.tick,

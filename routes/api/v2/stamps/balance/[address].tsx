@@ -9,6 +9,46 @@ import {
   PaginatedStampBalanceResponseBody,
 } from "globals";
 
+
+/**
+ * @swagger
+ * /balance/{address}:
+ *   get:
+ *     summary: Get stamp balances by address
+ *     description: Retrieve stamp balances for a specific address
+ *     parameters:
+ *       - in: path
+ *         name: address
+ *         required: true
+ *         description: The address to retrieve stamp balances for
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: limit
+ *         description: The maximum number of stamp balances to retrieve (default: 1000)
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: page
+ *         description: The page number of stamp balances to retrieve (default: 1)
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       '200':
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedStampBalanceResponseBody'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
+
+
 export const handler = async (
   _req: PaginatedRequest,
   ctx: AddressHandlerContext,

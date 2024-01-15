@@ -6,6 +6,33 @@ import {
   StampResponseBody,
 } from "globals";
 
+
+/**
+ * @swagger
+ * /api/v2/stamps/issuances/{id}:
+ *   get:
+ *     summary: Get stamp issuances by stamp id or identifier
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The stamp id or identifier
+ *     responses:
+ *       '200':
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/StampResponseBody'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
 export const handler = async (_req: Request, ctx: IdHandlerContext): Promise<Response> => {
   const { id } = ctx.params;
   try {

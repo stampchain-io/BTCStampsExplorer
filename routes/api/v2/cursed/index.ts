@@ -8,6 +8,36 @@ import {
 import { paginate } from "../../../../lib/utils/util.ts";
 
 
+/**
+ * @swagger
+ * /api/v2/cursed:
+ *   get:
+ *     summary: Get paginated cursed stamps
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: The maximum number of stamps to retrieve (default: 1000)
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The page number of the results (default: 0)
+ *     responses:
+ *       '200':
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedStampResponseBody'
+ *       '500':
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponseBody'
+ */
 export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Promise<Response> => {
   try {
     const url = new URL(req.url);
