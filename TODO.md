@@ -58,11 +58,11 @@
 [x] /stamps/balance/[address]
 
 ## cursed
-[] /cursed/index
-[] /cursed/[id]
-[] /cursed/ident
-[] /cursed/block/[block_index]
-[] /cursed/balance/[address]
+[x] /cursed/index
+[x] /cursed/[id]
+[x] /cursed/ident
+[x] /cursed/block/[block_index]
+[x] /cursed/balance/[address]
 
 ## issuances
 [x] /issuances/[id]

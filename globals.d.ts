@@ -208,7 +208,7 @@ export interface IdHandlerContext extends HandlerContext {
 
 export interface IdentHandlerContext extends HandlerContext {
   params: {
-    id: string;
+    ident: string;
   };
 }
 

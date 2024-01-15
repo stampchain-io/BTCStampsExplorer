@@ -1,12 +1,19 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { connectDb, CommonClass, CursedClass } from "$lib/database/index.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
+import {
+  ErrorResponseBody,
+  IdentHandlerContext,
+  PaginatedIdResponseBody,
+  PaginatedRequest,
+} from "globals";
+import { paginate } from "../../../../../lib/utils/util.ts";
 
-export const handler = async (req: Request, ctx: HandlerContext): Response => {
+export const handler = async (req: PaginatedRequest, ctx: IdentHandlerContext): Promise<Response> => {
   const { ident } = ctx.params;
   if (!PROTOCOL_IDENTIFIERS.includes(ident.toUpperCase())) {
-    let body = JSON.stringify({ error: `Error: ident: ${ident} not found` });
-    return new Response(body);
+    const body: ErrorResponseBody = { error: `Error: ident: ${ident} not found` };
+    return new Response(JSON.stringify(body));
   }
   try {
     const url = new URL(req.url);
@@ -16,17 +23,18 @@ export const handler = async (req: Request, ctx: HandlerContext): Response => {
     const data = await CursedClass.get_cursed_by_ident_with_client(client, ident.toUpperCase(), limit, page);
     const total = await CursedClass.get_total_cursed_by_ident_with_client(client, ident.toUpperCase());
     const last_block = await CommonClass.get_last_block_with_client(client);
-    let body = JSON.stringify({
+    const pagination = paginate(total, page, limit);
+    const body: PaginatedIdResponseBody = {
+      ...pagination,
+      last_block: last_block.rows[0]["last_block"],
       ident: ident.toUpperCase(),
       data: data.rows,
-      limit,
-      page,
-      total: total.rows[0]['total'],
-      last_block: last_block.rows[0]['last_block'],
-    });
-    return new Response(body);
+    };
+    return new Response(JSON.stringify(body));
   } catch {
-    let body = JSON.stringify({ error: `Error: stamps with ident: ${ident} not found` });
-    return new Response(body);
+    const body: ErrorResponseBody = {
+      error: `Error: Cursed stamps with ident: ${ident} not found`,
+    };
+    return new Response(JSON.stringify(body));
   }
-};
+}; 

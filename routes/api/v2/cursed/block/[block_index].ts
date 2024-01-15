@@ -1,7 +1,15 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { connectDb, CommonClass, CursedClass } from "$lib/database/index.ts";
+import {
+  BlockHandlerContext,
+  StampBlockResponseBody,
+  ErrorResponseBody,
+} from "globals";
 
-export const handler = async (_req: Request, ctx: HandlerContext): Response => {
+export const handler = async (
+  _req: Request,
+  ctx: BlockHandlerContext,
+): Promise<Response> => {
   const { block_index } = ctx.params;
   try {
     const client = await connectDb();
@@ -9,15 +17,18 @@ export const handler = async (_req: Request, ctx: HandlerContext): Response => {
     const last_block = await CommonClass.get_last_block_with_client(client);
     const cursed = await CursedClass.get_cursed_by_block_index_with_client(client, block_index);
 
-    let body = JSON.stringify(
-      {
-        block_info: block_info.rows[0],
-        data: cursed.rows
-      }
-    );
-    return new Response(body);
+    const body: StampBlockResponseBody = {
+      last_block: last_block.rows[0]["last_block"],
+      block_info: block_info.rows[0],
+      data: cursed.rows,
+    };
+    
+    return new Response(JSON.stringify(body));
   } catch {
-    let body = JSON.stringify({ error: `Block: ${block_index} not found` });
-    return new Response(body);
+    const body: ErrorResponseBody = {
+      error: `Block: ${block_index} not found`,
+    };
+    return new Response(JSON.stringify(body));
   }
 };
+ 
