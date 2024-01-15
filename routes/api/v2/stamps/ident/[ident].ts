@@ -11,7 +11,7 @@ import { paginate } from "../../../../../lib/utils/util.ts";
 
 export const handler = async (
   req: PaginatedRequest,
-  ctx: HandlerContext,
+  ctx: IdentHandlerContext,
 ): Promise<Response> => {
   const { ident } = ctx.params;
   if (!PROTOCOL_IDENTIFIERS.includes(ident.toUpperCase())) {
@@ -51,3 +51,4 @@ export const handler = async (
     return new Response(JSON.stringify(body));
   }
 };
+ 

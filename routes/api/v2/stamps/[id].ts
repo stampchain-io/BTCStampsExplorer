@@ -9,7 +9,7 @@ import {
   ErrorResponseBody,
   IdHandlerContext,
   StampResponseBody,
-} from "globals";
+} from "globals"; 
 
 export const handler = async (
   _req: Request,
