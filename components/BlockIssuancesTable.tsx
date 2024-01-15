@@ -13,7 +13,7 @@ interface BlockIssuancesTableProps {
     block_info: BlockInfo;
     issuances: StampRow[];
     sends: SendRow[];
-  }
+  };
 }
 
 export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
@@ -42,7 +42,11 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
         </thead>
         <tbody>
           {issuances.map((issuance: StampRow) => {
-            const kind = issuance.is_btc_stamp ? "stamp" : issuance.cpid.startsWith("A") ? "cursed" : "named"
+            const kind = issuance.is_btc_stamp
+              ? "stamp"
+              : issuance.cpid.startsWith("A")
+              ? "cursed"
+              : "named";
             return (
               <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                 <td class="px-0.5 py-0.5">
@@ -50,7 +54,7 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
                     <Stamp stamp={issuance} />
                   </a>
                 </td>
-                <td class="px-6 py-4">{issuance.stamp >= 0 ? issuance.stamp : 'CURSED'}</td>
+                <td class="px-6 py-4">{issuance.stamp}</td>
                 <td class="px-6 py-4 text-sm">
                   <StampKind kind={kind} />
                 </td>
@@ -62,17 +66,27 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
                 <td class="px-6 py-4 text-sm">
                   {issuance.creator_name ?? short_address(issuance.creator)}
                 </td>
-                <td class="px-6 py-4 text-sm">{issuance.divisible ? "true" : "false"}</td>
-                <td class="px-6 py-4 text-sm">{issuance.locked ? "true" : "false"}</td>
+                <td class="px-6 py-4 text-sm">
+                  {issuance.divisible ? "true" : "false"}
+                </td>
+                <td class="px-6 py-4 text-sm">
+                  {issuance.locked ? "true" : "false"}
+                </td>
                 <td class="px-6 py-4 text-sm">{issuance.supply}</td>
-                <td class="px-6 py-4 text-sm">{issuance.keyburn ? "true" : "false"}</td>
-                <td class="px-6 py-4 text-sm">{dayjs(Number(block_info.block_time)).fromNow()}</td>
-                <td class="px-6 py-4 text-sm">{issuance.is_reissue ? "true" : "false"}</td>
+                <td class="px-6 py-4 text-sm">
+                  {issuance.keyburn ? "true" : "false"}
+                </td>
+                <td class="px-6 py-4 text-sm">
+                  {dayjs(Number(block_info.block_time)).fromNow()}
+                </td>
+                <td class="px-6 py-4 text-sm">
+                  {issuance.is_reissue ? "true" : "false"}
+                </td>
               </tr>
             );
           })}
         </tbody>
       </table>
     </div>
-  )
+  );
 }

@@ -1,87 +1,24 @@
 import * as bitcoin from "bitcoin";
-import { crypto } from "crypto";
-import { BigFloat } from "bigfloat/mod.ts";
-import { Client } from "$mysql/mod.ts";
+import * as bitcore from "bitcore";
+import * as crypto from "crypto";
+import { Buffer } from "buffer";
 
-import { address_from_pubkeyhash, scramble } from "utils/minting/utils.ts";
-import { connectDb, Src20Class } from "$lib/database/index.ts";
+import {
+  get_public_key_from_address,
+  get_transaction,
+} from "utils/quicknode.ts";
+import {
+  address_from_pubkeyhash,
+  bin2hex,
+  hex2bin,
+  scramble,
+} from "utils/minting/utils.ts";
+import { getUTXOForAddress } from "./utils.ts";
+import { selectUTXOs } from "./utxo-selector.ts";
 
-interface SRC20Input {
-  network: string;
-  utxos: unknown[];
-  changeAddress: string;
-  toAddress: string;
-  feeRate: number;
-  transferString: string;
-  action: string;
-  publicKey: string;
-}
+const DUST_SIZE = 808;
 
-interface IMintSRC20 {
-  recipient: string;
-  tick: string;
-  amount: string;
-}
-
-async function checkMintedOut(
-  client: Client,
-  tick: string,
-  amount: string,
-) {
-  try {
-    const mint_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client(
-        client,
-        tick,
-      );
-    if (!mint_status) {
-      throw new Error("Tick not found");
-    }
-    const { max_supply, total_minted } = mint_status;
-    if (BigFloat(total_minted).add(BigFloat(amount)).gt(max_supply)) {
-      return { ...mint_status, minted_out: true };
-    }
-    return { ...mint_status, minted_out: false };
-  } catch (error) {
-    console.error(error);
-    throw new Error("Error: Internal server error");
-  }
-}
-
-async function mintSRC20({
-  recipient,
-  tick,
-  amount,
-}: IMintSRC20) {
-  try {
-    const client = await connectDb();
-
-    const mint_info = await checkMintedOut(
-      client,
-      tick,
-      amount,
-    );
-    if (mint_info.minted_out === true) {
-      throw new Error("Minted out");
-    }
-    if (new BigFloat(amount).gt(mint_info.lim)) {
-      amount = mint_info.lim;
-    }
-    const src20_mint_obj = {
-      op: "MINT",
-      p: "SRC-20",
-      tick: tick,
-      amt: amount,
-    };
-    const src20_string = JSON.stringify(src20_mint_obj, null, 2);
-    console.log(src20_string);
-  } catch (error) {
-    console.error(error);
-    throw new Error("Error: Internal server error");
-  }
-}
-
-export const prepareSendSrc20 = async ({
+export const prepareSrc20TX = async ({
   network,
   utxos,
   changeAddress,
@@ -89,24 +26,23 @@ export const prepareSendSrc20 = async ({
   feeRate,
   transferString,
   publicKey,
-}: SRC20Input) => {
+}: IPrepareSRC20TX) => {
   const psbtNetwork = network === "testnet"
     ? bitcoin.networks.testnet
     : bitcoin.networks.bitcoin;
   const psbt = new bitcoin.Psbt({ network: psbtNetwork });
   const sortedUtxos = utxos.sort((a, b) => b.value - a.value);
 
-  let vouts = [{ address: toAddress, value: 808 }];
-
+  const vouts = [{ address: toAddress, value: DUST_SIZE }];
   let transferHex = Buffer.from(transferString, "utf-8").toString("hex");
-  let count = (transferHex.length / 2).toString(16);
+  const count = (transferHex.length / 2).toString(16);
   let padding = "";
   for (let i = count.length; i < 4; i++) {
     padding += "0";
   }
   transferHex = padding + count + transferHex;
 
-  let remaining = transferHex.length % (62 * 2);
+  const remaining = transferHex.length % (62 * 2);
   if (remaining > 0) {
     for (let i = 0; i < 62 * 2 - remaining; i++) {
       transferHex += "0";
@@ -126,29 +62,30 @@ export const prepareSendSrc20 = async ({
     let pubkeyhash;
     let address1 = "";
     let address2 = "";
-
+    let hash1;
     while (address1.length == 0) {
       const first_byte = Math.random() > 0.5 ? "02" : "03";
       second_byte = crypto.randomBytes(1).toString("hex");
       pubkeyhash = first_byte + pubkey_seg1 + second_byte;
 
-      if (bitcore.PublicKey.isValid(pubkeyhash)) {
-        var hash1 = pubkeyhash;
+      if (bitcore.default.PublicKey.isValid(pubkeyhash)) {
+        hash1 = pubkeyhash;
         address1 = address_from_pubkeyhash(pubkeyhash);
       }
     }
+    let hash2;
 
     while (address2.length == 0) {
       const first_byte = Math.random() > 0.5 ? "02" : "03";
       second_byte = crypto.randomBytes(1).toString("hex");
       pubkeyhash = first_byte + pubkey_seg2 + second_byte;
 
-      if (bitcore.PublicKey.isValid(pubkeyhash)) {
-        const hash2 = pubkeyhash;
+      if (bitcore.default.PublicKey.isValid(pubkeyhash)) {
+        hash2 = pubkeyhash;
         address2 = address_from_pubkeyhash(pubkeyhash);
       }
     }
-    var data_hashes = [hash1, hash2];
+    const data_hashes = [hash1, hash2];
     return data_hashes;
   });
 
@@ -157,7 +94,7 @@ export const prepareSendSrc20 = async ({
       each[1]
     }2102020202020202020202020202020202020202020202020202020202020202020253ae`;
   });
-  for (let cpScriptHex of cpScripts) {
+  for (const cpScriptHex of cpScripts) {
     vouts.push({
       script: Buffer.from(cpScriptHex, "hex"),
       value: 810,
@@ -169,16 +106,17 @@ export const prepareSendSrc20 = async ({
     feeTotal += vout.value;
   }
 
-  const { inputs, fee, change } = selectSrc20Utxos(sortedUtxos, vouts, feeRate);
+  const { inputs, fee, change } = selectUTXOs(sortedUtxos, vouts, feeRate);
   if (!inputs) {
     throw new Error(`Not enough BTC balance`);
   }
 
-  for (let input of inputs) {
-    const txDetails = await getTransaction(network, input.txid);
+  for (const input of inputs) {
+    const txDetails = await get_transaction(input.txid);
     const inputDetails = txDetails.vout[input.vout];
     const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
-    let psbtInput = {
+
+    const psbtInput = {
       hash: input.txid,
       index: input.vout,
     };
@@ -198,10 +136,9 @@ export const prepareSendSrc20 = async ({
       });
       psbtInput.redeemScript = redeem.output;
     }
-
     psbt.addInput(psbtInput);
   }
-  for (let vout of vouts) {
+  for (const vout of vouts) {
     psbt.addOutput(vout);
   }
   psbt.addOutput({
@@ -210,5 +147,27 @@ export const prepareSendSrc20 = async ({
   });
 
   const psbtHex = psbt.toHex();
+  // note!!!!!
+  // -- selectSrc20UTXOs needs to be updated to properly estimate fee before going live! (more accurate fee estimation now)
+  // -- getTransaction needs to be updated, should use local node probably before going live! (Using quicknode now for getTransaction)
+  // -- this psbt will need to be signed! (Signed on the client side)
   return psbtHex;
 };
+
+// const address = "address_here_to_test";
+// const pubKey = await get_public_key_from_address(address);
+// const utxos = await getUTXOForAddress(address);
+// if (!utxos || utxos.length === 0) {
+//   throw new Error("No UTXO found");
+// }
+// const psbt = await prepareSrc20TX({
+//   network: "mainnet",
+//   utxos,
+//   changeAddress: address,
+//   toAddress: address,
+//   feeRate: 70,
+//   transferString:
+//     '{"p": "src-20","op": "deploy","tick": "PSBT","max": "21000000", "lim": "10000"}',
+//   publicKey: pubKey,
+// });
+// console.log(psbt);
