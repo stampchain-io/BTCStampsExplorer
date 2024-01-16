@@ -31,10 +31,12 @@ const ImageModal = ({ imgSrc, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div class="fixed z-20 inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div
+      onClick={onClose}
+      class="fixed z-20 inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+    >
       <div onClick={(e) => e.stopPropagation()}>
         <img class="w-60 h-60" src={imgSrc} alt="Modal" />
-        <button onClick={onClose}>x</button>
       </div>
     </div>
   );
@@ -45,11 +47,6 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
 
   const [modalImg, setModalImg] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
-
-  const handleImgHover = (imgSrc) => {
-    setModalImg(imgSrc);
-    setModalOpen(true);
-  };
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -96,9 +93,6 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     <img
                       src={`/content/${src20.tx_hash}.svg`}
                       class="w-10 h-10"
-                      onMouseEnter={() =>
-                        handleImgHover(`/content/${src20.tx_hash}.svg`)}
-                      onMouseLeave={handleCloseModal}
                       onClick={() =>
                         handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
                     />
