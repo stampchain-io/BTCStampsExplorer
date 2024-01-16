@@ -5,50 +5,81 @@ import { short_address } from "utils/util.ts";
 interface HoldersInfoProps {
   holders: {}[];
   total_holders: number;
+  total_mints: number;
 }
 export const SRC20HoldersInfo = (props: HoldersInfoProps) => {
-  const { holders, total_holders } = props;
+  const { holders, total_holders, total_mints, total_sends } = props;
   const labels = holders.map((holder) => holder.percentage);
 
   return (
     <div class="mx-auto w-full p-4 flex flex-col md:flex-row space-between">
-      <Chart
-        type="pie"
-        width={350}
-        options={{
-          responsive: true,
-          devicePixelRatio: 1,
-          plugins: {
-            legend: {
-              display: false,
+      <div class="flex flex-col gap-2 items-center w-full text-white">
+        <div class="flex flex-col gap-2 items-center w-full">
+          <div class="text-3xl font-bold text-center">
+            {total_holders}
+          </div>
+          <div class="text-xl font-bold text-center">
+            Total Holders
+          </div>
+        </div>
+        <Chart
+          type="pie"
+          width={350}
+          options={{
+            responsive: true,
+            devicePixelRatio: 1,
+            plugins: {
+              legend: {
+                display: false,
+              },
             },
-          },
-          //scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
-        }}
-        data={{
-          datasets: [{
-            label: "Holders",
-            data: labels,
-            borderColor: transparentize("#fefefe", 0.9),
-            backgroundColor: [
-              transparentize(ChartColors.Red, 0.6),
-              transparentize(ChartColors.Orange, 0.6),
-              transparentize(ChartColors.Yellow, 0.6),
-              transparentize(ChartColors.Green, 0.6),
-              transparentize(ChartColors.Blue, 0.6),
-            ],
-            borderWidth: 1,
-          }],
-        }}
-      />
-      <div class="flex flex-col gap-2 items-center w-full">
-        <div class="text-3xl font-bold text-center">
-          {total_holders}
+          }}
+          data={{
+            datasets: [{
+              label: "Holders",
+              data: labels,
+              borderColor: transparentize("#fefefe", 0.9),
+              backgroundColor: [
+                transparentize(ChartColors.Red, 0.6),
+                transparentize(ChartColors.Orange, 0.6),
+                transparentize(ChartColors.Yellow, 0.6),
+                transparentize(ChartColors.Green, 0.6),
+                transparentize(ChartColors.Blue, 0.6),
+              ],
+              borderWidth: 1,
+            }],
+          }}
+        />
+      </div>
+
+      <div class="flex flex-col gap-2 items-center w-full text-white">
+        <div class="flex flex-row text-center items-center w-full">
+          <div class="flex flex-col gap-2 items-center w-full">
+            <div class="text-3xl font-bold text-center">
+              {total_mints}
+            </div>
+            <div class="text-xl font-bold text-center">
+              Total Mints
+            </div>
+          </div>
+          <div class="flex flex-col gap-2 items-center w-full">
+            <div class="text-3xl font-bold text-center">
+              {total_sends}
+            </div>
+            <div class="text-xl font-bold text-center">
+              Total Sends
+            </div>
+          </div>
+          <div class="flex flex-col gap-2 items-center w-full">
+            <div class="text-3xl font-bold text-center">
+              {total_sends + total_mints}
+            </div>
+            <div class="text-xl font-bold text-center">
+              TXs
+            </div>
+          </div>
         </div>
-        <div class="text-xl font-bold text-center">
-          Total Holders
-        </div>
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg max-h-72 w-full md:px-16">
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg max-h-80 py-4 w-full">
           <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>

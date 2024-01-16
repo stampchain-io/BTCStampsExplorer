@@ -1,5 +1,7 @@
 import { HandlerContext } from "$fresh/server.ts";
-import TickInfo from "$components/src20/TickInfo.tsx";
+import { SRC20TickHeader } from "$components/src20/SRC20TickHeader.tsx";
+import { SRC20HoldersInfo } from "$components/src20/SRC20HoldersInfo.tsx";
+import { SRC20TX } from "$components/src20/SRC20TX.tsx";
 
 import {
   CommonClass,
@@ -14,7 +16,7 @@ export const handler: Handlers<StampRow> = {
     try {
       const { tick } = ctx.params;
       const url = new URL(req.url);
-      const limit = Number(url.searchParams.get("limit")) || 20;
+      const limit = Number(url.searchParams.get("limit")) || 200;
       const page = Number(url.searchParams.get("page")) || 1;
 
       const client = await connectDb();
@@ -59,6 +61,14 @@ export const handler: Handlers<StampRow> = {
         page,
       );
 
+      const total_sends = await Src20Class
+        .get_total_valid_src20_tx_by_tick_with_op_with_client(
+          client,
+          tick,
+          "TRANSFER",
+        );
+      console.log(total_sends);
+
       const last_block = await CommonClass.get_last_block_with_client(client);
 
       client.close();
@@ -71,13 +81,14 @@ export const handler: Handlers<StampRow> = {
             lim: row.lim ? row.lim.toString() : null,
             amt: row.amt ? row.amt.toString() : null,
           };
-        }),
+        })[0],
         sends: sends.rows.map((row) => {
           return {
             ...row,
             amt: row.amt ? row.amt.toString() : null,
           };
         }),
+        total_sends: total_sends.rows[0]["total"],
         mints: mints.rows.map((row) => {
           return {
             ...row,
@@ -122,16 +133,24 @@ export const SRC20TickPage = (props) => {
     holders,
     mint_status,
     last_block,
+    total_sends,
   } = props.data;
-
+  console.log(mint_status);
   return (
-    <div class="text-white">
-      <TickInfo
+    <div class="flex flex-col gap-2">
+      <SRC20TickHeader
         deployment={deployment}
         mint_status={mint_status}
         total_holders={total_holders}
-        holders={holders}
       />
+      <SRC20HoldersInfo
+        holders={holders}
+        total_holders={total_holders}
+        total_mints={mint_status.total_mints}
+        total_sends={total_sends}
+      />
+      <SRC20TX txs={sends} type="TRANSFER" />
+      <SRC20TX txs={mints} type="MINT" />
     </div>
   );
 };
