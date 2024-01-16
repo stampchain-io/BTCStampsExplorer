@@ -76,6 +76,15 @@ export function Header() {
             Stamps
           </a>
           <a
+            href="/src20"
+            f-partial={"/src20"}
+            class={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
+              path === "src20" ? activeClass : inactiveClass
+            }`}
+          >
+            SRC20
+          </a>
+          <a
             href="/cursed"
             f-partial={"/cursed"}
             class={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
