@@ -178,6 +178,7 @@ export class Src20Class {
     op = "DEPLOY",
     limit = 1000,
     page = 0,
+    order = "ASC",
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
     return await handleSqlQueryWithCache(
@@ -197,7 +198,7 @@ export class Src20Class {
             src20.tick COLLATE utf8mb4_0900_as_ci = ?
             AND src20.op = ?
         ORDER BY 
-            src20.tx_index
+            src20.tx_index ${order}
         ${limit ? `LIMIT ? OFFSET ?` : ""};
         `,
       [tick, op, limit, offset],
