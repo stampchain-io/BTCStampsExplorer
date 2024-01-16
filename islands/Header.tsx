@@ -9,6 +9,8 @@ export function Header() {
     path = (window?.location?.pathname)?.split("/")[1];
   }
   const toggleMenu = () => {
+    const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobileScreen) return;
     setOpen(!open);
     document.body.style.overflow = !open ? "hidden" : "";
   };
