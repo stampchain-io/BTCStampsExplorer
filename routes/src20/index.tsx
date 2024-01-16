@@ -34,7 +34,6 @@ export const handler = {
         data: data.rows.map((row) => {
           return {
             ...row,
-            tick: convertToEmoji(row.tick),
             max: row.max ? row.max.toString() : null,
             lim: row.lim ? row.lim.toString() : null,
             amt: row.amt ? row.amt.toString() : null,
