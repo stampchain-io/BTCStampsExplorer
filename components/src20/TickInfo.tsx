@@ -20,7 +20,8 @@ export const TickInfo = ({
         src={`/content/${deployment.tx_hash}.svg`}
         class="w-full h-full md:w-60 md:h-60"
       />
-      <div class="relative overflow-x-auto shadow-md sm:rounded-lg flex flex-col md:flex-row gap-4 items-center justify-center">
+
+      <div class="relative w-full overflow-x-auto shadow-md sm:rounded-lg">
         <table class="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 uppercase">
           <tbody>
             <tr class="border-b">
