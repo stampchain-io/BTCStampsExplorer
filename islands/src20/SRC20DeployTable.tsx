@@ -84,6 +84,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
           </thead>
           <tbody>
             {data.map((src20: SRC20Row) => {
+              const href = `/src20/${convertToEmoji(src20.tick)}`;
               return (
                 <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                   <td class="px-6 py-4 uppercase">
@@ -98,7 +99,9 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     />
                   </td>
                   <td class="px-6 py-4 uppercase">
-                    {convertToEmoji(src20.tick)}
+                    <a href={href}>
+                      {convertToEmoji(src20.tick)}
+                    </a>
                   </td>
                   <td class="px-6 py-4">
                     {src20.block_index}
