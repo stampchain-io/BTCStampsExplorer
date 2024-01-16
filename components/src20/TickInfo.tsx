@@ -14,12 +14,11 @@ export const TickInfo = ({
   }
 
   deployment = deployment[0];
-  console.log(mint_status);
   return (
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg flex flex-col md:flex-row gap-4 items-center justify-center">
       <img
         src={`/content/${deployment.tx_hash}.svg`}
-        class="w-20 h-20"
+        class="w-full h-full md:w-20 md:h-20"
       />
       <table class="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 uppercase">
         <tbody>
