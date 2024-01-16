@@ -60,10 +60,13 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                   {src20.row_num}
                 </td>
                 <td class="px-6 py-4 uppercase">
-                  {convertToEmoji(src20.tick)}
+                  <img
+                    src={`/content/${src20.tx_hash}.svg`}
+                    class="w-10 h-10"
+                  />
                 </td>
                 <td class="px-6 py-4 uppercase">
-                  <img src={`/content/${src20.tx_hash}.svg`} class="w-6 h-6" />
+                  {convertToEmoji(src20.tick)}
                 </td>
                 <td class="px-6 py-4">
                   {src20.block_index}
