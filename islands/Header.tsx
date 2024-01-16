@@ -60,6 +60,7 @@ export function Header() {
           <a
             href="/block/last"
             f-partial={"/block/last"}
+            onClick={toggleMenu}
             class={`p-2 lg:px-4 md:mx-2 hover:text-gray-700 transition-colors duration-300 ${
               path === "block" ? activeClass : inactiveClass
             }`}
@@ -69,6 +70,7 @@ export function Header() {
           <a
             href="/stamp"
             f-partial={"/stamp"}
+            onClick={toggleMenu}
             class={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
               path === "stamp" ? activeClass : inactiveClass
             }`}
@@ -78,6 +80,7 @@ export function Header() {
           <a
             href="/src20"
             f-partial={"/src20"}
+            onClick={toggleMenu}
             class={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
               path === "src20" ? activeClass : inactiveClass
             }`}
@@ -87,6 +90,7 @@ export function Header() {
           <a
             href="/cursed"
             f-partial={"/cursed"}
+            onClick={toggleMenu}
             class={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
               path === "cursed" ? activeClass : inactiveClass
             }`}
