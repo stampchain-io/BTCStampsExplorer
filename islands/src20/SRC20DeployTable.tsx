@@ -31,10 +31,9 @@ const ImageModal = ({ imgSrc, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="fixed z-20 inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-4">
-        <img src={imgSrc} alt="Modal" />
-        <button onClick={onClose}>Close</button>
+        <img class="w-40 h-40" src={imgSrc} alt="Modal" />
       </div>
     </div>
   );
