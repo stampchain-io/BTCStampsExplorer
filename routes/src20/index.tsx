@@ -51,7 +51,6 @@ export const handler = {
 
 export function SRC20Page(props) {
   const { data, total, page, pages, limit } = props.data;
-  console.log([data[42], data[328]]);
   return (
     <div>
       <SRC20DeployTable data={data} />
