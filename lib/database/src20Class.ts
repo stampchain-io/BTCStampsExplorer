@@ -235,6 +235,7 @@ export class Src20Class {
       client,
       `
         SELECT 
+            (@row_number:=@row_number + 1) AS row_num,
             src20.*,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
@@ -244,13 +245,15 @@ export class Src20Class {
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
+        CROSS JOIN
+            (SELECT @row_number := ? - 1) AS init
         WHERE 
             src20.op = ?
         ORDER BY 
             src20.tx_index
         ${limit ? `LIMIT ? OFFSET ?` : ""};
         `,
-      [op, limit, offset],
+      [offset, op, limit, offset],
       1000 * 60 * 2,
     );
   }
