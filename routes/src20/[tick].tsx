@@ -38,14 +38,16 @@ export const handler: Handlers<StampRow> = {
           "MINT",
           limit,
           page,
+          "DESC",
         );
       const sends = await Src20Class
         .get_valid_src20_tx_by_tick_with_op_with_client(
           client,
           tick,
-          "SEND",
+          "TRANSFER",
           limit,
           page,
+          "DESC",
         );
       const total_holders = await Src20Class
         .get_total_src20_holders_by_tick_with_client(
@@ -67,11 +69,17 @@ export const handler: Handlers<StampRow> = {
           tick,
           "TRANSFER",
         );
-      console.log(total_sends);
+      const total_mints = await Src20Class
+        .get_total_valid_src20_tx_by_tick_with_op_with_client(
+          client,
+          tick,
+          "MINT",
+        );
 
       const last_block = await CommonClass.get_last_block_with_client(client);
 
       client.close();
+      set_precision(-4);
       const body = {
         last_block: last_block.rows[0]["last_block"],
         deployment: deployment.rows.map((row) => {
@@ -85,16 +93,17 @@ export const handler: Handlers<StampRow> = {
         sends: sends.rows.map((row) => {
           return {
             ...row,
-            amt: row.amt ? row.amt.toString() : null,
+            amt: row.amt ? new BigFloat(row.amt).toString() : null,
           };
         }),
         total_sends: total_sends.rows[0]["total"],
         mints: mints.rows.map((row) => {
           return {
             ...row,
-            amt: row.amt ? row.amt.toString() : null,
+            amt: row.amt ? new BigFloat(row.amt).toString() : null,
           };
         }),
+        total_mints: total_mints.rows[0]["total"],
         total_holders: total_holders.rows[0]["total"],
         holders: holders.rows.map((row) => {
           const percentage = new BigFloat(row.amt).mul(100).div(
@@ -132,10 +141,11 @@ export const SRC20TickPage = (props) => {
     total_holders,
     holders,
     mint_status,
+    total_mints,
     last_block,
     total_sends,
   } = props.data;
-  console.log(mint_status);
+  console.log({ deployment });
   return (
     <div class="flex flex-col gap-2">
       <SRC20TickHeader
@@ -146,7 +156,7 @@ export const SRC20TickPage = (props) => {
       <SRC20HoldersInfo
         holders={holders}
         total_holders={total_holders}
-        total_mints={mint_status.total_mints}
+        total_mints={total_mints}
         total_sends={total_sends}
       />
       <SRC20TX txs={sends} type="TRANSFER" />
