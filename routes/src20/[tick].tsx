@@ -55,7 +55,7 @@ export const handler: Handlers<StampRow> = {
         client,
         tick,
         1,
-        limit,
+        0,
         page,
       );
 
@@ -130,6 +130,7 @@ export const SRC20TickPage = (props) => {
         deployment={deployment}
         mint_status={mint_status}
         total_holders={total_holders}
+        holders={holders}
       />
     </div>
   );
