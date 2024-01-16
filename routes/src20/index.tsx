@@ -2,7 +2,8 @@ import { HandlerContext } from "$fresh/server.ts";
 
 import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
 import { convertToEmoji, paginate } from "utils/util.ts";
-import { SRC20DeployTable } from "$components/SRC20DeployTable.tsx";
+//import { SRC20DeployTable } from "$components/SRC20DeployTable.tsx";
+import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
 
 export const handler = {
   async GET(req: Request, ctx: HandlerContext) {

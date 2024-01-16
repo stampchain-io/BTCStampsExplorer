@@ -50,6 +50,7 @@ import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
+import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -115,6 +116,7 @@ const manifest = {
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
+    "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
