@@ -3,17 +3,24 @@ import * as bitcore from "bitcore";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
 
+// HEAD
 import {
   get_public_key_from_address,
   get_transaction,
 } from "utils/quicknode.ts";
+//
+import { get_transaction } from "utils/quicknode.ts";
+//ja_src20
 import {
   address_from_pubkeyhash,
   bin2hex,
   hex2bin,
   scramble,
 } from "utils/minting/utils.ts";
+// HEAD
 import { getUTXOForAddress } from "./utils.ts";
+//
+//ja_src20
 import { selectUTXOs } from "./utxo-selector.ts";
 
 const DUST_SIZE = 808;
@@ -34,7 +41,14 @@ export const prepareSrc20TX = async ({
   const sortedUtxos = utxos.sort((a, b) => b.value - a.value);
 
   const vouts = [{ address: toAddress, value: DUST_SIZE }];
+  // HEAD
   let transferHex = Buffer.from(transferString, "utf-8").toString("hex");
+  //
+  let transferHex = Buffer.from(`${"stamp:"}${transferString}`, "utf-8")
+    .toString(
+      "hex",
+    );
+  //ja_src20
   const count = (transferHex.length / 2).toString(16);
   let padding = "";
   for (let i = count.length; i < 4; i++) {
@@ -148,10 +162,14 @@ export const prepareSrc20TX = async ({
 
   const psbtHex = psbt.toHex();
   // note!!!!!
-  // -- selectSrc20UTXOs needs to be updated to properly estimate fee before going live! (more accurate fee estimation now)
+  // -- selectSrc20UTXOs needs to be updated to properly estimate fee before going live! (more accurate fee estimation now with sigops estimated with 2.5X)
   // -- getTransaction needs to be updated, should use local node probably before going live! (Using quicknode now for getTransaction)
   // -- this psbt will need to be signed! (Signed on the client side)
-  return psbtHex;
+  return {
+    hex: psbtHex,
+    fee: fee,
+    change: change,
+  };
 };
 
 // const address = "address_here_to_test";

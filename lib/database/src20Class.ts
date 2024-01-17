@@ -172,6 +172,40 @@ export class Src20Class {
     );
   }
 
+  static async get_valid_src20_tx_by_tick_with_op_with_client(
+    client: Client,
+    tick: string,
+    op = "DEPLOY",
+    limit = 1000,
+    page = 0,
+    order = "ASC",
+  ) {
+    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    return await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT
+            src20.*,
+            creator_info.creator as creator_name,
+            destination_info.creator as destination_name
+        FROM 
+            ${SRC20_TABLE} src20
+        LEFT JOIN 
+            creator creator_info ON src20.creator = creator_info.address
+        LEFT JOIN 
+            creator destination_info ON src20.destination = destination_info.address
+        WHERE 
+            src20.tick COLLATE utf8mb4_0900_as_ci = ?
+            AND src20.op = ?
+        ORDER BY 
+            src20.tx_index ${order}
+        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        `,
+      [tick, op, limit, offset],
+      1000 * 60 * 2,
+    );
+  }
+
   static async get_valid_src20_tx_by_tick_with_client(
     client: Client,
     tick: string,
@@ -235,6 +269,7 @@ export class Src20Class {
       client,
       `
         SELECT 
+            (@row_number:=@row_number + 1) AS row_num,
             src20.*,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
@@ -244,13 +279,15 @@ export class Src20Class {
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
+        CROSS JOIN
+            (SELECT @row_number := ? - 1) AS init
         WHERE 
             src20.op = ?
         ORDER BY 
             src20.tx_index
         ${limit ? `LIMIT ? OFFSET ?` : ""};
         `,
-      [op, limit, offset],
+      [offset, op, limit, offset],
       1000 * 60 * 2,
     );
   }
@@ -438,6 +475,47 @@ export class Src20Class {
         AND tick = ?;
         `,
       [address, tick],
+      1000 * 60 * 2,
+    );
+  }
+
+  static async get_src20_holders_by_tick_with_client(
+    client: Client,
+    tick: string,
+    amt = 1,
+    limit = 1000,
+    page = 0,
+  ) {
+    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    return await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT id,address,p,tick,amt,block_time,last_update
+        FROM ${SRC20_BALANCE_TABLE}
+        WHERE tick = ?
+        AND amt >= ?
+        ORDER BY amt DESC
+        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        `,
+      [tick, amt, limit, offset],
+      1000 * 60 * 2,
+    );
+  }
+
+  static async get_total_src20_holders_by_tick_with_client(
+    client: Client,
+    tick: string,
+    amt = 1,
+  ) {
+    return await handleSqlQueryWithCache(
+      client,
+      `
+        SELECT COUNT(*) AS total
+        FROM ${SRC20_BALANCE_TABLE}
+        WHERE tick = ?
+        AND amt >= ?;
+        `,
+      [tick, amt],
       1000 * 60 * 2,
     );
   }

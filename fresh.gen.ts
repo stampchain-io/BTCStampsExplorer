@@ -34,6 +34,8 @@ import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
+import * as $src20_tick_ from "./routes/src20/[tick].tsx";
+import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
@@ -48,6 +50,7 @@ import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
+import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -94,6 +97,8 @@ const manifest = {
     "./routes/cursed/index.tsx": $cursed_index,
     "./routes/index.tsx": $index,
     "./routes/s/[...id].tsx": $s_id_,
+    "./routes/src20/[tick].tsx": $src20_tick_,
+    "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/index.tsx": $stamp_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
@@ -111,6 +116,7 @@ const manifest = {
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
+    "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
