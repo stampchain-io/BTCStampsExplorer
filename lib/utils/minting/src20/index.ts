@@ -8,11 +8,6 @@ import { checkDeployedTick, checkMintedOut } from "./check.ts";
 import { prepareSrc20TX } from "./tx.ts";
 import { getUTXOForAddress } from "./utils.ts";
 
-// HEAD
-//TODO:[WIP] getUTXOForAddress => Now using mempool.space, add other alternatives as mempool.space dont show script and size
-
-//
-//ja_src20
 export async function mintSRC20({
   toAddress,
   changeAddress,
