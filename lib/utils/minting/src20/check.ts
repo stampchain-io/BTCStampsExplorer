@@ -39,7 +39,6 @@ export async function checkDeployedTick(
         tick,
         "DEPLOY",
       );
-    console.log(token_status.rows[0]["total"]);
     if (!token_status.rows[0]["total"]) {
       return {
         deployed: false,

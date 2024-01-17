@@ -43,8 +43,8 @@ interface StampRow {
 interface SendRow {
   from: string;
   to: string;
-  cpid: string|null;
-  tick: string|null;
+  cpid: string | null;
+  tick: string | null;
   memo: string;
   quantity: BigInt;
   tx_hash: string;
