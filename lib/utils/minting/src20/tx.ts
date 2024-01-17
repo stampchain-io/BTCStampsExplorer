@@ -3,24 +3,14 @@ import * as bitcore from "bitcore";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
 
-// HEAD
-import {
-  get_public_key_from_address,
-  get_transaction,
-} from "utils/quicknode.ts";
-//
 import { get_transaction } from "utils/quicknode.ts";
-//ja_src20
 import {
   address_from_pubkeyhash,
   bin2hex,
   hex2bin,
   scramble,
 } from "utils/minting/utils.ts";
-// HEAD
-import { getUTXOForAddress } from "./utils.ts";
-//
-//ja_src20
+
 import { selectUTXOs } from "./utxo-selector.ts";
 
 const DUST_SIZE = 808;
@@ -41,14 +31,11 @@ export const prepareSrc20TX = async ({
   const sortedUtxos = utxos.sort((a, b) => b.value - a.value);
 
   const vouts = [{ address: toAddress, value: DUST_SIZE }];
-  // HEAD
-  let transferHex = Buffer.from(transferString, "utf-8").toString("hex");
-  //
   let transferHex = Buffer.from(`${"stamp:"}${transferString}`, "utf-8")
     .toString(
       "hex",
     );
-  //ja_src20
+
   const count = (transferHex.length / 2).toString(16);
   let padding = "";
   for (let i = count.length; i < 4; i++) {
