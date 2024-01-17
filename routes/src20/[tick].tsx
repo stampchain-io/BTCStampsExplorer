@@ -127,8 +127,7 @@ export const handler: Handlers<StampRow> = {
       return await ctx.render(body);
     } catch (error) {
       console.error(error);
-      const body = { error: `Error: Internal server error` };
-      return ctx.render(body);
+      return ctx.renderNotFound();
     }
   },
 };

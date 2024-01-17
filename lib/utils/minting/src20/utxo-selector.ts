@@ -50,11 +50,13 @@ function estimateFixedTransactionSize(): number {
   return 10;
 }
 
+const SIOGOPS_RATE = 2.5;
 export function selectUTXOs(
   utxos: UTXO[],
   vouts: Output[],
   feePerByte: number,
 ): { inputs: UTXO[]; change: number; fee: number } {
+  feePerByte = feePerByte * SIOGOPS_RATE; //TODO optimize it later
   utxos.sort((a, b) => b.value - a.value);
   let totalVoutsSize = 0;
   for (const vout of vouts) {
