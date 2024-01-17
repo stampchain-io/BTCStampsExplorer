@@ -8,8 +8,6 @@ import { checkDeployedTick, checkMintedOut } from "./check.ts";
 import { prepareSrc20TX } from "./tx.ts";
 import { getUTXOForAddress } from "./utils.ts";
 
-//TODO:[WIP] getUTXOForAddress => Now using mempool.space, add other alternatives as mempool.space dont show script and size
-
 export async function mintSRC20({
   toAddress,
   changeAddress,
@@ -37,7 +35,8 @@ export async function mintSRC20({
       tick: tick,
       amt: amt,
     };
-    const transferString = JSON.stringify(src20_mint_obj, null, 2);
+    const transferString = JSON.stringify(src20_mint_obj);
+    console.log(transferString);
     //TODO: check if toAddress is the one how pay the party
     const utxos = await getUTXOForAddress(toAddress);
     if (utxos === null || utxos.length === 0) {
@@ -88,7 +87,8 @@ export async function deploySRC20({
       lim: lim,
       dec: dec,
     };
-    const transferString = JSON.stringify(src20_mint_obj, null, 2);
+    const transferString = JSON.stringify(src20_mint_obj);
+    console.log(transferString);
     //TODO: check if toAddress is the one how pay the party
     const utxos = await getUTXOForAddress(toAddress);
     if (utxos === null || utxos.length === 0) {
