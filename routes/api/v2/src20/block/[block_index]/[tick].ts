@@ -1,15 +1,17 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { connectDb, Src20Class } from "$lib/database/index.ts";
 import { convertEmojiToTick, paginate } from "utils/util.ts";
-import { convertToEmoji, jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
 import {
+  convertToEmoji,
+  jsonStringifyBigInt,
+} from "../../../../../../lib/utils/util.ts";
+import {
+  BlockTickHandlerContext,
   ErrorResponseBody,
   PaginatedRequest,
   PaginatedSrc20ResponseBody,
-  BlockTickHandlerContext,
 } from "globals";
 import { CommonClass } from "../../../../../../lib/database/index.ts";
-
 
 /**
  * @swagger
@@ -58,7 +60,10 @@ import { CommonClass } from "../../../../../../lib/database/index.ts";
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-export const handler = async (req: Request, ctx: BlockTickHandlerContext): Promise<Response> => {
+export const handler = async (
+  req: Request,
+  ctx: BlockTickHandlerContext,
+): Promise<Response> => {
   let { block_index, tick } = ctx.params;
   try {
     const url = new URL(req.url);
@@ -66,7 +71,7 @@ export const handler = async (req: Request, ctx: BlockTickHandlerContext): Promi
     const page = Number(url.searchParams.get("page")) || 1;
     const client = await connectDb();
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+
     tick = convertEmojiToTick(tick);
     const valid_src20_txs_in_block = await Src20Class
       .get_valid_src20_tx_from_block_by_tick_with_client(
@@ -75,13 +80,14 @@ export const handler = async (req: Request, ctx: BlockTickHandlerContext): Promi
         tick,
         limit,
         page,
-      ); 
+      );
     const total = await Src20Class
       .get_total_valid_src20_tx_from_block_by_tick_with_client(
         client,
         block_index,
         tick,
       );
+    client.close();
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const body: PaginatedSrc20ResponseBody = {
       ...pagination,

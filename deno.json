@@ -5,11 +5,21 @@
     "start": "deno run -A --watch=static/,routes/,components/,islands/ dev.ts",
     "dev": "export ENV=development && deno run -A --watch=static/,routes/,components/,islands/ dev.ts",
     "build": "deno run -A dev.ts build",
+    "docs": "deno run --allow-read --allow-write swagger.js",
     "preview": "deno run -A main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update ."
   },
-  "lint": { "rules": { "tags": ["fresh", "recommended"] } },
-  "exclude": ["**/_fresh/*"],
+  "lint": {
+    "rules": {
+      "tags": [
+        "fresh",
+        "recommended"
+      ]
+    }
+  },
+  "exclude": [
+    "**/_fresh/*"
+  ],
   "nodeModulesDir": true,
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.6.3/",
@@ -43,5 +53,8 @@
     "globals": "./globals.d.ts",
     "$/": "./"
   },
-  "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" }
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  }
 }

@@ -9,7 +9,6 @@ import {
   PaginatedStampBalanceResponseBody,
 } from "globals";
 
-
 /**
  * @swagger
  * /balance/{address}:
@@ -48,7 +47,6 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
 export const handler = async (
   _req: PaginatedRequest,
   ctx: AddressHandlerContext,
@@ -66,14 +64,16 @@ export const handler = async (
       limit,
       page,
     );
+    console.log(data.rows);
     const total =
       (await CommonClass.get_total_stamp_balance_with_client(client, address))
         .rows[0]["total"] || 0;
+    console.log(total);
     const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
 
     const pagination = paginate(total, page, limit);
- 
+
     const body: PaginatedStampBalanceResponseBody = {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
