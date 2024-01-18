@@ -170,7 +170,7 @@ export class Src20Class {
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
         WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        AND op = ${op}
+        AND op = '${op}'
         `,
       [tick, op],
       1000 * 60 * 2,
@@ -562,13 +562,13 @@ export class Src20Class {
       `
         SELECT SUM(amt) as total
         FROM ${SRC20_BALANCE_TABLE}
-        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
+        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}';
         `,
       [tick],
       0,
     );
 
-    const total_minted = new BigFloat(total_minted_data.rows[0]["total"]);
+    const total_minted = new BigFloat(total_minted_data.rows[0]["total"] ?? 0);
 
     const progress = parseFloat(
       total_minted.div(max_supply).mul(100),
@@ -592,39 +592,43 @@ export class Src20Class {
         SELECT 
             src.max,
             src.deci,
+            src.lim,
             COUNT(CASE WHEN src.op = 'MINT' THEN 1 ELSE NULL END) as total_mints,
-            SUM(CASE WHEN balance.tick = CONVERT('${tick}' USING utf8mb4) COLLATE utf8mb4_0900_as_ci THEN balance.amt ELSE 0 END) as total_minted
+            SUM(CASE WHEN balance.tick COLLATE utf8mb4_0900_as_ci = '${tick}' THEN balance.amt ELSE 0 END) as total_minted
         FROM ${SRC20_TABLE} as src
             LEFT JOIN ${SRC20_BALANCE_TABLE} as balance ON src.tick = balance.tick
         WHERE 
             src.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
             AND src.op = 'DEPLOY'
         GROUP BY 
-            src.max, src.deci;
+            src.max, src.deci, src.lim;
     `;
 
     const data = await handleSqlQueryWithCache(client, query, [tick, tick], 0);
 
-    console.log({ data });
     if (data.rows.length === 0) {
       return null;
     }
 
     const row = data.rows[0];
     const max_supply = new BigFloat(row["max"]);
+    const limit = new BigFloat(row["lim"]);
     const decimals = parseInt(row["deci"]);
     const total_mints = parseInt(row["total_mints"]);
-    const total_minted = new BigFloat(row["total_minted"] || 0);
+    const total_minted = new BigFloat(row["total_minted"] ?? 0);
     const progress = parseFloat(total_minted.div(max_supply).mul(100)).toFixed(
       3,
     );
-
-    return {
+    const response = {
       max_supply: max_supply.toString(),
       total_minted: total_minted.toString(),
+      limit: limit.toString(),
       total_mints: total_mints,
       progress,
       decimals,
     };
+    console.log(response);
+
+    return response;
   }
 }

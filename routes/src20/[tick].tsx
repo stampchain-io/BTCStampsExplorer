@@ -10,11 +10,13 @@ import {
 } from "../../lib/database/index.ts";
 import { BigFloat, set_precision } from "bigfloat/mod.ts";
 import { paginate } from "utils/util.ts";
+import { convertEmojiToTick } from "utils/util.ts";
 
 export const handler: Handlers<StampRow> = {
   async GET(req: Request, ctx: HandlerContext) {
     try {
-      const { tick } = ctx.params;
+      let { tick } = ctx.params;
+      tick = convertEmojiToTick(tick);
       const url = new URL(req.url);
       const limit = Number(url.searchParams.get("limit")) || 200;
       const page = Number(url.searchParams.get("page")) || 1;
@@ -27,7 +29,7 @@ export const handler: Handlers<StampRow> = {
         );
 
       const mint_status = await Src20Class
-        .get_src20_minting_progress_by_tick_with_client(
+        .get_src20_minting_progress_by_tick_with_client_new(
           client,
           tick,
         );

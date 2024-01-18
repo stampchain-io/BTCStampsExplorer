@@ -74,8 +74,9 @@ export const handler = async (
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
     const pagination = paginate(total.rows[0]["total"], page, limit);
+    //TODO: review this
     const mint_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client_new(
+      .get_src20_minting_progress_by_tick_with_client(
         client,
         tick,
       );
