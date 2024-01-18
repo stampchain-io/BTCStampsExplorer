@@ -62,7 +62,7 @@ export const handler: Handlers<TX | TXError> = {
         }));
       }
       return new Response(JSON.stringify({
-        hex,
+        ...hex,
       }));
     }
 
@@ -77,7 +77,7 @@ export const handler: Handlers<TX | TXError> = {
         dec: body.dec,
       });
       return new Response(JSON.stringify({
-        hex,
+        ...hex,
       }));
     }
   },
