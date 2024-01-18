@@ -31,5 +31,5 @@ jobs:
         with:
           project: "careful-bee-79"
           #entrypoint: "main.ts" # 📝 Update the entrypoint if necessary
-          entrypoint: "dev.ts" # 📝 Update the entrypoint if necessary
+          entrypoint: "main.ts" # 📝 Update the entrypoint if necessary
           root: "." # 📝 Update the root if necessary
