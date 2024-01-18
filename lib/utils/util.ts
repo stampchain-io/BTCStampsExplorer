@@ -101,7 +101,7 @@ export function categorizeInput(
   }
 
   // If neither, return "none"
-  return "none"; 
+  return "none";
 }
 
 export function paginate(total: number, page = 1, limit = 10) {
@@ -139,7 +139,7 @@ export function convertEmojiToTick(str: string): string {
   let result = "";
   for (const char of str) {
     if (char.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]/)) {
-      result += "\\u" + char.codePointAt(0)!.toString(16).padStart(8, "0");
+      result += "\\\\u" + char.codePointAt(0)!.toString(16).padStart(8, "0");
     } else {
       result += char;
     }
