@@ -1,5 +1,6 @@
 import { Client } from "$mysql/mod.ts";
 import { handleQueryWithClient } from "$lib/database/index.ts";
+import { conf } from "./config.ts";
 
 interface CacheEntry {
   data: any;
@@ -47,11 +48,13 @@ export async function handleSqlQueryWithCache(
   params: any[],
   ttl: number | "never",
 ) {
-  /* const cacheKey = generateSQLCacheKey(query, params);
+  if (conf.ENV === "development" || conf.CACHE === "false") {
+    return handleQueryWithClient(client, query, params);
+  }
+  const cacheKey = generateSQLCacheKey(query, params);
   return handleCache(
     cacheKey,
     () => handleQueryWithClient(client, query, params),
     ttl,
-  ); */
-  return handleQueryWithClient(client, query, params);
+  );
 }
