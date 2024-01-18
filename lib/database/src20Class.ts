@@ -606,7 +606,6 @@ export class Src20Class {
 
     const data = await handleSqlQueryWithCache(client, query, [tick, tick], 0);
 
-    console.log({ data });
     if (data.rows.length === 0) {
       return null;
     }
