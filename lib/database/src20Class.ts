@@ -3,6 +3,9 @@ import { SRC20_BALANCE_TABLE, SRC20_TABLE, TTL_CACHE } from "constants";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 
+// NOTE: To compare tick use this ones below:
+//  tick COLLATE utf8mb4_0900_as_ci = '${tick}'
+//  tick = CONVERT('${tick}' USING utf8mb4) COLLATE utf8mb4_0900_as_ci
 export class Src20Class {
   static async get_total_valid_src20_tx_with_client(client: Client) {
     return await handleSqlQueryWithCache(
@@ -25,7 +28,7 @@ export class Src20Class {
       `
     SELECT COUNT(*) AS total
     FROM ${SRC20_TABLE}
-    WHERE block_index = ?
+    WHERE block_index = '${block_index}';
     `,
       [block_index],
       1000 * 60 * 2,
@@ -42,7 +45,8 @@ export class Src20Class {
       `
     SELECT COUNT(*) AS total
     FROM ${SRC20_TABLE}
-    WHERE block_index = ? AND tick = CONVERT(? USING utf8mb4) COLLATE utf8mb4_0900_as_ci
+    WHERE block_index = ${block_index}
+    AND tick COLLATE utf8mb4_0900_as_ci = '${tick}'
     `,
       [block_index, tick],
       1000 * 60 * 2,
@@ -70,7 +74,7 @@ export class Src20Class {
             creator destination_info ON src20.destination = destination_info.address
         ORDER BY 
             src20.tx_index
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [limit, offset],
       1000 * 60 * 2,
@@ -97,10 +101,10 @@ export class Src20Class {
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN
             creator destination_info ON src20.destination = destination_info.address
-        WHERE src20.block_index = ?
+        WHERE src20.block_index = '${block_index}'
         ORDER BY
             src20.tx_index
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [block_index, limit, offset],
       1000 * 60 * 2,
@@ -128,10 +132,11 @@ export class Src20Class {
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN
             creator destination_info ON src20.destination = destination_info.address
-        WHERE src20.block_index = ? AND src20.tick = CONVERT(? USING utf8mb4) COLLATE utf8mb4_0900_as_ci
+        WHERE src20.block_index = '${block_index}'
+        AND src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
         ORDER BY
             src20.tx_index
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [block_index, tick, limit, offset],
       1000 * 60 * 2,
@@ -147,7 +152,7 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        WHERE tick COLLATE utf8mb4_0900_as_ci = ?
+        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
         `,
       [tick],
       1000 * 60 * 2,
@@ -164,8 +169,8 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        WHERE tick COLLATE utf8mb4_0900_as_ci = ?
-        AND op = ?
+        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
+        AND op = ${op}
         `,
       [tick, op],
       1000 * 60 * 2,
@@ -195,11 +200,11 @@ export class Src20Class {
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            src20.tick COLLATE utf8mb4_0900_as_ci = ?
-            AND src20.op = ?
+            src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
+            AND src20.op = '${op}'
         ORDER BY 
             src20.tx_index ${order}
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [tick, op, limit, offset],
       1000 * 60 * 2,
@@ -227,10 +232,9 @@ export class Src20Class {
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            src20.tick COLLATE utf8mb4_0900_as_ci = ?
-        ORDER BY 
-            src20.tx_index
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+            src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
+        ORDER BY src20.tx_index ASC
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [tick, limit, offset],
       1000 * 60 * 2,
@@ -249,9 +253,9 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        WHERE op = ?
-        ORDER BY tx_index
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        WHERE op = '${op}'
+        ORDER BY tx_index ASC
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [op, limit, offset],
       1000 * 60 * 2,
@@ -280,12 +284,12 @@ export class Src20Class {
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         CROSS JOIN
-            (SELECT @row_number := ? - 1) AS init
+            (SELECT @row_number := ${offset} - 1) AS init
         WHERE 
-            src20.op = ?
+            src20.op = '${op}'
         ORDER BY 
             src20.tx_index
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [offset, op, limit, offset],
       1000 * 60 * 2,
@@ -309,9 +313,8 @@ export class Src20Class {
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
-        WHERE 
-            src20.op = 'DEPLOY'
-        AND src20.tick = ?
+        WHERE src20.op = 'DEPLOY'
+        AND src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
         `,
       [tick],
       1000 * 60 * 2,
@@ -335,8 +338,7 @@ export class Src20Class {
             creator creator_info ON src20.creator = creator_info.address
         LEFT JOIN
             creator destination_info ON src20.destination = destination_info.address
-        WHERE
-            src20.tx_hash = ?
+        WHERE src20.tx_hash = '${tx_hash}';
         `,
       [tx_hash],
       1000 * 60 * 2,
@@ -352,7 +354,7 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        WHERE address = ?
+        WHERE address = ${address};
         `,
       [address],
       1000 * 60 * 2,
@@ -380,10 +382,10 @@ export class Src20Class {
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            (src20.creator = ? OR src20.destination = ?)
+            (src20.creator = ${address} OR src20.destination = ${address})
         ORDER BY 
             src20.tx_index
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [address, address, limit, offset],
       1000 * 60 * 2,
@@ -400,8 +402,8 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        WHERE address = ?
-        AND tick = ?
+        WHERE address = ${address}
+        AND tick COLLATE utf8mb4_0900_as_ci = '${tick}';
         `,
       [address, tick],
       1000 * 60 * 2,
@@ -430,11 +432,11 @@ export class Src20Class {
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            (src20.creator = ? OR src20.destination = ?)
-        AND src20.tick = ?
+            (src20.creator = ${address} OR src20.destination = ${address})
+        AND src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
         ORDER BY 
             src20.tx_index
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [address, address, tick, limit, offset],
       1000 * 60 * 2,
@@ -448,13 +450,14 @@ export class Src20Class {
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    console.log({ address, limit, offset });
     return await handleSqlQueryWithCache(
       client,
       `
         SELECT id,address,p,tick,amt,block_time,last_update
         FROM ${SRC20_BALANCE_TABLE}
-        WHERE address = ?
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        WHERE address = '${address}'
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [address, limit, offset],
       1000 * 60 * 2,
@@ -471,8 +474,8 @@ export class Src20Class {
       `
         SELECT id,address,p,tick,amt,block_time,last_update
         FROM ${SRC20_BALANCE_TABLE}
-        WHERE address = ?
-        AND tick = ?;
+        WHERE address = '${address}'
+        AND tick COLLATE utf8mb4_0900_as_ci = '${tick}';
         `,
       [address, tick],
       1000 * 60 * 2,
@@ -492,10 +495,10 @@ export class Src20Class {
       `
         SELECT id,address,p,tick,amt,block_time,last_update
         FROM ${SRC20_BALANCE_TABLE}
-        WHERE tick = ?
-        AND amt >= ?
+        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
+        AND amt >= ${amt}
         ORDER BY amt DESC
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [tick, amt, limit, offset],
       1000 * 60 * 2,
@@ -512,8 +515,8 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_BALANCE_TABLE}
-        WHERE tick = ?
-        AND amt >= ?;
+        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
+        AND amt >= ${amt};
         `,
       [tick, amt],
       1000 * 60 * 2,
@@ -529,12 +532,13 @@ export class Src20Class {
       `
         SELECT max, deci, lim
         FROM ${SRC20_TABLE}
-        WHERE tick = ?
+        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
         AND op = 'DEPLOY';
         `,
       [tick],
       0,
     );
+    console.log({ max_supply_data });
     const max_supply = new BigFloat(max_supply_data.rows[0]["max"]);
     const decimals = parseInt(max_supply_data.rows[0]["deci"]);
     const limit = parseInt(max_supply_data.rows[0]["lim"]);
@@ -544,7 +548,7 @@ export class Src20Class {
       `
         SELECT COUNT(*) as total
         FROM ${SRC20_TABLE}
-        WHERE tick = ?
+        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
         AND op = 'MINT';
         `,
       [tick],
@@ -558,7 +562,7 @@ export class Src20Class {
       `
         SELECT SUM(amt) as total
         FROM ${SRC20_BALANCE_TABLE}
-        WHERE tick = ?
+        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
         `,
       [tick],
       0,
@@ -580,19 +584,20 @@ export class Src20Class {
     };
   }
 
-
-  static async get_src20_minting_progress_by_tick_with_client_new(client: Client, tick: string) {
+  static async get_src20_minting_progress_by_tick_with_client_new(
+    client: Client,
+    tick: string,
+  ) {
     const query = `
         SELECT 
             src.max,
             src.deci,
             COUNT(CASE WHEN src.op = 'MINT' THEN 1 ELSE NULL END) as total_mints,
-            SUM(CASE WHEN balance.tick = ? THEN balance.amt ELSE 0 END) as total_minted
-        FROM 
-            ${SRC20_TABLE} as src
+            SUM(CASE WHEN balance.tick = CONVERT('${tick}' USING utf8mb4) COLLATE utf8mb4_0900_as_ci THEN balance.amt ELSE 0 END) as total_minted
+        FROM ${SRC20_TABLE} as src
             LEFT JOIN ${SRC20_BALANCE_TABLE} as balance ON src.tick = balance.tick
         WHERE 
-            src.tick = ?
+            src.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
             AND src.op = 'DEPLOY'
         GROUP BY 
             src.max, src.deci;
@@ -600,24 +605,26 @@ export class Src20Class {
 
     const data = await handleSqlQueryWithCache(client, query, [tick, tick], 0);
 
+    console.log({ data });
     if (data.rows.length === 0) {
-        return null;
+      return null;
     }
 
     const row = data.rows[0];
     const max_supply = new BigFloat(row["max"]);
     const decimals = parseInt(row["deci"]);
     const total_mints = parseInt(row["total_mints"]);
-    const total_minted = new BigFloat(row["total_minted"] || 0); 
-    const progress = parseFloat(total_minted.div(max_supply).mul(100)).toFixed(3);
+    const total_minted = new BigFloat(row["total_minted"] || 0);
+    const progress = parseFloat(total_minted.div(max_supply).mul(100)).toFixed(
+      3,
+    );
 
     return {
-        max_supply: max_supply.toString(),
-        total_minted: total_minted.toString(),
-        total_mints: total_mints,
-        progress,
-        decimals,
+      max_supply: max_supply.toString(),
+      total_minted: total_minted.toString(),
+      total_mints: total_mints,
+      progress,
+      decimals,
     };
-}
-
+  }
 }

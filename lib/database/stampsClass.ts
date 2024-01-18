@@ -28,7 +28,7 @@ export class StampsClass {
       `
       SELECT COUNT(*) AS total
       FROM ${STAMP_TABLE}
-      WHERE ident = ?
+      WHERE ident = ${ident}
       AND is_btc_stamp IS NOT NULL;
       `,
       [ident],
@@ -50,7 +50,7 @@ export class StampsClass {
         LEFT JOIN creator AS cr ON st.creator = cr.address
         WHERE st.is_btc_stamp IS NOT NULL
         ORDER BY st.stamp
-        LIMIT ? OFFSET ?;
+        LIMIT ${limit} OFFSET ${offset};
       `,
       [limit, offset],
       1000 * 60 * 2,
@@ -68,12 +68,22 @@ export class StampsClass {
     return await handleSqlQueryWithCache(
       client,
       `
-      SELECT st.stamp, st.cpid, st.creator, cr.creator AS creator_name, st.tx_hash, st.stamp_mimetype, st.supply, st.divisible, st.locked, st.ident, st.block_time, st.block_index
+      SELECT
+        st.stamp,
+        st.cpid,
+        st.creator,
+        cr.creator AS creator_name,
+        st.tx_hash, st.stamp_mimetype,
+        st.supply, st.divisible,
+        st.locked,
+        st.ident,
+        st.block_time,
+        st.block_index
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
       WHERE st.is_btc_stamp IS NOT NULL
       ORDER BY st.tx_index ${order}
-      LIMIT ? OFFSET ?;
+      LIMIT ${limit} OFFSET ${offset};
       `,
       [limit, offset],
       1000 * 60 * 2,
@@ -90,7 +100,7 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.block_index = ?
+      WHERE st.block_index = ${block_index}
       AND st.is_btc_stamp IS NOT NULL
       ORDER BY stamp
       `,
@@ -112,10 +122,10 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.ident = ?
+      WHERE st.ident = ${ident}
       AND st.is_btc_stamp IS NOT NULL
       ORDER BY st.stamp
-      LIMIT ? OFFSET ?;
+      LIMIT ${limit} OFFSET ${offset};
       `,
       [ident, limit, offset],
       1000 * 60 * 2,
@@ -129,7 +139,7 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.stamp = ?
+      WHERE st.stamp = ${stamp}
       ORDER BY st.tx_index;
       `,
       [stamp],
@@ -147,7 +157,7 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE}
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE (st.cpid = ? OR st.tx_hash = ? OR st.stamp_hash = ?);
+      WHERE (st.cpid = ${identifier} OR st.tx_hash = ${identifier} OR st.stamp_hash = ${identifier});
       `,
       [identifier, identifier, identifier],
       TTL_CACHE,
@@ -163,7 +173,8 @@ export class StampsClass {
       `
       SELECT tx_hash, stamp_hash, stamp_mimetype, cpid
       FROM ${STAMP_TABLE}
-      WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?) AND stamp IS NOT NULL;
+      WHERE (cpid = ${identifier} OR tx_hash = ${identifier} OR stamp_hash = ${identifier})
+      AND stamp IS NOT NULL;
       `,
       [identifier, identifier, identifier],
       TTL_CACHE,
@@ -200,7 +211,7 @@ export class StampsClass {
         client,
         `
         SELECT cpid FROM ${STAMP_TABLE}
-        WHERE stamp = ?;
+        WHERE stamp = ${identifier};
         `,
         [identifier],
         "never",
@@ -210,7 +221,7 @@ export class StampsClass {
       client,
       `
       SELECT cpid FROM ${STAMP_TABLE}
-      WHERE (cpid = ? OR tx_hash = ?);
+      WHERE (cpid = ${identifier} OR tx_hash = ${identifier});
       `,
       [identifier, identifier],
       "never",

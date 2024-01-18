@@ -49,7 +49,10 @@ import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-export const handler = async (req: PaginatedRequest, ctx: TickHandlerContext): Promise<Response> => {
+export const handler = async (
+  req: PaginatedRequest,
+  ctx: TickHandlerContext,
+): Promise<Response> => {
   let { tick } = ctx.params;
   try {
     const url = new URL(req.url);
@@ -61,7 +64,7 @@ export const handler = async (req: PaginatedRequest, ctx: TickHandlerContext): P
       .get_valid_src20_tx_by_tick_with_client(
         client,
         tick,
-        limit, 
+        limit,
         page,
       );
 
@@ -76,13 +79,19 @@ export const handler = async (req: PaginatedRequest, ctx: TickHandlerContext): P
         client,
         tick,
       );
+    console.log(mint_status);
+    client.close();
     const body: PaginatedTickResponseBody = {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
       mint_status: {
         ...mint_status,
-        max_supply: mint_status.max_supply ? mint_status.max_supply.toString() : null,
-        total_minted: mint_status.total_minted ? mint_status.total_minted.toString() : null,
+        max_supply: mint_status.max_supply
+          ? mint_status.max_supply.toString()
+          : null,
+        total_minted: mint_status.total_minted
+          ? mint_status.total_minted.toString()
+          : null,
         limit: mint_status.limit ? mint_status.limit.toString() : null,
       },
       data: src20_txs.rows.map((tx: any) => {
@@ -98,6 +107,7 @@ export const handler = async (req: PaginatedRequest, ctx: TickHandlerContext): P
 
     return new Response(jsonStringifyBigInt(body));
   } catch (error) {
+    console.log(error);
 
     const body: ErrorResponseBody = { error: `Error: Internal server error` };
     return new Response(JSON.stringify(body));
