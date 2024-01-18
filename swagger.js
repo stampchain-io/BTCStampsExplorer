@@ -97,9 +97,9 @@ async function main() {
     const combinedYaml = openApiYaml + "paths:\n"+ jsdocYaml + "\n" + schemaYaml;
 
     // Write the combined content to a new file
-    await Deno.writeTextFile("openapi.yml", combinedYaml);
+    await Deno.writeTextFile("/static/swagger/openapi.yml", combinedYaml);
 
-    await processYamlFile("openapi.yml");
+    await processYamlFile("/static/swagger/openapi.yml");
 }
 
 main();
