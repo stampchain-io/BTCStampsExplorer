@@ -29,10 +29,6 @@ jobs:
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-<<<<<<< HEAD
           project: "btcstamps"
-=======
-          project: "careful-bee-79"
->>>>>>> d6d51a3 (Create deploy.yml)
           entrypoint: "main.ts" # 📝 Update the entrypoint if necessary
           root: "." # 📝 Update the root if necessary
