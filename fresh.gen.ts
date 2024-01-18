@@ -32,6 +32,7 @@ import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
+import * as $docs_index from "./routes/docs/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
@@ -92,6 +93,7 @@ const manifest = {
     "./routes/block/index.tsx": $block_index,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/cursed/index.tsx": $cursed_index,
+    "./routes/docs/index.tsx": $docs_index,
     "./routes/index.tsx": $index,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/stamp/[id].tsx": $stamp_id_,
