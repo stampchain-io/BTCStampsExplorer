@@ -124,15 +124,14 @@ export function jsonStringifyBigInt(obj: Record<string, unknown>) {
 }
 
 export function convertToEmoji(tick: string): string {
-  if (!tick.startsWith("\\u")) {
-    return tick;
-  }
-  const codePoint = parseInt(tick.substring(2), 16);
-  if (!isNaN(codePoint)) {
-    return String.fromCodePoint(codePoint);
-  } else {
-    return tick;
-  }
+  return tick.replace(/\\u([a-fA-F0-9]{8})/g, (match, grp) => {
+    const codePoint = parseInt(grp, 16);
+    if (!isNaN(codePoint)) {
+      return String.fromCodePoint(codePoint);
+    } else {
+      return match;
+    }
+  });
 }
 
 export function convertEmojiToTick(str: string): string {

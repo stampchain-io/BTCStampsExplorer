@@ -3,7 +3,7 @@ import { ComponentChildren } from "preact";
 import { computed } from "@preact/signals";
 
 import { walletContext } from "store/wallet/wallet.ts";
-import {short_address} from "utils/util.ts";
+import { short_address } from "utils/util.ts";
 import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { ConnectedModal } from "./ConnectedModal.tsx";
 
@@ -31,19 +31,26 @@ export const WalletModal = ({ connectors }: Props) => {
     <>
       <button
         onClick={toggleModal}
-        class="block m-1 text-white border outline-1 border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-transparent font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+        class="block w-full mx-6 text-white border outline-1 border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-transparent font-medium rounded-lg text-sm px-5 py-2.5 text-center"
         type="button"
       >
-        {
-          isConnected.value && address ? short_address(address) : "Connect Wallet"
-        }
+        {isConnected.value && address
+          ? short_address(address)
+          : "Connect Wallet"}
       </button>
 
       {isModalOpen && !isConnected.value && (
-        <ConnectorsModal connectors={connectors} toggleModal={toggleModal} handleCloseModal={handleCloseModal} />
+        <ConnectorsModal
+          connectors={connectors}
+          toggleModal={toggleModal}
+          handleCloseModal={handleCloseModal}
+        />
       )}
       {isModalOpen && isConnected.value && (
-        <ConnectedModal toggleModal={toggleModal} handleCloseModal={handleCloseModal} />
+        <ConnectedModal
+          toggleModal={toggleModal}
+          handleCloseModal={handleCloseModal}
+        />
       )}
     </>
   );
