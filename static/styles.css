@@ -1,20 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 .image-rendering-pixelated {
-    image-rendering: pixelated;
-    background-image: url(/img/transparent-bg.png);
-    background-size: 6px;
+  image-rendering: pixelated;
+  background-image: url('/img/transparent-bg.png');
+  background-size: 6px;
 }
 
 .pixelart {
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 .center {
-    display: flex;
-    align-items: center;
-    justify-content: center
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
