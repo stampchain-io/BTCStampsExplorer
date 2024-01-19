@@ -1,9 +1,9 @@
 name: Deploy
 on:
   push:
-    branches: ja_fix_queries
+    branches: main
   pull_request:
-    branches: ja_fix_queries
+    branches: main
 
 jobs:
   deploy:
