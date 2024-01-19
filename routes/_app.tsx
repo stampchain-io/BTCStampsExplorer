@@ -12,12 +12,15 @@ export default function App({ Component }: AppProps) {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>app</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="/styles.css" />
+        {/* <link rel="stylesheet" href="/styles.css" /> */}
+        <link rel="stylesheet" href="/main.css" />
       </head>
-      <body class="bg-black" >
+      <body class="bg-black">
         <ToastProvider>
-          <div class="px-2 py-8 mx-auto bg-[#000000] flex flex-col md:gap-4 overflow-auto max-w-6xl" f-client-nav>
+          <div
+            class="px-2 py-8 mx-auto bg-[#000000] flex flex-col md:gap-4 overflow-auto max-w-6xl"
+            f-client-nav
+          >
             <div class="py-0 my-0">
               <Header />
               <MempoolWeather />
@@ -26,7 +29,6 @@ export default function App({ Component }: AppProps) {
               <Component />
             </Partial>
           </div>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
         </ToastProvider>
       </body>
     </html>

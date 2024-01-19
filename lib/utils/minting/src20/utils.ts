@@ -1,4 +1,3 @@
-import * as btc from "@scure/btc-signer";
 import { estimateInputSize } from "./utxo-selector.ts";
 
 const MAX_RETRIES = 3;
