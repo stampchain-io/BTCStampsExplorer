@@ -5,7 +5,11 @@ const env_file = Deno.env.get("ENV") === "development"
   ? "./.env.development.local"
   : "./.env";
 
-export const conf = await load({
+const confFromFile = await load({
   envPath: env_file,
   export: true,
 });
+
+const envVars = Deno.env.toObject();
+
+export const conf = { ...envVars, ...confFromFile };
