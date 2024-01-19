@@ -28,7 +28,6 @@ import * as $api_v2_stamps_balance_address_ from "./routes/api/v2/stamps/balance
 import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block/[block_index].ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
-import * as $api_v2_test from "./routes/api/v2/test.ts";
 import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
@@ -93,7 +92,6 @@ const manifest = {
       $api_v2_stamps_block_block_index_,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
-    "./routes/api/v2/test.ts": $api_v2_test,
     "./routes/block/[id].tsx": $block_id_,
     "./routes/block/index.tsx": $block_index,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
