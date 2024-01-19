@@ -28,7 +28,7 @@ export class StampsClass {
       `
       SELECT COUNT(*) AS total
       FROM ${STAMP_TABLE}
-      WHERE ident = ${ident}
+      WHERE ident = '${ident}'
       AND is_btc_stamp IS NOT NULL;
       `,
       [ident],
@@ -100,7 +100,7 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.block_index = ${block_index}
+      WHERE st.block_index = '${block_index}'
       AND st.is_btc_stamp IS NOT NULL
       ORDER BY stamp
       `,
@@ -122,7 +122,7 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.ident = ${ident}
+      WHERE st.ident = '${ident}'
       AND st.is_btc_stamp IS NOT NULL
       ORDER BY st.stamp
       LIMIT ${limit} OFFSET ${offset};
@@ -139,7 +139,7 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.stamp = ${stamp}
+      WHERE st.stamp = '${stamp}'
       ORDER BY st.tx_index;
       `,
       [stamp],
@@ -157,7 +157,7 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE}
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE (st.cpid = ${identifier} OR st.tx_hash = ${identifier} OR st.stamp_hash = ${identifier});
+      WHERE (st.cpid = '${identifier}' OR st.tx_hash = '${identifier}' OR st.stamp_hash = '${identifier}');
       `,
       [identifier, identifier, identifier],
       TTL_CACHE,
@@ -173,7 +173,7 @@ export class StampsClass {
       `
       SELECT tx_hash, stamp_hash, stamp_mimetype, cpid
       FROM ${STAMP_TABLE}
-      WHERE (cpid = ${identifier} OR tx_hash = ${identifier} OR stamp_hash = ${identifier})
+      WHERE (cpid = '${identifier}' OR tx_hash = '${identifier}' OR stamp_hash = '${identifier}')
       AND stamp IS NOT NULL;
       `,
       [identifier, identifier, identifier],
@@ -211,7 +211,7 @@ export class StampsClass {
         client,
         `
         SELECT cpid FROM ${STAMP_TABLE}
-        WHERE stamp = ${identifier};
+        WHERE stamp = '${identifier}';
         `,
         [identifier],
         "never",
@@ -221,7 +221,7 @@ export class StampsClass {
       client,
       `
       SELECT cpid FROM ${STAMP_TABLE}
-      WHERE (cpid = ${identifier} OR tx_hash = ${identifier});
+      WHERE (cpid = '${identifier}' OR tx_hash = '${identifier}');
       `,
       [identifier, identifier],
       "never",

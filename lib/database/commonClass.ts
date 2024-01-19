@@ -17,7 +17,7 @@ export class CommonClass {
       client,
       `
       SELECT * FROM blocks
-      WHERE block_index = ${block_index};
+      WHERE block_index = '${block_index}';
       `,
       [block_index],
       "never",
@@ -57,7 +57,7 @@ export class CommonClass {
         `
         SELECT COUNT(*) AS tx_count
         FROM ${STAMP_TABLE}
-        WHERE block_index = ${block.block_index};
+        WHERE block_index = '${block.block_index}';
         `,
         [block.block_index],
         "never",
@@ -104,7 +104,7 @@ export class CommonClass {
         `
         SELECT COUNT(*) AS sends
         FROM sends
-        WHERE block_index = ${block.block_index};
+        WHERE block_index = '${block.block_index}';
         `,
         [block.block_index],
         "never",
@@ -135,7 +135,7 @@ export class CommonClass {
           WHERE stamp IS NOT NULL
           AND is_btc_stamp IS NOT NULL
       ) num ON st.cpid = num.cpid
-      WHERE st.block_index = ${block_index}
+      WHERE st.block_index = '${block_index}'
       ORDER BY st.tx_index;
       `,
       [block_index],
@@ -175,7 +175,7 @@ export class CommonClass {
       client,
       `
       SELECT * FROM blocks
-      WHERE block_hash = ${block_hash};
+      WHERE block_hash = '${block_hash}';
       `,
       [block_hash],
       "never",
@@ -191,7 +191,7 @@ export class CommonClass {
       `
       SELECT block_index
       FROM blocks
-      WHERE block_hash = ${block_hash};
+      WHERE block_hash = '${block_hash}';
       `,
       [block_hash],
       "never",
@@ -224,7 +224,7 @@ export class CommonClass {
         `
         SELECT COUNT(*) AS issuances
         FROM ${STAMP_TABLE}
-        WHERE block_index = ${block.block_index};
+        WHERE block_index = '${block.block_index}';
         `,
         [block.block_index],
         "never",
@@ -235,7 +235,7 @@ export class CommonClass {
         `
         SELECT COUNT(*) AS sends
         FROM sends
-        WHERE block_index = ${block.block_index};
+        WHERE block_index = '${block.block_index}';
         `,
         [block.block_index],
         "never",
@@ -266,7 +266,7 @@ export class CommonClass {
           WHERE stamp IS NOT NULL
           AND is_btc_stamp IS NOT NULL
       ) num ON st.cpid = num.cpid
-      WHERE st.block_hash = ${block_hash}
+      WHERE st.block_hash = '${block_hash}'
       ORDER BY st.tx_index;
       `,
       [block_hash],
@@ -311,7 +311,7 @@ export class CommonClass {
       client,
       `
       SELECT * FROM ${STAMP_TABLE}
-      WHERE stamp = ${stamp}
+      WHERE stamp = '${stamp}'
       ORDER BY tx_index;
       `,
       [stamp],
@@ -340,7 +340,7 @@ export class CommonClass {
       client,
       `
       SELECT * FROM ${STAMP_TABLE}
-      WHERE (cpid = ${identifier} OR tx_hash = ${identifier} OR stamp_hash = ${identifier})
+      WHERE (cpid = '${identifier}' OR tx_hash = '${identifier}' OR stamp_hash = '${identifier}')
       ORDER BY tx_index;
       `,
       [identifier, identifier, identifier],
@@ -351,7 +351,7 @@ export class CommonClass {
       client,
       `
       SELECT * FROM ${STAMP_TABLE}
-      WHERE (cpid = ${cpid})
+      WHERE (cpid = '${cpid}')
       ORDER BY tx_index;
       `,
       [cpid],
@@ -433,7 +433,7 @@ export class CommonClass {
           st.cpid IN ( ${
         assets.map((asset: string) => `'${asset}'`).join(", ")
       } )
-        ORDER BY st.cpid ${order}
+        ORDER BY st.tx_index ${order}
         LIMIT ${limit}
         OFFSET ${offset};
       `;
@@ -475,7 +475,7 @@ export class CommonClass {
     const query = `
       SELECT s.*, b.block_time FROM ${SEND_TABLE} AS s
       LEFT JOIN ${BLOCK_TABLE} AS b ON s.block_index = b.block_index
-      WHERE s.cpid = ${cpid}
+      WHERE s.cpid = '${cpid}'
       ORDER BY s.tx_index;
     `;
     return await handleSqlQueryWithCache(
