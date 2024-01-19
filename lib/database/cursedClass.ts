@@ -28,7 +28,7 @@ export class CursedClass {
       `
     SELECT COUNT(*) AS total
     FROM ${STAMP_TABLE}
-    WHERE ident = ${ident}
+    WHERE ident = '${ident}'
     AND is_btc_stamp IS NULL
     AND is_reissue IS NULL;
     `,
@@ -93,7 +93,7 @@ export class CursedClass {
     SELECT st.*, cr.creator AS creator_name
     FROM ${STAMP_TABLE} AS st
     LEFT JOIN creator AS cr ON st.creator = cr.address
-    WHERE st.block_index = ${block_index}
+    WHERE st.block_index = '${block_index}'
     AND st.is_btc_stamp IS NULL
     AND st.is_reissue IS NULL
     ORDER BY st.tx_index

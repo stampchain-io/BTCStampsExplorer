@@ -382,7 +382,7 @@ export class Src20Class {
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            (src20.creator = ${address} OR src20.destination = ${address})
+            (src20.creator = '${address}' OR src20.destination = '${address}')
         ORDER BY 
             src20.tx_index
         ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
@@ -402,7 +402,7 @@ export class Src20Class {
       `
         SELECT COUNT(*) AS total
         FROM ${SRC20_TABLE}
-        WHERE address = ${address}
+        WHERE address = '${address}'
         AND tick COLLATE utf8mb4_0900_as_ci = '${tick}';
         `,
       [address, tick],
@@ -432,7 +432,7 @@ export class Src20Class {
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            (src20.creator = ${address} OR src20.destination = ${address})
+            (src20.creator = '${address}' OR src20.destination = '${address}')
         AND src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
         ORDER BY 
             src20.tx_index
