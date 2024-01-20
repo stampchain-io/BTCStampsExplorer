@@ -89,7 +89,8 @@ export function Header() {
           >
             SRC20
           </a>
-          <a
+          {
+            /* <a
             href="/cursed"
             f-partial={"/cursed"}
             onClick={toggleMenu}
@@ -98,7 +99,8 @@ export function Header() {
             }`}
           >
             Cursed
-          </a>
+          </a> */
+          }
           <div class="w-full flex items-center">
             <ConnectWallet />
           </div>
