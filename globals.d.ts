@@ -1,10 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
 
-
-
-
-
-
 // General Types ---------------------------------------------------------------
 
 type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
@@ -146,7 +141,6 @@ interface MintStatus {
   limit: number | null;
 }
 
-
 // Request Types ---------------------------------------------------------------
 
 export interface PaginationQueryParams {
@@ -177,28 +171,24 @@ export interface PaginatedStampBalanceResponseBody extends Pagination {
   data: StampBalance[];
 }
 
-export interface PaginatedSrc20ResponseBody extends Pagination { 
+export interface PaginatedSrc20ResponseBody extends Pagination {
   last_block: number;
   data: Src20Detail[];
 }
 
-export interface PaginatedTickResponseBody extends Pagination { 
+export interface PaginatedTickResponseBody extends Pagination {
   last_block: number;
   mint_status: MintStatus;
   data: Src20Detail[];
-  
 }
 
-
-export interface TickResponseBody extends Pagination { 
+export interface TickResponseBody extends Pagination {
   last_block: number;
   mint_status: MintStatus;
   data: Src20Detail;
-  
 }
 
-
-export interface StampsAndSrc20{
+export interface StampsAndSrc20 {
   stamps: StampRow[];
   src20: SRC20Balance[];
 }
@@ -216,9 +206,8 @@ export interface Src20BalanceResponseBody {
 export interface PaginatedBalanceResponseBody extends Pagination {
   last_block: number;
   btc: BtcInfo;
-  data: StampsAndSrc20[]
+  data: StampsAndSrc20[];
 }
-
 
 export interface StampResponseBody {
   data: StampRow;
@@ -242,7 +231,6 @@ export interface ErrorResponseBody {
 export type PaginatedResponseBody =
   | PaginatedStampResponseBody
   | ErrorResponseBody;
-  
 
 export interface BlockInfoResponseBody {
   block_info: BlockRow;
@@ -260,9 +248,7 @@ export interface StampBlockResponseBody {
   block_info: BlockRow;
   data: StampRow[];
   last_block: number;
-
 }
-
 
 // Handler Contexts ------------------------------------------------------------
 
@@ -296,21 +282,20 @@ export interface TxHandlerContext extends HandlerContext {
   };
 }
 
-
-export interface TickHandlerContext extends HandlerContext { 
+export interface TickHandlerContext extends HandlerContext {
   params: {
     tick: string | number;
   };
 }
 
-export interface BlockTickHandlerContext extends HandlerContext { 
+export interface BlockTickHandlerContext extends HandlerContext {
   params: {
     block_index: number | string;
     tick: string | number;
   };
 }
 
-export interface AddressTickHandlerContext extends HandlerContext { 
+export interface AddressTickHandlerContext extends HandlerContext {
   params: {
     address: string;
     tick: string | number;
@@ -320,6 +305,8 @@ export interface AddressTickHandlerContext extends HandlerContext {
 // Post Request Types ----------------------------------------------------------
 export interface TX {
   hex: string;
+  fee: number;
+  change: number;
 }
 export interface TXError {
   error: string;
@@ -336,8 +323,3 @@ export interface InputData {
   dec?: number;
   amt?: number | string;
 }
-
-
-
-
-

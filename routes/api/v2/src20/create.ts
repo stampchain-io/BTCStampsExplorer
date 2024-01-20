@@ -1,12 +1,10 @@
-import { deploySRC20 } from "utils/minting/src20/index.ts";
-import { HandlerContext, Handlers } from "$fresh/runtime.ts";
 import {
-  TX,
-  TXError,
-  InputData,
-} from "globals";
-
-
+  deploySRC20,
+  mintSRC20,
+  transferSRC20,
+} from "utils/minting/src20/index.ts";
+import { HandlerContext, Handlers } from "$fresh/runtime.ts";
+import { InputData, TX, TXError } from "globals";
 
 /**
  * @swagger
@@ -46,7 +44,7 @@ export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, _ctx: HandlerContext) {
     const body: InputData = await req.json();
     if (body.op.toLowerCase() === "deploy") {
-      const hex: string = await deploySRC20({
+      const hex = await deploySRC20({
         toAddress: body.toAddress,
         changeAddress: body.changeAddress,
         tick: body.tick,
@@ -67,14 +65,25 @@ export const handler: Handlers<TX | TXError> = {
     }
 
     if (body.op.toLowerCase() === "mint") {
-      const hex: string = await deploySRC20({
+      const hex = await mintSRC20({
         toAddress: body.toAddress,
         changeAddress: body.changeAddress,
         tick: body.tick,
         feeRate: body.feeRate,
-        max: body.max,
-        lim: body.lim,
-        dec: body.dec,
+        amt: body.amt,
+      });
+      return new Response(JSON.stringify({
+        ...hex,
+      }));
+    }
+
+    if (body.op.toLowerCase() === "transfer") {
+      const hex = await transferSRC20({
+        toAddress: body.toAddress,
+        fromAddress: body.fromAddress,
+        tick: body.tick,
+        feeRate: body.feeRate,
+        amt: body.amt,
       });
       return new Response(JSON.stringify({
         ...hex,

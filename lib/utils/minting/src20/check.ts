@@ -18,7 +18,7 @@ export async function checkMintedOut(
       throw new Error("Tick not found");
     }
     const { max_supply, total_minted } = mint_status;
-    if (BigFloat(total_minted).add(BigFloat(amount)).gt(max_supply)) {
+    if (new BigFloat(total_minted).add(new BigFloat(amount)).gt(max_supply)) {
       return { ...mint_status, minted_out: true };
     }
     return { ...mint_status, minted_out: false };
@@ -50,5 +50,32 @@ export async function checkDeployedTick(
   } catch (error) {
     console.error(error);
     throw new Error("Error: Internal server error");
+  }
+}
+
+export async function checkEnoughBalance(
+  client: Client,
+  address: string,
+  tick: string,
+  amount: string,
+) {
+  try {
+    const balance_address_tick_data = await Src20Class
+      .get_src20_balance_by_address_and_tick_with_client(
+        client,
+        address,
+        tick,
+      );
+    const balance_address_tick = balance_address_tick_data.rows[0];
+    if (balance_address_tick === null) {
+      throw new Error("No balance found");
+    }
+    if (new BigFloat(amount).gt(balance_address_tick.amt)) {
+      throw new Error("Error: Not enough balance");
+    }
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
 }

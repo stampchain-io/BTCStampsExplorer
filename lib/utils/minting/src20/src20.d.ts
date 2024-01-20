@@ -1,8 +1,22 @@
+import { Buffer } from "buffer";
+
 type INETWORK = "mainnet" | "testnet";
 
 interface VOUT {
-  address: string;
+  address?: string;
   value: number;
+  script?: Buffer;
+}
+
+interface PSBTInput {
+  hash: string;
+  index: number;
+  witnessUtxo?: {
+    script: Buffer;
+    value: number;
+  };
+  nonWitnessUtxo?: Buffer;
+  redeemScript?: Buffer;
 }
 
 interface SRC20Input {
@@ -42,4 +56,12 @@ interface IPrepareSRC20TX {
   feeRate: number;
   transferString: string;
   publicKey: string;
+}
+
+interface ITransferSRC20 {
+  toAddress: string;
+  fromAddress: string;
+  tick: string;
+  feeRate: number;
+  amt: string;
 }
