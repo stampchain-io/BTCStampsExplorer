@@ -2,6 +2,8 @@ import { BigFloat } from "bigfloat/mod.ts";
 import { Client } from "$mysql/mod.ts";
 
 import { Src20Class } from "$lib/database/index.ts";
+import { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "./src20.d.ts";
+import { isValidBitcoinAddress } from "./utils.ts";
 
 export async function checkMintedOut(
   client: Client,
@@ -28,6 +30,32 @@ export async function checkMintedOut(
   }
 }
 
+export function checkMintParams({
+  toAddress,
+  changeAddress,
+  feeRate,
+  tick,
+  amt,
+}: IMintSRC20) {
+  if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
+    throw new Error("Error: toAddress not found");
+  }
+  if (
+    !changeAddress || changeAddress === "" || !isValidBitcoinAddress(toAddress)
+  ) {
+    throw new Error("Error: changeAddress not found");
+  }
+  if (!feeRate) {
+    throw new Error("Error: feeRate not found");
+  }
+  if (!tick || tick === "") {
+    throw new Error("Error: tick not found");
+  }
+  const float_amt = new BigFloat(amt);
+  if (!amt || amt === "" || float_amt.lte(0)) {
+    throw new Error("Error: amt not found or invalid");
+  }
+}
 export async function checkDeployedTick(
   client: Client,
   tick: string,
@@ -50,6 +78,42 @@ export async function checkDeployedTick(
   } catch (error) {
     console.error(error);
     throw new Error("Error: Internal server error");
+  }
+}
+
+export function checkDeployParams({
+  toAddress,
+  changeAddress,
+  tick,
+  feeRate,
+  max,
+  lim,
+  dec = 18,
+}: IDeploySRC20) {
+  if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
+    throw new Error("Error: toAddress not found");
+  }
+  if (
+    !changeAddress || changeAddress === "" || !isValidBitcoinAddress(toAddress)
+  ) {
+    throw new Error("Error: changeAddress not found");
+  }
+  if (!feeRate) {
+    throw new Error("Error: feeRate not found");
+  }
+  if (!tick || tick === "") {
+    throw new Error("Error: tick not found");
+  }
+  const float_max = new BigFloat(max);
+  if (!max || max === "" || float_max.lte(0)) {
+    throw new Error("Error: max not found or invalid");
+  }
+  const float_lim = new BigFloat(lim);
+  if (!lim || lim === "" || float_lim.lte(0) || float_lim.gt(float_max)) {
+    throw new Error("Error: lim not found or invalid");
+  }
+  if (!dec || dec === 0) {
+    throw new Error("Error: dec not found or invalid");
   }
 }
 
@@ -77,5 +141,32 @@ export async function checkEnoughBalance(
   } catch (error) {
     console.error(error);
     return false;
+  }
+}
+
+export function checkTransferParams({
+  toAddress,
+  fromAddress,
+  tick,
+  feeRate,
+  amt,
+}: ITransferSRC20) {
+  if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
+    throw new Error("Error: toAddress not found");
+  }
+  if (
+    !fromAddress || fromAddress === "" || !isValidBitcoinAddress(fromAddress)
+  ) {
+    throw new Error("Error: fromAddress not found");
+  }
+  if (!feeRate) {
+    throw new Error("Error: feeRate not found");
+  }
+  if (!tick || tick === "") {
+    throw new Error("Error: tick not found");
+  }
+  const float_amt = new BigFloat(amt);
+  if (!amt || amt === "" || float_amt.lte(0)) {
+    throw new Error("Error: amt not found or invalid");
   }
 }

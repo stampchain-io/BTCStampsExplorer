@@ -37,6 +37,7 @@
     "$mysql/": "https://deno.land/x/mysql@v2.12.1/",
     "$dayjs/": "https://esm.sh/dayjs@1.11.10/",
     "$fresh_charts/": "https://deno.land/x/fresh_charts@0.3.1/",
+    "compress": "https://deno.land/x/foras@v2.1.4/src/deno/mod.ts",
     "bitcoin": "npm:bitcoinjs-lib@6.1.5",
     "bitcore": "npm:bitcore@4.1.1",
     "crypto": "https://deno.land/std@0.177.0/node/crypto.ts",

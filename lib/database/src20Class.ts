@@ -450,7 +450,6 @@ export class Src20Class {
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    console.log({ address, limit, offset });
     return await handleSqlQueryWithCache(
       client,
       `
@@ -538,7 +537,6 @@ export class Src20Class {
       [tick],
       0,
     );
-    console.log({ max_supply_data });
     const max_supply = new BigFloat(max_supply_data.rows[0]["max"]);
     const decimals = parseInt(max_supply_data.rows[0]["deci"]);
     const limit = parseInt(max_supply_data.rows[0]["lim"]);
@@ -627,7 +625,6 @@ export class Src20Class {
       progress,
       decimals,
     };
-    console.log(response);
 
     return response;
   }

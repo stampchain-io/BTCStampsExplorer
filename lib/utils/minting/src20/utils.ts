@@ -1,8 +1,18 @@
+import * as bitcoin from "bitcoin";
 import { estimateInputSize } from "./utxo-selector.ts";
 
 const MAX_RETRIES = 3;
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
+
+export function isValidBitcoinAddress(address) {
+  try {
+    bitcoin.address.toOutputScript(address);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 function reverseEndian(hexString: string): string {
   if (hexString.length % 2 !== 0) {
