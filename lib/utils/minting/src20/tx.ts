@@ -10,10 +10,12 @@ import {
   hex2bin,
   scramble,
 } from "utils/minting/utils.ts";
+import { IPrepareSRC20TX, PSBTInput, VOUT } from "./src20.d.ts";
 
 import { selectUTXOs } from "./utxo-selector.ts";
+import { compressWithCheck } from "../zlib.ts";
 
-const DUST_SIZE = 808;
+const DUST_SIZE = 777;
 
 export const prepareSrc20TX = async ({
   network,
@@ -30,11 +32,8 @@ export const prepareSrc20TX = async ({
   const psbt = new bitcoin.Psbt({ network: psbtNetwork });
   const sortedUtxos = utxos.sort((a, b) => b.value - a.value);
 
-  const vouts = [{ address: toAddress, value: DUST_SIZE }];
-  let transferHex = Buffer.from(`${"stamp:"}${transferString}`, "utf-8")
-    .toString(
-      "hex",
-    );
+  const vouts: VOUT[] = [{ address: toAddress, value: 789 }];
+  let transferHex = await compressWithCheck(`stamp:${transferString}`);
 
   const count = (transferHex.length / 2).toString(16);
   let padding = "";
@@ -98,12 +97,12 @@ export const prepareSrc20TX = async ({
   for (const cpScriptHex of cpScripts) {
     vouts.push({
       script: Buffer.from(cpScriptHex, "hex"),
-      value: 810,
+      value: DUST_SIZE,
     });
   }
 
   let feeTotal = 0;
-  for (let vout of vouts) {
+  for (const vout of vouts) {
     feeTotal += vout.value;
   }
 
@@ -117,7 +116,7 @@ export const prepareSrc20TX = async ({
     const inputDetails = txDetails.vout[input.vout];
     const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
 
-    const psbtInput = {
+    const psbtInput: PSBTInput = {
       hash: input.txid,
       index: input.vout,
     };

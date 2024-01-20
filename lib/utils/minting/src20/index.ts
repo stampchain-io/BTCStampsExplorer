@@ -2,12 +2,15 @@ import { Client } from "$mysql/mod.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import * as bitcoin from "bitcoin";
 
-import { connectDb, Src20Class } from "$lib/database/index.ts";
+import { connectDb } from "$lib/database/index.ts";
 import { get_public_key_from_address } from "utils/quicknode.ts";
 import {
   checkDeployedTick,
+  checkDeployParams,
   checkEnoughBalance,
   checkMintedOut,
+  checkMintParams,
+  checkTransferParams,
 } from "./check.ts";
 import { prepareSrc20TX } from "./tx.ts";
 import { getUTXOForAddress } from "./utils.ts";
@@ -26,8 +29,14 @@ export async function mintSRC20({
   amt,
 }: IMintSRC20) {
   try {
+    checkMintParams({
+      toAddress,
+      changeAddress,
+      feeRate,
+      tick,
+      amt,
+    });
     const client: Client = await connectDb();
-
     const mint_info = await checkMintedOut(
       client,
       tick,
@@ -35,9 +44,6 @@ export async function mintSRC20({
     );
     if (mint_info.minted_out === true) {
       throw new Error(`Error: token ${tick} already minted out`);
-    }
-    if (new BigFloat(amt).gt(mint_info.lim)) {
-      amt = mint_info.lim;
     }
     const src20_mint_obj = {
       op: "MINT",
@@ -64,7 +70,7 @@ export async function mintSRC20({
     const psbtHex = await prepareSrc20TX(prepare);
     return psbtHex;
   } catch (error) {
-    console.error(error);
+    console.log(error.message);
     return {
       error: error.message,
     };
@@ -81,6 +87,16 @@ export async function deploySRC20({
   dec = 18,
 }: IDeploySRC20) {
   try {
+    checkDeployParams({
+      toAddress,
+      changeAddress,
+      tick,
+      feeRate,
+      max,
+      lim,
+      dec,
+    });
+
     const client = await connectDb();
 
     const mint_info = await checkDeployedTick(
@@ -131,6 +147,13 @@ export async function transferSRC20({
   amt,
 }: ITransferSRC20) {
   try {
+    checkTransferParams({
+      toAddress,
+      fromAddress,
+      tick,
+      feeRate,
+      amt,
+    });
     const client = await connectDb();
     const has_enough_balance = await checkEnoughBalance(
       client,

@@ -19,6 +19,15 @@ interface PSBTInput {
   redeemScript?: Buffer;
 }
 
+interface UTXO {
+  txid: string;
+  vout: number;
+  value: number;
+  address: string;
+  script: string;
+  size?: number;
+}
+
 interface SRC20Input {
   network: string;
   utxos: UTXO[];
