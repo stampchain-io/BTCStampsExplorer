@@ -21,7 +21,7 @@ export class StampsClass {
 
   static async get_total_stamps_by_ident_with_client(
     client: Client,
-    ident: SUBPROTOCOLS,
+    ident: typeof SUBPROTOCOLS,
   ) {
     return await handleSqlQueryWithCache(
       client,
@@ -31,7 +31,7 @@ export class StampsClass {
       WHERE ident = '${ident}'
       AND is_btc_stamp IS NOT NULL;
       `,
-      [ident],
+      [],
       1000 * 60 * 2,
     );
   }
@@ -111,7 +111,7 @@ export class StampsClass {
 
   static async get_stamps_by_ident_with_client(
     client: Client,
-    ident: SUBPROTOCOLS,
+    ident: typeof SUBPROTOCOLS,
     limit = 1000,
     page = 1,
   ) {

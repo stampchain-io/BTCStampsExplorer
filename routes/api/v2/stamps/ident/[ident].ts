@@ -77,10 +77,10 @@ export const handler = async (
       limit,
       page,
     );
-    const total = await StampsClass.get_total_stamps_by_ident_with_client(
+    const total = (await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ident.toUpperCase(),
-    );
+    )).rows[0]["total"];
     const pagination = paginate(total, page, limit);
     const last_block = await CommonClass.get_last_block_with_client(client);
     const body: PaginatedIdResponseBody = {
