@@ -11,6 +11,8 @@ servers:
     description: Production server (uses live data)
   - url: 'http://localhost:8000'
     description: Development server (local)
+  - url: 'https://btcstamps.deno.dev/'
+    description: Staging server (uses live data)
 paths:
 
 
@@ -24,7 +26,7 @@ paths:
           schema:
             type: string
           description: The address of the wallet
-      responses:
+      responses: 
         '200':
           description: Successful response
           content:
@@ -39,6 +41,29 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
 
+  /api/v2/block/{block_index}:
+    get:
+      summary: Get block info by block index or block hash
+      parameters:
+        - in: path
+          name: block_index
+          required: true
+          schema:
+            type: string
+          description: The block index or block hash
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockInfoResponseBody'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/block/block_count/{number}:
     get:
@@ -63,7 +88,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
-
 
 
   /api/v2/block/related/{block_index}:
@@ -91,24 +115,27 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
 
-
-  /api/v2/block/{block_index}:
+  /api/v2/cursed:
     get:
-      summary: Get block info by block index or block hash
+      summary: Get paginated cursed stamps
       parameters:
-        - in: path
-          name: block_index
-          required: true
+        - in: query
+          name: limit
           schema:
-            type: string
-          description: The block index or block hash
+            type: integer
+          description: 'The maximum number of stamps to retrieve (default: 1000)'
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: 'The page number of the results (default: 0)'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BlockInfoResponseBody'
+                $ref: '#/components/schemas/PaginatedStampResponseBody'
         '500':
           description: Internal Server Error
           content:
@@ -116,7 +143,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
-
+  /api/v2/cursed/{id}:
+    get:
+      summary: Get stamp information by ID or identifier
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID or identifier of the stamp
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StampResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/cursed/block/{block_index}:
     get:
@@ -163,7 +212,7 @@ paths:
           name: page
           schema:
             type: integer
-          description: 'The page number of the results (default: 0)'
+          description: 'The page number of the results (default: 1)'
       responses:
         '200':
           description: OK
@@ -178,39 +227,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
-
-
-  /api/v2/cursed:
-    get:
-      summary: Get paginated cursed stamps
-      parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          description: 'The maximum number of stamps to retrieve (default: 1000)'
-        - in: query
-          name: page
-          schema:
-            type: integer
-          description: 'The page number of the results (default: 0)'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedStampResponseBody'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-
-
-  /api/v2/stamps/issuances/{id}:
+  /api/v2/issuances/{id}:
     get:
       summary: Get stamp issuances by stamp id or identifier
       parameters:
@@ -226,7 +243,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampResponseBody'
+                $ref: '#/components/schemas/StampsResponseBody'
         '500':
           description: Internal server error
           content:
@@ -235,30 +252,32 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
 
-
-  /api/v2/src20/balance/{address}/{tick}:
+  /api/v2/src20:
     get:
-      summary: Get src20 balance by address and tick
+      summary: Get paginated valid src20 transactions
+      description: Retrieve paginated valid src20 transactions with optional limit and page parameters
       parameters:
-        - in: path
-          name: address
-          required: true
+        - in: query
+          name: limit
           schema:
-            type: string
-          description: The address of the wallet
-        - in: path
-          name: tick
-          required: true
+            type: integer
+            minimum: 1
+            default: 1000
+          description: The maximum number of transactions to retrieve per page
+        - in: query
+          name: page
           schema:
-            type: string
-          description: The tick value
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
       responses:
         '200':
-          description: Successful response
+          description: Successful response with paginated src20 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20BalanceResponseBody'
+                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
         '500':
           description: Internal server error
           content:
@@ -292,6 +311,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
+
+  /api/v2/src20/balance/{address}/{tick}:
+    get:
+      summary: Get src20 balance by address and tick
+      parameters:
+        - in: path
+          name: address
+          required: true
+          schema:
+            type: string
+          description: The address of the wallet
+        - in: path
+          name: tick
+          required: true
+          schema:
+            type: string
+          description: The tick value
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Src20BalanceResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
 
   /api/v2/src20/block/{block_index}:
@@ -376,6 +425,7 @@ paths:
 
 
 
+
   /api/v2/src20/create:
     post:
       summary: Create a new SRC20 token or mint additional tokens.
@@ -385,6 +435,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/InputData'
+            examples:
+              deploy:
+                value:
+                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  op: "deploy"
+                  tick: "PSBT"
+                  feeRate: 60
+                  max: 2100000000
+                  lim: 100000
+                  dec: 18
+              mint:
+                value:
+                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  op: "mint"
+                  tick: "DOGE"
+                  feeRate: 150
+                  amt: 1000
+              transfer:
+                value:
+                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  op: "transfer"
+                  tick: "STAMP"
+                  feeRate: 150
+                  amt: 100000
       responses:
         '200':
           description: Successful response with the hex value.
@@ -407,40 +484,6 @@ paths:
                     type: string
                     description: The error message.
 
-
-
-  /api/v2/src20:
-    get:
-      summary: Get paginated valid src20 transactions
-      description: Retrieve paginated valid src20 transactions with optional limit and page parameters
-      parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            minimum: 1
-            default: 1000
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
-      responses:
-        '200':
-          description: Successful response with paginated src20 transactions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
 
 
 
@@ -479,30 +522,6 @@ paths:
 
 
 
-  /tick/{tick}/deploy:
-    get:
-      summary: Get deployment details for a specific tick
-      description: Retrieve deployment details for a specific tick in the tick API.
-      parameters:
-        - in: path
-          name: tick
-          required: true
-          description: The tick value.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response with deployment details.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TickResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
 
 
 
@@ -540,7 +559,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
-
+  /api/v2/src20/tick/{tick}/deploy:
+    get:
+      summary: Get deployment details for a specific tick
+      description: Retrieve deployment details for a specific tick in the tick API.
+      parameters:
+        - in: path
+          name: tick
+          required: true
+          description: The tick value.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with deployment details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TickResponseBody'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
 
   /api/v2/src20/tx/{tx_hash}:
@@ -568,6 +610,99 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
 
+
+
+
+  /api/v2/stamps:
+    get:
+      summary: Get paginated stamps
+      description: Retrieve a paginated list of stamps.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: The maximum number of stamps to return per page. Defaults to 1000.
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: The page number to retrieve. Defaults to 1.
+      responses:
+        '200':
+          description: Successful response with paginated stamps.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStampResponseBody'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+
+  /api/v2/stamps/{id}:
+    get:
+      summary: Get stamp by ID
+      description: Retrieve a stamp by its ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of the stamp
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StampResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+
+  /api/v2/stamps/balance/{address}:
+    get:
+      summary: Get stamp balances by address
+      description: Retrieve stamp balances for a specific address
+      parameters:
+        - in: path
+          name: address
+          required: true
+          description: The address to retrieve stamp balances for
+          schema:
+            type: string
+        - in: query
+          name: limit
+          description: 'The maximum number of stamp balances to retrieve. default: 1000'
+          schema:
+            type: integer
+        - in: query
+          name: page
+          description: 'The page number of stamp balances to retrieve. default: 1'
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStampBalanceResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/stamps/block/{block_index}:
     get:
@@ -613,7 +748,7 @@ paths:
             type: integer
         - in: query
           name: page
-          description: 'The page number of stamps to retrieve (default: 0)'
+          description: 'The page number of stamps to retrieve (default: 1)'
           schema:
             type: integer
       responses:
@@ -637,62 +772,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
 
-
-  /api/v2/stamps:
-    get:
-      summary: Get paginated stamps
-      description: Retrieve a paginated list of stamps.
-      parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          description: The maximum number of stamps to return per page. Defaults to 1000.
-        - in: query
-          name: page
-          schema:
-            type: integer
-          description: The page number to retrieve. Defaults to 1.
-      responses:
-        '200':
-          description: Successful response with paginated stamps.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedStampResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-
-
-  /api/v2/stamps/{id}:
-    get:
-      summary: Get stamp by ID
-      description: Retrieve a stamp by its ID
-      parameters:
-        - in: path
-          name: id
-          required: true
-          description: ID of the stamp
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StampResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
 
 
 components:
@@ -1017,42 +1096,54 @@ components:
           type: number
     PaginatedStampResponseBody:
       type: object
-      properties:
-        last_block:
-          type: number
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampRow"
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            last_block:
+              type: number
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/StampRow"
     PaginatedStampBalanceResponseBody:
       type: object
-      properties:
-        last_block:
-          type: number
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampBalance"
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            last_block:
+              type: number
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/StampBalance"
     PaginatedSrc20ResponseBody:
       type: object
-      properties:
-        last_block:
-          type: number
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/Src20Detail"
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            last_block:
+              type: number
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Src20Detail"
     PaginatedTickResponseBody:
       type: object
-      properties:
-        last_block:
-          type: number
-        mint_status:
-          $ref: "#/components/schemas/MintStatus"
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/Src20Detail"
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            last_block:
+              type: number
+            mint_status:
+              $ref: "#/components/schemas/MintStatus"
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Src20Detail"
     TickResponseBody:
       type: object
       properties:
@@ -1091,15 +1182,18 @@ components:
             $ref: "#/components/schemas/Src20Detail"
     PaginatedBalanceResponseBody:
       type: object
-      properties:
-        last_block:
-          type: number
-        btc:
-          $ref: "#/components/schemas/BtcInfo"
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampsAndSrc20"
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            last_block:
+              type: number
+            btc:
+              $ref: "#/components/schemas/BtcInfo"
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/StampsAndSrc20"
     StampResponseBody:
       type: object
       properties:
@@ -1110,25 +1204,27 @@ components:
     StampsResponseBody:
       type: object
       properties:
+        last_block:
+          type: number
         data:
           type: array
           items:
             $ref: "#/components/schemas/StampRow"
-        last_block:
-          type: number
     PaginatedIdResponseBody:
       type: object
-      properties:
-        ident:
-          oneOf:
-            - type: string
-            
-        last_block:
-          type: number
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampRow"
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            last_block:
+              type: number
+            ident:
+              oneOf:
+                - type: string
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/StampRow"
     ErrorResponseBody:
       type: object
       properties:
@@ -1156,12 +1252,12 @@ components:
     BlockRelatedResponseBody:
       type: object
       properties:
+        last_block:
+          type: number
         blocks:
           type: array
           items:
             $ref: "#/components/schemas/BlockRow"
-        last_block:
-          type: number
     StampBlockResponseBody:
       type: object
       properties:
@@ -1272,6 +1368,10 @@ components:
           type: string
         changeAddress:
           type: string
+        fromAddress:
+          oneOf:
+            - type: string
+              nullable: true
         tick:
           type: string
         feeRate:
@@ -1280,13 +1380,17 @@ components:
           oneOf:
             - type: number
             - type: string
+              nullable: true
         lim:
           oneOf:
             - type: number
             - type: string
+              nullable: true
         dec:
           type: number
+          nullable: true
         amt:
           oneOf:
             - type: number
             - type: string
+              nullable: true

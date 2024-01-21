@@ -69,7 +69,7 @@ export const handler = async (
   try {
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
-    const page = Number(url.searchParams.get("page")) || 0;
+    const page = Number(url.searchParams.get("page")) || 1;
     const client = await connectDb();
     const data = await StampsClass.get_stamps_by_ident_with_client(
       client,
