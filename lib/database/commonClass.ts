@@ -86,7 +86,6 @@ export class CommonClass {
       [block_index, block_index],
       0,
     );
-    console.log({ blocks });
     const populated = blocks?.rows?.map(async (block: any) => {
       const issuances_from_block = await handleSqlQueryWithCache(
         client,
@@ -437,7 +436,6 @@ export class CommonClass {
         LIMIT ${limit}
         OFFSET ${offset};
       `;
-      console.log(query);
 
       const balances = await handleSqlQueryWithCache(
         client,
