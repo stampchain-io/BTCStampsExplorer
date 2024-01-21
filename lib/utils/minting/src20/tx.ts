@@ -14,6 +14,7 @@ import { IPrepareSRC20TX, PSBTInput, VOUT } from "./src20.d.ts";
 
 import { selectUTXOs } from "./utxo-selector.ts";
 import { compressWithCheck } from "../zlib.ts";
+import { conf } from "utils/config.ts";
 
 const DUST_SIZE = 777;
 
@@ -98,6 +99,15 @@ export const prepareSrc20TX = async ({
     vouts.push({
       script: Buffer.from(cpScriptHex, "hex"),
       value: DUST_SIZE,
+    });
+  }
+
+  if (parseInt(conf.MINTING_SERVICE_FEE_ENABLED) === 1) {
+    const feeAddress = conf.MINTING_SERVICE_FEE_ADDRESS;
+    const feeAmount = parseInt(conf.MINTING_SERVICE_FEE_FIXED_SATS);
+    vouts.push({
+      address: feeAddress,
+      value: feeAmount,
     });
   }
 
