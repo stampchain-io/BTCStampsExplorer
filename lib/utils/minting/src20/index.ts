@@ -9,7 +9,7 @@ import {
   checkDeployParams,
   checkEnoughBalance,
   checkMintedOut,
-  checkMintParams,
+  checkMintParams, 
   checkTransferParams,
 } from "./check.ts";
 import { prepareSrc20TX } from "./tx.ts";
@@ -36,6 +36,7 @@ export async function mintSRC20({
       tick,
       amt,
     });
+    
     const client: Client = await connectDb();
     const mint_info = await checkMintedOut(
       client,
@@ -96,7 +97,6 @@ export async function deploySRC20({
       lim,
       dec,
     });
-
     const client = await connectDb();
 
     const mint_info = await checkDeployedTick(

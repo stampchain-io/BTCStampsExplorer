@@ -9,7 +9,7 @@ export async function checkMintedOut(
   client: Client,
   tick: string,
   amount: string,
-) {
+) { 
   try {
     const mint_status = await Src20Class
       .get_src20_minting_progress_by_tick_with_client(

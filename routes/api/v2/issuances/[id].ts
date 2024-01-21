@@ -9,7 +9,7 @@ import {
 
 /**
  * @swagger
- * /api/v2/stamps/issuances/{id}:
+ * /api/v2/issuances/{id}:
  *   get:
  *     summary: Get stamp issuances by stamp id or identifier
  *     parameters:

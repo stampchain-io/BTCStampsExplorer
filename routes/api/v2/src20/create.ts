@@ -43,7 +43,7 @@ import { InputData, TX, TXError } from "globals";
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, _ctx: HandlerContext) {
     const body: InputData = await req.json();
-    if (body.op.toLowerCase() === "deploy") {
+    if (body.op.toLowerCase() === "deploy") { 
       const hex = await deploySRC20({
         toAddress: body.toAddress,
         changeAddress: body.changeAddress,

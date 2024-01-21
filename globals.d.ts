@@ -24,7 +24,7 @@ interface StampRow {
   asset_longname: string | null;
   creator: string;
   divisible: number;
-  keyburn: number | null;
+  keyburn: number | null; 
   locked: number;
   message_index: number;
   stamp_base64: string;
@@ -316,6 +316,7 @@ export interface InputData {
   op: string;
   toAddress: string;
   changeAddress: string;
+  fromAddress?: string;
   tick: string;
   feeRate: number;
   max?: number | string;
