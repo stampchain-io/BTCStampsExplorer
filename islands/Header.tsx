@@ -40,7 +40,7 @@ export function Header() {
             f-partial={"/block/last"}
             class="font-bold text-xl text-indigo-600"
           >
-            Bitcoin Stamps
+            BITCOIN STAMPS
           </a>
           <button
             onClick={toggleMenu}
@@ -67,7 +67,7 @@ export function Header() {
               path === "block" ? activeClass : inactiveClass
             }`}
           >
-            Blocks
+            BLOCKS
           </a>
           <a
             href="/stamp"
@@ -77,7 +77,7 @@ export function Header() {
               path === "stamp" ? activeClass : inactiveClass
             }`}
           >
-            Stamps
+            STAMPS
           </a>
           <a
             href="/src20"
