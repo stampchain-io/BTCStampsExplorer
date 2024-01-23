@@ -8,11 +8,13 @@ externalDocs:
   url: 'http://stampchain.io'
 servers:
   - url: 'https://stampchain.io'
+    description:  Production server (uses live data)
+  - url: "https://bitcoinstamps.xyz"
     description: Production server (uses live data)
   - url: 'http://localhost:8000'
-    description: Development server (local)
-  - url: 'https://btcstamps.deno.dev/'
-    description: Staging server (uses live data)
+  #   description: Development server (local)
+  # - url: 'https://btcstamps.deno.dev/'
+  #   description: Staging server (uses live data)
 paths:
 
 
@@ -123,7 +125,7 @@ paths:
           name: limit
           schema:
             type: integer
-          description: 'The maximum number of stamps to retrieve (default: 1000)'
+          description: 'The maximum number of stamps to retrieve (default: 50)'
         - in: query
           name: page
           schema:
@@ -207,7 +209,7 @@ paths:
           name: limit
           schema:
             type: integer
-          description: 'The maximum number of stamps to retrieve (default: 1000)'
+          description: 'The maximum number of stamps to retrieve (default: 50)'
         - in: query
           name: page
           schema:
@@ -262,7 +264,7 @@ paths:
           schema:
             type: integer
             minimum: 1
-            default: 1000
+            default: 50
           description: The maximum number of transactions to retrieve per page
         - in: query
           name: page
@@ -357,7 +359,7 @@ paths:
           name: limit
           schema:
             type: integer
-          description: 'The maximum number of transactions to retrieve (default: 1000)'
+          description: 'The maximum number of transactions to retrieve (default: 50)'
         - in: query
           name: page
           schema:
@@ -400,7 +402,7 @@ paths:
           schema:
             type: integer
             minimum: 1
-            default: 1000
+            default: 50
           description: The maximum number of transactions to return per page.
         - in: query
           name: page
@@ -428,7 +430,14 @@ paths:
 
   /api/v2/src20/create:
     post:
-      summary: Create a new SRC20 token or mint additional tokens.
+      summary: Deploy, Mint, Transfer SRC-20 Tokens
+      description: |
+        This returns an unsigned transaction ready for signing and broadcasting
+        via wallet or library. There is no validation that the input data provided
+        will conform to SRC-20 specifications or mint limit requirements. It is the 
+        users sole responsibility to confirm mint, deploy limits and confirm existing
+        balances prior to a transfer of tokens. The examples provided are for demonstration
+        purposes only.
       requestBody:
         required: true
         content:
@@ -441,7 +450,7 @@ paths:
                   toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
                   op: "deploy"
-                  tick: "PSBT"
+                  tick: "KEVIN"
                   feeRate: 60
                   max: 2100000000
                   lim: 100000
@@ -497,7 +506,7 @@ paths:
           schema:
             type: integer
             minimum: 1
-            default: 1000
+            default: 50
           description: The maximum number of transactions to retrieve per page
         - in: query
           name: page
@@ -538,7 +547,7 @@ paths:
             type: string
         - in: query
           name: limit
-          description: 'Number of records per page (default: 1000)'
+          description: 'Number of records per page (default: 50)'
           schema:
             type: integer
         - in: query
@@ -622,7 +631,7 @@ paths:
           name: limit
           schema:
             type: integer
-          description: The maximum number of stamps to return per page. Defaults to 1000.
+          description: The maximum number of stamps to return per page. Defaults to 50.
         - in: query
           name: page
           schema:
@@ -682,7 +691,7 @@ paths:
             type: string
         - in: query
           name: limit
-          description: 'The maximum number of stamp balances to retrieve. default: 1000'
+          description: 'The maximum number of stamp balances to retrieve. default: 50'
           schema:
             type: integer
         - in: query
@@ -743,7 +752,7 @@ paths:
             type: string
         - in: query
           name: limit
-          description: 'The maximum number of stamps to retrieve (default: 1000)'
+          description: 'The maximum number of stamps to retrieve (default: 50)'
           schema:
             type: integer
         - in: query
