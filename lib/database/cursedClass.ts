@@ -39,7 +39,7 @@ export class CursedClass {
 
   static async get_cursed_by_page_with_client(
     client: Client,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -61,7 +61,7 @@ export class CursedClass {
 
   static async get_resumed_cursed_by_page_with_client(
     client: Client,
-    limit = 1000,
+    limit = 50,
     page = 1,
     order = "DESC",
   ) {
@@ -106,7 +106,7 @@ export class CursedClass {
   static async get_cursed_by_ident_with_client(
     client: Client,
     ident: SUBPROTOCOLS,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;

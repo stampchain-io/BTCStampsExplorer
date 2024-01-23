@@ -1,7 +1,7 @@
 import { connectDb, StampsClass, CommonClass } from "../database/index.ts";
 import { get_holders} from "../utils/xcp.ts"
 
-export async function api_get_stamps(page = 0, page_size = 1000, order: "DESC"|"ASC"="DESC") {
+export async function api_get_stamps(page = 0, page_size = 200, order: "DESC"|"ASC"="DESC") {
   try {
     const client = await connectDb();
     const stamps = await StampsClass.get_resumed_stamps_by_page_with_client(client, page_size, page, order);
@@ -9,7 +9,7 @@ export async function api_get_stamps(page = 0, page_size = 1000, order: "DESC"|"
       client.close();
       throw new Error("No stamps found");
     }
-    const total = await StampsClass.get_total_stamps_with_client(client);
+    const total = await StampsClass.get_total_stamps_by_ident_with_client(client, ["STAMP", "SRC-721"]);
     client.close();
     return {
       stamps: stamps.rows,

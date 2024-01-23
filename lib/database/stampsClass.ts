@@ -19,16 +19,27 @@ export class StampsClass {
     );
   }
 
+  /**
+   * Retrieves the total number of stamps by identifier(s) with the specified client.
+   * 
+   * @param client - The database client.
+   * @param ident - The identifier(s) of the stamps. It can be a single identifier or an array of identifiers.
+   *                If it's a single identifier, it should be one of the values defined in the SUBPROTOCOLS enum.
+   *                If it's an array of identifiers, each identifier should be one of the values defined in the SUBPROTOCOLS enum.
+   * @returns A promise that resolves to the total number of stamps matching the identifier(s) with the client.
+   */
   static async get_total_stamps_by_ident_with_client(
     client: Client,
-    ident: typeof SUBPROTOCOLS,
+    ident: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
   ) {
+    const identList = Array.isArray(ident) ? ident : [ident];
+    const identCondition = identList.map((id) => `ident = '${id}'`).join(" OR ");
     return await handleSqlQueryWithCache(
       client,
       `
       SELECT COUNT(*) AS total
       FROM ${STAMP_TABLE}
-      WHERE ident = '${ident}'
+      WHERE (${identCondition})
       AND is_btc_stamp IS NOT NULL;
       `,
       [],
@@ -38,7 +49,7 @@ export class StampsClass {
 
   static async get_stamps_by_page_with_client(
     client: Client,
-    limit = 1000,
+    limit = 50,
     page = 1,
   ) {
     const offset = (page - 1) * limit;
@@ -59,7 +70,7 @@ export class StampsClass {
 
   static async get_resumed_stamps_by_page_with_client(
     client: Client,
-    limit = 1000,
+    limit = 50,
     page = 1,
     order = "DESC",
   ) {
@@ -81,7 +92,7 @@ export class StampsClass {
         st.block_index
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.is_btc_stamp IS NOT NULL
+      WHERE st.is_btc_stamp IS NOT NULL AND (st.ident = 'STAMP' or st.ident = 'SRC-721')
       ORDER BY st.tx_index ${order}
       LIMIT ${limit} OFFSET ${offset};
       `,
@@ -112,7 +123,7 @@ export class StampsClass {
   static async get_stamps_by_ident_with_client(
     client: Client,
     ident: typeof SUBPROTOCOLS,
-    limit = 1000,
+    limit = 50,
     page = 1,
   ) {
     const offset = (page - 1) * limit;

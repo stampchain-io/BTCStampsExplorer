@@ -4,7 +4,7 @@ import { paginate } from "../utils/util.ts";
 
 export const api_get_stamp_balance = async (
   address: string,
-  limit = 1000,
+  limit = 50,
   page = 1,
 ) => {
   try {
@@ -79,7 +79,7 @@ export const api_get_src20_balance_by_tick = async (
 
 export const api_get_balance = async (
   address: string,
-  limit = 1000,
+  limit = 50,
   page = 1,
 ) => {
   try {

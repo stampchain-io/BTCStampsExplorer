@@ -55,7 +55,7 @@ export class Src20Class {
 
   static async get_valid_src20_tx_with_client(
     client: Client,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -84,7 +84,7 @@ export class Src20Class {
   static async get_valid_src20_tx_from_block_with_client(
     client: Client,
     block_index: number,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -115,7 +115,7 @@ export class Src20Class {
     client: Client,
     block_index: number,
     tick: string,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -181,7 +181,7 @@ export class Src20Class {
     client: Client,
     tick: string,
     op = "DEPLOY",
-    limit = 1000,
+    limit = 50,
     page = 0,
     order = "ASC",
   ) {
@@ -214,7 +214,7 @@ export class Src20Class {
   static async get_valid_src20_tx_by_tick_with_client(
     client: Client,
     tick: string,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -244,7 +244,7 @@ export class Src20Class {
   static async get_total_valid_src20_tx_by_op_with_client(
     client: Client,
     op = "DEPLOY",
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -265,7 +265,7 @@ export class Src20Class {
   static async get_valid_src20_tx_by_op_with_client(
     client: Client,
     op = "DEPLOY",
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -364,7 +364,7 @@ export class Src20Class {
   static async get_valid_src20_tx_by_address_with_client(
     client: Client,
     address: string,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -414,7 +414,7 @@ export class Src20Class {
     client: Client,
     address: string,
     tick: string,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -446,7 +446,7 @@ export class Src20Class {
   static async get_src20_balance_by_address_with_client(
     client: Client,
     address: string,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -485,7 +485,7 @@ export class Src20Class {
     client: Client,
     tick: string,
     amt = 1,
-    limit = 1000,
+    limit = 50,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;

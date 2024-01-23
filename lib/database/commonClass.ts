@@ -401,7 +401,7 @@ export class CommonClass {
   static async get_stamp_balances_by_address_with_client(
     client: Client,
     address: string,
-    limit = 1000,
+    limit = 50,
     page = 1,
     order = "DESC",
   ) {
@@ -414,7 +414,6 @@ export class CommonClass {
         SELECT 
           st.cpid, 
           st.stamp, 
-          st.stamp_base64, 
           st.stamp_url, 
           st.stamp_mimetype, 
           st.tx_hash, 
