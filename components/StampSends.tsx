@@ -10,17 +10,17 @@ export function StampSends({ sends }: { sends: SendRow[] }) {
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg max-h-96 max-w-96">
       <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-          Activity
+          ACTIVITY
         </caption>
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th scope="col" class="px-6 py-3">From</th>
             <th scope="col" class="px-6 py-3">To</th>
             <th scope="col" class="px-6 py-3">Qty</th>
-            <th scope="col" class="px-6 py-3">Unitary price</th>
+            <th scope="col" class="px-6 py-3">Unit Price</th>
             <th scope="col" class="px-6 py-3">Memo</th>
-            <th scope="col" class="px-6 py-3">Tx_hash</th>
-            <th scope="col" class="px-6 py-3">Timestamp</th>
+            <th scope="col" class="px-6 py-3">Tx hash</th>
+            <th scope="col" class="px-6 py-3">Created</th>
           </tr>
         </thead>
         <tbody>
