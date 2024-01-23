@@ -2,7 +2,7 @@ import { connectDb, CursedClass } from "$lib/database/index.ts";
 
 export async function api_get_cursed(
   page: number = 0,
-  page_size: number = 1000,
+  page_size: number = 200,
   order: "DESC" | "ASC" = "DESC",
 ) {
   try {

@@ -47,6 +47,12 @@ export const get_suffix_from_mimetype = (mimetype: string) => {
   return suffix;
 };
 
+/**
+ * Returns a shortened version of the given address.
+ * @param address - The address to be shortened.
+ * @param number - The number of characters to keep at the beginning and end of the address. Default is 6.
+ * @returns The shortened address.
+ */
 export const short_address = (address: string, number = 6) => {
   return address.slice(0, number) + "..." + address.slice(-number);
 };
