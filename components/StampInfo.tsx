@@ -34,14 +34,14 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          CPID: {stamp.cpid}
+          ID: {stamp.cpid}
         </a>
       </div>
       <div class="flex justify-around truncate border-b border-t">
         <p>
           Creator: {stamp.creator_name
             ? stamp.creator_name
-            : short_address(stamp.creator, 6)}
+            : stamp.creator}
         </p>
       </div>
       <div class="flex justify-around truncate border-b border-t">

@@ -31,14 +31,14 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
             <th scope="col" class="px-6 py-3">Kind</th>
             <th scope="col" class="px-6 py-3">From</th>
             <th scope="col" class="px-6 py-3">To</th>
-            <th scope="col" class="px-6 py-3">Cpid</th>
+            <th scope="col" class="px-6 py-3">ID</th>
             <th scope="col" class="px-6 py-3">Tick</th>
             <th scope="col" class="px-6 py-3">Qty</th>
-            <th scope="col" class="px-6 py-3">Unitary price</th>
+            <th scope="col" class="px-6 py-3">Unit Price</th>
             <th scope="col" class="px-6 py-3">Memo</th>
-            <th scope="col" class="px-6 py-3">Tx_hash</th>
-            <th scope="col" class="px-6 py-3">Tx_index</th>
-            <th scope="col" class="px-6 py-3">Timestamp</th>
+            <th scope="col" class="px-6 py-3">Tx hash</th>
+            <th scope="col" class="px-6 py-3">Tx index</th>
+            <th scope="col" class="px-6 py-3">Created</th>
           </tr>
         </thead>
         <tbody>
