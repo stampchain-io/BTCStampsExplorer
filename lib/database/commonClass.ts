@@ -414,6 +414,7 @@ export class CommonClass {
         SELECT 
           st.cpid, 
           st.stamp, 
+          st.stamp_base64,
           st.stamp_url, 
           st.stamp_mimetype, 
           st.tx_hash, 
