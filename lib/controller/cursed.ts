@@ -1,8 +1,9 @@
 import { connectDb, CursedClass } from "$lib/database/index.ts";
+import { BIG_LIMIT } from "utils/constants.ts";
 
 export async function api_get_cursed(
-  page: number = 0,
-  page_size: number = 200,
+  page = 1,
+  page_size: number = BIG_LIMIT,
   order: "DESC" | "ASC" = "DESC",
 ) {
   try {

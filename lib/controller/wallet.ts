@@ -1,10 +1,11 @@
 import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
 import { getBtcAddressInfo } from "../utils/btc.ts";
+import { SMALL_LIMIT } from "utils/constants.ts";
 import { paginate } from "../utils/util.ts";
 
 export const api_get_stamp_balance = async (
   address: string,
-  limit = 50,
+  limit = SMALL_LIMIT,
   page = 1,
 ) => {
   try {

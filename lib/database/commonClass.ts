@@ -2,10 +2,9 @@
 
 import { Client } from "$mysql/mod.ts";
 import { summarize_issuances } from "./index.ts";
-import { BLOCK_TABLE, SEND_TABLE, STAMP_TABLE } from "constants";
 import { get_balances } from "utils/xcp.ts";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
-import { TTL_CACHE } from "utils/constants.ts";
+import { SMALL_LIMIT, STAMP_TABLE, TTL_CACHE } from "utils/constants.ts";
 
 export class CommonClass {
   //------------------Blocks by index------------------
@@ -98,21 +97,12 @@ export class CommonClass {
         "never",
       );
 
-      const sends_from_block = await handleSqlQueryWithCache(
-        client,
-        `
-        SELECT COUNT(*) AS sends
-        FROM sends
-        WHERE block_index = '${block.block_index}';
-        `,
-        [block.block_index],
-        "never",
-      );
+      const sends_from_block = 0;
 
       return {
         ...block,
         issuances: issuances_from_block.rows[0]["issuances"] ?? 0,
-        sends: sends_from_block.rows[0]["sends"] ?? 0,
+        sends: sends_from_block,
       };
     });
     const result = await Promise.all(populated.reverse());
@@ -136,29 +126,6 @@ export class CommonClass {
       ) num ON st.cpid = num.cpid
       WHERE st.block_index = '${block_index}'
       ORDER BY st.tx_index;
-      `,
-      [block_index],
-      "never",
-    );
-  }
-
-  static async get_sends_by_block_index_with_client(
-    client: Client,
-    block_index: number,
-  ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT s.*, st.*
-      FROM sends s
-      JOIN ${STAMP_TABLE} st ON s.cpid = st.cpid
-      WHERE s.block_index = ${block_index}
-        AND st.is_valid_base64 = true
-        AND st.block_index = (SELECT MIN(block_index) 
-                              FROM ${STAMP_TABLE} 
-                              WHERE cpid = s.cpid 
-                                AND is_valid_base64 = 1)
-      ORDER BY s.tx_index;
       `,
       [block_index],
       "never",
@@ -229,21 +196,12 @@ export class CommonClass {
         "never",
       );
 
-      const sends_from_block = await handleSqlQueryWithCache(
-        client,
-        `
-        SELECT COUNT(*) AS sends
-        FROM sends
-        WHERE block_index = '${block.block_index}';
-        `,
-        [block.block_index],
-        "never",
-      );
+      const sends_from_block = 0;
 
       return {
         ...block,
         issuances: issuances_from_block.rows[0]["issuances"] ?? 0,
-        sends: sends_from_block.rows[0]["sends"] ?? 0,
+        sends: sends_from_block,
       };
     });
     const result = await Promise.all(populated.reverse());
@@ -269,33 +227,6 @@ export class CommonClass {
       ORDER BY st.tx_index;
       `,
       [block_hash],
-      "never",
-    );
-  }
-
-  static async get_sends_by_block_hash_with_client(
-    client: Client,
-    block_hash: string,
-  ) {
-    const block_index = await this.get_block_index_by_hash_with_client(
-      client,
-      block_hash,
-    );
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT s.*, st.*
-      FROM sends s
-      JOIN ${STAMP_TABLE} st ON s.cpid = st.cpid
-      WHERE s.block_index = ${block_index}
-        AND st.is_valid_base64 = true
-        AND st.block_index = (SELECT MIN(block_index) 
-                              FROM ${STAMP_TABLE} 
-                              WHERE cpid = s.cpid 
-                                AND is_valid_base64 = 1)
-      ORDER BY s.tx_index;
-      `,
-      [block_index],
       "never",
     );
   }
@@ -401,7 +332,7 @@ export class CommonClass {
   static async get_stamp_balances_by_address_with_client(
     client: Client,
     address: string,
-    limit = 50,
+    limit = SMALL_LIMIT,
     page = 1,
     order = "DESC",
   ) {
@@ -467,20 +398,5 @@ export class CommonClass {
       console.error("Error getting balances: ", error);
       return [];
     }
-  }
-
-  static async get_sends_for_cpid_with_client(client: Client, cpid: string) {
-    const query = `
-      SELECT s.*, b.block_time FROM ${SEND_TABLE} AS s
-      LEFT JOIN ${BLOCK_TABLE} AS b ON s.block_index = b.block_index
-      WHERE s.cpid = '${cpid}'
-      ORDER BY s.tx_index;
-    `;
-    return await handleSqlQueryWithCache(
-      client,
-      query,
-      [cpid],
-      1000 * 60 * 60,
-    );
   }
 }
