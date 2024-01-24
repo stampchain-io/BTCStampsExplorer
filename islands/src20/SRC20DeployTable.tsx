@@ -112,10 +112,10 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                       : short_address(src20.destination)}
                   </td>
                   <td class="px-6 py-4">
-                    {src20.max}
+                    {typeof src20.max === 'number' ? src20.max.toLocaleString() : Number(src20.max).toLocaleString()}
                   </td>
                   <td class="px-6 py-4">
-                    {src20.lim}
+                    {typeof src20.lim === 'number' ? src20.lim.toLocaleString() : Number(src20.lim).toLocaleString()}
                   </td>
                   <td class="px-6 py-4">
                     {src20.deci}
