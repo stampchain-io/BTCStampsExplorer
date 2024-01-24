@@ -17,7 +17,7 @@ export default function App({ Component }: AppProps) {
       <body class="bg-black">
         <ToastProvider>
           <div
-            class="px-2 py-8 mx-auto bg-[#000000] flex flex-col md:gap-4 overflow-auto max-w-6xl"
+            class="px-2 py-8 mx-auto bg-[#000000] flex flex-col md:gap-4 overflow-auto max-w-7xl"
             f-client-nav
           >
             <div class="py-0 my-0">
