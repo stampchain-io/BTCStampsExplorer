@@ -4,6 +4,7 @@ import { api_get_stamps } from "$lib/controller/stamp.ts";
 
 import { PageControl } from "$components/PageControl.tsx";
 import { StampCard } from "$components/StampCard.tsx";
+import { BIG_LIMIT } from "constants";
 
 type StampPageProps = {
   params: {
@@ -19,7 +20,7 @@ export const handler: Handlers<StampRow> = {
   async GET(req: Request, ctx: HandlerContext) {
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1");
-    const page_size = parseInt(url.searchParams.get("limit") || "200");
+    const page_size = parseInt(url.searchParams.get("limit") || BIG_LIMIT);
     const order = url.searchParams.get("order")?.toUpperCase() || "DESC";
     const { stamps, total, pages, page: pag, page_size: limit } =
       await api_get_stamps(page, page_size, order);

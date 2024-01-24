@@ -1,7 +1,6 @@
 import { Client } from "$mysql/mod.ts";
-import { STAMP_TABLE } from "constants";
+import { SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
-import { TTL_CACHE } from "constants";
 import { SUBPROTOCOLS } from "utils/protocol.ts";
 
 export class CursedClass {
@@ -39,7 +38,7 @@ export class CursedClass {
 
   static async get_cursed_by_page_with_client(
     client: Client,
-    limit = 50,
+    limit = SMALL_LIMIT,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
@@ -61,7 +60,7 @@ export class CursedClass {
 
   static async get_resumed_cursed_by_page_with_client(
     client: Client,
-    limit = 50,
+    limit = SMALL_LIMIT,
     page = 1,
     order = "DESC",
   ) {
@@ -106,7 +105,7 @@ export class CursedClass {
   static async get_cursed_by_ident_with_client(
     client: Client,
     ident: SUBPROTOCOLS,
-    limit = 50,
+    limit = SMALL_LIMIT,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;

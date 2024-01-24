@@ -1,9 +1,9 @@
 import { Client } from "$mysql/mod.ts";
 import { CommonClass, summarize_issuances } from "./index.ts";
-import { STAMP_TABLE, TTL_CACHE } from "constants";
-import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "../utils/protocol.ts";
-import { handleSqlQueryWithCache } from "../utils/cache.ts";
-import { get_suffix_from_mimetype, getMimeType } from "utils/util.ts";
+import { SMALL_LIMIT, STAMP_TABLE, TTL_CACHE } from "constants";
+import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
+import { handleSqlQueryWithCache } from "utils/cache.ts";
+import { get_suffix_from_mimetype } from "utils/util.ts";
 
 export class StampsClass {
   static async get_total_stamps_with_client(client: Client) {
@@ -21,7 +21,7 @@ export class StampsClass {
 
   /**
    * Retrieves the total number of stamps by identifier(s) with the specified client.
-   * 
+   *
    * @param client - The database client.
    * @param ident - The identifier(s) of the stamps. It can be a single identifier or an array of identifiers.
    *                If it's a single identifier, it should be one of the values defined in the SUBPROTOCOLS enum.
@@ -33,7 +33,9 @@ export class StampsClass {
     ident: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
   ) {
     const identList = Array.isArray(ident) ? ident : [ident];
-    const identCondition = identList.map((id) => `ident = '${id}'`).join(" OR ");
+    const identCondition = identList.map((id) => `ident = '${id}'`).join(
+      " OR ",
+    );
     return await handleSqlQueryWithCache(
       client,
       `
@@ -49,7 +51,7 @@ export class StampsClass {
 
   static async get_stamps_by_page_with_client(
     client: Client,
-    limit = 50,
+    limit = SMALL_LIMIT,
     page = 1,
   ) {
     const offset = (page - 1) * limit;
@@ -70,7 +72,7 @@ export class StampsClass {
 
   static async get_resumed_stamps_by_page_with_client(
     client: Client,
-    limit = 50,
+    limit = SMALL_LIMIT,
     page = 1,
     order = "DESC",
   ) {
@@ -123,7 +125,7 @@ export class StampsClass {
   static async get_stamps_by_ident_with_client(
     client: Client,
     ident: typeof SUBPROTOCOLS,
-    limit = 50,
+    limit = SMALL_LIMIT,
     page = 1,
   ) {
     const offset = (page - 1) * limit;
