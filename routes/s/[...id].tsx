@@ -1,9 +1,11 @@
 import { CommonClass, connectDb, StampsClass } from "$lib/database/index.ts";
-import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
+import * as base64 from "base64/mod.ts";
 
 export const handler: Handlers<StampRow> = {
   async GET(req: Request, ctx: HandlerContext) {
     const { id } = ctx.params;
+    const url = new URL(req.url);
+    const params = url.searchParams.toString();
     const client = await connectDb();
     const file_name = await StampsClass
       .get_stamp_file_by_identifier_with_client(
@@ -28,7 +30,9 @@ export const handler: Handlers<StampRow> = {
     client.close();
     return new Response("", {
       status: 301,
-      headers: { Location: `/content/${file_name}` },
+      headers: {
+        Location: `/content/${file_name}${params ? `?${params}` : ""}`,
+      },
     });
   },
 };
