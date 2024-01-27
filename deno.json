@@ -39,6 +39,7 @@
     "$fresh_charts/": "https://deno.land/x/fresh_charts@0.3.1/",
     "compress": "https://deno.land/x/foras@v2.1.4/src/deno/mod.ts",
     "bitcoin": "npm:bitcoinjs-lib@6.1.5",
+    "base64/": "https://denopkg.com/chiefbiiko/base64/",
     "bitcore": "npm:bitcore@4.1.1",
     "crypto": "https://deno.land/std@0.177.0/node/crypto.ts",
     "$lib/": "./lib/",
@@ -53,6 +54,6 @@
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsxImportSource": "https://esm.sh/preact"
   }
 }
