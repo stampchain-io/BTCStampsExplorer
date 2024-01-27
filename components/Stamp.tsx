@@ -8,7 +8,7 @@ export const Stamp = (
       <iframe
         width="100%"
         height="100%"
-        class={`${className} aspect-square`}
+        class={`${className} aspect-square rounded-lg`}
         sandbox="allow-scripts"
         src={`/content/${stamp.tx_hash}.${
           get_suffix_from_mimetype(stamp.stamp_mimetype)
