@@ -40,6 +40,7 @@ export function StampCard(
               : (
                 <img
                   src={src}
+                  loading="lazy"
                   onError={(e) => {
                     e.currentTarget.src = `/content/not-available.png`;
                   }}
@@ -69,9 +70,11 @@ export function StampCard(
           </a>
         */
         }
-        {/* <p class="truncate text-[13px] rounded-lg ">
+        {
+          /* <p class="truncate text-[13px] rounded-lg ">
           {stamp.cpid}
-        </p> */}
+        </p> */
+        }
         <div class="flex flex-1 flex-col justify-end">
           <div class="flex items-center gap-x-2 justify-between">
             <div

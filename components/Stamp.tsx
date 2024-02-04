@@ -36,6 +36,7 @@ export const Stamp = (
   return (
     <img
       width="100%"
+      loading="lazy"
       class={`${className} w-full h-full max-w-none object-contain image-rendering-pixelated rounded-lg`}
       src={`/content/${stamp.tx_hash}.${
         get_suffix_from_mimetype(stamp.stamp_mimetype)
