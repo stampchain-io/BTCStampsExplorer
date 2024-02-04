@@ -35,11 +35,15 @@ export default function BlockHeaderTable(props: BlockHeaderTableProps) {
           <tr class="border-b">
             <th scope="row" class="whitespace-nowrap px-6 py-3">Ledger Hash</th>
             <td class="whitespace-nowrap">
-              {short_address(block_info.ledger_hash)}
+              {block_info.ledger_hash
+                ? short_address(block_info.ledger_hash)
+                : "null"}
             </td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">Txlist Hash</th>
             <td class="whitespace-nowrap">
-              {short_address(block_info.txlist_hash)}
+              {block_info.txlist_hash
+                ? short_address(block_info.txlist_hash)
+                : "null"}
             </td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">Txlist Hash</th>
             <td class="whitespace-nowrap">
@@ -51,8 +55,6 @@ export default function BlockHeaderTable(props: BlockHeaderTableProps) {
           <tr class="border-b">
             <th scope="row" class="px-6 py-3">Issuances</th>
             <td class="whitespace-nowrap">{issuances.length}</td>
-            <th scope="row" class="px-6 py-3">Sends</th>
-            <td class="whitespace-nowrap">{sends.length}</td>
           </tr>
         </tbody>
       </table>
