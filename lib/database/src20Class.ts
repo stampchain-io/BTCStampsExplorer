@@ -500,7 +500,7 @@ export class Src20Class {
         ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [tick, amt, limit, offset],
-      1000 * 60 * 2,
+      0,
     );
   }
 
