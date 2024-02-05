@@ -80,7 +80,6 @@ export const handler = async (
         client,
         tick,
       );
-    console.log(mint_status);
     client.close();
     const body: PaginatedTickResponseBody = {
       ...pagination,

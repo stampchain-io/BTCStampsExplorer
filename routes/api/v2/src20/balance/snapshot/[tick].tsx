@@ -8,6 +8,7 @@ import {
 import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { Client } from "$mysql/mod.ts";
+import { SMALL_LIMIT } from "constants";
 
 export const handler = async (
   req: Request,
@@ -17,7 +18,7 @@ export const handler = async (
   const url = new URL(req.url);
   const params = url.searchParams;
   const amt = Number(params.get("amt"));
-  const limit = Number(params.get("limit"));
+  const limit = Number(params.get("limit")) || SMALL_LIMIT;
   const page = Number(params.get("page"));
   try {
     const client = await connectDb();
@@ -33,11 +34,17 @@ export const handler = async (
       limit,
       page,
     );
+    const total_data = await Src20Class
+      .get_total_src20_holders_by_tick_with_client(
+        client as Client,
+        tick,
+        amt,
+      );
+    const total = total_data.rows[0]["total"];
     client.close();
-    console.log(src20.rows[0]);
     const body: Src20BalanceResponseBody = {
       snapshot_block: last_block.rows[0]["last_block"],
-      total: src20.rows.length,
+      total,
       data: src20.rows.map((row) => {
         return {
           tick: row["tick"],
