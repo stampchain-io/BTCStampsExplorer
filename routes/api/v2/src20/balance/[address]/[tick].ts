@@ -51,7 +51,6 @@ export const handler = async (
   let { address, tick } = ctx.params;
   try {
     const client = await connectDb();
-    console.log("im here");
     const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
     tick = convertEmojiToTick(tick);

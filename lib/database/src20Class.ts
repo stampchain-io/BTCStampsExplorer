@@ -518,7 +518,7 @@ export class Src20Class {
         AND amt >= ${amt};
         `,
       [tick, amt],
-      1000 * 60 * 2,
+      0,
     );
   }
 
