@@ -2,13 +2,15 @@ import { HandlerContext } from "$fresh/server.ts";
 import { api_get_src20_balance_by_tick } from "$lib/controller/wallet.ts";
 import { convertEmojiToTick } from "utils/util.ts";
 import {
+  AddressTickHandlerContext,
   ErrorResponseBody,
   PaginatedRequest,
   Src20BalanceResponseBody,
-  AddressTickHandlerContext,
 } from "globals";
-import { CommonClass, connectDb } from "../../../../../../lib/database/index.ts";
-
+import {
+  CommonClass,
+  connectDb,
+} from "../../../../../../lib/database/index.ts";
 
 /**
  * @swagger
@@ -42,10 +44,14 @@ import { CommonClass, connectDb } from "../../../../../../lib/database/index.ts"
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
-export const handler = async (_req: Request, ctx: AddressTickHandlerContext): Promise<Response> => {
+export const handler = async (
+  _req: Request,
+  ctx: AddressTickHandlerContext,
+): Promise<Response> => {
   let { address, tick } = ctx.params;
   try {
     const client = await connectDb();
+    console.log("im here");
     const last_block = await CommonClass.get_last_block_with_client(client);
     client.close();
     tick = convertEmojiToTick(tick);
