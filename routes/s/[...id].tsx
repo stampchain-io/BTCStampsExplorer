@@ -3,9 +3,6 @@ import { api_get_stamp } from "$lib/controller/stamp.ts";
 
 import * as base64 from "base64/mod.ts";
 
-/*
-Content-Security-Policy: default-src 'none'; img-src 'self' /content/; script-src 'self' /content/; style-src 'self' /content/
-*/
 export const handler: Handlers<StampRow> = {
   async GET(req: Request, ctx: HandlerContext) {
     const { id } = ctx.params;
