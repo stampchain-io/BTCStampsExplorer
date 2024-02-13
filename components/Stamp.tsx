@@ -8,6 +8,7 @@ export const Stamp = (
       <iframe
         width="100%"
         height="100%"
+        scrolling="no"
         class={`${className} aspect-square rounded-lg`}
         sandbox="allow-scripts"
         src={`/content/${stamp.tx_hash}.${
