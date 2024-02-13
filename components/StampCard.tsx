@@ -32,6 +32,7 @@ export function StampCard(
             {suffix === "html"
               ? (
                 <iframe
+                  scrolling="no"
                   sandbox="allow-scripts allow-same-origin"
                   src={src}
                   class="h-full w-fit max-w-full object-contain items-center standalone:h-full standalone:w-auto safari_only_image"
