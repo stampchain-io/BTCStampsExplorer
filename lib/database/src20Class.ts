@@ -1,5 +1,5 @@
 import { Client } from "$mysql/mod.ts";
-import { SMALL_LIMIT, SRC20_BALANCE_TABLE, SRC20_TABLE } from "constants";
+import { SMALL_LIMIT, SRC20_BALANCE_TABLE, SRC20_TABLE, BIG_LIMIT } from "constants";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 
@@ -446,7 +446,7 @@ export class Src20Class {
   static async get_src20_balance_by_address_with_client(
     client: Client,
     address: string,
-    limit = SMALL_LIMIT,
+    limit = BIG_LIMIT,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
