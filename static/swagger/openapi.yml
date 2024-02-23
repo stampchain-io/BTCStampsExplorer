@@ -830,9 +830,6 @@ components:
           type: number
         cpid:
           type: string
-        asset_longname:
-          oneOf:
-            - type: string
             
         creator:
           type: string
@@ -843,8 +840,6 @@ components:
             - type: number
             
         locked:
-          type: number
-        message_index:
           type: number
         stamp_base64:
           type: string
@@ -874,10 +869,6 @@ components:
         stamp_hash:
           type: string
         is_btc_stamp:
-          oneOf:
-            - type: number
-            
-        is_reissue:
           oneOf:
             - type: number
             
