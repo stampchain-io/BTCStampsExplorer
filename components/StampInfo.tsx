@@ -14,7 +14,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
     ? "cursed"
     : "named";
   return (
-    <div class="flex flex-col uppercase text-gray-200">
+    <div class="flex flex-col text-gray-200">
       <div class="flex justify-around items-center truncate border-b border-t">
         <p>
           Stamp: #{stamp.stamp}
