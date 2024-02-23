@@ -53,7 +53,7 @@ export default function BlockHeaderTable(props: BlockHeaderTableProps) {
             </td>
           </tr>
           <tr class="border-b">
-            <th scope="row" class="px-6 py-3">Issuances</th>
+            <th scope="row" class="px-6 py-3">Stamps</th>
             <td class="whitespace-nowrap">{issuances.length}</td>
           </tr>
         </tbody>

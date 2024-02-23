@@ -39,15 +39,18 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
       </div>
       <div class="flex justify-around truncate border-b border-t">
         <p>
-          Creator: {stamp.creator_name
-            ? stamp.creator_name
-            : stamp.creator}
+          Creator: {stamp.creator_name ? stamp.creator_name : stamp.creator}
         </p>
       </div>
       <div class="flex justify-around truncate border-b border-t">
         <p>
           Created: {timestamp.toLocaleDateString()}{" "}
           ({dayjs(timestamp).fromNow()})
+        </p>
+      </div>
+      <div class="flex justify-around truncate border-b border-t">
+        <p>
+          TX: {stamp.tx_hash}
         </p>
       </div>
     </div>
