@@ -781,9 +781,6 @@ components:
           type: number
         cpid:
           type: string
-        asset_longname:
-          oneOf:
-            - type: string
             
         creator:
           type: string
