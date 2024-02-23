@@ -21,12 +21,10 @@ interface StampRow {
   stamp: number | null;
   block_index: number;
   cpid: string;
-  asset_longname: string | null;
   creator: string;
   divisible: number;
-  keyburn: number | null; 
+  keyburn: number | null;
   locked: number;
-  message_index: number;
   stamp_base64: string;
   stamp_mimetype: string;
   stamp_url: string;
@@ -34,13 +32,10 @@ interface StampRow {
   timestamp: Date;
   tx_hash: string;
   tx_index: number;
-  src_data: null;
   ident: SUBPROTOCOLS;
   creator_name: string | null;
-  stamp_gen: null;
   stamp_hash: string;
   is_btc_stamp: number;
-  is_reissue: number | null;
   file_hash: string;
 }
 
@@ -50,7 +45,7 @@ interface SendRow {
   cpid: string | null;
   tick: string | null;
   memo: string;
-  quantity: BigInt;
+  quantity: bigint;
   tx_hash: string;
   tx_index: number;
   block_index: number;
@@ -111,7 +106,7 @@ interface Src20Detail {
   max: string;
   destination: string;
   block_time: string;
-  status: any | null;
+  status: string | null;
   creator_name: string | null;
   destination_name: string;
 }

@@ -2,9 +2,9 @@
 
 import { Client } from "$mysql/mod.ts";
 import { summarize_issuances } from "./index.ts";
-import { get_balances } from "utils/xcp.ts";
-import { handleSqlQueryWithCache } from "utils/cache.ts";
-import { SMALL_LIMIT, STAMP_TABLE, TTL_CACHE } from "utils/constants.ts";
+import { get_balances } from "../utils/xcp.ts";
+import { handleSqlQueryWithCache } from "../utils/cache.ts";
+import { SMALL_LIMIT, STAMP_TABLE, TTL_CACHE } from "../utils/constants.ts";
 
 export class CommonClass {
   //------------------Blocks by index------------------
@@ -250,8 +250,9 @@ export class CommonClass {
     let issuances = await handleSqlQueryWithCache(
       client,
       `
-      SELECT stamp, cpid, tx_hash, block_index, block_time, creator, creator_name, divisible, keyburn, 
-      locked, supply, stamp_url, stamp_base64, file_hash, ident
+      SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
+      stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
+
       FROM ${STAMP_TABLE}
       WHERE stamp = '${stamp}'
       ORDER BY stamp;
@@ -264,8 +265,8 @@ export class CommonClass {
     issuances = await handleSqlQueryWithCache(
       client,
       `
-      SELECT stamp, cpid, tx_hash, block_index, block_time, creator, creator_name, divisible, keyburn, 
-      locked, supply, stamp_url, stamp_base64, file_hash, ident
+      SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
+      stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
       FROM ${STAMP_TABLE}
       WHERE (cpid = '${cpid}')
       ORDER BY stamp;
@@ -283,8 +284,9 @@ export class CommonClass {
     let issuances = await handleSqlQueryWithCache(
       client,
       `
-      SELECT stamp, cpid, tx_hash, block_index, block_time, creator, creator_name, divisible, keyburn, 
-      locked, supply, stamp_url, stamp_base64, file_hash, ident
+      SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
+      stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
+
       FROM ${STAMP_TABLE}
       WHERE (cpid = '${identifier}' OR tx_hash = '${identifier}' OR stamp_hash = '${identifier}')
       ORDER BY stamp;
@@ -296,8 +298,8 @@ export class CommonClass {
     issuances = await handleSqlQueryWithCache(
       client,
       `
-      SELECT stamp, cpid, tx_hash, block_index, block_time, creator, creator_name, divisible, keyburn, 
-      locked, supply, stamp_url, stamp_base64, file_hash, ident 
+      SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
+      stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
       FROM ${STAMP_TABLE}
       WHERE (cpid = '${cpid}')
       ORDER BY stamp;
