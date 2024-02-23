@@ -39,9 +39,11 @@ export default function StampPage(props: StampPageProps) {
         <Stamp stamp={stamp} className="w-full" />
       </div>
 
-      <div class="order-3 sm:order-2 text-gray-200">
+      {
+        /* <div class="order-3 sm:order-2 text-gray-200">
         <StampHistory holders={holders} sends={sends} className="w-full" />
-      </div>
+      </div> */
+      }
 
       <div class="order-2 sm:order-3">
         <StampInfo stamp={stamp} className="w-full" />
