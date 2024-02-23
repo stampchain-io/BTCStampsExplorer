@@ -15,7 +15,9 @@ export class CommonClass {
     return await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM blocks
+      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
+      txlist_hash, messages_hash 
+      FROM blocks
       WHERE block_index = '${block_index}';
       `,
       [block_index],
@@ -43,7 +45,9 @@ export class CommonClass {
     const blocks = await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM blocks
+      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
+      txlist_hash, messages_hash 
+      FROM blocks
       ORDER BY block_index DESC
       LIMIT ${num};
       `,
@@ -77,7 +81,9 @@ export class CommonClass {
     const blocks = await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM blocks
+      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
+      txlist_hash, messages_hash 
+      FROM blocks
       WHERE block_index >= ${block_index} - 2
       AND block_index <= ${block_index} + 2
       ORDER BY block_index DESC;
@@ -125,7 +131,7 @@ export class CommonClass {
           AND is_btc_stamp IS NOT NULL
       ) num ON st.cpid = num.cpid
       WHERE st.block_index = '${block_index}'
-      ORDER BY st.tx_index;
+      ORDER BY st.stamp;
       `,
       [block_index],
       "never",
@@ -140,7 +146,9 @@ export class CommonClass {
     return await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM blocks
+      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
+      txlist_hash, messages_hash 
+      FROM blocks
       WHERE block_hash = '${block_hash}';
       `,
       [block_hash],
@@ -176,7 +184,9 @@ export class CommonClass {
     const blocks = await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM blocks
+      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
+      txlist_hash, messages_hash 
+      FROM blocks
       WHERE block_index >= ${block_index} - 2
       AND block_index <= ${block_index} + 2
       ORDER BY block_index DESC;
@@ -240,9 +250,11 @@ export class CommonClass {
     let issuances = await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM ${STAMP_TABLE}
+      SELECT stamp, cpid, tx_hash, block_index, block_time, creator, creator_name, divisible, keyburn, 
+      locked, supply, stamp_url, stamp_base64, file_hash, ident
+      FROM ${STAMP_TABLE}
       WHERE stamp = '${stamp}'
-      ORDER BY tx_index;
+      ORDER BY stamp;
       `,
       [stamp],
       TTL_CACHE,
@@ -252,9 +264,11 @@ export class CommonClass {
     issuances = await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM ${STAMP_TABLE}
+      SELECT stamp, cpid, tx_hash, block_index, block_time, creator, creator_name, divisible, keyburn, 
+      locked, supply, stamp_url, stamp_base64, file_hash, ident
+      FROM ${STAMP_TABLE}
       WHERE (cpid = '${cpid}')
-      ORDER BY tx_index;
+      ORDER BY stamp;
       `,
       [cpid],
       TTL_CACHE,
@@ -269,9 +283,11 @@ export class CommonClass {
     let issuances = await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM ${STAMP_TABLE}
+      SELECT stamp, cpid, tx_hash, block_index, block_time, creator, creator_name, divisible, keyburn, 
+      locked, supply, stamp_url, stamp_base64, file_hash, ident
+      FROM ${STAMP_TABLE}
       WHERE (cpid = '${identifier}' OR tx_hash = '${identifier}' OR stamp_hash = '${identifier}')
-      ORDER BY tx_index;
+      ORDER BY stamp;
       `,
       [identifier, identifier, identifier],
       TTL_CACHE,
@@ -280,9 +296,11 @@ export class CommonClass {
     issuances = await handleSqlQueryWithCache(
       client,
       `
-      SELECT * FROM ${STAMP_TABLE}
+      SELECT stamp, cpid, tx_hash, block_index, block_time, creator, creator_name, divisible, keyburn, 
+      locked, supply, stamp_url, stamp_base64, file_hash, ident 
+      FROM ${STAMP_TABLE}
       WHERE (cpid = '${cpid}')
-      ORDER BY tx_index;
+      ORDER BY stamp;
       `,
       [cpid],
       TTL_CACHE,
@@ -363,7 +381,7 @@ export class CommonClass {
           st.cpid IN ( ${
         assets.map((asset: string) => `'${asset}'`).join(", ")
       } )
-        ORDER BY st.tx_index ${order}
+        ORDER BY st.stamp ${order}
         LIMIT ${limit}
         OFFSET ${offset};
       `;
