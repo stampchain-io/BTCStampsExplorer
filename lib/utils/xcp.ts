@@ -103,6 +103,39 @@ export const get_stamps_balance = async (address: string) => {
   return await get_balances(address);
 };
 
+export const get_sends = async (cpid: string) => {
+  const params = {
+    filters: [
+      {
+        field: "asset",
+        op: "==",
+        value: cpid,
+      },
+      {
+        field: "status",
+        op: "==",
+        value: "valid",
+      },
+    ],
+    "filterop": "AND",
+  };
+  const payload = create_payload("get_sends", params);
+  const sends = await handleQuery(payload);
+
+  if (!sends) {
+    console.log("no sends found");
+    return [];
+  }
+  return sends.map((send: any) => ({
+    tx_hash: send.tx_hash,
+    block_index: send.block_index,
+    source: send.source,
+    destination: send.destination,
+    quantity: send.quantity,
+    asset: send.asset,
+  }));
+};
+
 export const get_holders = async (cpid: string) => {
   const params = {
     filters: [
@@ -138,20 +171,91 @@ export const get_dispensers = async (cpid: string) => {
     ],
   };
   const payload = create_payload("get_dispensers", params);
+  console.log("Dispenser Payload:", payload);
+
   const dispensers = await handleQuery(payload);
+  console.log("Dispenser Response:", dispensers);
+
   if (!dispensers) {
+    console.log("No dispensers found");
     return [];
   }
-  return dispensers
-    .filter((dispenser: any) => dispenser.give_remaining > 0)
-    .map((dispenser: any) => ({
-      tx_hash: dispenser.tx_hash,
-      block_index: dispenser.block_index,
-      source: dispenser.source,
-      cpid: dispenser.asset,
-      give_quantity: dispenser.give_quantity,
-      escrow_quantity: dispenser.escrow_quantity,
-      satoshirate: dispenser.satoshirate,
-      origin: dispenser.origin,
-    }));
+
+  const filteredDispensers = dispensers.filter((dispenser: string) =>
+    dispenser.give_remaining > 0
+  );
+
+  const mappedDispensers = filteredDispensers.map((dispenser: any) => ({
+    tx_hash: dispenser.tx_hash,
+    block_index: dispenser.block_index,
+    source: dispenser.source,
+    cpid: dispenser.asset,
+    give_quantity: dispenser.give_quantity,
+    give_remaining: dispenser.give_remaining,
+    escrow_quantity: dispenser.escrow_quantity,
+    satoshirate: dispenser.satoshirate,
+    btcrate: dispenser.satoshirate / 100000000,
+    origin: dispenser.origin,
+  }));
+
+  return mappedDispensers;
+};
+
+export const get_all_dispensers = async () => {
+  const payload = create_payload("get_dispensers", {});
+  console.log("Payload:", payload);
+
+  const dispensers = await handleQuery(payload);
+  console.log("Response:", dispensers);
+
+  if (!dispensers) {
+    console.log("No dispensers found");
+    return [];
+  }
+
+  const filteredDispensers = dispensers.filter((dispenser: any) =>
+    dispenser.give_remaining > 0
+  );
+
+  const mappedDispensers = filteredDispensers.map((dispenser: any) => ({
+    tx_hash: dispenser.tx_hash,
+    block_index: dispenser.block_index,
+    source: dispenser.source,
+    cpid: dispenser.asset,
+    give_quantity: dispenser.give_quantity,
+    escrow_quantity: dispenser.escrow_quantity,
+    satoshirate: dispenser.satoshirate,
+    origin: dispenser.origin,
+  }));
+
+  const total = filteredDispensers.length;
+
+  return { total, mappedDispensers };
+};
+
+export const get_dispenses = async (cpid: string) => {
+  const params = {
+    filters: [
+      {
+        field: "asset",
+        op: "==",
+        value: cpid,
+      },
+    ],
+  };
+  const payload = create_payload("get_dispenses", params);
+  const dispenses = await handleQuery(payload);
+  if (!dispenses) {
+    return [];
+  }
+  return dispenses.map((dispense: any) => ({
+    tx_hash: dispense.tx_hash,
+    block_index: dispense.block_index,
+    cpid: dispense.asset,
+    source: dispense.source,
+    destination: dispense.destination,
+    dispenser_tx_hash: dispense.dispenser_tx_hash,
+    dispense_quantity: dispense.dispense_quantity,
+    // need to query the tx_hash to get the amount?
+  }));
 };

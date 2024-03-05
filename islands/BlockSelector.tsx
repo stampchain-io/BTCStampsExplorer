@@ -39,7 +39,7 @@ export default function Block(props: BlockProps) {
         <p class="truncate">{displayAddress}</p>
       </div>
       <div class="flex items-center justify-between text-xs sm:text-sm">
-        <span>Issuances: {block.issuances}</span>
+        <span>Stamps: {block.issuances}</span>
         <span>Sends: {block.sends}</span>
       </div>
     </a>
