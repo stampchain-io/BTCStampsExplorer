@@ -1,5 +1,10 @@
 import { connectDb, StampsClass } from "../database/index.ts";
-import { get_holders } from "utils/xcp.ts";
+import {
+  get_dispensers,
+  get_dispenses,
+  get_holders,
+  get_sends,
+} from "utils/xcp.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
 export async function api_get_stamps(
@@ -52,7 +57,9 @@ export async function api_get_stamp(id: string) {
     const cpid = cpid_result.rows[0].cpid;
 
     const holders = await get_holders(cpid);
-    const sends = [];
+    const dispensers = await get_dispensers(cpid);
+    const sends = await get_sends(cpid);
+    const dispenses = await get_dispenses(cpid);
     return {
       stamp: stamp,
       holders: holders.map((holder: any) => {
@@ -63,7 +70,9 @@ export async function api_get_stamp(id: string) {
             : holder.quantity,
         };
       }),
-      sends,
+      sends: sends,
+      dispensers: dispensers,
+      dispenses: dispenses,
       total: total.rows[0].total,
     };
   } catch (error) {

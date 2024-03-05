@@ -49,9 +49,13 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
         </p>
       </div>
       <div class="flex justify-around truncate border-b border-t">
-        <p>
+        <a
+          href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           TX: {stamp.tx_hash}
-        </p>
+        </a>
       </div>
     </div>
   );
