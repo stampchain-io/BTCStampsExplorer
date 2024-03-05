@@ -171,12 +171,6 @@ export const get_sends = async (cpid: string) => {
   }));
 };
 
-/**
- * Retrieves the holders of a specific asset.
- *
- * @param cpid - The asset identifier.
- * @returns An array of holders with a positive quantity of the specified asset.
- */
 export const get_holders = async (cpid: string) => {
   const params = {
     filters: [
