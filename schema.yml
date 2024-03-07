@@ -595,13 +595,13 @@ paths:
 
   /api/v2/stamps/{id}:
     get:
-      summary: Get stamp by ID
-      description: Retrieve a stamp by its ID
+      summary: Get stamp by ID {tx_hash, stamp, cpid}
+      description: Retrieve a stamp by its ID one of tx_hash, stamp number, or cpid
       parameters:
         - in: path
           name: id
           required: true
-          description: ID of the stamp
+          description: ID {tx_hash, stamp, cpid} of the stamp
           schema:
             type: string
       responses:
@@ -834,9 +834,9 @@ components:
     SendRow:
       type: object
       properties:
-        from:
+        source:
           type: string
-        to:
+        destination:
           type: string
         cpid:
           oneOf:
