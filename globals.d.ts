@@ -40,8 +40,8 @@ interface StampRow {
 }
 
 interface SendRow {
-  from: string;
-  to: string;
+  source: string;
+  destination: string;
   cpid: string | null;
   tick: string | null;
   memo: string;
@@ -49,6 +49,9 @@ interface SendRow {
   tx_hash: string;
   tx_index: number;
   block_index: number;
+  satoshirate: number | null;
+  is_btc_stamp: number;
+  block_time: Date;
 }
 
 interface HolderRow {
