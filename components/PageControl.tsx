@@ -33,7 +33,7 @@ export function PageControl(
   }
 
   return (
-    <nav aria-label="Page navigation example">
+    <nav aria-label="Page navigation">
       <ul class="inline-flex items-center -space-x-px text-sm">
         <li>
           <a
