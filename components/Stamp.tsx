@@ -26,9 +26,9 @@ export const Stamp = (
       <img
         width="100%"
         class={`${className} w-full h-full max-w-none object-contain image-rendering-pixelated rounded-lg`}
-        src={`/content/not-available.png`}
+        src={`/not-available.png`}
         onError={(e) => {
-          e.currentTarget.src = `/content/not-available.png`;
+          e.currentTarget.src = `/not-available.png`;
         }}
         alt="Stamp"
       />
