@@ -39,7 +39,6 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
 export const handler = async (
   req: PaginatedRequest,
   _ctx: HandlerContext,
@@ -48,11 +47,13 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
+    const sort_order = url.searchParams.get("sort_order") || "asc";
     const client = await connectDb();
     const data = await StampsClass.get_stamps_by_page_with_client(
       client,
       limit,
       page,
+      sort_order,
     );
     const total =
       (await StampsClass.get_total_stamps_with_client(client)).rows[0]["total"];
