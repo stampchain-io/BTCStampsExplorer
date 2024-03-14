@@ -6,7 +6,7 @@ export function Header() {
 
   let path: string | null = null;
   if (typeof window !== undefined) {
-    path = (window?.location?.pathname)?.split("/")[1];
+    path = (globalThis?.location?.pathname)?.split("/")[1];
   }
   const toggleMenu = () => {
     const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
@@ -32,29 +32,33 @@ export function Header() {
   const inactiveClass = "text-gray-600 rounded hover:text-white md:underline";
 
   return (
-    <nav class="border rounded-lg py-2 mb-6 md:py-4 ">
-      <div class="container px-4 mx-auto md:flex md:items-center">
-        <div class="flex justify-between items-center">
+    <nav className="border rounded-lg py-2 mb-6 md:py-4 ">
+      <div className="container px-4 mx-auto md:flex md:items-center">
+        <div className="flex justify-between items-center">
           <a
             href="/block/last"
             f-partial={"/block/last"}
-            class="font-bold text-xl text-indigo-600"
+            className="font-bold text-xl text-indigo-600"
           >
-            BITCOIN STAMPS
+            <img
+              src="/img/stampchain.gif"
+              alt="stampchain"
+              className="w-auto h-12 md:h-16"
+            />
           </a>
           <button
             onClick={toggleMenu}
-            class="border border-solid border-blue-600 px-3 py-1 rounded text-blue-600 opacity-50 hover:opacity-75 md:hidden"
+            className="border border-solid border-blue-600 px-3 py-1 rounded text-blue-600 opacity-50 hover:opacity-75 md:hidden"
             id="navbar-toggle"
           >
-            <img src="/icons/menu.svg" alt="menu" class="w-6 h-6" />
+            <img src="/icons/menu.svg" alt="menu" className="w-6 h-6" />
           </button>
         </div>
 
         <div
-          class={`${
+          className={`${
             open
-              ? "flex items-center gap-10 absolute right-0 top-[103px] w-full h-full z-20 bg-black scroll-none p-6"
+              ? "flex items-center gap-10 absolute right-0 top-[103px] w-full h-full z-20 bg-[#181818] scroll-none p-6"
               : "hidden"
           } flex-col md:flex md:flex-row md:ml-auto mt-8 md:mt-0 text-center`}
           id="navbar-collapse"
@@ -63,7 +67,7 @@ export function Header() {
             href="/block/last"
             f-partial={"/block/last"}
             onClick={toggleMenu}
-            class={`p-2 lg:px-4 md:mx-2 hover:text-gray-700 transition-colors duration-300 ${
+            className={`p-2 lg:px-4 md:mx-2 hover:text-gray-700 transition-colors duration-300 ${
               path === "block" ? activeClass : inactiveClass
             }`}
           >
@@ -73,7 +77,7 @@ export function Header() {
             href="/stamp"
             f-partial={"/stamp"}
             onClick={toggleMenu}
-            class={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
+            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
               path === "stamp" ? activeClass : inactiveClass
             }`}
           >
@@ -83,7 +87,7 @@ export function Header() {
             href="/src20"
             f-partial={"/src20"}
             onClick={toggleMenu}
-            class={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
+            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
               path === "src20" ? activeClass : inactiveClass
             }`}
           >
@@ -94,14 +98,14 @@ export function Header() {
             href="/cursed"
             f-partial={"/cursed"}
             onClick={toggleMenu}
-            class={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
+            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
               path === "cursed" ? activeClass : inactiveClass
             }`}
           >
             Cursed
           </a> */
           }
-          <div class="w-full flex items-center">
+          <div className="w-full flex items-center">
             <ConnectWallet />
           </div>
         </div>

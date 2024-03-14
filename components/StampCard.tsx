@@ -1,5 +1,6 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
+import { StampRow } from "globals";
 
 import {
   get_suffix_from_mimetype,
@@ -18,13 +19,22 @@ export function StampCard(
   let src: string;
   const suffix = get_suffix_from_mimetype(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
+  // src = `${stamp.stamp_url}`;
+  // console.log(suffix);
+  if (suffix === "unknown") {
+    src = `/not-available.png`;
+  }
   if (suffix === "json" || suffix === "txt") {
-    src = `/content/not-available.png`;
+    src = `/not-available.png`;
   }
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
-      class="text-white group relative z-10 flex h-full w-full grow flex-col overflow-hidden rounded-[17px] p-2 @container bg-gray-800 transition-all hover:bg-gray-700"
+      // href={`${stamp.stamp_url}`}
+
+      // className="text-white group relative z-10 flex h-full w-full grow flex-col overflow-hidden rounded-[17px] p-1 @container bg-[#181818] transition-all hover:bg-gray-700 md:w-1/2 lg:w-1/3"
+      className="text-white group relative z-10 flex h-full w-full grow flex-col overflow-hidden rounded-t-[17px] p-1 @container bg-[#181818] transition-all hover:bg-gray-700"
+      style={{ aspectRatio: "1/1", objectFit: "cover" }}
     >
       <div class="relative flex overflow-hidden">
         <div class="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden rounded-[13px]">
@@ -52,12 +62,12 @@ export function StampCard(
           </div>
         </div>
       </div>
-      <div class="flex grow flex-col pt-2.5 font-title text-[13px] font-medium text-text">
-        <div class="flex justify-between">
-          <h3 class="text-[15px] font-medium text-text-strong">
-            {`#${stamp.stamp}`}
+      <div class="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
+        <div class="flex justify-between bg-white text-black">
+          <h3 class="text-[13px] font-medium text-text pl-3">
+            {`${stamp.stamp}`}
           </h3>
-          <h3 class="truncate text-[12px] text-text">
+          <h3 class="truncate text-[13px] text-text pr-3">
             {stamp.creator_name
               ? stamp.creator_name
               : short_address(stamp.creator, 6)}
@@ -73,15 +83,12 @@ export function StampCard(
         }
         {
           /* <p class="truncate text-[13px] rounded-lg ">
-          {stamp.cpid}
-        </p> */
+        {stamp.cpid}
+      </p> */
         }
-        <div class="flex flex-1 flex-col justify-end">
-          <div class="flex items-center gap-x-2 justify-between">
-            <div
-              class="rounded-[7px] bg-foreground-1 px-[8px] py-[4px] transition-all hover:bg-foreground-1-hover"
-              aria-label="up-vote"
-            >
+        <div class="flex flex-1 flex-col justify-end bg-white text-black border-t-2 border-black">
+          <div class="flex items-center gap-x-2 justify-between pt-1">
+            <div class="bg-foreground-1 transition-all hover:bg-foreground-1-hover pl-3">
               <div class="center h-[18px] gap-x-1">
                 <p class="leading-4">
                   {stamp.ident !== "SRC-20" &&
@@ -97,7 +104,7 @@ export function StampCard(
                 </p>
               </div>
             </div>
-            <p class="truncate text-[13px] rounded-lg uppercase">
+            <p class="truncate text-[12px] rounded-lg uppercase pr-3">
               {stamp.ident && stamp.ident === "SRC-20"
                 ? "SRC-20"
                 : stamp.ident && stamp.ident === "SRC-721"
