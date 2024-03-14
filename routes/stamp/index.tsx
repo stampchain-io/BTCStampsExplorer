@@ -1,10 +1,10 @@
-import { Partial } from "$fresh/runtime.ts";
-
 import { api_get_stamps } from "$lib/controller/stamp.ts";
+import { HandlerContext, Handlers } from "$fresh/server.ts";
 
 import { PageControl } from "$components/PageControl.tsx";
 import { StampCard } from "$components/StampCard.tsx";
 import { BIG_LIMIT } from "constants";
+import { StampRow } from "globals";
 
 type StampPageProps = {
   params: {
@@ -45,11 +45,13 @@ export function StampPage(props: StampPageProps) {
         page_size={page_size}
         type={"stamp"}
       />
-      <Partial name="stamps">
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out">
-          {stamps.map((stamp: StampRow) => <StampCard stamp={stamp} />)}
+      <div name="stamps">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out">
+          {stamps.map((stamp: StampRow) => (
+            <StampCard stamp={stamp} kind="stamp" />
+          ))}
         </div>
-      </Partial>
+      </div>
       <PageControl
         page={page}
         pages={pages}

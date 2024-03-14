@@ -3,10 +3,9 @@ import { CommonClass, connectDb, StampsClass } from "$lib/database/index.ts";
 import { api_get_block } from "$lib/controller/block.ts";
 import {
   BlockHandlerContext,
-  StampBlockResponseBody,
   ErrorResponseBody,
+  StampBlockResponseBody,
 } from "globals";
-
 
 /**
  * @swagger
@@ -34,7 +33,6 @@ import {
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
-
 
 export const handler = async (
   _req: Request,
@@ -65,4 +63,3 @@ export const handler = async (
     return new Response(JSON.stringify(body));
   }
 };
- 
