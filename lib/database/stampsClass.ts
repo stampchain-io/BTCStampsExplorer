@@ -53,8 +53,10 @@ export class StampsClass {
     client: Client,
     limit = SMALL_LIMIT,
     page = 1,
+    sort_order: "asc" | "desc" = "asc",
   ) {
     const offset = (page - 1) * limit;
+    const order = sort_order.toUpperCase() === "ASC" ? "ASC" : "DESC";
     return await handleSqlQueryWithCache(
       client,
       `
@@ -62,7 +64,7 @@ export class StampsClass {
         FROM ${STAMP_TABLE} AS st
         LEFT JOIN creator AS cr ON st.creator = cr.address
         WHERE st.is_btc_stamp IS NOT NULL
-        ORDER BY st.stamp
+        ORDER BY st.stamp ${order}
         LIMIT ${limit} OFFSET ${offset};
       `,
       [limit, offset],

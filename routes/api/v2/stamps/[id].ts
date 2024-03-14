@@ -9,7 +9,7 @@ import {
   ErrorResponseBody,
   IdHandlerContext,
   StampResponseBody,
-} from "globals"; 
+} from "globals";
 
 /**
  * @swagger
@@ -39,18 +39,23 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
-
 export const handler = async (
   _req: Request,
   ctx: IdHandlerContext,
 ): Promise<Response> => {
-  const { id } = ctx.params;
+  const id = String(ctx.params.id);
+  // const id = String(ctx.params);
   try {
     const client = await connectDb();
     const data = await api_get_stamp(id);
-    const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+    let last_block;
+    if (client) {
+      last_block = await CommonClass.get_last_block_with_client(client);
+      client.close();
+    }
+    if (!data) {
+      throw new Error("Stamp not found");
+    }
     const body: StampResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: data,

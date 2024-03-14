@@ -14,10 +14,10 @@ export default function App({ Component }: AppProps) {
         <title>Bitcoin stamps</title>
         <link rel="stylesheet" href="/styles.css" />
       </head>
-      <body class="bg-black">
+      <body class="bg-[#181818]">
         <ToastProvider>
           <div
-            class="px-2 py-8 mx-auto bg-[#000000] flex flex-col md:gap-4 overflow-auto max-w-7xl"
+            class="px-2 py-8 mx-auto bg-[#181818] flex flex-col md:gap-4 overflow-auto max-w-7xl"
             f-client-nav
           >
             <div class="py-0 my-0">
