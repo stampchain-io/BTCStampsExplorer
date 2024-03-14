@@ -4,6 +4,7 @@ import { api_get_cursed } from "$lib/controller/cursed.ts";
 
 import { PageControl } from "$components/PageControl.tsx";
 import { StampCard } from "$components/StampCard.tsx";
+import { StampRow } from "globals";
 
 type CursedPageProps = {
   params: {
@@ -46,7 +47,9 @@ export default function StampPage(props: CursedPageProps) {
       />
       <Partial name="stamps">
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out">
-          {stamps.map((stamp: StampRow) => <StampCard stamp={stamp} />)}
+          {stamps.map((stamp: StampRow) => (
+            <StampCard stamp={stamp} kind="cursed" />
+          ))}
         </div>
       </Partial>
       <PageControl

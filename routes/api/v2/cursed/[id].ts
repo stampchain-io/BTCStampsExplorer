@@ -1,17 +1,21 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { connectDb, CommonClass, StampsClass, summarize_issuances } from "$lib/database/index.ts";
+import { _HandlerContext } from "$fresh/server.ts";
+import {
+  CommonClass,
+  connectDb,
+  StampsClass,
+  summarize_issuances,
+} from "$lib/database/index.ts";
 import {
   ErrorResponseBody,
   IdHandlerContext,
   StampResponseBody,
 } from "globals";
 
-
 /**
  * @swagger
  * /api/v2/stamps/issuances/{id}:
  *   get:
- *     summary: Get stamp issuances by stamp id or identifier
+ *     summary: Get stamp by stamp id or identifier
  *     parameters:
  *       - in: path
  *         name: id
@@ -33,13 +37,19 @@ import {
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
-export const handler = async (_req: Request, ctx: IdHandlerContext): Promise<Response> => {
+export const handler = async (
+  _req: Request,
+  ctx: IdHandlerContext,
+): Promise<Response> => {
   const { id } = ctx.params;
   try {
     const client = await connectDb();
-    let data; 
+    if (!client) {
+      throw new Error("Failed to connect to the database");
+    }
+    let data;
     if (Number.isInteger(Number(id))) {
-      data = await StampsClass.get_stamp_by_stamp_with_client(client, id)
+      data = await StampsClass.get_stamp_by_stamp_with_client(client, id);
     } else {
       data = await StampsClass.get_stamp_by_identifier_with_client(client, id);
     }
