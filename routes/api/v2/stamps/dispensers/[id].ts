@@ -46,13 +46,17 @@ export const handler = async (
   const { id } = ctx.params;
   try {
     const data = await api_get_stamp(id);
-    const dispensers = await get_dispensers(id); // Call the get_dispensers function
+    if (!data) {
+      throw new Error("Stamp not found");
+    }
+    const dispensers = await get_dispensers(id);
     const body: StampResponseBody = {
       data: data,
       dispensers: dispensers, // Add the dispensers to the response body
     };
     return new Response(JSON.stringify(body));
-  } catch {
+  } catch (error) {
+    console.error("Error:", error);
     const body: ErrorResponseBody = { error: `Error: Internal server error` };
     return new Response(JSON.stringify(body));
   }
