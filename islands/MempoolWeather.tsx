@@ -94,7 +94,7 @@ export const MempoolWeather = () => {
                       <td class="px-1 py-.5 whitespace-nowrap">
                         {fees.recomendedFee}
                       </td>
-                      <td class="px-1 py-.5 whitespace-nowrap justify-end">
+                      <td class="flex items-center px-1 py-.5 whitespace-nowrap justify-end">
                         {fees.block}
                       </td>
                     </tr>
