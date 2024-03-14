@@ -1,17 +1,23 @@
 import { get_suffix_from_mimetype, short_address } from "$lib/utils/util.ts";
 
-export function StampBalanceCard({ stamp, kind = 'stamp' }: { stamp: StampRow, kind: "cursed" | "stamp" | "named" }) {
+export function StampBalanceCard(
+  { stamp, kind = "stamp" }: {
+    stamp: StampRow;
+    kind: "cursed" | "stamp" | "named";
+  },
+) {
   let src: string;
   const suffix = get_suffix_from_mimetype(stamp.stamp_mimetype);
 
   if (suffix === "json") {
     src = "/content/not-available.png";
   } else {
-    src = `/content/${stamp.tx_hash}.${suffix}`
+    src = `/content/${stamp.tx_hash}.${suffix}`;
   }
 
   return (
-    <a href={`/stamp/${stamp.tx_hash}`}
+    <a
+      href={`/stamp/${stamp.tx_hash}`}
       class="border rounded-lg text-center text-sm uppercase"
     >
       <div class="relative pb-[100%] w-full overflow-hidden">
@@ -20,7 +26,7 @@ export function StampBalanceCard({ stamp, kind = 'stamp' }: { stamp: StampRow, k
           alt={`Stamp No. ${stamp.stamp ?? "CURSED"}`}
           src={src}
           onError={(e) => {
-            e.currentTarget.src = `/content/not-available.png`;
+            e.currentTarget.src = `/not-available.png`;
           }}
         />
       </div>
@@ -30,14 +36,14 @@ export function StampBalanceCard({ stamp, kind = 'stamp' }: { stamp: StampRow, k
             Stamp: #{stamp.stamp ?? "CURSED"}
           </p>
           <p class="text-gray-200 text-xs text-center ">
-            bal: {
-              stamp.balance && stamp.divisible ?
-                parseFloat(Number(stamp.balance / 100000000).toString()).toFixed(8) :
-                stamp.balance && BigInt(stamp.balance) > BigInt(100000) ?
-                  "+100000" :
-                  stamp.balance ? BigInt(stamp.balance).toString() :
-                    0
-            }
+            bal: {stamp.balance && stamp.divisible
+              ? parseFloat(Number(stamp.balance / 100000000).toString())
+                .toFixed(8)
+              : stamp.balance && BigInt(stamp.balance) > BigInt(100000)
+              ? "+100000"
+              : stamp.balance
+              ? BigInt(stamp.balance).toString()
+              : 0}
           </p>
         </div>
         <p class="text-gray-200 border-b">
@@ -45,5 +51,5 @@ export function StampBalanceCard({ stamp, kind = 'stamp' }: { stamp: StampRow, k
         </p>
       </div>
     </a>
-  )
+  );
 }
