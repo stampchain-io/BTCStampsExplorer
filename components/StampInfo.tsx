@@ -54,7 +54,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          TX: {stamp.tx_hash}
+          TX: {short_address(stamp.tx_hash, 12)}
         </a>
       </div>
     </div>
