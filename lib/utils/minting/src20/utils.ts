@@ -25,6 +25,44 @@ function reverseEndian(hexString: string): string {
   return result;
 }
 
+// export async function fetchPricefromBlockCypherAPI(
+//   tx_hash: string,
+//   source: string,
+// ): Promise<number | null> {
+//   // lookup tx_hash details from api, look in the outputs  key to match the source var
+//   // with the outputs key addresses and return satoshirate from the addresses value that mamtches the
+//   // source var - the returned value is  the sale price of the dispense
+//   // {
+//   // "outputs": [
+//   //   {
+//   //     "value": 85380,
+//   //     "script": "0014b991d97a78403dfe523f721a7bdc61f2636d4b35",
+//   //     "addresses": [
+//   //       "bc1qhxgaj7ncgq7lu53lwgd8hhrp7f3k6je4mzmp8r"
+//   //     ],
+//   //     "script_type": "pay-to-witness-pubkey-hash"
+//   //   }, ...
+//   //  ]
+//   try {
+//     const endpoint = `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/txs/${tx_hash}`;
+//     const response = await fetch(endpoint);
+//     const data = await response.json();
+//     if (data.error) {
+//       throw new Error(data.error);
+//     }
+//     const outputs = data.outputs;
+//     for (const output of outputs) {
+//       if (output.addresses.includes(source)) {
+//         return output.value;
+//       }
+//     }
+//     return null;
+//   } catch (error) {
+//     console.error(error);
+//     return null;
+//   }
+// }
+
 async function fetchUTXOsFromBlockchainAPI(address: string) {
   try {
     const endpoint = `${BLOCKCHAIN_API_BASE_URL}/unspent?active=${address}`;
