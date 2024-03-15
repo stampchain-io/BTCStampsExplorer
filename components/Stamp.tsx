@@ -9,7 +9,7 @@ export const Stamp = (
         width="100%"
         height="100%"
         scrolling="no"
-        class={`${className} aspect-square rounded-lg`}
+        class={`rounded-lg ${className} `}
         sandbox="allow-scripts"
         src={`/content/${stamp.tx_hash}.${
           get_suffix_from_mimetype(stamp.stamp_mimetype)
@@ -25,7 +25,7 @@ export const Stamp = (
     return (
       <img
         width="100%"
-        class={`${className} w-full h-full max-w-none object-contain image-rendering-pixelated rounded-lg`}
+        class={`max-w-none object-contain image-rendering-pixelated rounded-lg ${className} `}
         src={`/not-available.png`}
         onError={(e) => {
           e.currentTarget.src = `/not-available.png`;
@@ -38,7 +38,7 @@ export const Stamp = (
     <img
       width="100%"
       loading="lazy"
-      class={`${className} w-full h-full max-w-none object-contain image-rendering-pixelated rounded-lg`}
+      class={`max-w-none object-contain image-rendering-pixelated rounded-lg ${className} `}
       src={`/content/${stamp.tx_hash}.${
         get_suffix_from_mimetype(stamp.stamp_mimetype)
       }`}
