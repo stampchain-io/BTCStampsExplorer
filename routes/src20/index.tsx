@@ -1,6 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
 
-import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
+import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
 import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
 
@@ -13,7 +13,7 @@ export const handler = {
       const limit = Number(url.searchParams.get("limit")) || 1000;
       const page = Number(url.searchParams.get("page")) || 1;
 
-      const client = await connectDb();
+      const client = await getClient();
       const data = await Src20Class.get_valid_src20_tx_by_op_with_client(
         client,
         "DEPLOY",
@@ -25,7 +25,6 @@ export const handler = {
         "DEPLOY",
       );
       const last_block = await CommonClass.get_last_block_with_client(client);
-      await client.close();
 
       const pagination = paginate(total.rows[0]["total"], page, limit);
 

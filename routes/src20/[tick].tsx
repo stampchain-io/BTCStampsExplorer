@@ -5,11 +5,10 @@ import { SRC20TX } from "$components/src20/SRC20TX.tsx";
 
 import {
   CommonClass,
-  connectDb,
+  getClient,
   Src20Class,
 } from "../../lib/database/index.ts";
 import { BigFloat, set_precision } from "bigfloat/mod.ts";
-import { paginate } from "utils/util.ts";
 import { convertEmojiToTick } from "utils/util.ts";
 
 export const handler: Handlers<StampRow> = {
@@ -21,7 +20,7 @@ export const handler: Handlers<StampRow> = {
       const limit = Number(url.searchParams.get("limit")) || 200;
       const page = Number(url.searchParams.get("page")) || 1;
 
-      const client = await connectDb();
+      const client = await getClient();
       const deployment = await Src20Class
         .get_valid_src20_deploy_by_tick_with_client(
           client,
@@ -80,7 +79,6 @@ export const handler: Handlers<StampRow> = {
 
       const last_block = await CommonClass.get_last_block_with_client(client);
 
-      await client.close();
       set_precision(-4);
       const body = {
         last_block: last_block.rows[0]["last_block"],

@@ -1,5 +1,4 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { CommonClass, connectDb, StampsClass } from "$lib/database/index.ts";
+import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
 import {
   ErrorResponseBody,
@@ -8,7 +7,6 @@ import {
   PaginatedRequest,
 } from "globals";
 import { paginate } from "../../../../../lib/utils/util.ts";
-
 
 /**
  * @swagger
@@ -54,7 +52,6 @@ import { paginate } from "../../../../../lib/utils/util.ts";
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
 export const handler = async (
   req: PaginatedRequest,
   ctx: IdentHandlerContext,
@@ -70,7 +67,7 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
-    const client = await connectDb();
+    const client = await getClient();
     const data = await StampsClass.get_stamps_by_ident_with_client(
       client,
       ident.toUpperCase(),
@@ -97,4 +94,3 @@ export const handler = async (
     return new Response(JSON.stringify(body));
   }
 };
- 

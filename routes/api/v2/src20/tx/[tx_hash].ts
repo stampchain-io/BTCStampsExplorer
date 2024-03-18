@@ -1,11 +1,9 @@
-import { HandlerContext } from "$fresh/server.ts";
 import { api_get_src20_valid_tx } from "$lib/controller/wallet.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { convertToEmoji } from "utils/util.ts";
-import { CommonClass, connectDb } from "../../../../../lib/database/index.ts";
+import { CommonClass, getClient } from "../../../../../lib/database/index.ts";
 import {
   ErrorResponseBody,
-  PaginatedRequest,
   Src20ResponseBody,
   TxHandlerContext,
 } from "globals";
@@ -44,9 +42,8 @@ export const handler = async (
   const { tx_hash } = ctx.params;
   try {
     const tx_info = await api_get_src20_valid_tx(tx_hash);
-    const client = await connectDb();
+    const client = await getClient();
     const last_block = await CommonClass.get_last_block_with_client(client);
-    await client.close();
     const body: Src20ResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: {

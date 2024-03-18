@@ -4,6 +4,8 @@ import { conf } from "utils/config.ts";
 const maxRetries = parseInt(conf.DB_MAX_RETRIES) || 5;
 const retryInterval = 500;
 
+let db: Client | null = null;
+
 export const connectDb = async () => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -30,6 +32,14 @@ export const connectDb = async () => {
     }
   }
 };
+
+export async function getClient() {
+  if (db) {
+    return db;
+  }
+  db = await connectDb();
+  return db;
+}
 
 export const handleQuery = async (query: string, params: string[]) => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {

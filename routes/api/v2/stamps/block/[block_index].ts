@@ -1,12 +1,9 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { CommonClass, connectDb, StampsClass } from "$lib/database/index.ts";
-import { api_get_block } from "$lib/controller/block.ts";
+import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
 import {
   BlockHandlerContext,
-  StampBlockResponseBody,
   ErrorResponseBody,
+  StampBlockResponseBody,
 } from "globals";
-
 
 /**
  * @swagger
@@ -35,14 +32,13 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
 export const handler = async (
   _req: Request,
   ctx: BlockHandlerContext,
 ): Promise<Response> => {
   const { block_index } = ctx.params;
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const block_info = await CommonClass.get_block_info_with_client(
       client,
       block_index,
@@ -65,4 +61,3 @@ export const handler = async (
     return new Response(JSON.stringify(body));
   }
 };
- 

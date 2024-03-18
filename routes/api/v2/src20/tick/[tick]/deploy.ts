@@ -1,14 +1,11 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
+import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { jsonStringifyBigInt } from "utils/util.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
 import {
   ErrorResponseBody,
-  PaginatedRequest,
-  TickResponseBody,
   TickHandlerContext,
+  TickResponseBody,
 } from "globals";
-
 
 /**
  * @swagger
@@ -38,12 +35,14 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
-export const handler = async (_req: Request, ctx: TickHandlerContext): Promise<Response> => {
+export const handler = async (
+  _req: Request,
+  ctx: TickHandlerContext,
+): Promise<Response> => {
   let { tick } = ctx.params;
   try {
     tick = convertEmojiToTick(tick);
-    const client = await connectDb();
+    const client = await getClient();
     const deployment = await Src20Class
       .get_valid_src20_deploy_by_tick_with_client(
         client,
@@ -60,14 +59,17 @@ export const handler = async (_req: Request, ctx: TickHandlerContext): Promise<R
       last_block: last_block.rows[0]["last_block"],
       mint_status: {
         ...mint_status,
-        max_supply: mint_status.max_supply ? mint_status.max_supply.toString() : null,
-        total_minted: mint_status.total_minted ? mint_status.total_minted.toString() : null,
+        max_supply: mint_status.max_supply
+          ? mint_status.max_supply.toString()
+          : null,
+        total_minted: mint_status.total_minted
+          ? mint_status.total_minted.toString()
+          : null,
         limit: mint_status.limit ? mint_status.limit.toString() : null,
       },
       data: {
-        ...deployment.rows[0], 
+        ...deployment.rows[0],
         tick: convertToEmoji(deployment.rows[0].tick),
-
       },
     };
     return new Response(jsonStringifyBigInt(body));
