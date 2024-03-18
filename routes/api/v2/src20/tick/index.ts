@@ -44,7 +44,10 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Promise<Response> => {
+export const handler = async (
+  req: PaginatedRequest,
+  _ctx: HandlerContext,
+): Promise<Response> => {
   try {
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
@@ -61,7 +64,7 @@ export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Prom
       "DEPLOY",
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+    await client.close();
 
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const body: PaginatedSrc20ResponseBody = {
@@ -75,7 +78,7 @@ export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Prom
           amt: row.amt ? new BigFloat(row.amt).toString() : null,
         };
       }),
-    }
+    };
     return new Response(jsonStringifyBigInt(body));
   } catch (error) {
     const body: ErrorResponseBody = { error: `Error: Internal server error` };

@@ -53,7 +53,7 @@ export const handler = async (
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
     const total = await CursedClass.get_total_cursed_with_client(client);
-    client.close();
+    await client.close();
     const pagination = paginate(total, page, limit);
 
     const body: PaginatedStampResponseBody = {

@@ -80,7 +80,7 @@ export const handler: Handlers<StampRow> = {
 
       const last_block = await CommonClass.get_last_block_with_client(client);
 
-      client.close();
+      await client.close();
       set_precision(-4);
       const body = {
         last_block: last_block.rows[0]["last_block"],
