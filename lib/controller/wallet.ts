@@ -1,4 +1,4 @@
-import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
+import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { getBtcAddressInfo } from "../utils/btc.ts";
 import { SMALL_LIMIT } from "utils/constants.ts";
 import { paginate } from "../utils/util.ts";
@@ -9,7 +9,7 @@ export const api_get_stamp_balance = async (
   page = 1,
 ) => {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const balances = await CommonClass
       .get_stamp_balances_by_address_with_client(
         client,
@@ -17,7 +17,6 @@ export const api_get_stamp_balance = async (
         limit,
         page,
       );
-    await client.close();
     return balances;
   } catch (error) {
     console.error(error);
@@ -27,12 +26,11 @@ export const api_get_stamp_balance = async (
 
 export const api_get_src20_valid_tx = async (tx_hash: string) => {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const tx_data = await Src20Class.get_valid_src20_tx_by_tx_hash_with_client(
       client,
       tx_hash,
     );
-    await client.close();
     return tx_data.rows[0];
   } catch (error) {
     console.error(error);
@@ -49,12 +47,11 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
  */
 export const api_get_src20_balance = async (address: string) => {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const balances = await Src20Class.get_src20_balance_by_address_with_client(
       client,
       address,
     );
-    await client.close();
     if (balances.rows.length === 0) {
       return [];
     }
@@ -78,14 +75,13 @@ export const api_get_src20_balance_by_tick = async (
   tick: string,
 ) => {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const balances = await Src20Class
       .get_src20_balance_by_address_and_tick_with_client(
         client,
         address,
         tick,
       );
-    await client.close();
     return balances.rows[0];
   } catch (error) {
     console.error(error);
@@ -106,7 +102,7 @@ export const api_get_balance = async (
   page = 1,
 ) => {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const total =
       (await CommonClass.get_total_stamp_balance_with_client(client, address))
         .rows[0]["total"] || 0;
@@ -129,7 +125,6 @@ export const api_get_balance = async (
       client,
       address,
     );
-    await client.close();
     return {
       ...pagination,
       btc: btcInfo,

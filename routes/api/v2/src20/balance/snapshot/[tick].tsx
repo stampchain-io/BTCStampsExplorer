@@ -5,7 +5,7 @@ import {
   PaginatedRequest,
   Src20BalanceResponseBody,
 } from "globals";
-import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
+import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { Client } from "$mysql/mod.ts";
 import { SMALL_LIMIT } from "constants";
@@ -21,7 +21,7 @@ export const handler = async (
   const limit = Number(params.get("limit")) || SMALL_LIMIT;
   const page = Number(params.get("page"));
   try {
-    const client = await connectDb();
+    const client = await getClient();
     if (!client) {
       throw new Error("Client not found");
     }
@@ -41,7 +41,6 @@ export const handler = async (
         amt,
       );
     const total = total_data.rows[0]["total"];
-    await client.close();
     const body: Src20BalanceResponseBody = {
       snapshot_block: last_block.rows[0]["last_block"],
       total,

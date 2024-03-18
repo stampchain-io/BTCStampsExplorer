@@ -1,15 +1,14 @@
 import { Client } from "$mysql/mod.ts";
-import { BigFloat } from "bigfloat/mod.ts";
 import * as bitcoin from "bitcoin";
 
-import { connectDb } from "$lib/database/index.ts";
+import { getClient } from "$lib/database/index.ts";
 import { get_public_key_from_address } from "utils/quicknode.ts";
 import {
   checkDeployedTick,
   checkDeployParams,
   checkEnoughBalance,
   checkMintedOut,
-  checkMintParams, 
+  checkMintParams,
   checkTransferParams,
 } from "./check.ts";
 import { prepareSrc20TX } from "./tx.ts";
@@ -36,8 +35,8 @@ export async function mintSRC20({
       tick,
       amt,
     });
-    
-    const client: Client = await connectDb();
+
+    const client: Client = await getClient();
     const mint_info = await checkMintedOut(
       client,
       tick,
@@ -97,7 +96,7 @@ export async function deploySRC20({
       lim,
       dec,
     });
-    const client = await connectDb();
+    const client = await getClient();
 
     const mint_info = await checkDeployedTick(
       client,
@@ -154,7 +153,7 @@ export async function transferSRC20({
       feeRate,
       amt,
     });
-    const client = await connectDb();
+    const client = await getClient();
     const has_enough_balance = await checkEnoughBalance(
       client,
       fromAddress,

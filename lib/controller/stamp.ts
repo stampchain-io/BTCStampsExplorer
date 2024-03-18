@@ -1,10 +1,5 @@
-import { connectDb, StampsClass } from "../database/index.ts";
-import {
-  get_dispensers,
-  get_dispenses,
-  get_holders,
-  get_sends,
-} from "utils/xcp.ts";
+import { getClient, StampsClass } from "../database/index.ts";
+import { get_dispenses, get_holders, get_sends } from "utils/xcp.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
 export async function api_get_stamps(
@@ -13,7 +8,7 @@ export async function api_get_stamps(
   order: "DESC" | "ASC" = "DESC",
 ) {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const stamps = await StampsClass.get_resumed_stamps_by_page_with_client(
       client,
       page_size,
@@ -21,14 +16,12 @@ export async function api_get_stamps(
       order,
     );
     if (!stamps) {
-      await client.close();
       throw new Error("No stamps found");
     }
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ["STAMP", "SRC-721"],
     );
-    await client.close();
     return {
       stamps: stamps.rows,
       total: total.rows[0].total,
@@ -44,7 +37,7 @@ export async function api_get_stamps(
 
 export async function api_get_stamp(id: string) {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const stamp = await StampsClass.get_stamp_with_client(client, id);
     if (!stamp) {
       throw new Error(`Error: Stamp ${id} not found`);
@@ -60,7 +53,6 @@ export async function api_get_stamp(id: string) {
     const dispensers = await get_dispensers(cpid);
     const sends = await get_sends(cpid);
     const dispenses = await get_dispenses(cpid);
-    await client.close();
     return {
       stamp: stamp,
       holders: holders.map((holder: any) => {

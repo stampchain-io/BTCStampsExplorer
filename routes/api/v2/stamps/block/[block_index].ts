@@ -1,6 +1,4 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { CommonClass, connectDb, StampsClass } from "$lib/database/index.ts";
-import { api_get_block } from "$lib/controller/block.ts";
+import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
 import {
   BlockHandlerContext,
   ErrorResponseBody,
@@ -40,7 +38,7 @@ export const handler = async (
 ): Promise<Response> => {
   const { block_index } = ctx.params;
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const block_info = await CommonClass.get_block_info_with_client(
       client,
       block_index,

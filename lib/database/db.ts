@@ -4,6 +4,8 @@ import { conf } from "utils/config.ts";
 const maxRetries = parseInt(conf.DB_MAX_RETRIES) || 5;
 const retryInterval = 500;
 
+let db: Client | null = null;
+
 /**
  * Connects to the database.
  * @returns {Promise<Client>} A promise that resolves to the connected client.
@@ -35,6 +37,14 @@ export const connectDb = async () => {
     }
   }
 };
+
+export async function getClient() {
+  if (db) {
+    return db;
+  }
+  db = await connectDb();
+  return db;
+}
 
 /**
  * Executes a database query with retry logic.
