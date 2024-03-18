@@ -1,5 +1,10 @@
 import { Client } from "$mysql/mod.ts";
-import { SMALL_LIMIT, SRC20_BALANCE_TABLE, SRC20_TABLE, BIG_LIMIT } from "constants";
+import {
+  BIG_LIMIT,
+  SMALL_LIMIT,
+  SRC20_BALANCE_TABLE,
+  SRC20_TABLE,
+} from "constants";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 
@@ -455,7 +460,7 @@ export class Src20Class {
       `
         SELECT id,address,p,tick,amt,block_time,last_update
         FROM ${SRC20_BALANCE_TABLE}
-        WHERE address = '${address}'
+        WHERE address = '${address}' AND amt > 0
         ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [address, limit, offset],
@@ -473,7 +478,7 @@ export class Src20Class {
       `
         SELECT id,address,p,tick,amt,block_time,last_update
         FROM ${SRC20_BALANCE_TABLE}
-        WHERE address = '${address}'
+        WHERE address = '${address}' and amt > 0
         AND tick COLLATE utf8mb4_0900_as_ci = '${tick}';
         `,
       [address, tick],

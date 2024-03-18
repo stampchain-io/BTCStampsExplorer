@@ -9,7 +9,11 @@ interface HoldersInfoProps {
 }
 export const SRC20HoldersInfo = (props: HoldersInfoProps) => {
   const { holders, total_holders, total_mints, total_sends } = props;
-  const labels = holders.map((holder) => holder.percentage);
+  const labels = holders
+    .map((holder) => parseFloat(holder.percentage))
+    .filter((percentage) => !isNaN(percentage));
+  // problem here with NaN values
+  // console.log(holders);
 
   return (
     <div class="mx-auto w-full p-4 flex flex-col md:flex-row space-between">

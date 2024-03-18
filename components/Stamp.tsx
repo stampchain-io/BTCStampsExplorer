@@ -10,7 +10,7 @@ export const Stamp = (
         height="100%"
         scrolling="no"
         class={`rounded-lg ${className} `}
-        sandbox="allow-scripts"
+        sandbox="allow-scripts "
         src={`/content/${stamp.tx_hash}.${
           get_suffix_from_mimetype(stamp.stamp_mimetype)
         }`}

@@ -39,7 +39,13 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
       </div>
       <div class="flex justify-around truncate border-b border-t">
         <p>
-          Creator: {stamp.creator_name ? stamp.creator_name : stamp.creator}
+          Creator: {stamp.creator_name
+            ? stamp.creator_name
+            : (
+              <a href={`/wallet/${stamp.creator}`}>
+                {short_address(stamp.creator, 12)}
+              </a>
+            )}
         </p>
       </div>
       <div class="flex justify-around truncate border-b border-t">

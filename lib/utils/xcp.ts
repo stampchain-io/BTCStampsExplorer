@@ -26,6 +26,12 @@ const public_nodes = [
   },
 ];
 
+/**
+ * Creates a payload object for JSON-RPC requests.
+ * @param method - The method name.
+ * @param params - The parameters for the method.
+ * @returns The payload object.
+ */
 const create_payload = (method: string, params: XCPParams) => {
   return {
     jsonrpc: "2.0",
@@ -35,12 +41,20 @@ const create_payload = (method: string, params: XCPParams) => {
   };
 };
 
+/**
+ * Makes a query to the specified URL with retries in case of failure.
+ * @param url - The URL to make the query to.
+ * @param auth - The authentication string.
+ * @param payload - The payload to send with the query.
+ * @param retries - The number of retries to attempt (default is 0).
+ * @returns The result of the query or null if all retries failed.
+ */
 const handleQueryWithRetries = async (
   url: string,
   auth: string,
   payload: any,
-  retries: number = 0,
-) => {
+  retries = 0,
+): Promise<any | null> => {
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -62,6 +76,12 @@ const handleQueryWithRetries = async (
   }
 };
 
+/**
+ * Handles the query by sending it to multiple public nodes and returning the result from the first successful query.
+ * If all queries fail, it logs an error message and returns null.
+ * @param payload - The query payload to be sent to the nodes.
+ * @returns The result of the successful query or null if all queries fail.
+ */
 export const handleQuery = async (payload: any) => {
   for (const node of public_nodes) {
     const auth = btoa(`${node.user}:${node.password}`);
@@ -74,6 +94,11 @@ export const handleQuery = async (payload: any) => {
   return null;
 };
 
+/**
+ * Retrieves the balances for a given address.
+ * @param address - The address for which to retrieve the balances.
+ * @returns An array of balances, each containing the asset ID, quantity, and divisibility.
+ */
 export const get_balances = async (address: string) => {
   const params = {
     filters: [
@@ -98,11 +123,21 @@ export const get_balances = async (address: string) => {
     }));
 };
 
+/**
+ * Retrieves the stamps balance for a given address.
+ * @param address - The address for which to retrieve the stamps balance.
+ * @returns A promise that resolves to the stamps balance.
+ */
 export const get_stamps_balance = async (address: string) => {
   //TODO: filter xcp balances and add populated info with stamptable data
   return await get_balances(address);
 };
 
+/**
+ * Retrieves a list of sends for a given cpid.
+ * @param cpid - The cpid to filter sends by.
+ * @returns An array of sends, each containing transaction hash, block index, source, destination, quantity, and asset.
+ */
 export const get_sends = async (cpid: string) => {
   const params = {
     filters: [
@@ -136,6 +171,12 @@ export const get_sends = async (cpid: string) => {
   }));
 };
 
+/**
+ * Retrieves the holders of a specific asset.
+ *
+ * @param cpid - The asset identifier.
+ * @returns An array of holders with a positive quantity of the specified asset.
+ */
 export const get_holders = async (cpid: string) => {
   const params = {
     filters: [
@@ -160,6 +201,11 @@ export const get_holders = async (cpid: string) => {
   );
 };
 
+/**
+ * Retrieves the dispensers for a given asset.
+ * @param cpid - The asset identifier.
+ * @returns An array of mapped dispensers.
+ */
 export const get_dispensers = async (cpid: string) => {
   const params = {
     filters: [
@@ -201,6 +247,10 @@ export const get_dispensers = async (cpid: string) => {
   return mappedDispensers;
 };
 
+/**
+ * Retrieves all dispensers with remaining give quantity.
+ * @returns An object containing the total number of dispensers and an array of mapped dispensers.
+ */
 export const get_all_dispensers = async () => {
   const payload = create_payload("get_dispensers", {});
   console.log("Payload:", payload);
@@ -233,6 +283,11 @@ export const get_all_dispensers = async () => {
   return { total, mappedDispensers };
 };
 
+/**
+ * Retrieves dispenses for a given cpid.
+ * @param cpid - The asset identifier.
+ * @returns An array of dispenses.
+ */
 export const get_dispenses = async (cpid: string) => {
   const params = {
     filters: [

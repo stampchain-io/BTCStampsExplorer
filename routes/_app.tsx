@@ -4,6 +4,7 @@ import { Partial } from "$fresh/runtime.ts";
 import { Header } from "$islands/Header.tsx";
 import { MempoolWeather } from "$islands/MempoolWeather.tsx";
 import { ToastProvider } from "$islands/Toast/toast.tsx";
+import { StampSearchClient } from "$islands/StampSearch.tsx";
 
 export default function App({ Component }: AppProps) {
   return (
@@ -11,18 +12,36 @@ export default function App({ Component }: AppProps) {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Bitcoin stamps</title>
+        <title>BITCOIN STAMPS</title>
+        <meta
+          name="description"
+          content="Unprunable UTXO Art, Because Sats Don’t Exist."
+        />
+        <meta name="title" content="BITCOIN STAMPS"></meta>
+        <meta property="og:title" content="BITCOIN STAMPS" />
+        <meta
+          property="og:description"
+          content="Unprunable UTXO Art, Because Sats Don’t Exist."
+        />
+        <meta
+          http-equiv="Content-Security-Policy"
+          content="default-src 'unsafe-eval' 'unsafe-inline' 'self' data: blob:"
+        />
+        <meta property="og:image" content="/img/stamp.jpg"></meta>
+        <link rel="icon" type="image/x-icon" href="/img/icon.jpg"></link>
+        <link rel="apple-touch-icon" href="/img/icon.jpg"></link>
         <link rel="stylesheet" href="/styles.css" />
       </head>
-      <body class="bg-[#181818]">
+      <body className="bg-[#181818]">
         <ToastProvider>
           <div
-            class="px-2 py-8 mx-auto bg-[#181818] flex flex-col md:gap-4 overflow-auto max-w-7xl"
+            className="px-2 py-8 mx-auto bg-[#181818] flex flex-col md:gap-4 overflow-auto max-w-7xl"
             f-client-nav
           >
-            <div class="py-0 my-0">
+            <div className="py-0 my-0">
               <Header />
               <MempoolWeather />
+              <StampSearchClient />
             </div>
             <Partial name="body">
               <Component />

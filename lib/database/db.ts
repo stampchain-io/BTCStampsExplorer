@@ -4,6 +4,11 @@ import { conf } from "utils/config.ts";
 const maxRetries = parseInt(conf.DB_MAX_RETRIES) || 5;
 const retryInterval = 500;
 
+/**
+ * Connects to the database.
+ * @returns {Promise<Client>} A promise that resolves to the connected client.
+ * @throws {Error} If unable to connect to the database after maximum retries.
+ */
 export const connectDb = async () => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -31,6 +36,14 @@ export const connectDb = async () => {
   }
 };
 
+/**
+ * Executes a database query with retry logic.
+ *
+ * @param query - The query to execute.
+ * @param params - The parameters for the query.
+ * @returns A Promise that resolves to the result of the query.
+ * @throws If the query fails after the maximum number of retries.
+ */
 export const handleQuery = async (query: string, params: string[]) => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -51,6 +64,15 @@ export const handleQuery = async (query: string, params: string[]) => {
   }
 };
 
+/**
+ * Executes a database query using the provided client and handles retries in case of failure.
+ *
+ * @param client - The database client to use for executing the query.
+ * @param query - The query to execute.
+ * @param params - The parameters to pass to the query.
+ * @returns A Promise that resolves to the result of the query execution.
+ * @throws If the query execution fails after the maximum number of retries.
+ */
 export const handleQueryWithClient = async (
   client: Client,
   query: string,

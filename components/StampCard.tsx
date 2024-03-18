@@ -10,30 +10,33 @@ import {
 
 dayjs.extend(relativeTime);
 
-export function StampCard(
-  { stamp, kind = "stamp" }: {
-    stamp: StampRow;
-    kind: "cursed" | "stamp" | "named";
-  },
-) {
+/**
+ * Renders a stamp card component.
+ * @param stamp - The stamp row data.
+ * @param kind - The kind of stamp card (cursed, stamp, named).
+ * @returns The stamp card component.
+ */
+export function StampCard({
+  stamp,
+  kind = "stamp",
+}: {
+  stamp: StampRow;
+  kind: "cursed" | "stamp" | "named";
+}) {
   let src: string;
   const suffix = get_suffix_from_mimetype(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
-  // src = `${stamp.stamp_url}`;
-  // console.log(suffix);
   if (suffix === "unknown") {
     src = `/not-available.png`;
   }
   if (suffix === "json" || suffix === "txt") {
     src = `/not-available.png`;
   }
+
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
-      // href={`${stamp.stamp_url}`}
-
-      className="text-white group relative z-10 flex h-full w-full grow flex-col overflow-hidden p-1 @container bg-[#181818] transition-all hover:bg-gray-700"
-      style={{ aspectRatio: "1/1", objectFit: "cover" }}
+      className="text-white group relative z-10 flex h-full w-full grow flex-col p-1 @container bg-[#181818] transition-all hover:bg-gray-700"
     >
       <div class="relative flex overflow-hidden">
         <div class="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden rounded-t-lg">
@@ -42,7 +45,7 @@ export function StampCard(
               ? (
                 <iframe
                   scrolling="no"
-                  sandbox="allow-scripts allow-same-origin"
+                  sandbox="allow-scripts "
                   src={src}
                   class="h-full w-fit max-w-full object-contain items-center standalone:h-full standalone:w-auto"
                 />
@@ -74,8 +77,7 @@ export function StampCard(
           </h3>
         </div>
         {
-          /*
-          stamp.collection &&
+          /* stamp.collection &&
           <a class="text-[12px] text-accent hover:underline" href="/collection/honey-badgers">
             {stamp.collection}
           </a>
@@ -91,15 +93,16 @@ export function StampCard(
             <div class="bg-foreground-1 transition-all hover:bg-foreground-1-hover pl-3">
               <div class="center h-[18px] text-[12px] gap-x-1">
                 <p class="leading-4">
-                  {stamp.ident !== "SRC-20" &&
-                    (
-                      stamp.balance
-                        ? `${getSupply(stamp.balance, stamp.divisible)}/${
-                          stamp.supply < 100000 && !stamp.divisible
-                            ? getSupply(stamp.supply, stamp.divisible)
-                            : "+100000"
-                        }`
-                        : `1/${getSupply(stamp.supply, stamp.divisible)}`
+                  {stamp.ident !== "SRC-20" && stamp.balance
+                    ? (
+                      `${getSupply(stamp.balance, stamp.divisible)}/${
+                        stamp.supply < 100000 && !stamp.divisible
+                          ? getSupply(stamp.supply, stamp.divisible)
+                          : "+100000"
+                      }`
+                    )
+                    : (
+                      `1/${getSupply(stamp.supply, stamp.divisible)}`
                     )}
                 </p>
               </div>
