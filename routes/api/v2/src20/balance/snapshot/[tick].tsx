@@ -41,7 +41,7 @@ export const handler = async (
         amt,
       );
     const total = total_data.rows[0]["total"];
-    client.close();
+    await client.close();
     const body: Src20BalanceResponseBody = {
       snapshot_block: last_block.rows[0]["last_block"],
       total,

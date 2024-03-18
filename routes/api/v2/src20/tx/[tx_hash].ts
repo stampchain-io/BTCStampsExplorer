@@ -37,13 +37,16 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-export const handler = async (_req: Request, ctx: TxHandlerContext): Promise<Response> => {
+export const handler = async (
+  _req: Request,
+  ctx: TxHandlerContext,
+): Promise<Response> => {
   const { tx_hash } = ctx.params;
   try {
     const tx_info = await api_get_src20_valid_tx(tx_hash);
     const client = await connectDb();
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+    await client.close();
     const body: Src20ResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: {

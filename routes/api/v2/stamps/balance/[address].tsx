@@ -68,7 +68,7 @@ export const handler = async (
       (await CommonClass.get_total_stamp_balance_with_client(client, address))
         .rows[0]["total"] || 0;
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+    await client.close();
 
     const pagination = paginate(total, page, limit);
 

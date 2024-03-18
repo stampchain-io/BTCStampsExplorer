@@ -9,7 +9,7 @@ import {
   ErrorResponseBody,
   IdHandlerContext,
   StampResponseBody,
-} from "globals"; 
+} from "globals";
 
 /**
  * @swagger
@@ -39,8 +39,6 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
-
 export const handler = async (
   _req: Request,
   ctx: IdHandlerContext,
@@ -50,7 +48,7 @@ export const handler = async (
     const client = await connectDb();
     const data = await api_get_stamp(id);
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+    await client.close();
     const body: StampResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: data,

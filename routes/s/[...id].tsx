@@ -24,7 +24,7 @@ export const handler: Handlers<StampRow> = {
         return ctx.renderNotFound();
       }
     }
-    client.close();
+    await client.close();
     return new Response("", {
       status: 301,
       headers: {

@@ -16,14 +16,14 @@ export async function api_get_stamps(
       order,
     );
     if (!stamps) {
-      client.close();
+      await client.close();
       throw new Error("No stamps found");
     }
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ["STAMP", "SRC-721"],
     );
-    client.close();
+    await client.close();
     return {
       stamps: stamps.rows,
       total: total.rows[0].total,
@@ -52,6 +52,7 @@ export async function api_get_stamp(id: string) {
     const cpid = cpid_result.rows[0].cpid;
 
     const holders = await get_holders(cpid);
+    await client.close();
     const sends = [];
     return {
       stamp: stamp,

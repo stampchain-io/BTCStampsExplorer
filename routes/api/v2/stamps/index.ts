@@ -39,7 +39,6 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
 export const handler = async (
   req: PaginatedRequest,
   _ctx: HandlerContext,
@@ -57,7 +56,7 @@ export const handler = async (
     const total =
       (await StampsClass.get_total_stamps_with_client(client)).rows[0]["total"];
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+    await client.close();
 
     const pagination = paginate(total, page, limit);
 
