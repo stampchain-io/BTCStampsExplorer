@@ -7,6 +7,7 @@ import { StampHistory } from "$components/StampHistory.tsx";
 import { Stamp } from "$components/Stamp.tsx";
 import { HolderRow, SendRow, StampRow } from "globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
+
 type StampPageProps = {
   // data: { stamp: any; sends: any; holders: any; total: any };
   params: {
@@ -38,6 +39,7 @@ export const handler: Handlers<StampRow> = {
     return await ctx.render(data);
   },
 };
+
 export default function StampPage(props: StampPageProps) {
   const { stamp, sends, holders, total } = props.data;
   console.log("holders:", holders);

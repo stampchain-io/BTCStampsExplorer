@@ -40,6 +40,13 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
   }
 };
 
+/**
+ * Retrieves the SRC20 token balances for a given address.
+ *
+ * @param address - The address for which to retrieve the SRC20 token balances.
+ * @returns A Promise that resolves to an array of SRC20 token balances.
+ * @throws If there is an error while retrieving the SRC20 token balances.
+ */
 export const api_get_src20_balance = async (address: string) => {
   try {
     const client = await connectDb();
@@ -58,6 +65,14 @@ export const api_get_src20_balance = async (address: string) => {
   }
 };
 
+/**
+ * Retrieves the balance of a specific SRC20 token for a given address and tick.
+ *
+ * @param address - The address for which to retrieve the balance.
+ * @param tick - The tick of the SRC20 token.
+ * @returns The balance of the SRC20 token for the given address and tick.
+ * @throws If an error occurs while retrieving the balance.
+ */
 export const api_get_src20_balance_by_tick = async (
   address: string,
   tick: string,
@@ -78,6 +93,13 @@ export const api_get_src20_balance_by_tick = async (
   }
 };
 
+/**
+ * Retrieves the balance information for a given address.
+ * @param address - The address for which to retrieve the balance.
+ * @param limit - The maximum number of results to return per page. Default is 50.
+ * @param page - The page number to retrieve. Default is 1.
+ * @returns An object containing the balance information.
+ */
 export const api_get_balance = async (
   address: string,
   limit = 50,

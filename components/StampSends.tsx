@@ -1,3 +1,12 @@
+import { short_address } from "$lib/utils/util.ts";
+import dayjs from "$dayjs/";
+
+/**
+ * Renders a table displaying the stamp sends activity.
+ *
+ * @param sends - An array of `SendRow` objects representing the stamp sends.
+ * @returns The rendered StampSends component.
+ */
 export function StampSends({ sends }: { sends: SendRow[] }) {
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-h-96 max-w-256">
