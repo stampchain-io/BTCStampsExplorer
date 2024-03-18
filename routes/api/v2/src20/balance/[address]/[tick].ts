@@ -1,15 +1,13 @@
-import { HandlerContext } from "$fresh/server.ts";
 import { api_get_src20_balance_by_tick } from "$lib/controller/wallet.ts";
 import { convertEmojiToTick } from "utils/util.ts";
 import {
   AddressTickHandlerContext,
   ErrorResponseBody,
-  PaginatedRequest,
   Src20BalanceResponseBody,
 } from "globals";
 import {
   CommonClass,
-  connectDb,
+  getClient,
 } from "../../../../../../lib/database/index.ts";
 
 /**
@@ -50,9 +48,8 @@ export const handler = async (
 ): Promise<Response> => {
   let { address, tick } = ctx.params;
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const last_block = await CommonClass.get_last_block_with_client(client);
-    await client.close();
     tick = convertEmojiToTick(tick);
     const src20 = await api_get_src20_balance_by_tick(address, tick);
     const body: Src20BalanceResponseBody = {

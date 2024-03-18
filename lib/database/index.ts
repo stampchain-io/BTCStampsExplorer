@@ -1,4 +1,9 @@
-export { connectDb, handleQuery, handleQueryWithClient } from "./db.ts";
+export {
+  connectDb,
+  getClient,
+  handleQuery,
+  handleQueryWithClient,
+} from "./db.ts";
 
 export { CommonClass } from "./commonClass.ts";
 export { CursedClass } from "./cursedClass.ts";
