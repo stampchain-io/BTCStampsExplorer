@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
+import { StampSearchClient } from "$islands/StampSearch.tsx";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -46,6 +47,7 @@ export function Header() {
               className="w-auto h-12 md:h-16"
             />
           </a>
+          {/* <StampSearchClient /> */}
           <button
             onClick={toggleMenu}
             className="border border-solid border-blue-600 px-3 py-1 rounded text-blue-600 opacity-50 hover:opacity-75 md:hidden"
@@ -67,9 +69,10 @@ export function Header() {
             href="/block/last"
             f-partial={"/block/last"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 hover:text-gray-700 transition-colors duration-300 ${
+            className={`p-2 lg:px-4 md:mx-2 hover:text-gray-700 transition-colors duration-300 flex justify-center items-center ${
               path === "block" ? activeClass : inactiveClass
             }`}
+            style={{ textDecoration: "none" }}
           >
             BLOCKS
           </a>
@@ -77,9 +80,10 @@ export function Header() {
             href="/stamp"
             f-partial={"/stamp"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
+            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 flex justify-center items-center ${
               path === "stamp" ? activeClass : inactiveClass
             }`}
+            style={{ textDecoration: "none" }}
           >
             STAMPS
           </a>
@@ -87,9 +91,10 @@ export function Header() {
             href="/src20"
             f-partial={"/src20"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
+            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 flex justify-center items-center ${
               path === "src20" ? activeClass : inactiveClass
             }`}
+            style={{ textDecoration: "none" }}
           >
             SRC20
           </a>

@@ -40,7 +40,7 @@ export default function Block(props: BlockProps) {
       </div>
       <div class="flex items-center justify-between text-xs sm:text-sm">
         <span>Stamps: {block.issuances}</span>
-        <span>Sends: {block.sends}</span>
+        {/* <span>Sends: {block.sends}</span> */}
       </div>
     </a>
   );
