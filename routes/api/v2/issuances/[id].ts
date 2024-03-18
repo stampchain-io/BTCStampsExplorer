@@ -6,7 +6,6 @@ import {
   StampsResponseBody,
 } from "globals";
 
-
 /**
  * @swagger
  * /api/v2/issuances/{id}:
@@ -50,7 +49,7 @@ export const handler = async (
       );
     }
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+    await client.close();
     const body: StampsResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: data.rows,

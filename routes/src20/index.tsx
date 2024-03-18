@@ -25,7 +25,7 @@ export const handler = {
         "DEPLOY",
       );
       const last_block = await CommonClass.get_last_block_with_client(client);
-      client.close();
+      await client.close();
 
       const pagination = paginate(total.rows[0]["total"], page, limit);
 

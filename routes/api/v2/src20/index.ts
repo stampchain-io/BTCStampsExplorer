@@ -8,7 +8,6 @@ import {
   PaginatedSrc20ResponseBody,
 } from "globals";
 
-
 /**
  * @swagger
  * /api/v2/src20:
@@ -45,8 +44,10 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
-export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Promise<Response> => {
+export const handler = async (
+  req: PaginatedRequest,
+  _ctx: HandlerContext,
+): Promise<Response> => {
   try {
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
@@ -61,7 +62,7 @@ export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Prom
       client,
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
+    await client.close();
     const pagination = paginate(total.rows[0].total, page, limit);
     const body: PaginatedSrc20ResponseBody = {
       ...pagination,

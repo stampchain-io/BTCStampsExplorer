@@ -80,7 +80,7 @@ export const handler = async (
         client,
         tick,
       );
-    client.close();
+    await client.close();
     const body: PaginatedTickResponseBody = {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],

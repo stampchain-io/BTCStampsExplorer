@@ -40,7 +40,7 @@ export async function api_get_block(block_index_or_hash: number | string) {
       issuances: issuances.rows,
       sends: sends,
     };
-    client.close();
+    await client.close();
     return response;
   } catch (error) {
     console.error(error);
@@ -77,7 +77,7 @@ export const api_get_related_blocks = async (
       last_block: last_block.rows[0]["last_block"],
       blocks,
     };
-    client.close();
+    await client.close();
     return response;
   } catch (error) {
     console.error(error);
@@ -98,7 +98,7 @@ export const api_get_last_block = async () => {
     const response = {
       last_block: last_block.rows[0]["last_block"],
     };
-    client.close();
+    await client.close();
     return response;
   } catch (error) {
     console.error(error);

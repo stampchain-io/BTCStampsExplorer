@@ -15,11 +15,11 @@ export async function api_get_cursed(
       order,
     );
     if (!stamps) {
-      client.close();
+      await client.close();
       throw new Error("No stamps found");
     }
     const total = await CursedClass.get_total_cursed_with_client(client);
-    client.close();
+    await client.close();
     return {
       stamps: stamps.rows,
       total: total.rows[0].total,

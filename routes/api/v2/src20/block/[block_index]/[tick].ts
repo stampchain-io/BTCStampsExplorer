@@ -87,7 +87,7 @@ export const handler = async (
         block_index,
         tick,
       );
-    client.close();
+    await client.close();
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const body: PaginatedSrc20ResponseBody = {
       ...pagination,

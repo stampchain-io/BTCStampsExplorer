@@ -3,14 +3,13 @@ import { connectDb, Src20Class } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
 import { convertToEmoji } from "utils/util.ts";
 import {
+  BlockHandlerContext,
   ErrorResponseBody,
   PaginatedRequest,
   PaginatedSrc20ResponseBody,
-  BlockHandlerContext,
 } from "globals";
 import { CommonClass } from "../../../../../../lib/database/index.ts";
 import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
-
 
 /**
  * @swagger
@@ -49,7 +48,10 @@ import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-export const handler = async (req: PaginatedRequest, ctx: BlockHandlerContext): Promise<Response> => {
+export const handler = async (
+  req: PaginatedRequest,
+  ctx: BlockHandlerContext,
+): Promise<Response> => {
   const { block_index } = ctx.params;
   try {
     const url = new URL(req.url);
@@ -69,7 +71,7 @@ export const handler = async (req: PaginatedRequest, ctx: BlockHandlerContext): 
         block_index,
       );
     const last_block = await CommonClass.get_last_block_with_client(client);
-      client.close();
+    await client.close();
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const body: PaginatedSrc20ResponseBody = {
       ...pagination,

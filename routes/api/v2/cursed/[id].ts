@@ -1,4 +1,4 @@
-import { _HandlerContext } from "$fresh/server.ts";
+import { HandlerContext } from "$fresh/server.ts";
 import {
   CommonClass,
   connectDb,
@@ -41,6 +41,10 @@ export const handler = async (
   _req: Request,
   ctx: IdHandlerContext,
 ): Promise<Response> => {
+export const handler = async (
+  _req: Request,
+  ctx: IdHandlerContext,
+): Promise<Response> => {
   const { id } = ctx.params;
   try {
     const client = await connectDb();
@@ -50,12 +54,13 @@ export const handler = async (
     let data;
     if (Number.isInteger(Number(id))) {
       data = await StampsClass.get_stamp_by_stamp_with_client(client, id);
+      data = await StampsClass.get_stamp_by_stamp_with_client(client, id);
     } else {
       data = await StampsClass.get_stamp_by_identifier_with_client(client, id);
     }
     const last_block = await CommonClass.get_last_block_with_client(client);
     const stamp = await summarize_issuances(data.rows);
-    client.close();
+    await client.close();
     const body: StampResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: stamp,
