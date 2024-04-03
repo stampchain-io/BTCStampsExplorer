@@ -41,10 +41,6 @@ export const handler = async (
   _req: Request,
   ctx: IdHandlerContext,
 ): Promise<Response> => {
-export const handler = async (
-  _req: Request,
-  ctx: IdHandlerContext,
-): Promise<Response> => {
   const { id } = ctx.params;
   try {
     const client = await getClient();

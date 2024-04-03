@@ -5,7 +5,6 @@ import {
   IdHandlerContext,
   StampResponseBody,
 } from "globals";
-} from "globals";
 
 /**
  * @swagger
