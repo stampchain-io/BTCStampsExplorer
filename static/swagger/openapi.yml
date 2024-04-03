@@ -1,20 +1,16 @@
 openapi: 3.0.3
 info:
-  title: Stampchain - OpenAPI 3.0
-  description: Stampchain API UI
+  title: Universelle - OpenAPI 3.0
+  description: Universelle API UI
   version: 2.0.0
 externalDocs:
   description: Find out more about Stampchain
-  url: 'http://stampchain.io'
+  url: 'http://btcstamps.deno.dev'
 servers:
-  - url: 'https://stampchain.io'
-    description:  Production server (uses live data)
-  - url: "https://bitcoinstamps.xyz"
-    description: Production server (uses live data)
   - url: 'http://localhost:8000'
-  #   description: Development server (local)
-  # - url: 'https://btcstamps.deno.dev/'
-  #   description: Staging server (uses live data)
+    description: Development server (local)
+  - url: 'https://btcstamps.deno.dev/'
+    description: Staging server (uses live data)
 paths:
 
 
