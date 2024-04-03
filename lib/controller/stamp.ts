@@ -1,5 +1,10 @@
 import { getClient, StampsClass } from "../database/index.ts";
-import { get_dispenses, get_holders, get_sends } from "utils/xcp.ts";
+import {
+  get_dispensers,
+  get_dispenses,
+  get_holders,
+  get_sends,
+} from "utils/xcp.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
 export async function api_get_stamps(
