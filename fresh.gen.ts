@@ -13,6 +13,7 @@ import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block
 import * as $api_v2_cursed_ident_ident_ from "./routes/api/v2/cursed/ident/[ident].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
 import * as $api_v2_issuances_id_ from "./routes/api/v2/issuances/[id].ts";
+import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
 import * as $api_v2_src20_balance_snapshot_tick_ from "./routes/api/v2/src20/balance/snapshot/[tick].tsx";
@@ -71,6 +72,7 @@ const manifest = {
     "./routes/api/v2/cursed/ident/[ident].ts": $api_v2_cursed_ident_ident_,
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
     "./routes/api/v2/issuances/[id].ts": $api_v2_issuances_id_,
+    "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/src20/balance/[address].ts":
       $api_v2_src20_balance_address_,
     "./routes/api/v2/src20/balance/[address]/[tick].ts":
