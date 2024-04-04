@@ -425,77 +425,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
-
-
-
-  /api/v2/src20/create:
-    post:
-      summary: Deploy, Mint, Transfer SRC-20 Tokens
-      description: |
-        This returns an unsigned transaction ready for signing and broadcasting
-        via wallet or library. There is no validation that the input data provided
-        will conform to SRC-20 specifications or mint limit requirements. It is the 
-        users sole responsibility to confirm mint, deploy limits and confirm existing
-        balances prior to a transfer of tokens. The examples provided are for demonstration
-        purposes only.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/InputData'
-            examples:
-              deploy:
-                value:
-                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
-                  op: "deploy"
-                  tick: "KEVIN"
-                  feeRate: 60
-                  max: 2100000000
-                  lim: 100000
-                  dec: 18
-              mint:
-                value:
-                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
-                  op: "mint"
-                  tick: "DOGE"
-                  feeRate: 150
-                  amt: 1000
-              transfer:
-                value:
-                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
-                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
-                  op: "transfer"
-                  tick: "STAMP"
-                  feeRate: 150
-                  amt: 100000
-      responses:
-        '200':
-          description: Successful response with the hex value.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  hex:
-                    type: string
-                    description: The hex value.
-        '400':
-          description: Bad request error response.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: The error message.
-
-
-
-
   /api/v2/src20/tick:
     get:
       summary: Get paginated valid src20 transactions by operation type
@@ -804,6 +733,124 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
+
+  /api/v2/src20/create:
+    post:
+      summary: Deploy, Mint, Transfer SRC-20 Tokens
+      description: |
+        This returns an unsigned transaction ready for signing and broadcasting
+        via wallet or library. There is no validation that the input data provided
+        will conform to SRC-20 specifications or mint limit requirements. It is the 
+        users sole responsibility to confirm mint, deploy limits and confirm existing
+        balances prior to a transfer of tokens. The examples provided are for demonstration
+        purposes only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputData'
+            examples:
+              deploy:
+                value:
+                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  op: "deploy"
+                  tick: "KEVIN"
+                  feeRate: 60
+                  max: 2100000000
+                  lim: 100000
+                  dec: 18
+              mint:
+                value:
+                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  op: "mint"
+                  tick: "DOGE"
+                  feeRate: 150
+                  amt: 1000
+              transfer:
+                value:
+                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  op: "transfer"
+                  tick: "STAMP"
+                  feeRate: 150
+                  amt: 100000
+      responses:
+        '200':
+          description: Successful response with the hex value.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hex:
+                    type: string
+                    description: The hex value.
+        '400':
+          description: Bad request error response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message.
+
+
+
+  /api/v2/olga/mint:
+    post:
+      summary: Mint a new OLGA STAMP.
+      description: |
+        This returns an unsigned transaction ready for signing and broadcasting
+        via wallet or library. There is no validation that the input data provided
+        will conform to STAMP specifications. It is the 
+        users sole responsibility to confirm mint, deploy limits and confirm existing
+        balances prior to a transfer of tokens. The examples provided are for demonstration
+        purposes only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MintStampInputData'
+            examples:
+              mint:
+                value:
+                  sourceWallet: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  qty: 1
+                  locked: true
+                  divisible: true
+                  filename: test.png
+                  file: "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAG1BMVEUAAAALOzcKBiAJTzz/1lqZoxgIaSyfQuJmIslgvM+QAAAAAXRSTlMAQObYZgAAAMlJREFUeNp9kNVhAzEMQFVtYE+ge8HfxhsUFkjuFih4gPJ3Jz9mMPuJJVvjzkR0CBJf7CFQB05GKs75EVCwEbAa+3Wg9XmZ5rOz7gljoE9ZmSydzT67lqcdaWrhUCo8m8baKDEt7Qqz4wtVKTVHRI8R2N1bW7wqMb4GLya0KQOYVOUrXfIaHKWY1lsCTfKXyih0msQXeA1td/RoHGOk++8figPKo67o+dqappTnx8FakD2Vxf11QA78F+cZ6cC5BCrd0F+T8UDmIwdjIhoVAu1hnQAAAABJRU5ErkJggg=="
+                  satsPerKB: 20
+                  service_fee: null
+                  service_fee_address: null
+      responses:
+        '200':
+          description: Successful response with the hex value.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hex:
+                    type: string
+                    description: The hex value.
+        '400':
+          description: Bad request error response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message.
+  
 
 components:
   schemas:
@@ -1416,3 +1463,32 @@ components:
             - type: number
             - type: string
               nullable: true
+    MintStampInputData:
+      type: object
+      properties:
+        sourceWallet:
+          type: string
+        assetName:
+          oneOf:
+            - type: string
+            - type: undefined
+        qty:
+          type: number
+        locked:
+          type: boolean
+        divisible:
+          type: boolean
+        filename:
+          type: string
+        file:
+          type: string
+        satsPerKB:
+          type: number
+        service_fee:
+          oneOf:
+            - type: number
+            - type: undefined
+        service_fee_address:
+          oneOf:
+            - type: string
+            - type: undefined
