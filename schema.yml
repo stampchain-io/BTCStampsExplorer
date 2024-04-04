@@ -435,6 +435,36 @@ paths:
                     description: The error message.
 
 
+  /api/v2/olga/mint:
+    post:
+      summary: Mint a new OLGA STAMP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MintStampInputData'
+      responses:
+        '200':
+          description: Successful response with the hex value.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hex:
+                    type: string
+                    description: The hex value.
+        '400':
+          description: Bad request error response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message.
 
 
   /api/v2/src20/tick:
@@ -595,13 +625,13 @@ paths:
 
   /api/v2/stamps/{id}:
     get:
-      summary: Get stamp by ID {tx_hash, stamp, cpid}
-      description: Retrieve a stamp by its ID one of tx_hash, stamp number, or cpid
+      summary: Get stamp by ID
+      description: Retrieve a stamp by its ID
       parameters:
         - in: path
           name: id
           required: true
-          description: ID {tx_hash, stamp, cpid} of the stamp
+          description: ID of the stamp
           schema:
             type: string
       responses:
@@ -781,6 +811,9 @@ components:
           type: number
         cpid:
           type: string
+        asset_longname:
+          oneOf:
+            - type: string
             
         creator:
           type: string
@@ -834,9 +867,9 @@ components:
     SendRow:
       type: object
       properties:
-        source:
+        from:
           type: string
-        destination:
+        to:
           type: string
         cpid:
           oneOf:

@@ -5,7 +5,7 @@ import { handleQuery } from "utils/xcp.ts";
 import { extractOutputs } from "utils/minting/utils.ts";
 import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
 import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
-import CIP33 from "utils/minting/olga/Cip33.ts";
+import CIP33 from "utils/minting/olga/CIP33.ts";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 import { Buffer } from "buffer";
 import { get_transaction } from "utils/quicknode.ts";
