@@ -46,7 +46,7 @@ export const handler: Handlers<TX | TXError> = {
       ...body,
       prefix: "stamp",
       assetName: await generateAvailableAssetName(),
-      service_fee: body.service_fee ||
+      service_fee: body.service_fee === 0 ? 0 : body.service_fee ||
         parseInt(conf.MINTING_SERVICE_FEE_FIXED_SATS),
       service_fee_address: body.service_fee_address ||
         conf.MINTING_SERVICE_FEE_ADDRESS,
