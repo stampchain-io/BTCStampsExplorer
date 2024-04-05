@@ -1,4 +1,4 @@
-import { api_get_stamp } from "$lib/controller/stamp.ts";
+import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
 import { get_suffix_from_mimetype, short_address } from "$lib/utils/util.ts";
 
 import { StampInfo } from "$components/StampInfo.tsx";
@@ -25,7 +25,7 @@ type StampHistoryProps = {
 export const handler: Handlers<StampRow> = {
   async GET(req: Request, ctx: FreshContext) {
     const { id } = ctx.params;
-    const res = await api_get_stamp(id);
+    const res = await api_get_stamp_all_data(id);
     if (!res) {
       return ctx.renderNotFound();
     }

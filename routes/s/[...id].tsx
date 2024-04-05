@@ -1,5 +1,6 @@
 import { getClient, StampsClass } from "$lib/database/index.ts";
 import { api_get_stamp } from "$lib/controller/stamp.ts";
+import { HandlerContext, Handlers } from "$fresh/server.ts";
 
 import * as base64 from "base64/mod.ts";
 
