@@ -1,4 +1,4 @@
-import { api_get_stamp } from "$lib/controller/stamp.ts";
+import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
 import {
   ErrorResponseBody,
   IdHandlerContext,
@@ -39,7 +39,7 @@ export const handler = async (
 ): Promise<Response> => {
   const { id } = ctx.params;
   try {
-    const data = await api_get_stamp(id);
+    const data = await api_get_stamp_all_data(id);
     if (!data) {
       throw new Error("Stamp not found");
     }
