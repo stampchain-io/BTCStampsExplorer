@@ -50,7 +50,6 @@ export const handler = async (
     let data;
     if (Number.isInteger(Number(id))) {
       data = await StampsClass.get_stamp_by_stamp_with_client(client, id);
-      data = await StampsClass.get_stamp_by_stamp_with_client(client, id);
     } else {
       data = await StampsClass.get_stamp_by_identifier_with_client(client, id);
     }
