@@ -46,7 +46,6 @@ export const handler = async (
     let last_block;
     if (client) {
       last_block = await CommonClass.get_last_block_with_client(client);
-      client.close();
     }
     if (!data) {
       throw new Error("Stamp not found");
