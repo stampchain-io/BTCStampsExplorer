@@ -1,4 +1,4 @@
-import { CommonClass, getClient } from "$lib/database/index.ts";
+import { CommonClass, getClient, releaseClient } from "$lib/database/index.ts";
 import { categorizeInput } from "$lib/utils/util.ts";
 
 export async function api_get_block(block_index_or_hash: number | string) {
@@ -40,6 +40,7 @@ export async function api_get_block(block_index_or_hash: number | string) {
       issuances: issuances.rows,
       sends: sends,
     };
+    releaseClient;
     return response;
   } catch (error) {
     console.error(error);

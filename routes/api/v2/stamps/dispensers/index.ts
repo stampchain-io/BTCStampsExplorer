@@ -1,4 +1,4 @@
-import { CommonClass, connectDb } from "$lib/database/index.ts";
+import { CommonClass, getClient } from "$lib/database/index.ts";
 import {
   ErrorResponseBody,
   PaginatedRequest,
@@ -51,7 +51,7 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
-    const client = await connectDb();
+    const client = await getClient();
     const last_block = await CommonClass.get_last_block_with_client(client);
     const { total, dispensers } = await get_all_dispensers(); // Call the get_all_dispensers function and destructure the returned values
     const pagination = paginate(total, page, limit); // Update the pagination variable

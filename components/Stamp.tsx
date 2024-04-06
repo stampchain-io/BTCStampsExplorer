@@ -1,4 +1,5 @@
 import { get_suffix_from_mimetype } from "$lib/utils/util.ts";
+import { StampRow } from "globals";
 
 export const Stamp = (
   { stamp, className }: { stamp: StampRow; className: string },

@@ -1,8 +1,9 @@
 export {
-  connectDb,
+  closeClient,
   getClient,
   handleQuery,
   handleQueryWithClient,
+  releaseClient,
 } from "./db.ts";
 
 export { CommonClass } from "./commonClass.ts";
