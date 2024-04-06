@@ -1,4 +1,9 @@
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import {
+  CommonClass,
+  getClient,
+  releaseClient,
+  Src20Class,
+} from "$lib/database/index.ts";
 import { getBtcAddressInfo } from "../utils/btc.ts";
 import { SMALL_LIMIT } from "utils/constants.ts";
 import { paginate } from "../utils/util.ts";
@@ -17,6 +22,7 @@ export const api_get_stamp_balance = async (
         limit,
         page,
       );
+    releaseClient(client);
     return balances;
   } catch (error) {
     console.error(error);
@@ -31,6 +37,7 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
       client,
       tx_hash,
     );
+    releaseClient(client);
     return tx_data.rows[0];
   } catch (error) {
     console.error(error);
@@ -52,6 +59,7 @@ export const api_get_src20_balance = async (address: string) => {
       client,
       address,
     );
+    releaseClient(client);
     if (balances.rows.length === 0) {
       return [];
     }
@@ -82,6 +90,7 @@ export const api_get_src20_balance_by_tick = async (
         address,
         tick,
       );
+    releaseClient(client);
     return balances.rows[0];
   } catch (error) {
     console.error(error);
@@ -108,7 +117,7 @@ export const api_get_balance = async (
         .rows[0]["total"] || 0;
     const pagination = paginate(total, page, limit);
 
-    const btcInfo = await getBtcAddressInfo(address);
+    const btcInfo = await getBtcAddressInfo(address); // frequently getting conn reset errors https://mempool.space/api/address/bc1qhy4t0j60sysrfmp6e5g0h67rthtvz4ktnggjpu): connection error: connection reset
     let stamps;
     if (total !== 0) {
       stamps = await CommonClass
@@ -125,6 +134,7 @@ export const api_get_balance = async (
       client,
       address,
     );
+    releaseClient(client);
     return {
       ...pagination,
       btc: btcInfo,

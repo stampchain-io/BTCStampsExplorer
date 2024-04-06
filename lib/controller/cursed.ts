@@ -1,4 +1,9 @@
-import { CursedClass, getClient } from "$lib/database/index.ts";
+import {
+  closeClient,
+  CursedClass,
+  getClient,
+  releaseClient,
+} from "$lib/database/index.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
 export async function api_get_cursed(
@@ -15,9 +20,11 @@ export async function api_get_cursed(
       order,
     );
     if (!stamps) {
+      closeClient(client);
       throw new Error("No stamps found");
     }
     const total = await CursedClass.get_total_cursed_with_client(client);
+    releaseClient(client);
     return {
       stamps: stamps.rows,
       total: total.rows[0].total,
