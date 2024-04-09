@@ -2,9 +2,11 @@ import { api_get_stamps } from "$lib/controller/stamp.ts";
 import { HandlerContext, Handlers } from "$fresh/server.ts";
 
 import { PageControl } from "$components/PageControl.tsx";
+import { StampNavigator } from "$components/StampNavigator.tsx";
 import { StampCard } from "$components/StampCard.tsx";
 import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";
+import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
 
 type StampPageProps = {
   params: {
@@ -37,8 +39,23 @@ export const handler: Handlers<StampRow> = {
 
 export function StampPage(props: StampPageProps) {
   const { stamps, total, page, pages, page_size } = props.data;
+
+  const sortBy = (sortId: string) => {
+    console.log(sortId);
+    if (sortId === "Supply") {
+      stamps.sort((a: StampRow, b: StampRow) => a.supply - b.supply);
+    } else if (sortId === "Block") {
+      stamps.sort((a: StampRow, b: StampRow) => a.block_index - b.block_index);
+    }
+    // console.log(stamps);
+  };
+
+  const filterBy = () => {
+  };
+
   return (
     <div class="w-full flex flex-col items-center">
+      <StampNavigator sortBy={sortBy} filterBy={filterBy} />
       <PageControl
         page={page}
         pages={pages}
