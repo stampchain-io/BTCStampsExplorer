@@ -2,7 +2,7 @@ import { api_get_stamps } from "$lib/controller/stamp.ts";
 import { HandlerContext, Handlers } from "$fresh/server.ts";
 
 import { PageControl } from "$components/PageControl.tsx";
-import { StampNavigator } from "$components/StampNavigator.tsx";
+import { StampNavigator } from "$islands/StampNavigator.tsx";
 import { StampCard } from "$components/StampCard.tsx";
 import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";

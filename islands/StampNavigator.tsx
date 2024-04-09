@@ -9,19 +9,24 @@ interface StampNavigatorInterface {
 
 interface SortItemInterface {
   title: string;
+  onChange: any;
+}
+
+interface FilterItemInterface {
+  title: string;
   onChange: (item: string) => void;
 }
 
 const SortItem = (props: SortItemInterface) => {
   const title = props.title;
   const sortBy = props.onChange;
-  const handle = (event) => {
-    console.log("Hello");
-  };
+
   return (
     <div
-      class="flex gap-x-2 items-center cursor-pointer"
-      onClick={handle}
+      class="flex gap-x-2 items-center cursor-pointer opacity-25 hover:opacity-60"
+      onClick={() => {
+        sortBy(title);
+      }}
     >
       <img class="rounded-full" src={`/img/${title}.png`} width={30} />
       <span>{title}</span>
@@ -29,10 +34,16 @@ const SortItem = (props: SortItemInterface) => {
   );
 };
 
-const FilterItem = (props: { title: string }) => {
+const FilterItem = (props: FilterItemInterface) => {
+  const filterBy = props.onChange;
   return (
     <div class="flex gap-x-1 items-center ">
-      <input type="checkbox" />
+      <input
+        type="checkbox"
+        onClick={() => {
+          filterBy(props.title);
+        }}
+      />
       <span>{props.title}</span>
     </div>
   );
@@ -45,7 +56,7 @@ export function StampNavigator(props: StampNavigatorInterface) {
         <span class="w-20">Filter by:</span>
         <div class="flex flex-1 border border-gray-600 h-16 px-10 py-6 gap-x-5">
           {filters.map((item) => {
-            return <FilterItem title={item} />;
+            return <FilterItem title={item} onChange={props.filterBy} />;
           })}
         </div>
       </div>
