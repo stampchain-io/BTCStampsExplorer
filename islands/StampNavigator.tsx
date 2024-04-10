@@ -1,31 +1,28 @@
+import { StampRow } from "globals";
+import { useContext } from "preact/hooks";
+import { useNavigator } from "$islands/Navigator/navigator.tsx";
 const filters = ["Png", "Gif", "Svg", "Jpg", "Html"];
-const sorts = ["Supply", "File Size"];
+const sorts = ["Supply", "Block", "Stamp"];
 const active = " opacity-50";
-
-interface StampNavigatorInterface {
-  sortBy: (item: string) => void;
-  filterBy: () => void;
-}
 
 interface SortItemInterface {
   title: string;
-  onChange: any;
+  onChange: (id: string) => void;
 }
 
 interface FilterItemInterface {
   title: string;
-  onChange: (item: string) => void;
+  onChange: (id: string) => void;
 }
 
 const SortItem = (props: SortItemInterface) => {
   const title = props.title;
-  const sortBy = props.onChange;
 
   return (
     <div
       class="flex gap-x-2 items-center cursor-pointer opacity-25 hover:opacity-60"
       onClick={() => {
-        sortBy(title);
+        props.onChange(title);
       }}
     >
       <img class="rounded-full" src={`/img/${title}.png`} width={30} />
@@ -35,28 +32,29 @@ const SortItem = (props: SortItemInterface) => {
 };
 
 const FilterItem = (props: FilterItemInterface) => {
-  const filterBy = props.onChange;
+  const title = props.title;
   return (
-    <div class="flex gap-x-1 items-center ">
-      <input
-        type="checkbox"
-        onClick={() => {
-          filterBy(props.title);
-        }}
-      />
-      <span>{props.title}</span>
+    <div
+      class="flex gap-x-1 items-center "
+      onClick={() => {
+        props.onChange(title);
+      }}
+    >
+      <input type="checkbox" />
+      <span>{title}</span>
     </div>
   );
 };
 
-export function StampNavigator(props: StampNavigatorInterface) {
+export function StampNavigator() {
+  const { setSortOption, setFilterOption } = useNavigator();
   return (
     <>
       <div class="flex flex-row text-white/80 w-full mb-4">
         <span class="w-20">Filter by:</span>
         <div class="flex flex-1 border border-gray-600 h-16 px-10 py-6 gap-x-5">
           {filters.map((item) => {
-            return <FilterItem title={item} onChange={props.filterBy} />;
+            return <FilterItem title={item} onChange={setFilterOption} />;
           })}
         </div>
       </div>
@@ -66,7 +64,7 @@ export function StampNavigator(props: StampNavigatorInterface) {
           {sorts.map((item) => (
             <SortItem
               title={item}
-              onChange={props.sortBy}
+              onChange={setSortOption}
             />
           ))}
         </div>

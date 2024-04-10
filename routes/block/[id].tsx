@@ -11,13 +11,13 @@ import { useSignal } from "@preact/signals";
 type BlockPageProps = {
   params: {
     id: string;
-    block: BlockInfo;
+    block: typeof BlockInfo;
   };
 };
 
 export const handler: Handlers<BlockRow[]> = {
   async GET(_req: Request, ctx: HandlerContext) {
-    let block: BlockInfo;
+    let block: typeof BlockInfo;
     if (!ctx.params.id || isNaN(Number(ctx.params.id))) {
       const { last_block } = await api_get_last_block();
       ctx.params.id = last_block;

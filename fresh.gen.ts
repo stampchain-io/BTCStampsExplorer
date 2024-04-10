@@ -46,6 +46,7 @@ import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $BlockSelector from "./islands/BlockSelector.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
+import * as $Navigator_navigator from "./islands/Navigator/navigator.tsx";
 import * as $StampNavigator from "./islands/StampNavigator.tsx";
 import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
@@ -119,6 +120,7 @@ const manifest = {
     "./islands/BlockSelector.tsx": $BlockSelector,
     "./islands/Header.tsx": $Header,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
+    "./islands/Navigator/navigator.tsx": $Navigator_navigator,
     "./islands/StampNavigator.tsx": $StampNavigator,
     "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,

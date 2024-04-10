@@ -4,7 +4,7 @@ export function StampSearchClient() {
     // if (!isNaN(Number(searchTerm))) {
     // const stampId = parseInt(searchTerm);
     // Redirect to /stamp/[id] route with the stampId
-    // window.location.href = `/stamp/${searchTerm}`;
+    window.location.href = `/stamp/${searchTerm}`;
     console.log("ssssss");
     // }
   };
