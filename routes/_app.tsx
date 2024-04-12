@@ -37,14 +37,19 @@ export default function App({ Component }: AppProps) {
       </head>
       <body className="bg-[#181818]">
         <ToastProvider>
-          <div
-            className="px-2 py-8 mx-auto bg-[#181818] flex flex-col md:gap-4 overflow-auto max-w-7xl"
-            f-client-nav
-          >
-            <div className="py-0 my-0">
-              <Header />
-              <MempoolWeather />
-              <StampSearchClient />
+          <NavigatorProvider>
+            <div
+              className="px-2 py-8 mx-auto bg-[#181818] flex flex-col md:gap-4 overflow-auto max-w-7xl"
+              f-client-nav
+            >
+              <div className="py-0 my-0">
+                <Header />
+                <MempoolWeather />
+                <StampSearchClient />
+              </div>
+              <Partial name="body">
+                <Component />
+              </Partial>
             </div>
             <NavigatorProvider>
               <Partial name="body">

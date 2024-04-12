@@ -12,10 +12,21 @@ import {
 } from "utils/xcp.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
+const sortData = (stamps, sortBy) => {
+  if (sortBy == "Supply") {
+    return [...stamps.sort((a, b) => a.supply - b.supply)];
+  } else if (sortBy == "Block") {
+    return [...stamps.sort((a, b) => a.block_index - b.block_index)];
+  } else if (sortBy == "Stamp") {
+    return [...stamps.sort((a, b) => a.stamp - b.stamp)];
+  } else return [...stamps];
+};
+
 export async function api_get_stamps(
   page = 0,
   page_size = BIG_LIMIT,
-  order: "DESC" | "ASC" = "DESC",
+  order: "DESC" | "ASC" = "ASC",
+  sortBy = "none",
 ) {
   try {
     const client = await getClient();
@@ -29,13 +40,16 @@ export async function api_get_stamps(
       closeClient(client);
       throw new Error("No stamps found");
     }
+    let data = sortData(stamps.rows, sortBy);
+    console.log("backend: ", sortBy);
+
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ["STAMP", "SRC-721"],
     );
     releaseClient(client);
     return {
-      stamps: stamps.rows,
+      stamps: data,
       total: total.rows[0].total,
       pages: Math.ceil(total.rows[0].total / page_size),
       page: page,

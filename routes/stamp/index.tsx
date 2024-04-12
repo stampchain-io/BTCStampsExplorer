@@ -3,6 +3,7 @@ import { HandlerContext, Handlers } from "$fresh/server.ts";
 import { PageControl } from "$islands/PageControl.tsx";
 import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";
+import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
 
 type StampPageProps = {
   params: {
@@ -17,11 +18,14 @@ type StampPageProps = {
 export const handler: Handlers<StampRow> = {
   async GET(req: Request, ctx: HandlerContext) {
     const url = new URL(req.url);
+    const filter = url.searchParams.get("filter") || "none";
+    const sortBy = url.searchParams.get("sortBy") || "none";
+    console.log(sortBy);
     const page = parseInt(url.searchParams.get("page") || "1");
     const page_size = parseInt(url.searchParams.get("limit") || BIG_LIMIT);
     const order = url.searchParams.get("order")?.toUpperCase() || "DESC";
     const { stamps, total, pages, page: pag, page_size: limit } =
-      await api_get_stamps(page, page_size, order);
+      await api_get_stamps(page, page_size, order, sortBy);
     const data = {
       stamps,
       total,
@@ -35,9 +39,9 @@ export const handler: Handlers<StampRow> = {
 
 export function StampPage(props: StampPageProps) {
   const { stamps, total, page, pages, page_size } = props.data;
-
   return (
     <div class="w-full flex flex-col items-center">
+      <StampNavigator />
       <PageControl
         page={page}
         pages={pages}
