@@ -1,5 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { CommonClass, connectDb, CursedClass } from "$lib/database/index.ts";
+import { CommonClass, CursedClass, getClient } from "$lib/database/index.ts";
 import {
   ErrorResponseBody,
   PaginatedRequest,
@@ -45,7 +45,7 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 0;
-    const client = await connectDb();
+    const client = await getClient();
     const data = await CursedClass.get_cursed_by_page_with_client(
       client,
       limit,
@@ -53,7 +53,6 @@ export const handler = async (
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
     const total = await CursedClass.get_total_cursed_with_client(client);
-    client.close();
     const pagination = paginate(total, page, limit);
 
     const body: PaginatedStampResponseBody = {

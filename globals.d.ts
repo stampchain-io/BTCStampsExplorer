@@ -322,3 +322,16 @@ export interface InputData {
   dec?: number;
   amt?: number | string;
 }
+
+export interface MintStampInputData {
+  sourceWallet: string;
+  assetName?: string;
+  qty: number;
+  locked: boolean;
+  divisible: boolean;
+  filename: string;
+  file: string;
+  satsPerKB: number;
+  service_fee: number;
+  service_fee_address: string;
+}

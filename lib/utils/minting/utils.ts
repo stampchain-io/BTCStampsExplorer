@@ -1,4 +1,7 @@
 import * as bitcore from "npm:bitcore";
+import * as btc from "bitcoin";
+
+import { Output } from "utils/minting/src20/utils.d.ts";
 
 export function scramble(key, str) {
   const s = [];
@@ -55,4 +58,34 @@ export function address_from_pubkeyhash(pubkeyhash) {
   const address = bitcore.default.Address.fromPublicKey(publicKey);
 
   return address.toString();
+}
+
+export function extractOutputs(tx: btc.Transaction, address: string) {
+  const outputs = [];
+  for (const vout of tx.outs) {
+    if ("address" in vout) {
+      outputs.push({
+        value: vout.value,
+        address: vout.address,
+      });
+    } else if ("script" in vout) {
+      try {
+        if (
+          btc.address.fromOutputScript(vout.script, btc.networks.bitcoin) !==
+            address
+        ) {
+          outputs.push({
+            value: vout.value,
+            script: vout.script,
+          });
+        }
+      } catch {
+        outputs.push({
+          value: vout.value,
+          script: vout.script,
+        });
+      }
+    }
+  }
+  return outputs as Output[];
 }

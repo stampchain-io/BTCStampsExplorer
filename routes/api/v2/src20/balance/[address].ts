@@ -1,13 +1,10 @@
-import { HandlerContext } from "$fresh/server.ts";
 import { api_get_src20_balance } from "$lib/controller/wallet.ts";
 import {
-  ErrorResponseBody,
-  PaginatedRequest,
-  Src20BalanceResponseBody,
   AddressHandlerContext,
+  ErrorResponseBody,
+  Src20BalanceResponseBody,
 } from "globals";
-import { CommonClass, connectDb } from "../../../../../lib/database/index.ts";
-
+import { CommonClass, getClient } from "../../../../../lib/database/index.ts";
 
 /**
  * @swagger
@@ -35,12 +32,14 @@ import { CommonClass, connectDb } from "../../../../../lib/database/index.ts";
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
-export const handler = async (_req: Request, ctx: AddressHandlerContext): Promise<Response> => {
+export const handler = async (
+  _req: Request,
+  ctx: AddressHandlerContext,
+): Promise<Response> => {
   const { address } = ctx.params;
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
     const src20 = await api_get_src20_balance(address);
     const body: Src20BalanceResponseBody = {
       last_block: last_block.rows[0]["last_block"],

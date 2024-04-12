@@ -1,5 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { connectDb, Src20Class } from "$lib/database/index.ts";
+import { getClient, Src20Class } from "$lib/database/index.ts";
 import { convertEmojiToTick, paginate } from "utils/util.ts";
 import {
   convertToEmoji,
@@ -8,7 +8,6 @@ import {
 import {
   BlockTickHandlerContext,
   ErrorResponseBody,
-  PaginatedRequest,
   PaginatedSrc20ResponseBody,
 } from "globals";
 import { CommonClass } from "../../../../../../lib/database/index.ts";
@@ -69,7 +68,7 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
-    const client = await connectDb();
+    const client = await getClient();
     const last_block = await CommonClass.get_last_block_with_client(client);
 
     tick = convertEmojiToTick(tick);
@@ -87,7 +86,6 @@ export const handler = async (
         block_index,
         tick,
       );
-    client.close();
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const body: PaginatedSrc20ResponseBody = {
       ...pagination,

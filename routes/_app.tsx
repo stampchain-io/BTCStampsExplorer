@@ -24,10 +24,12 @@ export default function App({ Component }: AppProps) {
           property="og:description"
           content="Unprunable UTXO Art, Because Sats Don’t Exist."
         />
-        <meta
+        {
+          /* <meta
           http-equiv="Content-Security-Policy"
           content="default-src 'unsafe-eval' 'unsafe-inline' 'self' data: blob:"
-        />
+        /> */
+        }
         <meta property="og:image" content="/img/stamp.jpg"></meta>
         <link rel="icon" type="image/x-icon" href="/img/icon.jpg"></link>
         <link rel="apple-touch-icon" href="/img/icon.jpg"></link>
@@ -49,7 +51,12 @@ export default function App({ Component }: AppProps) {
                 <Component />
               </Partial>
             </div>
-          </NavigatorProvider>
+            <NavigatorProvider>
+              <Partial name="body">
+                <Component />
+              </Partial>
+            </NavigatorProvider>
+          </div>
         </ToastProvider>
       </body>
     </html>

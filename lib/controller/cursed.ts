@@ -1,4 +1,9 @@
-import { connectDb, CursedClass } from "$lib/database/index.ts";
+import {
+  closeClient,
+  CursedClass,
+  getClient,
+  releaseClient,
+} from "$lib/database/index.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
 export async function api_get_cursed(
@@ -7,7 +12,7 @@ export async function api_get_cursed(
   order: "DESC" | "ASC" = "DESC",
 ) {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     const stamps = await CursedClass.get_resumed_cursed_by_page_with_client(
       client,
       page_size,
@@ -15,11 +20,11 @@ export async function api_get_cursed(
       order,
     );
     if (!stamps) {
-      client.close();
+      closeClient(client);
       throw new Error("No stamps found");
     }
     const total = await CursedClass.get_total_cursed_with_client(client);
-    client.close();
+    releaseClient(client);
     return {
       stamps: stamps.rows,
       total: total.rows[0].total,

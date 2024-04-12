@@ -1,5 +1,5 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
+import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { convertToEmoji, paginate } from "utils/util.ts";
 import {
@@ -7,7 +7,6 @@ import {
   PaginatedRequest,
   PaginatedSrc20ResponseBody,
 } from "globals";
-
 
 /**
  * @swagger
@@ -45,13 +44,15 @@ import {
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
 
-
-export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Promise<Response> => {
+export const handler = async (
+  req: PaginatedRequest,
+  _ctx: HandlerContext,
+): Promise<Response> => {
   try {
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
-    const client = await connectDb();
+    const client = await getClient();
     const data = await Src20Class.get_valid_src20_tx_with_client(
       client,
       limit,
@@ -61,7 +62,6 @@ export const handler = async (req: PaginatedRequest, _ctx: HandlerContext): Prom
       client,
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
-    client.close();
     const pagination = paginate(total.rows[0].total, page, limit);
     const body: PaginatedSrc20ResponseBody = {
       ...pagination,

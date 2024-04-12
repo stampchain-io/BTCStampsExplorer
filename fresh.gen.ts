@@ -13,6 +13,7 @@ import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block
 import * as $api_v2_cursed_ident_ident_ from "./routes/api/v2/cursed/ident/[ident].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
 import * as $api_v2_issuances_id_ from "./routes/api/v2/issuances/[id].ts";
+import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
 import * as $api_v2_src20_balance_snapshot_tick_ from "./routes/api/v2/src20/balance/snapshot/[tick].tsx";
@@ -46,8 +47,9 @@ import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $BlockSelector from "./islands/BlockSelector.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
+import * as $Navigator_NavigatorComponent from "./islands/Navigator/NavigatorComponent.tsx";
 import * as $Navigator_navigator from "./islands/Navigator/navigator.tsx";
-import * as $StampNavigator from "./islands/StampNavigator.tsx";
+import * as $PageControl from "./islands/PageControl.tsx";
 import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_toast from "./islands/Toast/toast.tsx";
@@ -76,6 +78,7 @@ const manifest = {
     "./routes/api/v2/cursed/ident/[ident].ts": $api_v2_cursed_ident_ident_,
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
     "./routes/api/v2/issuances/[id].ts": $api_v2_issuances_id_,
+    "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/src20/balance/[address].ts":
       $api_v2_src20_balance_address_,
     "./routes/api/v2/src20/balance/[address]/[tick].ts":
@@ -120,8 +123,9 @@ const manifest = {
     "./islands/BlockSelector.tsx": $BlockSelector,
     "./islands/Header.tsx": $Header,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
+    "./islands/Navigator/NavigatorComponent.tsx": $Navigator_NavigatorComponent,
     "./islands/Navigator/navigator.tsx": $Navigator_navigator,
-    "./islands/StampNavigator.tsx": $StampNavigator,
+    "./islands/PageControl.tsx": $PageControl,
     "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/toast.tsx": $Toast_toast,

@@ -1,4 +1,5 @@
 import { get_suffix_from_mimetype } from "$lib/utils/util.ts";
+import { StampRow } from "globals";
 
 export const Stamp = (
   { stamp, className }: { stamp: StampRow; className: string },
@@ -9,8 +10,8 @@ export const Stamp = (
         width="100%"
         height="100%"
         scrolling="no"
-        class={`rounded-lg ${className} `}
-        sandbox="allow-scripts "
+        class={`${className} aspect-square rounded-lg`}
+        sandbox="allow-scripts allow-same-origin"
         src={`/content/${stamp.tx_hash}.${
           get_suffix_from_mimetype(stamp.stamp_mimetype)
         }`}

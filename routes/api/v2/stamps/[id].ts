@@ -1,10 +1,5 @@
-import { HandlerContext } from "$fresh/server.ts";
-import {
-  CommonClass,
-  connectDb,
-  summarize_issuances,
-} from "$lib/database/index.ts";
-import { api_get_stamp } from "$lib/controller/stamp.ts";
+import { CommonClass, getClient } from "$lib/database/index.ts";
+import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
 import {
   ErrorResponseBody,
   IdHandlerContext,
@@ -46,12 +41,11 @@ export const handler = async (
   const id = String(ctx.params.id);
   // const id = String(ctx.params);
   try {
-    const client = await connectDb();
-    const data = await api_get_stamp(id);
+    const client = await getClient();
+    const data = await api_get_stamp_all_data(id);
     let last_block;
     if (client) {
       last_block = await CommonClass.get_last_block_with_client(client);
-      client.close();
     }
     if (!data) {
       throw new Error("Stamp not found");

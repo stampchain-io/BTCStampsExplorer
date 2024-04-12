@@ -1,11 +1,10 @@
 import { HandlerContext } from "$fresh/server.ts";
-import { connectDb, CommonClass, CursedClass } from "$lib/database/index.ts";
+import { CommonClass, CursedClass, getClient } from "$lib/database/index.ts";
 import {
   BlockHandlerContext,
-  StampBlockResponseBody,
   ErrorResponseBody,
+  StampBlockResponseBody,
 } from "globals";
-
 
 /**
  * @swagger
@@ -39,17 +38,23 @@ export const handler = async (
 ): Promise<Response> => {
   const { block_index } = ctx.params;
   try {
-    const client = await connectDb();
-    const block_info = await CommonClass.get_block_info_with_client(client, block_index);
+    const client = await getClient();
+    const block_info = await CommonClass.get_block_info_with_client(
+      client,
+      block_index,
+    );
     const last_block = await CommonClass.get_last_block_with_client(client);
-    const cursed = await CursedClass.get_cursed_by_block_index_with_client(client, block_index);
+    const cursed = await CursedClass.get_cursed_by_block_index_with_client(
+      client,
+      block_index,
+    );
 
     const body: StampBlockResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       block_info: block_info.rows[0],
       data: cursed.rows,
     };
-    
+
     return new Response(JSON.stringify(body));
   } catch {
     const body: ErrorResponseBody = {
@@ -58,4 +63,3 @@ export const handler = async (
     return new Response(JSON.stringify(body));
   }
 };
- 

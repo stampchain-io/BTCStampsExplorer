@@ -1,7 +1,7 @@
-import { _HandlerContext } from "$fresh/server.ts";
+import { HandlerContext } from "$fresh/server.ts";
 import {
   CommonClass,
-  connectDb,
+  getClient,
   StampsClass,
   summarize_issuances,
 } from "$lib/database/index.ts";
@@ -43,7 +43,7 @@ export const handler = async (
 ): Promise<Response> => {
   const { id } = ctx.params;
   try {
-    const client = await connectDb();
+    const client = await getClient();
     if (!client) {
       throw new Error("Failed to connect to the database");
     }
@@ -55,7 +55,6 @@ export const handler = async (
     }
     const last_block = await CommonClass.get_last_block_with_client(client);
     const stamp = await summarize_issuances(data.rows);
-    client.close();
     const body: StampResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: stamp,

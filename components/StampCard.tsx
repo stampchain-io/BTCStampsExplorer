@@ -45,7 +45,7 @@ export function StampCard({
               ? (
                 <iframe
                   scrolling="no"
-                  sandbox="allow-scripts "
+                  sandbox="allow-scripts allow-same-origin"
                   src={src}
                   class="h-full w-fit max-w-full object-contain items-center standalone:h-full standalone:w-auto"
                 />

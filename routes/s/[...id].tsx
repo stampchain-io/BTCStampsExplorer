@@ -1,5 +1,6 @@
-import { CommonClass, connectDb, StampsClass } from "$lib/database/index.ts";
+import { getClient, StampsClass } from "$lib/database/index.ts";
 import { api_get_stamp } from "$lib/controller/stamp.ts";
+import { HandlerContext, Handlers } from "$fresh/server.ts";
 
 import * as base64 from "base64/mod.ts";
 
@@ -8,7 +9,7 @@ export const handler: Handlers<StampRow> = {
     const { id } = ctx.params;
     const url = new URL(req.url);
     const params = url.searchParams.toString();
-    const client = await connectDb();
+    const client = await getClient();
     const file_name = await StampsClass
       .get_stamp_file_by_identifier_with_client(
         client,
@@ -24,7 +25,6 @@ export const handler: Handlers<StampRow> = {
         return ctx.renderNotFound();
       }
     }
-    client.close();
     return new Response("", {
       status: 301,
       headers: {

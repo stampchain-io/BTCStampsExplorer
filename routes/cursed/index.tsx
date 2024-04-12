@@ -2,7 +2,7 @@ import { Partial } from "$fresh/runtime.ts";
 
 import { api_get_cursed } from "$lib/controller/cursed.ts";
 
-import { PageControl } from "$components/PageControl.tsx";
+import { PageControl } from "$islands/PageControl.tsx";
 import { StampCard } from "$components/StampCard.tsx";
 import { StampRow } from "globals";
 

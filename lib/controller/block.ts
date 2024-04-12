@@ -1,9 +1,9 @@
-import { CommonClass, connectDb } from "$lib/database/index.ts";
+import { CommonClass, getClient, releaseClient } from "$lib/database/index.ts";
 import { categorizeInput } from "$lib/utils/util.ts";
 
 export async function api_get_block(block_index_or_hash: number | string) {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     if (!client) {
       throw new Error("Could not connect to database");
     }
@@ -40,7 +40,7 @@ export async function api_get_block(block_index_or_hash: number | string) {
       issuances: issuances.rows,
       sends: sends,
     };
-    client.close();
+    releaseClient;
     return response;
   } catch (error) {
     console.error(error);
@@ -52,7 +52,7 @@ export const api_get_related_blocks = async (
   block_index_or_hash: number | string,
 ) => {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     if (!client) {
       throw new Error("Could not connect to database");
     }
@@ -77,7 +77,6 @@ export const api_get_related_blocks = async (
       last_block: last_block.rows[0]["last_block"],
       blocks,
     };
-    client.close();
     return response;
   } catch (error) {
     console.error(error);
@@ -87,7 +86,7 @@ export const api_get_related_blocks = async (
 
 export const api_get_last_block = async () => {
   try {
-    const client = await connectDb();
+    const client = await getClient();
     if (!client) {
       throw new Error("Could not connect to database");
     }
@@ -98,7 +97,6 @@ export const api_get_last_block = async () => {
     const response = {
       last_block: last_block.rows[0]["last_block"],
     };
-    client.close();
     return response;
   } catch (error) {
     console.error(error);

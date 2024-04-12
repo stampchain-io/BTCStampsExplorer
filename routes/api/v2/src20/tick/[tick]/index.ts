@@ -1,5 +1,4 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { CommonClass, connectDb, Src20Class } from "$lib/database/index.ts";
+import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -58,7 +57,7 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
-    const client = await connectDb();
+    const client = await getClient();
     tick = convertEmojiToTick(tick);
     const src20_txs = await Src20Class
       .get_valid_src20_tx_by_tick_with_client(
@@ -80,7 +79,6 @@ export const handler = async (
         client,
         tick,
       );
-    client.close();
     const body: PaginatedTickResponseBody = {
       ...pagination,
       last_block: last_block.rows[0]["last_block"],
