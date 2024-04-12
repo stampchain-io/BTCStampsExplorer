@@ -1,8 +1,6 @@
 import { api_get_stamps } from "$lib/controller/stamp.ts";
 import { HandlerContext, Handlers } from "$fresh/server.ts";
-
-import { PageControl } from "$components/PageControl.tsx";
-import { StampCard } from "$components/StampCard.tsx";
+import { PageControl } from "$islands/PageControl.tsx";
 import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";
 
@@ -37,6 +35,7 @@ export const handler: Handlers<StampRow> = {
 
 export function StampPage(props: StampPageProps) {
   const { stamps, total, page, pages, page_size } = props.data;
+
   return (
     <div class="w-full flex flex-col items-center">
       <PageControl
@@ -44,14 +43,9 @@ export function StampPage(props: StampPageProps) {
         pages={pages}
         page_size={page_size}
         type={"stamp"}
+        stamps={stamps}
       />
-      <div name="stamps">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out">
-          {stamps.map((stamp: StampRow) => (
-            <StampCard stamp={stamp} kind="stamp" />
-          ))}
-        </div>
-      </div>
+
       <PageControl
         page={page}
         pages={pages}
