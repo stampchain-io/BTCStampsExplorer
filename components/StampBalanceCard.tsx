@@ -4,8 +4,11 @@ export function StampBalanceCard({ stamp, kind = 'stamp' }: { stamp: StampRow, k
   let src: string;
   const suffix = get_suffix_from_mimetype(stamp.stamp_mimetype);
 
-  if (suffix === "json") {
-    src = "/content/not-available.png";
+  if (
+    suffix === "json"
+    || suffix === "unknown"
+  ) {
+    src = "/not-available.png";
   } else {
     src = `/content/${stamp.tx_hash}.${suffix}`
   }
@@ -20,7 +23,7 @@ export function StampBalanceCard({ stamp, kind = 'stamp' }: { stamp: StampRow, k
           alt={`Stamp No. ${stamp.stamp ?? "CURSED"}`}
           src={src}
           onError={(e) => {
-            e.currentTarget.src = `/content/not-available.png`;
+            e.currentTarget.src = `/not-available.png`;
           }}
         />
       </div>

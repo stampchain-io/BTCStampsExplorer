@@ -18,8 +18,8 @@ export function StampCard(
   let src: string;
   const suffix = get_suffix_from_mimetype(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
-  if (suffix === "json" || suffix === "txt") {
-    src = `/content/not-available.png`;
+  if (suffix === "json" || suffix === "txt" || suffix === "unknown") {
+    src = `/not-available.png`;
   }
   return (
     <a
@@ -43,7 +43,7 @@ export function StampCard(
                   src={src}
                   loading="lazy"
                   onError={(e) => {
-                    e.currentTarget.src = `/content/not-available.png`;
+                    e.currentTarget.src = `/not-available.png`;
                   }}
                   alt={`Stamp No. ${stamp.stamp}`}
                   class="pixelart image-rendering-pixelated h-full w-fit max-w-full object-contain items-center standalone:h-full standalone:w-auto safari_only_image"

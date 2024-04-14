@@ -41,7 +41,7 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
           </tr>
         </thead>
         <tbody>
-          {issuances.map((issuance: StampRow) => {
+          {issuances.sort((a,b) => a.stamp - b.stamp ).map((issuance: StampRow) => {
             const kind = issuance.is_btc_stamp
               ? "stamp"
               : issuance.cpid.startsWith("A")
