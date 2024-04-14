@@ -25,7 +25,7 @@ export const handler: Handlers<StampRow> = {
     const { stamps, total, pages, page: pag, page_size: limit } =
       await api_get_stamps(page, page_size, order);
     const data = {
-      stamps,
+      stamps: stamps.sort((a,b) => a.stamp - b.stamp),
       total,
       page: pag,
       pages,
