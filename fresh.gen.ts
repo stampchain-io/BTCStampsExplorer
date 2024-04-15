@@ -38,6 +38,7 @@ import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $index from "./routes/index.tsx";
+import * as $mint_index from "./routes/mint/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
@@ -53,6 +54,7 @@ import * as $StampNavigator from "./islands/StampNavigator.tsx";
 import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_toast from "./islands/Toast/toast.tsx";
+import * as $UploadImage from "./islands/UploadImage.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
 import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
@@ -112,6 +114,7 @@ const manifest = {
     "./routes/cursed/index.tsx": $cursed_index,
     "./routes/docs/index.tsx": $docs_index,
     "./routes/index.tsx": $index,
+    "./routes/mint/index.tsx": $mint_index,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
@@ -129,6 +132,7 @@ const manifest = {
     "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/toast.tsx": $Toast_toast,
+    "./islands/UploadImage.tsx": $UploadImage,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
     "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
     "./islands/Wallet/ConnectorsModal.tsx": $Wallet_ConnectorsModal,
