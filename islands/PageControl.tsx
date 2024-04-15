@@ -76,7 +76,6 @@ export function PageControl(
   return (
     <>
       <nav aria-label="Page navigation">
-        <span class="text-white">SortBY: {sortOption}</span>
         <ul class="inline-flex items-center -space-x-px text-sm">
           <li>
             <a

@@ -50,6 +50,7 @@ import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
 import * as $Navigator_NavigatorComponent from "./islands/Navigator/NavigatorComponent.tsx";
 import * as $Navigator_navigator from "./islands/Navigator/navigator.tsx";
 import * as $PageControl from "./islands/PageControl.tsx";
+import * as $StampNavigator from "./islands/StampNavigator.tsx";
 import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_toast from "./islands/Toast/toast.tsx";
@@ -126,6 +127,7 @@ const manifest = {
     "./islands/Navigator/NavigatorComponent.tsx": $Navigator_NavigatorComponent,
     "./islands/Navigator/navigator.tsx": $Navigator_navigator,
     "./islands/PageControl.tsx": $PageControl,
+    "./islands/StampNavigator.tsx": $StampNavigator,
     "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/toast.tsx": $Toast_toast,

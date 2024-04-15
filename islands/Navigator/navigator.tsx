@@ -1,4 +1,3 @@
-
 import { useContext, useState } from "preact/hooks";
 import { createContext } from "preact";
 import { NavigatorComponent } from "$islands/Navigator/NavigatorComponent.tsx";
@@ -8,7 +7,6 @@ const NavigatorContext = createContext(null);
 export const useNavigator = () => useContext(NavigatorContext);
 
 export const NavigatorProvider = ({ children }) => {
-
   const [sortOption, setSortOption] = useState("");
   const [filterOption, setFilterOption] = useState<string[]>([]);
 
@@ -34,7 +32,7 @@ export const NavigatorProvider = ({ children }) => {
   };
   return (
     <NavigatorContext.Provider value={contextValue}>
-      <NavigatorComponent />
+      {/* <NavigatorComponent /> */}
       {/* <span class="text-white">SortOption: {sortOption}</span> */}
       {children}
     </NavigatorContext.Provider>

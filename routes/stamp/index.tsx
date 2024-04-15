@@ -4,6 +4,7 @@ import { PageControl } from "$islands/PageControl.tsx";
 import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";
 import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
+import { StampNavigator } from "$islands/StampNavigator.tsx";
 
 type StampPageProps = {
   params: {
