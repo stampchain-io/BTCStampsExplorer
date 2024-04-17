@@ -12,9 +12,6 @@ servers:
   - url: "https://bitcoinstamps.xyz"
     description: Production server (uses live data)
   - url: 'http://localhost:8000'
-  #   description: Development server (local)
-  # - url: 'https://btcstamps.deno.dev/'
-  #   description: Staging server (uses live data)
 paths:
 
 
@@ -256,8 +253,8 @@ paths:
 
   /api/v2/src20:
     get:
-      summary: Get paginated valid src20 transactions
-      description: Retrieve paginated valid src20 transactions with optional limit and page parameters
+      summary: Get paginated valid SRC-20 transactions
+      description: Retrieve paginated valid SRC-20 transactions with optional limit and page parameters
       parameters:
         - in: query
           name: limit
@@ -275,7 +272,7 @@ paths:
           description: The page number of transactions to retrieve
       responses:
         '200':
-          description: Successful response with paginated src20 transactions
+          description: Successful response with paginated SRC-20 transactions
           content:
             application/json:
               schema:
@@ -291,7 +288,7 @@ paths:
 
   /api/v2/src20/balance/{address}:
     get:
-      summary: Get src20 balance by address
+      summary: Get SRC-20 balances by BTC wallet address
       parameters:
         - in: path
           name: address
@@ -316,7 +313,7 @@ paths:
 
   /api/v2/src20/balance/{address}/{tick}:
     get:
-      summary: Get src20 balance by address and tick
+      summary: Get SRC-20 balance by address and tick
       parameters:
         - in: path
           name: address
@@ -347,7 +344,7 @@ paths:
   /api/v2/src20/balance/snapshot/{tick}:
     get:
       summary: | 
-        Get src20 balance snapshot by tick, based upon current block height.
+        Get SRC-20 balance snapshot by tick, based upon current block height.
       description: |
         Retrieve a snapshot of all owners for the SRC-20 tick value based upon the current block height.
       parameters:
@@ -388,7 +385,7 @@ paths:
 
   /api/v2/src20/block/{block_index}:
     get:
-      summary: Get paginated valid src20 transactions from a specific block
+      summary: Get paginated valid SRC-20 transactions from a specific block
       parameters:
         - in: path
           name: block_index
@@ -424,7 +421,7 @@ paths:
 
   /api/v2/src20/block/{block_index}/{tick}:
     get:
-      summary: Get valid src20 transactions from a specific block and tick.
+      summary: Get valid SRC-20 transactions from a specific block and tick.
       parameters:
         - in: path
           name: block_index
@@ -454,7 +451,7 @@ paths:
           description: The page number.
       responses:
         '200':
-          description: Successful response with the list of valid src20 transactions.
+          description: Successful response with the list of valid SRC-20 transactions.
           content:
             application/json:
               schema:
@@ -466,10 +463,75 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
+
+
+  /api/v2/src20/create:
+    post:
+      summary: Create a new SRC20 token or mint additional tokens.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InputData'
+      responses:
+        '200':
+          description: Successful response with the hex value.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hex:
+                    type: string
+                    description: The hex value.
+        '400':
+          description: Bad request error response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message.
+
+
+  /api/v2/olga/mint:
+    post:
+      summary: Mint a new OLGA STAMP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MintStampInputData'
+      responses:
+        '200':
+          description: Successful response with the hex value.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hex:
+                    type: string
+                    description: The hex value.
+        '400':
+          description: Bad request error response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message.
+
   /api/v2/src20/tick:
     get:
-      summary: Get paginated valid src20 transactions by operation type
-      description: Retrieve paginated valid src20 transactions by operation type (DEPLOY)
+      summary: Get paginated valid SRC-20 transactions by operation type
+      description: Retrieve paginated valid SRC-20 transactions by operation type (DEPLOY, MINT, TRANSFER)
       parameters:
         - in: query
           name: limit
@@ -485,9 +547,16 @@ paths:
             minimum: 1
             default: 1
           description: The page number of transactions to retrieve
+        - in: query
+          name: op
+          schema:
+            type: string
+            default: DEPLOY
+            enum: [TRANSFER, MINT, DEPLOY]
+          description: The operation type [TRANSFER, MINT, DEPLOY(DEFAULT)]
       responses:
         '200':
-          description: Successful response with paginated src20 transactions
+          description: Successful response with paginated SRC-20 transactions
           content:
             application/json:
               schema:
@@ -751,7 +820,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/stamps/dispensers/{id}:
-      get:
+    get:
       summary: Get open dispensers by stamp number, cpid, or stamp_hash
       description: Retrieve open dispensers by stamp number, cpid, or stamp_hash
       parameters:
@@ -891,6 +960,17 @@ paths:
 
 components:
   schemas:
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+        limit:
+          type: number
+        totalPages:
+          type: number
+        total:
+          type: number
     SUBPROTOCOLS:
       type: string
       enum:
@@ -1196,17 +1276,7 @@ components:
       properties:
         query:
           $ref: "#/components/schemas/PaginationQueryParams"
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: number
-        limit:
-          type: number
-        totalPages:
-          type: number
-        total:
-          type: number
+
     PaginatedStampResponseBody:
       type: object
       allOf:
