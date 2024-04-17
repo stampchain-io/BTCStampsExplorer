@@ -59,6 +59,7 @@ export const handler = async (
   const params = url.searchParams;
   const limit = Number(params.get("limit")) || BIG_LIMIT;
   const page = Number(params.get("page")) || 1;
+  const amt = Number(params.get("amt"));
   try {
     const client = await getClient();
     if (!client) {
