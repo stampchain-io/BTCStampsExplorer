@@ -3,23 +3,62 @@ import {
   AddressTickHandlerContext,
   ErrorResponseBody,
   PaginatedRequest,
-  Src20BalanceResponseBody,
+  Src20SnapshotResponseBody,
 } from "globals";
 import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { Client } from "$mysql/mod.ts";
-import { SMALL_LIMIT } from "constants";
+import { BIG_LIMIT } from "constants";
+
+// @swagger
+// /api/v2/src20/balance/snapshot/{tick}:
+// get:
+//   summary: |
+//     Get src20 balance snapshot by tick, based upon current block height.
+//   parameters:
+//     - in: path
+//       name: tick
+//       required: true
+//       schema:
+//         type: string
+//       description: The SRC20 tick value
+//     - in: query
+//       name: limit
+//       schema:
+//         type: integer
+//         minimum: 1
+//         default: 200
+//       description: The maximum number of transactions to retrieve per page
+//     - in: query
+//       name: page
+//       schema:
+//         type: integer
+//         minimum: 1
+//         default: 1
+//       description: The page number of transactions to retrieve
+//   responses:
+//     '200':
+//       description: Successful response
+//       content:
+//         application/json:
+//           schema:
+//             $ref: '#/components/schemas/Src20SnapshotResponseBody'
+//     '500':
+//       description: Internal server error
+//       content:
+//         application/json:
+//           schema:
+//             $ref: '#/components/schemas/ErrorResponseBody'
 
 export const handler = async (
-  req: Request,
+  req: PaginatedRequest,
   ctx: AddressTickHandlerContext,
 ): Promise<Response> => {
   let { tick } = ctx.params;
   const url = new URL(req.url);
   const params = url.searchParams;
-  const amt = Number(params.get("amt"));
-  const limit = Number(params.get("limit")) || SMALL_LIMIT;
-  const page = Number(params.get("page"));
+  const limit = Number(params.get("limit")) || BIG_LIMIT;
+  const page = Number(params.get("page")) || 1;
   try {
     const client = await getClient();
     if (!client) {
@@ -41,9 +80,12 @@ export const handler = async (
         amt,
       );
     const total = total_data.rows[0]["total"];
-    const body: Src20BalanceResponseBody = {
+    const body: Src20SnapshotResponseBody = {
+      page: page,
+      limit: limit,
+      totalPages: Math.ceil(total / limit),
+      total: total,
       snapshot_block: last_block.rows[0]["last_block"],
-      total,
       data: src20.rows.map((row) => {
         return {
           tick: row["tick"],

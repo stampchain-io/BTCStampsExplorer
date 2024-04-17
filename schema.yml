@@ -983,7 +983,6 @@ components:
         amt:
           oneOf:
             - type: number
-            
         deci:
           type: number
         lim:
@@ -997,13 +996,22 @@ components:
         status:
           oneOf:
             - type: object
-            
         creator_name:
           oneOf:
             - type: string
-            
         destination_name:
           type: string
+    Src20SnapshotDetail:
+      type: object
+      properties:
+        tick:
+          type: string
+        address:
+          type: string
+        balance:
+          oneOf:
+            - type: number
+            - type: string
     StampBalance:
       type: object
       properties:
@@ -1023,7 +1031,6 @@ components:
           oneOf:
             - type: number
             - type: boolean
-            
         divisible:
           type: number
         supply:
@@ -1160,6 +1167,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Src20Detail"
+    Src20SnapshotResponseBody:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            snapshot_block:
+              type: number
+            data:
+              $ref: "#/components/schemas/Src20SnapshotDetail"
     PaginatedBalanceResponseBody:
       type: object
       allOf:
