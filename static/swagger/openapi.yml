@@ -69,7 +69,7 @@ paths:
 
   /api/v2/block/block_count/{number}:
     get:
-      summary: Get last blocks
+      summary: Get last x blocks
       parameters:
         - in: path
           name: number
@@ -154,7 +154,7 @@ paths:
           required: true
           schema:
             type: string
-          description: The ID or identifier of the stamp
+          description: Stamp number, cpid, or stamp_hash
       responses:
         '200':
           description: Successful response
@@ -204,7 +204,7 @@ paths:
           required: true
           schema:
             type: string
-          description: The ident of the stamp
+          description: The ident of the stamp (SRC-721, STAMP)
         - in: query
           name: limit
           schema:
@@ -231,14 +231,14 @@ paths:
 
   /api/v2/issuances/{id}:
     get:
-      summary: Get stamp issuances by stamp id or identifier
+      summary: Get stamp issuances by stamp number, cpid, or stamp_hash
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: The stamp id or identifier
+          description: Stamp number, cpid, or stamp_hash
       responses:
         '200':
           description: Successful response
@@ -337,6 +337,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Src20BalanceResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+  /api/v2/src20/balance/snapshot/{tick}:
+    get:
+      summary: | 
+        Get src20 balance snapshot by tick, based upon current block height.
+      description: |
+        Retrieve a snapshot of all owners for the SRC-20 tick value based upon the current block height.
+      parameters:
+        - in: path
+          name: tick
+          required: true
+          schema:
+            type: string
+          description: The SRC20 tick value
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 200
+          description: The maximum number of transactions to retrieve per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Src20SnapshotResponseBody'
         '500':
           description: Internal server error
           content:
@@ -676,7 +717,7 @@ paths:
         - in: path
           name: ident
           required: true
-          description: The ident value
+          description: The ident value (SRC-721, STAMP)
           schema:
             type: string
         - in: query
@@ -711,13 +752,13 @@ paths:
 
   /api/v2/stamps/dispensers/{id}:
       get:
-      summary: Get open dispensers by Stamp ID
-      description: Retrieve aopen dispensers by Stamp ID
+      summary: Get open dispensers by stamp number, cpid, or stamp_hash
+      description: Retrieve open dispensers by stamp number, cpid, or stamp_hash
       parameters:
         - in: path
           name: id
           required: true
-          description: ID of the stamp
+          description: Stamp number, cpid, or stamp_hash
           schema:
             type: string
       responses:
@@ -799,18 +840,14 @@ paths:
                     type: string
                     description: The error message.
 
-
-
   /api/v2/olga/mint:
     post:
-      summary: Mint a new OLGA STAMP.
+      summary: Mint an OLGA STAMP.
       description: |
         This returns an unsigned transaction ready for signing and broadcasting
         via wallet or library. There is no validation that the input data provided
-        will conform to STAMP specifications. It is the 
-        users sole responsibility to confirm mint, deploy limits and confirm existing
-        balances prior to a transfer of tokens. The examples provided are for demonstration
-        purposes only.
+        will conform to all STAMP specifications. It is the users sole responsibility 
+        The examples provided are for demonstration purposes only.
       requestBody:
         required: true
         content:
@@ -1062,7 +1099,6 @@ components:
         amt:
           oneOf:
             - type: number
-            
         deci:
           type: number
         lim:
@@ -1076,13 +1112,23 @@ components:
         status:
           oneOf:
             - type: object
-            
         creator_name:
           oneOf:
             - type: string
-            
         destination_name:
           type: string
+    Src20SnapshotDetail:
+      type: object
+      properties:
+        tick:
+          type: string
+        address:
+          type: string
+        balance:
+          oneOf:
+            - type: number
+            - type: string
+    
     StampBalance:
       type: object
       properties:
@@ -1102,7 +1148,6 @@ components:
           oneOf:
             - type: number
             - type: boolean
-            
         divisible:
           type: number
         supply:
@@ -1118,7 +1163,6 @@ components:
         creator_name:
           oneOf:
             - type: string
-            
         balance:
           oneOf:
             - type: number
@@ -1222,6 +1266,17 @@ components:
           $ref: "#/components/schemas/MintStatus"
         data:
           $ref: "#/components/schemas/Src20Detail"
+    Src20SnapshotResponseBody:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            snapshot_block:
+              type: number
+            data:
+              $ref: "#/components/schemas/Src20SnapshotDetail"
+   
     StampsAndSrc20:
       type: object
       properties:
