@@ -81,10 +81,11 @@ export const handler = async (
         page,
       );
     const total = await Src20Class
-      .get_total_valid_src20_tx_from_block_by_tick_with_client(
+      .get_total_valid_src20_tx_with_client(
         client,
-        block_index,
         tick,
+        null,
+        block_index,
       );
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const body: PaginatedSrc20ResponseBody = {

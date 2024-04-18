@@ -66,6 +66,7 @@ export const handler = async (
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
     const op = url.searchParams.get("op") || "DEPLOY";
+    const sort = url.searchParams.get("sort") || "ASC";
     const client = await getClient();
     const data = await Src20Class.get_valid_src20_tx_by_op_with_client(
       client,
@@ -73,8 +74,9 @@ export const handler = async (
       limit,
       page,
     );
-    const total = await Src20Class.get_total_valid_src20_tx_by_op_with_client(
+    const total = await Src20Class.get_total_valid_src20_tx_with_client(
       client,
+      null,
       op,
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
