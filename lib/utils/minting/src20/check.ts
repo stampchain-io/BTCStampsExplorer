@@ -9,7 +9,7 @@ export async function checkMintedOut(
   client: Client,
   tick: string,
   amount: string,
-) { 
+) {
   try {
     const mint_status = await Src20Class
       .get_src20_minting_progress_by_tick_with_client(
@@ -62,7 +62,7 @@ export async function checkDeployedTick(
 ) {
   try {
     const token_status = await Src20Class
-      .get_total_valid_src20_tx_by_tick_with_op_with_client(
+      .get_total_valid_src20_tx_with_client(
         client,
         tick,
         "DEPLOY",
