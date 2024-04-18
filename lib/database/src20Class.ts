@@ -384,7 +384,8 @@ export class Src20Class {
     client: Client,
     ticks: string[],
   ) {
-    const tickPlaceholders = ticks.map(() => "?").join(",");
+    const ticksArray = typeof ticks === "string" ? [ticks] : ticks;
+    const tickPlaceholders = ticksArray.map(() => "?").join(",");
     return await handleSqlQueryWithCache(
       client,
       `
