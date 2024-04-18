@@ -13,48 +13,49 @@ import { conf } from "../../lib/utils/config.ts";
 //  tick COLLATE utf8mb4_0900_as_ci = '${tick}'
 //  tick = CONVERT('${tick}' USING utf8mb4) COLLATE utf8mb4_0900_as_ci
 export class Src20Class {
-  static async get_total_valid_src20_tx_with_client(client: Client) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-    SELECT COUNT(*) AS total
-    FROM ${SRC20_TABLE}
-    `,
-      [],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_total_valid_src20_tx_from_block_with_client(
+  static async get_total_valid_src20_tx_with_client(
     client: Client,
-    block_index: number,
+    tick: string | null = null,
+    op: string | null = null,
+    block_index: number | null = null,
+    address: string | null = null,
   ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-    SELECT COUNT(*) AS total
-    FROM ${SRC20_TABLE}
-    WHERE block_index = '${block_index}';
-    `,
-      [block_index],
-      1000 * 60 * 2,
-    );
-  }
+    const queryParams = [];
+    const whereConditions = [];
 
-  static async get_total_valid_src20_tx_from_block_by_tick_with_client(
-    client: Client,
-    block_index: number,
-    tick: string,
-  ) {
+    if (tick !== null) {
+      whereConditions.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
+      queryParams.push(tick);
+    }
+
+    if (op !== null) {
+      whereConditions.push(`op = ?`);
+      queryParams.push(op);
+    }
+
+    if (block_index !== null) {
+      whereConditions.push(`block_index = ?`);
+      queryParams.push(block_index);
+    }
+
+    if (address !== null) {
+      whereConditions.push(`address = ?`);
+      queryParams.push(address);
+    }
+
+    let sqlQuery = `
+        SELECT COUNT(*) AS total
+        FROM ${SRC20_TABLE}
+    `;
+
+    if (whereConditions.length > 0) {
+      sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
+    }
+
     return await handleSqlQueryWithCache(
       client,
-      `
-    SELECT COUNT(*) AS total
-    FROM ${SRC20_TABLE}
-    WHERE block_index = ${block_index}
-    AND tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-    `,
-      [block_index, tick],
+      sqlQuery,
+      queryParams,
       1000 * 60 * 2,
     );
   }
@@ -185,40 +186,6 @@ export class Src20Class {
     );
   }
 
-  static async get_total_valid_src20_tx_by_tick_with_client(
-    client: Client,
-    tick: string,
-  ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT COUNT(*) AS total
-        FROM ${SRC20_TABLE}
-        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        `,
-      [tick],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_total_valid_src20_tx_by_tick_with_op_with_client(
-    client: Client,
-    tick: string,
-    op: string,
-  ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT COUNT(*) AS total
-        FROM ${SRC20_TABLE}
-        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        AND op = '${op}'
-        `,
-      [tick, op],
-      1000 * 60 * 2,
-    );
-  }
-
   static async get_valid_src20_tx_by_tick_with_op_with_client(
     client: Client,
     tick: string,
@@ -323,27 +290,6 @@ export class Src20Class {
       client,
       sqlQuery,
       queryParams,
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_total_valid_src20_tx_by_op_with_client(
-    client: Client,
-    op: string,
-    limit = SMALL_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT COUNT(*) AS total
-        FROM ${SRC20_TABLE}
-        WHERE op = '${op}'
-        ORDER BY tx_index ASC
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [op, limit, offset],
       1000 * 60 * 2,
     );
   }
@@ -464,22 +410,6 @@ export class Src20Class {
         WHERE src20.tx_hash = '${tx_hash}';
         `,
       [tx_hash],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_total_valid_src20_tx_by_address_with_client(
-    client: Client,
-    address: string,
-  ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT COUNT(*) AS total
-        FROM ${SRC20_TABLE}
-        WHERE address = ${address};
-        `,
-      [address],
       1000 * 60 * 2,
     );
   }

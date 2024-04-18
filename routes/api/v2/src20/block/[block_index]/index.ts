@@ -60,14 +60,16 @@ export const handler = async (
     const valid_src20_txs_in_block = await Src20Class
       .get_valid_src20_tx_from_block_with_client(
         client,
-        block_index,
+        Number(block_index),
         limit,
         page,
       );
     const total = await Src20Class
-      .get_total_valid_src20_tx_from_block_with_client(
+      .get_total_valid_src20_tx_with_client(
         client,
-        block_index,
+        null,
+        null,
+        Number(block_index),
       );
     const last_block = await CommonClass.get_last_block_with_client(client);
     const pagination = paginate(total.rows[0]["total"], page, limit);

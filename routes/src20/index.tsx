@@ -20,8 +20,9 @@ export const handler = {
         limit,
         page,
       );
-      const total = await Src20Class.get_total_valid_src20_tx_by_op_with_client(
+      const total = await Src20Class.get_total_valid_src20_tx_with_client(
         client,
+        null,
         "DEPLOY",
       );
       const last_block = await CommonClass.get_last_block_with_client(client);

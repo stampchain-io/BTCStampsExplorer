@@ -65,13 +65,13 @@ export const handler: Handlers<StampRow> = {
       );
 
       const total_sends = await Src20Class
-        .get_total_valid_src20_tx_by_tick_with_op_with_client(
+        .get_total_valid_src20_tx_with_client(
           client,
           tick,
           "TRANSFER",
         );
       const total_mints = await Src20Class
-        .get_total_valid_src20_tx_by_tick_with_op_with_client(
+        .get_total_valid_src20_tx_with_client(
           client,
           tick,
           "MINT",
