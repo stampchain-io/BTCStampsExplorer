@@ -93,6 +93,7 @@ interface SRC20Balance {
   amt: number;
   block_time: Date;
   last_update: number;
+  deploy_img: string;
 }
 
 interface Src20Detail {
