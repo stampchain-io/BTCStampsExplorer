@@ -201,6 +201,11 @@ export interface Src20BalanceResponseBody {
   data: Src20Detail[];
 }
 
+export interface Src20SnapshotResponseBody extends Pagination {
+  snapshot_block: number;
+  data: Src20Detail[];
+}
+
 export interface PaginatedBalanceResponseBody extends Pagination {
   last_block: number;
   btc: BtcInfo;
