@@ -600,23 +600,19 @@ export class Src20Class {
     );
 
     const ticks = results.rows ? results.rows.map((result) => result.tick) : [];
-    console.log(ticks);
     const tx_hashes_response = await Src20Class
       .get_valid_src20_deploy_by_tick_with_client(client, ticks);
     const tx_hashes = tx_hashes_response.rows.map((row) => row.tx_hash);
-    console.log(tx_hashes);
-    // Pair each result with its corresponding tx_hash
     const resultsAndHashes = results.rows.map((result, index) => ({
       result,
       tx_hash: tx_hashes[index],
     }));
 
-    const resultsWithStampUrl = resultsAndHashes.map(({ result, tx_hash }) => {
-      const stampUrl = `${conf.IMAGES_SRC_PATH}/${tx_hash}.svg`;
-      return { ...result, stampUrl };
+    const resultsWithDeployImg = resultsAndHashes.map(({ result, tx_hash }) => {
+      const deployImg = `${conf.IMAGES_SRC_PATH}/${tx_hash}.svg`;
+      return { ...result, deploy_img: deployImg };
     });
-    console.log(resultsWithStampUrl);
-    return { rows: resultsWithStampUrl };
+    return { rows: resultsWithDeployImg };
   }
 
   static async get_src20_balance_by_address_and_tick_with_client(
@@ -624,10 +620,10 @@ export class Src20Class {
     address: string,
     tick: string,
   ) {
-    return await handleSqlQueryWithCache(
+    const results = await handleSqlQueryWithCache(
       client,
       `
-        SELECT id,address,p,tick,amt,block_time,last_update
+        SELECT address,p,tick,amt,block_time,last_update
         FROM ${SRC20_BALANCE_TABLE}
         WHERE address = '${address}' and amt > 0
         AND tick COLLATE utf8mb4_0900_as_ci = '${tick}';
@@ -635,6 +631,16 @@ export class Src20Class {
       [address, tick],
       1000 * 60 * 2,
     );
+    const tx_hashes_response = await Src20Class
+      .get_valid_src20_deploy_by_tick_with_client(client, [tick]);
+    const tx_hash = tx_hashes_response.rows[0].tx_hash;
+    const deployImg = `${conf.IMAGES_SRC_PATH}/${tx_hash}.svg`;
+
+    const resultsWithDeployImg = results.rows.map((result) => {
+      return { ...result, deploy_img: deployImg };
+    });
+
+    return { rows: resultsWithDeployImg };
   }
 
   static async get_src20_holders_by_tick_with_client(
