@@ -19,33 +19,46 @@ const sortData = (stamps, sortBy) => {
     return [...stamps.sort((a, b) => a.block_index - b.block_index)];
   } else if (sortBy == "Stamp") {
     return [...stamps.sort((a, b) => a.stamp - b.stamp)];
-  } else return [...stamps];
+  }
+  return [...stamps];
 };
 
+const filterData = (stamps, filterBy) => {
+  if (filterBy.length == 0) {
+    return stamps;
+  }
+  return stamps.filter((stamp) =>
+    filterBy.find((option) =>
+      stamp.stamp_mimetype.indexOf(option.toLowerCase()) >= 0
+    ) != null
+  );
+};
 export async function api_get_stamps(
   page = 0,
   page_size = BIG_LIMIT,
   order: "DESC" | "ASC" = "ASC",
   sortBy = "none",
+  filterBy = [],
 ) {
   try {
     const client = await getClient();
-    const stamps = await StampsClass.get_resumed_stamps_by_page_with_client(
+    const stamps = await StampsClass.get_resumed_stamps(
       client,
-      page_size,
-      page,
       order,
     );
     if (!stamps) {
       closeClient(client);
       throw new Error("No stamps found");
     }
-    let data = sortData(stamps.rows, sortBy);
-    console.log("backend: ", sortBy);
-
+    console.log("backend: ", sortBy, filterBy);
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ["STAMP", "SRC-721"],
+    );
+
+    let data = sortData(filterData(stamps.rows, filterBy), sortBy).slice(
+      page,
+      page_size,
     );
     releaseClient(client);
     return {

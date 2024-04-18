@@ -5,7 +5,6 @@ export function StampSearchClient() {
     // const stampId = parseInt(searchTerm);
     // Redirect to /stamp/[id] route with the stampId
     window.location.href = `/stamp/${searchTerm}`;
-    console.log("ssssss");
     // }
   };
 

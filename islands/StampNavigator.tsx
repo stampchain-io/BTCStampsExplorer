@@ -1,17 +1,19 @@
 import { StampRow } from "globals";
-import { useContext } from "preact/hooks";
+import { useContext, useEffect } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
 const filters = ["Png", "Gif", "Svg", "Jpg", "Html"];
-const sorts = ["Supply", "Block", "Stamp"];
+const sorts = ["Supply", "Stamp"];
 const active = " opacity-50";
 
 interface SortItemInterface {
   title: string;
   onChange: (id: string) => void;
+  value: string;
 }
 
 interface FilterItemInterface {
   title: string;
+  value: string[];
   onChange: (id: string) => void;
 }
 
@@ -20,7 +22,8 @@ const SortItem = (props: SortItemInterface) => {
 
   return (
     <div
-      class="flex gap-x-2 items-center cursor-pointer opacity-25 hover:opacity-60"
+      class={"flex gap-x-2 items-center cursor-pointer hover:opacity-100 " +
+        (props.value == props.title ? "opacity-100" : "opacity-15")}
       onClick={() => {
         props.onChange(title);
       }}
@@ -40,21 +43,46 @@ const FilterItem = (props: FilterItemInterface) => {
         props.onChange(title);
       }}
     >
-      <input type="checkbox" />
+      <input type="checkbox" checked={props.value.includes(title)} />
       <span>{title}</span>
     </div>
   );
 };
 
-export function StampNavigator() {
-  const { setSortOption, setFilterOption } = useNavigator();
+export function StampNavigator({ initFilter, initSort }) {
+  const {
+    setSortOption,
+    setFilterOption,
+    sortOption,
+    filterOption,
+    setFilter,
+    setSort,
+  } = useNavigator();
+
+  useEffect(() => {
+    console.log(initFilter, initSort, "++++");
+    if (initFilter) {
+      console.log(initFilter, "---------------");
+      setFilter(initFilter);
+    }
+    if (initSort) {
+      console.log(initSort, "-----------------");
+      setSort(initSort);
+    }
+  }, []);
   return (
     <>
       <div class="flex flex-row text-white/80 w-full mb-4">
         <span class="w-20">Filter by:</span>
         <div class="flex flex-1 border border-gray-600 h-16 px-10 py-6 gap-x-5">
           {filters.map((item) => {
-            return <FilterItem title={item} onChange={setFilterOption} />;
+            return (
+              <FilterItem
+                title={item}
+                onChange={setFilterOption}
+                value={filterOption}
+              />
+            );
           })}
         </div>
       </div>
@@ -65,6 +93,7 @@ export function StampNavigator() {
             <SortItem
               title={item}
               onChange={setSortOption}
+              value={sortOption}
             />
           ))}
         </div>

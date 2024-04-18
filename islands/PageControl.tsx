@@ -4,29 +4,29 @@ import { StampRow } from "globals";
 import { useEffect, useState } from "preact/hooks";
 import { StampsClass } from "$lib/database/index.ts";
 
-const sortData = (stamps: StampRow[], sortBy: string) => {
-  const data = [...stamps];
-  if (sortBy == "Supply") {
-    return [...data.sort((a: StampRow, b: StampRow) => a.supply - b.supply)];
-  } else if (sortBy == "Block") {
-    return [
-      ...data.sort((a: StampRow, b: StampRow) => a.block_index - b.block_index),
-    ];
-  } else if (sortBy == "Stamp") {
-    return [...data.sort((a: StampRow, b: StampRow) => a.stamp - b.stamp)];
-  } else return [...data];
-};
+// const sortData = (stamps: StampRow[], sortBy: string) => {
+//   const data = [...stamps];
+//   if (sortBy == "Supply") {
+//     return [...data.sort((a: StampRow, b: StampRow) => a.supply - b.supply)];
+//   } else if (sortBy == "Block") {
+//     return [
+//       ...data.sort((a: StampRow, b: StampRow) => a.block_index - b.block_index),
+//     ];
+//   } else if (sortBy == "Stamp") {
+//     return [...data.sort((a: StampRow, b: StampRow) => a.stamp - b.stamp)];
+//   } else return [...data];
+// };
 
-const filterData = (stamps: StampRow[], filterBy: string[]) => {
-  if (filterBy.length == 0) {
-    return stamps;
-  }
-  return stamps.filter((stamp) =>
-    filterBy.find((option) =>
-      stamp.stamp_mimetype.indexOf(option.toLowerCase()) >= 0
-    ) != null
-  );
-};
+// const filterData = (stamps: StampRow[], filterBy: string[]) => {
+//   if (filterBy.length == 0) {
+//     return stamps;
+//   }
+//   return stamps.filter((stamp) =>
+//     filterBy.find((option) =>
+//       stamp.stamp_mimetype.indexOf(option.toLowerCase()) >= 0
+//     ) != null
+//   );
+// };
 
 export function PageControl(
   { page, pages, page_size, type = "stamp", stamps = [] }: {
@@ -44,21 +44,20 @@ export function PageControl(
   const endPage = Math.min(totalPages, currentPage + maxPagesToShow);
   const pageItems = [];
   const { filterOption, sortOption } = useNavigator();
-  const [content, setContent] = useState<StampRow[]>([]);
 
-  useEffect(() => {
-    if (stamps.length > 0) {
-      console.log("updated!!!!", stamps.length, stamps.at(0));
+  // useEffect(() => {
+  //   if (stamps.length > 0) {
+  //     console.log("updated!!!!", stamps.length, stamps.at(0));
 
-      setContent([...filterData(sortData(stamps, sortOption), filterOption)]);
-    }
-  }, [sortOption, filterOption]);
+  //     setContent([...filterData(sortData(stamps, sortOption), filterOption)]);
+  //   }
+  // }, [sortOption, filterOption]);
 
   for (let p = startPage; p <= endPage; p++) {
     pageItems.push(
       <li key={p}>
         <a
-          href={`/${type}?page=${p}&limit=${page_size}`}
+          href={`/${type}?page=${p}&limit=${page_size}&sort=${sortOption}&filter=${filterOption}`}
           f-partial={`/${type}?page=${p}&limit=${page_size}`}
           class={`flex items-center justify-center px-3 h-8 leading-tight font-medium hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-white
             ${
@@ -75,7 +74,7 @@ export function PageControl(
 
   return (
     <>
-      {(content.length > 0 || stamps.length == 0) &&
+      {(stamps.length != 0) &&
         (
           <nav aria-label="Page navigation">
             <ul class="inline-flex items-center -space-x-px text-sm">
@@ -129,7 +128,7 @@ export function PageControl(
         )}
       <div name="stamps">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out">
-          {content.map((stamp: StampRow) => (
+          {stamps.map((stamp: StampRow) => (
             <StampCard stamp={stamp} kind="stamp" />
           ))}
         </div>
