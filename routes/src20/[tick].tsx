@@ -24,7 +24,7 @@ export const handler: Handlers<StampRow> = {
       const deployment = await Src20Class
         .get_valid_src20_deploy_by_tick_with_client(
           client,
-          tick,
+          [tick],
         );
 
       const mint_status = await Src20Class

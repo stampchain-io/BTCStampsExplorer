@@ -46,7 +46,7 @@ export const handler = async (
     const deployment = await Src20Class
       .get_valid_src20_deploy_by_tick_with_client(
         client,
-        tick,
+        [tick],
       );
     const mint_status = await Src20Class
       .get_src20_minting_progress_by_tick_with_client(
