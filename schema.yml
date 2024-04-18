@@ -489,6 +489,13 @@ paths:
             default: DEPLOY
             enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type [TRANSFER, MINT, DEPLOY(DEFAULT)]
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: DESC
+            enum: [ASC, DESC]
+          description: Sort order [ASC, DESC]
       responses:
         '200':
           description: Successful response with paginated SRC-20 transactions
@@ -502,10 +509,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
-
-
-
-
 
 
   /api/v2/src20/tick/{tick}:
@@ -529,6 +532,20 @@ paths:
           description: 'Page number (default: 1)'
           schema:
             type: integer
+        - in: query
+          name: op
+          schema:
+            type: string
+            default: null
+            enum: [TRANSFER, MINT, DEPLOY]
+          description: The operation type [TRANSFER, MINT, DEPLOY]
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: ASC
+            enum: [ASC, DESC]
+          description: Sort order [ASC, DESC]
       responses:
         '200':
           description: Successful response
@@ -542,6 +559,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
+
   /api/v2/src20/tick/{tick}/deploy:
     get:
       summary: Get deployment details for a specific tick
@@ -771,7 +789,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampResponseBody'
+                $ref: '#/components/schemas/DispenserResponseBody'
         '500':
           description: Internal server error
           content:
@@ -1358,6 +1376,13 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StampRow"
+    DispenserResponseBody:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/DispenserRow"
+        last_block:
+          type: number
     ErrorResponseBody:
       type: object
       properties:

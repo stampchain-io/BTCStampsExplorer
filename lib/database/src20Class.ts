@@ -82,7 +82,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
@@ -124,7 +123,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM
@@ -168,7 +166,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM
@@ -228,7 +225,7 @@ export class Src20Class {
     op: string,
     limit = BIG_LIMIT,
     page = 0,
-    order = "ASC",
+    sort = "ASC",
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
     return await handleSqlQueryWithCache(
@@ -248,7 +245,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
@@ -261,7 +257,7 @@ export class Src20Class {
             src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
             AND src20.op = '${op}'
         ORDER BY 
-            src20.tx_index ${order}
+            src20.tx_index ${sort}
         ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
         `,
       [tick, op, limit, offset],
@@ -272,13 +268,25 @@ export class Src20Class {
   static async get_valid_src20_tx_by_tick_with_client(
     client: Client,
     tick: string,
-    limit = SMALL_LIMIT,
+    op: string | null,
+    sort = "ASC",
+    limit = BIG_LIMIT,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
+    let whereClause = `src20.tick COLLATE utf8mb4_0900_as_ci = ?`;
+    const queryParams = [tick]; // Changed from 'let' to 'const'
+
+    if (op !== null) {
+      whereClause += ` AND src20.op = ?`;
+      queryParams.push(op);
+    }
+
+    const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
+      ? sort.toUpperCase()
+      : "ASC";
+
+    const sqlQuery = `
         SELECT 
             src20.tx_hash,
             src20.tx_index,
@@ -293,7 +301,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
@@ -303,11 +310,19 @@ export class Src20Class {
         LEFT JOIN 
             creator destination_info ON src20.destination = destination_info.address
         WHERE 
-            src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        ORDER BY src20.tx_index ASC
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [tick, limit, offset],
+            ${whereClause}
+        ORDER BY src20.tx_index ${validOrder}
+        ${limit ? `LIMIT ? OFFSET ?` : ""};
+    `;
+
+    if (limit) {
+      queryParams.push(limit, offset);
+    }
+
+    return await handleSqlQueryWithCache(
+      client,
+      sqlQuery,
+      queryParams,
       1000 * 60 * 2,
     );
   }
@@ -358,7 +373,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
@@ -402,7 +416,6 @@ export class Src20Class {
                 src20.max,
                 src20.destination,
                 src20.block_time,
-                src20.status,
                 creator_info.creator as creator_name,
                 destination_info.creator as destination_name
             FROM 
@@ -440,7 +453,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM
@@ -496,7 +508,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 
@@ -559,7 +570,6 @@ export class Src20Class {
             src20.max,
             src20.destination,
             src20.block_time,
-            src20.status,
             creator_info.creator as creator_name,
             destination_info.creator as destination_name
         FROM 

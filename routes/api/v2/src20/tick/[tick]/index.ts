@@ -33,6 +33,20 @@ import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
  *         description: Page number (default: 1)
  *         schema:
  *           type: integer
+ *       - in: query
+ *         name: op
+ *         schema:
+ *           type: string
+ *           default: null
+ *           enum: [TRANSFER, MINT, DEPLOY]
+ *         description: The operation type [TRANSFER, MINT, DEPLOY(DEFAULT)]
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           default: ASC
+ *           enum: [ASC, DESC]
+ *         description: Sort order [ASC, DESC]
  *     responses:
  *       '200':
  *         description: Successful response
@@ -57,12 +71,16 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
+    const op = url.searchParams.get("op");
+    const sort = url.searchParams.get("sort") || "ASC";
     const client = await getClient();
     tick = convertEmojiToTick(tick);
     const src20_txs = await Src20Class
       .get_valid_src20_tx_by_tick_with_client(
         client,
         tick,
+        op,
+        sort,
         limit,
         page,
       );
