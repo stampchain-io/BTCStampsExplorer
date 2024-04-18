@@ -34,6 +34,14 @@ import {
  *         schema:
  *           type: string
  *           default: DEPLOY
+ *           enum: [TRANSFER, MINT, DEPLOY]
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           default: ASC
+ *           enum: [ASC, DESC]
+ *         description: Sort order [ASC, DESC]
  *     responses:
  *       '200':
  *         description: Successful response with paginated src20 transactions
