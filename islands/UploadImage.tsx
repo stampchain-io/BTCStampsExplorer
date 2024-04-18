@@ -474,8 +474,12 @@ export function UploadImage() {
               class={"flex gap-1 items-center cursor-pointer"}
               onClick={() => setVisible(!visible)}
             >
-              <span>0.001139</span>
-              <span className="coin"></span>
+              <span class={"flex"}>
+                {coinType === "BTC"
+                  ? total.toFixed(6)
+                  : (total * BTCPrice).toFixed(2)}
+                &nbsp;<span className={"coin"}></span>
+              </span>
               {!visible
                 ? (
                   <svg
