@@ -289,6 +289,7 @@ export interface TxHandlerContext extends HandlerContext {
 export interface TickHandlerContext extends HandlerContext {
   params: {
     tick: string | number;
+    op?: string; // future use for mint/transfer deploy is defined in routes
   };
 }
 
