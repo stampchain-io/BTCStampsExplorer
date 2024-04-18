@@ -602,15 +602,19 @@ export class Src20Class {
     const ticks = results.rows ? results.rows.map((result) => result.tick) : [];
     const tx_hashes_response = await Src20Class
       .get_valid_src20_deploy_by_tick_with_client(client, ticks);
-    const tx_hashes = tx_hashes_response.rows.map((row) => row.tx_hash);
-    const resultsAndHashes = results.rows.map((result, index) => ({
-      result,
-      tx_hash: tx_hashes[index],
+    const tx_hashes_map = tx_hashes_response.rows.reduce((map, row) => {
+      map[row.tick] = row.tx_hash;
+      return map;
+    }, {});
+
+    const resultsAndHashes = results.rows.map((result) => ({
+      ...result,
+      tx_hash: tx_hashes_map[result.tick],
     }));
 
-    const resultsWithDeployImg = resultsAndHashes.map(({ result, tx_hash }) => {
-      const deployImg = `${conf.IMAGES_SRC_PATH}/${tx_hash}.svg`;
-      return { ...result, deploy_img: deployImg };
+    const resultsWithDeployImg = resultsAndHashes.map((row) => {
+      const deployImg = `${conf.IMAGES_SRC_PATH}/${row.tx_hash}.svg`;
+      return { ...row, deploy_img: deployImg };
     });
     return { rows: resultsWithDeployImg };
   }
