@@ -60,6 +60,19 @@ interface HolderRow {
   divisible: number;
 }
 
+interface DispenserRow {
+  tx_hash: string;
+  block_index: number;
+  source: string;
+  cpid: string;
+  give_quantity: number;
+  give_remaining: number;
+  escrow_quantity: number;
+  satoshirate: number;
+  btcrate: number;
+  origin: string;
+}
+
 interface BlockInfo {
   block_info: BlockRow;
   issuances: StampRow[];
@@ -252,6 +265,10 @@ export interface StampBlockResponseBody {
   block_info: BlockRow;
   data: StampRow[];
   last_block: number;
+}
+
+export interface DispenserResponseBody {
+  dispensers: DispenserRow[];
 }
 
 // Handler Contexts ------------------------------------------------------------

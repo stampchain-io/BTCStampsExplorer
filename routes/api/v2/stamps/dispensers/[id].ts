@@ -1,5 +1,6 @@
 import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
 import {
+  DispenserResponseBody,
   ErrorResponseBody,
   IdHandlerContext,
   StampResponseBody,
@@ -39,13 +40,13 @@ export const handler = async (
 ): Promise<Response> => {
   const { id } = ctx.params;
   try {
-    const data = await api_get_stamp_all_data(id);
-    if (!data) {
-      throw new Error("Stamp not found");
-    }
+    // const data = await api_get_stamp_all_data(id);
+    // if (!data) {
+    //   throw new Error("Stamp not found");
+    // }
     const dispensers = await get_dispensers(id);
-    const body: StampResponseBody = {
-      data: data,
+    const body: DispenserResponseBody = {
+      // data: data,
       dispensers: dispensers, // Add the dispensers to the response body
     };
     return new Response(JSON.stringify(body));
