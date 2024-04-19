@@ -12,30 +12,58 @@ import {
 } from "utils/xcp.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
+const sortData = (stamps, sortBy) => {
+  if (sortBy == "Supply") {
+    return [...stamps.sort((a, b) => a.supply - b.supply)];
+  } else if (sortBy == "Block") {
+    return [...stamps.sort((a, b) => a.block_index - b.block_index)];
+  } else if (sortBy == "Stamp") {
+    return [...stamps.sort((a, b) => a.stamp - b.stamp)];
+  }
+  return [...stamps];
+};
+
+const filterData = (stamps, filterBy) => {
+  if (filterBy.length == 0) {
+    return stamps;
+  }
+  return stamps.filter((stamp) =>
+    filterBy.find((option) =>
+      stamp.stamp_mimetype.indexOf(option.toLowerCase()) >= 0
+    ) != null
+  );
+};
 export async function api_get_stamps(
-  page = 0,
+  page = 1,
   page_size = BIG_LIMIT,
-  order: "DESC" | "ASC" = "DESC",
+  order: "DESC" | "ASC" = "ASC",
+  sortBy = "none",
+  filterBy = [],
 ) {
   try {
     const client = await getClient();
-    const stamps = await StampsClass.get_resumed_stamps_by_page_with_client(
+    const stamps = await StampsClass.get_resumed_stamps(
       client,
-      page_size,
-      page,
       order,
     );
     if (!stamps) {
       closeClient(client);
       throw new Error("No stamps found");
     }
+    console.log("backend: ", sortBy, filterBy);
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ["STAMP", "SRC-721"],
     );
+
+    let data = sortData(filterData(stamps.rows, filterBy), sortBy).slice(
+      page * page_size - page_size,
+      page * page_size,
+    );
+    console.log(data.length);
     releaseClient(client);
     return {
-      stamps: stamps.rows,
+      stamps: data,
       total: total.rows[0].total,
       pages: Math.ceil(total.rows[0].total / page_size),
       page: page,

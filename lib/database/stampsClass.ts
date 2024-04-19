@@ -105,6 +105,34 @@ export class StampsClass {
     );
   }
 
+  static async get_resumed_stamps(
+    client: Client,
+    order = "DESC",
+  ) {
+    order = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    return await handleSqlQueryWithCache(
+      client,
+      `
+      SELECT
+        st.stamp,
+        st.cpid,
+        st.creator,
+        cr.creator AS creator_name,
+        st.tx_hash, st.stamp_mimetype,
+        st.supply, st.divisible,
+        st.locked,
+        st.ident,
+        st.block_time,
+        st.block_index
+      FROM ${STAMP_TABLE} AS st
+      LEFT JOIN creator AS cr ON st.creator = cr.address
+      WHERE st.is_btc_stamp IS NOT NULL AND (st.ident = 'STAMP' or st.ident = 'SRC-721')
+      `,
+      [],
+      1000 * 60 * 2,
+    );
+  }
+
   static async get_stamps_by_block_index_with_client(
     client: Client,
     block_index: number,
