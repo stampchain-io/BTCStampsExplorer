@@ -202,7 +202,7 @@ export const get_holders = async (cpid: string) => {
 };
 
 /**
- * Retrieves the dispensers for a given asset.
+ * Retrieves the open dispensers for a given asset.
  * @param cpid - The asset identifier.
  * @returns An array of mapped dispensers.
  */

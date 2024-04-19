@@ -22,9 +22,11 @@ export const handler: Handlers<StampRow> = {
 
       const client = await getClient();
       const deployment = await Src20Class
-        .get_valid_src20_deploy_by_tick_with_client(
+        .get_valid_src20_tx_with_client(
           client,
+          null,
           [tick],
+          "DEPLOY",
         );
 
       const mint_status = await Src20Class
@@ -33,8 +35,9 @@ export const handler: Handlers<StampRow> = {
           tick,
         );
       const mints = await Src20Class
-        .get_valid_src20_tx_by_tick_with_op_with_client(
+        .get_valid_src20_tx_with_client(
           client,
+          null,
           tick,
           "MINT",
           limit,
@@ -42,8 +45,9 @@ export const handler: Handlers<StampRow> = {
           "DESC",
         );
       const sends = await Src20Class
-        .get_valid_src20_tx_by_tick_with_op_with_client(
+        .get_valid_src20_tx_with_client(
           client,
+          null,
           tick,
           "TRANSFER",
           limit,

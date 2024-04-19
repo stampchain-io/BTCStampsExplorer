@@ -30,6 +30,88 @@ export async function checkMintedOut(
   }
 }
 
+// TODO: Implement and replace mint/deploy functions
+export async function checkParams({
+  operation, // "Mint" or "Deploy"
+  toAddress,
+  changeAddress,
+  feeRate,
+  tick,
+  amt,
+  max,
+  lim,
+  dec = 18,
+  client, // Optional, only needed for Deploy check
+}: {
+  operation: "Mint" | "Deploy";
+  toAddress: string;
+  changeAddress: string;
+  feeRate: number;
+  tick: string;
+  amt?: string;
+  max?: number | string | undefined;
+  lim?: number | string | undefined;
+  dec?: number;
+  client?: Client;
+}) {
+  // Common checks for both Mint and Deploy
+  if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
+    throw new Error("Error: toAddress not found");
+  }
+  if (
+    !changeAddress || changeAddress === "" ||
+    !isValidBitcoinAddress(changeAddress)
+  ) {
+    throw new Error("Error: changeAddress not found");
+  }
+  if (!feeRate) {
+    throw new Error("Error: feeRate not found");
+  }
+  if (!tick || tick === "") {
+    throw new Error("Error: tick not found");
+  }
+
+  // Operation-specific checks
+  switch (operation) {
+    case "Mint":
+      if (!amt || amt === "" || new BigFloat(amt).lte(0)) {
+        throw new Error("Error: amt not found or invalid");
+      }
+      break;
+    case "Deploy":
+      if (!max || max === "" || new BigFloat(max).lte(0)) {
+        throw new Error("Error: max not found or invalid");
+      }
+      if (
+        !lim || lim === "" || new BigFloat(lim).lte(0) ||
+        new BigFloat(lim).gt(new BigFloat(max))
+      ) {
+        throw new Error("Error: lim not found or invalid");
+      }
+      if (!dec || dec === 0) {
+        throw new Error("Error: dec not found or invalid");
+      }
+      // Check if tick is already deployed
+      if (client) {
+        try {
+          const token_status = await Src20Class
+            .get_total_valid_src20_tx_with_client(client, tick, "DEPLOY");
+          if (!token_status.rows[0]["total"]) {
+            return { deployed: false };
+          }
+          return { deployed: true };
+        } catch (error) {
+          console.error(error);
+          throw new Error("Error: Internal server error");
+        }
+      } else {
+        throw new Error("Error: Client not provided for Deploy operation");
+      }
+    default:
+      throw new Error("Error: Invalid operation type");
+  }
+}
+
 export function checkMintParams({
   toAddress,
   changeAddress,
@@ -125,7 +207,7 @@ export async function checkEnoughBalance(
 ) {
   try {
     const balance_address_tick_data = await Src20Class
-      .get_src20_balance_by_address_and_tick_with_client(
+      .get_src20_balance_with_client(
         client,
         address,
         tick,

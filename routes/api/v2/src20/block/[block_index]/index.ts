@@ -58,9 +58,10 @@ export const handler = async (
     const page = Number(url.searchParams.get("page")) || 1;
     const client = await getClient();
     const valid_src20_txs_in_block = await Src20Class
-      .get_valid_src20_tx_from_block_with_client(
+      .get_valid_src20_tx_with_client(
         client,
         Number(block_index),
+        null,
         limit,
         page,
       );
