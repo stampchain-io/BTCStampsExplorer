@@ -5,6 +5,7 @@ import { Header } from "$islands/Header.tsx";
 import { MempoolWeather } from "$islands/MempoolWeather.tsx";
 import { ToastProvider } from "$islands/Toast/toast.tsx";
 import { StampSearchClient } from "$islands/StampSearch.tsx";
+import { NavigatorProvider } from "$islands/Navigator/navigator.tsx";
 
 export default function App({ Component }: AppProps) {
   return (
@@ -45,9 +46,11 @@ export default function App({ Component }: AppProps) {
               <MempoolWeather />
               <StampSearchClient />
             </div>
-            <Partial name="body">
-              <Component />
-            </Partial>
+            <NavigatorProvider>
+              <Partial name="body">
+                <Component />
+              </Partial>
+            </NavigatorProvider>
           </div>
         </ToastProvider>
       </body>
