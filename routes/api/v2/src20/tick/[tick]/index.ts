@@ -76,13 +76,14 @@ export const handler = async (
     const client = await getClient();
     tick = convertEmojiToTick(tick);
     const src20_txs = await Src20Class
-      .get_valid_src20_tx_by_tick_with_client(
+      .get_valid_src20_tx_with_client(
         client,
+        null,
         tick,
         op,
-        sort,
         limit,
         page,
+        sort,
       );
 
     const total = await Src20Class.get_total_valid_src20_tx_with_client(

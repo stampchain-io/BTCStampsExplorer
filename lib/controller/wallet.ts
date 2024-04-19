@@ -33,8 +33,14 @@ export const api_get_stamp_balance = async (
 export const api_get_src20_valid_tx = async (tx_hash: string) => {
   try {
     const client = await getClient();
-    const tx_data = await Src20Class.get_valid_src20_tx_by_tx_hash_with_client(
+    const tx_data = await Src20Class.get_valid_src20_tx_with_client(
       client,
+      null,
+      null,
+      null,
+      undefined,
+      undefined,
+      "ASC",
       tx_hash,
     );
     releaseClient(client);
@@ -55,7 +61,7 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
 export const api_get_src20_balance = async (address: string) => {
   try {
     const client = await getClient();
-    const balances = await Src20Class.get_src20_balance_by_address_with_client(
+    const balances = await Src20Class.get_src20_balance_with_client(
       client,
       address,
     );
@@ -85,7 +91,7 @@ export const api_get_src20_balance_by_tick = async (
   try {
     const client = await getClient();
     const balances = await Src20Class
-      .get_src20_balance_by_address_and_tick_with_client(
+      .get_src20_balance_with_client(
         client,
         address,
         tick,
@@ -130,7 +136,7 @@ export const api_get_balance = async (
     } else {
       stamps = [];
     }
-    const src20 = await Src20Class.get_src20_balance_by_address_with_client(
+    const src20 = await Src20Class.get_src20_balance_with_client(
       client,
       address,
     );

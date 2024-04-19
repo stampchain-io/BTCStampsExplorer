@@ -62,191 +62,55 @@ export class Src20Class {
 
   static async get_valid_src20_tx_with_client(
     client: Client,
-    limit = SMALL_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT 
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM 
-            ${SRC20_TABLE} src20
-        LEFT JOIN 
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN 
-            creator destination_info ON src20.destination = destination_info.address
-        ORDER BY 
-            src20.tx_index
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [limit, offset],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_valid_src20_tx_from_block_with_client(
-    client: Client,
-    block_index: number,
-    limit = SMALL_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT 
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM
-            ${SRC20_TABLE} src20
-        LEFT JOIN 
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN
-            creator destination_info ON src20.destination = destination_info.address
-        WHERE src20.block_index = '${block_index}'
-        ORDER BY
-            src20.tx_index
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [block_index, limit, offset],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_valid_src20_tx_from_block_by_tick_with_client(
-    client: Client,
-    block_index: number,
-    tick: string,
-    limit = SMALL_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT 
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM
-            ${SRC20_TABLE} src20
-        LEFT JOIN 
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN
-            creator destination_info ON src20.destination = destination_info.address
-        WHERE src20.block_index = '${block_index}'
-        AND src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        ORDER BY
-            src20.tx_index
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [block_index, tick, limit, offset],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_valid_src20_tx_by_tick_with_op_with_client(
-    client: Client,
-    tick: string,
-    op: string,
+    block_index: number | null = null,
+    tick: string | string[] | null = null,
+    op: string | null = null,
     limit = BIG_LIMIT,
     page = 0,
     sort = "ASC",
+    tx_hash: string | null = null,
+    address: string | null = null,
   ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM 
-            ${SRC20_TABLE} src20
-        LEFT JOIN 
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN 
-            creator destination_info ON src20.destination = destination_info.address
-        WHERE 
-            src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-            AND src20.op = '${op}'
-        ORDER BY 
-            src20.tx_index ${sort}
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [tick, op, limit, offset],
-      1000 * 60 * 2,
-    );
-  }
+    const queryParams = [];
+    let whereClause = "";
 
-  static async get_valid_src20_tx_by_tick_with_client(
-    client: Client,
-    tick: string,
-    op: string | null,
-    sort = "ASC",
-    limit = BIG_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    let whereClause = `src20.tick COLLATE utf8mb4_0900_as_ci = ?`;
-    const queryParams = [tick]; // Changed from 'let' to 'const'
+    if (block_index !== null) {
+      whereClause += `src20.block_index = ?`;
+      queryParams.push(block_index);
+    }
+
+    if (tick !== null) {
+      if (Array.isArray(tick)) {
+        const tickPlaceholders = tick.map(() => "?").join(", ");
+        whereClause += (whereClause ? " AND " : "") +
+          `src20.tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})`;
+        queryParams.push(...tick);
+      } else {
+        whereClause += (whereClause ? " AND " : "") +
+          `src20.tick COLLATE utf8mb4_0900_as_ci = ?`;
+        queryParams.push(tick);
+      }
+    }
 
     if (op !== null) {
-      whereClause += ` AND src20.op = ?`;
+      whereClause += (whereClause ? " AND " : "") + `src20.op = ?`;
       queryParams.push(op);
+    }
+
+    if (tx_hash !== null) {
+      whereClause += (whereClause ? " AND " : "") + `src20.tx_hash = ?`;
+      queryParams.push(tx_hash);
+    }
+
+    if (address !== null) {
+      whereClause += (whereClause ? " AND " : "") +
+        `(src20.creator = ? OR src20.destination = ?)`;
+      queryParams.push(address, address);
+    }
+
+    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    if (limit) {
+      queryParams.push(limit, offset);
     }
 
     const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
@@ -254,37 +118,38 @@ export class Src20Class {
       : "ASC";
 
     const sqlQuery = `
-        SELECT 
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM 
-            ${SRC20_TABLE} src20
-        LEFT JOIN 
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN 
-            creator destination_info ON src20.destination = destination_info.address
-        WHERE 
-            ${whereClause}
-        ORDER BY src20.tx_index ${validOrder}
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
+      SELECT 
+        (@row_number:=@row_number + 1) AS row_num,
+        src20.tx_hash,
+        src20.tx_index,
+        src20.block_index,
+        src20.p,
+        src20.op,
+        src20.tick,
+        src20.creator,
+        src20.amt,
+        src20.deci,
+        src20.lim,
+        src20.max,
+        src20.destination,
+        src20.block_time,
+        creator_info.creator as creator_name,
+        destination_info.creator as destination_name
+      FROM
+        ${SRC20_TABLE} src20
+      LEFT JOIN 
+        creator creator_info ON src20.creator = creator_info.address
+      LEFT JOIN
+        creator destination_info ON src20.destination = destination_info.address
+      CROSS JOIN
+        (SELECT @row_number := ?) AS init
+      ${whereClause ? `WHERE ${whereClause}` : ""}
+      ORDER BY 
+        src20.tx_index ${validOrder}
+      ${limit ? `LIMIT ? OFFSET ?` : ""};
     `;
 
-    if (limit) {
-      queryParams.push(limit, offset);
-    }
+    queryParams.unshift(offset);
 
     return await handleSqlQueryWithCache(
       client,
@@ -294,295 +159,72 @@ export class Src20Class {
     );
   }
 
-  static async get_valid_src20_tx_by_op_with_client(
+  static async get_src20_balance_with_client(
     client: Client,
-    op: string,
-    limit = SMALL_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT 
-            (@row_number:=@row_number + 1) AS row_num,
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM 
-            ${SRC20_TABLE} src20
-        LEFT JOIN 
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN 
-            creator destination_info ON src20.destination = destination_info.address
-        CROSS JOIN
-            (SELECT @row_number := ${offset} - 1) AS init
-        WHERE 
-            src20.op = '${op}'
-        ORDER BY 
-            src20.tx_index
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [offset, op, limit, offset],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_valid_src20_deploy_by_tick_with_client(
-    client: Client,
-    ticks: string[],
-  ) {
-    const tickPlaceholders = ticks.map(() => "?").join(",");
-    return await handleSqlQueryWithCache(
-      client,
-      `
-            SELECT 
-                src20.tx_hash,
-                src20.tx_index,
-                src20.block_index,
-                src20.p,
-                src20.op,
-                src20.tick,
-                src20.creator,
-                src20.amt,
-                src20.deci,
-                src20.lim,
-                src20.max,
-                src20.destination,
-                src20.block_time,
-                creator_info.creator as creator_name,
-                destination_info.creator as destination_name
-            FROM 
-                ${SRC20_TABLE} src20
-            LEFT JOIN 
-                creator creator_info ON src20.creator = creator_info.address
-            LEFT JOIN 
-                creator destination_info ON src20.destination = destination_info.address
-            WHERE src20.op = 'DEPLOY'
-            AND src20.tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})
-            `,
-      ticks,
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_valid_src20_tx_by_tx_hash_with_client(
-    client: Client,
-    tx_hash: string,
-  ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM
-            ${SRC20_TABLE} src20
-        LEFT JOIN
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN
-            creator destination_info ON src20.destination = destination_info.address
-        WHERE src20.tx_hash = '${tx_hash}';
-        `,
-      [tx_hash],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_valid_src20_tx_by_address_with_client(
-    client: Client,
-    address: string,
-    limit = SMALL_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT 
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM 
-            ${SRC20_TABLE} src20
-        LEFT JOIN 
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN 
-            creator destination_info ON src20.destination = destination_info.address
-        WHERE 
-            (src20.creator = '${address}' OR src20.destination = '${address}')
-        ORDER BY 
-            src20.tx_index
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [address, address, limit, offset],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_total_valid_src20_tx_by_address_and_tick_with_client(
-    client: Client,
-    address: string,
-    tick: string,
-  ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT COUNT(*) AS total
-        FROM ${SRC20_TABLE}
-        WHERE address = '${address}'
-        AND tick COLLATE utf8mb4_0900_as_ci = '${tick}';
-        `,
-      [address, tick],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_valid_src20_tx_by_address_and_tick_with_client(
-    client: Client,
-    address: string,
-    tick: string,
-    limit = SMALL_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT 
-            src20.tx_hash,
-            src20.tx_index,
-            src20.block_index,
-            src20.p,
-            src20.op,
-            src20.tick,
-            src20.creator,
-            src20.amt,
-            src20.deci,
-            src20.lim,
-            src20.max,
-            src20.destination,
-            src20.block_time,
-            creator_info.creator as creator_name,
-            destination_info.creator as destination_name
-        FROM 
-            ${SRC20_TABLE} src20
-        LEFT JOIN 
-            creator creator_info ON src20.creator = creator_info.address
-        LEFT JOIN 
-            creator destination_info ON src20.destination = destination_info.address
-        WHERE 
-            (src20.creator = '${address}' OR src20.destination = '${address}')
-        AND src20.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        ORDER BY 
-            src20.tx_index
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [address, address, tick, limit, offset],
-      1000 * 60 * 2,
-    );
-  }
-
-  static async get_src20_balance_by_address_with_client(
-    client: Client,
-    address: string,
+    address: string | null = null,
+    tick: string | string[] | null = null,
     limit = BIG_LIMIT,
     page = 0,
   ) {
     const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    const whereClauses = ["amt > 0"]; // Default condition
+
+    // Dynamically add conditions based on provided parameters
+    if (address) {
+      whereClauses.push(`address = ?`);
+    }
+    if (tick) {
+      if (Array.isArray(tick)) {
+        const tickPlaceholders = tick.map(() => "?").join(", ");
+        whereClauses.push(
+          `tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})`,
+        );
+      } else {
+        whereClauses.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
+      }
+    }
+
+    const whereClause = whereClauses.join(" AND ");
+    const queryParams = [
+      address,
+      ...(Array.isArray(tick) ? tick : [tick]),
+      limit,
+      offset,
+    ].filter((param) => param !== null);
+
     const results = await handleSqlQueryWithCache(
       client,
       `
-            SELECT address,p,tick,amt,block_time,last_update
-            FROM ${SRC20_BALANCE_TABLE}
-            WHERE address = '${address}' AND amt > 0
-            ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [address, limit, offset],
+        SELECT address, p, tick, amt, block_time, last_update
+        FROM ${SRC20_BALANCE_TABLE}
+        WHERE ${whereClause}
+        ${limit ? `LIMIT ? OFFSET ?` : ""};
+      `,
+      queryParams,
       1000 * 60 * 2,
     );
 
-    const ticks = results.rows ? results.rows.map((result) => result.tick) : [];
-    const tx_hashes_response = await Src20Class
-      .get_valid_src20_deploy_by_tick_with_client(client, ticks);
+    // Retrieve transaction hashes for the ticks
+    const ticksToQuery = results.rows
+      ? results.rows.map((result) => result.tick)
+      : [];
+    const tx_hashes_response = await Src20Class.get_valid_src20_tx_with_client(
+      client,
+      null,
+      ticksToQuery.length > 0 ? ticksToQuery : tick,
+      "DEPLOY",
+    );
     const tx_hashes_map = tx_hashes_response.rows.reduce((map, row) => {
       map[row.tick] = row.tx_hash;
       return map;
     }, {});
 
-    const resultsAndHashes = results.rows.map((result) => ({
+    // Add transaction hash and deploy image URL to each result
+    const resultsWithDeployImg = results.rows.map((result) => ({
       ...result,
       tx_hash: tx_hashes_map[result.tick],
+      deploy_img: `${conf.IMAGES_SRC_PATH}/${tx_hashes_map[result.tick]}.svg`,
     }));
-
-    const resultsWithDeployImg = resultsAndHashes.map((row) => {
-      const deployImg = `${conf.IMAGES_SRC_PATH}/${row.tx_hash}.svg`;
-      return { ...row, deploy_img: deployImg };
-    });
-    return { rows: resultsWithDeployImg };
-  }
-
-  static async get_src20_balance_by_address_and_tick_with_client(
-    client: Client,
-    address: string,
-    tick: string,
-  ) {
-    const results = await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT address,p,tick,amt,block_time,last_update
-        FROM ${SRC20_BALANCE_TABLE}
-        WHERE address = '${address}' and amt > 0
-        AND tick COLLATE utf8mb4_0900_as_ci = '${tick}';
-        `,
-      [address, tick],
-      1000 * 60 * 2,
-    );
-    const tx_hashes_response = await Src20Class
-      .get_valid_src20_deploy_by_tick_with_client(client, [tick]);
-    const tx_hash = tx_hashes_response.rows[0].tx_hash;
-    const deployImg = `${conf.IMAGES_SRC_PATH}/${tx_hash}.svg`;
-
-    const resultsWithDeployImg = results.rows.map((result) => {
-      return { ...result, deploy_img: deployImg };
-    });
 
     return { rows: resultsWithDeployImg };
   }
@@ -613,7 +255,7 @@ export class Src20Class {
   static async get_total_src20_holders_by_tick_with_client(
     client: Client,
     tick: string,
-    amt = 1,
+    amt = 0,
   ) {
     return await handleSqlQueryWithCache(
       client,
@@ -621,7 +263,7 @@ export class Src20Class {
         SELECT COUNT(*) AS total
         FROM ${SRC20_BALANCE_TABLE}
         WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        AND amt >= ${amt};
+        AND amt > ${amt};
         `,
       [tick, amt],
       0,

@@ -68,11 +68,14 @@ export const handler = async (
     const op = url.searchParams.get("op") || "DEPLOY";
     const sort = url.searchParams.get("sort") || "ASC";
     const client = await getClient();
-    const data = await Src20Class.get_valid_src20_tx_by_op_with_client(
+    const data = await Src20Class.get_valid_src20_tx_with_client(
       client,
+      null,
+      null,
       op,
       limit,
       page,
+      sort,
     );
     const total = await Src20Class.get_total_valid_src20_tx_with_client(
       client,

@@ -44,9 +44,11 @@ export const handler = async (
     tick = convertEmojiToTick(tick);
     const client = await getClient();
     const deployment = await Src20Class
-      .get_valid_src20_deploy_by_tick_with_client(
+      .get_valid_src20_tx_with_client(
         client,
+        null,
         [tick],
+        "DEPLOY",
       );
     const mint_status = await Src20Class
       .get_src20_minting_progress_by_tick_with_client(
