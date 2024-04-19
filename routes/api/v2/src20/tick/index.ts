@@ -29,6 +29,11 @@ import {
  *           minimum: 1
  *           default: 1
  *         description: The page number of transactions to retrieve
+ *       - in: query
+ *         name: op
+ *         schema:
+ *           type: string
+ *           default: DEPLOY
  *     responses:
  *       '200':
  *         description: Successful response with paginated src20 transactions
@@ -52,16 +57,17 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
+    const op = url.searchParams.get("op") || "DEPLOY";
     const client = await getClient();
     const data = await Src20Class.get_valid_src20_tx_by_op_with_client(
       client,
-      "DEPLOY",
+      op,
       limit,
       page,
     );
     const total = await Src20Class.get_total_valid_src20_tx_by_op_with_client(
       client,
-      "DEPLOY",
+      op,
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
 

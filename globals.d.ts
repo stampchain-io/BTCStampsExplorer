@@ -93,6 +93,7 @@ interface SRC20Balance {
   amt: number;
   block_time: Date;
   last_update: number;
+  deploy_img: string;
 }
 
 interface Src20Detail {
@@ -201,6 +202,11 @@ export interface Src20BalanceResponseBody {
   data: Src20Detail[];
 }
 
+export interface Src20SnapshotResponseBody extends Pagination {
+  snapshot_block: number;
+  data: Src20Detail[];
+}
+
 export interface PaginatedBalanceResponseBody extends Pagination {
   last_block: number;
   btc: BtcInfo;
@@ -283,6 +289,7 @@ export interface TxHandlerContext extends HandlerContext {
 export interface TickHandlerContext extends HandlerContext {
   params: {
     tick: string | number;
+    op?: string; // future use for mint/transfer deploy is defined in routes
   };
 }
 
