@@ -1,9 +1,8 @@
-import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
+// import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
 import {
   DispenserResponseBody,
   ErrorResponseBody,
   IdHandlerContext,
-  StampResponseBody,
 } from "globals";
 import { get_dispensers } from "$lib/utils/xcp.ts";
 /**

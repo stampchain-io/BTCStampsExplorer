@@ -68,24 +68,27 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
+    const sort = url.searchParams.get("sort") || "asc";
     const client = await getClient();
     const last_block = await CommonClass.get_last_block_with_client(client);
 
     tick = convertEmojiToTick(tick);
     const valid_src20_txs_in_block = await Src20Class
-      .get_valid_src20_tx_from_block_by_tick_with_client(
+      .get_valid_src20_tx_with_client(
         client,
-        block_index,
+        Number(block_index),
         tick,
+        null,
         limit,
         page,
+        sort,
       );
     const total = await Src20Class
       .get_total_valid_src20_tx_with_client(
         client,
         tick,
         null,
-        block_index,
+        Number(block_index),
       );
     const pagination = paginate(total.rows[0]["total"], page, limit);
     const body: PaginatedSrc20ResponseBody = {

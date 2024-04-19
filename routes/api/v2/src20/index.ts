@@ -55,6 +55,9 @@ export const handler = async (
     const client = await getClient();
     const data = await Src20Class.get_valid_src20_tx_with_client(
       client,
+      null,
+      null,
+      null,
       limit,
       page,
     );
