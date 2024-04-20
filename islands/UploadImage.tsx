@@ -38,16 +38,42 @@ export function UploadImage() {
   }, []);
 
   useEffect(() => {
-    axiod.get(`https://api.api-ninjas.com/v1/cryptoprice?symbol=BTCUSDT`, {
+    
+    const config = {
       headers: {
-        "X-Api-Key": "5ML8663hYv3htd+L5OdccQ==gvWwdj58xzw4nqoa",
+        "Content-Type": "application/json",
       },
-    }).then((res) => {
-      setBTCPrice(parseFloat(res.data.price));
-    });
+    };
+    const data = {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "cg_simplePrice",
+      params: ["bitcoin", "usd", true, true, true],
+    };
+    axiod
+      .post(
+        "https://wider-winter-seed.btc.quiknode.pro/e19fdcea2a4d1af8238330fc4832c8d4cc32bdaf",
+        data,
+        config
+      )
+      .then(function (response) {
+        // handle success
+
+        console.log(response.data.result.bitcoin.usd);
+        
+      setBTCPrice(parseFloat(response.data.result.bitcoin.usd));
+      })
+      .catch((err:any) => {
+        // handle error
+        console.log(err);
+      });
+      
   }, [coinType]);
   const handleChangeFee = (e: any) => {
     setFee(e.target.value);
+  
+    
+                        
   };
 
   const handleChangeCoin = () => {
