@@ -78,7 +78,7 @@ export const handler = async (
         client,
         Number(block_index),
         tick,
-        null,
+        undefined,
         limit,
         page,
         sort,
