@@ -3,7 +3,7 @@
   "tasks": {
     "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
     "start": "deno run -A  main.ts",
-    "dev": "export ENV=development && deno run -A --watch=static/,routes/,components/,islands/ dev.ts",
+    "dev": "export ENV=development && deno run -A --watch=static/,routes/,components/,islands/ dev.ts --host",
     "build": "deno run -A dev.ts build",
     "docs": "deno run --allow-read --allow-write swagger.js",
     "fakebuild": "echo 'fake build'",
@@ -30,6 +30,7 @@
     "@preact/signals-core": "https://esm.sh/@preact/signals-core@1.5.1",
     "$std/": "https://deno.land/std@0.212.0/",
     "bigfloat/": "https://deno.land/x/bigfloat@v3.0.2/",
+    "@iconify/react": "npm:@iconify/react@4.1.1",
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
