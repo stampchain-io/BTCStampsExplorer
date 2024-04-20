@@ -56,14 +56,17 @@ export const handler = async (
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
+    const sort = url.searchParams.get("sort") || "ASC";
     const client = await getClient();
     const valid_src20_txs_in_block = await Src20Class
       .get_valid_src20_tx_with_client(
         client,
         Number(block_index),
         null,
+        undefined,
         limit,
         page,
+        sort,
       );
     const total = await Src20Class
       .get_total_valid_src20_tx_with_client(
