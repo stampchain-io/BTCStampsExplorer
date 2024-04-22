@@ -52,14 +52,23 @@ export const handler: Handlers<TX | TXError> = {
         conf.MINTING_SERVICE_FEE_ADDRESS,
     };
     const mint_tx = await mintStampCIP33(prepare);
-    console.log("hex", mint_tx?.toHex());
     if (!mint_tx) {
-      return new Response(JSON.stringify({
-        error: "Error generating mint transaction",
-      }));
+      return new Response(
+        JSON.stringify({
+          error: "Error generating mint transaction",
+        }),
+        { status: 400 },
+      );
     }
+
+    console.log(mint_tx);
     return new Response(JSON.stringify({
-      hex: mint_tx.toHex(),
+      hex: mint_tx.psbt.toHex(),
+      est_tx_size: mint_tx.estimatedTxSize,
+      input_value: mint_tx.totalInputValue,
+      total_dust_value: mint_tx.totalDustValue,
+      est_miner_fee: mint_tx.estMinerFee,
+      change_value: mint_tx.totalChangeOutput,
     }));
   },
 };
