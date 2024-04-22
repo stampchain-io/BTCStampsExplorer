@@ -60,11 +60,12 @@ export const handler: Handlers<StampRow> = {
           tick,
           1,
         );
-      const holders = await Src20Class.get_src20_holders_by_tick_with_client(
+      const holders = await Src20Class.get_src20_balance_with_client(
         client,
+        null,
         tick,
-        1,
         0,
+        limit,
         page,
       );
 

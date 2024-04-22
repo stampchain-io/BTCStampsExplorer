@@ -1,98 +1,48 @@
-import { getClient, Src20Class } from "$lib/database/index.ts";
-import { paginate } from "utils/util.ts";
-import { convertToEmoji } from "utils/util.ts";
-import {
-  BlockHandlerContext,
-  ErrorResponseBody,
-  PaginatedRequest,
-  PaginatedSrc20ResponseBody,
-} from "globals";
-import { CommonClass } from "../../../../../../lib/database/index.ts";
-import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
+// routes/block/[block_index]/index.ts
+import { handleSrc20TransactionsRequest } from "$lib/database/src20Transactions.ts";
+import { FreshContext } from "$fresh/server.ts";
 
-/**
- * @swagger
- * /api/v2/src20/block/{block_index}:
- *   get:
- *     summary: Get paginated valid src20 transactions from a specific block
- *     parameters:
- *       - in: path
- *         name: block_index
- *         required: true
- *         schema:
- *           type: integer
- *         description: The index of the block
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         description: The maximum number of transactions to retrieve (default: 1000)
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *         description: The page number of the results (default: 1)
- *     responses:
- *       '200':
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
- *       '500':
- *         description: Internal Server Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
-
-export const handler = async (
-  req: PaginatedRequest,
-  ctx: BlockHandlerContext,
+export const handler = (
+  req: Request,
+  ctx: FreshContext,
 ): Promise<Response> => {
   const { block_index } = ctx.params;
-  try {
-    const url = new URL(req.url);
-    const limit = Number(url.searchParams.get("limit")) || 1000;
-    const page = Number(url.searchParams.get("page")) || 1;
-    const sort = url.searchParams.get("sort") || "ASC";
-    const client = await getClient();
-    const valid_src20_txs_in_block = await Src20Class
-      .get_valid_src20_tx_with_client(
-        client,
-        Number(block_index),
-        null,
-        undefined,
-        limit,
-        page,
-        sort,
-      );
-    const total = await Src20Class
-      .get_total_valid_src20_tx_with_client(
-        client,
-        null,
-        null,
-        Number(block_index),
-      );
-    const last_block = await CommonClass.get_last_block_with_client(client);
-    const pagination = paginate(total.rows[0]["total"], page, limit);
-    const body: PaginatedSrc20ResponseBody = {
-      ...pagination,
-      last_block: last_block.rows[0]["last_block"],
-      data: valid_src20_txs_in_block.rows.map((tx: any) => {
-        return {
-          ...tx,
-          tick: convertToEmoji(tx.tick),
-          amt: tx.amt ? tx.amt.toString() : null,
-          lim: tx.lim ? tx.lim.toString() : null,
-          max: tx.max ? tx.max.toString() : null,
-        };
-      }),
-    };
-    return new Response(jsonStringifyBigInt(body));
-  } catch {
-    const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return new Response(JSON.stringify(body));
-  }
+  const params = {
+    block_index: parseInt(block_index, 10),
+  };
+  return handleSrc20TransactionsRequest(req, params);
 };
+
+// import { fetchAndFormatSrc20Transactions } from "$lib/database/src20Transactions.ts";
+// import { ErrorResponseBody } from "globals";
+// import { FreshContext } from "$fresh/server.ts";
+// import { SRC20TrxRequestParams } from "globals";
+
+// export const handler = async (
+//   req: Request,
+//   ctx: FreshContext,
+// ): Promise<Response> => {
+//   const { block_index } = ctx.params;
+//   const url = new URL(req.url);
+
+//   const params: SRC20TrxRequestParams = {
+//     block_index: block_index ? parseInt(block_index, 10) : null,
+//     op: url.searchParams.get("op"),
+//     limit: Number(url.searchParams.get("limit")) || 1000,
+//     page: Number(url.searchParams.get("page")) || 1,
+//     sort: url.searchParams.get("sort") || "ASC",
+//   };
+
+//   try {
+//     const responseBodyString = await fetchAndFormatSrc20Transactions(params);
+//     return new Response(responseBodyString, {
+//       headers: { "Content-Type": "application/json" },
+//     });
+//   } catch (error) {
+//     console.error("Error processing request:", error);
+//     const errorBody: ErrorResponseBody = {
+//       error: `Error: Internal server error`,
+//     };
+//     return new Response(JSON.stringify(errorBody), { status: 500 });
+//   }
+// };

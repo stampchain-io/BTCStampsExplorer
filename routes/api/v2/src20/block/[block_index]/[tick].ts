@@ -1,112 +1,54 @@
-import { HandlerContext } from "$fresh/server.ts";
-import { getClient, Src20Class } from "$lib/database/index.ts";
-import { convertEmojiToTick, paginate } from "utils/util.ts";
-import {
-  convertToEmoji,
-  jsonStringifyBigInt,
-} from "../../../../../../lib/utils/util.ts";
-import {
-  BlockTickHandlerContext,
-  ErrorResponseBody,
-  PaginatedSrc20ResponseBody,
-} from "globals";
-import { CommonClass } from "../../../../../../lib/database/index.ts";
+// routes/block/[block_index]/[tick].ts
+import { handleSrc20TransactionsRequest } from "$lib/database/src20Transactions.ts";
+import { FreshContext } from "$fresh/server.ts";
+import { convertEmojiToTick } from "$lib/utils/util.ts"; // Adjust import path as necessary
 
-/**
- * @swagger
- * /api/v2/src20/block/{block_index}/{tick}:
- *   get:
- *     summary: Get valid src20 transactions from a specific block and tick.
- *     parameters:
- *       - in: path
- *         name: block_index
- *         required: true
- *         schema:
- *           type: string
- *         description: The index of the block.
- *       - in: path
- *         name: tick
- *         required: true
- *         schema:
- *           type: string
- *         description: The tick value.
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1000
- *         description: The maximum number of transactions to return per page.
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: The page number.
- *     responses:
- *       '200':
- *         description: Successful response with the list of valid src20 transactions.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
- *       '500':
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
-
-export const handler = async (
+export const handler = (
   req: Request,
-  ctx: BlockTickHandlerContext,
+  ctx: FreshContext,
 ): Promise<Response> => {
-  let { block_index, tick } = ctx.params;
-  try {
-    const url = new URL(req.url);
-    const limit = Number(url.searchParams.get("limit")) || 1000;
-    const page = Number(url.searchParams.get("page")) || 1;
-    const sort = url.searchParams.get("sort") || "asc";
-    const client = await getClient();
-    const last_block = await CommonClass.get_last_block_with_client(client);
-
-    tick = convertEmojiToTick(tick);
-    const valid_src20_txs_in_block = await Src20Class
-      .get_valid_src20_tx_with_client(
-        client,
-        Number(block_index),
-        tick,
-        undefined,
-        limit,
-        page,
-        sort,
-      );
-    const total = await Src20Class
-      .get_total_valid_src20_tx_with_client(
-        client,
-        tick,
-        null,
-        Number(block_index),
-      );
-    const pagination = paginate(total.rows[0]["total"], page, limit);
-    const body: PaginatedSrc20ResponseBody = {
-      ...pagination,
-      last_block: last_block.rows[0]["last_block"],
-      data: valid_src20_txs_in_block.rows.map((tx: any) => {
-        return {
-          ...tx,
-          tick: convertToEmoji(tx.tick),
-          amt: tx.amt ? tx.amt.toString() : null,
-          lim: tx.lim ? tx.lim.toString() : null,
-          max: tx.max ? tx.max.toString() : null,
-        };
-      }),
-    };
-    return new Response(jsonStringifyBigInt(body));
-  } catch {
-    const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return new Response(JSON.stringify(body));
-  }
+  const { block_index, tick: emojiTick } = ctx.params;
+  const tick = convertEmojiToTick(emojiTick); // Convert emoji to tick here
+  const params = {
+    block_index: parseInt(block_index, 10),
+    tick,
+  };
+  return handleSrc20TransactionsRequest(req, params);
 };
+
+// import { fetchAndFormatSrc20Transactions } from "$lib/database/src20Transactions.ts";
+// import { ErrorResponseBody } from "globals";
+// import { FreshContext } from "$fresh/server.ts";
+// import { SRC20TrxRequestParams } from "globals";
+// import { convertEmojiToTick } from "utils/util.ts";
+
+// export const handler = async (
+//   req: Request,
+//   ctx: FreshContext,
+// ): Promise<Response> => {
+//   const { block_index, tick: emojiTick } = ctx.params;
+//   const url = new URL(req.url);
+//   const tick = convertEmojiToTick(emojiTick);
+
+//   const params: SRC20TrxRequestParams = {
+//     block_index: block_index ? parseInt(block_index, 10) : null,
+//     tick,
+//     op: url.searchParams.get("op"),
+//     limit: Number(url.searchParams.get("limit")) || 1000,
+//     page: Number(url.searchParams.get("page")) || 1,
+//     sort: url.searchParams.get("sort") || "ASC",
+//   };
+
+//   try {
+//     const responseBodyString = await fetchAndFormatSrc20Transactions(params);
+//     return new Response(responseBodyString, {
+//       headers: { "Content-Type": "application/json" },
+//     });
+//   } catch (error) {
+//     console.error("Error processing request:", error);
+//     const errorBody: ErrorResponseBody = {
+//       error: `Error: Internal server error`,
+//     };
+//     return new Response(JSON.stringify(errorBody), { status: 500 });
+//   }
+// };

@@ -18,6 +18,7 @@ export class Src20Class {
     tick: string | null = null,
     op: string | null = null,
     block_index: number | null = null,
+    tx_hash: string | null = null,
     address: string | null = null,
   ) {
     const queryParams = [];
@@ -41,6 +42,11 @@ export class Src20Class {
     if (address !== null) {
       whereConditions.push(`address = ?`);
       queryParams.push(address);
+    }
+
+    if (tx_hash !== null) {
+      whereConditions.push(`tx_hash = ?`);
+      queryParams.push(tx_hash);
     }
 
     let sqlQuery = `
@@ -163,45 +169,57 @@ export class Src20Class {
     client: Client,
     address: string | null = null,
     tick: string | string[] | null = null,
+    amt = 0,
     limit = BIG_LIMIT,
     page = 0,
+    sort = "ASC",
   ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    const whereClauses = ["amt > 0"]; // Default condition
+    const queryParams = [];
+    const whereClauses = [];
 
-    // Dynamically add conditions based on provided parameters
     if (address) {
       whereClauses.push(`address = ?`);
+      queryParams.push(address);
     }
+
     if (tick) {
       if (Array.isArray(tick)) {
         const tickPlaceholders = tick.map(() => "?").join(", ");
         whereClauses.push(
           `tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})`,
         );
+        queryParams.push(...tick);
       } else {
         whereClauses.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
+        queryParams.push(tick);
       }
     }
 
-    const whereClause = whereClauses.join(" AND ");
-    const queryParams = [
-      address,
-      ...(Array.isArray(tick) ? tick : [tick]),
-      limit,
-      offset,
-    ].filter((param) => param !== null);
+    if (amt > 0) {
+      whereClauses.push(`amt > ?`);
+      queryParams.push(amt);
+    }
+
+    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+    queryParams.push(limit, offset); // Add limit and offset at the end
+
+    const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
+      ? sort.toUpperCase()
+      : "ASC";
+
+    const sqlQuery = `
+      SELECT address, p, tick, amt, block_time, last_update
+      FROM ${SRC20_BALANCE_TABLE}
+      WHERE ${whereClauses.join(" AND ")}
+      ORDER BY last_update ${validOrder}
+      ${limit ? `LIMIT ? OFFSET ?` : ""}
+    `;
 
     const results = await handleSqlQueryWithCache(
       client,
-      `
-        SELECT address, p, tick, amt, block_time, last_update
-        FROM ${SRC20_BALANCE_TABLE}
-        WHERE ${whereClause}
-        ${limit ? `LIMIT ? OFFSET ?` : ""};
-      `,
+      sqlQuery,
       queryParams,
-      1000 * 60 * 2,
+      0, //1000 * 60 * 2, // Cache duration
     );
 
     // Retrieve transaction hashes for the ticks
@@ -229,44 +247,162 @@ export class Src20Class {
     return { rows: resultsWithDeployImg };
   }
 
-  static async get_src20_holders_by_tick_with_client(
-    client: Client,
-    tick: string,
-    amt = 1,
-    limit = SMALL_LIMIT,
-    page = 0,
-  ) {
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT id,address,p,tick,amt,block_time,last_update
-        FROM ${SRC20_BALANCE_TABLE}
-        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        AND amt >= ${amt}
-        ORDER BY amt DESC
-        ${limit ? `LIMIT ${limit} OFFSET ${offset}` : ""};
-        `,
-      [tick, amt, limit, offset],
-      0,
-    );
-  }
+  // static async get_src20_balance_with_client(
+  //   client: Client,
+  //   address: string | null = null,
+  //   tick: string | string[] | null = null,
+  //   limit = BIG_LIMIT,
+  //   page = 0,
+  //   sort = "ASC",
+  // ) {
+  //   const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+  //   const whereClauses = ["amt > 0"]; // Default condition
+
+  //   if (address) {
+  //     whereClauses.push(`address = ?`);
+  //   }
+  //   if (tick) {
+  //     if (Array.isArray(tick)) {
+  //       const tickPlaceholders = tick.map(() => "?").join(", ");
+  //       whereClauses.push(
+  //         `tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})`,
+  //       );
+  //     } else {
+  //       whereClauses.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
+  //     }
+  //   }
+
+  //   const whereClause = whereClauses.join(" AND ");
+  //   const queryParams = [
+  //     address,
+  //     ...(Array.isArray(tick) ? tick : [tick]),
+  //     limit,
+  //     offset,
+  //   ].filter((param) => param !== null);
+
+  //   const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
+  //     ? sort.toUpperCase()
+  //     : "ASC";
+
+  //   const results = await handleSqlQueryWithCache(
+  //     client,
+  //     `
+  //       SELECT address, p, tick, amt, block_time, last_update
+  //       FROM ${SRC20_BALANCE_TABLE}
+  //       WHERE ${whereClause}
+  //       ${limit ? `LIMIT ? OFFSET ?` : ""}
+  //       ORDER BY last_update ${validOrder};
+  //     `,
+  //     queryParams,
+  //     1000 * 60 * 2,
+  //   );
+
+  //   // Retrieve transaction hashes for the ticks
+  //   const ticksToQuery = results.rows
+  //     ? results.rows.map((result) => result.tick)
+  //     : [];
+  //   const tx_hashes_response = await Src20Class.get_valid_src20_tx_with_client(
+  //     client,
+  //     null,
+  //     ticksToQuery.length > 0 ? ticksToQuery : tick,
+  //     "DEPLOY",
+  //   );
+  //   const tx_hashes_map = tx_hashes_response.rows.reduce((map, row) => {
+  //     map[row.tick] = row.tx_hash;
+  //     return map;
+  //   }, {});
+
+  //   // Add transaction hash and deploy image URL to each result
+  //   const resultsWithDeployImg = results.rows.map((result) => ({
+  //     ...result,
+  //     tx_hash: tx_hashes_map[result.tick],
+  //     deploy_img: `${conf.IMAGES_SRC_PATH}/${tx_hashes_map[result.tick]}.svg`,
+  //   }));
+
+  //   return { rows: resultsWithDeployImg };
+  // }
+
+  // static async get_src20_holders_with_client(
+  //   client: Client,
+  //   tick: string | null = null,
+  //   amt = 0,
+  //   limit = BIG_LIMIT,
+  //   page = 0,
+  //   sort = "ASC",
+  // ) {
+  //   const queryParams = [];
+  //   const whereConditions = [];
+
+  //   if (tick !== null) {
+  //     whereConditions.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
+  //     queryParams.push(tick);
+  //   }
+
+  //   const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
+  //   if (limit) {
+  //     queryParams.push(limit, offset);
+  //   }
+
+  //   if (amt !== null) {
+  //     whereConditions.push(`amt > ?`);
+  //     queryParams.push(amt);
+  //   }
+
+  //   const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
+  //     ? sort.toUpperCase()
+  //     : "ASC";
+
+  //   let sqlQuery = `
+  //     SELECT address, p, tick, amt, block_time, last_update
+  //     FROM ${SRC20_BALANCE_TABLE}
+  //     WHERE ${whereConditions.join(" AND ")}
+  //     ORDER BY last_update ${validOrder}
+  //   `;
+
+  //   if (limit) {
+  //     sqlQuery += ` LIMIT ? OFFSET ?`;
+  //   }
+
+  //   return await handleSqlQueryWithCache(
+  //     client,
+  //     sqlQuery,
+  //     queryParams,
+  //     0, // Cache duration
+  //   );
+  // }
 
   static async get_total_src20_holders_by_tick_with_client(
     client: Client,
-    tick: string,
+    tick: string | null = null,
     amt = 0,
   ) {
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (tick !== null) {
+      whereConditions.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
+      queryParams.push(tick);
+    }
+
+    // Always include amt condition
+    whereConditions.push(`amt > ?`);
+    queryParams.push(amt);
+
+    let sqlQuery = `
+      SELECT COUNT(*) AS total
+      FROM ${SRC20_BALANCE_TABLE}
+    `;
+
+    // Add WHERE clause if there are conditions
+    if (whereConditions.length > 0) {
+      sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
+    }
+
     return await handleSqlQueryWithCache(
       client,
-      `
-        SELECT COUNT(*) AS total
-        FROM ${SRC20_BALANCE_TABLE}
-        WHERE tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-        AND amt > ${amt};
-        `,
-      [tick, amt],
-      0,
+      sqlQuery,
+      queryParams,
+      0, // Cache duration
     );
   }
 
