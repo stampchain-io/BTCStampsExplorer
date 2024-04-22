@@ -7,34 +7,6 @@ import {
   TickResponseBody,
 } from "globals";
 
-/**
- * @swagger
- * /tick/{tick}/deploy:
- *   get:
- *     summary: Get deployment details for a specific tick
- *     description: Retrieve deployment details for a specific tick in the tick API.
- *     parameters:
- *       - in: path
- *         name: tick
- *         required: true
- *         description: The tick value.
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: Successful response with deployment details.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/TickResponseBody'
- *       '500':
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
-
 export const handler = async (
   _req: Request,
   ctx: TickHandlerContext,
