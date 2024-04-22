@@ -7,7 +7,6 @@ import {
   ErrorResponseBody,
 } from "globals";
 
-
 /**
  * @swagger
  * /api/v2/block/{block_index}:
@@ -43,7 +42,8 @@ export const handler = async (
   if (!isIntOr32ByteHex(block_index_or_hash)) {
     return new Response(
       JSON.stringify({
-        error: "Invalid argument provided. Must be an integer or 32 byte hex string.",
+        error:
+          "Invalid argument provided. Must be an integer or 32 byte hex string.",
       }),
       {
         status: 400, // Bad Request
@@ -55,7 +55,9 @@ export const handler = async (
   }
 
   try {
-    const response: BlockInfoResponseBody = await api_get_block(block_index_or_hash);
+    const response: BlockInfoResponseBody = await api_get_block(
+      block_index_or_hash,
+    );
     const body = JSON.stringify(response);
     return new Response(body);
   } catch {

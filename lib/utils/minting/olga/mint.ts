@@ -252,7 +252,7 @@ async function generatePSBT(
   // console.log(`Total Dust Value: ${totalDustValue} satoshis`);
 
   const psbtData = {
-    psbt: psbt, // Your PSBT object
+    psbt: psbt,
     feePerKb: fee_per_kb,
     estimatedTxSize: estimatedSize,
     totalInputValue: totalInputValue,
