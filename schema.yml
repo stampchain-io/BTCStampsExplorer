@@ -393,7 +393,7 @@ paths:
           schema:
             type: integer
           description: The index of the block
-         - in: query
+        - in: query
           name: op
           required: false
           schema:
