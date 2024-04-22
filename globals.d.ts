@@ -164,6 +164,26 @@ export interface PaginatedRequest extends Request {
   query: PaginationQueryParams;
 }
 
+export interface SRC20TrxRequestParams {
+  block_index?: number | null;
+  tick?: string | null;
+  op?: string | null;
+  limit?: number;
+  page?: number;
+  sort?: string;
+  tx_hash?: string | null;
+  address?: string | null;
+}
+
+export interface SRC20BalanceRequestParams {
+  address?: string | null;
+  tick?: string | null;
+  amt?: number | null;
+  limit?: number;
+  page?: number;
+  sort?: string;
+}
+
 // Response Types --------------------------------------------------------------
 
 export interface Pagination {
@@ -210,7 +230,7 @@ export interface Src20ResponseBody {
   data: Src20Detail;
 }
 
-export interface Src20BalanceResponseBody {
+export interface Src20BalanceResponseBody extends Pagination {
   last_block: number;
   data: Src20Detail[];
 }
@@ -294,12 +314,6 @@ export interface BlockHandlerContext extends HandlerContext {
 export interface AddressHandlerContext extends HandlerContext {
   params: {
     address: string;
-  };
-}
-
-export interface TxHandlerContext extends HandlerContext {
-  params: {
-    tx_hash: string;
   };
 }
 
