@@ -120,7 +120,7 @@ export function paginate(total: number, page = 1, limit = 10) {
   };
 }
 
-export function jsonStringifyBigInt(obj: Record<string, unknown>) {
+export function jsonStringifyBigInt(obj: object): string {
   return JSON.stringify(obj, (_key: string, value: unknown) => {
     if (typeof value === "bigint") {
       return value.toString();

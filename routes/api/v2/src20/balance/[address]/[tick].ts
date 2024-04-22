@@ -1,4 +1,4 @@
-import { api_get_src20_balance_by_tick } from "$lib/controller/wallet.ts";
+import { Src20Class } from "$lib/database/index.ts";
 import { convertEmojiToTick } from "utils/util.ts";
 import {
   AddressTickHandlerContext,
@@ -10,38 +10,6 @@ import {
   getClient,
 } from "../../../../../../lib/database/index.ts";
 
-/**
- * @swagger
- * /api/v2/src20/balance/{address}/{tick}:
- *   get:
- *     summary: Get src20 balance by address and tick
- *     parameters:
- *       - in: path
- *         name: address
- *         required: true
- *         schema:
- *           type: string
- *         description: The address of the wallet
- *       - in: path
- *         name: tick
- *         required: true
- *         schema:
- *           type: string
- *         description: The tick value
- *     responses:
- *       '200':
- *         description: Successful response
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Src20BalanceResponseBody'
- *       '500':
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
 export const handler = async (
   _req: Request,
   ctx: AddressTickHandlerContext,
@@ -51,7 +19,11 @@ export const handler = async (
     const client = await getClient();
     const last_block = await CommonClass.get_last_block_with_client(client);
     tick = convertEmojiToTick(tick);
-    const src20 = await api_get_src20_balance_by_tick(address, tick);
+    const src20 = await Src20Class.get_src20_balance_with_client(
+      client,
+      address,
+      tick,
+    );
     const body: Src20BalanceResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: src20,
