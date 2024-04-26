@@ -1,37 +1,10 @@
-import { api_get_src20_balance } from "$lib/controller/wallet.ts";
+import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import {
   AddressHandlerContext,
   ErrorResponseBody,
   Src20BalanceResponseBody,
 } from "globals";
-import { CommonClass, getClient } from "../../../../../lib/database/index.ts";
 
-/**
- * @swagger
- * /api/v2/src20/balance/{address}:
- *   get:
- *     summary: Get src20 balance by address
- *     parameters:
- *       - in: path
- *         name: address
- *         required: true
- *         schema:
- *           type: string
- *         description: The address of the wallet
- *     responses:
- *       '200':
- *         description: Successful response
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Src20BalanceResponseBody'
- *       '500':
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
 export const handler = async (
   _req: Request,
   ctx: AddressHandlerContext,
@@ -40,7 +13,10 @@ export const handler = async (
   try {
     const client = await getClient();
     const last_block = await CommonClass.get_last_block_with_client(client);
-    const src20 = await api_get_src20_balance(address);
+    const src20 = await Src20Class.get_src20_balance_with_client(
+      client,
+      address,
+    );
     const body: Src20BalanceResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       data: src20,
