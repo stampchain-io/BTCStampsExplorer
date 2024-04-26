@@ -394,15 +394,34 @@ paths:
             type: integer
           description: The index of the block
         - in: query
+          name: op
+          required: false
+          schema:
+            type: string
+          description: The operation type, if applicable.
+        - in: query
           name: limit
+          required: false
           schema:
             type: integer
-          description: 'The maximum number of transactions to retrieve (default: 50)'
+            format: int32
+            default: 1000
+          description: The maximum number of items to return, default is 1000.
         - in: query
           name: page
+          required: false
           schema:
             type: integer
-          description: 'The page number of the results (default: 1)'
+            format: int32
+            default: 1
+          description: The page number for pagination, default is 1.
+        - in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+            default: 'ASC'
+          description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
       responses:
         '200':
           description: OK
@@ -421,34 +440,53 @@ paths:
 
   /api/v2/src20/block/{block_index}/{tick}:
     get:
-      summary: Get valid SRC-20 transactions from a specific block and tick.
+      summary: Fetches SRC20 transactions for a given block and tick
+      description: >
+        Retrieves SRC20 transactions filtered by block index and tick value,
+        with additional optional filtering and pagination parameters.
       parameters:
         - in: path
           name: block_index
           required: true
           schema:
-            type: string
+            type: integer
+            format: int32
           description: The index of the block.
         - in: path
           name: tick
           required: true
           schema:
             type: string
-          description: The tick value.
+          description: The tick value, possibly represented as an emoji.
+        - in: query
+          name: op
+          required: false
+          schema:
+            type: string
+          description: The operation type, if applicable.
         - in: query
           name: limit
+          required: false
           schema:
             type: integer
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to return per page.
+            format: int32
+            default: 1000
+          description: The maximum number of items to return, default is 1000.
         - in: query
           name: page
+          required: false
           schema:
             type: integer
-            minimum: 1
+            format: int32
             default: 1
-          description: The page number.
+          description: The page number for pagination, default is 1.
+        - in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+            default: 'ASC'
+          description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
       responses:
         '200':
           description: Successful response with the list of valid SRC-20 transactions.
@@ -801,7 +839,7 @@ paths:
     post:
       summary: Deploy, Mint, Transfer SRC-20 Tokens
       description: |
-        This returns an unsigned transaction ready for signing and broadcasting
+        This returns a hex encoded serialized PSBT transaction ready for signing and broadcasting
         via wallet or library. There is no validation that the input data provided
         will conform to SRC-20 specifications or mint limit requirements. It is the 
         users sole responsibility to confirm mint, deploy limits and confirm existing
@@ -866,7 +904,7 @@ paths:
     post:
       summary: Mint an OLGA STAMP.
       description: |
-        This returns an unsigned transaction ready for signing and broadcasting
+        This returns a hex encoded serialized PSBT transaction ready for signing and broadcasting
         via wallet or library. There is no validation that the input data provided
         will conform to all STAMP specifications. It is the users sole responsibility 
         The examples provided are for demonstration purposes only.
@@ -1220,7 +1258,47 @@ components:
         limit:
           oneOf:
             - type: number
-            
+
+    SRC20TrxRequestParams:
+      type: object
+      properties:
+        block_index:
+          type: integer
+          format: int32
+          nullable: true
+          description: The index of the block.
+        tick:
+          type: string
+          nullable: true
+          description: The tick value, possibly represented as an emoji.
+        op:
+          type: string
+          nullable: true
+          description: The operation type, if applicable.
+        limit:
+          type: integer
+          format: int32
+          default: 1000
+          description: The maximum number of items to return.
+        page:
+          type: integer
+          format: int32
+          default: 1
+          description: The page number for pagination.
+        sort:
+          type: string
+          default: "ASC"
+          description: The sorting order, ASC or DESC.
+        tx_hash:
+          type: string
+          nullable: true
+          description: The transaction hash, if filtering by transaction.
+        address:
+          type: string
+          nullable: true
+          description: The address involved in the transactions.
+      required: []
+
     PaginationQueryParams:
       type: object
       properties:
@@ -1462,14 +1540,6 @@ components:
           type: object
           properties:
             address:
-              type: string
-    TxHandlerContext:
-      type: object
-      properties:
-        params:
-          type: object
-          properties:
-            tx_hash:
               type: string
     TickHandlerContext:
       type: object

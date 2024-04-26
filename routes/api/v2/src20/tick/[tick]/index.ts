@@ -10,58 +10,6 @@ import {
 } from "globals";
 import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
 
-/**
- * @swagger
- * /api/v2/src20/tick/{tick}:
- *   get:
- *     summary: Get paginated tick data
- *     description: Retrieve paginated tick data for a specific tick
- *     parameters:
- *       - in: path
- *         name: tick
- *         required: true
- *         description: Tick value
- *         schema:
- *           type: string
- *       - in: query
- *         name: limit
- *         description: Number of records per page (default: 1000)
- *         schema:
- *           type: integer
- *       - in: query
- *         name: page
- *         description: Page number (default: 1)
- *         schema:
- *           type: integer
- *       - in: query
- *         name: op
- *         schema:
- *           type: string
- *           default: null
- *           enum: [TRANSFER, MINT, DEPLOY]
- *         description: The operation type [TRANSFER, MINT, DEPLOY(DEFAULT)]
- *       - in: query
- *         name: sort
- *         schema:
- *           type: string
- *           default: ASC
- *           enum: [ASC, DESC]
- *         description: Sort order [ASC, DESC]
- *     responses:
- *       '200':
- *         description: Successful response
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedTickResponseBody'
- *       '500':
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
-
 export const handler = async (
   req: PaginatedRequest,
   ctx: TickHandlerContext,
