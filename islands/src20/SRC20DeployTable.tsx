@@ -66,10 +66,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
       />
       <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-            SRC20
-          </caption>
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <thead class="bg-[#343434] uppercase text-xs text-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" class="px-6 py-3">#</th>
               <th scope="col" class="px-6 py-3">img</th>
@@ -86,7 +83,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
             {data.map((src20: SRC20Row) => {
               const href = `/src20/${convertToEmoji(src20.tick)}`;
               return (
-                <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <tr class="bg-[#262424] border-b dark:border-gray-700">
                   <td class="px-6 py-4 uppercase">
                     {src20.row_num}
                   </td>
@@ -112,10 +109,14 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                       : short_address(src20.destination)}
                   </td>
                   <td class="px-6 py-4">
-                    {typeof src20.max === 'number' ? src20.max.toLocaleString() : Number(src20.max).toLocaleString()}
+                    {typeof src20.max === "number"
+                      ? src20.max.toLocaleString()
+                      : Number(src20.max).toLocaleString()}
                   </td>
                   <td class="px-6 py-4">
-                    {typeof src20.lim === 'number' ? src20.lim.toLocaleString() : Number(src20.lim).toLocaleString()}
+                    {typeof src20.lim === "number"
+                      ? src20.lim.toLocaleString()
+                      : Number(src20.lim).toLocaleString()}
                   </td>
                   <td class="px-6 py-4">
                     {src20.deci}

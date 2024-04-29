@@ -31,7 +31,7 @@ export const WalletModal = ({ connectors }: Props) => {
     <>
       <button
         onClick={toggleModal}
-        class="block w-full mx-6 text-white border outline-1 border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-transparent font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+        class="block w-full bg-[#03A606] hover:bg-blue-800 focus:ring-4 focus:ring-transparent font-medium rounded-lg text-sm px-5 py-2.5 text-center"
         type="button"
       >
         {isConnected.value && address

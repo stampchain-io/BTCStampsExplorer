@@ -1,6 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
-import { StampSearchClient } from "$islands/StampSearch.tsx";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -29,12 +28,10 @@ export function Header() {
       window.removeEventListener("orientationchange", handleOrientationChange);
     };
   }, [open]);
-  const activeClass = "text-gray-600 rounded hover:text-white md:underline"; //"rounded text-blue-600 md:underline hover:text-white"
-  const inactiveClass = "text-gray-600 rounded hover:text-white md:underline";
 
   return (
-    <nav className="border rounded-lg py-2 mb-6 md:py-4 ">
-      <div className="container px-4 mx-auto md:flex md:items-center">
+    <nav className="py-2 md:py-4">
+      <div className="container px-4 mx-auto md:flex md:items-center md:justify-between">
         <div className="flex justify-between items-center">
           <a
             href="/block/last"
@@ -44,75 +41,101 @@ export function Header() {
             <img
               src="/img/stampchain.gif"
               alt="stampchain"
-              className="w-auto h-12 md:h-16"
+              className="w-[178px] h-auto"
             />
           </a>
-          {/* <StampSearchClient /> */}
           <button
             onClick={toggleMenu}
-            className="border border-solid border-blue-600 px-3 py-1 rounded text-blue-600 opacity-50 hover:opacity-75 md:hidden"
+            className="px-3 py-1 text-blue-600 opacity-50 hover:opacity-75 md:hidden z-[100]"
             id="navbar-toggle"
           >
-            <img src="/icons/menu.svg" alt="menu" className="w-6 h-6" />
+            {open && (
+              <img
+                src="/img/menu-close.png"
+                alt="menu"
+                className="w-6 h-6"
+              />
+            )}
+            {!open && (
+              <img src="/img/menu-open.png" alt="menu" className="w-6 h-6" />
+            )}
           </button>
         </div>
 
         <div
           className={`${
             open
-              ? "flex items-center gap-10 absolute right-0 top-[103px] w-full h-full z-20 bg-[#181818] scroll-none p-6"
+              ? "flex items-center justify-center gap-5 md:gap-10 right-0 top-0 fixed w-full h-screen z-20 bg-[#181818] scroll-none p-6"
               : "hidden"
-          } flex-col md:flex md:flex-row md:ml-auto mt-8 md:mt-0 text-center`}
+          } flex-col md:flex md:flex-row text-center`}
           id="navbar-collapse"
         >
           <a
-            href="/block/last"
-            f-partial={"/block/last"}
+            href="/home"
+            f-partial={"/home"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 hover:text-gray-700 transition-colors duration-300 flex justify-center items-center ${
-              path === "block" ? activeClass : inactiveClass
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
+              path === "home" ? "text-[#03A606]" : "text-white"
             }`}
-            style={{ textDecoration: "none" }}
           >
-            BLOCKS
+            Home
           </a>
           <a
             href="/stamp"
             f-partial={"/stamp"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 flex justify-center items-center ${
-              path === "stamp" ? activeClass : inactiveClass
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
+              path === "stamp" ? "text-[#03A606]" : "text-white"
             }`}
-            style={{ textDecoration: "none" }}
           >
-            STAMPS
+            Stamps
           </a>
           <a
             href="/src20"
             f-partial={"/src20"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 flex justify-center items-center ${
-              path === "src20" ? activeClass : inactiveClass
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
+              path === "src20" ? "text-[#03A606]" : "text-white"
             }`}
-            style={{ textDecoration: "none" }}
           >
-            SRC20
+            Src-20
           </a>
-          {
-            /* <a
-            href="/cursed"
-            f-partial={"/cursed"}
+          <a
+            href="/block/last"
+            f-partial={"/block/last"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2  hover:text-gray-700 transition-colors duration-300 ${
-              path === "cursed" ? activeClass : inactiveClass
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
+              path === "block" ? "text-[#03A606]" : "text-white"
             }`}
           >
-            Cursed
-          </a> */
-          }
-          <div className="w-full flex items-center">
+            Blocks
+          </a>
+          <a
+            href="/collection"
+            f-partial={"/collection"}
+            onClick={toggleMenu}
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
+              path === "collection" ? "text-[#03A606]" : "text-white"
+            }`}
+          >
+            Collections
+          </a>
+          <a
+            href="/minting"
+            f-partial={"/minting"}
+            onClick={toggleMenu}
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
+              path === "minting" ? "text-[#03A606]" : "text-white"
+            }`}
+          >
+            Minting
+          </a>
+          <div class="block md:hidden">
             <ConnectWallet />
           </div>
+        </div>
+        <div class="hidden md:block">
+          <ConnectWallet />
         </div>
       </div>
     </nav>

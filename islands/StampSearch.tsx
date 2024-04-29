@@ -11,8 +11,8 @@ export function StampSearchClient() {
   return (
     <input
       type="text"
-      className="h-1/2 w-full p-2 border-2 border-black rounded-lg bg-gray-800"
-      placeholder="Search for a Stamp, CPID, Transaction, or Address"
+      className="min-w-80 bg-[#262424] px-4 py-2 border border-[#8A8989] rounded-lg"
+      placeholder="Search stamp..."
       onInput={handleSearch}
     />
   );

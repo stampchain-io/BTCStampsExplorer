@@ -22,10 +22,7 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-h-196">
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:h-auto">
-        <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-          Stamps
-        </caption>
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <thead className="bg-[#343434] uppercase text-xs text-gray-700 dark:text-gray-400">
           <tr>
             <th scope="col" className="px-6 py-3">Image</th>
             <th scope="col" className="px-6 py-3">Stamp</th>
@@ -48,7 +45,7 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
               ? "cursed"
               : "named";
             return (
-              <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+              <tr className="bg-[#262424] border-b dark:border-gray-700">
                 <td className="px-0.5 py-0.5">
                   <a href={`/stamp/${issuance.cpid}`}>
                     <Stamp
