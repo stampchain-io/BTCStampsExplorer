@@ -46,6 +46,7 @@ import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $BlockSelector from "./islands/BlockSelector.tsx";
+import * as $Footer from "./islands/Footer.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
 import * as $Navigator_navigator from "./islands/Navigator/navigator.tsx";
@@ -60,8 +61,12 @@ import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
+import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
+import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
+import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
+import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -124,6 +129,7 @@ const manifest = {
   },
   islands: {
     "./islands/BlockSelector.tsx": $BlockSelector,
+    "./islands/Footer.tsx": $Footer,
     "./islands/Header.tsx": $Header,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
     "./islands/Navigator/navigator.tsx": $Navigator_navigator,
@@ -139,8 +145,12 @@ const manifest = {
     "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
+    "./islands/block/BlockHeader.tsx": $block_BlockHeader,
+    "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
+    "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
+    "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
