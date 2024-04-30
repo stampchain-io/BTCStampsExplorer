@@ -5,7 +5,7 @@ import { Header } from "$islands/Header.tsx";
 import { Footer } from "$islands/Footer.tsx";
 import { MempoolWeather } from "$islands/MempoolWeather.tsx";
 import { ToastProvider } from "$islands/Toast/toast.tsx";
-import { StampSearchClient } from "$islands/StampSearch.tsx";
+import { StampSearchClient } from "../islands/stamp/StampSearch.tsx";
 import { NavigatorProvider } from "$islands/Navigator/navigator.tsx";
 
 export default function App({ Component }: AppProps) {

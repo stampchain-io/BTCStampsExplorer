@@ -121,11 +121,11 @@ export function Header() {
             Collections
           </a>
           <a
-            href="/minting"
-            f-partial={"/minting"}
+            href="/mint"
+            f-partial={"/mint"}
             onClick={toggleMenu}
             className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "minting" ? "text-[#03A606]" : "text-white"
+              path === "mint" ? "text-[#03A606]" : "text-white"
             }`}
           >
             Minting

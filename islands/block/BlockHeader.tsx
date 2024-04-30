@@ -1,4 +1,4 @@
-import { StampSearchClient } from "$islands/StampSearch.tsx";
+import { StampSearchClient } from "../stamp/StampSearch.tsx";
 
 export default function BlockHeader() {
   return (
