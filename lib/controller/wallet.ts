@@ -146,7 +146,7 @@ export const api_get_balance = async (
       btc: btcInfo,
       data: {
         stamps: stamps,
-        src20: src20.rows,
+        src20: src20,
       },
     };
   } catch (error) {

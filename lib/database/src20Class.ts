@@ -244,7 +244,7 @@ export class Src20Class {
       deploy_img: `${conf.IMAGES_SRC_PATH}/${tx_hashes_map[result.tick]}.svg`,
     }));
 
-    return { rows: resultsWithDeployImg };
+    return resultsWithDeployImg;
   }
 
   // static async get_src20_balance_with_client(
