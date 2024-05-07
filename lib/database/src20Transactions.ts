@@ -12,6 +12,7 @@ import {
   SRC20TrxRequestParams,
 } from "globals";
 import { ErrorResponseBody } from "globals";
+import { releaseClient } from "$lib/database/db.ts";
 
 export async function fetchAndFormatSrc20Transactions(
   params: SRC20TrxRequestParams,
@@ -53,17 +54,24 @@ export async function fetchAndFormatSrc20Transactions(
   const total = totalResult.rows[0]["total"];
   const last_block = await CommonClass.get_last_block_with_client(client);
   const pagination = paginate(total, page, limit);
+  const mappedData = valid_src20_txs_in_block.rows.map((tx: any) => ({
+    ...tx,
+    tick: convertToEmoji(tx.tick),
+    amt: tx.amt ? tx.amt.toString() : null,
+    lim: tx.lim ? tx.lim.toString() : null,
+    max: tx.max ? tx.max.toString() : null,
+  }));
+
   const body: PaginatedSrc20ResponseBody = {
     ...pagination,
     last_block: last_block.rows[0]["last_block"],
-    data: valid_src20_txs_in_block.rows.map((tx: any) => ({
-      ...tx,
-      tick: convertToEmoji(tx.tick),
-      amt: tx.amt ? tx.amt.toString() : null,
-      lim: tx.lim ? tx.lim.toString() : null,
-      max: tx.max ? tx.max.toString() : null,
-    })),
+    data:
+      (tick !== undefined || tx_hash !== undefined) && mappedData.length === 1
+        ? mappedData[0]
+        : mappedData,
   };
+
+  releaseClient(client);
   return jsonStringifyBigInt(body);
 }
 
@@ -113,7 +121,6 @@ export async function fetchAndFormatSrc20Balance(
     sort = "ASC",
   } = params;
 
-  // Fetch client and data
   const client = await getClient();
   const src20 = await Src20Class.get_src20_balance_with_client(
     client,
@@ -125,7 +132,6 @@ export async function fetchAndFormatSrc20Balance(
     sort,
   );
 
-  // Fetch total data for pagination
   const total_data = await Src20Class
     .get_total_src20_holders_by_tick_with_client(
       client,
@@ -135,7 +141,6 @@ export async function fetchAndFormatSrc20Balance(
   const total = total_data.rows[0]["total"];
   const last_block = await CommonClass.get_last_block_with_client(client);
 
-  // Prepare response body
   const body: Src20BalanceResponseBody = {
     page,
     limit,
@@ -149,6 +154,5 @@ export async function fetchAndFormatSrc20Balance(
     })),
   };
 
-  // Ensure sorting is done in the database query for consistency
   return jsonStringifyBigInt(body);
 }

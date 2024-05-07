@@ -1,8 +1,17 @@
 import { Foras, Memory, unzlib, zlib } from "compress";
 
-async function zLibCompress(data: string) {
-  await Foras.initBundledOnce();
+let initialized = false;
 
+async function zLibCompress(data: string) {
+  if (!initialized) {
+    try {
+      await Foras.initBundledOnce(); // this fails on vs code debugger, not in production
+      initialized = true;
+    } catch (error) {
+      console.error("Failed to initialize Foras:", error);
+      return;
+    }
+  }
   const bytes = new TextEncoder().encode(data);
   const mem = new Memory(bytes);
   const compressed = zlib(mem).copyAndDispose();
@@ -16,7 +25,7 @@ async function zLibUncompress(hexString: string) {
   await Foras.initBundledOnce();
 
   const compressed = new Uint8Array(
-    hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)),
+    hexString.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? [],
   );
   const comp_mem = new Memory(compressed);
   const uncompressed = unzlib(comp_mem).copyAndDispose();
@@ -31,17 +40,46 @@ function stringToHex(str: string) {
 }
 
 export async function compressWithCheck(data: string) {
-  const compressed = await zLibCompress(data);
-  const uncompressed = await zLibUncompress(compressed);
+  // Convert the data string to a byte array to check its length in bytes
+  const encoder = new TextEncoder();
+  const dataBytes = encoder.encode(data);
 
-  if (uncompressed !== data) {
-    throw new Error("Error: ZLIB Compression error");
+  let hexString;
+
+  // Only compress if data is more than 32 bytes
+  if (dataBytes.length > 16) {
+    const compressed = await zLibCompress(data);
+    if (compressed === "") {
+      throw new Error("Compression resulted in an empty string");
+    }
+
+    const uncompressed = await zLibUncompress(compressed || "");
+
+    if (uncompressed !== data) {
+      throw new Error("Error: ZLIB Compression error");
+    }
+
+    // Use the compressed data if it's shorter than the original hex string
+    hexString = stringToHex(data);
+    // Check if hexString is an empty string
+    if (hexString === "") {
+      throw new Error("Hex string conversion resulted in an empty string");
+    }
+
+    if (compressed.length < hexString.length) {
+      return compressed; // compressed is already in hex format
+    }
+    // If compressed data is not shorter, return the original data's hex string
+    return hexString;
+  } else {
+    // If data is 32 bytes or less, directly return its hex string
+    hexString = stringToHex(data);
+    // Check if hexString is an empty string
+    if (hexString === "") {
+      throw new Error("Hex string conversion resulted in an empty string");
+    }
+    return hexString;
   }
-  const hexString = stringToHex(data);
-  if (compressed.length < hexString.length) {
-    return compressed;
-  }
-  return hexString;
 }
 
 //const strs = [

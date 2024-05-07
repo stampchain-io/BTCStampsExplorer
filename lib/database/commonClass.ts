@@ -4,34 +4,31 @@ import { Client } from "$mysql/mod.ts";
 import { summarize_issuances } from "./index.ts";
 import { get_balances } from "../utils/xcp.ts";
 import { handleSqlQueryWithCache } from "../utils/cache.ts";
-import {
-  BIG_LIMIT,
-  SMALL_LIMIT,
-  STAMP_TABLE,
-  TTL_CACHE,
-} from "../utils/constants.ts";
+import { BIG_LIMIT, STAMP_TABLE, TTL_CACHE } from "../utils/constants.ts";
 
 export class CommonClass {
-  //------------------Blocks by index------------------
   /**
-   * Retrieves block information with the specified block index using the provided database client.
+   * Retrieves block information by block index or hash using the provided database client.
    * @param client - The database client to use for the query.
-   * @param block_index - The block index to retrieve information for.
-   * @returns A Promise that resolves to the block information.
+   * @param block_index_or_hash - The block index or hash to retrieve information for.
+   * @returns A promise that resolves to the block information.
    */
   static async get_block_info_with_client(
     client: Client,
-    block_index: number,
+    block_index_or_hash: number | string,
   ) {
+    const isIndex = !isNaN(Number(block_index_or_hash));
+    const field = isIndex ? "block_index" : "block_hash";
+
     return await handleSqlQueryWithCache(
       client,
       `
       SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
       txlist_hash, messages_hash 
       FROM blocks
-      WHERE block_index = '${block_index}';
+      WHERE ${field} = ?;
       `,
-      [block_index],
+      [block_index_or_hash],
       "never",
     );
   }
@@ -102,43 +99,54 @@ export class CommonClass {
    * Retrieves related blocks with the specified client.
    *
    * @param client - The database client.
-   * @param block_index - The block index.
+   * @param block_index_or_hash - The block index or hash.
    * @returns A promise that resolves to an array of related blocks.
    */
   static async get_related_blocks_with_client(
     client: Client,
-    block_index: number,
+    block_index_or_hash: number | string,
   ) {
+    let block_index: number;
+
+    if (!isNaN(Number(block_index_or_hash))) {
+      block_index = Number(block_index_or_hash);
+    } else {
+      block_index = await this.get_block_index_by_hash_with_client(
+        client,
+        block_index_or_hash,
+      );
+    }
+
     const blocks = await handleSqlQueryWithCache(
       client,
       `
-      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
-      txlist_hash, messages_hash 
-      FROM blocks
-      WHERE block_index >= ${block_index} - 2
-      AND block_index <= ${block_index} + 2
-      ORDER BY block_index DESC;
-      `,
+    SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
+    txlist_hash, messages_hash 
+    FROM blocks
+    WHERE block_index >= ? - 2
+    AND block_index <= ? + 2
+    ORDER BY block_index DESC;
+    `,
       [block_index, block_index],
       0,
     );
     const populated = blocks?.rows?.map(async (block: any) => {
-      const issuances_from_block = await handleSqlQueryWithCache(
+      const stamps_from_block = await handleSqlQueryWithCache(
         client,
         `
-        SELECT COUNT(*) AS issuances
-        FROM ${STAMP_TABLE}
-        WHERE block_index = ${block.block_index};
-        `,
+      SELECT COUNT(*) AS issuances
+      FROM ${STAMP_TABLE}
+      WHERE block_index = ?;
+      `,
         [block.block_index],
         "never",
       );
 
-      const sends_from_block = 0;
+      const sends_from_block = 0; // FIXME: need to add the send data
 
       return {
         ...block,
-        issuances: issuances_from_block.rows[0]["issuances"] ?? 0,
+        issuances: stamps_from_block.rows[0]["issuances"] ?? 0,
         sends: sends_from_block,
       };
     });
@@ -146,19 +154,12 @@ export class CommonClass {
     return result;
   }
 
-  /**
-   * Retrieves issuances by block index using the provided database client.
-   * @param client - The database client to use for the query.
-   * @param block_index - The block index to filter the issuances by.
-   * @returns A promise that resolves to the result of the SQL query.
-   */
-  static async get_issuances_by_block_index_with_client(
+  static async get_stamps_with_client(
     client: Client,
-    block_index: number,
+    block_index_or_hash: number | string,
   ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
+    const isBlockIndex = !isNaN(Number(block_index_or_hash));
+    const query = `
       SELECT st.*, num.stamp AS stamp, num.is_btc_stamp AS is_btc_stamp
       FROM ${STAMP_TABLE} st
       LEFT JOIN (
@@ -167,34 +168,13 @@ export class CommonClass {
           WHERE stamp IS NOT NULL
           AND is_btc_stamp IS NOT NULL
       ) num ON st.cpid = num.cpid
-      WHERE st.block_index = '${block_index}'
-      ORDER BY st.stamp;
-      `,
-      [block_index],
-      "never",
-    );
-  }
-
-  //------------------Blocks by hash------------------
-  /**
-   * Retrieves block information by hash using the provided database client.
-   * @param client - The database client to use for the query.
-   * @param block_hash - The hash of the block to retrieve information for.
-   * @returns A promise that resolves to the block information.
-   */
-  static async get_block_info_by_hash_with_client(
-    client: Client,
-    block_hash: string,
-  ) {
+      WHERE st.${isBlockIndex ? "block_index" : "block_hash"} = ?
+      ORDER BY st.${isBlockIndex ? "stamp" : "tx_index"};
+    `;
     return await handleSqlQueryWithCache(
       client,
-      `
-      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
-      txlist_hash, messages_hash 
-      FROM blocks
-      WHERE block_hash = '${block_hash}';
-      `,
-      [block_hash],
+      query,
+      [block_index_or_hash],
       "never",
     );
   }
@@ -220,87 +200,6 @@ export class CommonClass {
       "never",
     );
     return result?.rows?.[0]?.block_index;
-  }
-
-  /**
-   * Retrieves related blocks by hash with the specified client.
-   *
-   * @param client - The database client.
-   * @param block_hash - The hash of the block.
-   * @returns A promise that resolves to an array of related blocks.
-   */
-  static async get_related_blocks_by_hash_with_client(
-    client: Client,
-    block_hash: string,
-  ) {
-    const block_index = await this.get_block_index_by_hash_with_client(
-      client,
-      block_hash,
-    );
-    const blocks = await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
-      txlist_hash, messages_hash 
-      FROM blocks
-      WHERE block_index >= ${block_index} - 2
-      AND block_index <= ${block_index} + 2
-      ORDER BY block_index DESC;
-      `,
-      [block_index, block_index],
-      0,
-    );
-    const populated = blocks?.rows?.map(async (block: any) => {
-      const issuances_from_block = await handleSqlQueryWithCache(
-        client,
-        `
-        SELECT COUNT(*) AS issuances
-        FROM ${STAMP_TABLE}
-        WHERE block_index = '${block.block_index}';
-        `,
-        [block.block_index],
-        "never",
-      );
-
-      const sends_from_block = 0;
-
-      return {
-        ...block,
-        issuances: issuances_from_block.rows[0]["issuances"] ?? 0,
-        sends: sends_from_block,
-      };
-    });
-    const result = await Promise.all(populated.reverse());
-    return result;
-  }
-
-  /**
-   * Retrieves issuances by block hash with the specified client.
-   * @param client - The database client.
-   * @param block_hash - The block hash to filter the issuances.
-   * @returns A promise that resolves to the result of the SQL query.
-   */
-  static async get_issuances_by_block_hash_with_client(
-    client: Client,
-    block_hash: string,
-  ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT st.*, num.stamp AS stamp, num.is_btc_stamp AS is_btc_stamp
-      FROM ${STAMP_TABLE} st
-      LEFT JOIN (
-          SELECT cpid, stamp, is_btc_stamp
-          FROM ${STAMP_TABLE}
-          WHERE stamp IS NOT NULL
-          AND is_btc_stamp IS NOT NULL
-      ) num ON st.cpid = num.cpid
-      WHERE st.block_hash = '${block_hash}'
-      ORDER BY st.tx_index;
-      `,
-      [block_hash],
-      "never",
-    );
   }
 
   // -------------Stamps--------------
@@ -357,30 +256,25 @@ export class CommonClass {
     client: Client,
     identifier: string,
   ) {
-    let issuances = await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
-      stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
+    if (typeof identifier !== "string") {
+      throw new Error("Identifier must be a string");
+    }
 
-      FROM ${STAMP_TABLE}
-      WHERE (cpid = '${identifier}' OR tx_hash = '${identifier}' OR stamp_hash = '${identifier}')
-      ORDER BY stamp;
-      `,
-      [identifier, identifier, identifier],
-      TTL_CACHE,
-    );
-    const cpid = issuances.rows[0].cpid;
-    issuances = await handleSqlQueryWithCache(
+    const issuances = await handleSqlQueryWithCache(
       client,
       `
       SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
       stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
       FROM ${STAMP_TABLE}
-      WHERE (cpid = '${cpid}')
+      WHERE cpid = (
+        SELECT cpid
+        FROM ${STAMP_TABLE}
+        WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?)
+        LIMIT 1
+      )
       ORDER BY stamp;
       `,
-      [cpid],
+      [identifier],
       TTL_CACHE,
     );
     return issuances;

@@ -1,4 +1,3 @@
-import { HandlerContext } from "$fresh/server.ts";
 import {
   CommonClass,
   getClient,
@@ -47,12 +46,10 @@ export const handler = async (
     if (!client) {
       throw new Error("Failed to connect to the database");
     }
-    let data;
-    if (Number.isInteger(Number(id))) {
-      data = await StampsClass.get_stamp_by_stamp_with_client(client, id);
-    } else {
-      data = await StampsClass.get_stamp_by_identifier_with_client(client, id);
-    }
+    const data = await StampsClass.get_stamp_by_identifier_or_stamp_with_client(
+      client,
+      id,
+    );
     const last_block = await CommonClass.get_last_block_with_client(client);
     const stamp = await summarize_issuances(data.rows);
     const body: StampResponseBody = {

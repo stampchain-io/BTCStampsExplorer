@@ -77,34 +77,6 @@ export const api_get_src20_balance = async (address: string) => {
 };
 
 /**
- * Retrieves the balance of a specific SRC20 token for a given address and tick.
- *
- * @param address - The address for which to retrieve the balance.
- * @param tick - The tick of the SRC20 token.
- * @returns The balance of the SRC20 token for the given address and tick.
- * @throws If an error occurs while retrieving the balance.
- */
-export const api_get_src20_balance_by_tick = async (
-  address: string,
-  tick: string,
-) => {
-  try {
-    const client = await getClient();
-    const balances = await Src20Class
-      .get_src20_balance_with_client(
-        client,
-        address,
-        tick,
-      );
-    releaseClient(client);
-    return balances.rows[0];
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-/**
  * Retrieves the balance information for a given address.
  * @param address - The address for which to retrieve the balance.
  * @param limit - The maximum number of results to return per page. Default is 50.
@@ -145,8 +117,8 @@ export const api_get_balance = async (
       ...pagination,
       btc: btcInfo,
       data: {
-        stamps: stamps,
-        src20: src20,
+        stamps: Array.isArray(stamps) ? stamps : [stamps],
+        src20: Array.isArray(src20) ? src20 : [src20],
       },
     };
   } catch (error) {

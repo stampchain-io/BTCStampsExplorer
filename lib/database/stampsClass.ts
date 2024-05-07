@@ -64,10 +64,10 @@ export class StampsClass {
         FROM ${STAMP_TABLE} AS st
         LEFT JOIN creator AS cr ON st.creator = cr.address
         WHERE st.is_btc_stamp IS NOT NULL
-        ORDER BY st.stamp ${order}
-        LIMIT ${limit} OFFSET ${offset};
+        ORDER BY st.stamp ?
+        LIMIT ? OFFSET ?;
       `,
-      [limit, offset],
+      [order, limit, offset],
       1000 * 60 * 2,
     );
   }
@@ -97,10 +97,10 @@ export class StampsClass {
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
       WHERE st.is_btc_stamp IS NOT NULL AND (st.ident = 'STAMP' or st.ident = 'SRC-721')
-      ORDER BY st.tx_index ${order}
-      LIMIT ${limit} OFFSET ${offset};
+      ORDER BY st.tx_index ?
+      LIMIT ? OFFSET ?;
       `,
-      [limit, offset],
+      [order, limit, offset],
       1000 * 60 * 2,
     );
   }
@@ -143,9 +143,9 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.block_index = '${block_index}'
+      WHERE st.block_index = ?
       AND st.is_btc_stamp IS NOT NULL
-      ORDER BY stamp
+      ORDER BY stamp;
       `,
       [block_index],
       "never",
@@ -165,46 +165,49 @@ export class StampsClass {
       SELECT st.*, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.ident = '${ident}'
+      WHERE st.ident = ?
       AND st.is_btc_stamp IS NOT NULL
       ORDER BY st.stamp
-      LIMIT ${limit} OFFSET ${offset};
+      LIMIT ? OFFSET ?;
       `,
       [ident, limit, offset],
       1000 * 60 * 2,
     );
   }
 
-  static async get_stamp_by_stamp_with_client(client: Client, stamp: number) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT st.*, cr.creator AS creator_name
-      FROM ${STAMP_TABLE} AS st
-      LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.stamp = '${stamp}'
-      ORDER BY st.tx_index;
-      `,
-      [stamp],
-      TTL_CACHE,
-    );
-  }
-
-  static async get_stamp_by_identifier_with_client(
+  static async get_stamp_by_identifier_or_stamp_with_client(
     client: Client,
-    identifier: string,
+    identifierOrStamp: string | number,
   ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT st.*, cr.creator AS creator_name
-      FROM ${STAMP_TABLE}
-      LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE (st.cpid = '${identifier}' OR st.tx_hash = '${identifier}' OR st.stamp_hash = '${identifier}');
-      `,
-      [identifier, identifier, identifier],
-      TTL_CACHE,
-    );
+    if (typeof identifierOrStamp === "number") {
+      return await handleSqlQueryWithCache(
+        client,
+        `
+
+        SELECT st.*, cr.creator AS creator_name
+        FROM ${STAMP_TABLE} AS st
+        LEFT JOIN creator AS cr ON st.creator = cr.address
+        WHERE st.stamp = ?
+        ORDER BY st.tx_index;
+        `,
+        [identifierOrStamp],
+        TTL_CACHE,
+      );
+    } else if (typeof identifierOrStamp === "string") {
+      return await handleSqlQueryWithCache(
+        client,
+        `
+        SELECT st.*, cr.creator AS creator_name
+        FROM ${STAMP_TABLE} AS st
+        LEFT JOIN creator AS cr ON st.creator = cr.address
+        WHERE (st.cpid = ? OR st.tx_hash = ? OR st.stamp_hash = ?);
+        `,
+        [identifierOrStamp, identifierOrStamp, identifierOrStamp],
+        TTL_CACHE,
+      );
+    } else {
+      throw new Error("Invalid argument type. Expected string or number.");
+    }
   }
 
   static async get_stamp_file_by_identifier_with_client(
@@ -216,7 +219,7 @@ export class StampsClass {
       `
       SELECT tx_hash, stamp_hash, stamp_mimetype, cpid
       FROM ${STAMP_TABLE}
-      WHERE (cpid = '${identifier}' OR tx_hash = '${identifier}' OR stamp_hash = '${identifier}')
+      WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?)
       AND stamp IS NOT NULL;
       `,
       [identifier, identifier, identifier],
@@ -254,7 +257,7 @@ export class StampsClass {
         client,
         `
         SELECT cpid FROM ${STAMP_TABLE}
-        WHERE stamp = '${identifier}';
+        WHERE stamp = ?;
         `,
         [identifier],
         "never",
@@ -264,7 +267,7 @@ export class StampsClass {
       client,
       `
       SELECT cpid FROM ${STAMP_TABLE}
-      WHERE (cpid = '${identifier}' OR tx_hash = '${identifier}');
+      WHERE (cpid = ? OR tx_hash = ?);
       `,
       [identifier, identifier],
       "never",

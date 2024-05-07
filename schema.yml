@@ -89,31 +89,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
 
-  /api/v2/block/related/{block_index}:
-    get:
-      summary: Get related blocks by block index or block hash
-      parameters:
-        - in: path
-          name: block_index
-          required: true
-          schema:
-            type: string
-          description: The block index or block hash
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BlockRelatedResponseBody'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-
   /api/v2/cursed:
     get:
       summary: Get paginated cursed stamps
@@ -996,6 +971,42 @@ components:
           type: number
         sends:
           type: number
+        tx_count:
+          type: number
+    DispenserRow:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+        block_index:
+          type: number
+        source:
+          type: string
+        cpid:
+          type: string
+        give_quantity:
+          type: number
+        give_remaining:
+          type: number
+        escrow_quantity:
+          type: number
+        satoshirate:
+          type: number
+        btcrate:
+          type: number
+        origin:
+          type: string
+      required:
+        - tx_hash
+        - block_index
+        - source
+        - cpid
+        - give_quantity
+        - give_remaining
+        - escrow_quantity
+        - satoshirate
+        - btcrate
+        - origin
     StampRow:
       type: object
       properties:
@@ -1025,7 +1036,7 @@ components:
         stamp_url:
           type: string
         supply:
-          type: number
+          type: [number, 'null']
         timestamp:
           type: string
           format: date-time
@@ -1040,7 +1051,6 @@ components:
         creator_name:
           oneOf:
             - type: string
-            
         stamp_gen:
           type: string
         stamp_hash:
@@ -1485,15 +1495,6 @@ components:
             $ref: "#/components/schemas/SendRow"
         last_block:
           type: number
-    BlockRelatedResponseBody:
-      type: object
-      properties:
-        last_block:
-          type: number
-        blocks:
-          type: array
-          items:
-            $ref: "#/components/schemas/BlockRow"
     StampBlockResponseBody:
       type: object
       properties:
