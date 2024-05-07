@@ -1,4 +1,3 @@
-import { HandlerContext } from "$fresh/server.ts";
 import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
 import {
   ErrorResponseBody,
@@ -43,7 +42,7 @@ export const handler = async (
     if (Number.isInteger(Number(id))) {
       data = await CommonClass.get_issuances_by_stamp_with_client(client, id);
     } else {
-      data = await StampsClass.get_issuances_by_identifier_with_client(
+      data = await CommonClass.get_issuances_by_identifier_with_client(
         client,
         id,
       );
@@ -55,7 +54,7 @@ export const handler = async (
     };
     return new Response(JSON.stringify(body));
   } catch (error) {
-    // console.log(error)
+    console.log(error);
     const body: ErrorResponseBody = { error: `Error: Internal server error` };
     return new Response(JSON.stringify(body));
   }

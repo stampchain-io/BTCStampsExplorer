@@ -38,8 +38,7 @@ export const handler = async (
   _req: Request,
   ctx: IdHandlerContext,
 ): Promise<Response> => {
-  const id = String(ctx.params.id);
-  // const id = String(ctx.params);
+  const { id } = ctx.params;
   try {
     const client = await getClient();
     const data = await api_get_stamp_all_data(id);

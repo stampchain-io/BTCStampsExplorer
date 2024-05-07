@@ -212,13 +212,18 @@ export async function checkEnoughBalance(
         address,
         tick,
       );
-    const balance_address_tick = balance_address_tick_data.rows[0];
-    if (balance_address_tick === null) {
-      throw new Error("No balance found");
+    // let balance_address_tick;
+    console.log("balance_address_tick_data:", balance_address_tick_data);
+
+    if (!balance_address_tick_data) {
+      console.error("balance_address_tick_data is undefined");
+      throw new Error("No SRC-20 token balance found");
     }
-    if (new BigFloat(amount).gt(balance_address_tick.amt)) {
-      throw new Error("Error: Not enough balance");
+
+    if (new BigFloat(amount).gt(balance_address_tick_data.amt)) {
+      throw new Error("Error: Not enough SRC-20 token balance");
     }
+
     return true;
   } catch (error) {
     console.error(error);
