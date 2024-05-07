@@ -88,7 +88,7 @@ export async function api_get_stamp(id: string) {
       id,
     );
     const cpid = cpid_result.rows[0].cpid;
-
+    releaseClient(client);
     // const holders = await get_holders(cpid);
     // const dispensers = await get_dispensers(cpid);
     // const sends = await get_sends(cpid);
@@ -132,6 +132,7 @@ export async function api_get_stamp_all_data(id: string) {
     const dispensers = await get_dispensers(cpid);
     const sends = await get_sends(cpid);
     const dispenses = await get_dispenses(cpid);
+    releaseClient(client);
     return {
       stamp: stamp,
       holders: holders.map((holder: any) => {
