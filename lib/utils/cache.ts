@@ -1,8 +1,10 @@
 import { Client } from "$mysql/mod.ts";
 import { handleQueryWithClient } from "$lib/database/index.ts";
+import { CreatePayload, handleQuery } from "utils/xcp.ts";
 import { conf } from "./config.ts";
-import { connect } from "https://deno.land/x/redis/mod.ts";
+import { connect, Redis } from "https://deno.land/x/redis/mod.ts";
 import * as crypto from "crypto";
+import { XCPParams } from "globals";
 
 interface CacheEntry {
   data: any;
@@ -10,9 +12,27 @@ interface CacheEntry {
 }
 
 const cache: { [query: string]: CacheEntry } = {};
+const ongoingFetches = new Map<string, Promise<any>>();
 
-let redisClient;
+let redisClient: Redis | undefined;
 let isConnecting = false;
+let retryCount = 0;
+const MAX_RETRIES = 10;
+
+export function clearCache() {
+  ongoingFetches.clear();
+  if (redisClient) {
+    redisClient.flushall();
+  }
+}
+
+export function clearCacheKey(key: string) {
+  delete cache[key];
+  ongoingFetches.delete(key);
+  if (redisClient) {
+    redisClient.del(key);
+  }
+}
 
 export async function connectToRedisInBackground() {
   if (!conf.ELASTICACHE_ENDPOINT) {
@@ -38,22 +58,30 @@ export async function connectToRedisInBackground() {
     });
     redisClient = client;
     console.log("Connected to Redis successfully");
+    retryCount = 0;
   } catch (error) {
-    console.error(
-      "Failed to connect to Redis, falling back to in-memory cache. Error: ",
-      error,
-    );
-    setTimeout(() => {
-      console.log("Retrying connection to Redis...");
-      connectToRedisInBackground();
-    }, 10000); // Retry after 10 seconds
+    if (retryCount < MAX_RETRIES) {
+      console.error(
+        "Failed to connect to Redis, falling back to in-memory cache. Error: ",
+        error,
+      );
+      retryCount++;
+      setTimeout(() => {
+        console.log("Retrying connection to Redis...");
+        connectToRedisInBackground();
+      }, 10000);
+    } else {
+      console.error("Max retries reached, giving up on Redis connection.");
+      redisClient = undefined;
+      clearCache();
+    }
   } finally {
     isConnecting = false;
   }
 }
 
 function generateCacheKey(key: string): string {
-  return key;
+  return generateHash(key);
 }
 
 function generateHash(input: string): string {
@@ -87,6 +115,10 @@ export async function handleCache(
   const cacheKey = generateCacheKey(key);
   let entry;
 
+  if (!redisClient && !isConnecting) {
+    connectToRedisInBackground();
+  }
+
   if (redisClient) {
     try {
       const redisData = await redisClient.get(cacheKey);
@@ -107,30 +139,52 @@ export async function handleCache(
   if (entry && !isExpired(entry)) {
     return entry.data;
   } else {
-    const data = await fetchFunction();
-    const expiry = ttl === "never" ? "never" : Date.now() + ttl;
-
-    if (expiry !== "never" && typeof expiry !== "number") {
-      throw new Error("Invalid expiry value");
+    delete cache[cacheKey];
+    if (redisClient) {
+      redisClient.del(cacheKey);
+    }
+    if (ongoingFetches.has(cacheKey)) {
+      return await ongoingFetches.get(cacheKey);
     }
 
-    const newEntry: CacheEntry = { data, expiry };
+    const fetchPromise = fetchFunction().then(async (data) => {
+      ongoingFetches.delete(cacheKey);
+      const expiry = ttl === "never" ? "never" : Date.now() + ttl;
 
-    if (redisClient) {
-      try {
-        await redisClient.set(cacheKey, JSON.stringify(newEntry, replacer));
-      } catch (error) {
-        console.error("Failed to write to Redis cache. Error: ", error);
-        if (!isConnecting) {
-          connectToRedisInBackground();
+      if (expiry !== "never" && typeof expiry !== "number") {
+        throw new Error("Invalid expiry value");
+      }
+
+      const newEntry: CacheEntry = { data, expiry };
+
+      if (redisClient) {
+        try {
+          await redisClient.set(cacheKey, JSON.stringify(newEntry, replacer));
+        } catch (error) {
+          console.error("Failed to write to Redis cache. Error: ", error);
+          if (!isConnecting) {
+            connectToRedisInBackground();
+          }
+          cache[cacheKey] = newEntry;
         }
+      } else {
         cache[cacheKey] = newEntry;
       }
-    } else {
-      cache[cacheKey] = newEntry;
-    }
 
-    return data;
+      return data;
+    }).catch((error) => {
+      console.error(
+        `Failed to fetch data for key "${cacheKey}". Error: `,
+        error,
+      );
+      ongoingFetches.delete(cacheKey);
+      clearCache();
+      throw error;
+    });
+
+    ongoingFetches.set(cacheKey, fetchPromise);
+
+    return await fetchPromise;
   }
 }
 
@@ -146,7 +200,44 @@ export function handleSqlQueryWithCache(
   const cacheKey = generateSQLCacheKey(query, params);
   return handleCache(
     cacheKey,
-    () => handleQueryWithClient(client, query, params),
+    async () => {
+      try {
+        return await handleQueryWithClient(client, query, params);
+      } catch (error) {
+        console.error("Error executing SQL query:", error);
+        clearCache();
+        throw error;
+      }
+    },
     ttl,
   );
+}
+
+export function handleApiRequestWithCache(
+  method: string,
+  params: XCPParams,
+  ttl: number | "never",
+) {
+  if (conf.ENV === "development" || conf.CACHE?.toLowerCase() === "false") {
+    return handleQuery(CreatePayload(method, params));
+  }
+  const cacheKey = generateApiCacheKey(method, params);
+  return handleCache(
+    cacheKey,
+    async () => {
+      try {
+        return await handleQuery(CreatePayload(method, params));
+      } catch (error) {
+        console.error("Error making API request:", error);
+        clearCache();
+        throw error;
+      }
+    },
+    ttl,
+  );
+}
+
+function generateApiCacheKey(method: string, params: any) {
+  const paramsString = JSON.stringify(params);
+  return `${method}:${paramsString}`;
 }

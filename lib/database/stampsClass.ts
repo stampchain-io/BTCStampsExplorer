@@ -175,41 +175,6 @@ export class StampsClass {
     );
   }
 
-  static async get_stamp_by_identifier_or_stamp_with_client(
-    client: Client,
-    identifierOrStamp: string | number,
-  ) {
-    if (typeof identifierOrStamp === "number") {
-      return await handleSqlQueryWithCache(
-        client,
-        `
-
-        SELECT st.*, cr.creator AS creator_name
-        FROM ${STAMP_TABLE} AS st
-        LEFT JOIN creator AS cr ON st.creator = cr.address
-        WHERE st.stamp = ?
-        ORDER BY st.tx_index;
-        `,
-        [identifierOrStamp],
-        TTL_CACHE,
-      );
-    } else if (typeof identifierOrStamp === "string") {
-      return await handleSqlQueryWithCache(
-        client,
-        `
-        SELECT st.*, cr.creator AS creator_name
-        FROM ${STAMP_TABLE} AS st
-        LEFT JOIN creator AS cr ON st.creator = cr.address
-        WHERE (st.cpid = ? OR st.tx_hash = ? OR st.stamp_hash = ?);
-        `,
-        [identifierOrStamp, identifierOrStamp, identifierOrStamp],
-        TTL_CACHE,
-      );
-    } else {
-      throw new Error("Invalid argument type. Expected string or number.");
-    }
-  }
-
   static async get_stamp_file_by_identifier_with_client(
     client: Client,
     identifier: string,
@@ -231,46 +196,13 @@ export class StampsClass {
   }
 
   static async get_stamp_with_client(client: Client, id: string) {
-    let data;
-    if (!isNaN(Number(id))) {
-      data = await CommonClass.get_issuances_by_stamp_with_client(
-        client,
-        Number(id),
-      );
-    } else {
-      data = await CommonClass.get_issuances_by_identifier_with_client(
-        client,
-        id,
-      );
-    }
-    if (!data) return null;
+    const data = await CommonClass.get_stamps_by_stamp_tx_hash_cpid_stamp_hash(
+      client,
+      id,
+    );
+
+    if (!data || !data.rows) return null;
     const stamp = summarize_issuances(data.rows);
     return stamp;
-  }
-
-  static async get_cpid_from_identifier_with_client(
-    client: Client,
-    identifier: string,
-  ) {
-    if (!isNaN(Number(identifier))) {
-      return await handleSqlQueryWithCache(
-        client,
-        `
-        SELECT cpid FROM ${STAMP_TABLE}
-        WHERE stamp = ?;
-        `,
-        [identifier],
-        "never",
-      );
-    }
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT cpid FROM ${STAMP_TABLE}
-      WHERE (cpid = ? OR tx_hash = ?);
-      `,
-      [identifier, identifier],
-      "never",
-    );
   }
 }
