@@ -50,7 +50,6 @@ export async function api_get_stamps(
       closeClient(client);
       throw new Error("No stamps found");
     }
-    console.log("backend: ", sortBy, filterBy);
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ["STAMP", "SRC-721"],
@@ -60,7 +59,6 @@ export async function api_get_stamps(
       page * page_size - page_size,
       page * page_size,
     );
-    console.log(data.length);
     releaseClient(client);
     return {
       stamps: data,
