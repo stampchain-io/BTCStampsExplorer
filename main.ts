@@ -9,14 +9,14 @@ import "$std/dotenv/load.ts";
 import { start } from "$fresh/server.ts";
 import manifest from "./fresh.gen.ts";
 import config from "./fresh.config.ts";
-
-// Import connectToRedis from the appropriate module
-import { connectToRedis } from "./lib/utils/cache.ts";
+import { conf } from "utils/config.ts";
+import { connectToRedisInBackground as ConnectRedis } from "utils/cache.ts";
 
 async function startApp() {
-  // Connect to Redis
-  await connectToRedis();
-
+  if (conf.CACHE?.toLowerCase() === "true") {
+    console.log("Initiating Connection to Redis");
+    ConnectRedis();
+  }
   // Start your server
   await start(manifest, config);
 }

@@ -217,13 +217,10 @@ export const get_dispensers = async (cpid: string) => {
     ],
   };
   const payload = create_payload("get_dispensers", params);
-  console.log("Dispenser Payload:", payload);
 
   const dispensers = await handleQuery(payload);
-  console.log("Dispenser Response:", dispensers);
 
   if (!dispensers) {
-    console.log("No dispensers found");
     return [];
   }
 
