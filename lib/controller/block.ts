@@ -17,7 +17,7 @@ export async function api_get_block(block_index_or_hash: number | string) {
     if (!last_block || !last_block?.rows?.length) {
       throw new Error("Could not get last block");
     }
-    const issuances = await CommonClass.get_stamps_with_client(
+    const issuances = await CommonClass.get_stamps_by_block_with_client(
       client,
       block_index_or_hash,
     );

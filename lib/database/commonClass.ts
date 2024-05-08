@@ -154,7 +154,7 @@ export class CommonClass {
     return result;
   }
 
-  static async get_stamps_with_client(
+  static async get_stamps_by_block_with_client(
     client: Client,
     block_index_or_hash: number | string,
   ) {
@@ -204,82 +204,40 @@ export class CommonClass {
 
   // -------------Stamps--------------
 
-  /**
-   * Retrieves the issuances for a specific stamp using the provided database client.
-   *
-   * @param client - The database client to use for the query.
-   * @param stamp - The stamp number to retrieve issuances for.
-   * @returns A Promise that resolves to the issuances for the specified stamp, or null if no issuances are found.
-   */
-  static async get_issuances_by_stamp_with_client(
+  static async get_stamps_by_stamp_tx_hash_cpid_stamp_hash(
     client: Client,
-    stamp: number,
+    stampOrTxHash: number | string,
   ) {
-    let issuances = await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
-      stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
+    const isTxHash = typeof stampOrTxHash === "string" &&
+      stampOrTxHash.length === 64 && /^[a-fA-F0-9]+$/.test(stampOrTxHash);
+    const isStampHash = typeof stampOrTxHash === "string" &&
+      /^[a-zA-Z0-9]{12,20}$/.test(stampOrTxHash) &&
+      /[a-z]/.test(stampOrTxHash) && /[A-Z]/.test(stampOrTxHash);
+    const isNumber = typeof stampOrTxHash === "number" ||
+      !isNaN(Number(stampOrTxHash));
+    const queryKey = isNumber
+      ? "stamp"
+      : (isTxHash ? "tx_hash" : (isStampHash ? "stamp_hash" : "cpid"));
 
-      FROM ${STAMP_TABLE}
-      WHERE stamp = '${stamp}'
-      ORDER BY stamp;
-      `,
-      [stamp],
-      TTL_CACHE,
-    );
-    const cpid = issuances?.rows[0]?.cpid;
-    if (!cpid) return null;
-    issuances = await handleSqlQueryWithCache(
-      client,
-      `
+    const query = `
       SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
       stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
       FROM ${STAMP_TABLE}
-      WHERE (cpid = '${cpid}')
+      WHERE ${queryKey} = ?
       ORDER BY stamp;
-      `,
-      [cpid],
-      TTL_CACHE,
-    );
-    return issuances;
-  }
-
-  /**
-   * Retrieves issuances by identifier with the specified client.
-   *
-   * @param client - The database client.
-   * @param identifier - The identifier to search for.
-   * @returns A Promise that resolves to the list of issuances.
-   */
-  static async get_issuances_by_identifier_with_client(
-    client: Client,
-    identifier: string,
-  ) {
-    if (typeof identifier !== "string") {
-      throw new Error("Identifier must be a string");
-    }
+    `;
+    console.log(query);
+    const queryParams = [stampOrTxHash];
 
     const issuances = await handleSqlQueryWithCache(
       client,
-      `
-      SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
-      stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
-      FROM ${STAMP_TABLE}
-      WHERE cpid = (
-        SELECT cpid
-        FROM ${STAMP_TABLE}
-        WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?)
-        LIMIT 1
-      )
-      ORDER BY stamp;
-      `,
-      [identifier, identifier, identifier],
+      query,
+      queryParams,
       TTL_CACHE,
     );
+
     return issuances;
   }
-
   /**
    * Retrieves the total stamp balance for a given address using the provided database client.
    *
