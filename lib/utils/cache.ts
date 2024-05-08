@@ -12,18 +12,43 @@ interface CacheEntry {
 const cache: { [query: string]: CacheEntry } = {};
 
 let redisClient;
+let isConnecting = false;
 
-export async function connectToRedis() {
+export async function connectToRedisInBackground() {
+  if (!conf.ELASTICACHE_ENDPOINT) {
+    console.log(
+      "ELASTICACHE_ENDPOINT is not defined, skipping connection attempt...",
+    );
+    return;
+  }
+
+  if (isConnecting) {
+    console.log("Connection attempt already in progress, skipping...");
+    return;
+  }
+
+  console.log("Attempting to connect to Redis...");
+  isConnecting = true;
+
   try {
-    redisClient = await connect({
-      hostname: "stamp-4-redis-ycbgmb.serverless.use1.cache.amazonaws.com",
+    const client = await connect({
+      hostname: conf.ELASTICACHE_ENDPOINT,
       port: 6379,
       tls: true,
     });
+    redisClient = client;
+    console.log("Connected to Redis successfully");
   } catch (error) {
     console.error(
-      "Failed to connect to Redis, falling back to in-memory cache.",
+      "Failed to connect to Redis, falling back to in-memory cache. Error: ",
+      error,
     );
+    setTimeout(() => {
+      console.log("Retrying connection to Redis...");
+      connectToRedisInBackground();
+    }, 10000); // Retry after 10 seconds
+  } finally {
+    isConnecting = false;
   }
 }
 
@@ -34,10 +59,6 @@ function generateCacheKey(key: string): string {
 function generateHash(input: string): string {
   return crypto.createHash("sha256").update(input).digest("hex");
 }
-
-// function generateSQLCacheKey(query: string, params: any[]): string {
-//   return query + JSON.stringify(params);
-// }
 
 function generateSQLCacheKey(query: string, params: any[]): string {
   const key = query + JSON.stringify(params);
@@ -60,9 +81,17 @@ export async function handleCache(
   let entry;
 
   if (redisClient) {
-    const redisData = await redisClient.get(cacheKey);
-    if (redisData) {
-      entry = JSON.parse(redisData.toString());
+    try {
+      const redisData = await redisClient.get(cacheKey);
+      if (redisData) {
+        entry = JSON.parse(redisData.toString());
+      }
+    } catch (error) {
+      console.error("Redis command failed, attempting to reconnect...", error);
+      if (!isConnecting) {
+        connectToRedisInBackground();
+      }
+      entry = cache[cacheKey];
     }
   } else {
     entry = cache[cacheKey];
@@ -72,9 +101,8 @@ export async function handleCache(
     return entry.data;
   } else {
     const data = await fetchFunction();
-    let expiry = ttl === "never" ? "never" : Date.now() + ttl;
+    const expiry = ttl === "never" ? "never" : Date.now() + ttl;
 
-    // Ensure that expiry is either a number or "never"
     if (expiry !== "never" && typeof expiry !== "number") {
       throw new Error("Invalid expiry value");
     }
@@ -82,7 +110,15 @@ export async function handleCache(
     const newEntry: CacheEntry = { data, expiry };
 
     if (redisClient) {
-      await redisClient.set(cacheKey, JSON.stringify(newEntry));
+      try {
+        await redisClient.set(cacheKey, JSON.stringify(newEntry));
+      } catch (error) {
+        console.error("Failed to write to Redis cache. Error: ", error);
+        if (!isConnecting) {
+          connectToRedisInBackground();
+        }
+        cache[cacheKey] = newEntry;
+      }
     } else {
       cache[cacheKey] = newEntry;
     }
@@ -97,7 +133,7 @@ export function handleSqlQueryWithCache(
   params: any[],
   ttl: number | "never",
 ) {
-  if (conf.ENV === "development" || conf.CACHE === "false") {
+  if (conf.ENV === "development" || conf.CACHE?.toLowerCase() === "false") {
     return handleQueryWithClient(client, query, params);
   }
   const cacheKey = generateSQLCacheKey(query, params);
