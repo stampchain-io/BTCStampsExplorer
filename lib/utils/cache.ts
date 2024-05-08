@@ -72,6 +72,13 @@ function isExpired(entry: CacheEntry): boolean {
   return Date.now() > entry.expiry;
 }
 
+function replacer(_key, value) {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+  return value;
+}
+
 export async function handleCache(
   key: string,
   fetchFunction: () => Promise<any>,
@@ -111,7 +118,7 @@ export async function handleCache(
 
     if (redisClient) {
       try {
-        await redisClient.set(cacheKey, JSON.stringify(newEntry));
+        await redisClient.set(cacheKey, JSON.stringify(newEntry, replacer));
       } catch (error) {
         console.error("Failed to write to Redis cache. Error: ", error);
         if (!isConnecting) {
