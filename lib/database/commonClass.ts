@@ -274,7 +274,7 @@ export class CommonClass {
       )
       ORDER BY stamp;
       `,
-      [identifier, identifier, identifier]
+      [identifier, identifier, identifier],
       TTL_CACHE,
     );
     return issuances;
