@@ -1,6 +1,8 @@
 import { Client } from "$mysql/mod.ts";
 import { handleQueryWithClient } from "$lib/database/index.ts";
 import { conf } from "./config.ts";
+import { connect } from "https://deno.land/x/redis/mod.ts";
+import * as crypto from "crypto";
 
 interface CacheEntry {
   data: any;
@@ -9,12 +11,37 @@ interface CacheEntry {
 
 const cache: { [query: string]: CacheEntry } = {};
 
+let redisClient;
+
+export async function connectToRedis() {
+  try {
+    redisClient = await connect({
+      hostname: "stamp-4-redis-ycbgmb.serverless.use1.cache.amazonaws.com",
+      port: 6379,
+      tls: true,
+    });
+  } catch (error) {
+    console.error(
+      "Failed to connect to Redis, falling back to in-memory cache.",
+    );
+  }
+}
+
 function generateCacheKey(key: string): string {
   return key;
 }
 
+function generateHash(input: string): string {
+  return crypto.createHash("sha256").update(input).digest("hex");
+}
+
+// function generateSQLCacheKey(query: string, params: any[]): string {
+//   return query + JSON.stringify(params);
+// }
+
 function generateSQLCacheKey(query: string, params: any[]): string {
-  return query + JSON.stringify(params);
+  const key = query + JSON.stringify(params);
+  return generateHash(key);
 }
 
 function isExpired(entry: CacheEntry): boolean {
@@ -30,19 +57,41 @@ export async function handleCache(
   ttl: number | "never",
 ) {
   const cacheKey = generateCacheKey(key);
-  const entry = cache[cacheKey];
+  let entry;
+
+  if (redisClient) {
+    const redisData = await redisClient.get(cacheKey);
+    if (redisData) {
+      entry = JSON.parse(redisData.toString());
+    }
+  } else {
+    entry = cache[cacheKey];
+  }
 
   if (entry && !isExpired(entry)) {
     return entry.data;
   } else {
     const data = await fetchFunction();
-    const expiry = ttl === "never" ? "never" : Date.now() + ttl;
-    cache[cacheKey] = { data, expiry };
+    let expiry = ttl === "never" ? "never" : Date.now() + ttl;
+
+    // Ensure that expiry is either a number or "never"
+    if (expiry !== "never" && typeof expiry !== "number") {
+      throw new Error("Invalid expiry value");
+    }
+
+    const newEntry: CacheEntry = { data, expiry };
+
+    if (redisClient) {
+      await redisClient.set(cacheKey, JSON.stringify(newEntry));
+    } else {
+      cache[cacheKey] = newEntry;
+    }
+
     return data;
   }
 }
 
-export async function handleSqlQueryWithCache(
+export function handleSqlQueryWithCache(
   client: Client,
   query: string,
   params: any[],
