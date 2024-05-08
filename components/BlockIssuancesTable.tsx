@@ -87,9 +87,11 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
                 }
 
                 <td className="px-6 py-4 text-sm">
-                  {issuance.supply.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })}
+                  {issuance.supply
+                    ? issuance.supply.toLocaleString(undefined, {
+                      maximumFractionDigits: 0,
+                    })
+                    : "N/A"}
                 </td>
                 {
                   /* <td className="px-6 py-4 text-sm">
