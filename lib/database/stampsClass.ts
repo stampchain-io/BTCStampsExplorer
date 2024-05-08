@@ -64,10 +64,10 @@ export class StampsClass {
         FROM ${STAMP_TABLE} AS st
         LEFT JOIN creator AS cr ON st.creator = cr.address
         WHERE st.is_btc_stamp IS NOT NULL
-        ORDER BY st.stamp ?
+        ORDER BY st.stamp ${order}
         LIMIT ? OFFSET ?;
       `,
-      [order, limit, offset],
+      [limit, offset],
       1000 * 60 * 2,
     );
   }
