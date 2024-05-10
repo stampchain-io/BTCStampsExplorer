@@ -14,7 +14,7 @@ export class CursedClass {
     AND is_reissue IS NULL;
     `,
       [],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
@@ -32,7 +32,7 @@ export class CursedClass {
     AND is_reissue IS NULL;
     `,
       [ident],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
@@ -54,7 +54,7 @@ export class CursedClass {
     LIMIT ${limit} OFFSET ${offset};
     `,
       [limit, offset],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
@@ -122,7 +122,7 @@ export class CursedClass {
     LIMIT ${limit} OFFSET ${offset};
     `,
       [ident, limit, offset],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 }

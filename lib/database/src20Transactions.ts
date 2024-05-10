@@ -66,9 +66,10 @@ export async function fetchAndFormatSrc20Transactions(
     ...pagination,
     last_block: last_block.rows[0]["last_block"],
     data:
-      (tick !== undefined || tx_hash !== undefined) && mappedData.length === 1
+      tx_hash !== undefined && mappedData.length === 1 &&
+        block_index === undefined
         ? mappedData[0]
-        : mappedData,
+        : [mappedData].flat(),
   };
 
   releaseClient(client);

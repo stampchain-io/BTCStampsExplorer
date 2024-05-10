@@ -226,7 +226,6 @@ export class CommonClass {
       WHERE ${queryKey} = ?
       ORDER BY stamp;
     `;
-    console.log(query);
     const queryParams = [stampOrTxHash];
 
     const issuances = await handleSqlQueryWithCache(

@@ -23,5 +23,5 @@ async function startApp() {
 
 startApp().catch((error) => {
   console.error("Failed to start application:", error);
-  process.exit(1);
+  Deno.exit(1);
 });
