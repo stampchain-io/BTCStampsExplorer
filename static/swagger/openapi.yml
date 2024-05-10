@@ -895,7 +895,6 @@ paths:
                   sourceWallet: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   qty: 1
                   locked: true
-                  divisible: true
                   filename: test.png
                   file: "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAG1BMVEUAAAALOzcKBiAJTzz/1lqZoxgIaSyfQuJmIslgvM+QAAAAAXRSTlMAQObYZgAAAMlJREFUeNp9kNVhAzEMQFVtYE+ge8HfxhsUFkjuFih4gPJ3Jz9mMPuJJVvjzkR0CBJf7CFQB05GKs75EVCwEbAa+3Wg9XmZ5rOz7gljoE9ZmSydzT67lqcdaWrhUCo8m8baKDEt7Qqz4wtVKTVHRI8R2N1bW7wqMb4GLya0KQOYVOUrXfIaHKWY1lsCTfKXyih0msQXeA1td/RoHGOk++8figPKo67o+dqappTnx8FakD2Vxf11QA78F+cZ6cC5BCrd0F+T8UDmIwdjIhoVAu1hnQAAAABJRU5ErkJggg=="
                   satsPerKB: 20
@@ -903,7 +902,7 @@ paths:
                   service_fee_address: null
       responses:
         '200':
-          description: Successful response with the hex value.
+          description: Successful response with the psbt transaction
           content:
             application/json:
               schema:
@@ -911,7 +910,10 @@ paths:
                 properties:
                   hex:
                     type: string
-                    description: The hex value.
+                    description: The hex string of the psbt transaction
+                  base64:
+                    type: string
+                    description: The base64 string of the psbt transaction
         '400':
           description: Bad request error response.
           content:

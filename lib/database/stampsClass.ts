@@ -15,7 +15,7 @@ export class StampsClass {
       WHERE is_btc_stamp IS NOT NULL;
       `,
       [],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
@@ -45,7 +45,7 @@ export class StampsClass {
       AND is_btc_stamp IS NOT NULL;
       `,
       [],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
@@ -68,7 +68,7 @@ export class StampsClass {
         LIMIT ? OFFSET ?;
       `,
       [limit, offset],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
@@ -101,7 +101,7 @@ export class StampsClass {
       LIMIT ? OFFSET ?;
       `,
       [order, limit, offset],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
@@ -129,7 +129,7 @@ export class StampsClass {
       WHERE st.is_btc_stamp IS NOT NULL AND (st.ident = 'STAMP' or st.ident = 'SRC-721')
       `,
       [],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
@@ -171,7 +171,7 @@ export class StampsClass {
       LIMIT ? OFFSET ?;
       `,
       [ident, limit, offset],
-      1000 * 60 * 2,
+      1000 * 60 * 3,
     );
   }
 
