@@ -212,8 +212,6 @@ export async function checkEnoughBalance(
         address,
         tick,
       );
-    // let balance_address_tick;
-    console.log("balance_address_tick_data:", balance_address_tick_data);
 
     if (!balance_address_tick_data) {
       console.error("balance_address_tick_data is undefined");

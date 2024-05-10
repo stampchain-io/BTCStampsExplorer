@@ -280,7 +280,7 @@ export class Src20Class {
       client,
       sqlQuery,
       queryParams,
-      0, // Cache duration
+      1000 * 60 * 2,
     );
   }
 
