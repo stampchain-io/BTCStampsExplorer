@@ -65,11 +65,10 @@ export async function fetchAndFormatSrc20Transactions(
   const body: PaginatedSrc20ResponseBody = {
     ...pagination,
     last_block: last_block.rows[0]["last_block"],
-    data:
-      tx_hash !== undefined && mappedData.length === 1 &&
-        block_index === undefined
-        ? mappedData[0]
-        : [mappedData].flat(),
+    data: tx_hash !== null && mappedData.length === 1 &&
+        block_index === null
+      ? mappedData[0]
+      : [mappedData].flat(),
   };
 
   releaseClient(client);
