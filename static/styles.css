@@ -3,10 +3,29 @@
 @tailwind utilities;
 .image-rendering-pixelated {
   image-rendering: pixelated;
-  background-image: url('/img/transparent-bg.png');
+  background-image: url("/img/transparent-bg.png");
   background-size: 3px;
-  padding:6px 12px;
+  padding: 6px 12px;
+}
 
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #343434;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #262424;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .pixelart {

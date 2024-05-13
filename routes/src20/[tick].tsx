@@ -1,7 +1,7 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$components/src20/SRC20TickHeader.tsx";
-import { SRC20HoldersInfo } from "$components/src20/SRC20HoldersInfo.tsx";
-import { SRC20TX } from "$components/src20/SRC20TX.tsx";
+import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
+import { SRC20DetailsTab } from "$islands/src20/SRC20DetailsTab.tsx";
 
 import {
   CommonClass,
@@ -150,21 +150,24 @@ export const SRC20TickPage = (props) => {
     total_sends,
   } = props.data;
   console.log({ deployment });
+
   return (
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-8">
+      <SRC20Header />
       <SRC20TickHeader
         deployment={deployment}
         mint_status={mint_status}
         total_holders={total_holders}
-      />
-      <SRC20HoldersInfo
-        holders={holders}
-        total_holders={total_holders}
         total_mints={total_mints}
         total_sends={total_sends}
       />
-      <SRC20TX txs={sends} type="TRANSFER" />
-      <SRC20TX txs={mints} type="MINT" />
+      <div class="w-full flex flex-col md:flex-row gap-4 items-center justify-center">
+        <div class="w-full md:w-2/5 h-full">
+          <SRC20DetailsTab holders={holders} sends={sends} mints={mints} />
+        </div>
+        <div class="relative w-full md:w-3/5">
+        </div>
+      </div>
     </div>
   );
 };

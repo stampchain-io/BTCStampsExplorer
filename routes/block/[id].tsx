@@ -5,7 +5,9 @@ import {
   api_get_related_blocks,
 } from "$lib/controller/block.ts";
 import BlockInfo from "$components/BlockInfo.tsx";
-import Block from "$islands/BlockSelector.tsx";
+import BlockHeader from "$islands/block/BlockHeader.tsx";
+import BlockSelector from "$islands/block/BlockSelector.tsx";
+
 import { useSignal } from "@preact/signals";
 
 type BlockPageProps = {
@@ -41,14 +43,15 @@ export function BlockPage(props: BlockPageProps) {
     blocks.find((b: BlockRow) => b.block_index === block_info.block_index),
   );
   return (
-    <>
-      <div class="grid grid-cols-1 gap-4 my-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 py-2 overflow-y-auto">
+    <div class="flex flex-col gap-8">
+      <BlockHeader />
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 py-2 overflow-y-auto">
         {blocks.map((block: BlockRow) => (
-          <Block block={block} selected={selected} />
+          <BlockSelector block={block} selected={selected} />
         ))}
       </div>
       <BlockInfo block={block} />
-    </>
+    </div>
   );
 }
 
