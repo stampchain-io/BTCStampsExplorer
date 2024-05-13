@@ -4,7 +4,7 @@ import { PageControl } from "$islands/PageControl.tsx";
 import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";
 import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
-import { StampNavigator } from "$islands/StampNavigator.tsx";
+import { StampNavigator } from "../../islands/stamp/StampNavigator.tsx";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
 import { useEffect } from "preact/hooks";
 import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";

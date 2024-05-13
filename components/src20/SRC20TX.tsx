@@ -10,23 +10,20 @@ export const SRC20TX = (props: SRC20TXProps) => {
   const { txs, total, type } = props;
   if (type === "TRANSFER") {
     return (
-      <div class="relative overflow-x-auto shadow-md sm:rounded-lg max-h-80 py-4 w-full">
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-            Transfers
-          </caption>
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
+      <div class="relative shadow-md sm:rounded-lg w-full">
+        <table class="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead class="table-fixed text-xs text-gray-700 uppercase bg-[#343434] dark:text-gray-400">
+            <tr class="w-full table table-fixed">
               <th scope="col" class="px-6 py-3">block</th>
               <th scope="col" class="px-6 py-3">from</th>
               <th scope="col" class="px-6 py-3">to</th>
               <th scope="col" class="px-6 py-3">amount</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="table-fixed overflow-x-auto max-h-80 block">
             {txs.map((tx) => {
               return (
-                <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <tr class="w-full table table-fixed bg-[#262424] text-[#9D9B9B] border-b dark:border-gray-700">
                   <td class="px-6 py-4">
                     {tx.block_index}
                   </td>
@@ -49,22 +46,19 @@ export const SRC20TX = (props: SRC20TXProps) => {
   }
   if (type === "MINT") {
     return (
-      <div class="relative overflow-x-auto shadow-md sm:rounded-lg max-h-80 py-4 w-full">
+      <div class="relative shadow-md sm:rounded-lg w-full">
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-            Mints
-          </caption>
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
+          <thead class="table-fixed text-xs text-gray-700 uppercase bg-[#343434] dark:text-gray-400 w-[calc(100%-1em)]">
+            <tr class="w-full table table-fixed">
               <th scope="col" class="px-6 py-3">block</th>
               <th scope="col" class="px-6 py-3">address</th>
               <th scope="col" class="px-6 py-3">amount</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="table-fixed overflow-x-auto max-h-80 block">
             {txs.map((tx) => {
               return (
-                <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <tr class="w-full table table-fixed bg-[#262424] text-[#9D9B9B] border-b dark:border-gray-700">
                   <td class="px-6 py-4">
                     {tx.block_index}
                   </td>

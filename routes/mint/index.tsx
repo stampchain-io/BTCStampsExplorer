@@ -1,9 +1,10 @@
 import { HandlerContext } from "$fresh/server.ts";
+import { MintHeader } from "$islands/mint/MintHeader.tsx";
 
 import { CommonClass, getClient } from "$lib/database/index.ts";
 import { useState } from "preact/hooks";
 import { paginate } from "utils/util.ts";
-import { UploadImage } from "$islands/UploadImage.tsx";
+import { UploadImage } from "../../islands/mint/UploadImage.tsx";
 
 //TODO: Add pagination
 
@@ -25,6 +26,7 @@ export function MintPage(props) {
   const { data, total, page, pages, limit } = props.data;
   return (
     <div className={"self-center"}>
+      <MintHeader />
       <div class={"text-yellow-600 text-[26px] font-bold"}>
         Mint OLGA Stamp (P2WSH)
       </div>

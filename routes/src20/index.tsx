@@ -2,6 +2,7 @@ import { HandlerContext } from "$fresh/server.ts";
 
 import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
+import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
 
 //TODO: Add pagination
@@ -55,7 +56,8 @@ export const handler = {
 export function SRC20Page(props) {
   const { data, total, page, pages, limit } = props.data;
   return (
-    <div>
+    <div class="flex flex-col gap-8">
+      <SRC20Header />
       <SRC20DeployTable data={data} />
     </div>
   );
