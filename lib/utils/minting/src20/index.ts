@@ -1,6 +1,5 @@
 import { Client } from "$mysql/mod.ts";
 import * as bitcoin from "bitcoin";
-import { UTXO } from "utils/minting/src20/utils.d.ts";
 
 import { getClient } from "$lib/database/index.ts";
 import { get_public_key_from_address } from "utils/quicknode.ts";
@@ -20,7 +19,6 @@ import {
   IPrepareSRC20TX,
   ITransferSRC20,
 } from "./src20.d.ts";
-import { releaseClient } from "$lib/database/db.ts";
 
 export async function mintSRC20({
   toAddress,
@@ -55,13 +53,9 @@ export async function mintSRC20({
     };
     const transferString = JSON.stringify(src20_mint_obj);
     //TODO: check if toAddress is the one how pay the party
-    const fetchedUtxos = await getUTXOForAddress(fromAddress);
-    if (fetchedUtxos === null || fetchedUtxos.length === 0) {
-      throw new Error("No UTXO found");
-    }
-    const utxos: UTXO[] = fetchedUtxos;
+    const utxos = await getUTXOForAddress(toAddress);
     if (utxos === null || utxos.length === 0) {
-      throw new Error("No UTXO found");
+      throw new Error(`Error: No UTXO found in wallet ${toAddress}`);
     }
     const publicKey = await get_public_key_from_address(toAddress);
     const prepare: IPrepareSRC20TX = {
@@ -74,7 +68,6 @@ export async function mintSRC20({
       publicKey,
     };
     const psbtHex = await prepareSrc20TX(prepare);
-    releaseClient(client);
     return psbtHex;
   } catch (error) {
     console.log(error.message);
@@ -121,13 +114,9 @@ export async function deploySRC20({
       dec: dec,
     };
     const transferString = JSON.stringify(src20_mint_obj);
-    const fetchedUtxos = await getUTXOForAddress(fromAddress);
-    if (fetchedUtxos === null || fetchedUtxos.length === 0) {
-      throw new Error("No UTXO found");
-    }
-    const utxos: UTXO[] = fetchedUtxos;
+    const utxos = await getUTXOForAddress(toAddress);
     if (utxos === null || utxos.length === 0) {
-      throw new Error("No UTXO found");
+      throw new Error(`Error: No UTXO found in wallet ${toAddress}`);
     }
     const publicKey = await get_public_key_from_address(toAddress);
     const prepare: IPrepareSRC20TX = {
@@ -181,11 +170,7 @@ export async function transferSRC20({
       amt: amt,
     };
     const transferString = JSON.stringify(src20_mint_obj);
-    const fetchedUtxos = await getUTXOForAddress(fromAddress);
-    if (fetchedUtxos === null || fetchedUtxos.length === 0) {
-      throw new Error("No UTXO found");
-    }
-    const utxos: UTXO[] = fetchedUtxos;
+    const utxos = await getUTXOForAddress(fromAddress);
     if (utxos === null || utxos.length === 0) {
       throw new Error("No UTXO found");
     }

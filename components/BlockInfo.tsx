@@ -1,6 +1,6 @@
 import BlockHeaderTable from "$/components/BlockHeaderTable.tsx";
 import BlockIssuancesTable from "$/components/BlockIssuancesTable.tsx";
-// import BlockSendsTable from "$/components/BlockSendsTable.tsx";
+import BlockSendsTable from "$/components/BlockSendsTable.tsx";
 
 interface BlockInfoProps {
   block: BlockInfo;

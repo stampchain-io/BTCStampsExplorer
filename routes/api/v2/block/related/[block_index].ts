@@ -33,38 +33,28 @@ import {
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
-export const handler = async (
-  _req: Request,
-  ctx: BlockHandlerContext,
-): Promise<Response> => {
-  const block_index_or_hash = ctx.params.block_index;
-  let body: BlockRelatedResponseBody | ErrorResponseBody;
-  let status = 200; // OK
+export const handler: Handlers = {
+  async GET(_req: Request, ctx: BlockHandlerContext) {
+    const block_index_or_hash = ctx.params.block_index;
 
-  if (!isIntOr32ByteHex(block_index_or_hash)) {
-    body = {
-      error:
-        "Invalid argument provided. Must be an integer or 32 byte hex string.",
-    };
-    status = 400;
-  } else {
+    if (!isIntOr32ByteHex(block_index_or_hash)) {
+      const body: ErrorResponseBody = {
+        error:
+          "Invalid argument provided. Must be an integer or 32 byte hex string.",
+      };
+      return new Response(JSON.stringify(body));
+    }
+
     try {
-      const response: BlockRelatedResponseBody = await api_get_related_blocks(
+      const blocks: BlockRelatedResponseBody = await api_get_related_blocks(
         block_index_or_hash,
       );
-      body = response;
-    } catch {
-      body = {
-        error: `Block: ${block_index_or_hash} not found`,
+      return new Response(JSON.stringify(blocks));
+    } catch (error) {
+      const body: ErrorResponseBody = {
+        error: `Related blocks not found`,
       };
-      status = 404;
+      return new Response(JSON.stringify(body));
     }
-  }
-
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  },
 };

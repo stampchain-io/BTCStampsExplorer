@@ -1,8 +1,19 @@
-// api/v2/cursed/[id].ts
-import { getStampByIdOrIdentifier } from "$lib/controller/sharedHandlers.ts";
+import { HandlerContext } from "$fresh/server.ts";
+import {
+  CommonClass,
+  getClient,
+  StampsClass,
+  summarize_issuances,
+} from "$lib/database/index.ts";
+import {
+  ErrorResponseBody,
+  IdHandlerContext,
+  StampResponseBody,
+} from "globals";
+
 /**
  * @swagger
- * /api/v2/stamps/cursed/{id}:
+ * /api/v2/stamps/issuances/{id}:
  *   get:
  *     summary: Get stamp by stamp id or identifier
  *     parameters:
@@ -26,4 +37,31 @@ import { getStampByIdOrIdentifier } from "$lib/controller/sharedHandlers.ts";
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
-export const handler = getStampByIdOrIdentifier;
+export const handler = async (
+  _req: Request,
+  ctx: IdHandlerContext,
+): Promise<Response> => {
+  const { id } = ctx.params;
+  try {
+    const client = await getClient();
+    if (!client) {
+      throw new Error("Failed to connect to the database");
+    }
+    let data;
+    if (Number.isInteger(Number(id))) {
+      data = await StampsClass.get_stamp_by_stamp_with_client(client, id);
+    } else {
+      data = await StampsClass.get_stamp_by_identifier_with_client(client, id);
+    }
+    const last_block = await CommonClass.get_last_block_with_client(client);
+    const stamp = await summarize_issuances(data.rows);
+    const body: StampResponseBody = {
+      last_block: last_block.rows[0]["last_block"],
+      data: stamp,
+    };
+    return new Response(JSON.stringify(body));
+  } catch {
+    const body: ErrorResponseBody = { error: `Error: Internal server error` };
+    return new Response(JSON.stringify(body));
+  }
+};

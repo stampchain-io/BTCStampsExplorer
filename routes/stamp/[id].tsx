@@ -42,6 +42,7 @@ export const handler: Handlers<StampRow> = {
 
 export default function StampPage(props: StampPageProps) {
   const { stamp, sends, holders, total } = props.data;
+  console.log("holders:", holders);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-4">

@@ -120,7 +120,7 @@ export function selectUTXOs(
   `);
 
   if (change < 0) {
-    throw new Error("Insufficient funds at address for BTC transaction");
+    throw new Error("Insufficient funds");
   }
 
   return { inputs: selectedUTXOs, change, fee: finalFee };

@@ -1,3 +1,4 @@
+import { HandlerContext } from "$fresh/server.ts";
 import { CommonClass, CursedClass, getClient } from "$lib/database/index.ts";
 import {
   BlockHandlerContext,
@@ -36,14 +37,6 @@ export const handler = async (
   ctx: BlockHandlerContext,
 ): Promise<Response> => {
   const { block_index } = ctx.params;
-
-  if (!Number.isInteger(Number(block_index))) {
-    const body: ErrorResponseBody = {
-      error: `Invalid block_index: ${block_index}. It must be an integer.`,
-    };
-    return new Response(JSON.stringify(body));
-  }
-
   try {
     const client = await getClient();
     const block_info = await CommonClass.get_block_info_with_client(

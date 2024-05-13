@@ -30,7 +30,6 @@ export const handler = async (
     };
     return new Response(JSON.stringify(body));
   } catch (error) {
-    console.log(error);
     const body: ErrorResponseBody = { error: `Error: Internal server error` };
     return new Response(JSON.stringify(body));
   }

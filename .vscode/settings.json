@@ -26,9 +26,5 @@
     "editor.defaultFormatter": "denoland.vscode-deno",
     "editor.formatOnSave": true,
     "editor.tabSize": 2
-  },
-  "cSpell.words": [
-    "psbt",
-    "utxos"
-  ]
+  }
 }

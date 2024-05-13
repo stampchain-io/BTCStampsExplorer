@@ -27,28 +27,14 @@ export const prepareSrc20TX = async ({
   transferString,
   publicKey,
 }: IPrepareSRC20TX) => {
-  console.log("prepareSrc20TX inputs", {
-    network,
-    utxos,
-    changeAddress,
-    toAddress,
-    feeRate,
-    transferString,
-    publicKey,
-  });
-
   const psbtNetwork = network === "testnet"
     ? bitcoin.networks.testnet
     : bitcoin.networks.bitcoin;
-  console.log("psbtNetwork", psbtNetwork);
-
   const psbt = new bitcoin.Psbt({ network: psbtNetwork });
   const sortedUtxos = utxos.sort((a, b) => b.value - a.value);
-  console.log("sortedUtxos", sortedUtxos);
 
   const vouts: VOUT[] = [{ address: toAddress, value: 789 }];
   let transferHex = await compressWithCheck(`stamp:${transferString}`);
-  console.log("Initial transferHex", transferHex);
 
   const count = (transferHex.length / 2).toString(16);
   let padding = "";
@@ -63,8 +49,6 @@ export const prepareSrc20TX = async ({
       transferHex += "0";
     }
   }
-  console.log("Initial transferHex", transferHex);
-
   const encryption = bin2hex(
     scramble(hex2bin(sortedUtxos[0].txid), hex2bin(transferHex)),
   );
@@ -91,7 +75,6 @@ export const prepareSrc20TX = async ({
       }
     }
     let hash2;
-    console.log("Chunks", chunks);
 
     while (address2.length == 0) {
       const first_byte = Math.random() > 0.5 ? "02" : "03";
@@ -118,7 +101,6 @@ export const prepareSrc20TX = async ({
       value: DUST_SIZE,
     });
   }
-  console.log("cpScripts", cpScripts);
 
   if (parseInt(conf.MINTING_SERVICE_FEE_ENABLED) === 1) {
     const feeAddress = conf.MINTING_SERVICE_FEE_ADDRESS;
@@ -175,9 +157,6 @@ export const prepareSrc20TX = async ({
   });
 
   const psbtHex = psbt.toHex();
-  console.log("Final vouts", vouts);
-  console.log("Fee total", feeTotal);
-
   // note!!!!!
   // -- selectSrc20UTXOs needs to be updated to properly estimate fee before going live! (more accurate fee estimation now with sigops estimated with 2.5X)
   // -- getTransaction needs to be updated, should use local node probably before going live! (Using quicknode now for getTransaction)

@@ -4,7 +4,6 @@ import {
   ErrorResponseBody,
   StampBlockResponseBody,
 } from "globals";
-import { releaseClient } from "$lib/database/db.ts";
 
 /**
  * @swagger
@@ -38,14 +37,6 @@ export const handler = async (
   ctx: BlockHandlerContext,
 ): Promise<Response> => {
   const { block_index } = ctx.params;
-
-  if (!Number.isInteger(Number(block_index))) {
-    const body: ErrorResponseBody = {
-      error: `Invalid block_index: ${block_index}. It must be an integer.`,
-    };
-    return new Response(JSON.stringify(body));
-  }
-
   try {
     const client = await getClient();
     const block_info = await CommonClass.get_block_info_with_client(
@@ -62,7 +53,6 @@ export const handler = async (
       block_info: block_info.rows[0],
       data: data.rows,
     };
-    releaseClient(client);
     return new Response(JSON.stringify(body));
   } catch {
     const body: ErrorResponseBody = {

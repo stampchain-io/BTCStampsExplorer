@@ -47,6 +47,7 @@ export const handler = async (
   req: PaginatedRequest,
 ): Promise<Response> => {
   try {
+    console.log("Request:", req); // Add console log output
     const url = new URL(req.url);
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
@@ -60,6 +61,7 @@ export const handler = async (
       last_block: last_block.rows[0]["last_block"],
       data: dispensers, // Update the dispensers in the response body
     };
+    console.log("Dispensers", dispensers); // Add console log output
     return new Response(JSON.stringify(body));
   } catch (error) {
     console.log("Error:", error); // Add console log output

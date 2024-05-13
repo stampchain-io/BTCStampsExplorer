@@ -1,3 +1,4 @@
+import { HandlerContext } from "$fresh/server.ts";
 import { api_get_block } from "$lib/controller/block.ts";
 import { isIntOr32ByteHex } from "$lib/utils/util.ts";
 import {
@@ -37,33 +38,30 @@ export const handler = async (
   ctx: BlockHandlerContext,
 ): Promise<Response> => {
   const block_index_or_hash = ctx.params.block_index;
-  let body: BlockInfoResponseBody | ErrorResponseBody;
-  let status = 200; // OK
 
   if (!isIntOr32ByteHex(block_index_or_hash)) {
-    body = {
-      error:
-        "Invalid argument provided. Must be an integer or 32 byte hex string.",
-    };
-    status = 400;
-  } else {
-    try {
-      const response: BlockInfoResponseBody = await api_get_block(
-        block_index_or_hash,
-      );
-      body = response;
-    } catch {
-      body = {
-        error: `Block: ${block_index_or_hash} not found`,
-      };
-      status = 404;
-    }
+    return new Response(
+      JSON.stringify({
+        error:
+          "Invalid argument provided. Must be an integer or 32 byte hex string.",
+      }),
+      {
+        status: 400, // Bad Request
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
   }
 
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  try {
+    const response: BlockInfoResponseBody = await api_get_block(
+      block_index_or_hash,
+    );
+    const body = JSON.stringify(response);
+    return new Response(body);
+  } catch {
+    const body = { error: `Block: ${block_index_or_hash} not found` };
+    return new Response(JSON.stringify(body));
+  }
 };

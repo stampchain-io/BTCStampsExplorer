@@ -2,9 +2,10 @@ import { AppProps } from "$fresh/server.ts";
 import { Partial } from "$fresh/runtime.ts";
 
 import { Header } from "$islands/Header.tsx";
+import { Footer } from "$islands/Footer.tsx";
 import { MempoolWeather } from "$islands/MempoolWeather.tsx";
 import { ToastProvider } from "$islands/Toast/toast.tsx";
-import { StampSearchClient } from "$islands/StampSearch.tsx";
+import { StampSearchClient } from "../islands/stamp/StampSearch.tsx";
 import { NavigatorProvider } from "$islands/Navigator/navigator.tsx";
 
 export default function App({ Component }: AppProps) {
@@ -35,23 +36,22 @@ export default function App({ Component }: AppProps) {
         <link rel="apple-touch-icon" href="/img/icon.jpg"></link>
         <link rel="stylesheet" href="/styles.css" />
       </head>
-      <body className="bg-[#181818]">
+      <body className="bg-gradient-to-br from-[#010901] via-[#042004] to-[#010901]">
         <ToastProvider>
           <div
-            className="px-2 py-8 mx-auto bg-[#181818] flex flex-col md:gap-4 overflow-auto max-w-7xl"
+            className="px-2 pt-8 mx-auto flex flex-col gap-5 overflow-auto max-w-7xl"
             f-client-nav
           >
-            <div className="py-0 my-0">
-              <Header />
-              <MempoolWeather />
-              <StampSearchClient />
-            </div>
+            <Header />
+            {/* <MempoolWeather /> */}
+            {/* <StampSearchClient /> */}
             <NavigatorProvider>
               <Partial name="body">
                 <Component />
               </Partial>
             </NavigatorProvider>
           </div>
+          <Footer />
         </ToastProvider>
       </body>
     </html>

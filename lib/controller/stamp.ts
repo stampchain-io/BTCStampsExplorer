@@ -50,6 +50,7 @@ export async function api_get_stamps(
       closeClient(client);
       throw new Error("No stamps found");
     }
+    console.log("backend: ", sortBy, filterBy);
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ["STAMP", "SRC-721"],
@@ -59,6 +60,7 @@ export async function api_get_stamps(
       page * page_size - page_size,
       page * page_size,
     );
+    console.log(data.length);
     releaseClient(client);
     return {
       stamps: data,
@@ -81,9 +83,12 @@ export async function api_get_stamp(id: string) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
     const total = await StampsClass.get_total_stamps_with_client(client);
-    // const cpid = stamp.cpid;
+    const cpid_result = await StampsClass.get_cpid_from_identifier_with_client(
+      client,
+      id,
+    );
+    const cpid = cpid_result.rows[0].cpid;
 
-    releaseClient(client);
     // const holders = await get_holders(cpid);
     // const dispensers = await get_dispensers(cpid);
     // const sends = await get_sends(cpid);
@@ -117,13 +122,16 @@ export async function api_get_stamp_all_data(id: string) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
     const total = await StampsClass.get_total_stamps_with_client(client);
-    const cpid = stamp.cpid;
+    const cpid_result = await StampsClass.get_cpid_from_identifier_with_client(
+      client,
+      id,
+    );
+    const cpid = cpid_result.rows[0].cpid;
 
     const holders = await get_holders(cpid);
     const dispensers = await get_dispensers(cpid);
     const sends = await get_sends(cpid);
     const dispenses = await get_dispenses(cpid);
-    releaseClient(client);
     return {
       stamp: stamp,
       holders: holders.map((holder: any) => {

@@ -1,4 +1,4 @@
-// routes/api/v2/src20/tx/[tx_hash].ts
+// routes/block/[block_index]/[tx_hash].ts
 import { handleSrc20TransactionsRequest } from "$lib/database/src20Transactions.ts";
 import { FreshContext } from "$fresh/server.ts";
 

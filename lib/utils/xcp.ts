@@ -1,6 +1,3 @@
-import { handleApiRequestWithCache } from "utils/cache.ts";
-import { XCPParams } from "globals";
-
 const public_nodes = [
   {
     name: "stampchain.io",
@@ -35,7 +32,7 @@ const public_nodes = [
  * @param params - The parameters for the method.
  * @returns The payload object.
  */
-export const CreatePayload = (method: string, params: XCPParams) => {
+const create_payload = (method: string, params: XCPParams) => {
   return {
     jsonrpc: "2.0",
     id: 0,
@@ -112,13 +109,8 @@ export const get_balances = async (address: string) => {
       },
     ],
   };
-  // const payload = CreatePayload("get_balances", params); // now done in handleApiRequestWithCache
-  const balances = await handleApiRequestWithCache(
-    "get_balances",
-    params,
-    1000 * 60 * 5,
-  );
-
+  const payload = create_payload("get_balances", params);
+  const balances = await handleQuery(payload);
   if (!balances) {
     return [];
   }
@@ -162,11 +154,9 @@ export const get_sends = async (cpid: string) => {
     ],
     "filterop": "AND",
   };
-  const sends = await handleApiRequestWithCache(
-    "get_sends",
-    params,
-    1000 * 60 * 5,
-  );
+  const payload = create_payload("get_sends", params);
+  const sends = await handleQuery(payload);
+
   if (!sends) {
     console.log("no sends found");
     return [];
@@ -197,11 +187,8 @@ export const get_holders = async (cpid: string) => {
       },
     ],
   };
-  const holders = await handleApiRequestWithCache(
-    "get_balances",
-    params,
-    1000 * 60 * 5,
-  );
+  const payload = create_payload("get_balances", params);
+  const holders = await handleQuery(payload);
   if (!holders) {
     return [];
   }
@@ -229,13 +216,14 @@ export const get_dispensers = async (cpid: string) => {
       },
     ],
   };
-  const dispensers = await handleApiRequestWithCache(
-    "get_dispensers",
-    params,
-    1000 * 60 * 5,
-  );
+  const payload = create_payload("get_dispensers", params);
+  console.log("Dispenser Payload:", payload);
+
+  const dispensers = await handleQuery(payload);
+  console.log("Dispenser Response:", dispensers);
 
   if (!dispensers) {
+    console.log("No dispensers found");
     return [];
   }
 
@@ -264,11 +252,11 @@ export const get_dispensers = async (cpid: string) => {
  * @returns An object containing the total number of dispensers and an array of mapped dispensers.
  */
 export const get_all_dispensers = async () => {
-  const dispensers = await handleApiRequestWithCache(
-    "get_dispensers",
-    {},
-    1000 * 60 * 5,
-  );
+  const payload = create_payload("get_dispensers", {});
+  console.log("Payload:", payload);
+
+  const dispensers = await handleQuery(payload);
+  console.log("Response:", dispensers);
 
   if (!dispensers) {
     console.log("No dispensers found");
@@ -310,7 +298,7 @@ export const get_dispenses = async (cpid: string) => {
       },
     ],
   };
-  const payload = CreatePayload("get_dispenses", params);
+  const payload = create_payload("get_dispenses", params);
   const dispenses = await handleQuery(payload);
   if (!dispenses) {
     return [];

@@ -34,9 +34,11 @@ import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[iden
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
 import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
+import * as $collection_index from "./routes/collection/index.tsx";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
+import * as $home_index from "./routes/home/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $mint_index from "./routes/mint/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
@@ -44,24 +46,39 @@ import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
+import * as $upload_tick_ from "./routes/upload/[tick].tsx";
+import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $BlockSelector from "./islands/BlockSelector.tsx";
+import * as $Footer from "./islands/Footer.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
+import * as $MintForm from "./islands/MintForm.tsx";
 import * as $Navigator_navigator from "./islands/Navigator/navigator.tsx";
 import * as $PageControl from "./islands/PageControl.tsx";
 import * as $StampNavigator from "./islands/StampNavigator.tsx";
 import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_toast from "./islands/Toast/toast.tsx";
-import * as $UploadImage from "./islands/UploadImage.tsx";
+import * as $UploadForm from "./islands/UploadForm.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
 import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
+import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
+import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
+import * as $collection_CollectionHeader from "./islands/collection/CollectionHeader.tsx";
+import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
+import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
+import * as $mint_UploadImage from "./islands/mint/UploadImage.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
+import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
+import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
+import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
+import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
+import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -110,9 +127,11 @@ const manifest = {
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
     "./routes/block/[id].tsx": $block_id_,
     "./routes/block/index.tsx": $block_index,
+    "./routes/collection/index.tsx": $collection_index,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/cursed/index.tsx": $cursed_index,
     "./routes/docs/index.tsx": $docs_index,
+    "./routes/home/index.tsx": $home_index,
     "./routes/index.tsx": $index,
     "./routes/mint/index.tsx": $mint_index,
     "./routes/s/[...id].tsx": $s_id_,
@@ -120,27 +139,42 @@ const manifest = {
     "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/index.tsx": $stamp_index,
+    "./routes/upload/[tick].tsx": $upload_tick_,
+    "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
     "./islands/BlockSelector.tsx": $BlockSelector,
+    "./islands/Footer.tsx": $Footer,
     "./islands/Header.tsx": $Header,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
+    "./islands/MintForm.tsx": $MintForm,
     "./islands/Navigator/navigator.tsx": $Navigator_navigator,
     "./islands/PageControl.tsx": $PageControl,
     "./islands/StampNavigator.tsx": $StampNavigator,
     "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/toast.tsx": $Toast_toast,
-    "./islands/UploadImage.tsx": $UploadImage,
+    "./islands/UploadForm.tsx": $UploadForm,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
     "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
     "./islands/Wallet/ConnectorsModal.tsx": $Wallet_ConnectorsModal,
     "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
+    "./islands/block/BlockHeader.tsx": $block_BlockHeader,
+    "./islands/block/BlockSelector.tsx": $block_BlockSelector,
+    "./islands/collection/CollectionHeader.tsx": $collection_CollectionHeader,
+    "./islands/home/HomeHeader.tsx": $home_HomeHeader,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
+    "./islands/mint/MintHeader.tsx": $mint_MintHeader,
+    "./islands/mint/UploadImage.tsx": $mint_UploadImage,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
+    "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
+    "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
+    "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
+    "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
+    "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

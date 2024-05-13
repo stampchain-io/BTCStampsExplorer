@@ -1,5 +1,6 @@
+import { HandlerContext, Handlers, Request } from "$fresh/server.ts";
 import { CommonClass, getClient } from "$lib/database/index.ts";
-import { BlockInfo, ErrorResponseBody } from "globals";
+import { BlockInfo, ErrorResponseBody, IdHandlerContext } from "globals";
 
 /**
  * @swagger
@@ -27,34 +28,31 @@ import { BlockInfo, ErrorResponseBody } from "globals";
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
+export const handler: Handlers = {
+  async GET(_req: Request, ctx: IdHandlerContext) {
+    const number = ctx.params.number ? parseInt(ctx.params.number) : 1;
 
-export const handler = async (
-  _req: Request,
-  ctx: { params: { number: string } },
-): Promise<Response> => {
-  const { number } = ctx.params;
-  const parsedNumber = number ? parseInt(number) : 1;
+    if (Number.isNaN(number) || number < 1 || number > 100) {
+      const body: ErrorResponseBody = {
+        error: "Invalid number provided. Must be a number between 1 and 100.",
+      };
+      return new Response(JSON.stringify(body));
+    }
 
-  if (Number.isNaN(parsedNumber) || parsedNumber < 1 || parsedNumber > 100) {
-    const body: ErrorResponseBody = {
-      error: "Invalid number provided. Must be a number between 1 and 100.",
-    };
-    return new Response(JSON.stringify(body));
-  }
-
-  try {
-    const client = await getClient();
-    const lastBlocks = await CommonClass.get_last_x_blocks_with_client(
-      client,
-      parsedNumber,
-    );
-    const body: BlockInfo = lastBlocks;
-    return new Response(JSON.stringify(body));
-  } catch (error) {
-    console.error("Failed to get last blocks:", error);
-    const body: ErrorResponseBody = {
-      error: `Blocks not found`,
-    };
-    return new Response(JSON.stringify(body));
-  }
+    try {
+      const client = await getClient();
+      const lastBlocks = await CommonClass.get_last_x_blocks_with_client(
+        client,
+        number,
+      );
+      const body: BlockInfo = lastBlocks;
+      return new Response(JSON.stringify(body));
+    } catch (error) {
+      console.error("Failed to get last blocks:", error);
+      const body: ErrorResponseBody = {
+        error: `Related blocks not found`,
+      };
+      return new Response(JSON.stringify(body));
+    }
+  },
 };

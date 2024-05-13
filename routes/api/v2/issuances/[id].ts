@@ -1,5 +1,11 @@
-// api/v2/issuances/[id].ts
-import { getStampByIdOrIdentifier } from "$lib/controller/sharedHandlers.ts";
+import { HandlerContext } from "$fresh/server.ts";
+import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
+import {
+  ErrorResponseBody,
+  IdHandlerContext,
+  StampsResponseBody,
+} from "globals";
+
 /**
  * @swagger
  * /api/v2/issuances/{id}:
@@ -26,4 +32,31 @@ import { getStampByIdOrIdentifier } from "$lib/controller/sharedHandlers.ts";
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponseBody'
  */
-export const handler = getStampByIdOrIdentifier;
+export const handler = async (
+  _req: Request,
+  ctx: IdHandlerContext,
+): Promise<Response> => {
+  const { id } = ctx.params;
+  try {
+    const client = await getClient();
+    let data;
+    if (Number.isInteger(Number(id))) {
+      data = await CommonClass.get_issuances_by_stamp_with_client(client, id);
+    } else {
+      data = await StampsClass.get_issuances_by_identifier_with_client(
+        client,
+        id,
+      );
+    }
+    const last_block = await CommonClass.get_last_block_with_client(client);
+    const body: StampsResponseBody = {
+      last_block: last_block.rows[0]["last_block"],
+      data: data.rows,
+    };
+    return new Response(JSON.stringify(body));
+  } catch (error) {
+    // console.log(error)
+    const body: ErrorResponseBody = { error: `Error: Internal server error` };
+    return new Response(JSON.stringify(body));
+  }
+};

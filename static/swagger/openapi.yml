@@ -89,6 +89,31 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
 
+  /api/v2/block/related/{block_index}:
+    get:
+      summary: Get related blocks by block index or block hash
+      parameters:
+        - in: path
+          name: block_index
+          required: true
+          schema:
+            type: string
+          description: The block index or block hash
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockRelatedResponseBody'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+
   /api/v2/cursed:
     get:
       summary: Get paginated cursed stamps
@@ -895,6 +920,7 @@ paths:
                   sourceWallet: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   qty: 1
                   locked: true
+                  divisible: true
                   filename: test.png
                   file: "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAG1BMVEUAAAALOzcKBiAJTzz/1lqZoxgIaSyfQuJmIslgvM+QAAAAAXRSTlMAQObYZgAAAMlJREFUeNp9kNVhAzEMQFVtYE+ge8HfxhsUFkjuFih4gPJ3Jz9mMPuJJVvjzkR0CBJf7CFQB05GKs75EVCwEbAa+3Wg9XmZ5rOz7gljoE9ZmSydzT67lqcdaWrhUCo8m8baKDEt7Qqz4wtVKTVHRI8R2N1bW7wqMb4GLya0KQOYVOUrXfIaHKWY1lsCTfKXyih0msQXeA1td/RoHGOk++8figPKo67o+dqappTnx8FakD2Vxf11QA78F+cZ6cC5BCrd0F+T8UDmIwdjIhoVAu1hnQAAAABJRU5ErkJggg=="
                   satsPerKB: 20
@@ -902,7 +928,7 @@ paths:
                   service_fee_address: null
       responses:
         '200':
-          description: Successful response with the psbt transaction
+          description: Successful response with the hex value.
           content:
             application/json:
               schema:
@@ -910,10 +936,7 @@ paths:
                 properties:
                   hex:
                     type: string
-                    description: The hex string of the psbt transaction
-                  base64:
-                    type: string
-                    description: The base64 string of the psbt transaction
+                    description: The hex value.
         '400':
           description: Bad request error response.
           content:
@@ -973,42 +996,6 @@ components:
           type: number
         sends:
           type: number
-        tx_count:
-          type: number
-    DispenserRow:
-      type: object
-      properties:
-        tx_hash:
-          type: string
-        block_index:
-          type: number
-        source:
-          type: string
-        cpid:
-          type: string
-        give_quantity:
-          type: number
-        give_remaining:
-          type: number
-        escrow_quantity:
-          type: number
-        satoshirate:
-          type: number
-        btcrate:
-          type: number
-        origin:
-          type: string
-      required:
-        - tx_hash
-        - block_index
-        - source
-        - cpid
-        - give_quantity
-        - give_remaining
-        - escrow_quantity
-        - satoshirate
-        - btcrate
-        - origin
     StampRow:
       type: object
       properties:
@@ -1038,7 +1025,7 @@ components:
         stamp_url:
           type: string
         supply:
-          type: [number, 'null']
+          type: number
         timestamp:
           type: string
           format: date-time
@@ -1053,6 +1040,7 @@ components:
         creator_name:
           oneOf:
             - type: string
+            
         stamp_gen:
           type: string
         stamp_hash:
@@ -1497,6 +1485,15 @@ components:
             $ref: "#/components/schemas/SendRow"
         last_block:
           type: number
+    BlockRelatedResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        blocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockRow"
     StampBlockResponseBody:
       type: object
       properties:

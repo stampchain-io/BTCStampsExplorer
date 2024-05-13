@@ -120,7 +120,7 @@ export async function mintStampCIP33(
     const hex_file = CIP33.base64_to_hex(file);
     const cip33Addresses = CIP33.file_to_addresses(hex_file);
     console.log("hex", hex);
-    const psbt = await generatePSBT(
+    const psbt = generatePSBT(
       hex,
       sourceWallet,
       satsPerKB,
@@ -132,7 +132,6 @@ export async function mintStampCIP33(
     return psbt;
   } catch (error) {
     console.error("mint error", error);
-    throw error;
   }
 }
 
@@ -175,15 +174,7 @@ async function generatePSBT(
   let totalInputValue = 0; // Initialize total input value
   utxos.forEach((utxo) => totalInputValue += utxo.value); // Sum up input values
 
-  let inputs, change;
-
-  try {
-    ({ inputs, change } = selectUTXOs(utxos, vouts, fee_per_kb));
-  } catch (error) {
-    console.error(error);
-    throw Error(error.message);
-  }
-
+  const { inputs, change } = selectUTXOs(utxos, vouts, fee_per_kb);
   totalOutputValue += change; // Add change to total output value
 
   vouts.push({

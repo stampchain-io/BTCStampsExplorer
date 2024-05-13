@@ -128,7 +128,7 @@ export const handleQueryWithClient = async (
         error,
       );
       if (attempt === maxRetries) {
-        throw new Error("Stamps Down...");
+        throw error;
       }
     }
     await new Promise((resolve) => setTimeout(resolve, retryInterval));

@@ -26,7 +26,7 @@ export const handler: Handlers<any> = {
       totalPages: 1,
       total: 1,
     };
-    // console.log("API Response Wallet:", data); // Debug output
+    console.log("API Response Wallet:", data); // Debug output
     return await ctx.render(data);
   },
 };

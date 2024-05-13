@@ -1,3 +1,5 @@
+import { HandlerContext } from "$fresh/server.ts";
+
 // General Types ---------------------------------------------------------------
 
 type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
@@ -230,7 +232,7 @@ export interface Src20ResponseBody {
 
 export interface Src20BalanceResponseBody extends Pagination {
   last_block: number;
-  data: Src20Detail[] | {};
+  data: Src20Detail[];
 }
 
 export interface Src20SnapshotResponseBody extends Pagination {
@@ -274,6 +276,11 @@ export interface BlockInfoResponseBody {
   last_block: number;
 }
 
+export interface BlockRelatedResponseBody {
+  blocks: BlockRow[];
+  last_block: number;
+}
+
 export interface StampBlockResponseBody {
   block_info: BlockRow;
   data: StampRow[];
@@ -286,47 +293,45 @@ export interface DispenserResponseBody {
 
 // Handler Contexts ------------------------------------------------------------
 
-// IdHandlerContext is used when the context requires an 'id' parameter
-export interface IdHandlerContext {
+export interface IdHandlerContext extends HandlerContext {
   params: {
-    id: string;
+    id: string | number;
   };
 }
 
-// IdentHandlerContext is used when the context requires an 'ident' parameter
-export interface IdentHandlerContext {
+export interface IdentHandlerContext extends HandlerContext {
   params: {
     ident: string;
   };
 }
 
-export interface BlockHandlerContext {
+export interface BlockHandlerContext extends HandlerContext {
   params: {
-    block_index: string;
+    block_index: number | string;
   };
 }
 
-export interface AddressHandlerContext {
+export interface AddressHandlerContext extends HandlerContext {
   params: {
     address: string;
   };
 }
 
-export interface TickHandlerContext {
+export interface TickHandlerContext extends HandlerContext {
   params: {
     tick: string | number;
     op?: string; // future use for mint/transfer deploy is defined in routes
   };
 }
 
-export interface BlockTickHandlerContext {
+export interface BlockTickHandlerContext extends HandlerContext {
   params: {
     block_index: number | string;
     tick: string | number;
   };
 }
 
-export interface AddressTickHandlerContext {
+export interface AddressTickHandlerContext extends HandlerContext {
   params: {
     address: string;
     tick: string | number;
