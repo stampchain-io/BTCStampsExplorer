@@ -60,6 +60,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
 
   const getAccount = () => {
     setWallet(JSON.parse(localStorage.getItem("wallet") as any));
+    // setWallet({ address: "bc1qqz5tvzm3uw3w4lruga8aylsk9fs93y0w8fysfe" });
   };
 
   useEffect(() => {
@@ -96,66 +97,64 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                 </tr>
               </thead>
               <tbody>
-                {
-                  // data.filter((row) => row.creator === wallet.address).map(
-                  data.map(
-                    (src20: SRC20Row) => {
-                      const href = `/upload/${convertToEmoji(src20.tick)}`;
-                      return (
-                        <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                          <td class="px-6 py-4 uppercase">
-                            {src20.row_num}
-                          </td>
-                          <td class="px-6 py-4 uppercase">
-                            <img
-                              src={`/content/${src20.tx_hash}.svg`}
-                              class="w-10 h-10"
-                              onClick={() =>
-                                handleImageInteraction(
-                                  `/content/${src20.tx_hash}.svg`,
-                                )}
-                            />
-                          </td>
-                          <td class="px-6 py-4 uppercase">
-                            <a href={href}>
-                              {convertToEmoji(src20.tick)}
-                            </a>
-                          </td>
-                          <td class="px-6 py-4">
-                            {src20.block_index}
-                          </td>
-                          <td class="px-6 py-4">
-                            {src20.creator
-                              ? src20.creator
-                              : short_address(src20.creator)}
-                          </td>
-                          <td class="px-6 py-4">
-                            {typeof src20.max === "number"
-                              ? src20.max.toLocaleString()
-                              : Number(src20.max).toLocaleString()}
-                          </td>
-                          <td class="px-6 py-4">
-                            {typeof src20.lim === "number"
-                              ? src20.lim.toLocaleString()
-                              : Number(src20.lim).toLocaleString()}
-                          </td>
-                          <td class="px-6 py-4">
-                            {src20.deci}
-                          </td>
-                          <td class="px-6 py-4 text-sm">
-                            {new Date(src20.block_time).toLocaleString(
-                              "default",
-                              {
-                                month: "short",
-                                year: "numeric",
-                              },
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    },
-                  )
-                }
+                {data.filter((row) => row.creator === wallet.address).map(
+                  // data.map(
+                  (src20: SRC20Row) => {
+                    const href = `/upload/${convertToEmoji(src20.tick)}`;
+                    return (
+                      <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                        <td class="px-6 py-4 uppercase">
+                          {src20.row_num}
+                        </td>
+                        <td class="px-6 py-4 uppercase">
+                          <img
+                            src={`/content/${src20.tx_hash}.svg`}
+                            class="w-10 h-10"
+                            onClick={() =>
+                              handleImageInteraction(
+                                `/content/${src20.tx_hash}.svg`,
+                              )}
+                          />
+                        </td>
+                        <td class="px-6 py-4 uppercase">
+                          <a href={href}>
+                            {convertToEmoji(src20.tick)}
+                          </a>
+                        </td>
+                        <td class="px-6 py-4">
+                          {src20.block_index}
+                        </td>
+                        <td class="px-6 py-4">
+                          {src20.creator
+                            ? src20.creator
+                            : short_address(src20.creator)}
+                        </td>
+                        <td class="px-6 py-4">
+                          {typeof src20.max === "number"
+                            ? src20.max.toLocaleString()
+                            : Number(src20.max).toLocaleString()}
+                        </td>
+                        <td class="px-6 py-4">
+                          {typeof src20.lim === "number"
+                            ? src20.lim.toLocaleString()
+                            : Number(src20.lim).toLocaleString()}
+                        </td>
+                        <td class="px-6 py-4">
+                          {src20.deci}
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                          {new Date(src20.block_time).toLocaleString(
+                            "default",
+                            {
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  },
+                )}
               </tbody>
             </table>
           </div>
