@@ -130,6 +130,16 @@ export function Header() {
           >
             Minting
           </a>
+          <a
+            href="/upload"
+            f-partial={"/upload"}
+            onClick={toggleMenu}
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
+              path === "upload" ? "text-[#03A606]" : "text-white"
+            }`}
+          >
+            Upload Image
+          </a>
           <div class="block md:hidden">
             <ConnectWallet />
           </div>

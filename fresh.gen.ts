@@ -78,7 +78,9 @@ import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
+import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
+import * as $upload_UploadTickHeader from "./islands/upload/UploadTickHeader.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -174,7 +176,9 @@ const manifest = {
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
+    "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
+    "./islands/upload/UploadTickHeader.tsx": $upload_UploadTickHeader,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

@@ -32,6 +32,7 @@
     "bigfloat/": "https://deno.land/x/bigfloat@v3.0.2/",
     "@iconify/react": "npm:@iconify/react@4.1.1",
     "tailwindcss": "npm:tailwindcss@3.4.1",
+    "usehooks": "npm:usehooks-ts@3.1.0",
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
     "buffer": "https://deno.land/std@0.177.0/node/buffer.ts",

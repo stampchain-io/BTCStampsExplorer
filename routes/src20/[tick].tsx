@@ -149,7 +149,6 @@ export const SRC20TickPage = (props) => {
     last_block,
     total_sends,
   } = props.data;
-  console.log({ deployment });
 
   return (
     <div class="flex flex-col gap-8">
