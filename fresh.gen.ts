@@ -5,6 +5,7 @@
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
+import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
 import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index].ts";
 import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_count/[...number].ts";
 import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
@@ -82,6 +83,8 @@ const manifest = {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
+    "./routes/api/v2/balance/getStampsBalance.ts":
+      $api_v2_balance_getStampsBalance,
     "./routes/api/v2/block/[block_index].ts": $api_v2_block_block_index_,
     "./routes/api/v2/block/block_count/[...number].ts":
       $api_v2_block_block_count_number_,
