@@ -45,6 +45,7 @@ import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
+import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $BlockSelector from "./islands/BlockSelector.tsx";
 import * as $Footer from "./islands/Footer.tsx";
@@ -56,6 +57,7 @@ import * as $StampNavigator from "./islands/StampNavigator.tsx";
 import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_toast from "./islands/Toast/toast.tsx";
+import * as $UploadForm from "./islands/UploadForm.tsx";
 import * as $UploadImage from "./islands/UploadImage.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
 import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
@@ -74,6 +76,9 @@ import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
+import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
+import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
+import * as $upload_UploadTickHeader from "./islands/upload/UploadTickHeader.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -134,6 +139,7 @@ const manifest = {
     "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/index.tsx": $stamp_index,
+    "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
@@ -147,6 +153,7 @@ const manifest = {
     "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/toast.tsx": $Toast_toast,
+    "./islands/UploadForm.tsx": $UploadForm,
     "./islands/UploadImage.tsx": $UploadImage,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
     "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
@@ -166,6 +173,9 @@ const manifest = {
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
+    "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
+    "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
+    "./islands/upload/UploadTickHeader.tsx": $upload_UploadTickHeader,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
