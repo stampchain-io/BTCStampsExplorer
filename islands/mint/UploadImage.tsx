@@ -27,7 +27,7 @@ export function UploadImage() {
   const [coinType, setCoinType] = useState("BTC");
   const [visible, setVisible] = useState(false);
   const [txfee, setTxfee] = useState(0.001285);
-  const [mintfee, setMintfee] = useState(0.00015);
+  const [mintfee, setMintfee] = useState(0.00000);
   const [dust, setDust] = useState(0.000113);
   const [total, setTotal] = useState(0.001547);
   const [BTCPrice, setBTCPrice] = useState(60000);
@@ -38,7 +38,6 @@ export function UploadImage() {
   }, []);
 
   useEffect(() => {
-    
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -54,26 +53,22 @@ export function UploadImage() {
       .post(
         "https://wider-winter-seed.btc.quiknode.pro/e19fdcea2a4d1af8238330fc4832c8d4cc32bdaf",
         data,
-        config
+        config,
       )
       .then(function (response) {
         // handle success
 
         console.log(response.data.result.bitcoin.usd);
-        
-      setBTCPrice(parseFloat(response.data.result.bitcoin.usd));
+
+        setBTCPrice(parseFloat(response.data.result.bitcoin.usd));
       })
-      .catch((err:any) => {
+      .catch((err: any) => {
         // handle error
         console.log(err);
       });
-      
   }, [coinType]);
   const handleChangeFee = (e: any) => {
     setFee(e.target.value);
-  
-    
-                        
   };
 
   const handleChangeCoin = () => {
