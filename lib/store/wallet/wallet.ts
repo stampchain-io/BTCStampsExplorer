@@ -52,7 +52,7 @@ export const disconnect = () => {
 };
 
 export const getBasicStampInfo = async (address: string) => {
-  const response = await fetch("/api/getStampsBalance", {
+  const response = await fetch("/api/v2/balance/getStampsBalance", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ address }),
