@@ -12,15 +12,23 @@ import {
 } from "utils/xcp.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
-const sortData = (stamps, sortBy) => {
+const sortData = (stamps, sortBy, order) => {
+  let sortedStamps;
   if (sortBy == "Supply") {
-    return [...stamps.sort((a, b) => a.supply - b.supply)];
+    sortedStamps = stamps.sort((a, b) => a.supply - b.supply);
   } else if (sortBy == "Block") {
-    return [...stamps.sort((a, b) => a.block_index - b.block_index)];
+    sortedStamps = stamps.sort((a, b) => a.block_index - b.block_index);
   } else if (sortBy == "Stamp") {
-    return [...stamps.sort((a, b) => a.stamp - b.stamp)];
+    sortedStamps = stamps.sort((a, b) => a.stamp - b.stamp);
+  } else {
+    sortedStamps = stamps;
   }
-  return [...stamps];
+
+  if (order === "DESC") {
+    sortedStamps.reverse();
+  }
+
+  return sortedStamps;
 };
 
 const filterData = (stamps, filterBy) => {
@@ -33,10 +41,11 @@ const filterData = (stamps, filterBy) => {
     ) != null
   );
 };
+
 export async function api_get_stamps(
   page = 1,
   page_size = BIG_LIMIT,
-  order: "DESC" | "ASC" = "ASC",
+  order: "DESC" | "ASC" = "DESC",
   sortBy = "none",
   filterBy = [],
 ) {
@@ -55,13 +64,18 @@ export async function api_get_stamps(
       ["STAMP", "SRC-721"],
     );
 
-    let data = sortData(filterData(stamps.rows, filterBy), sortBy).slice(
+    // Sort the entire dataset before pagination
+    let sortedData = sortData(filterData(stamps.rows, filterBy), sortBy, order);
+
+    // Apply pagination
+    let paginatedData = sortedData.slice(
       page * page_size - page_size,
       page * page_size,
     );
+
     releaseClient(client);
     return {
-      stamps: data,
+      stamps: paginatedData,
       total: total.rows[0].total,
       pages: Math.ceil(total.rows[0].total / page_size),
       page: page,
@@ -72,7 +86,6 @@ export async function api_get_stamps(
     throw error;
   }
 }
-
 export async function api_get_stamp(id: string) {
   try {
     const client = await getClient();
