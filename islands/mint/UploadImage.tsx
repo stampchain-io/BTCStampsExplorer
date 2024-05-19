@@ -67,6 +67,7 @@ export function UploadImage() {
         console.log(err);
       });
   }, [coinType]);
+
   const handleChangeFee = (e: any) => {
     setFee(e.target.value);
   };
