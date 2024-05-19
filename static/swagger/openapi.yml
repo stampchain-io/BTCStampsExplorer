@@ -119,7 +119,9 @@ paths:
 
   /api/v2/cursed/{id}:
     get:
-      summary: Get stamp information by ID or identifier
+      summary: Get stamp by ID {tx_hash, stamp, cpid}
+      description: |
+        Cursed stamps simply have a negative stamp number. This is equivalent to /api/v2/stamps/{id} 
       parameters:
         - in: path
           name: id
