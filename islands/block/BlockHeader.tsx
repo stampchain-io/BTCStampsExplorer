@@ -4,7 +4,7 @@ export default function BlockHeader() {
   return (
     <div class="text-white flex flex-col gap-8">
       <div class="text-center">
-        <p class="text-7xl leading-normal">StampChain Blocks</p>
+        <p class="text-7xl leading-normal">Stamp Block Explorer</p>
         <p class="text-[#DBDBDB] font-light">
           Welcome to the forefront of digital collectibles, where each stamp is
           a unique<br />
