@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
+import { fetch_quicknode } from "utils/quicknode.ts";
 
 export function UploadImage() {
   const { wallet, isConnected } = walletContext;
@@ -38,34 +39,37 @@ export function UploadImage() {
   }, []);
 
   useEffect(() => {
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    const data = {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "cg_simplePrice",
-      params: ["bitcoin", "usd", true, true, true],
-    };
-    axiod
-      .post(
-        "https://wider-winter-seed.btc.quiknode.pro/e19fdcea2a4d1af8238330fc4832c8d4cc32bdaf",
-        data,
-        config,
-      )
-      .then(function (response) {
-        // handle success
-
-        console.log(response.data.result.bitcoin.usd);
-
-        setBTCPrice(parseFloat(response.data.result.bitcoin.usd));
-      })
-      .catch((err: any) => {
-        // handle error
-        console.log(err);
+    const func = async () => {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const data = {
+        jsonrpc: "2.0",
+        id: 1,
+        method: "cg_simplePrice",
+        params: ["bitcoin", "usd", true, true, true],
+      };
+      // const res = fetch_quicknode("cg_simplePrice", [
+      //   "bitcoin",
+      //   "usd",
+      //   true,
+      //   true,
+      //   true,
+      // ]);
+      const response = await fetch("/api/v2/quicknode/getPrice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "cg_simplePrice",
+          params: ["bitcoin", "usd", true, true, true],
+        }),
       });
+      const { price } = await response.json();
+      console.log(price);
+    };
+    func();
   }, [coinType]);
 
   const handleChangeFee = (e: any) => {
