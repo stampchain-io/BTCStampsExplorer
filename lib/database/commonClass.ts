@@ -305,7 +305,7 @@ export class CommonClass {
     try {
       const xcp_balances = await get_balances(address);
       const assets = xcp_balances.map((balance: any) => balance.cpid);
-  
+
       const query = `
         SELECT 
           st.cpid, 
@@ -332,14 +332,14 @@ export class CommonClass {
         LIMIT ${limit}
         OFFSET ${offset};
       `;
-  
+
       const balances = await handleSqlQueryWithCache(
         client,
         query,
         assets,
         TTL_CACHE,
       );
-  
+
       const grouped = balances.rows.reduce((acc: any, cur: any) => {
         acc[cur.cpid] = acc[cur.cpid] || [];
         acc[cur.cpid].push({
@@ -348,11 +348,11 @@ export class CommonClass {
         });
         return acc;
       }, {});
-  
+
       const summarized = Object.keys(grouped).map((key) =>
         summarize_issuances(grouped[key])
       );
-  
+
       return summarized.map((summary) => {
         const xcp_balance = xcp_balances.find((balance: any) =>
           balance.cpid === summary.cpid
@@ -367,3 +367,4 @@ export class CommonClass {
       return [];
     }
   }
+}
