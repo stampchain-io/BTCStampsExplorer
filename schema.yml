@@ -1017,12 +1017,10 @@ components:
         stamp:
           oneOf:
             - type: number
-            
         block_index:
           type: number
         cpid:
           type: string
-            
         creator:
           type: string
         divisible:
@@ -1030,7 +1028,6 @@ components:
         keyburn:
           oneOf:
             - type: number
-            
         locked:
           type: number
         stamp_base64:
@@ -1040,7 +1037,10 @@ components:
         stamp_url:
           type: string
         supply:
-          type: [number, 'null']
+          oneOf:
+            - type: number
+            - type: string
+          nullable: true
         timestamp:
           type: string
           format: date-time
@@ -1311,7 +1311,6 @@ components:
           type: string
           nullable: true
           description: The address involved in the transactions.
-      required: []
 
     PaginationQueryParams:
       type: object
@@ -1635,7 +1634,7 @@ components:
         assetName:
           oneOf:
             - type: string
-            - type: undefined
+          nullable: true
         qty:
           type: number
         locked:
@@ -1651,8 +1650,8 @@ components:
         service_fee:
           oneOf:
             - type: number
-            - type: undefined
+          nullable: true
         service_fee_address:
           oneOf:
             - type: string
-            - type: undefined
+          nullable: true
