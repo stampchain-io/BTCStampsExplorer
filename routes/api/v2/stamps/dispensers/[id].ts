@@ -39,19 +39,23 @@ export const handler = async (
 ): Promise<Response> => {
   const { id } = ctx.params;
   try {
-    // const data = await api_get_stamp_all_data(id);
-    // if (!data) {
-    //   throw new Error("Stamp not found");
-    // }
     const dispensers = await get_dispensers(id);
+    if (!dispensers) {
+      throw new Error("No dispensers found");
+    }
     const body: DispenserResponseBody = {
-      // data: data,
-      dispensers: dispensers, // Add the dispensers to the response body
+      dispensers: dispensers,
     };
-    return new Response(JSON.stringify(body));
+    return new Response(JSON.stringify(body), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Error:", error);
     const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return new Response(JSON.stringify(body));
+    return new Response(JSON.stringify(body), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
