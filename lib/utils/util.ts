@@ -43,6 +43,7 @@ export const get_suffix_from_mimetype = (mimetype: string) => {
   if (!mimetype) return "unknown";
   const suffix = mimetype.split("/")[1];
   if (suffix === "svg+xml") return "svg";
+  if (suffix == "javascript") return "js";
   if (!suffix) return "json";
   return suffix;
 };
