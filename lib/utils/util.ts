@@ -39,15 +39,17 @@ export const SUPPORTED_UNICODE = new Set(
   emojiCodePoints.map((code) => parseInt(code, 16)),
 );
 
-export const get_suffix_from_mimetype = (mimetype: string) => {
-  if (!mimetype) return "unknown";
-  const suffix = mimetype.split("/")[1];
-  if (suffix === "svg+xml") return "svg";
-  if (suffix == "javascript") return "js";
-  if (!suffix) return "json";
-  return suffix;
+const specialCases: { [key: string]: string } = {
+  "svg+xml": "svg",
+  "javascript": "js",
+  "plain": "txt",
 };
 
+export const get_suffix_from_mimetype = (mimetype: string): string => {
+  if (!mimetype) return "unknown";
+  const suffix = mimetype.split("/")[1];
+  return specialCases[suffix] || suffix || "json";
+};
 /**
  * Returns a shortened version of the given address.
  * @param address - The address to be shortened.
