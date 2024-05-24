@@ -58,7 +58,7 @@ export function UploadImage() {
       //   true,
       //   true,
       // ]);
-      const response = await fetch("/api/v2/quicknode/getPrice", {
+      const response = await fetch("/quicknode/getPrice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
