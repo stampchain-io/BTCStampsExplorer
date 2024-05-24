@@ -127,7 +127,6 @@ export class Src20Class {
       SELECT 
         (@row_number:=@row_number + 1) AS row_num,
         src20.tx_hash,
-        src20.tx_index,
         src20.block_index,
         src20.p,
         src20.op,

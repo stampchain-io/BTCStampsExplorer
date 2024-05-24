@@ -1,54 +1,17 @@
-import { FreshContext, Handlers } from "$fresh/runtime.ts";
+import { FreshContext, Handlers } from "$fresh/server.ts";
 import { MintStampInputData, TX, TXError } from "globals";
 import { conf } from "utils/config.ts";
 import { mintStampCIP33 } from "utils/minting/olga/mint.ts";
 import { generateAvailableAssetName } from "utils/minting/stamp.ts";
+import { ResponseUtil } from "utils/responseUtil.ts";
 
-/**
- * @swagger
- * /api/v2/olga/mint:
- *   post:
- *     summary: Mint a new OLGA STAMP.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/MintStampInputData'
- *     responses:
- *       '200':
- *         description: Successful response with the hex value.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 hex:
- *                   type: string
- *                   description: The hex value.
- *       '400':
- *         description: Bad request error response.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: The error message.
- */
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, _ctx: FreshContext) {
     let body: MintStampInputData;
     try {
       body = await req.json();
-    } catch (error) {
-      return new Response(
-        JSON.stringify({
-          error: "Invalid JSON format in request body",
-        }),
-        { status: 400 },
-      );
+    } catch (_error) {
+      return ResponseUtil.error("Invalid JSON format in request body", 400);
     }
 
     const assetName = await generateAvailableAssetName();
@@ -66,16 +29,11 @@ export const handler: Handlers<TX | TXError> = {
     try {
       const mint_tx = await mintStampCIP33(prepare);
       if (!mint_tx) {
-        return new Response(
-          JSON.stringify({
-            error: "Error generating mint transaction",
-          }),
-          { status: 400 },
-        );
+        return ResponseUtil.error("Error generating mint transaction", 400);
       }
 
       console.log(mint_tx);
-      return new Response(JSON.stringify({
+      return ResponseUtil.success({
         hex: mint_tx.psbt.toHex(),
         cpid: assetName,
         base64: mint_tx.psbt.toBase64(),
@@ -84,14 +42,9 @@ export const handler: Handlers<TX | TXError> = {
         total_dust_value: mint_tx.totalDustValue,
         est_miner_fee: mint_tx.estMinerFee,
         change_value: mint_tx.totalChangeOutput,
-      }));
+      });
     } catch (error) {
-      return new Response(
-        JSON.stringify({
-          error: `Error: ${error.message}`,
-        }),
-        { status: 500 },
-      );
+      return ResponseUtil.error(`Error: ${error.message}`, 500);
     }
   },
 };

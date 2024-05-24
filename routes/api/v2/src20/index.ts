@@ -1,4 +1,4 @@
-import { HandlerContext } from "$fresh/server.ts";
+import { FreshContext } from "$fresh/server.ts";
 import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { convertToEmoji, paginate } from "utils/util.ts";
@@ -7,46 +7,11 @@ import {
   PaginatedRequest,
   PaginatedSrc20ResponseBody,
 } from "globals";
-
-/**
- * @swagger
- * /api/v2/src20:
- *   get:
- *     summary: Get paginated valid src20 transactions
- *     description: Retrieve paginated valid src20 transactions with optional limit and page parameters
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1000
- *         description: The maximum number of transactions to retrieve per page
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: The page number of transactions to retrieve
- *     responses:
- *       '200':
- *         description: Successful response with paginated src20 transactions
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
- *       '500':
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
+import { ResponseUtil } from "utils/responseUtil.ts";
 
 export const handler = async (
   req: PaginatedRequest,
-  _ctx: HandlerContext,
+  _ctx: FreshContext,
 ): Promise<Response> => {
   try {
     const url = new URL(req.url);
@@ -79,9 +44,9 @@ export const handler = async (
         };
       }),
     };
-    return new Response(JSON.stringify(body));
-  } catch (error) {
+    return ResponseUtil.success(body);
+  } catch (_error) {
     const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return new Response(JSON.stringify(body));
+    return ResponseUtil.error(body.error, 500);
   }
 };

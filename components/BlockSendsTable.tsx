@@ -100,7 +100,6 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
                 </td>
                 <td class="px-6 py-4 text-sm">{send.memo}</td>
                 <td class="px-6 py-4 text-sm">{short_address(send.tx_hash)}</td>
-                <td class="px-6 py-4 text-sm">{send.tx_index}</td>
                 <td class="px-6 py-4 text-sm">
                   {dayjs(Number(block_info.block_time)).fromNow()}
                 </td>

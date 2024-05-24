@@ -5,6 +5,7 @@ import {
   IdHandlerContext,
   StampResponseBody,
 } from "globals";
+import { ResponseUtil } from "utils/responseUtil.ts";
 
 export const getStampByIdOrIdentifier = async (
   _req: Request,
@@ -25,9 +26,9 @@ export const getStampByIdOrIdentifier = async (
       last_block: last_block.rows[0]["last_block"],
       data: data,
     };
-    return new Response(JSON.stringify(body));
-  } catch {
+    return ResponseUtil.success(body);
+  } catch (_error) {
     const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return new Response(JSON.stringify(body));
+    return ResponseUtil.error(body.error, 500);
   }
 };

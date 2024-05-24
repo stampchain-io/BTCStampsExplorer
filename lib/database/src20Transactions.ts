@@ -1,4 +1,3 @@
-// utils/src20Transactions.ts
 import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import {
   convertToEmoji,
@@ -7,12 +6,12 @@ import {
 } from "$lib/utils/util.ts";
 import { SRC20BalanceRequestParams } from "globals";
 import {
+  PaginatedSrc20BalanceResponseBody,
   PaginatedSrc20ResponseBody,
-  Src20BalanceResponseBody,
   SRC20TrxRequestParams,
 } from "globals";
-import { ErrorResponseBody } from "globals";
 import { releaseClient } from "$lib/database/db.ts";
+import { ResponseUtil } from "utils/responseUtil.ts";
 
 export async function fetchAndFormatSrc20Transactions(
   params: SRC20TrxRequestParams,
@@ -92,26 +91,18 @@ export async function handleSrc20TransactionsRequest(
     const responseBodyString = await fetchAndFormatSrc20Transactions(
       finalParams,
     );
-    return new Response(responseBodyString, {
-      headers: { "Content-Type": "application/json" },
-    });
+    return ResponseUtil.success(responseBodyString); // Using ResponseUtil for success response
   } catch (error) {
     console.error("Error processing request:", error);
-    const errorBody: ErrorResponseBody = {
-      error: `Error: Internal server error. ${error.message || ""}`,
-    };
-    return new Response(JSON.stringify(errorBody), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return ResponseUtil.error(
+      `Error: Internal server error. ${error.message || ""}`,
+    ); // Using ResponseUtil for error response
   }
 }
 
 export async function fetchAndFormatSrc20Balance(
-  // TODO: pending implementation to reduce code duplication in /balance api calls
   params: SRC20BalanceRequestParams,
 ) {
-  // Destructure and use params
   const {
     address = null,
     tick = null,
@@ -126,7 +117,7 @@ export async function fetchAndFormatSrc20Balance(
     client,
     address,
     tick,
-    amt,
+    amt ?? 0,
     limit,
     page,
     sort,
@@ -136,12 +127,12 @@ export async function fetchAndFormatSrc20Balance(
     .get_total_src20_holders_by_tick_with_client(
       client,
       tick,
-      amt,
+      amt ?? 0,
     );
   const total = total_data.rows[0]["total"];
   const last_block = await CommonClass.get_last_block_with_client(client);
 
-  const body: Src20BalanceResponseBody = {
+  const body: PaginatedSrc20BalanceResponseBody = {
     page,
     limit,
     totalPages: Math.ceil(total / limit),
@@ -154,5 +145,6 @@ export async function fetchAndFormatSrc20Balance(
     })),
   };
 
-  return jsonStringifyBigInt(body);
+  releaseClient(client);
+  return ResponseUtil.success(jsonStringifyBigInt(body)); // Using ResponseUtil for success response
 }

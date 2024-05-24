@@ -1,37 +1,7 @@
-// import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
-import {
-  DispenserResponseBody,
-  ErrorResponseBody,
-  IdHandlerContext,
-} from "globals";
-import { get_dispensers } from "$lib/utils/xcp.ts";
-/**
- * @swagger
- * /api/v2/stamps/dispensers/{id}:
- *   get:
- *     summary: Get Dispensers by ID
- *     description: Retrieve all dispensers associated with a specific stamp ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID of the stamp
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: Successful response
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/StampResponseBody'
- *       '500':
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
+import { DispenserResponseBody, IdHandlerContext } from "globals";
+import { get_dispensers } from "utils/xcp.ts";
+import { CommonClass, getClient } from "$lib/database/index.ts";
+import { ResponseUtil } from "utils/responseUtil.ts";
 
 export const handler = async (
   _req: Request,
@@ -40,22 +10,21 @@ export const handler = async (
   const { id } = ctx.params;
   try {
     const dispensers = await get_dispensers(id);
-    if (!dispensers) {
-      throw new Error("No dispensers found");
+    const client = await getClient();
+    const last_block = await CommonClass.get_last_block_with_client(client);
+
+    if (!dispensers || dispensers.length === 0) {
+      return ResponseUtil.error("No dispensers found", 404);
     }
+
     const body: DispenserResponseBody = {
-      dispensers: dispensers,
+      dispensers: dispensers[0],
+      last_block: last_block.rows[0].last_block,
     };
-    return new Response(JSON.stringify(body), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+
+    return ResponseUtil.success(body);
   } catch (error) {
     console.error("Error:", error);
-    const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return new Response(JSON.stringify(body), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return ResponseUtil.error("Internal server error", 500);
   }
 };

@@ -1,6 +1,7 @@
 // General Types ---------------------------------------------------------------
 
 type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
+import Big from "https://esm.sh/big.js";
 
 interface BlockRow {
   block_index: number;
@@ -29,7 +30,6 @@ interface StampRow {
   supply: number;
   timestamp: Date;
   tx_hash: string;
-  tx_index: number;
   ident: SUBPROTOCOLS;
   creator_name: string | null;
   stamp_hash: string;
@@ -45,7 +45,6 @@ interface SendRow {
   memo: string;
   quantity: bigint;
   tx_hash: string;
-  tx_index: number;
   block_index: number;
   satoshirate: number | null;
   is_btc_stamp: number;
@@ -96,9 +95,7 @@ interface XCPParams {
 }
 
 interface SRC20Balance {
-  id: string;
   address: string;
-  cpid: string;
   p: string;
   tick: string;
   amt: number;
@@ -109,13 +106,12 @@ interface SRC20Balance {
 
 interface Src20Detail {
   tx_hash: string;
-  tx_index: number;
   block_index: number;
   p: string;
   op: string;
   tick: string;
   creator: string;
-  amt: number | null;
+  amt: Big | null;
   deci: number;
   lim: string;
   max: string;
@@ -124,6 +120,12 @@ interface Src20Detail {
   status: string | null;
   creator_name: string | null;
   destination_name: string;
+}
+
+interface Src20SnapShotDetail {
+  tick: string;
+  address: string;
+  balance: Big;
 }
 
 interface StampBalance {
@@ -218,6 +220,12 @@ export interface TickResponseBody extends Pagination {
   data: Src20Detail;
 }
 
+export interface DeployResponseBody {
+  last_block: number;
+  mint_status: MintStatus;
+  data: Src20Detail;
+}
+
 export interface StampsAndSrc20 {
   stamps: StampRow[];
   src20: SRC20Balance[];
@@ -228,14 +236,14 @@ export interface Src20ResponseBody {
   data: Src20Detail;
 }
 
-export interface Src20BalanceResponseBody extends Pagination {
+export interface PaginatedSrc20BalanceResponseBody extends Pagination {
   last_block: number;
-  data: Src20Detail[] | {};
+  data: Src20Detail[] | [];
 }
 
 export interface Src20SnapshotResponseBody extends Pagination {
   snapshot_block: number;
-  data: Src20Detail[];
+  data: Src20SnapShotDetail[];
 }
 
 export interface PaginatedBalanceResponseBody extends Pagination {
@@ -282,6 +290,7 @@ export interface StampBlockResponseBody {
 
 export interface DispenserResponseBody {
   dispensers: DispenserRow[];
+  last_block: number;
 }
 
 // Handler Contexts ------------------------------------------------------------

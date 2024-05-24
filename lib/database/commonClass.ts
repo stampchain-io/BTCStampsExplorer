@@ -1,10 +1,10 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { Client } from "$mysql/mod.ts";
-import { summarize_issuances } from "./index.ts";
-import { get_balances } from "../utils/xcp.ts";
-import { handleSqlQueryWithCache } from "../utils/cache.ts";
-import { BIG_LIMIT, STAMP_TABLE, TTL_CACHE } from "../utils/constants.ts";
+import { summarize_issuances } from "$lib/database/index.ts";
+import { get_balances } from "utils/xcp.ts";
+import { handleSqlQueryWithCache } from "utils/cache.ts";
+import { BIG_LIMIT, STAMP_TABLE, TTL_CACHE } from "utils/constants.ts";
 
 export class CommonClass {
   /**
@@ -113,7 +113,7 @@ export class CommonClass {
     } else {
       block_index = await this.get_block_index_by_hash_with_client(
         client,
-        block_index_or_hash,
+        String(block_index_or_hash),
       );
     }
 
@@ -157,24 +157,42 @@ export class CommonClass {
   static async get_stamps_by_block_with_client(
     client: Client,
     block_index_or_hash: number | string,
+    type: "stamps" | "cursed",
   ) {
     const isBlockIndex = !isNaN(Number(block_index_or_hash));
+    const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
     const query = `
-      SELECT st.*, num.stamp AS stamp, num.is_btc_stamp AS is_btc_stamp
-      FROM ${STAMP_TABLE} st
-      LEFT JOIN (
-          SELECT cpid, stamp, is_btc_stamp
-          FROM ${STAMP_TABLE}
-          WHERE stamp IS NOT NULL
-          AND is_btc_stamp IS NOT NULL
-      ) num ON st.cpid = num.cpid
+      SELECT 
+        st.stamp, 
+        st.block_index, 
+        st.cpid, 
+        st.creator, 
+        cr.creator AS creator_name, 
+        st.divisible, 
+        st.keyburn, 
+        st.locked, 
+        st.stamp_base64, 
+        st.stamp_mimetype, 
+        st.stamp_url, 
+        st.supply, 
+        st.block_time, 
+        st.tx_hash, 
+        st.tx_index, 
+        st.ident, 
+        st.stamp_hash, 
+        st.is_btc_stamp, 
+        st.file_hash
+      FROM ${STAMP_TABLE} AS st
+      LEFT JOIN creator AS cr ON st.creator = cr.address
       WHERE st.${isBlockIndex ? "block_index" : "block_hash"} = ?
+        AND ${stampCondition}
       ORDER BY st.${isBlockIndex ? "stamp" : "tx_index"};
     `;
+    const queryParams = [block_index_or_hash];
     return await handleSqlQueryWithCache(
       client,
       query,
-      [block_index_or_hash],
+      queryParams,
       "never",
     );
   }
@@ -220,12 +238,30 @@ export class CommonClass {
       : (isTxHash ? "tx_hash" : (isStampHash ? "stamp_hash" : "cpid"));
 
     const query = `
-      SELECT stamp, block_index, cpid, creator, divisible, keyburn, locked, stamp_base64, stamp_mimetype, 
-      stamp_url, supply, block_time, tx_hash, tx_index, ident, stamp_hash, is_btc_stamp, file_hash
-      FROM ${STAMP_TABLE}
-      WHERE ${queryKey} = ?
-      ORDER BY stamp;
-    `;
+        SELECT 
+          st.stamp, 
+          st.block_index, 
+          st.cpid, 
+          st.creator, 
+          st.divisible, 
+          st.keyburn, 
+          st.locked, 
+          st.stamp_base64, 
+          st.stamp_mimetype, 
+          st.stamp_url, 
+          st.supply, 
+          st.block_time, 
+          st.tx_hash, 
+          st.ident, 
+          st.stamp_hash, 
+          st.is_btc_stamp, 
+          st.file_hash,
+          cr.creator AS creator_name
+        FROM ${STAMP_TABLE} st
+        LEFT JOIN creator AS cr ON st.creator = cr.address
+        WHERE ${queryKey} = ?
+        ORDER BY st.stamp;
+      `;
     const queryParams = [stampOrTxHash];
 
     const issuances = await handleSqlQueryWithCache(
@@ -314,7 +350,6 @@ export class CommonClass {
           st.stamp_url, 
           st.stamp_mimetype, 
           st.tx_hash, 
-          st.is_btc_stamp,  
           st.divisible, 
           st.supply, 
           st.locked, 
