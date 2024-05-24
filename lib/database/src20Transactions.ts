@@ -26,7 +26,6 @@ export async function fetchAndFormatSrc20Transactions(
     tx_hash = null,
     address = null,
   } = params;
-
   const client = await getClient();
   const valid_src20_txs_in_block = await Src20Class
     .get_valid_src20_tx_with_client(
@@ -40,7 +39,6 @@ export async function fetchAndFormatSrc20Transactions(
       tx_hash,
       address,
     );
-
   const totalResult = await Src20Class.get_total_valid_src20_tx_with_client(
     client,
     tick,
@@ -49,7 +47,6 @@ export async function fetchAndFormatSrc20Transactions(
     tx_hash,
     address,
   );
-
   const total = totalResult.rows[0]["total"];
   const last_block = await CommonClass.get_last_block_with_client(client);
   const pagination = paginate(total, page, limit);
@@ -69,9 +66,8 @@ export async function fetchAndFormatSrc20Transactions(
       ? mappedData[0]
       : [mappedData].flat(),
   };
-
   releaseClient(client);
-  return jsonStringifyBigInt(body);
+  return body;
 }
 
 export async function handleSrc20TransactionsRequest(
@@ -88,15 +84,13 @@ export async function handleSrc20TransactionsRequest(
   };
 
   try {
-    const responseBodyString = await fetchAndFormatSrc20Transactions(
-      finalParams,
-    );
-    return ResponseUtil.success(responseBodyString); // Using ResponseUtil for success response
+    const responseBody = await fetchAndFormatSrc20Transactions(finalParams);
+    return ResponseUtil.success(responseBody);
   } catch (error) {
     console.error("Error processing request:", error);
     return ResponseUtil.error(
       `Error: Internal server error. ${error.message || ""}`,
-    ); // Using ResponseUtil for error response
+    );
   }
 }
 
@@ -111,7 +105,6 @@ export async function fetchAndFormatSrc20Balance(
     page = 1,
     sort = "ASC",
   } = params;
-
   const client = await getClient();
   const src20 = await Src20Class.get_src20_balance_with_client(
     client,
@@ -122,7 +115,10 @@ export async function fetchAndFormatSrc20Balance(
     page,
     sort,
   );
-
+  if (!src20.rows.length) {
+    releaseClient(client);
+    return ResponseUtil.error(`Error: SRC20 balance not found`, 404);
+  }
   const total_data = await Src20Class
     .get_total_src20_holders_by_tick_with_client(
       client,
@@ -131,7 +127,6 @@ export async function fetchAndFormatSrc20Balance(
     );
   const total = total_data.rows[0]["total"];
   const last_block = await CommonClass.get_last_block_with_client(client);
-
   const body: PaginatedSrc20BalanceResponseBody = {
     page,
     limit,

@@ -26,6 +26,10 @@ export const handler = async (
       page,
       sort,
     );
+
+    if (!src20) {
+      return ResponseUtil.error(`Error: SRC20 balance not found`, 404);
+    }
     const total = src20.length;
     const body: PaginatedSrc20ResponseBody = {
       page: page,
@@ -36,8 +40,7 @@ export const handler = async (
       data: src20,
     };
     return ResponseUtil.success(body);
-  } catch (error) {
-    console.error(error);
+  } catch (_error) {
     return ResponseUtil.error("Error: Internal server error");
   }
 };

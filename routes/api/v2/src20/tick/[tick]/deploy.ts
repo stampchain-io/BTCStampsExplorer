@@ -1,11 +1,6 @@
 import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
-import { jsonStringifyBigInt } from "utils/util.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
-import {
-  DeployResponseBody,
-  ErrorResponseBody,
-  TickHandlerContext,
-} from "globals";
+import { DeployResponseBody, TickHandlerContext } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 
 export const handler = async (
@@ -47,9 +42,8 @@ export const handler = async (
         tick: convertToEmoji(deployment.rows[0].tick),
       },
     };
-    return ResponseUtil.success(jsonStringifyBigInt(body));
+    return ResponseUtil.success(body); // Return the object directly
   } catch (_error) {
-    const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return ResponseUtil.error(JSON.stringify(body));
+    return ResponseUtil.error(`Error: Internal server error`);
   }
 };

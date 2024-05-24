@@ -239,7 +239,7 @@ export class Src20Class {
     // Add transaction hash and deploy image URL to each result
     const resultsWithDeployImg = results.rows.map((result) => ({
       ...result,
-      tx_hash: tx_hashes_map[result.tick],
+      deploy_tx: tx_hashes_map[result.tick],
       deploy_img: `${conf.IMAGES_SRC_PATH}/${tx_hashes_map[result.tick]}.svg`,
     }));
 
