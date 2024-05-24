@@ -11,8 +11,13 @@ import {
   get_sends,
 } from "utils/xcp.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
+import { HolderRow, StampRow } from "globals";
 
-const sortData = (stamps: any[], sortBy: string, order: "ASC" | "DESC") => {
+const sortData = (
+  stamps: StampRow[],
+  sortBy: string,
+  order: "ASC" | "DESC",
+) => {
   let sortedStamps;
   if (sortBy == "Supply") {
     sortedStamps = stamps.sort((a, b) => a.supply - b.supply);
@@ -135,7 +140,7 @@ export async function api_get_stamp_all_data(id: string) {
     releaseClient(client);
     return {
       stamp: stamp,
-      holders: holders.map((holder: any) => {
+      holders: holders.map((holder: HolderRow) => {
         return {
           address: holder.address,
           quantity: holder.divisible

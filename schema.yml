@@ -225,6 +225,20 @@ paths:
           schema:
             type: string
           description: The address of the wallet
+        - in: query
+          name: limit
+          example: 2
+          schema:
+            type: integer
+            minimum: 1
+            default: 200
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
       responses:
         '200':
           description: Successful response
@@ -232,6 +246,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedSrc20BalanceResponseBody'
+        '404':
+          description: Address Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
         '500':
           description: Internal server error
           content:
@@ -247,14 +267,14 @@ paths:
         - in: path
           name: address
           required: true
-          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
+          example: "bc1qx6tg7nls0u949wy8eudwcaw0rcq0vl7ehh6p9l"
           schema:
             type: string
           description: The address of the wallet
         - in: path
           name: tick
           required: true
-          example: "KEVIN"
+          example: "STAMP"
           schema:
             type: string
           description: The tick value
@@ -264,7 +284,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20ResponseBody'
+                $ref: '#/components/schemas/Src20BalanceResponseBody'
+        '404':
+          description: Address/Tick Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
         '500':
           description: Internal server error
           content:
@@ -765,7 +791,7 @@ paths:
         - in: path
           name: id
           required: true
-          example: "A497773418239920605"
+          example: "A12190973650444749000"
           description: Stamp number, cpid, or stamp_hash
           schema:
             type: string
@@ -798,11 +824,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InputData'
+              oneOf:
+                - $ref: '#/components/schemas/SRC20InputData'
+                - $ref: '#/components/schemas/SRC20TransferInputData'
             examples:
               deploy:
                 value:
-                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
                   toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
                   op: "deploy"
@@ -813,7 +840,6 @@ paths:
                   dec: 18
               mint:
                 value:
-                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
                   toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
                   op: "mint"
@@ -943,7 +969,8 @@ components:
     SendsRow:
       type: object
       properties:
-        from: string
+        from: 
+          type: string
     DispenserRow:
       type: object
       properties:
@@ -1105,6 +1132,9 @@ components:
         last_update:
           type: number
           description: "The block index of the last update to the balance"
+        deploy_tx:
+          type: string
+          description: "the tx_hash of the deploy transaction"
         deploy_img:
           type: string
           description: "The image associated with the deploy token"
@@ -1145,9 +1175,6 @@ components:
           type: string
         block_time:
           type: string
-        status:
-          oneOf:
-            - type: object
         creator_name:
           oneOf:
             - type: string
@@ -1292,17 +1319,6 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StampBalance"
-    Src20ResponseBody:
-      type: object
-      allOf:
-        - type: object
-          properties:
-            last_block:
-              type: number
-            data:
-              type: array
-              items:
-                $ref: "#/components/schemas/Src20Detail"
     PaginatedSrc20ResponseBody:
       type: object
       allOf:
@@ -1338,6 +1354,13 @@ components:
           $ref: "#/components/schemas/MintStatus"
         data:
           $ref: "#/components/schemas/Src20Detail"
+    Src20ResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          $ref: "#/components/schemas/Src20Detail"
     Src20SnapshotResponseBody:
       type: object
       allOf:
@@ -1348,7 +1371,6 @@ components:
               type: number
             data:
               $ref: "#/components/schemas/Src20SnapshotDetail"
-   
     StampsAndSrc20:
       type: object
       properties:
@@ -1360,13 +1382,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SRC20Balance"
-    Src20ResponseBody:
-      type: object
-      properties:
-        last_block:
-          type: number
-        data:
-          $ref: "#/components/schemas/SRC20Balance"
     PaginatedSrc20BalanceResponseBody:
       type: object
       properties:
@@ -1376,6 +1391,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SRC20Balance"
+    Src20BalanceResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          $ref: "#/components/schemas/SRC20Balance"
     PaginatedBalanceResponseBody:
       type: object
       allOf:
@@ -1429,7 +1451,8 @@ components:
       properties:
         dispensers:
           type: array
-          $ref: "#/components/schemas/DispenserRow"
+          items:
+            $ref: "#/components/schemas/DispenserRow"
         last_block:
           type: number
     ErrorResponseBody:
@@ -1545,7 +1568,38 @@ components:
       properties:
         error:
           type: string
-    InputData:
+    SRC20InputData:
+      type: object
+      properties:
+        op:
+          type: string
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        tick:
+          type: string
+        feeRate:
+          type: number
+        max:
+          oneOf:
+            - type: number
+            - type: string
+              nullable: true
+        lim:
+          oneOf:
+            - type: number
+            - type: string
+              nullable: true
+        dec:
+          type: number
+          nullable: true
+        amt:
+          oneOf:
+            - type: number
+            - type: string
+              nullable: true
+    SRC20TransferInputData:
       type: object
       properties:
         op:

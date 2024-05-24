@@ -18,7 +18,7 @@ export const handler = async (
     }
 
     const body: DispenserResponseBody = {
-      dispensers: dispensers[0],
+      dispensers: dispensers,
       last_block: last_block.rows[0].last_block,
     };
 

@@ -101,6 +101,7 @@ interface SRC20Balance {
   amt: number;
   block_time: Date;
   last_update: number;
+  deploy_tx: string;
   deploy_img: string;
 }
 
@@ -117,7 +118,6 @@ interface Src20Detail {
   max: string;
   destination: string;
   block_time: string;
-  status: string | null;
   creator_name: string | null;
   destination_name: string;
 }
@@ -238,9 +238,13 @@ export interface Src20ResponseBody {
 
 export interface PaginatedSrc20BalanceResponseBody extends Pagination {
   last_block: number;
-  data: Src20Detail[] | [];
+  data: SRC20Balance[] | [];
 }
 
+export interface Src20BalanceResponseBody {
+  last_block: number;
+  data: SRC20Balance;
+}
 export interface Src20SnapshotResponseBody extends Pagination {
   snapshot_block: number;
   data: Src20SnapShotDetail[];
@@ -312,6 +316,13 @@ export interface IdentHandlerContext {
 export interface BlockHandlerContext {
   params: {
     block_index: string;
+  };
+}
+
+export interface AddressTickHandlerContext {
+  params: {
+    address: string;
+    tick: string | number;
   };
 }
 
