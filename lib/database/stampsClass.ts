@@ -6,13 +6,17 @@ import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { get_suffix_from_mimetype } from "utils/util.ts";
 
 export class StampsClass {
-  static async get_total_stamps_with_client(client: Client) {
+  static async get_total_stamps_with_client(
+    client: Client,
+    type: "stamps" | "cursed",
+  ) {
+    const stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
     return await handleSqlQueryWithCache(
       client,
       `
       SELECT COUNT(*) AS total
       FROM ${STAMP_TABLE}
-      WHERE is_btc_stamp IS NOT NULL;
+      WHERE  ${stampCondition};
       `,
       [],
       1000 * 60 * 3,
@@ -31,17 +35,20 @@ export class StampsClass {
   static async get_total_stamps_by_ident_with_client(
     client: Client,
     ident: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
+    type: "stamps" | "cursed",
   ) {
     const identList = Array.isArray(ident) ? ident : [ident];
     const identCondition = identList.map((id) => `ident = '${id}'`).join(
       " OR ",
     );
+    const stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
     return await handleSqlQueryWithCache(
       client,
       `
       SELECT COUNT(*) AS total
       FROM ${STAMP_TABLE}
       WHERE (${identCondition})
+        AND ${stampCondition}
       AND is_btc_stamp IS NOT NULL;
       `,
       [],
@@ -54,16 +61,18 @@ export class StampsClass {
     limit = SMALL_LIMIT,
     page = 1,
     sort_order: "asc" | "desc" = "asc",
+    type: "stamps" | "cursed",
   ) {
     const offset = (page - 1) * limit;
     const order = sort_order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
     return await handleSqlQueryWithCache(
       client,
       `
         SELECT st.*, cr.creator AS creator_name
         FROM ${STAMP_TABLE} AS st
         LEFT JOIN creator AS cr ON st.creator = cr.address
-        WHERE st.is_btc_stamp IS NOT NULL
+        WHERE ${stampCondition}
         ORDER BY st.stamp ${order}
         LIMIT ? OFFSET ?;
       `,
@@ -77,9 +86,11 @@ export class StampsClass {
     limit = SMALL_LIMIT,
     page = 1,
     order = "DESC",
+    type: "stamps" | "cursed",
   ) {
     order = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
     const offset = (page - 1) * limit;
+    const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
     return await handleSqlQueryWithCache(
       client,
       `
@@ -96,7 +107,7 @@ export class StampsClass {
         st.block_index
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.is_btc_stamp IS NOT NULL AND (st.ident = 'STAMP' or st.ident = 'SRC-721')
+      WHERE ${stampCondition} AND (st.ident = 'STAMP' or st.ident = 'SRC-721')
       ORDER BY st.tx_index ?
       LIMIT ? OFFSET ?;
       `,
@@ -140,7 +151,22 @@ export class StampsClass {
     return await handleSqlQueryWithCache(
       client,
       `
-      SELECT st.*, cr.creator AS creator_name
+      SELECT
+        st.stamp,
+        st.tx_hash,
+        st.cpid,
+        st.creator,
+        cr.creator AS creator_name,
+        st.tx_hash, st.stamp_mimetype,
+        st.supply, st.divisible,
+        st.keyburn, st.stamp_base64,
+        st.stamp_url,
+        st.stamp_hash,
+        st.locked,
+        st.ident,
+        st.block_time,
+        st.file_hash,
+        st.block_index, cr.creator AS creator_name
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
       WHERE st.block_index = ?
@@ -157,16 +183,28 @@ export class StampsClass {
     ident: typeof SUBPROTOCOLS,
     limit = SMALL_LIMIT,
     page = 1,
+    type: "stamps" | "cursed",
   ) {
     const offset = (page - 1) * limit;
+    const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
     return await handleSqlQueryWithCache(
       client,
       `
-      SELECT st.*, cr.creator AS creator_name
+      SELECT
+        st.stamp,
+        st.cpid,
+        st.creator,
+        cr.creator AS creator_name,
+        st.tx_hash, st.stamp_mimetype,
+        st.supply, st.divisible,
+        st.locked,
+        st.ident,
+        st.block_time,
+        st.block_index
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
       WHERE st.ident = ?
-      AND st.is_btc_stamp IS NOT NULL
+      AND ${stampCondition}
       ORDER BY st.stamp
       LIMIT ? OFFSET ?;
       `,

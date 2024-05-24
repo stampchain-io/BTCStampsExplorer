@@ -4,7 +4,6 @@ import { convertToEmoji, short_address } from "utils/util.ts";
 
 interface SRC20Row {
   tx_hash: string;
-  tx_index: number;
   block_index: number;
   p: string;
   op: string;

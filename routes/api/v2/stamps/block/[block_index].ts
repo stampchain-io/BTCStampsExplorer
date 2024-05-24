@@ -1,37 +1,7 @@
 import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
-import {
-  BlockHandlerContext,
-  ErrorResponseBody,
-  StampBlockResponseBody,
-} from "globals";
+import { BlockHandlerContext, StampBlockResponseBody } from "globals";
 import { releaseClient } from "$lib/database/db.ts";
-
-/**
- * @swagger
- * /api/v2/stamps/block/{block_index}:
- *   get:
- *     summary: Get stamps by block index
- *     parameters:
- *       - in: path
- *         name: block_index
- *         required: true
- *         schema:
- *           type: string
- *         description: The index of the block
- *     responses:
- *       '200':
- *         description: Successful response
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/StampBlockResponseBody'
- *       '404':
- *         description: Block not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
+import { ResponseUtil } from "utils/responseUtil.ts";
 
 export const handler = async (
   _req: Request,
@@ -39,35 +9,34 @@ export const handler = async (
 ): Promise<Response> => {
   const { block_index } = ctx.params;
 
-  if (!Number.isInteger(Number(block_index))) {
-    const body: ErrorResponseBody = {
-      error: `Invalid block_index: ${block_index}. It must be an integer.`,
-    };
-    return new Response(JSON.stringify(body));
+  const blockIndexNumber = Number(block_index);
+  if (!Number.isInteger(blockIndexNumber)) {
+    return ResponseUtil.error(
+      `Invalid block_index: ${block_index}. It must be an integer.`,
+      400,
+    );
   }
 
   try {
     const client = await getClient();
     const block_info = await CommonClass.get_block_info_with_client(
       client,
-      block_index,
-    );
-    const data = await StampsClass.get_stamps_by_block_index_with_client(
-      client,
-      block_index,
+      blockIndexNumber,
     );
     const last_block = await CommonClass.get_last_block_with_client(client);
+    const data = await StampsClass.get_stamps_by_block_index_with_client(
+      client,
+      blockIndexNumber,
+    );
+
     const body: StampBlockResponseBody = {
       last_block: last_block.rows[0]["last_block"],
       block_info: block_info.rows[0],
       data: data.rows,
     };
     releaseClient(client);
-    return new Response(JSON.stringify(body));
+    return ResponseUtil.success(body);
   } catch {
-    const body: ErrorResponseBody = {
-      error: `Block: ${block_index} not found`,
-    };
-    return new Response(JSON.stringify(body));
+    return ResponseUtil.error(`Block: ${block_index} not found`, 404);
   }
 };

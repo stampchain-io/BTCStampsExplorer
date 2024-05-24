@@ -73,7 +73,7 @@ paths:
         - in: path
           name: number
           required: true
-          example: 5
+          example: 2
           schema:
             type: integer
           description: The number of last blocks
@@ -83,7 +83,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BlockInfo'
+                type: object
+                properties:
+                  blocks:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BlockRow"
         '500':
           description: Internal server error
           content:
@@ -130,7 +135,7 @@ paths:
         - in: path
           name: id
           required: true
-          example: "2"
+          example: "-2"
           schema:
             type: string
           description: Stamp number, cpid, or stamp_hash
@@ -155,7 +160,7 @@ paths:
         - in: path
           name: block_index
           required: true
-          example: 844755
+          example: 781141
           schema:
             type: integer
           description: The block index
@@ -172,69 +177,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
-
-
-
-  /api/v2/cursed/ident/{ident}:
-    get:
-      summary: Get paginated cursed stamps by ident
-      parameters:
-        - in: path
-          name: ident
-          required: true
-          example: "SRC-721"
-          schema:
-            type: string
-          description: The ident of the stamp (SRC-721, STAMP)
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          description: 'The maximum number of stamps to retrieve (default: 50)'
-        - in: query
-          name: page
-          schema:
-            type: integer
-          description: 'The page number of the results (default: 1)'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedIdResponseBody'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-  /api/v2/issuances/{id}:
-    get:
-      summary: Get stamp issuances by stamp number, cpid, or stamp_hash
-      parameters:
-        - in: path
-          name: id
-          required: true
-          example: "2"
-          schema:
-            type: string
-          description: Stamp number, cpid, or stamp_hash
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StampsResponseBody'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
 
   /api/v2/src20:
     get:
@@ -289,7 +231,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20BalanceResponseBody'
+                $ref: '#/components/schemas/PaginatedSrc20BalanceResponseBody'
         '500':
           description: Internal server error
           content:
@@ -322,7 +264,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20BalanceResponseBody'
+                $ref: '#/components/schemas/Src20ResponseBody'
         '500':
           description: Internal server error
           content:
@@ -504,6 +446,7 @@ paths:
           name: limit
           schema:
             type: integer
+            example: 2
             minimum: 1
             default: 50
           description: The maximum number of transactions to retrieve per page
@@ -721,6 +664,7 @@ paths:
             type: string
         - in: query
           name: limit
+          example: 2
           description: 'The maximum number of stamp balances to retrieve. default: 50'
           schema:
             type: integer
@@ -750,7 +694,7 @@ paths:
         - in: path
           name: block_index
           required: true
-          example: "435879"
+          example: "779652"
           schema:
             type: string
           description: The index of the block
@@ -784,6 +728,7 @@ paths:
             type: string
         - in: query
           name: limit
+          example: 2
           description: 'The maximum number of stamps to retrieve (default: 50)'
           schema:
             type: integer
@@ -857,16 +802,18 @@ paths:
             examples:
               deploy:
                 value:
+                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
                   toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
                   op: "deploy"
                   tick: "APIV2"
-                  feeRate: 60
+                  feeRate: 12
                   max: 2100000000
                   lim: 100000
                   dec: 18
               mint:
                 value:
+                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
                   toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
                   op: "mint"
@@ -987,22 +934,16 @@ components:
               format: date-time
         previous_block_hash:
           type: string
-        difficulty:
-          type: number
         ledger_hash:
           type: string
         txlist_hash:
           type: string
         messages_hash:
           type: string
-        indexed:
-          type: number
-        issuances:
-          type: number
-        sends:
-          type: number
-        tx_count:
-          type: number
+    SendsRow:
+      type: object
+      properties:
+        from: string
     DispenserRow:
       type: object
       properties:
@@ -1067,28 +1008,15 @@ components:
             - type: number
             - type: string
           nullable: true
-        timestamp:
-          type: string
-          format: date-time
         tx_hash:
-          type: string
-        tx_index:
-          type: number
-        src_data:
           type: string
         ident:
           $ref: "#/components/schemas/SUBPROTOCOLS"
         creator_name:
           oneOf:
             - type: string
-        stamp_gen:
-          type: string
         stamp_hash:
           type: string
-        is_btc_stamp:
-          oneOf:
-            - type: number
-            
         file_hash:
           type: string
     SendRow:
@@ -1113,8 +1041,6 @@ components:
           format: int64
         tx_hash:
           type: string
-        tx_index:
-          type: number
         block_index:
           type: number
     HolderRow:
@@ -1131,14 +1057,6 @@ components:
       properties:
         block_info:
           $ref: "#/components/schemas/BlockRow"
-        issuances:
-          type: array
-          items:
-            $ref: "#/components/schemas/StampRow"
-        sends:
-          type: array
-          items:
-            $ref: "#/components/schemas/SendRow"
     BtcInfo:
       type: object
       properties:
@@ -1173,11 +1091,7 @@ components:
     SRC20Balance:
       type: object
       properties:
-        id:
-          type: string
         address:
-          type: string
-        cpid:
           type: string
         p:
           type: string
@@ -1194,13 +1108,20 @@ components:
         deploy_img:
           type: string
           description: "The image associated with the deploy token"
+    Src20SnapShotDetail:
+      type: object
+      properties:
+        tick: 
+          type: string
+        address:
+          type: string
+        balance:
+          type: string
     Src20Detail:
       type: object
       properties:
         tx_hash:
           type: string
-        tx_index:
-          type: number
         block_index:
           type: number
         p:
@@ -1259,10 +1180,6 @@ components:
           type: string
         tx_hash:
           type: string
-        is_btc_stamp:
-          oneOf:
-            - type: number
-            - type: boolean
         divisible:
           type: number
         supply:
@@ -1375,6 +1292,17 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StampBalance"
+    Src20ResponseBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            last_block:
+              type: number
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Src20Detail"
     PaginatedSrc20ResponseBody:
       type: object
       allOf:
@@ -1439,7 +1367,7 @@ components:
           type: number
         data:
           $ref: "#/components/schemas/SRC20Balance"
-    Src20BalanceResponseBody:
+    PaginatedSrc20BalanceResponseBody:
       type: object
       properties:
         last_block:
@@ -1466,7 +1394,10 @@ components:
       type: object
       properties:
         data:
-          $ref: "#/components/schemas/StampRow"
+          type: object
+          properties:
+            stamp:
+              $ref: "#/components/schemas/StampRow"
         last_block:
           type: number
     StampsResponseBody:
@@ -1496,7 +1427,8 @@ components:
     DispenserResponseBody:
       type: object
       properties:
-        data:
+        dispensers:
+          type: array
           $ref: "#/components/schemas/DispenserRow"
         last_block:
           type: number
@@ -1518,10 +1450,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/StampRow"
-        sends:
-          type: array
-          items:
-            $ref: "#/components/schemas/SendRow"
         last_block:
           type: number
     StampBlockResponseBody:
