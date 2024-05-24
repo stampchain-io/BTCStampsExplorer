@@ -5,7 +5,6 @@ import {
   PaginatedSrc20BalanceResponseBody,
 } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts"; // Import the responseUtil helper
-import Big from "https://esm.sh/big.js";
 
 export const handler = async (
   req: Request,
@@ -16,7 +15,7 @@ export const handler = async (
   const params = url.searchParams;
   const limit = Number(params.get("limit")) || 1000;
   const page = Number(params.get("page")) || 1;
-  const amt = Big(params.get("amt"));
+  const amt = params.get("amt");
   const sort = params.get("sort") || "ASC";
   try {
     const client = await getClient();
@@ -25,7 +24,7 @@ export const handler = async (
       client as Client,
       address,
       null,
-      amt,
+      Number(amt) || undefined,
       limit,
       page,
       sort,
