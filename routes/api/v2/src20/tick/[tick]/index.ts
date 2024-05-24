@@ -3,12 +3,11 @@ import { paginate } from "utils/util.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import {
-  ErrorResponseBody,
   PaginatedRequest,
   PaginatedTickResponseBody,
   TickHandlerContext,
 } from "globals";
-import { jsonStringifyBigInt } from "../../../../../../lib/utils/util.ts";
+import { ResponseUtil } from "utils/responseUtil.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -22,7 +21,7 @@ export const handler = async (
     const op = url.searchParams.get("op");
     const sort = url.searchParams.get("sort") || "ASC";
     const client = await getClient();
-    tick = convertEmojiToTick(tick);
+    tick = convertEmojiToTick(String(tick));
     const src20_txs = await Src20Class
       .get_valid_src20_tx_with_client(
         client,
@@ -52,13 +51,13 @@ export const handler = async (
       last_block: last_block.rows[0]["last_block"],
       mint_status: {
         ...mint_status,
-        max_supply: mint_status.max_supply
+        max_supply: (mint_status.max_supply
           ? mint_status.max_supply.toString()
-          : null,
-        total_minted: mint_status.total_minted
+          : null) as string,
+        total_minted: (mint_status.total_minted
           ? mint_status.total_minted.toString()
-          : null,
-        limit: mint_status.limit ? mint_status.limit.toString() : null,
+          : null) as string,
+        limit: mint_status.limit ? mint_status.limit : null,
       },
       data: src20_txs.rows.map((tx: any) => {
         return {
@@ -71,11 +70,9 @@ export const handler = async (
       }),
     };
 
-    return new Response(jsonStringifyBigInt(body));
-  } catch (error) {
-    console.log(error);
-
-    const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return new Response(JSON.stringify(body));
+    return ResponseUtil.success(body);
+  } catch (_error) {
+    console.log(_error);
+    return ResponseUtil.error("Error: Internal server error");
   }
 };

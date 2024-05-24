@@ -20,6 +20,7 @@ export async function api_get_block(block_index_or_hash: number | string) {
     const issuances = await CommonClass.get_stamps_by_block_with_client(
       client,
       block_index_or_hash,
+      "stamps",
     );
 
     const sends = [];

@@ -1,13 +1,14 @@
 import { convertEmojiToTick } from "utils/util.ts";
 import {
   AddressTickHandlerContext,
-  ErrorResponseBody,
   PaginatedRequest,
   Src20SnapshotResponseBody,
 } from "globals";
 import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
-import { BigFloat } from "bigfloat/mod.ts";
 import { Client } from "$mysql/mod.ts";
+import { ResponseUtil } from "utils/responseUtil.ts";
+import Big from "https://esm.sh/big.js";
+import { Src20SnapShotDetail } from "globals";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -26,7 +27,7 @@ export const handler = async (
       throw new Error("Client not found");
     }
     const last_block = await CommonClass.get_last_block_with_client(client);
-    tick = convertEmojiToTick(tick);
+    tick = convertEmojiToTick(String(tick));
     const src20 = await Src20Class.get_src20_balance_with_client(
       client as Client,
       null,
@@ -36,33 +37,30 @@ export const handler = async (
       page,
       sort,
     );
-    const total_data = await Src20Class
-      .get_total_src20_holders_by_tick_with_client(
-        client as Client,
-        tick,
-        amt,
-      );
-    const total = total_data.rows[0]["total"];
+
+    const total = src20.length;
     const body: Src20SnapshotResponseBody = {
       page: page,
       limit: limit,
       totalPages: Math.ceil(total / limit),
       total: total,
       snapshot_block: last_block.rows[0]["last_block"],
-      data: src20.rows.map((row) => {
+      data: src20.map((row: Src20SnapShotDetail) => {
         return {
           tick: row["tick"],
           address: row["address"],
-          balance: new BigFloat(row["amt"]).toString(),
+          balance: new Big(row["amt"]),
         };
-      }).sort((a, b) => {
-        return new BigFloat(b.balance).gte(new BigFloat(a.balance));
+      }).sort((a: { balance: Big }, b: { balance: Big }) => {
+        const balanceA = new Big(a.balance);
+        const balanceB = new Big(b.balance);
+        if (balanceB.gte(balanceA)) return 1;
+        if (balanceA.gte(balanceB)) return -1;
+        return 0;
       }),
     };
-    return new Response(JSON.stringify(body));
-  } catch (error) {
-    console.error(error);
-    const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return new Response(JSON.stringify(body));
+    return ResponseUtil.success(body);
+  } catch (_error) {
+    return ResponseUtil.error("Error: Internal server error");
   }
 };

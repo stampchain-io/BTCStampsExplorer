@@ -12,7 +12,7 @@ import {
 } from "utils/xcp.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 
-const sortData = (stamps, sortBy, order) => {
+const sortData = (stamps: any[], sortBy: string, order: "ASC" | "DESC") => {
   let sortedStamps;
   if (sortBy == "Supply") {
     sortedStamps = stamps.sort((a, b) => a.supply - b.supply);
@@ -62,13 +62,18 @@ export async function api_get_stamps(
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
       ["STAMP", "SRC-721"],
+      "stamps",
     );
 
     // Sort the entire dataset before pagination
-    let sortedData = sortData(filterData(stamps.rows, filterBy), sortBy, order);
+    const sortedData = sortData(
+      filterData(stamps.rows, filterBy),
+      sortBy,
+      order,
+    );
 
     // Apply pagination
-    let paginatedData = sortedData.slice(
+    const paginatedData = sortedData.slice(
       page * page_size - page_size,
       page * page_size,
     );
@@ -93,27 +98,15 @@ export async function api_get_stamp(id: string) {
     if (!stamp) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
-    const total = await StampsClass.get_total_stamps_with_client(client);
-    // const cpid = stamp.cpid;
+    const total = await StampsClass.get_total_stamps_with_client(
+      client,
+      "stamps",
+    );
 
     releaseClient(client);
-    // const holders = await get_holders(cpid);
-    // const dispensers = await get_dispensers(cpid);
-    // const sends = await get_sends(cpid);
-    // const dispenses = await get_dispenses(cpid);
+
     return {
       stamp: stamp,
-      // holders: holders.map((holder: any) => {
-      //   return {
-      //     address: holder.address,
-      //     quantity: holder.divisible
-      //       ? holder.quantity / 100000000
-      //       : holder.quantity,
-      //   };
-      // }),
-      // sends: sends,
-      // dispensers: dispensers,
-      // dispenses: dispenses,
       total: total.rows[0].total,
     };
   } catch (error) {
@@ -129,7 +122,10 @@ export async function api_get_stamp_all_data(id: string) {
     if (!stamp) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
-    const total = await StampsClass.get_total_stamps_with_client(client);
+    const total = await StampsClass.get_total_stamps_with_client(
+      client,
+      "stamps",
+    );
     const cpid = stamp.cpid;
 
     const holders = await get_holders(cpid);
