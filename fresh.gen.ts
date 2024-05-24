@@ -13,7 +13,6 @@ import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
-import * as $api_v2_quicknode_getPrice from "./routes/api/v2/quicknode/getPrice.ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
 import * as $api_v2_src20_balance_snapshot_tick_ from "./routes/api/v2/src20/balance/snapshot/[tick].ts";
@@ -41,6 +40,7 @@ import * as $docs_index from "./routes/docs/index.tsx";
 import * as $home_index from "./routes/home/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $mint_index from "./routes/mint/index.tsx";
+import * as $quicknode_getPrice from "./routes/quicknode/getPrice.ts";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
@@ -98,7 +98,6 @@ const manifest = {
       $api_v2_cursed_block_block_index_,
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
-    "./routes/api/v2/quicknode/getPrice.ts": $api_v2_quicknode_getPrice,
     "./routes/api/v2/src20/balance/[address].ts":
       $api_v2_src20_balance_address_,
     "./routes/api/v2/src20/balance/[address]/[tick].ts":
@@ -135,6 +134,7 @@ const manifest = {
     "./routes/home/index.tsx": $home_index,
     "./routes/index.tsx": $index,
     "./routes/mint/index.tsx": $mint_index,
+    "./routes/quicknode/getPrice.ts": $quicknode_getPrice,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
