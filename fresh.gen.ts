@@ -11,7 +11,6 @@ import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_
 import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
-import * as $api_v2_cursed_ident_ident_ from "./routes/api/v2/cursed/ident/[ident].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
@@ -92,7 +91,6 @@ const manifest = {
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,
     "./routes/api/v2/cursed/block/[block_index].ts":
       $api_v2_cursed_block_block_index_,
-    "./routes/api/v2/cursed/ident/[ident].ts": $api_v2_cursed_ident_ident_,
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/src20/balance/[address].ts":
