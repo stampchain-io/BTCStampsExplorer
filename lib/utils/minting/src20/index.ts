@@ -19,7 +19,7 @@ import {
   IMintSRC20,
   IPrepareSRC20TX,
   ITransferSRC20,
-} from "./src20.d.ts";
+} from "utils/minting/src20/src20.d.ts";
 import { releaseClient } from "$lib/database/db.ts";
 
 export async function mintSRC20({
@@ -54,8 +54,7 @@ export async function mintSRC20({
       amt: amt,
     };
     const transferString = JSON.stringify(src20_mint_obj);
-    //TODO: check if toAddress is the one how pay the party
-    const fetchedUtxos = await getUTXOForAddress(fromAddress);
+    const fetchedUtxos = await getUTXOForAddress(toAddress);
     if (fetchedUtxos === null || fetchedUtxos.length === 0) {
       throw new Error("No UTXO found");
     }
@@ -105,10 +104,7 @@ export async function deploySRC20({
     });
     const client = await getClient();
 
-    const mint_info = await checkDeployedTick(
-      client,
-      tick,
-    );
+    const mint_info = await checkDeployedTick(client, tick);
     if (mint_info.deployed === true) {
       throw new Error(`Error: Token ${tick} already deployed`);
     }
@@ -121,14 +117,21 @@ export async function deploySRC20({
       dec: dec,
     };
     const transferString = JSON.stringify(src20_mint_obj);
-    const fetchedUtxos = await getUTXOForAddress(fromAddress);
+
+    // TODO: check for overmint
+
+    // Modified: Use toAddress or changeAddress for fetching UTXOs
+    const fetchedUtxos = await getUTXOForAddress(toAddress);
+    // console.log("Fetched UTXOs:", fetchedUtxos); // Log the fetched UTXOs
+    // console.log("Type of fetchedUtxos:", typeof fetchedUtxos); // Log the type of fetchedUtxos
+    // console.log("Is Array:", Array.isArray(fetchedUtxos)); // Check if fetchedUtxos is an array
+    // console.log("Length of fetchedUtxos:", fetchedUtxos.length); // Log the length of fetchedUtxos
+
     if (fetchedUtxos === null || fetchedUtxos.length === 0) {
+      // console.log("NO UTXO FOUND");
       throw new Error("No UTXO found");
     }
     const utxos: UTXO[] = fetchedUtxos;
-    if (utxos === null || utxos.length === 0) {
-      throw new Error("No UTXO found");
-    }
     const publicKey = await get_public_key_from_address(toAddress);
     const prepare: IPrepareSRC20TX = {
       network: bitcoin.networks.bitcoin,
