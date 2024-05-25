@@ -2,41 +2,66 @@ import { Foras, Memory, unzlib, zlib } from "compress";
 
 let initialized = false;
 
-async function zLibCompress(data: string) {
-  if (!initialized) {
-    try {
-      await Foras.initBundledOnce(); // this fails on vs code debugger, not in production
-      initialized = true;
-    } catch (error) {
-      console.error("Failed to initialize Foras:", error);
-      return;
-    }
-  }
-  const bytes = new TextEncoder().encode(data);
-  const mem = new Memory(bytes);
-  const compressed = zlib(mem).copyAndDispose();
-  const hexString = Array.from(compressed).map((b) =>
-    b.toString(16).padStart(2, "0")
-  ).join("");
-  return hexString;
-}
-
-async function zLibUncompress(hexString: string) {
-  await Foras.initBundledOnce();
-
-  const compressed = new Uint8Array(
-    hexString.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? [],
-  );
-  const comp_mem = new Memory(compressed);
-  const uncompressed = unzlib(comp_mem).copyAndDispose();
-  const decode = new TextDecoder().decode(uncompressed);
-  return decode;
-}
-
-function stringToHex(str: string) {
+export function stringToHex(str: string) {
   const encoder = new TextEncoder();
   const bytes = encoder.encode(str);
   return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function zLibCompress(data: string) {
+  try {
+    await initializeForas();
+  } catch {
+    // Handle the case where WebAssembly initialization fails
+    return stringToHex(data); // Return hex string as fallback
+  }
+
+  try {
+    const bytes = new TextEncoder().encode(data);
+    const mem = new Memory(bytes);
+    const compressed = zlib(mem).copyAndDispose();
+    const hexString = Array.from(compressed).map((b) =>
+      b.toString(16).padStart(2, "0")
+    ).join("");
+    return hexString;
+  } catch {
+    // Handle compression failure
+    return stringToHex(data); // Return hex string as fallback
+  }
+}
+
+async function zLibUncompress(hexString: string) {
+  try {
+    await initializeForas();
+  } catch {
+    // Handle the case where WebAssembly initialization fails
+    return hexString; // Return original hex string as fallback
+  }
+
+  try {
+    const compressed = new Uint8Array(
+      hexString.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? [],
+    );
+    const comp_mem = new Memory(compressed);
+    const uncompressed = unzlib(comp_mem).copyAndDispose();
+    const decode = new TextDecoder().decode(uncompressed);
+    return decode;
+  } catch {
+    // Handle decompression failure
+    return hexString; // Return original hex string as fallback
+  }
+}
+
+async function initializeForas() {
+  if (!initialized) {
+    try {
+      await Foras.initBundledOnce();
+      initialized = true;
+    } catch (error) {
+      console.error("Failed to initialize Foras:", error);
+      // Skip WebAssembly initialization
+    }
+  }
 }
 
 export async function compressWithCheck(data: string) {
@@ -47,25 +72,36 @@ export async function compressWithCheck(data: string) {
   let hexString;
 
   // Only compress if data is more than 32 bytes
-  if (dataBytes.length > 16) {
-    const compressed = await zLibCompress(data);
-    if (compressed === "") {
-      throw new Error("Compression resulted in an empty string");
+  if (dataBytes.length > 32) {
+    let compressed;
+    try {
+      compressed = await zLibCompress(data);
+    } catch {
+      compressed = stringToHex(data); // Fallback to hex string if compression fails
     }
 
-    const uncompressed = await zLibUncompress(compressed || "");
+    if (compressed === "") {
+      return stringToHex(data); // Return hex string if compression results in an empty string
+    }
+
+    let uncompressed;
+    try {
+      uncompressed = await zLibUncompress(compressed || "");
+    } catch {
+      uncompressed = data; // Fallback to original data if decompression fails
+    }
 
     if (uncompressed !== data) {
-      throw new Error("Error: ZLIB Compression error");
+      return stringToHex(data); // Return hex string if decompression does not match original data
     }
 
-    // Use the compressed data if it's shorter than the original hex string
     hexString = stringToHex(data);
     // Check if hexString is an empty string
     if (hexString === "") {
-      throw new Error("Hex string conversion resulted in an empty string");
+      return stringToHex(data); // Return hex string if conversion results in an empty string
     }
 
+    // Use the compressed data if it's shorter than the original hex string
     if (compressed.length < hexString.length) {
       return compressed; // compressed is already in hex format
     }
@@ -76,12 +112,11 @@ export async function compressWithCheck(data: string) {
     hexString = stringToHex(data);
     // Check if hexString is an empty string
     if (hexString === "") {
-      throw new Error("Hex string conversion resulted in an empty string");
+      return stringToHex(data); // Return hex string if conversion results in an empty string
     }
     return hexString;
   }
 }
-
 //const strs = [
 //  '{"p":"src-20", "op": "deploy", "tick":"PEPE", "dec":"8", "max":"100000000, "lim":"10000"}',
 //  '{"p":"src-20", "op": "mint", "tick":"PEPE", "amt":"1000000"}',
