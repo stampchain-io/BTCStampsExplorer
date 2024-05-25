@@ -865,13 +865,12 @@ paths:
                   hex:
                     type: string
                     description: The hex encoded serialized psbt trx
-                  base64:
-                    type: string
-                    description: The base64 encoded serialized psbt trx
-                  cpid:
-                    type: string
-                    description: The cpid assigned to the stamp
-
+                  fee:
+                    type: integer
+                    description: The estimated miner fee
+                  change:
+                    type: integer
+                    description: The change value
         '400':
           description: Bad request error response.
           content:
