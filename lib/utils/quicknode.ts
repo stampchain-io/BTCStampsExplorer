@@ -2,8 +2,8 @@ import { conf } from "utils/config.ts";
 import { MAX_XCP_RETRIES } from "utils/constants.ts";
 
 const { QUICKNODE_ENDPOINT, QUICKNODE_API_KEY } = conf;
-
 const QUICKNODE_URL = `${QUICKNODE_ENDPOINT}/${QUICKNODE_API_KEY}`;
+
 export const fetch_quicknode = async (
   method: string,
   params: unknown[],
@@ -23,19 +23,35 @@ export const fetch_quicknode = async (
       redirect: "follow",
     };
     const response = await fetch(QUICKNODE_URL, options);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        `Error: response for method: ${method} at ${QUICKNODE_ENDPOINT} unsuccessful. Response: ${response.status} - ${errorText}`,
+      );
+
+      // Handle specific fatal HTTP responses
+      if (
+        response.status === 402 ||
+        response.status >= 400 && response.status < 500
+      ) {
+        throw new Error(`Fatal error: ${response.status} - ${errorText}`);
+      }
+
       throw new Error(
         `Error: response for method: ${method} at ${QUICKNODE_ENDPOINT} unsuccessful. Response: ${response.status}`,
       );
     }
+
     const result = await response.json();
     return result;
   } catch (error) {
     if (retries < MAX_XCP_RETRIES) {
+      console.log(`Retrying... (${retries + 1}/${MAX_XCP_RETRIES})`);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return await fetch_quicknode(method, params, retries + 1);
     } else {
-      console.error(error);
+      console.error("Max retries reached. Returning null.");
       return null;
     }
   }
