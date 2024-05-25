@@ -43,7 +43,7 @@ export const prepareSrc20TX = async ({
   console.log("psbtNetwork", psbtNetwork);
 
   const psbt = new bitcoin.Psbt({ network: psbtNetwork });
-  const sortedUtxos = utxos.sort((a, b) => b.value - a.value);
+  const sortedUtxos = utxos.sort((a, b) => b.value - a.value); // TODO: check for pending trx on this UTXO
   console.log("sortedUtxos", sortedUtxos);
 
   const vouts: VOUT[] = [{ address: toAddress, value: 789 }];

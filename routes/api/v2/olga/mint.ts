@@ -11,7 +11,7 @@ export const handler: Handlers<TX | TXError> = {
     try {
       body = await req.json();
     } catch (_error) {
-      return ResponseUtil.error("Invalid JSON format in request body", 400);
+      return ResponseUtil.error("Invalid JSON format in request body", 500);
     }
 
     const assetName = await generateAvailableAssetName();
