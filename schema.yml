@@ -831,7 +831,7 @@ paths:
               deploy:
                 value:
                   toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   op: "deploy"
                   tick: "APIV2"
                   feeRate: 12
@@ -841,7 +841,7 @@ paths:
               mint:
                 value:
                   toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
                   op: "mint"
                   tick: "DOGE"
                   feeRate: 150
@@ -864,7 +864,14 @@ paths:
                 properties:
                   hex:
                     type: string
-                    description: The hex value.
+                    description: The hex encoded serialized psbt trx
+                  base64:
+                    type: string
+                    description: The base64 encoded serialized psbt trx
+                  cpid:
+                    type: string
+                    description: The cpid assigned to the stamp
+
         '400':
           description: Bad request error response.
           content:
@@ -912,9 +919,27 @@ paths:
                   hex:
                     type: string
                     description: The hex string of the psbt transaction
+                  cpid:
+                    type: string
+                    description: The asset name
                   base64:
                     type: string
                     description: The base64 string of the psbt transaction
+                  est_tx_size:
+                    type: integer
+                    description: The estimated transaction size
+                  input_value:
+                    type: integer
+                    description: The total input value
+                  total_dust_value:
+                    type: integer
+                    description: The total dust value
+                  est_miner_fee:
+                    type: integer
+                    description: The estimated miner fee
+                  change_value:
+                    type: integer
+                    description: The change value
         '400':
           description: Bad request error response.
           content:
@@ -925,6 +950,8 @@ paths:
                   error:
                     type: string
                     description: The error message.
+                required:
+                  - error
   
 
 components:
