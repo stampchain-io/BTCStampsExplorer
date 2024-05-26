@@ -67,7 +67,7 @@ export function UploadImage() {
         }),
       });
       const { price } = await response.json();
-      console.log(price);
+      setBTCPrice(price);
     };
     func();
   }, [coinType]);
