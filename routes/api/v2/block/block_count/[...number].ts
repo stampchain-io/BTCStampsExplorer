@@ -20,7 +20,7 @@ export const handler = async (
       client,
       parsedNumber,
     );
-    return ResponseUtil.success({ blocks: lastBlocks });
+    return ResponseUtil.successArray(lastBlocks);
   } catch (error) {
     console.error("Failed to get last blocks:", error);
     return ResponseUtil.error("Blocks not found", 404);

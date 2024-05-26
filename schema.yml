@@ -83,12 +83,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  blocks:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/BlockRow"
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlockRow"
         '500':
           description: Internal server error
           content:
