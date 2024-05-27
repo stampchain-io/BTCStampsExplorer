@@ -3,7 +3,6 @@ import { HandlerContext } from "$fresh/server.ts";
 import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
 import { useEffect, useState } from "preact/hooks";
 import { paginate } from "utils/util.ts";
-import { UploadForm } from "../../islands/UploadForm.tsx";
 import { initialWallet, walletContext } from "store/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
 
