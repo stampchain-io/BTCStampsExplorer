@@ -1,5 +1,5 @@
-import { DispenserResponseBody, IdHandlerContext } from "globals";
-import { get_dispensers } from "utils/xcp.ts";
+import { DispenserResponseBody, DispenserRow, IdHandlerContext } from "globals";
+import { get_dispensers, get_dispenses } from "utils/xcp.ts";
 import { CommonClass, getClient } from "$lib/database/index.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 
@@ -17,8 +17,19 @@ export const handler = async (
       return ResponseUtil.error("No dispensers found", 404);
     }
 
+    // Fetch dispenses for each dispenser
+    const mappedDispensers = await Promise.all(
+      dispensers.map(async (dispenser: DispenserRow) => {
+        const dispenses = await get_dispenses(dispenser.cpid);
+        return {
+          ...dispenser,
+          dispenses,
+        };
+      }),
+    );
+
     const body: DispenserResponseBody = {
-      dispensers: dispensers,
+      dispensers: mappedDispensers,
       last_block: last_block.rows[0].last_block,
     };
 

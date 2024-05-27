@@ -780,6 +780,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
+  /api/v2/stamps/dispensers:
+    get:
+      summary: Get all open dispensers 
+      description: Retrieve all open counterparty dispensers
+      parameters:
+        - in: query
+          name: limit
+          example: 2
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+          description: The maximum number of transactions to retrieve per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDispenserResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
   /api/v2/stamps/dispensers/{id}:
     get:
       summary: Get open dispensers by stamp number, cpid, or stamp_hash
@@ -994,6 +1028,23 @@ components:
       properties:
         from: 
           type: string
+    DispenseRow:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+        block_index:
+          type: integer
+        cpid:
+          type: string
+        source:
+          type: string
+        destination:
+          type: string
+        dispenser_tx_hash:
+          type: string
+        dispense_quantity:
+          type: integer
     DispenserRow:
       type: object
       properties:
@@ -1017,6 +1068,10 @@ components:
           type: number
         origin:
           type: string
+        dispenses:
+          type: array
+          items:
+            $ref: '#/components/schemas/DispenseRow'
       required:
         - tx_hash
         - block_index
@@ -1469,6 +1524,23 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StampRow"
+    PaginatedDispenserResponseBody:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+        total:
+          type: integer
+        last_block:
+          type: integer
+        dispensers:
+          type: array
+          items:
+            $ref: '#/components/schemas/DispenserRow'
     DispenserResponseBody:
       type: object
       properties:

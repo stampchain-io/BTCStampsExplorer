@@ -57,6 +57,16 @@ interface HolderRow {
   divisible: number;
 }
 
+export interface DispenseRow {
+  tx_hash: string;
+  block_index: number;
+  cpid: string;
+  source: string;
+  destination: string;
+  dispenser_tx_hash: string;
+  dispense_quantity: number;
+}
+
 interface DispenserRow {
   tx_hash: string;
   block_index: number;
@@ -68,6 +78,7 @@ interface DispenserRow {
   satoshirate: number;
   btcrate: number;
   origin: string;
+  dispenses: DispenseRow[];
 }
 
 interface BlockInfo {
@@ -297,6 +308,14 @@ export interface DispenserResponseBody {
   last_block: number;
 }
 
+export interface PaginatedDispenserResponseBody {
+  page: number;
+  limit: number;
+  totalPages: number;
+  total: number;
+  last_block: number;
+  dispensers: DispenserRow[];
+}
 // Handler Contexts ------------------------------------------------------------
 
 // IdHandlerContext is used when the context requires an 'id' parameter

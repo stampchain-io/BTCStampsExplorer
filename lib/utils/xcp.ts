@@ -263,7 +263,10 @@ export const get_dispensers = async (cpid: string) => {
  * Retrieves all dispensers with remaining give quantity.
  * @returns An object containing the total number of dispensers and an array of mapped dispensers.
  */
-export const get_all_dispensers = async () => {
+export const get_all_dispensers = async (
+  page: number = 1,
+  limit: number = 10,
+) => {
   const dispensers = await handleApiRequestWithCache(
     "get_dispensers",
     {},
@@ -272,27 +275,40 @@ export const get_all_dispensers = async () => {
 
   if (!dispensers) {
     console.log("No dispensers found");
-    return [];
+    return { total: 0, dispensers: [] };
   }
 
-  const filteredDispensers = dispensers.filter((dispenser: any) =>
+  const openDispensers = dispensers.filter((dispenser: any) =>
     dispenser.give_remaining > 0
   );
 
-  const mappedDispensers = filteredDispensers.map((dispenser: any) => ({
-    tx_hash: dispenser.tx_hash,
-    block_index: dispenser.block_index,
-    source: dispenser.source,
-    cpid: dispenser.asset,
-    give_quantity: dispenser.give_quantity,
-    escrow_quantity: dispenser.escrow_quantity,
-    satoshirate: dispenser.satoshirate,
-    origin: dispenser.origin,
-  }));
+  const mappedDispensers = await Promise.all(
+    openDispensers.map(async (dispenser: any) => {
+      const dispenses = await get_dispenses(dispenser.asset);
+      return {
+        tx_hash: dispenser.tx_hash,
+        block_index: dispenser.block_index,
+        source: dispenser.source,
+        cpid: dispenser.asset,
+        give_quantity: dispenser.give_quantity,
+        give_remaining: dispenser.give_remaining,
+        escrow_quantity: dispenser.escrow_quantity,
+        satoshirate: dispenser.satoshirate,
+        btcrate: dispenser.satoshirate / 100000000, // Convert satoshis to BTC
+        origin: dispenser.origin,
+        dispenses,
+      };
+    }),
+  );
 
-  const total = filteredDispensers.length;
+  const total = openDispensers.length;
 
-  return { total, mappedDispensers };
+  // Calculate pagination
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginatedDispensers = mappedDispensers.slice(startIndex, endIndex);
+
+  return { total, dispensers: paginatedDispensers };
 };
 
 /**
@@ -310,11 +326,16 @@ export const get_dispenses = async (cpid: string) => {
       },
     ],
   };
-  const payload = CreatePayload("get_dispenses", params);
-  const dispenses = await handleQuery(payload);
+  const dispenses = await handleApiRequestWithCache(
+    "get_dispenses",
+    params,
+    1000 * 60 * 3,
+  );
+
   if (!dispenses) {
     return [];
   }
+
   return dispenses.map((dispense: any) => ({
     tx_hash: dispense.tx_hash,
     block_index: dispense.block_index,
@@ -323,6 +344,5 @@ export const get_dispenses = async (cpid: string) => {
     destination: dispense.destination,
     dispenser_tx_hash: dispense.dispenser_tx_hash,
     dispense_quantity: dispense.dispense_quantity,
-    // need to query the tx_hash to get the amount?
   }));
 };
