@@ -1,6 +1,5 @@
 import { short_address } from "utils/util.ts";
 
-
 interface BTCAddressInfoProps {
   btc: {
     address: string;
@@ -23,17 +22,21 @@ export default function BtcAddressInfo(props: BTCAddressInfoProps) {
             <td class="whitespace-nowrap">{short_address(btc.address)}</td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">BTC Balance</th>
             <td class="whitespace-nowrap">{btc.balance} BTC</td>
-            <th scope="row" class="whitespace-nowrap px-6 py-3">Confirmed TXs</th>
+            <th scope="row" class="whitespace-nowrap px-6 py-3">
+              Confirmed TXs
+            </th>
             <td class="whitespace-nowrap">{btc.txCount}</td>
           </tr>
           <tr class="border-b">
             <th scope="row" class="px-6 py-3">Unconfirmed Balance</th>
             <td class="whitespace-nowrap">{btc.unconfirmedBalance}</td>
-            <th scope="row" class="whitespace-nowrap px-6 py-3">Unconfirmed TXs</th>
+            <th scope="row" class="whitespace-nowrap px-6 py-3">
+              Unconfirmed TXs
+            </th>
             <td class="whitespace-nowrap">{btc.unconfirmedTxCount}</td>
           </tr>
         </tbody>
       </table>
     </div>
-  )
+  );
 }

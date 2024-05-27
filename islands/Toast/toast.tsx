@@ -1,7 +1,7 @@
 // ToastContext.tsx
-import { createContext } from 'preact';
-import { useState, useContext } from 'preact/hooks';
-import { ToastComponent } from './ToastComponent.tsx';
+import { createContext } from "preact";
+import { useContext, useState } from "preact/hooks";
+import { ToastComponent } from "./ToastComponent.tsx";
 
 const ToastContext = createContext(null);
 
@@ -29,9 +29,7 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
-      {toasts.map(toast => (
-        <ToastComponent key={toast.id} {...toast} />
-      ))}
+      {toasts.map((toast) => <ToastComponent key={toast.id} {...toast} />)}
     </ToastContext.Provider>
   );
 };

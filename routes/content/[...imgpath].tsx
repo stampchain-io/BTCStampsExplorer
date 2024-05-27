@@ -14,7 +14,9 @@ export async function handler(
     path = `${conf.IMAGES_SRC_PATH}/${imgpath}`;
     try {
       const file = await fetch(path);
-      if (!file.ok) throw new Error(`File ${imgpath} not found in IMAGES_SRC_PATH`);
+      if (!file.ok) {
+        throw new Error(`File ${imgpath} not found in IMAGES_SRC_PATH`);
+      }
       const content = await file.arrayBuffer();
       return new Response(content, {
         status: 200,

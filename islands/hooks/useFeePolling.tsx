@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'preact/hooks';
-import { getRecommendedFees, getCurrentBlock } from 'utils/mempool.ts';
+import { useEffect, useState } from "preact/hooks";
+import { getCurrentBlock, getRecommendedFees } from "utils/mempool.ts";
 
 export const useFeePolling = (intervalDuration = 30000) => {
   const [fees, setFees] = useState(null);
@@ -39,8 +39,10 @@ export const useFeePolling = (intervalDuration = 30000) => {
     intervalId = setInterval(fetchFees, intervalDuration);
 
     progressInterval = setInterval(() => {
-      setProgress(prevProgress => {
-        return prevProgress >= 100 ? 100 : prevProgress + (100 * 1000 / intervalDuration);
+      setProgress((prevProgress) => {
+        return prevProgress >= 100
+          ? 100
+          : prevProgress + (100 * 1000 / intervalDuration);
       });
     }, 1000);
 

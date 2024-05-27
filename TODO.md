@@ -15,7 +15,8 @@
   - [DOING] Migrate all the logic from enpoints to its own file to be reused by
     pages and endpoint
     - this is done for /stamps and /stamps/balance/[address]
-- [DONE] create classes for database functions - will make importing/exporting easier and faster
+- [DONE] create classes for database functions - will make importing/exporting
+  easier and faster
 - [TODO] /stamps/block and /stamps/balance and /block_count doesnt work
 - [TODO] /balance and /cursed pagination
 
@@ -35,7 +36,6 @@
 - [TODO] Work on stamp page
 - [TODO] tons of work...
 
-
 # SRC20:
 
 - GET[tx_hash] return src20 transaction info (fromAddress, toAddress, op,
@@ -47,42 +47,34 @@
   - check if is a valid posible tx
   - create unsigned transaction
 
-
 # OPENAPI
 
 ## stamps
-[x] /stamps/index
-[x] /stamps/[id]
-[x] /stamps/ident/[ident]
-[x] /stamps/block/[block_index]
-[x] /stamps/balance/[address]
+
+[x] /stamps/index [x] /stamps/[id] [x] /stamps/ident/[ident] [x]
+/stamps/block/[block_index] [x] /stamps/balance/[address]
 
 ## cursed
-[x] /cursed/index
-[x] /cursed/[id]
-[x] /cursed/ident
-[x] /cursed/block/[block_index]
-[x] /cursed/balance/[address]
+
+[x] /cursed/index [x] /cursed/[id] [x] /cursed/ident [x]
+/cursed/block/[block_index] [x] /cursed/balance/[address]
 
 ## issuances
+
 [x] /issuances/[id]
 
 ## block
-[x] /block/[block_index]
-[x] /block/related/[block_index]
-[x] /block/block_count/[...number]
+
+[x] /block/[block_index] [x] /block/related/[block_index] [x]
+/block/block_count/[...number]
 
 ## balance
+
 [x] /balance/address
 
 ## src20
-[x] /src20/index
-[] /src20/create
-[x] /src20/tx/[tx_hash]
-[x] /src20/tick
-[x] /src20/tick/[tick]
-[x] /src20/tick/[tick]/deploy
-[x] /src20/block/[block_index]
-[x] /src/block/[block_index]/[tick]
-[x] /src20/balance/[address]
-[x] /src20/balance/[address]/[tick]
+
+[x] /src20/index [] /src20/create [x] /src20/tx/[tx_hash] [x] /src20/tick [x]
+/src20/tick/[tick] [x] /src20/tick/[tick]/deploy [x] /src20/block/[block_index]
+[x] /src/block/[block_index]/[tick] [x] /src20/balance/[address] [x]
+/src20/balance/[address]/[tick]
