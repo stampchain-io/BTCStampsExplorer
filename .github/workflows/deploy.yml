@@ -24,4 +24,22 @@ jobs:
           deno-version: v1.x
 
       - name: Build step
-        run: "deno task build"
+        run: deno task build
+
+      - name: Start Deno app
+        run: deno run -A dev.ts &
+        env:
+          PORT: 8000
+
+      - name: Wait for Deno app to be ready
+        run: |
+          echo "Waiting for Deno app to start..."
+          sleep 10
+
+      - name: Install Dredd
+        run: npm install -g dredd
+
+      - name: Run Dredd tests
+        run: dredd
+        env:
+          DREDD_SERVER: http://localhost:8000
