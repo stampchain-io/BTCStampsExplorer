@@ -58,7 +58,6 @@ import * as $StampNavigator from "./islands/StampNavigator.tsx";
 import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_toast from "./islands/Toast/toast.tsx";
-import * as $UploadForm from "./islands/UploadForm.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
 import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
@@ -154,7 +153,6 @@ const manifest = {
     "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/toast.tsx": $Toast_toast,
-    "./islands/UploadForm.tsx": $UploadForm,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
     "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
     "./islands/Wallet/ConnectorsModal.tsx": $Wallet_ConnectorsModal,
