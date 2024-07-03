@@ -36,10 +36,10 @@ export function StampCard({
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
-      className="text-white group relative z-10 flex h-full w-full grow flex-col p-1 @container bg-[#181818] transition-all hover:bg-gray-700"
+      className="bg-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col m-1 p-2 rounded-lg @container transition-all"
     >
       <div class="relative flex overflow-hidden">
-        <div class="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden rounded-t-lg">
+        <div class="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden rounded-lg">
           <div class="center relative aspect-square overflow-hidden">
             {suffix === "html"
               ? (
@@ -58,39 +58,47 @@ export function StampCard({
                     e.currentTarget.src = `/not-available.png`;
                   }}
                   alt={`Stamp No. ${stamp.stamp}`}
-                  class="pixelart image-rendering-pixelated h-full w-full object-contain items-center standalone:h-full standalone:w-auto"
-                  style={{ backgroundColor: "#000000" }}
+                  class="h-full w-full object-contain items-center standalone:h-full standalone:w-auto bg-[#F56487]"
                 />
               )}
           </div>
         </div>
       </div>
       <div class="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
-        <div class="flex justify-between bg-white text-black">
-          <h3 class="text-[13px] font-medium text-text pl-3">
-            {`${stamp.stamp}`}
+        <div class="flex justify-between text-black">
+          <h3 class="text-[13px] font-semibold text-white text-lg">
+            {`Stamp #${stamp.stamp}`}
           </h3>
-          <h3 class="truncate text-[13px] text-text pr-3">
+        </div>
+        <div>
+          <div class="flex justify-between text-black">
+            <h3 class="text-white text-[11px]">Creator address :</h3>
+          </div>
+          <h3 class="truncate text-[13px] text-[#C7C5C5]">
             {stamp.creator_name
               ? stamp.creator_name
               : short_address(stamp.creator, 6)}
           </h3>
         </div>
         {
-          /* stamp.collection &&
-          <a class="text-[12px] text-accent hover:underline" href="/collection/honey-badgers">
-            {stamp.collection}
-          </a>
-        */
+          /* {stamp.collection &&
+          (
+            <a
+              class="text-[12px] text-accent hover:underline"
+              href="/collection/honey-badgers"
+            >
+              {stamp.collection}
+            </a>
+          )} */
         }
         {
           /* <p class="truncate text-[13px] rounded-lg ">
-        {stamp.cpid}
-      </p> */
+          {stamp.cpid}
+        </p> */
         }
-        <div class="flex flex-1 flex-col justify-end rounded-b-lg bg-white text-black border-t-2 border-black">
+        <div class="flex flex-1 flex-col justify-end rounded-b-lg text-white">
           <div class="flex items-center gap-x-2 justify-between pt-1">
-            <div class="bg-foreground-1 transition-all hover:bg-foreground-1-hover pl-3">
+            <div class="bg-foreground-1 transition-all hover:bg-foreground-1-hover">
               <div class="center h-[18px] text-[12px] gap-x-1">
                 <p class="leading-4">
                   {stamp.ident !== "SRC-20" && stamp.balance
@@ -107,7 +115,7 @@ export function StampCard({
                 </p>
               </div>
             </div>
-            <p class="truncate text-[12px] rounded-lg uppercase pr-3">
+            <p class="truncate text-[12px] rounded-lg uppercase">
               {stamp.ident && stamp.ident === "SRC-20"
                 ? "SRC-20"
                 : stamp.ident && stamp.ident === "SRC-721"

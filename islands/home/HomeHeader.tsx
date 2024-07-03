@@ -1,23 +1,22 @@
-import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
+// import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 
 export const HomeHeader = () => {
   return (
-    <div class="text-white flex flex-col gap-8">
-      <div class="w-2/3">
-        <p class="text-7xl leading-normal">
-          Unprunable UTXO Art, Because Sats Don't Exist.
-        </p>
-        <p class="text-[#DBDBDB] font-light">
-          Welcome to the forefront of digital collectibles, where each stamp is
-          a unique<br />
-          piece of art intertwined with the immutability of the blockchain.
-        </p>
-        <div class="mt-5">
+    <div class="flex flex-col items-center justify-center gap-8">
+      <p class="max-w-[1000px] text-6xl leading-normal text-center text-[#F5F5F5]">
+        Unprunable{" "}
+        <span class="text-[#7A00F5] font-bold">UTXO Art</span>, Because Sats
+        Don't Exist.
+      </p>
+      <p class="max-w-[850px] text-2xl text-[#DBDBDB] text-center">
+        Welcome to the forefront of digital collectibles, where each stamp is a
+        unique piece of art intertwined with the immutability of the blockchain.
+      </p>
+      {
+        /* <div class="mt-5">
           <ConnectWallet />
-        </div>
-      </div>
-      <div class="w-1/3">
-      </div>
+        </div> */
+      }
     </div>
   );
 };

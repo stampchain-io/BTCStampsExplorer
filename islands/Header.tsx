@@ -31,7 +31,7 @@ export function Header() {
 
   return (
     <nav className="py-2 md:py-4">
-      <div className="container px-4 mx-auto md:flex md:items-center md:justify-between">
+      <div className="container mx-auto md:flex md:items-center md:justify-between">
         <div className="flex justify-between items-center">
           <a
             href="/block/last"
@@ -74,8 +74,8 @@ export function Header() {
             href="/home"
             f-partial={"/home"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "home" ? "text-[#03A606]" : "text-white"
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+              path === "home" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
             Home
@@ -84,8 +84,8 @@ export function Header() {
             href="/stamp"
             f-partial={"/stamp"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "stamp" ? "text-[#03A606]" : "text-white"
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+              path === "stamp" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
             Stamps
@@ -94,8 +94,8 @@ export function Header() {
             href="/src20"
             f-partial={"/src20"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "src20" ? "text-[#03A606]" : "text-white"
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+              path === "src20" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
             Src-20
@@ -104,8 +104,8 @@ export function Header() {
             href="/block/last"
             f-partial={"/block/last"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "block" ? "text-[#03A606]" : "text-white"
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+              path === "block" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
             Blocks
@@ -114,8 +114,8 @@ export function Header() {
             href="/collection"
             f-partial={"/collection"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "collection" ? "text-[#03A606]" : "text-white"
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+              path === "collection" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
             Collections
@@ -124,22 +124,24 @@ export function Header() {
             href="/mint"
             f-partial={"/mint"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "mint" ? "text-[#03A606]" : "text-white"
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+              path === "mint" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
             Minting
           </a>
-          <a
+          {
+            /* <a
             href="/upload"
             f-partial={"/upload"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "upload" ? "text-[#03A606]" : "text-white"
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+              path === "upload" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
             Upload Image
-          </a>
+          </a> */
+          }
           <div class="block md:hidden">
             <ConnectWallet />
           </div>

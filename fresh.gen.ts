@@ -66,7 +66,9 @@ import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connector
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $collection_CollectionHeader from "./islands/collection/CollectionHeader.tsx";
+import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
+import * as $home_HomeSalesInfo from "./islands/home/HomeSalesInfo.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
 import * as $mint_UploadImage from "./islands/mint/UploadImage.tsx";
@@ -162,7 +164,9 @@ const manifest = {
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/collection/CollectionHeader.tsx": $collection_CollectionHeader,
+    "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
+    "./islands/home/HomeSalesInfo.tsx": $home_HomeSalesInfo,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/mint/MintHeader.tsx": $mint_MintHeader,
     "./islands/mint/UploadImage.tsx": $mint_UploadImage,
