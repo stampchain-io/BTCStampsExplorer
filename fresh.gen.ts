@@ -69,6 +69,8 @@ import * as $collection_CollectionHeader from "./islands/collection/CollectionHe
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
 import * as $home_HomeSalesInfo from "./islands/home/HomeSalesInfo.tsx";
+import * as $home_HomeSalesInfoDetails from "./islands/home/HomeSalesInfoDetails.tsx";
+import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
 import * as $mint_UploadImage from "./islands/mint/UploadImage.tsx";
@@ -167,6 +169,8 @@ const manifest = {
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
     "./islands/home/HomeSalesInfo.tsx": $home_HomeSalesInfo,
+    "./islands/home/HomeSalesInfoDetails.tsx": $home_HomeSalesInfoDetails,
+    "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/mint/MintHeader.tsx": $mint_MintHeader,
     "./islands/mint/UploadImage.tsx": $mint_UploadImage,

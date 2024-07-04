@@ -4,7 +4,7 @@ import { PageControl } from "$islands/PageControl.tsx";
 import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";
 import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
-import { StampNavigator } from "../../islands/stamp/StampNavigator.tsx";
+import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
 import { useEffect } from "preact/hooks";
 import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
@@ -27,7 +27,9 @@ export const handler: Handlers<StampRow> = {
     console.log(filterBy, sortBy, "stamp");
     if (url.searchParams.get("filterBy") == "") filterBy = [];
     const page = parseInt(url.searchParams.get("page") || "1");
-    const page_size = parseInt(url.searchParams.get("limit") || BIG_LIMIT);
+    const page_size = parseInt(
+      url.searchParams.get("limit") || BIG_LIMIT.toString(),
+    );
     const order = url.searchParams.get("order")?.toUpperCase() || "DESC";
     const { stamps, total, pages, page: pag, page_size: limit } =
       await api_get_stamps(page, page_size, order, sortBy, filterBy);

@@ -9,11 +9,18 @@ export function StampSearchClient() {
   };
 
   return (
-    <input
-      type="text"
-      className="min-w-80 bg-[#262424] px-4 py-2 border border-[#8A8989] rounded-lg"
-      placeholder="Search stamp..."
-      onInput={handleSearch}
-    />
+    <div class="relative inline-block">
+      <input
+        type="text"
+        className="min-w-[460px] h-[54px] bg-[#3F2A4E] px-4 py-2 rounded text-[13px] text-[#8D9199]"
+        placeholder="Search stamps"
+        onInput={handleSearch}
+      />
+      <img
+        src="/img/icon_search.svg"
+        alt="Search icon"
+        class="absolute top-4 right-6"
+      />
+    </div>
   );
 }

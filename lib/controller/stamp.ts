@@ -53,6 +53,7 @@ export async function api_get_stamps(
   order: "DESC" | "ASC" = "DESC",
   sortBy = "none",
   filterBy = [],
+  typeBy = ["STAMP", "SRC-721"],
 ) {
   try {
     const client = await getClient();
@@ -66,7 +67,7 @@ export async function api_get_stamps(
     }
     const total = await StampsClass.get_total_stamps_by_ident_with_client(
       client,
-      ["STAMP", "SRC-721"],
+      typeBy,
       "stamps",
     );
 

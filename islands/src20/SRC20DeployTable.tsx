@@ -1,26 +1,6 @@
+import { SRC20Row } from "globals";
 import { useState } from "preact/hooks";
-
 import { convertToEmoji, short_address } from "utils/util.ts";
-
-interface SRC20Row {
-  tx_hash: string;
-  block_index: number;
-  p: string;
-  op: string;
-  tick: string;
-  tick_hash: string;
-  creator: string;
-  creator_name: string;
-  amt?: string | number;
-  deci?: number;
-  max?: string | number;
-  lim?: string | number;
-  destination: string;
-  destination_name?: string;
-  block_time: Date;
-  status: string;
-  row_num: number;
-}
 
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
