@@ -58,6 +58,7 @@ export function HomeTable({ data = [] }: { data: [] }) {
             </tr>
           </thead>
           <tbody class="text-lg">
+            {/* this is intended to pull both src-20 and stamps */}
             {data.map((src20: SRC20Row) => {
               const href = `/src20/${convertToEmoji(src20.tick)}`;
               return (
@@ -79,10 +80,10 @@ export function HomeTable({ data = [] }: { data: [] }) {
                     STAMP
                   </td>
                   <td class="px-3 md:px-6 py-2 md:py-4">
-                    0.012 slots
+                    0.012 BTC
                   </td>
                   <td class="px-3 md:px-6 py-2 md:py-4">
-                    12 slots
+                    12 BTC
                   </td>
                   <td class="px-3 md:px-6 py-2 md:py-4">
                     {src20.destination_name
