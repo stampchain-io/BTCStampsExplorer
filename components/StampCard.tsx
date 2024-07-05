@@ -36,7 +36,7 @@ export function StampCard({
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
-      className="bg-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col m-1 p-2 rounded-lg @container transition-all"
+      className="bg-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col m-1 p-2 rounded-lg @container transition-all min-w-[200px]"
     >
       <div class="relative flex overflow-hidden">
         <div class="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden rounded-lg">

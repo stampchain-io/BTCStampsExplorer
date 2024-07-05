@@ -1,8 +1,10 @@
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
-import { StampCard } from "$components/StampCard.tsx";
+// import { useEffect, useState } from "preact/hooks";
+
 import { StampRow } from "globals";
-import { useEffect, useState } from "preact/hooks";
-import { StampsClass } from "$lib/database/index.ts";
+
+import { StampCard } from "$components/StampCard.tsx";
+
+// import { StampsClass } from "$lib/database/index.ts";
 
 // const sortData = (stamps: StampRow[], sortBy: string) => {
 //   const data = [...stamps];
@@ -29,22 +31,10 @@ import { StampsClass } from "$lib/database/index.ts";
 // };
 
 export function PageControl(
-  { page, pages, page_size, type = "stamp", stamps = [] }: {
-    page: number;
-    pages: number;
-    page_size: number;
-    type: "cursed" | "stamp";
+  { stamps = [] }: {
     stamps: [];
   },
 ) {
-  const maxPagesToShow = 5;
-  const currentPage = page;
-  const totalPages = pages;
-  const startPage = Math.max(1, currentPage - maxPagesToShow);
-  const endPage = Math.min(totalPages, currentPage + maxPagesToShow);
-  const pageItems = [];
-  const { filterOption, sortOption } = useNavigator();
-
   // useEffect(() => {
   //   if (stamps.length > 0) {
   //     console.log("updated!!!!", stamps.length, stamps.at(0));
@@ -53,86 +43,13 @@ export function PageControl(
   //   }
   // }, [sortOption, filterOption]);
 
-  for (let p = startPage; p <= endPage; p++) {
-    pageItems.push(
-      <li key={p}>
-        <a
-          href={`/${type}?page=${p}&limit=${page_size}&sort=${sortOption}&filter=${filterOption}`}
-          f-partial={`/${type}?page=${p}&limit=${page_size}`}
-          class={`flex items-center justify-center px-3 h-8 leading-tight font-medium hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-white
-            ${
-            currentPage === p
-              ? "bg-white text-gray-800 dark:bg-gray-400 dark:text-black font-semibold"
-              : "text-gray-500 bg-white dark:text-gray-400 dark:bg-gray-800"
-          }`}
-        >
-          {p}
-        </a>
-      </li>,
-    );
-  }
-
   return (
-    <>
-      {(stamps.length != 0) &&
-        (
-          <nav aria-label="Page navigation">
-            <ul class="inline-flex items-center -space-x-px text-sm">
-              <li>
-                <a
-                  href={`/${type}?page=1&limit=${page_size}`}
-                  f-partial={`/${type}?page=1&limit=${page_size}`}
-                  class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-r-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  {"<<"}
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`/${type}?page=${
-                    Math.max(1, currentPage - 1)
-                  }&limit=${page_size}`}
-                  f-partial={`/${type}?page=${
-                    Math.max(1, currentPage - 1)
-                  }&limit=${page_size}`}
-                  class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-r-0 border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  {"<"}
-                </a>
-              </li>
-              {pageItems}
-              <li>
-                <a
-                  href={`/${type}?page=${
-                    Math.min(totalPages, currentPage + 1)
-                  }&limit=${page_size}`}
-                  f-partial={`/${type}?page=${
-                    Math.min(totalPages, currentPage + 1)
-                  }&limit=${page_size}`}
-                  class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  {">"}
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`/${type}?page=${totalPages}&limit=${page_size}`}
-                  f-partial={`/${type}?page=${totalPages}&limit=${page_size}`}
-                  class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-l-0 border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  {">>"}
-                </a>
-              </li>
-            </ul>
-          </nav>
-        )}
-      <div name="stamps">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out">
-          {stamps.map((stamp: StampRow) => (
-            <StampCard stamp={stamp} kind="stamp" />
-          ))}
-        </div>
+    <div name="stamps">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 py-6 transition-opacity duration-700 ease-in-out">
+        {stamps.map((stamp: StampRow) => (
+          <StampCard stamp={stamp} kind="stamp" />
+        ))}
       </div>
-    </>
+    </div>
   );
 }

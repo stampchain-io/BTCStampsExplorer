@@ -36,10 +36,10 @@ export function Header() {
           <a
             href="/block/last"
             f-partial={"/block/last"}
-            className="font-bold text-xl text-indigo-600"
+            className="font-bold text-xl text-indigo-600 hidden md:block"
           >
             <img
-              src="/img/stampchain.gif"
+              src="/img/logo.png"
               alt="stampchain"
               className="w-[178px] h-auto"
             />
@@ -60,6 +60,10 @@ export function Header() {
               <img src="/img/menu-open.png" alt="menu" className="w-6 h-6" />
             )}
           </button>
+
+          <div class="block md:hidden">
+            <ConnectWallet />
+          </div>
         </div>
 
         <div
@@ -74,7 +78,7 @@ export function Header() {
             href="/home"
             f-partial={"/home"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white text-3xl md:text-base ${
               path === "home" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
@@ -84,7 +88,7 @@ export function Header() {
             href="/stamp"
             f-partial={"/stamp"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white text-3xl md:text-base ${
               path === "stamp" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
@@ -94,7 +98,7 @@ export function Header() {
             href="/src20"
             f-partial={"/src20"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white text-3xl md:text-base ${
               path === "src20" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
@@ -104,7 +108,7 @@ export function Header() {
             href="/block/last"
             f-partial={"/block/last"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white text-3xl md:text-base ${
               path === "block" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
@@ -114,7 +118,7 @@ export function Header() {
             href="/collection"
             f-partial={"/collection"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white text-3xl md:text-base ${
               path === "collection" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
@@ -124,7 +128,7 @@ export function Header() {
             href="/mint"
             f-partial={"/mint"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white text-3xl md:text-base ${
               path === "mint" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
@@ -135,16 +139,13 @@ export function Header() {
             href="/upload"
             f-partial={"/upload"}
             onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white ${
+            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline hover:text-gray-600 text-white text-3xl md:text-base ${
               path === "upload" ? "border-[#7A00F5] border-b-4" : ""
             }`}
           >
             Upload Image
           </a> */
           }
-          <div class="block md:hidden">
-            <ConnectWallet />
-          </div>
         </div>
         <div class="hidden md:block">
           <ConnectWallet />

@@ -119,7 +119,13 @@ export class StampsClass {
   static async get_resumed_stamps(
     client: Client,
     order = "DESC",
+    typeBy: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
   ) {
+    const identList = Array.isArray(typeBy) ? typeBy : [typeBy];
+    const identCondition = identList.map((id) => `ident = '${id}'`).join(
+      " OR ",
+    );
+
     order = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
     return await handleSqlQueryWithCache(
       client,
@@ -137,7 +143,7 @@ export class StampsClass {
         st.block_index
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.is_btc_stamp IS NOT NULL AND (st.ident = 'STAMP' or st.ident = 'SRC-721')
+      WHERE st.is_btc_stamp IS NOT NULL AND (${identCondition})
       `,
       [],
       1000 * 60 * 3,

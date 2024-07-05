@@ -8,6 +8,7 @@ import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
 import { useEffect } from "preact/hooks";
 import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
+import { Pagination } from "$components/Pagination.tsx";
 
 type StampPageProps = {
   params: {
@@ -28,9 +29,9 @@ export const handler: Handlers<StampRow> = {
     if (url.searchParams.get("filterBy") == "") filterBy = [];
     const page = parseInt(url.searchParams.get("page") || "1");
     const page_size = parseInt(
-      url.searchParams.get("limit") || BIG_LIMIT.toString(),
+      url.searchParams.get("limit") || "24",
     );
-    const order = url.searchParams.get("order")?.toUpperCase() || "DESC";
+    const order = url.searchParams.get("order")?.toUpperCase() || "ASC";
     const { stamps, total, pages, page: pag, page_size: limit } =
       await api_get_stamps(page, page_size, order, sortBy, filterBy);
     const data = {
@@ -55,6 +56,9 @@ export function StampPage(props: StampPageProps) {
     <div class="w-full flex flex-col items-center">
       <StampNavigator initFilter={filterBy} initSort={sortBy} />
       <PageControl
+        stamps={stamps}
+      />
+      <Pagination
         page={page}
         pages={pages}
         page_size={page_size}

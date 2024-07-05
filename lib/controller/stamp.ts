@@ -60,6 +60,7 @@ export async function api_get_stamps(
     const stamps = await StampsClass.get_resumed_stamps(
       client,
       order,
+      typeBy,
     );
     if (!stamps) {
       closeClient(client);
