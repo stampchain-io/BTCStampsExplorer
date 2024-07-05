@@ -82,7 +82,7 @@ export function HomeSalesInfo(
 
       <div>
         <div class="flex justify-between items-end">
-          <p class="text-2xl md:text-4xl text-[#F5F5F5]">News Banner</p>
+          <p class="text-2xl md:text-4xl text-[#F5F5F5]">Posh Stamps</p>
           <a href="/home?type=news">See all</a>
         </div>
         <div class="flex overflow-x-auto">
