@@ -13,13 +13,13 @@ export function Footer() {
           </p>
 
           <div class="flex gap-7 items-center justify-center">
-            <a href="#">
+            <a href="https://x.com/Stampchain">
               <img src="/img/icon_x.png" class="w-14" />
             </a>
-            <a href="#">
+            <a href="https://discord.gg/PCZU6xrt">
               <img src="/img/icon_discord.png" class="w-14" />
             </a>
-            <a href="#">
+            <a href="https://t.me/BitcoinStamps">
               <img src="/img/icon_telegram.png" class="w-14" />
             </a>
           </div>
