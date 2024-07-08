@@ -8,8 +8,11 @@ export const useNavigator = () => useContext(NavigatorContext);
 export const NavigatorProvider = ({ children }) => {
   const [sortOption, setSortOption] = useState("");
   const [filterOption, setFilterOption] = useState<string[]>([]);
+  const [typeOption, setTypeOption] = useState("");
 
   const setSortOptionData = (value: string) => {
+    setSortOption(value);
+    console.log("Sort option: ", value);
     if (window.history) {
       window.history.pushState(
         {},
@@ -18,8 +21,6 @@ export const NavigatorProvider = ({ children }) => {
       );
       window.location.reload();
     }
-    setSortOption(value);
-    console.log("Sort option: ", value);
   };
 
   const setFilterOptionData = (value: string) => {
@@ -29,6 +30,8 @@ export const NavigatorProvider = ({ children }) => {
     } else {
       updatedData = [...filterOption, value];
     }
+    setFilterOption(updatedData);
+    console.log(updatedData);
     if (window.history) {
       window.history.pushState(
         {},
@@ -37,8 +40,6 @@ export const NavigatorProvider = ({ children }) => {
       );
       window.location.reload();
     }
-    setFilterOption(updatedData);
-    console.log(updatedData);
   };
 
   const contextValue = {

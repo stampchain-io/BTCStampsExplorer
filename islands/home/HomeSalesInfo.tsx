@@ -9,11 +9,11 @@ export function HomeSalesInfo(
     stamps_src20 = [],
     stamps_news = [],
   }: {
-    stamps_recent: [];
-    stamps_src721: [];
-    stamps_art: [];
-    stamps_src20: [];
-    stamps_news: [];
+    stamps_recent: StampRow[];
+    stamps_src721: StampRow[];
+    stamps_art: StampRow[];
+    stamps_src20: StampRow[];
+    stamps_news: StampRow[];
   },
 ) {
   return (

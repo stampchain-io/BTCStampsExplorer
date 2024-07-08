@@ -3,7 +3,7 @@ import { StampCard } from "$components/StampCard.tsx";
 
 export const HomeSalesInfoDetails = (
   { stamps = [] }: {
-    stamps: [];
+    stamps: StampRow[];
   },
 ) => {
   return (

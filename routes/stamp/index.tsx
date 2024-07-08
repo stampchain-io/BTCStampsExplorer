@@ -1,14 +1,14 @@
-import { api_get_stamps } from "$lib/controller/stamp.ts";
-import { HandlerContext, Handlers } from "$fresh/server.ts";
-import { PageControl } from "$islands/PageControl.tsx";
-import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";
-import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
-import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
-import { useEffect } from "preact/hooks";
-import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
 import { Pagination } from "$components/Pagination.tsx";
+import { HandlerContext, Handlers } from "$fresh/server.ts";
+import { api_get_stamps } from "$lib/controller/stamp.ts";
+
+import { PageControl } from "$islands/PageControl.tsx";
+import { useNavigator } from "$islands/Navigator/navigator.tsx";
+import { StampHeader } from "$islands/stamp/StampHeader.tsx";
+
+import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
+import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
 
 type StampPageProps = {
   params: {
@@ -54,7 +54,7 @@ export function StampPage(props: StampPageProps) {
 
   return (
     <div class="w-full flex flex-col items-center">
-      <StampNavigator initFilter={filterBy} initSort={sortBy} />
+      <StampHeader filterBy={filterBy} sortBy={sortBy} />
       <PageControl
         stamps={stamps}
       />
@@ -63,7 +63,7 @@ export function StampPage(props: StampPageProps) {
         pages={pages}
         page_size={page_size}
         type={"stamp"}
-        stamps={stamps}
+        data_length={stamps.length}
       />
     </div>
   );

@@ -58,7 +58,7 @@ export function StampCard({
                     e.currentTarget.src = `/not-available.png`;
                   }}
                   alt={`Stamp No. ${stamp.stamp}`}
-                  class="h-full w-full object-contain items-center standalone:h-full standalone:w-auto bg-[#F56487]"
+                  class="h-full w-full object-contain items-center standalone:h-full standalone:w-auto pixelart image-rendering-pixelated"
                 />
               )}
           </div>

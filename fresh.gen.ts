@@ -77,6 +77,7 @@ import * as $mint_UploadImage from "./islands/mint/UploadImage.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
+import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
@@ -177,6 +178,7 @@ const manifest = {
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
+    "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
