@@ -9,6 +9,7 @@ import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
+// import Carousel from "$islands/Carousel.tsx";
 // import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
 import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeSalesInfo } from "$islands/home/HomeSalesInfo.tsx";
@@ -238,6 +239,14 @@ export default function Home(props: HomePageProps) {
           <div class="flex flex-col gap-24 text-white">
             <HomeHeader />
             {/* <HomeCarousel /> */}
+            {
+              /* <Carousel
+              automatic
+              showNavigation
+              interval={3000}
+              currentSlide={0}
+            /> */
+            }
             <div class="flex flex-col gap-10">
               <HomeTable data={src20s} />
               <Pagination

@@ -3,12 +3,12 @@ import { Pagination } from "$components/Pagination.tsx";
 import { HandlerContext, Handlers } from "$fresh/server.ts";
 import { api_get_stamps } from "$lib/controller/stamp.ts";
 
-import { PageControl } from "$islands/PageControl.tsx";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
+import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { StampHeader } from "$islands/stamp/StampHeader.tsx";
+// import { useNavigator } from "$islands/Navigator/navigator.tsx";
 
-import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
-import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
+// import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
+// import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
 
 type StampPageProps = {
   params: {
@@ -50,12 +50,12 @@ export const handler: Handlers<StampRow> = {
 export function StampPage(props: StampPageProps) {
   const { stamps, total, page, pages, page_size, filterBy, sortBy } =
     props.data;
-  const { setSortOption, setFilterOption, setFilter } = useNavigator();
+  // const { setSortOption, setFilterOption, setFilter } = useNavigator();
 
   return (
     <div class="w-full flex flex-col items-center">
       <StampHeader filterBy={filterBy} sortBy={sortBy} />
-      <PageControl
+      <StampContent
         stamps={stamps}
       />
       <Pagination

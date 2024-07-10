@@ -19,7 +19,7 @@ export const SRC20Header = (
         </p>
       </div>
       <div class="flex flex-col-reverse md:flex-row justify-between w-full border-b border-[#3F2A4E]">
-        <div class="flex gap-4 md:gap-8 items-end">
+        <div class="flex gap-6 md:gap-8 items-end">
           <p
             class={selectedTab === "All"
               ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"

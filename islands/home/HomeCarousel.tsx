@@ -1,20 +1,25 @@
-// import { h } from "preact";
-// import Flicking, { MoveEvent, WillChangeEvent } from "@egjs/preact-flicking";
-// import { Carousel } from "netzo";
-import Slider from "npm:react-slick@0.30.2";
+// import Flicking, {
+//   MoveEvent,
+//   WillChangeEvent,
+// } from "https://esm.sh/@egjs/preact-flicking@4.11.0";
 
 export const HomeCarousel = () => {
-  var settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
-
   return (
+    // <Flicking
+    //   viewportTag="div"
+    //   cameraTag="div"
+    //   cameraClass=""
+    //   align="center"
+    //   onMove={(e: MoveEvent) => {}}
+    //   onWillChange={(e: WillChangeEvent) => {}}
+    //   horizontal={true}
+    //   circular={true}
+    // >
+    //   <div>panel 0</div>
+    //   <div>panel 1</div>
+    //   <div>panel 2</div>
+    // </Flicking>
     <div>
-      {/* <Slider {...settings}> */}
       <div>
         <img src="/img/home/carousel1.png" />
       </div>
@@ -24,7 +29,6 @@ export const HomeCarousel = () => {
       <div>
         <img src="/img/home/carousel3.png" />
       </div>
-      {/* </Slider> */}
     </div>
   );
 };

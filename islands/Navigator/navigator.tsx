@@ -17,7 +17,7 @@ export const NavigatorProvider = ({ children }) => {
       window.history.pushState(
         {},
         "",
-        `/stamp?sortBy=${value}&filterBy=${filterOption}`,
+        `/stamp?sortBy=${value}&filterBy=${filterOption}&typeBy=${typeOption}`,
       );
       window.location.reload();
     }
@@ -36,7 +36,20 @@ export const NavigatorProvider = ({ children }) => {
       window.history.pushState(
         {},
         "",
-        `/stamp?sortBy=${sortOption}&filterBy=${updatedData}`,
+        `/stamp?sortBy=${sortOption}&filterBy=${updatedData}&typeBy=${typeOption}`,
+      );
+      window.location.reload();
+    }
+  };
+
+  const setTypeOptionData = (value: string) => {
+    setTypeOption(value);
+    console.log("Type option: ", value);
+    if (window.history) {
+      window.history.pushState(
+        {},
+        "",
+        `/stamp?sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${value}`,
       );
       window.location.reload();
     }
@@ -44,11 +57,14 @@ export const NavigatorProvider = ({ children }) => {
 
   const contextValue = {
     sortOption,
-    setSortOption: setSortOptionData,
+    setSort: setSortOption,
     filterOption,
     setFilter: setFilterOption,
-    setSort: setSortOption,
+    typeOption,
+    setType: setTypeOption,
+    setSortOption: setSortOptionData,
     setFilterOption: setFilterOptionData,
+    setTypeOption: setTypeOptionData,
   };
   return (
     <NavigatorContext.Provider value={contextValue}>

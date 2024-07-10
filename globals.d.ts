@@ -37,6 +37,26 @@ interface StampRow {
   file_hash: string;
 }
 
+export interface SRC20Row {
+  tx_hash: string;
+  block_index: number;
+  p: string;
+  op: string;
+  tick: string;
+  tick_hash: string;
+  creator: string;
+  creator_name: string;
+  amt?: string | number;
+  deci?: number;
+  max?: string | number;
+  lim?: string | number;
+  destination: string;
+  destination_name?: string;
+  block_time: Date;
+  status: string;
+  row_num: number;
+}
+
 interface SendRow {
   source: string;
   destination: string;

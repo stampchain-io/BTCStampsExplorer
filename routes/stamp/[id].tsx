@@ -5,8 +5,9 @@ import { FreshContext, Handlers } from "$fresh/server.ts";
 import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
 import { get_suffix_from_mimetype, short_address } from "$lib/utils/util.ts";
 
-import { HoldersInfo } from "$components/HoldersInfo.tsx";
 import { Stamp } from "$components/Stamp.tsx";
+import { HoldersInfo } from "$components/HoldersInfo.tsx";
+
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
 import { StampVaulted } from "$components/stampDetails/StampVaulted.tsx";
 import { StampInfo } from "../../components/stampDetails/StampInfo.tsx";
