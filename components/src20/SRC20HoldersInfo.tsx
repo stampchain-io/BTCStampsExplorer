@@ -7,9 +7,9 @@ interface HoldersInfoProps {
 }
 export const SRC20HoldersInfo = (props: HoldersInfoProps) => {
   const { holders } = props;
-  const labels = holders
-    .map((holder) => parseFloat(holder.percentage))
-    .filter((percentage) => !isNaN(percentage));
+  // const labels = holders
+  //   .map((holder) => parseFloat(holder.percentage))
+  //   .filter((percentage) => !isNaN(percentage));
   // problem here with NaN values
   // console.log(holders);
 
@@ -26,7 +26,7 @@ export const SRC20HoldersInfo = (props: HoldersInfoProps) => {
               </tr>
             </thead>
             <tbody class="table-fixed overflow-x-auto max-h-80 block">
-              {holders.map((src20) => {
+              {holders?.map((src20) => {
                 return (
                   <tr class="w-full table table-fixed bg-[#262424] text-[#9D9B9B] border-b dark:border-gray-700">
                     <td class="px-6 py-4">

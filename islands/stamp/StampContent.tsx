@@ -30,7 +30,7 @@ import { StampCard } from "$components/StampCard.tsx";
 //   );
 // };
 
-export function PageControl(
+export function StampContent(
   { stamps = [] }: {
     stamps: [];
   },

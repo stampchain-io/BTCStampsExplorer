@@ -1,0 +1,1 @@
+globalThis.document = {} as any;

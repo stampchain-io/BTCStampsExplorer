@@ -1,13 +1,14 @@
-import { api_get_stamps } from "$lib/controller/stamp.ts";
-import { HandlerContext, Handlers } from "$fresh/server.ts";
-import { PageControl } from "$islands/PageControl.tsx";
-import { BIG_LIMIT } from "constants";
 import { StampRow } from "globals";
-import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
-import { StampNavigator } from "../../islands/stamp/StampNavigator.tsx";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
-import { useEffect } from "preact/hooks";
-import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
+import { Pagination } from "$components/Pagination.tsx";
+import { HandlerContext, Handlers } from "$fresh/server.ts";
+import { api_get_stamps } from "$lib/controller/stamp.ts";
+
+import { StampContent } from "$islands/stamp/StampContent.tsx";
+import { StampHeader } from "$islands/stamp/StampHeader.tsx";
+// import { useNavigator } from "$islands/Navigator/navigator.tsx";
+
+// import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
+// import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
 
 type StampPageProps = {
   params: {
@@ -27,8 +28,10 @@ export const handler: Handlers<StampRow> = {
     console.log(filterBy, sortBy, "stamp");
     if (url.searchParams.get("filterBy") == "") filterBy = [];
     const page = parseInt(url.searchParams.get("page") || "1");
-    const page_size = parseInt(url.searchParams.get("limit") || BIG_LIMIT);
-    const order = url.searchParams.get("order")?.toUpperCase() || "DESC";
+    const page_size = parseInt(
+      url.searchParams.get("limit") || "24",
+    );
+    const order = url.searchParams.get("order")?.toUpperCase() || "ASC";
     const { stamps, total, pages, page: pag, page_size: limit } =
       await api_get_stamps(page, page_size, order, sortBy, filterBy);
     const data = {
@@ -47,17 +50,20 @@ export const handler: Handlers<StampRow> = {
 export function StampPage(props: StampPageProps) {
   const { stamps, total, page, pages, page_size, filterBy, sortBy } =
     props.data;
-  const { setSortOption, setFilterOption, setFilter } = useNavigator();
+  // const { setSortOption, setFilterOption, setFilter } = useNavigator();
 
   return (
     <div class="w-full flex flex-col items-center">
-      <StampNavigator initFilter={filterBy} initSort={sortBy} />
-      <PageControl
+      <StampHeader filterBy={filterBy} sortBy={sortBy} />
+      <StampContent
+        stamps={stamps}
+      />
+      <Pagination
         page={page}
         pages={pages}
         page_size={page_size}
         type={"stamp"}
-        stamps={stamps}
+        data_length={stamps.length}
       />
     </div>
   );

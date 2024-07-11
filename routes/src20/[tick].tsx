@@ -110,7 +110,7 @@ export const handler: Handlers<StampRow> = {
         }),
         total_mints: total_mints.rows[0]["total"],
         total_holders: total_holders.rows[0]["total"],
-        holders: holders.rows.map((row) => {
+        holders: holders.rows?.map((row) => {
           const percentage = new BigFloat(row.amt).mul(100).div(
             mint_status.total_minted,
           );
@@ -153,7 +153,7 @@ export const SRC20TickPage = (props) => {
 
   return (
     <div class="flex flex-col gap-8">
-      <SRC20Header />
+      {/* <SRC20Header /> */}
       <SRC20TickHeader
         deployment={deployment}
         mint_status={mint_status}

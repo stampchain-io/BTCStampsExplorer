@@ -31,15 +31,15 @@ export function Header() {
 
   return (
     <nav className="py-2 md:py-4">
-      <div className="container px-4 mx-auto md:flex md:items-center md:justify-between">
+      <div className="container mx-auto md:flex md:items-center md:justify-between">
         <div className="flex justify-between items-center">
           <a
             href="/block/last"
             f-partial={"/block/last"}
-            className="font-bold text-xl text-indigo-600"
+            className="font-bold text-xl text-indigo-600 hidden md:block"
           >
             <img
-              src="/img/stampchain.gif"
+              src="/img/logo.png"
               alt="stampchain"
               className="w-[178px] h-auto"
             />
@@ -60,90 +60,129 @@ export function Header() {
               <img src="/img/menu-open.png" alt="menu" className="w-6 h-6" />
             )}
           </button>
+
+          <div class="block md:hidden">
+            <ConnectWallet />
+          </div>
         </div>
 
         <div
           className={`${
             open
-              ? "flex items-center justify-center gap-5 md:gap-10 right-0 top-0 fixed w-full h-screen z-20 bg-[#181818] scroll-none p-6"
+              ? "flex left-0 top-0 fixed w-[300px] h-screen z-20 bg-[#181818] scroll-none p-6 pt-24"
               : "hidden"
-          } flex-col md:flex md:flex-row text-center`}
+          } flex-col md:flex md:flex-row text-center justify-between`}
           id="navbar-collapse"
         >
-          <a
-            href="/home"
-            f-partial={"/home"}
-            onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "home" ? "text-[#03A606]" : "text-white"
+          <img
+            src="/img/logo.png"
+            alt="stampchain"
+            className={`${
+              open ? "absolute" : "hidden"
+            } top-12 right-5 w-[178px] h-auto`}
+          />
+          <div
+            className={`${
+              open
+                ? "flex flex-col md:flex-row items-start justify-between gap-8 md:gap-10 text-center"
+                : "hidden md:flex flex-col md:flex-row text-center"
+            } `}
+          >
+            <a
+              href="/home"
+              f-partial={"/home"}
+              onClick={toggleMenu}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                path === "home" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              Home
+            </a>
+            <a
+              href="/stamp"
+              f-partial={"/stamp"}
+              onClick={toggleMenu}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                path === "stamp" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              Stamps
+            </a>
+            <a
+              href="/src20"
+              f-partial={"/src20"}
+              onClick={toggleMenu}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                path === "src20" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              Src-20
+            </a>
+            <a
+              href="/block/last"
+              f-partial={"/block/last"}
+              onClick={toggleMenu}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                path === "block" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              Blocks
+            </a>
+            <a
+              href="/collection"
+              f-partial={"/collection"}
+              onClick={toggleMenu}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                path === "collection" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              Collections
+            </a>
+            <a
+              href="/mint"
+              f-partial={"/mint"}
+              onClick={toggleMenu}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                path === "mint" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              Minting
+            </a>
+            {
+              /* <a
+              href="/upload"
+              f-partial={"/upload"}
+              onClick={toggleMenu}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                path === "upload" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              Upload Image
+            </a> */
+            }
+
+            <div class="block md:hidden">
+              <ConnectWallet />
+            </div>
+          </div>
+
+          <div
+            class={`gap-6 items-center justify-center ${
+              open ? "flex" : "hidden"
             }`}
           >
-            Home
-          </a>
-          <a
-            href="/stamp"
-            f-partial={"/stamp"}
-            onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "stamp" ? "text-[#03A606]" : "text-white"
-            }`}
-          >
-            Stamps
-          </a>
-          <a
-            href="/src20"
-            f-partial={"/src20"}
-            onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "src20" ? "text-[#03A606]" : "text-white"
-            }`}
-          >
-            Src-20
-          </a>
-          <a
-            href="/block/last"
-            f-partial={"/block/last"}
-            onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "block" ? "text-[#03A606]" : "text-white"
-            }`}
-          >
-            Blocks
-          </a>
-          <a
-            href="/collection"
-            f-partial={"/collection"}
-            onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "collection" ? "text-[#03A606]" : "text-white"
-            }`}
-          >
-            Collections
-          </a>
-          <a
-            href="/mint"
-            f-partial={"/mint"}
-            onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "mint" ? "text-[#03A606]" : "text-white"
-            }`}
-          >
-            Minting
-          </a>
-          <a
-            href="/upload"
-            f-partial={"/upload"}
-            onClick={toggleMenu}
-            className={`p-2 lg:px-4 md:mx-2 transition-colors duration-300 flex justify-center items-center no-underline rounded hover:text-gray-600 ${
-              path === "upload" ? "text-[#03A606]" : "text-white"
-            }`}
-          >
-            Upload Image
-          </a>
-          <div class="block md:hidden">
-            <ConnectWallet />
+            <a href="#">
+              <img src="/img/icon_x.png" class="w-12" />
+            </a>
+            <a href="#">
+              <img src="/img/icon_discord.png" class="w-12" />
+            </a>
+            <a href="#">
+              <img src="/img/icon_telegram.png" class="w-12" />
+            </a>
           </div>
         </div>
+
         <div class="hidden md:block">
           <ConnectWallet />
         </div>

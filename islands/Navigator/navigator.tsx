@@ -8,18 +8,19 @@ export const useNavigator = () => useContext(NavigatorContext);
 export const NavigatorProvider = ({ children }) => {
   const [sortOption, setSortOption] = useState("");
   const [filterOption, setFilterOption] = useState<string[]>([]);
+  const [typeOption, setTypeOption] = useState("");
 
   const setSortOptionData = (value: string) => {
+    setSortOption(value);
+    console.log("Sort option: ", value);
     if (window.history) {
       window.history.pushState(
         {},
         "",
-        `/stamp?sortBy=${value}&filterBy=${filterOption}`,
+        `/stamp?sortBy=${value}&filterBy=${filterOption}&typeBy=${typeOption}`,
       );
       window.location.reload();
     }
-    setSortOption(value);
-    console.log("Sort option: ", value);
   };
 
   const setFilterOptionData = (value: string) => {
@@ -29,25 +30,41 @@ export const NavigatorProvider = ({ children }) => {
     } else {
       updatedData = [...filterOption, value];
     }
+    setFilterOption(updatedData);
+    console.log(updatedData);
     if (window.history) {
       window.history.pushState(
         {},
         "",
-        `/stamp?sortBy=${sortOption}&filterBy=${updatedData}`,
+        `/stamp?sortBy=${sortOption}&filterBy=${updatedData}&typeBy=${typeOption}`,
       );
       window.location.reload();
     }
-    setFilterOption(updatedData);
-    console.log(updatedData);
+  };
+
+  const setTypeOptionData = (value: string) => {
+    setTypeOption(value);
+    console.log("Type option: ", value);
+    if (window.history) {
+      window.history.pushState(
+        {},
+        "",
+        `/stamp?sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${value}`,
+      );
+      window.location.reload();
+    }
   };
 
   const contextValue = {
     sortOption,
-    setSortOption: setSortOptionData,
+    setSort: setSortOption,
     filterOption,
     setFilter: setFilterOption,
-    setSort: setSortOption,
+    typeOption,
+    setType: setTypeOption,
+    setSortOption: setSortOptionData,
     setFilterOption: setFilterOptionData,
+    setTypeOption: setTypeOptionData,
   };
   return (
     <NavigatorContext.Provider value={contextValue}>

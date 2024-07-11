@@ -71,33 +71,43 @@ export function StampNavigator({ initFilter, initSort }) {
     }
   }, []);
   return (
-    <>
-      <div class="flex flex-row text-white/80 w-full mb-4">
-        <span class="w-20">Filter by:</span>
-        <div class="flex flex-1 border border-gray-600 h-16 px-10 py-6 gap-x-5">
-          {filters.map((item) => {
-            return (
-              <FilterItem
+    <div class="group relative">
+      <div class="bg-white flex justify-between items-center p-4 min-w-[120px] w-[120px] h-[54px] rounded cursor-pointer mb-3">
+        <p class="text-[#022516] text-xl">Filter</p>
+        <img
+          src="/img/icon_filter.png"
+          class="w-[18px] h-[12px]"
+          alt="Filter icon"
+        />
+      </div>
+      <div class="bg-white text-[#022516] p-6 rounded absolute hidden group-hover:inline-block z-[100]">
+        <div class="flex flex-col mb-6">
+          <span class="w-20">Filter by:</span>
+          <div class="flex flex-1 border-b border-gray-600 h-16 py-3 gap-x-5">
+            {filters.map((item) => {
+              return (
+                <FilterItem
+                  title={item}
+                  onChange={setFilterOption}
+                  value={filterOption}
+                />
+              );
+            })}
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <span class="w-20">Sort by:</span>
+          <div class="flex flex-1 items-center gap-x-10 border-b border-gray-600 py-3">
+            {sorts.map((item) => (
+              <SortItem
                 title={item}
-                onChange={setFilterOption}
-                value={filterOption}
+                onChange={setSortOption}
+                value={sortOption}
               />
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
-      <div class="flex flex-row text-white/80 w-full mb-10">
-        <span class="w-20">Sort by:</span>
-        <div class="flex flex-1 border gap-x-10 border-gray-600 px-10 py-6 items-center">
-          {sorts.map((item) => (
-            <SortItem
-              title={item}
-              onChange={setSortOption}
-              value={sortOption}
-            />
-          ))}
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

@@ -1,41 +1,43 @@
+import { SRC20Row } from "globals";
+
+import { Pagination } from "$components/Pagination.tsx";
+
 import { HandlerContext } from "$fresh/server.ts";
 
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
-import { paginate } from "utils/util.ts";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
 
-//TODO: Add pagination
+import { api_get_src20s } from "$lib/controller/src20.ts";
+
+type SRC20PageProps = {
+  data: {
+    src20s: SRC20Row[];
+    total: number;
+    page: number;
+    pages: number;
+    page_size: number;
+    filterBy: any[];
+    sortBy: string;
+  };
+};
 
 export const handler = {
   async GET(req: Request, ctx: HandlerContext) {
     try {
       const url = new URL(req.url);
-      const limit = Number(url.searchParams.get("limit")) || 1000;
+      const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+      const sortBy = url.searchParams.get("sortBy") || "none";
       const page = Number(url.searchParams.get("page")) || 1;
+      const page_size = Number(url.searchParams.get("limit")) || 11;
 
-      const client = await getClient();
-      const data = await Src20Class.get_valid_src20_tx_with_client(
-        client,
-        null,
-        null,
-        "DEPLOY",
-        limit,
-        page,
-      );
-      const total = await Src20Class.get_total_valid_src20_tx_with_client(
-        client,
-        null,
-        "DEPLOY",
-      );
-      const last_block = await CommonClass.get_last_block_with_client(client);
+      const { src20s, total, pages, page: pag, page_size: limit } =
+        await api_get_src20s(
+          page,
+          page_size,
+        );
 
-      const pagination = paginate(total.rows[0]["total"], page, limit);
-
-      const body = {
-        ...pagination,
-        last_block: last_block.rows[0]["last_block"],
-        data: data.rows.map((row) => {
+      const data = {
+        src20s: src20s.map((row: SRC20Row) => {
           return {
             ...row,
             max: row.max ? row.max.toString() : null,
@@ -43,22 +45,36 @@ export const handler = {
             amt: row.amt ? row.amt.toString() : null,
           };
         }),
+        total,
+        page: pag,
+        pages,
+        page_size: limit,
+        filterBy,
+        sortBy,
       };
-      return await ctx.render(body);
+      return await ctx.render(data);
     } catch (error) {
       console.error(error);
-      const body = { error: `Error: Internal server error` };
-      return ctx.render(body);
+      const data = { error: `Error: Internal server error` };
+      return ctx.render(data);
     }
   },
 };
 
-export function SRC20Page(props) {
-  const { data, total, page, pages, limit } = props.data;
+export function SRC20Page(props: SRC20PageProps) {
+  const { src20s, total, page, pages, page_size, filterBy, sortBy } =
+    props.data;
   return (
     <div class="flex flex-col gap-8">
-      <SRC20Header />
-      <SRC20DeployTable data={data} />
+      <SRC20Header filterBy={filterBy} sortBy={sortBy} />
+      <SRC20DeployTable data={src20s} />
+      <Pagination
+        page={page}
+        pages={pages}
+        page_size={page_size}
+        type={"src20"}
+        data_length={src20s.length}
+      />
     </div>
   );
 }
