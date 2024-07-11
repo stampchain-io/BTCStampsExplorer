@@ -4,9 +4,9 @@ import { SRC20HoldersInfo } from "$components/src20/SRC20HoldersInfo.tsx";
 import { SRC20TX } from "$components/src20/SRC20TX.tsx";
 
 type SRC20DetailsTabProps = {
-  holders: number;
-  sends: number;
-  mints: number;
+  holders: any[];
+  sends: any[];
+  mints: any[];
 };
 
 export const SRC20DetailsTab = (props: SRC20DetailsTabProps) => {
@@ -19,26 +19,26 @@ export const SRC20DetailsTab = (props: SRC20DetailsTabProps) => {
 
   return (
     <>
-      <div class="flex justify-between text-2xl cursor-pointer mb-5 border-b-2">
+      <div class="flex gap-12 text-2xl cursor-pointer mb-5">
         <p
-          className={`w-1/3 pb-4 ${
-            selected === 0 ? "text-[#03A606]" : "text-[#625F5F]"
+          className={`pb-4 border-[#7A00F5] ${
+            selected === 0 ? "text-[#7A00F5] border-b-4" : "text-[#625F5F]"
           }`}
           onClick={() => updateSelected(0)}
         >
           Holders
         </p>
         <p
-          className={`w-1/3 pb-4 ${
-            selected === 1 ? "text-[#03A606]" : "text-[#625F5F]"
+          className={`pb-4 border-[#7A00F5] ${
+            selected === 1 ? "text-[#7A00F5] border-b-4" : "text-[#625F5F]"
           }`}
           onClick={() => updateSelected(1)}
         >
           Transfers
         </p>
         <p
-          className={`w-1/3 pb-4 ${
-            selected === 2 ? "text-[#03A606]" : "text-[#625F5F]"
+          className={`pb-4 border-[#7A00F5] ${
+            selected === 2 ? "text-[#7A00F5] border-b-4" : "text-[#625F5F]"
           }`}
           onClick={() => updateSelected(2)}
         >

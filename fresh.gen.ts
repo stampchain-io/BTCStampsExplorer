@@ -49,11 +49,11 @@ import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $BlockSelector from "./islands/BlockSelector.tsx";
+import * as $Carousel from "./islands/Carousel.tsx";
 import * as $Footer from "./islands/Footer.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
 import * as $Navigator_navigator from "./islands/Navigator/navigator.tsx";
-import * as $PageControl from "./islands/PageControl.tsx";
 import * as $StampNavigator from "./islands/StampNavigator.tsx";
 import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
@@ -66,13 +66,19 @@ import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connector
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $collection_CollectionHeader from "./islands/collection/CollectionHeader.tsx";
+import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
+import * as $home_HomeSalesInfo from "./islands/home/HomeSalesInfo.tsx";
+import * as $home_HomeSalesInfoDetails from "./islands/home/HomeSalesInfoDetails.tsx";
+import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
 import * as $mint_UploadImage from "./islands/mint/UploadImage.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
+import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
+import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
@@ -144,11 +150,11 @@ const manifest = {
   },
   islands: {
     "./islands/BlockSelector.tsx": $BlockSelector,
+    "./islands/Carousel.tsx": $Carousel,
     "./islands/Footer.tsx": $Footer,
     "./islands/Header.tsx": $Header,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
     "./islands/Navigator/navigator.tsx": $Navigator_navigator,
-    "./islands/PageControl.tsx": $PageControl,
     "./islands/StampNavigator.tsx": $StampNavigator,
     "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
@@ -162,13 +168,19 @@ const manifest = {
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/collection/CollectionHeader.tsx": $collection_CollectionHeader,
+    "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
+    "./islands/home/HomeSalesInfo.tsx": $home_HomeSalesInfo,
+    "./islands/home/HomeSalesInfoDetails.tsx": $home_HomeSalesInfoDetails,
+    "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/mint/MintHeader.tsx": $mint_MintHeader,
     "./islands/mint/UploadImage.tsx": $mint_UploadImage,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
+    "./islands/stamp/StampContent.tsx": $stamp_StampContent,
+    "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,

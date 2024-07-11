@@ -34,12 +34,24 @@ export default function App({ Component }: AppProps) {
         <meta property="og:image" content="/img/stamp.jpg"></meta>
         <link rel="icon" type="image/x-icon" href="/img/icon.jpg"></link>
         <link rel="apple-touch-icon" href="/img/icon.jpg"></link>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin="true"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap"
+          rel="stylesheet"
+        />
+
         <link rel="stylesheet" href="/styles.css" />
       </head>
-      <body className="bg-gradient-to-br from-[#010901] via-[#042004] to-[#010901]">
+      <body className="bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-['Pixelify_Sans']">
         <ToastProvider>
           <div
-            className="px-2 pt-8 mx-auto flex flex-col gap-5 overflow-auto max-w-7xl"
+            className="px-2 pt-8 mx-auto flex flex-col gap-5 overflow-auto max-w-7xl w-full mb-[70px] md:mb-[200px]"
             f-client-nav
           >
             <Header />
