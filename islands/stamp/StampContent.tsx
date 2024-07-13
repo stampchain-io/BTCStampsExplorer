@@ -32,7 +32,7 @@ import { StampCard } from "$components/StampCard.tsx";
 
 export function StampContent(
   { stamps = [] }: {
-    stamps: [];
+    stamps: StampRow[];
   },
 ) {
   // useEffect(() => {

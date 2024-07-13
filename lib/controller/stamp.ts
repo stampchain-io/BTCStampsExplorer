@@ -26,7 +26,7 @@ const sortData = (
   } else if (sortBy == "Stamp") {
     sortedStamps = stamps.sort((a, b) => a.stamp - b.stamp);
   } else {
-    sortedStamps = stamps;
+    sortedStamps = stamps.sort((a, b) => a.stamp - b.stamp);
   }
 
   if (order === "DESC") {
@@ -36,7 +36,7 @@ const sortData = (
   return sortedStamps;
 };
 
-const filterData = (stamps, filterBy) => {
+const filterData = (stamps: StampRow[], filterBy) => {
   if (filterBy.length == 0) {
     return stamps;
   }
@@ -47,20 +47,84 @@ const filterData = (stamps, filterBy) => {
   );
 };
 
-export async function api_get_stamps(
+export async function api_get_stamps_by_page(
   page = 1,
   page_size = BIG_LIMIT,
-  order: "DESC" | "ASC" = "DESC",
+  orderBy: "DESC" | "ASC" = "DESC",
   sortBy = "none",
-  filterBy = [],
+  filterBy: string[] = [],
   typeBy = ["STAMP", "SRC-721"],
 ) {
   try {
     const client = await getClient();
+    const stamps = await StampsClass.get_resumed_stamps_by_page_with_client(
+      client,
+      page_size,
+      page,
+      orderBy,
+      filterBy,
+      typeBy,
+      "stamps",
+    );
+    if (!stamps) {
+      closeClient(client);
+      throw new Error("No stamps found");
+    }
+
+    // Sort the entire dataset before pagination
+    const sortedData = sortData(
+      filterData(stamps.rows, filterBy),
+      sortBy,
+      orderBy,
+    );
+
+    releaseClient(client);
+    return {
+      stamps: sortedData,
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function api_get_stamps(
+  page = 1,
+  page_size = BIG_LIMIT,
+  orderBy: "DESC" | "ASC" = "DESC",
+  sortBy = "none",
+  filterBy: string[] = [],
+  typeBy = ["STAMP", "SRC-721"],
+) {
+  try {
+    const client = await getClient();
+    // filterBy = filterBy.map((filter) => {
+    //   if (filter === "Gif") {
+    //     return "image/gif";
+    //   } else if (filter === "Png") {
+    //     return "image/png";
+    //   } else if (filter === "Svg") {
+    //     return "image/svg+xml";
+    //   } else if (filter === "Html") {
+    //     return "text/html";
+    //   } else {
+    //     return "";
+    //   }
+    // });
+    // const stamps = await StampsClass.get_resumed_stamps_by_page_with_client(
+    //   client,
+    //   page_size,
+    //   page,
+    //   orderBy,
+    //   filterBy,
+    //   typeBy,
+    //   "stamps",
+    // );
     const stamps = await StampsClass.get_resumed_stamps(
       client,
-      order,
+      orderBy,
       typeBy,
+      "stamps",
     );
     if (!stamps) {
       closeClient(client);
@@ -76,7 +140,7 @@ export async function api_get_stamps(
     const sortedData = sortData(
       filterData(stamps.rows, filterBy),
       sortBy,
-      order,
+      orderBy,
     );
 
     // Apply pagination
@@ -98,6 +162,7 @@ export async function api_get_stamps(
     throw error;
   }
 }
+
 export async function api_get_stamp(id: string) {
   try {
     const client = await getClient();

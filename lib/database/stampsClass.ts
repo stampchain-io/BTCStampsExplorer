@@ -83,14 +83,21 @@ export class StampsClass {
 
   static async get_resumed_stamps_by_page_with_client(
     client: Client,
-    limit = SMALL_LIMIT,
+    page_size = SMALL_LIMIT,
     page = 1,
-    order = "DESC",
+    orderBy = "DESC",
+    filterBy,
+    typeBy: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
     type: "stamps" | "cursed",
   ) {
-    order = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
-    const offset = (page - 1) * limit;
+    orderBy = orderBy.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    const offset = (page - 1) * page_size;
     const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
+    const identList = Array.isArray(typeBy) ? typeBy : [typeBy];
+    const identCondition = identList.map((id) => `ident = '${id}'`).join(
+      " OR ",
+    );
+
     return await handleSqlQueryWithCache(
       client,
       `
@@ -99,19 +106,21 @@ export class StampsClass {
         st.cpid,
         st.creator,
         cr.creator AS creator_name,
-        st.tx_hash, st.stamp_mimetype,
-        st.supply, st.divisible,
+        st.tx_hash,
+        st.stamp_mimetype,
+        st.supply,
+        st.divisible,
         st.locked,
         st.ident,
         st.block_time,
         st.block_index
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE ${stampCondition} AND (st.ident = 'STAMP' or st.ident = 'SRC-721')
-      ORDER BY st.tx_index ?
+      WHERE ${stampCondition} AND ${identCondition}
+      ORDER BY st.stamp ${orderBy}
       LIMIT ? OFFSET ?;
       `,
-      [order, limit, offset],
+      [page_size, offset],
       1000 * 60 * 3,
     );
   }
@@ -120,13 +129,17 @@ export class StampsClass {
     client: Client,
     order = "DESC",
     typeBy: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
+    type: "stamps" | "cursed",
   ) {
     const identList = Array.isArray(typeBy) ? typeBy : [typeBy];
     const identCondition = identList.map((id) => `ident = '${id}'`).join(
       " OR ",
     );
 
+    const stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
+
     order = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+
     return await handleSqlQueryWithCache(
       client,
       `
@@ -135,15 +148,17 @@ export class StampsClass {
         st.cpid,
         st.creator,
         cr.creator AS creator_name,
-        st.tx_hash, st.stamp_mimetype,
-        st.supply, st.divisible,
+        st.tx_hash,
+        st.stamp_mimetype,
+        st.supply,
+        st.divisible,
         st.locked,
         st.ident,
         st.block_time,
         st.block_index
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.is_btc_stamp IS NOT NULL AND (${identCondition})
+      WHERE st.is_btc_stamp IS NOT NULL AND (${identCondition}) AND (${stampCondition})
       `,
       [],
       1000 * 60 * 3,

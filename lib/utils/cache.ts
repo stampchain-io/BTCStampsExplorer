@@ -6,9 +6,6 @@ import { connect, Redis } from "https://deno.land/x/redis/mod.ts";
 import * as crypto from "crypto";
 import { XCPParams } from "globals";
 
-let disableRedis = false;
-const DISABLE_REDIS_AFTER_FAILURES = 20;
-
 interface CacheEntry {
   data: any;
   expiry: number | "never";
@@ -38,10 +35,6 @@ export function clearCacheKey(key: string) {
 }
 
 export async function connectToRedisInBackground() {
-  if (disableRedis) {
-    console.log("Redis connections disabled due to repeated failures.");
-    return;
-  }
   if (!conf.ELASTICACHE_ENDPOINT) {
     console.log(
       "ELASTICACHE_ENDPOINT is not defined, skipping connection attempt...",
@@ -67,23 +60,20 @@ export async function connectToRedisInBackground() {
     console.log("Connected to Redis successfully");
     retryCount = 0;
   } catch (error) {
-    console.error(
-      "Failed to connect to Redis, falling back to in-memory cache. Error: ",
-      error,
-    );
-    retryCount++;
-    if (retryCount >= DISABLE_REDIS_AFTER_FAILURES) {
+    if (retryCount < MAX_RETRIES) {
       console.error(
-        `Max retries (${DISABLE_REDIS_AFTER_FAILURES}) reached, disabling Redis connections.`,
+        "Failed to connect to Redis, falling back to in-memory cache. Error: ",
+        error,
       );
-      redisClient = undefined;
-      clearCache();
-      disableRedis = true;
-    } else if (retryCount < MAX_RETRIES) {
+      retryCount++;
       setTimeout(() => {
         console.log("Retrying connection to Redis...");
         connectToRedisInBackground();
       }, 10000);
+    } else {
+      console.error("Max retries reached, giving up on Redis connection.");
+      redisClient = undefined;
+      clearCache();
     }
   } finally {
     isConnecting = false;
@@ -125,7 +115,7 @@ export async function handleCache(
   const cacheKey = generateCacheKey(key);
   let entry;
 
-  if (!redisClient && !isConnecting && !disableRedis) {
+  if (!redisClient && !isConnecting) {
     connectToRedisInBackground();
   }
 

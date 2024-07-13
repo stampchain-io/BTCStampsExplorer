@@ -15,7 +15,10 @@ import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeSalesInfo } from "$islands/home/HomeSalesInfo.tsx";
 import { HomeSalesInfoDetails } from "$islands/home/HomeSalesInfoDetails.tsx";
 
-import { api_get_stamps } from "$lib/controller/stamp.ts";
+import {
+  api_get_stamps,
+  api_get_stamps_by_page,
+} from "$lib/controller/stamp.ts";
 import { api_get_src20s } from "$lib/controller/src20.ts";
 
 type HomePageProps = {
@@ -59,7 +62,7 @@ export const handler: Handlers<StampRow> = {
       let filterBy, sortBy, orderBy;
 
       if (!type) {
-        const res1 = await api_get_stamps(
+        const res1 = await api_get_stamps_by_page(
           1,
           6,
           "DESC",
@@ -69,7 +72,7 @@ export const handler: Handlers<StampRow> = {
         );
         stamps_recent = res1.stamps;
 
-        const res2 = await api_get_stamps(
+        const res2 = await api_get_stamps_by_page(
           1,
           6,
           "DESC",
@@ -79,7 +82,7 @@ export const handler: Handlers<StampRow> = {
         );
         stamps_src721 = res2.stamps;
 
-        const res3 = await api_get_stamps(
+        const res3 = await api_get_stamps_by_page(
           1,
           6,
           "DESC",
@@ -89,7 +92,7 @@ export const handler: Handlers<StampRow> = {
         );
         stamps_art = res3.stamps;
 
-        const res4 = await api_get_stamps(
+        const res4 = await api_get_stamps_by_page(
           1,
           6,
           "DESC",
