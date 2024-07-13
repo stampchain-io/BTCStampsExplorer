@@ -70,6 +70,7 @@ export function StampNavigator({ initFilter, initSort }) {
       setSort(initSort);
     }
   }, []);
+
   return (
     <div class="group relative">
       <div class="bg-white flex justify-between items-center p-4 min-w-[120px] w-[120px] h-[54px] rounded cursor-pointer mb-3">
