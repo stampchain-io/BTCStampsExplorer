@@ -1,60 +1,76 @@
 import { StampRow } from "globals";
+
 import { Pagination } from "$components/Pagination.tsx";
 import { HandlerContext, Handlers } from "$fresh/server.ts";
 import { api_get_stamps } from "$lib/controller/stamp.ts";
 
 import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { StampHeader } from "$islands/stamp/StampHeader.tsx";
-// import { useNavigator } from "$islands/Navigator/navigator.tsx";
-
-// import { sort } from "https://deno.land/std@0.211.0/semver/sort.ts";
-// import { sortObject } from "https://deno.land/x/importmap@0.2.1/_util.ts";
 
 type StampPageProps = {
-  params: {
+  data: {
     stamps: StampRow[];
     total: number;
     page: number;
     pages: number;
     page_size: number;
+    selectedTab: "all" | "classic";
+    sortBy: string;
+    filterBy: string[];
   };
 };
 
 export const handler: Handlers<StampRow> = {
   async GET(req: Request, ctx: HandlerContext) {
     const url = new URL(req.url);
-    let filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+    const orderBy = url.searchParams.get("order")?.toUpperCase() == "ASC"
+      ? "ASC"
+      : "DESC";
     const sortBy = url.searchParams.get("sortBy") || "none";
-    console.log(filterBy, sortBy, "stamp");
-    if (url.searchParams.get("filterBy") == "") filterBy = [];
+    const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+    const selectedTab = url.searchParams.get("typeBy") || "all";
+    const typeBy = selectedTab === "all"
+      ? ["STAMP", "SRC-721", "SRC-20"]
+      : ["STAMP", "SRC-721"];
     const page = parseInt(url.searchParams.get("page") || "1");
     const page_size = parseInt(
       url.searchParams.get("limit") || "24",
     );
-    const order = url.searchParams.get("order")?.toUpperCase() || "ASC";
-    const { stamps, total, pages, page: pag, page_size: limit } =
-      await api_get_stamps(page, page_size, order, sortBy, filterBy);
+
+    const { stamps, pages, page: pag, page_size: limit } =
+      await api_get_stamps(page, page_size, orderBy, sortBy, filterBy, typeBy);
+
     const data = {
       stamps,
-      total,
       page: pag,
       pages,
       page_size: limit,
       filterBy,
       sortBy,
+      selectedTab,
     };
     return await ctx.render(data);
   },
 };
 
 export function StampPage(props: StampPageProps) {
-  const { stamps, total, page, pages, page_size, filterBy, sortBy } =
-    props.data;
-  // const { setSortOption, setFilterOption, setFilter } = useNavigator();
+  const {
+    stamps,
+    page,
+    pages,
+    page_size,
+    filterBy,
+    sortBy,
+    selectedTab,
+  } = props.data;
 
   return (
     <div class="w-full flex flex-col items-center">
-      <StampHeader filterBy={filterBy} sortBy={sortBy} />
+      <StampHeader
+        filterBy={filterBy}
+        sortBy={sortBy}
+        selectedTab={selectedTab}
+      />
       <StampContent
         stamps={stamps}
       />
