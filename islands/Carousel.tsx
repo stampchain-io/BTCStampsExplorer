@@ -3,7 +3,7 @@ import { useEffect } from "preact/hooks";
 import IconCircleChevronsRight from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/circle-chevrons-right.tsx";
 import IconCircleChevronsLeft from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/circle-chevrons-left.tsx";
 import { asset } from "$fresh/runtime.ts";
-import { tw } from "twind";
+// import { tw } from "twind";
 
 const SLIDE_DATA = [
   { url: asset("/snow_den.png"), alt: "snowy deno" },
@@ -50,7 +50,7 @@ const Carousel = (props) => {
       if (outgoingSlide === idx) return "-translate-x-full z-10";
       return "translate-x-full";
     };
-    return tw`slide absolute top-0 left-0 transition-all ease-in-out duration-700 transform ${TRANSITION_CLASS}`;
+    // return tw`slide absolute top-0 left-0 transition-all ease-in-out duration-700 transform ${TRANSITION_CLASS}`;
   };
 
   const nextSlide = () => {

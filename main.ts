@@ -14,8 +14,8 @@ import config from "./fresh.config.ts";
 import { conf } from "utils/config.ts";
 import { connectToRedisInBackground as ConnectRedis } from "utils/cache.ts";
 
-import twindPlugin from "$fresh/plugins/twind.ts";
-import twindConfig from "./twind.config.ts";
+// import twindPlugin from "$fresh/plugins/twind.ts";
+// import twindConfig from "./twind.config.ts";
 
 async function startApp() {
   if (conf.CACHE?.toLowerCase() === "true") {
@@ -23,7 +23,7 @@ async function startApp() {
     ConnectRedis();
   }
   // Start your server
-  await start(manifest, { ...config, plugins: [twindPlugin(twindConfig)] });
+  await start(manifest, config);
 }
 
 startApp().catch((error) => {
