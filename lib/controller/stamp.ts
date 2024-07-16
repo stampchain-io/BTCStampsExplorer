@@ -225,3 +225,28 @@ export async function api_get_stamp_all_data(id: string) {
     return null;
   }
 }
+
+export async function api_get_multiple_stamp_categories(
+  categories: { types: string[]; limit: number }[],
+) {
+  const client = await getClient();
+  try {
+    const results = await Promise.all(
+      categories.map((category) =>
+        StampsClass.get_resumed_stamps_by_page_with_client(
+          client,
+          category.limit,
+          1,
+          "DESC",
+          [],
+          category.types,
+          "stamps",
+        )
+      ),
+    );
+
+    return results.map((result) => result.rows);
+  } finally {
+    releaseClient(client);
+  }
+}
