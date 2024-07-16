@@ -16,8 +16,8 @@ import { HomeSalesInfo } from "$islands/home/HomeSalesInfo.tsx";
 import { HomeSalesInfoDetails } from "$islands/home/HomeSalesInfoDetails.tsx";
 
 import {
+  api_get_multiple_stamp_categories,
   api_get_stamps,
-  api_get_stamps_by_page,
 } from "$lib/controller/stamp.ts";
 import { api_get_src20s } from "$lib/controller/src20.ts";
 
@@ -62,55 +62,18 @@ export const handler: Handlers<StampRow> = {
       let filterBy, sortBy, orderBy;
 
       if (!type) {
-        const res1 = await api_get_stamps_by_page(
-          1,
-          6,
-          "DESC",
-          "none",
-          [],
-          ["STAMP", "SRC-721"],
-        );
-        stamps_recent = res1.stamps;
+        const stampCategories = await api_get_multiple_stamp_categories([
+          { types: ["STAMP", "SRC-721"], limit: 6 },
+          { types: ["SRC-721"], limit: 6 },
+          { types: ["STAMP"], limit: 6 },
+          { types: ["SRC-20"], limit: 6 },
+        ]);
 
-        const res2 = await api_get_stamps_by_page(
-          1,
-          6,
-          "DESC",
-          "none",
-          [],
-          ["SRC-721"],
-        );
-        stamps_src721 = res2.stamps;
-
-        const res3 = await api_get_stamps_by_page(
-          1,
-          6,
-          "DESC",
-          "none",
-          [],
-          ["STAMP"],
-        );
-        stamps_art = res3.stamps;
-
-        const res4 = await api_get_stamps_by_page(
-          1,
-          6,
-          "DESC",
-          "none",
-          [],
-          ["SRC-20"],
-        );
-        stamps_src20 = res4.stamps;
-
-        // const res5 = await api_get_stamps(
-        //   1,
-        //   6,
-        //   "DESC",
-        //   "none",
-        //   [],
-        //   ["STAMP", "SRC-721"],
-        // );
-        stamps_news = res1.stamps;
+        stamps_recent = stampCategories[0];
+        stamps_src721 = stampCategories[1];
+        stamps_art = stampCategories[2];
+        stamps_src20 = stampCategories[3];
+        stamps_news = stampCategories[0]; // Reuse stamps_recent for news
 
         page_size = Number(url.searchParams.get("limit")) || 10;
         page = Number(url.searchParams.get("page")) || 1;
