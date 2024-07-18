@@ -822,7 +822,7 @@ paths:
         - in: path
           name: id
           required: true
-          example: "A12190973650444749000"
+          example: "A666240355190303432"
           description: Stamp number, cpid, or stamp_hash
           schema:
             type: string
