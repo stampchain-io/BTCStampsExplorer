@@ -130,10 +130,10 @@ export async function api_get_stamps(
       closeClient(client);
       throw new Error("No stamps found");
     }
-    const total = await StampsClass.get_total_stamps_by_ident_with_client(
+    const total = await StampsClass.get_total_stamp_count(
       client,
-      typeBy,
       "stamps",
+      typeBy,
     );
 
     // Sort the entire dataset before pagination
@@ -170,7 +170,7 @@ export async function api_get_stamp(id: string) {
     if (!stamp) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
-    const total = await StampsClass.get_total_stamps_with_client(
+    const total = await StampsClass.get_total_stamp_count(
       client,
       "stamps",
     );
@@ -194,7 +194,7 @@ export async function api_get_stamp_all_data(id: string) {
     if (!stamp) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
-    const total = await StampsClass.get_total_stamps_with_client(
+    const total = await StampsClass.get_total_stamp_count(
       client,
       "stamps",
     );

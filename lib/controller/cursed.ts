@@ -24,7 +24,7 @@ export async function api_get_cursed(
       closeClient(client);
       throw new Error("No stamps found");
     }
-    const total = await StampsClass.get_total_stamps_with_client(
+    const total = await StampsClass.get_total_stamp_count(
       client,
       "cursed",
     );
