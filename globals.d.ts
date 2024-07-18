@@ -356,6 +356,7 @@ export interface BlockHandlerContext {
   params: {
     block_index: string;
   };
+  url: URL;
 }
 
 export interface AddressTickHandlerContext {

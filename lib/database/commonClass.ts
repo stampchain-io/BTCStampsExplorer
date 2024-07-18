@@ -5,6 +5,10 @@ import { summarize_issuances } from "$lib/database/index.ts";
 import { get_balances } from "utils/xcp.ts";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { BIG_LIMIT, STAMP_TABLE, TTL_CACHE } from "utils/constants.ts";
+import { StampBalance } from "globals";
+
+const BLOCK_FIELDS =
+  `block_index, block_time, block_hash, previous_block_hash, ledger_hash, txlist_hash, messages_hash`;
 
 export class CommonClass {
   /**
@@ -23,8 +27,7 @@ export class CommonClass {
     return await handleSqlQueryWithCache(
       client,
       `
-      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
-      txlist_hash, messages_hash 
+      SELECT ${BLOCK_FIELDS}
       FROM blocks
       WHERE ${field} = ?;
       `,
@@ -63,38 +66,45 @@ export class CommonClass {
     client: Client,
     num = 10,
   ) {
-    const blocks = await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
-      txlist_hash, messages_hash 
-      FROM blocks
-      ORDER BY block_index DESC
-      LIMIT ${num};
-      `,
-      [num],
-      0,
-    );
-    const populated = blocks.rows.map(async (block: any) => {
-      const tx_info_from_block = await handleSqlQueryWithCache(
+    try {
+      const blocks = await handleSqlQueryWithCache(
         client,
         `
-        SELECT COUNT(*) AS tx_count
-        FROM ${STAMP_TABLE}
-        WHERE block_index = '${block.block_index}';
+        SELECT ${BLOCK_FIELDS}
+        FROM blocks
+        ORDER BY block_index DESC
+        LIMIT ?;
         `,
-        [block.block_index],
-        "never",
+        [num],
+        0,
       );
 
-      return {
-        ...block,
-        tx_count: tx_info_from_block.rows[0]["tx_count"],
-      };
-    });
-    return Promise.all(populated.reverse());
-  }
+      const populated = await Promise.all(
+        blocks.rows.map(async (block: any) => {
+          const tx_info_from_block = await handleSqlQueryWithCache(
+            client,
+            `
+          SELECT COUNT(*) AS tx_count
+          FROM ${STAMP_TABLE}
+          WHERE block_index = ?;
+          `,
+            [block.block_index],
+            "never",
+          );
 
+          return {
+            ...block,
+            tx_count: tx_info_from_block.rows[0]["tx_count"],
+          };
+        }),
+      );
+
+      return populated.reverse();
+    } catch (error) {
+      console.error("Error in get_last_x_blocks_with_client:", error);
+      throw error;
+    }
+  }
   /**
    * Retrieves related blocks with the specified client.
    *
@@ -117,43 +127,45 @@ export class CommonClass {
       );
     }
 
-    const blocks = await handleSqlQueryWithCache(
-      client,
-      `
-    SELECT block_index, block_time, block_hash, previous_block_hash, ledger_hash, 
-    txlist_hash, messages_hash 
-    FROM blocks
-    WHERE block_index >= ? - 2
-    AND block_index <= ? + 2
-    ORDER BY block_index DESC;
-    `,
-      [block_index, block_index],
-      0,
-    );
-    const populated = blocks?.rows?.map(async (block: any) => {
-      const stamps_from_block = await handleSqlQueryWithCache(
+    const [blocks, stamps] = await Promise.all([
+      handleSqlQueryWithCache(
         client,
         `
-      SELECT COUNT(*) AS issuances
-      FROM ${STAMP_TABLE}
-      WHERE block_index = ?;
-      `,
-        [block.block_index],
+        SELECT ${BLOCK_FIELDS}
+        FROM blocks
+        WHERE block_index >= ? - 2
+        AND block_index <= ? + 2
+        ORDER BY block_index DESC;
+        `,
+        [block_index, block_index],
+        0,
+      ),
+      handleSqlQueryWithCache(
+        client,
+        `
+        SELECT block_index, COUNT(*) AS issuances
+        FROM ${STAMP_TABLE}
+        WHERE block_index >= ? - 2
+        AND block_index <= ? + 2
+        GROUP BY block_index;
+        `,
+        [block_index, block_index],
         "never",
-      );
+      ),
+    ]);
 
-      const sends_from_block = 0; // FIXME: need to add the send data
+    const stampMap = new Map(
+      stamps.rows.map((row) => [row.block_index, row.issuances]),
+    );
 
-      return {
-        ...block,
-        issuances: stamps_from_block.rows[0]["issuances"] ?? 0,
-        sends: sends_from_block,
-      };
-    });
-    const result = await Promise.all(populated.reverse());
-    return result;
+    const result = blocks.rows.map((block) => ({
+      ...block,
+      issuances: stampMap.get(block.block_index) ?? 0,
+      sends: 0, // FIXME: need to add the send data
+    }));
+
+    return result.reverse();
   }
-
   static async get_stamps_by_block_with_client(
     client: Client,
     block_index_or_hash: number | string,
@@ -212,7 +224,7 @@ export class CommonClass {
       `
       SELECT block_index
       FROM blocks
-      WHERE block_hash = '${block_hash}';
+      WHERE block_hash = ?;
       `,
       [block_hash],
       "never",
@@ -336,7 +348,7 @@ export class CommonClass {
     limit = BIG_LIMIT,
     page = 1,
     order = "DESC",
-  ) {
+  ): Promise<StampBalance[]> {
     const offset = (page - 1) * limit;
     try {
       const xcp_balances = await get_balances(address);
@@ -375,21 +387,24 @@ export class CommonClass {
         TTL_CACHE,
       );
 
-      const grouped = balances.rows.reduce((acc: any, cur: any) => {
-        acc[cur.cpid] = acc[cur.cpid] || [];
-        acc[cur.cpid].push({
-          ...cur,
-          is_btc_stamp: cur.is_btc_stamp ?? 0, // Transform null to 0
-        });
-        return acc;
-      }, {});
+      const grouped = balances.rows.reduce(
+        (acc: Record<string, StampBalance[]>, cur: StampBalance) => {
+          acc[cur.cpid] = acc[cur.cpid] || [];
+          acc[cur.cpid].push({
+            ...cur,
+            is_btc_stamp: cur.is_btc_stamp ?? 0,
+          });
+          return acc;
+        },
+        {},
+      );
 
       const summarized = Object.keys(grouped).map((key) =>
         summarize_issuances(grouped[key])
       );
 
-      return summarized.map((summary) => {
-        const xcp_balance = xcp_balances.find((balance: any) =>
+      return summarized.map((summary: StampBalance) => {
+        const xcp_balance = xcp_balances.find((balance) =>
           balance.cpid === summary.cpid
         );
         return {
