@@ -1,5 +1,4 @@
 import { Client } from "$mysql/mod.ts";
-import { CommonClass, summarize_issuances } from "./index.ts";
 import { SMALL_LIMIT, STAMP_TABLE, TTL_CACHE } from "constants";
 import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
@@ -32,31 +31,6 @@ export class StampsClass {
       client,
       query,
       [],
-      1000 * 60 * 3,
-    );
-  }
-
-  static async get_stamps_by_page_with_client(
-    client: Client,
-    limit = SMALL_LIMIT,
-    page = 1,
-    sort_order: "asc" | "desc" = "asc",
-    type: "stamps" | "cursed",
-  ) {
-    const offset = (page - 1) * limit;
-    const order = sort_order.toUpperCase() === "ASC" ? "ASC" : "DESC";
-    const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
-    return await handleSqlQueryWithCache(
-      client,
-      `
-        SELECT st.*, cr.creator AS creator_name
-        FROM ${STAMP_TABLE} AS st
-        LEFT JOIN creator AS cr ON st.creator = cr.address
-        WHERE ${stampCondition}
-        ORDER BY st.stamp ${order}
-        LIMIT ? OFFSET ?;
-      `,
-      [limit, offset],
       1000 * 60 * 3,
     );
   }
@@ -145,41 +119,6 @@ export class StampsClass {
     );
   }
 
-  static async get_stamps_by_ident_with_client(
-    client: Client,
-    ident: typeof SUBPROTOCOLS,
-    limit = SMALL_LIMIT,
-    page = 1,
-    type: "stamps" | "cursed",
-  ) {
-    const offset = (page - 1) * limit;
-    const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT
-        st.stamp,
-        st.cpid,
-        st.creator,
-        cr.creator AS creator_name,
-        st.tx_hash, st.stamp_mimetype,
-        st.supply, st.divisible,
-        st.locked,
-        st.ident,
-        st.block_time,
-        st.block_index
-      FROM ${STAMP_TABLE} AS st
-      LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.ident = ?
-      AND ${stampCondition}
-      ORDER BY st.stamp
-      LIMIT ? OFFSET ?;
-      `,
-      [ident, limit, offset],
-      1000 * 60 * 3,
-    );
-  }
-
   static async get_stamp_file_by_identifier_with_client(
     client: Client,
     identifier: string,
@@ -200,14 +139,143 @@ export class StampsClass {
     return `${data.rows[0].tx_hash}.${ext}`;
   }
 
-  static async get_stamp_with_client(client: Client, id: string) {
-    const data = await CommonClass.get_stamps_by_stamp_tx_hash_cpid_stamp_hash(
-      client,
-      id,
-    );
+  static async get_stamps(
+    client: Client,
+    options: {
+      limit?: number;
+      page?: number;
+      sort_order?: "asc" | "desc";
+      type?: "stamps" | "cursed";
+      ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string;
+      identifier?: string | number;
+      blockIdentifier?: number | string;
+      all_columns?: boolean;
+      no_pagination?: boolean;
+      cache_duration?: number | "never";
+    },
+  ) {
+    const {
+      limit = SMALL_LIMIT,
+      page = 1,
+      sort_order = "asc",
+      type,
+      ident,
+      identifier,
+      blockIdentifier,
+      all_columns = false,
+      no_pagination = false,
+      cache_duration = 1000 * 60 * 3,
+    } = options;
 
-    if (!data || !data.rows) return null;
-    const stamp = summarize_issuances(data.rows);
-    return stamp;
+    const offset = no_pagination ? 0 : (page - 1) * limit;
+    const order = sort_order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+
+    const whereConditions = [];
+    const queryParams: any[] = [];
+
+    // Type condition
+    if (type) {
+      const stampCondition = type === "stamps"
+        ? "st.stamp >= 0"
+        : "st.stamp < 0";
+      whereConditions.push(stampCondition);
+    }
+
+    // Ident condition
+    if (ident) {
+      const identList = Array.isArray(ident) ? ident : [ident];
+      const identCondition = `(${
+        identList.map(() => "st.ident = ?").join(" OR ")
+      })`;
+      whereConditions.push(identCondition);
+      queryParams.push(...identList);
+    }
+
+    // Identifier condition (stamp, tx_hash, cpid, or stamp_hash)
+    if (identifier) {
+      const isNumber = typeof identifier === "number" ||
+        !isNaN(Number(identifier));
+      const isTxHash = typeof identifier === "string" &&
+        identifier.length === 64 && /^[a-fA-F0-9]+$/.test(identifier);
+      const isStampHash = typeof identifier === "string" &&
+        /^[a-zA-Z0-9]{12,20}$/.test(identifier) && /[a-z]/.test(identifier) &&
+        /[A-Z]/.test(identifier);
+
+      const identifierCondition = isNumber
+        ? "st.stamp = ?"
+        : isTxHash
+        ? "st.tx_hash = ?"
+        : isStampHash
+        ? "st.stamp_hash = ?"
+        : "st.cpid = ?";
+
+      whereConditions.push(identifierCondition);
+      queryParams.push(identifier);
+    }
+
+    // Block identifier condition
+    if (blockIdentifier !== undefined) {
+      if (
+        typeof blockIdentifier === "number" || /^\d+$/.test(blockIdentifier)
+      ) {
+        whereConditions.push("st.block_index = ?");
+        queryParams.push(Number(blockIdentifier));
+      } else if (
+        typeof blockIdentifier === "string" && blockIdentifier.length === 64
+      ) {
+        whereConditions.push("st.block_hash = ?");
+        queryParams.push(blockIdentifier);
+      }
+    }
+
+    const specificColumns = `
+      st.stamp, 
+      st.block_index, 
+      st.cpid, 
+      st.creator, 
+      cr.creator AS creator_name, 
+      st.divisible, 
+      st.keyburn, 
+      st.locked, 
+      st.stamp_base64, 
+      st.stamp_mimetype, 
+      st.stamp_url, 
+      st.supply, 
+      st.block_time, 
+      st.tx_hash, 
+      st.tx_index, 
+      st.ident, 
+      st.stamp_hash, 
+      st.is_btc_stamp, 
+      st.file_hash
+    `;
+
+    const selectClause = all_columns
+      ? "st.*, cr.creator AS creator_name"
+      : specificColumns;
+
+    const whereClause = whereConditions.length > 0
+      ? `WHERE ${whereConditions.join(" AND ")}`
+      : "";
+
+    const query = `
+      SELECT ${selectClause}
+      FROM ${STAMP_TABLE} AS st
+      LEFT JOIN creator AS cr ON st.creator = cr.address
+      ${whereClause}
+      ORDER BY st.stamp ${order}
+      ${no_pagination ? "" : "LIMIT ? OFFSET ?"};
+    `;
+
+    if (!no_pagination) {
+      queryParams.push(limit, offset);
+    }
+
+    return await handleSqlQueryWithCache(
+      client,
+      query,
+      queryParams,
+      cache_duration,
+    );
   }
 }

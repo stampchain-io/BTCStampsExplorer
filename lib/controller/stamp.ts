@@ -47,47 +47,6 @@ const filterData = (stamps: StampRow[], filterBy) => {
   );
 };
 
-export async function api_get_stamps_by_page(
-  page = 1,
-  page_size = BIG_LIMIT,
-  orderBy: "DESC" | "ASC" = "DESC",
-  sortBy = "none",
-  filterBy: string[] = [],
-  typeBy = ["STAMP", "SRC-721"],
-) {
-  try {
-    const client = await getClient();
-    const stamps = await StampsClass.get_resumed_stamps_by_page_with_client(
-      client,
-      page_size,
-      page,
-      orderBy,
-      filterBy,
-      typeBy,
-      "stamps",
-    );
-    if (!stamps) {
-      closeClient(client);
-      throw new Error("No stamps found");
-    }
-
-    // Sort the entire dataset before pagination
-    const sortedData = sortData(
-      filterData(stamps.rows, filterBy),
-      sortBy,
-      orderBy,
-    );
-
-    releaseClient(client);
-    return {
-      stamps: sortedData,
-    };
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-
 export async function api_get_stamps(
   page = 1,
   page_size = BIG_LIMIT,
@@ -190,31 +149,37 @@ export async function api_get_stamp(id: string) {
 export async function api_get_stamp_all_data(id: string) {
   try {
     const client = await getClient();
-    const stamp = await StampsClass.get_stamp_with_client(client, id);
-    if (!stamp) {
+    const stampResult = await StampsClass.get_stamps(client, {
+      identifier: id,
+      all_columns: true,
+      no_pagination: true,
+      cache_duration: "never",
+    });
+
+    if (!stampResult || stampResult.rows.length === 0) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
-    const total = await StampsClass.get_total_stamp_count(
-      client,
-      "stamps",
-    );
+
+    const stamp = stampResult.rows[0];
     const cpid = stamp.cpid;
 
-    const holders = await get_holders(cpid);
-    const dispensers = await get_dispensers(cpid);
-    const sends = await get_sends(cpid);
-    const dispenses = await get_dispenses(cpid);
+    const [holders, dispensers, sends, dispenses, total] = await Promise.all([
+      get_holders(cpid),
+      get_dispensers(cpid),
+      get_sends(cpid),
+      get_dispenses(cpid),
+      StampsClass.get_total_stamp_count(client, "stamps"),
+    ]);
+
     releaseClient(client);
     return {
       stamp: stamp,
-      holders: holders.map((holder: HolderRow) => {
-        return {
-          address: holder.address,
-          quantity: holder.divisible
-            ? holder.quantity / 100000000
-            : holder.quantity,
-        };
-      }),
+      holders: holders.map((holder: HolderRow) => ({
+        address: holder.address,
+        quantity: holder.divisible
+          ? holder.quantity / 100000000
+          : holder.quantity,
+      })),
       sends: sends,
       dispensers: dispensers,
       dispenses: dispenses,

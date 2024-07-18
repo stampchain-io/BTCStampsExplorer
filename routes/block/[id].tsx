@@ -1,37 +1,46 @@
 import { Handler, HandlerContext, Handlers, PageProps } from "$fresh/server.ts";
 import {
-  api_get_block,
-  api_get_last_block,
-  api_get_related_blocks,
-} from "$lib/controller/block.ts";
+  getBlockInfo,
+  getLastBlock,
+  getRelatedBlocks,
+  transformToBlockInfoResponse,
+} from "$lib/services/blockService.ts";
 import BlockInfo from "$components/BlockInfo.tsx";
 import BlockHeader from "$islands/block/BlockHeader.tsx";
 import BlockSelector from "$islands/block/BlockSelector.tsx";
-
 import { useSignal } from "@preact/signals";
+import { BlockInfoResponseBody, BlockRow } from "globals";
 
 type BlockPageProps = {
   params: {
     id: string;
-    block: BlockInfo;
+    block: BlockInfoResponseBody;
   };
 };
 
 export const handler: Handlers<BlockRow[]> = {
   async GET(_req: Request, ctx: HandlerContext) {
-    let block: BlockInfo;
+    let blockIdentifier: number | string;
     if (!ctx.params.id || isNaN(Number(ctx.params.id))) {
-      const { last_block } = await api_get_last_block();
-      ctx.params.id = last_block;
+      const { last_block } = await getLastBlock();
+      blockIdentifier = last_block;
+    } else {
+      blockIdentifier = ctx.params.id;
     }
-    block = await api_get_block(Number(ctx.params.id));
-    const related_blocks = await api_get_related_blocks(
-      Number(ctx.params.id),
-    );
-    return await ctx.render({
-      block,
-      related_blocks,
-    });
+
+    try {
+      const stampBlockResponse = await getBlockInfo(blockIdentifier, "stamps");
+      const block = transformToBlockInfoResponse(stampBlockResponse);
+      const related_blocks = await getRelatedBlocks(blockIdentifier);
+
+      return await ctx.render({
+        block,
+        related_blocks,
+      });
+    } catch (error) {
+      console.error("Error fetching block info:", error);
+      return new Response("Error fetching block info", { status: 500 });
+    }
   },
 };
 

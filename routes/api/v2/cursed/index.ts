@@ -19,13 +19,13 @@ export const handler = async (
     const client = await getClient();
 
     const [data, totalResult, lastBlock] = await Promise.all([
-      StampsClass.get_stamps_by_page_with_client(
-        client,
+      StampsClass.get_stamps(client, {
         limit,
         page,
         sort_order,
-        "cursed",
-      ),
+        type: "cursed",
+        all_columns: true,
+      }),
       StampsClass.get_total_stamp_count(client, "cursed"),
       CommonClass.get_last_block_with_client(client),
     ]);
