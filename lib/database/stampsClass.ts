@@ -6,51 +6,31 @@ import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { get_suffix_from_mimetype } from "utils/util.ts";
 
 export class StampsClass {
-  static async get_total_stamps_with_client(
+  static async get_total_stamp_count(
     client: Client,
     type: "stamps" | "cursed",
+    ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
   ) {
     const stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
-    return await handleSqlQueryWithCache(
-      client,
-      `
+    let query = `
       SELECT COUNT(*) AS total
       FROM ${STAMP_TABLE}
-      WHERE  ${stampCondition};
-      `,
-      [],
-      1000 * 60 * 3,
-    );
-  }
+      WHERE ${stampCondition}
+    `;
 
-  /**
-   * Retrieves the total number of stamps by identifier(s) with the specified client.
-   *
-   * @param client - The database client.
-   * @param ident - The identifier(s) of the stamps. It can be a single identifier or an array of identifiers.
-   *                If it's a single identifier, it should be one of the values defined in the SUBPROTOCOLS enum.
-   *                If it's an array of identifiers, each identifier should be one of the values defined in the SUBPROTOCOLS enum.
-   * @returns A promise that resolves to the total number of stamps matching the identifier(s) with the client.
-   */
-  static async get_total_stamps_by_ident_with_client(
-    client: Client,
-    ident: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
-    type: "stamps" | "cursed",
-  ) {
-    const identList = Array.isArray(ident) ? ident : [ident];
-    const identCondition = identList.map((id) => `ident = '${id}'`).join(
-      " OR ",
-    );
-    const stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
+    if (ident) {
+      const identList = Array.isArray(ident) ? ident : [ident];
+      const identCondition = identList.map((id) => `ident = '${id}'`).join(
+        " OR ",
+      );
+      query += ` AND (${identCondition}) AND is_btc_stamp IS NOT NULL`;
+    }
+
+    query += ";";
+
     return await handleSqlQueryWithCache(
       client,
-      `
-      SELECT COUNT(*) AS total
-      FROM ${STAMP_TABLE}
-      WHERE (${identCondition})
-        AND ${stampCondition}
-      AND is_btc_stamp IS NOT NULL;
-      `,
+      query,
       [],
       1000 * 60 * 3,
     );
@@ -162,40 +142,6 @@ export class StampsClass {
       `,
       [],
       1000 * 60 * 3,
-    );
-  }
-
-  static async get_stamps_by_block_index_with_client(
-    client: Client,
-    block_index: number,
-  ) {
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT
-        st.stamp,
-        st.tx_hash,
-        st.cpid,
-        st.creator,
-        cr.creator AS creator_name,
-        st.tx_hash, st.stamp_mimetype,
-        st.supply, st.divisible,
-        st.keyburn, st.stamp_base64,
-        st.stamp_url,
-        st.stamp_hash,
-        st.locked,
-        st.ident,
-        st.block_time,
-        st.file_hash,
-        st.block_index, cr.creator AS creator_name
-      FROM ${STAMP_TABLE} AS st
-      LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.block_index = ?
-      AND st.is_btc_stamp IS NOT NULL
-      ORDER BY stamp;
-      `,
-      [block_index],
-      "never",
     );
   }
 
