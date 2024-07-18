@@ -22,7 +22,7 @@ export function Footer() {
             <a href="https://t.me/BitcoinStamps">
               <img src="/img/icon_telegram.png" class="w-14" />
             </a>
-            <a href="/">
+            <a href="https://github.com/stampchain-io/">
               <img src="/img/icon_github.png" class="w-14" />
             </a>
           </div>
