@@ -1,35 +1,31 @@
-import { CommonClass, getClient } from "$lib/database/index.ts";
+import { CommonClass } from "$lib/database/index.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
-
-// Import the ErrorResponseBody type
-import type { ErrorResponseBody } from "types/api.ts";
+// import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { withDatabaseClient } from "$lib/services/databaseService.ts";
+import { BlockCountHandlerContext, PaginatedRequest } from "globals";
 
 export const handler = async (
-  _req: Request,
-  ctx: { params: { number: string } },
+  _req: PaginatedRequest,
+  ctx: BlockCountHandlerContext,
 ): Promise<Response> => {
-  const { number } = ctx.params;
-  const parsedNumber = number ? parseInt(number) : 1;
-
-  if (Number.isNaN(parsedNumber) || parsedNumber < 1 || parsedNumber > 100) {
-    const errorBody: ErrorResponseBody = {
-      error: "Invalid number provided. Must be a number between 1 and 100.",
-    };
-    return ResponseUtil.error(errorBody, 400);
-  }
-
   try {
-    const client = await getClient();
-    const lastBlocks = await CommonClass.get_last_x_blocks_with_client(
-      client,
-      parsedNumber,
-    );
+    const { number } = ctx.params;
+    const parsedNumber = number ? parseInt(number) : 100;
+
+    if (Number.isNaN(parsedNumber) || parsedNumber < 1 || parsedNumber > 100) {
+      return ResponseUtil.error(
+        "Invalid number provided. Must be a number between 1 and 100.",
+        400,
+      );
+    }
+
+    const lastBlocks = await withDatabaseClient((client) => {
+      return CommonClass.get_last_x_blocks_with_client(client, parsedNumber);
+    });
+
     return ResponseUtil.successArray(lastBlocks);
   } catch (error) {
     console.error("Failed to get last blocks:", error);
-    const errorBody: ErrorResponseBody = {
-      error: "Internal server error",
-    };
-    return ResponseUtil.error(errorBody, 500);
+    return ResponseUtil.error("Internal server error", 500);
   }
 };

@@ -14,15 +14,17 @@ export class CommonClass {
   /**
    * Retrieves block information by block index or hash using the provided database client.
    * @param client - The database client to use for the query.
-   * @param block_index_or_hash - The block index or hash to retrieve information for.
+   * @param blockIdentifier - The block index or hash to retrieve information for.
    * @returns A promise that resolves to the block information.
    */
   static async get_block_info_with_client(
     client: Client,
-    block_index_or_hash: number | string,
+    blockIdentifier: number | string,
   ) {
-    const isIndex = !isNaN(Number(block_index_or_hash));
+    const isIndex = typeof blockIdentifier === "number" ||
+      /^\d+$/.test(blockIdentifier);
     const field = isIndex ? "block_index" : "block_hash";
+    const queryValue = isIndex ? Number(blockIdentifier) : blockIdentifier;
 
     return await handleSqlQueryWithCache(
       client,
@@ -31,11 +33,10 @@ export class CommonClass {
       FROM blocks
       WHERE ${field} = ?;
       `,
-      [block_index_or_hash],
+      [queryValue],
       "never",
     );
   }
-
   /**
    * Retrieves the last block index from the database using the provided client.
    *
@@ -109,21 +110,21 @@ export class CommonClass {
    * Retrieves related blocks with the specified client.
    *
    * @param client - The database client.
-   * @param block_index_or_hash - The block index or hash.
+   * @param blockIdentifier - The block index (number) or block hash (string).
    * @returns A promise that resolves to an array of related blocks.
    */
   static async get_related_blocks_with_client(
     client: Client,
-    block_index_or_hash: number | string,
+    blockIdentifier: number | string,
   ) {
     let block_index: number;
 
-    if (!isNaN(Number(block_index_or_hash))) {
-      block_index = Number(block_index_or_hash);
+    if (typeof blockIdentifier === "number" || /^\d+$/.test(blockIdentifier)) {
+      block_index = Number(blockIdentifier);
     } else {
-      block_index = await this.get_block_index_by_hash_with_client(
+      block_index = await this.get_block_index_by_hash(
         client,
-        String(block_index_or_hash),
+        String(blockIdentifier),
       );
     }
 
@@ -131,24 +132,24 @@ export class CommonClass {
       handleSqlQueryWithCache(
         client,
         `
-        SELECT ${BLOCK_FIELDS}
-        FROM blocks
-        WHERE block_index >= ? - 2
-        AND block_index <= ? + 2
-        ORDER BY block_index DESC;
-        `,
+      SELECT ${BLOCK_FIELDS}
+      FROM blocks
+      WHERE block_index >= ? - 2
+      AND block_index <= ? + 2
+      ORDER BY block_index DESC;
+      `,
         [block_index, block_index],
         0,
       ),
       handleSqlQueryWithCache(
         client,
         `
-        SELECT block_index, COUNT(*) AS issuances
-        FROM ${STAMP_TABLE}
-        WHERE block_index >= ? - 2
-        AND block_index <= ? + 2
-        GROUP BY block_index;
-        `,
+      SELECT block_index, COUNT(*) AS issuances
+      FROM ${STAMP_TABLE}
+      WHERE block_index >= ? - 2
+      AND block_index <= ? + 2
+      GROUP BY block_index;
+      `,
         [block_index, block_index],
         "never",
       ),
@@ -166,48 +167,6 @@ export class CommonClass {
 
     return result.reverse();
   }
-  static async get_stamps_by_block_with_client(
-    client: Client,
-    block_index_or_hash: number | string,
-    type: "stamps" | "cursed",
-  ) {
-    const isBlockIndex = !isNaN(Number(block_index_or_hash));
-    const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
-    const query = `
-      SELECT 
-        st.stamp, 
-        st.block_index, 
-        st.cpid, 
-        st.creator, 
-        cr.creator AS creator_name, 
-        st.divisible, 
-        st.keyburn, 
-        st.locked, 
-        st.stamp_base64, 
-        st.stamp_mimetype, 
-        st.stamp_url, 
-        st.supply, 
-        st.block_time, 
-        st.tx_hash, 
-        st.tx_index, 
-        st.ident, 
-        st.stamp_hash, 
-        st.is_btc_stamp, 
-        st.file_hash
-      FROM ${STAMP_TABLE} AS st
-      LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.${isBlockIndex ? "block_index" : "block_hash"} = ?
-        AND ${stampCondition}
-      ORDER BY st.${isBlockIndex ? "stamp" : "tx_index"};
-    `;
-    const queryParams = [block_index_or_hash];
-    return await handleSqlQueryWithCache(
-      client,
-      query,
-      queryParams,
-      "never",
-    );
-  }
 
   /**
    * Retrieves the block index by its hash using the provided database client.
@@ -215,7 +174,7 @@ export class CommonClass {
    * @param block_hash - The hash of the block to retrieve the index for.
    * @returns The block index if found, otherwise undefined.
    */
-  static async get_block_index_by_hash_with_client(
+  static async get_block_index_by_hash(
     client: Client,
     block_hash: string,
   ) {
@@ -234,57 +193,6 @@ export class CommonClass {
 
   // -------------Stamps--------------
 
-  static async get_stamps_by_stamp_tx_hash_cpid_stamp_hash(
-    client: Client,
-    stampOrTxHash: number | string,
-  ) {
-    const isTxHash = typeof stampOrTxHash === "string" &&
-      stampOrTxHash.length === 64 && /^[a-fA-F0-9]+$/.test(stampOrTxHash);
-    const isStampHash = typeof stampOrTxHash === "string" &&
-      /^[a-zA-Z0-9]{12,20}$/.test(stampOrTxHash) &&
-      /[a-z]/.test(stampOrTxHash) && /[A-Z]/.test(stampOrTxHash);
-    const isNumber = typeof stampOrTxHash === "number" ||
-      !isNaN(Number(stampOrTxHash));
-    const queryKey = isNumber
-      ? "stamp"
-      : (isTxHash ? "tx_hash" : (isStampHash ? "stamp_hash" : "cpid"));
-
-    const query = `
-        SELECT 
-          st.stamp, 
-          st.block_index, 
-          st.cpid, 
-          st.creator, 
-          st.divisible, 
-          st.keyburn, 
-          st.locked, 
-          st.stamp_base64, 
-          st.stamp_mimetype, 
-          st.stamp_url, 
-          st.supply, 
-          st.block_time, 
-          st.tx_hash, 
-          st.ident, 
-          st.stamp_hash, 
-          st.is_btc_stamp, 
-          st.file_hash,
-          cr.creator AS creator_name
-        FROM ${STAMP_TABLE} st
-        LEFT JOIN creator AS cr ON st.creator = cr.address
-        WHERE ${queryKey} = ?
-        ORDER BY st.stamp;
-      `;
-    const queryParams = [stampOrTxHash];
-
-    const issuances = await handleSqlQueryWithCache(
-      client,
-      query,
-      queryParams,
-      TTL_CACHE,
-    );
-
-    return issuances;
-  }
   /**
    * Retrieves the total stamp balance for a given address using the provided database client.
    *
@@ -293,7 +201,7 @@ export class CommonClass {
    * @returns A promise that resolves to the total stamp balance.
    * @throws If there is an error retrieving the balances.
    */
-  static async get_total_stamp_balance_with_client(
+  static async get_count_stamp_balances_by_address(
     client: Client,
     address: string,
   ) {
@@ -342,7 +250,7 @@ export class CommonClass {
    * @param order - The order in which to retrieve the stamp balances. Default is "DESC".
    * @returns An array of summarized stamp balances for the given address.
    */
-  static async get_stamp_balances_by_address_with_client(
+  static async get_stamp_balances_by_address(
     client: Client,
     address: string,
     limit = BIG_LIMIT,

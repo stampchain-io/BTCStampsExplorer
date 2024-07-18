@@ -310,6 +310,9 @@ export type PaginatedResponseBody =
   | PaginatedStampResponseBody
   | ErrorResponseBody;
 
+export interface BlockCountHandlerContext {
+  params: { number: string };
+}
 export interface BlockInfoResponseBody {
   block_info: BlockRow;
   issuances: StampRow[];

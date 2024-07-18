@@ -22,13 +22,13 @@ export const handler = async (
 
     // Combine database queries into a single Promise.all call
     const [data, totalResult, last_block] = await Promise.all([
-      CommonClass.get_stamp_balances_by_address_with_client(
+      CommonClass.get_stamp_balances_by_address(
         client,
         address,
         limit,
         page,
       ),
-      CommonClass.get_total_stamp_balance_with_client(client, address),
+      CommonClass.get_count_stamp_balances_by_address(client, address),
       CommonClass.get_last_block_with_client(client),
     ]);
 

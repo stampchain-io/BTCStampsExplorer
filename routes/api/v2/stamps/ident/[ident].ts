@@ -1,15 +1,10 @@
 import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
-import {
-  IdentHandlerContext,
-  PaginatedIdResponseBody,
-  PaginatedRequest,
-} from "globals";
-import { paginate } from "utils/util.ts";
-import { ResponseUtil } from "utils/responseUtil.ts"; // Import ResponseUtil
+import { IdentHandlerContext, StampResponseBody } from "globals";
+import { ResponseUtil } from "utils/responseUtil.ts";
 
 export const handler = async (
-  req: PaginatedRequest,
+  _req: Request,
   ctx: IdentHandlerContext,
 ): Promise<Response> => {
   const { ident } = ctx.params;
@@ -17,29 +12,15 @@ export const handler = async (
     return ResponseUtil.error(`Error: ident: ${ident} not found`, 404);
   }
   try {
-    const url = new URL(req.url);
-    const limit = Number(url.searchParams.get("limit")) || 1000;
-    const page = Number(url.searchParams.get("page")) || 1;
     const client = await getClient();
-    const data = await StampsClass.get_stamps_by_ident_with_client(
-      client,
-      [ident.toUpperCase()],
-      limit,
-      page,
-      "stamps",
-    );
-    const total = (await StampsClass.get_total_stamp_count(
-      client,
-      "stamps",
-      ident.toUpperCase(),
-    )).rows[0]["total"];
-    const pagination = paginate(total, page, limit);
-    const last_block = await CommonClass.get_last_block_with_client(client);
-    const body: PaginatedIdResponseBody = {
-      ...pagination,
-      last_block: last_block.rows[0]["last_block"],
+    const data = await StampsClass.get_stamps(client, {
+      type: "stamps",
       ident: ident.toUpperCase(),
-      data: data.rows,
+    });
+    const last_block = await CommonClass.get_last_block_with_client(client);
+    const body: StampResponseBody = {
+      last_block: last_block.rows[0]["last_block"],
+      data: data.rows[0], // Assuming get_stamps returns an array, we take the first (and only) element
     };
     return ResponseUtil.success(body);
   } catch (error) {
