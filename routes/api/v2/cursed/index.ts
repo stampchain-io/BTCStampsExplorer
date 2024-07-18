@@ -26,7 +26,7 @@ export const handler = async (
         sort_order,
         "cursed",
       ),
-      StampsClass.get_total_stamps_with_client(client, "cursed"),
+      StampsClass.get_total_stamp_count(client, "cursed"),
       CommonClass.get_last_block_with_client(client),
     ]);
 
