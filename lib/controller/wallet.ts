@@ -16,7 +16,7 @@ export const api_get_stamp_balance = async (
   try {
     const client = await getClient();
     const balances = await CommonClass
-      .get_stamp_balances_by_address_with_client(
+      .get_stamp_balances_by_address(
         client,
         address,
         limit,
@@ -91,7 +91,7 @@ export const api_get_balance = async (
   try {
     const client = await getClient();
     const total =
-      (await CommonClass.get_total_stamp_balance_with_client(client, address))
+      (await CommonClass.get_count_stamp_balances_by_address(client, address))
         .rows[0]["total"] || 0;
     const pagination = paginate(total, page, limit);
 
@@ -99,7 +99,7 @@ export const api_get_balance = async (
     let stamps;
     if (total !== 0) {
       stamps = await CommonClass
-        .get_stamp_balances_by_address_with_client(
+        .get_stamp_balances_by_address(
           client,
           address,
           limit,

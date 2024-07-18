@@ -1,70 +1,37 @@
-import { Handlers, Request } from "$fresh/server.ts";
-import { api_get_related_blocks } from "$lib/controller/block.ts";
-import { isIntOr32ByteHex } from "$lib/utils/util.ts";
 import {
-  BlockHandlerContext,
-  BlockRelatedResponseBody,
-  ErrorResponseBody,
-} from "globals";
+  getBlockInfo,
+  transformToBlockInfoResponse,
+} from "$lib/services/blockService.ts";
+import { isIntOr32ByteHex } from "$lib/utils/util.ts";
+import { BlockHandlerContext, ErrorResponseBody } from "globals";
+import { ResponseUtil } from "utils/responseUtil.ts";
 
-/**
- * @swagger
- * /api/v2/block/related/{block_index}:
- *   get:
- *     summary: Get related blocks by block index or block hash
- *     parameters:
- *       - in: path
- *         name: block_index
- *         required: true
- *         schema:
- *           type: string
- *         description: The block index or block hash
- *     responses:
- *       '200':
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/BlockRelatedResponseBody'
- *       '500':
- *         description: Internal Server Error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponseBody'
- */
 export const handler = async (
   _req: Request,
   ctx: BlockHandlerContext,
 ): Promise<Response> => {
-  const block_index_or_hash = ctx.params.block_index;
-  let body: BlockRelatedResponseBody | ErrorResponseBody;
-  let status = 200; // OK
+  const blockIdentifier = ctx.params.block_index;
 
-  if (!isIntOr32ByteHex(block_index_or_hash)) {
-    body = {
+  if (!isIntOr32ByteHex(blockIdentifier)) {
+    const body: ErrorResponseBody = {
       error:
         "Invalid argument provided. Must be an integer or 32 byte hex string.",
     };
-    status = 400;
-  } else {
-    try {
-      const response: BlockRelatedResponseBody = await api_get_related_blocks(
-        block_index_or_hash,
-      );
-      body = response;
-    } catch {
-      body = {
-        error: `Block: ${block_index_or_hash} not found`,
-      };
-      status = 404;
-    }
+    return ResponseUtil.error(body.error, 400);
   }
 
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const isStamps = ctx.url.pathname.includes("/stamps/");
+  const type = isStamps ? "stamps" : "cursed";
+
+  try {
+    const blockInfo = await getBlockInfo(blockIdentifier, type);
+    const response = transformToBlockInfoResponse(blockInfo);
+    return ResponseUtil.success(response);
+  } catch (error) {
+    console.error(`Error in ${type}/block handler:`, error);
+    const body: ErrorResponseBody = {
+      error: `Block: ${blockIdentifier} not found`,
+    };
+    return ResponseUtil.error(body.error, 404);
+  }
 };
