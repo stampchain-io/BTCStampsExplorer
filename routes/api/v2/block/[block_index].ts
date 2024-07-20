@@ -23,8 +23,12 @@ export const handler = async (
   const blockIdentifier = /^\d+$/.test(block_index)
     ? Number(block_index)
     : block_index;
-  const isStamps = ctx.url.pathname.includes("/stamps/");
-  const type = isStamps ? "stamps" : "cursed";
+  // now we support api/v2/block/844755/cursed /stamps otherwise default to all
+  const type = ctx.url?.pathname?.includes("/cursed/")
+    ? "cursed"
+    : ctx.url?.pathname?.includes("/stamps/")
+    ? "stamps"
+    : "all";
 
   try {
     const blockInfo = await getBlockInfo(blockIdentifier, type);
@@ -33,8 +37,17 @@ export const handler = async (
   } catch (error) {
     console.error(`Error in ${type}/block handler:`, error);
     const body: ErrorResponseBody = {
-      error: `Block: ${block_index} not found`,
+      error: error instanceof Error &&
+          error.message === "Could not connect to database"
+        ? "Database connection error"
+        : `Block: ${block_index} not found`,
     };
-    return ResponseUtil.error(body.error, 404);
+    return ResponseUtil.error(
+      body.error,
+      error instanceof Error &&
+        error.message === "Could not connect to database"
+        ? 500
+        : 404,
+    );
   }
 };
