@@ -8,7 +8,7 @@ import { BlockInfoResponseBody, StampBlockResponseBody } from "globals";
 
 export async function getBlockInfo(
   blockIdentifier: number | string,
-  type: "stamps" | "cursed" = "stamps",
+  type: "stamps" | "cursed" | "all" = "stamps",
 ): Promise<StampBlockResponseBody> {
   const client = await getClient();
   if (!client) {
@@ -22,7 +22,7 @@ export async function getBlockInfo(
       StampsClass.get_stamps(client, {
         type,
         blockIdentifier,
-        sort_order: "desc",
+        sort_order: "asc",
         no_pagination: true,
         cache_duration: "never",
       }),

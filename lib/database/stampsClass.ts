@@ -145,7 +145,7 @@ export class StampsClass {
       limit?: number;
       page?: number;
       sort_order?: "asc" | "desc";
-      type?: "stamps" | "cursed";
+      type?: "stamps" | "cursed" | "all";
       ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string;
       identifier?: string | number;
       blockIdentifier?: number | string;
@@ -158,7 +158,7 @@ export class StampsClass {
       limit = SMALL_LIMIT,
       page = 1,
       sort_order = "asc",
-      type,
+      type = "stamps",
       ident,
       identifier,
       blockIdentifier,
@@ -174,7 +174,7 @@ export class StampsClass {
     const queryParams: any[] = [];
 
     // Type condition
-    if (type) {
+    if (type !== "all") {
       const stampCondition = type === "stamps"
         ? "st.stamp >= 0"
         : "st.stamp < 0";
