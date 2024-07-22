@@ -17,11 +17,11 @@ import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
 import { StampSales } from "$components/stampDetails/StampSales.tsx";
 
 type StampPageProps = {
-  // data: { stamp: any; sends: any; holders: any; total: any };
-  params: {
+  data: {
     stamp: StampRow;
     total: number;
-    // data: string;
+    sends: any;
+    holders: any;
   };
 };
 

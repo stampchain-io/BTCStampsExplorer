@@ -12,7 +12,7 @@ export function StampSearchClient() {
     <div class="relative inline-block">
       <input
         type="text"
-        className="min-w-[270px] md:min-w-[460px] h-[54px] bg-[#3F2A4E] px-4 py-2 rounded text-[13px] text-[#8D9199]"
+        className="min-w-[250px] md:min-w-[460px] h-[54px] bg-[#3F2A4E] px-4 py-2 rounded text-[13px] text-[#8D9199]"
         placeholder="Search stamps"
         onInput={handleSearch}
       />

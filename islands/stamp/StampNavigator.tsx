@@ -1,3 +1,4 @@
+import { useState } from "preact/hooks";
 import { StampRow } from "globals";
 import { useContext, useEffect } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
@@ -43,7 +44,10 @@ const FilterItem = (props: FilterItemInterface) => {
         props.onChange(title);
       }}
     >
-      <input type="checkbox" checked={props.value.includes(title)} />
+      <input
+        type="checkbox"
+        checked={props.value ? props.value.includes(title) : false}
+      />
       <span>{title}</span>
     </div>
   );
@@ -71,17 +75,33 @@ export function StampNavigator({ initFilter, initSort }) {
     }
   }, []);
 
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div class="group relative">
-      <div class="bg-white flex justify-between items-center p-4 min-w-[120px] w-[120px] h-[54px] rounded cursor-pointer mb-3">
-        <p class="text-[#022516] text-xl">Filter</p>
+      <div
+        class="bg-[#3F2A4E] hover:bg-white flex justify-between items-center p-4 min-w-[120px] w-[120px] h-[54px] rounded cursor-pointer mb-3"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <p
+          class={`${isHovered ? "text-[#022516]" : "text-[#8D9199]"} text-xl`}
+        >
+          Filter
+        </p>
         <img
-          src="/img/icon_filter.png"
+          src={isHovered
+            ? "/img/icon_filter_hover.png"
+            : "/img/icon_filter.png"}
           class="w-[18px] h-[12px]"
           alt="Filter icon"
         />
       </div>
-      <div class="bg-white text-[#022516] p-6 rounded absolute hidden group-hover:inline-block z-[100]">
+      <div
+        class="bg-white text-[#022516] p-6 rounded absolute hidden group-hover:inline-block z-[100]"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <div class="flex flex-col mb-6">
           <span class="w-20">Filter by:</span>
           <div class="flex flex-1 border-b border-gray-600 h-16 py-3 gap-x-5">
