@@ -1,6 +1,6 @@
 import { Chart } from "$fresh_charts/mod.ts";
 import { ChartColors, transparentize } from "$fresh_charts/utils.ts";
-import { short_address } from "utils/util.ts";
+import { abbreviateAddress } from "utils/util.ts";
 
 interface HoldersInfoProps {
   holders: {}[];
@@ -30,7 +30,7 @@ export const SRC20HoldersInfo = (props: HoldersInfoProps) => {
                 return (
                   <tr class="w-full table table-fixed bg-[#262424] text-[#9D9B9B] border-b dark:border-gray-700">
                     <td class="px-6 py-4">
-                      {short_address(src20.address)}
+                      {abbreviateAddress(src20.address)}
                     </td>
                     <td class="px-6 py-4">
                       {src20.amt}

@@ -1,18 +1,13 @@
-import { HandlerContext } from "$fresh/server.ts";
+import { Handlers } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$components/src20/SRC20TickHeader.tsx";
-import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20DetailsTab } from "$islands/src20/SRC20DetailsTab.tsx";
-
-import {
-  CommonClass,
-  getClient,
-  Src20Class,
-} from "../../lib/database/index.ts";
+import { BlockService } from "$lib/services/blockService.ts";
+import { getClient, Src20Class } from "../../lib/database/index.ts";
 import { BigFloat, set_precision } from "bigfloat/mod.ts";
 import { convertEmojiToTick } from "utils/util.ts";
 
-export const handler: Handlers<StampRow> = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
     try {
       let { tick } = ctx.params;
       tick = convertEmojiToTick(tick);
@@ -82,11 +77,11 @@ export const handler: Handlers<StampRow> = {
           "MINT",
         );
 
-      const last_block = await CommonClass.get_last_block_with_client(client);
+      const lastBlock = await BlockService.getLastBlock();
 
       set_precision(-4);
       const body = {
-        last_block: last_block.rows[0]["last_block"],
+        last_block: lastBlock.last_block,
         deployment: deployment.rows.map((row) => {
           return {
             ...row,

@@ -1,9 +1,8 @@
 import { BIG_LIMIT } from "utils/constants.ts";
-
 import { getClient, Src20Class } from "$lib/database/index.ts";
 
-export async function api_get_src20s(page = 1, page_size = BIG_LIMIT) {
-  try {
+export class Src20Service {
+  static async getSrc20s(page = 1, page_size = BIG_LIMIT) {
     const client = await getClient();
     const data = await Src20Class.get_valid_src20_tx_with_client(
       client,
@@ -26,8 +25,5 @@ export async function api_get_src20s(page = 1, page_size = BIG_LIMIT) {
       page: page,
       page_size: page_size,
     };
-  } catch (error) {
-    console.error(error);
-    throw error;
   }
 }

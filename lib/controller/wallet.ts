@@ -1,34 +1,11 @@
 import {
-  CommonClass,
   getClient,
   releaseClient,
   Src20Class,
+  StampRepository,
 } from "$lib/database/index.ts";
 import { getBtcAddressInfo } from "../utils/btc.ts";
-import { SMALL_LIMIT } from "utils/constants.ts";
 import { paginate } from "../utils/util.ts";
-
-export const api_get_stamp_balance = async (
-  address: string,
-  limit = SMALL_LIMIT,
-  page = 1,
-) => {
-  try {
-    const client = await getClient();
-    const balances = await CommonClass
-      .get_stamp_balances_by_address(
-        client,
-        address,
-        limit,
-        page,
-      );
-    releaseClient(client);
-    return balances;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
 
 export const api_get_src20_valid_tx = async (tx_hash: string) => {
   try {
@@ -90,21 +67,22 @@ export const api_get_balance = async (
 ) => {
   try {
     const client = await getClient();
-    const total =
-      (await CommonClass.get_count_stamp_balances_by_address(client, address))
-        .rows[0]["total"] || 0;
+    const total = (await StampRepository.getCountStampBalancesByAddressFromDb(
+      client,
+      address,
+    ))
+      .rows[0]["total"] || 0;
     const pagination = paginate(total, page, limit);
 
     const btcInfo = await getBtcAddressInfo(address); // frequently getting conn reset errors https://mempool.space/api/address/bc1qhy4t0j60sysrfmp6e5g0h67rthtvz4ktnggjpu): connection error: connection reset
     let stamps;
     if (total !== 0) {
-      stamps = await CommonClass
-        .get_stamp_balances_by_address(
-          client,
-          address,
-          limit,
-          page,
-        );
+      stamps = await StampRepository.getStampBalancesByAddressFromDb(
+        client,
+        address,
+        limit,
+        page,
+      );
     } else {
       stamps = [];
     }

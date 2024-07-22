@@ -1,5 +1,6 @@
 import { FreshContext } from "$fresh/server.ts";
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient, Src20Class } from "$lib/database/index.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { convertToEmoji, paginate } from "utils/util.ts";
 import {
@@ -29,11 +30,11 @@ export const handler = async (
     const total = await Src20Class.get_total_valid_src20_tx_with_client(
       client,
     );
-    const last_block = await CommonClass.get_last_block_with_client(client);
+    const lastBlock = await BlockService.getLastBlock();
     const pagination = paginate(total.rows[0].total, page, limit);
     const body: PaginatedSrc20ResponseBody = {
       ...pagination,
-      last_block: last_block.rows[0]["last_block"],
+      last_block: lastBlock.last_block,
       data: data.rows.map((row: any) => {
         return {
           ...row,

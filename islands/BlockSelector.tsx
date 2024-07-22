@@ -2,7 +2,8 @@ import type { Signal } from "@preact/signals";
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
-import { get_suffix_from_mimetype, short_address } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/util.ts";
+import { BlockRow } from "globals";
 
 dayjs.extend(relativeTime);
 
@@ -18,8 +19,8 @@ export default function Block(props: BlockProps) {
 
   const isSelected = selected.value === block;
   const displayAddress = globalThis.innerWidth >= 640
-    ? short_address(block.block_hash, 8)
-    : short_address(block.block_hash, 16);
+    ? abbreviateAddress(block.block_hash, 8)
+    : abbreviateAddress(block.block_hash, 16);
 
   return (
     <a
