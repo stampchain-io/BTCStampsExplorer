@@ -172,17 +172,30 @@ export default function Home(props: HomePageProps) {
     sortBy,
   } = props.data;
 
+  const stampDetailsInfoTitle: { [key: string]: string } = {
+    "recent": "Recent Sales",
+    "src721": "Src721",
+    "art": "Art",
+    "src20": "Src20",
+    "news": "Posh",
+  };
+
   return (
     <>
       {type
         ? (
           <div class="">
-            <div class="flex flex-col-reverse md:flex-row items-end justify-between border-b border-[#3F2A4E]">
+            <div class="flex flex-col-reverse md:flex-row items-start justify-between border-b border-[#3F2A4E]">
               <a
                 href="/home"
-                class="text-[#7A00F5] text-[26px] pb-3 border-b-4 border-[#7A00F5]"
+                class="text-[#7A00F5] text-[26px] pb-4 border-b-4 border-[#7A00F5] flex gap-1"
               >
-                {type}
+                <img
+                  src="/img/icon_arrow_left.png"
+                  className="w-5 h-10"
+                  alt=""
+                />
+                {stampDetailsInfoTitle[type]}
               </a>
               <div class="flex gap-6">
                 <StampNavigator initFilter={filterBy} initSort={sortBy} />

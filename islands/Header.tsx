@@ -46,7 +46,7 @@ export function Header() {
           </a>
           <button
             onClick={toggleMenu}
-            className="px-3 py-1 text-blue-600 opacity-50 hover:opacity-75 md:hidden z-[100]"
+            className="px-3 py-1 text-blue-600 md:hidden z-[100]"
             id="navbar-toggle"
           >
             {open && (
@@ -69,7 +69,7 @@ export function Header() {
         <div
           className={`${
             open
-              ? "flex left-0 top-0 fixed w-[300px] h-screen z-20 bg-[#181818] scroll-none p-6 pt-24"
+              ? "flex left-0 top-0 fixed w-[300px] h-screen z-20 bg-[#181818] scroll-none p-6 pt-[120px]"
               : "hidden"
           } flex-col md:flex md:flex-row text-center justify-between`}
           id="navbar-collapse"
@@ -171,14 +171,17 @@ export function Header() {
               open ? "flex" : "hidden"
             }`}
           >
-            <a href="#">
+            <a href="https://x.com/Stampchain">
               <img src="/img/icon_x.png" class="w-12" />
             </a>
-            <a href="#">
+            <a href="https://discord.gg/PCZU6xrt">
               <img src="/img/icon_discord.png" class="w-12" />
             </a>
-            <a href="#">
+            <a href="https://t.me/BitcoinStamps">
               <img src="/img/icon_telegram.png" class="w-12" />
+            </a>
+            <a href="https://github.com/stampchain-io/">
+              <img src="/img/icon_github.png" class="w-12" />
             </a>
           </div>
         </div>

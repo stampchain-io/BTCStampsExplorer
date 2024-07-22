@@ -34,32 +34,50 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           {stamp.cpid}
         </a>
       </div>
-      <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-        <p class="text-xl font-semibold">Creator</p>
-        <p class="text-[#60626F]">
-          {stamp.creator_name
-            ? stamp.creator_name
-            : (
-              <a href={`/wallet/${stamp.creator}`}>
-                {short_address(stamp.creator, 12)}
-              </a>
-            )}
-        </p>
+      <div class="flex justify-between items-end gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
+        <div className="flex flex-col">
+          <p class="text-xl font-semibold">Creator</p>
+          <p class="text-[#60626F]">
+            {stamp.creator_name
+              ? stamp.creator_name
+              : (
+                <a href={`/wallet/${stamp.creator}`}>
+                  {short_address(stamp.creator, 12)}
+                </a>
+              )}
+          </p>
+        </div>
+        <img
+          src="/img/icon_copy_to_clipboard.png"
+          className="w-4 h-5 cursor-pointer"
+        />
       </div>
-      <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-        <p class="text-xl font-semibold">Block #</p>
-        <p class="text-[#60626F]">832124</p>
+      <div class="flex justify-between items-end gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
+        <div className="flex flex-col">
+          <p class="text-xl font-semibold">Block #</p>
+          <p class="text-[#60626F]">832124</p>
+        </div>
+        <img
+          src="/img/icon_copy_to_clipboard.png"
+          className="w-4 h-5 cursor-pointer"
+        />
       </div>
-      <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-        <p class="text-xl font-semibold">TX hash</p>
-        <a
-          href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-[#60626F]"
-        >
-          {short_address(stamp.tx_hash, 12)}
-        </a>
+      <div class="flex justify-between items-end gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
+        <div className="flex flex-col">
+          <p class="text-xl font-semibold">TX hash</p>
+          <a
+            href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-[#60626F]"
+          >
+            {short_address(stamp.tx_hash, 12)}
+          </a>
+        </div>
+        <img
+          src="/img/icon_copy_to_clipboard.png"
+          className="w-4 h-5 cursor-pointer"
+        />
       </div>
       <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
         <p class="text-xl font-semibold">Supply</p>
