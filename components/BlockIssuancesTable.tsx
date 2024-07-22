@@ -4,7 +4,8 @@ import relativeTime from "$dayjs/plugin/relativeTime";
 import Stamp from "$/components/Stamp.tsx";
 import { StampKind } from "$/components/StampKind.tsx";
 
-import { get_suffix_from_mimetype, short_address } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/util.ts";
+import { BlockInfo, SendRow, StampRow } from "globals";
 
 dayjs.extend(relativeTime);
 
@@ -69,7 +70,8 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <a href={`/wallet/${issuance.creator}`}>
-                    {issuance.creator_name ?? short_address(issuance.creator)}
+                    {issuance.creator_name ??
+                      abbreviateAddress(issuance.creator)}
                   </a>
                 </td>
                 {

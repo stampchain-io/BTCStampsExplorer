@@ -1,4 +1,5 @@
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient, Src20Class } from "$lib/database/index.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 import {
   convertToEmoji,
   jsonStringifyBigInt,
@@ -48,7 +49,7 @@ export async function fetchAndFormatSrc20Transactions(
     address,
   );
   const total = totalResult.rows[0]["total"];
-  const last_block = await CommonClass.get_last_block_with_client(client);
+  const lastBlock = await BlockService.getLastBlock();
   const pagination = paginate(total, page, limit);
   const mappedData = valid_src20_txs_in_block.rows.map((tx: any) => ({
     ...tx,
@@ -60,7 +61,7 @@ export async function fetchAndFormatSrc20Transactions(
 
   const body: PaginatedSrc20ResponseBody = {
     ...pagination,
-    last_block: last_block.rows[0]["last_block"],
+    last_block: lastBlock.last_block,
     data: tx_hash !== null && mappedData.length === 1 &&
         block_index === null
       ? mappedData[0]
@@ -126,17 +127,19 @@ export async function fetchAndFormatSrc20Balance(
       amt ?? 0,
     );
   const total = total_data.rows[0]["total"];
-  const last_block = await CommonClass.get_last_block_with_client(client);
+  const lastBlock = await BlockService.getLastBlock();
   const body: PaginatedSrc20BalanceResponseBody = {
     page,
     limit,
     totalPages: Math.ceil(total / limit),
     total,
-    last_block: last_block.rows[0]["last_block"],
-    data: src20.rows.map((row) => ({
-      tick: row["tick"],
-      address: row["address"],
-      balance: row["amt"],
+    last_block: lastBlock.last_block,
+    data: src20.rows.map((
+      row: { tick: string; address: string; amt: number },
+    ) => ({
+      tick: row.tick,
+      address: row.address,
+      balance: row.amt,
     })),
   };
 

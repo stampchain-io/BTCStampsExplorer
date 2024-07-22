@@ -1,55 +1,48 @@
-import { StampRow } from "globals";
-
+import { StampPageProps } from "globals";
 import { Pagination } from "$components/Pagination.tsx";
-import { HandlerContext, Handlers } from "$fresh/server.ts";
-import { api_get_stamps } from "$lib/controller/stamp.ts";
-
+import { Handlers } from "$fresh/server.ts";
+import { StampController } from "$lib/controller/stampController.ts";
 import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { StampHeader } from "$islands/stamp/StampHeader.tsx";
 
-type StampPageProps = {
-  data: {
-    stamps: StampRow[];
-    total: number;
-    page: number;
-    pages: number;
-    page_size: number;
-    selectedTab: "all" | "classic";
-    sortBy: string;
-    filterBy: string[];
-  };
-};
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
+    try {
+      const url = new URL(req.url);
+      const orderBy = url.searchParams.get("order")?.toUpperCase() == "ASC"
+        ? "ASC"
+        : "DESC";
+      const sortBy = url.searchParams.get("sortBy") || "none";
+      const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+      const selectedTab = url.searchParams.get("typeBy") || "all";
+      const typeBy = selectedTab === "all"
+        ? ["STAMP", "SRC-721", "SRC-20"]
+        : ["STAMP", "SRC-721"];
+      const page = parseInt(url.searchParams.get("page") || "1");
+      const page_size = parseInt(
+        url.searchParams.get("limit") || "24",
+      );
 
-export const handler: Handlers<StampRow> = {
-  async GET(req: Request, ctx: HandlerContext) {
-    const url = new URL(req.url);
-    const orderBy = url.searchParams.get("order")?.toUpperCase() == "ASC"
-      ? "ASC"
-      : "DESC";
-    const sortBy = url.searchParams.get("sortBy") || "none";
-    const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
-    const selectedTab = url.searchParams.get("typeBy") || "all";
-    const typeBy = selectedTab === "all"
-      ? ["STAMP", "SRC-721", "SRC-20"]
-      : ["STAMP", "SRC-721"];
-    const page = parseInt(url.searchParams.get("page") || "1");
-    const page_size = parseInt(
-      url.searchParams.get("limit") || "24",
-    );
+      const result = await StampController.getStamps(
+        page,
+        page_size,
+        orderBy,
+        sortBy,
+        filterBy,
+        typeBy,
+      );
 
-    const { stamps, pages, page: pag, page_size: limit } =
-      await api_get_stamps(page, page_size, orderBy, sortBy, filterBy, typeBy);
-
-    const data = {
-      stamps,
-      page: pag,
-      pages,
-      page_size: limit,
-      filterBy,
-      sortBy,
-      selectedTab,
-    };
-    return await ctx.render(data);
+      const data = {
+        ...result,
+        filterBy,
+        sortBy,
+        selectedTab,
+      };
+      return ctx.render(data);
+    } catch (error) {
+      console.error("Error fetching stamp data:", error);
+      return new Response("Internal Server Error", { status: 500 });
+    }
   },
 };
 

@@ -4,11 +4,12 @@ import {
   PaginatedRequest,
   Src20SnapshotResponseBody,
 } from "globals";
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient, Src20Class } from "$lib/database/index.ts";
 import { Client } from "$mysql/mod.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import Big from "https://esm.sh/big.js";
 import { Src20SnapShotDetail } from "globals";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -26,7 +27,7 @@ export const handler = async (
     if (!client) {
       throw new Error("Client not found");
     }
-    const last_block = await CommonClass.get_last_block_with_client(client);
+    const lastBlock = await BlockService.getLastBlock();
     tick = convertEmojiToTick(String(tick));
     const src20 = await Src20Class.get_src20_balance_with_client(
       client as Client,
@@ -44,7 +45,7 @@ export const handler = async (
       limit: limit,
       totalPages: Math.ceil(total / limit),
       total: total,
-      snapshot_block: last_block.rows[0]["last_block"],
+      snapshot_block: lastBlock.last_block,
       data: src20.map((row: Src20SnapShotDetail) => {
         return {
           tick: row["tick"],

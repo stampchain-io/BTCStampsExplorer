@@ -1,4 +1,4 @@
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient, Src20Class } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -8,6 +8,7 @@ import {
   TickHandlerContext,
 } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -38,7 +39,7 @@ export const handler = async (
       tick,
       op,
     );
-    const last_block = await CommonClass.get_last_block_with_client(client);
+    const lastBlock = await BlockService.getLastBlock();
     const pagination = paginate(total.rows[0]["total"], page, limit);
     //TODO: review this
     const mint_status = await Src20Class
@@ -48,7 +49,7 @@ export const handler = async (
       );
     const body: PaginatedTickResponseBody = {
       ...pagination,
-      last_block: last_block.rows[0]["last_block"],
+      last_block: lastBlock.last_block,
       mint_status: {
         ...mint_status,
         max_supply: (mint_status.max_supply

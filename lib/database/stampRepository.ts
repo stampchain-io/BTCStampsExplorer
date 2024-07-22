@@ -1,21 +1,33 @@
 import { Client } from "$mysql/mod.ts";
 import { SMALL_LIMIT, STAMP_TABLE, TTL_CACHE } from "constants";
 import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
+import { get_balances } from "utils/xcp.ts";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
-import { get_suffix_from_mimetype } from "utils/util.ts";
+import { getFileSuffixFromMime } from "utils/util.ts";
+import { BIG_LIMIT } from "utils/constants.ts";
+import { StampBalance, XCPBalance } from "globals";
+import { summarize_issuances } from "./index.ts";
 
-export class StampsClass {
-  static async get_total_stamp_count(
+export class StampRepository {
+  static async getTotalStampCountFromDb(
     client: Client,
-    type: "stamps" | "cursed",
+    type: "stamps" | "cursed" | "all",
     ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
   ) {
-    const stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
+    let stampCondition = "";
+    if (type !== "all") {
+      stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
+    }
+
     let query = `
       SELECT COUNT(*) AS total
       FROM ${STAMP_TABLE}
-      WHERE ${stampCondition}
+      WHERE 1=1
     `;
+
+    if (stampCondition) {
+      query += ` AND ${stampCondition}`;
+    }
 
     if (ident) {
       const identList = Array.isArray(ident) ? ident : [ident];
@@ -35,91 +47,56 @@ export class StampsClass {
     );
   }
 
-  static async get_resumed_stamps_by_page_with_client(
+  /**
+   * Retrieves the total stamp balance for a given address using the provided database client.
+   *
+   * @param client - The database client to use for the query.
+   * @param address - The address for which to retrieve the stamp balance.
+   * @returns A promise that resolves to the total stamp balance.
+   * @throws If there is an error retrieving the balances.
+   */
+  static async getCountStampBalancesByAddressFromDb(
     client: Client,
-    page_size = SMALL_LIMIT,
-    page = 1,
-    orderBy = "DESC",
-    filterBy,
-    typeBy: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
-    type: "stamps" | "cursed",
+    address: string,
   ) {
-    orderBy = orderBy.toUpperCase() === "ASC" ? "ASC" : "DESC";
-    const offset = (page - 1) * page_size;
-    const stampCondition = type === "stamps" ? "st.stamp >= 0" : "st.stamp < 0";
-    const identList = Array.isArray(typeBy) ? typeBy : [typeBy];
-    const identCondition = identList.map((id) => `ident = '${id}'`).join(
-      " OR ",
-    );
-
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT
-        st.stamp,
-        st.cpid,
-        st.creator,
-        cr.creator AS creator_name,
-        st.tx_hash,
-        st.stamp_mimetype,
-        st.supply,
-        st.divisible,
-        st.locked,
-        st.ident,
-        st.block_time,
-        st.block_index
-      FROM ${STAMP_TABLE} AS st
-      LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE ${stampCondition} AND ${identCondition}
-      ORDER BY st.stamp ${orderBy}
-      LIMIT ? OFFSET ?;
-      `,
-      [page_size, offset],
-      1000 * 60 * 3,
-    );
+    try {
+      const xcp_balances = await get_balances(address);
+      const assets = xcp_balances.map((balance: any) => balance.cpid);
+      if (assets.length === 0) {
+        return {
+          rows: [
+            {
+              total: 0,
+            },
+          ],
+        };
+      }
+      const query = `
+          SELECT 
+            COUNT(*) AS total
+          FROM 
+            ${STAMP_TABLE} st
+          LEFT JOIN 
+            creator cr ON st.creator = cr.address
+          WHERE 
+            st.cpid IN (${
+        assets.map((asset: string) => `'${asset}'`).join(",")
+      })
+        `;
+      const balances = await handleSqlQueryWithCache(
+        client,
+        query,
+        assets,
+        TTL_CACHE,
+      );
+      return balances;
+    } catch (error) {
+      console.error("Error getting balances: ", error);
+      return [];
+    }
   }
 
-  static async get_resumed_stamps(
-    client: Client,
-    order = "DESC",
-    typeBy: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
-    type: "stamps" | "cursed",
-  ) {
-    const identList = Array.isArray(typeBy) ? typeBy : [typeBy];
-    const identCondition = identList.map((id) => `ident = '${id}'`).join(
-      " OR ",
-    );
-
-    const stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
-
-    order = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
-
-    return await handleSqlQueryWithCache(
-      client,
-      `
-      SELECT
-        st.stamp,
-        st.cpid,
-        st.creator,
-        cr.creator AS creator_name,
-        st.tx_hash,
-        st.stamp_mimetype,
-        st.supply,
-        st.divisible,
-        st.locked,
-        st.ident,
-        st.block_time,
-        st.block_index
-      FROM ${STAMP_TABLE} AS st
-      LEFT JOIN creator AS cr ON st.creator = cr.address
-      WHERE st.is_btc_stamp IS NOT NULL AND (${identCondition}) AND (${stampCondition})
-      `,
-      [],
-      1000 * 60 * 3,
-    );
-  }
-
-  static async get_stamp_file_by_identifier_with_client(
+  static async getStampFilenameByIdFromDb(
     client: Client,
     identifier: string,
   ) {
@@ -135,11 +112,11 @@ export class StampsClass {
       TTL_CACHE,
     );
     if (!data) return null;
-    const ext = get_suffix_from_mimetype(data.rows[0].stamp_mimetype);
+    const ext = getFileSuffixFromMime(data.rows[0].stamp_mimetype);
     return `${data.rows[0].tx_hash}.${ext}`;
   }
 
-  static async get_stamps(
+  static async getStampsFromDb(
     client: Client,
     options: {
       limit?: number;
@@ -171,7 +148,7 @@ export class StampsClass {
     const order = sort_order.toUpperCase() === "ASC" ? "ASC" : "DESC";
 
     const whereConditions = [];
-    const queryParams: any[] = [];
+    const queryParams: (string | number)[] = [];
 
     // Type condition
     if (type !== "all") {
@@ -188,7 +165,7 @@ export class StampsClass {
         identList.map(() => "st.ident = ?").join(" OR ")
       })`;
       whereConditions.push(identCondition);
-      queryParams.push(...identList);
+      queryParams.push(...(identList as string[]));
     }
 
     // Identifier condition (stamp, tx_hash, cpid, or stamp_hash)
@@ -277,5 +254,91 @@ export class StampsClass {
       queryParams,
       cache_duration,
     );
+  }
+
+  /**
+   * Retrieves stamp balances for a given address using a database client.
+   *
+   * @param client - The database client to use for the query.
+   * @param address - The address for which to retrieve stamp balances.
+   * @param limit - The maximum number of stamp balances to retrieve. Default is SMALL_LIMIT.
+   * @param page - The page number of stamp balances to retrieve. Default is 1.
+   * @param order - The order in which to retrieve the stamp balances. Default is "DESC".
+   * @returns An array of summarized stamp balances for the given address.
+   */
+  static async getStampBalancesByAddressFromDb(
+    client: Client,
+    address: string,
+    limit = BIG_LIMIT,
+    page = 1,
+    order = "DESC",
+  ): Promise<StampBalance[]> {
+    const offset = (page - 1) * limit;
+    try {
+      const xcp_balances = await get_balances(address);
+      const assets = xcp_balances.map((balance: XCPBalance) => balance.cpid);
+
+      const query = `
+        SELECT 
+          st.cpid, 
+          st.stamp, 
+          st.stamp_base64,
+          st.stamp_url, 
+          st.stamp_mimetype, 
+          st.tx_hash, 
+          st.divisible, 
+          st.supply, 
+          st.locked, 
+          st.creator, 
+          cr.creator AS creator_name
+        FROM 
+          ${STAMP_TABLE} st
+        LEFT JOIN 
+          creator cr ON st.creator = cr.address
+        WHERE 
+          st.cpid IN ( ${
+        assets.map((asset: string) => `'${asset}'`).join(", ")
+      } )
+        ORDER BY st.stamp ${order}
+        LIMIT ${limit}
+        OFFSET ${offset};
+      `;
+
+      const balances = await handleSqlQueryWithCache(
+        client,
+        query,
+        assets,
+        TTL_CACHE,
+      );
+
+      const grouped = balances.rows.reduce(
+        (acc: Record<string, StampBalance[]>, cur: StampBalance) => {
+          acc[cur.cpid] = acc[cur.cpid] || [];
+          acc[cur.cpid].push({
+            ...cur,
+            is_btc_stamp: cur.is_btc_stamp ?? 0,
+          });
+          return acc;
+        },
+        {},
+      );
+
+      const summarized = Object.keys(grouped).map((key) =>
+        summarize_issuances(grouped[key])
+      );
+
+      return summarized.map((summary: StampBalance) => {
+        const xcp_balance = xcp_balances.find((
+          balance: { cpid: string; quantity: number },
+        ) => balance.cpid === summary.cpid);
+        return {
+          ...summary,
+          balance: xcp_balance ? xcp_balance.quantity : 0,
+        };
+      });
+    } catch (error) {
+      console.error("Error getting balances: ", error);
+      return [];
+    }
   }
 }

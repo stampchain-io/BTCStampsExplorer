@@ -1,15 +1,15 @@
 import { HandlerContext } from "$fresh/server.ts";
 
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient, Src20Class } from "$lib/database/index.ts";
 import { useEffect, useState } from "preact/hooks";
 import { paginate } from "utils/util.ts";
 import { initialWallet, walletContext } from "store/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
+import { BlockService } from "$lib/services/blockService.ts";
+import { Handlers } from "$fresh/server.ts";
 
-//TODO: Add pagination
-
-export const handler = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
       const { wallet, isConnected } = walletContext;
@@ -30,13 +30,13 @@ export const handler = {
         null,
         "DEPLOY",
       );
-      const last_block = await CommonClass.get_last_block_with_client(client);
+      const lastBlock = await BlockService.getLastBlock();
 
       const pagination = paginate(total.rows[0]["total"], page, limit);
 
       const body = {
         ...pagination,
-        last_block: last_block.rows[0]["last_block"],
+        last_block: lastBlock.last_block,
         data: data.rows.map((row) => {
           return {
             ...row,

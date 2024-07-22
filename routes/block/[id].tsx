@@ -1,10 +1,5 @@
 import { Handler, HandlerContext, Handlers, PageProps } from "$fresh/server.ts";
-import {
-  getBlockInfo,
-  getLastBlock,
-  getRelatedBlocks,
-  transformToBlockInfoResponse,
-} from "$lib/services/blockService.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 import BlockInfo from "$components/BlockInfo.tsx";
 import BlockHeader from "$islands/block/BlockHeader.tsx";
 import BlockSelector from "$islands/block/BlockSelector.tsx";
@@ -22,16 +17,23 @@ export const handler: Handlers<BlockRow[]> = {
   async GET(_req: Request, ctx: HandlerContext) {
     let blockIdentifier: number | string;
     if (!ctx.params.id || isNaN(Number(ctx.params.id))) {
-      const { last_block } = await getLastBlock();
+      const { last_block } = await BlockService.getLastBlock();
       blockIdentifier = last_block;
     } else {
       blockIdentifier = ctx.params.id;
     }
 
     try {
-      const stampBlockResponse = await getBlockInfo(blockIdentifier, "stamps");
-      const block = transformToBlockInfoResponse(stampBlockResponse);
-      const related_blocks = await getRelatedBlocks(blockIdentifier);
+      const stampBlockResponse = await BlockService.getBlockInfo(
+        blockIdentifier,
+        "stamps",
+      );
+      const block = BlockService.transformToBlockInfoResponse(
+        stampBlockResponse,
+      );
+      const related_blocks = await BlockService.getRelatedBlocks(
+        blockIdentifier,
+      );
 
       return await ctx.render({
         block,
