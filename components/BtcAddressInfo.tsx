@@ -1,4 +1,4 @@
-import { short_address } from "utils/util.ts";
+import { abbreviateAddress } from "utils/util.ts";
 
 interface BTCAddressInfoProps {
   btc: {
@@ -19,7 +19,7 @@ export default function BtcAddressInfo(props: BTCAddressInfoProps) {
         <tbody>
           <tr class="border-b">
             <th scope="row" class="whitespace-nowrap px-6 py-3">Address</th>
-            <td class="whitespace-nowrap">{short_address(btc.address)}</td>
+            <td class="whitespace-nowrap">{abbreviateAddress(btc.address)}</td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">BTC Balance</th>
             <td class="whitespace-nowrap">{btc.balance} BTC</td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">

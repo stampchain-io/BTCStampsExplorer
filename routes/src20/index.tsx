@@ -1,13 +1,12 @@
 import { SRC20Row } from "globals";
 
 import { Pagination } from "$components/Pagination.tsx";
-
-import { HandlerContext } from "$fresh/server.ts";
+import { Handlers } from "$fresh/server.ts";
 
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
 
-import { api_get_src20s } from "$lib/controller/src20.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
 type SRC20PageProps = {
   data: {
@@ -21,8 +20,8 @@ type SRC20PageProps = {
   };
 };
 
-export const handler = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
       const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
@@ -30,25 +29,10 @@ export const handler = {
       const page = Number(url.searchParams.get("page")) || 1;
       const page_size = Number(url.searchParams.get("limit")) || 11;
 
-      const { src20s, total, pages, page: pag, page_size: limit } =
-        await api_get_src20s(
-          page,
-          page_size,
-        );
+      const result = await Src20Controller.getSrc20s(page, page_size);
 
       const data = {
-        src20s: src20s.map((row: SRC20Row) => {
-          return {
-            ...row,
-            max: row.max ? row.max.toString() : null,
-            lim: row.lim ? row.lim.toString() : null,
-            amt: row.amt ? row.amt.toString() : null,
-          };
-        }),
-        total,
-        page: pag,
-        pages,
-        page_size: limit,
+        ...result,
         filterBy,
         sortBy,
       };

@@ -1,12 +1,8 @@
-import { HolderRow, SendRow, StampRow } from "globals";
+import { StampRow } from "globals";
 
-import { FreshContext, Handlers } from "$fresh/server.ts";
-
-import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
-import { get_suffix_from_mimetype, short_address } from "$lib/utils/util.ts";
+import { Handlers } from "$fresh/server.ts";
 
 import { Stamp } from "$components/Stamp.tsx";
-import { HoldersInfo } from "$components/HoldersInfo.tsx";
 
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
 import { StampVaulted } from "$components/stampDetails/StampVaulted.tsx";
@@ -15,6 +11,8 @@ import { StampSends } from "$components/stampDetails/StampSends.tsx";
 import { StampHolders } from "$components/stampDetails/StampHolders.tsx";
 import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
 import { StampSales } from "$components/stampDetails/StampSales.tsx";
+import { StampController } from "$lib/controller/stampController.ts";
+import { IdHandlerContext } from "globals";
 
 type StampPageProps = {
   // data: { stamp: any; sends: any; holders: any; total: any };
@@ -25,26 +23,25 @@ type StampPageProps = {
   };
 };
 
-export const handler: Handlers<StampRow> = {
-  async GET(req: Request, ctx: FreshContext) {
+export const handler = async (
+  _req: Request,
+  ctx: IdHandlerContext,
+): Promise<Response> => {
+  try {
     const { id } = ctx.params;
-    const res = await api_get_stamp_all_data(id);
-    if (!res) {
-      return ctx.renderNotFound();
+    const stampData = await StampController.getStampDetailsById(id);
+    if (!stampData) {
+      return new Response("Stamp not found", { status: 404 });
     }
-    const { stamp, holders, total, sends } = res;
-    const data = {
-      stamp,
-      holders,
-      sends,
-      total,
-    };
-    return await ctx.render(data);
-  },
+    return ctx.render(stampData);
+  } catch (error) {
+    console.error("Error fetching stamp data:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
 };
 
 export default function StampPage(props: StampPageProps) {
-  const { stamp, sends, holders, total } = props.data;
+  const { stamp, sends, holders, _total } = props.data;
 
   return (
     <>

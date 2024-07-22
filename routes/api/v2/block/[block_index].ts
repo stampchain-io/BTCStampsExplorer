@@ -1,7 +1,4 @@
-import {
-  getBlockInfo,
-  transformToBlockInfoResponse,
-} from "$lib/services/blockService.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { isIntOr32ByteHex } from "$lib/utils/util.ts";
 import { BlockHandlerContext, ErrorResponseBody } from "globals";
@@ -31,8 +28,8 @@ export const handler = async (
     : "all";
 
   try {
-    const blockInfo = await getBlockInfo(blockIdentifier, type);
-    const response = transformToBlockInfoResponse(blockInfo);
+    const blockInfo = await BlockService.getBlockInfo(blockIdentifier, type);
+    const response = BlockService.transformToBlockInfoResponse(blockInfo);
     return ResponseUtil.success(response);
   } catch (error) {
     console.error(`Error in ${type}/block handler:`, error);

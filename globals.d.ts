@@ -125,6 +125,11 @@ interface XCPParams {
   asset?: string;
 }
 
+interface XCPBalance {
+  cpid: string;
+  quantity: number;
+}
+
 interface SRC20Balance {
   address: string;
   p: string;
@@ -302,6 +307,19 @@ export interface PaginatedIdResponseBody extends Pagination {
   data: StampRow[];
 }
 
+type StampPageProps = {
+  data: {
+    stamps: StampRow[];
+    total: number;
+    page: number;
+    pages: number;
+    page_size: number;
+    selectedTab: "all" | "classic";
+    sortBy: string;
+    filterBy: string[];
+  };
+};
+
 export interface ErrorResponseBody {
   error: string;
 }
@@ -430,4 +448,20 @@ export interface MintStampInputData {
   satsPerKB: number;
   service_fee: number;
   service_fee_address: string;
+}
+
+interface Collection {
+  collection_id: string;
+  collection_name: string;
+  creators: string[];
+  stamps: StampRow[];
+}
+
+interface CollectionQueryParams extends PaginationQueryParams {
+  creator?: string;
+}
+
+interface PaginatedCollectionResponseBody extends Pagination {
+  last_block: number;
+  data: Collection[];
 }

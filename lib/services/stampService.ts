@@ -1,34 +1,141 @@
-import { CommonClass, getClient } from "$lib/database/index.ts";
-import { api_get_stamp_all_data } from "$lib/controller/stamp.ts";
+import { withDatabaseClient } from "$lib/services/databaseService.ts";
+import { StampRepository } from "$lib/database/index.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 import {
-  ErrorResponseBody,
-  IdHandlerContext,
-  StampResponseBody,
-} from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
+  get_dispensers,
+  get_dispenses,
+  get_holders,
+  get_sends,
+} from "utils/xcp.ts";
 
-export const getStampByIdOrIdentifier = async (
-  _req: Request,
-  ctx: IdHandlerContext,
-): Promise<Response> => {
-  const { id } = ctx.params;
-  try {
-    const client = await getClient();
-    const data = await api_get_stamp_all_data(id);
-    let last_block;
-    if (client) {
-      last_block = await CommonClass.get_last_block_with_client(client);
+export class StampService {
+  static async getStampDetailsById(id: string) {
+    try {
+      return await withDatabaseClient(async (client) => {
+        const stampResult = await StampRepository.getStampsFromDb(client, {
+          identifier: id,
+          all_columns: true,
+          no_pagination: true,
+          cache_duration: "never",
+        });
+
+        if (!stampResult || stampResult.rows.length === 0) {
+          throw new Error(`Error: Stamp ${id} not found`);
+        }
+
+        const stamp = stampResult.rows[0];
+        const cpid = stamp.cpid;
+
+        const [holders, dispensers, sends, dispenses, total, lastBlock] =
+          await Promise.all([
+            get_holders(cpid),
+            get_dispensers(cpid),
+            get_sends(cpid),
+            get_dispenses(cpid),
+            StampRepository.getTotalStampCountFromDb(client, "stamps"),
+            BlockService.getLastBlock(),
+          ]);
+
+        return {
+          last_block: lastBlock.last_block,
+          stamp,
+          holders,
+          sends,
+          dispensers,
+          dispenses,
+          total: total.rows[0].total,
+        };
+      });
+    } catch (error) {
+      console.error("Error in getStampDetailsById:", error);
+      throw error;
     }
-    if (!data) {
-      throw new Error("Stamp not found");
-    }
-    const body: StampResponseBody = {
-      last_block: last_block.rows[0]["last_block"],
-      data: data,
-    };
-    return ResponseUtil.success(body);
-  } catch (_error) {
-    const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return ResponseUtil.error(body.error, 500);
   }
-};
+
+  static async getStamps(options: {
+    page?: number;
+    page_size?: number;
+    sort_order?: "asc" | "desc";
+    type?: "stamps" | "cursed" | "all";
+    ident?: string | string[];
+    identifier?: string | number;
+    all_columns?: boolean;
+    no_pagination?: boolean;
+  }) {
+    return await withDatabaseClient(async (client) => {
+      try {
+        const [stamps, total] = await Promise.all([
+          StampRepository.getStampsFromDb(client, options),
+          StampRepository.getTotalStampCountFromDb(
+            client,
+            options.type || "stamps",
+            options.ident,
+          ),
+        ]);
+
+        return {
+          stamps: stamps.rows,
+          total: total.rows[0].total,
+        };
+      } catch (error) {
+        console.error("Error in getStamps:", error);
+        throw error;
+      }
+    });
+  }
+
+  static async getStamp(id: string) {
+    try {
+      return await withDatabaseClient(async (client) => {
+        const stampResult = await StampRepository.getStampsFromDb(client, {
+          identifier: id,
+          all_columns: true,
+          no_pagination: true,
+          cache_duration: "never",
+        });
+
+        if (!stampResult || stampResult.rows.length === 0) {
+          return null;
+        }
+
+        const stamp = stampResult.rows[0];
+        const total = await StampRepository.getTotalStampCountFromDb(
+          client,
+          "stamps",
+        );
+
+        return {
+          stamp,
+          total: total.rows[0].total,
+        };
+      });
+    } catch (error) {
+      console.error("Error in getStamp:", error);
+      throw error;
+    }
+  }
+
+  static async getStampFile(id: string) {
+    return await withDatabaseClient(async (client) => {
+      const file_name = await StampRepository.getStampFilenameByIdFromDb(
+        client,
+        id,
+      );
+
+      if (!file_name) {
+        return { type: "notFound" };
+      }
+
+      if (file_name.indexOf(".unknown") > -1) {
+        const stampData = await this.getStamp(id);
+        if (stampData && stampData.stamp && "stamp_base64" in stampData.stamp) {
+          return { type: "base64", base64: stampData.stamp.stamp_base64 };
+        } else {
+          return { type: "notFound" };
+        }
+      }
+
+      return { type: "redirect", fileName: file_name };
+    });
+  }
+}

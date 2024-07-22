@@ -1,4 +1,4 @@
-import { getBlockInfo } from "$lib/services/blockService.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 import { BlockHandlerContext, ErrorResponseBody } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 
@@ -26,7 +26,7 @@ export const sharedBlockHandler = async (
   const type = isStamps ? "stamps" : "cursed";
 
   try {
-    const body = await getBlockInfo(blockIdentifier, type);
+    const body = await BlockService.getBlockInfo(blockIdentifier, type);
     return ResponseUtil.success(body);
   } catch (error) {
     console.error(`Error in ${type}/block handler:`, error);

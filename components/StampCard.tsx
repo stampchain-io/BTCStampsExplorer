@@ -3,9 +3,9 @@ import relativeTime from "$dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
 
 import {
-  get_suffix_from_mimetype,
+  abbreviateAddress,
+  getFileSuffixFromMime,
   getSupply,
-  short_address,
 } from "$lib/utils/util.ts";
 
 dayjs.extend(relativeTime);
@@ -24,7 +24,7 @@ export function StampCard({
   kind: "cursed" | "stamp" | "named";
 }) {
   let src: string;
-  const suffix = get_suffix_from_mimetype(stamp.stamp_mimetype);
+  const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
   if (suffix === "unknown") {
     src = `/not-available.png`;
@@ -77,7 +77,7 @@ export function StampCard({
           <h3 class="truncate text-[13px] text-[#C7C5C5]">
             {stamp.creator_name
               ? stamp.creator_name
-              : short_address(stamp.creator, 6)}
+              : abbreviateAddress(stamp.creator, 6)}
           </h3>
         </div>
         {

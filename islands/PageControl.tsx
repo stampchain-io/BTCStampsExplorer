@@ -4,7 +4,7 @@ import { StampRow } from "globals";
 
 import { StampCard } from "$components/StampCard.tsx";
 
-// import { StampsClass } from "$lib/database/index.ts";
+// import { StampRepository } from "$lib/database/index.ts";
 
 // const sortData = (stamps: StampRow[], sortBy: string) => {
 //   const data = [...stamps];

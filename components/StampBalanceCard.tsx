@@ -1,4 +1,5 @@
-import { get_suffix_from_mimetype, short_address } from "$lib/utils/util.ts";
+import { getFileSuffixFromMime } from "$lib/utils/util.ts";
+import { StampRow } from "globals";
 
 export function StampBalanceCard(
   { stamp, kind = "stamp" }: {
@@ -7,7 +8,7 @@ export function StampBalanceCard(
   },
 ) {
   let src: string;
-  const suffix = get_suffix_from_mimetype(stamp.stamp_mimetype);
+  const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
 
   if (suffix === "json" || suffix === "gz" || suffix === "js") {
     src = "/content/not-available.png";

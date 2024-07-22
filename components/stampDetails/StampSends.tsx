@@ -1,4 +1,4 @@
-import { short_address } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/util.ts";
 import dayjs from "$dayjs/";
 import { SendRow } from "globals";
 
@@ -38,10 +38,12 @@ export function StampSends({ sends }: { sends: SendRow[] }) {
                 key={send.tx_hash}
               >
                 <td className="px-6 py-4">
-                  {send.source ? short_address(send.source) : "NULL"}
+                  {send.source ? abbreviateAddress(send.source) : "NULL"}
                 </td>
                 <td className="px-6 py-4">
-                  {send.destination ? short_address(send.destination) : "NULL"}
+                  {send.destination
+                    ? abbreviateAddress(send.destination)
+                    : "NULL"}
                 </td>
                 <td className="px-6 py-4 text-sm">{send.quantity}</td>
                 {
@@ -53,7 +55,7 @@ export function StampSends({ sends }: { sends: SendRow[] }) {
                 }
                 <td className="px-6 py-4 text-sm">{send.memo || "transfer"}</td>
                 <td className="px-6 py-4 text-sm">
-                  {short_address(send.tx_hash)}
+                  {abbreviateAddress(send.tx_hash)}
                 </td>
                 <td className="px-6 py-4 text-sm">
                   {dayjs(Number(send.block_time)).fromNow()}

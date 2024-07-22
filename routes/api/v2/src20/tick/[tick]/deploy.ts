@@ -1,7 +1,8 @@
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient, Src20Class } from "$lib/database/index.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
 import { DeployResponseBody, TickHandlerContext } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler = async (
   _req: Request,
@@ -23,10 +24,10 @@ export const handler = async (
         client,
         tick,
       );
-    const last_block = await CommonClass.get_last_block_with_client(client);
+    const lastBlock = await BlockService.getLastBlock();
 
     const body: DeployResponseBody = {
-      last_block: last_block.rows[0]["last_block"],
+      last_block: lastBlock.last_block,
       mint_status: {
         ...mint_status,
         max_supply: (mint_status.max_supply
