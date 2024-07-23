@@ -34,6 +34,7 @@ import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[iden
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
 import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
+import * as $collection_id_ from "./routes/collection/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
@@ -68,7 +69,10 @@ import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connector
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
+import * as $collection_CollectionDetailsContent from "./islands/collection/CollectionDetailsContent.tsx";
+import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
 import * as $collection_CollectionHeader from "./islands/collection/CollectionHeader.tsx";
+import * as $collection_CollectionList from "./islands/collection/CollectionList.tsx";
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
 import * as $home_HomeSalesInfo from "./islands/home/HomeSalesInfo.tsx";
@@ -137,6 +141,7 @@ const manifest = {
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
     "./routes/block/[id].tsx": $block_id_,
     "./routes/block/index.tsx": $block_index,
+    "./routes/collection/[id].tsx": $collection_id_,
     "./routes/collection/index.tsx": $collection_index,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/cursed/index.tsx": $cursed_index,
@@ -174,7 +179,12 @@ const manifest = {
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
+    "./islands/collection/CollectionDetailsContent.tsx":
+      $collection_CollectionDetailsContent,
+    "./islands/collection/CollectionDetailsHeader.tsx":
+      $collection_CollectionDetailsHeader,
     "./islands/collection/CollectionHeader.tsx": $collection_CollectionHeader,
+    "./islands/collection/CollectionList.tsx": $collection_CollectionList,
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
     "./islands/home/HomeSalesInfo.tsx": $home_HomeSalesInfo,
