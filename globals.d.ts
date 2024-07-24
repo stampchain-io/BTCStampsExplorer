@@ -212,9 +212,9 @@ export interface SRC20TrxRequestParams {
 }
 
 export interface SRC20BalanceRequestParams {
-  address?: string | null;
-  tick?: string | null;
-  amt?: number | null;
+  address?: string;
+  tick?: string;
+  amt?: number;
   limit?: number;
   page?: number;
   sort?: string;
@@ -407,13 +407,6 @@ export interface BlockTickHandlerContext {
   };
 }
 
-export interface AddressTickHandlerContext {
-  params: {
-    address: string;
-    tick: string | number;
-  };
-}
-
 // Post Request Types ----------------------------------------------------------
 export interface TX {
   hex: string;
@@ -464,4 +457,12 @@ interface CollectionQueryParams extends PaginationQueryParams {
 interface PaginatedCollectionResponseBody extends Pagination {
   last_block: number;
   data: Collection[];
+}
+
+interface SRC20SnapshotRequestParams {
+  tick: string;
+  limit: number;
+  page: number;
+  amt: number;
+  sort: string;
 }

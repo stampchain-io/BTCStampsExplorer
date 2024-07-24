@@ -34,7 +34,7 @@ export class CollectionService {
           return {
             collection_id: row.collection_id,
             collection_name: row.collection_name,
-            creators: row.creators.split(","),
+            creators: row.creators ? row.creators.split(",") : [], // FIXME: this is returning [] incorrectly
             stamps: stamps.rows,
           };
         }),
