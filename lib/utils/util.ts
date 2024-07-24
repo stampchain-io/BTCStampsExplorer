@@ -1,3 +1,5 @@
+import { BigFloat } from "bigfloat/mod.ts";
+
 const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",
@@ -155,4 +157,22 @@ export function convertEmojiToTick(str: string): string {
     }
   }
   return result;
+}
+
+export function bigFloatToString(
+  value: BigFloat,
+  precision: number = 3,
+): string {
+  const stringValue = value.toString();
+  const [integerPart, fractionalPart] = stringValue.split(".");
+
+  if (!fractionalPart) {
+    return integerPart;
+  }
+
+  const roundedFractionalPart = fractionalPart.slice(0, precision);
+  const result = `${integerPart}.${roundedFractionalPart}`;
+
+  // Remove trailing zeros
+  return result.replace(/\.?0+$/, "");
 }

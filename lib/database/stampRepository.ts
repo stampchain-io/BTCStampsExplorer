@@ -144,14 +144,34 @@ export class StampRepository {
       cache_duration = 1000 * 60 * 3,
     } = options;
 
-    const offset = no_pagination ? 0 : (page - 1) * limit;
-    const order = sort_order.toUpperCase() === "ASC" ? "ASC" : "DESC";
-
     const whereConditions = [];
     const queryParams: (string | number)[] = [];
 
-    // Type condition
-    if (type !== "all") {
+    // Identifier condition (stamp, tx_hash, cpid, or stamp_hash)
+    if (identifier !== undefined) {
+      const isNumber = typeof identifier === "number" ||
+        !isNaN(Number(identifier));
+      const isTxHash = typeof identifier === "string" &&
+        identifier.length === 64 && /^[a-fA-F0-9]+$/.test(identifier);
+      const isStampHash = typeof identifier === "string" &&
+        /^[a-zA-Z0-9]{12,20}$/.test(identifier) && /[a-z]/.test(identifier) &&
+        /[A-Z]/.test(identifier);
+
+      if (isNumber) {
+        whereConditions.push("st.stamp = ?");
+        queryParams.push(Number(identifier));
+      } else if (isTxHash) {
+        whereConditions.push("st.tx_hash = ?");
+        queryParams.push(identifier);
+      } else if (isStampHash) {
+        whereConditions.push("st.stamp_hash = ?");
+        queryParams.push(identifier);
+      } else {
+        whereConditions.push("st.cpid = ?");
+        queryParams.push(identifier);
+      }
+    } else if (type !== "all") {
+      // Only add this condition if we're not searching for a specific stamp
       const stampCondition = type === "stamps"
         ? "st.stamp >= 0"
         : "st.stamp < 0";
@@ -166,28 +186,6 @@ export class StampRepository {
       })`;
       whereConditions.push(identCondition);
       queryParams.push(...(identList as string[]));
-    }
-
-    // Identifier condition (stamp, tx_hash, cpid, or stamp_hash)
-    if (identifier) {
-      const isNumber = typeof identifier === "number" ||
-        !isNaN(Number(identifier));
-      const isTxHash = typeof identifier === "string" &&
-        identifier.length === 64 && /^[a-fA-F0-9]+$/.test(identifier);
-      const isStampHash = typeof identifier === "string" &&
-        /^[a-zA-Z0-9]{12,20}$/.test(identifier) && /[a-z]/.test(identifier) &&
-        /[A-Z]/.test(identifier);
-
-      const identifierCondition = isNumber
-        ? "st.stamp = ?"
-        : isTxHash
-        ? "st.tx_hash = ?"
-        : isStampHash
-        ? "st.stamp_hash = ?"
-        : "st.cpid = ?";
-
-      whereConditions.push(identifierCondition);
-      queryParams.push(identifier);
     }
 
     // Block identifier condition
@@ -235,27 +233,41 @@ export class StampRepository {
       ? `WHERE ${whereConditions.join(" AND ")}`
       : "";
 
+    const order = sort_order.toUpperCase() === "DESC" ? "DESC" : "ASC";
+    const orderClause = `ORDER BY st.stamp ${order}`;
+
+    let limitClause = "";
+    let offsetClause = "";
+
+    if (!no_pagination) {
+      limitClause = `LIMIT ${limit}`;
+      const offset = (page - 1) * limit;
+      offsetClause = `OFFSET ${offset}`;
+    }
+
     const query = `
       SELECT ${selectClause}
       FROM ${STAMP_TABLE} AS st
       LEFT JOIN creator AS cr ON st.creator = cr.address
       ${whereClause}
-      ORDER BY st.stamp ${order}
-      ${no_pagination ? "" : "LIMIT ? OFFSET ?"};
+      ${orderClause}
+      ${limitClause}
+      ${offsetClause}
     `;
 
-    if (!no_pagination) {
-      queryParams.push(limit, offset);
-    }
+    console.log(`Executing query:`, query);
+    console.log(`Query params:`, queryParams);
 
-    return await handleSqlQueryWithCache(
+    const result = await handleSqlQueryWithCache(
       client,
       query,
       queryParams,
       cache_duration,
     );
-  }
+    console.log(`Query result:`, result);
 
+    return result;
+  }
   /**
    * Retrieves stamp balances for a given address using a database client.
    *

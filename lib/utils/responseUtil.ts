@@ -27,6 +27,16 @@ export class ResponseUtil {
     });
   }
 
+  static notFound(message: string = "Resource not found"): Response {
+    return new Response(
+      JSON.stringify({ error: message }),
+      {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+
   static handleError(error: unknown, defaultMessage: string): Response {
     console.error(error);
     const message = error instanceof Error ? error.message : defaultMessage;

@@ -6,6 +6,7 @@ import {
 } from "$lib/database/index.ts";
 import { getBtcAddressInfo } from "../utils/btc.ts";
 import { paginate } from "../utils/util.ts";
+import { SRC20Repository } from "$lib/database/src20Repository.ts";
 
 export const api_get_src20_valid_tx = async (tx_hash: string) => {
   try {
@@ -22,31 +23,6 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
     );
     releaseClient(client);
     return tx_data.rows[0];
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-/**
- * Retrieves the SRC20 token balances for a given address.
- *
- * @param address - The address for which to retrieve the SRC20 token balances.
- * @returns A Promise that resolves to an array of SRC20 token balances.
- * @throws If there is an error while retrieving the SRC20 token balances.
- */
-export const api_get_src20_balance = async (address: string) => {
-  try {
-    const client = await getClient();
-    const balances = await Src20Class.get_src20_balance_with_client(
-      client,
-      address,
-    );
-    releaseClient(client);
-    if (balances.rows.length === 0) {
-      return [];
-    }
-    return balances.rows;
   } catch (error) {
     console.error(error);
     throw error;
@@ -86,9 +62,9 @@ export const api_get_balance = async (
     } else {
       stamps = [];
     }
-    const src20 = await Src20Class.get_src20_balance_with_client(
+    const src20 = await SRC20Repository.getSrc20BalanceFromDb(
       client,
-      address,
+      { address, tick: undefined, limit, page, amt: undefined, sort: "ASC" },
     );
     releaseClient(client);
     return {

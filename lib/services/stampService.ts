@@ -10,8 +10,10 @@ import {
 
 export class StampService {
   static async getStampDetailsById(id: string) {
+    console.log(`getStampDetailsById called with id: ${id}`);
     try {
       return await withDatabaseClient(async (client) => {
+        console.log(`Querying database for stamp with id: ${id}`);
         const stampResult = await StampRepository.getStampsFromDb(client, {
           identifier: id,
           all_columns: true,
@@ -19,7 +21,10 @@ export class StampService {
           cache_duration: "never",
         });
 
+        console.log(`Query result:`, stampResult);
+
         if (!stampResult || stampResult.rows.length === 0) {
+          console.log(`No stamp found for id: ${id}`);
           throw new Error(`Error: Stamp ${id} not found`);
         }
 

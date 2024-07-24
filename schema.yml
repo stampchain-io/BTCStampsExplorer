@@ -14,6 +14,55 @@ servers:
   - url: 'http://localhost:8000'
 paths:
 
+  /api/v2/health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /api/v2/docs:
+    get:
+      summary: API documentation
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIDocs'
+
+  /api/v2/version:
+    get:
+      summary: Get API version
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+
+  /api/v2/error:
+    get:
+      summary: Test error endpoint
+      responses:
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/balance/{address}:
     get:
@@ -1823,3 +1872,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StampRow'
+    APIDocs:
+      type: object
+      properties:
+        version:
+          type: string
+        endpoints:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+              description:
+                type: string
