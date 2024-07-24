@@ -1,12 +1,13 @@
 import { HandlerContext } from "$fresh/server.ts";
 
-import { getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient } from "$lib/database/index.ts";
 import { useEffect, useState } from "preact/hooks";
 import { paginate } from "utils/util.ts";
 import { initialWallet, walletContext } from "store/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
 import { BlockService } from "$lib/services/blockService.ts";
 import { Handlers } from "$fresh/server.ts";
+import { SRC20Repository } from "$lib/database/src20Repository.ts";
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
@@ -17,7 +18,7 @@ export const handler: Handlers = {
       const page = Number(url.searchParams.get("page")) || 1;
 
       const client = await getClient();
-      const data = await Src20Class.get_valid_src20_tx_with_client(
+      const data = await SRC20Repository.getValidSrc20TxFromDb(
         client,
         null,
         null,
@@ -25,11 +26,12 @@ export const handler: Handlers = {
         limit,
         page,
       );
-      const total = await Src20Class.get_total_valid_src20_tx_with_client(
-        client,
-        null,
-        "DEPLOY",
-      );
+      const total = await SRC20Repository
+        .getTotalCountValidSrc20TxFromDb(
+          client,
+          null,
+          "DEPLOY",
+        );
       const lastBlock = await BlockService.getLastBlock();
 
       const pagination = paginate(total.rows[0]["total"], page, limit);

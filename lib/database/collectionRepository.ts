@@ -56,9 +56,29 @@ export class CollectionRepository {
     offset: number,
   ) {
     const query = `
-      SELECT s.*
+      SELECT 
+        s.stamp,
+        s.block_index,
+        s.cpid,
+        s.creator,
+        cr.creator AS creator_name,
+        s.divisible,
+        s.keyburn,
+        s.locked,
+        s.stamp_base64,
+        s.stamp_mimetype,
+        s.stamp_url,
+        s.supply,
+        s.block_time,
+        s.tx_hash,
+        s.tx_index,
+        s.ident,
+        s.stamp_hash,
+        s.is_btc_stamp,
+        s.file_hash
       FROM StampTableV4 s
       JOIN collection_stamps cs ON s.stamp = cs.stamp
+      LEFT JOIN creator cr ON s.creator = cr.address
       WHERE cs.collection_id = UNHEX(?)
       ORDER BY s.stamp DESC
       LIMIT ? OFFSET ?

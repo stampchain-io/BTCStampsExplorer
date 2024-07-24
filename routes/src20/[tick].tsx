@@ -1,10 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$components/src20/SRC20TickHeader.tsx";
 import { SRC20DetailsTab } from "$islands/src20/SRC20DetailsTab.tsx";
-import { BlockService } from "$lib/services/blockService.ts";
-import { getClient, Src20Class } from "../../lib/database/index.ts";
-import { BigFloat, set_precision } from "bigfloat/mod.ts";
 import { convertEmojiToTick } from "utils/util.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { BigFloat, set_precision } from "bigfloat/mod.ts";
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
@@ -15,113 +14,50 @@ export const handler: Handlers = {
       const limit = Number(url.searchParams.get("limit")) || 200;
       const page = Number(url.searchParams.get("page")) || 1;
 
-      const client = await getClient();
-      const deployment = await Src20Class
-        .get_valid_src20_tx_with_client(
-          client,
-          null,
-          [tick],
-          "DEPLOY",
-        );
-
-      const mint_status = await Src20Class
-        .get_src20_minting_progress_by_tick_with_client_new(
-          client,
+      const [balanceResponse, mintProgressResponse] = await Promise.all([
+        Src20Controller.handleSrc20BalanceRequest({
           tick,
-        );
-      const mints = await Src20Class
-        .get_valid_src20_tx_with_client(
-          client,
-          null,
-          tick,
-          "MINT",
           limit,
           page,
-          "DESC",
-        );
-      const sends = await Src20Class
-        .get_valid_src20_tx_with_client(
-          client,
-          null,
-          tick,
-          "TRANSFER",
-          limit,
-          page,
-          "DESC",
-        );
-      const total_holders = await Src20Class
-        .get_total_src20_holders_by_tick_with_client(
-          client,
-          tick,
-          1,
-        );
-      const holders = await Src20Class.get_src20_balance_with_client(
-        client,
-        null,
-        tick,
-        0,
-        limit,
-        page,
-      );
+          sort: "DESC",
+        }),
+        Src20Controller.handleSrc20MintProgressRequest(tick),
+      ]);
 
-      const total_sends = await Src20Class
-        .get_total_valid_src20_tx_with_client(
-          client,
-          tick,
-          "TRANSFER",
-        );
-      const total_mints = await Src20Class
-        .get_total_valid_src20_tx_with_client(
-          client,
-          tick,
-          "MINT",
-        );
+      if (!balanceResponse.ok || !mintProgressResponse.ok) {
+        throw new Error("Failed to fetch SRC20 data");
+      }
 
-      const lastBlock = await BlockService.getLastBlock();
+      const { data: balanceData } = await balanceResponse.json();
+      const { data: mintProgressData } = await mintProgressResponse.json();
 
       set_precision(-4);
       const body = {
-        last_block: lastBlock.last_block,
-        deployment: deployment.rows.map((row) => {
-          return {
-            ...row,
-            max: row.max ? row.max.toString() : null,
-            lim: row.lim ? row.lim.toString() : null,
-            amt: row.amt ? row.amt.toString() : null,
-          };
-        })[0],
-        sends: sends.rows.map((row) => {
-          return {
-            ...row,
-            amt: row.amt ? new BigFloat(row.amt).toString() : null,
-          };
-        }),
-        total_sends: total_sends.rows[0]["total"],
-        mints: mints.rows.map((row) => {
-          return {
-            ...row,
-            amt: row.amt ? new BigFloat(row.amt).toString() : null,
-          };
-        }),
-        total_mints: total_mints.rows[0]["total"],
-        total_holders: total_holders.rows[0]["total"],
-        holders: holders.rows?.map((row) => {
+        last_block: balanceResponse.last_block,
+        deployment: balanceData.find((item) => item.op === "DEPLOY"),
+        sends: balanceData.filter((item) => item.op === "TRANSFER"),
+        total_sends: balanceData.filter((item) =>
+          item.op === "TRANSFER"
+        ).length,
+        mints: balanceData.filter((item) => item.op === "MINT"),
+        total_mints: balanceData.filter((item) => item.op === "MINT").length,
+        total_holders: balanceData.length,
+        holders: balanceData.map((row) => {
           const percentage = new BigFloat(row.amt).mul(100).div(
-            mint_status.total_minted,
+            mintProgressData.total_minted,
           );
-          const amt = new BigFloat(row.amt);
           set_precision(-2);
           return {
             ...row,
-            amt: amt.toString(),
+            amt: new BigFloat(row.amt).toString(),
             percentage: parseFloat(percentage.toString()).toFixed(2),
           };
         }),
         mint_status: {
-          ...mint_status,
-          max_supply: mint_status.max_supply.toString(),
-          total_minted: mint_status.total_minted.toString(),
-          limit: mint_status.limit.toString(),
+          ...mintProgressData,
+          max_supply: mintProgressData.max_supply.toString(),
+          total_minted: mintProgressData.total_minted.toString(),
+          limit: mintProgressData.limit.toString(),
         },
       };
       return await ctx.render(body);

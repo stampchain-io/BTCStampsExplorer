@@ -1,4 +1,4 @@
-import { getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -9,6 +9,7 @@ import {
 } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { BlockService } from "$lib/services/blockService.ts";
+import { SRC20Repository } from "$lib/database/src20Repository.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -23,8 +24,8 @@ export const handler = async (
     const sort = url.searchParams.get("sort") || "ASC";
     const client = await getClient();
     tick = convertEmojiToTick(String(tick));
-    const src20_txs = await Src20Class
-      .get_valid_src20_tx_with_client(
+    const src20_txs = await SRC20Repository
+      .getValidSrc20TxFromDb(
         client,
         null,
         tick,
@@ -34,7 +35,7 @@ export const handler = async (
         sort,
       );
 
-    const total = await Src20Class.get_total_valid_src20_tx_with_client(
+    const total = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
       client,
       tick,
       op,
@@ -42,8 +43,8 @@ export const handler = async (
     const lastBlock = await BlockService.getLastBlock();
     const pagination = paginate(total.rows[0]["total"], page, limit);
     //TODO: review this
-    const mint_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client(
+    const mint_status = await SRC20Repository
+      .getSrc20MintProgressByTickFromDb(
         client,
         tick,
       );
