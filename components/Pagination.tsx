@@ -5,7 +5,7 @@ export const Pagination = (
     page: number;
     pages: number;
     page_size: number;
-    type: "cursed" | "stamp" | "src20" | "home";
+    type: "cursed" | "stamp" | "src20" | "home" | "collection";
     data_length: number;
   },
 ) => {
