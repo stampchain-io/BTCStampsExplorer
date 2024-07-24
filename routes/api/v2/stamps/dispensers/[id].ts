@@ -1,7 +1,7 @@
 import { DispenserResponseBody, DispenserRow, IdHandlerContext } from "globals";
 import { get_dispensers, get_dispenses } from "utils/xcp.ts";
-import { CommonClass, getClient } from "$lib/database/index.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler = async (
   _req: Request,
@@ -10,8 +10,7 @@ export const handler = async (
   const { id } = ctx.params;
   try {
     const dispensers = await get_dispensers(id);
-    const client = await getClient();
-    const last_block = await CommonClass.get_last_block_with_client(client);
+    const lastBlock = await BlockService.getLastBlock();
 
     if (!dispensers || dispensers.length === 0) {
       return ResponseUtil.error("No dispensers found", 404);
@@ -30,7 +29,7 @@ export const handler = async (
 
     const body: DispenserResponseBody = {
       dispensers: mappedDispensers,
-      last_block: last_block.rows[0].last_block,
+      last_block: lastBlock.last_block,
     };
 
     return ResponseUtil.success(body);

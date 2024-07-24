@@ -1,7 +1,7 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
-import { short_address } from "utils/util.ts";
+import { abbreviateAddress } from "utils/util.ts";
 
 dayjs.extend(relativeTime);
 
@@ -30,7 +30,7 @@ export function StampHolders(
               className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
               key={holder.address}
             >
-              <td className="px-6 py-4">{short_address(holder.address)}</td>
+              <td className="px-6 py-4">{abbreviateAddress(holder.address)}</td>
               <td className="px-6 py-4 text-sm">{holder.quantity}</td>
             </tr>
           ))}

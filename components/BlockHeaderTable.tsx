@@ -1,7 +1,7 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
-import { short_address } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/util.ts";
 
 dayjs.extend(relativeTime);
 
@@ -25,7 +25,7 @@ export default function BlockHeaderTable(props: BlockHeaderTableProps) {
             <td class="whitespace-nowrap">{block_info.block_index}</td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">Block Hash</th>
             <td class="whitespace-nowrap">
-              {short_address(block_info.block_hash)}
+              {abbreviateAddress(block_info.block_hash)}
             </td>
             <th scope="row" class="px-6 py-3">Time</th>
             <td class="whitespace-nowrap">
@@ -36,19 +36,19 @@ export default function BlockHeaderTable(props: BlockHeaderTableProps) {
             <th scope="row" class="whitespace-nowrap px-6 py-3">Ledger Hash</th>
             <td class="whitespace-nowrap">
               {block_info.ledger_hash
-                ? short_address(block_info.ledger_hash)
+                ? abbreviateAddress(block_info.ledger_hash)
                 : "null"}
             </td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">Txlist Hash</th>
             <td class="whitespace-nowrap">
               {block_info.txlist_hash
-                ? short_address(block_info.txlist_hash)
+                ? abbreviateAddress(block_info.txlist_hash)
                 : "null"}
             </td>
             <th scope="row" class="whitespace-nowrap px-6 py-3">Txlist Hash</th>
             <td class="whitespace-nowrap">
               {block_info.messages_hash
-                ? short_address(block_info.messages_hash)
+                ? abbreviateAddress(block_info.messages_hash)
                 : "null"}
             </td>
           </tr>

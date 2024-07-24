@@ -4,14 +4,19 @@
 
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
+import * as $api_v2_404 from "./routes/api/v2/_404.ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
 import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index].ts";
 import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_count/[...number].ts";
 import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
+import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
+import * as $api_v2_docs from "./routes/api/v2/docs.ts";
+import * as $api_v2_error from "./routes/api/v2/error.ts";
+import * as $api_v2_health from "./routes/api/v2/health.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_shared_sharedBlockHandler from "./routes/api/v2/shared/sharedBlockHandler.ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
@@ -32,6 +37,7 @@ import * as $api_v2_stamps_dispensers_id_ from "./routes/api/v2/stamps/dispenser
 import * as $api_v2_stamps_dispensers_index from "./routes/api/v2/stamps/dispensers/index.ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
+import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $collection_id_ from "./routes/collection/[id].tsx";
@@ -39,6 +45,8 @@ import * as $collection_index from "./routes/collection/index.tsx";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
+import * as $handlers_sharedBlockHandler from "./routes/handlers/sharedBlockHandler.ts";
+import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
 import * as $home_index from "./routes/home/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $mint_index from "./routes/mint/index.tsx";
@@ -98,6 +106,7 @@ const manifest = {
   routes: {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
+    "./routes/api/v2/_404.ts": $api_v2_404,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
       $api_v2_balance_getStampsBalance,
@@ -106,10 +115,14 @@ const manifest = {
       $api_v2_block_block_count_number_,
     "./routes/api/v2/block/related/[block_index].ts":
       $api_v2_block_related_block_index_,
+    "./routes/api/v2/collections/index.ts": $api_v2_collections_index,
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,
     "./routes/api/v2/cursed/block/[block_index].ts":
       $api_v2_cursed_block_block_index_,
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
+    "./routes/api/v2/docs.ts": $api_v2_docs,
+    "./routes/api/v2/error.ts": $api_v2_error,
+    "./routes/api/v2/health.ts": $api_v2_health,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/shared/sharedBlockHandler.ts":
       $api_v2_shared_sharedBlockHandler,
@@ -140,6 +153,7 @@ const manifest = {
       $api_v2_stamps_dispensers_index,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
+    "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/block/[id].tsx": $block_id_,
     "./routes/block/index.tsx": $block_index,
     "./routes/collection/[id].tsx": $collection_id_,
@@ -147,6 +161,8 @@ const manifest = {
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/cursed/index.tsx": $cursed_index,
     "./routes/docs/index.tsx": $docs_index,
+    "./routes/handlers/sharedBlockHandler.ts": $handlers_sharedBlockHandler,
+    "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
     "./routes/home/index.tsx": $home_index,
     "./routes/index.tsx": $index,
     "./routes/mint/index.tsx": $mint_index,

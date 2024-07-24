@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
-import { convertToEmoji, short_address } from "utils/util.ts";
+import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
 
 export function HomeTable({ data = [] }: { data: SRC20Row[] }) {
   const [selectedTab, setSelectedTab] = useState("Top");
@@ -88,7 +88,7 @@ export function HomeTable({ data = [] }: { data: SRC20Row[] }) {
                   <td class="px-3 md:px-6 py-2 md:py-4">
                     {src20.destination_name
                       ? src20.destination_name
-                      : short_address(src20.destination)}
+                      : abbreviateAddress(src20.destination)}
                   </td>
                 </tr>
               );

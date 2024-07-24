@@ -1,4 +1,4 @@
-import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
+import { getClient, StampRepository } from "$lib/database/index.ts";
 import { paginate } from "$lib/utils/util.ts";
 import {
   AddressHandlerContext,
@@ -7,6 +7,7 @@ import {
   PaginatedStampBalanceResponseBody,
 } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler = async (
   _req: PaginatedRequest,
@@ -20,16 +21,15 @@ export const handler = async (
 
     const client = await getClient();
 
-    // Combine database queries into a single Promise.all call
-    const [data, totalResult, last_block] = await Promise.all([
-      CommonClass.get_stamp_balances_by_address(
+    const [data, totalResult, lastBlock] = await Promise.all([
+      StampRepository.getStampBalancesByAddressFromDb(
         client,
         address,
         limit,
         page,
       ),
-      CommonClass.get_count_stamp_balances_by_address(client, address),
-      CommonClass.get_last_block_with_client(client),
+      StampRepository.getCountStampBalancesByAddressFromDb(client, address),
+      BlockService.getLastBlock(),
     ]);
 
     const total = totalResult.rows[0]?.total || 0;
@@ -37,7 +37,7 @@ export const handler = async (
 
     const body: PaginatedStampBalanceResponseBody = {
       ...pagination,
-      last_block: last_block.rows[0]?.last_block,
+      last_block: lastBlock.last_block,
       data: data,
     };
     return ResponseUtil.success(body);

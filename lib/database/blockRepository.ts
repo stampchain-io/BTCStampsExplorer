@@ -1,23 +1,20 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { Client } from "$mysql/mod.ts";
-import { summarize_issuances } from "$lib/database/index.ts";
-import { get_balances } from "utils/xcp.ts";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
-import { BIG_LIMIT, STAMP_TABLE, TTL_CACHE } from "utils/constants.ts";
-import { StampBalance } from "globals";
+import { STAMP_TABLE } from "utils/constants.ts";
 
 const BLOCK_FIELDS =
   `block_index, block_time, block_hash, previous_block_hash, ledger_hash, txlist_hash, messages_hash`;
 
-export class CommonClass {
+export class BlockRepository {
   /**
    * Retrieves block information by block index or hash using the provided database client.
    * @param client - The database client to use for the query.
    * @param blockIdentifier - The block index or hash to retrieve information for.
    * @returns A promise that resolves to the block information.
    */
-  static async get_block_info_with_client(
+  static async getBlockInfoFromDb(
     client: Client,
     blockIdentifier: number | string,
   ) {
@@ -43,7 +40,7 @@ export class CommonClass {
    * @param client - The database client to use for the query.
    * @returns A promise that resolves to the last block index.
    */
-  static async get_last_block_with_client(client: Client) {
+  static async getLastBlockFromDb(client: Client) {
     return await handleSqlQueryWithCache(
       client,
       `
@@ -122,7 +119,7 @@ export class CommonClass {
     if (typeof blockIdentifier === "number" || /^\d+$/.test(blockIdentifier)) {
       block_index = Number(blockIdentifier);
     } else {
-      block_index = await this.get_block_index_by_hash(
+      block_index = await this._getBlockIndexByHash(
         client,
         String(blockIdentifier),
       );
@@ -174,155 +171,20 @@ export class CommonClass {
    * @param block_hash - The hash of the block to retrieve the index for.
    * @returns The block index if found, otherwise undefined.
    */
-  static async get_block_index_by_hash(
+  static async _getBlockIndexByHash(
     client: Client,
     block_hash: string,
   ) {
     const result = await handleSqlQueryWithCache(
       client,
       `
-      SELECT block_index
-      FROM blocks
-      WHERE block_hash = ?;
-      `,
+    SELECT block_index
+    FROM blocks
+    WHERE block_hash = ?;
+    `,
       [block_hash],
       "never",
     );
     return result?.rows?.[0]?.block_index;
-  }
-
-  // -------------Stamps--------------
-
-  /**
-   * Retrieves the total stamp balance for a given address using the provided database client.
-   *
-   * @param client - The database client to use for the query.
-   * @param address - The address for which to retrieve the stamp balance.
-   * @returns A promise that resolves to the total stamp balance.
-   * @throws If there is an error retrieving the balances.
-   */
-  static async get_count_stamp_balances_by_address(
-    client: Client,
-    address: string,
-  ) {
-    try {
-      const xcp_balances = await get_balances(address);
-      const assets = xcp_balances.map((balance: any) => balance.cpid);
-      if (assets.length === 0) {
-        return {
-          rows: [
-            {
-              total: 0,
-            },
-          ],
-        };
-      }
-      const query = `
-        SELECT 
-          COUNT(*) AS total
-        FROM 
-          ${STAMP_TABLE} st
-        LEFT JOIN 
-          creator cr ON st.creator = cr.address
-        WHERE 
-          st.cpid IN (${assets.map((asset: string) => `'${asset}'`).join(",")})
-      `;
-      const balances = await handleSqlQueryWithCache(
-        client,
-        query,
-        assets,
-        TTL_CACHE,
-      );
-      return balances;
-    } catch (error) {
-      console.error("Error getting balances: ", error);
-      return [];
-    }
-  }
-
-  /**
-   * Retrieves stamp balances for a given address using a database client.
-   *
-   * @param client - The database client to use for the query.
-   * @param address - The address for which to retrieve stamp balances.
-   * @param limit - The maximum number of stamp balances to retrieve. Default is SMALL_LIMIT.
-   * @param page - The page number of stamp balances to retrieve. Default is 1.
-   * @param order - The order in which to retrieve the stamp balances. Default is "DESC".
-   * @returns An array of summarized stamp balances for the given address.
-   */
-  static async get_stamp_balances_by_address(
-    client: Client,
-    address: string,
-    limit = BIG_LIMIT,
-    page = 1,
-    order = "DESC",
-  ): Promise<StampBalance[]> {
-    const offset = (page - 1) * limit;
-    try {
-      const xcp_balances = await get_balances(address);
-      const assets = xcp_balances.map((balance: any) => balance.cpid);
-
-      const query = `
-        SELECT 
-          st.cpid, 
-          st.stamp, 
-          st.stamp_base64,
-          st.stamp_url, 
-          st.stamp_mimetype, 
-          st.tx_hash, 
-          st.divisible, 
-          st.supply, 
-          st.locked, 
-          st.creator, 
-          cr.creator AS creator_name
-        FROM 
-          ${STAMP_TABLE} st
-        LEFT JOIN 
-          creator cr ON st.creator = cr.address
-        WHERE 
-          st.cpid IN ( ${
-        assets.map((asset: string) => `'${asset}'`).join(", ")
-      } )
-        ORDER BY st.stamp ${order}
-        LIMIT ${limit}
-        OFFSET ${offset};
-      `;
-
-      const balances = await handleSqlQueryWithCache(
-        client,
-        query,
-        assets,
-        TTL_CACHE,
-      );
-
-      const grouped = balances.rows.reduce(
-        (acc: Record<string, StampBalance[]>, cur: StampBalance) => {
-          acc[cur.cpid] = acc[cur.cpid] || [];
-          acc[cur.cpid].push({
-            ...cur,
-            is_btc_stamp: cur.is_btc_stamp ?? 0,
-          });
-          return acc;
-        },
-        {},
-      );
-
-      const summarized = Object.keys(grouped).map((key) =>
-        summarize_issuances(grouped[key])
-      );
-
-      return summarized.map((summary: StampBalance) => {
-        const xcp_balance = xcp_balances.find((balance) =>
-          balance.cpid === summary.cpid
-        );
-        return {
-          ...summary,
-          balance: xcp_balance ? xcp_balance.quantity : 0,
-        };
-      });
-    } catch (error) {
-      console.error("Error getting balances: ", error);
-      return [];
-    }
   }
 }

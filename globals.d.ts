@@ -125,6 +125,11 @@ interface XCPParams {
   asset?: string;
 }
 
+interface XCPBalance {
+  cpid: string;
+  quantity: number;
+}
+
 interface SRC20Balance {
   address: string;
   p: string;
@@ -207,9 +212,9 @@ export interface SRC20TrxRequestParams {
 }
 
 export interface SRC20BalanceRequestParams {
-  address?: string | null;
-  tick?: string | null;
-  amt?: number | null;
+  address?: string;
+  tick?: string;
+  amt?: number;
   limit?: number;
   page?: number;
   sort?: string;
@@ -302,6 +307,19 @@ export interface PaginatedIdResponseBody extends Pagination {
   data: StampRow[];
 }
 
+type StampPageProps = {
+  data: {
+    stamps: StampRow[];
+    total: number;
+    page: number;
+    pages: number;
+    page_size: number;
+    selectedTab: "all" | "classic";
+    sortBy: string;
+    filterBy: string[];
+  };
+};
+
 export interface ErrorResponseBody {
   error: string;
 }
@@ -389,13 +407,6 @@ export interface BlockTickHandlerContext {
   };
 }
 
-export interface AddressTickHandlerContext {
-  params: {
-    address: string;
-    tick: string | number;
-  };
-}
-
 // Post Request Types ----------------------------------------------------------
 export interface TX {
   hex: string;
@@ -430,4 +441,28 @@ export interface MintStampInputData {
   satsPerKB: number;
   service_fee: number;
   service_fee_address: string;
+}
+
+interface Collection {
+  collection_id: string;
+  collection_name: string;
+  creators: string[];
+  stamps: StampRow[];
+}
+
+interface CollectionQueryParams extends PaginationQueryParams {
+  creator?: string;
+}
+
+interface PaginatedCollectionResponseBody extends Pagination {
+  last_block: number;
+  data: Collection[];
+}
+
+interface SRC20SnapshotRequestParams {
+  tick: string;
+  limit: number;
+  page: number;
+  amt: number;
+  sort: string;
 }

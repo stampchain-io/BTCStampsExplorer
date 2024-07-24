@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 
 import { SRC20Row } from "globals";
 
-import { convertToEmoji, short_address } from "utils/util.ts";
+import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
 
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
@@ -93,7 +93,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                   <td class="px-6 py-4">
                     {src20.destination_name
                       ? src20.destination_name
-                      : short_address(src20.destination)}
+                      : abbreviateAddress(src20.destination)}
                   </td>
                   <td class="px-6 py-4">
                     {typeof src20.max === "number"
@@ -155,7 +155,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                         <span class="text-lg font-medium">
                           {src20.destination_name
                             ? src20.destination_name
-                            : short_address(src20.destination)}
+                            : abbreviateAddress(src20.destination)}
                         </span>
                       </p>
                       <p class="text-sm">

@@ -1,4 +1,4 @@
-import { get_suffix_from_mimetype } from "$lib/utils/util.ts";
+import { getFileSuffixFromMime } from "$lib/utils/util.ts";
 import { StampRow } from "globals";
 
 export const Stamp = (
@@ -13,7 +13,7 @@ export const Stamp = (
         class={`${className} aspect-square rounded-lg`}
         sandbox="allow-scripts allow-same-origin"
         src={`/content/${stamp.tx_hash}.${
-          get_suffix_from_mimetype(stamp.stamp_mimetype)
+          getFileSuffixFromMime(stamp.stamp_mimetype)
         }`}
         onError={(e) => {
           e.currentTarget.src = stamp.stamp_url;
@@ -41,7 +41,7 @@ export const Stamp = (
       loading="lazy"
       class={`max-w-none object-contain image-rendering-pixelated rounded-lg ${className} `}
       src={`/content/${stamp.tx_hash}.${
-        get_suffix_from_mimetype(stamp.stamp_mimetype)
+        getFileSuffixFromMime(stamp.stamp_mimetype)
       }`}
       onError={(e) => {
         e.currentTarget.src = `/content/not-available.png`;

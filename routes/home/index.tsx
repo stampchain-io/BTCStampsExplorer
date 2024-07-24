@@ -1,25 +1,17 @@
-import { BIG_LIMIT } from "constants";
-import { SRC20Row, StampRow } from "globals";
+import { StampRow } from "globals";
 
 import { Pagination } from "$components/Pagination.tsx";
-
-import { HandlerContext, Handlers } from "$fresh/server.ts";
+import { Handlers } from "$fresh/server.ts";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
-// import Carousel from "$islands/Carousel.tsx";
-// import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
 import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeSalesInfo } from "$islands/home/HomeSalesInfo.tsx";
 import { HomeSalesInfoDetails } from "$islands/home/HomeSalesInfoDetails.tsx";
 
-import {
-  api_get_multiple_stamp_categories,
-  api_get_stamps,
-} from "$lib/controller/stamp.ts";
-import { api_get_src20s } from "$lib/controller/src20.ts";
+import { StampController } from "$lib/controller/stampController.ts";
 
 type HomePageProps = {
   data: {
@@ -42,112 +34,34 @@ type HomePageProps = {
   };
 };
 
-export const handler: Handlers<StampRow> = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
       const type = url.searchParams.get("type");
+      const page = Number(url.searchParams.get("page")) || 1;
+      const page_size = Number(url.searchParams.get("limit")) ||
+        (type ? 24 : 10);
+      const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+      const sortBy = url.searchParams.get("sortBy") || "none";
+      const orderByParam = url.searchParams.get("orderBy")?.toUpperCase();
+      const orderBy = orderByParam === "DESC" || orderByParam === "ASC"
+        ? orderByParam
+        : "DESC";
 
-      let stamps_recent: StampRow[] = [];
-      let stamps_src721: StampRow[] = [];
-      let stamps_art: StampRow[] = [];
-      let stamps_src20: StampRow[] = [];
-      let stamps_news: StampRow[] = [];
-      let page, page_size;
-      let stamps: StampRow[] = [],
-        pages_stamp,
-        page_stamp,
-        page_size_stamp;
-      let src20s: SRC20Row[] = [], pages_src20, page_src20, page_size_src20;
-      let filterBy, sortBy, orderBy;
-
-      if (!type) {
-        const stampCategories = await api_get_multiple_stamp_categories([
-          { types: ["STAMP", "SRC-721"], limit: 6 },
-          { types: ["SRC-721"], limit: 6 },
-          { types: ["STAMP"], limit: 6 },
-          { types: ["SRC-20"], limit: 6 },
-        ]);
-
-        stamps_recent = stampCategories[0];
-        stamps_src721 = stampCategories[1];
-        stamps_art = stampCategories[2];
-        stamps_src20 = stampCategories[3];
-        stamps_news = stampCategories[0]; // Reuse stamps_recent for news
-
-        page_size = Number(url.searchParams.get("limit")) || 10;
-        page = Number(url.searchParams.get("page")) || 1;
-
-        const res = await api_get_src20s(
-          page,
-          page_size,
-        );
-        src20s = res.src20s;
-        pages_src20 = res.pages;
-        page_src20 = res.page;
-        page_size_src20 = res.page_size;
-      } else {
-        let typeBy = ["STAMP", "SRC-721"];
-        if (type === "src721") {
-          typeBy = ["SRC-721"];
-        } else if (type === "art") {
-          typeBy = ["STAMP"];
-        } else if (type === "src20") {
-          typeBy = ["SRC-20"];
-        }
-        filterBy = url.searchParams.get("filterBy")?.split(",") || [];
-        sortBy = url.searchParams.get("sortBy") || "none";
-        orderBy = url.searchParams.get("orderBy")?.toUpperCase() || "DESC";
-        page = type
-          ? parseInt(url.searchParams.get("page") || "1")
-          : parseInt("1");
-        page_size = type
-          ? parseInt("24" || BIG_LIMIT.toString())
-          : parseInt("6");
-        const res = await api_get_stamps(
-          page,
-          page_size,
-          orderBy,
-          sortBy,
-          filterBy,
-          typeBy,
-        );
-        stamps = res.stamps;
-        pages_stamp = res.pages;
-        page_stamp = res.page;
-        page_size_stamp = res.page_size;
-      }
-
-      const res = {
-        stamps_recent,
-        stamps_src721,
-        stamps_art,
-        stamps_src20,
-        stamps_news,
-        stamps,
-        pages_stamp,
-        page_stamp,
-        page_size_stamp,
+      const result = await StampController.getHomePageData(
+        type,
+        page,
+        page_size,
         filterBy,
         sortBy,
-        src20s: src20s.map((row: SRC20Row) => {
-          return {
-            ...row,
-            max: row.max ? row.max.toString() : null,
-            lim: row.lim ? row.lim.toString() : null,
-            amt: row.amt ? row.amt.toString() : null,
-          };
-        }),
-        pages_src20,
-        page_src20,
-        page_size_src20,
-        type,
-      };
-      return await ctx.render(res);
+        orderBy,
+      );
+
+      return ctx.render(result);
     } catch (error) {
       console.error(error);
-      const res = { error: `Error: Internal server error` };
-      return ctx.render(res);
+      return ctx.render({ error: `Error: Internal server error` });
     }
   },
 };
@@ -217,15 +131,6 @@ export default function Home(props: HomePageProps) {
         : (
           <div class="flex flex-col gap-24 text-white">
             <HomeHeader />
-            {/* <HomeCarousel /> */}
-            {
-              /* <Carousel
-              automatic
-              showNavigation
-              interval={3000}
-              currentSlide={0}
-            /> */
-            }
             <div class="flex flex-col gap-10">
               <HomeTable data={src20s} />
               <Pagination

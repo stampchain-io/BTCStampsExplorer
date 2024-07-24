@@ -1,10 +1,10 @@
-import { CommonClass } from "$lib/database/index.ts";
 import { PaginatedDispenserResponseBody, PaginatedRequest } from "globals";
 import { paginate } from "$lib/utils/util.ts";
 import { get_all_dispensers } from "$lib/utils/xcp.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { withDatabaseClient } from "$lib/services/databaseService.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -14,13 +14,13 @@ export const handler = async (
     const { limit, page } = getPaginationParams(url);
 
     const body = await withDatabaseClient(async (client) => {
-      const last_block = await CommonClass.get_last_block_with_client(client);
+      const lastBlock = await BlockService.getLastBlock();
       const { total, dispensers } = await get_all_dispensers(page, limit);
       const pagination = paginate(total, page, limit);
 
       return {
         ...pagination,
-        last_block: last_block.rows[0]["last_block"],
+        last_block: lastBlock.last_block,
         dispensers,
       } as PaginatedDispenserResponseBody;
     });
