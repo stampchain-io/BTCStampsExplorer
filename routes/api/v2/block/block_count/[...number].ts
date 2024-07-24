@@ -1,4 +1,4 @@
-import { CommonClass } from "$lib/database/index.ts";
+import { BlockRepository } from "$lib/database/index.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 // import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { withDatabaseClient } from "$lib/services/databaseService.ts";
@@ -20,7 +20,10 @@ export const handler = async (
     }
 
     const lastBlocks = await withDatabaseClient((client) => {
-      return CommonClass.get_last_x_blocks_with_client(client, parsedNumber);
+      return BlockRepository.get_last_x_blocks_with_client(
+        client,
+        parsedNumber,
+      );
     });
 
     return ResponseUtil.successArray(lastBlocks);

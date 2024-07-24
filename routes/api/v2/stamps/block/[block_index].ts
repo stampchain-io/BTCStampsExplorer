@@ -1,3 +1,3 @@
-import { sharedBlockHandler } from "$/routes/api/v2/shared/sharedBlockHandler.ts";
+import { sharedBlockHandler } from "../../../../handlers/sharedBlockHandler.ts";
 
 export const handler = sharedBlockHandler;

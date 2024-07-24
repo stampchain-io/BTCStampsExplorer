@@ -3,7 +3,7 @@ import { ComponentChildren } from "preact";
 import { computed } from "@preact/signals";
 
 import { walletContext } from "store/wallet/wallet.ts";
-import { short_address } from "utils/util.ts";
+import { abbreviateAddress } from "utils/util.ts";
 import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { ConnectedModal } from "./ConnectedModal.tsx";
 
@@ -35,7 +35,7 @@ export const WalletModal = ({ connectors }: Props) => {
         type="button"
       >
         {isConnected.value && address
-          ? short_address(address)
+          ? abbreviateAddress(address)
           : "Connect Wallet"}
       </button>
 

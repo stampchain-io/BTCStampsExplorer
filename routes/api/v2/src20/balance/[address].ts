@@ -1,6 +1,7 @@
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient, Src20Class } from "$lib/database/index.ts";
 import { AddressHandlerContext, PaginatedSrc20ResponseBody } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler = async (
   _req: Request,
@@ -16,7 +17,7 @@ export const handler = async (
 
   try {
     const client = await getClient();
-    const last_block = await CommonClass.get_last_block_with_client(client);
+    const lastBlock = await BlockService.getLastBlock();
     const src20 = await Src20Class.get_src20_balance_with_client(
       client,
       address,
@@ -36,7 +37,7 @@ export const handler = async (
       limit: limit,
       totalPages: Math.ceil(total / limit),
       total: total,
-      last_block: last_block.rows[0]["last_block"],
+      last_block: lastBlock.last_block,
       data: src20,
     };
     return ResponseUtil.success(body);

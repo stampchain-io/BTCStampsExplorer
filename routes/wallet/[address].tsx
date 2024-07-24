@@ -2,7 +2,7 @@ import { api_get_balance } from "$lib/controller/wallet.ts";
 import { StampCard } from "$components/StampCard.tsx";
 import BtcAddressInfo from "$components/BtcAddressInfo.tsx";
 import { SRC20BalanceTable } from "$components/SRC20BalanceTable.tsx";
-import { HandlerContext, Handlers } from "$fresh/server.ts";
+import { Handlers } from "$fresh/server.ts";
 
 type WalletPageProps = {
   data: {
@@ -11,8 +11,8 @@ type WalletPageProps = {
     btc: any;
   };
 };
-export const handler: Handlers<any> = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(_req: Request, ctx) {
     const { address } = ctx.params;
     const { data: { stamps, src20 }, btc } = await api_get_balance(address);
     const data = {

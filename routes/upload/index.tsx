@@ -1,15 +1,16 @@
 import { HandlerContext } from "$fresh/server.ts";
 
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
+import { getClient } from "$lib/database/index.ts";
 import { useEffect, useState } from "preact/hooks";
 import { paginate } from "utils/util.ts";
 import { initialWallet, walletContext } from "store/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
+import { BlockService } from "$lib/services/blockService.ts";
+import { Handlers } from "$fresh/server.ts";
+import { SRC20Repository } from "$lib/database/src20Repository.ts";
 
-//TODO: Add pagination
-
-export const handler = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
       const { wallet, isConnected } = walletContext;
@@ -17,7 +18,7 @@ export const handler = {
       const page = Number(url.searchParams.get("page")) || 1;
 
       const client = await getClient();
-      const data = await Src20Class.get_valid_src20_tx_with_client(
+      const data = await SRC20Repository.getValidSrc20TxFromDb(
         client,
         null,
         null,
@@ -25,18 +26,19 @@ export const handler = {
         limit,
         page,
       );
-      const total = await Src20Class.get_total_valid_src20_tx_with_client(
-        client,
-        null,
-        "DEPLOY",
-      );
-      const last_block = await CommonClass.get_last_block_with_client(client);
+      const total = await SRC20Repository
+        .getTotalCountValidSrc20TxFromDb(
+          client,
+          null,
+          "DEPLOY",
+        );
+      const lastBlock = await BlockService.getLastBlock();
 
       const pagination = paginate(total.rows[0]["total"], page, limit);
 
       const body = {
         ...pagination,
-        last_block: last_block.rows[0]["last_block"],
+        last_block: lastBlock.last_block,
         data: data.rows.map((row) => {
           return {
             ...row,

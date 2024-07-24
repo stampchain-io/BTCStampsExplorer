@@ -1,7 +1,4 @@
-import {
-  getBlockInfo,
-  transformToBlockInfoResponse,
-} from "$lib/services/blockService.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { isIntOr32ByteHex } from "$lib/utils/util.ts";
 import { BlockHandlerContext, ErrorResponseBody } from "globals";
@@ -23,18 +20,31 @@ export const handler = async (
   const blockIdentifier = /^\d+$/.test(block_index)
     ? Number(block_index)
     : block_index;
-  const isStamps = ctx.url.pathname.includes("/stamps/");
-  const type = isStamps ? "stamps" : "cursed";
+  // now we support api/v2/block/844755/cursed /stamps otherwise default to all
+  const type = ctx.url?.pathname?.includes("/cursed/")
+    ? "cursed"
+    : ctx.url?.pathname?.includes("/stamps/")
+    ? "stamps"
+    : "all";
 
   try {
-    const blockInfo = await getBlockInfo(blockIdentifier, type);
-    const response = transformToBlockInfoResponse(blockInfo);
+    const blockInfo = await BlockService.getBlockInfo(blockIdentifier, type);
+    const response = BlockService.transformToBlockInfoResponse(blockInfo);
     return ResponseUtil.success(response);
   } catch (error) {
     console.error(`Error in ${type}/block handler:`, error);
     const body: ErrorResponseBody = {
-      error: `Block: ${block_index} not found`,
+      error: error instanceof Error &&
+          error.message === "Could not connect to database"
+        ? "Database connection error"
+        : `Block: ${block_index} not found`,
     };
-    return ResponseUtil.error(body.error, 404);
+    return ResponseUtil.error(
+      body.error,
+      error instanceof Error &&
+        error.message === "Could not connect to database"
+        ? 500
+        : 404,
+    );
   }
 };

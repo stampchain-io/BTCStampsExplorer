@@ -1,34 +1,12 @@
 import {
-  CommonClass,
   getClient,
   releaseClient,
   Src20Class,
+  StampRepository,
 } from "$lib/database/index.ts";
 import { getBtcAddressInfo } from "../utils/btc.ts";
-import { SMALL_LIMIT } from "utils/constants.ts";
 import { paginate } from "../utils/util.ts";
-
-export const api_get_stamp_balance = async (
-  address: string,
-  limit = SMALL_LIMIT,
-  page = 1,
-) => {
-  try {
-    const client = await getClient();
-    const balances = await CommonClass
-      .get_stamp_balances_by_address(
-        client,
-        address,
-        limit,
-        page,
-      );
-    releaseClient(client);
-    return balances;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
+import { SRC20Repository } from "$lib/database/src20Repository.ts";
 
 export const api_get_src20_valid_tx = async (tx_hash: string) => {
   try {
@@ -52,31 +30,6 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
 };
 
 /**
- * Retrieves the SRC20 token balances for a given address.
- *
- * @param address - The address for which to retrieve the SRC20 token balances.
- * @returns A Promise that resolves to an array of SRC20 token balances.
- * @throws If there is an error while retrieving the SRC20 token balances.
- */
-export const api_get_src20_balance = async (address: string) => {
-  try {
-    const client = await getClient();
-    const balances = await Src20Class.get_src20_balance_with_client(
-      client,
-      address,
-    );
-    releaseClient(client);
-    if (balances.rows.length === 0) {
-      return [];
-    }
-    return balances.rows;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-/**
  * Retrieves the balance information for a given address.
  * @param address - The address for which to retrieve the balance.
  * @param limit - The maximum number of results to return per page. Default is 50.
@@ -90,27 +43,28 @@ export const api_get_balance = async (
 ) => {
   try {
     const client = await getClient();
-    const total =
-      (await CommonClass.get_count_stamp_balances_by_address(client, address))
-        .rows[0]["total"] || 0;
+    const total = (await StampRepository.getCountStampBalancesByAddressFromDb(
+      client,
+      address,
+    ))
+      .rows[0]["total"] || 0;
     const pagination = paginate(total, page, limit);
 
     const btcInfo = await getBtcAddressInfo(address); // frequently getting conn reset errors https://mempool.space/api/address/bc1qhy4t0j60sysrfmp6e5g0h67rthtvz4ktnggjpu): connection error: connection reset
     let stamps;
     if (total !== 0) {
-      stamps = await CommonClass
-        .get_stamp_balances_by_address(
-          client,
-          address,
-          limit,
-          page,
-        );
+      stamps = await StampRepository.getStampBalancesByAddressFromDb(
+        client,
+        address,
+        limit,
+        page,
+      );
     } else {
       stamps = [];
     }
-    const src20 = await Src20Class.get_src20_balance_with_client(
+    const src20 = await SRC20Repository.getSrc20BalanceFromDb(
       client,
-      address,
+      { address, tick: undefined, limit, page, amt: undefined, sort: "ASC" },
     );
     releaseClient(client);
     return {

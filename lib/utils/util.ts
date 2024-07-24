@@ -1,3 +1,5 @@
+import { BigFloat } from "bigfloat/mod.ts";
+
 const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",
@@ -45,19 +47,20 @@ const specialCases: { [key: string]: string } = {
   "plain": "txt",
 };
 
-export const get_suffix_from_mimetype = (mimetype: string): string => {
+export const getFileSuffixFromMime = (mimetype: string): string => {
   if (!mimetype) return "unknown";
   const suffix = mimetype.split("/")[1];
   return specialCases[suffix] || suffix || "json";
 };
+
 /**
  * Returns a shortened version of the given address.
  * @param address - The address to be shortened.
  * @param number - The number of characters to keep at the beginning and end of the address. Default is 6.
  * @returns The shortened address.
  */
-export const short_address = (address: string, number = 6) => {
-  return address.slice(0, number) + "..." + address.slice(-number);
+export const abbreviateAddress = (address: string, visibleChars = 6) => {
+  return address.slice(0, visibleChars) + "..." + address.slice(-visibleChars);
 };
 
 export const getMimeType = (extension: string): string => {
@@ -154,4 +157,22 @@ export function convertEmojiToTick(str: string): string {
     }
   }
   return result;
+}
+
+export function bigFloatToString(
+  value: BigFloat,
+  precision: number = 3,
+): string {
+  const stringValue = value.toString();
+  const [integerPart, fractionalPart] = stringValue.split(".");
+
+  if (!fractionalPart) {
+    return integerPart;
+  }
+
+  const roundedFractionalPart = fractionalPart.slice(0, precision);
+  const result = `${integerPart}.${roundedFractionalPart}`;
+
+  // Remove trailing zeros
+  return result.replace(/\.?0+$/, "");
 }

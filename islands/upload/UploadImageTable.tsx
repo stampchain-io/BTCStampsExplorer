@@ -1,7 +1,6 @@
 import { SRC20Row } from "globals";
 import { useCallback, useEffect, useState } from "preact/hooks";
-import { convertToEmoji, short_address } from "utils/util.ts";
-
+import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
 
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
@@ -107,7 +106,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                         <td class="px-6 py-4">
                           {src20.creator
                             ? src20.creator
-                            : short_address(src20.creator)}
+                            : abbreviateAddress(src20.creator)}
                         </td>
                         <td class="px-6 py-4">
                           {typeof src20.max === "number"

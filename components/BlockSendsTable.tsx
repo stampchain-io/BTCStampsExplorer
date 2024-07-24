@@ -1,7 +1,7 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
-import { short_address } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/util.ts";
 import Stamp from "$/components/Stamp.tsx";
 import { StampKind } from "$/components/StampKind.tsx";
 import { BlockInfo, SendRow, StampRow } from "globals";
@@ -79,10 +79,12 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
                   <StampKind kind={kind} />
                 </td>
                 <td class="px-6 py-4">
-                  {send.source ? short_address(send.source) : "NULL"}
+                  {send.source ? abbreviateAddress(send.source) : "NULL"}
                 </td>
                 <td class="px-6 py-4">
-                  {send.destination ? short_address(send.destination) : "NULL"}
+                  {send.destination
+                    ? abbreviateAddress(send.destination)
+                    : "NULL"}
                 </td>
                 <td class="px-6 py-4 text-sm">
                   <a href={`/stamp/${send.cpid}`}>
@@ -99,7 +101,9 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
                     : "0 BTC"}
                 </td>
                 <td class="px-6 py-4 text-sm">{send.memo}</td>
-                <td class="px-6 py-4 text-sm">{short_address(send.tx_hash)}</td>
+                <td class="px-6 py-4 text-sm">
+                  {abbreviateAddress(send.tx_hash)}
+                </td>
                 <td class="px-6 py-4 text-sm">
                   {dayjs(Number(block_info.block_time)).fromNow()}
                 </td>

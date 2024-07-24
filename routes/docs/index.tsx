@@ -1,5 +1,7 @@
+import { Handlers } from "$fresh/server.ts";
+
 export const handler: Handlers = {
-  GET(_req, _ctx) {
+  GET(_req: Request, _ctx) {
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">

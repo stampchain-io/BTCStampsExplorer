@@ -1,7 +1,7 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
-import { short_address } from "utils/util.ts";
+import { abbreviateAddress } from "utils/util.ts";
 import { StampKind } from "$/components/StampKind.tsx";
 
 import { StampRow } from "globals";

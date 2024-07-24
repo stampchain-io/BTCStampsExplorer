@@ -1,4 +1,4 @@
-import { short_address } from "utils/util.ts";
+import { abbreviateAddress } from "utils/util.ts";
 
 interface SRC20TXProps {
   txs: unknown[];
@@ -27,10 +27,10 @@ export const SRC20TX = (props: SRC20TXProps) => {
                     {tx.block_index}
                   </td>
                   <td class="px-6 py-4">
-                    {short_address(tx.creator)}
+                    {abbreviateAddress(tx.creator)}
                   </td>
                   <td class="px-6 py-4">
-                    {short_address(tx.destination)}
+                    {abbreviateAddress(tx.destination)}
                   </td>
                   <td class="px-6 py-4">
                     {tx.amt}
@@ -62,7 +62,7 @@ export const SRC20TX = (props: SRC20TXProps) => {
                     {tx.block_index}
                   </td>
                   <td class="px-6 py-4">
-                    {short_address(tx.destination)}
+                    {abbreviateAddress(tx.destination)}
                   </td>
                   <td class="px-6 py-4">
                     {tx.amt}

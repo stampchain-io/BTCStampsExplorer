@@ -1,15 +1,11 @@
-import { HandlerContext } from "$fresh/server.ts";
 import { MintHeader } from "$islands/mint/MintHeader.tsx";
-
-import { CommonClass, getClient } from "$lib/database/index.ts";
-import { useState } from "preact/hooks";
-import { paginate } from "utils/util.ts";
+import { Handlers } from "$fresh/server.ts";
 import { UploadImage } from "../../islands/mint/UploadImage.tsx";
 
 //TODO: Add pagination
 
-export const handler = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(_req: Request, ctx) {
     try {
       const url = new URL(req.url);
       const body = {};
