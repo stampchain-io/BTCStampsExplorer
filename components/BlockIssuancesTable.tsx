@@ -1,22 +1,16 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
-import { SendRow, StampRow } from "globals";
+import Stamp from "$components/Stamp.tsx";
+import { StampKind } from "$components/StampKind.tsx";
 
-import Stamp from "$/components/Stamp.tsx";
-import { StampKind } from "$/components/StampKind.tsx";
-
-import { abbreviateAddress } from "$lib/utils/util.ts";
-import { BlockInfo, SendRow, StampRow } from "globals";
+import { abbreviateAddress } from "utils/util.ts";
+import { BlockInfo, StampRow } from "globals";
 
 dayjs.extend(relativeTime);
 
 interface BlockIssuancesTableProps {
-  block: {
-    block_info: BlockInfo;
-    issuances: StampRow[];
-    sends: SendRow[];
-  };
+  block: BlockInfo;
 }
 
 export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
@@ -90,7 +84,7 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
         </tbody>
       </table>
       <div class="flex md:hidden flex-col gap-3">
-        {issuances.map((issuance: StampRow, index: number) => {
+        {issuances.map((issuance: StampRow, _index: number) => {
           const kind = issuance.is_btc_stamp
             ? "stamp"
             : issuance.cpid.startsWith("A")
