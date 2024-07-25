@@ -9,7 +9,6 @@ import { StampKind } from "$/components/StampKind.tsx";
 import { abbreviateAddress } from "$lib/utils/util.ts";
 import { BlockInfo, SendRow, StampRow } from "globals";
 
-
 dayjs.extend(relativeTime);
 
 interface BlockIssuancesTableProps {
@@ -133,7 +132,8 @@ export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
                 <div>
                   <p>Creator:</p>
                   <a href={`/wallet/${issuance.creator}`}>
-                    {issuance.creator_name ?? short_address(issuance.creator)}
+                    {issuance.creator_name ??
+                      abbreviateAddress(issuance.creator)}
                   </a>
                 </div>
               </div>
