@@ -2,7 +2,6 @@ import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
 import { abbreviateAddress } from "utils/util.ts";
-import { StampKind } from "$/components/StampKind.tsx";
 
 import { StampRow } from "globals";
 
@@ -42,7 +41,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
               ? stamp.creator_name
               : (
                 <a href={`/wallet/${stamp.creator}`}>
-                  {short_address(stamp.creator, 12)}
+                  {abbreviateAddress(stamp.creator, 12)}
                 </a>
               )}
           </p>
@@ -71,7 +70,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
             rel="noopener noreferrer"
             class="text-[#60626F]"
           >
-            {short_address(stamp.tx_hash, 12)}
+            {abbreviateAddress(stamp.tx_hash, 12)}
           </a>
         </div>
         <img
