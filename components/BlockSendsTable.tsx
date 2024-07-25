@@ -1,18 +1,14 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
-import { abbreviateAddress } from "$lib/utils/util.ts";
-import Stamp from "$/components/Stamp.tsx";
-import { StampKind } from "$/components/StampKind.tsx";
-import { BlockInfo, SendRow, StampRow } from "globals";
+import { abbreviateAddress } from "utils/util.ts";
+import Stamp from "$components/Stamp.tsx";
+import { StampKind } from "$components/StampKind.tsx";
+import { BlockInfo, SendRow } from "globals";
 dayjs.extend(relativeTime);
 
 interface BlockSendsTableProps {
-  block: {
-    block_info: BlockInfo;
-    issuances: StampRow[];
-    sends: SendRow[];
-  };
+  block: BlockInfo;
 }
 
 export default function BlockSendsTable(props: BlockSendsTableProps) {
