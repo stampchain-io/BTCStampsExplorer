@@ -20,17 +20,12 @@ export const handler: Handlers = {
       const client = await getClient();
       const data = await SRC20Repository.getValidSrc20TxFromDb(
         client,
-        null,
-        null,
-        "DEPLOY",
-        limit,
-        page,
+        { op: "DEPLOY", limit, page },
       );
       const total = await SRC20Repository
         .getTotalCountValidSrc20TxFromDb(
           client,
-          null,
-          "DEPLOY",
+          { op: "DEPLOY" },
         );
       const lastBlock = await BlockService.getLastBlock();
 

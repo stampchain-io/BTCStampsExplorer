@@ -3,20 +3,20 @@ import { BlockInfoResponseBody, StampBlockResponseBody } from "globals";
 import { withDatabaseClient } from "$lib/services/databaseService.ts";
 
 export class BlockService {
-  static async getBlockInfo(
+  static async getBlockInfoWithStamps(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed" | "all" = "stamps",
+    type: "stamps" | "cursed" | "all" = "all",
   ): Promise<StampBlockResponseBody> {
     return await withDatabaseClient(async (client) => {
       const [block_info, last_block, data] = await Promise.all([
         BlockRepository.getBlockInfoFromDb(client, blockIdentifier),
-        BlockRepository.getLastBlockFromDb(client),
+        this.getLastBlock(),
         StampRepository.getStampsFromDb(client, {
           type,
           blockIdentifier,
           sort_order: "asc",
-          no_pagination: true,
-          cache_duration: "never",
+          noPagination: true,
+          cacheDuration: "never",
         }),
       ]);
 
@@ -24,12 +24,12 @@ export class BlockService {
         throw new Error(`Block: ${blockIdentifier} not found`);
       }
 
-      if (!last_block || !last_block.rows || last_block.rows.length === 0) {
+      if (!last_block || !last_block.last_block) {
         throw new Error("Could not get last block");
       }
 
       return {
-        last_block: last_block.rows[0].last_block,
+        last_block: last_block.last_block,
         block_info: block_info.rows[0],
         data: data.rows,
       };
@@ -47,19 +47,24 @@ export class BlockService {
     };
   }
 
-  static async getRelatedBlocks(blockIdentifier: number | string) {
+  static async getRelatedBlocksWithStamps(blockIdentifier: number | string) {
     return await withDatabaseClient(async (client) => {
       const [blocks, last_block] = await Promise.all([
-        BlockRepository.get_related_blocks_with_client(client, blockIdentifier),
-        BlockRepository.getLastBlockFromDb(client),
+        BlockRepository.getRelatedBlocksWithStampsFromDb(
+          client,
+          blockIdentifier,
+        ),
+        this.getLastBlock(),
       ]);
 
-      if (!last_block || !last_block.rows || last_block.rows.length === 0) {
+      if (
+        !last_block || !last_block.last_block
+      ) {
         throw new Error("Could not get last block");
       }
 
       return {
-        last_block: last_block.rows[0].last_block,
+        last_block: last_block.last_block,
         blocks,
       };
     });

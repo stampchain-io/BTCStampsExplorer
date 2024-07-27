@@ -1,15 +1,17 @@
 import * as bitcoin from "bitcoin";
-import { estimateInputSize } from "./utxo-selector.ts";
+import { estimateInputSize } from "utils/minting/src20/utxo-selector.ts";
+import { convertToEmoji } from "utils/util.ts";
+import { SRC20Row } from "globals";
 
 const MAX_RETRIES = 3;
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
 
-export function isValidBitcoinAddress(address) {
+export function isValidBitcoinAddress(address: string) {
   try {
     bitcoin.address.toOutputScript(address);
     return true;
-  } catch (e) {
+  } catch (_e) {
     return false;
   }
 }

@@ -1,40 +1,49 @@
-import { api_get_balance } from "$lib/controller/wallet.ts";
-import { BlockService } from "$lib/services/blockService.ts";
-import {
-  AddressHandlerContext,
-  PaginatedBalanceResponseBody,
-  PaginatedRequest,
-} from "globals";
-
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { FreshContext } from "$fresh/server.ts";
+import { SRC20TrxRequestParams } from "globals";
 
 export const handler = async (
-  _req: PaginatedRequest,
-  ctx: AddressHandlerContext,
+  req: Request,
+  _ctx: FreshContext,
 ): Promise<Response> => {
-  const { address } = ctx.params;
   try {
-    const url = new URL(_req.url);
-    const limit = Number(url.searchParams.get("limit")) || 1000;
+    const url = new URL(req.url);
     const page = Number(url.searchParams.get("page")) || 1;
-    const lastBlock = await BlockService.getLastBlock();
-    const balanceData = await api_get_balance(address, limit, page);
-    const body: PaginatedBalanceResponseBody = {
-      ...balanceData,
-      last_block: lastBlock.last_block,
-      btc: balanceData.btc || {
-        address: "",
-        balance: 0,
-        txCount: 0,
-        unconfirmedBalance: 0,
-        unconfirmedTxCount: 0,
-      },
-      data: [...balanceData.data.stamps, ...balanceData.data.src20],
+    const limit = Number(url.searchParams.get("limit")) || 11;
+    const sortBy = url.searchParams.get("sortBy") || "ASC";
+
+    const params: SRC20TrxRequestParams = {
+      op: "DEPLOY",
+      page,
+      limit,
+      sort: sortBy,
     };
 
-    return ResponseUtil.success(body);
+    const result = await Src20Controller.handleSrc20TransactionsRequest(
+      req,
+      params,
+    );
+    const resultData = await result.json();
+
+    const formattedData = {
+      src20s: resultData.data || [],
+      total: resultData.total || 0,
+      page: resultData.page || page,
+      totalPages: resultData.totalPages || 1,
+      limit: resultData.limit || limit,
+      last_block: resultData.last_block || 0,
+      filterBy: [],
+      sortBy: sortBy,
+    };
+
+    return new Response(JSON.stringify(formattedData), {
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("Error:", error);
-    return ResponseUtil.error("Internal server error", 500);
+    console.error("Error in src20/tick handler:", error);
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };

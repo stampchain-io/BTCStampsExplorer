@@ -6,7 +6,7 @@ import {
   abbreviateAddress,
   getFileSuffixFromMime,
   getSupply,
-} from "$lib/utils/util.ts";
+} from "utils/util.ts";
 
 dayjs.extend(relativeTime);
 

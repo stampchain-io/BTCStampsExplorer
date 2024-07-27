@@ -1,4 +1,4 @@
-import { getFileSuffixFromMime } from "$lib/utils/util.ts";
+import { getFileSuffixFromMime } from "utils/util.ts";
 import { StampRow } from "globals";
 
 export const Stamp = (

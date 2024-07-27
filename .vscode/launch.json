@@ -33,11 +33,12 @@
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
+      "outputCapture": "std",
       "runtimeArgs": [
         "run",
         "--inspect-brk",
         "-A",
-        "./main.ts" // replace with your main file
+        "./main.ts"
       ],
       "attachSimplePort": 9229
     }

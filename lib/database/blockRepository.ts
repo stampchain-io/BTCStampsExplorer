@@ -110,7 +110,7 @@ export class BlockRepository {
    * @param blockIdentifier - The block index (number) or block hash (string).
    * @returns A promise that resolves to an array of related blocks.
    */
-  static async get_related_blocks_with_client(
+  static async getRelatedBlocksWithStampsFromDb(
     client: Client,
     blockIdentifier: number | string,
   ) {
@@ -141,7 +141,7 @@ export class BlockRepository {
       handleSqlQueryWithCache(
         client,
         `
-      SELECT block_index, COUNT(*) AS issuances
+      SELECT block_index, COUNT(*) AS stampcount
       FROM ${STAMP_TABLE}
       WHERE block_index >= ? - 2
       AND block_index <= ? + 2
@@ -153,7 +153,7 @@ export class BlockRepository {
     ]);
 
     const stampMap = new Map(
-      stamps.rows.map((row) => [row.block_index, row.issuances]),
+      stamps.rows.map((row) => [row.block_index, row.stampcount]),
     );
 
     const result = blocks.rows.map((block) => ({

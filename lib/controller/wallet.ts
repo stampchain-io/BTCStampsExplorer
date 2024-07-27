@@ -7,6 +7,7 @@ import {
 import { getBtcAddressInfo } from "../utils/btc.ts";
 import { paginate } from "../utils/util.ts";
 import { SRC20Repository } from "$lib/database/src20Repository.ts";
+import { StampService } from "$lib/services/stampService.ts";
 
 export const api_get_src20_valid_tx = async (tx_hash: string) => {
   try {
@@ -30,6 +31,7 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
 };
 
 /**
+ * @deprecated use controller functions
  * Retrieves the balance information for a given address.
  * @param address - The address for which to retrieve the balance.
  * @param limit - The maximum number of results to return per page. Default is 50.
@@ -53,8 +55,7 @@ export const api_get_balance = async (
     const btcInfo = await getBtcAddressInfo(address); // frequently getting conn reset errors https://mempool.space/api/address/bc1qhy4t0j60sysrfmp6e5g0h67rthtvz4ktnggjpu): connection error: connection reset
     let stamps;
     if (total !== 0) {
-      stamps = await StampRepository.getStampBalancesByAddressFromDb(
-        client,
+      stamps = await StampService.getStampBalancesByAddress(
         address,
         limit,
         page,
@@ -64,7 +65,7 @@ export const api_get_balance = async (
     }
     const src20 = await SRC20Repository.getSrc20BalanceFromDb(
       client,
-      { address, tick: undefined, limit, page, amt: undefined, sort: "ASC" },
+      { address, limit, page, sort: "ASC", tick: undefined, amt: undefined },
     );
     releaseClient(client);
     return {

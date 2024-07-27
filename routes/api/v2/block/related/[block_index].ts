@@ -21,7 +21,10 @@ export const handler = async (
   const type = isStamps ? "stamps" : "cursed";
 
   try {
-    const blockInfo = await BlockService.getBlockInfo(blockIdentifier, type);
+    const blockInfo = await BlockService.getBlockInfoWithStamps(
+      blockIdentifier,
+      type,
+    );
     const response = BlockService.transformToBlockInfoResponse(blockInfo);
     return ResponseUtil.success(response);
   } catch (error) {
