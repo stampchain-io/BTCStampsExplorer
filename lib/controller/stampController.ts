@@ -1,8 +1,9 @@
 import { StampService } from "$lib/services/stampService.ts";
 import { filterData, sortData } from "utils/stampUtils.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
-import { HolderRow, SRC20Row } from "globals";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { HolderRow } from "globals";
+import { Src20Service } from "$lib/services/src20Service.ts";
+import { formatSRC20Row } from "utils/src20Utils.ts";
 
 export class StampController {
   static async getStampDetailsById(id: string) {
@@ -61,7 +62,8 @@ export class StampController {
         sort_order: orderBy.toLowerCase() as "asc" | "desc",
         type: "stamps",
         ident: typeBy,
-        no_pagination: true,
+        noPagination: false,
+        all_columns: false,
       });
 
       const sortedAndFilteredStamps = sortData(
@@ -92,7 +94,9 @@ export class StampController {
 
   static async getStamp(id: string) {
     try {
-      const result = await StampService.getStamp(id);
+      const result = await StampService.getStamps({
+        identifier: id,
+      });
 
       if (!result) {
         return null;
@@ -117,10 +121,10 @@ export class StampController {
         const serviceResult = await StampService.getStamps({
           page: 1,
           page_size: category.limit,
-          sort_order: "asc",
+          sort_order: "desc",
           type: "stamps",
           ident: category.types,
-          no_pagination: false,
+          noPagination: false,
         });
 
         return {
@@ -140,57 +144,58 @@ export class StampController {
     page_size: number,
     filterBy: string[] = [],
     sortBy: string = "none",
-    orderBy: "ASC" | "DESC" = "DESC",
+    orderBy: "DESC" | "ASC" = "DESC",
   ) {
-    if (!type) {
-      const stampCategories = await this.getMultipleStampCategories([
-        { types: ["STAMP", "SRC-721"], limit: 6 },
-        { types: ["SRC-721"], limit: 6 },
-        { types: ["STAMP"], limit: 6 },
-        { types: ["SRC-20"], limit: 6 },
-      ]);
+    try {
+      if (!type) {
+        const [stampCategories, src20Result] = await Promise.all([
+          this.getMultipleStampCategories([
+            { types: ["STAMP", "SRC-721"], limit: 6 },
+            { types: ["SRC-721"], limit: 6 },
+            { types: ["STAMP"], limit: 6 },
+            { types: ["SRC-20"], limit: 6 },
+          ]),
+          Src20Service.fetchAndFormatSrc20Data({
+            op: "DEPLOY",
+            page,
+            limit: page_size,
+          }),
+        ]);
 
-      const src20Result = await Src20Controller.getSrc20s(page, page_size);
+        return {
+          stamps_recent: stampCategories[0].stamps,
+          stamps_src721: stampCategories[1].stamps,
+          stamps_art: stampCategories[2].stamps,
+          stamps_src20: stampCategories[3].stamps,
+          stamps_news: stampCategories[0].stamps,
+          src20s: src20Result.data.map(formatSRC20Row),
+          pages_src20: src20Result.pages,
+          page_src20: src20Result.page,
+          page_size_src20: src20Result.page_size,
+          type,
+        };
+      } else {
+        const typeBy = this.getTypeBy(type);
+        const stampResult = await this.getStamps(
+          page,
+          page_size,
+          orderBy,
+          sortBy,
+          filterBy,
+          typeBy,
+        );
 
-      return {
-        stamps_recent: stampCategories[0],
-        stamps_src721: stampCategories[1],
-        stamps_art: stampCategories[2],
-        stamps_src20: stampCategories[3],
-        stamps_news: stampCategories[0],
-        src20s: src20Result.src20s.map(this.formatSRC20Row),
-        pages_src20: src20Result.pages,
-        page_src20: src20Result.page,
-        page_size_src20: src20Result.page_size,
-        type,
-      };
-    } else {
-      const typeBy = this.getTypeBy(type);
-      const stampResult = await this.getStamps(
-        page,
-        page_size,
-        orderBy,
-        sortBy,
-        filterBy,
-        typeBy,
-      );
-
-      return {
-        ...stampResult,
-        filterBy,
-        sortBy,
-        type,
-      };
+        return {
+          ...stampResult,
+          filterBy,
+          sortBy,
+          type,
+        };
+      }
+    } catch (error) {
+      console.error("Error in getHomePageData:", error);
+      throw error;
     }
-  }
-
-  static formatSRC20Row(row: SRC20Row) {
-    return {
-      ...row,
-      max: row.max ? row.max.toString() : null,
-      lim: row.lim ? row.lim.toString() : null,
-      amt: row.amt ? row.amt.toString() : null,
-    };
   }
 
   static getTypeBy(type: string) {

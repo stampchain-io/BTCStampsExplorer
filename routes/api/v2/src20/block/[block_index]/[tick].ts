@@ -1,5 +1,5 @@
 // routes/block/[block_index]/[tick].ts
-import { handleSrc20TransactionsRequest } from "$lib/database/src20Transactions.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { FreshContext } from "$fresh/server.ts";
 import { convertEmojiToTick } from "$lib/utils/util.ts"; // Adjust import path as necessary
 
@@ -13,5 +13,5 @@ export const handler = (
     block_index: parseInt(block_index, 10),
     tick,
   };
-  return handleSrc20TransactionsRequest(req, params);
+  return Src20Controller.handleSrc20TransactionsRequest(req, params);
 };

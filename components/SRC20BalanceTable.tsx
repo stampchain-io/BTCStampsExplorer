@@ -1,5 +1,6 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
+import { SRC20Balance } from "globals";
 
 dayjs.extend(relativeTime);
 

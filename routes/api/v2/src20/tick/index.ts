@@ -1,5 +1,5 @@
 // routes/src20/tick
-import { handleSrc20TransactionsRequest } from "$lib/database/src20Transactions.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { FreshContext } from "$fresh/server.ts";
 
 export const handler = (
@@ -10,5 +10,5 @@ export const handler = (
     op: "DEPLOY",
   };
 
-  return handleSrc20TransactionsRequest(req, params);
+  return Src20Controller.handleSrc20TransactionsRequest(req, params);
 };

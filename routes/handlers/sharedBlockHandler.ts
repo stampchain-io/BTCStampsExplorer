@@ -26,7 +26,10 @@ export const sharedBlockHandler = async (
   const type = isStamps ? "stamps" : "cursed";
 
   try {
-    const body = await BlockService.getBlockInfo(blockIdentifier, type);
+    const body = await BlockService.getBlockInfoWithStamps(
+      blockIdentifier,
+      type,
+    );
     return ResponseUtil.success(body);
   } catch (error) {
     console.error(`Error in ${type}/block handler:`, error);

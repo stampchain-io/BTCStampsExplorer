@@ -1,3 +1,3 @@
-import { sharedBlockHandler } from "../../../../handlers/sharedBlockHandler.ts";
+import { sharedBlockHandler } from "$handlers/sharedBlockHandler.ts";
 
 export const handler = sharedBlockHandler;

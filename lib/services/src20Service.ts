@@ -1,103 +1,70 @@
-import { withDatabaseClient } from "./databaseService.ts";
-import { SRC20Repository } from "../database/src20Repository.ts";
-import { BlockService } from "./blockService.ts";
+import { withDatabaseClient } from "$lib/services/databaseService.ts";
+import { SRC20Repository } from "$lib/database/src20Repository.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 import { SRC20BalanceRequestParams, SRC20TrxRequestParams } from "globals";
 import {
   PaginatedSrc20BalanceResponseBody,
   PaginatedSrc20ResponseBody,
   Src20BalanceResponseBody,
+  Src20ResponseBody,
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
   Src20SnapshotResponseBody,
 } from "globals";
-import { convertToEmoji, paginate } from "utils/util.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
-
+import { formatSRC20Row } from "utils/src20Utils.ts";
+import { paginate } from "utils/util.ts";
+import { Big } from "$Big";
 export class Src20Service {
-  static async getSrc20s(page = 1, page_size = BIG_LIMIT) {
+  static async getTotalCountValidSrc20Tx(params: {
+    tick?: string;
+    op?: string;
+  }): Promise<number> {
     return await withDatabaseClient(async (client) => {
-      const [data, total, lastBlock] = await Promise.all([
-        SRC20Repository.getValidSrc20TxFromDb(
-          client,
-          null,
-          null,
-          "DEPLOY",
-          page_size,
-          page,
-        ),
-        SRC20Repository.getTotalCountValidSrc20TxFromDb(client, null, "DEPLOY"),
-        BlockService.getLastBlock(),
-      ]);
-
-      return {
-        src20s: data,
-        total: total.rows[0].total,
-        pages: Math.ceil(total.rows[0].total / page_size),
-        page: page,
-        page_size: page_size,
-        last_block: lastBlock.last_block,
-      };
+      const result = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
+        client,
+        params,
+      );
+      return result.rows[0].total;
     });
   }
-  static async fetchAndFormatSrc20Transactions(
-    params: SRC20TrxRequestParams,
-  ): Promise<PaginatedSrc20ResponseBody> {
+
+  static async fetchAndFormatSrc20Data(
+    params: SRC20TrxRequestParams = {},
+  ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
     return await withDatabaseClient(async (client) => {
       try {
         // Sanitize string parameters
         const sanitizedParams = {
           ...params,
-          tick: params.tick ? params.tick.replace(/[^\w-]/g, "") : params.tick,
+          tick: params.tick
+            ? (Array.isArray(params.tick)
+              ? params.tick.map((t) => t.replace(/[^\w-]/g, ""))
+              : params.tick.replace(/[^\w-]/g, ""))
+            : params.tick,
           op: params.op ? params.op.replace(/[^\w-]/g, "") : params.op,
           tx_hash: params.tx_hash
             ? params.tx_hash.replace(/[^\w-]/g, "")
             : params.tx_hash,
         };
 
-        const [valid_src20_txs_in_block, totalResult, lastBlock] = await Promise
-          .all([
-            SRC20Repository.getValidSrc20TxFromDb(client, sanitizedParams),
-            SRC20Repository.getTotalCountValidSrc20TxFromDb(
-              client,
-              sanitizedParams,
-            ),
-            BlockService.getLastBlock(),
-          ]);
-
-        const total = totalResult.rows[0]["total"];
-        const pagination = paginate(total, params.page, params.limit);
-
-        const mappedData = this.mapTransactionData(
-          valid_src20_txs_in_block.rows,
-        );
-
-        return {
-          ...pagination,
-          last_block: lastBlock.last_block,
-          data: this.formatTransactionData(mappedData, params),
+        const isDeployQuery = !sanitizedParams.op &&
+          !sanitizedParams.block_index && !sanitizedParams.tx_hash;
+        const queryParams: SRC20TrxRequestParams = {
+          ...sanitizedParams,
+          op: isDeployQuery ? "DEPLOY" : sanitizedParams.op,
+          tick: Array.isArray(sanitizedParams.tick)
+            ? sanitizedParams.tick[0]
+            : sanitizedParams.tick,
+          limit: sanitizedParams.limit || BIG_LIMIT,
+          page: sanitizedParams.page || 1,
+          sort: sanitizedParams.sort || "ASC",
         };
-      } catch (error) {
-        console.error("Error in fetchAndFormatSrc20Transactions:", error);
-        if (error.message.includes("Stamps Down")) {
-          throw new Error("Stamps Down...");
-        }
-        throw error;
-      }
-    });
-  }
 
-  static async fetchSrc20Data(params: Partial<SRC20TrxRequestParams> = {}) {
-    return await withDatabaseClient(async (client) => {
-      try {
-        const isDeployQuery = !params.op && !params.block_index &&
-          !params.tx_hash;
-        const queryParams = isDeployQuery
-          ? {
-            op: "DEPLOY",
-            limit: params.limit || BIG_LIMIT,
-            page: params.page || 1,
-          }
-          : params;
+        // Ensure we're querying for DEPLOY operations
+        if (isDeployQuery || queryParams.op === "DEPLOY") {
+          queryParams.op = "DEPLOY";
+        }
 
         const [data, totalResult, lastBlock] = await Promise.all([
           SRC20Repository.getValidSrc20TxFromDb(client, queryParams),
@@ -109,18 +76,28 @@ export class Src20Service {
         const pagination = paginate(total, queryParams.page, queryParams.limit);
 
         const mappedData = this.mapTransactionData(data.rows);
+        const formattedData = this.formatTransactionData(
+          mappedData,
+          queryParams,
+        );
 
-        const formattedData = isDeployQuery
-          ? { src20s: mappedData }
-          : { data: this.formatTransactionData(mappedData, queryParams) };
+        if (
+          params.singleResult && Array.isArray(formattedData) &&
+          formattedData.length > 0
+        ) {
+          return {
+            last_block: lastBlock.last_block,
+            data: formattedData[0],
+          };
+        }
 
         return {
           ...pagination,
-          ...formattedData,
           last_block: lastBlock.last_block,
+          data: Array.isArray(formattedData) ? formattedData : [formattedData],
         };
       } catch (error) {
-        console.error("Error in fetchSrc20Data:", error);
+        console.error("Error in fetchAndFormatSrc20Data:", error);
         if (error.message.includes("Stamps Down")) {
           throw new Error("Stamps Down...");
         }
@@ -133,19 +110,25 @@ export class Src20Service {
     params: SRC20BalanceRequestParams,
   ): Promise<Src20BalanceResponseBody> {
     return await withDatabaseClient(async (client) => {
-      const [src20, lastBlock] = await Promise.all([
-        SRC20Repository.getSrc20BalanceFromDb(client, params),
-        BlockService.getLastBlock(),
-      ]);
+      try {
+        const [src20, lastBlock] = await Promise.all([
+          SRC20Repository.getSrc20BalanceFromDb(client, params),
+          BlockService.getLastBlock(),
+        ]);
 
-      if (!src20) {
-        throw new Error("SRC20 balance not found");
+        if (!src20) {
+          throw new Error("SRC20 balance not found");
+        }
+
+        return {
+          last_block: lastBlock.last_block,
+          data: src20,
+        };
+      } catch (error) {
+        console.error("Error in fetchAndFormatSrc20Balance:", error);
+        console.error("Params:", params);
+        throw error;
       }
-
-      return {
-        last_block: lastBlock.last_block,
-        data: src20,
-      };
     });
   }
 
@@ -190,13 +173,7 @@ export class Src20Service {
   }
 
   private static mapTransactionData(rows: any[]) {
-    return rows.map((tx: any) => ({
-      ...tx,
-      tick: convertToEmoji(tx.tick),
-      amt: tx.amt ? tx.amt.toString() : null,
-      lim: tx.lim ? tx.lim.toString() : null,
-      max: tx.max ? tx.max.toString() : null,
-    }));
+    return rows.map(formatSRC20Row);
   }
 
   private static formatTransactionData(

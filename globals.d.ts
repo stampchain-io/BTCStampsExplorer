@@ -1,7 +1,7 @@
 // General Types ---------------------------------------------------------------
 
 type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
-import Big from "https://esm.sh/big.js";
+import Big from "$Big";
 
 interface BlockRow {
   block_index: number;
@@ -46,10 +46,10 @@ export interface SRC20Row {
   tick_hash: string;
   creator: string;
   creator_name: string;
-  amt?: string | number;
+  amt?: string | bigint;
   deci?: number;
-  max?: string | number;
-  lim?: string | number;
+  max?: string | bigint;
+  lim?: string | bigint;
   destination: string;
   destination_name?: string;
   block_time: Date;
@@ -63,7 +63,7 @@ interface SendRow {
   cpid: string | null;
   tick: string | null;
   memo: string;
-  quantity: bigint;
+  quantity: string | bigint;
   tx_hash: string;
   block_index: number;
   satoshirate: number | null;
@@ -209,6 +209,8 @@ export interface SRC20TrxRequestParams {
   sort?: string;
   tx_hash?: string | null;
   address?: string | null;
+  noPagination?: boolean;
+  singleResult?: boolean;
 }
 
 export interface SRC20BalanceRequestParams {

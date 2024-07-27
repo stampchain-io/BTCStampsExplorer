@@ -110,7 +110,7 @@ function replacer(_key, value) {
 export async function handleCache(
   key: string,
   fetchFunction: () => Promise<any>,
-  ttl: number | "never",
+  cacheDuration: number | "never",
 ) {
   const cacheKey = generateCacheKey(key);
   let entry;
@@ -149,7 +149,9 @@ export async function handleCache(
 
     const fetchPromise = fetchFunction().then(async (data) => {
       ongoingFetches.delete(cacheKey);
-      const expiry = ttl === "never" ? "never" : Date.now() + ttl;
+      const expiry = cacheDuration === "never"
+        ? "never"
+        : Date.now() + cacheDuration;
 
       if (expiry !== "never" && typeof expiry !== "number") {
         throw new Error("Invalid expiry value");
@@ -192,7 +194,7 @@ export function handleSqlQueryWithCache(
   client: Client,
   query: string,
   params: any[],
-  ttl: number | "never",
+  cacheDuration: number | "never",
 ) {
   if (conf.ENV === "development" || conf.CACHE?.toLowerCase() === "false") {
     return handleQueryWithClient(client, query, params);
@@ -209,14 +211,14 @@ export function handleSqlQueryWithCache(
         throw error;
       }
     },
-    ttl,
+    cacheDuration,
   );
 }
 
 export function handleApiRequestWithCache(
   method: string,
   params: XCPParams,
-  ttl: number | "never",
+  cacheDuration: number | "never",
 ) {
   if (conf.ENV === "development" || conf.CACHE?.toLowerCase() === "false") {
     return handleQuery(CreatePayload(method, params));
@@ -233,7 +235,7 @@ export function handleApiRequestWithCache(
         throw error;
       }
     },
-    ttl,
+    cacheDuration,
   );
 }
 
