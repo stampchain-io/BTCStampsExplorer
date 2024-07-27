@@ -7,7 +7,7 @@ export const STAMP_TABLE = "StampTableV4";
 export const BLOCK_TABLE = "blocks";
 export const SRC20_TABLE = "SRC20Valid";
 export const SRC20_BALANCE_TABLE = "balances";
-export const TTL_CACHE = 1000 * 60 * 60 * 12; // 12 hours
+export const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
 
 export const BIG_LIMIT = 200;
 export const SMALL_LIMIT = 50;

@@ -9,11 +9,11 @@ import { BlockInfo, StampRow } from "globals";
 
 dayjs.extend(relativeTime);
 
-interface BlockIssuancesTableProps {
+interface BlockStampsTableProps {
   block: BlockInfo;
 }
 
-export default function BlockIssuancesTable(props: BlockIssuancesTableProps) {
+export default function BlockStampsTable(props: BlockStampsTableProps) {
   const { block_info, issuances } = props.block;
 
   return (

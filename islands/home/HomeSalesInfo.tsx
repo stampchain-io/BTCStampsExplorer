@@ -36,7 +36,7 @@ export function HomeSalesInfo(
       <div>
         <div class="flex justify-between items-end">
           <p class="text-2xl md:text-4xl text-[#F5F5F5]">
-            Latest Src721/721r Stamps
+            Latest SRC-721/721R Stamps
           </p>
           <a href="/home?type=src721">See all</a>
         </div>
@@ -67,7 +67,9 @@ export function HomeSalesInfo(
 
       <div>
         <div class="flex justify-between items-end">
-          <p class="text-2xl md:text-4xl text-[#F5F5F5]">Latest Src20 Stamps</p>
+          <p class="text-2xl md:text-4xl text-[#F5F5F5]">
+            Latest SRC-20 Stamps
+          </p>
           <a href="/home?type=src20">See all</a>
         </div>
         <div class="flex overflow-x-auto">

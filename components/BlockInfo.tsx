@@ -1,6 +1,7 @@
-import BlockHeaderTable from "$/components/BlockHeaderTable.tsx";
-import BlockIssuancesTable from "$/components/BlockIssuancesTable.tsx";
+// import BlockHeaderTable from "$/components/BlockHeaderTable.tsx";
+import BlockStampsTable from "$/components/BlockStampsTable.tsx";
 // import BlockSendsTable from "$/components/BlockSendsTable.tsx";
+import type { BlockInfo } from "globals";
 
 interface BlockInfoProps {
   block: BlockInfo;
@@ -12,7 +13,7 @@ export default function BlockInfo(props: BlockInfoProps) {
   return (
     <div class="sm:p-1 relative overflow-x-auto shadow-lg sm:rounded-lg h-full flex flex-col justify-around gap-4">
       {/* <BlockHeaderTable block={block} /> */}
-      <BlockIssuancesTable block={block} />
+      <BlockStampsTable block={block} />
       {/* <BlockSendsTable block={block} /> */}
     </div>
   );

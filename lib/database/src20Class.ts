@@ -1,18 +1,16 @@
 import { Client } from "$mysql/mod.ts";
-import {
-  BIG_LIMIT,
-  SMALL_LIMIT,
-  SRC20_BALANCE_TABLE,
-  SRC20_TABLE,
-} from "constants";
+import { BIG_LIMIT, SRC20_BALANCE_TABLE, SRC20_TABLE } from "constants";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { BigFloat } from "bigfloat/mod.ts";
-import { conf } from "../../lib/utils/config.ts";
+import { conf } from "utils/config.ts";
 
 // NOTE: To compare tick use this ones below:
 //  tick COLLATE utf8mb4_0900_as_ci = '${tick}'
 //  tick = CONVERT('${tick}' USING utf8mb4) COLLATE utf8mb4_0900_as_ci
 export class Src20Class {
+  /**
+   * @deprecated This method will be removed in the next major version. Use Src20Controller.getTotalCountValidSrc20TxFromDb instead.
+   */
   static async get_total_valid_src20_tx_with_client(
     client: Client,
     tick: string | null = null,
@@ -66,6 +64,9 @@ export class Src20Class {
     );
   }
 
+  /**
+   * @deprecated This method will be removed in the next major version. Use getValidSrc20TxFromDb instead.
+   */
   static async get_valid_src20_tx_with_client(
     client: Client,
     block_index: number | null = null,
@@ -164,6 +165,9 @@ export class Src20Class {
     );
   }
 
+  /**
+   * @deprecated This method will be removed in the next major version. Use  instead.
+   */
   static async get_src20_balance_with_client(
     client: Client,
     address: string | null = null,
@@ -248,6 +252,9 @@ export class Src20Class {
       : resultsWithDeployImg;
   }
 
+  /**
+   * @deprecated This method will be removed in the next major version. Use  instead.
+   */
   static async get_total_src20_holders_by_tick_with_client(
     client: Client,
     tick: string | null = null,
@@ -283,6 +290,9 @@ export class Src20Class {
     );
   }
 
+  /**
+   * @deprecated This method will be removed in the next major version. Use  instead.
+   */
   static async get_src20_minting_progress_by_tick_with_client(
     client: Client,
     tick: string,
@@ -343,6 +353,9 @@ export class Src20Class {
     };
   }
 
+  /**
+   * @deprecated This method will be removed in the next major version. Use  instead.
+   */
   static async get_src20_minting_progress_by_tick_with_client_new(
     client: Client,
     tick: string,

@@ -3,19 +3,30 @@ import { Client } from "$mysql/mod.ts";
 import { conf } from "utils/config.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { bigFloatToString } from "utils/util.ts";
-import { SRC20_TABLE } from "constants";
-import { BIG_LIMIT, SRC20_BALANCE_TABLE } from "utils/constants.ts";
-import { SRC20BalanceRequestParams, SRC20SnapshotRequestParams } from "globals";
+import {
+  BIG_LIMIT,
+  SRC20_BALANCE_TABLE,
+  SRC20_TABLE,
+} from "utils/constants.ts";
+import {
+  SRC20BalanceRequestParams,
+  SRC20SnapshotRequestParams,
+  SRC20TrxRequestParams,
+} from "globals";
 
 export class SRC20Repository {
   static async getTotalCountValidSrc20TxFromDb(
     client: Client,
-    tick: string | null = null,
-    op: string | null = null,
-    block_index: number | null = null,
-    tx_hash: string | null = null,
-    address: string | null = null,
+    params: SRC20TrxRequestParams,
   ) {
+    const {
+      tick = null,
+      op = null,
+      block_index = null,
+      tx_hash = null,
+      address = null,
+    } = params;
+
     const queryParams = [];
     const whereConditions = [];
 
@@ -63,56 +74,57 @@ export class SRC20Repository {
 
   static async getValidSrc20TxFromDb(
     client: Client,
-    block_index: number | null = null,
-    tick: string | string[] | null = null,
-    op: string | null = null,
-    limit = BIG_LIMIT,
-    page = 0,
-    sort = "ASC",
-    tx_hash: string | null = null,
-    address: string | null = null,
+    params: SRC20TrxRequestParams,
   ) {
-    const queryParams = [];
-    let whereClause = "";
+    const {
+      block_index,
+      tick,
+      op,
+      limit = BIG_LIMIT,
+      page = 1,
+      sort = "ASC",
+      tx_hash,
+      address,
+    } = params;
 
-    if (block_index !== null) {
-      whereClause += `src20.block_index = ?`;
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (block_index !== undefined) {
+      whereConditions.push(`src20.block_index = ?`);
       queryParams.push(block_index);
     }
 
-    if (tick !== null) {
+    if (tick !== undefined) {
       if (Array.isArray(tick)) {
         const tickPlaceholders = tick.map(() => "?").join(", ");
-        whereClause += (whereClause ? " AND " : "") +
-          `src20.tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})`;
+        whereConditions.push(
+          `src20.tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})`,
+        );
         queryParams.push(...tick);
       } else {
-        whereClause += (whereClause ? " AND " : "") +
-          `src20.tick COLLATE utf8mb4_0900_as_ci = ?`;
+        whereConditions.push(`src20.tick COLLATE utf8mb4_0900_as_ci = ?`);
         queryParams.push(tick);
       }
     }
 
-    if (op !== null) {
-      whereClause += (whereClause ? " AND " : "") + `src20.op = ?`;
+    if (op !== undefined) {
+      whereConditions.push(`src20.op = ?`);
       queryParams.push(op);
     }
 
-    if (tx_hash !== null) {
-      whereClause += (whereClause ? " AND " : "") + `src20.tx_hash = ?`;
+    if (tx_hash !== undefined) {
+      whereConditions.push(`src20.tx_hash = ?`);
       queryParams.push(tx_hash);
     }
 
-    if (address !== null) {
-      whereClause += (whereClause ? " AND " : "") +
-        `(src20.creator = ? OR src20.destination = ?)`;
+    if (address !== undefined) {
+      whereConditions.push(`(src20.creator = ? OR src20.destination = ?)`);
       queryParams.push(address, address);
     }
-
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    if (limit) {
-      queryParams.push(limit, offset);
-    }
+    const safePage = Math.max(1, Number(page));
+    const safeLimit = Number(limit) || BIG_LIMIT;
+    const offset = safeLimit * (safePage - 1);
 
     const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
       ? sort.toUpperCase()
@@ -143,13 +155,17 @@ export class SRC20Repository {
         creator destination_info ON src20.destination = destination_info.address
       CROSS JOIN
         (SELECT @row_number := ?) AS init
-      ${whereClause ? `WHERE ${whereClause}` : ""}
+      ${
+      whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""
+    }
       ORDER BY 
         src20.tx_index ${validOrder}
-      ${limit ? `LIMIT ? OFFSET ?` : ""};
+      LIMIT ? OFFSET ?;
     `;
 
     queryParams.unshift(offset);
+
+    queryParams.push(safeLimit, offset);
 
     return await handleSqlQueryWithCache(
       client,
@@ -161,7 +177,7 @@ export class SRC20Repository {
 
   static async getSrc20BalanceFromDb(
     client: Client,
-    params: SRC20BalanceRequestParams & SRC20SnapshotRequestParams,
+    params: Partial<SRC20BalanceRequestParams & SRC20SnapshotRequestParams>,
   ) {
     const { address, tick, amt, limit, page, sort: sortBy = "ASC" } = params;
     const queryParams = [];
@@ -185,7 +201,7 @@ export class SRC20Repository {
       }
     }
 
-    if (amt > 0) {
+    if (amt && amt > 0) {
       whereClauses.push(`amt > ?`);
       queryParams.push(amt);
     }
@@ -216,22 +232,27 @@ export class SRC20Repository {
 
     // Retrieve transaction hashes for the ticks
     const ticksToQuery = results.rows
-      ? results.rows.map((result) => result.tick)
+      ? results.rows.map((result: { tick: string }) => result.tick)
       : [];
-    const tx_hashes_response = await SRC20Repository
-      .getValidSrc20TxFromDb(
-        client,
-        null,
-        ticksToQuery.length > 0 ? ticksToQuery : tick,
-        "DEPLOY",
-      );
-    const tx_hashes_map = tx_hashes_response.rows.reduce((map, row) => {
-      map[row.tick] = row.tx_hash;
-      return map;
-    }, {});
+    const tx_hashes_response = await SRC20Repository.getValidSrc20TxFromDb(
+      client,
+      {
+        tick: ticksToQuery.length > 0 ? ticksToQuery : undefined,
+        op: "DEPLOY",
+      },
+    );
+    const tx_hashes_map = tx_hashes_response.rows.reduce(
+      (map: Record<string, string>, row: { tick: string; tx_hash: string }) => {
+        map[row.tick] = row.tx_hash;
+        return map;
+      },
+      {},
+    );
 
     // Add transaction hash and deploy image URL to each result
-    const resultsWithDeployImg = results.rows.map((result) => ({
+    const resultsWithDeployImg = results.rows.map((
+      result: { tick: string },
+    ) => ({
       ...result,
       deploy_tx: tx_hashes_map[result.tick],
       deploy_img: `${conf.IMAGES_SRC_PATH}/${tx_hashes_map[result.tick]}.svg`,

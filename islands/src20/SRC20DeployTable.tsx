@@ -31,6 +31,7 @@ const ImageModal = (
 
 export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
   const { data } = props;
+  // console.log("SRC20DeployTable received data:", data);
 
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);

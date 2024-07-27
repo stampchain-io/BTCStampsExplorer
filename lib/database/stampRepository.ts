@@ -1,5 +1,5 @@
 import { Client } from "$mysql/mod.ts";
-import { SMALL_LIMIT, STAMP_TABLE, TTL_CACHE } from "constants";
+import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
 import { get_balances } from "utils/xcp.ts";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
@@ -87,7 +87,7 @@ export class StampRepository {
         client,
         query,
         assets,
-        TTL_CACHE,
+        DEFAULT_CACHE_DURATION,
       );
       return balances;
     } catch (error) {
@@ -109,7 +109,7 @@ export class StampRepository {
       AND stamp IS NOT NULL;
       `,
       [identifier, identifier, identifier],
-      TTL_CACHE,
+      DEFAULT_CACHE_DURATION,
     );
     if (!data) return null;
     const ext = getFileSuffixFromMime(data.rows[0].stamp_mimetype);
@@ -127,8 +127,8 @@ export class StampRepository {
       identifier?: string | number;
       blockIdentifier?: number | string;
       all_columns?: boolean;
-      no_pagination?: boolean;
-      cache_duration?: number | "never";
+      noPagination?: boolean;
+      cacheDuration?: number | "never";
     },
   ) {
     const {
@@ -140,8 +140,8 @@ export class StampRepository {
       identifier,
       blockIdentifier,
       all_columns = false,
-      no_pagination = false,
-      cache_duration = 1000 * 60 * 3,
+      noPagination = false,
+      cacheDuration = 1000 * 60 * 3,
     } = options;
 
     const whereConditions = [];
@@ -239,7 +239,7 @@ export class StampRepository {
     let limitClause = "";
     let offsetClause = "";
 
-    if (!no_pagination) {
+    if (!noPagination) {
       limitClause = `LIMIT ${limit}`;
       const offset = (page - 1) * limit;
       offsetClause = `OFFSET ${offset}`;
@@ -262,7 +262,7 @@ export class StampRepository {
       client,
       query,
       queryParams,
-      cache_duration,
+      cacheDuration,
     );
     console.log(`Query result:`, result);
 
@@ -320,7 +320,7 @@ export class StampRepository {
         client,
         query,
         assets,
-        TTL_CACHE,
+        DEFAULT_CACHE_DURATION,
       );
 
       const grouped = balances.rows.reduce(

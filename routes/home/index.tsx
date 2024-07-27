@@ -39,13 +39,13 @@ export const handler: Handlers = {
     try {
       const url = new URL(req.url);
       const type = url.searchParams.get("type");
-      const page = Number(url.searchParams.get("page")) || 1;
+      const page = Number(url.searchParams.get("page")) || 0;
       const page_size = Number(url.searchParams.get("limit")) ||
         (type ? 24 : 10);
       const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
       const sortBy = url.searchParams.get("sortBy") || "none";
       const orderByParam = url.searchParams.get("orderBy")?.toUpperCase();
-      const orderBy = orderByParam === "DESC" || orderByParam === "ASC"
+      const orderBy = orderByParam === "DESC" || orderByParam === "DESC"
         ? orderByParam
         : "DESC";
 
@@ -87,7 +87,7 @@ export default function Home(props: HomePageProps) {
   } = props.data;
 
   const stampDetailsInfoTitle: { [key: string]: string } = {
-    "recent": "Recent Sales",
+    "recent": "Recent Sales", // TODO: need to fecth these from the xcp api
     "src721": "Src721",
     "art": "Art",
     "src20": "Src20",

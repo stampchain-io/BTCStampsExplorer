@@ -7,7 +7,7 @@ import {
 import { getClient, Src20Class } from "$lib/database/index.ts";
 import { Client } from "$mysql/mod.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
-import Big from "https://esm.sh/big.js";
+import { Big } from "$Big";
 import { Src20SnapShotDetail } from "globals";
 import { BlockService } from "$lib/services/blockService.ts";
 

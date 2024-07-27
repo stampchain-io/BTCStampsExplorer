@@ -10,6 +10,7 @@ import {
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { SRC20Repository } from "$lib/database/src20Repository.ts";
+import { BIG_LIMIT } from "utils/constants.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -18,22 +19,16 @@ export const handler = async (
   let { tick } = ctx.params;
   try {
     const url = new URL(req.url);
-    const limit = Number(url.searchParams.get("limit")) || 1000;
+    const limit = Number(url.searchParams.get("limit")) || BIG_LIMIT;
     const page = Number(url.searchParams.get("page")) || 1;
     const op = url.searchParams.get("op");
     const sort = url.searchParams.get("sort") || "ASC";
     const client = await getClient();
     tick = convertEmojiToTick(String(tick));
-    const src20_txs = await SRC20Repository
-      .getValidSrc20TxFromDb(
-        client,
-        null,
-        tick,
-        op,
-        limit,
-        page,
-        sort,
-      );
+    const src20_txs = await SRC20Repository.getValidSrc20TxFromDb(
+      client,
+      { tick, op, limit, page, sort },
+    );
 
     const total = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
       client,

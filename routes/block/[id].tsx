@@ -2,12 +2,13 @@ import { useSignal } from "@preact/signals";
 
 import { BlockInfoResponseBody, BlockRow } from "globals";
 
-import { Handler, HandlerContext, Handlers, PageProps } from "$fresh/server.ts";
+import { FreshContext, Handlers } from "$fresh/server.ts";
+
 import { BlockService } from "$lib/services/blockService.ts";
 import BlockInfo from "$components/BlockInfo.tsx";
-import BlockHeader from "$islands/block/BlockHeader.tsx";
+// import BlockHeader from "$islands/block/BlockHeader.tsx";
 import BlockTransactions from "$islands/block/BlockTransactions.tsx";
-import BlockSelector from "$islands/block/BlockSelector.tsx";
+// import BlockSelector from "$islands/block/BlockSelector.tsx";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
@@ -20,7 +21,7 @@ type BlockPageProps = {
 };
 
 export const handler: Handlers<BlockRow[]> = {
-  async GET(_req: Request, ctx: HandlerContext) {
+  async GET(_req: Request, ctx: FreshContext) {
     let blockIdentifier: number | string;
     if (!ctx.params.id || isNaN(Number(ctx.params.id))) {
       const { last_block } = await BlockService.getLastBlock();
@@ -30,14 +31,14 @@ export const handler: Handlers<BlockRow[]> = {
     }
 
     try {
-      const stampBlockResponse = await BlockService.getBlockInfo(
+      const stampBlockResponse = await BlockService.getBlockInfoWithStamps(
         blockIdentifier,
         "stamps",
       );
       const block = BlockService.transformToBlockInfoResponse(
         stampBlockResponse,
       );
-      const related_blocks = await BlockService.getRelatedBlocks(
+      const related_blocks = await BlockService.getRelatedBlocksWithStamps(
         blockIdentifier,
       );
 
@@ -79,7 +80,12 @@ export function BlockPage(props: BlockPageProps) {
           </div>
           <div>
             <p className="text-white text-[26px]">Stamps Block Data</p>
-            <p className="text-[#6E6E6E]">Today-April 2024</p>
+            <p className="text-[#6E6E6E]">
+              {new Date(block.block_info.block_time).toUTCString().replace(
+                / GMT$/,
+                " UTC",
+              ).slice(0, -4)}
+            </p>
           </div>
         </div>
         <div class="flex justify-between w-full md:w-auto gap-6">

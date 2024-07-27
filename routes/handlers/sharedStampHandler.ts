@@ -3,7 +3,7 @@ import { StampRepository } from "$lib/database/index.ts";
 import { paginate } from "$lib/utils/util.ts";
 import { PaginatedStampResponseBody } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { getPaginationParams } from "utils/paginationUtils.ts";
 import { withDatabaseClient } from "$lib/services/databaseService.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { StampController } from "$lib/controller/stampController.ts";

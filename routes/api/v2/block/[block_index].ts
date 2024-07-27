@@ -28,7 +28,10 @@ export const handler = async (
     : "all";
 
   try {
-    const blockInfo = await BlockService.getBlockInfo(blockIdentifier, type);
+    const blockInfo = await BlockService.getBlockInfoWithStamps(
+      blockIdentifier,
+      type,
+    );
     const response = BlockService.transformToBlockInfoResponse(blockInfo);
     return ResponseUtil.success(response);
   } catch (error) {

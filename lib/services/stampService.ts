@@ -17,8 +17,8 @@ export class StampService {
         const stampResult = await StampRepository.getStampsFromDb(client, {
           identifier: id,
           all_columns: true,
-          no_pagination: true,
-          cache_duration: "never",
+          noPagination: true,
+          cacheDuration: "never",
         });
 
         console.log(`Query result:`, stampResult);
@@ -65,18 +65,34 @@ export class StampService {
     ident?: string | string[];
     identifier?: string | number;
     all_columns?: boolean;
-    no_pagination?: boolean;
+    noPagination?: boolean;
   }) {
     return await withDatabaseClient(async (client) => {
       try {
+        const isSingleStamp = !!options.identifier;
         const [stamps, total] = await Promise.all([
-          StampRepository.getStampsFromDb(client, options),
+          StampRepository.getStampsFromDb(client, {
+            ...options,
+            all_columns: isSingleStamp ? true : options.all_columns,
+            noPagination: isSingleStamp ? true : options.noPagination,
+            cacheDuration: isSingleStamp ? "never" : undefined,
+          }),
           StampRepository.getTotalStampCountFromDb(
             client,
             options.type || "stamps",
             options.ident,
           ),
         ]);
+
+        if (isSingleStamp) {
+          if (!stamps.rows.length) {
+            return null;
+          }
+          return {
+            stamp: stamps.rows[0],
+            total: total.rows[0].total,
+          };
+        }
 
         return {
           stamps: stamps.rows,
@@ -87,37 +103,6 @@ export class StampService {
         throw error;
       }
     });
-  }
-
-  static async getStamp(id: string) {
-    try {
-      return await withDatabaseClient(async (client) => {
-        const stampResult = await StampRepository.getStampsFromDb(client, {
-          identifier: id,
-          all_columns: true,
-          no_pagination: true,
-          cache_duration: "never",
-        });
-
-        if (!stampResult || stampResult.rows.length === 0) {
-          return null;
-        }
-
-        const stamp = stampResult.rows[0];
-        const total = await StampRepository.getTotalStampCountFromDb(
-          client,
-          "stamps",
-        );
-
-        return {
-          stamp,
-          total: total.rows[0].total,
-        };
-      });
-    } catch (error) {
-      console.error("Error in getStamp:", error);
-      throw error;
-    }
   }
 
   static async getStampFile(id: string) {
@@ -132,7 +117,11 @@ export class StampService {
       }
 
       if (file_name.indexOf(".unknown") > -1) {
-        const stampData = await this.getStamp(id);
+        const stampData = await this.getStamps({
+          identifier: id,
+          all_columns: true,
+          noPagination: true,
+        });
         if (stampData && stampData.stamp && "stamp_base64" in stampData.stamp) {
           return { type: "base64", base64: stampData.stamp.stamp_base64 };
         } else {
@@ -141,6 +130,30 @@ export class StampService {
       }
 
       return { type: "redirect", fileName: file_name };
+    });
+  }
+
+  static async getStampBalancesByAddress(
+    address: string,
+    limit: number,
+    page: number,
+  ) {
+    return await withDatabaseClient(async (client) => {
+      const totalStamps = await StampRepository
+        .getCountStampBalancesByAddressFromDb(client, address);
+      const total = totalStamps.rows[0]?.total || 0;
+
+      let stamps = [];
+      if (total !== 0) {
+        stamps = await StampRepository.getStampBalancesByAddressFromDb(
+          client,
+          address,
+          limit,
+          page,
+        );
+      }
+
+      return { stamps, total };
     });
   }
 }

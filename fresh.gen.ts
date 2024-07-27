@@ -4,6 +4,7 @@
 
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
+import * as $api_404 from "./routes/api/_404.ts";
 import * as $api_v2_404 from "./routes/api/v2/_404.ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
@@ -18,7 +19,6 @@ import * as $api_v2_docs from "./routes/api/v2/docs.ts";
 import * as $api_v2_error from "./routes/api/v2/error.ts";
 import * as $api_v2_health from "./routes/api/v2/health.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
-import * as $api_v2_shared_sharedBlockHandler from "./routes/api/v2/shared/sharedBlockHandler.ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
 import * as $api_v2_src20_balance_snapshot_tick_ from "./routes/api/v2/src20/balance/snapshot/[tick].ts";
@@ -106,6 +106,7 @@ const manifest = {
   routes: {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
+    "./routes/api/_404.ts": $api_404,
     "./routes/api/v2/_404.ts": $api_v2_404,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
@@ -124,8 +125,6 @@ const manifest = {
     "./routes/api/v2/error.ts": $api_v2_error,
     "./routes/api/v2/health.ts": $api_v2_health,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
-    "./routes/api/v2/shared/sharedBlockHandler.ts":
-      $api_v2_shared_sharedBlockHandler,
     "./routes/api/v2/src20/balance/[address].ts":
       $api_v2_src20_balance_address_,
     "./routes/api/v2/src20/balance/[address]/[tick].ts":

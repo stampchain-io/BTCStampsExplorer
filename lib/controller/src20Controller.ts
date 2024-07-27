@@ -5,42 +5,27 @@ import {
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
 } from "globals";
-import { BIG_LIMIT } from "utils/constants.ts";
 
 export class Src20Controller {
-  static async getSrc20s(page = 1, page_size = BIG_LIMIT) {
+  static async getTotalCountValidSrc20Tx(tick?: string, op?: string) {
     try {
-      const result = await Src20Service.getSrc20s(page, page_size);
-      return ResponseUtil.success(result);
+      const total = await Src20Service.getTotalCountValidSrc20Tx({ tick, op });
+      return ResponseUtil.success({ total });
     } catch (error) {
-      console.error("Error in Src20Controller.getSrc20s:", error);
-      return ResponseUtil.error("Error fetching SRC20s");
+      console.error("Error getting total valid SRC20 transactions:", error);
+      return ResponseUtil.error("Error getting total valid SRC20 transactions");
     }
   }
 
   static async handleSrc20TransactionsRequest(
-    req: Request,
-    params: Partial<SRC20TrxRequestParams>,
-  ) {
+    _req: Request,
+    params: SRC20TrxRequestParams,
+  ): Promise<Response> {
     try {
-      const url = new URL(req.url);
-      const finalParams: SRC20TrxRequestParams = {
-        ...params,
-        op: url.searchParams.get("op"),
-        limit: Number(url.searchParams.get("limit")) || BIG_LIMIT,
-        page: Number(url.searchParams.get("page")) || 1,
-        sort: url.searchParams.get("sort") || "ASC",
-      };
-
-      const responseBody = await Src20Service.fetchAndFormatSrc20Transactions(
-        finalParams,
-      );
-      return ResponseUtil.success(responseBody);
+      const src20Data = await Src20Service.fetchAndFormatSrc20Data(params);
+      return ResponseUtil.success(src20Data);
     } catch (error) {
-      console.error("Error processing SRC20 transactions request:", error);
-      if (error.message === "Stamps Down...") {
-        return ResponseUtil.error("Service temporarily unavailable", 503);
-      }
+      console.error("Error processing SRC20 transaction request:", error);
       return ResponseUtil.error(
         `Error: Internal server error. ${error.message || ""}`,
         500,
@@ -56,11 +41,13 @@ export class Src20Controller {
       return ResponseUtil.success(responseBody);
     } catch (error) {
       console.error("Error processing SRC20 balance request:", error);
+      console.error("Params:", JSON.stringify(params));
       if (error.message === "SRC20 balance not found") {
         return ResponseUtil.error("Error: SRC20 balance not found", 404);
       }
       return ResponseUtil.error(
         `Error: Internal server error. ${error.message || ""}`,
+        500,
       );
     }
   }
