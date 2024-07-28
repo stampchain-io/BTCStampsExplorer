@@ -12,7 +12,9 @@ export function StampDispensers(
 ) {
   return (
     <div className="relative overflow-x-auto shadow-md max-h-96 max-w-256">
-      <p class="text-[#F5F5F5] text-[26px] font-semibold">Dispensers (x10)</p>
+      <p class="text-[#F5F5F5] text-[26px] font-semibold">
+        Dispensers (count of dispensers)
+      </p>
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:rounded-lg">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>

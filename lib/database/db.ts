@@ -4,8 +4,6 @@ import { conf } from "utils/config.ts";
 const maxRetries = parseInt(conf.DB_MAX_RETRIES) || 5;
 const retryInterval = 500;
 
-let db: Client | null = null;
-
 class ConnectionPool {
   private pool: Client[] = [];
   private readonly maxPoolSize: number;
