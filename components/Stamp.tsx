@@ -13,7 +13,7 @@ export const Stamp = (
         class={`${className} aspect-square rounded-lg`}
         sandbox="allow-scripts allow-same-origin"
         src={`/content/${stamp.tx_hash}.${
-          getFileSuffixFromMime(stamp.stamp_mimetype)
+          getFileSuffixFromMime(stamp.stamp_mimetype) // FIXME: this is pointless if the file already contains a suffix
         }`}
         onError={(e) => {
           e.currentTarget.src = stamp.stamp_url;
@@ -41,7 +41,7 @@ export const Stamp = (
       loading="lazy"
       class={`max-w-none object-contain image-rendering-pixelated rounded-lg ${className} `}
       src={`/content/${stamp.tx_hash}.${
-        getFileSuffixFromMime(stamp.stamp_mimetype)
+        getFileSuffixFromMime(stamp.stamp_mimetype) // FIXME: this is pointless if the file already contains a suffix
       }`}
       onError={(e) => {
         e.currentTarget.src = `/content/not-available.png`;
