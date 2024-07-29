@@ -46,6 +46,7 @@ import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $cursed_index from "./routes/cursed/index.tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $handlers_sharedBlockHandler from "./routes/handlers/sharedBlockHandler.ts";
+import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
 import * as $home_index from "./routes/home/index.tsx";
 import * as $index from "./routes/index.tsx";
@@ -84,8 +85,8 @@ import * as $collection_CollectionHeader from "./islands/collection/CollectionHe
 import * as $collection_CollectionList from "./islands/collection/CollectionList.tsx";
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
-import * as $home_HomeSalesInfo from "./islands/home/HomeSalesInfo.tsx";
-import * as $home_HomeSalesInfoDetails from "./islands/home/HomeSalesInfoDetails.tsx";
+import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
+import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
@@ -161,6 +162,8 @@ const manifest = {
     "./routes/cursed/index.tsx": $cursed_index,
     "./routes/docs/index.tsx": $docs_index,
     "./routes/handlers/sharedBlockHandler.ts": $handlers_sharedBlockHandler,
+    "./routes/handlers/sharedCollectionHandler.ts":
+      $handlers_sharedCollectionHandler,
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
     "./routes/home/index.tsx": $home_index,
     "./routes/index.tsx": $index,
@@ -205,8 +208,8 @@ const manifest = {
     "./islands/collection/CollectionList.tsx": $collection_CollectionList,
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
-    "./islands/home/HomeSalesInfo.tsx": $home_HomeSalesInfo,
-    "./islands/home/HomeSalesInfoDetails.tsx": $home_HomeSalesInfoDetails,
+    "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
+    "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
     "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/mint/MintHeader.tsx": $mint_MintHeader,
