@@ -7,6 +7,7 @@ import {
   PaginatedCollectionResponseBody,
 } from "globals";
 import { paginate } from "$lib/utils/util.ts";
+import { StampRepository } from "$lib/database/stampRepository.ts";
 
 export class CollectionService {
   static async getCollections(
@@ -24,12 +25,12 @@ export class CollectionService {
 
       const collections: Collection[] = await Promise.all(
         collectionsResult.rows.map(async (row: any) => {
-          const stamps = await CollectionRepository.getCollectionStamps(
-            client,
-            row.collection_id,
-            10, // Limit to 10 stamps per collection
-            0,
-          );
+          const stamps = await StampRepository.getStampsFromDb(client, {
+            limit: 10,
+            collectionId: row.collection_id,
+            noPagination: true,
+            type: "all",
+          });
 
           return {
             collection_id: row.collection_id,
@@ -64,12 +65,12 @@ export class CollectionService {
       }
 
       const row = collectionResult.rows[0];
-      const stamps = await CollectionRepository.getCollectionStamps(
-        client,
-        row.collection_id,
-        10, // Limit to 10 stamps per collection
-        0,
-      );
+      const stamps = await StampRepository.getStampsFromDb(client, {
+        limit: 10,
+        collectionId: row.collection_id,
+        noPagination: true,
+        type: "all",
+      });
 
       return {
         collection_id: row.collection_id,

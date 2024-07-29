@@ -129,6 +129,7 @@ export class StampRepository {
       all_columns?: boolean;
       noPagination?: boolean;
       cacheDuration?: number | "never";
+      collectionId?: string; // Add this new option
     },
   ) {
     const {
@@ -142,6 +143,7 @@ export class StampRepository {
       all_columns = false,
       noPagination = false,
       cacheDuration = 1000 * 60 * 3,
+      collectionId, // Destructure the new option
     } = options;
 
     const whereConditions = [];
@@ -203,6 +205,11 @@ export class StampRepository {
       }
     }
 
+    if (collectionId) {
+      whereConditions.push("cs.collection_id = UNHEX(?)");
+      queryParams.push(collectionId);
+    }
+
     const specificColumns = `
       st.stamp, 
       st.block_index, 
@@ -246,14 +253,15 @@ export class StampRepository {
     }
 
     const query = `
-      SELECT ${selectClause}
-      FROM ${STAMP_TABLE} AS st
-      LEFT JOIN creator AS cr ON st.creator = cr.address
-      ${whereClause}
-      ${orderClause}
-      ${limitClause}
-      ${offsetClause}
-    `;
+    SELECT ${selectClause}
+    FROM ${STAMP_TABLE} AS st
+    ${collectionId ? "JOIN collection_stamps cs ON st.stamp = cs.stamp" : ""}
+    LEFT JOIN creator AS cr ON st.creator = cr.address
+    ${whereClause}
+    ${orderClause}
+    ${limitClause}
+    ${offsetClause}
+  `;
 
     console.log(`Executing query:`, query);
     console.log(`Query params:`, queryParams);

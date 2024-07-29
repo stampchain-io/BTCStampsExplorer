@@ -32,8 +32,9 @@ export const NavigatorProvider = ({ children }) => {
     }
     setFilterOption(updatedData);
     console.log(updatedData);
-    if (window.history) {
-      window.history.pushState(
+
+    if (globalThis.history) {
+      globalThis.history.pushState(
         {},
         "",
         `/stamp?sortBy=${sortOption}&filterBy=${updatedData}&typeBy=${typeOption}`,
@@ -45,8 +46,8 @@ export const NavigatorProvider = ({ children }) => {
   const setTypeOptionData = (value: string) => {
     setTypeOption(value);
     console.log("Type option: ", value);
-    if (window.history) {
-      window.history.pushState(
+    if (globalThis.history) {
+      globalThis.history.pushState(
         {},
         "",
         `/stamp?sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${value}`,
