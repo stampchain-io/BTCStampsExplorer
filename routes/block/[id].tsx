@@ -79,7 +79,9 @@ export function BlockPage(props: BlockPageProps) {
             <img src="/img/icon_stamp_block.png" alt="" className="w-7 h-7" />
           </div>
           <div>
-            <p className="text-white text-[26px]">Stamps Block Data</p>
+            <p className="text-white text-[26px]">
+              Stamps Block {block.block_info.block_index}
+            </p>
             <p className="text-[#6E6E6E]">
               {new Date(block.block_info.block_time).toUTCString().replace(
                 / GMT$/,

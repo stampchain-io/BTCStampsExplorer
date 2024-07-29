@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+// import { useState } from "preact/hooks";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
@@ -22,7 +22,7 @@ export const StampHeader = (
             : "text-[20px] text-[#B9B9B9] cursor-pointer pb-4"}
           onClick={() => setTypeOption("all")}
         >
-          All Stamps
+          All
         </p>
         <p
           class={selectedTab === "classic"
@@ -30,7 +30,15 @@ export const StampHeader = (
             : "text-[20px] text-[#B9B9B9] cursor-pointer pb-4"}
           onClick={() => setTypeOption("classic")}
         >
-          Classic Stamps
+          Classic
+        </p>
+        <p
+          class={selectedTab === "classic"
+            ? "text-[26px] text-[#7A00F5] cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
+            : "text-[20px] text-[#B9B9B9] cursor-pointer pb-4"}
+          onClick={() => setTypeOption("posh")}
+        >
+          Posh
         </p>
       </div>
       <div class="flex gap-6">

@@ -28,20 +28,12 @@ export const CollectionHeader = (
           STAMPS
         </p>
         <p
-          class={selectedTab === "Src20"
-            ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-            : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => setSelectedTab("Src20")}
-        >
-          Src-20
-        </p>
-        <p
           class={selectedTab === "Rare"
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => setSelectedTab("Rare")}
+          onClick={() => setSelectedTab("Posh")}
         >
-          Rare
+          Posh
         </p>
       </div>
       <div class="flex gap-6">
