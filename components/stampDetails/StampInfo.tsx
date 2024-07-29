@@ -23,7 +23,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
         {/* <StampKind kind={kind} /> */}
       </div>
       <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-        <p class="text-xl font-semibold">Counter party ID</p>
+        <p class="text-xl font-semibold">CPID</p>
         <a
           href={`https://xcp.dev/asset/${stamp.cpid}`}
           target="_blank"
@@ -50,6 +50,12 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           src="/img/icon_copy_to_clipboard.png"
           className="w-4 h-5 cursor-pointer"
         />
+      </div>
+      <div class="flex flex-col gap-1 truncate text-[#F5F5F5] px-6 py-4">
+        <p class="text-xl font-semibold">Created</p>
+        <p class="text-[#60626F]">
+          {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
+        </p>
       </div>
       <div class="flex justify-between items-end gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
         <div className="flex flex-col">
@@ -101,14 +107,8 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
         <p class="text-[#60626F]">No</p>
       </div>
       <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-        <p class="text-xl font-semibold">Burned/destroyed</p>
-        <p class="text-[#60626F]">840612</p>
-      </div>
-      <div class="flex flex-col gap-1 truncate text-[#F5F5F5] px-6 py-4">
-        <p class="text-xl font-semibold">Created At</p>
-        <p class="text-[#60626F]">
-          {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
-        </p>
+        <p class="text-xl font-semibold">Stamp Vault Address</p>
+        <p class="text-[#60626F]">VAULT ADDRESS HERE</p>
       </div>
     </div>
   );

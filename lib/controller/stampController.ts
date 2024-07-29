@@ -4,6 +4,7 @@ import { BIG_LIMIT } from "utils/constants.ts";
 import { HolderRow } from "globals";
 import { Src20Service } from "$lib/services/src20Service.ts";
 import { formatSRC20Row } from "utils/src20Utils.ts";
+import { CollectionService } from "$lib/services/collectionService.ts";
 
 export class StampController {
   static async getStampDetailsById(id: string) {
@@ -148,26 +149,28 @@ export class StampController {
   ) {
     try {
       if (!type) {
-        const [stampCategories, src20Result] = await Promise.all([
-          this.getMultipleStampCategories([
-            { types: ["STAMP", "SRC-721"], limit: 6 },
-            { types: ["SRC-721"], limit: 6 },
-            { types: ["STAMP"], limit: 6 },
-            { types: ["SRC-20"], limit: 6 },
-          ]),
-          Src20Service.fetchAndFormatSrc20Data({
-            op: "DEPLOY",
-            page,
-            limit: page_size,
-          }),
-        ]);
+        const [stampCategories, src20Result, poshCollection] = await Promise
+          .all([
+            this.getMultipleStampCategories([
+              { types: ["STAMP", "SRC-721"], limit: 6 },
+              { types: ["SRC-721"], limit: 6 },
+              { types: ["STAMP"], limit: 6 },
+              { types: ["SRC-20"], limit: 6 },
+            ]),
+            Src20Service.fetchAndFormatSrc20Data({
+              op: "DEPLOY",
+              page,
+              limit: page_size,
+            }),
+            CollectionService.getCollectionByName("posh"),
+          ]);
 
         return {
           stamps_recent: stampCategories[0].stamps,
           stamps_src721: stampCategories[1].stamps,
           stamps_art: stampCategories[2].stamps,
           stamps_src20: stampCategories[3].stamps,
-          stamps_news: stampCategories[0].stamps,
+          stamps_posh: poshCollection ? poshCollection.stamps : [],
           src20s: src20Result.data.map(formatSRC20Row),
           pages_src20: src20Result.pages,
           page_src20: src20Result.page,

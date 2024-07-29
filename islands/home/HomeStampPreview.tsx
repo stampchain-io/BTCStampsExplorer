@@ -1,19 +1,19 @@
 import { StampRow } from "globals";
 import { StampCard } from "$components/StampCard.tsx";
 
-export function HomeSalesInfo(
+export function HomeStampPreview(
   {
     stamps_recent = [],
     stamps_src721 = [],
     stamps_art = [],
     stamps_src20 = [],
-    stamps_news = [],
+    stamps_posh = [],
   }: {
     stamps_recent: StampRow[];
     stamps_src721: StampRow[];
     stamps_art: StampRow[];
     stamps_src20: StampRow[];
-    stamps_news: StampRow[];
+    stamps_posh: StampRow[];
   },
 ) {
   return (
@@ -25,6 +25,21 @@ export function HomeSalesInfo(
         </div>
         <div class="flex overflow-x-auto">
           {stamps_recent.map((stamp: StampRow) => (
+            <StampCard
+              stamp={stamp}
+              kind="stamp"
+            />
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-end">
+          <p class="text-2xl md:text-4xl text-[#F5F5F5]">Posh Stamps</p>
+          <a href="/home?type=posh">See all</a>
+        </div>
+        <div class="flex overflow-x-auto">
+          {stamps_posh.map((stamp: StampRow) => (
             <StampCard
               stamp={stamp}
               kind="stamp"
@@ -74,21 +89,6 @@ export function HomeSalesInfo(
         </div>
         <div class="flex overflow-x-auto">
           {stamps_src20.map((stamp: StampRow) => (
-            <StampCard
-              stamp={stamp}
-              kind="stamp"
-            />
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between items-end">
-          <p class="text-2xl md:text-4xl text-[#F5F5F5]">Posh Stamps</p>
-          <a href="/home?type=news">See all</a>
-        </div>
-        <div class="flex overflow-x-auto">
-          {stamps_news.map((stamp: StampRow) => (
             <StampCard
               stamp={stamp}
               kind="stamp"
