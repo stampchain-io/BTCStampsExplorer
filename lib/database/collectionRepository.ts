@@ -1,5 +1,4 @@
 import { Client } from "$mysql/mod.ts";
-import { Collection, StampRow } from "globals";
 import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { SMALL_LIMIT } from "constants";
 
@@ -49,7 +48,7 @@ export class CollectionRepository {
     );
   }
 
-  static async getCollectionStamps(
+  static async getCollectionStamps( // TODO: combine with getStamps
     client: Client,
     collectionId: string,
     limit: number,
@@ -57,30 +56,30 @@ export class CollectionRepository {
   ) {
     const query = `
       SELECT 
-        s.stamp,
-        s.block_index,
-        s.cpid,
-        s.creator,
+        st.stamp,
+        st.block_index,
+        st.cpid,
+        st.creator,
         cr.creator AS creator_name,
-        s.divisible,
-        s.keyburn,
-        s.locked,
-        s.stamp_base64,
-        s.stamp_mimetype,
-        s.stamp_url,
-        s.supply,
-        s.block_time,
-        s.tx_hash,
-        s.tx_index,
-        s.ident,
-        s.stamp_hash,
-        s.is_btc_stamp,
-        s.file_hash
-      FROM StampTableV4 s
-      JOIN collection_stamps cs ON s.stamp = cs.stamp
-      LEFT JOIN creator cr ON s.creator = cr.address
+        st.divisible,
+        st.keyburn,
+        st.locked,
+        st.stamp_base64,
+        st.stamp_mimetype,
+        st.stamp_url,
+        st.supply,
+        st.block_time,
+        st.tx_hash,
+        st.tx_index,
+        st.ident,
+        st.stamp_hash,
+        st.is_btc_stamp,
+        st.file_hash
+      FROM StampTableV4 st
+      JOIN collection_stamps cs ON st.stamp = cs.stamp
+      LEFT JOIN creator cr ON st.creator = cr.address
       WHERE cs.collection_id = UNHEX(?)
-      ORDER BY s.stamp DESC
+      ORDER BY st.stamp ASC
       LIMIT ? OFFSET ?
     `;
 
@@ -114,5 +113,27 @@ export class CollectionRepository {
     );
 
     return result.rows[0].total;
+  }
+
+  static async getCollectionByName(client: Client, collectionName: string) {
+    const query = `
+      SELECT 
+        HEX(c.collection_id) as collection_id,
+        c.collection_name,
+        GROUP_CONCAT(DISTINCT cc.creator_address) as creators,
+        COUNT(DISTINCT cs.stamp) as stamp_count
+      FROM collections c
+      LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
+      LEFT JOIN collection_stamps cs ON c.collection_id = cs.collection_id
+      WHERE c.collection_name = ?
+      GROUP BY c.collection_id, c.collection_name
+    `;
+
+    return await handleSqlQueryWithCache(
+      client,
+      query,
+      [collectionName],
+      "never",
+    );
   }
 }

@@ -7,6 +7,7 @@ export function StampVaulted() {
         target="_blank"
         rel="noopener noreferrer"
         class="bg-[#2B0E49] py-6 px-4 text-[#60626F] inline-block w-full"
+        // FIXME: This needs to be a table since there may be multipe runes/ordinals in each vault
       >
         https://ord.link/70316503
       </a>

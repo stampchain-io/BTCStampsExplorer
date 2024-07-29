@@ -45,6 +45,7 @@ export function StampCard({
               ? (
                 <iframe
                   scrolling="no"
+                  loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
                   src={src}
                   class="h-full w-fit max-w-full object-contain items-center standalone:h-full standalone:w-auto"
@@ -67,7 +68,9 @@ export function StampCard({
       <div class="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
         <div class="flex justify-between text-black">
           <h3 class="text-[13px] font-semibold text-white text-lg">
-            {`Stamp #${stamp.stamp}`}
+            {Number(stamp.stamp ?? 0) < 0
+              ? `${stamp.cpid}`
+              : `Stamp #${stamp.stamp}`}
           </h3>
         </div>
         <div>

@@ -8,8 +8,8 @@ import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
 import { HomeTable } from "$islands/home/HomeTable.tsx";
-import { HomeSalesInfo } from "$islands/home/HomeSalesInfo.tsx";
-import { HomeSalesInfoDetails } from "$islands/home/HomeSalesInfoDetails.tsx";
+import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
+import { HomeStampPreviewDetails } from "$islands/home/HomeStampPreviewDetails.tsx";
 
 import { StampController } from "$lib/controller/stampController.ts";
 
@@ -19,7 +19,7 @@ type HomePageProps = {
     stamps_src721: StampRow[];
     stamps_art: StampRow[];
     stamps_src20: StampRow[];
-    stamps_news: StampRow[];
+    stamps_posh: StampRow[];
     stamps: StampRow[];
     page_stamp: number;
     pages_stamp: number;
@@ -72,7 +72,7 @@ export default function Home(props: HomePageProps) {
     stamps_src721,
     stamps_art,
     stamps_src20,
-    stamps_news,
+    stamps_posh,
     stamps,
     src20s,
     type,
@@ -91,7 +91,7 @@ export default function Home(props: HomePageProps) {
     "src721": "Src721",
     "art": "Art",
     "src20": "Src20",
-    "news": "Posh",
+    "posh": "Posh",
   };
 
   return (
@@ -116,7 +116,7 @@ export default function Home(props: HomePageProps) {
                 <StampSearchClient />
               </div>
             </div>
-            <HomeSalesInfoDetails
+            <HomeStampPreviewDetails
               stamps={stamps}
             />
             <Pagination
@@ -141,12 +141,12 @@ export default function Home(props: HomePageProps) {
                 type="home"
               />
             </div>
-            <HomeSalesInfo
+            <HomeStampPreview
               stamps_recent={stamps_recent}
               stamps_src721={stamps_src721}
               stamps_art={stamps_art}
               stamps_src20={stamps_src20}
-              stamps_news={stamps_news}
+              stamps_posh={stamps_posh}
             />
           </div>
         )}

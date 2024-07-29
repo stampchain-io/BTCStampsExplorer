@@ -49,4 +49,34 @@ export class CollectionService {
       };
     });
   }
+
+  static async getCollectionByName(
+    collectionName: string,
+  ): Promise<Collection | null> {
+    return await withDatabaseClient(async (client) => {
+      const collectionResult = await CollectionRepository.getCollectionByName(
+        client,
+        collectionName,
+      );
+
+      if (collectionResult.rows.length === 0) {
+        return null;
+      }
+
+      const row = collectionResult.rows[0];
+      const stamps = await CollectionRepository.getCollectionStamps(
+        client,
+        row.collection_id,
+        10, // Limit to 10 stamps per collection
+        0,
+      );
+
+      return {
+        collection_id: row.collection_id,
+        collection_name: row.collection_name,
+        creators: row.creators ? row.creators.split(",") : [],
+        stamps: stamps.rows,
+      };
+    });
+  }
 }
