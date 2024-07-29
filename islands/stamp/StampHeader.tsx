@@ -33,7 +33,7 @@ export const StampHeader = (
           Classic
         </p>
         <p
-          class={selectedTab === "classic"
+          class={selectedTab === "posh"
             ? "text-[26px] text-[#7A00F5] cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[20px] text-[#B9B9B9] cursor-pointer pb-4"}
           onClick={() => setTypeOption("posh")}

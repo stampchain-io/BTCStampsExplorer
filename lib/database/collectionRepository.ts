@@ -48,49 +48,6 @@ export class CollectionRepository {
     );
   }
 
-  static async getCollectionStamps( // TODO: combine with getStamps
-    client: Client,
-    collectionId: string,
-    limit: number,
-    offset: number,
-  ) {
-    const query = `
-      SELECT 
-        st.stamp,
-        st.block_index,
-        st.cpid,
-        st.creator,
-        cr.creator AS creator_name,
-        st.divisible,
-        st.keyburn,
-        st.locked,
-        st.stamp_base64,
-        st.stamp_mimetype,
-        st.stamp_url,
-        st.supply,
-        st.block_time,
-        st.tx_hash,
-        st.tx_index,
-        st.ident,
-        st.stamp_hash,
-        st.is_btc_stamp,
-        st.file_hash
-      FROM StampTableV4 st
-      JOIN collection_stamps cs ON st.stamp = cs.stamp
-      LEFT JOIN creator cr ON st.creator = cr.address
-      WHERE cs.collection_id = UNHEX(?)
-      ORDER BY st.stamp ASC
-      LIMIT ? OFFSET ?
-    `;
-
-    return await handleSqlQueryWithCache(
-      client,
-      query,
-      [collectionId, limit, offset],
-      1000 * 60 * 5, // 5 minutes cache
-    );
-  }
-
   static async getTotalCollections(
     client: Client,
     creator?: string,
