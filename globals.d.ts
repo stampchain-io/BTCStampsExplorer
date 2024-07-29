@@ -28,7 +28,7 @@ interface StampRow {
   stamp_mimetype: string;
   stamp_url: string;
   supply: number;
-  timestamp: Date;
+  block_time: Date;
   tx_hash: string;
   ident: SUBPROTOCOLS;
   creator_name: string | null;
