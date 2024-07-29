@@ -9,7 +9,7 @@ dayjs.extend(relativeTime);
 
 export function StampInfo({ stamp }: { stamp: StampRow }) {
   const timestamp = new Date(stamp.block_time);
-  const kind = stamp.is_btc_stamp
+  const _kind = stamp.is_btc_stamp
     ? "stamp"
     : stamp.cpid.startsWith("A")
     ? "cursed"
