@@ -1,8 +1,8 @@
 import { Client } from "$mysql/mod.ts";
 import { BIG_LIMIT, SRC20_BALANCE_TABLE, SRC20_TABLE } from "constants";
-import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { conf } from "utils/config.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 // NOTE: To compare tick use this ones below:
 //  tick COLLATE utf8mb4_0900_as_ci = '${tick}'
@@ -56,8 +56,7 @@ export class Src20Class {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2,
@@ -157,8 +156,7 @@ export class Src20Class {
 
     queryParams.unshift(offset);
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2,
@@ -218,8 +216,7 @@ export class Src20Class {
       ${limit ? `LIMIT ? OFFSET ?` : ""}
     `;
 
-    const results = await handleSqlQueryWithCache(
-      client,
+    const results = await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
       0, //1000 * 60 * 2, // Cache duration
@@ -282,8 +279,7 @@ export class Src20Class {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2,
@@ -297,8 +293,7 @@ export class Src20Class {
     client: Client,
     tick: string,
   ) {
-    const max_supply_data = await handleSqlQueryWithCache(
-      client,
+    const max_supply_data = await dbManager.executeQueryWithCache(
       `
         SELECT max, deci, lim
         FROM ${SRC20_TABLE}
@@ -312,8 +307,7 @@ export class Src20Class {
     const decimals = parseInt(max_supply_data.rows[0]["deci"]);
     const limit = parseInt(max_supply_data.rows[0]["lim"]);
 
-    const total_mints_data = await handleSqlQueryWithCache(
-      client,
+    const total_mints_data = await dbManager.executeQueryWithCache(
       `
         SELECT COUNT(*) as total
         FROM ${SRC20_TABLE}
@@ -326,8 +320,7 @@ export class Src20Class {
 
     const total_mints = parseInt(total_mints_data.rows[0]["total"]);
 
-    const total_minted_data = await handleSqlQueryWithCache(
-      client,
+    const total_minted_data = await dbManager.executeQueryWithCache(
       `
         SELECT SUM(amt) as total
         FROM ${SRC20_BALANCE_TABLE}
@@ -376,7 +369,10 @@ export class Src20Class {
             src.max, src.deci, src.lim;
     `;
 
-    const data = await handleSqlQueryWithCache(client, query, [tick, tick], 0);
+    const data = await dbManager.executeQueryWithCache(query, [
+      tick,
+      tick,
+    ], 0);
 
     if (data.rows.length === 0) {
       return null;

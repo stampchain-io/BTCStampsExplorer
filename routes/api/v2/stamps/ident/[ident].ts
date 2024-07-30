@@ -33,7 +33,6 @@ export const handler = async (
           all_columns: true,
         }),
         StampRepository.getTotalStampCountFromDb(
-          client,
           "stamps",
           ident.toUpperCase(),
         ),

@@ -2,7 +2,7 @@ import * as btc from "bitcoin";
 import { Buffer } from "buffer";
 
 import { generateRandomNumber } from "utils/util.ts";
-import { handleQuery } from "utils/xcp.ts";
+import { handleXcpQuery } from "utils/xcpUtils.ts";
 import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
 import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
@@ -183,7 +183,7 @@ export async function mintStampApiCall(
       base64Data,
       satsPerKB,
     });
-    const response = await handleQuery(method);
+    const response = await handleXcpQuery(method);
     return response;
   } catch (error) {
     console.error("mint error", error);
@@ -305,7 +305,7 @@ export async function checkAssetAvailability(assetName: string) {
         "asset": assetName,
       },
     };
-    const result = await handleQuery(method);
+    const result = await handleXcpQuery(method);
     if (!result.legth) {
       return true;
     }

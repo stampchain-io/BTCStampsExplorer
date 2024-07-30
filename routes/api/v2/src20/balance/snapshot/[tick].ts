@@ -4,12 +4,13 @@ import {
   PaginatedRequest,
   Src20SnapshotResponseBody,
 } from "globals";
-import { getClient, Src20Class } from "$lib/database/index.ts";
+import { Src20Class } from "$lib/database/index.ts";
 import { Client } from "$mysql/mod.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { Big } from "$Big";
 import { Src20SnapShotDetail } from "globals";
 import { BlockService } from "$lib/services/blockService.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -23,7 +24,7 @@ export const handler = async (
   const amt = Number(params.get("amt"));
   const sort = params.get("sort") || "ASC";
   try {
-    const client = await getClient();
+    const client = await dbManager.getClient();
     if (!client) {
       throw new Error("Client not found");
     }

@@ -38,7 +38,7 @@ export class StampService {
             get_dispensers(cpid),
             get_sends(cpid),
             get_dispenses(cpid),
-            StampRepository.getTotalStampCountFromDb(client, "stamps"),
+            StampRepository.getTotalStampCountFromDb("stamps"),
             BlockService.getLastBlock(),
           ]);
 
@@ -84,7 +84,6 @@ export class StampService {
             cacheDuration: isSingleStamp ? "never" : options.cacheDuration,
           }),
           StampRepository.getTotalStampCountFromDb(
-            client,
             options.type || "stamps",
             options.ident,
           ),
@@ -143,15 +142,14 @@ export class StampService {
     limit: number,
     page: number,
   ) {
-    return await withDatabaseClient(async (client) => {
+    return await withDatabaseClient(async () => {
       const totalStamps = await StampRepository
-        .getCountStampBalancesByAddressFromDb(client, address);
+        .getCountStampBalancesByAddressFromDb(address);
       const total = totalStamps.rows[0]?.total || 0;
 
       let stamps = [];
       if (total !== 0) {
         stamps = await StampRepository.getStampBalancesByAddressFromDb(
-          client,
           address,
           limit,
           page,

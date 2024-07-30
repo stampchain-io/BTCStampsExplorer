@@ -1,8 +1,9 @@
-import { getClient, Src20Class } from "$lib/database/index.ts";
+import { Src20Class } from "$lib/database/index.ts";
 import { Client } from "$mysql/mod.ts";
 import { AddressTickHandlerContext, Src20BalanceResponseBody } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts"; // Import the responseUtil helper
 import { BlockService } from "$lib/services/blockService.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 export const handler = async (
   _req: Request,
@@ -10,7 +11,7 @@ export const handler = async (
 ): Promise<Response> => {
   const { address, tick } = ctx.params;
   try {
-    const client = await getClient();
+    const client = await dbManager.getClient();
     const lastBlock = await BlockService.getLastBlock();
     const src20 = await Src20Class.get_src20_balance_with_client(
       client as Client,

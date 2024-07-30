@@ -1,4 +1,3 @@
-import { getClient } from "$lib/database/index.ts";
 import { paginate } from "utils/util.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -11,6 +10,7 @@ import { ResponseUtil } from "utils/responseUtil.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { SRC20Repository } from "$lib/database/src20Repository.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -23,7 +23,7 @@ export const handler = async (
     const page = Number(url.searchParams.get("page")) || 1;
     const op = url.searchParams.get("op");
     const sort = url.searchParams.get("sort") || "ASC";
-    const client = await getClient();
+    const client = await dbManager.getClient();
     tick = convertEmojiToTick(String(tick));
     const src20_txs = await SRC20Repository.getValidSrc20TxFromDb(
       client,

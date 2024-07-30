@@ -1,7 +1,8 @@
-import { getClient, Src20Class } from "$lib/database/index.ts";
+import { Src20Class } from "$lib/database/index.ts";
 import { AddressHandlerContext, PaginatedSrc20ResponseBody } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { BlockService } from "$lib/services/blockService.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 export const handler = async (
   _req: Request,
@@ -16,7 +17,7 @@ export const handler = async (
   const sort = params.get("sort") || "ASC";
 
   try {
-    const client = await getClient();
+    const client = await dbManager.getClient();
     const lastBlock = await BlockService.getLastBlock();
     const src20 = await Src20Class.get_src20_balance_with_client(
       client,

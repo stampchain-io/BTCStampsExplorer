@@ -6,7 +6,7 @@ import {
   CollectionQueryParams,
   PaginatedCollectionResponseBody,
 } from "globals";
-import { paginate } from "$lib/utils/util.ts";
+import { paginate } from "utils/util.ts";
 import { StampRepository } from "$lib/database/stampRepository.ts";
 
 export class CollectionService {
@@ -18,8 +18,8 @@ export class CollectionService {
 
       const [collectionsResult, totalCollections, lastBlock] = await Promise
         .all([
-          CollectionRepository.getCollections(client, { limit, page, creator }),
-          CollectionRepository.getTotalCollections(client, creator),
+          CollectionRepository.getCollections({ limit, page, creator }),
+          CollectionRepository.getTotalCollectionsByCreatorFromDb(creator),
           BlockService.getLastBlock(),
         ]);
 

@@ -21,7 +21,6 @@ export const handler = async (
 
     const lastBlocks = await withDatabaseClient((client) => {
       return BlockRepository.get_last_x_blocks_with_client(
-        client,
         parsedNumber,
       );
     });

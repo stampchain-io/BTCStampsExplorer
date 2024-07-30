@@ -9,7 +9,7 @@ export class BlockService {
   ): Promise<StampBlockResponseBody> {
     return await withDatabaseClient(async (client) => {
       const [block_info, last_block, data] = await Promise.all([
-        BlockRepository.getBlockInfoFromDb(client, blockIdentifier),
+        BlockRepository.getBlockInfoFromDb(blockIdentifier),
         this.getLastBlock(),
         StampRepository.getStampsFromDb(client, {
           type,
@@ -48,10 +48,9 @@ export class BlockService {
   }
 
   static async getRelatedBlocksWithStamps(blockIdentifier: number | string) {
-    return await withDatabaseClient(async (client) => {
+    return await withDatabaseClient(async () => {
       const [blocks, last_block] = await Promise.all([
         BlockRepository.getRelatedBlocksWithStampsFromDb(
-          client,
           blockIdentifier,
         ),
         this.getLastBlock(),
@@ -71,10 +70,8 @@ export class BlockService {
   }
 
   static async getLastBlock() {
-    return await withDatabaseClient(async (client) => {
-      const last_block = await BlockRepository.getLastBlockFromDb(
-        client,
-      );
+    return await withDatabaseClient(async () => {
+      const last_block = await BlockRepository.getLastBlockFromDb();
       if (!last_block || !last_block.rows || last_block.rows.length === 0) {
         throw new Error("Could not get last block");
       }
