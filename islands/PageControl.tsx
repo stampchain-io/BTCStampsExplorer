@@ -3,32 +3,7 @@
 import { StampRow } from "globals";
 
 import { StampCard } from "$components/StampCard.tsx";
-
-// import { StampRepository } from "$lib/database/index.ts";
-
-// const sortData = (stamps: StampRow[], sortBy: string) => {
-//   const data = [...stamps];
-//   if (sortBy == "Supply") {
-//     return [...data.sort((a: StampRow, b: StampRow) => a.supply - b.supply)];
-//   } else if (sortBy == "Block") {
-//     return [
-//       ...data.sort((a: StampRow, b: StampRow) => a.block_index - b.block_index),
-//     ];
-//   } else if (sortBy == "Stamp") {
-//     return [...data.sort((a: StampRow, b: StampRow) => a.stamp - b.stamp)];
-//   } else return [...data];
-// };
-
-// const filterData = (stamps: StampRow[], filterBy: string[]) => {
-//   if (filterBy.length == 0) {
-//     return stamps;
-//   }
-//   return stamps.filter((stamp) =>
-//     filterBy.find((option) =>
-//       stamp.stamp_mimetype.indexOf(option.toLowerCase()) >= 0
-//     ) != null
-//   );
-// };
+// import { filterOptions, sortOptions } from "utils/stampUtils.ts";
 
 export function PageControl(
   { stamps = [] }: {

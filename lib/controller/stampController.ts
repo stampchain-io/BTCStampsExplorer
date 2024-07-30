@@ -1,7 +1,7 @@
 import { StampService } from "$lib/services/stampService.ts";
 import { filterData, sortData } from "utils/stampUtils.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
-import { HolderRow } from "globals";
+import { HolderRow, SUBPROTOCOLS } from "globals";
 import { Src20Service } from "$lib/services/src20Service.ts";
 import { formatSRC20Row } from "utils/src20Utils.ts";
 import { CollectionService } from "$lib/services/collectionService.ts";
@@ -48,44 +48,72 @@ export class StampController {
     }
   }
 
-  static async getStamps(
+  static async getStamps({
     page = 1,
-    page_size = BIG_LIMIT,
-    orderBy: "DESC" | "ASC" = "DESC",
+    limit = BIG_LIMIT,
+    orderBy = "DESC",
     sortBy = "none",
-    filterBy: string[] = [],
-    typeBy = ["STAMP", "SRC-721"],
-  ) {
+    type = "all",
+    filterBy = [],
+    ident = ["STAMP", "SRC-721"],
+    collectionId,
+    identifier,
+    blockIdentifier,
+    cacheDuration,
+    noPagination = false, // Add this line
+  }: {
+    page?: number;
+    limit?: number;
+    orderBy?: "DESC" | "ASC";
+    sortBy?: string;
+    type?: "stamps" | "cursed" | "all";
+    filterBy?: string[];
+    ident?: SUBPROTOCOLS[];
+    collectionId?: string;
+    identifier?: string | number;
+    blockIdentifier?: number | string;
+    cacheDuration?: number | "never";
+    noPagination?: boolean; // Add this line
+  } = {}) {
     try {
       const result = await StampService.getStamps({
         page,
-        page_size,
+        limit,
         sort_order: orderBy.toLowerCase() as "asc" | "desc",
-        type: "stamps",
-        ident: typeBy,
-        noPagination: false,
+        type,
+        ident: ident,
         all_columns: false,
+        collectionId,
+        identifier,
+        blockIdentifier,
+        cacheDuration,
+        noPagination,
       });
+      if (!result) {
+        throw new Error("No stamps found");
+      }
 
-      const sortedAndFilteredStamps = sortData(
-        filterData(result.stamps, filterBy),
-        sortBy,
-        orderBy,
-      );
+      // Ensure we're using the correct property of the result object
+      const stamps = result.stamps.rows || result.stamps;
 
-      const paginatedData = sortedAndFilteredStamps.slice(
-        (page - 1) * page_size,
-        page * page_size,
-      );
+      // Only apply sorting and filtering if necessary
+      const sortedAndFilteredStamps = sortBy !== "none" || filterBy.length > 0
+        ? sortData(filterData(stamps, filterBy), sortBy, orderBy)
+        : stamps;
 
-      const totalPages = Math.ceil(result.total / page_size);
+      // Apply pagination only if noPagination is false
+      const paginatedData = noPagination
+        ? sortedAndFilteredStamps
+        : sortedAndFilteredStamps.slice((page - 1) * limit, page * limit);
+
+      const totalPages = Math.ceil(result.total / limit);
 
       return {
         stamps: paginatedData,
         total: result.total,
         pages: totalPages,
         page: page,
-        page_size: page_size,
+        page_size: limit,
       };
     } catch (error) {
       console.error("Error in getStamps:", error);
@@ -124,14 +152,14 @@ export class StampController {
           page_size: category.limit,
           sort_order: "desc",
           type: "stamps",
-          ident: category.types,
+          ident: category.types as SUBPROTOCOLS[],
           noPagination: false,
         });
 
         return {
           types: category.types,
-          stamps: serviceResult.stamps,
-          total: serviceResult.total,
+          stamps: serviceResult?.stamps ?? [],
+          total: serviceResult?.total ?? 0,
         };
       }),
     );
@@ -178,15 +206,16 @@ export class StampController {
           type,
         };
       } else {
-        const typeBy = this.getTypeBy(type);
-        const stampResult = await this.getStamps(
+        const ident = this.getIdent(type) as SUBPROTOCOLS[];
+        const stampResult = await this.getStamps({
           page,
-          page_size,
+          limit: page_size,
           orderBy,
           sortBy,
+          type: type as "stamps" | "cursed" | "all",
           filterBy,
-          typeBy,
-        );
+          ident,
+        });
 
         return {
           ...stampResult,
@@ -201,7 +230,7 @@ export class StampController {
     }
   }
 
-  static getTypeBy(type: string) {
+  static getIdent(type: string) {
     switch (type) {
       case "src721":
         return ["SRC-721"];

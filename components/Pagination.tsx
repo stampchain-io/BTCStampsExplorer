@@ -21,8 +21,8 @@ export const Pagination = (
     pageItems.push(
       <li key={p}>
         <a
-          href={`/${type}?page=${p}&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
-          f-partial={`/${type}?page=${p}&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
+          href={`/${type}?page=${p}&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
+          f-partial={`/${type}?page=${p}&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
           class={`flex items-center justify-center px-3 h-8 leading-tight font-semibold
             ${
             currentPage === p
@@ -47,8 +47,8 @@ export const Pagination = (
             <ul class="inline-flex items-center -space-x-px text-sm gap-2">
               <li>
                 <a
-                  href={`/${type}?page=1&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
-                  f-partial={`/${type}?page=1&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
+                  href={`/${type}?page=1&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
+                  f-partial={`/${type}?page=1&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
                   class="flex items-center justify-center px-3 h-8 leading-tight bg-[#5E1BA1] text-white"
                 >
                   {"<<"}
@@ -58,10 +58,10 @@ export const Pagination = (
                 <a
                   href={`/${type}?page=${
                     Math.max(1, currentPage - 1)
-                  }&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
+                  }&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
                   f-partial={`/${type}?page=${
                     Math.max(1, currentPage - 1)
-                  }&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
+                  }&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
                   class="flex items-center justify-center px-3 h-8 leading-tight bg-[#5E1BA1] text-white"
                 >
                   {"<"}
@@ -72,10 +72,10 @@ export const Pagination = (
                 <a
                   href={`/${type}?page=${
                     Math.min(totalPages, currentPage + 1)
-                  }&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
+                  }&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
                   f-partial={`/${type}?page=${
                     Math.min(totalPages, currentPage + 1)
-                  }&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
+                  }&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
                   class="flex items-center justify-center px-3 h-8 leading-tight bg-[#5E1BA1] text-white"
                 >
                   {">"}
@@ -83,8 +83,8 @@ export const Pagination = (
               </li>
               <li>
                 <a
-                  href={`/${type}?page=${totalPages}&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
-                  f-partial={`/${type}?page=${totalPages}&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${typeOption}`}
+                  href={`/${type}?page=${totalPages}&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
+                  f-partial={`/${type}?page=${totalPages}&limit=${page_size}&sortBy=${sortOption}&filterBy=${filterOption}&ident=${typeOption}`}
                   class="flex items-center justify-center px-3 h-8 leading-tight bg-[#5E1BA1] text-white"
                 >
                   {">>"}

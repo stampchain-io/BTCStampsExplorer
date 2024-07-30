@@ -19,30 +19,41 @@ export class StampRepository {
       stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
     }
 
-    let query = `
-      SELECT COUNT(*) AS total
-      FROM ${STAMP_TABLE}
-      WHERE 1=1
-    `;
+    const whereConditions = [];
+    const queryParams: string[] = [];
 
     if (stampCondition) {
-      query += ` AND ${stampCondition}`;
+      whereConditions.push(stampCondition);
     }
 
     if (ident) {
       const identList = Array.isArray(ident) ? ident : [ident];
-      const identCondition = identList.map((id) => `ident = '${id}'`).join(
-        " OR ",
-      );
-      query += ` AND (${identCondition}) AND is_btc_stamp IS NOT NULL`;
+      if (identList.length > 0) {
+        const identCondition = identList.map(() => "ident = ?").join(" OR ");
+        whereConditions.push(`(${identCondition})`);
+        queryParams.push(...identList.map(String));
+      }
     }
 
-    query += ";";
+    whereConditions.push("is_btc_stamp IS NOT NULL");
+
+    const whereClause = whereConditions.length > 0
+      ? `WHERE ${whereConditions.join(" AND ")}`
+      : "";
+
+    const query = `
+      SELECT COUNT(*) AS total
+      FROM ${STAMP_TABLE}
+      ${whereClause}
+    `;
+
+    console.log("Total count query:", query);
+    console.log("Total count query params:", queryParams);
 
     return await handleSqlQueryWithCache(
       client,
       query,
-      [],
+      queryParams,
       1000 * 60 * 3,
     );
   }
@@ -183,11 +194,13 @@ export class StampRepository {
     // Ident condition
     if (ident) {
       const identList = Array.isArray(ident) ? ident : [ident];
-      const identCondition = `(${
-        identList.map(() => "st.ident = ?").join(" OR ")
-      })`;
-      whereConditions.push(identCondition);
-      queryParams.push(...(identList as string[]));
+      if (identList.length > 0) {
+        const identCondition = identList.map((id) => `st.ident = ?`).join(
+          " OR ",
+        );
+        whereConditions.push(`(${identCondition})`);
+        queryParams.push(...identList.map(String));
+      }
     }
 
     // Block identifier condition
@@ -248,7 +261,7 @@ export class StampRepository {
 
     if (!noPagination) {
       limitClause = `LIMIT ${limit}`;
-      const offset = (page - 1) * limit;
+      const offset = Math.max(0, (page - 1) * limit);
       offsetClause = `OFFSET ${offset}`;
     }
 
@@ -262,7 +275,6 @@ export class StampRepository {
     ${limitClause}
     ${offsetClause}
   `;
-
     console.log(`Executing query:`, query);
     console.log(`Query params:`, queryParams);
 
@@ -272,7 +284,7 @@ export class StampRepository {
       queryParams,
       cacheDuration,
     );
-    console.log(`Query result:`, result);
+    console.log(`Query result repo`, result.rows);
 
     return result;
   }

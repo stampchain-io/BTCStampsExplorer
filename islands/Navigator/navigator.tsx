@@ -13,11 +13,11 @@ export const NavigatorProvider = ({ children }) => {
   const setSortOptionData = (value: string) => {
     setSortOption(value);
     console.log("Sort option: ", value);
-    if (window.history) {
-      window.history.pushState(
+    if (globalThis.history) {
+      globalThis.history.pushState(
         {},
         "",
-        `/stamp?sortBy=${value}&filterBy=${filterOption}&typeBy=${typeOption}`,
+        `/stamp?sortBy=${value}&filterBy=${filterOption}&ident=${typeOption}`,
       );
       window.location.reload();
     }
@@ -37,7 +37,7 @@ export const NavigatorProvider = ({ children }) => {
       globalThis.history.pushState(
         {},
         "",
-        `/stamp?sortBy=${sortOption}&filterBy=${updatedData}&typeBy=${typeOption}`,
+        `/stamp?sortBy=${sortOption}&filterBy=${updatedData}&ident=${typeOption}`,
       );
       window.location.reload();
     }
@@ -50,7 +50,7 @@ export const NavigatorProvider = ({ children }) => {
       globalThis.history.pushState(
         {},
         "",
-        `/stamp?sortBy=${sortOption}&filterBy=${filterOption}&typeBy=${value}`,
+        `/stamp?sortBy=${sortOption}&filterBy=${filterOption}&ident=${value}`,
       );
       window.location.reload();
     }

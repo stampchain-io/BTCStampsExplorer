@@ -4,32 +4,32 @@ export const sortData = (
   stamps: StampRow[],
   sortBy: string,
   order: "ASC" | "DESC",
-) => {
-  let sortedStamps;
-  if (sortBy == "Supply") {
-    sortedStamps = stamps.sort((a, b) => a.supply - b.supply);
-  } else if (sortBy == "Block") {
-    sortedStamps = stamps.sort((a, b) => a.block_index - b.block_index);
-  } else if (sortBy == "Stamp") {
-    sortedStamps = stamps.sort((a, b) => (a.stamp ?? 0) - (b.stamp ?? 0));
-  } else {
-    sortedStamps = stamps.sort((a, b) => (a.stamp ?? 0) - (b.stamp ?? 0));
-  }
+): StampRow[] => {
+  const sortedStamps = [...stamps].sort((a, b) => {
+    switch (sortBy) {
+      case "Supply":
+        return a.supply - b.supply;
+      case "Block":
+        return a.block_index - b.block_index;
+      case "Stamp":
+        return (a.stamp ?? 0) - (b.stamp ?? 0);
+      default:
+        return (a.stamp ?? 0) - (b.stamp ?? 0);
+    }
+  });
 
-  if (order === "DESC") {
-    sortedStamps.reverse();
-  }
-
-  return sortedStamps;
+  return order === "DESC" ? sortedStamps.reverse() : sortedStamps;
 };
 
-export const filterData = (stamps: StampRow[], filterBy: string[]) => {
-  if (filterBy.length == 0) {
-    return stamps;
-  }
-  return stamps.filter((stamp) =>
-    filterBy.find((option) =>
-      stamp.stamp_mimetype.indexOf(option.toLowerCase()) >= 0
-    ) != null
+export function filterData(data: StampRow[], filterBy: string[]): StampRow[] {
+  if (!filterBy || filterBy.length === 0) return data;
+
+  return data.filter((item) =>
+    filterBy.some((filter) =>
+      Object.entries(item).some(([key, value]) =>
+        value != null &&
+        value.toString().toLowerCase().includes(filter.toLowerCase())
+      )
+    )
   );
-};
+}

@@ -1,6 +1,6 @@
 import { Pagination } from "$components/Pagination.tsx";
 
-import { HandlerContext, Handlers } from "$fresh/server.ts";
+import { FreshContext, Handlers } from "$fresh/server.ts";
 
 import { CollectionHeader } from "$islands/collection/CollectionHeader.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
@@ -18,16 +18,16 @@ type CollectionPageProps = {
   };
 };
 
-export const handler: Handlers<CollectionRow> = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(req: Request, ctx: FreshContext) {
     const url = new URL(req.url);
     const orderBy = url.searchParams.get("order")?.toUpperCase() == "ASC"
       ? "ASC"
       : "DESC";
     const sortBy = url.searchParams.get("sortBy") || "none";
     const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
-    const selectedTab = url.searchParams.get("typeBy") || "all";
-    const typeBy = selectedTab === "all"
+    const selectedTab = url.searchParams.get("ident") || "all";
+    const ident = selectedTab === "all"
       ? ["STAMP", "SRC-721", "SRC-20"]
       : ["STAMP", "SRC-721"];
     const page = parseInt(url.searchParams.get("page") || "1");
@@ -48,7 +48,7 @@ export const handler: Handlers<CollectionRow> = {
     //     orderBy,
     //     sortBy,
     //     filterBy,
-    //     typeBy,
+    //     ident,
     //   );
 
     const data = {
