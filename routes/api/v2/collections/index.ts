@@ -1,8 +1,8 @@
 import { CollectionController } from "$lib/controller/collectionController.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ResponseUtil } from "utils/responseUtil.ts";
+import { getPaginationParams } from "utils/paginationUtils.ts";
 
-export const handler = async (req: Request): Promise<Response> => {
+export const GET = async (req: Request): Promise<Response> => {
   const url = new URL(req.url);
   const { limit, page } = getPaginationParams(url);
   const creator = url.searchParams.get("creator");

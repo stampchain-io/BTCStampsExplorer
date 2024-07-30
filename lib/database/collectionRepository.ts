@@ -1,10 +1,9 @@
 import { Client } from "$mysql/mod.ts";
-import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { SMALL_LIMIT } from "constants";
+import { dbManager } from "$lib/database/db.ts";
 
 export class CollectionRepository {
   static async getCollections(
-    client: Client,
     options: {
       limit?: number;
       page?: number;
@@ -40,16 +39,14 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       query,
       queryParams,
       1000 * 60 * 5, // 5 minutes cache
     );
   }
 
-  static async getTotalCollections(
-    client: Client,
+  static async getTotalCollectionsByCreatorFromDb(
     creator?: string,
   ) {
     let query =
@@ -62,11 +59,10 @@ export class CollectionRepository {
       queryParams.push(creator);
     }
 
-    const result = await handleSqlQueryWithCache(
-      client,
+    const result = await dbManager.executeQueryWithCache(
       query,
       queryParams,
-      1000 * 60 * 5, // 5 minutes cache
+      1000 * 60 * 30,
     );
 
     return result.rows[0].total;
@@ -86,8 +82,7 @@ export class CollectionRepository {
       GROUP BY c.collection_id, c.collection_name
     `;
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       query,
       [collectionName],
       "never",

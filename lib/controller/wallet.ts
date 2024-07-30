@@ -1,18 +1,14 @@
-import {
-  getClient,
-  releaseClient,
-  Src20Class,
-  StampRepository,
-} from "$lib/database/index.ts";
-import { getBtcAddressInfo } from "../utils/btc.ts";
-import { paginate } from "../utils/util.ts";
+import { Src20Class, StampRepository } from "$lib/database/index.ts";
+import { getBtcAddressInfo } from "utils/btc.ts";
+import { paginate } from "utils/util.ts";
 import { SRC20Repository } from "$lib/database/src20Repository.ts";
 import { StampService } from "$lib/services/stampService.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 export const api_get_src20_valid_tx = async (tx_hash: string) => {
   try {
-    const client = await getClient();
-    const tx_data = await Src20Class.get_valid_src20_tx_with_client(
+    const client = await dbManager.getClient();
+    const tx_data = await Src20Class.get_valid_src20_tx_with_client( // FIXME: refactor
       client,
       null,
       null,
@@ -22,7 +18,7 @@ export const api_get_src20_valid_tx = async (tx_hash: string) => {
       "ASC",
       tx_hash,
     );
-    releaseClient(client);
+    dbManager.releaseClient(client);
     return tx_data.rows[0];
   } catch (error) {
     console.error(error);
@@ -44,9 +40,8 @@ export const api_get_balance = async (
   page = 1,
 ) => {
   try {
-    const client = await getClient();
+    const client = await dbManager.getClient();
     const total = (await StampRepository.getCountStampBalancesByAddressFromDb(
-      client,
       address,
     ))
       .rows[0]["total"] || 0;
@@ -67,7 +62,7 @@ export const api_get_balance = async (
       client,
       { address, limit, page, sort: "ASC", tick: undefined, amt: undefined },
     );
-    releaseClient(client);
+    dbManager.releaseClient(client);
     return {
       ...pagination,
       btc: btcInfo,

@@ -1,11 +1,3 @@
-export {
-  closeClient,
-  getClient,
-  handleQuery,
-  handleQueryWithClient,
-  releaseClient,
-} from "$lib/database/db.ts";
-
 export { StampRepository } from "$lib/database/stampRepository.ts";
 export { BlockRepository } from "$lib/database/blockRepository.ts";
 export { CollectionRepository } from "$lib/database/collectionRepository.ts";

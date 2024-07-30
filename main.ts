@@ -12,15 +12,18 @@ import { start } from "$fresh/server.ts";
 import manifest from "./fresh.gen.ts";
 import config from "./fresh.config.ts";
 import { conf } from "utils/config.ts";
-import { connectToRedisInBackground as ConnectRedis } from "utils/cache.ts";
+// Import for dbManager initialization
+import "$lib/database/db.ts";
 
 // import twindPlugin from "$fresh/plugins/twind.ts";
 // import twindConfig from "./twind.config.ts";
 
 async function startApp() {
   if (conf.CACHE?.toLowerCase() === "true") {
-    console.log("Initiating Connection to Redis");
-    ConnectRedis();
+    console.log(
+      "Database manager initialized (includes Redis connection if configured)",
+    );
+    // The dbManager is already initialized when imported, which starts the Redis connection if configured
   }
   // Start your server
   await start(manifest, config);
