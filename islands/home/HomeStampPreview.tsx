@@ -51,7 +51,7 @@ export function HomeStampPreview(
       <div>
         <div class="flex justify-between items-end">
           <p class="text-2xl md:text-4xl text-[#F5F5F5]">
-            Latest SRC-721/721R Stamps
+            SRC-721/R Stamps
           </p>
           <a href="/home?type=src721">See all</a>
         </div>
@@ -67,7 +67,7 @@ export function HomeStampPreview(
 
       <div>
         <div class="flex justify-between items-end">
-          <p class="text-2xl md:text-4xl text-[#F5F5F5]">Latest Art Stamps</p>
+          <p class="text-2xl md:text-4xl text-[#F5F5F5]">Classic Stamps</p>
           <a href="/home?type=art">See all</a>
         </div>
         <div class="flex overflow-x-auto">
@@ -83,7 +83,7 @@ export function HomeStampPreview(
       <div>
         <div class="flex justify-between items-end">
           <p class="text-2xl md:text-4xl text-[#F5F5F5]">
-            Latest SRC-20 Stamps
+            SRC-20 Stamps
           </p>
           <a href="/home?type=src20">See all</a>
         </div>

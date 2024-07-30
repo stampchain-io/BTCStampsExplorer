@@ -13,7 +13,7 @@ import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
 import { StampSales } from "$components/stampDetails/StampSales.tsx";
 import { StampController } from "$lib/controller/stampController.ts";
 
-interface StampPageProps {
+interface StampDetailPageProps {
   data: {
     stamp: StampRow;
     total: number;
@@ -56,7 +56,7 @@ export const handler: Handlers<StampData> = {
   },
 };
 
-export default function StampPage(props: StampPageProps) {
+export default function StampPage(props: StampDetailPageProps) {
   const { stamp, holders, sends, dispensers, dispenses, total, last_block } =
     props.data;
   return (

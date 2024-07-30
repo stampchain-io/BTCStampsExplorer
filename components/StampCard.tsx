@@ -75,7 +75,7 @@ export function StampCard({
         </div>
         <div>
           <div class="flex justify-between text-black">
-            <h3 class="text-white text-[11px]">Creator address :</h3>
+            <h3 class="text-white text-[11px]">Creator :</h3>
           </div>
           <h3 class="truncate text-[13px] text-[#C7C5C5]">
             {stamp.creator_name

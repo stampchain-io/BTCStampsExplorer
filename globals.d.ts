@@ -316,7 +316,7 @@ type StampPageProps = {
     page: number;
     pages: number;
     page_size: number;
-    selectedTab: "all" | "classic";
+    selectedTab: "all" | "classic" | "posh";
     sortBy: string;
     filterBy: string[];
   };

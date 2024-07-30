@@ -7,6 +7,7 @@ import {
   get_holders,
   get_sends,
 } from "utils/xcp.ts";
+import { SUBPROTOCOLS } from "globals";
 
 export class StampService {
   static async getStampDetailsById(id: string) {
@@ -58,14 +59,18 @@ export class StampService {
   }
 
   static async getStamps(options: {
+    limit?: number;
     page?: number;
     page_size?: number;
     sort_order?: "asc" | "desc";
     type?: "stamps" | "cursed" | "all";
-    ident?: string | string[];
+    ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
     identifier?: string | number;
+    blockIdentifier?: number | string;
     all_columns?: boolean;
     noPagination?: boolean;
+    cacheDuration?: number | "never";
+    collectionId?: string;
   }) {
     return await withDatabaseClient(async (client) => {
       try {
@@ -73,9 +78,10 @@ export class StampService {
         const [stamps, total] = await Promise.all([
           StampRepository.getStampsFromDb(client, {
             ...options,
+            limit: options.page_size || options.limit,
             all_columns: isSingleStamp ? true : options.all_columns,
             noPagination: isSingleStamp ? true : options.noPagination,
-            cacheDuration: isSingleStamp ? "never" : undefined,
+            cacheDuration: isSingleStamp ? "never" : options.cacheDuration,
           }),
           StampRepository.getTotalStampCountFromDb(
             client,
@@ -83,7 +89,6 @@ export class StampService {
             options.ident,
           ),
         ]);
-
         if (isSingleStamp) {
           if (!stamps.rows.length) {
             return null;
