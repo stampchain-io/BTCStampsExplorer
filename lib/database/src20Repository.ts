@@ -1,4 +1,3 @@
-import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { Client } from "$mysql/mod.ts";
 import { conf } from "utils/config.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -13,6 +12,7 @@ import {
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
 } from "globals";
+import { dbManager } from "$lib/database/db.ts";
 
 export class SRC20Repository {
   static async getTotalCountValidSrc20TxFromDb(
@@ -64,8 +64,7 @@ export class SRC20Repository {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2,
@@ -167,8 +166,7 @@ export class SRC20Repository {
 
     queryParams.push(safeLimit, offset);
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2,
@@ -223,8 +221,7 @@ export class SRC20Repository {
       ${limit ? `LIMIT ? OFFSET ?` : ""}
     `;
 
-    const results = await handleSqlQueryWithCache(
-      client,
+    const results = await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
       0, //1000 * 60 * 2, // Cache duration
@@ -288,8 +285,7 @@ export class SRC20Repository {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
     }
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
       1000 * 60 * 2,
@@ -316,7 +312,10 @@ export class SRC20Repository {
             src.max, src.deci, src.lim;
     `;
 
-    const data = await handleSqlQueryWithCache(client, query, [tick, tick], 0);
+    const data = await dbManager.executeQueryWithCache(query, [
+      tick,
+      tick,
+    ], 0);
 
     if (data.rows.length === 0) {
       return null;

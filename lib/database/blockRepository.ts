@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { Client } from "$mysql/mod.ts";
-import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { STAMP_TABLE } from "utils/constants.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 const BLOCK_FIELDS =
   `block_index, block_time, block_hash, previous_block_hash, ledger_hash, txlist_hash, messages_hash`;
@@ -15,7 +15,6 @@ export class BlockRepository {
    * @returns A promise that resolves to the block information.
    */
   static async getBlockInfoFromDb(
-    client: Client,
     blockIdentifier: number | string,
   ) {
     const isIndex = typeof blockIdentifier === "number" ||
@@ -23,8 +22,7 @@ export class BlockRepository {
     const field = isIndex ? "block_index" : "block_hash";
     const queryValue = isIndex ? Number(blockIdentifier) : blockIdentifier;
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       `
       SELECT ${BLOCK_FIELDS}
       FROM blocks
@@ -40,9 +38,8 @@ export class BlockRepository {
    * @param client - The database client to use for the query.
    * @returns A promise that resolves to the last block index.
    */
-  static async getLastBlockFromDb(client: Client) {
-    return await handleSqlQueryWithCache(
-      client,
+  static async getLastBlockFromDb() {
+    return await dbManager.executeQueryWithCache(
       `
       SELECT MAX(block_index)
       AS last_block
@@ -61,12 +58,10 @@ export class BlockRepository {
    * @returns A promise that resolves to an array of blocks with additional transaction count information.
    */
   static async get_last_x_blocks_with_client(
-    client: Client,
     num = 10,
   ) {
     try {
-      const blocks = await handleSqlQueryWithCache(
-        client,
+      const blocks = await dbManager.executeQueryWithCache(
         `
         SELECT ${BLOCK_FIELDS}
         FROM blocks
@@ -79,8 +74,7 @@ export class BlockRepository {
 
       const populated = await Promise.all(
         blocks.rows.map(async (block: any) => {
-          const tx_info_from_block = await handleSqlQueryWithCache(
-            client,
+          const tx_info_from_block = await dbManager.executeQueryWithCache(
             `
           SELECT COUNT(*) AS tx_count
           FROM ${STAMP_TABLE}
@@ -111,7 +105,6 @@ export class BlockRepository {
    * @returns A promise that resolves to an array of related blocks.
    */
   static async getRelatedBlocksWithStampsFromDb(
-    client: Client,
     blockIdentifier: number | string,
   ) {
     let block_index: number;
@@ -120,14 +113,12 @@ export class BlockRepository {
       block_index = Number(blockIdentifier);
     } else {
       block_index = await this._getBlockIndexByHash(
-        client,
         String(blockIdentifier),
       );
     }
 
     const [blocks, stamps] = await Promise.all([
-      handleSqlQueryWithCache(
-        client,
+      dbManager.executeQueryWithCache(
         `
       SELECT ${BLOCK_FIELDS}
       FROM blocks
@@ -138,8 +129,7 @@ export class BlockRepository {
         [block_index, block_index],
         0,
       ),
-      handleSqlQueryWithCache(
-        client,
+      dbManager.executeQueryWithCache(
         `
       SELECT block_index, COUNT(*) AS stampcount
       FROM ${STAMP_TABLE}
@@ -171,20 +161,17 @@ export class BlockRepository {
    * @param block_hash - The hash of the block to retrieve the index for.
    * @returns The block index if found, otherwise undefined.
    */
-  static async _getBlockIndexByHash(
-    client: Client,
-    block_hash: string,
-  ) {
-    const result = await handleSqlQueryWithCache(
-      client,
+  static async _getBlockIndexByHash(block_hash: string) {
+    const result = await dbManager.executeQueryWithCache(
       `
-    SELECT block_index
-    FROM blocks
-    WHERE block_hash = ?;
-    `,
+      SELECT block_index
+      FROM blocks
+      WHERE block_hash = ?
+      LIMIT 1;
+      `,
       [block_hash],
       "never",
     );
-    return result?.rows?.[0]?.block_index;
+    return (result as number[])[0];
   }
 }

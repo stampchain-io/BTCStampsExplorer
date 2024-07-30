@@ -1,7 +1,7 @@
 import * as btc from "bitcoin";
 
 import { mintMethodOPRETURN } from "utils/minting/stamp.ts";
-import { handleQuery } from "utils/xcp.ts";
+import { handleXcpQuery } from "utils/xcpUtils.ts";
 import { extractOutputs } from "utils/minting/utils.ts";
 import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
 import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
@@ -68,7 +68,7 @@ export async function mintCIP33ApiCall(
       description,
       satsPerKB,
     });
-    const response = await handleQuery(method);
+    const response = await handleXcpQuery(method);
     return response;
   } catch (error) {
     console.error("mint error", error);

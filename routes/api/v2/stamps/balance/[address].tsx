@@ -1,4 +1,4 @@
-import { getClient, StampRepository } from "$lib/database/index.ts";
+import { StampRepository } from "$lib/database/index.ts";
 import { paginate } from "$lib/utils/util.ts";
 import {
   AddressHandlerContext,
@@ -19,16 +19,13 @@ export const handler = async (
     const limit = Number(url.searchParams.get("limit")) || 1000;
     const page = Number(url.searchParams.get("page")) || 1;
 
-    const client = await getClient();
-
     const [data, totalResult, lastBlock] = await Promise.all([
       StampRepository.getStampBalancesByAddressFromDb(
-        client,
         address,
         limit,
         page,
       ),
-      StampRepository.getCountStampBalancesByAddressFromDb(client, address),
+      StampRepository.getCountStampBalancesByAddressFromDb(address),
       BlockService.getLastBlock(),
     ]);
 

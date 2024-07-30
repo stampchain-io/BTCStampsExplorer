@@ -1,8 +1,9 @@
-import { getClient, Src20Class } from "$lib/database/index.ts";
+import { Src20Class } from "$lib/database/index.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
 import { DeployResponseBody, TickHandlerContext } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { BlockService } from "$lib/services/blockService.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 export const handler = async (
   _req: Request,
@@ -11,7 +12,7 @@ export const handler = async (
   let { tick } = ctx.params;
   try {
     tick = convertEmojiToTick(String(tick));
-    const client = await getClient();
+    const client = await dbManager.getClient();
     const deployment = await Src20Class
       .get_valid_src20_tx_with_client(
         client,

@@ -2,7 +2,7 @@ import { Client } from "$mysql/mod.ts";
 import * as bitcoin from "bitcoin";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 
-import { getClient } from "$lib/database/index.ts";
+import { dbManager } from "$lib/database/db.ts";
 import { get_public_key_from_address } from "utils/quicknode.ts";
 import {
   checkDeployedTick,
@@ -38,7 +38,7 @@ export async function mintSRC20({
       amt,
     });
 
-    const client: Client = await getClient();
+    const client: Client = await dbManager.getClient();
     const mint_info = await checkMintedOut(
       client,
       tick,
@@ -73,7 +73,7 @@ export async function mintSRC20({
       publicKey,
     };
     const psbtHex = await prepareSrc20TX(prepare);
-    releaseClient(client);
+    dbManager.releaseClient(client);
     return psbtHex;
   } catch (error) {
     console.log(error.message);
@@ -102,7 +102,7 @@ export async function deploySRC20({
       lim,
       dec,
     });
-    const client = await getClient();
+    const client = await dbManager.getClient();
 
     const mint_info = await checkDeployedTick(client, tick);
     if (mint_info.deployed === true) {
@@ -167,7 +167,7 @@ export async function transferSRC20({
       feeRate,
       amt,
     });
-    const client = await getClient();
+    const client = await dbManager.getClient();
     const has_enough_balance = await checkEnoughBalance(
       client,
       fromAddress,

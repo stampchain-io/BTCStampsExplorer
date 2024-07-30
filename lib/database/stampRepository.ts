@@ -2,15 +2,14 @@ import { Client } from "$mysql/mod.ts";
 import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
 import { get_balances } from "utils/xcp.ts";
-import { handleSqlQueryWithCache } from "utils/cache.ts";
 import { getFileSuffixFromMime } from "utils/util.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { StampBalance, XCPBalance } from "globals";
 import { summarize_issuances } from "./index.ts";
+import { dbManager } from "$lib/database/db.ts";
 
 export class StampRepository {
   static async getTotalStampCountFromDb(
-    client: Client,
     type: "stamps" | "cursed" | "all",
     ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
   ) {
@@ -50,8 +49,7 @@ export class StampRepository {
     console.log("Total count query:", query);
     console.log("Total count query params:", queryParams);
 
-    return await handleSqlQueryWithCache(
-      client,
+    return await dbManager.executeQueryWithCache(
       query,
       queryParams,
       1000 * 60 * 3,
@@ -67,7 +65,6 @@ export class StampRepository {
    * @throws If there is an error retrieving the balances.
    */
   static async getCountStampBalancesByAddressFromDb(
-    client: Client,
     address: string,
   ) {
     try {
@@ -94,8 +91,7 @@ export class StampRepository {
         assets.map((asset: string) => `'${asset}'`).join(",")
       })
         `;
-      const balances = await handleSqlQueryWithCache(
-        client,
+      const balances = await dbManager.executeQueryWithCache(
         query,
         assets,
         DEFAULT_CACHE_DURATION,
@@ -111,8 +107,7 @@ export class StampRepository {
     client: Client,
     identifier: string,
   ) {
-    const data = await handleSqlQueryWithCache(
-      client,
+    const data = await dbManager.executeQueryWithCache(
       `
       SELECT tx_hash, stamp_hash, stamp_mimetype, cpid
       FROM ${STAMP_TABLE}
@@ -278,8 +273,7 @@ export class StampRepository {
     console.log(`Executing query:`, query);
     console.log(`Query params:`, queryParams);
 
-    const result = await handleSqlQueryWithCache(
-      client,
+    const result = await dbManager.executeQueryWithCache(
       query,
       queryParams,
       cacheDuration,
@@ -299,7 +293,6 @@ export class StampRepository {
    * @returns An array of summarized stamp balances for the given address.
    */
   static async getStampBalancesByAddressFromDb(
-    client: Client,
     address: string,
     limit = BIG_LIMIT,
     page = 1,
@@ -336,8 +329,7 @@ export class StampRepository {
         OFFSET ${offset};
       `;
 
-      const balances = await handleSqlQueryWithCache(
-        client,
+      const balances = await dbManager.executeQueryWithCache(
         query,
         assets,
         DEFAULT_CACHE_DURATION,

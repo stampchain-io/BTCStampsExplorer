@@ -1,25 +1,29 @@
 import { Client } from "$mysql/mod.ts";
 import { conf } from "utils/config.ts";
+import { connect, Redis } from "https://deno.land/x/redis/mod.ts";
+import * as crypto from "crypto";
 
-const maxRetries = parseInt(conf.DB_MAX_RETRIES) || 5;
-const retryInterval = 500;
+const MAX_RETRIES = parseInt(conf.DB_MAX_RETRIES) || 5;
+const RETRY_INTERVAL = 500;
+const MAX_POOL_SIZE = 10;
 
-class ConnectionPool {
+class DatabaseManager {
   private pool: Client[] = [];
-  private readonly maxPoolSize: number;
+  private redisClient: Redis | undefined;
+  private isConnectingRedis = false;
+  private redisRetryCount = 0;
 
-  constructor(maxPoolSize: number) {
-    this.maxPoolSize = maxPoolSize;
+  constructor() {
+    this.connectToRedisInBackground();
   }
 
-  async getClient(): Promise<Client> {
+  getClient(): Promise<Client> {
     if (this.pool.length > 0) {
-      return this.pool.pop() as Client;
+      return Promise.resolve(this.pool.pop() as Client);
     }
 
-    if (this.pool.length < this.maxPoolSize) {
-      const client = await this.createConnection();
-      return client;
+    if (this.pool.length < MAX_POOL_SIZE) {
+      return this.createConnection();
     }
 
     throw new Error("No available connections in the pool");
@@ -37,98 +41,140 @@ class ConnectionPool {
     }
   }
 
+  async closeAllClients(): Promise<void> {
+    for (const client of this.pool) {
+      await this.closeClient(client);
+    }
+  }
+
+  async executeQuery<T>(query: string, params: any[]): Promise<T> {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const client = await this.getClient();
+        const result = await client.execute(query, params);
+        this.releaseClient(client);
+        return result as T;
+      } catch (error) {
+        console.error(
+          `ERROR: Error executing query on attempt ${attempt}:`,
+          error,
+        );
+        if (attempt === MAX_RETRIES) {
+          throw error;
+        }
+      }
+      await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
+    }
+    throw new Error("Max retries reached");
+  }
+
+  async executeQueryWithCache<T>(
+    query: string,
+    params: any[],
+    cacheDuration: number | "never",
+  ): Promise<T> {
+    if (conf.ENV === "development" || conf.CACHE?.toLowerCase() === "false") {
+      return await this.executeQuery<T>(query, params);
+    }
+
+    const cacheKey = this.generateCacheKey(query, params);
+    return this.handleCache<T>(
+      cacheKey,
+      () => this.executeQuery<T>(query, params),
+      cacheDuration,
+    );
+  }
+
   private async createConnection(): Promise<Client> {
-    const hostname = conf.DB_HOST;
-    const username = conf.DB_USER;
-    const password = conf.DB_PASSWORD;
-    const port = conf.DB_PORT;
-    const db = conf.DB_NAME;
+    const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = conf;
     const client = await new Client().connect({
-      hostname,
-      port: Number(port),
-      username,
-      db,
-      password,
+      hostname: DB_HOST,
+      port: Number(DB_PORT),
+      username: DB_USER,
+      db: DB_NAME,
+      password: DB_PASSWORD,
     });
     return client;
   }
-}
 
-const connectionPool = new ConnectionPool(10); // Create a new connection pool with a maximum size of 10
+  private async connectToRedisInBackground(): Promise<void> {
+    if (!conf.ELASTICACHE_ENDPOINT || this.isConnectingRedis) {
+      return;
+    }
 
-export async function getClient() {
-  const client = await connectionPool.getClient();
-  return client;
-}
-
-export async function closeClient(client: Client) {
-  await connectionPool.closeClient(client);
-}
-
-export async function closeAllClients() {
-  for (const client of connectionPool.pool) {
-    await connectionPool.closeClient(client);
-  }
-}
-
-export function releaseClient(client: Client) {
-  connectionPool.releaseClient(client);
-}
-/**
- * Executes a database query with retry logic.
- *
- * @param query - The query to execute.
- * @param params - The parameters for the query.
- * @returns A Promise that resolves to the result of the query.
- * @throws If the query fails after the maximum number of retries.
- */
-export const handleQuery = async (query: string, params: string[]) => {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    this.isConnectingRedis = true;
     try {
-      const client = await getClient();
-      const result = await client?.execute(query, params);
-      closeClient(client);
-      return result;
+      this.redisClient = await connect({
+        hostname: conf.ELASTICACHE_ENDPOINT,
+        port: 6379,
+        tls: true,
+      });
+      console.log("Connected to Redis successfully");
+      this.redisRetryCount = 0;
     } catch (error) {
-      console.error(
-        `ERROR: Error executing query on attempt ${attempt}:`,
-        error,
-      );
-      if (attempt === maxRetries) {
-        throw error;
+      console.error("Failed to connect to Redis:", error);
+      if (this.redisRetryCount < MAX_RETRIES) {
+        this.redisRetryCount++;
+        setTimeout(() => this.connectToRedisInBackground(), 10000);
+      } else {
+        console.error("Max retries reached, giving up on Redis connection.");
+        this.redisClient = undefined;
+      }
+    } finally {
+      this.isConnectingRedis = false;
+    }
+  }
+
+  private generateCacheKey(query: string, params: any[]): string {
+    const input = `${query}:${JSON.stringify(params)}`;
+    return crypto.createHash("sha256").update(input).digest("hex").toString();
+  }
+  public async handleCache<T>(
+    key: string,
+    fetchData: () => Promise<T>,
+    cacheDuration: number | "never",
+  ): Promise<T> {
+    const cachedData = await this.getCachedData(key);
+    if (cachedData) {
+      return cachedData as T;
+    }
+
+    const data = await fetchData();
+    await this.setCachedData(key, data, cacheDuration);
+    return data;
+  }
+
+  private async getCachedData(key: string): Promise<any | null> {
+    if (this.redisClient) {
+      try {
+        const data = await this.redisClient.get(key);
+        return data ? JSON.parse(data) : null;
+      } catch (error) {
+        console.error("Failed to read from Redis cache:", error);
+        this.connectToRedisInBackground();
       }
     }
-    await new Promise((resolve) => setTimeout(resolve, retryInterval));
+    return null;
   }
-};
 
-/**
- * Executes a database query using the provided client and handles retries in case of failure.
- *
- * @param client - The database client to use for executing the query.
- * @param query - The query to execute.
- * @param params - The parameters to pass to the query.
- * @returns A Promise that resolves to the result of the query execution.
- * @throws If the query execution fails after the maximum number of retries.
- */
-export const handleQueryWithClient = async (
-  client: Client,
-  query: string,
-  params: string[],
-) => {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const result = await client.execute(query, params);
-      return result;
-    } catch (error) {
-      console.error(
-        `ERROR: Error executing query with client on attempt ${attempt}:`,
-        error,
-      );
-      if (attempt === maxRetries) {
-        throw new Error("Stamps Down...");
+  private async setCachedData(
+    key: string,
+    data: any,
+    expiry: number | "never",
+  ): Promise<void> {
+    if (this.redisClient) {
+      try {
+        if (expiry === "never") {
+          await this.redisClient.set(key, JSON.stringify(data));
+        } else {
+          await this.redisClient.set(key, JSON.stringify(data), { ex: expiry });
+        }
+      } catch (error) {
+        console.error("Failed to write to Redis cache:", error);
+        this.connectToRedisInBackground();
       }
     }
-    await new Promise((resolve) => setTimeout(resolve, retryInterval));
   }
-};
+}
+
+export const dbManager = new DatabaseManager();
