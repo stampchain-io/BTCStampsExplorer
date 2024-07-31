@@ -68,7 +68,7 @@ export class CollectionRepository {
     return result.rows[0].total;
   }
 
-  static async getCollectionByName(client: Client, collectionName: string) {
+  static async getCollectionByName(collectionName: string) {
     const query = `
       SELECT 
         HEX(c.collection_id) as collection_id,

@@ -12,7 +12,6 @@ export class Src20Class {
    * @deprecated This method will be removed in the next major version. Use Src20Controller.getTotalCountValidSrc20TxFromDb instead.
    */
   static async get_total_valid_src20_tx_with_client(
-    client: Client,
     tick: string | null = null,
     op: string | null = null,
     block_index: number | null = null,

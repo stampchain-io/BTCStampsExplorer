@@ -84,7 +84,7 @@ export async function checkParams({
       if (client) {
         try {
           const token_status = await Src20Class
-            .get_total_valid_src20_tx_with_client(client, tick, "DEPLOY");
+            .get_total_valid_src20_tx_with_client(tick, "DEPLOY");
           if (!token_status.rows[0]["total"]) {
             return { deployed: false };
           }
@@ -135,7 +135,6 @@ export async function checkDeployedTick(
   try {
     const token_status = await Src20Class
       .get_total_valid_src20_tx_with_client(
-        client,
         tick,
         "DEPLOY",
       );
