@@ -39,7 +39,6 @@ export async function mintSRC20({
 
     const client: Client = await dbManager.getClient();
     const mint_info = await checkMintedOut(
-      client,
       tick,
       amt,
     );
