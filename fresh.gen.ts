@@ -89,7 +89,10 @@ import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
+import * as $mint_DeployContent from "./islands/mint/DeployContent.tsx";
+import * as $mint_MintContent from "./islands/mint/MintContent.tsx";
 import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
+import * as $mint_TransferContent from "./islands/mint/TransferContent.tsx";
 import * as $mint_UploadImage from "./islands/mint/UploadImage.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
@@ -212,7 +215,10 @@ const manifest = {
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
     "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
+    "./islands/mint/DeployContent.tsx": $mint_DeployContent,
+    "./islands/mint/MintContent.tsx": $mint_MintContent,
     "./islands/mint/MintHeader.tsx": $mint_MintHeader,
+    "./islands/mint/TransferContent.tsx": $mint_TransferContent,
     "./islands/mint/UploadImage.tsx": $mint_UploadImage,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,

@@ -28,7 +28,7 @@ export const CollectionHeader = (
           STAMPS
         </p>
         <p
-          class={selectedTab === "Rare"
+          class={selectedTab === "Posh"
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
           onClick={() => setSelectedTab("Posh")}

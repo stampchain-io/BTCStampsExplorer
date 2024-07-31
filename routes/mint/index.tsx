@@ -1,15 +1,18 @@
+import { MintPageProps } from "globals";
 import { MintHeader } from "$islands/mint/MintHeader.tsx";
 import { Handlers } from "$fresh/server.ts";
-import { UploadImage } from "../../islands/mint/UploadImage.tsx";
+import { MintContent } from "$islands/mint/MintContent.tsx";
+import { DeployContent } from "$islands/mint/DeployContent.tsx";
 
 //TODO: Add pagination
 
 export const handler: Handlers = {
-  async GET(_req: Request, ctx) {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-      const body = {};
-      return await ctx.render(body);
+      const selectedTab = url.searchParams.get("ident") || "mint";
+      const res = { selectedTab };
+      return await ctx.render(res);
     } catch (error) {
       console.error(error);
       const body = { error: `Error: Internal server error` };
@@ -18,15 +21,15 @@ export const handler: Handlers = {
   },
 };
 
-export function MintPage(props) {
-  const { data, total, page, pages, limit } = props.data;
+export function MintPage(props: MintPageProps) {
+  const { selectedTab } = props.data;
   return (
-    <div className={"self-center"}>
-      <MintHeader />
-      <div class={"text-yellow-600 text-[26px] font-bold"}>
-        Mint OLGA Stamp (P2WSH)
+    <div>
+      <MintHeader selectedTab={selectedTab} />
+      <div className={"self-center max-w-[680px] mx-auto"}>
+        {selectedTab === "mint" && <MintContent />}
+        {selectedTab === "deploy" && <DeployContent />}
       </div>
-      <UploadImage />
     </div>
   );
 }
