@@ -1,6 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
 
-import { Client } from "$mysql/mod.ts";
 import { STAMP_TABLE } from "utils/constants.ts";
 import { dbManager } from "$lib/database/db.ts";
 

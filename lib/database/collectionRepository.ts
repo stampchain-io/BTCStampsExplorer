@@ -1,4 +1,3 @@
-import { Client } from "$mysql/mod.ts";
 import { SMALL_LIMIT } from "constants";
 import { dbManager } from "$lib/database/db.ts";
 
@@ -63,7 +62,7 @@ export class CollectionRepository {
       query,
       queryParams,
       1000 * 60 * 30,
-    );
+    ) as { rows: [{ total: number }] };
 
     return result.rows[0].total;
   }

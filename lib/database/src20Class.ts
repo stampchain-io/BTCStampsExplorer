@@ -66,7 +66,6 @@ export class Src20Class {
    * @deprecated This method will be removed in the next major version. Use getValidSrc20TxFromDb instead.
    */
   static async get_valid_src20_tx_with_client(
-    client: Client,
     block_index: number | null = null,
     tick: string | string[] | null = null,
     op: string | null = null,
@@ -226,7 +225,6 @@ export class Src20Class {
       ? results.rows.map((result) => result.tick)
       : [];
     const tx_hashes_response = await Src20Class.get_valid_src20_tx_with_client(
-      client,
       null,
       ticksToQuery.length > 0 ? ticksToQuery : tick,
       "DEPLOY",
