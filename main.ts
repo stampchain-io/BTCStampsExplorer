@@ -4,14 +4,14 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import "./globals.ts";
+import "$/globals.ts";
+import { Manifest } from "$fresh/server.ts";
 
 import "$std/dotenv/load.ts";
 
 import { start } from "$fresh/server.ts";
-import manifest from "./fresh.gen.ts";
-import config from "./fresh.config.ts";
-import { conf } from "utils/config.ts";
+import manifest from "$/fresh.gen.ts";
+import config from "$/fresh.config.ts";
 // Import for dbManager initialization
 import "$lib/database/db.ts";
 
@@ -19,14 +19,7 @@ import "$lib/database/db.ts";
 // import twindConfig from "./twind.config.ts";
 
 async function startApp() {
-  if (conf.CACHE?.toLowerCase() === "true") {
-    console.log(
-      "Database manager initialized (includes Redis connection if configured)",
-    );
-    // The dbManager is already initialized when imported, which starts the Redis connection if configured
-  }
-  // Start your server
-  await start(manifest, config);
+  await start(manifest as unknown as Manifest, config);
 }
 
 startApp().catch((error) => {
