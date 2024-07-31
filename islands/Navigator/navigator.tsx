@@ -43,14 +43,14 @@ export const NavigatorProvider = ({ children }) => {
     }
   };
 
-  const setTypeOptionData = (value: string) => {
+  const setTypeOptionData = (prefix: string, value: string) => {
     setTypeOption(value);
     console.log("Type option: ", value);
     if (globalThis.history) {
       globalThis.history.pushState(
         {},
         "",
-        `/stamp?sortBy=${sortOption}&filterBy=${filterOption}&ident=${value}`,
+        `/${prefix}?sortBy=${sortOption}&filterBy=${filterOption}&ident=${value}`,
       );
       window.location.reload();
     }
