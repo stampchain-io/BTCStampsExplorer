@@ -12,9 +12,10 @@ class DatabaseManager {
   private redisClient: Redis | undefined;
   private isConnectingRedis = false;
   private redisRetryCount = 0;
+  private redisAvailable = false;
 
   constructor() {
-    this.connectToRedisInBackground();
+    this.initializeRedisConnection();
   }
 
   getClient(): Promise<Client> {
@@ -97,28 +98,51 @@ class DatabaseManager {
     return client;
   }
 
-  private async connectToRedisInBackground(): Promise<void> {
-    if (!conf.ELASTICACHE_ENDPOINT || this.isConnectingRedis) {
+  private async initializeRedisConnection(): Promise<void> {
+    console.log("Initializing Redis connection...");
+
+    if (conf.ENV === "development" || !conf.ELASTICACHE_ENDPOINT) {
+      console.log(
+        "Skipping Redis connection in development or due to missing endpoint",
+      );
       return;
     }
 
+    try {
+      await this.connectToRedis();
+    } catch (error) {
+      console.error("Failed to connect to Redis at startup:", error);
+      console.log(
+        "Continuing without Redis. Will retry connection in background.",
+      );
+      this.connectToRedisInBackground();
+    }
+  }
+
+  private async connectToRedis(): Promise<void> {
+    this.redisClient = await connect({
+      hostname: conf.ELASTICACHE_ENDPOINT,
+      port: 6379,
+      tls: true,
+    });
+    console.log("Connected to Redis successfully");
+    this.redisAvailable = true;
+    this.redisRetryCount = 0;
+  }
+
+  private async connectToRedisInBackground(): Promise<void> {
+    if (this.isConnectingRedis) return;
+
     this.isConnectingRedis = true;
     try {
-      this.redisClient = await connect({
-        hostname: conf.ELASTICACHE_ENDPOINT,
-        port: 6379,
-        tls: true,
-      });
-      console.log("Connected to Redis successfully");
-      this.redisRetryCount = 0;
+      await this.connectToRedis();
     } catch (error) {
       console.error("Failed to connect to Redis:", error);
       if (this.redisRetryCount < MAX_RETRIES) {
         this.redisRetryCount++;
-        setTimeout(() => this.connectToRedisInBackground(), 10000);
+        setTimeout(() => this.connectToRedisInBackground(), RETRY_INTERVAL);
       } else {
         console.error("Max retries reached, giving up on Redis connection.");
-        this.redisClient = undefined;
       }
     } finally {
       this.isConnectingRedis = false;
@@ -129,11 +153,16 @@ class DatabaseManager {
     const input = `${query}:${JSON.stringify(params)}`;
     return crypto.createHash("sha256").update(input).digest("hex").toString();
   }
+
   public async handleCache<T>(
     key: string,
     fetchData: () => Promise<T>,
     cacheDuration: number | "never",
   ): Promise<T> {
+    if (!this.redisAvailable) {
+      return await fetchData();
+    }
+
     const cachedData = await this.getCachedData(key);
     if (cachedData) {
       return cachedData as T;
