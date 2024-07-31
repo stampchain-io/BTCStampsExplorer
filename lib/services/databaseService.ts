@@ -1,8 +1,7 @@
-import { releaseClient } from "$lib/database/index.ts";
 import { Client } from "$mysql/mod.ts";
 import { dbManager } from "$lib/database/db.ts";
 
-export async function withDatabaseClient<T>(
+export async function withDatabaseClient<T>( // FIXME: remove calls to this and go directly to the dbManager
   operation: (client: Client) => Promise<T>,
 ): Promise<T> {
   const client = await dbManager.getClient();

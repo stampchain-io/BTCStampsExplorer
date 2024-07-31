@@ -250,47 +250,9 @@ export class Src20Class {
   }
 
   /**
-   * @deprecated This method will be removed in the next major version. Use  instead.
-   */
-  static async get_total_src20_holders_by_tick_with_client(
-    client: Client,
-    tick: string | null = null,
-    amt = 0,
-  ) {
-    const queryParams = [];
-    const whereConditions = [];
-
-    if (tick !== null) {
-      whereConditions.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
-      queryParams.push(tick);
-    }
-
-    // Always include amt condition
-    whereConditions.push(`amt > ?`);
-    queryParams.push(amt);
-
-    let sqlQuery = `
-      SELECT COUNT(*) AS total
-      FROM ${SRC20_BALANCE_TABLE}
-    `;
-
-    // Add WHERE clause if there are conditions
-    if (whereConditions.length > 0) {
-      sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
-    }
-
-    return await dbManager.executeQueryWithCache(
-      sqlQuery,
-      queryParams,
-      1000 * 60 * 2,
-    );
-  }
-
-  /**
-   * @deprecated This method will be removed in the next major version. Use  instead.
+   * @deprecated This method will be removed in the next major version. Use  getSrc20MintProgressByTickFromDb ? instead.
    */
   static async get_src20_minting_progress_by_tick_with_client(
-    client: Client,
     tick: string,
   ) {
     const max_supply_data = await dbManager.executeQueryWithCache(
@@ -344,58 +306,5 @@ export class Src20Class {
       decimals,
       limit,
     };
-  }
-
-  /**
-   * @deprecated This method will be removed in the next major version. Use  instead.
-   */
-  static async get_src20_minting_progress_by_tick_with_client_new(
-    client: Client,
-    tick: string,
-  ) {
-    const query = `
-        SELECT 
-            src.max,
-            src.deci,
-            src.lim,
-            COUNT(CASE WHEN src.op = 'MINT' THEN 1 ELSE NULL END) as total_mints,
-            SUM(CASE WHEN balance.tick COLLATE utf8mb4_0900_as_ci = '${tick}' THEN balance.amt ELSE 0 END) as total_minted
-        FROM ${SRC20_TABLE} as src
-            LEFT JOIN ${SRC20_BALANCE_TABLE} as balance ON src.tick = balance.tick
-        WHERE 
-            src.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-            AND src.op = 'DEPLOY'
-        GROUP BY 
-            src.max, src.deci, src.lim;
-    `;
-
-    const data = await dbManager.executeQueryWithCache(query, [
-      tick,
-      tick,
-    ], 0);
-
-    if (data.rows.length === 0) {
-      return null;
-    }
-
-    const row = data.rows[0];
-    const max_supply = new BigFloat(row["max"]);
-    const limit = new BigFloat(row["lim"]);
-    const decimals = parseInt(row["deci"]);
-    const total_mints = parseInt(row["total_mints"]);
-    const total_minted = new BigFloat(row["total_minted"] ?? 0);
-    const progress = parseFloat(total_minted.div(max_supply).mul(100)).toFixed(
-      3,
-    );
-    const response = {
-      max_supply: max_supply.toString(),
-      total_minted: total_minted.toString(),
-      limit: limit.toString(),
-      total_mints: total_mints,
-      progress,
-      decimals,
-    };
-
-    return response;
   }
 }

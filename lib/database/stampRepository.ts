@@ -123,7 +123,6 @@ export class StampRepository {
   }
 
   static async getStampsFromDb(
-    client: Client,
     options: {
       limit?: number;
       page?: number;

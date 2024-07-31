@@ -24,7 +24,7 @@ export const handler = async (
   try {
     return await withDatabaseClient(async (client) => {
       const [data, totalResult, lastBlock] = await Promise.all([
-        StampRepository.getStampsFromDb(client, { // FIXME: udpate to controller call
+        StampRepository.getStampsFromDb({ // FIXME: udpate to controller call
           limit,
           page,
           sort_order,

@@ -7,7 +7,7 @@ import {
   get_holders,
   get_sends,
 } from "utils/xcp.ts";
-import { SUBPROTOCOLS } from "globals";
+import { StampBalance, SUBPROTOCOLS } from "globals";
 
 export class StampService {
   static async getStampDetailsById(id: string) {
@@ -15,7 +15,7 @@ export class StampService {
     try {
       return await withDatabaseClient(async (client) => {
         console.log(`Querying database for stamp with id: ${id}`);
-        const stampResult = await StampRepository.getStampsFromDb(client, {
+        const stampResult = await StampRepository.getStampsFromDb({
           identifier: id,
           all_columns: true,
           noPagination: true,
@@ -76,7 +76,7 @@ export class StampService {
       try {
         const isSingleStamp = !!options.identifier;
         const [stamps, total] = await Promise.all([
-          StampRepository.getStampsFromDb(client, {
+          StampRepository.getStampsFromDb({
             ...options,
             limit: options.page_size || options.limit,
             all_columns: isSingleStamp ? true : options.all_columns,
@@ -144,10 +144,12 @@ export class StampService {
   ) {
     return await withDatabaseClient(async () => {
       const totalStamps = await StampRepository
-        .getCountStampBalancesByAddressFromDb(address);
+        .getCountStampBalancesByAddressFromDb(address) as {
+          rows: { total: number }[];
+        };
       const total = totalStamps.rows[0]?.total || 0;
 
-      let stamps = [];
+      let stamps: StampBalance[] = [];
       if (total !== 0) {
         stamps = await StampRepository.getStampBalancesByAddressFromDb(
           address,

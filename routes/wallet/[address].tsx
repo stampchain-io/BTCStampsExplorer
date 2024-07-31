@@ -1,4 +1,4 @@
-import { api_get_balance } from "$lib/controller/wallet.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { StampCard } from "$components/StampCard.tsx";
 import BtcAddressInfo from "$components/BtcAddressInfo.tsx";
 import { SRC20BalanceTable } from "$components/SRC20BalanceTable.tsx";
@@ -11,22 +11,21 @@ type WalletPageProps = {
     btc: any;
   };
 };
+
 export const handler: Handlers = {
   async GET(_req: Request, ctx) {
     const { address } = ctx.params;
-    const { data: { stamps, src20 }, btc } = await api_get_balance(address);
+    const response = await Src20Controller.handleWalletBalanceRequest(address);
+    const responseData = await response.json();
+
     const data = {
-      data: {
-        stamps,
-        src20,
-        btc,
-      },
+      data: responseData.data,
       page: 1,
       limit: 10,
       totalPages: 1,
       total: 1,
     };
-    // console.log("API Response Wallet:", data); // Debug output
+
     return await ctx.render(data);
   },
 };
