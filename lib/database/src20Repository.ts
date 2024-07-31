@@ -1,4 +1,3 @@
-import { Client } from "$mysql/mod.ts";
 import { conf } from "utils/config.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { bigFloatToString } from "utils/util.ts";
@@ -16,7 +15,6 @@ import { dbManager } from "$lib/database/db.ts";
 
 export class SRC20Repository {
   static async getTotalCountValidSrc20TxFromDb(
-    client: Client,
     params: SRC20TrxRequestParams,
   ) {
     const {
@@ -72,7 +70,6 @@ export class SRC20Repository {
   }
 
   static async getValidSrc20TxFromDb(
-    client: Client,
     params: SRC20TrxRequestParams,
   ) {
     const {
@@ -174,7 +171,6 @@ export class SRC20Repository {
   }
 
   static async getSrc20BalanceFromDb(
-    client: Client,
     params: Partial<SRC20BalanceRequestParams & SRC20SnapshotRequestParams>,
   ) {
     const { address, tick, amt, limit, page, sort: sortBy = "ASC" } = params;
@@ -232,7 +228,6 @@ export class SRC20Repository {
       ? results.rows.map((result: { tick: string }) => result.tick)
       : [];
     const tx_hashes_response = await SRC20Repository.getValidSrc20TxFromDb(
-      client,
       {
         tick: ticksToQuery.length > 0 ? ticksToQuery : undefined,
         op: "DEPLOY",
@@ -258,8 +253,7 @@ export class SRC20Repository {
     return resultsWithDeployImg;
   }
 
-  static async getTotalSrc20HoldersByTick(
-    client: Client,
+  static async getTotalSrc20HoldersByTickFromDb(
     tick: string | null = null,
     amt = 0,
   ) {

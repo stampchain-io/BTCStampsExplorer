@@ -24,17 +24,13 @@ export const handler = async (
     const page = Number(url.searchParams.get("page")) || 1;
     const op = url.searchParams.get("op");
     const sort = url.searchParams.get("sort") || "ASC";
-    const client = await dbManager.getClient();
     tick = convertEmojiToTick(String(tick));
     const src20_txs = await SRC20Repository.getValidSrc20TxFromDb(
-      client,
       { tick, op, limit, page, sort },
     );
 
     const total = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
-      client,
-      tick,
-      op,
+      { tick, op },
     );
     const lastBlock = await BlockService.getLastBlock();
     const pagination = paginate(total.rows[0]["total"], page, limit);

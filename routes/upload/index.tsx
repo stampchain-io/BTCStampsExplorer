@@ -15,14 +15,11 @@ export const handler: Handlers = {
       const limit = Number(url.searchParams.get("limit")) || 1000;
       const page = Number(url.searchParams.get("page")) || 1;
 
-      const client = await dbManager.getClient();
       const data = await SRC20Repository.getValidSrc20TxFromDb(
-        client,
         { op: "DEPLOY", limit, page },
       );
       const total = await SRC20Repository
         .getTotalCountValidSrc20TxFromDb(
-          client,
           { op: "DEPLOY" },
         );
       const lastBlock = await BlockService.getLastBlock();
