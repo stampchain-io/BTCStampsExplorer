@@ -20,7 +20,7 @@ export const createSharedStampIndexHandler = (
 
       const body = await withDatabaseClient(async (client) => {
         const [data, totalResult, lastBlock] = await Promise.all([
-          StampRepository.getStampsFromDb(client, {
+          StampRepository.getStampsFromDb({
             limit,
             page,
             sort_order,

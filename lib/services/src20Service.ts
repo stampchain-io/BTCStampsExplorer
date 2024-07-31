@@ -132,6 +132,27 @@ export class Src20Service {
     });
   }
 
+  static async fetchSingleSrc20Balance(
+    address: string,
+    tick: string,
+  ): Promise<Src20BalanceResponseBody> {
+    return await withDatabaseClient(async (client) => {
+      const [src20, lastBlock] = await Promise.all([
+        SRC20Repository.getSrc20BalanceFromDb(client, { address, tick }),
+        BlockService.getLastBlock(),
+      ]);
+
+      if (!src20 || src20.length === 0) {
+        throw new Error("SRC20 balance not found");
+      }
+
+      return {
+        last_block: lastBlock.last_block,
+        data: src20[0],
+      };
+    });
+  }
+
   static async fetchAndFormatSrc20Snapshot(
     params: SRC20SnapshotRequestParams,
   ): Promise<Src20SnapshotResponseBody> {
@@ -164,12 +185,7 @@ export class Src20Service {
   }
 
   static async getSrc20MintProgressByTick(tick: string) {
-    return await withDatabaseClient(async (client) => {
-      return await SRC20Repository.getSrc20MintProgressByTickFromDb(
-        client,
-        tick,
-      );
-    });
+    return await SRC20Repository.getSrc20MintProgressByTickFromDb(tick);
   }
 
   private static mapTransactionData(rows: any[]) {
@@ -204,5 +220,18 @@ export class Src20Service {
         balance: row.amt,
       })),
     };
+  }
+
+  static async checkMintedOut(tick: string, amount: string) {
+    return await withDatabaseClient(async (client) => {
+      const mint_status = await SRC20Repository
+        .getSrc20MintProgressByTickFromDb(tick);
+      if (!mint_status) {
+        throw new Error("Tick not found");
+      }
+      const { max_supply, total_minted } = mint_status;
+      const isMintedOut = new Big(total_minted).plus(amount).gt(max_supply);
+      return { ...mint_status, minted_out: isMintedOut };
+    });
   }
 }

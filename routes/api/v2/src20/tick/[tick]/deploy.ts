@@ -1,9 +1,7 @@
-import { Src20Class } from "$lib/database/index.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
-import { DeployResponseBody, TickHandlerContext } from "globals";
+import { TickHandlerContext } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
-import { BlockService } from "$lib/services/blockService.ts";
-import { dbManager } from "$lib/database/db.ts";
 
 export const handler = async (
   _req: Request,
@@ -12,40 +10,39 @@ export const handler = async (
   let { tick } = ctx.params;
   try {
     tick = convertEmojiToTick(String(tick));
-    const client = await dbManager.getClient();
-    const deployment = await Src20Class
-      .get_valid_src20_tx_with_client(
-        client,
-        null,
-        [tick],
-        "DEPLOY",
-      );
-    const mint_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client(
-        client,
-        tick,
-      );
-    const lastBlock = await BlockService.getLastBlock();
 
-    const body: DeployResponseBody = {
-      last_block: lastBlock.last_block,
-      mint_status: {
-        ...mint_status,
-        max_supply: (mint_status.max_supply
-          ? mint_status.max_supply.toString()
-          : null) as string,
-        total_minted: (mint_status.total_minted
-          ? mint_status.total_minted.toString()
-          : null) as string,
-        limit: mint_status.limit ? mint_status.limit : null,
-      },
+    const deploymentResponse = await Src20Controller
+      .handleSrc20TransactionsRequest(_req, {
+        tick: [tick],
+        op: "DEPLOY",
+        limit: 1,
+        page: 1,
+      });
+    const deploymentData = await deploymentResponse.json();
+
+    const mintStatusResponse = await Src20Controller
+      .handleSrc20MintProgressRequest(tick);
+    const mintStatusData = await mintStatusResponse.json();
+
+    const lastBlockResponse = await Src20Controller
+      .handleSrc20TransactionsRequest(_req, {
+        limit: 1,
+        page: 1,
+        sort: "DESC",
+      });
+    const lastBlockData = await lastBlockResponse.json();
+
+    const body = {
+      last_block: lastBlockData.last_block,
+      mint_status: mintStatusData,
       data: {
-        ...deployment.rows[0],
-        tick: convertToEmoji(deployment.rows[0].tick),
+        ...deploymentData.data[0],
+        tick: convertToEmoji(deploymentData.data[0].tick),
       },
     };
-    return ResponseUtil.success(body); // Return the object directly
-  } catch (_error) {
+    return ResponseUtil.success(body);
+  } catch (error) {
+    console.error("Error in deploy handler:", error);
     return ResponseUtil.error(`Error: Internal server error`);
   }
 };

@@ -1,33 +1,31 @@
-import { PaginatedDispenserResponseBody, PaginatedRequest } from "globals";
+import { Handlers } from "$fresh/server.ts";
 import { paginate } from "$lib/utils/util.ts";
 import { get_all_dispensers } from "$lib/utils/xcp.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { withDatabaseClient } from "$lib/services/databaseService.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 
-export const handler = async (
-  req: PaginatedRequest,
-): Promise<Response> => {
-  try {
-    const url = new URL(req.url);
-    const { limit, page } = getPaginationParams(url);
+export const handler: Handlers = {
+  async GET(req) {
+    try {
+      const url = new URL(req.url);
+      const { limit, page } = getPaginationParams(url);
 
-    const body = await withDatabaseClient(async (client) => {
-      const lastBlock = await BlockService.getLastBlock();
-      const { total, dispensers } = await get_all_dispensers(page, limit);
-      const pagination = paginate(total, page, limit);
+      const [lastBlock, { total, dispensers }] = await Promise.all([
+        BlockService.getLastBlock(),
+        get_all_dispensers(page, limit),
+      ]);
 
-      return {
-        ...pagination,
+      const body = {
+        ...paginate(total, page, limit),
         last_block: lastBlock.last_block,
         dispensers,
-      } as PaginatedDispenserResponseBody;
-    });
+      };
 
-    return ResponseUtil.success(body);
-  } catch (error) {
-    console.error("Error:", error);
-    return ResponseUtil.error("Error: Internal server error", 500);
-  }
+      return ResponseUtil.success(body);
+    } catch (error) {
+      console.error("Error:", error);
+      return ResponseUtil.error("Internal server error", 500);
+    }
+  },
 };

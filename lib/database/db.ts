@@ -1,6 +1,6 @@
 import { Client } from "$mysql/mod.ts";
 import { conf } from "utils/config.ts";
-import { connect, Redis } from "https://deno.land/x/redis/mod.ts";
+import { connect, Redis } from "redis";
 import * as crypto from "crypto";
 
 const MAX_RETRIES = parseInt(conf.DB_MAX_RETRIES) || 5;
@@ -99,6 +99,11 @@ class DatabaseManager {
   }
 
   private async initializeRedisConnection(): Promise<void> {
+    if (globalThis.SKIP_REDIS_CONNECTION) {
+      console.log("Skipping Redis connection for build process");
+      return;
+    }
+
     console.log("Initializing Redis connection...");
 
     if (conf.ENV === "development" || !conf.ELASTICACHE_ENDPOINT) {

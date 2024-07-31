@@ -11,6 +11,7 @@ import { BlockService } from "$lib/services/blockService.ts";
 import { SRC20Repository } from "$lib/database/src20Repository.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { dbManager } from "$lib/database/db.ts";
+import { Src20Service } from "$lib/services/src20Service.ts";
 
 export const handler = async (
   req: PaginatedRequest,
@@ -38,24 +39,19 @@ export const handler = async (
     const lastBlock = await BlockService.getLastBlock();
     const pagination = paginate(total.rows[0]["total"], page, limit);
     //TODO: review this
-    const mint_status = await SRC20Repository
-      .getSrc20MintProgressByTickFromDb(
-        client,
-        tick,
-      );
+
+    const mint_status = await Src20Service.getSrc20MintProgressByTick(tick);
     const body: PaginatedTickResponseBody = {
       ...pagination,
       last_block: lastBlock.last_block,
-      mint_status: {
-        ...mint_status,
-        max_supply: (mint_status.max_supply
-          ? mint_status.max_supply.toString()
-          : null) as string,
-        total_minted: (mint_status.total_minted
-          ? mint_status.total_minted.toString()
-          : null) as string,
-        limit: mint_status.limit ? mint_status.limit : null,
-      },
+      mint_status: mint_status
+        ? {
+          ...mint_status,
+          max_supply: mint_status.max_supply?.toString() ?? null,
+          total_minted: mint_status.total_minted?.toString() ?? null,
+          limit: mint_status.limit ?? null,
+        }
+        : null,
       data: src20_txs.rows.map((tx: any) => {
         return {
           ...tx,

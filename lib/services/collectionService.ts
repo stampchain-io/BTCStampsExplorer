@@ -13,7 +13,7 @@ export class CollectionService {
   static async getCollections(
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
-    return await withDatabaseClient(async (client) => {
+    return await withDatabaseClient(async () => {
       const { limit = 50, page = 1, creator } = params;
 
       const [collectionsResult, totalCollections, lastBlock] = await Promise
@@ -25,7 +25,7 @@ export class CollectionService {
 
       const collections: Collection[] = await Promise.all(
         collectionsResult.rows.map(async (row: any) => {
-          const stamps = await StampRepository.getStampsFromDb(client, {
+          const stamps = await StampRepository.getStampsFromDb({
             limit: 10,
             collectionId: row.collection_id,
             noPagination: true,
@@ -65,7 +65,7 @@ export class CollectionService {
       }
 
       const row = collectionResult.rows[0];
-      const stamps = await StampRepository.getStampsFromDb(client, {
+      const stamps = await StampRepository.getStampsFromDb({
         limit: 10,
         collectionId: row.collection_id,
         noPagination: true,

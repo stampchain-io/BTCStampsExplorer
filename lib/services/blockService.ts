@@ -11,7 +11,7 @@ export class BlockService {
       const [block_info, last_block, data] = await Promise.all([
         BlockRepository.getBlockInfoFromDb(blockIdentifier),
         this.getLastBlock(),
-        StampRepository.getStampsFromDb(client, {
+        StampRepository.getStampsFromDb({
           type,
           blockIdentifier,
           sort_order: "asc",

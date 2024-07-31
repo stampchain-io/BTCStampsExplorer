@@ -11,7 +11,7 @@ import {
   checkMintedOut,
   checkMintParams,
   checkTransferParams,
-} from "./check.ts";
+} from "utils/minting/src20/check.ts";
 import { prepareSrc20TX } from "./tx.ts";
 import { getUTXOForAddress } from "./utils.ts";
 import {
@@ -20,7 +20,6 @@ import {
   IPrepareSRC20TX,
   ITransferSRC20,
 } from "utils/minting/src20/src20.d.ts";
-import { releaseClient } from "$lib/database/db.ts";
 
 export async function mintSRC20({
   toAddress,

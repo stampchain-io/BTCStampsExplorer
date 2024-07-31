@@ -1,36 +1,25 @@
 import { BigFloat } from "bigfloat/mod.ts";
-import { Client } from "$mysql/mod.ts";
 
 import { Src20Class } from "$lib/database/index.ts";
 import { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "./src20.d.ts";
 import { isValidBitcoinAddress } from "./utils.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
-export async function checkMintedOut(
-  client: Client,
-  tick: string,
-  amount: string,
-) {
+export async function checkMintedOut(tick: string, amount: string) {
   try {
-    const mint_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client(
-        client,
-        tick,
-      );
-    if (!mint_status) {
-      throw new Error("Tick not found");
+    const response = await Src20Controller.handleCheckMintedOut(tick, amount);
+    const result = await response.json();
+    if (response.ok) {
+      return result;
+    } else {
+      throw new Error(result.error || "Error checking minted out status");
     }
-    const { max_supply, total_minted } = mint_status;
-    if (new BigFloat(total_minted).add(new BigFloat(amount)).gt(max_supply)) {
-      return { ...mint_status, minted_out: true };
-    }
-    return { ...mint_status, minted_out: false };
   } catch (error) {
     console.error(error);
     throw new Error("Error: Internal server error");
   }
 }
 
-// TODO: Implement and replace mint/deploy functions
 export async function checkParams({
   operation, // "Mint" or "Deploy"
   toAddress,
@@ -138,6 +127,7 @@ export function checkMintParams({
     throw new Error("Error: amt not found or invalid");
   }
 }
+
 export async function checkDeployedTick(
   client: Client,
   tick: string,
@@ -200,25 +190,29 @@ export function checkDeployParams({
 }
 
 export async function checkEnoughBalance(
-  client: Client,
   address: string,
   tick: string,
   amount: string,
 ) {
   try {
-    const balance_address_tick_data = await Src20Class
-      .get_src20_balance_with_client(
-        client,
-        address,
-        tick,
-      );
+    const params = {
+      address,
+      tick,
+      limit: 1,
+      page: 1,
+    };
 
-    if (!balance_address_tick_data) {
-      console.error("balance_address_tick_data is undefined");
+    const response = await Src20Controller.handleSrc20BalanceRequest(params);
+    const balanceData = await response.json();
+
+    if (!balanceData || !balanceData.data) {
+      console.error("No SRC-20 token balance found");
       throw new Error("No SRC-20 token balance found");
     }
 
-    if (new BigFloat(amount).gt(balance_address_tick_data.amt)) {
+    const balance = balanceData.data.amt;
+
+    if (new BigFloat(amount).gt(balance)) {
       throw new Error("Error: Not enough SRC-20 token balance");
     }
 

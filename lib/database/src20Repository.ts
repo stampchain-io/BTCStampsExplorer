@@ -293,7 +293,6 @@ export class SRC20Repository {
   }
 
   static async getSrc20MintProgressByTickFromDb(
-    client: Client,
     tick: string,
   ) {
     const query = `

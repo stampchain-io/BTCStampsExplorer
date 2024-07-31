@@ -50,16 +50,7 @@ export class BlockRepository {
     );
   }
 
-  /**
-   * Retrieves the last X blocks with the specified client.
-   *
-   * @param client - The database client to use for the query.
-   * @param num - The number of blocks to retrieve. Defaults to 10.
-   * @returns A promise that resolves to an array of blocks with additional transaction count information.
-   */
-  static async get_last_x_blocks_with_client(
-    num = 10,
-  ) {
+  static async getLastXBlocks(num = 10) {
     try {
       const blocks = await dbManager.executeQueryWithCache(
         `
@@ -93,7 +84,7 @@ export class BlockRepository {
 
       return populated.reverse();
     } catch (error) {
-      console.error("Error in get_last_x_blocks_with_client:", error);
+      console.error("Error in getLastXBlocks:", error);
       throw error;
     }
   }
