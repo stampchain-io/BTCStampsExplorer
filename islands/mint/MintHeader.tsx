@@ -1,20 +1,42 @@
-import { StampSearchClient } from "../stamp/StampSearch.tsx";
+import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { useNavigator } from "$islands/Navigator/navigator.tsx";
 
-export const MintHeader = () => {
+export const MintHeader = (
+  { selectedTab }: {
+    selectedTab: string;
+  },
+) => {
+  const { setTypeOption } = useNavigator();
+
   return (
-    <div class="text-white flex flex-col gap-8">
-      <div class="text-center">
-        <p class="text-7xl leading-normal">Stamp Minting Utility</p>
-        <p class="text-[#DBDBDB] font-light">
-          Welcome to the forefront of digital collectibles, where each stamp is
-          a unique<br />
-          piece of art intertwined with the immutability of the blockchain.
+    <div class="flex flex-col-reverse md:flex-row justify-between w-full border-b border-[#3F2A4E]">
+      <div class="flex gap-6 md:gap-8 items-end">
+        <p
+          class={selectedTab === "mint"
+            ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
+            : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
+          onClick={() => setTypeOption("mint", "mint")}
+        >
+          Mint
+        </p>
+        <p
+          class={selectedTab === "deploy"
+            ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
+            : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
+          onClick={() => setTypeOption("mint", "deploy")}
+        >
+          Deploy
+        </p>
+        <p
+          class={selectedTab === "transfer"
+            ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
+            : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
+          onClick={() => setTypeOption("mint", "transfer")}
+        >
+          Transfer
         </p>
       </div>
-      <div class="flex items-center justify-between">
-        <p class="text-lg underline">
-          Search for Stamps, CPID, Transaction or Address
-        </p>
+      <div class="flex gap-6">
         <StampSearchClient />
       </div>
     </div>
