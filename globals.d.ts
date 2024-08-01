@@ -322,6 +322,12 @@ type StampPageProps = {
   };
 };
 
+type MintPageProps = {
+  data: {
+    selectedTab: "mint" | "deploy" | "transfer";
+  };
+};
+
 export interface ErrorResponseBody {
   error: string;
 }
