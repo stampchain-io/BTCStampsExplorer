@@ -73,6 +73,10 @@ import * as $Toast_toast from "./islands/Toast/toast.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
 import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
+import * as $Wallet_HistoryContent from "./islands/Wallet/HistoryContent.tsx";
+import * as $Wallet_MyItemsContent from "./islands/Wallet/MyItemsContent.tsx";
+import * as $Wallet_TransactionsContent from "./islands/Wallet/TransactionsContent.tsx";
+import * as $Wallet_WalletHeader from "./islands/Wallet/WalletHeader.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
@@ -93,7 +97,6 @@ import * as $mint_DeployContent from "./islands/mint/DeployContent.tsx";
 import * as $mint_MintContent from "./islands/mint/MintContent.tsx";
 import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
 import * as $mint_TransferContent from "./islands/mint/TransferContent.tsx";
-import * as $mint_UploadImage from "./islands/mint/UploadImage.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
@@ -195,6 +198,10 @@ const manifest = {
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
     "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
     "./islands/Wallet/ConnectorsModal.tsx": $Wallet_ConnectorsModal,
+    "./islands/Wallet/HistoryContent.tsx": $Wallet_HistoryContent,
+    "./islands/Wallet/MyItemsContent.tsx": $Wallet_MyItemsContent,
+    "./islands/Wallet/TransactionsContent.tsx": $Wallet_TransactionsContent,
+    "./islands/Wallet/WalletHeader.tsx": $Wallet_WalletHeader,
     "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
@@ -219,7 +226,6 @@ const manifest = {
     "./islands/mint/MintContent.tsx": $mint_MintContent,
     "./islands/mint/MintHeader.tsx": $mint_MintHeader,
     "./islands/mint/TransferContent.tsx": $mint_TransferContent,
-    "./islands/mint/UploadImage.tsx": $mint_UploadImage,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
