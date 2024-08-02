@@ -49,9 +49,9 @@ export class BlockRepository {
     );
   }
 
-  static async getLastXBlocks(num = 10) {
+  static async getLastXBlocksFromDb(num = 10) {
     try {
-      const blocks = await dbManager.executeQueryWithCache(
+      const result = await dbManager.executeQueryWithCache(
         `
         SELECT ${BLOCK_FIELDS}
         FROM blocks
@@ -60,26 +60,34 @@ export class BlockRepository {
         `,
         [num],
         0,
+      ) || { rows: [] };
+
+      const blocks = result.rows;
+      const blockIndexes = blocks.map((block) => block.block_index);
+
+      const tx_counts_result = await dbManager.executeQueryWithCache<
+        { block_index: number; tx_count: number }[]
+      >(
+        `
+        SELECT block_index, COUNT(*) AS tx_count
+        FROM ${STAMP_TABLE}
+        WHERE block_index IN (${blockIndexes.map(() => "?").join(",")})
+        GROUP BY block_index;
+        `,
+        blockIndexes,
+        "never",
+      ) || { rows: [] };
+
+      const tx_counts = tx_counts_result.rows;
+
+      const tx_count_map = new Map(
+        tx_counts.map((item) => [item.block_index, item.tx_count]),
       );
 
-      const populated = await Promise.all(
-        blocks.rows.map(async (block: any) => {
-          const tx_info_from_block = await dbManager.executeQueryWithCache(
-            `
-          SELECT COUNT(*) AS tx_count
-          FROM ${STAMP_TABLE}
-          WHERE block_index = ?;
-          `,
-            [block.block_index],
-            "never",
-          );
-
-          return {
-            ...block,
-            tx_count: tx_info_from_block.rows[0]["tx_count"],
-          };
-        }),
-      );
+      const populated = blocks.map((block) => ({
+        ...block,
+        tx_count: tx_count_map.get(block.block_index) || 0,
+      }));
 
       return populated.reverse();
     } catch (error) {
