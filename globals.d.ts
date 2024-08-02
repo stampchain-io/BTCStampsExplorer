@@ -468,3 +468,11 @@ interface SRC20SnapshotRequestParams {
   amt: number;
   sort: string;
 }
+
+declare global {
+  interface GlobalThis {
+    SKIP_REDIS_CONNECTION: boolean | undefined;
+  }
+}
+
+export {};
