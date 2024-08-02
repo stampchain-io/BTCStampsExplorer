@@ -170,7 +170,7 @@ export function FileContent() {
       </p>
 
       <div>
-        <div class="flex gap-8">
+        <div class="flex flex-col md:flex-row gap-8">
           <div
             id="image-preview"
             class="relative max-w-sm border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]"
@@ -236,63 +236,6 @@ export function FileContent() {
             )}
           </div>
         </div>
-        {
-          /* <div class="flex w-full">
-          <div class="flex w-1/2 justify-center items-center gap-8">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              class={"cursor-pointer"}
-              onClick={removeImage}
-            >
-              <path
-                fill="#cc6d00"
-                d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zM9 17h2V8H9zm4 0h2V8h-2zM7 6v13z"
-              />
-            </svg>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              class={"cursor-pointer"}
-              onClick={copyImage}
-            >
-              <g fill="none">
-                <path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                <path
-                  fill="#cc6d00"
-                  d="M19 2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V4a2 2 0 0 1 2-2zm-4 6H5v12h10zm-5 7a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2zm9-11H9v2h6a2 2 0 0 1 2 2v8h2zm-7 7a1 1 0 0 1 .117 1.993L12 13H8a1 1 0 0 1-.117-1.993L8 11z"
-                />
-              </g>
-            </svg>
-          </div>
-          <div class={"flex w-1/2 justify-center items-center"}>
-            <span class={"text-white px-2 py-1 text-[20px]"}>
-              OPTIMIZED PREVIEW
-            </span>
-            <div
-              class={"flex items-center px-2 py-1 rounded-md"}
-              style={{ border: "solid 1px green" }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="1em"
-                height="1em"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="green"
-                  d="M11 4h2v12l5.5-5.5l1.42 1.42L12 19.84l-7.92-7.92L5.5 10.5L11 16z"
-                />
-              </svg>
-              <span class={"text-[green]"}>56.51%</span>
-            </div>
-          </div>
-        </div> */
-        }
       </div>
 
       <div class="w-full">
@@ -306,7 +249,7 @@ export function FileContent() {
         />
       </div>
 
-      <div class="flex justify-between gap-5 w-full">
+      <div class="flex flex-col md:flex-row justify-between gap-5 w-full">
         <div class="w-full">
           <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
             Token
@@ -330,7 +273,7 @@ export function FileContent() {
         </div>
       </div>
 
-      <div class="flex justify-between gap-5 w-full">
+      <div class="flex flex-col md:flex-row justify-between gap-5 w-full">
         <div class="w-full">
           <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
             Max Circulation
@@ -435,7 +378,7 @@ export function FileContent() {
           Optimization
         </p>
         <hr />
-        <div class="flex justify-between gap-4 py-6 px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 justify-between gap-4 py-6 px-6">
           <div class={"flex items-center"}>
             <input
               id="default-radio-1"
