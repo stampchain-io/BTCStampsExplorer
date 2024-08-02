@@ -1,11 +1,26 @@
 import { Client } from "$mysql/mod.ts";
-import { conf } from "utils/config.ts";
 import { connect, Redis } from "redis";
 import * as crypto from "crypto";
+import {
+  ConsoleHandler,
+  FileHandler,
+  getLogger,
+  LogRecord,
+  setup,
+} from "$std/log/mod.ts";
 
-const MAX_RETRIES = parseInt(conf.DB_MAX_RETRIES) || 5;
-const RETRY_INTERVAL = 500;
-const MAX_POOL_SIZE = 10;
+// Define a configuration interface
+interface DatabaseConfig {
+  DB_HOST: string;
+  DB_USER: string;
+  DB_PASSWORD: string;
+  DB_PORT: number;
+  DB_NAME: string;
+  DB_MAX_RETRIES: number;
+  ELASTICACHE_ENDPOINT: string;
+  ENV: string;
+  CACHE?: string;
+}
 
 class DatabaseManager {
   private pool: Client[] = [];
@@ -13,9 +28,40 @@ class DatabaseManager {
   private isConnectingRedis = false;
   private redisRetryCount = 0;
   private redisAvailable = false;
+  private readonly MAX_RETRIES: number;
+  private readonly RETRY_INTERVAL = 500;
+  private readonly MAX_POOL_SIZE = 10;
+  private logger: ReturnType<typeof getLogger>;
 
-  constructor() {
-    this.initializeRedisConnection();
+  constructor(private config: DatabaseConfig) {
+    this.MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
+    this.setupLogging();
+    this.logger = getLogger();
+  }
+
+  public async initialize(): Promise<void> {
+    await this.initializeRedisConnection();
+  }
+
+  private setupLogging(): void {
+    setup({
+      handlers: {
+        console: new ConsoleHandler("DEBUG"),
+        file: new FileHandler("WARNING", {
+          filename: "./db.log",
+          formatter: (logRecord: LogRecord) =>
+            `${logRecord.levelName} ${logRecord.msg}`,
+        }),
+      },
+      loggers: {
+        default: {
+          level: "DEBUG",
+          handlers: ["console", "file"],
+        },
+      },
+    });
+
+    this.logger = getLogger();
   }
 
   getClient(): Promise<Client> {
@@ -23,11 +69,11 @@ class DatabaseManager {
       return Promise.resolve(this.pool.pop() as Client);
     }
 
-    if (this.pool.length < MAX_POOL_SIZE) {
+    if (this.pool.length < this.MAX_POOL_SIZE) {
       return this.createConnection();
     }
 
-    throw new Error("No available connections in the pool");
+    return Promise.reject(new Error("No available connections in the pool"));
   }
 
   releaseClient(client: Client): void {
@@ -43,38 +89,39 @@ class DatabaseManager {
   }
 
   async closeAllClients(): Promise<void> {
-    for (const client of this.pool) {
-      await this.closeClient(client);
-    }
+    await Promise.all(this.pool.map((client) => this.closeClient(client)));
   }
 
-  async executeQuery<T>(query: string, params: any[]): Promise<T> {
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+  async executeQuery<T>(query: string, params: unknown[]): Promise<T> {
+    for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
       try {
         const client = await this.getClient();
         const result = await client.execute(query, params);
         this.releaseClient(client);
         return result as T;
       } catch (error) {
-        console.error(
-          `ERROR: Error executing query on attempt ${attempt}:`,
+        this.logger.error(
+          `Error executing query on attempt ${attempt}:`,
           error,
         );
-        if (attempt === MAX_RETRIES) {
+        if (attempt === this.MAX_RETRIES) {
           throw error;
         }
       }
-      await new Promise((resolve) => setTimeout(resolve, RETRY_INTERVAL));
+      await new Promise((resolve) => setTimeout(resolve, this.RETRY_INTERVAL));
     }
     throw new Error("Max retries reached");
   }
 
   async executeQueryWithCache<T>(
     query: string,
-    params: any[],
+    params: unknown[],
     cacheDuration: number | "never",
   ): Promise<T> {
-    if (conf.ENV === "development" || conf.CACHE?.toLowerCase() === "false") {
+    if (
+      this.config.ENV === "development" ||
+      this.config.CACHE?.toLowerCase() === "false"
+    ) {
       return await this.executeQuery<T>(query, params);
     }
 
@@ -86,38 +133,29 @@ class DatabaseManager {
     );
   }
 
-  private async createConnection(): Promise<Client> {
-    const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = conf;
-    const client = await new Client().connect({
+  private createConnection(): Promise<Client> {
+    const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
+    return new Client().connect({
       hostname: DB_HOST,
-      port: Number(DB_PORT),
+      port: DB_PORT,
       username: DB_USER,
       db: DB_NAME,
       password: DB_PASSWORD,
     });
-    return client;
   }
 
   private async initializeRedisConnection(): Promise<void> {
     if (globalThis.SKIP_REDIS_CONNECTION) {
-      console.log("Skipping Redis connection for build process");
+      this.logger.info("Skipping Redis connection for build process");
       return;
     }
 
-    console.log("Initializing Redis connection...");
-
-    if (conf.ENV === "development" || !conf.ELASTICACHE_ENDPOINT) {
-      console.log(
-        "Skipping Redis connection in development or due to missing endpoint",
-      );
-      return;
-    }
-
+    this.logger.info("Initializing Redis connection...");
     try {
       await this.connectToRedis();
     } catch (error) {
-      console.error("Failed to connect to Redis at startup:", error);
-      console.log(
+      this.logger.error("Failed to connect to Redis at startup:", error);
+      this.logger.info(
         "Continuing without Redis. Will retry connection in background.",
       );
       this.connectToRedisInBackground();
@@ -126,11 +164,11 @@ class DatabaseManager {
 
   private async connectToRedis(): Promise<void> {
     this.redisClient = await connect({
-      hostname: conf.ELASTICACHE_ENDPOINT,
+      hostname: this.config.ELASTICACHE_ENDPOINT,
       port: 6379,
       tls: true,
     });
-    console.log("Connected to Redis successfully");
+    this.logger.info("Connected to Redis successfully");
     this.redisAvailable = true;
     this.redisRetryCount = 0;
   }
@@ -142,19 +180,24 @@ class DatabaseManager {
     try {
       await this.connectToRedis();
     } catch (error) {
-      console.error("Failed to connect to Redis:", error);
-      if (this.redisRetryCount < MAX_RETRIES) {
+      this.logger.error("Failed to connect to Redis:", error);
+      if (this.redisRetryCount < this.MAX_RETRIES) {
         this.redisRetryCount++;
-        setTimeout(() => this.connectToRedisInBackground(), RETRY_INTERVAL);
+        setTimeout(
+          () => this.connectToRedisInBackground(),
+          this.RETRY_INTERVAL,
+        );
       } else {
-        console.error("Max retries reached, giving up on Redis connection.");
+        this.logger.error(
+          "Max retries reached, giving up on Redis connection.",
+        );
       }
     } finally {
       this.isConnectingRedis = false;
     }
   }
 
-  private generateCacheKey(query: string, params: any[]): string {
+  private generateCacheKey(query: string, params: unknown[]): string {
     const input = `${query}:${JSON.stringify(params)}`;
     return crypto.createHash("sha256").update(input).digest("hex").toString();
   }
@@ -178,13 +221,13 @@ class DatabaseManager {
     return data;
   }
 
-  private async getCachedData(key: string): Promise<any | null> {
+  private async getCachedData(key: string): Promise<unknown | null> {
     if (this.redisClient) {
       try {
         const data = await this.redisClient.get(key);
         return data ? JSON.parse(data) : null;
       } catch (error) {
-        console.error("Failed to read from Redis cache:", error);
+        this.logger.error("Failed to read from Redis cache:", error);
         this.connectToRedisInBackground();
       }
     }
@@ -193,22 +236,54 @@ class DatabaseManager {
 
   private async setCachedData(
     key: string,
-    data: any,
+    data: unknown,
     expiry: number | "never",
   ): Promise<void> {
     if (this.redisClient) {
       try {
+        const value = JSON.stringify(data);
         if (expiry === "never") {
-          await this.redisClient.set(key, JSON.stringify(data));
+          await this.redisClient.set(key, value);
         } else {
-          await this.redisClient.set(key, JSON.stringify(data), { ex: expiry });
+          await this.redisClient.set(key, value, { ex: expiry });
         }
       } catch (error) {
-        console.error("Failed to write to Redis cache:", error);
+        this.logger.error("Failed to write to Redis cache:", error);
+        this.connectToRedisInBackground();
+      }
+    }
+  }
+
+  public async invalidateCacheByPattern(pattern: string): Promise<void> {
+    if (this.redisClient) {
+      try {
+        const keys = await this.redisClient.keys(pattern);
+        if (keys.length > 0) {
+          await this.redisClient.del(...keys);
+          this.logger.info(`Cache invalidated for pattern: ${pattern}`);
+        }
+      } catch (error) {
+        this.logger.error(
+          "Failed to invalidate Redis cache by pattern:",
+          error,
+        );
         this.connectToRedisInBackground();
       }
     }
   }
 }
 
-export const dbManager = new DatabaseManager();
+const dbConfig: DatabaseConfig = {
+  DB_HOST: Deno.env.get("DB_HOST") || "",
+  DB_USER: Deno.env.get("DB_USER") || "",
+  DB_PASSWORD: Deno.env.get("DB_PASSWORD") || "",
+  DB_PORT: Number(Deno.env.get("DB_PORT")) || 3306,
+  DB_NAME: Deno.env.get("DB_NAME") || "",
+  DB_MAX_RETRIES: Number(Deno.env.get("DB_MAX_RETRIES")) || 5,
+  ELASTICACHE_ENDPOINT: Deno.env.get("ELASTICACHE_ENDPOINT") || "",
+  ENV: Deno.env.get("ENV") || "development",
+  CACHE: Deno.env.get("CACHE") || "true",
+};
+
+export const dbManager = new DatabaseManager(dbConfig);
+await dbManager.initialize();
