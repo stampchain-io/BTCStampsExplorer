@@ -16,7 +16,7 @@ interface BlockRow {
   issuances?: number;
   sends?: number;
 }
-interface StampRow {
+export interface StampRow {
   stamp: number | null;
   block_index: number;
   cpid: string;
