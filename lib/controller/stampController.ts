@@ -234,7 +234,7 @@ export class StampController {
     switch (type) {
       case "src721":
         return ["SRC-721"];
-      case "art":
+      case "classic":
         return ["STAMP"];
       case "src20":
         return ["SRC-20"];
