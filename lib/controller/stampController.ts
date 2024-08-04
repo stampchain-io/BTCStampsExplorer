@@ -245,7 +245,10 @@ export class StampController {
 
   static async getStampFile(id: string) {
     try {
-      return await StampService.getStampFile(id);
+      const row = await StampService.getStampFile(id);
+      if (!row) {
+        return { type: "notFound" };
+      }
     } catch (error) {
       console.error("Error in StampController.getStampFile:", error);
       throw error;

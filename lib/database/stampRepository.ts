@@ -9,6 +9,10 @@ import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$lib/database/db.ts";
 
 export class StampRepository {
+  static sanitize(input: string): string {
+    return input.replace(/[^\w.-]/gi, "");
+  }
+
   static async getTotalStampCountFromDb(
     type: "stamps" | "cursed" | "all",
     ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
@@ -104,9 +108,11 @@ export class StampRepository {
   }
 
   static async getStampFilenameByIdFromDb(
-    client: Client,
     identifier: string,
-  ) {
+  ): Promise<string | null> {
+    // Sanitize the identifier
+    const sanitizedIdentifier = this.sanitize(identifier);
+
     const data = await dbManager.executeQueryWithCache(
       `
       SELECT tx_hash, stamp_hash, stamp_mimetype, cpid
@@ -114,12 +120,26 @@ export class StampRepository {
       WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?)
       AND stamp IS NOT NULL;
       `,
-      [identifier, identifier, identifier],
+      [sanitizedIdentifier, sanitizedIdentifier, sanitizedIdentifier],
       DEFAULT_CACHE_DURATION,
     );
-    if (!data) return null;
-    const ext = getFileSuffixFromMime(data.rows[0].stamp_mimetype);
-    return `${data.rows[0].tx_hash}.${ext}`;
+
+    // Check if data is null or has no rows
+    if (!data || data.rows.length === 0) {
+      return null;
+    }
+
+    // Use optional chaining and nullish coalescing to safely access properties
+    const tx_hash = data.rows[0]?.tx_hash;
+    const stamp_mimetype = data.rows[0]?.stamp_mimetype;
+
+    // If either tx_hash or stamp_mimetype is undefined, return null
+    if (!tx_hash || !stamp_mimetype) {
+      return null;
+    }
+
+    const ext = getFileSuffixFromMime(stamp_mimetype);
+    return `${tx_hash}.${ext}`;
   }
 
   static async getStampsFromDb(
