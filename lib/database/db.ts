@@ -8,6 +8,10 @@ import {
   LogRecord,
   setup,
 } from "$std/log/mod.ts";
+import {
+  deadline,
+  DeadlineError,
+} from "https://deno.land/std@0.201.0/async/mod.ts";
 
 // Define a configuration interface
 interface DatabaseConfig {
@@ -32,6 +36,7 @@ class DatabaseManager {
   private readonly RETRY_INTERVAL = 500;
   private readonly MAX_POOL_SIZE = 10;
   private logger: ReturnType<typeof getLogger>;
+  private redisAvailableAtStartup = false;
 
   constructor(private config: DatabaseConfig) {
     this.MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
@@ -41,6 +46,7 @@ class DatabaseManager {
 
   public async initialize(): Promise<void> {
     await this.initializeRedisConnection();
+    this.redisAvailableAtStartup = this.redisAvailable;
   }
 
   private setupLogging(): void {
@@ -154,23 +160,36 @@ class DatabaseManager {
     try {
       await this.connectToRedis();
     } catch (error) {
-      this.logger.error("Failed to connect to Redis at startup:", error);
-      this.logger.info(
-        "Continuing without Redis. Will retry connection in background.",
-      );
-      this.connectToRedisInBackground();
+      if (error instanceof DeadlineError) {
+        this.logger.error("Redis connection timed out:", error);
+      } else {
+        this.logger.error("Failed to connect to Redis at startup:", error);
+      }
+      this.logger.info("Continuing without Redis.");
     }
   }
 
   private async connectToRedis(): Promise<void> {
-    this.redisClient = await connect({
-      hostname: this.config.ELASTICACHE_ENDPOINT,
-      port: 6379,
-      tls: true,
-    });
-    this.logger.info("Connected to Redis successfully");
-    this.redisAvailable = true;
-    this.redisRetryCount = 0;
+    const REDIS_CONNECTION_TIMEOUT = 5000; // 5 seconds timeout
+
+    try {
+      this.redisClient = await deadline(
+        connect({
+          hostname: this.config.ELASTICACHE_ENDPOINT,
+          port: 6379,
+          tls: true,
+        }),
+        REDIS_CONNECTION_TIMEOUT,
+      );
+      this.logger.info("Connected to Redis successfully");
+      this.redisAvailable = true;
+      this.redisRetryCount = 0;
+    } catch (error) {
+      if (error instanceof DeadlineError) {
+        throw new Error("Redis connection timed out");
+      }
+      throw error;
+    }
   }
 
   private async connectToRedisInBackground(): Promise<void> {
@@ -208,9 +227,11 @@ class DatabaseManager {
     cacheDuration: number | "never",
   ): Promise<T> {
     if (!this.redisAvailable) {
+      if (this.redisAvailableAtStartup) {
+        this.connectToRedisInBackground();
+      }
       return await fetchData();
     }
-
     const cachedData = await this.getCachedData(key);
     if (cachedData) {
       return cachedData as T;
@@ -228,7 +249,10 @@ class DatabaseManager {
         return data ? JSON.parse(data) : null;
       } catch (error) {
         this.logger.error("Failed to read from Redis cache:", error);
-        this.connectToRedisInBackground();
+        if (this.redisAvailableAtStartup) {
+          this.connectToRedisInBackground();
+        }
+        this.redisAvailable = false;
       }
     }
     return null;
@@ -249,7 +273,10 @@ class DatabaseManager {
         }
       } catch (error) {
         this.logger.error("Failed to write to Redis cache:", error);
-        this.connectToRedisInBackground();
+        if (this.redisAvailableAtStartup) {
+          this.connectToRedisInBackground();
+        }
+        this.redisAvailable = false;
       }
     }
   }
@@ -267,7 +294,10 @@ class DatabaseManager {
           "Failed to invalidate Redis cache by pattern:",
           error,
         );
-        this.connectToRedisInBackground();
+        if (this.redisAvailableAtStartup) {
+          this.connectToRedisInBackground();
+        }
+        this.redisAvailable = false;
       }
     }
   }
