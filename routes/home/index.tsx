@@ -89,7 +89,7 @@ export default function Home(props: HomePageProps) {
   const stampDetailsInfoTitle: { [key: string]: string } = {
     "recent": "Recent Sales", // TODO: need to fecth these from the xcp api
     "src721": "Src721",
-    "art": "Art",
+    "classic": "Classic",
     "src20": "Src20",
     "posh": "Posh",
   };
