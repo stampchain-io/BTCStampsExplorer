@@ -62,9 +62,10 @@ export const getFileSuffixFromMime = (mimetype: string): string => {
  * @param number - The number of characters to keep at the beginning and end of the address. Default is 6.
  * @returns The shortened address.
  */
-export const abbreviateAddress = (address: string, visibleChars = 6) => {
-  return address.slice(0, visibleChars) + "..." + address.slice(-visibleChars);
-};
+export function abbreviateAddress(address?: string): string {
+  if (!address) return "";
+  return `${address.slice(0, 4)}...${address.slice(-4)}`;
+}
 
 export const getMimeType = (extension: string): string => {
   const normalizedExt = extension.toLowerCase();

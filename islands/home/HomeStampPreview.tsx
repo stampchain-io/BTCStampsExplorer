@@ -20,7 +20,6 @@ function StampSection({ title, type, stamps }: StampSection) {
         >
           See all
         </a>
-        {/* <a href={`/stamps?type=${type}`}>See all</a> */}
       </div>
       <div class="flex overflow-x-auto">
         {stamps.map((stamp: StampRow) => (

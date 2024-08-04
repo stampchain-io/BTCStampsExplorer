@@ -1,9 +1,6 @@
 import { StampRow } from "globals";
-
 import { Handlers } from "$fresh/server.ts";
-
 import { Stamp } from "$components/Stamp.tsx";
-
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
 import { StampVaulted } from "$components/stampDetails/StampVaulted.tsx";
 import { StampInfo } from "$components/stampDetails/StampInfo.tsx";
