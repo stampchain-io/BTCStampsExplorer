@@ -146,8 +146,9 @@ export function Header() {
                 path === "mint" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
-              Minting
+              Stamping
             </a>
+            {/* TODO: need to update this from /mint to /stamping */}
             {
               /* <a
               href="/upload"
