@@ -1,12 +1,8 @@
 import { StampRepository } from "$lib/database/index.ts";
 import { BlockService } from "$lib/services/blockService.ts";
-import {
-  get_dispensers,
-  get_dispenses,
-  get_holders,
-  get_sends,
-} from "utils/xcp.ts";
+import { get_holders, get_sends } from "$lib/services/xcpService.ts";
 import { StampBalance, SUBPROTOCOLS } from "globals";
+import { DispenserManager } from "$lib/services/xcpService.ts";
 
 export class StampService {
   static async getStampDetailsById(id: string) {
@@ -28,9 +24,9 @@ export class StampService {
     const [holders, dispensers, sends, dispenses, total, lastBlock] =
       await Promise.all([
         get_holders(cpid),
-        get_dispensers(cpid),
+        DispenserManager.getDispensersByCpid(cpid),
         get_sends(cpid),
-        get_dispenses(cpid),
+        DispenserManager.getDispensesByCpid(cpid),
         StampRepository.getTotalStampCountFromDb("stamps"),
         BlockService.getLastBlock(),
       ]);
@@ -47,7 +43,18 @@ export class StampService {
   }
 
   static async getStamps(options: {
-    // ... (keep the existing options interface)
+    page?: number;
+    limit?: number;
+    sort_order?: "asc" | "desc";
+    type?: "stamps" | "cursed" | "all";
+    ident?: SUBPROTOCOLS[];
+    all_columns?: boolean;
+    collectionId?: string;
+    identifier?: string | number;
+    blockIdentifier?: number | string;
+    cacheDuration?: number | "never";
+    noPagination?: boolean;
+    page_size?: number;
   }) {
     const isSingleStamp = !!options.identifier;
     const [stamps, total] = await Promise.all([
