@@ -1,7 +1,7 @@
 import { Client } from "$mysql/mod.ts";
 import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
-import { get_balances } from "utils/xcp.ts";
+import { get_balances } from "$lib/services/xcpService.ts";
 import { getFileSuffixFromMime } from "utils/util.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { StampBalance, XCPBalance } from "globals";
@@ -383,5 +383,26 @@ export class StampRepository {
       console.error("Error getting balances: ", error);
       return [];
     }
+  }
+
+  static async getALLCPIDs(cacheDuration: number | "never" = 1000 * 60 * 3) {
+    const query = `
+      SELECT DISTINCT cpid
+      FROM ${STAMP_TABLE}
+      WHERE ident != 'SRC-20'
+      ORDER BY cpid ASC
+    `;
+
+    console.log(`Executing query:`, query);
+
+    const result = await dbManager.executeQueryWithCache(
+      query,
+      [],
+      cacheDuration,
+    );
+
+    console.log(`Query result:`, result.rows);
+
+    return result.rows.map((row) => row.cpid);
   }
 }

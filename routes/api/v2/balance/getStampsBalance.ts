@@ -1,4 +1,4 @@
-import { get_stamps_balance } from "utils/xcp.ts";
+import { get_stamps_balance } from "$lib/services/xcpService.ts";
 
 export async function handler(req: Request): Promise<Response> {
   const { address } = await req.json();
