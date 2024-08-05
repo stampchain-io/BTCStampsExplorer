@@ -51,7 +51,8 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           className="w-4 h-5 cursor-pointer"
         />
       </div>
-      <div class="flex flex-col gap-1 truncate text-[#F5F5F5] px-6 py-4">
+      <div class="flex justify-between items-end gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
+        {/* <div class="flex flex-col gap-1 truncate text-[#F5F5F5] px-6 py-4"> */}
         <p class="text-xl font-semibold">Created</p>
         <p class="text-[#60626F]">
           {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
@@ -106,7 +107,8 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
         <p class="text-xl font-semibold">Keyburned</p>
         <p class="text-[#60626F]">No</p>
       </div>
-      <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
+      <div class="flex flex-col gap-1 truncate text-[#F5F5F5] px-6 py-4">
+        {/* <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4"> */}
         <p class="text-xl font-semibold">Stamp Vault Address</p>
         <p class="text-[#60626F]">VAULT ADDRESS HERE</p>
       </div>

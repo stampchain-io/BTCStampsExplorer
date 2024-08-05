@@ -9,7 +9,7 @@ import { CollectionService } from "$lib/services/collectionService.ts";
 export class StampController {
   static async getStampDetailsById(id: string) {
     try {
-      const res = await StampService.getStampDetailsById(id);
+      const res = await StampService.getStampDetailsById(id, "all");
       if (!res) {
         return null;
       }
