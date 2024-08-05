@@ -39,7 +39,7 @@ export function Header() {
             className="font-bold text-xl text-indigo-600 hidden md:block"
           >
             <img
-              src="/img/logo.png"
+              src="/img/header/logo.png"
               alt="stampchain"
               className="w-[178px] h-auto"
             />
@@ -51,13 +51,17 @@ export function Header() {
           >
             {open && (
               <img
-                src="/img/menu-close.png"
+                src="/img/header/menu-close.png"
                 alt="menu"
                 className="w-6 h-6"
               />
             )}
             {!open && (
-              <img src="/img/menu-open.png" alt="menu" className="w-6 h-6" />
+              <img
+                src="/img/header/menu-open.png"
+                alt="menu"
+                className="w-6 h-6"
+              />
             )}
           </button>
 
@@ -75,7 +79,7 @@ export function Header() {
           id="navbar-collapse"
         >
           <img
-            src="/img/logo.png"
+            src="/img/header/logo.png"
             alt="stampchain"
             className={`${
               open ? "absolute" : "hidden"
@@ -139,16 +143,15 @@ export function Header() {
               Collections
             </a>
             <a
-              href="/mint"
-              f-partial={"/mint"}
+              href="/stamping"
+              f-partial={"/stamping"}
               onClick={toggleMenu}
               className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                path === "mint" ? "border-[#7A00F5] border-b-4" : ""
+                path === "stamping" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
               Stamping
             </a>
-            {/* TODO: need to update this from /mint to /stamping */}
             {
               /* <a
               href="/upload"
@@ -173,16 +176,16 @@ export function Header() {
             }`}
           >
             <a href="https://x.com/Stampchain">
-              <img src="/img/icon_x.png" class="w-12" />
+              <img src="/img/footer/icon_x.png" class="w-12" />
             </a>
             <a href="https://discord.gg/PCZU6xrt">
-              <img src="/img/icon_discord.png" class="w-12" />
+              <img src="/img/footer/icon_discord.png" class="w-12" />
             </a>
             <a href="https://t.me/BitcoinStamps">
-              <img src="/img/icon_telegram.png" class="w-12" />
+              <img src="/img/footer/icon_telegram.png" class="w-12" />
             </a>
             <a href="https://github.com/stampchain-io/">
-              <img src="/img/icon_github.png" class="w-12" />
+              <img src="/img/footer/icon_github.png" class="w-12" />
             </a>
           </div>
         </div>

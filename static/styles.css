@@ -11,21 +11,61 @@
 /* width */
 ::-webkit-scrollbar {
   width: 10px;
+  border-radius: 14px;
+}
+
+@media (max-width: 768px) {
+  /* Adjust the max-width as needed */
+  ::-webkit-scrollbar {
+    width: 8px; /* Smaller width for mobile */
+    border-radius: 14px;
+  }
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #343434;
+  background: #3f2a4e;
+  border-radius: 14px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #262424;
+  background: #bbb9bc;
+  border-radius: 14px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #dbd9dc;
+}
+
+/* New custom scrollbar styles for specific class */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 28px; /* Custom width */
+  border-radius: 0px;
+}
+
+@media (max-width: 768px) {
+  /* Adjust the max-width as needed */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 17px; /* Smaller width for mobile */
+    border-radius: 0px;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #2b0e49; /* Custom track color */
+  padding: 4px;
+  border-radius: 0px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #b9b9b9; /* Custom handle color */
+  border-radius: 0px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #d9d9d9; /* Custom handle hover color */
 }
 
 .pixelart {
