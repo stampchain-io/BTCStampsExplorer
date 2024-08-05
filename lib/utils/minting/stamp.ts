@@ -310,7 +310,7 @@ export async function checkAssetAvailability(assetName: string) {
       return true;
     }
     return false;
-  } catch (error) {
+  } catch (_error) {
     console.log(`asset: ${assetName} not available`);
     return false;
   }

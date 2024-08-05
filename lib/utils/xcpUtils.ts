@@ -1,5 +1,6 @@
-import { xcp_public_nodes } from "utils/xcp.ts";
+import { xcp_public_nodes } from "../services/xcpService.ts";
 import { XCPParams } from "globals";
+import { dbManager } from "$lib/database/db.ts";
 
 /**
  * Creates a payload object for JSON-RPC requests.
@@ -15,6 +16,23 @@ export const CreatePayload = (method: string, params: XCPParams) => {
     params,
   };
 };
+
+export async function handleXcpApiRequestWithCache(
+  method: string,
+  params: XCPParams,
+  cacheDuration: number | "never",
+) {
+  const cacheKey = `api:${method}:${JSON.stringify(params)}`;
+
+  return await dbManager.handleCache(
+    cacheKey,
+    async () => {
+      const payload = CreatePayload(method, params);
+      return await handleXcpQuery(payload);
+    },
+    cacheDuration,
+  );
+}
 
 /**
  * Makes a query to the specified URL with retries in case of failure.

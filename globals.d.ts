@@ -87,7 +87,7 @@ export interface DispenseRow {
   dispense_quantity: number;
 }
 
-interface DispenserRow {
+export interface DispenserRow {
   tx_hash: string;
   block_index: number;
   source: string;
@@ -101,13 +101,13 @@ interface DispenserRow {
   dispenses: DispenseRow[];
 }
 
-interface BlockInfo {
+export interface BlockInfo {
   block_info: BlockRow;
   issuances: StampRow[];
   sends: SendRow[];
 }
 
-interface BtcInfo {
+export interface BtcInfo {
   address: string;
   balance: number;
   txCount: number;
@@ -115,7 +115,7 @@ interface BtcInfo {
   unconfirmedTxCount: number;
 }
 
-interface XCPParams {
+export interface XCPParams {
   filters?: {
     field: string;
     op: string;
@@ -125,12 +125,12 @@ interface XCPParams {
   asset?: string;
 }
 
-interface XCPBalance {
+export interface XCPBalance {
   cpid: string;
   quantity: number;
 }
 
-interface SRC20Balance {
+export interface SRC20Balance {
   address: string;
   p: string;
   tick: string;
@@ -141,7 +141,7 @@ interface SRC20Balance {
   deploy_img: string;
 }
 
-interface Src20Detail {
+export interface Src20Detail {
   tx_hash: string;
   block_index: number;
   p: string;
@@ -158,13 +158,13 @@ interface Src20Detail {
   destination_name: string;
 }
 
-interface Src20SnapShotDetail {
+export interface Src20SnapShotDetail {
   tick: string;
   address: string;
   balance: Big;
 }
 
-interface StampBalance {
+export interface StampBalance {
   cpid: string;
   stamp: number;
   stamp_base64: string;

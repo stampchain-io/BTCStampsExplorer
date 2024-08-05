@@ -1,7 +1,7 @@
 import { DispenserResponseBody, DispenserRow, IdHandlerContext } from "globals";
-import { get_dispensers, get_dispenses } from "utils/xcp.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { BlockService } from "$lib/services/blockService.ts";
+import { DispenserManager } from "$lib/services/xcpService.ts";
 
 export const handler = async (
   _req: Request,
@@ -9,7 +9,7 @@ export const handler = async (
 ): Promise<Response> => {
   const { id } = ctx.params;
   try {
-    const dispensers = await get_dispensers(id);
+    const dispensers = await DispenserManager.getDispensersByCpid(id);
     const lastBlock = await BlockService.getLastBlock();
 
     if (!dispensers || dispensers.length === 0) {
@@ -19,7 +19,9 @@ export const handler = async (
     // Fetch dispenses for each dispenser
     const mappedDispensers = await Promise.all(
       dispensers.map(async (dispenser: DispenserRow) => {
-        const dispenses = await get_dispenses(dispenser.cpid);
+        const dispenses = await DispenserManager.getDispensesByCpid(
+          dispenser.cpid,
+        );
         return {
           ...dispenser,
           dispenses,
