@@ -1,4 +1,5 @@
 import { handleXcpApiRequestWithCache } from "utils/xcpUtils.ts";
+import { StampService } from "$lib/services/stampService.ts";
 
 export const xcp_public_nodes = [
   {
@@ -141,7 +142,7 @@ export const get_holders = async (cpid: string) => {
   }
   return holders.filter(
     (holder: any) => {
-      if (holder.quantity > 0) {
+      if (holder.quantity > 0) { // if an item is on dispenser it is possible there is not any holders besides the dispenser addy
         return true;
       }
     },
@@ -152,7 +153,10 @@ export class DispenserManager {
   private static cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
   private static handleXcpApiRequestWithCache = handleXcpApiRequestWithCache;
 
-  static async getDispensersByCpid(cpid: string) {
+  static async getDispensersByCpid(
+    cpid: string,
+    filter: "open" | "closed" | "all" = "open",
+  ) {
     const params = {
       filters: [
         {
@@ -174,9 +178,13 @@ export class DispenserManager {
       return [];
     }
 
-    const filteredDispensers = dispensers.filter((dispenser) =>
-      dispenser.give_remaining > 0
-    );
+    const filteredDispensers = filter === "all"
+      ? dispensers
+      : dispensers.filter((dispenser) =>
+        filter === "open"
+          ? dispenser.give_remaining > 0
+          : dispenser.give_remaining === 0
+      );
 
     return filteredDispensers.map((dispenser: any) => ({
       tx_hash: dispenser.tx_hash,
@@ -193,42 +201,47 @@ export class DispenserManager {
   }
 
   static async getAllDispensers(page: number = 1, limit: number = 10) {
-    const dispensers = await DispenserManager.handleXcpApiRequestWithCache<
-      any[]
-    >(
-      "get_dispensers",
-      {},
-      this.cacheTimeout,
-    );
+    const [dispensers, allCPIDs] = await Promise.all([
+      this.handleXcpApiRequestWithCache<any[]>(
+        "get_dispensers",
+        {},
+        this.cacheTimeout,
+      ),
+      StampService.getAllCPIDs(),
+    ]);
 
     if (!dispensers || !Array.isArray(dispensers)) {
       console.log("No dispensers found");
       return { total: 0, dispensers: [] };
     }
 
+    const cpidMap = new Map(allCPIDs.map((cpid) => [cpid.cpid, cpid.stamp]));
+
     const openDispensers = dispensers.filter((dispenser) =>
-      dispenser.give_remaining > 0
+      dispenser.give_remaining > 0 && cpidMap.has(dispenser.asset)
     );
 
-    const mappedDispensers = await Promise.all(
-      openDispensers.map(async (dispenser) => {
-        const dispenses = await this.getDispensesByCpid(dispenser.asset);
-        return {
-          tx_hash: dispenser.tx_hash,
-          block_index: dispenser.block_index,
-          source: dispenser.source,
-          cpid: dispenser.asset,
-          give_quantity: dispenser.give_quantity,
-          give_remaining: dispenser.give_remaining,
-          escrow_quantity: dispenser.escrow_quantity,
-          satoshirate: dispenser.satoshirate,
-          btcrate: dispenser.satoshirate / 100000000, // Convert satoshis to BTC
-          origin: dispenser.origin,
-          dispenses,
-        };
-      }),
-    );
-    const total = openDispensers.length;
+    const mappedDispensersPromises = openDispensers.map(async (dispenser) => {
+      const dispenses = this.getDispensesByCpid(dispenser.asset);
+      return {
+        tx_hash: dispenser.tx_hash,
+        block_index: dispenser.block_index,
+        source: dispenser.source,
+        cpid: dispenser.asset,
+        give_quantity: dispenser.give_quantity,
+        give_remaining: dispenser.give_remaining,
+        escrow_quantity: dispenser.escrow_quantity,
+        satoshirate: dispenser.satoshirate,
+        btcrate: dispenser.satoshirate / 100000000,
+        origin: dispenser.origin,
+        dispenses: await dispenses,
+        stamp: cpidMap.get(dispenser.asset),
+      };
+    });
+
+    const mappedDispensers = await Promise.all(mappedDispensersPromises);
+
+    const total = mappedDispensers.length;
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedDispensers = mappedDispensers.slice(startIndex, endIndex);
