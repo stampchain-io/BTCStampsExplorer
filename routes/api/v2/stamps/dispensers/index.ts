@@ -1,9 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { paginate } from "$lib/utils/util.ts";
-import { get_all_dispensers } from "$lib/utils/xcp.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { BlockService } from "$lib/services/blockService.ts";
+import { DispenserManager } from "$lib/services/xcpService.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -13,7 +13,7 @@ export const handler: Handlers = {
 
       const [lastBlock, { total, dispensers }] = await Promise.all([
         BlockService.getLastBlock(),
-        get_all_dispensers(page, limit),
+        DispenserManager.getAllDispensers(page, limit),
       ]);
 
       const body = {
