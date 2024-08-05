@@ -5,7 +5,7 @@ import { BlockInfoResponseBody, BlockRow } from "globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
 import { BlockService } from "$lib/services/blockService.ts";
-import BlockInfo from "$components/BlockInfo.tsx";
+import BlockInfo from "$components/block/BlockInfo.tsx";
 // import BlockHeader from "$islands/block/BlockHeader.tsx";
 import BlockTransactions from "$islands/block/BlockTransactions.tsx";
 // import BlockSelector from "$islands/block/BlockSelector.tsx";
