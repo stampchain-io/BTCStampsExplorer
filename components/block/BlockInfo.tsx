@@ -1,5 +1,5 @@
 // import BlockHeaderTable from "$/components/BlockHeaderTable.tsx";
-import BlockStampsTable from "$/components/BlockStampsTable.tsx";
+import BlockStampsTable from "./BlockStampsTable.tsx";
 // import BlockSendsTable from "$/components/BlockSendsTable.tsx";
 import type { BlockInfo } from "globals";
 

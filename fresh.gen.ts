@@ -50,7 +50,6 @@ import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedColl
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
 import * as $home_index from "./routes/home/index.tsx";
 import * as $index from "./routes/index.tsx";
-import * as $mint_index from "./routes/mint/index.tsx";
 import * as $quicknode_getPrice from "./routes/quicknode/getPrice.ts";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
@@ -58,17 +57,14 @@ import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $stamp_tool from "./routes/stamp/tool.tsx";
+import * as $stamping_index from "./routes/stamping/index.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
-import * as $BlockSelector from "./islands/BlockSelector.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
 import * as $Footer from "./islands/Footer.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
 import * as $Navigator_navigator from "./islands/Navigator/navigator.tsx";
-import * as $PageControl from "./islands/PageControl.tsx";
-import * as $StampNavigator from "./islands/StampNavigator.tsx";
-import * as $StampSearch from "./islands/StampSearch.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_toast from "./islands/Toast/toast.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
@@ -176,7 +172,6 @@ const manifest = {
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
     "./routes/home/index.tsx": $home_index,
     "./routes/index.tsx": $index,
-    "./routes/mint/index.tsx": $mint_index,
     "./routes/quicknode/getPrice.ts": $quicknode_getPrice,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
@@ -184,19 +179,16 @@ const manifest = {
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/index.tsx": $stamp_index,
     "./routes/stamp/tool.tsx": $stamp_tool,
+    "./routes/stamping/index.tsx": $stamping_index,
     "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
-    "./islands/BlockSelector.tsx": $BlockSelector,
     "./islands/Carousel.tsx": $Carousel,
     "./islands/Footer.tsx": $Footer,
     "./islands/Header.tsx": $Header,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
     "./islands/Navigator/navigator.tsx": $Navigator_navigator,
-    "./islands/PageControl.tsx": $PageControl,
-    "./islands/StampNavigator.tsx": $StampNavigator,
-    "./islands/StampSearch.tsx": $StampSearch,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/toast.tsx": $Toast_toast,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
