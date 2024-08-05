@@ -49,6 +49,7 @@ export class CollectionService {
 
   static async getCollectionByName(
     collectionName: string,
+    limit: number = 10,
   ): Promise<Collection | null> {
     const collectionResult = await CollectionRepository.getCollectionByName(
       collectionName,
@@ -60,7 +61,7 @@ export class CollectionService {
 
     const row = collectionResult.rows[0];
     const stamps = await StampRepository.getStampsFromDb({
-      limit: 10,
+      limit: limit,
       collectionId: row.collection_id,
       noPagination: true,
       type: "all",
@@ -70,7 +71,7 @@ export class CollectionService {
       collection_id: row.collection_id,
       collection_name: row.collection_name,
       creators: row.creators ? row.creators.split(",") : [],
-      stamps: stamps.rows,
+      stamps: stamps.rows.slice(0, limit), // Ensure we only return up to the limit
     };
   }
 }

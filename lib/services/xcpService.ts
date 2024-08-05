@@ -1,5 +1,33 @@
 import { handleXcpApiRequestWithCache } from "utils/xcpUtils.ts";
 import { StampService } from "$lib/services/stampService.ts";
+import { dbManager } from "$lib/database/db.ts";
+
+export const xcp_v2_nodes = [
+  {
+    name: "counterparty.io",
+    url: "https://api.counterparty.io:4000/v2",
+  },
+];
+
+interface DispenseEvent {
+  event_index: number;
+  event: "DISPENSE";
+  params: {
+    asset: string;
+    block_index: number;
+    btc_amount: number;
+    destination: string;
+    dispense_index: number;
+    dispense_quantity: number;
+    dispenser_tx_hash: string;
+    source: string;
+    tx_hash: string;
+    tx_index: number;
+  };
+  tx_hash: string;
+  block_index: number;
+  timestamp: string | null;
+}
 
 export const xcp_public_nodes = [
   {
@@ -278,5 +306,108 @@ export class DispenserManager {
       dispenser_tx_hash: dispense.dispenser_tx_hash,
       dispense_quantity: dispense.dispense_quantity,
     }));
+  }
+}
+
+export class XcpManager {
+  private static cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
+
+  private static async fetchWithCache<T>(
+    endpoint: string,
+    queryParams: URLSearchParams,
+  ): Promise<T> {
+    const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
+
+    return await dbManager.handleCache(
+      cacheKey,
+      async () => {
+        const url = `${
+          xcp_v2_nodes[0].url
+        }${endpoint}?${queryParams.toString()}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+      },
+      this.cacheTimeout,
+    );
+  }
+
+  static getDispenseEvents(
+    cursor: string | null = null,
+    limit: number = 10000,
+  ): Promise<
+    {
+      result: DispenseEvent[];
+      next_cursor: string | null;
+      result_count: number;
+    }
+  > {
+    const endpoint = "/events/DISPENSE";
+    const queryParams = new URLSearchParams();
+    if (cursor) {
+      queryParams.append("cursor", cursor);
+    }
+    queryParams.append("limit", limit.toString());
+
+    return this.fetchWithCache<
+      { events: DispenseEvent[]; next_cursor: string | null }
+    >(endpoint, queryParams);
+  }
+
+  static async fetchDispenseEvents(
+    limit: number | "all" = "all",
+  ): Promise<DispenseEvent[]> {
+    let cursor: string | null = null;
+    const batchSize = 1000;
+    let allEvents: DispenseEvent[] = [];
+
+    do {
+      const response = await this.getDispenseEvents(cursor, batchSize);
+
+      if (
+        !response || typeof response !== "object" ||
+        !Array.isArray(response.result)
+      ) {
+        throw new Error("Unexpected response structure from getDispenseEvents");
+      }
+
+      const validEvents = response.result.filter(
+        (event): event is DispenseEvent => {
+          return (
+            typeof event === "object" &&
+            event !== null &&
+            typeof event.event_index === "number" &&
+            event.event === "DISPENSE" &&
+            typeof event.params === "object" &&
+            event.params !== null &&
+            typeof event.params.asset === "string" &&
+            typeof event.params.block_index === "number" &&
+            typeof event.params.btc_amount === "number" &&
+            typeof event.params.destination === "string" &&
+            typeof event.params.dispense_index === "number" &&
+            typeof event.params.dispense_quantity === "number" &&
+            typeof event.params.dispenser_tx_hash === "string" &&
+            typeof event.params.source === "string" &&
+            typeof event.params.tx_hash === "string" &&
+            typeof event.params.tx_index === "number" &&
+            typeof event.tx_hash === "string" &&
+            typeof event.block_index === "number"
+          );
+        },
+      );
+
+      allEvents = allEvents.concat(validEvents);
+      cursor = response.next_cursor;
+
+      // If we've reached the desired limit, break the loop
+      if (limit !== "all" && allEvents.length >= limit) {
+        allEvents = allEvents.slice(0, limit);
+        break;
+      }
+    } while (cursor);
+
+    return allEvents;
   }
 }
