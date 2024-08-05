@@ -4,12 +4,16 @@ import { BlockService } from "$lib/services/blockService.ts";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 
 export const handler = async (
-  _req: Request,
+  req: Request,
   ctx: IdHandlerContext,
 ): Promise<Response> => {
   const { id } = ctx.params;
+  const url = new URL(req.url);
+  const filter = url.searchParams.get("filter") as "open" | "closed" | "all" ||
+    "open";
+
   try {
-    const dispensers = await DispenserManager.getDispensersByCpid(id);
+    const dispensers = await DispenserManager.getDispensersByCpid(id, filter);
     const lastBlock = await BlockService.getLastBlock();
 
     if (!dispensers || dispensers.length === 0) {

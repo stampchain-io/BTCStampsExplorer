@@ -387,7 +387,7 @@ export class StampRepository {
 
   static async getALLCPIDs(cacheDuration: number | "never" = 1000 * 60 * 3) {
     const query = `
-      SELECT DISTINCT cpid
+      SELECT DISTINCT cpid, stamp
       FROM ${STAMP_TABLE}
       WHERE ident != 'SRC-20'
       ORDER BY cpid ASC
@@ -403,6 +403,6 @@ export class StampRepository {
 
     console.log(`Query result:`, result.rows);
 
-    return result.rows.map((row) => row.cpid);
+    return result.rows;
   }
 }

@@ -5,7 +5,10 @@ import { StampBalance, SUBPROTOCOLS } from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 
 export class StampService {
-  static async getStampDetailsById(id: string) {
+  static async getStampDetailsById(
+    id: string,
+    filter: "open" | "closed" | "all" = "open",
+  ) {
     console.log(`getStampDetailsById called with id: ${id}`);
     const stampResult = await StampRepository.getStampsFromDb({
       identifier: id,
@@ -24,7 +27,7 @@ export class StampService {
     const [holders, dispensers, sends, dispenses, total, lastBlock] =
       await Promise.all([
         get_holders(cpid),
-        DispenserManager.getDispensersByCpid(cpid),
+        DispenserManager.getDispensersByCpid(cpid, filter),
         get_sends(cpid),
         DispenserManager.getDispensesByCpid(cpid),
         StampRepository.getTotalStampCountFromDb("stamps"),
@@ -123,5 +126,19 @@ export class StampService {
     }
 
     return { stamps, total };
+  }
+
+  static async getAllCPIDs() {
+    return await StampRepository.getALLCPIDs();
+  }
+
+  static mapDispensesWithRates(dispenses, dispensers) {
+    const dispenserRates = new Map(
+      dispensers.map((d) => [d.tx_hash, d.satoshirate]),
+    );
+    return dispenses.map((dispense) => ({
+      ...dispense,
+      satoshirate: dispenserRates.get(dispense.dispenser_tx_hash) || 0,
+    }));
   }
 }
