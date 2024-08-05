@@ -3,6 +3,7 @@ import { BlockService } from "$lib/services/blockService.ts";
 import { get_holders, get_sends } from "$lib/services/xcpService.ts";
 import { StampBalance, SUBPROTOCOLS } from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
+import { XcpManager } from "$lib/services/xcpService.ts";
 
 export class StampService {
   static async getStampDetailsById(
@@ -140,5 +141,38 @@ export class StampService {
       ...dispense,
       satoshirate: dispenserRates.get(dispense.dispenser_tx_hash) || 0,
     }));
+  }
+
+  static async getRecentSales(limit: number = 6) {
+    const [dispenseEvents, cpids] = await Promise.all([
+      XcpManager.fetchDispenseEvents(500),
+      this.getAllCPIDs(),
+    ]);
+
+    const cpidMap = new Map(cpids.map((row) => [row.cpid, row.stamp]));
+
+    const recentSales = await Promise.all(
+      dispenseEvents
+        .filter((event) => cpidMap.has(event.params.asset))
+        .map(async (event) => {
+          const stampDetails = await this.getStamps({
+            identifier: cpidMap.get(event.params.asset),
+            all_columns: true,
+            noPagination: true,
+          });
+          return {
+            ...stampDetails.stamp,
+            sale_data: {
+              btc_amount: event.params.btc_amount,
+              block_index: event.block_index,
+              tx_hash: event.tx_hash,
+            },
+          };
+        }),
+    );
+
+    return recentSales
+      .sort((a, b) => b.sale_data.block_index - a.sale_data.block_index)
+      .slice(0, limit);
   }
 }
