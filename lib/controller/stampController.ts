@@ -177,8 +177,8 @@ export class StampController {
   ) {
     try {
       if (!type) {
-        const [stampCategories, src20Result, poshCollection] = await Promise
-          .all([
+        const [stampCategories, src20Result, poshCollection, recentSales] =
+          await Promise.all([
             this.getMultipleStampCategories([
               { types: ["STAMP", "SRC-721"], limit: 6 },
               { types: ["SRC-721"], limit: 6 },
@@ -190,11 +190,12 @@ export class StampController {
               page,
               limit: page_size,
             }),
-            CollectionService.getCollectionByName("posh"),
+            CollectionService.getCollectionByName("posh", 6),
+            StampService.getRecentSales(6),
           ]);
 
         return {
-          stamps_recent: stampCategories[0].stamps,
+          stamps_recent: recentSales,
           stamps_src721: stampCategories[1].stamps,
           stamps_art: stampCategories[2].stamps,
           stamps_src20: stampCategories[3].stamps,
