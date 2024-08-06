@@ -337,13 +337,11 @@ export class XcpManager {
   static getDispenseEvents(
     cursor: string | null = null,
     limit: number = 10000,
-  ): Promise<
-    {
-      result: DispenseEvent[];
-      next_cursor: string | null;
-      result_count: number;
-    }
-  > {
+  ): Promise<{
+    result: DispenseEvent[];
+    next_cursor: string | null;
+    result_count: number;
+  }> {
     const endpoint = "/events/DISPENSE";
     const queryParams = new URLSearchParams();
     if (cursor) {
@@ -351,9 +349,11 @@ export class XcpManager {
     }
     queryParams.append("limit", limit.toString());
 
-    return this.fetchWithCache<
-      { events: DispenseEvent[]; next_cursor: string | null }
-    >(endpoint, queryParams);
+    return this.fetchWithCache<{
+      result: DispenseEvent[];
+      next_cursor: string | null;
+      result_count: number;
+    }>(endpoint, queryParams);
   }
 
   static async fetchDispenseEvents(
