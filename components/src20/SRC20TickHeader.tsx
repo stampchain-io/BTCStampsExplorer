@@ -34,9 +34,6 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
               {convertToEmoji(deployment.tick)}
             </p>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam,
             </p>
           </div>
           <hr class="border-[#3F2A4E] border-2" />

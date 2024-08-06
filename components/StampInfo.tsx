@@ -3,6 +3,7 @@ import relativeTime from "$dayjs/plugin/relativeTime";
 
 import { abbreviateAddress } from "utils/util.ts";
 import { StampKind } from "$/components/StampKind.tsx";
+import { StampRow } from "globals";
 
 dayjs.extend(relativeTime);
 
