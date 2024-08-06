@@ -70,12 +70,12 @@ import * as $Toast_toast from "./islands/Toast/toast.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
 import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
-import * as $Wallet_HistoryContent from "./islands/Wallet/HistoryContent.tsx";
-import * as $Wallet_MyItemsContent from "./islands/Wallet/MyItemsContent.tsx";
-import * as $Wallet_TransactionsContent from "./islands/Wallet/TransactionsContent.tsx";
-import * as $Wallet_WalletHeader from "./islands/Wallet/WalletHeader.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
+import * as $Wallet_details_HistoryContent from "./islands/Wallet/details/HistoryContent.tsx";
+import * as $Wallet_details_MyItemsContent from "./islands/Wallet/details/MyItemsContent.tsx";
+import * as $Wallet_details_TransactionsContent from "./islands/Wallet/details/TransactionsContent.tsx";
+import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
@@ -194,13 +194,16 @@ const manifest = {
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
     "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
     "./islands/Wallet/ConnectorsModal.tsx": $Wallet_ConnectorsModal,
-    "./islands/Wallet/HistoryContent.tsx": $Wallet_HistoryContent,
-    "./islands/Wallet/MyItemsContent.tsx": $Wallet_MyItemsContent,
-    "./islands/Wallet/TransactionsContent.tsx": $Wallet_TransactionsContent,
-    "./islands/Wallet/WalletHeader.tsx": $Wallet_WalletHeader,
     "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
+    "./islands/Wallet/details/HistoryContent.tsx":
+      $Wallet_details_HistoryContent,
+    "./islands/Wallet/details/MyItemsContent.tsx":
+      $Wallet_details_MyItemsContent,
+    "./islands/Wallet/details/TransactionsContent.tsx":
+      $Wallet_details_TransactionsContent,
+    "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,

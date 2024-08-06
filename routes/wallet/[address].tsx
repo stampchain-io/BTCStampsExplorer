@@ -3,10 +3,10 @@ import { StampCard } from "$components/StampCard.tsx";
 import BtcAddressInfo from "$components/BtcAddressInfo.tsx";
 import { SRC20BalanceTable } from "$components/SRC20BalanceTable.tsx";
 import { Handlers } from "$fresh/server.ts";
-import { WalletHeader } from "$islands/Wallet/WalletHeader.tsx";
-import { MyItemsContent } from "$islands/Wallet/MyItemsContent.tsx";
-import { TransactionsContent } from "$islands/Wallet/TransactionsContent.tsx";
-import { HistoryContent } from "$islands/Wallet/HistoryContent.tsx";
+import { WalletHeader } from "../../islands/Wallet/details/WalletHeader.tsx";
+import { MyItemsContent } from "../../islands/Wallet/details/MyItemsContent.tsx";
+import { TransactionsContent } from "../../islands/Wallet/details/TransactionsContent.tsx";
+import { HistoryContent } from "../../islands/Wallet/details/HistoryContent.tsx";
 
 type WalletPageProps = {
   data: {

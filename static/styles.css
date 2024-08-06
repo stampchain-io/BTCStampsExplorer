@@ -11,6 +11,7 @@
 /* width */
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
   border-radius: 14px;
 }
 
@@ -18,6 +19,7 @@
   /* Adjust the max-width as needed */
   ::-webkit-scrollbar {
     width: 8px; /* Smaller width for mobile */
+    height: 8px;
     border-radius: 14px;
   }
 }
@@ -42,6 +44,7 @@
 /* New custom scrollbar styles for specific class */
 .custom-scrollbar::-webkit-scrollbar {
   width: 28px; /* Custom width */
+  height: 20px;
   border-radius: 0px;
 }
 
@@ -49,6 +52,7 @@
   /* Adjust the max-width as needed */
   .custom-scrollbar::-webkit-scrollbar {
     width: 17px; /* Smaller width for mobile */
+    height: 14px;
     border-radius: 0px;
   }
 }
