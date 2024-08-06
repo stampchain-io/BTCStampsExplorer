@@ -1,4 +1,4 @@
-import { Pagination } from "$components/Pagination.tsx";
+import { Pagination } from "$islands/pagination/Pagination.tsx";
 
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
@@ -77,7 +77,11 @@ export default function Collection(props: CollectionPageProps) {
 
   return (
     <div class="flex flex-col gap-8">
-      <CollectionHeader />
+      <CollectionHeader
+        filterBy={filterBy}
+        sortBy={sortBy}
+        selectedTab={selectedTab}
+      />
       <CollectionList />
       <Pagination
         page={page}

@@ -1,6 +1,6 @@
 import { StampRow } from "globals";
 
-import { Pagination } from "$components/Pagination.tsx";
+import { Pagination } from "$islands/pagination/Pagination.tsx";
 import { Handlers } from "$fresh/server.ts";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";

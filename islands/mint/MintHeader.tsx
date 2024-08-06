@@ -15,7 +15,7 @@ export const MintHeader = (
           class={selectedTab === "mint"
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => setTypeOption("mint", "mint")}
+          onClick={() => setTypeOption("stamping", "mint")}
         >
           Mint
         </p>
@@ -23,7 +23,7 @@ export const MintHeader = (
           class={selectedTab === "deploy"
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => setTypeOption("mint", "deploy")}
+          onClick={() => setTypeOption("stamping", "deploy")}
         >
           Deploy
         </p>
@@ -31,7 +31,7 @@ export const MintHeader = (
           class={selectedTab === "transfer"
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => setTypeOption("mint", "transfer")}
+          onClick={() => setTypeOption("stamping", "transfer")}
         >
           Transfer
         </p>

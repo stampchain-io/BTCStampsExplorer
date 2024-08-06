@@ -50,20 +50,21 @@ export default function App({ Component }: AppProps) {
       </head>
       <body className="bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-['Pixelify_Sans']">
         <ToastProvider>
-          <div
-            className="px-2 pt-8 mx-auto flex flex-col gap-5 overflow-auto max-w-7xl w-full mb-[70px] md:mb-[200px]"
-            f-client-nav
-          >
-            <Header />
-            {/* <MempoolWeather /> */}
-            {/* <StampSearchClient /> */}
-            <NavigatorProvider>
+          <NavigatorProvider>
+            <div
+              className="px-2 pt-8 mx-auto flex flex-col gap-5 overflow-auto max-w-7xl w-full mb-[70px] md:mb-[200px]"
+              f-client-nav
+            >
+              <Header />
+              {/* <MempoolWeather /> */}
+              {/* <StampSearchClient /> */}
+
               <Partial name="body">
                 <Component />
               </Partial>
-            </NavigatorProvider>
-          </div>
-          <Footer />
+            </div>
+            <Footer />
+          </NavigatorProvider>
         </ToastProvider>
       </body>
     </html>
