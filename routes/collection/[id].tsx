@@ -1,4 +1,4 @@
-import { Pagination } from "$components/Pagination.tsx";
+import { Pagination } from "$islands/pagination/Pagination.tsx";
 import { FreshContext } from "$fresh/server.ts";
 
 import { StampRow } from "globals";

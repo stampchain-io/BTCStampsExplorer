@@ -15,7 +15,10 @@ export const Pagination = (
   const startPage = Math.max(1, currentPage - maxPagesToShow);
   const endPage = Math.min(totalPages, currentPage + maxPagesToShow);
   const pageItems = [];
-  const { filterOption, sortOption, typeOption } = useNavigator();
+  const { getSort, getFilter, getType } = useNavigator();
+  const sortOption = getSort();
+  const filterOption = getFilter();
+  const typeOption = getType();
 
   for (let p = startPage; p <= endPage; p++) {
     pageItems.push(

@@ -1,4 +1,4 @@
-import { useContext, useState } from "preact/hooks";
+import { useContext, useRef, useState } from "preact/hooks";
 import { createContext } from "preact";
 
 const NavigatorContext = createContext(null);
@@ -23,6 +23,10 @@ export const NavigatorProvider = ({ children }) => {
     }
   };
 
+  const getSortOption = () => {
+    return sortOption;
+  };
+
   const setFilterOptionData = (value: string) => {
     let updatedData;
     if (filterOption.includes(value)) {
@@ -31,7 +35,7 @@ export const NavigatorProvider = ({ children }) => {
       updatedData = [...filterOption, value];
     }
     setFilterOption(updatedData);
-    console.log(updatedData);
+    console.log("Filter option: ", updatedData);
 
     if (globalThis.history) {
       globalThis.history.pushState(
@@ -41,6 +45,10 @@ export const NavigatorProvider = ({ children }) => {
       );
       window.location.reload();
     }
+  };
+
+  const getFilterOption = () => {
+    return filterOption;
   };
 
   const setTypeOptionData = (prefix: string, value: string) => {
@@ -56,17 +64,25 @@ export const NavigatorProvider = ({ children }) => {
     }
   };
 
+  const getTypeOption = () => {
+    return typeOption;
+  };
+
   const contextValue = {
     sortOption,
     setSort: setSortOption,
+    setSortOption: setSortOptionData,
+    getSort: getSortOption,
     filterOption,
     setFilter: setFilterOption,
+    setFilterOption: setFilterOptionData,
+    getFilter: getFilterOption,
     typeOption,
     setType: setTypeOption,
-    setSortOption: setSortOptionData,
-    setFilterOption: setFilterOptionData,
     setTypeOption: setTypeOptionData,
+    getType: getTypeOption,
   };
+
   return (
     <NavigatorContext.Provider value={contextValue}>
       {/* <span class="text-white">SortOption: {sortOption}</span> */}

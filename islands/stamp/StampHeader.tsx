@@ -1,3 +1,5 @@
+import { useEffect } from "preact/hooks";
+
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
@@ -9,7 +11,11 @@ export const StampHeader = (
     selectedTab: string;
   },
 ) => {
-  const { setTypeOption } = useNavigator();
+  const { setType, setTypeOption } = useNavigator();
+
+  useEffect(() => {
+    setType(selectedTab);
+  }, []);
 
   return (
     <div class="flex flex-col-reverse md:flex-row justify-between w-full border-b border-[#3F2A4E]">
