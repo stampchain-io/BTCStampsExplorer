@@ -54,20 +54,28 @@ export class StampService {
     ident?: SUBPROTOCOLS[];
     all_columns?: boolean;
     collectionId?: string;
-    identifier?: string | number;
+    identifier?: string | number | (string | number)[];
     blockIdentifier?: number | string;
     cacheDuration?: number | "never";
     noPagination?: boolean;
     page_size?: number;
   }) {
-    const isSingleStamp = !!options.identifier;
+    const isMultipleStamps = Array.isArray(options.identifier);
+    const isSingleStamp = !!options.identifier && !isMultipleStamps;
+
     const [stamps, total] = await Promise.all([
       StampRepository.getStampsFromDb({
         ...options,
         limit: options.page_size || options.limit,
-        all_columns: isSingleStamp ? true : options.all_columns,
-        noPagination: isSingleStamp ? true : options.noPagination,
-        cacheDuration: isSingleStamp ? "never" : options.cacheDuration,
+        all_columns: isSingleStamp || isMultipleStamps
+          ? true
+          : options.all_columns,
+        noPagination: isSingleStamp || isMultipleStamps
+          ? true
+          : options.noPagination,
+        cacheDuration: isSingleStamp || isMultipleStamps
+          ? "never"
+          : options.cacheDuration,
       }),
       StampRepository.getTotalStampCountFromDb(
         options.type || "stamps",
@@ -79,6 +87,10 @@ export class StampService {
       return !stamps.rows.length
         ? null
         : { stamp: stamps.rows[0], total: total.rows[0].total };
+    }
+
+    if (isMultipleStamps) {
+      return { stamps: stamps.rows, total: stamps.rows.length };
     }
 
     return { stamps: stamps.rows, total: total.rows[0].total };
@@ -143,33 +155,46 @@ export class StampService {
     }));
   }
 
-  static async getRecentSales(limit: number = 6) {
+  static async getRecentSales(limit: number = 20) {
     const [dispenseEvents, cpids] = await Promise.all([
-      XcpManager.fetchDispenseEvents(500),
+      XcpManager.fetchDispenseEvents(100),
       this.getAllCPIDs(),
     ]);
 
     const cpidMap = new Map(cpids.map((row) => [row.cpid, row.stamp]));
 
-    const recentSales = await Promise.all(
-      dispenseEvents
-        .filter((event) => cpidMap.has(event.params.asset))
-        .map(async (event) => {
-          const stampDetails = await this.getStamps({
-            identifier: cpidMap.get(event.params.asset),
-            all_columns: true,
-            noPagination: true,
-          });
-          return {
-            ...stampDetails.stamp,
-            sale_data: {
-              btc_amount: event.params.btc_amount,
-              block_index: event.block_index,
-              tx_hash: event.tx_hash,
-            },
-          };
-        }),
+    // Filter matching events and collect their identifiers
+    const matchingEvents = dispenseEvents.filter((event) =>
+      cpidMap.has(event.params.asset)
     );
+    const matchingIdentifiers = matchingEvents.map((event) =>
+      cpidMap.get(event.params.asset)
+    );
+
+    // Fetch all matching stamps in a single call
+    const stampDetails = await this.getStamps({
+      identifier: matchingIdentifiers,
+      all_columns: true,
+      noPagination: true,
+    });
+
+    // Create a map for quick lookup of stamp details
+    const stampDetailsMap = new Map(
+      stampDetails.stamps.map((stamp) => [stamp.stamp, stamp]),
+    );
+
+    const recentSales = matchingEvents.map((event) => {
+      const stamp = stampDetailsMap.get(cpidMap.get(event.params.asset));
+      if (!stamp) return null;
+      return {
+        ...stamp,
+        sale_data: {
+          btc_amount: event.params.btc_amount,
+          block_index: event.block_index,
+          tx_hash: event.tx_hash,
+        },
+      };
+    }).filter(Boolean);
 
     return recentSales
       .sort((a, b) => b.sale_data.block_index - a.sale_data.block_index)

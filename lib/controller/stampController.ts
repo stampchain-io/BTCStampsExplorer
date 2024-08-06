@@ -191,7 +191,7 @@ export class StampController {
               limit: page_size,
             }),
             CollectionService.getCollectionByName("posh", 6),
-            StampService.getRecentSales(6),
+            StampService.getRecentSales(20),
           ]);
 
         return {
