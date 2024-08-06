@@ -1,4 +1,3 @@
-import { Client } from "$mysql/mod.ts";
 import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
 import { get_balances } from "$lib/services/xcpService.ts";
@@ -141,7 +140,6 @@ export class StampRepository {
     const ext = getFileSuffixFromMime(stamp_mimetype);
     return `${tx_hash}.${ext}`;
   }
-
   static async getStampsFromDb(
     options: {
       limit?: number;
@@ -149,12 +147,12 @@ export class StampRepository {
       sort_order?: "asc" | "desc";
       type?: "stamps" | "cursed" | "all";
       ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string;
-      identifier?: string | number;
+      identifier?: string | number | (string | number)[];
       blockIdentifier?: number | string;
       all_columns?: boolean;
       noPagination?: boolean;
       cacheDuration?: number | "never";
-      collectionId?: string; // Add this new option
+      collectionId?: string;
     },
   ) {
     const {
@@ -168,37 +166,59 @@ export class StampRepository {
       all_columns = false,
       noPagination = false,
       cacheDuration = 1000 * 60 * 3,
-      collectionId, // Destructure the new option
+      collectionId,
     } = options;
 
-    const whereConditions = [];
+    const whereConditions: string[] = [];
     const queryParams: (string | number)[] = [];
 
     // Identifier condition (stamp, tx_hash, cpid, or stamp_hash)
     if (identifier !== undefined) {
-      const isNumber = typeof identifier === "number" ||
-        !isNaN(Number(identifier));
-      const isTxHash = typeof identifier === "string" &&
-        identifier.length === 64 && /^[a-fA-F0-9]+$/.test(identifier);
-      const isStampHash = typeof identifier === "string" &&
-        /^[a-zA-Z0-9]{12,20}$/.test(identifier) && /[a-z]/.test(identifier) &&
-        /[A-Z]/.test(identifier);
+      if (Array.isArray(identifier)) {
+        const numericIds = identifier.filter((id): id is number =>
+          typeof id === "number"
+        );
+        const stringIds = identifier.filter((id): id is string =>
+          typeof id === "string"
+        );
 
-      if (isNumber) {
-        whereConditions.push("st.stamp = ?");
-        queryParams.push(Number(identifier));
-      } else if (isTxHash) {
-        whereConditions.push("st.tx_hash = ?");
-        queryParams.push(identifier);
-      } else if (isStampHash) {
-        whereConditions.push("st.stamp_hash = ?");
-        queryParams.push(identifier);
+        if (numericIds.length > 0) {
+          whereConditions.push(
+            `st.stamp IN (${numericIds.map(() => "?").join(",")})`,
+          );
+          queryParams.push(...numericIds);
+        }
+
+        if (stringIds.length > 0) {
+          whereConditions.push(
+            `st.cpid IN (${stringIds.map(() => "?").join(",")})`,
+          );
+          queryParams.push(...stringIds);
+        }
       } else {
-        whereConditions.push("st.cpid = ?");
-        queryParams.push(identifier);
+        const isNumber = typeof identifier === "number" ||
+          !isNaN(Number(identifier));
+        const isTxHash = typeof identifier === "string" &&
+          identifier.length === 64 && /^[a-fA-F0-9]+$/.test(identifier);
+        const isStampHash = typeof identifier === "string" &&
+          /^[a-zA-Z0-9]{12,20}$/.test(identifier) && /[a-z]/.test(identifier) &&
+          /[A-Z]/.test(identifier);
+
+        if (isNumber) {
+          whereConditions.push("st.stamp = ?");
+          queryParams.push(Number(identifier));
+        } else if (isTxHash) {
+          whereConditions.push("st.tx_hash = ?");
+          queryParams.push(identifier);
+        } else if (isStampHash) {
+          whereConditions.push("st.stamp_hash = ?");
+          queryParams.push(identifier);
+        } else {
+          whereConditions.push("st.cpid = ?");
+          queryParams.push(identifier);
+        }
       }
     } else if (type !== "all") {
-      // Only add this condition if we're not searching for a specific stamp
       const stampCondition = type === "stamps"
         ? "st.stamp >= 0"
         : "st.stamp < 0";
@@ -209,9 +229,7 @@ export class StampRepository {
     if (ident) {
       const identList = Array.isArray(ident) ? ident : [ident];
       if (identList.length > 0) {
-        const identCondition = identList.map((id) => `st.ident = ?`).join(
-          " OR ",
-        );
+        const identCondition = identList.map(() => "st.ident = ?").join(" OR ");
         whereConditions.push(`(${identCondition})`);
         queryParams.push(...identList.map(String));
       }
@@ -262,11 +280,9 @@ export class StampRepository {
     const selectClause = all_columns
       ? "st.*, cr.creator AS creator_name"
       : specificColumns;
-
     const whereClause = whereConditions.length > 0
       ? `WHERE ${whereConditions.join(" AND ")}`
       : "";
-
     const order = sort_order.toUpperCase() === "DESC" ? "DESC" : "ASC";
     const orderClause = `ORDER BY st.stamp ${order}`;
 
@@ -288,7 +304,7 @@ export class StampRepository {
     ${orderClause}
     ${limitClause}
     ${offsetClause}
-  `;
+    `;
     console.log(`Executing query:`, query);
     console.log(`Query params:`, queryParams);
 
