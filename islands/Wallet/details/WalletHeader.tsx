@@ -1,3 +1,4 @@
+import { useRef, useState } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
 
 export const WalletHeader = ({
@@ -8,6 +9,12 @@ export const WalletHeader = ({
   address: string;
 }) => {
   const { setTypeOption } = useNavigator();
+  const displayNameRef = useRef(null);
+  const [displayName, setDisplayName] = useState("NameHere");
+  const [displayNameDisabled, setDisplayNameDisabled] = useState(true);
+  const xNameRef = useRef(null);
+  const [xName, setXName] = useState("NameHere");
+  const [xNameDisabled, setXNameDisabled] = useState(true);
 
   return (
     <div class="flex flex-col gap-3">
@@ -24,7 +31,7 @@ export const WalletHeader = ({
           />
           <div class="flex flex-col justify-between">
             <p class="font-semibold text-[18px] text-white flex gap-2 items-center">
-              <img src="/img/icon_btc.png" className="w-5 h-5" alt="" />
+              <img src="/img/footer/icon_btc.png" className="w-5 h-5" alt="" />
               <span className="hidden md:block">
                 bc1p2dds1a421xvf53e2dcx6vxcg423sl64r
               </span>
@@ -40,17 +47,57 @@ export const WalletHeader = ({
             </p>
           </div>
         </div>
-        <div className="w-[137px] hidden md:block">
+        <div className="w-[150px] hidden md:block">
           <div className="flex justify-between items-center">
-            <p className="text-[#B9B9B9] text-[14px]">Display name</p>
-            <img src="/img/wallet/icon-edit.svg" alt="" />
+            <p className="text-[#B9B9B9] text-[14px]">
+              Display name
+            </p>
+            <img
+              src="/img/wallet/icon-edit.svg"
+              alt=""
+              className={"cursor-pointer"}
+              onClick={() => {
+                setDisplayNameDisabled(false);
+                displayNameRef.current.focus();
+              }}
+            />
           </div>
-          <p className="text-[18px] text-[#F5F5F5] mb-[19px]">NameHere</p>
+          <input
+            className="bg-transparent text-[18px] text-[#F5F5F5] mb-[19px] w-[150px]"
+            value={displayName}
+            disabled={displayNameDisabled}
+            onChange={(e) => {
+              setDisplayName(e.target.value);
+
+              // TODO: add name update logic here
+            }}
+            onFocusOut={() => setDisplayNameDisabled(true)}
+            ref={displayNameRef}
+          />
           <div className="flex justify-between items-center">
             <p className="text-[#B9B9B9] text-[14px]">X (Twitter)</p>
-            <img src="/img/wallet/icon-edit.svg" alt="" />
+            <img
+              src="/img/wallet/icon-edit.svg"
+              alt=""
+              className={"cursor-pointer"}
+              onClick={() => {
+                setXNameDisabled(false);
+                xNameRef.current.focus();
+              }}
+            />
           </div>
-          <p className="text-[18px] text-[#F5F5F5]">NameHere</p>
+          <input
+            className="bg-transparent text-[18px] text-[#F5F5F5] w-[150px]"
+            value={xName}
+            disabled={xNameDisabled}
+            onChange={(e) => {
+              setXName(e.target.value);
+
+              // TODO: add name update logic here
+            }}
+            onFocusOut={() => setXNameDisabled(true)}
+            ref={xNameRef}
+          />
         </div>
       </div>
       <div class="flex gap-6 md:gap-8 items-end overflow-auto">
