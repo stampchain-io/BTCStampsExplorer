@@ -76,10 +76,8 @@ export default function StampPage(props: StampDetailPageProps) {
       </div>
 
       <StampSends sends={sends} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
-        <StampDispensers dispensers={dispensers} />
-        <StampHolders holders={holders} />
-      </div>
+      <StampDispensers dispensers={dispensers} />
+      <StampHolders holders={holders} />
       <StampSales dispenses={dispensesWithRates} />
     </>
   );
