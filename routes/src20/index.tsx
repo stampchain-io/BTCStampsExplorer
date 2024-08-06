@@ -1,4 +1,4 @@
-import { Pagination } from "$components/Pagination.tsx";
+import { Pagination } from "$islands/pagination/Pagination.tsx";
 import { Handlers } from "$fresh/server.ts";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
@@ -11,6 +11,7 @@ export const handler: Handlers = {
       const url = new URL(req.url);
       const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
       const sortBy = url.searchParams.get("sortBy") || "ASC";
+      const selectedTab = url.searchParams.get("ident") || "all";
       const page = Number(url.searchParams.get("page")) || 1;
       const limit = Number(url.searchParams.get("limit")) || 11;
 
@@ -36,6 +37,7 @@ export const handler: Handlers = {
         last_block: resultData.last_block || 0,
         filterBy,
         sortBy,
+        selectedTab,
       };
 
       console.log("Handler sending data:", data);
@@ -63,6 +65,7 @@ export default function SRC20Page(props: any) {
     limit = 11,
     filterBy = [],
     sortBy = "ASC",
+    selectedTab,
   } = data;
 
   if (!src20s || src20s.length === 0) {
@@ -71,7 +74,11 @@ export default function SRC20Page(props: any) {
 
   return (
     <div class="flex flex-col gap-8">
-      <SRC20Header filterBy={filterBy} sortBy={sortBy} />
+      <SRC20Header
+        filterBy={filterBy}
+        sortBy={sortBy}
+        selectedTab={selectedTab}
+      />
       <SRC20DeployTable data={data.src20s} />
       <Pagination
         page={page}

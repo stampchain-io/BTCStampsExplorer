@@ -1,5 +1,5 @@
 import { StampPageProps } from "globals";
-import { Pagination } from "$components/Pagination.tsx";
+import { Pagination } from "$islands/pagination/Pagination.tsx";
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampContent } from "$islands/stamp/StampContent.tsx";

@@ -94,6 +94,7 @@ import * as $mint_DeployContent from "./islands/mint/DeployContent.tsx";
 import * as $mint_MintContent from "./islands/mint/MintContent.tsx";
 import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
 import * as $mint_TransferContent from "./islands/mint/TransferContent.tsx";
+import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
@@ -225,6 +226,7 @@ const manifest = {
     "./islands/mint/MintContent.tsx": $mint_MintContent,
     "./islands/mint/MintHeader.tsx": $mint_MintHeader,
     "./islands/mint/TransferContent.tsx": $mint_TransferContent,
+    "./islands/pagination/Pagination.tsx": $pagination_Pagination,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
