@@ -103,8 +103,8 @@ export function Header() {
               Home
             </a>
             <a
-              href="/stamp"
-              f-partial={"/stamp"}
+              href="/stamp?ident=classic"
+              f-partial={"/stamp?ident=classic"}
               onClick={toggleMenu}
               className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
                 path === "stamp" ? "border-[#7A00F5] border-b-4" : ""
