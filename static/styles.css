@@ -62,6 +62,7 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #b9b9b9; /* Custom handle color */
   border-radius: 0px;
+  background-clip: padding-box;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
