@@ -4,6 +4,7 @@ import { get_holders, get_sends } from "$lib/services/xcpService.ts";
 import { StampBalance, SUBPROTOCOLS } from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
+import { BIG_LIMIT } from "utils/constants.ts";
 
 export class StampService {
   static async getStampDetailsById(
@@ -62,11 +63,16 @@ export class StampService {
   }) {
     const isMultipleStamps = Array.isArray(options.identifier);
     const isSingleStamp = !!options.identifier && !isMultipleStamps;
+    const limit = options.page_size || options.limit || BIG_LIMIT;
+    const page = options.page || 1;
 
     const [stamps, total] = await Promise.all([
       StampRepository.getStampsFromDb({
         ...options,
-        limit: options.page_size || options.limit,
+        limit: isSingleStamp || isMultipleStamps ? undefined : limit,
+        offset: isSingleStamp || isMultipleStamps
+          ? undefined
+          : (page - 1) * limit,
         all_columns: isSingleStamp || isMultipleStamps
           ? true
           : options.all_columns,
@@ -83,17 +89,31 @@ export class StampService {
       ),
     ]);
 
+    const totalCount = total.rows[0].total;
+    const totalPages = Math.ceil(totalCount / limit);
+
     if (isSingleStamp) {
       return !stamps.rows.length
         ? null
-        : { stamp: stamps.rows[0], total: total.rows[0].total };
+        : { stamp: stamps.rows[0], total: totalCount };
     }
 
     if (isMultipleStamps) {
       return { stamps: stamps.rows, total: stamps.rows.length };
     }
 
-    return { stamps: stamps.rows, total: total.rows[0].total };
+    // Apply pagination only if noPagination is false
+    const paginatedData = options.noPagination
+      ? stamps.rows
+      : stamps.rows.slice(0, limit);
+
+    return {
+      stamps: paginatedData,
+      total: totalCount,
+      pages: totalPages,
+      page: page,
+      page_size: limit,
+    };
   }
 
   static async getStampFile(id: string) {

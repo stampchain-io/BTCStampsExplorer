@@ -60,7 +60,7 @@ export class StampController {
     identifier,
     blockIdentifier,
     cacheDuration,
-    noPagination = false, // Add this line
+    noPagination = false,
   }: {
     page?: number;
     limit?: number;
@@ -81,7 +81,7 @@ export class StampController {
         limit,
         sort_order: orderBy.toLowerCase() as "asc" | "desc",
         type,
-        ident: ident,
+        ident,
         all_columns: false,
         collectionId,
         identifier,
@@ -93,27 +93,18 @@ export class StampController {
         throw new Error("No stamps found");
       }
 
-      // Ensure we're using the correct property of the result object
-      const stamps = result.stamps.rows || result.stamps;
-
-      // Only apply sorting and filtering if necessary
-      const sortedAndFilteredStamps = sortBy !== "none" || filterBy.length > 0
-        ? sortData(filterData(stamps, filterBy), sortBy, orderBy)
-        : stamps;
-
-      // Apply pagination only if noPagination is false
-      const paginatedData = noPagination
-        ? sortedAndFilteredStamps
-        : sortedAndFilteredStamps.slice((page - 1) * limit, page * limit);
-
-      const totalPages = Math.ceil(result.total / limit);
+      // Apply sorting and filtering if needed
+      let stamps = result.stamps;
+      if (sortBy !== "none" || filterBy.length > 0) {
+        stamps = sortData(filterData(stamps, filterBy), sortBy, orderBy);
+      }
 
       return {
-        stamps: paginatedData,
+        stamps,
         total: result.total,
-        pages: totalPages,
-        page: page,
-        page_size: limit,
+        pages: result.pages,
+        page: result.page,
+        page_size: result.page_size,
       };
     } catch (error) {
       console.error("Error in getStamps:", error);
@@ -149,7 +140,7 @@ export class StampController {
       categories.map(async (category) => {
         const serviceResult = await StampService.getStamps({
           page: 1,
-          page_size: category.limit,
+          limit: category.limit,
           sort_order: "desc",
           type: "stamps",
           ident: category.types as SUBPROTOCOLS[],
@@ -167,64 +158,33 @@ export class StampController {
     return results;
   }
 
-  static async getHomePageData(
-    type: string | null,
-    page: number,
-    page_size: number,
-    filterBy: string[] = [],
-    sortBy: string = "none",
-    orderBy: "DESC" | "ASC" = "DESC",
-  ) {
+  static async getHomePageData() {
     try {
-      if (!type) {
-        const [stampCategories, src20Result, poshCollection, recentSales] =
-          await Promise.all([
-            this.getMultipleStampCategories([
-              { types: ["STAMP", "SRC-721"], limit: 6 },
-              { types: ["SRC-721"], limit: 6 },
-              { types: ["STAMP"], limit: 6 },
-              { types: ["SRC-20"], limit: 6 },
-            ]),
-            Src20Service.fetchAndFormatSrc20Data({
-              op: "DEPLOY",
-              page,
-              limit: page_size,
-            }),
-            CollectionService.getCollectionByName("posh", 6),
-            StampService.getRecentSales(20),
-          ]);
+      const [stampCategories, src20Result, poshCollection, recentSales] =
+        await Promise.all([
+          this.getMultipleStampCategories([
+            { types: ["STAMP", "SRC-721"], limit: 6 },
+            { types: ["SRC-721"], limit: 6 },
+            { types: ["STAMP"], limit: 6 },
+            { types: ["SRC-20"], limit: 6 },
+          ]),
+          Src20Service.fetchAndFormatSrc20Data({
+            op: "DEPLOY",
+            page: 1,
+            limit: 10,
+          }),
+          CollectionService.getCollectionByName("posh", 6),
+          StampService.getRecentSales(20),
+        ]);
 
-        return {
-          stamps_recent: recentSales,
-          stamps_src721: stampCategories[1].stamps,
-          stamps_art: stampCategories[2].stamps,
-          stamps_src20: stampCategories[3].stamps,
-          stamps_posh: poshCollection ? poshCollection.stamps : [],
-          src20s: src20Result.data.map(formatSRC20Row),
-          pages_src20: src20Result.pages,
-          page_src20: src20Result.page,
-          page_size_src20: src20Result.page_size,
-          type,
-        };
-      } else {
-        const ident = this.getIdent(type) as SUBPROTOCOLS[];
-        const stampResult = await this.getStamps({
-          page,
-          limit: page_size,
-          orderBy,
-          sortBy,
-          type: type as "stamps" | "cursed" | "all",
-          filterBy,
-          ident,
-        });
-
-        return {
-          ...stampResult,
-          filterBy,
-          sortBy,
-          type,
-        };
-      }
+      return {
+        stamps_recent: recentSales,
+        stamps_src721: stampCategories[1].stamps,
+        stamps_art: stampCategories[2].stamps,
+        stamps_src20: stampCategories[3].stamps,
+        stamps_posh: poshCollection ? poshCollection.stamps : [],
+        src20s: src20Result.data.map(formatSRC20Row),
+      };
     } catch (error) {
       console.error("Error in getHomePageData:", error);
       throw error;
