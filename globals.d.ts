@@ -322,7 +322,7 @@ type StampPageProps = {
   };
 };
 
-type MintPageProps = {
+export type MintPageProps = {
   data: {
     selectedTab: "mint" | "deploy" | "transfer";
   };

@@ -171,80 +171,7 @@ export function MintContent() {
 
       <div>
         <div class="flex gap-8">
-          <div
-            id="image-preview"
-            class="relative max-w-sm border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]"
-          >
-            <input
-              id="upload"
-              type="file"
-              class="hidden"
-              accept="image/*"
-              onChange={handleImage}
-            />
-            {file !== null && (
-              <img
-                width={324}
-                style={{
-                  height: "100%",
-                  objectFit: "contain",
-                  imageRendering: "pixelated",
-                  backgroundColor: "rgb(0,0,0)",
-                  borderRadius: "6px",
-                }}
-                src={URL.createObjectURL(file)}
-              />
-            )}
-            {file === null && (
-              <label
-                for="upload"
-                class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
-              >
-                {
-                  /* <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-8 h-8 text-gray-200 mx-auto mb-4"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-                  />
-                </svg> */
-                }
-                <img
-                  src="/img/mint/icon-image-upload.png"
-                  class="w-20 h-20"
-                  alt=""
-                />
-                <h5 class="text-[#F5F5F5] text-2xl font-semibold">
-                  Upload Image
-                </h5>
-                {
-                  /* <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-100">
-                  Drop file here
-                  <p class="font-normal text-sm text-gray-400 md:px-6">
-                    or click to upload
-                  </p>
-                </h5> */
-                }
-                {
-                  /* <p class="font-normal text-sm text-gray-400 md:px-6">
-                  Max File Size: 65000 bytes
-                </p>
-                <span id="filename" class="text-gray-500 bg-gray-200 z-50">
-                </span> */
-                }
-              </label>
-            )}
-          </div>
-
-          {
-            /* <div class="max-w-sm p-6 mb-4 border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-gray-800">
+          <div class="max-w-sm p-6 mb-4 border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]">
             {file !== null && (
               <img
                 width={350}
@@ -259,15 +186,14 @@ export function MintContent() {
             )}
             {file === null && (
               <label class="cursor-pointer">
-                <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-100">
+                <h5 class="mb-2 text-[#F5F5F5] text-2xl font-semibold tracking-light">
                   Preview
                 </h5>
                 <span id="filename" class="text-gray-500 bg-gray-200 z-50">
                 </span>
               </label>
             )}
-          </div> */
-          }
+          </div>
         </div>
         {
           /* <div class="flex w-full">
