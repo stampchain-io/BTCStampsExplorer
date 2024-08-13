@@ -231,30 +231,6 @@ export function DeployContent() {
               </label>
             )}
           </div>
-
-          <div class="max-w-sm p-6 mb-4 border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]">
-            {file !== null && (
-              <img
-                width={350}
-                style={{
-                  height: "100%",
-                  objectFit: "contain",
-                  imageRendering: "pixelated",
-                  backgroundColor: "rgb(0,0,0)",
-                }}
-                src={URL.createObjectURL(file)}
-              />
-            )}
-            {file === null && (
-              <label class="cursor-pointer">
-                <h5 class="mb-2 text-[#F5F5F5] text-2xl font-semibold tracking-light">
-                  Preview
-                </h5>
-                <span id="filename" class="text-gray-500 bg-gray-200 z-50">
-                </span>
-              </label>
-            )}
-          </div>
         </div>
       </div>
 

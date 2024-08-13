@@ -227,32 +227,26 @@ export class DispenserManager {
       origin: dispenser.origin,
     }));
   }
+
   static async getAllDispensers(page: number = 1, limit: number = 10) {
-    const dispensers = await this.handleXcpApiRequestWithCache<any[]>(
-      "get_dispensers",
-      {},
-      this.cacheTimeout,
-    );
+    const [dispensers, allCPIDs] = await Promise.all([
+      this.handleXcpApiRequestWithCache<any[]>(
+        "get_dispensers",
+        {},
+        this.cacheTimeout,
+      ),
+      StampService.getAllCPIDs(),
+    ]);
 
     if (!dispensers || !Array.isArray(dispensers)) {
       console.log("No dispensers found");
       return { total: 0, dispensers: [] };
     }
 
-    const assetIds = [
-      ...new Set(dispensers.map((dispenser) => dispenser.asset)),
-    ];
-
-    const stamps = await StampService.getStamps({
-      identifier: assetIds,
-      all_columns: true,
-      noPagination: true,
-    });
-
-    const stampMap = new Map(stamps.stamps.map((stamp) => [stamp.cpid, stamp]));
+    const cpidMap = new Map(allCPIDs.map((cpid) => [cpid.cpid, cpid.stamp]));
 
     const openDispensers = dispensers.filter((dispenser) =>
-      dispenser.give_remaining > 0 && stampMap.has(dispenser.asset)
+      dispenser.give_remaining > 0 && cpidMap.has(dispenser.asset)
     );
 
     const mappedDispensersPromises = openDispensers.map(async (dispenser) => {
@@ -269,7 +263,7 @@ export class DispenserManager {
         btcrate: dispenser.satoshirate / 100000000,
         origin: dispenser.origin,
         dispenses: await dispenses,
-        stamp: stampMap.get(dispenser.asset),
+        stamp: cpidMap.get(dispenser.asset),
       };
     });
 

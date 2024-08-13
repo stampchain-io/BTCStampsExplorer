@@ -56,9 +56,8 @@ import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
-import * as $stamp_tool from "./routes/stamp/tool.tsx";
-import * as $stamping_deploy from "./routes/stamping/deploy.tsx";
-import * as $stamping_mint from "./routes/stamping/mint.tsx";
+import * as $stamping_src20 from "./routes/stamping/src20.tsx";
+import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
@@ -99,10 +98,10 @@ import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
-import * as $stamp_tool_FileContent from "./islands/stamp/tool/FileContent.tsx";
-import * as $stamp_tool_StampToolHeader from "./islands/stamp/tool/StampToolHeader.tsx";
 import * as $stamping_DeployContent from "./islands/stamping/DeployContent.tsx";
 import * as $stamping_MintContent from "./islands/stamping/MintContent.tsx";
+import * as $stamping_OlgaContent from "./islands/stamping/OlgaContent.tsx";
+import * as $stamping_StampingSrc20Header from "./islands/stamping/StampingSrc20Header.tsx";
 import * as $stamping_TransferContent from "./islands/stamping/TransferContent.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
@@ -179,9 +178,8 @@ const manifest = {
     "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/index.tsx": $stamp_index,
-    "./routes/stamp/tool.tsx": $stamp_tool,
-    "./routes/stamping/deploy.tsx": $stamping_deploy,
-    "./routes/stamping/mint.tsx": $stamping_mint,
+    "./routes/stamping/src20.tsx": $stamping_src20,
+    "./routes/stamping/stamp.tsx": $stamping_stamp,
     "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
@@ -231,10 +229,10 @@ const manifest = {
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
-    "./islands/stamp/tool/FileContent.tsx": $stamp_tool_FileContent,
-    "./islands/stamp/tool/StampToolHeader.tsx": $stamp_tool_StampToolHeader,
     "./islands/stamping/DeployContent.tsx": $stamping_DeployContent,
     "./islands/stamping/MintContent.tsx": $stamping_MintContent,
+    "./islands/stamping/OlgaContent.tsx": $stamping_OlgaContent,
+    "./islands/stamping/StampingSrc20Header.tsx": $stamping_StampingSrc20Header,
     "./islands/stamping/TransferContent.tsx": $stamping_TransferContent,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,

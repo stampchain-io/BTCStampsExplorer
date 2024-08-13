@@ -152,20 +152,20 @@ export function Header() {
               </a>
               <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] md:top-[34px] left-[100px] md:left-[15px] z-[100] py-2">
                 <a
-                  href="/stamping/mint"
-                  f-partial={"/stamping/mint"}
+                  href="/stamping/stamp"
+                  f-partial={"/stamping/stamp"}
                   onClick={toggleMenu}
                   className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                    path === "stamping/mint"
+                    path === "stamping/stamp"
                       ? "border-[#7A00F5] border-b-4"
                       : ""
                   }`}
                 >
-                  Mint
+                  Stamp
                 </a>
                 <a
-                  href="/stamping/deploy"
-                  f-partial={"/stamping/deploy"}
+                  href="/stamping/src20"
+                  f-partial={"/stamping/src20"}
                   onClick={toggleMenu}
                   className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
                     path === "stamping/deploy"
@@ -173,7 +173,7 @@ export function Header() {
                       : ""
                   }`}
                 >
-                  Deploy
+                  Src-20
                 </a>
               </div>
             </div>

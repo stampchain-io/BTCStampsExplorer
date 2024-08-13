@@ -176,36 +176,45 @@ export class StampService {
   }
 
   static async getRecentSales(limit: number = 20) {
-    // Fetch dispense events and extract unique asset values
-    const dispenseEvents = await XcpManager.fetchDispenseEvents(500); // assuming we have 20 stamp sales in last 500 dispenses
-    const uniqueAssets = [
-      ...new Set(dispenseEvents.map((event) => event.params.asset)),
-    ];
+    const [dispenseEvents, cpids] = await Promise.all([
+      XcpManager.fetchDispenseEvents(100),
+      this.getAllCPIDs(),
+    ]);
 
+    const cpidMap = new Map(cpids.map((row) => [row.cpid, row.stamp]));
+
+    // Filter matching events and collect their identifiers
+    const matchingEvents = dispenseEvents.filter((event) =>
+      cpidMap.has(event.params.asset)
+    );
+    const matchingIdentifiers = matchingEvents.map((event) =>
+      cpidMap.get(event.params.asset)
+    );
+
+    // Fetch all matching stamps in a single call
     const stampDetails = await this.getStamps({
-      identifier: uniqueAssets,
+      identifier: matchingIdentifiers,
       all_columns: true,
       noPagination: true,
     });
 
+    // Create a map for quick lookup of stamp details
     const stampDetailsMap = new Map(
-      stampDetails.stamps.map((stamp) => [stamp.cpid, stamp]),
+      stampDetails.stamps.map((stamp) => [stamp.stamp, stamp]),
     );
 
-    const recentSales = dispenseEvents
-      .map((event) => {
-        const stamp = stampDetailsMap.get(event.params.asset);
-        if (!stamp) return null;
-        return {
-          ...stamp,
-          sale_data: {
-            btc_amount: event.params.btc_amount,
-            block_index: event.block_index,
-            tx_hash: event.tx_hash,
-          },
-        };
-      })
-      .filter(Boolean);
+    const recentSales = matchingEvents.map((event) => {
+      const stamp = stampDetailsMap.get(cpidMap.get(event.params.asset));
+      if (!stamp) return null;
+      return {
+        ...stamp,
+        sale_data: {
+          btc_amount: event.params.btc_amount,
+          block_index: event.block_index,
+          tx_hash: event.tx_hash,
+        },
+      };
+    }).filter(Boolean);
 
     return recentSales
       .sort((a, b) => b.sale_data.block_index - a.sale_data.block_index)

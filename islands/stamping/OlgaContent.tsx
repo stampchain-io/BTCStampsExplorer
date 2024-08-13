@@ -1,9 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
-import { walletContext } from "store/wallet/wallet.ts";
+import { walletContext } from "$lib/store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { fetch_quicknode } from "utils/quicknode.ts";
 
-export function FileContent() {
+export function OlgaContent() {
   const { wallet, isConnected } = walletContext;
   const { address } = wallet.value;
   const btcIcon = `<svg
@@ -112,8 +112,13 @@ export function FileContent() {
   };
 
   const handleImage = (e: any) => {
-    setFile(e.target.files[0]);
-    console.log(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    if (selectedFile.size > 64 * 1024) { // Check if file size is greater than 64KB
+      alert("File size must be less than 64KB.");
+      return;
+    }
+    setFile(selectedFile);
+    console.log(selectedFile);
   };
 
   const removeImage = () => {
@@ -166,7 +171,7 @@ export function FileContent() {
   return (
     <div class={"flex flex-col w-full items-center gap-8"}>
       <p class={"text-[#5503A6] text-[43px] font-medium mt-6 w-full text-left"}>
-        Mint Src20
+        Mint Stamp (Olga)
       </p>
 
       <div>
