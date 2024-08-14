@@ -21,45 +21,47 @@ export const handler: Handlers = {
         sort: "DESC",
       };
 
-      const [balanceResponse, mintProgressResponse] = await Promise.all([
-        SRC20Repository.getValidSrc20TxFromDb(balanceParams), // FIXME: this is only returning 200 rose
-        // Src20Controller.handleSrc20BalanceRequest(balanceParams),
-        Src20Controller.handleSrc20MintProgressRequest(tick),
-      ]);
+      const [srcTrxResponse, balanceResponse, mintProgressResponse] =
+        await Promise.all([
+          SRC20Repository.getValidSrc20TxFromDb(balanceParams),
+          Src20Controller.handleSrc20BalanceRequest(balanceParams),
+          Src20Controller.handleSrc20MintProgressRequest(tick),
+        ]);
 
-      if (!balanceResponse || !mintProgressResponse) {
+      if (!srcTrxResponse || !mintProgressResponse) {
         throw new Error("Failed to fetch SRC20 data");
       }
 
-      const balanceData = await balanceResponse.rows;
+      const trxData = await srcTrxResponse.rows;
       const mintProgressData = await mintProgressResponse.json();
+      const balanceData = await balanceResponse.json();
 
-      console.log("Balance Data:", balanceData);
+      console.log("Balance Data:", trxData);
       console.log("Mint Progress Data:", mintProgressData);
 
       set_precision(-4);
       const body = {
-        last_block: balanceData[0]?.block_index, // Use optional chaining
-        deployment: balanceData.find((item) => item.op === "DEPLOY"),
-        sends: balanceData.filter((item) => item.op === "TRANSFER"),
-        total_sends: balanceData.filter((item) =>
-          item.op === "TRANSFER"
-        ).length,
-        mints: balanceData.filter((item) => item.op === "MINT"),
-        total_mints: balanceData.filter((item) => item.op === "MINT").length,
-        total_holders: balanceData.length,
-        holders: balanceData.map((row) => {
-          const amt = new BigFloat(row.amt || "0"); // Handle potential null/undefined
-          const percentage = amt.mul(100).div(
-            new BigFloat(mintProgressData.total_minted || "1"), // Avoid division by zero
-          );
-          set_precision(-2);
-          return {
-            ...row,
-            amt: amt.toString(),
-            percentage: parseFloat(percentage.toString()).toFixed(2),
-          };
-        }),
+        last_block: trxData[0]?.block_index,
+        deployment: trxData.find((item) => item.op === "DEPLOY"),
+        sends: trxData.filter((item) => item.op === "TRANSFER"),
+        total_sends: trxData.filter((item) => item.op === "TRANSFER").length,
+        mints: trxData.filter((item) => item.op === "MINT"),
+        total_mints: trxData.filter((item) => item.op === "MINT").length,
+        total_holders: balanceData.data.length,
+        holders: balanceData.data
+          .map((row) => {
+            const amt = formatAmount(row.amt || "0");
+            const totalMinted = formatAmount(
+              mintProgressData.total_minted || "1",
+            );
+            const percentage = calculatePercentage(amt, totalMinted);
+            return { ...row, amt, percentage };
+          })
+          .sort((a, b) => {
+            const amtA = parseFloat(a.amt.replace(/,/g, ""));
+            const amtB = parseFloat(b.amt.replace(/,/g, ""));
+            return amtB - amtA; // Sort in descending order
+          }),
         mint_status: {
           ...mintProgressData,
           max_supply: mintProgressData.max_supply?.toString() || "0",
@@ -75,6 +77,22 @@ export const handler: Handlers = {
     }
   },
 };
+
+function formatAmount(value: string): string {
+  // Remove leading zeros and split into whole and decimal parts
+  const [whole, decimal = ""] = value.replace(/^0+/, "").split(".");
+  // Remove trailing zeros from decimal part
+  const trimmedDecimal = decimal.replace(/0+$/, "");
+  return trimmedDecimal ? `${whole}.${trimmedDecimal}` : whole;
+}
+
+function calculatePercentage(amount: string, total: string): string {
+  const amountNum = parseFloat(amount.replace(/,/g, ""));
+  const totalNum = parseFloat(total.replace(/,/g, ""));
+  if (totalNum === 0) return "0.00";
+  const percentage = (amountNum / totalNum) * 100;
+  return percentage.toFixed(2);
+}
 
 export const SRC20TickPage = (props) => {
   const {
