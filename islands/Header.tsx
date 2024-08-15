@@ -142,16 +142,41 @@ export function Header() {
             >
               Collections
             </a>
-            <a
-              href="/stamping"
-              f-partial={"/stamping"}
-              onClick={toggleMenu}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                path === "stamping" ? "border-[#7A00F5] border-b-4" : ""
-              }`}
-            >
-              Stamping
-            </a>
+            <div className={"group relative"}>
+              <a
+                className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg md:text-base ${
+                  path === "stamping" ? "border-[#7A00F5] border-b-4" : ""
+                }`}
+              >
+                Stamping
+              </a>
+              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] md:top-[34px] left-[100px] md:left-[15px] z-[100] py-2">
+                <a
+                  href="/stamping/stamp"
+                  f-partial={"/stamping/stamp"}
+                  onClick={toggleMenu}
+                  className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                    path === "stamping/stamp"
+                      ? "border-[#7A00F5] border-b-4"
+                      : ""
+                  }`}
+                >
+                  Stamp
+                </a>
+                <a
+                  href="/stamping/src20"
+                  f-partial={"/stamping/src20"}
+                  onClick={toggleMenu}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                    path === "stamping/src20"
+                      ? "border-[#7A00F5] border-b-4"
+                      : ""
+                  }`}
+                >
+                  Src-20
+                </a>
+              </div>
+            </div>
             {
               /* <a
               href="/upload"

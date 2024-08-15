@@ -3,7 +3,7 @@ import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { fetch_quicknode } from "utils/quicknode.ts";
 
-export function FileContent() {
+export function TransferContent() {
   const { wallet, isConnected } = walletContext;
   const { address } = wallet.value;
   const btcIcon = `<svg
@@ -166,77 +166,8 @@ export function FileContent() {
   return (
     <div class={"flex flex-col w-full items-center gap-8"}>
       <p class={"text-[#5503A6] text-[43px] font-medium mt-6 w-full text-left"}>
-        Mint Src20
+        Transfer Src20
       </p>
-
-      <div>
-        <div class="flex flex-col md:flex-row gap-8">
-          <div
-            id="image-preview"
-            class="relative max-w-sm border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]"
-          >
-            <input
-              id="upload"
-              type="file"
-              class="hidden"
-              accept="image/*"
-              onChange={handleImage}
-            />
-            {file !== null && (
-              <img
-                width={324}
-                style={{
-                  height: "100%",
-                  objectFit: "contain",
-                  imageRendering: "pixelated",
-                  backgroundColor: "rgb(0,0,0)",
-                  borderRadius: "6px",
-                }}
-                src={URL.createObjectURL(file)}
-              />
-            )}
-            {file === null && (
-              <label
-                for="upload"
-                class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
-              >
-                <img
-                  src="/img/mint/icon-image-upload.png"
-                  class="w-20 h-20"
-                  alt=""
-                />
-                <h5 class="text-[#F5F5F5] text-2xl font-semibold">
-                  Upload Image
-                </h5>
-              </label>
-            )}
-          </div>
-
-          <div class="max-w-sm p-6 mb-4 border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]">
-            {file !== null && (
-              <img
-                width={350}
-                style={{
-                  height: "100%",
-                  objectFit: "contain",
-                  imageRendering: "pixelated",
-                  backgroundColor: "rgb(0,0,0)",
-                }}
-                src={URL.createObjectURL(file)}
-              />
-            )}
-            {file === null && (
-              <label class="cursor-pointer">
-                <h5 class="text-[25px] font-semibold text-[#F5F5F5]">
-                  Preview
-                </h5>
-                <span id="filename" class="text-gray-500 bg-gray-200 z-50">
-                </span>
-              </label>
-            )}
-          </div>
-        </div>
-      </div>
 
       <div class="w-full">
         <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
@@ -249,146 +180,45 @@ export function FileContent() {
         />
       </div>
 
-      <div class="flex flex-col md:flex-row justify-between gap-5 w-full">
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            Token
-          </p>
-          <input
-            type="text"
-            class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Case Sensitive"
-          />
-        </div>
-
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            Limit Per Mint
-          </p>
-          <input
-            type="text"
-            class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Positive Integer"
-          />
-        </div>
-      </div>
-
-      <div class="flex flex-col md:flex-row justify-between gap-5 w-full">
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            Max Circulation
-          </p>
-          <input
-            type="number"
-            class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Positive Integer"
-          />
-        </div>
-
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            File <span class="text-[#FF2D2D]">*</span>
-          </p>
-          <input
-            type="number"
-            class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Choose : SVG | PNG"
-          />
-        </div>
+      <div class="w-full">
+        <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
+          Token
+        </p>
+        <input
+          type="text"
+          class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
+          placeholder="Case Sensitive"
+        />
       </div>
 
       <div class="w-full">
         <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Asset Inssuance
+          Repeat Mint
         </p>
-        <div class={"flex gap-[18px] w-full mb-3"}>
-          <div
-            class={"p-4 text-[#F5F5F5] text-[24px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"}
-          >
-            {inssuance}
-          </div>
-          <div
-            class={"w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"}
-            onClick={() => handleDecrease()}
-          >
-            <svg
-              width="32"
-              height="4"
-              viewBox="0 0 32 4"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect width="32" height="4" fill="#D9D9D9" />
-            </svg>
-          </div>
-          <div
-            class={"w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"}
-            onClick={() => handleIncrease()}
-          >
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 32 32"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect y="14" width="32" height="4" fill="#D9D9D9" />
-              <rect
-                x="14"
-                y="32"
-                width="32"
-                height="4"
-                transform="rotate(-90 14 32)"
-                fill="#D9D9D9"
-              />
-            </svg>
-          </div>
-        </div>
-        <div className="flex gap-7">
-          <div className="flex gap-2 items-center">
-            <input
-              type="checkbox"
-              id="assets"
-              name="assets"
-              className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
-            />
-            <label
-              for="assets"
-              className="text-[#B9B9B9] text-[16px] font-semibold"
-            >
-              Lock assets
-            </label>
-          </div>
-          <div className="flex gap-2 items-center">
-            <input type="checkbox" id="burn" name="burn" className="w-5 h-5" />
-            <label
-              for="burn"
-              className="text-[#B9B9B9] text-[16px] font-semibold"
-            >
-              Keyburn
-            </label>
-          </div>
-        </div>
+        <input
+          type="text"
+          class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
+          placeholder="Number"
+        />
       </div>
 
-      <div
-        class={"bg-[#6E6E6E] w-full"}
+      {
+        /* <div
+        class={"bg-gray-800 w-[340px] px-4 py-4 rounded-lg"}
+        style={{ border: "solid 1px gray" }}
       >
-        <p class={"text-[#F5F5F5] text-[22px] font-semibold px-6 py-[15px]"}>
-          Optimization
-        </p>
-        <hr />
-        <div class="grid grid-cols-2 md:grid-cols-4 justify-between gap-4 py-6 px-6">
+        <span class={"text-white text-[16px]"}>Optimization</span>
+        <div class="flex flex-col mb-4 gap-4 pt-2">
           <div class={"flex items-center"}>
             <input
               id="default-radio-1"
               type="radio"
               name="radio"
-              class="w-5 h-5 focus:ring-blue-500 focus:ring-2"
+              class="w-4 h-4 focus:ring-blue-500 focus:ring-2"
             />
             <label
               for="default-radio-1"
-              class="ms-2 text-[18px] font-semibold text-[#F5F5F5]"
+              class="ms-2 text-sm font-medium text-white"
             >
               None
             </label>
@@ -398,11 +228,11 @@ export function FileContent() {
               id="default-radio-2"
               type="radio"
               name="radio"
-              class="w-5 h-5 focus:ring-blue-500 focus:ring-2"
+              class="w-4 h-4 focus:ring-blue-500 focus:ring-2"
             />
             <label
               for="default-radio-2"
-              class="ms-2 text-[18px] font-semibold text-[#F5F5F5]"
+              class="ms-2 text-sm font-medium text-white"
             >
               Max compression
             </label>
@@ -412,11 +242,11 @@ export function FileContent() {
               id="default-radio-2"
               type="radio"
               name="radio"
-              class="w-5 h-5 focus:ring-blue-500 focus:ring-2"
+              class="w-4 h-4 focus:ring-blue-500 focus:ring-2"
             />
             <label
               for="default-radio-2"
-              class="ms-2 text-[18px] font-semibold text-[#F5F5F5]"
+              class="ms-2 text-sm font-medium text-white"
             >
               Balanced
             </label>
@@ -426,17 +256,25 @@ export function FileContent() {
               id="default-radio-2"
               type="radio"
               name="radio"
-              class="w-5 h-5 focus:ring-blue-500 focus:ring-2"
+              class="w-4 h-4 focus:ring-blue-500 focus:ring-2"
             />
             <label
               for="default-radio-2"
-              class="ms-2 text-[18px] font-semibold text-[#F5F5F5]"
+              class="ms-2 text-sm font-medium text-white"
             >
               Max quality
             </label>
           </div>
+          <span class={"text-gray-400 pt-4"}>Note: There are no refunds</span>
+          <span class={"text-gray-400"}>
+            Only mint if the preview is of acceptable quality!
+          </span>
+          <span class={"text-gray-400"}>
+            Sometimes it's ok to not optimize!
+          </span>
         </div>
-      </div>
+      </div> */
+      }
 
       <div class={"w-full flex flex-col gap-2"}>
         <div class="flex justify-between">
@@ -536,6 +374,48 @@ export function FileContent() {
           </span>
         </div>
       </div>
+
+      {
+        /* <div>
+        <div class={"text-gray-200 w-[340px] text-left pt-4 pb-2"}>
+          Asset Inssuance
+        </div>
+        <div
+          class={"flex w-[340px] bg-gray-900 rounded-lg"}
+          style={{ border: "solid 1px gray" }}
+        >
+          <div class={"w-5/6 p-2 text-white"}>{inssuance}</div>
+          <div
+            class={"w-[40px] flex items-center justify-center p-1 cursor-pointer"}
+            style={{ borderLeft: "solid 1px gray" }}
+            onClick={() => handleDecrease()}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="1em"
+              height="1em"
+              viewBox="0 0 24 24"
+            >
+              <path fill="white" d="M19 12.998H5v-2h14z" />
+            </svg>
+          </div>
+          <div
+            class={"w-[40px] flex items-center justify-center p-1 cursor-pointer"}
+            style={{ borderLeft: "solid 1px gray" }}
+            onClick={() => handleIncrease()}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="1em"
+              height="1em"
+              viewBox="0 0 24 24"
+            >
+              <path fill="white" d="M19 12.998h-6v6h-2v-6H5v-2h6v-6h2v6h6z" />
+            </svg>
+          </div>
+        </div>
+      </div> */
+      }
 
       {
         <div class={`${file === null ? "hidden" : ""}`}>
@@ -689,17 +569,34 @@ export function FileContent() {
         </div>
       }
 
-      <div class="w-full">
-        <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Total Estimated
-        </p>
-        <input
-          type="text"
-          class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-          placeholder="0.0041 BTC"
-        >
-          <img src="/img/icon_btc.png" alt="" />
-        </input>
+      <div class="bg-[#6E6E6E] text-[#F5F5F5] px-3 py-1 w-full">
+        <div class="border-b border-[#8A8989] py-4">
+          <p>0.0041 BTC</p>
+        </div>
+        <div class="flex justify-between border-b border-[#8A8989] py-4">
+          <p>Sats per byte</p>
+          <p>78,000</p>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between md:gap-8">
+          <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
+            <p>Transaction Fee</p>
+            <p>0.00051 BTC</p>
+          </div>
+          <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
+            <p>Minting Fee</p>
+            <p>0.00051 BTC</p>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between md:gap-8">
+          <div class="flex justify-between w-full border-b border-[#8A8989] md:border-none py-4">
+            <p>Multisig Dust</p>
+            <p>0.00051 BTC</p>
+          </div>
+          <div class="flex justify-between w-full py-4">
+            <p>Total Estimated</p>
+            <p>0.00051 BTC</p>
+          </div>
+        </div>
       </div>
 
       <div
