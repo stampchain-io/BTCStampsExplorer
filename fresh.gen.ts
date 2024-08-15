@@ -56,8 +56,8 @@ import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
-import * as $stamp_tool from "./routes/stamp/tool.tsx";
-import * as $stamping_index from "./routes/stamping/index.tsx";
+import * as $stamping_src20 from "./routes/stamping/src20.tsx";
+import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
@@ -90,10 +90,6 @@ import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
-import * as $mint_DeployContent from "./islands/mint/DeployContent.tsx";
-import * as $mint_MintContent from "./islands/mint/MintContent.tsx";
-import * as $mint_MintHeader from "./islands/mint/MintHeader.tsx";
-import * as $mint_TransferContent from "./islands/mint/TransferContent.tsx";
 import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
@@ -102,8 +98,11 @@ import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
-import * as $stamp_tool_FileContent from "./islands/stamp/tool/FileContent.tsx";
-import * as $stamp_tool_StampToolHeader from "./islands/stamp/tool/StampToolHeader.tsx";
+import * as $stamping_DeployContent from "./islands/stamping/DeployContent.tsx";
+import * as $stamping_MintContent from "./islands/stamping/MintContent.tsx";
+import * as $stamping_OlgaContent from "./islands/stamping/OlgaContent.tsx";
+import * as $stamping_StampingSrc20Header from "./islands/stamping/StampingSrc20Header.tsx";
+import * as $stamping_TransferContent from "./islands/stamping/TransferContent.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import * as $upload_UploadTickHeader from "./islands/upload/UploadTickHeader.tsx";
@@ -179,8 +178,8 @@ const manifest = {
     "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/index.tsx": $stamp_index,
-    "./routes/stamp/tool.tsx": $stamp_tool,
-    "./routes/stamping/index.tsx": $stamping_index,
+    "./routes/stamping/src20.tsx": $stamping_src20,
+    "./routes/stamping/stamp.tsx": $stamping_stamp,
     "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
@@ -222,10 +221,6 @@ const manifest = {
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
     "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
-    "./islands/mint/DeployContent.tsx": $mint_DeployContent,
-    "./islands/mint/MintContent.tsx": $mint_MintContent,
-    "./islands/mint/MintHeader.tsx": $mint_MintHeader,
-    "./islands/mint/TransferContent.tsx": $mint_TransferContent,
     "./islands/pagination/Pagination.tsx": $pagination_Pagination,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
@@ -234,8 +229,11 @@ const manifest = {
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
-    "./islands/stamp/tool/FileContent.tsx": $stamp_tool_FileContent,
-    "./islands/stamp/tool/StampToolHeader.tsx": $stamp_tool_StampToolHeader,
+    "./islands/stamping/DeployContent.tsx": $stamping_DeployContent,
+    "./islands/stamping/MintContent.tsx": $stamping_MintContent,
+    "./islands/stamping/OlgaContent.tsx": $stamping_OlgaContent,
+    "./islands/stamping/StampingSrc20Header.tsx": $stamping_StampingSrc20Header,
+    "./islands/stamping/TransferContent.tsx": $stamping_TransferContent,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
     "./islands/upload/UploadTickHeader.tsx": $upload_UploadTickHeader,
