@@ -191,17 +191,6 @@ export function TransferContent() {
         />
       </div>
 
-      <div class="w-full">
-        <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Repeat Mint
-        </p>
-        <input
-          type="text"
-          class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-          placeholder="Number"
-        />
-      </div>
-
       {
         /* <div
         class={"bg-gray-800 w-[340px] px-4 py-4 rounded-lg"}

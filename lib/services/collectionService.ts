@@ -47,6 +47,34 @@ export class CollectionService {
     };
   }
 
+  static async getCollectionNames(
+    params: CollectionQueryParams,
+  ): Promise<PaginatedCollectionResponseBody> {
+    const { limit = 50, page = 1, creator } = params;
+
+    const [collectionsResult, totalCollections] = await Promise.all([
+      CollectionRepository.getCollections({ limit, page, creator }),
+      CollectionRepository.getTotalCollectionsByCreatorFromDb(creator),
+    ]);
+
+    const collections: Collection[] = await Promise.all(
+      collectionsResult.rows.map(async (row: any) => {
+        return {
+          collection_id: row.collection_id,
+          collection_name: row.collection_name,
+          creators: row.creators ? row.creators.split(",") : [], // FIXME: this is returning [] incorrectly
+        };
+      }),
+    );
+
+    const pagination = paginate(totalCollections, page, limit);
+
+    return {
+      ...pagination,
+      data: collections,
+    };
+  }
+
   static async getCollectionByName(
     collectionName: string,
     limit: number = 10,
