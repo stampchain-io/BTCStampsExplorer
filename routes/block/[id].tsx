@@ -4,14 +4,19 @@ import { BlockInfoResponseBody, BlockRow } from "globals";
 
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
-import { BlockService } from "$lib/services/blockService.ts";
 import BlockInfo from "$components/block/BlockInfo.tsx";
+import BlockGeneral from "$components/block/BlockGeneral.tsx";
+import BlockCurrency from "$components/block/BlockCurrency.tsx";
+import BlockNetwork from "$components/block/BlockNetwork.tsx";
+
 // import BlockHeader from "$islands/block/BlockHeader.tsx";
 import BlockTransactions from "$islands/block/BlockTransactions.tsx";
 // import BlockSelector from "$islands/block/BlockSelector.tsx";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+
+import { BlockService } from "$lib/services/blockService.ts";
 
 type BlockPageProps = {
   params: {
@@ -94,6 +99,11 @@ export function BlockPage(props: BlockPageProps) {
           <StampNavigator initFilter={filterBy} initSort={sortBy} />
           <StampSearchClient />
         </div>
+      </div>
+      <div className={"flex flex-col md:flex-row justify-between gap-3"}>
+        <BlockGeneral />
+        <BlockCurrency />
+        <BlockNetwork />
       </div>
       <BlockInfo block={block} />
     </div>
