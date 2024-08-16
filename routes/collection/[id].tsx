@@ -6,6 +6,9 @@ import { StampRow } from "globals";
 import { CollectionDetailsHeader } from "$islands/collection/CollectionDetailsHeader.tsx";
 import { CollectionDetailsContent } from "$islands/collection/CollectionDetailsContent.tsx";
 
+import { StampController } from "$lib/controller/stampController.ts";
+import { CollectionService } from "$lib/services/collectionService.ts";
+
 type CollectionPageProps = {
   data: {
     stamps: StampRow[];
@@ -21,6 +24,8 @@ type CollectionPageProps = {
 
 export const handler: Handlers = {
   async GET(req: Request, ctx: FreshContext) {
+    const { id } = ctx.params;
+
     const url = new URL(req.url);
     const orderBy = url.searchParams.get("order")?.toUpperCase() == "ASC"
       ? "ASC"
@@ -36,11 +41,37 @@ export const handler: Handlers = {
       url.searchParams.get("limit") || "24",
     );
 
+    let collectionId;
+    const type: "stamps" | "cursed" | "all" | undefined = "all";
+    const collection = await CollectionService.getCollectionByName(
+      id,
+    );
+    console.log(collection);
+
+    if (collection) {
+      collectionId = collection.collection_id;
+      console.log(collection);
+    } else {
+      throw new Error("Posh collection not found");
+    }
+
+    const result = await StampController.getStamps({
+      page,
+      limit: page_size,
+      orderBy: orderBy as "ASC" | "DESC",
+      sortBy,
+      type,
+      filterBy,
+      ident,
+      collectionId,
+    });
+    console.log(result);
+
     const { stamps, pages, pag, limit } = {
-      stamps: [...Array(100)],
-      pages: 10,
+      stamps: result.stamps,
+      pages: result.pages,
       pag: 1,
-      limit: 20,
+      limit: result.limit,
     };
     // const { collections, pages, page: pag, page_size: limit } =
     //   await api_get_stamps(

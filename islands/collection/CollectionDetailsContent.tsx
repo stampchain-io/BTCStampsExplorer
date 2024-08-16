@@ -25,7 +25,7 @@ export const CollectionDetailsContent = ({ stamps = [] }: {
   return (
     <div name="stamps">
       <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6 transition-opacity duration-700 ease-in-out">
-        {stampsArray.map((stamp: StampRow) => (
+        {stamps.map((stamp: StampRow) => (
           <StampCard stamp={stamp} kind="stamp" />
         ))}
       </div>

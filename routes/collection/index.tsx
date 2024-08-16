@@ -1,9 +1,10 @@
-import { Pagination } from "$islands/pagination/Pagination.tsx";
-
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
 import { CollectionHeader } from "$islands/collection/CollectionHeader.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
+import { Pagination } from "$islands/pagination/Pagination.tsx";
+
+import { CollectionService } from "$lib/services/collectionService.ts";
 
 type CollectionPageProps = {
   data: {
@@ -35,11 +36,17 @@ export const handler: Handlers = {
       url.searchParams.get("limit") || "24",
     );
 
+    const collectionsData = await CollectionService.getCollectionNames({
+      limit: page_size,
+      page: page,
+      creator: "",
+    });
+
     const { collections, pages, pag, limit } = {
-      collections: [...Array(100)],
-      pages: 10,
-      pag: 1,
-      limit: 20,
+      collections: collectionsData.data,
+      pages: collectionsData.totalPages,
+      pag: collectionsData.page,
+      limit: collectionsData.limit,
     };
     // const { collections, pages, page: pag, page_size: limit } =
     //   await api_get_stamps(
@@ -82,7 +89,7 @@ export default function Collection(props: CollectionPageProps) {
         sortBy={sortBy}
         selectedTab={selectedTab}
       />
-      <CollectionList />
+      <CollectionList collections={collections} />
       <Pagination
         page={page}
         pages={pages}
