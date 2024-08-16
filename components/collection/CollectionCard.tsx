@@ -5,7 +5,7 @@ export function CollectionCard({
 }) {
   return (
     <a
-      href={`/collection/123456789`}
+      href={`/collection/${collection.collection_name}`}
       className="bg-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col m-1 p-2 rounded-lg @container transition-all min-w-[200px]"
     >
       <div class="relative flex overflow-hidden">
@@ -26,7 +26,7 @@ export function CollectionCard({
       <div class="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
         <div class="flex justify-between text-black">
           <h3 class="text-[13px] font-semibold text-white text-lg">
-            {`Collection #1`}
+            Collection - {collection.collection_name}
           </h3>
         </div>
         <div>
