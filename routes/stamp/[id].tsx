@@ -4,10 +4,7 @@ import { Stamp } from "$components/Stamp.tsx";
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
 import { StampVaulted } from "$components/stampDetails/StampVaulted.tsx";
 import { StampInfo } from "$components/stampDetails/StampInfo.tsx";
-import { StampSends } from "$components/stampDetails/StampSends.tsx";
-import { StampHolders } from "$components/stampDetails/StampHolders.tsx";
-import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
-import { StampSales } from "$components/stampDetails/StampSales.tsx";
+import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
 
@@ -19,6 +16,7 @@ interface StampDetailPageProps {
     dispensers: any;
     dispenses: any;
     holders: any;
+    vaults: any;
     last_block: number;
   };
 }
@@ -55,8 +53,16 @@ export const handler: Handlers<StampData> = {
 };
 
 export default function StampPage(props: StampDetailPageProps) {
-  const { stamp, holders, sends, dispensers, dispenses, total, last_block } =
-    props.data;
+  const {
+    stamp,
+    holders,
+    sends,
+    dispensers,
+    dispenses,
+    vaults,
+    total,
+    last_block,
+  } = props.data;
 
   // Create a Map of dispenser tx_hash to satoshirate for quick lookup
   const dispensesWithRates = StampService.mapDispensesWithRates(
@@ -75,10 +81,12 @@ export default function StampPage(props: StampDetailPageProps) {
         <StampInfo stamp={stamp} />
       </div>
 
-      <StampSends sends={sends} />
-      <StampDispensers dispensers={dispensers} />
-      <StampHolders holders={holders} />
-      <StampSales dispenses={dispensesWithRates} />
+      <StampRelatedInfo
+        sends={sends}
+        dispensers={dispensers}
+        holders={holders}
+        dispensesWithRates={dispensesWithRates}
+      />
     </>
   );
 }
