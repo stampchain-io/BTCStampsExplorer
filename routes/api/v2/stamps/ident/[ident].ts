@@ -20,7 +20,7 @@ export const handler = async (
   const sort_order = (url.searchParams.get("sort_order") as "asc" | "desc") ||
     "asc";
   try {
-    const [data, totalResult, lastBlock] = await Promise.all([
+    const [{ stamps: data }, totalResult, lastBlock] = await Promise.all([
       StampRepository.getStampsFromDb({ // FIXME: update to controller call
         limit,
         page,

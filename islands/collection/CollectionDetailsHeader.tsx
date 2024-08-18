@@ -4,7 +4,7 @@ import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 export const CollectionDetailsHeader = (
-  { filterBy, sortBy }: { filterBy: any[]; sortBy: string },
+  { id, filterBy, sortBy }: { id: string; filterBy: any[]; sortBy: string },
 ) => {
   const [selectedCategory, setSelectedCategory] = useState("BigTiles");
 
@@ -21,7 +21,7 @@ export const CollectionDetailsHeader = (
           class="h-24 w-24 object-contain items-center standalone:h-24 standalone:w-auto pixelart image-rendering-pixelated"
         />
         <div class="flex flex-col justify-between">
-          <p class="font-semibold text-xl text-white">Collection 1</p>
+          <p class="font-semibold text-xl text-white">COLLECTION - {id}</p>
           <div class="flex flex-col md:flex-row gap-4">
             <div class="flex gap-4">
               <div>

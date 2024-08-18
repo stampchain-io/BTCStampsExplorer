@@ -22,7 +22,7 @@ export class CollectionService {
 
     const collections: Collection[] = await Promise.all(
       collectionsResult.rows.map(async (row: any) => {
-        const stamps = await StampRepository.getStampsFromDb({
+        const { stamps } = await StampRepository.getStampsFromDb({
           limit: 10,
           collectionId: row.collection_id,
           noPagination: true,
@@ -88,7 +88,7 @@ export class CollectionService {
     }
 
     const row = collectionResult.rows[0];
-    const stamps = await StampRepository.getStampsFromDb({
+    const { stamps } = await StampRepository.getStampsFromDb({
       limit: limit,
       collectionId: row.collection_id,
       noPagination: true,
