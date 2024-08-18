@@ -12,7 +12,7 @@ export class StampService {
     filter: "open" | "closed" | "all" = "open",
   ) {
     console.log(`getStampDetailsById called with id: ${id}`);
-    const stampResult = await StampRepository.getStampsFromDb({
+    const { stamps: stampResult } = await StampRepository.getStampsFromDb({
       identifier: id,
       all_columns: true,
       noPagination: true,
@@ -66,28 +66,22 @@ export class StampService {
     const limit = options.page_size || options.limit || BIG_LIMIT;
     const page = options.page || 1;
 
-    const [stamps, total] = await Promise.all([
-      StampRepository.getStampsFromDb({
-        ...options,
-        limit: isSingleStamp || isMultipleStamps ? undefined : limit,
-        offset: isSingleStamp || isMultipleStamps
-          ? undefined
-          : (page - 1) * limit,
-        all_columns: isSingleStamp || isMultipleStamps
-          ? true
-          : options.all_columns,
-        noPagination: isSingleStamp || isMultipleStamps
-          ? true
-          : options.noPagination,
-        cacheDuration: isSingleStamp || isMultipleStamps
-          ? "never"
-          : options.cacheDuration,
-      }),
-      StampRepository.getTotalStampCountFromDb(
-        options.type || "stamps",
-        options.ident,
-      ),
-    ]);
+    const { stamps, total } = await StampRepository.getStampsFromDb({
+      ...options,
+      limit: isSingleStamp || isMultipleStamps ? undefined : limit,
+      offset: isSingleStamp || isMultipleStamps
+        ? undefined
+        : (page - 1) * limit,
+      all_columns: isSingleStamp || isMultipleStamps
+        ? true
+        : options.all_columns,
+      noPagination: isSingleStamp || isMultipleStamps
+        ? true
+        : options.noPagination,
+      cacheDuration: isSingleStamp || isMultipleStamps
+        ? "never"
+        : options.cacheDuration,
+    });
 
     const totalCount = total.rows[0].total;
     const totalPages = Math.ceil(totalCount / limit);

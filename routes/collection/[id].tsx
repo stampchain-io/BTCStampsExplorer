@@ -11,6 +11,7 @@ import { CollectionService } from "$lib/services/collectionService.ts";
 
 type CollectionPageProps = {
   data: {
+    id: string;
     stamps: StampRow[];
     total: number;
     page: number;
@@ -38,7 +39,7 @@ export const handler: Handlers = {
       : ["STAMP", "SRC-721"];
     const page = parseInt(url.searchParams.get("page") || "1");
     const page_size = parseInt(
-      url.searchParams.get("limit") || "24",
+      url.searchParams.get("limit") || "20",
     );
 
     let collectionId;
@@ -46,11 +47,9 @@ export const handler: Handlers = {
     const collection = await CollectionService.getCollectionByName(
       id,
     );
-    console.log(collection);
 
     if (collection) {
       collectionId = collection.collection_id;
-      console.log(collection);
     } else {
       throw new Error("Posh collection not found");
     }
@@ -65,25 +64,16 @@ export const handler: Handlers = {
       ident,
       collectionId,
     });
-    console.log(result);
 
     const { stamps, pages, pag, limit } = {
       stamps: result.stamps,
       pages: result.pages,
-      pag: 1,
-      limit: result.limit,
+      pag: result.page,
+      limit: result.page_size,
     };
-    // const { collections, pages, page: pag, page_size: limit } =
-    //   await api_get_stamps(
-    //     page,
-    //     page_size,
-    //     orderBy,
-    //     sortBy,
-    //     filterBy,
-    //     ident,
-    //   );
 
     const data = {
+      id,
       stamps,
       page: pag,
       pages,
@@ -98,6 +88,7 @@ export const handler: Handlers = {
 
 export default function Collection(props: CollectionPageProps) {
   const {
+    id,
     stamps,
     page,
     pages,
@@ -109,13 +100,13 @@ export default function Collection(props: CollectionPageProps) {
 
   return (
     <div class="flex flex-col gap-8">
-      <CollectionDetailsHeader />
+      <CollectionDetailsHeader id={id} />
       <CollectionDetailsContent stamps={stamps} />
       <Pagination
         page={page}
         pages={pages}
         page_size={page_size}
-        type={"collection"}
+        type={"collection/" + id}
         data_length={stamps.length}
       />
     </div>
