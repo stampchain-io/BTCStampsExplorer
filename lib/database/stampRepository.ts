@@ -305,17 +305,33 @@ export class StampRepository {
     ${limitClause}
     ${offsetClause}
     `;
-    console.log(`Executing query:`, query);
-    console.log(`Query params:`, queryParams);
+    // console.log(`Executing query:`, query);
+    // console.log(`Query params:`, queryParams);
 
     const result = await dbManager.executeQueryWithCache(
       query,
       queryParams,
       cacheDuration,
     );
-    console.log(`Query result repo`, result.rows);
+    // console.log(`Query result repo`, result.rows);
 
-    return result;
+    const queryTotal = `
+    SELECT COUNT(*) AS total
+    FROM ${STAMP_TABLE} AS st
+    ${collectionId ? "JOIN collection_stamps cs ON st.stamp = cs.stamp" : ""}
+    LEFT JOIN creator AS cr ON st.creator = cr.address
+    ${whereClause}
+    ${orderClause}
+    `;
+    // console.log(`Executing total query:`, queryTotal);
+    const resultTotal = await dbManager.executeQueryWithCache(
+      queryTotal,
+      queryParams,
+      cacheDuration,
+    );
+    // console.log(`Total query result repo`, resultTotal.rows);
+
+    return { stamps: result, total: resultTotal };
   }
   /**
    * Retrieves stamp balances for a given address using a database client.

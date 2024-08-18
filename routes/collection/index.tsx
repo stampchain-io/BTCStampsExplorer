@@ -13,7 +13,7 @@ type CollectionPageProps = {
     page: number;
     pages: number;
     page_size: number;
-    selectedTab: "all" | "stamps" | "src20" | "rare";
+    selectedTab: "all" | "stamps" | "posh";
     sortBy: string;
     filterBy: string[];
   };
@@ -28,12 +28,9 @@ export const handler: Handlers = {
     const sortBy = url.searchParams.get("sortBy") || "none";
     const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
     const selectedTab = url.searchParams.get("ident") || "all";
-    const ident = selectedTab === "all"
-      ? ["STAMP", "SRC-721", "SRC-20"]
-      : ["STAMP", "SRC-721"];
     const page = parseInt(url.searchParams.get("page") || "1");
     const page_size = parseInt(
-      url.searchParams.get("limit") || "24",
+      url.searchParams.get("limit") || "20",
     );
 
     const collectionsData = await CollectionService.getCollectionNames({
@@ -48,15 +45,6 @@ export const handler: Handlers = {
       pag: collectionsData.page,
       limit: collectionsData.limit,
     };
-    // const { collections, pages, page: pag, page_size: limit } =
-    //   await api_get_stamps(
-    //     page,
-    //     page_size,
-    //     orderBy,
-    //     sortBy,
-    //     filterBy,
-    //     ident,
-    //   );
 
     const data = {
       collections,
