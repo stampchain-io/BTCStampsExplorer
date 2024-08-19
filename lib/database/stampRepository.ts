@@ -12,51 +12,152 @@ export class StampRepository {
     return input.replace(/[^\w.-]/gi, "");
   }
 
-  static async getTotalStampCountFromDb(
-    type: "stamps" | "cursed" | "all",
+  private static buildIdentifierConditions(
+    whereConditions: string[],
+    queryParams: (string | number)[],
+    identifier?: string | number | (string | number)[] | undefined,
+    type?: "stamps" | "cursed" | "all",
     ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
+    blockIdentifier?: number | string,
+    collectionId?: string,
   ) {
-    let stampCondition = "";
-    if (type !== "all") {
-      stampCondition = type === "stamps" ? "stamp >= 0" : "stamp < 0";
-    }
+    // Identifier condition (stamp, tx_hash, cpid, or stamp_hash)
+    if (identifier !== undefined) {
+      if (Array.isArray(identifier)) {
+        const numericIds = identifier.filter((id): id is number =>
+          typeof id === "number"
+        );
+        const stringIds = identifier.filter((id): id is string =>
+          typeof id === "string"
+        );
 
-    const whereConditions = [];
-    const queryParams: string[] = [];
+        if (numericIds.length > 0) {
+          whereConditions.push(
+            `st.stamp IN (${numericIds.map(() => "?").join(",")})`,
+          );
+          queryParams.push(...numericIds);
+        }
 
-    if (stampCondition) {
+        if (stringIds.length > 0) {
+          whereConditions.push(
+            `st.cpid IN (${stringIds.map(() => "?").join(",")})`,
+          );
+          queryParams.push(...stringIds);
+        }
+      } else {
+        const isNumber = typeof identifier === "number" ||
+          !isNaN(Number(identifier));
+        const isTxHash = typeof identifier === "string" &&
+          identifier.length === 64 && /^[a-fA-F0-9]+$/.test(identifier);
+        const isStampHash = typeof identifier === "string" &&
+          /^[a-zA-Z0-9]{12,20}$/.test(identifier) && /[a-z]/.test(identifier) &&
+          /[A-Z]/.test(identifier);
+
+        if (isNumber) {
+          whereConditions.push("st.stamp = ?");
+          queryParams.push(Number(identifier));
+        } else if (isTxHash) {
+          whereConditions.push("st.tx_hash = ?");
+          queryParams.push(identifier);
+        } else if (isStampHash) {
+          whereConditions.push("st.stamp_hash = ?");
+          queryParams.push(identifier);
+        } else {
+          whereConditions.push("st.cpid = ?");
+          queryParams.push(identifier);
+        }
+      }
+    } else if (type !== "all") {
+      const stampCondition = type === "stamps"
+        ? "st.stamp >= 0"
+        : "st.stamp < 0";
       whereConditions.push(stampCondition);
     }
 
+    // Ident condition
     if (ident) {
       const identList = Array.isArray(ident) ? ident : [ident];
       if (identList.length > 0) {
-        const identCondition = identList.map(() => "ident = ?").join(" OR ");
+        const identCondition = identList.map(() => "st.ident = ?").join(" OR ");
         whereConditions.push(`(${identCondition})`);
         queryParams.push(...identList.map(String));
       }
     }
 
-    whereConditions.push("is_btc_stamp IS NOT NULL");
+    // Block identifier condition
+    if (blockIdentifier !== undefined) {
+      if (
+        typeof blockIdentifier === "number" || /^\d+$/.test(blockIdentifier)
+      ) {
+        whereConditions.push("st.block_index = ?");
+        queryParams.push(Number(blockIdentifier));
+      } else if (
+        typeof blockIdentifier === "string" && blockIdentifier.length === 64
+      ) {
+        whereConditions.push("st.block_hash = ?");
+        queryParams.push(blockIdentifier);
+      }
+    }
+
+    if (collectionId) {
+      whereConditions.push("cs.collection_id = UNHEX(?)");
+      queryParams.push(collectionId);
+    }
+  }
+
+  static async getTotalStampCountFromDb(
+    options: {
+      sort_order?: "asc" | "desc";
+      type?: "stamps" | "cursed" | "all";
+      ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string;
+      identifier?: string | number | (string | number)[];
+      blockIdentifier?: number | string;
+      collectionId?: string;
+    },
+  ) {
+    const {
+      sort_order = "asc",
+      type = "stamps",
+      ident,
+      identifier,
+      blockIdentifier,
+      collectionId,
+    } = options;
+
+    const whereConditions: string[] = [];
+    const queryParams: (string | number)[] = [];
+
+    this.buildIdentifierConditions(
+      whereConditions,
+      queryParams,
+      identifier,
+      type,
+      ident,
+      blockIdentifier,
+      collectionId,
+    );
 
     const whereClause = whereConditions.length > 0
       ? `WHERE ${whereConditions.join(" AND ")}`
       : "";
+    const order = sort_order.toUpperCase() === "DESC" ? "DESC" : "ASC";
+    const orderClause = `ORDER BY st.stamp ${order}`;
 
-    const query = `
-      SELECT COUNT(*) AS total
-      FROM ${STAMP_TABLE}
-      ${whereClause}
+    const queryTotal = `
+    SELECT COUNT(*) AS total
+    FROM ${STAMP_TABLE} AS st
+    ${collectionId ? "JOIN collection_stamps cs ON st.stamp = cs.stamp" : ""}
+    LEFT JOIN creator AS cr ON st.creator = cr.address
+    ${whereClause}
+    ${orderClause}
     `;
-
-    console.log("Total count query:", query);
-    console.log("Total count query params:", queryParams);
-
-    return await dbManager.executeQueryWithCache(
-      query,
+    const resultTotal = await dbManager.executeQueryWithCache(
+      queryTotal,
       queryParams,
       1000 * 60 * 3,
     );
+
+    return resultTotal;
   }
 
   /**
@@ -172,88 +273,15 @@ export class StampRepository {
     const whereConditions: string[] = [];
     const queryParams: (string | number)[] = [];
 
-    // Identifier condition (stamp, tx_hash, cpid, or stamp_hash)
-    if (identifier !== undefined) {
-      if (Array.isArray(identifier)) {
-        const numericIds = identifier.filter((id): id is number =>
-          typeof id === "number"
-        );
-        const stringIds = identifier.filter((id): id is string =>
-          typeof id === "string"
-        );
-
-        if (numericIds.length > 0) {
-          whereConditions.push(
-            `st.stamp IN (${numericIds.map(() => "?").join(",")})`,
-          );
-          queryParams.push(...numericIds);
-        }
-
-        if (stringIds.length > 0) {
-          whereConditions.push(
-            `st.cpid IN (${stringIds.map(() => "?").join(",")})`,
-          );
-          queryParams.push(...stringIds);
-        }
-      } else {
-        const isNumber = typeof identifier === "number" ||
-          !isNaN(Number(identifier));
-        const isTxHash = typeof identifier === "string" &&
-          identifier.length === 64 && /^[a-fA-F0-9]+$/.test(identifier);
-        const isStampHash = typeof identifier === "string" &&
-          /^[a-zA-Z0-9]{12,20}$/.test(identifier) && /[a-z]/.test(identifier) &&
-          /[A-Z]/.test(identifier);
-
-        if (isNumber) {
-          whereConditions.push("st.stamp = ?");
-          queryParams.push(Number(identifier));
-        } else if (isTxHash) {
-          whereConditions.push("st.tx_hash = ?");
-          queryParams.push(identifier);
-        } else if (isStampHash) {
-          whereConditions.push("st.stamp_hash = ?");
-          queryParams.push(identifier);
-        } else {
-          whereConditions.push("st.cpid = ?");
-          queryParams.push(identifier);
-        }
-      }
-    } else if (type !== "all") {
-      const stampCondition = type === "stamps"
-        ? "st.stamp >= 0"
-        : "st.stamp < 0";
-      whereConditions.push(stampCondition);
-    }
-
-    // Ident condition
-    if (ident) {
-      const identList = Array.isArray(ident) ? ident : [ident];
-      if (identList.length > 0) {
-        const identCondition = identList.map(() => "st.ident = ?").join(" OR ");
-        whereConditions.push(`(${identCondition})`);
-        queryParams.push(...identList.map(String));
-      }
-    }
-
-    // Block identifier condition
-    if (blockIdentifier !== undefined) {
-      if (
-        typeof blockIdentifier === "number" || /^\d+$/.test(blockIdentifier)
-      ) {
-        whereConditions.push("st.block_index = ?");
-        queryParams.push(Number(blockIdentifier));
-      } else if (
-        typeof blockIdentifier === "string" && blockIdentifier.length === 64
-      ) {
-        whereConditions.push("st.block_hash = ?");
-        queryParams.push(blockIdentifier);
-      }
-    }
-
-    if (collectionId) {
-      whereConditions.push("cs.collection_id = UNHEX(?)");
-      queryParams.push(collectionId);
-    }
+    this.buildIdentifierConditions(
+      whereConditions,
+      queryParams,
+      identifier,
+      type,
+      ident,
+      blockIdentifier,
+      collectionId,
+    );
 
     const specificColumns = `
       st.stamp, 
@@ -305,33 +333,14 @@ export class StampRepository {
     ${limitClause}
     ${offsetClause}
     `;
-    // console.log(`Executing query:`, query);
-    // console.log(`Query params:`, queryParams);
 
     const result = await dbManager.executeQueryWithCache(
       query,
       queryParams,
       cacheDuration,
     );
-    // console.log(`Query result repo`, result.rows);
 
-    const queryTotal = `
-    SELECT COUNT(*) AS total
-    FROM ${STAMP_TABLE} AS st
-    ${collectionId ? "JOIN collection_stamps cs ON st.stamp = cs.stamp" : ""}
-    LEFT JOIN creator AS cr ON st.creator = cr.address
-    ${whereClause}
-    ${orderClause}
-    `;
-    // console.log(`Executing total query:`, queryTotal);
-    const resultTotal = await dbManager.executeQueryWithCache(
-      queryTotal,
-      queryParams,
-      cacheDuration,
-    );
-    // console.log(`Total query result repo`, resultTotal.rows);
-
-    return { stamps: result, total: resultTotal };
+    return result;
   }
   /**
    * Retrieves stamp balances for a given address using a database client.
