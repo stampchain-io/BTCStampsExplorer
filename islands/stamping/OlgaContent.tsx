@@ -40,24 +40,6 @@ export function OlgaContent() {
 
   useEffect(() => {
     const func = async () => {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      const data = {
-        jsonrpc: "2.0",
-        id: 1,
-        method: "cg_simplePrice",
-        params: ["bitcoin", "usd", true, true, true],
-      };
-      // const res = fetch_quicknode("cg_simplePrice", [
-      //   "bitcoin",
-      //   "usd",
-      //   true,
-      //   true,
-      //   true,
-      // ]);
       const response = await fetch("/quicknode/getPrice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,12 +87,6 @@ export function OlgaContent() {
       reader.onerror = reject;
     });
 
-  const getImageBlobFromUrl = async (url: any) => {
-    const fetchedImageData = await fetch(url);
-    const blob = await fetchedImageData.blob();
-    return blob;
-  };
-
   const handleImage = (e: any) => {
     const selectedFile = e.target.files[0];
     if (selectedFile.size > 64 * 1024) { // Check if file size is greater than 64KB
@@ -119,15 +95,6 @@ export function OlgaContent() {
     }
     setFile(selectedFile);
     console.log(selectedFile);
-  };
-
-  const removeImage = () => {
-    setFile(null);
-  };
-
-  const copyImage = async () => {
-    const blob = await getImageBlobFromUrl(URL.createObjectURL(file));
-    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
   };
 
   const handleDecrease = () => {
@@ -240,65 +207,6 @@ export function OlgaContent() {
               </label>
             )}
           </div>
-        </div>
-      </div>
-
-      <div class="w-full">
-        <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Address <span class="text-[#FF2D2D]">*</span>
-        </p>
-        <input
-          type="text"
-          class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-          placeholder="Legacy (starts with 1) or Segwit (starts with bc1q)"
-        />
-      </div>
-
-      <div class="flex flex-col md:flex-row justify-between gap-5 w-full">
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            Token
-          </p>
-          <input
-            type="text"
-            class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Case Sensitive"
-          />
-        </div>
-
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            Limit Per Mint
-          </p>
-          <input
-            type="text"
-            class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Positive Integer"
-          />
-        </div>
-      </div>
-
-      <div class="flex flex-col md:flex-row justify-between gap-5 w-full">
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            Max Circulation
-          </p>
-          <input
-            type="number"
-            class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Positive Integer"
-          />
-        </div>
-
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            File <span class="text-[#FF2D2D]">*</span>
-          </p>
-          <input
-            type="number"
-            class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Choose : SVG | PNG"
-          />
         </div>
       </div>
 
@@ -465,75 +373,6 @@ export function OlgaContent() {
             onInput={handleChangeFee}
             class="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#3F2A4E]"
           />
-          {
-            /* <span class="text-sm text-gray-500 dark:text-gray-400 absolute start-0 -bottom-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 15 15"
-            >
-              <path
-                fill="white"
-                d="M10 1a1 1 0 1 0 0 2a1 1 0 0 0 0-2M8.145 2.994a.5.5 0 0 0-.348.143l-2.64 2.5a.5.5 0 0 0 .042.763L7 7.75v2.75c-.01.676 1.01.676 1 0v-3a.5.5 0 0 0-.2-.4l-.767-.577l1.818-1.72l.749.998A.5.5 0 0 0 10 6h1.5c.676.01.676-1.01 0-1h-1.25L9.5 4l-.6-.8a.5.5 0 0 0-.384-.206zM3 7a3 3 0 1 0 0 6a3 3 0 0 0 0-6m9 0a3 3 0 1 0 0 6a3 3 0 0 0 0-6M3 8a2 2 0 1 1 0 4a2 2 0 0 1 0-4m9 0a2 2 0 1 1 0 4a2 2 0 0 1 0-4"
-              />
-            </svg>
-          </span>
-          <span class="text-sm text-gray-500 dark:text-gray-400 absolute start-1/3 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1.25em"
-              height="1em"
-              viewBox="0 0 640 512"
-            >
-              <path
-                fill="white"
-                d="M171.3 96H224v96H111.3l30.4-75.9C146.5 104 158.2 96 171.3 96M272 192V96h81.2c9.7 0 18.9 4.4 25 12l67.2 84zm256.2 1l-100-125c-18.2-22.8-45.8-36-75-36H171.3C132 32 96.7 55.9 82.2 92.3L40.6 196.4C16.8 205.8 0 228.9 0 256v112c0 17.7 14.3 32 32 32h33.3c7.6 45.4 47.1 80 94.7 80s87.1-34.6 94.7-80h130.6c7.6 45.4 47.1 80 94.7 80s87.1-34.6 94.7-80H608c17.7 0 32-14.3 32-32v-48c0-65.2-48.8-119-111.8-127m-93.5 175a48 48 0 1 1 90.5 32a48 48 0 1 1-90.5-32M160 336a48 48 0 1 1 0 96a48 48 0 1 1 0-96"
-              />
-            </svg>
-          </span>
-          <span class="text-sm text-gray-500 dark:text-gray-400 absolute start-2/3 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1.2em"
-              height="1.2em"
-              viewBox="0 0 36 36"
-            >
-              <path
-                fill="white"
-                d="M6.25 11.5L12 13.16l6.32-4.59l-9.07.26a.52.52 0 0 0-.25.08l-2.87 1.65a.51.51 0 0 0 .12.94"
-                class="clr-i-solid clr-i-solid-path-1"
-              />
-              <path
-                fill="white"
-                d="M34.52 6.36L28.22 5a3.78 3.78 0 0 0-3.07.67L6.12 19.5l-4.57-.2a1.25 1.25 0 0 0-.83 2.22l4.45 3.53a.55.55 0 0 0 .53.09c1.27-.49 6-3 11.59-6.07l1.12 11.51a.55.55 0 0 0 .9.37l2.5-2.08a.76.76 0 0 0 .26-.45l2.37-13.29c4-2.22 7.82-4.37 10.51-5.89a1.55 1.55 0 0 0-.43-2.88"
-                class="clr-i-solid clr-i-solid-path-2"
-              />
-              <path fill="none" d="M0 0h36v36H0z" />
-            </svg>
-          </span>
-          <span class="text-sm text-gray-500 dark:text-gray-400 absolute end-0 -bottom-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 512 512"
-            >
-              <path
-                fill="white"
-                d="M328.85 156.79a26.69 26.69 0 1 0 18.88 7.81a26.6 26.6 0 0 0-18.88-7.81"
-              />
-              <path
-                fill="white"
-                d="M477.44 50.06a.29.29 0 0 1 0-.09a20.4 20.4 0 0 0-15.13-15.3c-29.8-7.27-76.68.48-128.63 21.28c-52.36 21-101.42 52-134.58 85.22A320.7 320.7 0 0 0 169.55 175c-22.33-1-42 2.18-58.57 9.41c-57.74 25.41-74.23 90.44-78.62 117.14a25 25 0 0 0 27.19 29h.13l64.32-7.02c.08.82.17 1.57.24 2.26a34.36 34.36 0 0 0 9.9 20.72l31.39 31.41a34.27 34.27 0 0 0 20.71 9.91l2.15.23l-7 64.24v.13A25 25 0 0 0 206 480a25.25 25.25 0 0 0 4.15-.34C237 475.34 302 459.05 327.34 401c7.17-16.46 10.34-36.05 9.45-58.34a314.78 314.78 0 0 0 33.95-29.55c33.43-33.26 64.53-81.92 85.31-133.52c20.69-51.36 28.48-98.59 21.39-129.53M370.38 224.94a58.77 58.77 0 1 1 0-83.07a58.3 58.3 0 0 1 0 83.07"
-              />
-              <path
-                fill="white"
-                d="M161.93 386.44a16 16 0 0 0-11 2.67c-6.39 4.37-12.81 8.69-19.29 12.9c-13.11 8.52-28.79-6.44-21-20l12.15-21a16 16 0 0 0-15.16-24.91A61.25 61.25 0 0 0 72 353.56c-3.66 3.67-14.79 14.81-20.78 57.26A357.94 357.94 0 0 0 48 447.59A16 16 0 0 0 64 464h.4a359.87 359.87 0 0 0 36.8-3.2c42.47-6 53.61-17.14 57.27-20.8a60.49 60.49 0 0 0 17.39-35.74a16 16 0 0 0-13.93-17.82"
-              />
-            </svg>
-          </span> */
-          }
         </div>
         <div class="justify-end flex md:hidden">
           <span class={"text-[#F5F5F5]"}>
@@ -693,19 +532,6 @@ export function OlgaContent() {
           </div>
         </div>
       }
-
-      <div class="w-full">
-        <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Total Estimated
-        </p>
-        <input
-          type="text"
-          class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-          placeholder="0.0041 BTC"
-        >
-          <img src="/img/icon_btc.png" alt="" />
-        </input>
-      </div>
 
       <div
         class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}
