@@ -99,6 +99,7 @@ import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
+import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
 import * as $stamping_DeployContent from "./islands/stamping/DeployContent.tsx";
 import * as $stamping_MintContent from "./islands/stamping/MintContent.tsx";
 import * as $stamping_OlgaContent from "./islands/stamping/OlgaContent.tsx";
@@ -232,6 +233,8 @@ const manifest = {
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/stamp/details/StampRelatedInfo.tsx":
       $stamp_details_StampRelatedInfo,
+    "./islands/stamp/details/StampTextContent.tsx":
+      $stamp_details_StampTextContent,
     "./islands/stamping/DeployContent.tsx": $stamping_DeployContent,
     "./islands/stamping/MintContent.tsx": $stamping_MintContent,
     "./islands/stamping/OlgaContent.tsx": $stamping_OlgaContent,
