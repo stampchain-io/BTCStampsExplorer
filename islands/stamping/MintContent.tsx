@@ -2,6 +2,9 @@ import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { fetch_quicknode } from "utils/quicknode.ts";
+import { conf } from "utils/config.ts";
+
+const { API_BASE_URL } = conf;
 
 export function MintContent() {
   const { wallet, isConnected } = walletContext;
@@ -66,7 +69,7 @@ export function MintContent() {
     }
 
     axiod
-      .post("https://stampchain.io/api/v2/src20/create", {
+      .post(API_BASE_URL + "/src20/create", {
         toAddress: toAddress,
         changeAddress: address,
         op: "mint",

@@ -17,7 +17,7 @@ export const createSharedStampIndexHandler = (
       const sort_order =
         (url.searchParams.get("sort_order") as "asc" | "desc") || "asc";
 
-      const [{ stamps: data }, totalResult, lastBlock] = await Promise.all([
+      const [data, totalResult, lastBlock] = await Promise.all([
         StampRepository.getStampsFromDb({
           limit,
           page,

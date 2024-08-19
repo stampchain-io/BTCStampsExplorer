@@ -2,6 +2,9 @@ import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$lib/store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { fetch_quicknode } from "utils/quicknode.ts";
+import { conf } from "utils/config.ts";
+
+const { API_BASE_URL } = conf;
 
 export function OlgaContent() {
   const { wallet, isConnected } = walletContext;
@@ -119,7 +122,7 @@ export function OlgaContent() {
 
     const data = await toBase64(file);
     axiod
-      .post("https://stampchain.io/api/v2/olga/mint", {
+      .post(API_BASE_URL + "/olga/mint", {
         sourceWallet: address,
         qty: inssuance,
         locked: true,
