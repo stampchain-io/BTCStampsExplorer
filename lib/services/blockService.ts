@@ -6,7 +6,7 @@ export class BlockService {
     blockIdentifier: number | string,
     type: "stamps" | "cursed" | "all" = "all",
   ): Promise<StampBlockResponseBody> {
-    const [block_info, last_block, { stamps: data }] = await Promise.all([
+    const [block_info, last_block, data] = await Promise.all([
       BlockRepository.getBlockInfoFromDb(blockIdentifier),
       this.getLastBlock(),
       StampRepository.getStampsFromDb({
