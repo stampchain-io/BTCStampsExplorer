@@ -1,5 +1,6 @@
 import { StampRow } from "globals";
 import { mimeTypesArray } from "utils/util.ts";
+import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 
 export const Stamp = (
   { stamp, className }: { stamp: StampRow; className: string },
@@ -21,6 +22,18 @@ export const Stamp = (
 
   const src = getStampSrc();
 
+  if (src === "/content/not-available.png") {
+    return (
+      <img
+        width="100%"
+        loading="lazy"
+        className={`max-w-none object-contain image-rendering-pixelated rounded-lg ${className}`}
+        src={src}
+        alt="Not Available"
+      />
+    );
+  }
+
   if (stamp.stamp_mimetype === "text/html") {
     return (
       <iframe
@@ -39,6 +52,10 @@ export const Stamp = (
     );
   }
 
+  if (stamp.stamp_mimetype === "text/plain") {
+    return <TextContentIsland src={src} />;
+  }
+
   return (
     <img
       width="100%"
@@ -46,7 +63,7 @@ export const Stamp = (
       className={`max-w-none object-contain image-rendering-pixelated rounded-lg ${className}`}
       src={src}
       onError={(e) => {
-        e.currentTarget.src = "/content/not-available.png";
+        (e.target as HTMLImageElement).src = "/content/not-available.png";
       }}
       alt="Stamp"
     />
