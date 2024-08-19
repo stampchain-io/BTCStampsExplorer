@@ -28,6 +28,7 @@ const mimeTypes: { [key: string]: string } = {
   "djvu": "image/vnd.djvu",
   "djv": "image/vnd.djvu",
   "html": "text/html",
+  "txt": "text/plain",
 };
 
 // export const mimeTypesArray: [string, string][] = Object.entries(mimeTypes);
