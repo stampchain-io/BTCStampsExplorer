@@ -22,11 +22,13 @@ export function DeployContent() {
     `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
     style="padding: 1px;" viewBox="0 0 32 32"><path fill="#0E9F6E" fill-rule="evenodd" d="M16 32C7.163 32 0 24.837 0 16S7.163 0 16 0s16 7.163 16 16s-7.163 16-16 16m6.5-12.846c0-2.523-1.576-3.948-5.263-4.836v-4.44c1.14.234 2.231.725 3.298 1.496l1.359-2.196a9.49 9.49 0 0 0-4.56-1.776V6h-2.11v1.355c-3.032.234-5.093 1.963-5.093 4.486c0 2.64 1.649 3.925 5.19 4.813v4.58c-1.577-.234-2.886-.935-4.269-2.01L9.5 21.35a11.495 11.495 0 0 0 5.724 2.314V26h2.11v-2.313c3.08-.257 5.166-1.963 5.166-4.533m-7.18-5.327c-1.867-.537-2.327-1.168-2.327-2.15c0-1.027.8-1.845 2.328-1.962zm4.318 5.49c0 1.122-.873 1.893-2.401 2.01v-4.229c1.892.538 2.401 1.168 2.401 2.22z"/></svg>`;
 
+  const [toAddress, setToAddress] = useState<string>("");
+  const [token, setToken] = useState<string>("");
+  const [limitPerMint, setLimitPerMint] = useState<number>(0);
+  const [maxCirculation, setMaxCirculation] = useState<number>(0);
   const [file, setFile] = useState<any>(null);
   const [fee, setFee] = useState<any>(780);
-  const [inssuance, setInssuance] = useState(1);
   const [coinType, setCoinType] = useState("BTC");
-  const [visible, setVisible] = useState(false);
   const [txfee, setTxfee] = useState(0.001285);
   const [mintfee, setMintfee] = useState(0.00000);
   const [dust, setDust] = useState(0.000113);
@@ -40,24 +42,6 @@ export function DeployContent() {
 
   useEffect(() => {
     const func = async () => {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-      const data = {
-        jsonrpc: "2.0",
-        id: 1,
-        method: "cg_simplePrice",
-        params: ["bitcoin", "usd", true, true, true],
-      };
-      // const res = fetch_quicknode("cg_simplePrice", [
-      //   "bitcoin",
-      //   "usd",
-      //   true,
-      //   true,
-      //   true,
-      // ]);
       const response = await fetch("/quicknode/getPrice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -97,20 +81,6 @@ export function DeployContent() {
     else setCoinType("BTC");
   };
 
-  const toBase64 = (file: any) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
-
-  const getImageBlobFromUrl = async (url: any) => {
-    const fetchedImageData = await fetch(url);
-    const blob = await fetchedImageData.blob();
-    return blob;
-  };
-
   const handleImage = (e: any) => {
     const file = e.target.files[0];
     const validTypes = ["image/gif", "image/jpeg", "image/png"];
@@ -136,46 +106,22 @@ export function DeployContent() {
     }
   };
 
-  const removeImage = () => {
-    setFile(null);
-  };
-
-  const copyImage = async () => {
-    const blob = await getImageBlobFromUrl(URL.createObjectURL(file));
-    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-  };
-
-  const handleDecrease = () => {
-    if (inssuance === 1) return;
-    setInssuance(inssuance - 1);
-  };
-
-  const handleIncrease = () => {
-    setInssuance(inssuance + 1);
-  };
-
   const handleMint = async () => {
     if (!isConnected.value) {
       alert("Connect your wallet");
       return;
     }
 
-    if (file === null) {
-      alert("Upload your file");
-      return;
-    }
-
-    const data = await toBase64(file);
     axiod
-      .post("https://stampchain.io/api/v2/olga/mint", {
-        sourceWallet: address,
-        qty: inssuance,
-        locked: true,
-        filename: file.name,
-        file: data,
-        satsPerKB: fee,
-        service_fee: null,
-        service_fee_address: null,
+      .post("https://stampchain.io/api/v2/src20/create", {
+        toAddress: toAddress,
+        chagneAddress: address,
+        op: "deploy",
+        tick: token,
+        feeRate: fee,
+        max: maxCirculation,
+        lim: limitPerMint,
+        dec: 18,
       })
       .then((response) => {
         console.log(response);
@@ -242,6 +188,8 @@ export function DeployContent() {
           type="text"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Legacy (starts with 1) or Segwit (starts with bc1q)"
+          value={toAddress}
+          onChange={(e: any) => setToAddress(e.target.value)}
         />
       </div>
 
@@ -254,6 +202,8 @@ export function DeployContent() {
             type="text"
             class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
             placeholder="Case Sensitive"
+            value={token}
+            onChange={(e: any) => setToken(e.target.value)}
           />
         </div>
         <div class="w-full">
@@ -264,6 +214,8 @@ export function DeployContent() {
             type="number"
             class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
             placeholder="Positive Integer"
+            value={limitPerMint}
+            onChange={(e: any) => setLimitPerMint(e.target.value)}
           />
         </div>
       </div>
@@ -276,6 +228,8 @@ export function DeployContent() {
           type="number"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Positive Integer"
+          value={maxCirculation}
+          onChange={(e: any) => setMaxCirculation(e.target.value)}
         />
       </div>
 
@@ -309,108 +263,94 @@ export function DeployContent() {
         </div>
       </div>
 
-      <div class="bg-[#6E6E6E] text-[#F5F5F5] px-3 py-1 w-full">
-        <div class="flex justify-between border-b border-[#8A8989] py-4">
-          <div>
-            {file && (
+      {file && (
+        <div class="bg-[#6E6E6E] text-[#F5F5F5] px-3 py-1 w-full">
+          <div class="flex justify-between border-b border-[#8A8989] py-4">
+            <div>
               <span class={"flex"}>
-                {coinType === "BTC"
+                Total Estimated - {coinType === "BTC"
                   ? total.toFixed(6)
                   : (total * BTCPrice).toFixed(2)}
                 &nbsp;<span className={"coin"}></span>
               </span>
-            )}
-          </div>
-
-          <button
-            class="w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
-            onClick={handleChangeCoin}
-          >
-            <div
-              id="switch-toggle"
-              class="coin w-6 h-6 relative rounded-full transition duration-500 transform text-white translate-x-full"
-            >
             </div>
-          </button>
-        </div>
 
-        <div class="flex flex-col md:flex-row justify-between md:gap-8">
-          <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-            <p>File Type</p>
-            <p>{file?.type}</p>
+            <button
+              class="w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+              onClick={handleChangeCoin}
+            >
+              <div
+                id="switch-toggle"
+                class="coin w-6 h-6 relative rounded-full transition duration-500 transform text-white translate-x-full"
+              >
+              </div>
+            </button>
           </div>
-          <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-            <p>File Size</p>
-            <p>{file?.size} bytes</p>
+
+          <div class="flex flex-col md:flex-row justify-between md:gap-8">
+            <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
+              <p>Sats Per Byte</p>
+              <p>{(fee / 10.0).toFixed(2)}</p>
+            </div>
+          </div>
+          <div class="flex flex-col md:flex-row justify-between md:gap-8">
+            <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
+              <p>Transaction Fee</p>
+              <p class={"flex"}>
+                {file && (
+                  <>
+                    {coinType === "BTC"
+                      ? txfee.toFixed(6)
+                      : (txfee * BTCPrice).toFixed(2)}
+                    &nbsp;<span className={"coin"}></span>
+                  </>
+                )}
+              </p>
+            </div>
+            <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
+              <p>Minting Fee</p>
+              <p class={"flex"}>
+                {file && (
+                  <>
+                    {coinType === "BTC"
+                      ? mintfee.toFixed(6)
+                      : (mintfee * BTCPrice).toFixed(2)}
+                    &nbsp;<span className={"coin"}></span>
+                  </>
+                )}
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col md:flex-row justify-between md:gap-8">
+            <div class="flex justify-between w-full border-b border-[#8A8989] md:border-none py-4">
+              <p>Multisig Dust</p>
+              <p class={"flex"}>
+                {file && (
+                  <>
+                    {coinType === "BTC"
+                      ? dust.toFixed(6)
+                      : (dust * BTCPrice).toFixed(2)}
+                    &nbsp;<span className={"coin"}></span>
+                  </>
+                )}
+              </p>
+            </div>
+            <div class="flex justify-between w-full py-4">
+              <p>Total Estimated</p>
+              <p class={"flex"}>
+                {file && (
+                  <>
+                    {coinType === "BTC"
+                      ? total.toFixed(6)
+                      : (total * BTCPrice).toFixed(2)}
+                    &nbsp;<span className={"coin"}></span>
+                  </>
+                )}
+              </p>
+            </div>
           </div>
         </div>
-        <div class="flex flex-col md:flex-row justify-between md:gap-8">
-          <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-            <p>Sats Per Byte</p>
-            <p>{(fee / 10.0).toFixed(2)}</p>
-          </div>
-          <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-            <p>Items to mint</p>
-            <p>{file && inssuance}</p>
-          </div>
-        </div>
-        <div class="flex flex-col md:flex-row justify-between md:gap-8">
-          <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-            <p>Transaction Fee</p>
-            <p class={"flex"}>
-              {file && (
-                <>
-                  {coinType === "BTC"
-                    ? txfee.toFixed(6)
-                    : (txfee * BTCPrice).toFixed(2)}
-                  &nbsp;<span className={"coin"}></span>
-                </>
-              )}
-            </p>
-          </div>
-          <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-            <p>Minting Fee</p>
-            <p class={"flex"}>
-              {file && (
-                <>
-                  {coinType === "BTC"
-                    ? mintfee.toFixed(6)
-                    : (mintfee * BTCPrice).toFixed(2)}
-                  &nbsp;<span className={"coin"}></span>
-                </>
-              )}
-            </p>
-          </div>
-        </div>
-        <div class="flex flex-col md:flex-row justify-between md:gap-8">
-          <div class="flex justify-between w-full border-b border-[#8A8989] md:border-none py-4">
-            <p>Multisig Dust</p>
-            <p class={"flex"}>
-              {file && (
-                <>
-                  {coinType === "BTC"
-                    ? dust.toFixed(6)
-                    : (dust * BTCPrice).toFixed(2)}
-                  &nbsp;<span className={"coin"}></span>
-                </>
-              )}
-            </p>
-          </div>
-          <div class="flex justify-between w-full py-4">
-            <p>Total Estimated</p>
-            <p class={"flex"}>
-              {file && (
-                <>
-                  {coinType === "BTC"
-                    ? total.toFixed(6)
-                    : (total * BTCPrice).toFixed(2)}
-                  &nbsp;<span className={"coin"}></span>
-                </>
-              )}
-            </p>
-          </div>
-        </div>
-      </div>
+      )}
 
       <div
         class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}
