@@ -3,13 +3,34 @@ import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState<string | null>(null);
 
-  let path: string | null = null;
-  if (typeof window !== undefined) {
-    path = (globalThis?.location?.pathname)?.split("/")[1];
-  }
+  useEffect(() => {
+    // Set initial path
+    setCurrentPath((globalThis?.location?.pathname)?.split("/")[1] || null);
+
+    // Update path on route change
+    const handleRouteChange = () => {
+      setCurrentPath((globalThis?.location?.pathname)?.split("/")[1] || null);
+    };
+
+    // Listen for route changes
+    globalThis.addEventListener("popstate", handleRouteChange);
+
+    return () => {
+      globalThis.removeEventListener("popstate", handleRouteChange);
+    };
+  }, []);
+
+  const isStampingActive = currentPath === "stamping" ||
+    currentPath === "stamping/stamp" ||
+    currentPath === "stamping/src20";
+
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const toggleWalletModal = () => setIsWalletModalOpen(!isWalletModalOpen);
+
   const toggleMenu = () => {
-    const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
+    const isMobileScreen = globalThis.matchMedia("(max-width: 768px)").matches;
     if (!isMobileScreen) return;
     setOpen(!open);
     document.body.style.overflow = !open ? "hidden" : "";
@@ -23,9 +44,12 @@ export function Header() {
       }
     };
 
-    window.addEventListener("orientationchange", handleOrientationChange);
+    globalThis.addEventListener("orientationchange", handleOrientationChange);
     return () => {
-      window.removeEventListener("orientationchange", handleOrientationChange);
+      globalThis.removeEventListener(
+        "orientationchange",
+        handleOrientationChange,
+      );
     };
   }, [open]);
 
@@ -34,8 +58,8 @@ export function Header() {
       <div className="container mx-auto md:flex md:items-center md:justify-between">
         <div className="flex justify-between items-center">
           <a
-            href="/block/last"
-            f-partial={"/block/last"}
+            href="/home"
+            f-partial={"/home"}
             className="font-bold text-xl text-indigo-600 hidden md:block"
           >
             <img
@@ -66,7 +90,7 @@ export function Header() {
           </button>
 
           <div class="block md:hidden">
-            <ConnectWallet />
+            <ConnectWallet toggleModal={toggleWalletModal} />
           </div>
         </div>
 
@@ -93,87 +117,94 @@ export function Header() {
             } `}
           >
             <a
-              href="/home"
-              f-partial={"/home"}
-              onClick={toggleMenu}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                path === "home" ? "border-[#7A00F5] border-b-4" : ""
-              }`}
-            >
-              Home
-            </a>
-            <a
               href="/stamp?ident=classic"
               f-partial={"/stamp?ident=classic"}
-              onClick={toggleMenu}
+              onClick={() => {
+                toggleMenu();
+                setCurrentPath("stamp");
+              }}
               className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                path === "stamp" ? "border-[#7A00F5] border-b-4" : ""
+                currentPath === "stamp" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
-              Stamps
-            </a>
-            <a
-              href="/src20"
-              f-partial={"/src20"}
-              onClick={toggleMenu}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                path === "src20" ? "border-[#7A00F5] border-b-4" : ""
-              }`}
-            >
-              Src-20
-            </a>
-            <a
-              href="/block/last"
-              f-partial={"/block/last"}
-              onClick={toggleMenu}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                path === "block" ? "border-[#7A00F5] border-b-4" : ""
-              }`}
-            >
-              Blocks
+              STAMPS
             </a>
             <a
               href="/collection"
               f-partial={"/collection"}
-              onClick={toggleMenu}
+              onClick={() => {
+                toggleMenu();
+                setCurrentPath("collection");
+              }}
               className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                path === "collection" ? "border-[#7A00F5] border-b-4" : ""
+                currentPath === "collection"
+                  ? "border-[#7A00F5] border-b-4"
+                  : ""
               }`}
             >
-              Collections
+              COLLECTIONS
             </a>
+            <a
+              href="/src20"
+              f-partial={"/src20"}
+              onClick={() => {
+                toggleMenu();
+                setCurrentPath("src20");
+              }}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                currentPath === "src20" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              SRC-20
+            </a>
+            <a
+              href="/block/last"
+              f-partial={"/block/last"}
+              onClick={() => {
+                toggleMenu();
+                setCurrentPath("block");
+              }}
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                currentPath === "block" ? "border-[#7A00F5] border-b-4" : ""
+              }`}
+            >
+              BLOCKS
+            </a>
+
             <div className={"group relative"}>
               <a
                 className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg md:text-base ${
-                  path === "stamping" ? "border-[#7A00F5] border-b-4" : ""
+                  isStampingActive ? "border-[#7A00F5] border-b-4" : ""
                 }`}
               >
-                Stamping
+                STAMPING
               </a>
               <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] md:top-[34px] left-[100px] md:left-[15px] z-[100] py-2">
                 <a
                   href="/stamping/stamp"
                   f-partial={"/stamping/stamp"}
-                  onClick={toggleMenu}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("stamping/stamp");
+                  }}
                   className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                    path === "stamping/stamp"
-                      ? "border-[#7A00F5] border-b-4"
-                      : ""
+                    currentPath === "stamping/stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  Stamp
+                  STAMP
                 </a>
                 <a
                   href="/stamping/src20"
                   f-partial={"/stamping/src20"}
-                  onClick={toggleMenu}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("stamping/src20");
+                  }}
                   className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
-                    path === "stamping/src20"
-                      ? "border-[#7A00F5] border-b-4"
-                      : ""
+                    currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  Src-20
+                  SRC-20
                 </a>
               </div>
             </div>
@@ -191,7 +222,7 @@ export function Header() {
             }
 
             <div class="block md:hidden">
-              <ConnectWallet />
+              <ConnectWallet toggleModal={toggleWalletModal} />
             </div>
           </div>
 
@@ -216,7 +247,7 @@ export function Header() {
         </div>
 
         <div class="hidden md:block">
-          <ConnectWallet />
+          <ConnectWallet toggleModal={toggleWalletModal} />
         </div>
       </div>
     </nav>
