@@ -1,13 +1,16 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
-import { fetch_quicknode } from "utils/quicknode.ts";
-
-import { frontendConfig } from "utils/frontendConfig.ts";
-
-const API_BASE_URL = frontendConfig.API_BASE_URL;
+import { useConfig } from "$/hooks/useConfig.ts";
 
 export function DeployContent() {
+  const config = useConfig();
+
+  if (!config) {
+    console.error("Config not loaded");
+    return null;
+  }
+
   const { wallet, isConnected } = walletContext;
   const { address } = wallet.value;
   const btcIcon = `<svg
@@ -110,16 +113,16 @@ export function DeployContent() {
     }
   };
 
-  const handleMint = async () => {
+  const handleDeploy = async () => {
     if (!isConnected.value) {
       alert("Connect your wallet");
       return;
     }
 
     axiod
-      .post(API_BASE_URL + "/src20/create", {
+      .post(`${config.API_BASE_URL}/src20/create`, {
         toAddress: toAddress,
-        chagneAddress: address,
+        changeAddress: address,
         op: "deploy",
         tick: token,
         feeRate: fee,
@@ -358,7 +361,7 @@ export function DeployContent() {
 
       <div
         class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}
-        onClick={handleMint}
+        onClick={handleDeploy}
       >
         Mint Now
       </div>

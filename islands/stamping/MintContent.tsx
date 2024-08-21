@@ -1,13 +1,16 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
-import { fetch_quicknode } from "utils/quicknode.ts";
-
-import { frontendConfig } from "utils/frontendConfig.ts";
-
-const API_BASE_URL = frontendConfig.API_BASE_URL;
+import { useConfig } from "$/hooks/useConfig.ts";
 
 export function MintContent() {
+  const config = useConfig();
+
+  if (!config) {
+    console.error("Config not loaded");
+    return null;
+  }
+
   const { wallet, isConnected } = walletContext;
   const { address } = wallet.value;
   const btcIcon = `<svg
@@ -70,7 +73,7 @@ export function MintContent() {
     }
 
     axiod
-      .post(API_BASE_URL + "/src20/create", {
+      .post(`${config.API_BASE_URL}/src20/create`, {
         toAddress: toAddress,
         changeAddress: address,
         op: "mint",

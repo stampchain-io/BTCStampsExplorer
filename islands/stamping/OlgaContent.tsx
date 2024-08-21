@@ -1,19 +1,15 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$lib/store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
-import { fetch_quicknode } from "utils/quicknode.ts";
+import { useConfig } from "$/hooks/useConfig.ts";
 
 export function OlgaContent() {
-  const [frontendConfig, setFrontendConfig] = useState(null);
+  const config = useConfig();
 
-  useEffect(() => {
-    fetch("/config")
-      .then((response) => response.json())
-      .then((data) => setFrontendConfig(data))
-      .catch((error) =>
-        console.error("Error fetching frontend config:", error)
-      );
-  }, []);
+  if (!config) {
+    return <div>Error...</div>;
+  }
+
   const { wallet, isConnected } = walletContext;
   const { address } = wallet.value;
   const btcIcon = `<svg
@@ -129,15 +125,15 @@ export function OlgaContent() {
 
     const data = await toBase64(file);
     axiod
-      .post(frontendConfig.API_BASE_URL + "/olga/mint", {
+      .post(config.API_BASE_URL + "/olga/mint", {
         sourceWallet: address,
         qty: issuance,
         locked: true,
         filename: file.name,
         file: data,
         satsPerKB: fee,
-        service_fee: frontendConfig.MINTING_SERVICE_FEE,
-        service_fee_address: frontendConfig.MINTING_SERVICE_FEE_ADDRESS,
+        service_fee: config.MINTING_SERVICE_FEE,
+        service_fee_address: config.MINTING_SERVICE_FEE_ADDRESS,
       })
       .then((response) => {
         console.log(response);
