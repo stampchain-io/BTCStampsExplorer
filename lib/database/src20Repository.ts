@@ -220,7 +220,7 @@ export class SRC20Repository {
     const results = await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      0, //1000 * 60 * 2, // Cache duration
+      1000 * 60 * 2, //1000 * 60 * 2, // Cache duration
     );
 
     // Retrieve transaction hashes for the ticks
@@ -294,21 +294,22 @@ export class SRC20Repository {
             src.max,
             src.deci,
             src.lim,
-            COUNT(CASE WHEN src.op = 'MINT' THEN 1 ELSE NULL END) as total_mints,
-            SUM(CASE WHEN balance.tick COLLATE utf8mb4_0900_as_ci = '${tick}' THEN balance.amt ELSE 0 END) as total_minted
+            COUNT(CASE WHEN src.op = 'MINT' THEN 1 END) as total_mints,
+            COALESCE(SUM(balance.amt), 0) as total_minted
         FROM ${SRC20_TABLE} as src
-            LEFT JOIN ${SRC20_BALANCE_TABLE} as balance ON src.tick = balance.tick
+        LEFT JOIN ${SRC20_BALANCE_TABLE} as balance ON src.tick = balance.tick AND src.tick_hash = balance.tick_hash
         WHERE 
-            src.tick COLLATE utf8mb4_0900_as_ci = '${tick}'
-            AND src.op = 'DEPLOY'
+            src.tick = ? AND
+            src.op = 'DEPLOY'
         GROUP BY 
             src.max, src.deci, src.lim;
     `;
 
-    const data = await dbManager.executeQueryWithCache(query, [
-      tick,
-      tick,
-    ], 0);
+    const data = await dbManager.executeQueryWithCache(
+      query,
+      [tick],
+      1000 * 60 * 2,
+    );
 
     if (data.rows.length === 0) {
       return null;
