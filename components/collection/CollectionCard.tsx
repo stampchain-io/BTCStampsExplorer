@@ -26,7 +26,7 @@ export function CollectionCard({
       <div class="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
         <div class="flex justify-between text-black">
           <h3 class="text-[13px] font-semibold text-white text-lg">
-            Collection - {collection.collection_name}
+            {collection.collection_name}
           </h3>
         </div>
         <div>
