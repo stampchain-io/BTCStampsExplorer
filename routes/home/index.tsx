@@ -3,6 +3,7 @@ import { Handlers } from "$fresh/server.ts";
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
 import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
+// import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
 import { StampController } from "$lib/controller/stampController.ts";
 
 type HomePageProps = {
@@ -49,15 +50,16 @@ export default function Home(props: HomePageProps) {
   return (
     <div class="flex flex-col gap-24 text-white">
       <HomeHeader />
+      {/* <HomeCarousel /> */}
       <div class="flex flex-col gap-10">
         <HomeTable data={src20s} />
       </div>
       <HomeStampPreview
-        stamps_recent={stamps_recent}
-        stamps_src721={stamps_src721}
         stamps_art={stamps_art}
-        stamps_src20={stamps_src20}
         stamps_posh={stamps_posh}
+        stamps_src721={stamps_src721}
+        stamps_recent={stamps_recent}
+        stamps_src20={stamps_src20}
       />
     </div>
   );

@@ -40,25 +40,28 @@ export function HomeStampPreview({
   stamps_src20 = [],
   stamps_posh = [],
 }: {
-  stamps_recent: StampRow[];
-  stamps_src721: StampRow[];
   stamps_art: StampRow[];
-  stamps_src20: StampRow[];
   stamps_posh: StampRow[];
+  stamps_src721: StampRow[];
+  stamps_recent: StampRow[];
+  stamps_src20: StampRow[];
 }) {
   const sections: StampSection[] = [
-    { title: "Recent Sales", type: "recent", stamps: stamps_recent },
-    { title: "Posh Stamps", type: "posh", stamps: stamps_posh },
-    { title: "SRC-721/R Stamps", type: "src721", stamps: stamps_src721 },
-    { title: "Classic Stamps", type: "classic", stamps: stamps_art },
+    { title: "CLASSIC", type: "classic", stamps: stamps_art },
+    { title: "POSH", type: "posh", stamps: stamps_posh },
+    { title: "SRC-721/R", type: "src721", stamps: stamps_src721 },
+    { title: "RECENT SALES", type: "recent", stamps: stamps_recent },
     { title: "SRC-20 Stamps", type: "src20", stamps: stamps_src20 },
   ];
 
   return (
-    <div class="flex flex-col gap-12">
-      {sections.map((section) => (
-        <StampSection key={section.type} {...section} />
-      ))}
-    </div>
+    <>
+      <h2 class="text-3xl md:text text-left text-[#F5F5F5]">Latest Stamps</h2>
+      <div class="flex flex-col gap-12">
+        {sections.map((section) => (
+          <StampSection key={section.type} {...section} />
+        ))}
+      </div>
+    </>
   );
 }
