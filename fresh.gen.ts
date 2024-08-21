@@ -43,6 +43,7 @@ import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $collection_id_ from "./routes/collection/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
+import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $handlers_sharedBlockHandler from "./routes/handlers/sharedBlockHandler.ts";
@@ -166,6 +167,7 @@ const manifest = {
     "./routes/block/index.tsx": $block_index,
     "./routes/collection/[id].tsx": $collection_id_,
     "./routes/collection/index.tsx": $collection_index,
+    "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/docs/index.tsx": $docs_index,
     "./routes/handlers/sharedBlockHandler.ts": $handlers_sharedBlockHandler,
