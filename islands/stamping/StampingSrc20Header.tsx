@@ -15,7 +15,7 @@ export const StampingSrc20Header = (
           class={selectedTab === "mint"
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => setTypeOption("stamping/src20", "mint")}
+          onClick={() => setTypeOption("stamping/src20", "mint", true)}
         >
           Mint
         </p>
@@ -23,7 +23,7 @@ export const StampingSrc20Header = (
           class={selectedTab === "deploy"
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => setTypeOption("stamping/src20", "deploy")}
+          onClick={() => setTypeOption("stamping/src20", "deploy", true)}
         >
           Deploy
         </p>
@@ -31,7 +31,7 @@ export const StampingSrc20Header = (
           class={selectedTab === "transfer"
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => setTypeOption("stamping/src20", "transfer")}
+          onClick={() => setTypeOption("stamping/src20", "transfer", true)}
         >
           Transfer
         </p>

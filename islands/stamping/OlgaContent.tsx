@@ -4,6 +4,8 @@ import axiod from "https://deno.land/x/axiod/mod.ts";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 
+import { MempoolWeather } from "$islands/MempoolWeather.tsx";
+
 export function OlgaContent() {
   const config = useConfig();
 
@@ -358,38 +360,9 @@ export function OlgaContent() {
         </div>
       </div>
 
-      <div class={"w-full flex flex-col gap-2"}>
-        <div class="flex justify-between">
-          <span class={"text-[#F5F5F5]"}>
-            EFFECTIVE FEE RATE: {(fee / 10.0).toFixed(2)} sat/vB
-          </span>
-          <span class={"text-[#F5F5F5] hidden md:block"}>
-            RECOMMENDED: 78 sat/vB
-          </span>
-        </div>
-        <div class="relative">
-          <label for="labels-range-input" class="sr-only">
-            Labels range
-          </label>
-          <input
-            id="labels-range-input"
-            type="range"
-            value={fee}
-            min="88"
-            max="2640"
-            onInput={handleChangeFee}
-            class="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#3F2A4E]"
-          />
-        </div>
-        <div class="justify-end flex md:hidden">
-          <span class={"text-[#F5F5F5]"}>
-            RECOMMENDED: 78 sat/vB
-          </span>
-        </div>
-      </div>
-
       <FeeEstimation
         fee={fee}
+        handleChangeFee={handleChangeFee}
         type="stamp"
         fileType={file?.type}
         fileSize={file?.size}
