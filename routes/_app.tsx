@@ -42,13 +42,15 @@ export default function App({ Component }: AppProps) {
           crossorigin="true"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400..700&display=swap"
+          // href="https://fonts.googleapis.com/css2?family=Micro+5&display=swap"
           rel="stylesheet"
         />
 
         <link rel="stylesheet" href="/styles.css" />
       </head>
-      <body className="bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-['Pixelify_Sans']">
+      <body className="bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-['Work_Sans']">
+        {/* <body className="bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-['Micro_5']"> */}
         <ToastProvider>
           <NavigatorProvider>
             <div

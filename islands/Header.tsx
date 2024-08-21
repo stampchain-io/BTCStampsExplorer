@@ -123,7 +123,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("stamp");
               }}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
                 currentPath === "stamp" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -136,7 +136,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("collection");
               }}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
                 currentPath === "collection"
                   ? "border-[#7A00F5] border-b-4"
                   : ""
@@ -151,7 +151,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("src20");
               }}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
                 currentPath === "src20" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -164,7 +164,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("block");
               }}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
                 currentPath === "block" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -173,7 +173,7 @@ export function Header() {
 
             <div className={"group relative"}>
               <a
-                className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg md:text-base ${
+                className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg md:text-base font-weight-900 ${
                   isStampingActive ? "border-[#7A00F5] border-b-4" : ""
                 }`}
               >
@@ -187,7 +187,7 @@ export function Header() {
                     toggleMenu();
                     setCurrentPath("stamping/stamp");
                   }}
-                  className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                  className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
                     currentPath === "stamping/stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
@@ -200,7 +200,7 @@ export function Header() {
                     toggleMenu();
                     setCurrentPath("stamping/src20");
                   }}
-                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
                     currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
                   }`}
                 >
@@ -213,7 +213,7 @@ export function Header() {
               href="/upload"
               f-partial={"/upload"}
               onClick={toggleMenu}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base ${
+              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
                 path === "upload" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
