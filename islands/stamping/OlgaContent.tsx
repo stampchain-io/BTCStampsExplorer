@@ -6,6 +6,8 @@ import { fetch_quicknode } from "utils/quicknode.ts";
 import { frontendConfig } from "utils/frontendConfig.ts";
 
 const API_BASE_URL = frontendConfig.API_BASE_URL;
+const MINTING_SERVICE_FEE = frontendConfig.MINTING_SERVICE_FEE;
+const MINTING_SERVICE_FEE_ADDRESS = frontendConfig.MINTING_SERVICE_FEE_ADDRESS;
 
 export function OlgaContent() {
   const { wallet, isConnected } = walletContext;
@@ -28,7 +30,7 @@ export function OlgaContent() {
 
   const [file, setFile] = useState<any>(null);
   const [fee, setFee] = useState<any>(780);
-  const [inssuance, setInssuance] = useState(1);
+  const [issuance, setIssuance] = useState(1);
   const [coinType, setCoinType] = useState("BTC");
   const [visible, setVisible] = useState(false);
   const [txfee, setTxfee] = useState(0.001285);
@@ -102,12 +104,12 @@ export function OlgaContent() {
   };
 
   const handleDecrease = () => {
-    if (inssuance === 1) return;
-    setInssuance(inssuance - 1);
+    if (issuance === 1) return;
+    setIssuance(issuance - 1);
   };
 
   const handleIncrease = () => {
-    setInssuance(inssuance + 1);
+    setIssuance(issuance + 1);
   };
 
   const handleMint = async () => {
@@ -125,13 +127,13 @@ export function OlgaContent() {
     axiod
       .post(API_BASE_URL + "/olga/mint", {
         sourceWallet: address,
-        qty: inssuance,
+        qty: issuance,
         locked: true,
         filename: file.name,
         file: data,
         satsPerKB: fee,
-        service_fee: null,
-        service_fee_address: null,
+        service_fee: MINTING_SERVICE_FEE,
+        service_fee_address: MINTING_SERVICE_FEE_ADDRESS,
       })
       .then((response) => {
         console.log(response);
@@ -216,13 +218,13 @@ export function OlgaContent() {
 
       <div class="w-full">
         <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Asset Inssuance
+          Asset Issuance
         </p>
         <div class={"flex gap-[18px] w-full mb-3"}>
           <div
             class={"p-4 text-[#F5F5F5] text-[24px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"}
           >
-            {inssuance}
+            {issuance}
           </div>
           <div
             class={"w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"}
@@ -484,7 +486,7 @@ export function OlgaContent() {
               style={{ borderBottom: "solid 1px gray" }}
             >
               <span>Items to mint</span>
-              <span>{inssuance}</span>
+              <span>{issuance}</span>
             </div>
             <div
               class={"flex justify-between pb-2"}
