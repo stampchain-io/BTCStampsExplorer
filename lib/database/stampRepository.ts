@@ -147,9 +147,7 @@ export class StampRepository {
     SELECT COUNT(*) AS total
     FROM ${STAMP_TABLE} AS st
     ${collectionId ? "JOIN collection_stamps cs ON st.stamp = cs.stamp" : ""}
-    LEFT JOIN creator AS cr ON st.creator = cr.address
     ${whereClause}
-    ${orderClause}
     `;
     const resultTotal = await dbManager.executeQueryWithCache(
       queryTotal,
