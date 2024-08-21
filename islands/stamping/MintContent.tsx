@@ -2,9 +2,8 @@ import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { fetch_quicknode } from "utils/quicknode.ts";
-import { conf } from "utils/config.ts";
 
-const { API_BASE_URL } = conf;
+const API_BASE_URL = Deno.env.get("API_BASE_URL");
 
 export function MintContent() {
   const { wallet, isConnected } = walletContext;
