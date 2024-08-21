@@ -90,37 +90,7 @@ export function MintContent() {
         />
       </div>
 
-      <div class={"w-full flex flex-col gap-2"}>
-        <div class="flex justify-between">
-          <span class={"text-[#F5F5F5]"}>
-            EFFECTIVE FEE RATE: {(fee / 10.0).toFixed(2)} sat/vB
-          </span>
-          <span class={"text-[#F5F5F5] hidden md:block"}>
-            RECOMMENDED: 78 sat/vB
-          </span>
-        </div>
-        <div class="relative">
-          <label for="labels-range-input" class="sr-only">
-            Labels range
-          </label>
-          <input
-            id="labels-range-input"
-            type="range"
-            value={fee}
-            min="88"
-            max="2640"
-            onInput={handleChangeFee}
-            class="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#3F2A4E]"
-          />
-        </div>
-        <div class="justify-end flex md:hidden">
-          <span class={"text-[#F5F5F5]"}>
-            RECOMMENDED: 78 sat/vB
-          </span>
-        </div>
-      </div>
-
-      <FeeEstimation fee={fee} type="src20" />
+      <FeeEstimation fee={fee} handleChangeFee={handleChangeFee} type="src20" />
 
       <div
         class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}

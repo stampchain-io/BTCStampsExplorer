@@ -51,15 +51,27 @@ export const NavigatorProvider = ({ children }) => {
     return filterOption;
   };
 
-  const setTypeOptionData = (prefix: string, value: string) => {
+  const setTypeOptionData = (
+    prefix: string,
+    value: string,
+    identOnly: boolean = false,
+  ) => {
     setTypeOption(value);
     console.log("Type option: ", value);
     if (globalThis.history) {
-      globalThis.history.pushState(
-        {},
-        "",
-        `/${prefix}?sortBy=${sortOption}&filterBy=${filterOption}&ident=${value}`,
-      );
+      if (identOnly) {
+        globalThis.history.pushState(
+          {},
+          "",
+          `/${prefix}?ident=${value}`,
+        );
+      } else {
+        globalThis.history.pushState(
+          {},
+          "",
+          `/${prefix}?sortBy=${sortOption}&filterBy=${filterOption}&ident=${value}`,
+        );
+      }
       window.location.reload();
     }
   };
