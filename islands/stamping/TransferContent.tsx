@@ -30,7 +30,7 @@ export function TransferContent() {
   const [token, setToken] = useState<string>("");
   const [file, setFile] = useState<any>(null);
   const [fee, setFee] = useState<any>(780);
-  const [inssuance, setInssuance] = useState(1);
+  const [issuance, setIssuance] = useState(1);
   const [coinType, setCoinType] = useState("BTC");
   const [visible, setVisible] = useState(false);
   const [txfee, setTxfee] = useState(0.001285);
@@ -84,14 +84,6 @@ export function TransferContent() {
     if (coinType === "BTC") setCoinType("USDT");
     else setCoinType("BTC");
   };
-
-  const toBase64 = (file: any) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
 
   const handleMint = async () => {
     if (!isConnected.value) {
