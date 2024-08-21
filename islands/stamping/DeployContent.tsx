@@ -3,7 +3,9 @@ import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { fetch_quicknode } from "utils/quicknode.ts";
 
-const API_BASE_URL = Deno.env.get("API_BASE_URL");
+import { frontendConfig } from "utils/frontendConfig.ts";
+
+const API_BASE_URL = frontendConfig.API_BASE_URL;
 
 export function DeployContent() {
   const { wallet, isConnected } = walletContext;
