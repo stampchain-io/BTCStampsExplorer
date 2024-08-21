@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$lib/store/wallet/wallet.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { useConfig } from "$/hooks/useConfig.ts";
+import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 
 export function OlgaContent() {
   const config = useConfig();
@@ -387,157 +388,13 @@ export function OlgaContent() {
         </div>
       </div>
 
-      {
-        <div class={`${file === null ? "hidden" : ""}`}>
-          <div class={"flex text-gray-200 w-[340px] justify-between py-4"}>
-            <span>Total Estimated</span>
-            <div
-              class={"flex gap-1 items-center cursor-pointer"}
-              onClick={() => setVisible(!visible)}
-            >
-              <span class={"flex"}>
-                {coinType === "BTC"
-                  ? total.toFixed(6)
-                  : (total * BTCPrice).toFixed(2)}
-                &nbsp;<span className={"coin"}></span>
-              </span>
-              {!visible
-                ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
-                  >
-                    <g fill="none" fill-rule="evenodd">
-                      <path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                      <path
-                        fill="white"
-                        d="M12.707 15.707a1 1 0 0 1-1.414 0L5.636 10.05A1 1 0 1 1 7.05 8.636l4.95 4.95l4.95-4.95a1 1 0 0 1 1.414 1.414z"
-                      />
-                    </g>
-                  </svg>
-                )
-                : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
-                  >
-                    <g fill="none" fill-rule="evenodd">
-                      <path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                      <path
-                        fill="white"
-                        d="M11.293 8.293a1 1 0 0 1 1.414 0l5.657 5.657a1 1 0 0 1-1.414 1.414L12 10.414l-4.95 4.95a1 1 0 0 1-1.414-1.414z"
-                      />
-                    </g>
-                  </svg>
-                )}
-            </div>
-          </div>
-
-          <div
-            style={{
-              width: "350px",
-              backgroundColor: "#111827",
-              border: "solid 1px gray",
-            }}
-            class={`px-6 py-4 flex flex-col gap-4 text-gray-500 rounded-xl ${
-              visible ? "" : "hidden"
-            }`}
-          >
-            <div class={"flex justify-between"}>
-              <span class={"text-[20px] text-white"}>Summary</span>
-              <button
-                class="w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
-                onClick={handleChangeCoin}
-              >
-                <div
-                  id="switch-toggle"
-                  class="coin w-6 h-6 relative rounded-full transition duration-500 transform text-white translate-x-full"
-                >
-                </div>
-              </button>
-            </div>
-            <div
-              class={"flex justify-between pb-2"}
-              style={{ borderBottom: "solid 1px gray" }}
-            >
-              <span>File Type</span>
-              <span>{file?.type}</span>
-            </div>
-            <div
-              class={"flex justify-between pb-2"}
-              style={{ borderBottom: "solid 1px gray" }}
-            >
-              <span>File Size</span>
-              <span>{file?.size} bytes</span>
-            </div>
-            <div
-              class={"flex justify-between pb-2"}
-              style={{ borderBottom: "solid 1px gray" }}
-            >
-              <span>Sats Per Byte</span>
-              <span>{(fee / 10.0).toFixed(2)}</span>
-            </div>
-            <div
-              class={"flex justify-between pb-2"}
-              style={{ borderBottom: "solid 1px gray" }}
-            >
-              <span>Items to mint</span>
-              <span>{issuance}</span>
-            </div>
-            <div
-              class={"flex justify-between pb-2"}
-              style={{ borderBottom: "solid 1px gray" }}
-            >
-              <span>Transaction Fee</span>
-              <span class={"flex"}>
-                {coinType === "BTC"
-                  ? txfee.toFixed(6)
-                  : (txfee * BTCPrice).toFixed(2)}
-                &nbsp;<span className={"coin"}></span>
-              </span>
-            </div>
-            <div
-              class={"flex justify-between pb-2"}
-              style={{ borderBottom: "solid 1px gray" }}
-            >
-              <span>Minting Fee</span>
-              <span class={"flex"}>
-                {coinType === "BTC"
-                  ? mintfee.toFixed(6)
-                  : (mintfee * BTCPrice).toFixed(2)}
-                &nbsp;<span className={"coin"}></span>
-              </span>
-            </div>
-            <div
-              class={"flex justify-between pb-2"}
-              style={{ borderBottom: "solid 1px gray" }}
-            >
-              <span>Multisig Dust</span>
-              <span class={"flex"}>
-                {coinType === "BTC"
-                  ? dust.toFixed(6)
-                  : (dust * BTCPrice).toFixed(2)}
-                &nbsp;<span className={"coin"}></span>
-              </span>
-            </div>
-            <div
-              class={"flex justify-between pb-2"}
-            >
-              <span>Total estimated</span>
-              <span class={"flex"}>
-                {coinType === "BTC"
-                  ? total.toFixed(6)
-                  : (total * BTCPrice).toFixed(2)}
-                &nbsp;<span className={"coin"}></span>
-              </span>
-            </div>
-          </div>
-        </div>
-      }
+      <FeeEstimation
+        fee={fee}
+        type="stamp"
+        fileType={file?.type}
+        fileSize={file?.size}
+        issuance={issuance}
+      />
 
       <div
         class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}

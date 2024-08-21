@@ -102,6 +102,7 @@ import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
 import * as $stamping_DeployContent from "./islands/stamping/DeployContent.tsx";
+import * as $stamping_FeeEstimation from "./islands/stamping/FeeEstimation.tsx";
 import * as $stamping_MintContent from "./islands/stamping/MintContent.tsx";
 import * as $stamping_OlgaContent from "./islands/stamping/OlgaContent.tsx";
 import * as $stamping_StampingSrc20Header from "./islands/stamping/StampingSrc20Header.tsx";
@@ -238,6 +239,7 @@ const manifest = {
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
     "./islands/stamping/DeployContent.tsx": $stamping_DeployContent,
+    "./islands/stamping/FeeEstimation.tsx": $stamping_FeeEstimation,
     "./islands/stamping/MintContent.tsx": $stamping_MintContent,
     "./islands/stamping/OlgaContent.tsx": $stamping_OlgaContent,
     "./islands/stamping/StampingSrc20Header.tsx": $stamping_StampingSrc20Header,
