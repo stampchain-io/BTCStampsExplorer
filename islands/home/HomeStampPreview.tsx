@@ -51,12 +51,14 @@ export function HomeStampPreview({
     { title: "POSH", type: "posh", stamps: stamps_posh },
     { title: "SRC-721/R", type: "src721", stamps: stamps_src721 },
     { title: "RECENT SALES", type: "recent", stamps: stamps_recent },
-    { title: "SRC-20 Stamps", type: "src20", stamps: stamps_src20 },
+    { title: "SRC-20", type: "src20", stamps: stamps_src20 },
   ];
 
   return (
     <>
-      <h2 class="text-3xl md:text text-left text-[#F5F5F5]">Latest Stamps</h2>
+      <h1 class="text-xl md:text text-left text-[#F5F5F5] mb-2 font-weight-900">
+        LATEST STAMPS
+      </h1>
       <div class="flex flex-col gap-12">
         {sections.map((section) => (
           <StampSection key={section.type} {...section} />
