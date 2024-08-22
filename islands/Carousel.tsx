@@ -60,22 +60,24 @@ const Carousel = (props: CarouselProps) => {
   return (
     <div class={`relative overflow-hidden ${props.class ?? ""}`}>
       {SLIDE_DATA.map((slide, index) => (
-        <div
+        <img
           key={index}
-          class={`absolute w-full h-full transition-opacity duration-500 ${
-            index === currentSlide.value ? "opacity-100" : "opacity-0"
+          src={slide.url}
+          alt={slide.alt}
+          class={`absolute transition-transform duration-500 h-auto object-fit ${
+            index === currentSlide.value
+              ? "left-1/2 -translate-x-1/2 w-[calc(30%+200px)] z-10"
+              : (index === (currentSlide.value - 1 + SLIDE_DATA.length) %
+                  SLIDE_DATA.length
+                ? "left-[16.67%] -translate-x-1/2 top-[100px] w-1/3 z-0"
+                : "left-[83.33%] -translate-x-1/2 top-[100px] w-1/3 z-0")
           }`}
-        >
-          <img
-            src={slide.url}
-            alt={slide.alt}
-            class="w-full h-full object-cover"
-          />
-        </div>
+        />
       ))}
       {SHOW_NAVIGATION && (
         <>
-          <button
+          {
+            /* <button
             onClick={previousSlide}
             class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
           >
@@ -86,14 +88,17 @@ const Carousel = (props: CarouselProps) => {
             class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
           >
             <IconCircleChevronsRight />
-          </button>
-          <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          </button> */
+          }
+          <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
             {SLIDE_DATA.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                class={`w-3 h-3 rounded-full ${
-                  index === currentSlide.value ? "bg-white" : "bg-gray-400"
+                class={`w-[44px] md:w-[88px] h-0 border-2 rounded-[4px] ${
+                  index === currentSlide.value
+                    ? "border-[#7A00F5]"
+                    : "border-[#3F2A4E]"
                 }`}
               />
             ))}
