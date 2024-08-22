@@ -55,8 +55,8 @@ export function HomeStampPreview({
   ];
 
   return (
-    <>
-      <h1 class="text-xl md:text text-left text-[#F5F5F5] mb-2 font-weight-900">
+    <div>
+      <h1 class="text-3xl md:text-6xl text-left mb-10 text-[#F5F5F5] font-black">
         LATEST STAMPS
       </h1>
       <div class="flex flex-col gap-12">
@@ -64,6 +64,6 @@ export function HomeStampPreview({
           <StampSection key={section.type} {...section} />
         ))}
       </div>
-    </>
+    </div>
   );
 }

@@ -102,13 +102,19 @@ export function Header() {
           } flex-col md:flex md:flex-row text-center justify-between`}
           id="navbar-collapse"
         >
-          <img
-            src="/img/header/logo.png"
-            alt="stampchain"
-            className={`${
-              open ? "absolute" : "hidden"
-            } top-12 right-5 w-[178px] h-auto`}
-          />
+          <a
+            href="/home"
+            f-partial={"/home"}
+            className="font-bold text-xl text-indigo-600 block md:hidden"
+          >
+            <img
+              src="/img/header/logo.png"
+              alt="stampchain"
+              className={`${
+                open ? "absolute" : "hidden"
+              } top-12 right-5 w-[178px] h-auto`}
+            />
+          </a>
           <div
             className={`${
               open

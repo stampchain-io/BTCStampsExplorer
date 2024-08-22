@@ -3,7 +3,7 @@ import Carousel from "../Carousel.tsx";
 
 export const HomeCarousel = () => {
   return (
-    <div class="w-full h-[400px]">
+    <div class="w-full h-[300px] md:h-[520px]">
       {IS_BROWSER
         ? (
           <Carousel
