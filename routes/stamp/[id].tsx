@@ -2,7 +2,6 @@ import { StampRow } from "globals";
 import { Handlers } from "$fresh/server.ts";
 import { Stamp } from "$components/Stamp.tsx";
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
-import { StampVaulted } from "$components/stampDetails/StampVaulted.tsx";
 import { StampInfo } from "$components/stampDetails/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 import { StampController } from "$lib/controller/stampController.ts";
@@ -76,7 +75,6 @@ export default function StampPage(props: StampDetailPageProps) {
         <div class="flex flex-col gap-8 justify-between">
           <Stamp stamp={stamp} className="w-full" />
           <StampShare stamp={stamp} />
-          <StampVaulted />
         </div>
         <StampInfo stamp={stamp} />
       </div>
