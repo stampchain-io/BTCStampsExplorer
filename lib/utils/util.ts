@@ -69,7 +69,8 @@ export function abbreviateAddress(address?: string): string {
 }
 
 export function formatSatoshisToBTC(satoshis: number): string {
-  return (satoshis / 100000000).toFixed(8) + " BTC";
+  const btc = (satoshis / 100000000).toFixed(8);
+  return btc.replace(/\.?0+$/, "") + " BTC";
 }
 
 export const getMimeType = (extension: string): string => {
