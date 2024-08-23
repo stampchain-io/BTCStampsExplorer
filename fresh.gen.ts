@@ -14,6 +14,7 @@ import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_
 import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
+import * as $api_v2_cursed_block from "./routes/api/v2/cursed/block.ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
 import * as $api_v2_docs from "./routes/api/v2/docs.ts";
@@ -46,7 +47,7 @@ import * as $collection_index from "./routes/collection/index.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
-import * as $handlers_sharedBlockHandler from "./routes/handlers/sharedBlockHandler.ts";
+import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/sharedBlockWithStampsHandler.ts";
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
 import * as $home_index from "./routes/home/index.tsx";
@@ -129,6 +130,7 @@ const manifest = {
       $api_v2_block_related_block_index_,
     "./routes/api/v2/collections/index.ts": $api_v2_collections_index,
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,
+    "./routes/api/v2/cursed/block.ts": $api_v2_cursed_block,
     "./routes/api/v2/cursed/block/[block_index].ts":
       $api_v2_cursed_block_block_index_,
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
@@ -171,7 +173,8 @@ const manifest = {
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/docs/index.tsx": $docs_index,
-    "./routes/handlers/sharedBlockHandler.ts": $handlers_sharedBlockHandler,
+    "./routes/handlers/sharedBlockWithStampsHandler.ts":
+      $handlers_sharedBlockWithStampsHandler,
     "./routes/handlers/sharedCollectionHandler.ts":
       $handlers_sharedCollectionHandler,
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
