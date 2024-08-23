@@ -291,7 +291,7 @@ export interface Src20SnapshotResponseBody extends Pagination {
 export interface PaginatedBalanceResponseBody extends Pagination {
   last_block: number;
   btc: BtcInfo;
-  data: StampsAndSrc20[];
+  data: StampsAndSrc20;
 }
 
 export interface StampResponseBody {
