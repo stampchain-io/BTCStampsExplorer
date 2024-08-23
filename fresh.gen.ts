@@ -4,9 +4,9 @@
 
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
-import * as $api_404 from "./routes/api/_404.ts";
+import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_bitcoin_notification from "./routes/api/bitcoin-notification.ts";
-import * as $api_v2_404 from "./routes/api/v2/_404.ts";
+import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
 import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index].ts";
@@ -116,9 +116,9 @@ const manifest = {
   routes: {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
-    "./routes/api/_404.ts": $api_404,
+    "./routes/api/[...path].ts": $api_path_,
     "./routes/api/bitcoin-notification.ts": $api_bitcoin_notification,
-    "./routes/api/v2/_404.ts": $api_v2_404,
+    "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
       $api_v2_balance_getStampsBalance,
