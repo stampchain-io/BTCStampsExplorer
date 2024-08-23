@@ -15,6 +15,11 @@ export function StampDispensers(
     }[];
   },
 ) {
+  // TODO: the secondary sort should be by creation date
+  const sortedDispensers = [...dispensers].sort((a, b) =>
+    b.give_remaining - a.give_remaining
+  );
+
   return (
     <div className="relative shadow-md max-w-256">
       <p class="text-[#F5F5F5] text-[26px] font-semibold">
@@ -66,7 +71,7 @@ export function StampDispensers(
             </tr>
           </thead>
           <tbody>
-            {dispensers.map((dispenser) => (
+            {sortedDispensers.map((dispenser) => (
               <tr
                 className="odd:bg-gray-900 even:bg-gray-800"
                 key={dispenser.source}

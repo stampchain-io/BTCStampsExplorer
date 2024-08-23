@@ -1,7 +1,7 @@
 import { StampRow } from "globals";
+const rootUrl = globalThis.location?.origin || "https://stampchain.io";
 
 export function StampShare({ stamp }: { stamp: StampRow }) {
-  const rootUrl = Deno.env.get("BASE_URL") || "";
   return (
     <div class="text-[#F5F5F5] w-full flex flex-col gap-3">
       <p class="text-[26px] font-semibold">Share this stamp:</p>
