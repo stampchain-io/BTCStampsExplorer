@@ -24,6 +24,7 @@ export class Src20Service {
     );
     return result.rows[0].total;
   }
+
   static async fetchAndFormatSrc20Data(
     params: SRC20TrxRequestParams = {},
   ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
@@ -35,17 +36,14 @@ export class Src20Service {
             ? params.tick.map((t) => t.replace(/[^\w-]/g, ""))
             : params.tick.replace(/[^\w-]/g, ""))
           : params.tick,
-        op: params.op ? params.op.replace(/[^\w-]/g, "") : params.op,
+        op: params.op ? params.op.replace(/[^\w-]/g, "") : undefined,
         tx_hash: params.tx_hash
           ? params.tx_hash.replace(/[^\w-]/g, "")
           : params.tx_hash,
       };
 
-      const isDeployQuery = !sanitizedParams.op &&
-        !sanitizedParams.block_index && !sanitizedParams.tx_hash;
       const queryParams: SRC20TrxRequestParams = {
         ...sanitizedParams,
-        op: isDeployQuery ? "DEPLOY" : sanitizedParams.op,
         tick: Array.isArray(sanitizedParams.tick)
           ? sanitizedParams.tick[0]
           : sanitizedParams.tick,
@@ -54,9 +52,9 @@ export class Src20Service {
         sort: sanitizedParams.sort || "ASC",
       };
 
-      // Ensure we're querying for DEPLOY operations
-      if (isDeployQuery || queryParams.op === "DEPLOY") {
-        queryParams.op = "DEPLOY";
+      // Remove the op property if it's undefined
+      if (queryParams.op === undefined) {
+        delete queryParams.op;
       }
 
       const [data, totalResult, lastBlock] = await Promise.all([
