@@ -21,6 +21,7 @@ import * as $api_v2_docs from "./routes/api/v2/docs.ts";
 import * as $api_v2_error from "./routes/api/v2/error.ts";
 import * as $api_v2_health from "./routes/api/v2/health.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
+import * as $api_v2_src20_op_ from "./routes/api/v2/src20/[...op].ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
 import * as $api_v2_src20_balance_snapshot_tick_ from "./routes/api/v2/src20/balance/snapshot/[tick].ts";
@@ -34,6 +35,7 @@ import * as $api_v2_src20_tick_index from "./routes/api/v2/src20/tick/index.ts";
 import * as $api_v2_src20_tx_tx_hash_ from "./routes/api/v2/src20/tx/[tx_hash].ts";
 import * as $api_v2_stamps_id_ from "./routes/api/v2/stamps/[id].ts";
 import * as $api_v2_stamps_balance_address_ from "./routes/api/v2/stamps/balance/[address].tsx";
+import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
 import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block/[block_index].ts";
 import * as $api_v2_stamps_dispensers_id_ from "./routes/api/v2/stamps/dispensers/[id].ts";
 import * as $api_v2_stamps_dispensers_index from "./routes/api/v2/stamps/dispensers/index.ts";
@@ -138,6 +140,7 @@ const manifest = {
     "./routes/api/v2/error.ts": $api_v2_error,
     "./routes/api/v2/health.ts": $api_v2_health,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
+    "./routes/api/v2/src20/[...op].ts": $api_v2_src20_op_,
     "./routes/api/v2/src20/balance/[address].ts":
       $api_v2_src20_balance_address_,
     "./routes/api/v2/src20/balance/[address]/[tick].ts":
@@ -158,6 +161,7 @@ const manifest = {
     "./routes/api/v2/stamps/[id].ts": $api_v2_stamps_id_,
     "./routes/api/v2/stamps/balance/[address].tsx":
       $api_v2_stamps_balance_address_,
+    "./routes/api/v2/stamps/block.ts": $api_v2_stamps_block,
     "./routes/api/v2/stamps/block/[block_index].ts":
       $api_v2_stamps_block_block_index_,
     "./routes/api/v2/stamps/dispensers/[id].ts": $api_v2_stamps_dispensers_id_,

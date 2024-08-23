@@ -29,13 +29,25 @@ export class SRC20Repository {
     const whereConditions = [];
 
     if (tick !== null) {
-      whereConditions.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
-      queryParams.push(tick);
+      if (Array.isArray(tick)) {
+        whereConditions.push(
+          `tick IN (${tick.map(() => "?").join(", ")})`,
+        );
+        queryParams.push(...tick);
+      } else {
+        whereConditions.push(`tick = ?`);
+        queryParams.push(tick);
+      }
     }
 
     if (op !== null) {
-      whereConditions.push(`op = ?`);
-      queryParams.push(op);
+      if (Array.isArray(op)) {
+        whereConditions.push(`op IN (${op.map(() => "?").join(", ")})`);
+        queryParams.push(...op);
+      } else {
+        whereConditions.push(`op = ?`);
+        queryParams.push(op);
+      }
     }
 
     if (block_index !== null) {
@@ -105,8 +117,14 @@ export class SRC20Repository {
     }
 
     if (op !== undefined) {
-      whereConditions.push(`src20.op = ?`);
-      queryParams.push(op);
+      if (Array.isArray(op)) {
+        const opPlaceholders = op.map(() => "?").join(", ");
+        whereConditions.push(`src20.op IN (${opPlaceholders})`);
+        queryParams.push(...op);
+      } else {
+        whereConditions.push(`src20.op = ?`);
+        queryParams.push(op);
+      }
     }
 
     if (tx_hash !== undefined) {

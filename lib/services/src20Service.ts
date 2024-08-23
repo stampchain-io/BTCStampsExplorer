@@ -36,7 +36,11 @@ export class Src20Service {
             ? params.tick.map((t) => t.replace(/[^\w-]/g, ""))
             : params.tick.replace(/[^\w-]/g, ""))
           : params.tick,
-        op: params.op ? params.op.replace(/[^\w-]/g, "") : undefined,
+        op: Array.isArray(params.op)
+          ? params.op.map((o) => o.replace(/[^\w-]/g, ""))
+          : params.op
+          ? params.op.replace(/[^\w-]/g, "")
+          : undefined,
         tx_hash: params.tx_hash
           ? params.tx_hash.replace(/[^\w-]/g, "")
           : params.tx_hash,
