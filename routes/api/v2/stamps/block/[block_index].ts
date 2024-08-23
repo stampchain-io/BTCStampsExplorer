@@ -1,3 +1,3 @@
-import { sharedBlockHandler } from "$handlers/sharedBlockHandler.ts";
+import { sharedBlockWithStampsHandler } from "$routes/handlers/sharedBlockWithStampsHandler.ts";
 
-export const handler = sharedBlockHandler;
+export const handler = sharedBlockWithStampsHandler;
