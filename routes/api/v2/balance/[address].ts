@@ -1,46 +1,42 @@
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { FreshContext } from "$fresh/server.ts";
-import { SRC20TrxRequestParams } from "globals";
-
+import { AddressHandlerContext, PaginatedBalanceResponseBody } from "globals";
 export const handler = async (
   req: Request,
-  _ctx: FreshContext,
+  ctx: FreshContext<AddressHandlerContext>,
 ): Promise<Response> => {
   try {
+    const { address } = ctx.params;
     const url = new URL(req.url);
     const page = Number(url.searchParams.get("page")) || 1;
-    const limit = Number(url.searchParams.get("limit")) || 11;
-    const sortBy = url.searchParams.get("sortBy") || "ASC";
+    const limit = Number(url.searchParams.get("limit")) || 50;
 
-    const params: SRC20TrxRequestParams = {
-      op: "DEPLOY",
-      page,
+    const result = await Src20Controller.handleWalletBalanceRequest(
+      address,
       limit,
-      sort: sortBy,
-    };
-
-    const result = await Src20Controller.handleSrc20TransactionsRequest(
-      req,
-      params,
+      page,
     );
     const resultData = await result.json();
 
-    const formattedData = {
-      src20s: resultData.data || [],
-      total: resultData.total || 0,
-      page: resultData.page || page,
-      totalPages: resultData.totalPages || 1,
-      limit: resultData.limit || limit,
-      last_block: resultData.last_block || 0,
-      filterBy: [],
-      sortBy: sortBy,
+    console.log("Debug: resultData", JSON.stringify(resultData, null, 2));
+
+    const responseBody: PaginatedBalanceResponseBody = {
+      page: resultData.pagination.page,
+      limit: resultData.pagination.limit,
+      totalPages: resultData.pagination.totalPages,
+      total: resultData.pagination.totalItems,
+      last_block: resultData.last_block,
+      btc: resultData.btc,
+      data: resultData.data,
     };
 
-    return new Response(JSON.stringify(formattedData), {
+    console.log("Debug: responseBody", JSON.stringify(responseBody, null, 2));
+
+    return new Response(JSON.stringify(responseBody), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error in src20/tick handler:", error);
+    console.error("Error in balance/[address] handler:", error);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
