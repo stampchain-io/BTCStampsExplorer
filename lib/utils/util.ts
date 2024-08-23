@@ -68,6 +68,10 @@ export function abbreviateAddress(address?: string): string {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
+export function formatSatoshisToBTC(satoshis: number): string {
+  return (satoshis / 100000000).toFixed(8) + " BTC";
+}
+
 export const getMimeType = (extension: string): string => {
   const normalizedExt = extension.toLowerCase();
 
