@@ -1,7 +1,6 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
-
-import { abbreviateAddress } from "utils/util.ts";
+import { formatSatoshisToBTC } from "utils/util.ts";
 
 dayjs.extend(relativeTime);
 
@@ -10,6 +9,8 @@ export function StampDispensers(
     dispensers: {
       source: string;
       give_remaining: number;
+      escrow_quantity: number;
+      give_quantity: number;
       satoshirate: number;
     }[];
   },
@@ -51,10 +52,16 @@ export function StampDispensers(
                 Address
               </th>
               <th scope="col" className="px-6 py-3">
+                Escrow Qty
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Give Qty
+              </th>
+              <th scope="col" className="px-6 py-3">
                 Remaining
               </th>
               <th scope="col" className="px-6 py-3">
-                Price (satoshis)
+                Price (BTC)
               </th>
             </tr>
           </thead>
@@ -65,12 +72,22 @@ export function StampDispensers(
                 key={dispenser.source}
               >
                 <td className="px-6 py-4">
-                  {abbreviateAddress(dispenser.source)}
+                  {/* TODO: this should popup perhaps with a barcode (or construct a trx for the wallet) similar to https://tokenscan.io/tx/0b4f6ad4eb97760cdd6bd70cc533f04030411f9fa13241ca2da53af32de0e121 */}
+                  {dispenser.source}
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  {dispenser.escrow_quantity}
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  {dispenser.give_quantity}
                 </td>
                 <td className="px-6 py-4 text-sm">
                   {dispenser.give_remaining}
                 </td>
-                <td className="px-6 py-4 text-sm">{dispenser.satoshirate}</td>
+                <td className="px-6 py-4 text-sm">
+                  {/* TODO: display USD price as well */}
+                  {formatSatoshisToBTC(dispenser.satoshirate)}
+                </td>
               </tr>
             ))}
           </tbody>
