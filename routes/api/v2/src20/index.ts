@@ -9,8 +9,6 @@ export const handler: Handlers = {
         req,
         {},
       );
-
-      // Since result is already a Response, we can return it directly
       return result;
     } catch (error) {
       return ResponseUtil.handleError(error, "Error processing request");

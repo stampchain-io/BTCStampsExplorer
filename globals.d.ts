@@ -202,8 +202,8 @@ export interface PaginatedRequest extends Request {
 
 export interface SRC20TrxRequestParams {
   block_index?: number | null;
-  tick?: string | null;
-  op?: string | null;
+  tick?: string | string[] | null;
+  op?: string | string[] | null;
   limit?: number;
   page?: number;
   sort?: string;
