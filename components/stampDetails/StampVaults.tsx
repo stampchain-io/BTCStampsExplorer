@@ -20,16 +20,16 @@ export function StampVaults(
           <thead className="text-lg font-semibold uppercase text-[#C184FF] bg-[#2B0E49] border-b border-gray-700">
             <tr>
               <th scope="col" className="px-6 py-3">
-                From
+                Image
               </th>
               <th scope="col" className="px-6 py-3">
-                To
+                Details
               </th>
               <th scope="col" className="px-6 py-3">
                 Quantity
               </th>
               <th scope="col" className="px-6 py-3">
-                Price (satoshis)
+                Link
               </th>
             </tr>
           </thead>
