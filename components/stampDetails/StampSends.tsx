@@ -11,7 +11,9 @@ import { SendRow } from "globals";
 export function StampSends({ sends }: { sends: SendRow[] }) {
   return (
     <div className="relative shadow-md max-w-256">
-      <p class="text-[#F5F5F5] text-[26px] font-semibold">Transfers</p>
+      <p class="text-[#F5F5F5] text-[26px] font-semibold">
+        Transfers ({sends.length})
+      </p>
       <div className="max-h-96 overflow-x-auto">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:rounded-lg">
           <thead className="text-lg font-bold text-[#C184FF] uppercase bg-[#2B0E49] border-b dark:border-gray-700">

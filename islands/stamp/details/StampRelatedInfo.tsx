@@ -33,14 +33,6 @@ export function StampRelatedInfo(
             Dispensers
           </p>
           <p
-            class={selectedTab === "holders"
-              ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-              : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-            onClick={() => setSelectedTab("holders")}
-          >
-            Holders
-          </p>
-          <p
             class={selectedTab === "sales"
               ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
               : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
@@ -48,6 +40,15 @@ export function StampRelatedInfo(
           >
             Sales
           </p>
+          <p
+            class={selectedTab === "holders"
+              ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
+              : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
+            onClick={() => setSelectedTab("holders")}
+          >
+            Holders
+          </p>
+
           <p
             class={selectedTab === "transfers"
               ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
@@ -69,8 +70,8 @@ export function StampRelatedInfo(
       {selectedTab === "dispensers" && (
         <StampDispensers dispensers={dispensers} />
       )}
-      {selectedTab === "holders" && <StampHolders holders={holders} />}
       {selectedTab === "sales" && <StampSales dispenses={dispensesWithRates} />}
+      {selectedTab === "holders" && <StampHolders holders={holders} />}
       {selectedTab === "transfers" && <StampSends sends={sends} />}
       {selectedTab === "vaults" && <StampVaults vaults={[]} />}
     </>

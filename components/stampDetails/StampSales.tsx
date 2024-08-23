@@ -1,4 +1,5 @@
 import { abbreviateAddress } from "utils/util.ts";
+import { formatSatoshisToBTC } from "utils/util.ts";
 
 export function StampSales(
   { dispenses }: {
@@ -56,7 +57,7 @@ export function StampSales(
                 Quantity
               </th>
               <th scope="col" className="px-6 py-3">
-                Price (satoshis)
+                Price (BTC)
               </th>
             </tr>
           </thead>
@@ -67,15 +68,25 @@ export function StampSales(
                 key={index}
               >
                 <td className="px-6 py-4">
-                  {abbreviateAddress(dispense.source)}
+                  <a
+                    href={`/wallet/${dispense.source}`}
+                  >
+                    {abbreviateAddress(dispense.source)}
+                  </a>
                 </td>
                 <td className="px-6 py-4">
-                  {abbreviateAddress(dispense.destination)}
+                  <a
+                    href={`/wallet/${dispense.destination}`}
+                  >
+                    {abbreviateAddress(dispense.destination)}
+                  </a>
                 </td>
                 <td className="px-6 py-4 text-sm">
                   {dispense.dispense_quantity}
                 </td>
-                <td className="px-6 py-4 text-sm">{dispense.satoshirate}</td>
+                <td className="px-6 py-4 text-sm">
+                  {formatSatoshisToBTC(dispense.satoshirate)}
+                </td>
               </tr>
             ))}
           </tbody>
