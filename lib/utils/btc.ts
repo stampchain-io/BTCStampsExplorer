@@ -1,5 +1,3 @@
-import { fetch_quicknode } from "./quicknode.ts";
-
 export const getBtcBalance = async (address: string) => {
   const utxos = await fetch(
     `https://mempool.space/api/address/${address}/utxo`,
@@ -29,12 +27,26 @@ async function getBtcAddressInfoFromMempool(address: string) {
 }
 
 async function getBtcAddressInfoFromQuickNode(address: string) {
-  const balance = await fetch_quicknode("getbalance", [address]);
-  const unconfirmedBalance = await fetch_quicknode("getunconfirmedbalance", [
+  const fetchQuickNode = async (name: string, params: any[]) => {
+    const response = await fetch("/api/quicknode/getPrice", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, params }),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  };
+
+  const balance = await fetchQuickNode("getbalance", [address]);
+  const unconfirmedBalance = await fetchQuickNode("getunconfirmedbalance", [
     address,
   ]);
-  const txCount = await fetch_quicknode("getreceivedbyaddress", [address, 0]);
-  const unconfirmedTxCount = await fetch_quicknode("getunconfirmedbalance", [
+  const txCount = await fetchQuickNode("getreceivedbyaddress", [address, 0]);
+  const unconfirmedTxCount = await fetchQuickNode("getunconfirmedbalance", [
     address,
   ]);
 
