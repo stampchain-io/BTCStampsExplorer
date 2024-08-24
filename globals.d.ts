@@ -220,6 +220,7 @@ export interface SRC20BalanceRequestParams {
   limit?: number;
   page?: number;
   sort?: string;
+  includePagination?: boolean;
 }
 
 // Response Types --------------------------------------------------------------
@@ -282,10 +283,12 @@ export interface PaginatedSrc20BalanceResponseBody extends Pagination {
 export interface Src20BalanceResponseBody {
   last_block: number;
   data: SRC20Balance;
+  pagination?: Pagination;
 }
 export interface Src20SnapshotResponseBody extends Pagination {
   snapshot_block: number;
   data: Src20SnapShotDetail[];
+  pagination?: Pagination;
 }
 
 export interface PaginatedBalanceResponseBody extends Pagination {
