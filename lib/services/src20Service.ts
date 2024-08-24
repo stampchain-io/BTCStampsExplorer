@@ -100,47 +100,63 @@ export class Src20Service {
     }
   }
 
-  static async fetchAndFormatSrc20Balance(
-    params: SRC20BalanceRequestParams,
-  ): Promise<Src20BalanceResponseBody> {
+  static async fetchAllSrc20DataForTick(tick: string) {
     try {
-      const [src20, lastBlock] = await Promise.all([
-        SRC20Repository.getSrc20BalanceFromDb(params),
-        BlockService.getLastBlock(),
-      ]);
-
-      if (!src20) {
-        throw new Error("SRC20 balance not found");
-      }
-
-      return {
-        last_block: lastBlock.last_block,
-        data: src20,
+      const params: SRC20TrxRequestParams = {
+        tick,
+        op: ["DEPLOY", "MINT", "TRANSFER"],
+        sort: "DESC",
       };
+
+      const result = await SRC20Repository.getValidSrc20TxFromDb(params);
+
+      const deployment = result.rows.find((row) => row.op === "DEPLOY");
+      const mints = result.rows.filter((row) => row.op === "MINT");
+      const transfers = result.rows.filter((row) => row.op === "TRANSFER");
+
+      return { deployment, mints, transfers };
     } catch (error) {
-      console.error("Error in fetchAndFormatSrc20Balance:", error);
-      console.error("Params:", params);
+      console.error("Error in fetchAllSrc20DataForTick:", error);
       throw error;
     }
   }
 
-  static async fetchSingleSrc20Balance(
-    address: string,
-    tick: string,
+  static async fetchSrc20Balance(
+    params: SRC20BalanceRequestParams,
   ): Promise<Src20BalanceResponseBody> {
-    const [src20, lastBlock] = await Promise.all([
-      SRC20Repository.getSrc20BalanceFromDb({ address, tick }),
-      BlockService.getLastBlock(),
-    ]);
+    try {
+      const [src20, lastBlock, totalCount] = await Promise.all([
+        SRC20Repository.getSrc20BalanceFromDb(params),
+        BlockService.getLastBlock(),
+        params.includePagination
+          ? SRC20Repository.getTotalSrc20BalanceCount(params)
+          : Promise.resolve(0),
+      ]);
 
-    if (!src20 || src20.length === 0) {
-      throw new Error("SRC20 balance not found");
+      if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
+        throw new Error("SRC20 balance not found");
+      }
+
+      const response: Src20BalanceResponseBody = {
+        last_block: lastBlock.last_block,
+        data: params.address && params.tick ? src20[0] : src20,
+      };
+
+      if (params.includePagination) {
+        response.pagination = {
+          page: params.page || 1,
+          limit: params.limit || 10,
+          total: totalCount,
+          totalPages: Math.ceil(totalCount / (params.limit || 10)),
+        };
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error in fetchSrc20Balance:", error);
+      console.error("Params:", params);
+      throw error;
     }
-
-    return {
-      last_block: lastBlock.last_block,
-      data: src20[0],
-    };
   }
 
   static async fetchAndFormatSrc20Snapshot(
@@ -149,7 +165,10 @@ export class Src20Service {
     const [src20, lastBlock, total] = await Promise.all([
       SRC20Repository.getSrc20BalanceFromDb(params),
       BlockService.getLastBlock(),
-      SRC20Repository.getTotalSrc20HoldersByTickFromDb(params.tick, params.amt),
+      SRC20Repository.getTotalSrc20BalanceCount({
+        tick: params.tick,
+        amt: params.amt,
+      }),
     ]);
 
     const data = src20

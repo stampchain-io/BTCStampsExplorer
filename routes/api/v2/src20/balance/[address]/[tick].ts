@@ -8,8 +8,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
     const params = {
       address,
       tick: tick.toString(),
-      limit: 1,
-      page: 1,
+      includePagination: false,
     };
     return await Src20Controller.handleSrc20BalanceRequest(params);
   },

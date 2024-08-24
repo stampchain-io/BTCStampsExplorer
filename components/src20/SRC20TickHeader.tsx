@@ -6,11 +6,18 @@ interface SRC20TickHeaderProps {
   mint_status: any;
   total_holders: number;
   total_mints: number;
-  total_sends: number;
+  total_transfers: number;
 }
+
 export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
-  const { deployment, mint_status, total_holders, total_mints, total_sends } =
-    props;
+  const {
+    deployment,
+    mint_status,
+    total_holders,
+    total_mints,
+    total_transfers,
+  } = props;
+
   return (
     <>
       <div class="flex justify-between items-end gap-6 border-b-2 pb-3 border-[#3F2A4E]">
@@ -33,8 +40,7 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
             <p class="text-5xl uppercase text-[#7A00F5]">
               {convertToEmoji(deployment.tick)}
             </p>
-            <p>
-            </p>
+            <p></p>
           </div>
           <hr class="border-[#3F2A4E] border-2" />
           <div class="flex flex-col gap-3">
@@ -54,14 +60,14 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
               </div>
               <div class="flex items-center justify-center">
                 <div class="flex flex-col">
-                  <p class="text-2xl font-semibold">{total_sends}</p>
+                  <p class="text-2xl font-semibold">{total_transfers}</p>
                   <p class="text-base">Total Sends</p>
                 </div>
               </div>
               <div class="flex items-center justify-end">
                 <div class="flex flex-col">
                   <p class="text-2xl font-semibold">
-                    {total_sends + total_mints}
+                    {total_transfers + total_mints}
                   </p>
                   <p class="text-base">TXs</p>
                 </div>
@@ -81,15 +87,15 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
                 </div>
               </div>
               <div class="border-r border-[#3F2A4E] border-2"></div>
-              <div class="w-2/5 flex items-center justify-center">
+              <div class="w-1/3 flex items-center justify-center">
                 <div class="flex flex-col">
                   <p class="text-2xl font-semibold">{deployment.block_index}</p>
-                  <p class="text-base">Block</p>
+                  <p class="text-base">Deploy Block</p>
                 </div>
               </div>
               <div class="border-r border-[#3F2A4E] border-2"></div>
               <div class="w-1/3 flex items-center justify-end">
-                <div class="flex flex-col">
+                <div class="flex flex-col items-end">
                   <p class="text-2xl font-semibold">
                     {new Date(deployment.block_time).toLocaleString("default", {
                       month: "short",
@@ -108,7 +114,7 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
                 </div>
               </div>
               <div class="border-r border-[#3F2A4E] border-2"></div>
-              <div class="w-2/5 flex items-center justify-center">
+              <div class="w-1/3 flex items-center justify-center">
                 <div class="flex flex-col">
                   <p class="text-2xl font-semibold">{total_holders}</p>
                   <p class="text-base">Total Holders</p>
@@ -116,7 +122,7 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
               </div>
               <div class="border-r border-[#3F2A4E] border-2"></div>
               <div class="w-1/3 flex items-center justify-end">
-                <div class="flex flex-col">
+                <div class="flex flex-col items-end">
                   <p class="text-2xl font-semibold">{mint_status.progress}%</p>
                   <p class="text-base">Total minted</p>
                 </div>
