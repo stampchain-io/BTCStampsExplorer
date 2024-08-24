@@ -90,7 +90,7 @@ const Carousel = (props: CarouselProps) => {
             <IconCircleChevronsRight />
           </button> */
           }
-          <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+          <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-[19]">
             {SLIDE_DATA.map((_, index) => (
               <button
                 key={index}

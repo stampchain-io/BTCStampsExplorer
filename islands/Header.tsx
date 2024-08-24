@@ -60,6 +60,10 @@ export function Header() {
           <a
             href="/home"
             f-partial={"/home"}
+            onClick={() => {
+              toggleMenu();
+              setCurrentPath("collection");
+            }}
             className="font-bold text-xl text-indigo-600 hidden md:block"
           >
             <img
@@ -105,6 +109,10 @@ export function Header() {
           <a
             href="/home"
             f-partial={"/home"}
+            onClick={() => {
+              toggleMenu();
+              setCurrentPath("collection");
+            }}
             className="font-bold text-xl text-indigo-600 block md:hidden"
           >
             <img

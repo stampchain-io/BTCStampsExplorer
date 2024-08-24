@@ -18,10 +18,16 @@ export function FeeEstimation(
   const [txfee, setTxfee] = useState(0.001285);
   const [mintfee, setMintfee] = useState(0.00000);
   const [dust, setDust] = useState(0.000113);
-  const [total, setTotal] = useState(0.001547);
+  const [total, setTotal] = useState(0.0);
 
   const [coinType, setCoinType] = useState("BTC");
   const [BTCPrice, setBTCPrice] = useState(60000);
+
+  useEffect(() => {
+    const _total = (fileSize ? fee * fileSize / 100000000 : 0) + txfee +
+      mintfee + dust;
+    setTotal(_total);
+  }, [fee, fileSize, mintfee, dust]);
 
   useEffect(() => {
     const func = async () => {
@@ -183,7 +189,7 @@ export function FeeEstimation(
                 <p>{(fee / 10.0).toFixed(2)}</p>
               </div>
             )}
-            {type === "stamp" &&
+            {(type === "stamp" || type === "src20-deploy") &&
               (
                 <>
                   <div class="flex flex-col md:flex-row justify-between md:gap-8">
