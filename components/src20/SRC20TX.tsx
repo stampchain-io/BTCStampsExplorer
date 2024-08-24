@@ -1,5 +1,4 @@
-import { abbreviateAddress } from "utils/util.ts";
-
+import { abbreviateAddress, stripTrailingZeros } from "utils/util.ts";
 interface SRC20TXProps {
   txs: unknown[];
   type: "TRANSFER" | "MINT";
@@ -33,7 +32,7 @@ export const SRC20TX = (props: SRC20TXProps) => {
                     {abbreviateAddress(tx.destination)}
                   </td>
                   <td class="px-6 py-4">
-                    {tx.amt}
+                    {stripTrailingZeros(tx.amt)}
                   </td>
                 </tr>
               );
@@ -65,7 +64,7 @@ export const SRC20TX = (props: SRC20TXProps) => {
                     {abbreviateAddress(tx.destination)}
                   </td>
                   <td class="px-6 py-4">
-                    {tx.amt}
+                    {stripTrailingZeros(tx.amt)}
                   </td>
                 </tr>
               );

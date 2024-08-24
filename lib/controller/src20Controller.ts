@@ -36,17 +36,22 @@ export class Src20Controller {
     }
   }
 
+  static async handleAllSrc20DataForTickRequest(tick: string) {
+    try {
+      const allData = await Src20Service.fetchAllSrc20DataForTick(tick);
+      return ResponseUtil.success(allData);
+    } catch (error) {
+      console.error("Error processing all SRC20 data request for tick:", error);
+      return ResponseUtil.error(
+        `Error: Internal server error. ${error.message || ""}`,
+        500,
+      );
+    }
+  }
+
   static async handleSrc20BalanceRequest(params: SRC20BalanceRequestParams) {
     try {
-      let responseBody;
-      if (params.address && params.tick) {
-        responseBody = await Src20Service.fetchSingleSrc20Balance(
-          params.address,
-          params.tick,
-        );
-      } else {
-        responseBody = await Src20Service.fetchAndFormatSrc20Balance(params);
-      }
+      const responseBody = await Src20Service.fetchSrc20Balance(params);
       return ResponseUtil.success(responseBody);
     } catch (error) {
       console.error("Error processing SRC20 balance request:", error);
@@ -146,7 +151,7 @@ export class Src20Controller {
         pagination: {
           page,
           limit,
-          totalItems,
+          total: totalItems,
           totalPages,
         },
         last_block: src20Data.last_block || lastBlockData?.last_block || 0,
