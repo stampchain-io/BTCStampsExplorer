@@ -1,6 +1,9 @@
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
+import { useFeePolling } from "hooks/useFeePolling.tsx";
 
 export default function BlockTransactions() {
+  const { fees } = useFeePolling();
+
   const [isExpanded, setIsExpanded] = useState(true);
 
   const handleExpand = () => {
@@ -43,7 +46,10 @@ export default function BlockTransactions() {
                   </p>
                   <div className="text-center flex flex-col items-center">
                     <p className="text-[#6E6E6E]">
-                      <span className="text-2xl text-white">6</span> sat/vB
+                      <span className="text-2xl text-white">
+                        {fees?.minimumFee}
+                      </span>{" "}
+                      sat/vB
                     </p>
                     <hr className="border-[#6E6E6E] w-[80px]" />
                     <p className="text-[#2E9C3B]">$0.58</p>
@@ -55,7 +61,10 @@ export default function BlockTransactions() {
                   </p>
                   <div className="text-center flex flex-col items-center">
                     <p className="text-[#6E6E6E]">
-                      <span className="text-2xl text-white">26</span> sat/vB
+                      <span className="text-2xl text-white">
+                        {fees?.hourFee}
+                      </span>{" "}
+                      sat/vB
                     </p>
                     <hr className="border-[#6E6E6E] w-[80px]" />
                     <p className="text-[#2E9C3B]">$2.53</p>
@@ -67,7 +76,10 @@ export default function BlockTransactions() {
                   </p>
                   <div className="text-center flex flex-col items-center">
                     <p className="text-[#6E6E6E]">
-                      <span className="text-2xl text-white">27</span> sat/vB
+                      <span className="text-2xl text-white">
+                        {fees?.halfHourFee}
+                      </span>{" "}
+                      sat/vB
                     </p>
                     <hr className="border-[#6E6E6E] w-[80px]" />
                     <p className="text-[#2E9C3B]">$2.63</p>
@@ -79,7 +91,10 @@ export default function BlockTransactions() {
                   </p>
                   <div className="text-center flex flex-col items-center">
                     <p className="text-[#6E6E6E]">
-                      <span className="text-2xl text-white">28</span> sat/vB
+                      <span className="text-2xl text-white">
+                        {fees?.fastestFee}
+                      </span>{" "}
+                      sat/vB
                     </p>
                     <hr className="border-[#6E6E6E] w-[80px]" />
                     <p className="text-[#2E9C3B]">$2.72</p>
