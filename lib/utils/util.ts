@@ -70,7 +70,18 @@ export function abbreviateAddress(address?: string): string {
 
 export function formatSatoshisToBTC(satoshis: number): string {
   const btc = (satoshis / 100000000).toFixed(8);
-  return btc.replace(/\.?0+$/, "") + " BTC";
+  return stripTrailingZeros(btc) + " BTC";
+}
+
+export function stripTrailingZeros(num: number | string): string {
+  const str = num.toString();
+  const parts = str.split(".");
+  if (parts.length === 1) {
+    return str; // No decimal point, return as is
+  }
+  const integerPart = parts[0];
+  const decimalPart = parts[1].replace(/0+$/, "");
+  return decimalPart.length > 0 ? `${integerPart}.${decimalPart}` : integerPart;
 }
 
 export const getMimeType = (extension: string): string => {

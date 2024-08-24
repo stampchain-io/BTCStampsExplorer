@@ -88,8 +88,8 @@ export class SRC20Repository {
       block_index,
       tick,
       op,
-      limit = BIG_LIMIT,
-      page = 1,
+      limit,
+      page,
       sort = "ASC",
       tx_hash,
       address,
@@ -97,6 +97,8 @@ export class SRC20Repository {
 
     const queryParams = [];
     const whereConditions = [];
+    let limitOffsetClause = "";
+    let offset = 0;
 
     if (block_index !== undefined) {
       whereConditions.push(`src20.block_index = ?`);
@@ -107,11 +109,11 @@ export class SRC20Repository {
       if (Array.isArray(tick)) {
         const tickPlaceholders = tick.map(() => "?").join(", ");
         whereConditions.push(
-          `src20.tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})`,
+          `src20.tick IN (${tickPlaceholders})`,
         );
         queryParams.push(...tick);
       } else {
-        whereConditions.push(`src20.tick COLLATE utf8mb4_0900_as_ci = ?`);
+        whereConditions.push(`src20.tick = ?`);
         queryParams.push(tick);
       }
     }
@@ -136,13 +138,18 @@ export class SRC20Repository {
       whereConditions.push(`(src20.creator = ? OR src20.destination = ?)`);
       queryParams.push(address, address);
     }
-    const safePage = Math.max(1, Number(page));
-    const safeLimit = Number(limit) || BIG_LIMIT;
-    const offset = safeLimit * (safePage - 1);
 
     const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
       ? sort.toUpperCase()
       : "ASC";
+
+    if (limit !== undefined) {
+      const safePage = Math.max(1, Number(page || 1));
+      const safeLimit = Number(limit);
+      offset = safeLimit * (safePage - 1);
+      limitOffsetClause = `LIMIT ? OFFSET ?`;
+      queryParams.push(safeLimit, offset);
+    }
 
     const sqlQuery = `
       SELECT 
@@ -174,12 +181,10 @@ export class SRC20Repository {
     }
       ORDER BY 
         src20.tx_index ${validOrder}
-      LIMIT ? OFFSET ?;
+      ${limitOffsetClause};
     `;
 
     queryParams.unshift(offset);
-
-    queryParams.push(safeLimit, offset);
 
     return await dbManager.executeQueryWithCache(
       sqlQuery,
@@ -191,9 +196,17 @@ export class SRC20Repository {
   static async getSrc20BalanceFromDb(
     params: Partial<SRC20BalanceRequestParams & SRC20SnapshotRequestParams>,
   ) {
-    const { address, tick, amt, limit, page, sort: sortBy = "ASC" } = params;
+    const {
+      address,
+      tick,
+      limit,
+      page,
+      sort: sortBy = "DESC",
+      sortField = "amt",
+    } = params;
     const queryParams = [];
     const whereClauses = [];
+    whereClauses.push(`amt > 0`);
 
     if (address) {
       whereClauses.push(`address = ?`);
@@ -204,36 +217,39 @@ export class SRC20Repository {
       if (Array.isArray(tick)) {
         const tickPlaceholders = tick.map(() => "?").join(", ");
         whereClauses.push(
-          `tick COLLATE utf8mb4_0900_as_ci IN (${tickPlaceholders})`,
+          `tick IN (${tickPlaceholders})`,
         );
         queryParams.push(...tick);
       } else {
-        whereClauses.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
+        whereClauses.push(`tick = ?`);
         queryParams.push(tick);
       }
     }
 
-    if (amt && amt > 0) {
-      whereClauses.push(`amt > ?`);
-      queryParams.push(amt);
-    }
-
-    const offset = limit && page ? Number(limit) * (Number(page) - 1) : 0;
-    if (limit) {
-      queryParams.push(limit, offset);
+    let limitOffsetClause = "";
+    if (limit !== undefined) {
+      const safePage = Math.max(1, Number(page || 1));
+      const safeLimit = Number(limit);
+      const offset = safeLimit * (safePage - 1);
+      limitOffsetClause = "LIMIT ? OFFSET ?";
+      queryParams.push(safeLimit, offset);
     }
 
     const validOrder = ["ASC", "DESC"].includes(sortBy.toUpperCase())
       ? sortBy.toUpperCase()
-      : "ASC";
+      : "DESC";
+
+    const validSortField = ["amt", "last_update"].includes(sortField)
+      ? sortField
+      : "amt";
 
     const sqlQuery = `
-      SELECT address, p, tick, amt, block_time, last_update
-      FROM ${SRC20_BALANCE_TABLE}
-      ${whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : ""}
-      ORDER BY last_update ${validOrder}
-      ${limit ? `LIMIT ? OFFSET ?` : ""}
-    `;
+    SELECT address, p, tick, amt, block_time, last_update
+    FROM ${SRC20_BALANCE_TABLE}
+    ${whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : ""}
+    ORDER BY ${validSortField} ${validOrder}, amt DESC
+    ${limitOffsetClause}
+  `;
 
     const results = await dbManager.executeQueryWithCache(
       sqlQuery,
@@ -271,37 +287,50 @@ export class SRC20Repository {
     return resultsWithDeployImg;
   }
 
-  static async getTotalSrc20HoldersByTickFromDb(
-    tick: string | null = null,
-    amt = 0,
-  ) {
+  static async getTotalSrc20BalanceCount(
+    params: Partial<SRC20BalanceRequestParams & SRC20SnapshotRequestParams>,
+  ): Promise<number> {
+    const { address, tick, amt = 0 } = params;
     const queryParams = [];
     const whereConditions = [];
 
-    if (tick !== null) {
-      whereConditions.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
-      queryParams.push(tick);
+    if (address) {
+      whereConditions.push(`address = ?`);
+      queryParams.push(address);
     }
 
-    // Always include amt condition
+    if (tick) {
+      if (Array.isArray(tick)) {
+        const tickPlaceholders = tick.map(() => "?").join(", ");
+        whereConditions.push(
+          `tick IN (${tickPlaceholders})`,
+        );
+        queryParams.push(...tick);
+      } else {
+        whereConditions.push(`tick = ?`);
+        queryParams.push(tick);
+      }
+    }
+
+    // Always include amt condition, as in the original method
     whereConditions.push(`amt > ?`);
     queryParams.push(amt);
 
-    let sqlQuery = `
-      SELECT COUNT(*) AS total
-      FROM ${SRC20_BALANCE_TABLE}
-    `;
-
-    // Add WHERE clause if there are conditions
-    if (whereConditions.length > 0) {
-      sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
+    const sqlQuery = `
+        SELECT COUNT(*) AS total
+        FROM ${SRC20_BALANCE_TABLE}
+        ${
+      whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""
     }
+      `;
 
-    return await dbManager.executeQueryWithCache(
+    const result = await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2,
+      1000 * 60 * 2, // Cache duration: 2 minutes
     );
+
+    return result.rows[0].total;
   }
 
   static async getSrc20MintProgressByTickFromDb(

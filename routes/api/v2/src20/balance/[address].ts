@@ -14,6 +14,7 @@ export const handler: Handlers<AddressHandlerContext> = {
       page: Number(params.get("page")) || 1,
       amt: Number(params.get("amt")) || 0,
       sort: params.get("sort") || "ASC",
+      includePagination: params.get("includePagination") !== "false",
     };
 
     return await Src20Controller.handleSrc20BalanceRequest(balanceParams);
