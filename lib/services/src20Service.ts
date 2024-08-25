@@ -162,31 +162,39 @@ export class Src20Service {
   static async fetchAndFormatSrc20Snapshot(
     params: SRC20SnapshotRequestParams,
   ): Promise<Src20SnapshotResponseBody> {
-    const [src20, lastBlock, total] = await Promise.all([
-      SRC20Repository.getSrc20BalanceFromDb(params),
-      BlockService.getLastBlock(),
-      SRC20Repository.getTotalSrc20BalanceCount({
+    try {
+      const balanceParams: SRC20BalanceRequestParams = {
         tick: params.tick,
-        amt: params.amt,
-      }),
-    ]);
+        amt: params.amt || 0,
+        limit: params.limit,
+        page: params.page,
+        sort: params.sort || "DESC",
+        includePagination: true,
+      };
 
-    const data = src20
-      .map((row: Src20SnapShotDetail) => ({
+      const [balanceResponse, lastBlock] = await Promise.all([
+        this.fetchSrc20Balance(balanceParams),
+        BlockService.getLastBlock(),
+      ]);
+
+      const snapshotData = balanceResponse.data.map((row) => ({
         tick: row.tick,
         address: row.address,
-        balance: new Big(row.amt),
-      }))
-      .sort((a, b) => b.balance.cmp(a.balance));
+        balance: row.amt, // Assuming 'amt' is the balance field
+      }));
 
-    return {
-      page: params.page,
-      limit: params.limit,
-      totalPages: Math.ceil(total.rows[0].total / params.limit),
-      total: total.rows[0].total,
-      snapshot_block: lastBlock.last_block,
-      data,
-    };
+      return {
+        page: balanceResponse.pagination?.page || params.page,
+        limit: balanceResponse.pagination?.limit || params.limit,
+        totalPages: balanceResponse.pagination?.totalPages || 1,
+        total: balanceResponse.pagination?.total || snapshotData.length,
+        snapshot_block: lastBlock.last_block,
+        data: snapshotData,
+      };
+    } catch (error) {
+      console.error("Error in fetchAndFormatSrc20Snapshot:", error);
+      throw error;
+    }
   }
 
   static async getSrc20MintProgressByTick(tick: string) {
