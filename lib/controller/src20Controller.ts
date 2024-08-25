@@ -67,6 +67,7 @@ export class Src20Controller {
   }
 
   static async handleSrc20SnapshotRequest(params: SRC20SnapshotRequestParams) {
+    // TODO: revise this to query SRC20Valid for prior block balances
     try {
       const responseBody = await Src20Service.fetchAndFormatSrc20Snapshot(
         params,
