@@ -102,7 +102,7 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
                       year: "numeric",
                     })}
                   </p>
-                  <p class="text-base">Time</p>
+                  <p class="text-base">Deploy Date</p>
                 </div>
               </div>
             </div>
