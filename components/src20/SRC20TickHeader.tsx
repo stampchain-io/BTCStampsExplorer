@@ -61,7 +61,7 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
               <div class="flex items-center justify-center">
                 <div class="flex flex-col">
                   <p class="text-2xl font-semibold">{total_transfers}</p>
-                  <p class="text-base">Total Sends</p>
+                  <p class="text-base">Total Transfers</p>
                 </div>
               </div>
               <div class="flex items-center justify-end">
