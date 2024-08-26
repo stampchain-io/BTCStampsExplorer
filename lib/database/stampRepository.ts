@@ -107,7 +107,6 @@ export class StampRepository {
 
   static async getTotalStampCountFromDb(
     options: {
-      sort_order?: "asc" | "desc";
       type?: "stamps" | "cursed" | "all";
       ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string;
       identifier?: string | number | (string | number)[];
@@ -116,7 +115,6 @@ export class StampRepository {
     },
   ) {
     const {
-      sort_order = "asc",
       type = "stamps",
       ident,
       identifier,
@@ -140,8 +138,6 @@ export class StampRepository {
     const whereClause = whereConditions.length > 0
       ? `WHERE ${whereConditions.join(" AND ")}`
       : "";
-    const order = sort_order.toUpperCase() === "DESC" ? "DESC" : "ASC";
-    const orderClause = `ORDER BY st.stamp ${order}`;
 
     const queryTotal = `
     SELECT COUNT(*) AS total
@@ -250,7 +246,7 @@ export class StampRepository {
       ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string;
       identifier?: string | number | (string | number)[];
       blockIdentifier?: number | string;
-      all_columns?: boolean;
+      allColumns?: boolean;
       noPagination?: boolean;
       cacheDuration?: number | "never";
       collectionId?: string;
@@ -264,7 +260,7 @@ export class StampRepository {
       ident,
       identifier,
       blockIdentifier,
-      all_columns = false,
+      allColumns = false,
       noPagination = false,
       cacheDuration = 1000 * 60 * 3,
       collectionId,
@@ -305,7 +301,7 @@ export class StampRepository {
       st.file_hash
     `;
 
-    const selectClause = all_columns
+    const selectClause = allColumns
       ? "st.*, cr.creator AS creator_name"
       : specificColumns;
     const whereClause = whereConditions.length > 0
