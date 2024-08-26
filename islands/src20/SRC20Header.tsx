@@ -23,7 +23,7 @@ export const SRC20Header = (
           piece of art intertwined with the immutability of the blockchain.
         </p>
       </div>
-      <div class="flex flex-col-reverse md:flex-row justify-between w-full border-b border-[#3F2A4E]">
+      <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E]">
         <div class="flex gap-6 md:gap-8 items-end">
           <p
             class={selectedTab === "all"

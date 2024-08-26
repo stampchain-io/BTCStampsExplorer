@@ -54,7 +54,7 @@ export default function App({ Component }: AppProps) {
         <ToastProvider>
           <NavigatorProvider>
             <div
-              className="px-2 pt-8 mx-auto flex flex-col gap-5 overflow-auto max-w-7xl w-full mb-[70px] md:mb-[200px]"
+              className="px-2 pt-8 mx-auto flex flex-col gap-5 max-w-7xl w-full mb-[70px] md:mb-[200px]"
               f-client-nav
             >
               <Header />

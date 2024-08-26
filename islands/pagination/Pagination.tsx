@@ -1,4 +1,21 @@
+import { useEffect, useState } from "preact/hooks";
+
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // Adjust the breakpoint as needed
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return isMobile;
+};
 
 export const Pagination = (
   { page, pages, page_size, type = "stamp", data_length }: {
@@ -9,7 +26,8 @@ export const Pagination = (
     data_length: number;
   },
 ) => {
-  const maxPagesToShow = 4;
+  const isMobile = useIsMobile();
+  const maxPagesToShow = isMobile ? 2 : 4;
   const currentPage = page;
   const totalPages = pages;
   const startPage = Math.max(1, currentPage - maxPagesToShow);
