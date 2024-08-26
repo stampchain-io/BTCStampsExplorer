@@ -5,6 +5,7 @@ import { HolderRow, SUBPROTOCOLS } from "globals";
 import { Src20Service } from "$lib/services/src20Service.ts";
 import { formatSRC20Row } from "utils/src20Utils.ts";
 import { CollectionService } from "$lib/services/collectionService.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export class StampController {
   static async getStampDetailsById(id: string) {
@@ -55,12 +56,13 @@ export class StampController {
     sortBy = "none",
     type = "all",
     filterBy = [],
-    ident = ["STAMP", "SRC-721"],
+    ident,
     collectionId,
     identifier,
     blockIdentifier,
     cacheDuration,
     noPagination = false,
+    allColumns = false,
   }: {
     page?: number;
     limit?: number;
@@ -73,38 +75,43 @@ export class StampController {
     identifier?: string | number;
     blockIdentifier?: number | string;
     cacheDuration?: number | "never";
-    noPagination?: boolean; // Add this line
+    noPagination?: boolean;
+    allColumns?: boolean;
   } = {}) {
     try {
-      const result = await StampService.getStamps({
-        page,
-        limit,
-        sort_order: orderBy.toLowerCase() as "asc" | "desc",
-        type,
-        ident,
-        all_columns: false,
-        collectionId,
-        identifier,
-        blockIdentifier,
-        cacheDuration,
-        noPagination,
-      });
+      const [result, lastBlock] = await Promise.all([
+        StampService.getStamps({
+          page,
+          limit,
+          sort_order: orderBy.toLowerCase() as "asc" | "desc",
+          type,
+          ident,
+          allColumns,
+          collectionId,
+          identifier,
+          blockIdentifier,
+          cacheDuration,
+          noPagination,
+        }),
+        BlockService.getLastBlock(),
+      ]);
+
       if (!result) {
         throw new Error("No stamps found");
       }
 
-      // Apply sorting and filtering if needed
       let stamps = result.stamps;
       if (sortBy !== "none" || filterBy.length > 0) {
         stamps = sortData(filterData(stamps, filterBy), sortBy, orderBy);
       }
 
       return {
-        stamps,
-        total: result.total,
-        pages: result.pages,
         page: result.page,
-        page_size: result.page_size,
+        limit: result.page_size,
+        totalPages: result.pages,
+        total: result.total,
+        last_block: lastBlock.last_block || lastBlock,
+        data: result.stamps,
       };
     } catch (error) {
       console.error("Error in getStamps:", error);

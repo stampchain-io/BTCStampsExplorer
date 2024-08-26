@@ -1,5 +1,5 @@
 import { Pagination } from "$islands/pagination/Pagination.tsx";
-import { FreshContext } from "$fresh/server.ts";
+import { FreshContext, Handlers } from "$fresh/server.ts";
 
 import { StampRow } from "globals";
 
@@ -66,10 +66,10 @@ export const handler: Handlers = {
     });
 
     const { stamps, pages, pag, limit } = {
-      stamps: result.stamps,
-      pages: result.pages,
-      pag: result.page,
-      limit: result.page_size,
+      stamps: result.data,
+      pages: result.totalPages,
+      page: result.page,
+      limit: result.limit,
     };
 
     const data = {

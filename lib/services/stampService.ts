@@ -14,7 +14,7 @@ export class StampService {
     console.log(`getStampDetailsById called with id: ${id}`);
     const stampResult = await StampRepository.getStampsFromDb({
       identifier: id,
-      all_columns: true,
+      allColumns: true,
       noPagination: true,
       cacheDuration: "never",
     });
@@ -53,7 +53,7 @@ export class StampService {
     sort_order?: "asc" | "desc";
     type?: "stamps" | "cursed" | "all";
     ident?: SUBPROTOCOLS[];
-    all_columns?: boolean;
+    allColumns?: boolean;
     collectionId?: string;
     identifier?: string | number | (string | number)[];
     blockIdentifier?: number | string;
@@ -70,9 +70,9 @@ export class StampService {
       StampRepository.getStampsFromDb({
         ...options,
         limit: isSingleStamp || isMultipleStamps ? undefined : limit,
-        all_columns: isSingleStamp || isMultipleStamps
+        allColumns: isSingleStamp || isMultipleStamps
           ? true
-          : options.all_columns,
+          : options.allColumns,
         noPagination: isSingleStamp || isMultipleStamps
           ? true
           : options.noPagination,
@@ -98,7 +98,6 @@ export class StampService {
       return { stamps: stamps.rows, total: stamps.rows.length };
     }
 
-    // Apply pagination only if noPagination is false
     const paginatedData = options.noPagination
       ? stamps.rows
       : stamps.rows.slice(0, limit);
@@ -122,7 +121,7 @@ export class StampService {
     if (file_name.indexOf(".unknown") > -1) {
       const stampData = await this.getStamps({
         identifier: id,
-        all_columns: true,
+        allColumns: true,
         noPagination: true,
       });
       if (stampData?.stamp?.stamp_base64) {
@@ -180,7 +179,7 @@ export class StampService {
 
     const stampDetails = await this.getStamps({
       identifier: uniqueAssets,
-      all_columns: true,
+      allColumns: true,
       noPagination: true,
     });
 

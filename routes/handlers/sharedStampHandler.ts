@@ -1,13 +1,18 @@
 import { Handlers } from "$fresh/server.ts";
-import { StampRepository } from "$lib/database/index.ts";
-import { paginate } from "$lib/utils/util.ts";
-import { PaginatedStampResponseBody } from "globals";
+import { StampController } from "$lib/controller/stampController.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { getPaginationParams } from "utils/paginationUtils.ts";
 import { BlockService } from "$lib/services/blockService.ts";
-import { StampController } from "$lib/controller/stampController.ts";
 
-export const createSharedStampIndexHandler = (
+// Add this function to handle BigInt serialization
+function bigIntSerializer(key: string, value: any) {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+  return value;
+}
+
+export const sharedStampIndexHandler = (
   stampType: "stamps" | "cursed",
 ): Handlers => ({
   async GET(req: Request, _ctx) {
@@ -15,30 +20,20 @@ export const createSharedStampIndexHandler = (
       const url = new URL(req.url);
       const { limit, page } = getPaginationParams(url);
       const sort_order =
-        (url.searchParams.get("sort_order") as "asc" | "desc") || "asc";
+        (url.searchParams.get("sort_order")?.toUpperCase() as "ASC" | "DESC") ||
+        "ASC";
 
-      const [data, totalResult, lastBlock] = await Promise.all([
-        StampRepository.getStampsFromDb({
-          limit,
-          page,
-          sort_order,
-          type: stampType,
-          all_columns: true,
-        }),
-        StampRepository.getTotalStampCountFromDb(stampType),
-        BlockService.getLastBlock(),
-      ]);
+      const result = await StampController.getStamps({
+        page,
+        limit,
+        orderBy: sort_order.toUpperCase(),
+        type: stampType,
+        all_columns: true,
+      });
 
-      const total = totalResult.rows[0]["total"];
-      const pagination = paginate(total, page, limit);
-
-      const body = {
-        ...pagination,
-        last_block: lastBlock.last_block || lastBlock,
-        data: data.rows,
-      } as PaginatedStampResponseBody;
-
-      return ResponseUtil.success(body);
+      return ResponseUtil.success(
+        JSON.parse(JSON.stringify(result, bigIntSerializer)),
+      );
     } catch (error) {
       console.error(`Error fetching paginated ${stampType}: ${error.message}`);
       return ResponseUtil.error(`Error: Internal server error`, 500);
