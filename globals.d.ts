@@ -312,13 +312,13 @@ export interface PaginatedIdResponseBody extends Pagination {
   data: StampRow[];
 }
 
-type StampPageProps = {
+export type StampPageProps = {
   data: {
     stamps: StampRow[];
     total: number;
     page: number;
-    pages: number;
-    page_size: number;
+    totalPages: number;
+    limit: number;
     selectedTab: "all" | "classic" | "posh";
     sortBy: string;
     filterBy: string[];
