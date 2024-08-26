@@ -6,6 +6,8 @@ import { Src20Service } from "$lib/services/src20Service.ts";
 import { formatSRC20Row } from "utils/src20Utils.ts";
 import { CollectionService } from "$lib/services/collectionService.ts";
 import { BlockService } from "$lib/services/blockService.ts";
+import { paginate } from "utils/util.ts";
+import { PaginatedStampBalanceResponseBody } from "globals";
 
 export class StampController {
   static async getStampDetailsById(id: string) {
@@ -138,6 +140,25 @@ export class StampController {
       console.error("Error in getStamp:", error);
       throw error;
     }
+  }
+
+  static async getStampBalancesByAddress(
+    address: string,
+    limit: number,
+    page: number,
+  ): Promise<PaginatedStampBalanceResponseBody> {
+    const [{ stamps, total }, lastBlock] = await Promise.all([
+      StampService.getStampBalancesByAddress(address, limit, page),
+      BlockService.getLastBlock(),
+    ]);
+
+    const pagination = paginate(total, page, limit);
+
+    return {
+      ...pagination,
+      last_block: lastBlock.last_block,
+      data: stamps,
+    };
   }
 
   static async getMultipleStampCategories(
