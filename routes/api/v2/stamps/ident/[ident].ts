@@ -1,10 +1,8 @@
-import { StampRepository } from "$lib/database/index.ts";
+import { StampController } from "$lib/controller/stampController.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
 import { IdentHandlerContext, PaginatedStampResponseBody } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { paginate } from "$lib/utils/util.ts";
-import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler = async (
   req: Request,
@@ -12,37 +10,30 @@ export const handler = async (
 ): Promise<Response> => {
   const { ident } = ctx.params;
   if (!PROTOCOL_IDENTIFIERS.includes(ident.toUpperCase())) {
-    return ResponseUtil.error(`Error: ident: ${ident} not found`, 404);
+    return ResponseUtil.error(
+      `Error: ident: ${ident} not found, use ${PROTOCOL_IDENTIFIERS}`,
+      404,
+    );
   }
 
   const url = new URL(req.url);
   const { limit, page } = getPaginationParams(url);
   const sort_order = (url.searchParams.get("sort_order") as "asc" | "desc") ||
     "asc";
-  try {
-    const [data, totalResult, lastBlock] = await Promise.all([
-      StampRepository.getStampsFromDb({ // FIXME: update to controller call
-        limit,
-        page,
-        sort_order,
-        type: "stamps",
-        ident: ident.toUpperCase(),
-        all_columns: true,
-      }),
-      StampRepository.getTotalStampCountFromDb(
-        "stamps",
-        ident.toUpperCase(),
-      ),
-      BlockService.getLastBlock(),
-    ]);
 
-    const total = totalResult.rows[0]["total"];
-    const pagination = paginate(total, page, limit);
+  try {
+    const result = await StampController.getStamps({
+      page,
+      limit,
+      orderBy: sort_order.toUpperCase(),
+      type: "stamps",
+      ident: [ident.toUpperCase()],
+      allColumns: true,
+    });
 
     const body: PaginatedStampResponseBody = {
-      ...pagination,
-      last_block: lastBlock.last_block,
-      data: data.rows,
+      ...result,
+      data: result.data,
     };
 
     return ResponseUtil.success(body);

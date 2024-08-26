@@ -53,9 +53,10 @@ export const handler: Handlers = {
         ident,
         collectionId,
       });
-
+      const { data: stamps, ...restResult } = result;
       const data = {
-        ...result,
+        ...restResult,
+        stamps,
         filterBy,
         sortBy,
         selectedTab,
@@ -71,8 +72,8 @@ export function StampPage(props: StampPageProps) {
   const {
     stamps,
     page,
-    pages,
-    page_size,
+    totalPages,
+    limit,
     filterBy,
     sortBy,
     selectedTab,
@@ -90,8 +91,8 @@ export function StampPage(props: StampPageProps) {
       />
       <Pagination
         page={page}
-        pages={pages}
-        page_size={page_size}
+        pages={totalPages}
+        page_size={limit}
         type={"stamp"}
         data_length={stamps.length}
       />

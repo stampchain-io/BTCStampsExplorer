@@ -229,7 +229,7 @@ export class DispenserManager {
   }
   static async getAllDispensers(page: number = 1, limit: number = 10) {
     const dispensers = await this.handleXcpApiRequestWithCache<any[]>(
-      "get_dispensers",
+      "get_dispensers", // FIXME: by default this only gets the first 1000
       {},
       this.cacheTimeout,
     );
@@ -245,7 +245,7 @@ export class DispenserManager {
 
     const stamps = await StampService.getStamps({
       identifier: assetIds,
-      all_columns: true,
+      allColumns: true,
       noPagination: true,
     });
 
