@@ -64,7 +64,7 @@ const Carousel = (props: CarouselProps) => {
           key={index}
           src={slide.url}
           alt={slide.alt}
-          class={`absolute transition-transform duration-500 h-auto object-fit ${
+          class={`absolute origin-center transition-all duration-500 h-auto object-fit ${
             index === currentSlide.value
               ? "left-1/2 -translate-x-1/2 w-[calc(30%+200px)] z-10"
               : (index === (currentSlide.value - 1 + SLIDE_DATA.length) %

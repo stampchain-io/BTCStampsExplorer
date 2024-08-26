@@ -21,7 +21,11 @@ function StampSection({ title, type, stamps }: StampSection) {
           See all
         </a>
       </div>
-      <div class="flex overflow-x-auto">
+      <div
+        class={`grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 justify-center ${
+          type === "recent" ? "" : "xl:grid-cols-6 xl:gap-6"
+        }`}
+      >
         {stamps.map((stamp: StampRow) => (
           <StampCard
             stamp={stamp}
