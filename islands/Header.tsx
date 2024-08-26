@@ -30,7 +30,7 @@ export function Header() {
   const toggleWalletModal = () => setIsWalletModalOpen(!isWalletModalOpen);
 
   const toggleMenu = () => {
-    const isMobileScreen = globalThis.matchMedia("(max-width: 768px)").matches;
+    const isMobileScreen = globalThis.matchMedia("(max-width: 1024px)").matches;
     if (!isMobileScreen) return;
     setOpen(!open);
     document.body.style.overflow = !open ? "hidden" : "";
@@ -54,8 +54,8 @@ export function Header() {
   }, [open]);
 
   return (
-    <nav className="py-2 md:py-4">
-      <div className="container mx-auto md:flex md:items-center md:justify-between">
+    <nav className="py-2 lg:py-4">
+      <div className="container mx-auto lg:flex lg:items-center lg:justify-between">
         <div className="flex justify-between items-center">
           <a
             href="/home"
@@ -64,7 +64,7 @@ export function Header() {
               toggleMenu();
               setCurrentPath("collection");
             }}
-            className="font-bold text-xl text-indigo-600 hidden md:block"
+            className="font-bold text-xl text-indigo-600 hidden lg:block"
           >
             <img
               src="/img/header/logo.png"
@@ -74,7 +74,7 @@ export function Header() {
           </a>
           <button
             onClick={toggleMenu}
-            className="px-3 py-1 text-blue-600 md:hidden z-[100]"
+            className="px-3 py-1 text-blue-600 lg:hidden z-[100]"
             id="navbar-toggle"
           >
             {open && (
@@ -93,7 +93,7 @@ export function Header() {
             )}
           </button>
 
-          <div class="block md:hidden">
+          <div class="block lg:hidden">
             <ConnectWallet toggleModal={toggleWalletModal} />
           </div>
         </div>
@@ -101,9 +101,9 @@ export function Header() {
         <div
           className={`${
             open
-              ? "flex left-0 top-0 fixed w-[300px] h-screen z-20 bg-[#181818] scroll-none p-6 pt-[120px]"
+              ? "flex left-0 top-0 fixed min-w-[300px] w-4/5 h-screen z-20 bg-[#181818] scroll-none p-6 pt-[120px]"
               : "hidden"
-          } flex-col md:flex md:flex-row text-center justify-between`}
+          } flex-col lg:flex lg:flex-row text-center justify-between`}
           id="navbar-collapse"
         >
           <a
@@ -113,7 +113,7 @@ export function Header() {
               toggleMenu();
               setCurrentPath("collection");
             }}
-            className="font-bold text-xl text-indigo-600 block md:hidden"
+            className="font-bold text-xl text-indigo-600 block lg:hidden"
           >
             <img
               src="/img/header/logo.png"
@@ -126,8 +126,8 @@ export function Header() {
           <div
             className={`${
               open
-                ? "flex flex-col md:flex-row items-start justify-between gap-8 md:gap-10 text-center"
-                : "hidden md:flex flex-col md:flex-row text-center"
+                ? "flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10 text-center"
+                : "hidden lg:flex flex-col lg:flex-row text-center"
             } `}
           >
             <a
@@ -137,7 +137,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("stamp");
               }}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
+              className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                 currentPath === "stamp" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -150,7 +150,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("collection");
               }}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
+              className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                 currentPath === "collection"
                   ? "border-[#7A00F5] border-b-4"
                   : ""
@@ -165,7 +165,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("src20");
               }}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
+              className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                 currentPath === "src20" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -178,7 +178,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("block");
               }}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
+              className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                 currentPath === "block" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -187,13 +187,13 @@ export function Header() {
 
             <div className={"group relative"}>
               <a
-                className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg md:text-base font-weight-900 ${
+                className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg lg:text-base font-weight-900 ${
                   isStampingActive ? "border-[#7A00F5] border-b-4" : ""
                 }`}
               >
                 STAMPING
               </a>
-              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] md:top-[34px] left-[100px] md:left-[15px] z-[100] py-2">
+              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[34px] left-[100px] lg:left-[15px] z-[100] py-2">
                 <a
                   href="/stamping/stamp"
                   f-partial={"/stamping/stamp"}
@@ -201,7 +201,7 @@ export function Header() {
                     toggleMenu();
                     setCurrentPath("stamping/stamp");
                   }}
-                  className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
+                  className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                     currentPath === "stamping/stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
@@ -214,7 +214,7 @@ export function Header() {
                     toggleMenu();
                     setCurrentPath("stamping/src20");
                   }}
-                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                     currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
                   }`}
                 >
@@ -222,20 +222,7 @@ export function Header() {
                 </a>
               </div>
             </div>
-            {
-              /* <a
-              href="/upload"
-              f-partial={"/upload"}
-              onClick={toggleMenu}
-              className={`pb-2 lg:px-4 md:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg md:text-base font-weight-900 ${
-                path === "upload" ? "border-[#7A00F5] border-b-4" : ""
-              }`}
-            >
-              Upload Image
-            </a> */
-            }
-
-            <div class="block md:hidden">
+            <div class="block lg:hidden">
               <ConnectWallet toggleModal={toggleWalletModal} />
             </div>
           </div>
@@ -260,7 +247,7 @@ export function Header() {
           </div>
         </div>
 
-        <div class="hidden md:block">
+        <div class="hidden lg:block">
           <ConnectWallet toggleModal={toggleWalletModal} />
         </div>
       </div>
