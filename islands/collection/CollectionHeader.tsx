@@ -14,7 +14,7 @@ export const CollectionHeader = (
   const { setTypeOption } = useNavigator();
 
   return (
-    <div class="flex flex-col-reverse md:flex-row justify-between w-full border-b border-[#3F2A4E]">
+    <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E]">
       <div class="flex gap-6 md:gap-8 items-end">
         <p
           class={selectedTab === "all"
@@ -41,7 +41,7 @@ export const CollectionHeader = (
           Posh
         </p>
       </div>
-      <div class="flex gap-6">
+      <div class="flex gap-3 md:gap-6 justify-between">
         <StampNavigator initFilter={filterBy} initSort={sortBy} />
         <StampSearchClient />
       </div>

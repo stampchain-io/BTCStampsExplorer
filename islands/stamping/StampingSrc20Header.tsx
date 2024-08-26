@@ -9,7 +9,7 @@ export const StampingSrc20Header = (
   const { setTypeOption } = useNavigator();
 
   return (
-    <div class="flex flex-col-reverse md:flex-row justify-between w-full border-b border-[#3F2A4E]">
+    <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E]">
       <div class="flex gap-6 md:gap-8 items-end">
         <p
           class={selectedTab === "mint"

@@ -34,7 +34,7 @@ export function HomeTable({ data = [] }: { data: SRC20Row[] }) {
           </input>
           <input
             placeholder="stamp #, CPID, wallet address, tx_hash"
-            class="hidden md:block min-w-[640px] h-[54px] bg-[#3F2A4E] px-3 md:px-6 py-5 text-sm text-[#8D9199] mb-4"
+            class="hidden md:block min-w-[520px] h-[54px] bg-[#3F2A4E] px-3 md:px-6 py-5 text-sm text-[#8D9199] mb-4"
           >
           </input>
           <img

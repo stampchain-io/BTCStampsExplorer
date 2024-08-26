@@ -6,7 +6,7 @@ export function CollectionCard({
   return (
     <a
       href={`/collection/${collection.collection_name}`}
-      className="bg-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col m-1 p-2 rounded-lg @container transition-all min-w-[200px]"
+      className="bg-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-2 rounded-lg @container transition-all"
     >
       <div class="relative flex overflow-hidden">
         <div class="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden rounded-lg">
