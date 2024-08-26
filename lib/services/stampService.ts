@@ -138,20 +138,12 @@ export class StampService {
     limit: number,
     page: number,
   ) {
-    const totalStamps = await StampRepository
-      .getCountStampBalancesByAddressFromDb(address) as {
-        rows: { total: number }[];
-      };
-    const total = totalStamps.rows[0]?.total || 0;
+    const [totalResult, stamps] = await Promise.all([
+      StampRepository.getCountStampBalancesByAddressFromDb(address),
+      StampRepository.getStampBalancesByAddressFromDb(address, limit, page),
+    ]);
 
-    let stamps: StampBalance[] = [];
-    if (total !== 0) {
-      stamps = await StampRepository.getStampBalancesByAddressFromDb(
-        address,
-        limit,
-        page,
-      );
-    }
+    const total = totalResult.rows[0]?.total || 0;
 
     return { stamps, total };
   }
