@@ -8,6 +8,8 @@ export function StampSales(
       destination: string;
       dispense_quantity: number;
       satoshirate: number;
+      confirmed: boolean;
+      close_block_index: number;
     }[];
   },
 ) {
@@ -54,10 +56,16 @@ export function StampSales(
                 To
               </th>
               <th scope="col" className="px-6 py-3">
-                Quantity
+                Qty
               </th>
               <th scope="col" className="px-6 py-3">
                 Price (BTC)
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Confirmed
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Close Block
               </th>
             </tr>
           </thead>
@@ -86,6 +94,12 @@ export function StampSales(
                 </td>
                 <td className="px-6 py-4 text-sm">
                   {formatSatoshisToBTC(dispense.satoshirate)}
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  {dispense.confirmed ? "Yes" : "No"}
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  {dispense.close_block_index}
                 </td>
               </tr>
             ))}

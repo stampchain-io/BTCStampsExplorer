@@ -12,6 +12,8 @@ export function StampDispensers(
       escrow_quantity: number;
       give_quantity: number;
       satoshirate: number;
+      confirmed: boolean;
+      close_block_index: number;
     }[];
   },
 ) {
@@ -68,6 +70,12 @@ export function StampDispensers(
               <th scope="col" className="px-6 py-3">
                 Price (BTC)
               </th>
+              <th scope="col" className="px-6 py-3">
+                Confirmed
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Close Block
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -92,6 +100,12 @@ export function StampDispensers(
                 <td className="px-6 py-4 text-sm">
                   {/* TODO: display USD price as well */}
                   {formatSatoshisToBTC(dispenser.satoshirate)}
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  {dispenser.confirmed ? "Yes" : "No"}
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  {dispenser.close_block_index}
                 </td>
               </tr>
             ))}
