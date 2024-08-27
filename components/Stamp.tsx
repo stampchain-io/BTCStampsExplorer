@@ -27,7 +27,7 @@ export const Stamp = (
       <img
         width="100%"
         loading="lazy"
-        className={`max-w-none object-contain image-rendering-pixelated rounded-lg ${className}`}
+        className={`mx-10 md:mx-0 max-w-none object-contain image-rendering-pixelated rounded-lg ${className}`}
         src={src}
         alt="Not Available"
       />
@@ -60,7 +60,7 @@ export const Stamp = (
     <img
       width="100%"
       loading="lazy"
-      className={`max-w-none object-contain image-rendering-pixelated rounded-lg ${className}`}
+      className={`mx-10 md:mx-0 max-w-none object-contain image-rendering-pixelated rounded-lg ${className}`}
       src={src}
       onError={(e) => {
         (e.target as HTMLImageElement).src = "/content/not-available.png";

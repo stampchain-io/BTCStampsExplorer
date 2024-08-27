@@ -73,7 +73,7 @@ export default function StampPage(props: StampDetailPageProps) {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
         <div class="flex flex-col gap-8 justify-between">
-          <Stamp stamp={stamp} className="w-full" />
+          <Stamp stamp={stamp} className="w-[calc(100%-80px)] md:w-full" />
           <StampShare stamp={stamp} />
         </div>
         <StampInfo stamp={stamp} />
