@@ -34,10 +34,10 @@ export const handler: Handlers = {
       ) {
         throw new Error("Failed to fetch SRC20 data");
       }
-      const allSrc20Data = await allSrc20DataResponse.json();
+      const allSrc20Data = await allSrc20DataResponse;
       const { deployment, mints, transfers } = allSrc20Data;
-      const mintProgressData = await mintProgressResponse.json();
-      const balanceData = await balanceResponse.json();
+      const mintProgressData = await mintProgressResponse;
+      const balanceData = await balanceResponse;
       const total_transfers = transfers.length;
       const total_mints = mints.length;
       const totalCount = total_transfers + total_mints;

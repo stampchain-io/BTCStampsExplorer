@@ -1,67 +1,67 @@
-import { paginate } from "utils/util.ts";
-import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
+import { Handlers } from "$fresh/server.ts";
+import { convertEmojiToTick, convertToEmoji, paginate } from "utils/util.ts";
 import { BigFloat } from "bigfloat/mod.ts";
-import {
-  PaginatedRequest,
-  PaginatedTickResponseBody,
-  TickHandlerContext,
-} from "globals";
+import { PaginatedTickResponseBody, TickHandlerContext } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { SRC20Repository } from "$lib/database/src20Repository.ts";
-import { BIG_LIMIT } from "utils/constants.ts";
-import { dbManager } from "$lib/database/db.ts";
 import { Src20Service } from "$lib/services/src20Service.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 
-export const handler = async (
-  req: PaginatedRequest,
-  ctx: TickHandlerContext,
-): Promise<Response> => {
-  let { tick } = ctx.params;
-  try {
-    const url = new URL(req.url);
-    const limit = Number(url.searchParams.get("limit")) || BIG_LIMIT;
-    const page = Number(url.searchParams.get("page")) || 1;
-    const op = url.searchParams.get("op");
-    const sort = url.searchParams.get("sort") || "ASC";
-    tick = convertEmojiToTick(String(tick));
-    const src20_txs = await SRC20Repository.getValidSrc20TxFromDb(
-      { tick, op, limit, page, sort },
-    );
+export const handler: Handlers = {
+  async GET(req, ctx) {
+    try {
+      const { tick } = ctx.params;
+      const url = new URL(req.url);
+      const { limit, page } = getPaginationParams(url);
+      const params = {
+        tick: convertEmojiToTick(String(tick)),
+        limit,
+        page,
+        op: url.searchParams.get("op") || undefined,
+        sort: url.searchParams.get("sort") || "ASC",
+      };
 
-    const total = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
-      { tick, op },
-    );
-    const lastBlock = await BlockService.getLastBlock();
-    const pagination = paginate(total.rows[0]["total"], page, limit);
-    //TODO: review this
+      const [src20_txs, total, lastBlock, mint_status] = await Promise.all([
+        SRC20Repository.getValidSrc20TxFromDb(params),
+        SRC20Repository.getTotalCountValidSrc20TxFromDb({
+          tick: params.tick,
+          op: params.op,
+        }),
+        BlockService.getLastBlock(),
+        Src20Service.getSrc20MintProgressByTick(params.tick),
+      ]);
 
-    const mint_status = await Src20Service.getSrc20MintProgressByTick(tick);
-    const body: PaginatedTickResponseBody = {
-      ...pagination,
-      last_block: lastBlock.last_block,
-      mint_status: mint_status
-        ? {
-          ...mint_status,
-          max_supply: mint_status.max_supply?.toString() ?? null,
-          total_minted: mint_status.total_minted?.toString() ?? null,
-          limit: mint_status.limit ?? null,
-        }
-        : null,
-      data: src20_txs.rows.map((tx: any) => {
-        return {
+      const pagination = paginate(
+        total.rows[0]["total"],
+        params.page,
+        params.limit,
+      );
+
+      const body: PaginatedTickResponseBody = {
+        ...pagination,
+        last_block: lastBlock.last_block,
+        mint_status: mint_status
+          ? {
+            ...mint_status,
+            max_supply: mint_status.max_supply?.toString() ?? null,
+            total_minted: mint_status.total_minted?.toString() ?? null,
+            limit: mint_status.limit ?? null,
+          }
+          : null,
+        data: src20_txs.rows.map((tx: any) => ({
           ...tx,
           tick: convertToEmoji(tx.tick),
           max: tx.max ? new BigFloat(tx.max).toString() : null,
           lim: tx.lim ? new BigFloat(tx.lim).toString() : null,
           amt: tx.amt ? new BigFloat(tx.amt).toString() : null,
-        };
-      }),
-    };
+        })),
+      };
 
-    return ResponseUtil.success(body);
-  } catch (_error) {
-    console.log(_error);
-    return ResponseUtil.error("Error: Internal server error");
-  }
+      return ResponseUtil.success(body);
+    } catch (error) {
+      console.error(error);
+      return ResponseUtil.handleError(error, "Error processing request");
+    }
+  },
 };
