@@ -35,6 +35,7 @@ export class StampService {
         BlockService.getLastBlock(),
       ]);
 
+    // FIXME: Need to merge the mutable fields of the stamp into the XCP response data ( divisible/locked )
     return {
       last_block: lastBlock.last_block,
       stamp,
