@@ -60,265 +60,11 @@ export const xcp_public_nodes = [
 // curl -X GET 'https://api.counterparty.io:4000/v2/healthz'
 // {"result": {"status": "Healthy"}}%
 
-/**
- * Retrieves the balances for a given address.
- * @param address - The address for which to retrieve the balances.
- * @returns An array of balances, each containing the asset ID, quantity, and divisibility.
- */
-export const get_balances = async (address: string) => {
-  const params = {
-    filters: [
-      {
-        field: "address",
-        op: "==",
-        value: address,
-      },
-    ],
-  };
-  // const payload = CreatePayload("get_balances", params); // now done in handleXcpApiRequestWithCache
-  const balances = await handleXcpApiRequestWithCache(
-    "get_balances",
-    params,
-    1000 * 60 * 5,
-  );
-
-  if (!balances) {
-    return [];
-  }
-  return balances
-    .filter((balance: any) => balance.quantity > 0)
-    .map((balance: any) => ({
-      cpid: balance.asset,
-      quantity: balance.quantity,
-      divisible: balance.divisible,
-    }));
-};
-
-/**
- * Retrieves the stamps balance for a given address.
- * @param address - The address for which to retrieve the stamps balance.
- * @returns A promise that resolves to the stamps balance.
- */
-export const get_stamps_balance = async (address: string) => {
-  //TODO: filter xcp balances and add populated info with stamptable data
-  return await get_balances(address);
-};
-
-/**
- * Retrieves a list of sends for a given cpid.
- * @param cpid - The cpid to filter sends by.
- * @returns An array of sends, each containing transaction hash, block index, source, destination, quantity, and asset.
- */
-export const get_sends = async (cpid: string) => {
-  const params = {
-    filters: [
-      {
-        field: "asset",
-        op: "==",
-        value: cpid,
-      },
-      {
-        field: "status",
-        op: "==",
-        value: "valid",
-      },
-    ],
-    "filterop": "AND",
-  };
-  const sends = await handleXcpApiRequestWithCache(
-    "get_sends",
-    params,
-    1000 * 60 * 5,
-  );
-  if (!sends) {
-    console.log("no sends found");
-    return [];
-  }
-  return sends.map((send: any) => ({
-    tx_hash: send.tx_hash,
-    block_index: send.block_index,
-    source: send.source,
-    destination: send.destination,
-    quantity: send.quantity,
-    asset: send.asset,
-  }));
-};
-
-/**
- * Retrieves the holders of a specific asset.
- *
- * @param cpid - The asset identifier.
- * @returns An array of holders with a positive quantity of the specified asset.
- */
-export const get_holders = async (cpid: string) => {
-  const params = {
-    filters: [
-      {
-        field: "asset",
-        op: "==",
-        value: cpid,
-      },
-    ],
-  };
-  const holders = await handleXcpApiRequestWithCache(
-    "get_balances",
-    params,
-    1000 * 60 * 5,
-  );
-  if (!holders) {
-    return [];
-  }
-  return holders.filter(
-    (holder: any) => {
-      if (holder.quantity > 0) { // if an item is on dispenser it is possible there is not any holders besides the dispenser addy
-        return true;
-      }
-    },
-  );
-};
-
 export class DispenserManager {
   private static cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
   private static handleXcpApiRequestWithCache = handleXcpApiRequestWithCache;
 
-  static async getDispensersByCpid(
-    cpid: string,
-    filter: "open" | "closed" | "all" = "open",
-  ) {
-    const params = {
-      filters: [
-        {
-          field: "asset",
-          op: "==",
-          value: cpid,
-        },
-      ],
-    };
-    const dispensers = await DispenserManager.handleXcpApiRequestWithCache<
-      any[]
-    >(
-      "get_dispensers",
-      params,
-      1000 * 60 * 5,
-    );
-
-    if (!dispensers || !Array.isArray(dispensers)) {
-      return [];
-    }
-
-    const filteredDispensers = filter === "all"
-      ? dispensers
-      : dispensers.filter((dispenser) =>
-        filter === "open"
-          ? dispenser.give_remaining > 0
-          : dispenser.give_remaining === 0
-      );
-
-    return filteredDispensers.map((dispenser: any) => ({
-      tx_hash: dispenser.tx_hash,
-      block_index: dispenser.block_index,
-      source: dispenser.source,
-      cpid: dispenser.asset,
-      give_quantity: dispenser.give_quantity,
-      give_remaining: dispenser.give_remaining,
-      escrow_quantity: dispenser.escrow_quantity,
-      satoshirate: dispenser.satoshirate,
-      btcrate: dispenser.satoshirate / 100000000,
-      origin: dispenser.origin,
-    }));
-  }
-  static async getAllDispensers(page: number = 1, limit: number = 10) {
-    const dispensers = await this.handleXcpApiRequestWithCache<any[]>(
-      "get_dispensers", // FIXME: by default this only gets the first 1000
-      {},
-      this.cacheTimeout,
-    );
-
-    if (!dispensers || !Array.isArray(dispensers)) {
-      console.log("No dispensers found");
-      return { total: 0, dispensers: [] };
-    }
-
-    const assetIds = [
-      ...new Set(dispensers.map((dispenser) => dispenser.asset)),
-    ];
-
-    const stamps = await StampService.getStamps({
-      identifier: assetIds,
-      allColumns: true,
-      noPagination: true,
-    });
-
-    const stampMap = new Map(stamps.stamps.map((stamp) => [stamp.cpid, stamp]));
-
-    const openDispensers = dispensers.filter((dispenser) =>
-      dispenser.give_remaining > 0 && stampMap.has(dispenser.asset)
-    );
-
-    const mappedDispensersPromises = openDispensers.map(async (dispenser) => {
-      const dispenses = this.getDispensesByCpid(dispenser.asset);
-      return {
-        tx_hash: dispenser.tx_hash,
-        block_index: dispenser.block_index,
-        source: dispenser.source,
-        cpid: dispenser.asset,
-        give_quantity: dispenser.give_quantity,
-        give_remaining: dispenser.give_remaining,
-        escrow_quantity: dispenser.escrow_quantity,
-        satoshirate: dispenser.satoshirate,
-        btcrate: dispenser.satoshirate / 100000000,
-        origin: dispenser.origin,
-        dispenses: await dispenses,
-        stamp: stampMap.get(dispenser.asset),
-      };
-    });
-
-    const mappedDispensers = await Promise.all(mappedDispensersPromises);
-
-    const total = mappedDispensers.length;
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedDispensers = mappedDispensers.slice(startIndex, endIndex);
-
-    return { total, dispensers: paginatedDispensers };
-  }
-
-  static async getDispensesByCpid(cpid: string) {
-    const params = {
-      filters: [
-        {
-          field: "asset",
-          op: "==",
-          value: cpid,
-        },
-      ],
-    };
-    const dispenses = await this.handleXcpApiRequestWithCache(
-      "get_dispenses",
-      params,
-      this.cacheTimeout,
-    );
-
-    if (!dispenses) {
-      return [];
-    }
-
-    return dispenses.map((dispense: any) => ({
-      tx_hash: dispense.tx_hash,
-      block_index: dispense.block_index,
-      cpid: dispense.asset,
-      source: dispense.source,
-      destination: dispense.destination,
-      dispenser_tx_hash: dispense.dispenser_tx_hash,
-      dispense_quantity: dispense.dispense_quantity,
-    }));
-  }
-}
-
-export class XcpManager {
-  private static cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
-
-  private static async fetchWithCache<T>(
+  private static async fetchXcpV2WithCache<T>(
     endpoint: string,
     queryParams: URLSearchParams,
   ): Promise<T> {
@@ -340,7 +86,388 @@ export class XcpManager {
     );
   }
 
-  static getDispenseEvents(
+  static async getDispensersByCpid(
+    cpid: string,
+    filter: "open" | "closed" | "all" = "open",
+  ): Promise<[]> {
+    const endpoint = `/assets/${cpid}/dispensers`;
+    let allDispensers: any[] = [];
+    let cursor: string | null = null;
+    const limit = 1000;
+
+    while (true) {
+      const queryParams = new URLSearchParams({
+        limit: limit.toString(),
+        verbose: "true",
+      });
+      if (cursor) {
+        queryParams.append("cursor", cursor);
+      }
+
+      try {
+        const response = await this.fetchXcpV2WithCache<any>(
+          endpoint,
+          queryParams,
+        );
+
+        if (!response || !Array.isArray(response.result)) {
+          break;
+        }
+
+        const dispensers = response.result.map((dispenser: any) => ({
+          tx_hash: dispenser.tx_hash,
+          block_index: dispenser.block_index,
+          source: dispenser.source,
+          cpid: cpid,
+          give_quantity: dispenser.give_quantity,
+          give_remaining: dispenser.give_remaining,
+          escrow_quantity: dispenser.escrow_quantity,
+          satoshirate: dispenser.satoshirate,
+          btcrate: dispenser.satoshirate_normalized,
+          origin: dispenser.origin,
+          confirmed: dispenser.confirmed, // whether or not this is in the mempool
+          close_block_index: dispenser.close_block_index,
+        }));
+
+        allDispensers = allDispensers.concat(dispensers);
+
+        // Check if there's a next cursor
+        cursor = response.next_cursor || null;
+        if (!cursor) {
+          break; // No more pages
+        }
+      } catch (error) {
+        console.error(`Error fetching dispensers for cpid ${cpid}:`, error);
+        break;
+      }
+    }
+
+    const filteredDispensers = filter === "all"
+      ? allDispensers
+      : allDispensers.filter((dispenser) =>
+        filter === "open"
+          ? dispenser.give_remaining > 0
+          : dispenser.give_remaining === 0
+      );
+
+    return filteredDispensers;
+  }
+
+  static async getAllOpenStampDispensers(page: number = 1, limit: number = 10) {
+    const endpoint = "/events/OPEN_DISPENSER";
+    let allDispensers: any[] = [];
+    let cursor: string | null = null;
+    const apiLimit = 1000;
+
+    while (true) {
+      const queryParams = new URLSearchParams({ limit: apiLimit.toString() });
+      if (cursor) {
+        queryParams.append("cursor", cursor);
+      }
+
+      try {
+        const response = await this.fetchXcpV2WithCache<any>(
+          endpoint,
+          queryParams,
+        );
+
+        if (!response || !Array.isArray(response.result)) {
+          break;
+        }
+
+        const dispensers = response.result.map((event: any) => ({
+          tx_hash: event.tx_hash,
+          block_index: event.block_index,
+          source: event.params.source,
+          cpid: event.params.asset,
+          give_quantity: event.params.give_quantity,
+          give_remaining: event.params.give_remaining,
+          escrow_quantity: event.params.escrow_quantity,
+          satoshirate: event.params.satoshirate,
+          btcrate: event.params.satoshirate / 100000000,
+          origin: event.params.origin,
+        }));
+
+        allDispensers = allDispensers.concat(dispensers);
+
+        cursor = response.next_cursor || null;
+        if (!cursor) {
+          break;
+        }
+      } catch (error) {
+        console.error("Error fetching open dispensers:", error);
+        break;
+      }
+    }
+
+    const assetIds = [
+      ...new Set(allDispensers.map((dispenser) => dispenser.cpid)),
+    ];
+
+    const stamps = await StampService.getStamps({
+      identifier: assetIds,
+      allColumns: true,
+      noPagination: true,
+    });
+
+    const stampMap = new Map(stamps.stamps.map((stamp) => [stamp.cpid, stamp]));
+
+    const filteredDispensers = allDispensers.filter((dispenser) =>
+      stampMap.has(dispenser.cpid)
+    );
+
+    const mappedDispensersPromises = filteredDispensers.map(
+      async (dispenser) => {
+        const dispenses = await this.getDispensesByCpid(dispenser.cpid);
+        return {
+          ...dispenser,
+          dispenses,
+          stamp: stampMap.get(dispenser.cpid),
+        };
+      },
+    );
+
+    const mappedDispensers = await Promise.all(mappedDispensersPromises);
+
+    const total = mappedDispensers.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedDispensers = mappedDispensers.slice(startIndex, endIndex);
+
+    return { total, dispensers: paginatedDispensers };
+  }
+
+  static async getDispensesByCpid(cpid: string) {
+    const endpoint = `/assets/${cpid}/dispenses`;
+    let allDispenses: any[] = [];
+    let cursor: string | null = null;
+    const limit = 1000;
+
+    while (true) {
+      const queryParams = new URLSearchParams({
+        limit: limit.toString(),
+        verbose: "true",
+      });
+      if (cursor) {
+        queryParams.append("cursor", cursor);
+      }
+
+      try {
+        const response = await this.fetchXcpV2WithCache<any>(
+          endpoint,
+          queryParams,
+        );
+
+        if (!response || !Array.isArray(response.result)) {
+          break;
+        }
+
+        const dispenses = response.result.map((dispense: any) => ({
+          tx_hash: dispense.tx_hash,
+          block_index: dispense.block_index,
+          cpid: cpid,
+          source: dispense.source,
+          destination: dispense.destination,
+          dispenser_tx_hash: dispense.dispenser_tx_hash,
+          dispense_quantity: dispense.dispense_quantity,
+          confirmed: dispense.confirmed, // whether or not this is in the mempool
+          btc_amount: dispense.btc_amount_normalized,
+        }));
+
+        allDispenses = allDispenses.concat(dispenses);
+
+        // Check if there's a next cursor
+        cursor = response.next_cursor || null;
+        if (!cursor) {
+          break; // No more pages
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching dispenses for cpid ${cpid}:`,
+          error,
+        );
+        break;
+      }
+    }
+
+    return allDispenses;
+  }
+}
+
+export class XcpManager {
+  private static cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
+
+  private static async fetchXcpV2WithCache<T>(
+    endpoint: string,
+    queryParams: URLSearchParams,
+  ): Promise<T> {
+    const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
+
+    return await dbManager.handleCache(
+      cacheKey,
+      async () => {
+        const url = `${
+          xcp_v2_nodes[0].url
+        }${endpoint}?${queryParams.toString()}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+      },
+      this.cacheTimeout,
+    );
+  }
+
+  static getXcpHoldersByCpid = async (cpid: string) => {
+    const endpoint = `/assets/${cpid}/balances`;
+    let allHolders: any[] = [];
+    let cursor: string | null = null;
+    const limit = 1000;
+
+    while (true) {
+      const queryParams = new URLSearchParams({ limit: limit.toString() });
+      if (cursor) {
+        queryParams.append("cursor", cursor);
+      }
+
+      try {
+        const response = await this.fetchXcpV2WithCache<any>(
+          endpoint,
+          queryParams,
+        );
+
+        if (!response || !Array.isArray(response.result)) {
+          break;
+        }
+
+        const holders = response.result
+          .filter((holder: any) => holder.quantity > 0)
+          .map((holder: any) => ({
+            address: holder.address,
+            quantity: holder.quantity,
+          }));
+
+        allHolders = allHolders.concat(holders);
+
+        // Check if there's a next cursor
+        cursor = response.next_cursor || null;
+        if (!cursor) {
+          break; // No more pages
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching holders for cpid ${cpid}:`,
+          error,
+        );
+        break;
+      }
+    }
+
+    return allHolders;
+  };
+
+  static getXcpBalancesByAddress = async (address: string) => {
+    const endpoint = `/addresses/${address}/balances`;
+    let allBalances: any[] = [];
+    let cursor: string | null = null;
+    const limit = 1000;
+
+    while (true) {
+      const queryParams = new URLSearchParams({ limit: limit.toString() });
+      if (cursor) {
+        queryParams.append("cursor", cursor);
+      }
+
+      try {
+        const response = await this.fetchXcpV2WithCache<any>(
+          endpoint,
+          queryParams,
+        );
+
+        if (!response || !Array.isArray(response.result)) {
+          break;
+        }
+
+        const balances = response.result
+          .filter((balance: any) => balance.quantity > 0)
+          .map((balance: any) => ({
+            cpid: balance.asset,
+            quantity: balance.quantity,
+            divisible: balance.divisible,
+          }));
+
+        allBalances = allBalances.concat(balances);
+
+        // Check if there's a next cursor
+        cursor = response.next_cursor || null;
+        if (!cursor) {
+          break; // No more pages
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching balances for address ${address}:`,
+          error,
+        );
+        break;
+      }
+    }
+
+    return allBalances;
+  };
+
+  static getXcpSendsByCPID = async (cpid: string) => {
+    const endpoint = `/assets/${cpid}/sends`;
+    let allSends: any[] = [];
+    let cursor: string | null = null;
+    const limit = 1000;
+
+    while (true) {
+      const queryParams = new URLSearchParams({ limit: limit.toString() });
+      if (cursor) {
+        queryParams.append("cursor", cursor);
+      }
+
+      try {
+        const response = await this.fetchXcpV2WithCache<any>(
+          endpoint,
+          queryParams,
+        );
+
+        if (!response || !Array.isArray(response.result)) {
+          break;
+        }
+
+        const sends = response.result.map((send: any) => ({
+          tx_hash: send.tx_hash,
+          block_index: send.block_index,
+          source: send.source,
+          destination: send.destination,
+          quantity: send.quantity,
+          asset: cpid,
+          status: send.status,
+        }));
+
+        allSends = allSends.concat(sends);
+
+        // Check if there's a next cursor
+        cursor = response.next_cursor || null;
+        if (!cursor) {
+          break; // No more pages
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching sends for cpid ${cpid}:`,
+          error,
+        );
+        break;
+      }
+    }
+
+    return allSends;
+  };
+
+  private static getDispenseEvents(
     cursor: string | null = null,
     limit: number = 10000,
   ): Promise<{
@@ -355,7 +482,7 @@ export class XcpManager {
     }
     queryParams.append("limit", limit.toString());
 
-    return this.fetchWithCache<{
+    return this.fetchXcpV2WithCache<{
       result: DispenseEvent[];
       next_cursor: string | null;
       result_count: number;
