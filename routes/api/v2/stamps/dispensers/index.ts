@@ -13,7 +13,7 @@ export const handler: Handlers = {
 
       const [lastBlock, { total, dispensers }] = await Promise.all([
         BlockService.getLastBlock(),
-        DispenserManager.getAllDispensers(page, limit),
+        DispenserManager.getAllOpenStampDispensers(page, limit),
       ]);
 
       const body = {
