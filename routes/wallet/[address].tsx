@@ -26,8 +26,9 @@ export const handler: Handlers = {
     const selectedTab = url.searchParams.get("ident") || "my_items";
 
     const { address } = ctx.params;
-    const response = await Src20Controller.handleWalletBalanceRequest(address);
-    const responseData = await response.json();
+    const responseData = await Src20Controller.handleWalletBalanceRequest(
+      address,
+    );
 
     const data = {
       data: responseData.data,

@@ -4,33 +4,33 @@ import { TickHandlerContext } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 
 export const handler = async (
-  _req: Request,
+  req: Request,
   ctx: TickHandlerContext,
 ): Promise<Response> => {
-  let { tick } = ctx.params;
   try {
-    tick = convertEmojiToTick(String(tick));
+    const tick = convertEmojiToTick(String(ctx.params.tick));
 
-    const deploymentResponse = await Src20Controller
-      .handleSrc20TransactionsRequest(_req, {
-        tick: [tick],
-        op: "DEPLOY",
-        limit: 1,
-        page: 1,
-      });
-    const deploymentData = await deploymentResponse.json();
+    const [deploymentResponse, mintStatusResponse, lastBlockResponse] =
+      await Promise.all([
+        Src20Controller.handleSrc20TransactionsRequest(req, {
+          tick: [tick],
+          op: "DEPLOY",
+          limit: 1,
+          page: 1,
+        }),
+        Src20Controller.handleSrc20MintProgressRequest(tick),
+        Src20Controller.handleSrc20TransactionsRequest(req, {
+          limit: 1,
+          page: 1,
+          sort: "DESC",
+        }),
+      ]);
 
-    const mintStatusResponse = await Src20Controller
-      .handleSrc20MintProgressRequest(tick);
-    const mintStatusData = await mintStatusResponse.json();
-
-    const lastBlockResponse = await Src20Controller
-      .handleSrc20TransactionsRequest(_req, {
-        limit: 1,
-        page: 1,
-        sort: "DESC",
-      });
-    const lastBlockData = await lastBlockResponse.json();
+    const [deploymentData, mintStatusData, lastBlockData] = await Promise.all([
+      deploymentResponse,
+      mintStatusResponse,
+      lastBlockResponse,
+    ]);
 
     const body = {
       last_block: lastBlockData.last_block,
@@ -40,9 +40,10 @@ export const handler = async (
         tick: convertToEmoji(deploymentData.data[0].tick),
       },
     };
+
     return ResponseUtil.success(body);
   } catch (error) {
     console.error("Error in deploy handler:", error);
-    return ResponseUtil.error(`Error: Internal server error`);
+    return ResponseUtil.handleError(error, "Internal server error");
   }
 };
