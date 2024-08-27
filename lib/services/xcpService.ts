@@ -96,7 +96,7 @@ export class DispenserManager {
     while (true) {
       const queryParams = new URLSearchParams({
         limit: limit.toString(),
-        verbose: "true",
+        // verbose: "true",
       });
       if (cursor) {
         queryParams.append("cursor", cursor);
@@ -152,13 +152,16 @@ export class DispenserManager {
   }
 
   static async getAllOpenStampDispensers(page: number = 1, limit: number = 10) {
+    // FIXME: this is only returning the event for when they are opened, not all open dispensers
     const endpoint = "/events/OPEN_DISPENSER";
     let allDispensers: any[] = [];
     let cursor: string | null = null;
     const apiLimit = 1000;
 
     while (true) {
-      const queryParams = new URLSearchParams({ limit: apiLimit.toString() });
+      const queryParams = new URLSearchParams({
+        limit: apiLimit.toString(),
+      });
       if (cursor) {
         queryParams.append("cursor", cursor);
       }
@@ -271,6 +274,7 @@ export class DispenserManager {
           confirmed: dispense.confirmed, // whether or not this is in the mempool
           btc_amount: dispense.btc_amount_normalized,
           close_block_index: dispense.dispenser.close_block_index,
+          dispenser_details: dispense.dispenser,
         }));
 
         allDispenses = allDispenses.concat(dispenses);
@@ -296,6 +300,63 @@ export class DispenserManager {
 export class XcpManager {
   private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
+  static async getXcpAsset(cpid: string): Promise<any> {
+    const endpoint = `/assets/${cpid}`;
+    const queryParams = new URLSearchParams();
+
+    try {
+      const response = await this.fetchXcpV2WithCache<any>(
+        endpoint,
+        queryParams,
+      );
+
+      if (!response || typeof response !== "object") {
+        throw new Error(`Invalid response for asset ${cpid}`);
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`Error fetching asset info for cpid ${cpid}:`, error);
+      throw error;
+    }
+  }
+
+  static async getAllXcpAssets(maxRecords = 1000): Promise<any[]> { // TODO: maxRecords is used for dev testing, remove when we go to production
+    let allAssets: any[] = [];
+    let cursor: string | null = null;
+    const endpoint = "/assets";
+
+    do {
+      const remainingRecords = maxRecords - allAssets.length;
+      const queryLimit = Math.min(remainingRecords, 1000); // Limit to 1000 per request
+
+      const queryParams = new URLSearchParams({ limit: queryLimit.toString() });
+      if (cursor) {
+        queryParams.append("cursor", cursor);
+      }
+
+      const response = await this.fetchXcpV2WithCache<any>(
+        endpoint,
+        queryParams,
+      );
+
+      if (!response || !Array.isArray(response.result)) {
+        break;
+      }
+
+      allAssets = allAssets.concat(response.result);
+      cursor = response.next_cursor || null;
+
+      // Break the loop if we've reached or exceeded the maxRecords
+      if (allAssets.length >= maxRecords) {
+        break;
+      }
+    } while (cursor);
+
+    // Trim the result to exactly maxRecords if we've exceeded it
+    return allAssets.slice(0, maxRecords);
+  }
+
   static getXcpHoldersByCpid = async (cpid: string) => {
     const endpoint = `/assets/${cpid}/balances`;
     let allHolders: any[] = [];
@@ -303,7 +364,10 @@ export class XcpManager {
     const limit = 1000;
 
     while (true) {
-      const queryParams = new URLSearchParams({ limit: limit.toString() });
+      const queryParams = new URLSearchParams({
+        limit: limit.toString(),
+        // verbose: "true", // Only returns asset_info divisible, locked data (not supply)
+      });
       if (cursor) {
         queryParams.append("cursor", cursor);
       }

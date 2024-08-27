@@ -8,8 +8,64 @@ import { CollectionService } from "$lib/services/collectionService.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { paginate } from "utils/util.ts";
 import { PaginatedStampBalanceResponseBody } from "globals";
+import { DispenserManager, XcpManager } from "$lib/services/xcpService.ts";
+const NO_DISPENSERS = Symbol("NO_DISPENSERS");
+
+export class InMemoryCacheService {
+  private static cache: { [key: string]: { data: any; expiry: number } } = {};
+
+  static set(key: string, data: any, duration: number): void {
+    const expiry = Date.now() + duration;
+    this.cache[key] = { data, expiry };
+  }
+
+  static get(key: string): any | null {
+    const item = this.cache[key];
+    if (item && item.expiry > Date.now()) {
+      return item.data;
+    }
+    delete this.cache[key];
+    return null;
+  }
+}
 
 export class StampController {
+  private static CacheService = InMemoryCacheService;
+
+  private static async getXcpAssetsWithInMemoryCache(): Promise<any[]> {
+    const cacheKey = "xcp_assets";
+    const cacheDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
+
+    let xcpAssets = StampController.CacheService.get(cacheKey);
+    if (!xcpAssets) {
+      xcpAssets = await XcpManager.getAllXcpAssets();
+      StampController.CacheService.set(cacheKey, xcpAssets, cacheDuration);
+    }
+
+    return xcpAssets;
+  }
+
+  private static async getDispensersWithCache(cpid: string): Promise<any[]> {
+    const cacheKey = `dispensers_${cpid}`;
+    const cacheDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
+
+    let dispensers = StampController.CacheService.get(cacheKey);
+    if (dispensers === NO_DISPENSERS) {
+      return null;
+    }
+    console.log("Dispensers from cache:", dispensers);
+    if (!dispensers) {
+      dispensers = await DispenserManager.getDispensersByCpid(cpid);
+      StampController.CacheService.set(
+        cacheKey,
+        dispensers ?? NO_DISPENSERS,
+        cacheDuration,
+      );
+    }
+
+    return dispensers;
+  }
+
   static async getStampDetailsById(id: string) {
     try {
       const res = await StampService.getStampDetailsById(id, "all");
@@ -18,6 +74,7 @@ export class StampController {
       }
 
       const {
+        asset,
         stamp,
         holders,
         sends,
@@ -27,6 +84,12 @@ export class StampController {
         last_block,
       } = res;
 
+      // Note: replace mutable fields of the stamp with the values from xcp asset
+      if (asset) {
+        stamp.divisible = asset.divisible ?? stamp.divisible;
+        stamp.locked = asset.locked ?? stamp.locked;
+        stamp.supply = asset.supply ?? stamp.supply;
+      }
       const processedHolders = holders.map((holder: HolderRow) => ({
         address: holder.address,
         quantity: holder.divisible
@@ -34,15 +97,16 @@ export class StampController {
           : holder.quantity,
       }));
 
-      // Calculate floor price
-      let floorPrice = "priceless";
+      let floorPrice: string | number = "priceless";
       if (dispensers && dispensers.length > 0) {
         const openDispensers = dispensers.filter(
           (dispenser) => dispenser.give_remaining > 0,
         );
         if (openDispensers.length > 0) {
           const lowestBtcRate = Math.min(
-            ...openDispensers.map((dispenser) => dispenser.btcrate),
+            ...openDispensers.map((dispenser) =>
+              dispenser.satoshirate / 100000000 // Note: btcrate was sometimes returning null
+            ),
           );
           floorPrice = lowestBtcRate;
         }
@@ -98,7 +162,7 @@ export class StampController {
     allColumns?: boolean;
   } = {}) {
     try {
-      const [result, lastBlock] = await Promise.all([
+      const [stampResult, lastBlock, xcpAssets] = await Promise.all([
         StampService.getStamps({
           page,
           limit,
@@ -113,24 +177,64 @@ export class StampController {
           noPagination,
         }),
         BlockService.getLastBlock(),
+        this.getXcpAssetsWithInMemoryCache(),
       ]);
 
-      if (!result) {
+      if (!stampResult) {
         throw new Error("No stamps found");
       }
 
-      let stamps = result.stamps;
+      const updatedStamps = await Promise.all(
+        stampResult.stamps.map(async (stamp) => {
+          const xcpAsset = xcpAssets.find((asset) =>
+            asset.asset === stamp.cpid
+          );
+          let floorPrice: string | number | undefined = undefined;
+
+          if (stamp.ident === "STAMP" || stamp.ident === "SRC-721") {
+            const dispensers = await this.getDispensersWithCache(stamp.cpid);
+
+            if (dispensers && dispensers.length > 0) {
+              const openDispensers = dispensers.filter(
+                (dispenser) => dispenser.give_remaining > 0,
+              );
+              if (openDispensers.length > 0) {
+                const lowestBtcRate = Math.min(
+                  ...openDispensers.map((dispenser) =>
+                    dispenser.satoshirate / 100000000
+                  ),
+                );
+                floorPrice = lowestBtcRate;
+              } else {
+                floorPrice = "priceless";
+              }
+            } else {
+              floorPrice = "priceless";
+            }
+          }
+
+          return {
+            ...stamp,
+            divisible: xcpAsset?.divisible ?? stamp.divisible,
+            supply: xcpAsset?.supply ?? stamp.supply,
+            locked: xcpAsset?.locked ?? stamp.locked,
+            ...(floorPrice !== undefined && { floorPrice }),
+          };
+        }),
+      );
+
+      let stamps = updatedStamps;
       if (sortBy !== "none" || filterBy.length > 0) {
         stamps = sortData(filterData(stamps, filterBy), sortBy, orderBy);
       }
 
       return {
-        page: result.page,
-        limit: result.page_size,
-        totalPages: result.pages,
-        total: result.total,
+        page: stampResult.page,
+        limit: stampResult.page_size,
+        totalPages: stampResult.pages,
+        total: stampResult.total,
         last_block: lastBlock.last_block || lastBlock,
-        data: result.stamps,
+        data: stamps,
       };
     } catch (error) {
       console.error("Error in getStamps:", error);
