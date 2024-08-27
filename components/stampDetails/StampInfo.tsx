@@ -15,7 +15,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
     : "named";
   return (
     <div class="flex flex-col text-gray-200 bg-[#2B0E49]">
-      <div class="flex items-center truncate text-[#C184FF] text-5xl p-6 pb-0">
+      <div class="flex items-center truncate text-[#C184FF] text-2xl md:text-5xl p-6 pb-0">
         <p>
           Stamp: #{stamp.stamp}
         </p>

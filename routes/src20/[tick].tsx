@@ -4,6 +4,8 @@ import { SRC20DetailsTab } from "$islands/src20/SRC20DetailsTab.tsx";
 import { convertEmojiToTick } from "utils/util.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
+import { HoldersInfo } from "$components/HoldersInfo.tsx";
+import { TransfersInfo } from "$components/TransfersInfo.tsx";
 
 export const handler: Handlers = {
   async GET(_req: Request, ctx) {
@@ -114,7 +116,7 @@ export const SRC20TickPage = (props) => {
         total_mints={total_mints}
         total_transfers={total_transfers}
       />
-      <div class="w-full flex flex-col md:flex-row gap-4 items-center justify-center">
+      <div class="w-full flex flex-col md:flex-row gap-20 justify-center">
         <div class="w-full md:w-2/5 h-full">
           <SRC20DetailsTab
             holders={holders}
@@ -122,7 +124,9 @@ export const SRC20TickPage = (props) => {
             mints={mints}
           />
         </div>
-        <div class="relative w-full md:w-3/5">
+        <div class="relative w-full md:w-3/5 flex justify-center">
+          <HoldersInfo holders={holders} />
+          {/* <TransfersInfo transfers={transfers} /> */}
         </div>
       </div>
     </div>
