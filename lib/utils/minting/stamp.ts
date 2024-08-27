@@ -2,7 +2,7 @@ import * as btc from "bitcoin";
 import { Buffer } from "buffer";
 
 import { generateRandomNumber } from "utils/util.ts";
-import { handleXcpQuery } from "utils/xcpUtils.ts";
+import { handleXcpV1Query } from "utils/xcpUtils.ts";
 import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
 import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
@@ -13,6 +13,16 @@ export const burnkeys = [
   "033333333333333333333333333333333333333333333333333333333333333333",
   "020202020202020202020202020202020202020202020202020202020202020202",
 ];
+
+interface stampMintCIP33 {
+  sourceWallet: string;
+  assetName: string;
+  qty: number;
+  locked: boolean;
+  divisible: boolean;
+  description: string;
+  satsPerKB: number;
+}
 
 export const transferMethod = ({
   sourceWallet,
@@ -183,7 +193,7 @@ export async function mintStampApiCall(
       base64Data,
       satsPerKB,
     });
-    const response = await handleXcpQuery(method);
+    const response = await handleXcpV1Query(method);
     return response;
   } catch (error) {
     console.error("mint error", error);
@@ -305,7 +315,7 @@ export async function checkAssetAvailability(assetName: string) {
         "asset": assetName,
       },
     };
-    const result = await handleXcpQuery(method);
+    const result = await handleXcpV1Query(method);
     if (!result.legth) {
       return true;
     }
