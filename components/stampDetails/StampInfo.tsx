@@ -111,6 +111,14 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
         <p class="text-xl font-semibold">Keyburned</p>
         <p class="text-[#60626F]">{stamp.keyburn ?? false ? "Yes" : "No"}</p>
       </div>
+      <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
+        <p class="text-xl font-semibold">Floor Price</p>
+        <p class="text-[#60626F]">
+          {typeof stamp.floorPrice === "number"
+            ? `${stamp.floorPrice} BTC`
+            : stamp.floorPrice}
+        </p>
+      </div>
       <div class="flex flex-col gap-1 truncate text-[#F5F5F5] px-6 py-4">
         {/* <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4"> */}
         <p class="text-xl font-semibold">Vault Address</p>

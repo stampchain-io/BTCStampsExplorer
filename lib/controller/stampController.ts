@@ -34,16 +34,33 @@ export class StampController {
           : holder.quantity,
       }));
 
+      // Calculate floor price
+      let floorPrice = "priceless";
+      if (dispensers && dispensers.length > 0) {
+        const openDispensers = dispensers.filter(
+          (dispenser) => dispenser.give_remaining > 0,
+        );
+        if (openDispensers.length > 0) {
+          const lowestBtcRate = Math.min(
+            ...openDispensers.map((dispenser) => dispenser.btcrate),
+          );
+          floorPrice = lowestBtcRate;
+        }
+      }
+
       return {
         data: {
-          stamp,
+          stamp: {
+            ...stamp,
+            floorPrice,
+          },
           holders: processedHolders,
           sends,
           dispensers,
           dispenses,
           total,
         },
-        last_block, // TODO: add type
+        last_block,
       };
     } catch (error) {
       console.error("Error in StampController.getStampDetailsById:", error);
