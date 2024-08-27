@@ -1,5 +1,4 @@
 import { Src20Service } from "$lib/services/src20Service.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
 import {
   SRC20BalanceRequestParams,
   SRC20SnapshotRequestParams,
@@ -12,73 +11,50 @@ import { BlockService } from "$lib/services/blockService.ts";
 export class Src20Controller {
   static async getTotalCountValidSrc20Tx(tick?: string, op?: string) {
     try {
-      const total = await Src20Service.getTotalCountValidSrc20Tx({ tick, op });
-      return ResponseUtil.success({ total });
+      return await Src20Service.getTotalCountValidSrc20Tx({ tick, op });
     } catch (error) {
       console.error("Error getting total valid SRC20 transactions:", error);
-      return ResponseUtil.error("Error getting total valid SRC20 transactions");
+      throw error;
     }
   }
 
   static async handleSrc20TransactionsRequest(
     _req: Request,
     params: SRC20TrxRequestParams,
-  ): Promise<Response> {
+  ) {
     try {
-      const src20Data = await Src20Service.fetchAndFormatSrc20Data(params);
-      return ResponseUtil.success(src20Data);
+      return await Src20Service.fetchAndFormatSrc20Data(params);
     } catch (error) {
       console.error("Error processing SRC20 transaction request:", error);
-      return ResponseUtil.error(
-        `Error: Internal server error. ${error.message || ""}`,
-        500,
-      );
+      throw error;
     }
   }
 
   static async handleAllSrc20DataForTickRequest(tick: string) {
     try {
-      const allData = await Src20Service.fetchAllSrc20DataForTick(tick);
-      return ResponseUtil.success(allData);
+      return await Src20Service.fetchAllSrc20DataForTick(tick);
     } catch (error) {
       console.error("Error processing all SRC20 data request for tick:", error);
-      return ResponseUtil.error(
-        `Error: Internal server error. ${error.message || ""}`,
-        500,
-      );
+      throw error;
     }
   }
 
   static async handleSrc20BalanceRequest(params: SRC20BalanceRequestParams) {
     try {
-      const responseBody = await Src20Service.fetchSrc20Balance(params);
-      return ResponseUtil.success(responseBody);
+      return await Src20Service.fetchSrc20Balance(params);
     } catch (error) {
       console.error("Error processing SRC20 balance request:", error);
       console.error("Params:", JSON.stringify(params));
-      if (error.message === "SRC20 balance not found") {
-        return ResponseUtil.error("Error: SRC20 balance not found", 404);
-      }
-      return ResponseUtil.error(
-        `Error: Internal server error. ${error.message || ""}`,
-        500,
-      );
+      throw error;
     }
   }
 
   static async handleSrc20SnapshotRequest(params: SRC20SnapshotRequestParams) {
-    // TODO: revise this to query SRC20Valid for prior block balances
     try {
-      const responseBody = await Src20Service.fetchAndFormatSrc20Snapshot(
-        params,
-      );
-      return ResponseUtil.success(responseBody);
+      return await Src20Service.fetchAndFormatSrc20Snapshot(params);
     } catch (error) {
       console.error("Error processing SRC20 snapshot request:", error);
-      return ResponseUtil.error(
-        `Error: Internal server error. ${error.message || ""}`,
-        500,
-      );
+      throw error;
     }
   }
 
@@ -86,24 +62,21 @@ export class Src20Controller {
     try {
       const responseBody = await Src20Service.getSrc20MintProgressByTick(tick);
       if (responseBody === null) {
-        return ResponseUtil.error("Error: SRC20 mint progress not found", 404);
+        throw new Error("SRC20 mint progress not found");
       }
-      return ResponseUtil.success(responseBody);
+      return responseBody;
     } catch (error) {
       console.error("Error processing SRC20 mint progress request:", error);
-      return ResponseUtil.error(
-        `Error: Internal server error. ${error.message || ""}`,
-      );
+      throw error;
     }
   }
 
   static async handleCheckMintedOut(tick: string, amount: string) {
     try {
-      const result = await Src20Service.checkMintedOut(tick, amount);
-      return ResponseUtil.success(result);
+      return await Src20Service.checkMintedOut(tick, amount);
     } catch (error) {
       console.error("Error checking minted out status:", error);
-      return ResponseUtil.error(`Error: ${error.message}`, 500);
+      throw error;
     }
   }
 
@@ -113,7 +86,7 @@ export class Src20Controller {
     page = 1,
   ) {
     try {
-      const subLimit = Math.ceil(limit / 2); // Split the limit between stamps and src20
+      const subLimit = Math.ceil(limit / 2);
       const [btcInfo, stampsResponse, src20Response, lastBlock] = await Promise
         .allSettled([
           getBtcAddressInfo(address),
@@ -132,7 +105,7 @@ export class Src20Controller {
         ? stampsResponse.value
         : { stamps: [], total: 0 };
       const src20Data = src20Response.status === "fulfilled"
-        ? await src20Response.value.json()
+        ? src20Response.value
         : { data: [], last_block: 0 };
       const lastBlockData = lastBlock.status === "fulfilled"
         ? lastBlock.value
@@ -143,7 +116,7 @@ export class Src20Controller {
       const totalItems = stampsTotal + src20Total;
       const totalPages = Math.ceil(totalItems / limit);
 
-      return ResponseUtil.success({
+      return {
         btc: btcData,
         data: {
           stamps: stampsData.stamps,
@@ -156,13 +129,10 @@ export class Src20Controller {
           totalPages,
         },
         last_block: src20Data.last_block || lastBlockData?.last_block || 0,
-      });
+      };
     } catch (error) {
       console.error("Error processing wallet balance request:", error);
-      return ResponseUtil.error(
-        `Error: Internal server error. ${error.message || ""}`,
-        500,
-      );
+      throw error;
     }
   }
 }

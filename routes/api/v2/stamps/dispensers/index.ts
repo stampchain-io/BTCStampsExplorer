@@ -24,8 +24,8 @@ export const handler: Handlers = {
 
       return ResponseUtil.success(body);
     } catch (error) {
-      console.error("Error:", error);
-      return ResponseUtil.error("Internal server error", 500);
+      console.error("Error in dispensers handler:", error);
+      return ResponseUtil.handleError(error, "Error processing request");
     }
   },
 };

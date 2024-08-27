@@ -8,7 +8,7 @@ import { Src20Controller } from "$lib/controller/src20Controller.ts";
 export async function checkMintedOut(tick: string, amount: string) {
   try {
     const response = await Src20Controller.handleCheckMintedOut(tick, amount);
-    const result = await response.json();
+    const result = await response;
     if (response.ok) {
       return result;
     } else {
