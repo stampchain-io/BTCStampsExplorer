@@ -7,13 +7,8 @@ import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
 export async function checkMintedOut(tick: string, amount: string) {
   try {
-    const response = await Src20Controller.handleCheckMintedOut(tick, amount);
-    const result = await response;
-    if (response.ok) {
-      return result;
-    } else {
-      throw new Error(result.error || "Error checking minted out status");
-    }
+    const result = await Src20Controller.handleCheckMintedOut(tick, amount);
+    return result;
   } catch (error) {
     console.error(error);
     throw new Error("Error: Internal server error");
@@ -201,8 +196,7 @@ export async function checkEnoughBalance(
       page: 1,
     };
 
-    const response = await Src20Controller.handleSrc20BalanceRequest(params);
-    const balanceData = await response.json();
+    const balanceData = await Src20Controller.handleSrc20BalanceRequest(params);
 
     if (!balanceData || !balanceData.data) {
       console.error("No SRC-20 token balance found");
