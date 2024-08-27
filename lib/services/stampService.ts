@@ -1,6 +1,5 @@
 import { StampRepository } from "$lib/database/index.ts";
 import { BlockService } from "$lib/services/blockService.ts";
-import { get_holders, get_sends } from "$lib/services/xcpService.ts";
 import { StampBalance, SUBPROTOCOLS } from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
@@ -28,11 +27,11 @@ export class StampService {
 
     const [holders, dispensers, sends, dispenses, total, lastBlock] =
       await Promise.all([
-        get_holders(cpid),
+        XcpManager.getXcpHoldersByCpid(cpid),
         DispenserManager.getDispensersByCpid(cpid, filter),
-        get_sends(cpid),
+        XcpManager.getXcpSendsByCPID(cpid),
         DispenserManager.getDispensesByCpid(cpid),
-        StampRepository.getTotalStampCountFromDb("stamps"),
+        StampRepository.getTotalStampCountFromDb({ type: "stamps" }),
         BlockService.getLastBlock(),
       ]);
 

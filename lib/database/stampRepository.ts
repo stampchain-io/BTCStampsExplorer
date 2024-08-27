@@ -1,11 +1,11 @@
 import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
-import { get_balances } from "$lib/services/xcpService.ts";
 import { getFileSuffixFromMime } from "utils/util.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { StampBalance, XCPBalance } from "globals";
 import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$lib/database/db.ts";
+import { XcpManager } from "$lib/services/xcpService.ts";
 
 export class StampRepository {
   static sanitize(input: string): string {
@@ -168,7 +168,7 @@ export class StampRepository {
     address: string,
   ) {
     try {
-      const xcp_balances = await get_balances(address);
+      const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
       const assets = xcp_balances.map((balance: any) => balance.cpid);
       if (assets.length === 0) {
         return {
@@ -356,7 +356,7 @@ export class StampRepository {
   ): Promise<StampBalance[]> {
     const offset = (page - 1) * limit;
     try {
-      const xcp_balances = await get_balances(address);
+      const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
       const assets = xcp_balances.map((balance: XCPBalance) => balance.cpid);
 
       const query = `

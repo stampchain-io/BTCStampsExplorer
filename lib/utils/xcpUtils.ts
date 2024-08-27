@@ -1,4 +1,4 @@
-import { xcp_public_nodes } from "../services/xcpService.ts";
+import { xcp_public_nodes, xcp_v2_nodes } from "../services/xcpService.ts";
 import { XCPParams } from "globals";
 import { dbManager } from "$lib/database/db.ts";
 
