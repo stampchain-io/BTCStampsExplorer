@@ -28,7 +28,7 @@ export async function handleXcpApiRequestWithCache(
     cacheKey,
     async () => {
       const payload = CreatePayload(method, params);
-      return await handleXcpQuery(payload);
+      return await handleXcpV1Query(payload);
     },
     cacheDuration,
   );
@@ -75,7 +75,7 @@ const handleXcpQueryWIthRetries = async (
  * @param payload - The query payload to be sent to the nodes.
  * @returns The result of the successful query or null if all queries fail.
  */
-export const handleXcpQuery = async (payload: any) => {
+export const handleXcpV1Query = async (payload: any) => {
   for (const node of xcp_public_nodes) {
     const auth = btoa(`${node.user}:${node.password}`);
     const result = await handleXcpQueryWIthRetries(node.url, auth, payload, 0);

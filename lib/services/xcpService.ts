@@ -57,34 +57,33 @@ export const xcp_public_nodes = [
   },
 ];
 
+const cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
+
+export async function fetchXcpV2WithCache<T>(
+  endpoint: string,
+  queryParams: URLSearchParams,
+): Promise<T> {
+  const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
+
+  return await dbManager.handleCache(
+    cacheKey,
+    async () => {
+      const url = `${xcp_v2_nodes[0].url}${endpoint}?${queryParams.toString()}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    },
+    cacheTimeout,
+  );
+}
 // curl -X GET 'https://api.counterparty.io:4000/v2/healthz'
 // {"result": {"status": "Healthy"}}%
 
 export class DispenserManager {
   private static cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
-  private static handleXcpApiRequestWithCache = handleXcpApiRequestWithCache;
-
-  private static async fetchXcpV2WithCache<T>(
-    endpoint: string,
-    queryParams: URLSearchParams,
-  ): Promise<T> {
-    const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
-
-    return await dbManager.handleCache(
-      cacheKey,
-      async () => {
-        const url = `${
-          xcp_v2_nodes[0].url
-        }${endpoint}?${queryParams.toString()}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-      },
-      this.cacheTimeout,
-    );
-  }
+  private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
   static async getDispensersByCpid(
     cpid: string,
@@ -295,29 +294,7 @@ export class DispenserManager {
 }
 
 export class XcpManager {
-  private static cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
-
-  private static async fetchXcpV2WithCache<T>(
-    endpoint: string,
-    queryParams: URLSearchParams,
-  ): Promise<T> {
-    const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
-
-    return await dbManager.handleCache(
-      cacheKey,
-      async () => {
-        const url = `${
-          xcp_v2_nodes[0].url
-        }${endpoint}?${queryParams.toString()}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-      },
-      this.cacheTimeout,
-    );
-  }
+  private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
   static getXcpHoldersByCpid = async (cpid: string) => {
     const endpoint = `/assets/${cpid}/balances`;
