@@ -8,9 +8,8 @@ import { BIG_LIMIT } from "utils/constants.ts";
 export class StampService {
   static async getStampDetailsById(
     id: string,
-    filter: "open" | "closed" | "all" = "open",
+    filter: "open" | "closed" | "all" = "all",
   ) {
-    console.log(`getStampDetailsById called with id: ${id}`);
     const stampResult = await StampRepository.getStampsFromDb({
       identifier: id,
       allColumns: true,
