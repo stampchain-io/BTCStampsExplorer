@@ -22,11 +22,10 @@ export const handler: Handlers = {
         sort: sortBy,
       };
 
-      const result = await Src20Controller.handleSrc20TransactionsRequest(
+      const resultData = await Src20Controller.handleSrc20TransactionsRequest(
         req,
         params,
       );
-      const resultData = await result.json();
 
       const data = {
         src20s: resultData.data || [],
