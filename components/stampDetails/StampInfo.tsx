@@ -1,6 +1,5 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
-
 import { abbreviateAddress } from "utils/util.ts";
 
 import { StampRow } from "globals";
@@ -61,7 +60,12 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
       <div class="flex justify-between items-end gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
         <div className="flex flex-col">
           <p class="text-xl font-semibold">Block #</p>
-          <p class="text-[#60626F]">832124</p>
+          <a
+            href={`/block/${stamp.block_index}`}
+            class="text-[#60626F] hover:underline"
+          >
+            {stamp.block_index}
+          </a>
         </div>
         <img
           src="/img/icon_copy_to_clipboard.png"
@@ -97,15 +101,15 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
       </div>
       <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
         <p class="text-xl font-semibold">Locked</p>
-        <p class="text-[#60626F]">Yes</p>
+        <p class="text-[#60626F]">{stamp.locked ?? false ? "Yes" : "No"}</p>
       </div>
       <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
         <p class="text-xl font-semibold">Divisible</p>
-        <p class="text-[#60626F]">No</p>
+        <p class="text-[#60626F]">{stamp.divisible ? "Yes" : "No"}</p>
       </div>
       <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
         <p class="text-xl font-semibold">Keyburned</p>
-        <p class="text-[#60626F]">No</p>
+        <p class="text-[#60626F]">{stamp.keyburn ?? false ? "Yes" : "No"}</p>
       </div>
       <div class="flex flex-col gap-1 truncate text-[#F5F5F5] px-6 py-4">
         {/* <div class="flex flex-col gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4"> */}
