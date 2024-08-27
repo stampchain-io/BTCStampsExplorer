@@ -10,26 +10,49 @@ export class StampService {
     id: string,
     filter: "open" | "closed" | "all" = "all",
   ) {
-    const stampResult = await StampRepository.getStampsFromDb({
+    const stampResult = await this.getStamps({
       identifier: id,
       allColumns: true,
       noPagination: true,
       cacheDuration: "never",
     });
 
-    if (!stampResult || stampResult.rows.length === 0) {
+    if (!stampResult) {
       throw new Error(`Error: Stamp ${id} not found`);
     }
 
-    const stamp = stampResult.rows[0];
+    let stamp;
+    if (Array.isArray(stampResult.rows)) {
+      if (stampResult.rows.length === 0) {
+        throw new Error(`Error: Stamp ${id} not found`);
+      }
+      stamp = stampResult.rows[0];
+    } else if (stampResult.stamp) {
+      stamp = stampResult.stamp;
+    } else {
+      stamp = stampResult;
+    }
+
     const cpid = stamp.cpid;
 
-    const [holders, dispensers, sends, dispenses, total, lastBlock] =
+    const isStampOrSrc721 = stamp.ident === "STAMP" ||
+      stamp.ident === "SRC-721";
+
+    const [asset, holders, dispensers, sends, dispenses, total, lastBlock] =
       await Promise.all([
-        XcpManager.getXcpHoldersByCpid(cpid),
-        DispenserManager.getDispensersByCpid(cpid, filter),
-        XcpManager.getXcpSendsByCPID(cpid),
-        DispenserManager.getDispensesByCpid(cpid),
+        isStampOrSrc721 ? XcpManager.getXcpAsset(cpid) : Promise.resolve(null),
+        isStampOrSrc721
+          ? XcpManager.getXcpHoldersByCpid(cpid)
+          : Promise.resolve([]),
+        isStampOrSrc721
+          ? DispenserManager.getDispensersByCpid(cpid, filter)
+          : Promise.resolve([]),
+        isStampOrSrc721
+          ? XcpManager.getXcpSendsByCPID(cpid)
+          : Promise.resolve([]),
+        isStampOrSrc721
+          ? DispenserManager.getDispensesByCpid(cpid)
+          : Promise.resolve([]),
         StampRepository.getTotalStampCountFromDb({ type: "stamps" }),
         BlockService.getLastBlock(),
       ]);
@@ -37,6 +60,7 @@ export class StampService {
     // FIXME: Need to merge the mutable fields of the stamp into the XCP response data ( divisible/locked )
     return {
       last_block: lastBlock.last_block,
+      asset: asset ? asset.result : null,
       stamp,
       holders,
       sends,
