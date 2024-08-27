@@ -1,4 +1,3 @@
-import { handleXcpApiRequestWithCache } from "utils/xcpUtils.ts";
 import { StampService } from "$lib/services/stampService.ts";
 import { dbManager } from "$lib/database/db.ts";
 
@@ -271,6 +270,7 @@ export class DispenserManager {
           dispense_quantity: dispense.dispense_quantity,
           confirmed: dispense.confirmed, // whether or not this is in the mempool
           btc_amount: dispense.btc_amount_normalized,
+          close_block_index: dispense.dispenser.close_block_index,
         }));
 
         allDispenses = allDispenses.concat(dispenses);
