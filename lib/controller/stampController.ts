@@ -98,6 +98,8 @@ export class StampController {
       }));
 
       let floorPrice: string | number = "priceless";
+      let marketCap: string | number = "priceless";
+
       if (dispensers && dispensers.length > 0) {
         const openDispensers = dispensers.filter(
           (dispenser) => dispenser.give_remaining > 0,
@@ -112,11 +114,19 @@ export class StampController {
         }
       }
 
+      if (dispenses && dispenses.length > 0 && stamp.supply) {
+        const mostRecentDispense = dispenses[0]; // Assuming dispenses are sorted by recency
+        const recentPrice = mostRecentDispense.dispenser_details.satoshirate /
+          100000000;
+        marketCap = recentPrice * stamp.supply;
+      }
+
       return {
         data: {
           stamp: {
             ...stamp,
             floorPrice,
+            marketCap,
           },
           holders: processedHolders,
           sends,
