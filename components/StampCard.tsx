@@ -92,7 +92,9 @@ export function StampCard({
                 : abbreviateAddress(stamp.creator, 6)}
             </h3>
             <h3 className="truncate text-[13px] text-[#C7C5C5]">
-              {stamp.floorPrice ? `${stamp.floorPrice} BTC` : "priceless"}
+              {Number.isFinite(stamp.floorPrice)
+                ? `${stamp.floorPrice} BTC`
+                : "priceless"}
             </h3>
           </div>
         </div>
