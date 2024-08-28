@@ -1,8 +1,6 @@
-export function CollectionCard({
-  collection,
-}: {
-  collection: CollectionRow;
-}) {
+import { Collection } from "globals";
+
+export function CollectionCard({ collection }: { collection: Collection }) {
   return (
     <a
       href={`/collection/${collection.collection_name}`}
@@ -12,12 +10,12 @@ export function CollectionCard({
         <div class="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden rounded-lg">
           <div class="center relative aspect-square overflow-hidden">
             <img
-              src="/img/mock.png"
+              src={collection.first_stamp_image || "/img/mock.png"}
               loading="lazy"
               onError={(e) => {
-                e.currentTarget.src = `/not-available.png`;
+                (e.target as HTMLImageElement).src = `/not-available.png`;
               }}
-              alt="collection image"
+              alt={`First stamp in ${collection.collection_name}`}
               class="h-full w-full object-contain items-center standalone:h-full standalone:w-auto pixelart image-rendering-pixelated"
             />
           </div>
@@ -31,7 +29,11 @@ export function CollectionCard({
         </div>
         <div>
           <div class="flex justify-between text-black">
-            <h3 class="text-[#BF83FC]">Floor Price : $0.09863</h3>
+            <h3 class="text-[#BF83FC]">
+              Floor Price: {Number.isFinite(collection.floorPrice)
+                ? `${parseFloat(collection.floorPrice.toFixed(8))} BTC`
+                : collection.floorPrice || "N/A"}
+            </h3>
           </div>
         </div>
       </div>
