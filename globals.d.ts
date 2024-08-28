@@ -489,6 +489,10 @@ export interface Config {
 declare global {
   interface GlobalThis {
     SKIP_REDIS_CONNECTION: boolean | undefined;
+    LeatherProvider: {
+      request: (method: string, params?: any) => Promise<any>;
+      // Add other known properties and methods of LeatherProvider here
+    };
   }
 }
 
