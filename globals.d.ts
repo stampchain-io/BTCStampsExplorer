@@ -458,7 +458,8 @@ interface Collection {
   collection_id: string;
   collection_name: string;
   creators: string[];
-  stamps: StampRow[];
+  first_stamp_image: string | null;
+  stamps?: StampRow[];
 }
 
 interface CollectionQueryParams extends PaginationQueryParams {

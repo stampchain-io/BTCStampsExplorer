@@ -121,7 +121,7 @@ export class DispenserManager {
           give_remaining: dispenser.give_remaining,
           escrow_quantity: dispenser.escrow_quantity,
           satoshirate: dispenser.satoshirate,
-          btcrate: dispenser.satoshirate_normalized,
+          btcrate: dispenser.satoshirate / 100000000,
           origin: dispenser.origin,
           confirmed: dispenser.confirmed, // whether or not this is in the mempool
           close_block_index: dispenser.close_block_index,

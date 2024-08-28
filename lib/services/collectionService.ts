@@ -7,6 +7,7 @@ import {
 } from "globals";
 import { paginate } from "utils/util.ts";
 import { StampRepository } from "$lib/database/stampRepository.ts";
+import { StampController } from "$lib/controller/stampController.ts";
 
 export class CollectionService {
   static async getCollections(
@@ -59,10 +60,34 @@ export class CollectionService {
 
     const collections: Collection[] = await Promise.all(
       collectionsResult.rows.map(async (row: any) => {
+        const stampResult = await StampController.getStamps({
+          limit: 100, // Increased limit to get more stamps
+          collectionId: row.collection_id,
+          noPagination: true,
+          type: "all",
+          orderBy: "DESC",
+        });
+
+        let lowestFloorPrice = Infinity;
+        let firstStampImage = null;
+
+        for (const stamp of stampResult.data) {
+          if (
+            typeof stamp.floorPrice === "number" && !isNaN(stamp.floorPrice)
+          ) {
+            lowestFloorPrice = Math.min(lowestFloorPrice, stamp.floorPrice);
+          }
+          if (!firstStampImage && stamp.stamp_url) {
+            firstStampImage = stamp.stamp_url;
+          }
+        }
+
         return {
           collection_id: row.collection_id,
           collection_name: row.collection_name,
-          creators: row.creators ? row.creators.split(",") : [], // FIXME: this is returning [] incorrectly
+          creators: row.creators ? row.creators.split(",") : [],
+          first_stamp_image: firstStampImage,
+          floorPrice: lowestFloorPrice !== Infinity ? lowestFloorPrice : null,
         };
       }),
     );
@@ -88,18 +113,19 @@ export class CollectionService {
     }
 
     const row = collectionResult.rows[0];
-    const stamps = await StampRepository.getStampsFromDb({
+    const stamps = await StampController.getStamps({
       limit: limit,
       collectionId: row.collection_id,
       noPagination: true,
       type: "all",
+      sortBy: "desc",
     });
 
     return {
       collection_id: row.collection_id,
       collection_name: row.collection_name,
       creators: row.creators ? row.creators.split(",") : [],
-      stamps: stamps.rows.slice(0, limit), // Ensure we only return up to the limit
+      stamps: stamps?.data?.slice(0, limit) ?? [],
     };
   }
 }

@@ -65,19 +65,12 @@ export const handler: Handlers = {
       collectionId,
     });
 
-    const { stamps, pages, pag, limit } = {
-      stamps: result.data,
-      pages: result.totalPages,
-      page: result.page,
-      limit: result.limit,
-    };
-
     const data = {
       id,
-      stamps,
-      page: pag,
-      pages,
-      page_size: limit,
+      stamps: result.data,
+      page: result.page,
+      pages: result.totalPages,
+      page_size: result.limit,
       filterBy,
       sortBy,
       selectedTab,
