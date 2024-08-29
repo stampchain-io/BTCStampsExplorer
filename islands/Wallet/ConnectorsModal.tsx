@@ -9,6 +9,8 @@ interface Props {
 export const ConnectorsModal = (
   { connectors, toggleModal, handleCloseModal }: Props,
 ) => {
+  console.log("Rendering ConnectorsModal with connectors:", connectors);
+
   return (
     <div
       class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-blackbg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
@@ -48,6 +50,7 @@ export const ConnectorsModal = (
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
             {connectors.map((renderConnector, index) => {
               if (typeof renderConnector === "function") {
+                console.log(`Rendering connector at index ${index}`);
                 return renderConnector({ key: index, toggleModal });
               }
               return null;
