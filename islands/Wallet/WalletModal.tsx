@@ -107,9 +107,19 @@ export const WalletModal = ({ connectors }: Props) => {
 
   const toggleModal = () => {
     if (isConnected.value && path === "wallet") return;
-
-    setIsModalOpen(!isModalOpen);
-    console.log("Modal state:", !isModalOpen);
+    if (isConnected.value) {
+      if (globalThis.history) {
+        globalThis.history.pushState(
+          {},
+          "",
+          `/wallet/${address}`,
+        );
+        window.location.reload();
+      }
+    } else {
+      setIsModalOpen(!isModalOpen);
+      console.log("Modal state:", !isModalOpen);
+    }
   };
 
   const handleCloseModal = (event) => {
@@ -120,9 +130,7 @@ export const WalletModal = ({ connectors }: Props) => {
 
   return (
     <div
-      className={(isConnected.value && path === "wallet")
-        ? "group relative"
-        : ""}
+      className={(isConnected.value) ? "group relative" : ""}
     >
       <button
         onClick={toggleModal}
@@ -146,7 +154,19 @@ export const WalletModal = ({ connectors }: Props) => {
         />
       )}
 
-      <WalletPopup logout={disconnect} />
+      <WalletPopup
+        logout={() => {
+          disconnect();
+          if (path === "wallet") {
+            globalThis.history.pushState(
+              {},
+              "",
+              "/",
+            );
+            window.location.reload();
+          }
+        }}
+      />
     </div>
   );
 };
