@@ -10,7 +10,7 @@ export const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
 export const BIG_LIMIT = 200;
 export const SMALL_LIMIT = 50;
 
-export type WalletProviderKey = "unisat" | "leather";
+export type WalletProviderKey = "unisat" | "leather" | "okx";
 
 export const WALLET_PROVIDERS: Record<
   WalletProviderKey,
@@ -28,6 +28,13 @@ export const WALLET_PROVIDERS: Record<
     logo: {
       full: "/img/leather/logo_leather.svg",
       small: "/img/leather/logo_leather.svg",
+    },
+  },
+  okx: {
+    name: "OKX",
+    logo: {
+      full: "/img/okx/logo_okx.svg",
+      small: "/img/okx/logo_okx.svg",
     },
   },
 };

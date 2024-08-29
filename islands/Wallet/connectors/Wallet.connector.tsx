@@ -1,14 +1,14 @@
 import { WALLET_PROVIDERS, WalletProviderKey } from "utils/constants.ts";
 import { connectUnisat } from "store/wallet/unisat.ts";
 import { useToast } from "$islands/Toast/toast.tsx";
-import { leatherProvider } from "store/wallet/leather.ts";
+import { leatherProvider } from "$lib/store/wallet/leather.ts";
+import { okxProvider } from "$lib/store/wallet/okx.ts";
 
 interface WalletConnectorProps {
   providerKey: WalletProviderKey;
   toggleModal: () => void;
 }
 
-// Define a type for the addToast function
 type AddToastFunction = (message: string, type: string) => void;
 
 export const WalletConnector = (
@@ -17,9 +17,16 @@ export const WalletConnector = (
   const { addToast } = useToast() ??
     { addToast: (() => {}) as AddToastFunction };
   const providerInfo = WALLET_PROVIDERS[providerKey];
+
+  console.log(`Rendering wallet connector for ${providerKey}:`, providerInfo); // Add this line
+
   const connectFunction = providerKey === "unisat"
     ? connectUnisat
-    : (toast: AddToastFunction) => leatherProvider.connectLeather(toast);
+    : providerKey === "leather"
+    ? (toast: AddToastFunction) => leatherProvider.connectLeather(toast)
+    : providerKey === "okx"
+    ? (toast: AddToastFunction) => okxProvider.connectOKX(toast)
+    : () => {};
 
   const handleConnect = async () => {
     try {
