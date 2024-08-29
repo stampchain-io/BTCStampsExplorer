@@ -1,3 +1,5 @@
+import { WalletProviderKey } from "utils/constants.ts";
+
 export interface StampBalance {
   cpid?: string;
   tick?: string;
@@ -22,6 +24,6 @@ export interface Wallet {
   btcBalance: BtcBalance;
   stampBalance: StampBalance[];
   type?: "legacy" | "segwit";
-  provider?: "unisat" | "leather" | "okx";
+  provider?: WalletProviderKey;
   network?: "mainnet" | "testnet";
 }

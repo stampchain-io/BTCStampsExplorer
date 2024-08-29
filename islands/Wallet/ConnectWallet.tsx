@@ -1,12 +1,17 @@
 // connectWallet.tsx
 import { WalletModal } from "./WalletModal.tsx";
 import { WalletConnector } from "./connectors/Wallet.connector.tsx";
+import { WalletProviderKey } from "utils/constants.ts";
 
-export function ConnectWallet({ toggleModal }) {
-  const connectors = [
-    (extraProps) => <WalletConnector providerKey="unisat" {...extraProps} />,
-    (extraProps) => <WalletConnector providerKey="leather" {...extraProps} />,
-  ];
+export function ConnectWallet({ toggleModal }: { toggleModal: () => void }) {
+  const connectors: WalletProviderKey[] = ["unisat", "leather", "okx"];
 
-  return <WalletModal connectors={connectors} toggleModal={toggleModal} />;
+  return (
+    <WalletModal
+      connectors={connectors.map((key) => (extraProps: any) => (
+        <WalletConnector providerKey={key} {...extraProps} />
+      ))}
+      toggleModal={toggleModal}
+    />
+  );
 }
