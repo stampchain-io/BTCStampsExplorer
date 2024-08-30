@@ -24,13 +24,15 @@ export const Stamp = (
 
   if (src === "/content/not-available.png") {
     return (
-      <img
-        width="100%"
-        loading="lazy"
-        className={`mx-10 md:mx-0 max-w-none object-contain image-rendering-pixelated rounded-lg ${className}`}
-        src={src}
-        alt="Not Available"
-      />
+      <div className="stamp-container">
+        <img
+          width="100%"
+          loading="lazy"
+          className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
+          src={src}
+          alt="Not Available"
+        />
+      </div>
     );
   }
 
@@ -57,16 +59,18 @@ export const Stamp = (
   }
 
   return (
-    <img
-      width="100%"
-      loading="lazy"
-      className={`mx-10 md:mx-0 max-w-none object-contain image-rendering-pixelated rounded-lg ${className}`}
-      src={src}
-      onError={(e) => {
-        (e.target as HTMLImageElement).src = "/content/not-available.png";
-      }}
-      alt="Stamp"
-    />
+    <div className="stamp-container">
+      <img
+        width="100%"
+        loading="lazy"
+        className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
+        src={src}
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = "/content/not-available.png";
+        }}
+        alt="Stamp"
+      />
+    </div>
   );
 };
 
