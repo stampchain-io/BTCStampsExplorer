@@ -14,15 +14,15 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
     ? "cursed"
     : "named";
   return (
-    <div class="flex flex-col text-gray-200 bg-[#2B0E49]">
+    <div class="flex flex-col text-gray-200 font-semibold bg-[#2B0E49]">
       <div class="flex items-center truncate text-[#C184FF] text-2xl md:text-5xl p-6 pb-0">
         <p>
-          Stamp: #{stamp.stamp}
+          # {stamp.stamp}
         </p>
         {/* <StampKind kind={kind} /> */}
       </div>
       <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-        <p class="text-xl font-semibold">CPID</p>
+        {/* <p class="text-xl font-semibold">CPID</p> */}
         <a
           href={`https://xcp.dev/asset/${stamp.cpid}`}
           target="_blank"
@@ -58,6 +58,16 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
             className="w-4 h-5 cursor-pointer"
           />
         </div>
+      </div>
+      <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
+        <p class="text-xl font-semibold">Editions</p>
+        <p class="text-[#60626F]">
+          {stamp.divisible
+            ? (stamp.supply / 100000000).toFixed(2)
+            : stamp.supply > 100000
+            ? "+100000"
+            : stamp.supply}
+        </p>
       </div>
       <div class="flex justify-between items-end gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
         <p class="text-xl font-semibold">Created</p>
@@ -104,16 +114,6 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
             className="w-4 h-5 cursor-pointer"
           />
         </div>
-      </div>
-      <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-        <p class="text-xl font-semibold">Supply</p>
-        <p class="text-[#60626F]">
-          {stamp.divisible
-            ? (stamp.supply / 100000000).toFixed(2)
-            : stamp.supply > 100000
-            ? "+100000"
-            : stamp.supply}
-        </p>
       </div>
       <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
         <p class="text-xl font-semibold">Locked</p>
