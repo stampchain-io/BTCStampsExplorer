@@ -73,17 +73,17 @@ export function StampCard({
       </div>
       <div className="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
         <div className="flex justify-center items-center text-black">
-          <h3 className="text-[13px] font-semibold text-white text-lg">
+          <h3 className="text-[13px] font-normal text-white/80 text-lg">
             {Number(stamp.stamp ?? 0) >= 0 ||
                 (stamp.cpid && stamp.cpid.charAt(0) === "A")
-              ? `Stamp #${stamp.stamp}`
+              ? `${stamp.stamp}`
               : `${stamp.cpid}`}
           </h3>
         </div>
         <div>
           <div className="flex justify-between text-black">
-            <h3 className="text-white text-[11px]">Creator :</h3>
-            <h3 className="text-white text-[11px]">Floor :</h3>
+            {/* <h3 className="text-white text-[11px]">Creator :</h3> */}
+            {/* <h3 className="text-white text-[11px]">Floor :</h3> */}
           </div>
           <div className="flex justify-between">
             <h3 className="truncate text-[13px] text-[#C7C5C5]">
