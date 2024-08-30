@@ -293,7 +293,10 @@ export class StampController {
   }
 
   static async getMultipleStampCategories(
-    categories: { types: string[]; limit: number }[],
+    categories: {
+      types: string[];
+      limit: number;
+    }[],
   ) {
     const results = await Promise.all(
       categories.map(async (category) => {
@@ -324,7 +327,7 @@ export class StampController {
           this.getMultipleStampCategories([
             { types: ["STAMP", "SRC-721"], limit: 6 },
             { types: ["SRC-721"], limit: 6 },
-            { types: ["STAMP"], limit: 6 },
+            { types: ["STAMP"], limit: 12 },
             { types: ["SRC-20"], limit: 6 },
           ]),
           Src20Service.fetchAndFormatSrc20Data({
@@ -332,8 +335,8 @@ export class StampController {
             page: 1,
             limit: 10,
           }),
-          CollectionService.getCollectionByName("posh", 6),
-          StampService.getRecentSales(20),
+          CollectionService.getCollectionByName("posh", 4, "asc"),
+          StampService.getRecentSales(6),
         ]);
 
       return {

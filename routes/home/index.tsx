@@ -40,7 +40,7 @@ export const handler: Handlers = {
 export default function Home(props: HomePageProps) {
   const {
     stamps_recent,
-    stamps_src721,
+    stamps_src721, // FIXME: need to filter only for Recursive type 721's
     stamps_art,
     stamps_src20,
     stamps_posh,
@@ -51,9 +51,11 @@ export default function Home(props: HomePageProps) {
     <div class="flex flex-col gap-24 text-white">
       <HomeHeader />
       <HomeCarousel />
-      <div class="flex flex-col gap-10">
+      {
+        /* <div class="flex flex-col gap-10">
         <HomeTable data={src20s} />
-      </div>
+      </div> */
+      }
       <HomeStampPreview
         stamps_art={stamps_art}
         stamps_posh={stamps_posh}
