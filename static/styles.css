@@ -104,3 +104,27 @@
   align-items: center;
   justify-content: center;
 }
+
+.stamp-container {
+  position: relative;
+}
+
+.stamp-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("/img/transparent-bg.png");
+  background-size: 3px;
+  z-index: 1;
+}
+
+.stamp-image {
+  position: relative;
+  z-index: 2;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
