@@ -2,10 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 .image-rendering-pixelated {
-  image-rendering: pixelated;
+  position: relative;
+}
+
+.image-rendering-pixelated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: url("/img/transparent-bg.png");
   background-size: 3px;
-  padding: 6px 12px;
+  z-index: 1;
+}
+
+.image-rendering-pixelated img,
+.image-rendering-pixelated iframe,
+.image-rendering-pixelated > div {
+  position: relative;
+  z-index: 2;
+}
+
+.image-rendering-pixelated img {
+  mix-blend-mode: multiply;
 }
 
 /* width */
