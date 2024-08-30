@@ -53,7 +53,7 @@ export function StampCard({
             e.currentTarget.src = `/not-available.png`;
           }}
           alt={`Stamp No. ${stamp.stamp}`}
-          className="h-full w-full object-contain items-center standalone:h-full standalone:w-auto pixelart image-rendering-pixelated"
+          className="h-full w-full object-contain items-center standalone:h-full standalone:w-auto pixelart"
         />
       );
     }
@@ -65,7 +65,7 @@ export function StampCard({
       className="bg-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-2 rounded-lg @container transition-all"
     >
       <div className="relative flex overflow-hidden">
-        <div className="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden rounded-lg">
+        <div className="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden image-rendering-pixelated">
           <div className="center relative aspect-square overflow-hidden">
             {renderContent()}
           </div>
