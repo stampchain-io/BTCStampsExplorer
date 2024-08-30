@@ -6,31 +6,36 @@ interface StampSection {
   title: string;
   type: string;
   stamps: StampRow[];
+  layout: "grid" | "row";
 }
 
-function StampSection({ title, type, stamps }: StampSection) {
+function StampSection({ title, type, stamps, layout }: StampSection) {
   return (
     <div>
-      <div class="flex justify-between items-end">
-        <p class="text-2xl md:text-4xl text-[#F5F5F5]">{title}</p>
+      <div class="flex justify-between items-end mb-4">
+        <p class="text-2xl md:text-3xl text-[#F5F5F5] font-extralight">
+          {title}
+        </p>
         <a
           href={`/stamp?ident=${type}`}
           f-partial={`/stamp?ident=${type}`}
-          class="text-[#7A00F5]"
+          class="text-[#7A00F5] text-sm md:text-base font-light"
         >
           See all
         </a>
       </div>
       <div
-        class={`grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 justify-center ${
-          type === "recent" ? "" : "xl:grid-cols-6 xl:gap-6"
-        }`}
+        class={layout === "grid"
+          ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-4"
+          : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4"}
       >
-        {stamps.map((stamp: StampRow) => (
-          <StampCard
-            stamp={stamp}
-            kind="stamp"
-          />
+        {stamps.slice(0, layout === "grid" ? 12 : 6).map((stamp: StampRow) => (
+          <div class={layout === "grid" ? "" : "w-full"}>
+            <StampCard
+              stamp={stamp}
+              kind="stamp"
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -51,16 +56,19 @@ export function HomeStampPreview({
   stamps_src20: StampRow[];
 }) {
   const sections: StampSection[] = [
-    { title: "CLASSIC", type: "classic", stamps: stamps_art },
-    { title: "POSH", type: "posh", stamps: stamps_posh },
-    { title: "SRC-721/R", type: "src721", stamps: stamps_src721 },
-    { title: "RECENT SALES", type: "recent", stamps: stamps_recent },
-    { title: "SRC-20", type: "src20", stamps: stamps_src20 },
+    { title: "POSH", type: "posh", stamps: stamps_posh, layout: "grid" },
+    { title: "CLASSICAL", type: "classic", stamps: stamps_art, layout: "grid" },
+    {
+      title: "RECENT SALES",
+      type: "recent",
+      stamps: stamps_recent,
+      layout: "row",
+    },
   ];
 
   return (
     <div>
-      <h1 class="text-3xl md:text-6xl text-left mb-10 text-[#F5F5F5] font-black">
+      <h1 class="text-3xl md:text-5xl text-left mb-8 text-[#F5F5F5] font-medium">
         LATEST STAMPS
       </h1>
       <div class="flex flex-col gap-12">

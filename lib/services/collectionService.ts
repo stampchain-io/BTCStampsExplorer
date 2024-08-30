@@ -103,6 +103,7 @@ export class CollectionService {
   static async getCollectionByName(
     collectionName: string,
     limit: number = 10,
+    orderBy: "asc" | "desc" = "desc",
   ): Promise<Collection | null> {
     const collectionResult = await CollectionRepository.getCollectionByName(
       collectionName,
@@ -118,7 +119,7 @@ export class CollectionService {
       collectionId: row.collection_id,
       noPagination: true,
       type: "all",
-      sortBy: "desc",
+      orderBy: orderBy === "asc" ? "ASC" : "DESC",
     });
 
     return {
