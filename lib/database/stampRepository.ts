@@ -206,12 +206,10 @@ export class StampRepository {
   static async getStampFilenameByIdFromDb(
     identifier: string,
   ): Promise<string | null> {
-    // Sanitize the identifier
     const sanitizedIdentifier = this.sanitize(identifier);
-
     const data = await dbManager.executeQueryWithCache(
       `
-      SELECT tx_hash, stamp_hash, stamp_mimetype, cpid
+      SELECT tx_hash, stamp_hash, stamp_mimetype, cpid, stamp_base64
       FROM ${STAMP_TABLE}
       WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?)
       AND stamp IS NOT NULL;
@@ -220,23 +218,24 @@ export class StampRepository {
       DEFAULT_CACHE_DURATION,
     );
 
-    // Check if data is null or has no rows
     if (!data || data.rows.length === 0) {
       return null;
     }
 
-    // Use optional chaining and nullish coalescing to safely access properties
     const tx_hash = data.rows[0]?.tx_hash;
     const stamp_mimetype = data.rows[0]?.stamp_mimetype;
 
-    // If either tx_hash or stamp_mimetype is undefined, return null
     if (!tx_hash || !stamp_mimetype) {
       return null;
     }
 
     const ext = getFileSuffixFromMime(stamp_mimetype);
-    return `${tx_hash}.${ext}`;
+    const fileName = `${tx_hash}.${ext}`;
+    const base64 = data.rows[0].stamp_base64;
+
+    return { fileName, base64, stamp_mimetype };
   }
+
   static async getStampsFromDb(
     options: {
       limit?: number;

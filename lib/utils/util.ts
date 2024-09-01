@@ -1,6 +1,6 @@
 import { BigFloat } from "bigfloat/mod.ts";
 
-const mimeTypes: { [key: string]: string } = {
+export const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",
   "png": "image/png",
