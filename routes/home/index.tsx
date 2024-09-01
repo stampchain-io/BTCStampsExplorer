@@ -48,7 +48,7 @@ export default function Home(props: HomePageProps) {
   } = props.data;
 
   return (
-    <div class="flex flex-col gap-24 text-white">
+    <div class="flex flex-col gap-10 md:gap-24 text-white">
       <HomeHeader />
       <HomeCarousel />
       {
