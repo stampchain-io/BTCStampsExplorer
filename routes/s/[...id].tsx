@@ -10,46 +10,14 @@ export const handler: Handlers<StampRow> = {
     const params = url.searchParams.toString();
 
     try {
-      const result = await StampController.getStampFile(id as string);
-
-      if (!result) {
-        return redirectToNotAvailable();
-      }
-
-      switch (result.type) {
-        case "redirect":
-          return new Response("", {
-            status: 301,
-            headers: {
-              Location: `/content/${result.fileName}${
-                params ? `?${params}` : ""
-              }`,
-            },
-          });
-        case "base64":
-          return new Response(base64.toUint8Array(result.base64), {
-            headers: {
-              "Content-Type": result.mimeType || "application/octet-stream",
-            },
-          });
-        default:
-          return ctx.renderNotFound();
-      }
+      const result = await StampController.getStampFile(id as string, params);
+      return result;
     } catch (error) {
       console.error(`Error processing stamp file request for id ${id}:`, error);
-      return ctx.render(null, {
+      return new Response(null, {
         status: 500,
         headers: { "X-Error": "Internal Server Error" },
       });
     }
   },
 };
-
-function redirectToNotAvailable(): Response {
-  return new Response("", {
-    status: 301,
-    headers: {
-      Location: `/content/not-available.png`,
-    },
-  });
-}
