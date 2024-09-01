@@ -13,7 +13,7 @@ function StampSection({ title, type, stamps, layout }: StampSection) {
   return (
     <div>
       <div class="flex justify-between items-end mb-4">
-        <p class="text-2xl md:text-3xl text-[#F5F5F5] font-extralight">
+        <p class="text-2xl md:text-3xl text-[#FF00E9] font-light">
           {title}
         </p>
         <a
@@ -68,7 +68,7 @@ export function HomeStampPreview({
 
   return (
     <div>
-      <h1 class="text-3xl md:text-5xl text-left mb-8 text-[#F5F5F5] font-medium">
+      <h1 class="text-3xl md:text-5xl text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
         LATEST STAMPS
       </h1>
       <div class="flex flex-col gap-12">
