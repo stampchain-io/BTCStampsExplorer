@@ -134,7 +134,7 @@ export const WalletModal = ({ connectors }: Props) => {
     >
       <button
         onClick={toggleModal}
-        class="block bg-[#5503A6] hover:bg-[#6614B7] px-5 py-2.5 rounded font-semibold text-base text-center text-[#F5F5F5]"
+        class="block bg-[#FF00E9] hover:bg-[#FF11FF] px-5 py-2.5 rounded font-black text-base text-center text-[#F5F5F5] lg:mx-5"
         type="button"
       >
         {isConnected.value && address ? abbreviateAddress(address) : "CONNECT"}

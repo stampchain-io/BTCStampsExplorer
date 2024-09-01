@@ -64,13 +64,9 @@ export function Header() {
               toggleMenu();
               setCurrentPath("collection");
             }}
-            className="font-bold text-xl text-indigo-600 hidden lg:block"
+            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] text-xl md:text-4xl font-black italic hidden lg:block lg:px-1"}
           >
-            <img
-              src="/img/header/logo.png"
-              alt="stampchain"
-              className="w-[178px] h-auto"
-            />
+            STAMPCHAIN
           </a>
           <button
             onClick={toggleMenu}
@@ -106,7 +102,8 @@ export function Header() {
           } flex-col lg:flex lg:flex-row text-center justify-between`}
           id="navbar-collapse"
         >
-          <a
+          {
+            /* <a
             href="/home"
             f-partial={"/home"}
             onClick={() => {
@@ -122,13 +119,27 @@ export function Header() {
                 open ? "absolute" : "hidden"
               } top-12 right-5 w-[178px] h-auto`}
             />
+          </a> */
+          }
+          <a
+            href="/home"
+            f-partial={"/home"}
+            onClick={() => {
+              toggleMenu();
+              setCurrentPath("collection");
+            }}
+            className={`bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] text-xl md:text-4xl font-black italic block lg:hidden px-1 ${
+              open ? "absolute" : "hidden"
+            } top-12 right-5`}
+          >
+            STAMPCHAIN
           </a>
           <div
-            className={`${
+            className={`font-black text-center ${
               open
-                ? "flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10 text-center"
-                : "hidden lg:flex flex-col lg:flex-row text-center"
-            } `}
+                ? "flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10"
+                : "hidden lg:flex flex-col lg:flex-row items-center"
+            }`}
           >
             <a
               href="/stamp?ident=classic"
@@ -137,7 +148,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("stamp");
               }}
-              className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                 currentPath === "stamp" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -150,7 +161,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("collection");
               }}
-              className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                 currentPath === "collection"
                   ? "border-[#7A00F5] border-b-4"
                   : ""
@@ -165,7 +176,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("src20");
               }}
-              className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                 currentPath === "src20" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -178,7 +189,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("block");
               }}
-              className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
                 currentPath === "block" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -187,13 +198,13 @@ export function Header() {
 
             <div className={"group relative"}>
               <a
-                className={`pb-2 lg:px-4 lg:mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg lg:text-base font-weight-900 ${
+                className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg lg:text-base font-weight-900 ${
                   isStampingActive ? "border-[#7A00F5] border-b-4" : ""
                 }`}
               >
                 STAMPING
               </a>
-              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[34px] left-[100px] lg:left-[15px] z-[100] py-2">
+              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2">
                 <a
                   href="/stamping/stamp"
                   f-partial={"/stamping/stamp"}
@@ -222,7 +233,7 @@ export function Header() {
                 </a>
               </div>
             </div>
-            <div class="block lg:hidden">
+            <div class="">
               <ConnectWallet toggleModal={toggleWalletModal} />
             </div>
           </div>
@@ -245,10 +256,6 @@ export function Header() {
               <img src="/img/footer/icon_github.png" class="w-12" />
             </a>
           </div>
-        </div>
-
-        <div class="hidden lg:block">
-          <ConnectWallet toggleModal={toggleWalletModal} />
         </div>
       </div>
     </nav>
