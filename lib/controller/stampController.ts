@@ -9,6 +9,7 @@ import { BlockService } from "$lib/services/blockService.ts";
 import { paginate } from "utils/util.ts";
 import { PaginatedStampBalanceResponseBody } from "globals";
 import { DispenserManager, XcpManager } from "$lib/services/xcpService.ts";
+import * as base64 from "base64/mod.ts";
 const NO_DISPENSERS = Symbol("NO_DISPENSERS");
 
 export class InMemoryCacheService {
@@ -366,15 +367,45 @@ export class StampController {
     }
   }
 
-  static async getStampFile(id: string) {
+  static async getStampFile(id: string, params: string): Promise<Response> {
     try {
-      const row = await StampService.getStampFile(id);
-      if (!row) {
-        return { type: "notFound" };
+      const result = await StampService.getStampFile(id);
+
+      if (!result || result.type === "notFound") {
+        return this.redirectToNotAvailable();
+      }
+
+      switch (result.type) {
+        case "redirect":
+          return new Response("", {
+            status: 301,
+            headers: {
+              Location: `/content/${result.fileName}${
+                params ? `?${params}` : ""
+              }`,
+            },
+          });
+        case "base64":
+          return new Response(base64.toUint8Array(result.base64), {
+            headers: {
+              "Content-Type": result.mimeType || "application/octet-stream",
+            },
+          });
+        default:
+          return new Response(null, { status: 404 });
       }
     } catch (error) {
       console.error("Error in StampController.getStampFile:", error);
       throw error;
     }
+  }
+
+  private static redirectToNotAvailable(): Response {
+    return new Response("", {
+      status: 301,
+      headers: {
+        Location: `/content/not-available.png`,
+      },
+    });
   }
 }

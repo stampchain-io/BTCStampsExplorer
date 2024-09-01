@@ -4,6 +4,7 @@ import { StampBalance, SUBPROTOCOLS } from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
+import { mimeTypes } from "utils/util.ts";
 
 export class StampService {
   static async getStampDetailsById(
@@ -135,25 +136,25 @@ export class StampService {
   }
 
   static async getStampFile(id: string) {
-    const file_name = await StampRepository.getStampFilenameByIdFromDb(id);
-
-    if (!file_name) {
+    const result = await StampRepository.getStampFilenameByIdFromDb(id);
+    const fileName = result?.fileName;
+    const base64 = result?.base64;
+    const mimeType = result?.stamp_mimetype;
+    if (!fileName) {
       return { type: "notFound" };
     }
 
-    if (file_name.indexOf(".unknown") > -1) {
-      const stampData = await this.getStamps({
-        identifier: id,
-        allColumns: true,
-        noPagination: true,
-      });
-      if (stampData?.stamp?.stamp_base64) {
-        return { type: "base64", base64: stampData.stamp.stamp_base64 };
+    const fileExtension = fileName.split(".").pop()?.toLowerCase();
+    if (
+      !fileExtension || !Object.values(mimeTypes).includes(fileExtension as any)
+    ) {
+      if (base64) {
+        return { type: "base64", base64: base64, mimeType: mimeType };
       }
       return { type: "notFound" };
     }
 
-    return { type: "redirect", fileName: file_name };
+    return { type: "redirect", fileName: fileName, base64: base64 };
   }
 
   static async getStampBalancesByAddress(
