@@ -1,46 +1,68 @@
 export function Footer() {
   return (
     <div className={"text-[#7200B4] font-bold flex flex-col gap-5 my-5"}>
-      <div
+      {
+        /* <div
         className={"bg-gradient-to-r from-[#7200B4] via-[#FF00E9] to-[#7200B4] w-full h-2"}
-      />
+      /> */
+      }
 
       <div className={"p-2 md:p-10 xl:p-20 flex flex-col gap-4"}>
         <div
           className={"flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg"}
         >
-          <div className={"text-left flex flex-col gap-1"}>
-            <p className={"text-2xl font-black"}>SOCIALS</p>
-            <div className={"flex flex-row justify-between md:flex-col gap-1"}>
-              <a href="https://x.com/Stampchain" className={"w-1/3 md:w-full"}>
-                Twitter
-              </a>
-              <a
-                href="https://t.me/BitcoinStamps"
-                className={"w-1/3 md:w-full"}
+          <div className={"text-left flex flex-col justify-between gap-1"}>
+            <div className={"flex flex-col gap-1"}>
+              <p
+                className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-4xl md:text-7xl font-black italic"}
               >
-                Telegram
-              </a>
-              <a
-                href="https://discord.gg/PCZU6xrt"
-                className={"w-1/3 md:w-full"}
-              >
-                Discord
-              </a>
+                STAMPCHAIN<span className={"font-extralight"}>.IO</span>
+              </p>
+              <p className={"text-2xl font-light"}>
+                IMMORTALISED ART - STORED ON BITCOIN
+              </p>
+              <div className={"flex gap-6"}>
+                <a href="https://x.com/Stampchain">
+                  <img src="/img/footer/XLogo.png" />
+                </a>
+                <a href="https://t.me/BitcoinStamps">
+                  <img src="/img/footer/TelegramLogo.png" />
+                </a>
+                <a href="https://discord.gg/PCZU6xrt">
+                  <img src="/img/footer/DiscordLogo.png" />
+                </a>
+                <a href="https://github.com/stampchain-io/">
+                  <img src="/img/footer/GithubLogo.png" />
+                </a>
+              </div>
             </div>
+            <p className={"font-semibold text-[#660066]"}>
+              Bitcoin Stamps © 2024 All Rights Reserved
+            </p>
           </div>
 
-          <div className={"text-left md:text-center flex flex-col gap-1"}>
-            <p className={"text-2xl font-black"}>COLLAB</p>
+          <div className={"text-left flex flex-col gap-1"}>
+            <p className={"text-2xl font-black"}>STAMPS</p>
             <div className={"flex flex-row justify-between md:flex-col gap-1"}>
+              <a href="#" className={"w-1/3 md:w-full"}>
+                View All
+              </a>
               <a href="#" className={"w-1/3 md:w-full"}>
                 Selected Series
               </a>
               <a href="#" className={"w-1/3 md:w-full"}>
                 Vendingmachine
               </a>
+            </div>
+            <div className={"flex flex-row justify-between md:flex-col gap-1"}>
               <a href="#" className={"w-1/3 md:w-full"}>
-                Get Featured
+                Stamping
+              </a>
+              <a href="#" className={"w-1/3 md:w-full"}>
+                Collab
+              </a>
+              <a href="#" className={"invisible md:hidden w-1/3 md:w-full"}>
+                Collab
               </a>
             </div>
           </div>
@@ -68,24 +90,13 @@ export function Footer() {
                 Support
               </a>
               <a href="#" className={"w-1/3 md:w-full"}>
-                Legal Stuff
+                Disclaimer
               </a>
               <a href="#" className={"invisible md:hidden w-1/3 md:w-full"}>
-                Legal Stuff
+                Disclaimer
               </a>
             </div>
           </div>
-        </div>
-
-        <div>
-          <p
-            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] text-4xl md:text-7xl font-black italic"}
-          >
-            STAMPCHAIN
-          </p>
-          <p className={"text-lg font-semibold"}>
-            Bitcoin Stamps © 2024 All Rights Reserved
-          </p>
         </div>
       </div>
     </div>
