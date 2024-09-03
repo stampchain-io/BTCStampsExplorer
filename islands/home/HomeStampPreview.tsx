@@ -13,13 +13,13 @@ function StampSection({ title, type, stamps, layout }: StampSection) {
   return (
     <div>
       <div class="flex justify-between items-end mb-4">
-        <p class="text-2xl md:text-3xl text-[#FF00E9] font-light">
+        <p class="text-2xl md:text-3xl text-[#AA00FF] font-light">
           {title}
         </p>
         <a
           href={`/stamp?ident=${type}`}
           f-partial={`/stamp?ident=${type}`}
-          class="text-[#7A00F5] text-sm md:text-base font-light"
+          class="text-[#660099] text-sm md:text-base font-light border-2 border-[#660099] py-1 text-center min-w-[84px] rounded-md"
         >
           See all
         </a>

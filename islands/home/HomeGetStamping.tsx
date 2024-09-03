@@ -1,8 +1,10 @@
 export const HomeGetStamping = () => {
   return (
-    <div className={"flex flex-col md:flex-row justify-between md:items-end"}>
+    <div
+      className={"flex flex-col md:flex-row justify-between md:items-end gap-3"}
+    >
       <p
-        className={"italic font-black text-4xl md:text-7xl flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999]"}
+        className={"italic font-black text-4xl md:text-7xl flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-center md:text-left"}
       >
         GET STAMPING
         <span
@@ -12,7 +14,7 @@ export const HomeGetStamping = () => {
         </span>
       </p>
 
-      <div className={"flex gap-12 font-extrabold text-xl"}>
+      <div className={"flex gap-12 font-extrabold text-xl justify-center"}>
         <a
           href="#"
           className={"border-2 border-[#999999] text-[#999999] w-[136px] h-[60px] flex justify-center items-center rounded-md"}
