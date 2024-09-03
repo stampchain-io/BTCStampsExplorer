@@ -5,7 +5,7 @@ import { HomeHeader } from "$islands/home/HomeHeader.tsx";
 import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
-import { HomeStampChainSelected } from "$islands/home/HomeStampchainSelected.tsx";
+import { HomeStampChainSelected } from "$islands/home/HomeStampChainSelected.tsx";
 import { HomeGetStamping } from "$islands/home/HomeGetStamping.tsx";
 
 import { StampController } from "$lib/controller/stampController.ts";
