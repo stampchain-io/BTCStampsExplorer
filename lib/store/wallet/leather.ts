@@ -112,14 +112,33 @@ const signPSBT = async (psbt: string) => {
   if (typeof globalThis.LeatherProvider === "undefined") {
     throw new Error("Leather wallet not connected");
   }
-
-  const { psbt: signedPsbt } = await globalThis.LeatherProvider.request(
-    "signPsbt",
-    {
-      psbt,
-    },
-  );
-  return signedPsbt;
+  console.log("Attempting to sign PSBT", { psbt });
+  try {
+    const { psbt: signedPsbt } = await globalThis.LeatherProvider.request(
+      "signPsbt",
+      {
+        hex: psbt,
+        network: "mainnet",
+        broadcast: false,
+        inputsToSign: [
+          {
+            address: walletContext.wallet.value.address,
+            signingIndexes: [0],
+          },
+        ],
+      },
+    );
+    console.log("PSBT signed successfully", signedPsbt);
+    return signedPsbt;
+  } catch (error) {
+    console.error("Error signing PSBT:", error);
+    if (error.message.includes("User rejected")) {
+      // Handle user cancellation
+      console.log("User cancelled the transaction");
+      return null;
+    }
+    throw error;
+  }
 };
 
 export const leatherProvider = {

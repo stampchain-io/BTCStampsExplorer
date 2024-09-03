@@ -1,12 +1,18 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$lib/store/wallet/wallet.ts";
+import { leatherProvider } from "$lib/store/wallet/leather.ts";
+import { okxProvider } from "$lib/store/wallet/okx.ts";
+import { unisatProvider } from "$lib/store/wallet/unisat.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 
-import { MempoolWeather } from "$islands/MempoolWeather.tsx";
+const log = (message: string, data?: any) => {
+  console.log(`[OlgaContent] ${message}`, data ? data : "");
+};
 
 export function OlgaContent() {
+  console.log("OlgaContent component rendered");
   const config = useConfig();
 
   if (!config) {
@@ -31,16 +37,19 @@ export function OlgaContent() {
     `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
     style="padding: 1px;" viewBox="0 0 32 32"><path fill="#0E9F6E" fill-rule="evenodd" d="M16 32C7.163 32 0 24.837 0 16S7.163 0 16 0s16 7.163 16 16s-7.163 16-16 16m6.5-12.846c0-2.523-1.576-3.948-5.263-4.836v-4.44c1.14.234 2.231.725 3.298 1.496l1.359-2.196a9.49 9.49 0 0 0-4.56-1.776V6h-2.11v1.355c-3.032.234-5.093 1.963-5.093 4.486c0 2.64 1.649 3.925 5.19 4.813v4.58c-1.577-.234-2.886-.935-4.269-2.01L9.5 21.35a11.495 11.495 0 0 0 5.724 2.314V26h2.11v-2.313c3.08-.257 5.166-1.963 5.166-4.533m-7.18-5.327c-1.867-.537-2.327-1.168-2.327-2.15c0-1.027.8-1.845 2.328-1.962zm4.318 5.49c0 1.122-.873 1.893-2.401 2.01v-4.229c1.892.538 2.401 1.168 2.401 2.22z"/></svg>`;
 
-  const [file, setFile] = useState<any>(null);
-  const [fee, setFee] = useState<any>(780);
-  const [issuance, setIssuance] = useState(1);
-  const [coinType, setCoinType] = useState("BTC");
-  const [visible, setVisible] = useState(false);
-  const [txfee, setTxfee] = useState(0.001285);
-  const [mintfee, setMintfee] = useState(0.00000);
-  const [dust, setDust] = useState(0.000113);
-  const [total, setTotal] = useState(0.001547);
-  const [BTCPrice, setBTCPrice] = useState(60000);
+  type FileType = File | null;
+
+  const [file, setFile] = useState<FileType>(null);
+  const [fee, setFee] = useState<number>(80);
+  const [issuance, setIssuance] = useState<number>(1);
+  const [coinType, setCoinType] = useState<"BTC" | "USDT">("BTC");
+  const [visible, setVisible] = useState<boolean>(false);
+  const [txfee, setTxfee] = useState<number>(0.001285);
+  const [mintfee, setMintfee] = useState<number>(0.00000);
+  const [dust, setDust] = useState<number>(0.000113);
+  const [total, setTotal] = useState<number>(0.001547);
+  const [BTCPrice, setBTCPrice] = useState<number>(60000);
+  const [fileSize, setFileSize] = useState<number | null>(null);
 
   useEffect(() => {
     const coins = document.getElementsByClassName("coin");
@@ -48,23 +57,35 @@ export function OlgaContent() {
   }, []);
 
   useEffect(() => {
-    const func = async () => {
-      const response = await fetch("/quicknode/getPrice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "cg_simplePrice",
-          params: ["bitcoin", "usd", true, true, true],
-        }),
-      });
+    fetchBTCPrice();
+  }, []);
+
+  const fetchBTCPrice = async () => {
+    try {
+      const response = await fetch(
+        "/quicknode/getPrice",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: "cg_simplePrice",
+            params: ["bitcoin", "usd", true, true, true],
+          }),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const { price } = await response.json();
       setBTCPrice(price);
-    };
-    func();
-  }, [coinType]);
+    } catch (error) {
+      console.error("Error fetching BTC price:", error);
+      // You might want to set a default price or show an error message to the user
+    }
+  };
 
-  const handleChangeFee = (e: any) => {
-    setFee(e.target.value);
+  const handleChangeFee = (newFee: number) => {
+    setFee(newFee);
   };
 
   const handleChangeCoin = () => {
@@ -92,7 +113,11 @@ export function OlgaContent() {
     new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64Data = result.split(",")[1]; // Extract only the base64 part
+        resolve(base64Data);
+      };
       reader.onerror = reject;
     });
 
@@ -103,6 +128,7 @@ export function OlgaContent() {
       return;
     }
     setFile(selectedFile);
+    setFileSize(selectedFile.size);
     console.log(selectedFile);
   };
 
@@ -116,32 +142,113 @@ export function OlgaContent() {
   };
 
   const handleMint = async () => {
-    if (!isConnected.value) {
-      alert("Connect your wallet");
-      return;
-    }
+    try {
+      log("Starting minting process");
 
-    if (file === null) {
-      alert("Upload your file");
-      return;
-    }
+      if (!isConnected.value) {
+        log("Wallet not connected");
+        alert("Connect your wallet");
+        return;
+      }
 
-    const data = await toBase64(file);
-    axiod
-      .post(config.API_BASE_URL + "/olga/mint", {
-        sourceWallet: address,
-        qty: issuance,
-        locked: true,
-        filename: file.name,
-        file: data,
-        satsPerKB: fee,
-        service_fee: config.MINTING_SERVICE_FEE,
-        service_fee_address: config.MINTING_SERVICE_FEE_ADDRESS,
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => console.log(error));
+      if (file === null) {
+        log("No file selected");
+        alert("Upload your file");
+        return;
+      }
+
+      try {
+        log("Converting file to base64");
+        const data = await toBase64(file);
+        log("File converted to base64", { fileSize: data.length });
+
+        log("Preparing mint request");
+        const mintRequest = {
+          sourceWallet: address,
+          qty: issuance,
+          locked: true,
+          filename: file.name,
+          file: data,
+          satsPerKB: fee,
+          service_fee: config.MINTING_SERVICE_FEE,
+          service_fee_address: config.MINTING_SERVICE_FEE_ADDRESS,
+        };
+        log("Mint request prepared", mintRequest);
+
+        log("Sending mint request to API");
+        const response = await axiod.post("/api/v2/olga/mint", mintRequest);
+
+        log("Received response from API", response);
+
+        if (!response.data) {
+          throw new Error("No data received from API");
+        }
+
+        log("Response data", response.data);
+
+        if (!response.data.hex) {
+          throw new Error("Invalid response structure: missing hex field");
+        }
+
+        const { hex, cpid } = response.data;
+        log("Extracted hex and cpid from response", { hex, cpid });
+
+        log(
+          "Signing PSBT with wallet provider",
+          walletContext.wallet.value.provider,
+        );
+        let txid;
+        const walletProvider = walletContext.wallet.value.provider;
+
+        switch (walletProvider) {
+          case "leather":
+            console.log("Hex value being sent to signPSBT:", hex);
+            txid = await leatherProvider.signPSBT(hex);
+            if (txid === null) {
+              log("User cancelled the transaction");
+              return; // Exit the function early
+            }
+            break;
+          case "okx":
+            txid = await okxProvider.signPSBT(hex);
+            break;
+          case "unisat":
+            txid = await unisatProvider.signPSBT(hex);
+            break;
+          default:
+            throw new Error("Unsupported wallet provider");
+        }
+
+        log("PSBT signed", { txid });
+
+        if (txid) {
+          log("Minting successful", { txid, cpid });
+          alert(`Minting successful! Transaction ID: ${txid}\nCPID: ${cpid}`);
+        } else {
+          log("Transaction was not completed");
+          alert("Minting was cancelled or failed");
+        }
+      } catch (error) {
+        log("Error in minting process", error);
+        throw error; // Re-throw the error to be caught by the outer try-catch
+      }
+    } catch (error) {
+      console.error("Unexpected error in handleMint:", error);
+      let errorMessage = "An unexpected error occurred during minting";
+
+      if (error.response) {
+        console.error("API Error Response:", error.response);
+        if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+        console.error("Error stack:", error.stack);
+      }
+
+      log("Final error message", errorMessage);
+      alert(`Minting failed: ${errorMessage}`);
+    }
   };
 
   return (
@@ -221,7 +328,7 @@ export function OlgaContent() {
 
       <div class="w-full">
         <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Asset Issuance
+          Editions
         </p>
         <div class={"flex gap-[18px] w-full mb-3"}>
           <div
@@ -281,19 +388,12 @@ export function OlgaContent() {
               Lock assets
             </label>
           </div>
-          <div className="flex gap-2 items-center">
-            <input type="checkbox" id="burn" name="burn" className="w-5 h-5" />
-            <label
-              for="burn"
-              className="text-[#B9B9B9] text-[16px] font-semibold"
-            >
-              Keyburn
-            </label>
-          </div>
         </div>
       </div>
 
-      <div
+      {/* FIXME: FINALIZE OPTIMIZATION ROUTINE */}
+      {
+        /* <div
         class={"bg-[#6E6E6E] w-full"}
       >
         <p class={"text-[#F5F5F5] text-[22px] font-semibold px-6 py-[15px]"}>
@@ -358,15 +458,17 @@ export function OlgaContent() {
             </label>
           </div>
         </div>
-      </div>
+      </div> */
+      }
 
       <FeeEstimation
         fee={fee}
         handleChangeFee={handleChangeFee}
         type="stamp"
         fileType={file?.type}
-        fileSize={file?.size}
+        fileSize={fileSize}
         issuance={issuance}
+        BTCPrice={BTCPrice}
       />
 
       <div
