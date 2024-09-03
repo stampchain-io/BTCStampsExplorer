@@ -48,8 +48,18 @@ unisat?.on("accountsChanged", handleAccountsChanged);
 // Sign a message
 const signMessage = async (message: string) => {
   const unisat = (window as any).unisat;
-  const signature = await unisat.signMessage(message);
-  return signature;
+  if (!unisat) {
+    throw new Error("Unisat wallet not connected");
+  }
+  console.log("Unisat wallet signing message:", message);
+  try {
+    const signature = await unisat.signMessage(message);
+    console.log("Unisat wallet signature result:", signature);
+    return signature;
+  } catch (error) {
+    console.error("Error signing message with Unisat wallet:", error);
+    throw error;
+  }
 };
 
 // Sign a PSBT hex tx

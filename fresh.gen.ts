@@ -13,6 +13,8 @@ import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index]
 import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_count/[...number].ts";
 import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
+import * as $api_v2_creator_name from "./routes/api/v2/creator-name.ts";
+import * as $api_v2_csrf_token from "./routes/api/v2/csrf-token.ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
 import * as $api_v2_cursed_block from "./routes/api/v2/cursed/block.ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
@@ -41,6 +43,7 @@ import * as $api_v2_stamps_dispensers_id_ from "./routes/api/v2/stamps/dispenser
 import * as $api_v2_stamps_dispensers_index from "./routes/api/v2/stamps/dispensers/index.ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
+import * as $api_v2_update_creator_name from "./routes/api/v2/update-creator-name.ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
@@ -133,6 +136,8 @@ const manifest = {
     "./routes/api/v2/block/related/[block_index].ts":
       $api_v2_block_related_block_index_,
     "./routes/api/v2/collections/index.ts": $api_v2_collections_index,
+    "./routes/api/v2/creator-name.ts": $api_v2_creator_name,
+    "./routes/api/v2/csrf-token.ts": $api_v2_csrf_token,
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,
     "./routes/api/v2/cursed/block.ts": $api_v2_cursed_block,
     "./routes/api/v2/cursed/block/[block_index].ts":
@@ -171,6 +176,7 @@ const manifest = {
       $api_v2_stamps_dispensers_index,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
+    "./routes/api/v2/update-creator-name.ts": $api_v2_update_creator_name,
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/block/[id].tsx": $block_id_,
     "./routes/block/index.tsx": $block_index,
