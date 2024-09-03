@@ -11,7 +11,7 @@ export const handler: Handlers<TX | TXError> = {
     try {
       body = await req.json();
     } catch (_error) {
-      return ResponseUtil.error("Invalid JSON format in request body", 500);
+      return ResponseUtil.error("Invalid JSON format in request body", 400);
     }
 
     const assetName = await generateAvailableAssetName();
@@ -20,6 +20,7 @@ export const handler: Handlers<TX | TXError> = {
       ...body,
       prefix: "stamp",
       assetName: assetName,
+      satsPerKB: Number(body.satsPerKB), // This should now receive the correct integer value
       service_fee: body.service_fee ||
         parseInt(conf.MINTING_SERVICE_FEE_FIXED_SATS),
       service_fee_address: body.service_fee_address ||
@@ -28,11 +29,15 @@ export const handler: Handlers<TX | TXError> = {
 
     try {
       const mint_tx = await mintStampCIP33(prepare);
-      if (!mint_tx) {
-        return ResponseUtil.error("Error generating mint transaction", 400);
+      if (!mint_tx || !mint_tx.psbt) {
+        console.error("Invalid mint_tx structure:", mint_tx);
+        return ResponseUtil.error(
+          "Error generating mint transaction: Invalid response structure",
+          400,
+        );
       }
 
-      console.log(mint_tx);
+      console.log("Successful mint_tx:", mint_tx);
       return ResponseUtil.success({
         hex: mint_tx.psbt.toHex(),
         cpid: assetName,
@@ -44,7 +49,35 @@ export const handler: Handlers<TX | TXError> = {
         change_value: mint_tx.totalChangeOutput,
       });
     } catch (error) {
-      return ResponseUtil.error(`Error: ${error.message}`, 500);
+      console.error("Minting error:", error);
+
+      let errorMessage = "An unexpected error occurred during minting";
+      let statusCode = 500;
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        console.error("Error stack:", error.stack);
+      }
+
+      if (error.message.includes("Insufficient funds")) {
+        errorMessage = "Insufficient funds in the wallet for this transaction";
+        statusCode = 400;
+      } else if (error.message.includes("UTXO selection failed")) {
+        errorMessage = "Failed to select appropriate UTXOs for the transaction";
+        statusCode = 400;
+      } else if (error.message.includes("Invalid satsPerKB parameter")) {
+        errorMessage = "Invalid fee rate provided";
+        statusCode = 400;
+      } else if (
+        error instanceof TypeError &&
+        error.message.includes("Cannot read properties of undefined")
+      ) {
+        errorMessage =
+          "Error generating transaction: Invalid response structure";
+        statusCode = 500;
+      }
+
+      return ResponseUtil.error(errorMessage, statusCode);
     }
   },
 };

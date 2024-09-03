@@ -1,12 +1,26 @@
+import { Handlers } from "$fresh/server.ts";
 import { fetch_quicknode } from "utils/quicknode.ts";
 
-export async function handler(req: Request): Promise<Response> {
-  const { name, params } = await req.json();
-  const stampBalance = await fetch_quicknode(name, params);
-  return new Response(
-    JSON.stringify({ price: stampBalance.result.bitcoin.usd }),
-    {
-      headers: { "Content-Type": "application/json" },
-    },
-  );
-}
+export const handler: Handlers = {
+  async POST(req) {
+    const { name, params } = await req.json();
+    try {
+      const stampBalance = await fetch_quicknode(name, params);
+      return new Response(
+        JSON.stringify({ price: stampBalance.result.bitcoin.usd }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    } catch (error) {
+      console.error("Error fetching from QuickNode:", error);
+      return new Response(
+        JSON.stringify({ error: "Failed to fetch BTC price" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+  },
+};

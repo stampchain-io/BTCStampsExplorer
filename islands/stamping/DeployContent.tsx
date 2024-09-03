@@ -8,7 +8,7 @@ export function DeployContent() {
   const config = useConfig();
 
   if (!config) {
-    console.error("Config not loaded");
+    console.error("Config not loaded in deploycontent");
     return null;
   }
 
