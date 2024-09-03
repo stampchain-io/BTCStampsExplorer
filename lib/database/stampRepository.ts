@@ -444,4 +444,49 @@ export class StampRepository {
 
     return result.rows;
   }
+
+  static async getCreatorNameByAddress(
+    address: string,
+  ): Promise<string | null> {
+    const query = `
+      SELECT creator
+      FROM creator
+      WHERE address = ?
+    `;
+
+    const result = await dbManager.executeQueryWithCache(
+      query,
+      [address],
+      "never",
+    );
+
+    if (result && result.rows && result.rows.length > 0) {
+      return result.rows[0].creator;
+    }
+
+    return null;
+  }
+
+  static async updateCreatorName(
+    address: string,
+    newName: string,
+  ): Promise<boolean> {
+    const query = `
+      INSERT INTO creator (address, creator)
+      VALUES (?, ?)
+      ON DUPLICATE KEY UPDATE creator = ?
+    `;
+
+    try {
+      const result = await dbManager.executeQuery(query, [
+        address,
+        newName,
+        newName,
+      ]);
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error("Error updating creator name:", error);
+      return false;
+    }
+  }
 }

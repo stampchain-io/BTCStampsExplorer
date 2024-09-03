@@ -66,7 +66,18 @@ const handleAccountsChanged = async (accounts: string[]) => {
 
 const signMessage = async (message: string) => {
   const okx = (window as any).okxwallet;
-  return await okx.bitcoin.signMessage(message);
+  if (!okx || !okx.bitcoin) {
+    throw new Error("OKX wallet not connected");
+  }
+  console.log("OKX wallet signing message:", message);
+  try {
+    const signature = await okx.bitcoin.signMessage(message);
+    console.log("OKX wallet signature result:", signature);
+    return signature;
+  } catch (error) {
+    console.error("Error signing message with OKX wallet:", error);
+    throw error;
+  }
 };
 
 const signPSBT = async (psbt: string) => {

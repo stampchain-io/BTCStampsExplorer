@@ -98,14 +98,21 @@ const signMessage = async (message: string) => {
     throw new Error("Leather wallet not connected");
   }
 
-  const { signature } = await globalThis.LeatherProvider.request(
-    "signMessage",
-    {
-      message,
-      paymentType: "p2wpkh",
-    },
-  );
-  return signature;
+  console.log("Leather wallet signing message:", message);
+  try {
+    const { signature } = await globalThis.LeatherProvider.request(
+      "signMessage",
+      {
+        message,
+        paymentType: "p2wpkh",
+      },
+    );
+    console.log("Leather wallet signature result:", signature);
+    return signature;
+  } catch (error) {
+    console.error("Error signing message with Leather wallet:", error);
+    throw error;
+  }
 };
 
 const signPSBT = async (psbt: string) => {
