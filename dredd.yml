@@ -31,4 +31,4 @@ config: ./dredd.yml
 blueprint: schema.yml
 endpoint: 'http://localhost:8000/'
 # endpoint: 'https://stampchain.io'
-# endpoint: 'http://dev.bitcoinstamps.xyz'
+# endpoint: 'https://dev.bitcoinstamps.xyz'

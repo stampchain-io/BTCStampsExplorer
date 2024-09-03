@@ -1,5 +1,4 @@
 import * as btc from "bitcoin";
-
 import { mintMethodOPRETURN } from "utils/minting/stamp.ts";
 import { handleXcpV1Query } from "utils/xcpUtils.ts";
 import { extractOutputs } from "utils/minting/utils.ts";
@@ -10,33 +9,13 @@ import { UTXO } from "utils/minting/src20/utils.d.ts";
 import { Buffer } from "buffer";
 import { get_transaction } from "utils/quicknode.ts";
 import { PSBTInput } from "utils/minting/src20/src20.d.ts";
+import {
+  calculateDust,
+  calculateMiningFee,
+  estimateP2WSHTransactionSize,
+} from "utils/minting/feeCalculations.ts";
 
-function estimateP2WSHTransactionSize(
-  inputCount: number,
-  outputCount: number,
-): number {
-  const txOverhead = 10; // Approximation
-  const inputBase = 40; // Outpoint (36 bytes) + sequence (4 bytes)
-  const scriptSigLength = 1; // 0-length scriptSig + length byte
-  const outputSize = 43; // 8 (value) + 1 (length of scriptPubKey) + 34 (scriptPubKey for P2WSH)
-
-  // Witness data for a typical 2-of-3 multisig P2WSH input
-  // This is a simplification; actual size can vary based on the size of the signatures and the witness script
-  const witnessDataPerInput = (72 * 3) + (3 * 1) + 105; // 3 signatures (72 bytes each) + 3 byte separators + witness script (105 bytes is an example size)
-
-  // Calculate base transaction size (non-witness data)
-  const baseSize = txOverhead + (inputCount * (inputBase + scriptSigLength)) +
-    (outputCount * outputSize);
-
-  // Calculate total witness size
-  const totalWitnessSize = inputCount * witnessDataPerInput;
-
-  // Calculate total size (baseSize + totalWitnessSize), but for fee calculation, we need vsize
-  const totalSize = baseSize + totalWitnessSize;
-  const vsize = Math.ceil((baseSize * 3 + totalSize) / 4); // SegWit discount applied
-
-  return vsize;
-}
+const DUST_SIZE = 333;
 
 export async function mintCIP33ApiCall(
   {
@@ -120,6 +99,9 @@ export async function mintStampCIP33(
     const hex_file = CIP33.base64_to_hex(file);
     const cip33Addresses = CIP33.file_to_addresses(hex_file);
     console.log("hex", hex);
+
+    const fileSize = Math.ceil((file.length * 3) / 4);
+
     const psbt = await generatePSBT(
       hex,
       sourceWallet,
@@ -127,6 +109,7 @@ export async function mintStampCIP33(
       service_fee,
       service_fee_address,
       cip33Addresses as string[],
+      fileSize,
     );
 
     return psbt;
@@ -136,7 +119,6 @@ export async function mintStampCIP33(
   }
 }
 
-const DUST_SIZE = 333;
 async function generatePSBT(
   tx: string,
   address: string,
@@ -144,18 +126,17 @@ async function generatePSBT(
   service_fee: number,
   recipient_fee: string,
   cip33Addresses: string[],
+  fileSize: number,
 ) {
   const psbt = new btc.Psbt({ network: btc.networks.bitcoin });
   const txObj = btc.Transaction.fromHex(tx);
   const vouts = extractOutputs(txObj, address);
 
-  let totalDustValue = 0; // To store the total value of dust
-  let totalOutputValue = 0; // Initialize total output value
+  const totalDustValue = calculateDust(fileSize);
+  let totalOutputValue = totalDustValue; // Initialize with dust value
 
   for (let i = 0; i < cip33Addresses.length; i++) {
     const dustValue = DUST_SIZE + i;
-    totalDustValue += dustValue; // Add each dust value to the total
-    totalOutputValue += dustValue; // Add to total output value
     const cip33Address = cip33Addresses[i];
     vouts.push({
       value: dustValue,
@@ -218,19 +199,15 @@ async function generatePSBT(
 
   // console.log(`PSBT is instance of btc.Psbt: ${psbt instanceof btc.Psbt}`);
 
-  // Estimate transaction size
-  const estimatedSize = estimateP2WSHTransactionSize(
-    inputs.length,
-    vouts.length + 1,
-  ); // +1 for the change output
-  // console.log(`Estimated Transaction Size: ${estimatedSize} vbytes`);
+  const estimatedSize = estimateP2WSHTransactionSize(fileSize);
+
+  // Use calculateMiningFee instead of manual calculation
+  const estMinerFee = calculateMiningFee(fileSize, fee_per_kb);
 
   // // Clarify the fee rate unit and calculation
   // console.log(
   //   `Fee Rate: ${fee_per_kb} satoshis per vbyte`,
   // );
-  const feeRatePerByte = fee_per_kb; // Assuming fee_per_kb is correctly in satoshis per vbyte
-  const estMinerFee = Math.ceil(estimatedSize * feeRatePerByte);
   // console.log(`Estimated Miner Fee: ${estMinerFee} satoshis`);
 
   // // Display total input, output values, and change

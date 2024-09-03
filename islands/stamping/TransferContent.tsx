@@ -8,7 +8,7 @@ export function TransferContent() {
   const config = useConfig();
 
   if (!config) {
-    console.error("Config not loaded");
+    console.error("Config not loaded in transfercontent");
     return;
   }
 

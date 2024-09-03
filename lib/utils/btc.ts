@@ -28,7 +28,7 @@ async function getBtcAddressInfoFromMempool(address: string) {
 
 async function getBtcAddressInfoFromQuickNode(address: string) {
   const fetchQuickNode = async (name: string, params: any[]) => {
-    const response = await fetch("/api/quicknode/getPrice", {
+    const response = await fetch("/quicknode/getPrice", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

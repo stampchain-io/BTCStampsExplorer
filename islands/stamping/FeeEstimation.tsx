@@ -1,14 +1,19 @@
 import { useEffect, useState } from "preact/hooks";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
+import {
+  calculateDust,
+  calculateMiningFee,
+} from "utils/minting/feeCalculations.ts";
 
 export function FeeEstimation(
-  { fee, handleChangeFee, type, fileType, fileSize, issuance }: {
-    fee: any;
-    handleChangeFee: (fee: any) => void;
+  { fee, handleChangeFee, type, fileType, fileSize, issuance, BTCPrice }: {
+    fee: number;
+    handleChangeFee: (fee: number) => void;
     type: string;
-    fileType?: any;
-    fileSize?: any;
+    fileType?: string;
+    fileSize?: number;
     issuance?: number;
+    BTCPrice: number;
   },
 ) {
   const { fees } = useFeePolling();
@@ -17,33 +22,28 @@ export function FeeEstimation(
   const [visible, setVisible] = useState(true);
   const [txfee, setTxfee] = useState(0.001285);
   const [mintfee, setMintfee] = useState(0.00000);
-  const [dust, setDust] = useState(0.000113);
+  const [dust, setDust] = useState(0.000333);
   const [total, setTotal] = useState(0.0);
-
   const [coinType, setCoinType] = useState("BTC");
-  const [BTCPrice, setBTCPrice] = useState(60000);
 
   useEffect(() => {
-    const _total = (fileSize ? fee * fileSize / 100000000 : 0) + txfee +
-      mintfee + dust;
-    setTotal(_total);
+    if (fileSize) {
+      const newDust = calculateDust(fileSize) / 100000000; // Convert satoshis to BTC
+      setDust(newDust);
+    }
+  }, [fileSize]);
+
+  useEffect(() => {
+    if (fileSize && fee) {
+      console.log("[FeeEstimation] Recalculating fees", { fileSize, fee });
+      const newTxfee = calculateMiningFee(fileSize, fee) / 100000000; // Convert sats to BTC
+      setTxfee(newTxfee);
+
+      const newTotal = newTxfee + mintfee + dust;
+      setTotal(newTotal);
+      console.log("[FeeEstimation] Updated fees", { newTxfee, newTotal });
+    }
   }, [fee, fileSize, mintfee, dust]);
-
-  useEffect(() => {
-    const func = async () => {
-      const response = await fetch("/quicknode/getPrice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: "cg_simplePrice",
-          params: ["bitcoin", "usd", true, true, true],
-        }),
-      });
-      const { price } = await response.json();
-      setBTCPrice(price);
-    };
-    func();
-  }, [coinType]);
 
   const btcIcon = `<svg
     xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +96,7 @@ export function FeeEstimation(
       <div class={"w-full flex flex-col gap-2"}>
         <div class="flex justify-between">
           <span class={"text-[#F5F5F5]"}>
-            EFFECTIVE FEE RATE: {(fee / 10.0).toFixed(2)} sat/vB
+            EFFECTIVE FEE RATE: {fee} sat/vB
           </span>
           <span class={"text-[#F5F5F5] hidden md:block"}>
             RECOMMENDED: {fees && fees.recomendedFee} sat/vB
@@ -110,9 +110,13 @@ export function FeeEstimation(
             id="labels-range-input"
             type="range"
             value={fee}
-            min="88"
-            max="2640"
-            onInput={handleChangeFee}
+            min="1"
+            max="264"
+            step="1"
+            onInput={(e) =>
+              handleChangeFee(
+                parseInt((e.target as HTMLInputElement).value, 10),
+              )}
             class="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#3F2A4E]"
           />
         </div>
@@ -186,7 +190,7 @@ export function FeeEstimation(
             {type === "src20" && (
               <div class="flex justify-between border-b border-[#8A8989] py-4">
                 <p>Sats per byte</p>
-                <p>{(fee / 10.0).toFixed(2)}</p>
+                <p>{fee}</p>
               </div>
             )}
             {(type === "stamp" || type === "src20-deploy") &&
@@ -205,7 +209,7 @@ export function FeeEstimation(
                   <div class="flex flex-col md:flex-row justify-between md:gap-8">
                     <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
                       <p>Sats per byte</p>
-                      <p>{(fee / 10.0).toFixed(2)}</p>
+                      <p>{fee}</p>
                     </div>
                     <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
                       <p>Items to Mint</p>
@@ -216,10 +220,10 @@ export function FeeEstimation(
               )}
             <div class="flex flex-col md:flex-row justify-between md:gap-8">
               <div class="flex justify-between border-b border-[#8A8989] w-full py-4">
-                <p>Transaction Fee</p>
+                <p>Miner Fee</p>
                 <p className={"flex gap-1 items-center"}>
                   {coinType === "BTC"
-                    ? txfee.toFixed(6)
+                    ? txfee.toFixed(8)
                     : (txfee * BTCPrice).toFixed(2)}
                   &nbsp;<span className={"coin"}></span>
                 </p>
@@ -248,7 +252,7 @@ export function FeeEstimation(
                 <p>Total Estimated</p>
                 <p className={"flex gap-1 items-center"}>
                   {coinType === "BTC"
-                    ? total.toFixed(6)
+                    ? total.toFixed(8)
                     : (total * BTCPrice).toFixed(2)}
                   &nbsp;<span className={"coin"}></span>
                 </p>
