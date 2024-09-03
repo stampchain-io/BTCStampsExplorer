@@ -41,7 +41,7 @@ export const HomeStampChainSelected = () => {
             <p className={"text-[#AA00FF] text-xl md:text-4xl font-extralight"}>
               BY <span className={"font-bold"}>VIVA LA VANDAL</span>
             </p>
-            <div className={"flex gap-4 md:gap-12 mt-2 md:mt-5"}>
+            <div className={"flex gap-4 md:gap-12 mt-2 md:mt-5 font-extrabold"}>
               <img src="/img/home/fullscreen.png" />
               <a
                 href="#"

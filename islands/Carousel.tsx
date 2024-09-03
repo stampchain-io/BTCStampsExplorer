@@ -71,7 +71,23 @@ const Carousel = (props: CarouselProps) => {
 
   return (
     <div class={`relative overflow-hidden ${props.class ?? ""}`}>
-      {SLIDE_DATA.map((slide, index) => {
+      {SLIDE_DATA.map((slide, index) => (
+        <img
+          key={index}
+          src={slide.url}
+          alt={slide.alt}
+          class={`absolute origin-center transition-all duration-500 h-auto object-fit ${
+            index === currentSlide.value
+              ? "left-1/2 -translate-x-1/2 w-[calc(30%+200px)] z-10 opacity-100 blur-none"
+              : (index === (currentSlide.value - 1 + SLIDE_DATA.length) %
+                  SLIDE_DATA.length
+                ? "left-[16.67%] -translate-x-1/2 top-[100px] w-1/3 z-0 opacity-50 blur-sm"
+                : "left-[83.33%] -translate-x-1/2 top-[100px] w-1/3 z-0 opacity-50 blur-sm")
+          }`}
+        />
+      ))}
+      {
+        /* {SLIDE_DATA.map((slide, index) => {
         return (
           (
             <div
@@ -107,7 +123,8 @@ const Carousel = (props: CarouselProps) => {
             </div>
           )
         );
-      })}
+      })} */
+      }
       {SHOW_NAVIGATION && (
         <>
           {

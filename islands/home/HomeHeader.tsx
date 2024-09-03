@@ -2,9 +2,9 @@ export const HomeHeader = () => {
   return (
     <div class="flex flex-col items-center justify-center gap-4">
       <p class="max-w-[1000px] text-center">
-        <span class="text-3xl md:text-5xl lg:text-6xl leading-tight text-[#F5F5F5] font-black uppercase block">
+        <span class="text-3xl md:text-5xl lg:text-6xl leading-tight font-black uppercase block">
           Unprunable{" "}
-          <span class="bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9]">
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF]">
             UTXO Art
           </span>
         </span>
