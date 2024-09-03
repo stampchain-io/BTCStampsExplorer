@@ -14,7 +14,7 @@ export function Footer() {
           <div className={"text-left flex flex-col justify-between gap-1"}>
             <div className={"flex flex-col gap-1"}>
               <p
-                className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-4xl md:text-7xl font-black italic"}
+                className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-4xl md:text-7xl font-black italic px-2"}
               >
                 STAMPCHAIN<span className={"font-extralight"}>.IO</span>
               </p>

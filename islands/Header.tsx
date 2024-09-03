@@ -64,7 +64,7 @@ export function Header() {
               toggleMenu();
               setCurrentPath("collection");
             }}
-            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] text-xl md:text-4xl font-black italic hidden lg:block lg:px-1"}
+            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-xl md:text-4xl font-black italic hidden lg:block lg:px-1"}
           >
             STAMPCHAIN
           </a>
@@ -128,7 +128,7 @@ export function Header() {
               toggleMenu();
               setCurrentPath("collection");
             }}
-            className={`bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] text-xl md:text-4xl font-black italic block lg:hidden px-1 ${
+            className={`bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-xl md:text-4xl font-black italic block lg:hidden px-1 ${
               open ? "absolute" : "hidden"
             } top-12 right-5`}
           >
@@ -148,7 +148,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("stamp");
               }}
-              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
                 currentPath === "stamp" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -161,7 +161,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("collection");
               }}
-              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
                 currentPath === "collection"
                   ? "border-[#7A00F5] border-b-4"
                   : ""
@@ -176,7 +176,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("src20");
               }}
-              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
                 currentPath === "src20" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -189,7 +189,7 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath("block");
               }}
-              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
                 currentPath === "block" ? "border-[#7A00F5] border-b-4" : ""
               }`}
             >
@@ -198,7 +198,7 @@ export function Header() {
 
             <div className={"group relative"}>
               <a
-                className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-white cursor-pointer text-lg lg:text-base font-weight-900 ${
+                className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-lg lg:text-base font-weight-900 ${
                   isStampingActive ? "border-[#7A00F5] border-b-4" : ""
                 }`}
               >
@@ -212,7 +212,7 @@ export function Header() {
                     toggleMenu();
                     setCurrentPath("stamping/stamp");
                   }}
-                  className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+                  className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
                     currentPath === "stamping/stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
@@ -225,7 +225,7 @@ export function Header() {
                     toggleMenu();
                     setCurrentPath("stamping/src20");
                   }}
-                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-white text-lg lg:text-base font-weight-900 ${
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
                     currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
                   }`}
                 >
@@ -244,16 +244,16 @@ export function Header() {
             }`}
           >
             <a href="https://x.com/Stampchain">
-              <img src="/img/footer/icon_x.png" class="w-12" />
+              <img src="/img/footer/XLogo.png" class="w-12" />
             </a>
             <a href="https://discord.gg/PCZU6xrt">
-              <img src="/img/footer/icon_discord.png" class="w-12" />
+              <img src="/img/footer/DiscordLogo.png" class="w-12" />
             </a>
             <a href="https://t.me/BitcoinStamps">
-              <img src="/img/footer/icon_telegram.png" class="w-12" />
+              <img src="/img/footer/TelegramLogo.png" class="w-12" />
             </a>
             <a href="https://github.com/stampchain-io/">
-              <img src="/img/footer/icon_github.png" class="w-12" />
+              <img src="/img/footer/GithubLogo.png" class="w-12" />
             </a>
           </div>
         </div>
