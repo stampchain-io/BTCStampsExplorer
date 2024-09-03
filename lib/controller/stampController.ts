@@ -408,4 +408,27 @@ export class StampController {
       },
     });
   }
+
+  static async getCreatorNameByAddress(
+    address: string,
+  ): Promise<string | null> {
+    try {
+      return await StampService.getCreatorNameByAddress(address);
+    } catch (error) {
+      console.error("Error in getCreatorNameByAddress:", error);
+      throw error;
+    }
+  }
+
+  static async updateCreatorName(
+    address: string,
+    newName: string,
+  ): Promise<boolean> {
+    try {
+      return await StampService.updateCreatorName(address, newName);
+    } catch (error) {
+      console.error("Error in updateCreatorName:", error);
+      throw error;
+    }
+  }
 }

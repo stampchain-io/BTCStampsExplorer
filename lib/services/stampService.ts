@@ -222,4 +222,17 @@ export class StampService {
       .sort((a, b) => b.sale_data.block_index - a.sale_data.block_index)
       .slice(0, limit);
   }
+
+  static async getCreatorNameByAddress(
+    address: string,
+  ): Promise<string | null> {
+    return await StampRepository.getCreatorNameByAddress(address);
+  }
+
+  static async updateCreatorName(
+    address: string,
+    newName: string,
+  ): Promise<boolean> {
+    return await StampRepository.updateCreatorName(address, newName);
+  }
 }
