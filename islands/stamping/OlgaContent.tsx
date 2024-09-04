@@ -124,17 +124,25 @@ export function OlgaContent() {
     else setCoinType("BTC");
   };
 
-  const toBase64 = (file: any) =>
-    new Promise((resolve, reject) => {
+  const toBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
+      reader.readAsArrayBuffer(file);
       reader.onload = () => {
-        const result = reader.result as string;
-        const base64Data = result.split(",")[1]; // Extract only the base64 part
-        resolve(base64Data);
+        try {
+          const arrayBuffer = reader.result as ArrayBuffer;
+          const base64 = btoa(
+            new Uint8Array(arrayBuffer)
+              .reduce((data, byte) => data + String.fromCharCode(byte), ""),
+          );
+          resolve(base64);
+        } catch (error) {
+          reject(new Error("Failed to convert file to base64"));
+        }
       };
-      reader.onerror = reject;
+      reader.onerror = () => reject(new Error("Failed to read file"));
     });
+  };
 
   const handleImage = (e: any) => {
     const selectedFile = e.target.files[0];
