@@ -11,11 +11,15 @@ export const handler: Handlers = {
       const { limit, page } = getPaginationParams(url);
 
       const params: SRC20TrxRequestParams = {
-        op: url.searchParams.get("op") || "DEPLOY",
         sort: url.searchParams.get("sort") || "ASC",
         limit,
         page,
       };
+
+      const op = url.searchParams.get("op");
+      if (op) {
+        params.op = op;
+      }
 
       const result = await Src20Controller.handleSrc20TransactionsRequest(
         req,
