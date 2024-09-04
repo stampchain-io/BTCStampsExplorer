@@ -3,9 +3,7 @@ import { convertEmojiToTick, convertToEmoji, paginate } from "utils/util.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { PaginatedTickResponseBody, TickHandlerContext } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
-import { BlockService } from "$lib/services/blockService.ts";
-import { SRC20Repository } from "$lib/database/src20Repository.ts";
-import { Src20Service } from "$lib/services/src20Service.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 
 export const handler: Handlers = {
@@ -22,21 +20,10 @@ export const handler: Handlers = {
         sort: url.searchParams.get("sort") || "ASC",
       };
 
-      const [src20_txs, total, lastBlock, mint_status] = await Promise.all([
-        SRC20Repository.getValidSrc20TxFromDb(params),
-        SRC20Repository.getTotalCountValidSrc20TxFromDb({
-          tick: params.tick,
-          op: params.op,
-        }),
-        BlockService.getLastBlock(),
-        Src20Service.getSrc20MintProgressByTick(params.tick),
-      ]);
+      const { src20_txs, total, lastBlock, mint_status } = await Src20Controller
+        .getTickData(params);
 
-      const pagination = paginate(
-        total.rows[0]["total"],
-        params.page,
-        params.limit,
-      );
+      const pagination = paginate(total, params.page, params.limit);
 
       const body: PaginatedTickResponseBody = {
         ...pagination,

@@ -100,9 +100,8 @@ export async function deploySRC20({
       lim,
       dec,
     });
-    const client = await dbManager.getClient();
 
-    const mint_info = await checkDeployedTick(client, tick);
+    const mint_info = await checkDeployedTick(tick);
     if (mint_info.deployed === true) {
       throw new Error(`Error: Token ${tick} already deployed`);
     }

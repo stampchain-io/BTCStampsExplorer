@@ -14,6 +14,8 @@ import { BIG_LIMIT } from "utils/constants.ts";
 import { formatSRC20Row } from "utils/src20Utils.ts";
 import { paginate } from "utils/util.ts";
 import { Big } from "$Big";
+import { stripTrailingZeros } from "utils/util.ts";
+
 export class Src20Service {
   static async getTotalCountValidSrc20Tx(params: {
     tick?: string;
@@ -125,33 +127,13 @@ export class Src20Service {
     params: SRC20BalanceRequestParams,
   ): Promise<Src20BalanceResponseBody> {
     try {
-      const [src20, lastBlock, totalCount] = await Promise.all([
-        SRC20Repository.getSrc20BalanceFromDb(params),
-        BlockService.getLastBlock(),
-        params.includePagination
-          ? SRC20Repository.getTotalSrc20BalanceCount(params)
-          : Promise.resolve(0),
-      ]);
+      const src20 = await SRC20Repository.getSrc20BalanceFromDb(params);
 
       if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
         throw new Error("SRC20 balance not found");
       }
 
-      const response: Src20BalanceResponseBody = {
-        last_block: lastBlock.last_block,
-        data: params.address && params.tick ? src20[0] : src20,
-      };
-
-      if (params.includePagination) {
-        response.pagination = {
-          page: params.page || 1,
-          limit: params.limit || 10,
-          total: totalCount,
-          totalPages: Math.ceil(totalCount / (params.limit || 10)),
-        };
-      }
-
-      return response;
+      return params.address && params.tick ? src20[0] : src20;
     } catch (error) {
       console.error("Error in fetchSrc20Balance:", error);
       console.error("Params:", params);
@@ -159,9 +141,9 @@ export class Src20Service {
     }
   }
 
-  static async fetchAndFormatSrc20Snapshot(
+  static async fetchSrc20Snapshot(
     params: SRC20SnapshotRequestParams,
-  ): Promise<Src20SnapshotResponseBody> {
+  ): Promise<Src20SnapShotDetail[]> {
     try {
       const balanceParams: SRC20BalanceRequestParams = {
         tick: params.tick,
@@ -169,30 +151,19 @@ export class Src20Service {
         limit: params.limit,
         page: params.page,
         sort: params.sort || "DESC",
-        includePagination: true,
       };
 
-      const [balanceResponse, lastBlock] = await Promise.all([
-        this.fetchSrc20Balance(balanceParams),
-        BlockService.getLastBlock(),
-      ]);
+      const balanceResponse = await this.fetchSrc20Balance(balanceParams);
 
-      const snapshotData = balanceResponse.data.map((row) => ({
+      const snapshotData = balanceResponse.map((row) => ({
         tick: row.tick,
         address: row.address,
-        balance: row.amt, // Assuming 'amt' is the balance field
+        balance: stripTrailingZeros(row.amt.toString()),
       }));
 
-      return {
-        page: balanceResponse.pagination?.page || params.page,
-        limit: balanceResponse.pagination?.limit || params.limit,
-        totalPages: balanceResponse.pagination?.totalPages || 1,
-        total: balanceResponse.pagination?.total || snapshotData.length,
-        snapshot_block: lastBlock.last_block,
-        data: snapshotData,
-      };
+      return snapshotData;
     } catch (error) {
-      console.error("Error in fetchAndFormatSrc20Snapshot:", error);
+      console.error("Error in fetchSrc20Snapshot:", error);
       throw error;
     }
   }
@@ -244,5 +215,16 @@ export class Src20Service {
     const { max_supply, total_minted } = mint_status;
     const isMintedOut = new Big(total_minted).plus(amount).gt(max_supply);
     return { ...mint_status, minted_out: isMintedOut };
+  }
+
+  static async getTotalSrc20BalanceCount(
+    params: Partial<SRC20BalanceRequestParams>,
+  ): Promise<number> {
+    try {
+      return await SRC20Repository.getTotalSrc20BalanceCount(params);
+    } catch (error) {
+      console.error("Error getting total SRC20 balance count:", error);
+      throw error;
+    }
   }
 }

@@ -14,7 +14,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
       const balanceParams = {
         address,
         tick: convertEmojiToTick(String(tick)),
-        includePagination: params.get("includePagination") !== "false",
+        includePagination: params.get("includePagination") === "true", // or however you determine this
         limit: Number(params.get("limit")) || undefined,
         page: Number(params.get("page")) || undefined,
         amt: Number(params.get("amt")) || undefined,
