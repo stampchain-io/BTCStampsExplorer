@@ -13,7 +13,7 @@ interface CarouselProps {
 
 const SLIDE_DATA = [
   {
-    url: "http://dev.bitcoinstamps.xyz/img/home/carousel1.png",
+    url: "/img/home/carousel1.png",
     alt: "Slide 1",
     title: "PEPE",
     subTitle: "BY VOGELMANN",
@@ -21,7 +21,7 @@ const SLIDE_DATA = [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
   },
   {
-    url: "http://dev.bitcoinstamps.xyz/img/home/carousel2.png",
+    url: "/img/home/carousel2.png",
     alt: "Slide 2",
     title: "PEPE",
     subTitle: "BY VOGELMANN",
@@ -29,7 +29,7 @@ const SLIDE_DATA = [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
   },
   {
-    url: "http://dev.bitcoinstamps.xyz/img/home/carousel3.png",
+    url: "/img/home/carousel3.png",
     alt: "Slide 3",
     title: "PEPE",
     subTitle: "BY VOGELMANN",
