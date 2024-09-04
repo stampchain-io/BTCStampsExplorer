@@ -3,17 +3,17 @@ import Carousel from "../Carousel.tsx";
 
 export const HomeCarousel = () => {
   return (
-    <div class="w-full h-[300px] md:h-[520px]">
+    <>
       {IS_BROWSER
         ? (
           <Carousel
             showNavigation={true}
             automatic={true}
             interval={5000}
-            class="h-full"
+            class="w-full h-[min(calc(30vw+220px),650px)]"
           />
         )
         : <div>Loading carousel...</div>}
-    </div>
+    </>
   );
 };
