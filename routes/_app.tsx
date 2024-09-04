@@ -58,14 +58,7 @@ export default function App({ Component }: AppProps) {
           name="twitter:image"
           content="https://stampchain.io/img/stamp.jpg"
         />
-        {/* CSP header -- TODO: Review, may be too restrictive*/}
-        <meta
-          http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https:; connect-src 'self' https:;"
-        />
-        {/* Other security headers */}
         <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-        <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
         <meta
           http-equiv="Referrer-Policy"
           content="strict-origin-when-cross-origin"
