@@ -1,13 +1,15 @@
 export function Footer() {
   return (
-    <div className={"text-[#7200B4] font-bold flex flex-col gap-5 my-5"}>
+    <div
+      className={"px-2 text-[#7200B4] font-bold flex flex-col gap-5 my-5 max-w-7xl w-full mx-auto"}
+    >
       {
         /* <div
         className={"bg-gradient-to-r from-[#7200B4] via-[#FF00E9] to-[#7200B4] w-full h-2"}
       /> */
       }
 
-      <div className={"p-2 md:p-10 xl:p-20 flex flex-col gap-4"}>
+      <div className={"py-2 md:py-10 xl:py-20 flex flex-col gap-4"}>
         <div
           className={"flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg"}
         >

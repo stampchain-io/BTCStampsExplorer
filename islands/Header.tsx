@@ -55,7 +55,7 @@ export function Header() {
 
   return (
     <nav className="py-2 lg:py-4">
-      <div className="container mx-auto lg:flex lg:items-center lg:justify-between">
+      <div className="max-w-7xl w-full mx-auto lg:flex lg:items-center lg:justify-between">
         <div className="flex justify-between items-center">
           <a
             href="/home"
@@ -64,7 +64,7 @@ export function Header() {
               toggleMenu();
               setCurrentPath("collection");
             }}
-            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-xl md:text-4xl font-black italic hidden lg:block lg:px-1"}
+            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-xl md:text-5xl font-black italic hidden lg:block lg:px-1"}
           >
             STAMPCHAIN
           </a>
@@ -99,7 +99,7 @@ export function Header() {
             open
               ? "flex left-0 top-0 fixed min-w-[300px] w-4/5 h-screen z-20 bg-[#181818] scroll-none p-6 pt-[120px]"
               : "hidden"
-          } flex-col lg:flex lg:flex-row text-center justify-between`}
+          } flex-col lg:flex lg:flex-row justify-between`}
           id="navbar-collapse"
         >
           {
@@ -141,7 +141,8 @@ export function Header() {
                 : "hidden lg:flex flex-col lg:flex-row items-center"
             }`}
           >
-            <a
+            {
+              /* <a
               href="/stamp?ident=classic"
               f-partial={"/stamp?ident=classic"}
               onClick={() => {
@@ -153,8 +154,10 @@ export function Header() {
               }`}
             >
               STAMPS
-            </a>
-            <a
+            </a> */
+            }
+            {
+              /* <a
               href="/collection"
               f-partial={"/collection"}
               onClick={() => {
@@ -168,8 +171,10 @@ export function Header() {
               }`}
             >
               COLLECTIONS
-            </a>
-            <a
+            </a> */
+            }
+            {
+              /* <a
               href="/src20"
               f-partial={"/src20"}
               onClick={() => {
@@ -181,8 +186,10 @@ export function Header() {
               }`}
             >
               SRC-20
-            </a>
-            <a
+            </a> */
+            }
+            {
+              /* <a
               href="/block/last"
               f-partial={"/block/last"}
               onClick={() => {
@@ -194,9 +201,11 @@ export function Header() {
               }`}
             >
               BLOCKS
-            </a>
+            </a> */
+            }
 
-            <div className={"group relative"}>
+            {
+              /* <div className={"group relative"}>
               <a
                 className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-lg lg:text-base font-weight-900 ${
                   isStampingActive ? "border-[#7A00F5] border-b-4" : ""
@@ -232,7 +241,159 @@ export function Header() {
                   SRC-20
                 </a>
               </div>
+            </div> */
+            }
+
+            <div className={"group relative"}>
+              <a
+                className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-lg font-black`}
+              >
+                ART STAMPS
+              </a>
+              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-left">
+                <a
+                  href="/stamp/?ident=posh"
+                  f-partial={"/stamp/?ident=posh"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("stamp");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  POSH
+                </a>
+                <a
+                  href="#"
+                  f-partial={"#"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("#");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  PIXEL
+                </a>
+                <a
+                  href="#"
+                  f-partial={"#"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("#");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  VECTOR
+                </a>
+                <a
+                  href="#"
+                  f-partial={"#"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("#");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  RECURSIVE
+                </a>
+                <a
+                  href="/stamp/?ident=all"
+                  f-partial={"/stamp/?ident=all"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("stamp");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "stamp" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  VIEW ALL
+                </a>
+                <a
+                  href="/collection"
+                  f-partial={"/collection"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("collection");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "collection" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  COLLECTIONS
+                </a>
+                <a
+                  href="#"
+                  f-partial={"#"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("#");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  STAMP
+                </a>
+              </div>
             </div>
+
+            <div className={"group relative"}>
+              <a
+                className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-lg font-black`}
+              >
+                SRC-20 TOKENS
+              </a>
+              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-left">
+                <a
+                  href="/src20/?ident=all"
+                  f-partial={"/src20/?ident=all"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("src20");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "src20" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  ALL
+                </a>
+                <a
+                  href="/src20/?ident=trending"
+                  f-partial={"/src20/?ident=trending"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("src20");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "src20" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  TRENDING
+                </a>
+                <a
+                  href="/stamping/src20/?ident=deploy"
+                  f-partial={"/stamping/src20/?ident=deploy"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("stamping/src20");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  DEPLOY
+                </a>
+              </div>
+            </div>
+
             <div class="">
               <ConnectWallet toggleModal={toggleWalletModal} />
             </div>
