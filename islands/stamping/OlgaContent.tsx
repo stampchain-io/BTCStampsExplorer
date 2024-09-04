@@ -1,11 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$lib/store/wallet/wallet.ts";
-import { leatherProvider } from "$lib/store/wallet/leather.ts";
-import { okxProvider } from "$lib/store/wallet/okx.ts";
-import { unisatProvider } from "$lib/store/wallet/unisat.ts";
+import { getWalletProvider } from "$lib/store/wallet/walletHelper.ts";
 import axiod from "https://deno.land/x/axiod/mod.ts";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { useFeePolling } from "hooks/useFeePolling.tsx";
 
 const log = (message: string, data?: any) => {
   console.log(`[OlgaContent] ${message}`, data ? data : "");
@@ -40,8 +39,8 @@ export function OlgaContent() {
   type FileType = File | null;
 
   const [file, setFile] = useState<FileType>(null);
-  const [fee, setFee] = useState<number>(80);
-  const [issuance, setIssuance] = useState<number>(1);
+  const [fee, setFee] = useState<number>(0);
+  const [issuance, setIssuance] = useState("1");
   const [coinType, setCoinType] = useState<"BTC" | "USDT">("BTC");
   const [visible, setVisible] = useState<boolean>(false);
   const [txfee, setTxfee] = useState<number>(0.001285);
@@ -50,6 +49,17 @@ export function OlgaContent() {
   const [total, setTotal] = useState<number>(0.001547);
   const [BTCPrice, setBTCPrice] = useState<number>(60000);
   const [fileSize, setFileSize] = useState<number | null>(null);
+  const [isLocked, setIsLocked] = useState(true);
+  const [isPoshStamp, setIsPoshStamp] = useState(false);
+  const [stampName, setStampName] = useState("");
+  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
+
+  useEffect(() => {
+    if (fees && !loading) {
+      const recommendedFee = Math.round(fees.recomendedFee);
+      setFee(recommendedFee);
+    }
+  }, [fees, loading]);
 
   useEffect(() => {
     const coins = document.getElementsByClassName("coin");
@@ -58,6 +68,11 @@ export function OlgaContent() {
 
   useEffect(() => {
     fetchBTCPrice();
+  }, []);
+
+  useEffect(() => {
+    // Set the checkbox to checked by default
+    setIsLocked(true);
   }, []);
 
   const fetchBTCPrice = async () => {
@@ -132,13 +147,19 @@ export function OlgaContent() {
     console.log(selectedFile);
   };
 
-  const handleDecrease = () => {
-    if (issuance === 1) return;
-    setIssuance(issuance - 1);
+  const handleIssuanceChange = (e: Event) => {
+    const value = (e.target as HTMLInputElement).value;
+    // Only allow positive integers
+    if (/^\d*$/.test(value)) {
+      setIssuance(value === "" ? "1" : value);
+    }
   };
 
-  const handleIncrease = () => {
-    setIssuance(issuance + 1);
+  const handleStampNameChange = (e: Event) => {
+    const value = (e.target as HTMLInputElement).value;
+    if (/^[B-Zb-z][A-Za-z]{0,12}$/.test(value)) {
+      setStampName(value);
+    }
   };
 
   const handleMint = async () => {
@@ -163,16 +184,22 @@ export function OlgaContent() {
         log("File converted to base64", { fileSize: data.length });
 
         log("Preparing mint request");
-        const mintRequest = {
+        const mintRequest: any = {
           sourceWallet: address,
           qty: issuance,
-          locked: true,
+          locked: isLocked,
           filename: file.name,
           file: data,
           satsPerKB: fee,
           service_fee: config.MINTING_SERVICE_FEE,
           service_fee_address: config.MINTING_SERVICE_FEE_ADDRESS,
         };
+
+        // Add assetName to mintRequest if Posh Stamp is selected and a name is entered
+        if (isPoshStamp && stampName) {
+          mintRequest.assetName = stampName;
+        }
+
         log("Mint request prepared", mintRequest);
 
         log("Sending mint request to API");
@@ -190,47 +217,49 @@ export function OlgaContent() {
           throw new Error("Invalid response structure: missing hex field");
         }
 
-        const { hex, cpid } = response.data;
-        log("Extracted hex and cpid from response", { hex, cpid });
+        const { hex, base64, txDetails, cpid } = response.data;
+        log("Extracted data from response", { hex, base64, txDetails, cpid });
 
-        log(
-          "Signing PSBT with wallet provider",
+        const walletProvider = getWalletProvider(
           walletContext.wallet.value.provider,
         );
-        let txid;
-        const walletProvider = walletContext.wallet.value.provider;
 
-        switch (walletProvider) {
-          case "leather":
-            console.log("Hex value being sent to signPSBT:", hex);
-            txid = await leatherProvider.signPSBT(hex);
-            if (txid === null) {
-              log("User cancelled the transaction");
-              return; // Exit the function early
-            }
-            break;
-          case "okx":
-            txid = await okxProvider.signPSBT(hex);
-            break;
-          case "unisat":
-            txid = await unisatProvider.signPSBT(hex);
-            break;
-          default:
-            throw new Error("Unsupported wallet provider");
+        // Use txDetails to determine which inputs to sign
+        const inputsToSign = txDetails.map((input) => ({
+          address: walletContext.wallet.value.address,
+          signingIndexes: [input.signingIndex],
+        }));
+
+        const result = await walletProvider.signPSBT(hex, inputsToSign);
+
+        if (result === null) {
+          log("User cancelled the transaction");
+          alert("Transaction was cancelled by the user");
+          return;
         }
 
-        log("PSBT signed", { txid });
-
-        if (txid) {
-          log("Minting successful", { txid, cpid });
-          alert(`Minting successful! Transaction ID: ${txid}\nCPID: ${cpid}`);
+        if (typeof result === "string") {
+          if (result.startsWith("0x") || result.length === 64) {
+            // This is likely a transaction ID, meaning the transaction was broadcast
+            log("Transaction signed and broadcast successfully. TXID:", result);
+            alert(
+              `Transaction signed and broadcast successfully. TXID: ${result}`,
+            );
+          } else {
+            // This is likely a signed PSBT
+            log("Transaction signed successfully. Signed PSBT:", result);
+            // Here you would add code to broadcast the signed PSBT
+            alert(`Transaction signed successfully. Signed PSBT: ${result}`);
+          }
         } else {
-          log("Transaction was not completed");
-          alert("Minting was cancelled or failed");
+          log("Unexpected result from signPSBT:", result);
+          alert(
+            "Unexpected result from signing transaction. Please try again and check the console for more details.",
+          );
         }
       } catch (error) {
         log("Error in minting process", error);
-        throw error; // Re-throw the error to be caught by the outer try-catch
+        throw error;
       }
     } catch (error) {
       console.error("Unexpected error in handleMint:", error);
@@ -331,14 +360,21 @@ export function OlgaContent() {
           Editions
         </p>
         <div class={"flex gap-[18px] w-full mb-3"}>
-          <div
+          <input
+            type="text"
+            value={issuance}
+            onInput={handleIssuanceChange}
             class={"p-4 text-[#F5F5F5] text-[24px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"}
-          >
-            {issuance}
-          </div>
+          />
           <div
             class={"w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"}
-            onClick={() => handleDecrease()}
+            onClick={() =>
+              setIssuance((
+                prev,
+              ) => (parseInt(prev) > 1
+                ? (parseInt(prev) - 1).toString()
+                : "1")
+              )}
           >
             <svg
               width="32"
@@ -352,7 +388,8 @@ export function OlgaContent() {
           </div>
           <div
             class={"w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"}
-            onClick={() => handleIncrease()}
+            onClick={() =>
+              setIssuance((prev) => (parseInt(prev) + 1).toString())}
           >
             <svg
               width="32"
@@ -377,18 +414,48 @@ export function OlgaContent() {
           <div className="flex gap-2 items-center">
             <input
               type="checkbox"
-              id="assets"
-              name="assets"
+              id="lockEditions"
+              name="lockEditions"
+              checked={isLocked}
+              onChange={(e) => setIsLocked(e.target.checked)}
               className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
             />
             <label
-              for="assets"
+              htmlFor="lockEditions"
               className="text-[#B9B9B9] text-[16px] font-semibold"
             >
-              Lock assets
+              Lock Editions
+            </label>
+          </div>
+          <div className="flex gap-2 items-center">
+            <input
+              type="checkbox"
+              id="poshStamp"
+              name="poshStamp"
+              checked={isPoshStamp}
+              onChange={(e) => setIsPoshStamp(e.target.checked)}
+              className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
+            />
+            <label
+              htmlFor="poshStamp"
+              className="text-[#B9B9B9] text-[16px] font-semibold"
+            >
+              Posh Stamp
             </label>
           </div>
         </div>
+        {isPoshStamp && (
+          <div className="mt-3">
+            <input
+              type="text"
+              value={stampName}
+              onInput={handleStampNameChange}
+              placeholder="Stamp Name (max 13 chars, can't start with A)"
+              className="p-4 text-[#F5F5F5] text-[16px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"
+              maxLength={13}
+            />
+          </div>
+        )}
       </div>
 
       {/* FIXME: FINALIZE OPTIMIZATION ROUTINE */}
@@ -469,13 +536,14 @@ export function OlgaContent() {
         fileSize={fileSize}
         issuance={issuance}
         BTCPrice={BTCPrice}
+        onRefresh={fetchFees}
       />
 
       <div
         class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}
         onClick={handleMint}
       >
-        Mint Now
+        Stamp Now
       </div>
     </div>
   );

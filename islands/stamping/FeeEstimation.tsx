@@ -5,18 +5,28 @@ import {
   calculateMiningFee,
 } from "utils/minting/feeCalculations.ts";
 
-export function FeeEstimation(
-  { fee, handleChangeFee, type, fileType, fileSize, issuance, BTCPrice }: {
-    fee: number;
-    handleChangeFee: (fee: number) => void;
-    type: string;
-    fileType?: string;
-    fileSize?: number;
-    issuance?: number;
-    BTCPrice: number;
-  },
-) {
-  const { fees } = useFeePolling();
+interface FeeEstimationProps {
+  fee: number;
+  handleChangeFee: (fee: number) => void;
+  type: string;
+  fileType?: string;
+  fileSize?: number;
+  issuance?: number;
+  BTCPrice: number;
+  onRefresh: () => void;
+}
+
+export function FeeEstimation({
+  fee,
+  handleChangeFee,
+  type,
+  fileType,
+  fileSize,
+  issuance,
+  BTCPrice,
+  onRefresh,
+}: FeeEstimationProps) {
+  const { fees, loading } = useFeePolling();
   console.log(fees);
 
   const [visible, setVisible] = useState(true);
@@ -25,6 +35,13 @@ export function FeeEstimation(
   const [dust, setDust] = useState(0.000333);
   const [total, setTotal] = useState(0.0);
   const [coinType, setCoinType] = useState("BTC");
+
+  useEffect(() => {
+    if (fees && !loading) {
+      const recommendedFee = Math.round(fees.recomendedFee);
+      handleChangeFee(recommendedFee);
+    }
+  }, [fees, loading]);
 
   useEffect(() => {
     if (fileSize) {
@@ -219,12 +236,12 @@ export function FeeEstimation(
                 </>
               )}
             <div class="flex flex-col md:flex-row justify-between md:gap-8">
-              <div class="flex justify-between border-b border-[#8A8989] w-full py-4">
+              <div class="flex justify-between border-b border-[#8A8989] md:border-none w-full py-4">
                 <p>Miner Fee</p>
                 <p className={"flex gap-1 items-center"}>
                   {coinType === "BTC"
                     ? txfee.toFixed(8)
-                    : (txfee * BTCPrice).toFixed(2)}
+                    : (txfee * BTCPrice).toFixed(2)}{" "}
                   &nbsp;<span className={"coin"}></span>
                 </p>
               </div>
@@ -261,6 +278,7 @@ export function FeeEstimation(
           </>
         )}
       </div>
+      <button onClick={onRefresh}>Refresh Fees</button>
     </>
   );
 }
