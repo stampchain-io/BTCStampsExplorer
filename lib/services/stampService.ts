@@ -22,45 +22,14 @@ export class StampService {
       throw new Error(`Error: Stamp ${id} not found`);
     }
 
-    let stamp;
-    if (Array.isArray(stampResult.rows)) {
-      if (stampResult.rows.length === 0) {
-        throw new Error(`Error: Stamp ${id} not found`);
-      }
-      stamp = stampResult.rows[0];
-    } else if (stampResult.stamp) {
-      stamp = stampResult.stamp;
-    } else {
-      stamp = stampResult;
-    }
-
+    const stamp = this.extractStamp(stampResult);
     const cpid = stamp.cpid;
 
-    const isStampOrSrc721 = stamp.ident === "STAMP" ||
-      stamp.ident === "SRC-721";
-
     const [asset, holders, dispensers, sends, dispenses, total, lastBlock] =
-      await Promise.all([
-        isStampOrSrc721 ? XcpManager.getXcpAsset(cpid) : Promise.resolve(null),
-        isStampOrSrc721
-          ? XcpManager.getXcpHoldersByCpid(cpid)
-          : Promise.resolve([]),
-        isStampOrSrc721
-          ? DispenserManager.getDispensersByCpid(cpid, filter)
-          : Promise.resolve([]),
-        isStampOrSrc721
-          ? XcpManager.getXcpSendsByCPID(cpid)
-          : Promise.resolve([]),
-        isStampOrSrc721
-          ? DispenserManager.getDispensesByCpid(cpid)
-          : Promise.resolve([]),
-        StampRepository.getTotalStampCountFromDb({ type: "stamps" }),
-        BlockService.getLastBlock(),
-      ]);
+      await this.fetchRelatedData(stamp, cpid, filter);
 
-    // FIXME: Need to merge the mutable fields of the stamp into the XCP response data ( divisible/locked )
     return {
-      last_block: lastBlock.last_block,
+      last_block: lastBlock,
       asset: asset ? asset.result : null,
       stamp,
       holders,
@@ -69,6 +38,46 @@ export class StampService {
       dispenses,
       total: total.rows[0].total,
     };
+  }
+
+  private static extractStamp(stampResult: any) {
+    if (Array.isArray(stampResult.rows)) {
+      if (stampResult.rows.length === 0) {
+        throw new Error(`Error: Stamp not found`);
+      }
+      return stampResult.rows[0];
+    } else if (stampResult.stamp) {
+      return stampResult.stamp;
+    } else {
+      return stampResult;
+    }
+  }
+
+  private static async fetchRelatedData(
+    stamp: any,
+    cpid: string,
+    filter: string,
+  ) {
+    const isStampOrSrc721 = stamp.ident === "STAMP" ||
+      stamp.ident === "SRC-721";
+
+    return await Promise.all([
+      isStampOrSrc721 ? XcpManager.getXcpAsset(cpid) : Promise.resolve(null),
+      isStampOrSrc721
+        ? XcpManager.getXcpHoldersByCpid(cpid)
+        : Promise.resolve([]),
+      isStampOrSrc721
+        ? DispenserManager.getDispensersByCpid(cpid, filter)
+        : Promise.resolve([]),
+      isStampOrSrc721
+        ? XcpManager.getXcpSendsByCPID(cpid)
+        : Promise.resolve([]),
+      isStampOrSrc721
+        ? DispenserManager.getDispensesByCpid(cpid)
+        : Promise.resolve([]),
+      StampRepository.getTotalStampCountFromDb({ type: "stamps" }),
+      BlockService.getLastBlock(),
+    ]);
   }
 
   static async getStamps(options: {

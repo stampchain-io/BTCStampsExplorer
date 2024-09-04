@@ -12,64 +12,8 @@ export const handler: Handlers = {
     try {
       let { tick } = ctx.params;
       tick = convertEmojiToTick(tick);
-
-      const balanceParams = {
-        tick,
-        sort: "DESC",
-        includePagination: false,
-      };
-
-      const [
-        // srcTrxResponse,
-        balanceResponse,
-        mintProgressResponse,
-        allSrc20DataResponse,
-      ] = await Promise.all([
-        Src20Controller.handleSrc20BalanceRequest(balanceParams), // FIXME: sort by holder amt desc, make suer 0 bal are stripped
-        Src20Controller.handleSrc20MintProgressRequest(tick),
-        Src20Controller.handleAllSrc20DataForTickRequest(tick),
-      ]);
-
-      if (
-        !mintProgressResponse ||
-        !allSrc20DataResponse || !balanceResponse
-      ) {
-        throw new Error("Failed to fetch SRC20 data");
-      }
-      const allSrc20Data = await allSrc20DataResponse;
-      const { deployment, mints, transfers } = allSrc20Data;
-      const mintProgressData = await mintProgressResponse;
-      const balanceData = await balanceResponse;
-      const total_transfers = transfers.length;
-      const total_mints = mints.length;
-      const totalCount = total_transfers + total_mints;
-
       set_precision(-4);
-      const body = {
-        last_block: balanceData.last_block,
-        deployment: deployment,
-        transfers: transfers,
-        total_transfers: total_transfers,
-        mints: mints,
-        total_mints: total_mints,
-        total_holders: balanceData.data.length,
-        holders: balanceData.data.map((row) => {
-          const amt = formatAmount(row.amt || "0");
-          const totalMinted = formatAmount(
-            mintProgressData.total_minted || "1",
-          );
-          const percentage = calculatePercentage(amt, totalMinted);
-          return { ...row, amt, percentage };
-        }),
-        mint_status: {
-          ...mintProgressData,
-          max_supply: mintProgressData.max_supply?.toString() || "0",
-          total_minted: mintProgressData.total_minted?.toString() || "0",
-          limit: mintProgressData.limit?.toString() || "0",
-        },
-        total_transactions: totalCount,
-      };
-
+      const body = await Src20Controller.handleTickPageRequest(tick);
       return await ctx.render(body);
     } catch (error) {
       console.error(error);
@@ -77,22 +21,6 @@ export const handler: Handlers = {
     }
   },
 };
-
-function formatAmount(value: string): string {
-  // Remove leading zeros and split into whole and decimal parts
-  const [whole, decimal = ""] = value.replace(/^0+/, "").split(".");
-  // Remove trailing zeros from decimal part
-  const trimmedDecimal = decimal.replace(/0+$/, "");
-  return trimmedDecimal ? `${whole}.${trimmedDecimal}` : whole;
-}
-
-function calculatePercentage(amount: string, total: string): string {
-  const amountNum = parseFloat(amount.replace(/,/g, ""));
-  const totalNum = parseFloat(total.replace(/,/g, ""));
-  if (totalNum === 0) return "0.00";
-  const percentage = (amountNum / totalNum) * 100;
-  return percentage.toFixed(2);
-}
 
 export const SRC20TickPage = (props) => {
   const {

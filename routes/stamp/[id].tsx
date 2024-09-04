@@ -40,11 +40,11 @@ export const handler: Handlers<StampData> = {
       if (!stampData) {
         return new Response("Stamp not found", { status: 404 });
       }
-      // TODO: Get holders for src-20 tokens
+
       return ctx.render({
         ...stampData.data,
         last_block: stampData.last_block,
-      }); // Spread the stampData to avoid the extra nesting
+      });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
       return new Response("Internal Server Error", { status: 500 });

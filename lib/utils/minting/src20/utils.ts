@@ -1,6 +1,5 @@
 import * as bitcoin from "bitcoin";
 import { estimateInputSize } from "utils/minting/src20/utxo-selector.ts";
-import { convertToEmoji } from "utils/util.ts";
 import { SRC20Row } from "globals";
 
 const MAX_RETRIES = 3;

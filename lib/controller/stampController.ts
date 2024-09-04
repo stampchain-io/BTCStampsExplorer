@@ -85,42 +85,18 @@ export class StampController {
         last_block,
       } = res;
 
-      // Note: replace mutable fields of the stamp with the values from xcp asset
       if (asset) {
         stamp.divisible = asset.divisible ?? stamp.divisible;
         stamp.locked = asset.locked ?? stamp.locked;
         stamp.supply = asset.supply ?? stamp.supply;
       }
-      const processedHolders = holders.map((holder: HolderRow) => ({
-        address: holder.address,
-        quantity: holder.divisible
-          ? holder.quantity / 100000000
-          : holder.quantity,
-      }));
 
-      let floorPrice: string | number = "priceless";
-      let marketCap: string | number = "priceless";
-
-      if (dispensers && dispensers.length > 0) {
-        const openDispensers = dispensers.filter(
-          (dispenser) => dispenser.give_remaining > 0,
-        );
-        if (openDispensers.length > 0) {
-          const lowestBtcRate = Math.min(
-            ...openDispensers.map((dispenser) =>
-              dispenser.satoshirate / 100000000 // Note: btcrate was sometimes returning null
-            ),
-          );
-          floorPrice = lowestBtcRate;
-        }
-      }
-
-      if (dispenses && dispenses.length > 0 && stamp.supply) {
-        const mostRecentDispense = dispenses[0]; // Assuming dispenses are sorted by recency
-        const recentPrice = mostRecentDispense.dispenser_details.satoshirate /
-          100000000;
-        marketCap = recentPrice * stamp.supply;
-      }
+      const processedHolders = this.processHolders(holders);
+      const { floorPrice, marketCap } = this.calculatePrices(
+        dispensers,
+        dispenses,
+        stamp,
+      );
 
       return {
         data: {
@@ -141,6 +117,47 @@ export class StampController {
       console.error("Error in StampController.getStampDetailsById:", error);
       throw error;
     }
+  }
+
+  private static processHolders(holders: HolderRow[]): ProcessedHolder[] {
+    return holders.map((holder: HolderRow) => ({
+      address: holder.address,
+      quantity: holder.divisible
+        ? holder.quantity / 100000000
+        : holder.quantity,
+    }));
+  }
+
+  private static calculatePrices(
+    dispensers: any[],
+    dispenses: any[],
+    stamp: any,
+  ) {
+    let floorPrice: string | number = "priceless";
+    let marketCap: string | number = "priceless";
+
+    if (dispensers && dispensers.length > 0) {
+      const openDispensers = dispensers.filter(
+        (dispenser) => dispenser.give_remaining > 0,
+      );
+      if (openDispensers.length > 0) {
+        const lowestBtcRate = Math.min(
+          ...openDispensers.map((dispenser) =>
+            dispenser.satoshirate / 100000000
+          ),
+        );
+        floorPrice = lowestBtcRate;
+      }
+    }
+
+    if (dispenses && dispenses.length > 0 && stamp.supply) {
+      const mostRecentDispense = dispenses[0];
+      const recentPrice = mostRecentDispense.dispenser_details.satoshirate /
+        100000000;
+      marketCap = recentPrice * stamp.supply;
+    }
+
+    return { floorPrice, marketCap };
   }
 
   static async getStamps({
@@ -244,7 +261,7 @@ export class StampController {
         limit: stampResult.page_size,
         totalPages: stampResult.pages,
         total: stampResult.total,
-        last_block: lastBlock.last_block || lastBlock,
+        last_block: lastBlock,
         data: stamps,
       };
     } catch (error) {
@@ -288,7 +305,7 @@ export class StampController {
 
     return {
       ...pagination,
-      last_block: lastBlock.last_block,
+      last_block: lastBlock,
       data: stamps,
     };
   }
