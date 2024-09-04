@@ -83,14 +83,14 @@ export class Src20Service {
         formattedData.length > 0
       ) {
         return {
-          last_block: lastBlock.last_block,
+          last_block: lastBlock,
           data: formattedData[0],
         };
       }
 
       return {
         ...pagination,
-        last_block: lastBlock.last_block,
+        last_block: lastBlock,
         data: Array.isArray(formattedData) ? formattedData : [formattedData],
       };
     } catch (error) {
@@ -183,26 +183,6 @@ export class Src20Service {
         params.block_index === null
       ? mappedData[0]
       : [mappedData].flat();
-  }
-
-  private static formatBalanceResponse(
-    rows: any[],
-    total: number,
-    lastBlock: any,
-    params: SRC20BalanceRequestParams,
-  ): PaginatedSrc20BalanceResponseBody {
-    return {
-      page: params.page,
-      limit: params.limit,
-      totalPages: Math.ceil(total / params.limit),
-      total,
-      last_block: lastBlock.last_block,
-      data: rows.map((row: { tick: string; address: string; amt: number }) => ({
-        tick: row.tick,
-        address: row.address,
-        balance: row.amt,
-      })),
-    };
   }
 
   static async checkMintedOut(tick: string, amount: string) {

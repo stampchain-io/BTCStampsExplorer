@@ -2,9 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$lib/controller/stampController.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { getPaginationParams } from "utils/paginationUtils.ts";
-import { BlockService } from "$lib/services/blockService.ts";
 
-// Add this function to handle BigInt serialization
 function bigIntSerializer(key: string, value: any) {
   if (typeof value === "bigint") {
     return value.toString();

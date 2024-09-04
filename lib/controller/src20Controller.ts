@@ -8,6 +8,7 @@ import {
 import { StampService } from "$lib/services/stampService.ts";
 import { getBtcAddressInfo } from "utils/btc.ts";
 import { BlockService } from "$lib/services/blockService.ts";
+import { convertToEmoji } from "utils/util.ts";
 
 export class Src20Controller {
   static async getTotalCountValidSrc20Tx(
@@ -52,7 +53,7 @@ export class Src20Controller {
       ]);
 
       let restructuredResult: any = {
-        last_block: lastBlock.last_block,
+        last_block: lastBlock,
       };
 
       if (balanceParams.includePagination) {
@@ -97,7 +98,7 @@ export class Src20Controller {
         limit,
         totalPages: Math.ceil(total / limit),
         total,
-        snapshot_block: lastBlock.last_block,
+        snapshot_block: lastBlock,
         data: snapshotData,
       };
 
@@ -227,5 +228,97 @@ export class Src20Controller {
     ]);
 
     return { data, total, lastBlock };
+  }
+
+  static async handleDeploymentRequest(tick: string, req: Request) {
+    const [deploymentData, mintStatusData, lastBlockData] = await Promise.all([
+      this.handleSrc20TransactionsRequest(req, {
+        tick: [tick],
+        op: "DEPLOY",
+        limit: 1,
+        page: 1,
+      }),
+      this.handleSrc20MintProgressRequest(tick),
+      this.handleSrc20TransactionsRequest(req, {
+        limit: 1,
+        page: 1,
+        sort: "DESC",
+      }),
+    ]);
+
+    return {
+      last_block: lastBlockData.last_block,
+      mint_status: mintStatusData,
+      data: {
+        ...deploymentData.data[0],
+        tick: convertToEmoji(deploymentData.data[0].tick),
+      },
+    };
+  }
+
+  static async handleTickPageRequest(tick: string) {
+    const balanceParams = {
+      tick,
+      sort: "DESC",
+      includePagination: false,
+    };
+
+    const [
+      balanceResponse,
+      mintProgressResponse,
+      allSrc20DataResponse,
+    ] = await Promise.all([
+      this.handleSrc20BalanceRequest(balanceParams),
+      this.handleSrc20MintProgressRequest(tick),
+      this.handleAllSrc20DataForTickRequest(tick),
+    ]);
+
+    if (!mintProgressResponse || !allSrc20DataResponse || !balanceResponse) {
+      throw new Error("Failed to fetch SRC20 data");
+    }
+
+    const { deployment, mints, transfers } = allSrc20DataResponse;
+    const total_transfers = transfers.length;
+    const total_mints = mints.length;
+    const totalCount = total_transfers + total_mints;
+
+    return {
+      last_block: balanceResponse.last_block,
+      deployment: deployment,
+      transfers: transfers,
+      total_transfers: total_transfers,
+      mints: mints,
+      total_mints: total_mints,
+      total_holders: balanceResponse.data.length,
+      holders: balanceResponse.data.map((row) => {
+        const amt = this.formatAmount(row.amt || "0");
+        const totalMinted = this.formatAmount(
+          mintProgressResponse.total_minted || "1",
+        );
+        const percentage = this.calculatePercentage(amt, totalMinted);
+        return { ...row, amt, percentage };
+      }),
+      mint_status: {
+        ...mintProgressResponse,
+        max_supply: mintProgressResponse.max_supply?.toString() || "0",
+        total_minted: mintProgressResponse.total_minted?.toString() || "0",
+        limit: mintProgressResponse.limit?.toString() || "0",
+      },
+      total_transactions: totalCount,
+    };
+  }
+
+  private static formatAmount(value: string): string {
+    const [whole, decimal = ""] = value.replace(/^0+/, "").split(".");
+    const trimmedDecimal = decimal.replace(/0+$/, "");
+    return trimmedDecimal ? `${whole}.${trimmedDecimal}` : whole;
+  }
+
+  private static calculatePercentage(amount: string, total: string): string {
+    const amountNum = parseFloat(amount.replace(/,/g, ""));
+    const totalNum = parseFloat(total.replace(/,/g, ""));
+    if (totalNum === 0) return "0.00";
+    const percentage = (amountNum / totalNum) * 100;
+    return percentage.toFixed(2);
   }
 }

@@ -1,5 +1,5 @@
 import { CollectionRepository } from "$lib/database/collectionRepository.ts";
-import { BlockService } from "$lib/services/blockService.ts";
+import { BlockController } from "$lib/controller/blockController.ts";
 import {
   Collection,
   CollectionQueryParams,
@@ -18,7 +18,7 @@ export class CollectionService {
     const [collectionsResult, totalCollections, lastBlock] = await Promise.all([
       CollectionRepository.getCollections({ limit, page, creator }),
       CollectionRepository.getTotalCollectionsByCreatorFromDb(creator),
-      BlockService.getLastBlock(),
+      BlockController.getLastBlock(),
     ]);
 
     const collections: Collection[] = await Promise.all(
@@ -43,7 +43,7 @@ export class CollectionService {
 
     return {
       ...pagination,
-      last_block: lastBlock.last_block,
+      last_block: lastBlock,
       data: collections,
     };
   }

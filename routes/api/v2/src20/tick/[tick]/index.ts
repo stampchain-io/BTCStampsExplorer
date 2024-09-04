@@ -27,7 +27,7 @@ export const handler: Handlers = {
 
       const body: PaginatedTickResponseBody = {
         ...pagination,
-        last_block: lastBlock.last_block,
+        last_block: lastBlock,
         mint_status: mint_status
           ? {
             ...mint_status,
