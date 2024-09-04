@@ -115,32 +115,37 @@ const signMessage = async (message: string) => {
   }
 };
 
-const signPSBT = async (psbt: string) => {
+const signPSBT = async (psbtHex: string, inputsToSign: any[]) => {
   if (typeof globalThis.LeatherProvider === "undefined") {
     throw new Error("Leather wallet not connected");
   }
-  console.log("Attempting to sign PSBT", { psbt });
+  console.log("Attempting to sign PSBT", { psbtHex, inputsToSign });
+
   try {
-    const { psbt: signedPsbt } = await globalThis.LeatherProvider.request(
+    const result = await globalThis.LeatherProvider.request(
       "signPsbt",
       {
-        hex: psbt,
+        hex: psbtHex,
         network: "mainnet",
-        broadcast: false,
-        inputsToSign: [
-          {
-            address: walletContext.wallet.value.address,
-            signingIndexes: [0],
-          },
-        ],
+        broadcast: true,
+        inputsToSign: inputsToSign,
       },
     );
-    console.log("PSBT signed successfully", signedPsbt);
-    return signedPsbt;
+    console.log("PSBT signing result:", result);
+
+    if (result && result.result && result.result.hex) {
+      console.log("PSBT signed successfully", result.result.hex);
+      return result.result.hex;
+    } else if (result && result.result && result.result.txid) {
+      console.log("Transaction broadcast successfully", result.result.txid);
+      return result.result.txid;
+    } else {
+      console.error("Unexpected result format from Leather wallet", result);
+      throw new Error("Unexpected result format from Leather wallet");
+    }
   } catch (error) {
     console.error("Error signing PSBT:", error);
     if (error.message.includes("User rejected")) {
-      // Handle user cancellation
       console.log("User cancelled the transaction");
       return null;
     }

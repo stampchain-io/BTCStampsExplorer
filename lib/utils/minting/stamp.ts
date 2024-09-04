@@ -129,9 +129,12 @@ export const mintMethodOPRETURN = ({
   if (typeof assetName !== "string") {
     throw new Error("Invalid assetName parameter. Expected a string.");
   }
-  if (typeof qty !== "number") {
-    throw new Error("Invalid qty parameter. Expected a number.");
+
+  const quantity = typeof qty === "string" ? Number(qty) : qty;
+  if (isNaN(quantity) || !Number.isInteger(quantity) || quantity <= 0) {
+    throw new Error("Invalid qty parameter. Expected a positive integer.");
   }
+
   if (typeof locked !== "boolean") {
     throw new Error("Invalid locked parameter. Expected a boolean.");
   }
@@ -139,11 +142,16 @@ export const mintMethodOPRETURN = ({
     throw new Error("Invalid divisible parameter. Expected a boolean.");
   }
   if (typeof description !== "string") {
-    throw new Error("Invalid base64Data parameter. Expected a string.");
+    throw new Error("Invalid description parameter. Expected a string.");
   }
-  if (typeof satsPerKB !== "number") {
-    throw new Error("Invalid satsPerKB parameter. Expected a number.");
+
+  const feePerKB = typeof satsPerKB === "string"
+    ? Number(satsPerKB)
+    : satsPerKB;
+  if (isNaN(feePerKB) || feePerKB <= 0) {
+    throw new Error("Invalid satsPerKB parameter. Expected a positive number.");
   }
+
   return {
     "jsonrpc": "2.0",
     "id": 0,
@@ -151,7 +159,7 @@ export const mintMethodOPRETURN = ({
     "params": {
       "source": sourceWallet,
       "asset": assetName,
-      "quantity": qty,
+      "quantity": quantity,
       "divisible": divisible || false,
       "description": `${description}`,
       "lock": locked || true,
@@ -159,7 +167,7 @@ export const mintMethodOPRETURN = ({
       "allow_unconfirmed_inputs": true,
       "extended_tx_info": true,
       "disable_utxo_locks": false,
-      "fee_per_kb": satsPerKB,
+      "fee_per_kb": feePerKB,
     },
   };
 };
@@ -343,4 +351,37 @@ export async function generateAvailableAssetName() {
     }
   }
   return asset_name;
+}
+
+export async function validateAndPrepareAssetName(
+  assetName: string | undefined,
+): Promise<string> {
+  if (!assetName) {
+    return generateAvailableAssetName();
+  }
+  // FIXME: This will only allow named assets, not numeric to be defined.
+  // FIXME: We need to check and validate the users address has XCP in the wallet.
+
+  const upperCaseAssetName = assetName.toUpperCase();
+
+  if (upperCaseAssetName.length > 13) {
+    throw new Error("Asset name must not exceed 13 characters.");
+  }
+
+  if (upperCaseAssetName.startsWith("A")) {
+    throw new Error("Asset name must not start with 'A'.");
+  }
+
+  if (!/^[B-Z0-9]{1,13}$/.test(upperCaseAssetName)) {
+    throw new Error(
+      "Asset name must contain only uppercase letters (B-Z) and numbers.",
+    );
+  }
+
+  const isAvailable = await checkAssetAvailability(upperCaseAssetName);
+  if (!isAvailable) {
+    throw new Error("Asset name is not available.");
+  }
+
+  return upperCaseAssetName;
 }

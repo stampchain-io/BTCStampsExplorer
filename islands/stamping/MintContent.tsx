@@ -100,7 +100,7 @@ export function MintContent() {
         class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}
         onClick={handleMint}
       >
-        Mint Now
+        Stamp Now
       </div>
     </div>
   );
