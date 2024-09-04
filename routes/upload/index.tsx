@@ -2,10 +2,8 @@ import { useEffect, useState } from "preact/hooks";
 import { paginate } from "utils/util.ts";
 import { initialWallet, walletContext } from "store/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
-import { BlockService } from "$lib/services/blockService.ts";
 import { Handlers } from "$fresh/server.ts";
-import { SRC20Repository } from "$lib/database/src20Repository.ts";
-import { dbManager } from "$lib/database/db.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
@@ -15,21 +13,18 @@ export const handler: Handlers = {
       const limit = Number(url.searchParams.get("limit")) || 1000;
       const page = Number(url.searchParams.get("page")) || 1;
 
-      const data = await SRC20Repository.getValidSrc20TxFromDb(
-        { op: "DEPLOY", limit, page },
-      );
-      const total = await SRC20Repository
-        .getTotalCountValidSrc20TxFromDb(
-          { op: "DEPLOY" },
-        );
-      const lastBlock = await BlockService.getLastBlock();
+      const { data, total, lastBlock } = await Src20Controller.getUploadData({
+        op: "DEPLOY",
+        limit,
+        page,
+      });
 
-      const pagination = paginate(total.rows[0]["total"], page, limit);
+      const pagination = paginate(total, page, limit);
 
       const body = {
         ...pagination,
         last_block: lastBlock.last_block,
-        data: data.rows.map((row) => {
+        data: data.rows.map((row: any) => {
           return {
             ...row,
             max: row.max ? row.max.toString() : null,

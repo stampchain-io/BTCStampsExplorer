@@ -1,4 +1,5 @@
 import { Src20Service } from "$lib/services/src20Service.ts";
+import { SRC20Repository } from "$lib/database/src20Repository.ts";
 import {
   SRC20BalanceRequestParams,
   SRC20SnapshotRequestParams,
@@ -9,9 +10,11 @@ import { getBtcAddressInfo } from "utils/btc.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 
 export class Src20Controller {
-  static async getTotalCountValidSrc20Tx(tick?: string, op?: string) {
+  static async getTotalCountValidSrc20Tx(
+    params: { tick?: string; op?: string },
+  ) {
     try {
-      return await Src20Service.getTotalCountValidSrc20Tx({ tick, op });
+      return await Src20Service.getTotalCountValidSrc20Tx(params);
     } catch (error) {
       console.error("Error getting total valid SRC20 transactions:", error);
       throw error;
@@ -39,19 +42,66 @@ export class Src20Controller {
     }
   }
 
-  static async handleSrc20BalanceRequest(params: SRC20BalanceRequestParams) {
+  static async handleSrc20BalanceRequest(
+    balanceParams: SRC20BalanceRequestParams,
+  ) {
     try {
-      return await Src20Service.fetchSrc20Balance(params);
+      const [fetchedData, lastBlock] = await Promise.all([
+        Src20Service.fetchSrc20Balance(balanceParams),
+        BlockService.getLastBlock(),
+      ]);
+
+      let restructuredResult: any = {
+        last_block: lastBlock.last_block,
+      };
+
+      if (balanceParams.includePagination) {
+        const fetchedTotalCount = await Src20Service.getTotalSrc20BalanceCount(
+          balanceParams,
+        );
+        const limit = balanceParams.limit || fetchedData.length;
+        const page = balanceParams.page || 1;
+
+        restructuredResult = {
+          page,
+          limit,
+          totalPages: Math.ceil(fetchedTotalCount / limit),
+          total: fetchedTotalCount,
+          ...restructuredResult,
+        };
+      }
+
+      restructuredResult.data = fetchedData;
+
+      return restructuredResult;
     } catch (error) {
       console.error("Error processing SRC20 balance request:", error);
-      console.error("Params:", JSON.stringify(params));
+      console.error("Params:", JSON.stringify(balanceParams));
       throw error;
     }
   }
 
   static async handleSrc20SnapshotRequest(params: SRC20SnapshotRequestParams) {
     try {
-      return await Src20Service.fetchAndFormatSrc20Snapshot(params);
+      const [snapshotData, lastBlock, total] = await Promise.all([
+        Src20Service.fetchSrc20Snapshot(params),
+        BlockService.getLastBlock(),
+        Src20Service.getTotalSrc20BalanceCount(params),
+      ]);
+
+      const limit = params.limit || snapshotData.length;
+      const page = params.page || 1;
+
+      const restructuredResult = {
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        total,
+        snapshot_block: lastBlock.last_block,
+        data: snapshotData,
+      };
+
+      return restructuredResult;
     } catch (error) {
       console.error("Error processing SRC20 snapshot request:", error);
       throw error;
@@ -134,5 +184,48 @@ export class Src20Controller {
       console.error("Error processing wallet balance request:", error);
       throw error;
     }
+  }
+
+  static async getValidSrc20Tx(params: SRC20TrxRequestParams) {
+    return await SRC20Repository.getValidSrc20TxFromDb(params);
+  }
+
+  static async getLastBlock() {
+    return await BlockService.getLastBlock();
+  }
+
+  static async getSrc20MintProgressByTick(tick: string) {
+    return await Src20Service.getSrc20MintProgressByTick(tick);
+  }
+
+  static async getTickData(params: {
+    tick: string;
+    limit: number;
+    page: number;
+    op?: string;
+    sort?: string;
+  }) {
+    const [src20_txs, total, lastBlock, mint_status] = await Promise.all([
+      this.getValidSrc20Tx(params),
+      this.getTotalCountValidSrc20Tx({ tick: params.tick, op: params.op }),
+      this.getLastBlock(),
+      this.getSrc20MintProgressByTick(params.tick),
+    ]);
+
+    return { src20_txs, total, lastBlock, mint_status };
+  }
+
+  static async getUploadData(params: {
+    op: string;
+    limit: number;
+    page: number;
+  }) {
+    const [data, total, lastBlock] = await Promise.all([
+      this.getValidSrc20Tx(params),
+      this.getTotalCountValidSrc20Tx({ op: params.op }),
+      this.getLastBlock(),
+    ]);
+
+    return { data, total, lastBlock };
   }
 }
