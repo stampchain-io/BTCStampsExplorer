@@ -48,8 +48,8 @@ export const sharedStampIdHandler: Handlers = {
         return ResponseUtil.error("Stamp not found", 404);
       }
       return ResponseUtil.success({
+        last_block: stampData.last_block,
         data: stampData.data,
-        last_block: stampData.last_block, // TODO: Add type checking
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
