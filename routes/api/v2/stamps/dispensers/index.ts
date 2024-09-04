@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { paginate } from "$lib/utils/util.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { BlockService } from "$lib/services/blockService.ts";
+import { BlockController } from "$lib/controller/blockController.ts";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 
 export const handler: Handlers = {
@@ -12,13 +12,13 @@ export const handler: Handlers = {
       const { limit, page } = getPaginationParams(url);
 
       const [lastBlock, { total, dispensers }] = await Promise.all([
-        BlockService.getLastBlock(),
+        BlockController.getLastBlock(),
         DispenserManager.getAllOpenStampDispensers(page, limit),
       ]);
 
       const body = {
         ...paginate(total, page, limit),
-        last_block: lastBlock.last_block,
+        last_block: lastBlock,
         dispensers,
       };
 

@@ -23,7 +23,7 @@ export const handler: Handlers = {
 
       const body = {
         ...pagination,
-        last_block: lastBlock.last_block,
+        last_block: lastBlock,
         data: data.rows.map((row: any) => {
           return {
             ...row,
