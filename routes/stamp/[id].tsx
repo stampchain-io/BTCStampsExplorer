@@ -6,6 +6,7 @@ import { StampInfo } from "$components/stampDetails/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
+import { Head } from "$fresh/runtime.ts";
 
 interface StampDetailPageProps {
   data: {
@@ -52,18 +53,12 @@ export const handler: Handlers<StampData> = {
 };
 
 export default function StampPage(props: StampDetailPageProps) {
-  const {
-    stamp,
-    holders,
-    sends,
-    dispensers,
-    dispenses,
-    vaults,
-    total,
-    last_block,
-  } = props.data;
+  const { stamp, holders, sends, dispensers, dispenses } = props.data;
 
-  // Create a Map of dispenser tx_hash to satoshirate for quick lookup
+  const title = stamp.name
+    ? `${stamp.name}`
+    : `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
+
   const dispensesWithRates = StampService.mapDispensesWithRates(
     dispenses,
     dispensers,
@@ -71,6 +66,17 @@ export default function StampPage(props: StampDetailPageProps) {
 
   return (
     <>
+      <Head>
+        <title>{title}</title>
+        <meta property="og:title" content={title} />
+        <meta
+          property="og:description"
+          content="Unprunable UTXO Art, Because Sats Don't Exist"
+        />
+        <meta property="og:image" content={stamp.stamp_url} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Head>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
         <div class="flex flex-col gap-8 justify-between">
           <Stamp stamp={stamp} className="w-[calc(100%-80px)] md:w-full" />
