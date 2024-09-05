@@ -409,7 +409,7 @@ export class StampController {
             },
           });
         default:
-          return new Response(null, { status: 404 });
+          return this.redirectToNotAvailable();
       }
     } catch (error) {
       console.error("Error in StampController.getStampFile:", error);
@@ -418,10 +418,11 @@ export class StampController {
   }
 
   private static redirectToNotAvailable(): Response {
-    return new Response("", {
-      status: 301,
+    return new Response(null, {
+      status: 404,
       headers: {
-        Location: `/content/not-available.png`,
+        "Cache-Control": "no-store, must-revalidate",
+        "Content-Type": "text/html; charset=utf-8",
       },
     });
   }

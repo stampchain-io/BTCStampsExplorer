@@ -145,8 +145,6 @@ export class StampRepository {
     ${collectionId ? "JOIN collection_stamps cs ON st.stamp = cs.stamp" : ""}
     ${whereClause}
     `;
-    console.log("Total count query:", queryTotal);
-    console.log("Total count query params:", queryParams);
     const resultTotal = await dbManager.executeQueryWithCache(
       queryTotal,
       queryParams,
