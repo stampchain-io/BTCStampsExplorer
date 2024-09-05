@@ -48,7 +48,7 @@ export const WalletConnector = (
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      className="cursor-pointer flex items-center p-4 md:p-5 border rounded-lg border-gray-200 hover:border-gray-300 focus:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500 dark:focus:border-gray-500 transition-colors ease-in-out duration-150"
+      className="cursor-pointer flex items-center p-4 md:p-5 border rounded-lg border-gray-200 hover:border-gray-300 focus:border-gray-300 dark:border-[#8800CC] dark:hover:border-gray-500 dark:focus:border-gray-500 transition-colors ease-in-out duration-150"
     >
       <p className="text-md text-gray-200 uppercase md:text-base font-medium">
         {providerInfo.name}
