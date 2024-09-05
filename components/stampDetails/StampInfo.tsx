@@ -7,6 +7,12 @@ import { StampRow } from "globals";
 dayjs.extend(relativeTime);
 
 export function StampInfo({ stamp }: { stamp: StampRow }) {
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).catch((err) => {
+      console.error("Failed to copy text: ", err);
+    });
+  };
+
   const timestamp = new Date(stamp.block_time);
   const _kind = stamp.is_btc_stamp
     ? "stamp"
@@ -56,6 +62,8 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           <img
             src="/img/icon_copy_to_clipboard.png"
             className="w-4 h-5 cursor-pointer"
+            onClick={() => copyToClipboard(stamp.creator)}
+            alt="Copy to clipboard"
           />
         </div>
       </div>
@@ -87,6 +95,8 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           <img
             src="/img/icon_copy_to_clipboard.png"
             className="w-4 h-5 cursor-pointer"
+            onClick={() => copyToClipboard(stamp.block_index.toString())}
+            alt="Copy to clipboard"
           />
         </div>
       </div>
@@ -112,6 +122,8 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           <img
             src="/img/icon_copy_to_clipboard.png"
             className="w-4 h-5 cursor-pointer"
+            onClick={() => copyToClipboard(stamp.tx_hash)}
+            alt="Copy to clipboard"
           />
         </div>
       </div>
