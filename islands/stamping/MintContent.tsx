@@ -53,19 +53,6 @@ export function MintContent() {
 
       <div class="w-full">
         <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Address <span class="text-[#FF2D2D]">*</span>
-        </p>
-        <input
-          type="text"
-          class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-          placeholder="Legacy (starts with 1) or Segwit (starts with bc1q)"
-          value={toAddress}
-          onChange={(e: any) => setToAddress(e.target.value)}
-        />
-      </div>
-
-      <div class="w-full">
-        <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
           Token
         </p>
         <input
