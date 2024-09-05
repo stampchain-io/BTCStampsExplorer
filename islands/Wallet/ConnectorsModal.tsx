@@ -13,12 +13,12 @@ export const ConnectorsModal = (
 
   return (
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-blackbg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
       onClick={handleCloseModal}
     >
       <div class="relative p-4 w-full max-w-2xl h-auto">
-        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-          <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+        <div class="relative bg-white rounded-lg shadow dark:bg-[#0B0B0B] overflow-hidden">
+          <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-[#8800CC]">
             <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
               Connect your wallet
             </h3>
@@ -47,7 +47,7 @@ export const ConnectorsModal = (
             </button>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-[#8800CC]">
             {connectors.map((renderConnector, index) => {
               if (typeof renderConnector === "function") {
                 console.log(`Rendering connector at index ${index}`);
@@ -56,6 +56,12 @@ export const ConnectorsModal = (
               return null;
             })}
           </div>
+          {
+            /* <div
+            className={"bg-gradient-to-r from-[#8800CC] via-[#660099] to-transparent w-[800px] h-[700px] absolute top-[40px] left-[-70px] opacity-30 rounded-full rotate-[90deg]"}
+          >
+          </div> */
+          }
         </div>
       </div>
     </div>
