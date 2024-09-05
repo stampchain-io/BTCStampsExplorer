@@ -35,7 +35,7 @@ export default function App({ Component }: AppProps) {
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="icon" type="image/png" href="/img/icon.jpg" />
         <link rel="icon" type="image/x-icon" href="/img/icon.jpg" />
         <link rel="apple-touch-icon" href="/img/icon.jpg"></link>
         {/* OpenGraph tags */}
