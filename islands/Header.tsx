@@ -61,10 +61,9 @@ export function Header() {
             href="/home"
             f-partial={"/home"}
             onClick={() => {
-              toggleMenu();
-              setCurrentPath("collection");
+              setCurrentPath("home");
             }}
-            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-xl md:text-5xl font-black italic hidden lg:block lg:px-1"}
+            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-2xl md:text-5xl font-black italic px-1"}
           >
             STAMPCHAIN
           </a>
@@ -88,58 +87,14 @@ export function Header() {
               />
             )}
           </button>
-
-          <div class="block lg:hidden">
-            <ConnectWallet toggleModal={toggleWalletModal} />
-          </div>
         </div>
 
+        {/* Desktop Navbar */}
         <div
-          className={`${
-            open
-              ? "flex left-0 top-0 fixed min-w-[300px] w-4/5 h-screen z-20 bg-[#181818] scroll-none p-6 pt-[120px]"
-              : "hidden"
-          } flex-col lg:flex lg:flex-row justify-between`}
-          id="navbar-collapse"
+          className={`hidden lg:flex lg:flex-row justify-between`}
         >
-          {
-            /* <a
-            href="/home"
-            f-partial={"/home"}
-            onClick={() => {
-              toggleMenu();
-              setCurrentPath("collection");
-            }}
-            className="font-bold text-xl text-indigo-600 block lg:hidden"
-          >
-            <img
-              src="/img/header/logo.png"
-              alt="stampchain"
-              className={`${
-                open ? "absolute" : "hidden"
-              } top-12 right-5 w-[178px] h-auto`}
-            />
-          </a> */
-          }
-          <a
-            href="/home"
-            f-partial={"/home"}
-            onClick={() => {
-              toggleMenu();
-              setCurrentPath("collection");
-            }}
-            className={`bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-xl md:text-4xl font-black italic block lg:hidden px-1 ${
-              open ? "absolute" : "hidden"
-            } top-12 right-5`}
-          >
-            STAMPCHAIN
-          </a>
           <div
-            className={`font-black text-center ${
-              open
-                ? "flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10"
-                : "hidden lg:flex flex-col lg:flex-row items-center"
-            }`}
+            className={`font-black text-center flex flex-row items-center`}
           >
             {
               /* <a
@@ -246,11 +201,11 @@ export function Header() {
 
             <div className={"group relative"}>
               <a
-                className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-lg font-black`}
+                className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-2xl md:text-lg font-black`}
               >
                 ART STAMPS
               </a>
-              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-left">
+              <div className="md:hidden md:group-hover:flex flex flex-col md:absolute md:bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-center md:text-left">
                 <a
                   href="/stamp/?ident=posh"
                   f-partial={"/stamp/?ident=posh"}
@@ -398,11 +353,187 @@ export function Header() {
               <ConnectWallet toggleModal={toggleWalletModal} />
             </div>
           </div>
+        </div>
+
+        {/* Mobile Navbar */}
+        <div
+          className={`duration-500 flex flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808] scroll-none p-6 pt-[120px] ${
+            open ? "translate-x-0" : "translate-x-full"
+          }`}
+          id="navbar-collapse"
+        >
+          <a
+            href="/home"
+            f-partial={"/home"}
+            onClick={() => {
+              toggleMenu();
+              setCurrentPath("collection");
+            }}
+            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-2xl md:text-5xl font-black italic px-1 absolute top-10 left-2"}
+          >
+            STAMPCHAIN
+          </a>
 
           <div
-            class={`gap-6 items-center justify-center ${
-              open ? "flex" : "hidden"
-            }`}
+            className={`font-black text-center flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10`}
+          >
+            <div className={"relative"}>
+              <a
+                className={`transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-2xl font-black`}
+              >
+                ART STAMPS
+              </a>
+              <div className="flex flex-col z-[100] py-2 text-center">
+                <a
+                  href="/stamp/?ident=posh"
+                  f-partial={"/stamp/?ident=posh"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("stamp");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  POSH
+                </a>
+                <a
+                  href="#"
+                  f-partial={"#"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("#");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  PIXEL
+                </a>
+                <a
+                  href="#"
+                  f-partial={"#"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("#");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  VECTOR
+                </a>
+                <a
+                  href="#"
+                  f-partial={"#"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("#");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  RECURSIVE
+                </a>
+                <a
+                  href="/stamp/?ident=all"
+                  f-partial={"/stamp/?ident=all"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("stamp");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "stamp" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  VIEW ALL
+                </a>
+                <a
+                  href="/collection"
+                  f-partial={"/collection"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("collection");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "collection" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  COLLECTIONS
+                </a>
+                <a
+                  href="#"
+                  f-partial={"#"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("#");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  STAMP
+                </a>
+              </div>
+            </div>
+
+            <div className={"relative"}>
+              <a
+                className={`transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-2xl font-black`}
+              >
+                SRC-20 TOKENS
+              </a>
+              <div className="flex flex-col z-[100] py-2 text-center">
+                <a
+                  href="/src20/?ident=all"
+                  f-partial={"/src20/?ident=all"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("src20");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "src20" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  ALL
+                </a>
+                <a
+                  href="/src20/?ident=trending"
+                  f-partial={"/src20/?ident=trending"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("src20");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "src20" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  TRENDING
+                </a>
+                <a
+                  href="/stamping/src20/?ident=deploy"
+                  f-partial={"/stamping/src20/?ident=deploy"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("stamping/src20");
+                  }}
+                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
+                    currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  DEPLOY
+                </a>
+              </div>
+            </div>
+
+            <div class="">
+              <ConnectWallet toggleModal={toggleWalletModal} />
+            </div>
+          </div>
+
+          <div
+            class={`gap-6 items-center justify-center flex`}
           >
             <a href="https://x.com/Stampchain">
               <img src="/img/footer/XLogo.png" class="w-12" />
