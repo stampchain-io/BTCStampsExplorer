@@ -1,4 +1,6 @@
 import { ComponentChildren } from "preact";
+import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
+import { WalletConnector } from "./connectors/Wallet.connector.tsx";
 
 interface Props {
   connectors: ComponentChildren[];
@@ -48,20 +50,14 @@ export const ConnectorsModal = (
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-[#8800CC]">
-            {connectors.map((renderConnector, index) => {
-              if (typeof renderConnector === "function") {
-                console.log(`Rendering connector at index ${index}`);
-                return renderConnector({ key: index, toggleModal });
-              }
-              return null;
-            })}
+            {Object.keys(WALLET_PROVIDERS).map((providerKey) => (
+              <WalletConnector
+                key={providerKey}
+                providerKey={providerKey as WalletProviderKey}
+                toggleModal={toggleModal}
+              />
+            ))}
           </div>
-          {
-            /* <div
-            className={"bg-gradient-to-r from-[#8800CC] via-[#660099] to-transparent w-[800px] h-[700px] absolute top-[40px] left-[-70px] opacity-30 rounded-full rotate-[90deg]"}
-          >
-          </div> */
-          }
         </div>
       </div>
     </div>
