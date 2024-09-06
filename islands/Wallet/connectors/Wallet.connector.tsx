@@ -4,6 +4,7 @@ import { useToast } from "$islands/Toast/toast.tsx";
 import { leatherProvider } from "$lib/store/wallet/leather.ts";
 import { okxProvider } from "$lib/store/wallet/okx.ts";
 import { tapWalletProvider } from "$lib/store/wallet/tapwallet.ts";
+import { phantomProvider } from "$lib/store/wallet/phantom.ts";
 
 interface WalletConnectorProps {
   providerKey: WalletProviderKey;
@@ -33,6 +34,9 @@ export const WalletConnector = (
       case "tapwallet":
         return (toast: AddToastFunction) =>
           tapWalletProvider.connectTapWallet(toast);
+      case "phantom":
+        return (toast: AddToastFunction) =>
+          phantomProvider.connectPhantom(toast);
       default:
         return () => {};
     }

@@ -10,7 +10,12 @@ export const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
 export const BIG_LIMIT = 200;
 export const SMALL_LIMIT = 50;
 
-export type WalletProviderKey = "unisat" | "leather" | "okx" | "tapwallet";
+export type WalletProviderKey =
+  | "unisat"
+  | "leather"
+  | "okx"
+  | "tapwallet"
+  | "phantom";
 
 export const WALLET_PROVIDERS: Record<
   WalletProviderKey,
@@ -42,6 +47,13 @@ export const WALLET_PROVIDERS: Record<
     logo: {
       small: "/img/tapwallet/logo_tapwallet.png",
       full: "/img/tapwallet/logo_tapwallet.png",
+    },
+  },
+  phantom: {
+    name: "Phantom",
+    logo: {
+      full: "/img/phantom/logo_phantom.svg",
+      small: "/img/phantom/logo_phantom.svg",
     },
   },
 };
