@@ -37,6 +37,13 @@ export interface StampRow {
   file_hash: string;
 }
 
+export interface StampSectionProps {
+  title: string;
+  type: string;
+  stamps: StampRow[];
+  layout: "grid" | "row";
+}
+
 export interface SRC20Row {
   tx_hash: string;
   block_index: number;

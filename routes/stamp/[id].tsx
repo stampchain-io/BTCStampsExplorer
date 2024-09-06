@@ -1,6 +1,7 @@
-import { StampRow } from "globals";
+import { StampRow, StampSectionProps } from "globals";
 import { Handlers } from "$fresh/server.ts";
-import { Stamp } from "$components/Stamp.tsx";
+import StampSection from "$components/stamp/StampSection.tsx";
+import { StampImage } from "$components/stampDetails/StampImage.tsx";
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
 import { StampInfo } from "$components/stampDetails/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
@@ -18,6 +19,7 @@ interface StampDetailPageProps {
     holders: any;
     vaults: any;
     last_block: number;
+    stamps_recent: StampRow[];
   };
 }
 
@@ -36,6 +38,7 @@ export const handler: Handlers<StampData> = {
     try {
       const { id } = ctx.params;
       const stampData = await StampController.getStampDetailsById(id);
+      const result = await StampController.getRecentSales();
 
       if (!stampData) {
         return new Response("Stamp not found", { status: 404 });
@@ -43,6 +46,7 @@ export const handler: Handlers<StampData> = {
 
       return ctx.render({
         ...stampData.data,
+        ...result,
         last_block: stampData.last_block,
       });
     } catch (error) {
@@ -53,7 +57,8 @@ export const handler: Handlers<StampData> = {
 };
 
 export default function StampPage(props: StampDetailPageProps) {
-  const { stamp, holders, sends, dispensers, dispenses } = props.data;
+  const { stamp, holders, sends, dispensers, dispenses, stamps_recent } =
+    props.data;
 
   const title = stamp.name
     ? `${stamp.name}`
@@ -63,6 +68,15 @@ export default function StampPage(props: StampDetailPageProps) {
     dispenses,
     dispensers,
   );
+
+  const sections: StampSectionProps[] = [
+    {
+      title: "RECENT SALES",
+      type: "recent",
+      stamps: stamps_recent,
+      layout: "row",
+    },
+  ];
 
   return (
     <>
@@ -77,20 +91,39 @@ export default function StampPage(props: StampDetailPageProps) {
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
-        <div class="flex flex-col gap-8 justify-between">
-          <Stamp stamp={stamp} className="w-[calc(100%-80px)] md:w-full" />
-          <StampShare stamp={stamp} />
-        </div>
-        <StampInfo stamp={stamp} />
-      </div>
 
-      <StampRelatedInfo
-        sends={sends}
-        dispensers={dispensers}
-        holders={holders}
-        dispensesWithRates={dispensesWithRates}
-      />
+      <div className={"flex flex-col gap-10 md:gap-20 xl:gap-50"}>
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-12">
+          <div class="flex flex-col gap-8 justify-between sm:col-span-3">
+            <StampImage
+              stamp={stamp}
+              className="w-[calc(100%-80px)] md:w-full"
+            />
+            {/* <StampShare stamp={stamp} /> */}
+          </div>
+          <div className={"sm:col-span-2"}>
+            <StampInfo stamp={stamp} />
+          </div>
+        </div>
+
+        <StampRelatedInfo
+          sends={sends}
+          dispensers={dispensers}
+          holders={holders}
+          dispensesWithRates={dispensesWithRates}
+        />
+
+        <div>
+          <h1 class="text-3xl md:text-7xl text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+            LATEST STAMPS
+          </h1>
+          <div class="flex flex-col gap-12">
+            {sections.map((section) => (
+              <StampSection key={section.type} {...section} />
+            ))}
+          </div>
+        </div>
+      </div>
     </>
   );
 }

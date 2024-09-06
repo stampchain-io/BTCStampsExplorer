@@ -338,6 +338,19 @@ export class StampController {
     return results;
   }
 
+  static async getRecentSales() {
+    try {
+      const recentSales = await StampService.getRecentSales(6);
+
+      return {
+        stamps_recent: recentSales,
+      };
+    } catch (error) {
+      console.error("Error in getHomePageData:", error);
+      throw error;
+    }
+  }
+
   static async getHomePageData() {
     try {
       const [stampCategories, src20Result, poshCollection, recentSales] =
