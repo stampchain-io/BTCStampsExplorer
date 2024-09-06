@@ -3,6 +3,7 @@ import { okxProvider } from "./okx.ts";
 import { unisatProvider } from "./unisat.ts";
 import { Wallet } from "./wallet.d.ts";
 import { tapWalletProvider } from "./tapwallet.ts";
+import { phantomProvider } from "./phantom.ts";
 
 export const getWalletProvider = (provider: string) => {
   switch (provider) {
@@ -14,6 +15,8 @@ export const getWalletProvider = (provider: string) => {
       return unisatProvider;
     case "tapwallet":
       return tapWalletProvider;
+    case "phantom":
+      return phantomProvider;
     default:
       throw new Error(`Unsupported wallet provider: ${provider}`);
   }
