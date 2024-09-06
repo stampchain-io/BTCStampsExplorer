@@ -1,8 +1,9 @@
 import { WALLET_PROVIDERS, WalletProviderKey } from "utils/constants.ts";
-import { connectUnisat } from "store/wallet/unisat.ts";
+import { unisatProvider } from "store/wallet/unisat.ts";
 import { useToast } from "$islands/Toast/toast.tsx";
 import { leatherProvider } from "$lib/store/wallet/leather.ts";
 import { okxProvider } from "$lib/store/wallet/okx.ts";
+import { tapWalletProvider } from "$lib/store/wallet/tapwallet.ts";
 
 interface WalletConnectorProps {
   providerKey: WalletProviderKey;
@@ -18,21 +19,30 @@ export const WalletConnector = (
     { addToast: (() => {}) as AddToastFunction };
   const providerInfo = WALLET_PROVIDERS[providerKey];
 
-  console.log(`Rendering wallet connector for ${providerKey}:`, providerInfo); // Add this line
+  console.log(`Rendering wallet connector for ${providerKey}:`, providerInfo);
 
-  const connectFunction = providerKey === "unisat"
-    ? connectUnisat
-    : providerKey === "leather"
-    ? (toast: AddToastFunction) => leatherProvider.connectLeather(toast)
-    : providerKey === "okx"
-    ? (toast: AddToastFunction) => okxProvider.connectOKX(toast)
-    : () => {};
+  const connectFunction = (() => {
+    switch (providerKey) {
+      case "unisat":
+        return (toast: AddToastFunction) => unisatProvider.connectUnisat(toast);
+      case "leather":
+        return (toast: AddToastFunction) =>
+          leatherProvider.connectLeather(toast);
+      case "okx":
+        return (toast: AddToastFunction) => okxProvider.connectOKX(toast);
+      case "tapwallet":
+        return (toast: AddToastFunction) =>
+          tapWalletProvider.connectTapWallet(toast);
+      default:
+        return () => {};
+    }
+  })();
 
   const handleConnect = async () => {
     try {
       await connectFunction((message: string, type: string) => {
         addToast(message, type);
-        console.error(message);
+        console.log(message); // Changed from console.error to console.log for consistency
       });
       toggleModal();
     } catch (error) {
