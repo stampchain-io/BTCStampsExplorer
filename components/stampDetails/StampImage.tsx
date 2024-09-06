@@ -2,7 +2,7 @@ import { StampRow } from "globals";
 import { mimeTypesArray } from "utils/util.ts";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 
-export const Stamp = (
+export const StampImage = (
   { stamp, className }: { stamp: StampRow; className: string },
 ) => {
   const getStampSrc = () => {
@@ -59,19 +59,44 @@ export const Stamp = (
   }
 
   return (
-    <div className="stamp-container">
-      <img
-        width="100%"
-        loading="lazy"
-        className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
-        src={src}
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = "/content/not-available.png";
-        }}
-        alt="Stamp"
-      />
+    <div
+      className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-4"}
+    >
+      <div className="stamp-container">
+        <img
+          width="100%"
+          loading="lazy"
+          className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
+          src={src}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/content/not-available.png";
+          }}
+          alt="Stamp"
+        />
+      </div>
+      <div className={"flex justify-between"}>
+        <div className={"flex gap-4"}>
+          <a href="#">
+            <img src="/img/stamp/Copy.png" />
+          </a>
+          <a href="#">
+            <img src="/img/stamp/InstagramLogo.png" />
+          </a>
+          <a href="#">
+            <img src="/img/stamp/TwitterLogo.png" />
+          </a>
+        </div>
+        <div className={"flex gap-4"}>
+          <a href="#">
+            <img src="/img/stamp/Code.png" />
+          </a>
+          <a href="#">
+            <img src="/img/stamp/CornersOut.png" />
+          </a>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Stamp;
+export default StampImage;
