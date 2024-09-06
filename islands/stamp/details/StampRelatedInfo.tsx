@@ -21,7 +21,7 @@ export function StampRelatedInfo(
   }, [selectedTab]);
 
   return (
-    <>
+    <div>
       <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E] overflow-y-auto">
         <div class="flex gap-6 md:gap-8 items-end">
           <p
@@ -74,6 +74,6 @@ export function StampRelatedInfo(
       {selectedTab === "holders" && <StampHolders holders={holders} />}
       {selectedTab === "transfers" && <StampSends sends={sends} />}
       {selectedTab === "vaults" && <StampVaults vaults={[]} />}
-    </>
+    </div>
   );
 }
