@@ -1,15 +1,18 @@
 import { useState } from "preact/hooks";
 import { walletContext } from "store/wallet/wallet.ts";
-import axiod from "https://deno.land/x/axiod/mod.ts";
+import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 
 export function MintContent() {
-  const config = useConfig();
+  const { config, isLoading } = useConfig();
+
+  if (isLoading) {
+    return <div>Loading configuration...</div>;
+  }
 
   if (!config) {
-    console.error("Config not loaded in stamping/mintcontent");
-    return null;
+    return <div>Error: Failed to load configuration</div>;
   }
 
   const { wallet, isConnected } = walletContext;
@@ -18,10 +21,10 @@ export function MintContent() {
   const [toAddress, setToAddress] = useState<string>("");
   const [token, setToken] = useState<string>("");
   const [repeatMint, setRepeatMint] = useState<number>(1);
-  const [fee, setFee] = useState<any>(780);
+  const [fee, setFee] = useState<number>(780);
 
-  const handleChangeFee = (e: any) => {
-    setFee(e.target.value);
+  const handleChangeFee = (newFee: number) => {
+    setFee(newFee);
   };
 
   const handleMint = async () => {
@@ -30,25 +33,25 @@ export function MintContent() {
       return;
     }
 
-    axiod
-      .post(`${config.API_BASE_URL}/src20/create`, {
+    try {
+      const response = await axiod.post(`${config.API_BASE_URL}/src20/create`, {
         toAddress: toAddress,
         changeAddress: address,
         op: "mint",
         tick: token,
         feeRate: fee,
         amt: repeatMint,
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => console.log(error));
+      });
+      console.log(response);
+    } catch (error) {
+      console.error("Mint error:", error);
+    }
   };
 
   return (
     <div class={"flex flex-col w-full items-center gap-8"}>
       <p class={"text-[#5503A6] text-[43px] font-medium mt-6 w-full text-left"}>
-        Mint Src20
+        Mint SRC-20
       </p>
 
       <div class="w-full">
@@ -64,7 +67,8 @@ export function MintContent() {
         />
       </div>
 
-      <div class="w-full">
+      {
+        /* <div class="w-full">  Not yet implemented on backend
         <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
           Repeat Mint
         </p>
@@ -75,7 +79,8 @@ export function MintContent() {
           value={repeatMint}
           onChange={(e: any) => setRepeatMint(e.target.value)}
         />
-      </div>
+      </div> */
+      }
 
       <FeeEstimation
         fee={fee}

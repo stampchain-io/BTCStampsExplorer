@@ -123,7 +123,7 @@ export const WalletHeader = ({
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
           onClick={() => setTypeOption("wallet/" + address, "src20")}
         >
-          Src20
+          SRC-20
         </p>
         <p
           class={selectedTab === "src721"
