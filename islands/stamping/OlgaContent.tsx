@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$lib/store/wallet/wallet.ts";
 import { getWalletProvider } from "$lib/store/wallet/walletHelper.ts";
-import axiod from "https://deno.land/x/axiod/mod.ts";
+import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { useFeePolling } from "hooks/useFeePolling.tsx";

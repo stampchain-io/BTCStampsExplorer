@@ -285,8 +285,8 @@ export function Header() {
                   COLLECTIONS
                 </a>
                 <a
-                  href="#"
-                  f-partial={"#"}
+                  href="/stamping/stamp"
+                  f-partial={"/stamping/stamp"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("#");
@@ -334,8 +334,8 @@ export function Header() {
                   TRENDING
                 </a>
                 <a
-                  href="/stamping/src20/?ident=deploy"
-                  f-partial={"/stamping/src20/?ident=deploy"}
+                  href="/stamping/src20/deploy"
+                  f-partial={"/stamping/src20/deploy"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamping/src20");
@@ -463,8 +463,8 @@ export function Header() {
                   COLLECTIONS
                 </a>
                 <a
-                  href="#"
-                  f-partial={"#"}
+                  href="/stamping/stamp"
+                  f-partial={"/stamping/stamp"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("#");
@@ -512,8 +512,8 @@ export function Header() {
                   TRENDING
                 </a>
                 <a
-                  href="/stamping/src20/?ident=deploy"
-                  f-partial={"/stamping/src20/?ident=deploy"}
+                  href="/stamping/src20/deploy"
+                  f-partial={"/stamping/src20/deploy"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamping/src20");

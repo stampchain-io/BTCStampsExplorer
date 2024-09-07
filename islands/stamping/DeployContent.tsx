@@ -1,15 +1,18 @@
 import { useState } from "preact/hooks";
 import { walletContext } from "store/wallet/wallet.ts";
-import axiod from "https://deno.land/x/axiod/mod.ts";
+import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 
 export function DeployContent() {
-  const config = useConfig();
+  const { config, isLoading } = useConfig();
+
+  if (isLoading) {
+    return <div>Loading configuration...</div>;
+  }
 
   if (!config) {
-    console.error("Config not loaded in deploycontent");
-    return null;
+    return <div>Error: Failed to load configuration</div>;
   }
 
   const { wallet, isConnected } = walletContext;
@@ -19,11 +22,11 @@ export function DeployContent() {
   const [token, setToken] = useState<string>("");
   const [limitPerMint, setLimitPerMint] = useState<number>(0);
   const [maxCirculation, setMaxCirculation] = useState<number>(0);
-  const [file, setFile] = useState<any>(null);
-  const [fee, setFee] = useState<any>(780);
+  const [file, setFile] = useState<File | null>(null);
+  const [fee, setFee] = useState<number>(780);
 
-  const handleChangeFee = (e: any) => {
-    setFee(e.target.value);
+  const handleChangeFee = (newFee: number) => {
+    setFee(newFee);
   };
 
   const handleImage = (e: any) => {
@@ -77,7 +80,7 @@ export function DeployContent() {
   return (
     <div class={"flex flex-col w-full items-center gap-8"}>
       <p class={"text-[#5503A6] text-[43px] font-medium mt-6 w-full text-left"}>
-        Deploy Src20
+        Deploy SRC-20
       </p>
 
       <div>
