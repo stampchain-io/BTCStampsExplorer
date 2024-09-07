@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 import { StampRow } from "globals";
 import { useContext, useEffect } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
-const filters = ["Png", "Gif", "Svg", "Jpg", "Html"];
+const filters = ["gif", "html", "jpg", "png", "svg"];
 const sorts = ["Supply", "Stamp"];
 const active = " opacity-50";
 
