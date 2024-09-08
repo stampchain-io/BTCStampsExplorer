@@ -1,12 +1,15 @@
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
-import { StampCard } from "$components/StampCard.tsx";
+
+import { StampCard } from "$components/stamp/StampCard.tsx";
 import BtcAddressInfo from "$components/BtcAddressInfo.tsx";
 import { SRC20BalanceTable } from "$components/SRC20BalanceTable.tsx";
+
 import { Handlers } from "$fresh/server.ts";
-import { WalletHeader } from "../../islands/Wallet/details/WalletHeader.tsx";
-import { MyItemsContent } from "../../islands/Wallet/details/MyItemsContent.tsx";
-import { TransactionsContent } from "../../islands/Wallet/details/TransactionsContent.tsx";
-import { HistoryContent } from "../../islands/Wallet/details/HistoryContent.tsx";
+
+import { WalletHeader } from "$islands/Wallet/details/WalletHeader.tsx";
+import { MyItemsContent } from "$islands/Wallet/details/MyItemsContent.tsx";
+import { TransactionsContent } from "$islands/Wallet/details/TransactionsContent.tsx";
+import { HistoryContent } from "$islands/Wallet/details/HistoryContent.tsx";
 
 type WalletPageProps = {
   data: {

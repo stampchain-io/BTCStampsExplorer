@@ -1,13 +1,17 @@
 import { StampRow, StampSectionProps } from "globals";
+
 import { Handlers } from "$fresh/server.ts";
+import { Head } from "$fresh/runtime.ts";
+
 import StampSection from "$components/stamp/StampSection.tsx";
 import { StampImage } from "$components/stampDetails/StampImage.tsx";
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
-import { StampInfo } from "$components/stampDetails/StampInfo.tsx";
+
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
+import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
+
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
-import { Head } from "$fresh/runtime.ts";
 
 interface StampDetailPageProps {
   data: {
@@ -98,6 +102,7 @@ export default function StampPage(props: StampDetailPageProps) {
             <StampImage
               stamp={stamp}
               className="w-[calc(100%-80px)] md:w-full"
+              flag={true}
             />
             {/* <StampShare stamp={stamp} /> */}
           </div>

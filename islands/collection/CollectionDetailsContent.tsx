@@ -1,6 +1,6 @@
 import { StampRow } from "globals";
 
-import { StampCard } from "$components/StampCard.tsx";
+import { StampCard } from "$components/stamp/StampCard.tsx";
 
 export const CollectionDetailsContent = ({ stamps = [] }: {
   stamps: StampRow[];
