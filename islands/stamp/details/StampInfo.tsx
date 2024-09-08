@@ -1,12 +1,35 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
+
 import { abbreviateAddress } from "utils/util.ts";
 
+import StampBuyModal from "./StampBuyModal.tsx";
+
 import { StampRow } from "globals";
+
+import { useState } from "preact/hooks";
 
 dayjs.extend(relativeTime);
 
 export function StampInfo({ stamp }: { stamp: StampRow }) {
+  console.log("stamp: ", stamp);
+
+  const [fee, setFee] = useState<number>(0);
+  const handleChangeFee = (newFee: number) => {
+    setFee(newFee);
+  };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleCloseModal = (event: MouseEvent) => {
+    if (event.target === event.currentTarget) {
+      setIsModalOpen(false);
+    }
+  };
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).catch((err) => {
       console.error("Failed to copy text: ", err);
@@ -19,6 +42,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
     : stamp.cpid.startsWith("A")
     ? "cursed"
     : "named";
+
   return (
     <>
       <div className={"flex flex-col justify-between h-full"}>
@@ -59,8 +83,13 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
               : stamp.floorPrice}
           </p>
 
+          <span class="inline-block border-2 border-[#666666] text-[#666666] font-medium text-lg rounded p-2">
+            {stamp.stamp_mimetype}
+          </span>
+
           <button
-            className={"border-[3px] border-[#660099] rounded-md text-xl leading-6 text-[#660099] px-6 py-4 float-right"}
+            className={"border-[3px] border-[#660099] rounded-md text-xl leading-6 text-[#660099] px-6 py-4 float-right mt-28"}
+            onClick={toggleModal}
           >
             BUY
           </button>
@@ -136,6 +165,17 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           </div>
         </div>
       </div>
+
+      {isModalOpen && (
+        <StampBuyModal
+          stamp={stamp}
+          fee={fee}
+          handleChangeFee={handleChangeFee}
+          toggleModal={() => setIsModalOpen(false)}
+          handleCloseModal={handleCloseModal}
+        />
+      )}
+
       {
         /* <div class="flex flex-col text-gray-200 font-semibold bg-[#2B0E49]">
         <div class="flex items-center truncate text-[#C184FF] text-2xl md:text-5xl p-6 pb-0">
