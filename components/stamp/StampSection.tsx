@@ -1,5 +1,5 @@
 import { StampRow, StampSectionProps } from "globals";
-import { StampCard } from "$components/StampCard.tsx";
+import { StampCard } from "./StampCard.tsx";
 
 export default function StampSection(
   { title, type, stamps, layout }: StampSectionProps,

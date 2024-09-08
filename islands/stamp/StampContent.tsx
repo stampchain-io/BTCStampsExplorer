@@ -2,7 +2,7 @@
 
 import { StampRow } from "globals";
 
-import { StampCard } from "$components/StampCard.tsx";
+import { StampCard } from "$components/stamp/StampCard.tsx";
 // import { filterOptions, sortOptions } from "utils/stampUtils.ts";
 
 export function StampContent(

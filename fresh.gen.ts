@@ -108,6 +108,8 @@ import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
+import * as $stamp_details_StampBuyModal from "./islands/stamp/details/StampBuyModal.tsx";
+import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
 import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
 import * as $stamping_DeployContent from "./islands/stamping/DeployContent.tsx";
@@ -253,6 +255,8 @@ const manifest = {
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
+    "./islands/stamp/details/StampBuyModal.tsx": $stamp_details_StampBuyModal,
+    "./islands/stamp/details/StampInfo.tsx": $stamp_details_StampInfo,
     "./islands/stamp/details/StampRelatedInfo.tsx":
       $stamp_details_StampRelatedInfo,
     "./islands/stamp/details/StampTextContent.tsx":
