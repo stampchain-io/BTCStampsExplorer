@@ -424,7 +424,7 @@ export function Header() {
               </div>
             </div>
 
-            <div class="">
+            <div class="mt-3">
               <ConnectWallet toggleModal={toggleWalletModal} />
             </div>
           </div>
