@@ -45,7 +45,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
 
   return (
     <>
-      <div className={"flex flex-col justify-between h-full"}>
+      <div className={"flex flex-col gap-4"}>
         <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
           <p className={"text-6xl font-bold text-[#8800CC]"}>
             # {stamp.stamp}
@@ -99,18 +99,41 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           className={"flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6"}
         >
           <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1">
+            <p class="text-[#660099] font-light uppercase">TYPE</p>
+            <p class="text-[#999999] uppercase">
+              {stamp.locked ?? false ? "Yes" : "No"}
+            </p>
+          </div>
+          <div class="flex flex-row justify-between items-center md:flex-col md:items-center gap-1">
+            <p class="text-[#660099] font-light uppercase">DIMENSIONS</p>
+            <p class="text-[#999999] uppercase">
+              {stamp.divisible ? "Yes" : "No"}
+            </p>
+          </div>
+          <div class="flex flex-row justify-between items-center md:flex-col md:items-end gap-1">
+            <p class="text-[#660099] font-light uppercase">SIZE</p>
+            <p class="text-[#999999] uppercase">
+              {stamp.keyburn ?? false ? "Yes" : "No"}
+            </p>
+          </div>
+        </div>
+
+        <div
+          className={"flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6"}
+        >
+          <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1">
             <p class="text-[#660099] font-light uppercase">Locked</p>
             <p class="text-[#999999] uppercase">
               {stamp.locked ?? false ? "Yes" : "No"}
             </p>
           </div>
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1">
+          <div class="flex flex-row justify-between items-center md:flex-col md:items-center gap-1">
             <p class="text-[#660099] font-light uppercase">Divisible</p>
             <p class="text-[#999999] uppercase">
               {stamp.divisible ? "Yes" : "No"}
             </p>
           </div>
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1">
+          <div class="flex flex-row justify-between items-center md:flex-col md:items-end gap-1">
             <p class="text-[#660099] font-light uppercase">Keyburned</p>
             <p class="text-[#999999] uppercase">
               {stamp.keyburn ?? false ? "Yes" : "No"}
@@ -119,7 +142,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
         </div>
 
         <div
-          className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6"}
+          className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-7"}
         >
           <div className={"flex justify-between"}>
             <div class="flex flex-row md:flex-col justify-between items-start gap-1">
@@ -129,16 +152,14 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
               </p>
             </div>
 
-            <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1">
+            <div class="flex flex-row justify-between items-center md:flex-col md:items-end gap-1">
               <p class="text-lg font-light text-[#660099] uppercase">Block #</p>
-              <div class="flex justify-between items-center md:w-full gap-2">
-                <a
-                  href={`/block/${stamp.block_index}`}
-                  class="text-[#999999] hover:underline"
-                >
-                  {stamp.block_index}
-                </a>
-              </div>
+              <a
+                href={`/block/${stamp.block_index}`}
+                class="text-[#999999] hover:underline"
+              >
+                {stamp.block_index}
+              </a>
             </div>
           </div>
 

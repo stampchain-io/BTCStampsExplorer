@@ -27,7 +27,8 @@ export function CollectionCard({ collection }: { collection: Collection }) {
             {collection.collection_name}
           </h3>
         </div>
-        <div>
+        {
+          /* <div>
           <div class="flex justify-between text-black">
             <h3 class="text-[#BF83FC]">
               Floor Price: {Number.isFinite(collection.floorPrice)
@@ -35,7 +36,8 @@ export function CollectionCard({ collection }: { collection: Collection }) {
                 : collection.floorPrice || "N/A"}
             </h3>
           </div>
-        </div>
+        </div> */
+        }
       </div>
     </a>
   );

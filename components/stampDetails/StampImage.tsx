@@ -64,22 +64,24 @@ export const StampImage = (
 
   return (
     <div
-      className={`bg-[#1F002E] ${className} p-6 flex flex-col gap-4`}
+      className={`${className} flex flex-col gap-4`}
     >
-      <div className="stamp-container">
-        <img
-          width="100%"
-          loading="lazy"
-          className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg pixelart stamp-image`}
-          src={src}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "/content/not-available.png";
-          }}
-          alt="Stamp"
-        />
+      <div className={"p-6 bg-[#1F002E]"}>
+        <div className="stamp-container ">
+          <img
+            width="100%"
+            loading="lazy"
+            className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg pixelart stamp-image`}
+            src={src}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/content/not-available.png";
+            }}
+            alt="Stamp"
+          />
+        </div>
       </div>
       {flag && (
-        <div className={"flex justify-between"}>
+        <div className={"flex justify-between p-5 bg-[#1F002E]"}>
           <div className={"flex gap-4"}>
             <a href="#">
               <img src="/img/stamp/Copy.png" />
@@ -88,7 +90,7 @@ export const StampImage = (
               <img src="/img/stamp/InstagramLogo.png" />
             </a>
             <a href="#">
-              <img src="/img/stamp/TwitterLogo.png" />
+              <img src="/img/stamp/XLogo.png" />
             </a>
           </div>
           <div className={"flex gap-4"}>
