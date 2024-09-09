@@ -67,7 +67,7 @@ export default function Home(props: HomePageProps) {
         stamps_recent={stamps_recent}
         stamps_src20={stamps_src20}
       />
-      <HomeStampChainSelected />
+      {/* <HomeStampChainSelected />  // Leaving this out for initial release - Add later */} 
       <HomeGetStamping />
     </div>
   );
