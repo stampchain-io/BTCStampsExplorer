@@ -38,6 +38,8 @@ export interface StampRow {
   stamp_hash: string;
   is_btc_stamp: number;
   file_hash: string;
+  floorPrice?: number;
+  balance?: number | string;
 }
 
 export interface StampSectionProps {
