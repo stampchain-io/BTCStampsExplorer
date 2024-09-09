@@ -2,7 +2,7 @@
 
 export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
 export type STAMP_TYPES = "all" | "stamps" | "cursed" | "classic" | "posh";
-export type FILTER_TYPES = "Vector" | "Pixel" | "Recursive";
+export type FILTER_TYPES = "vector" | "pixel" | "recursive";
 
 import Big from "$Big";
 
