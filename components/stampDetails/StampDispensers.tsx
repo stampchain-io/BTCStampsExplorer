@@ -24,9 +24,11 @@ export function StampDispensers(
 
   return (
     <div className="relative shadow-md max-w-256">
-      <p class="text-[#F5F5F5] text-[26px] font-semibold">
+      {
+        /* <p class="text-[#F5F5F5] text-[26px] font-semibold">
         Dispensers ({dispensers.length})
-      </p>
+      </p> */
+      }
       {
         /* <div className={"custom-scrollbar max-h-96 overflow-x-auto"}>
         <div className="w-full min-h-96 h-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-[#2B0E49] py-6 pl-7">
@@ -53,9 +55,9 @@ export function StampDispensers(
       }
       <div className="max-h-96 overflow-x-auto">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:rounded-lg">
-          <thead className="text-lg font-semibold uppercase text-[#C184FF] bg-[#2B0E49] border-b border-gray-700">
+          <thead className="text-lg font-semibold uppercase">
             <tr>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="pr-6 py-3">
                 Address
               </th>
               <th scope="col" className="px-6 py-3">
@@ -73,7 +75,7 @@ export function StampDispensers(
               <th scope="col" className="px-6 py-3">
                 Confirmed
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="pl-6 py-3">
                 Close Block
               </th>
             </tr>
@@ -81,10 +83,9 @@ export function StampDispensers(
           <tbody>
             {sortedDispensers.map((dispenser) => (
               <tr
-                className="odd:bg-gray-900 even:bg-gray-800"
                 key={dispenser.source}
               >
-                <td className="px-6 py-4">
+                <td className="pr-6 py-4">
                   {/* TODO: this should popup perhaps with a barcode (or construct a trx for the wallet) similar to https://tokenscan.io/tx/0b4f6ad4eb97760cdd6bd70cc533f04030411f9fa13241ca2da53af32de0e121 */}
                   {dispenser.source}
                 </td>
@@ -104,7 +105,7 @@ export function StampDispensers(
                 <td className="px-6 py-4 text-sm">
                   {dispenser.confirmed ? "Yes" : "No"}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="pl-6 py-4 text-sm">
                   {dispenser.close_block_index}
                 </td>
               </tr>
