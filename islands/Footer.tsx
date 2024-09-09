@@ -39,7 +39,6 @@ export function Footer() {
               </div>
             </div>
             <p className={"font-semibold text-[#660066]"}>
-              Bitcoin Stamps © 2024 All Rights Reserved
             </p>
           </div>
 

@@ -111,46 +111,33 @@ export function Header() {
                     setCurrentPath("stamp");
                   }}
                   className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                    currentPath === "stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
                   POSH
                 </a>
                 <a
-                  href="#"
-                  f-partial={"#"}
+                  href="/stamp/?type=classic"
+                  f-partial={"/stamp/?type=classic"}
                   onClick={() => {
                     toggleMenu();
-                    setCurrentPath("#");
+                    setCurrentPath("stamp");
                   }}
                   className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                    currentPath === "stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  PIXEL
+                  CLASSIC
                 </a>
                 <a
-                  href="#"
-                  f-partial={"#"}
+                  href="/stamp/?type=classic&filterBy=recursive"
+                  f-partial={"/stamp/?type=classic&filterBy=recursive"}
                   onClick={() => {
                     toggleMenu();
-                    setCurrentPath("#");
+                    setCurrentPath("stamp");
                   }}
                   className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  VECTOR
-                </a>
-                <a
-                  href="#"
-                  f-partial={"#"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("#");
-                  }}
-                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                    currentPath === "stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
                   RECURSIVE
@@ -189,7 +176,7 @@ export function Header() {
                     setCurrentPath("#");
                   }}
                   className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
+                    currentPath === "stamping/stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
                   STAMP
@@ -218,21 +205,34 @@ export function Header() {
                   ALL
                 </a>
                 <a
-                  href="/src20/?ident=trending"
-                  f-partial={"/src20/?ident=trending"}
+                  href="/stamping/src20/deploy"
+                  f-partial={"/stamping/src20/deploy"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("src20");
                   }}
                   className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "src20" ? "text-[#7A00F5]" : ""
+                    currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  TRENDING
+                  DEPLOY
                 </a>
                 <a
-                  href="/stamping/src20/deploy"
-                  f-partial={"/stamping/src20/deploy"}
+                  href="/stamping/src20/mint"
+                  f-partial={"/stamping/src20/mint"}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath("src20");
+                  }}
+                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
+                    currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
+                  }`}
+                >
+                  MINT
+                </a>
+                <a
+                  href="/stamping/src20/transfer"
+                  f-partial={"/stamping/src20/transfer"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamping/src20");
@@ -241,7 +241,7 @@ export function Header() {
                     currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  DEPLOY
+                  TRANSFER
                 </a>
               </div>
             </div>

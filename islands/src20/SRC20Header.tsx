@@ -1,6 +1,4 @@
-import { useState } from "preact/hooks";
-
-import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
+import { StampNavigator } from "$islands/stamp/StampNavigator.tsx"; // FIXME: stampnavigator doesn't make sense here. maybe a src20navigator
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
 

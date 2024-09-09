@@ -1,8 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
 import { FILTER_TYPES, STAMP_TYPES } from "globals";
 
-const filters: FILTER_TYPES[] = ["Pixel", "Recursive", "Vector"];
+const filters: FILTER_TYPES[] = ["pixel", "recursive", "vector"];
 const sorts = ["Latest", "Oldest"];
 
 interface FilterItemProps {
