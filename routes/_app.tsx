@@ -37,7 +37,8 @@ export default function App({ Component }: AppProps) {
         />
         <link rel="icon" type="image/png" href="/img/icon.jpg" />
         <link rel="icon" type="image/x-icon" href="/img/icon.jpg" />
-        <link rel="apple-touch-icon" href="/img/icon.jpg"></link>
+        <link rel="apple-touch-icon" href="/img/icon.jpg" />
+        <link rel="canonical" href="https://stampchain.io" />
         {/* OpenGraph tags */}
         <meta property="og:title" content="Stampchain.io" />
         <meta
@@ -47,6 +48,7 @@ export default function App({ Component }: AppProps) {
         <meta property="og:image" content="/img/stamp.jpg" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://stampchain.io" />
+        <meta property="og:locale" content="en_US" />
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Stampchain.io" />
@@ -56,7 +58,7 @@ export default function App({ Component }: AppProps) {
         />
         <meta
           name="twitter:image"
-          content="https://stampchain.io/img/stamp.jpg"
+          content="/img/stamp.jpg"
         />
         <meta http-equiv="X-Content-Type-Options" content="nosniff" />
         <meta

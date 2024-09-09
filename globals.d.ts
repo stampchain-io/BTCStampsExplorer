@@ -1,6 +1,9 @@
 // General Types ---------------------------------------------------------------
 
-type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
+export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
+export type STAMP_TYPES = "all" | "stamps" | "cursed" | "classic" | "posh";
+export type FILTER_TYPES = "Vector" | "Pixel" | "Recursive";
+
 import Big from "$Big";
 
 interface BlockRow {
@@ -52,7 +55,7 @@ export interface SRC20Row {
   tick: string;
   tick_hash: string;
   creator: string;
-  creator_name: string;
+  creator_name: string | null;
   amt?: string | bigint;
   deci?: number;
   max?: string | bigint;
@@ -78,10 +81,15 @@ interface SendRow {
   block_time: Date;
 }
 
-interface HolderRow {
+export interface HolderRow {
   address: string;
   quantity: number;
-  divisible: number;
+  divisible: boolean;
+}
+
+export interface ProcessedHolder {
+  address: string;
+  quantity: number;
 }
 
 export interface DispenseRow {
@@ -461,24 +469,25 @@ export interface MintStampInputData {
   service_fee_address: string;
 }
 
-interface Collection {
+export interface Collection {
   collection_id: string;
   collection_name: string;
   creators: string[];
-  first_stamp_image: string | null;
-  stamps?: StampRow[];
+  stamps: StampRow[];
+  first_stamp_image?: string | null;
+  floorPrice?: number | null;
 }
 
-interface CollectionQueryParams extends PaginationQueryParams {
+export interface CollectionQueryParams extends PaginationQueryParams {
   creator?: string;
 }
 
-interface PaginatedCollectionResponseBody extends Pagination {
+export interface PaginatedCollectionResponseBody extends Pagination {
   last_block: number;
   data: Collection[];
 }
 
-interface SRC20SnapshotRequestParams {
+export interface SRC20SnapshotRequestParams {
   tick: string;
   limit: number;
   page: number;

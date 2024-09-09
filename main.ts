@@ -4,7 +4,7 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import "$/globals.ts";
+import "$/globals.d.ts";
 import { Manifest } from "$fresh/server.ts";
 
 import "$std/dotenv/load.ts";
