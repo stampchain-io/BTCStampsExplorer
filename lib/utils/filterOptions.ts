@@ -4,15 +4,15 @@ export const filterOptions: Record<FILTER_TYPES, {
   suffixFilters: string[];
   ident: SUBPROTOCOLS[];
 }> = {
-  "Vector": {
+  "vector": {
     suffixFilters: ["svg", "html"],
     ident: ["STAMP", "SRC-721"],
   },
-  "Pixel": {
+  "pixel": {
     suffixFilters: ["gif", "jpg", "png", "webp"],
     ident: ["STAMP", "SRC-721"],
   },
-  "Recursive": {
+  "recursive": {
     suffixFilters: [],
     ident: ["STAMP", "SRC-721"],
   },
