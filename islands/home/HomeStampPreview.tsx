@@ -17,7 +17,7 @@ export function HomeStampPreview({
 }) {
   const sections: StampSectionProps[] = [
     { title: "POSH", type: "posh", stamps: stamps_posh, layout: "grid" },
-    { title: "CLASSICAL", type: "classic", stamps: stamps_art, layout: "grid" },
+    { title: "CLASSIC", type: "classic", stamps: stamps_art, layout: "grid" },
     {
       title: "RECENT SALES",
       type: "recent",
