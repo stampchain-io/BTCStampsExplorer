@@ -1,134 +1,155 @@
-import { useState } from "preact/hooks";
-import { StampRow } from "globals";
-import { useContext, useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
-const filters = ["gif", "html", "jpg", "png", "svg"];
-const sorts = ["Supply", "Stamp"];
-const active = " opacity-50";
+import { FILTER_TYPES, STAMP_TYPES } from "globals";
 
-interface SortItemInterface {
+const filters: FILTER_TYPES[] = ["Pixel", "Recursive", "Vector"];
+const sorts = ["Latest", "Oldest"];
+
+interface FilterItemProps {
+  title: FILTER_TYPES;
+  value: FILTER_TYPES[];
+  onChange: (id: FILTER_TYPES) => void;
+}
+
+interface SortItemProps {
   title: string;
   onChange: (id: string) => void;
   value: string;
 }
 
-interface FilterItemInterface {
-  title: string;
-  value: string[];
-  onChange: (id: string) => void;
-}
+const FilterItem = ({ title, onChange, value }: FilterItemProps) => (
+  <div
+    class="flex items-center cursor-pointer py-2 px-2"
+    onClick={() => onChange(title)}
+  >
+    <input
+      type="checkbox"
+      checked={value.includes(title)}
+      class="form-checkbox h-5 w-5 text-[#8800CC] border-[#8A8989] rounded bg-[#3F2A4E] focus:ring-[#8800CC]"
+      onChange={() => onChange(title)}
+    />
+    <span class="text-white ml-2">{title}</span>
+  </div>
+);
 
-const SortItem = (props: SortItemInterface) => {
-  const title = props.title;
+const SortItem = ({ title, onChange, value }: SortItemProps) => (
+  <div
+    class={`flex items-center cursor-pointer py-2 px-2 ${
+      value === title ? "text-[#8800CC]" : "text-white"
+    }`}
+    onClick={() => onChange(title)}
+  >
+    <span>{title}</span>
+  </div>
+);
 
-  return (
-    <div
-      class={"flex gap-x-2 items-center cursor-pointer hover:opacity-100 " +
-        (props.value == props.title ? "opacity-100" : "opacity-15")}
-      onClick={() => {
-        props.onChange(title);
-      }}
-    >
-      <img class="rounded-full" src={`/img/${title}.png`} width={30} />
-      <span>{title}</span>
-    </div>
+export function StampNavigator(
+  { initFilter, initSort, initType, selectedTab }: {
+    initFilter?: FILTER_TYPES[];
+    initSort?: string;
+    initType?: STAMP_TYPES;
+    selectedTab: STAMP_TYPES;
+  },
+) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [localFilters, setLocalFilters] = useState<FILTER_TYPES[]>(
+    initFilter || [],
   );
-};
-
-const FilterItem = (props: FilterItemInterface) => {
-  const title = props.title;
-  return (
-    <div
-      class="flex gap-x-1 items-center "
-      onClick={() => {
-        props.onChange(title);
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={props.value ? props.value.includes(title) : false}
-      />
-      <span>{title}</span>
-    </div>
-  );
-};
-
-export function StampNavigator({ initFilter, initSort }) {
-  const {
-    setSortOption,
-    setFilterOption,
-    sortOption,
-    filterOption,
-    setFilter,
-    setSort,
-  } = useNavigator();
+  const [localSort, setLocalSort] = useState<string>(initSort || "DESC");
 
   useEffect(() => {
-    console.log(initFilter, initSort, "++++");
-    if (initFilter) {
-      console.log(initFilter, "---------------");
-      setFilter(initFilter);
-    }
-    if (initSort) {
-      console.log(initSort, "-----------------");
-      setSort(initSort);
-    }
-  }, []);
+    if (initFilter) setLocalFilters(initFilter);
+    if (initSort) setLocalSort(initSort);
+  }, [initFilter, initSort, initType]);
 
-  const [isHovered, setIsHovered] = useState(false);
+  const handleSortChange = (value: string) => {
+    const newSortOrder = value === "Latest" ? "DESC" : "ASC";
+    setLocalSort(newSortOrder);
+    updateURL({ sortBy: newSortOrder });
+  };
+
+  const handleFilterChange = (value: FILTER_TYPES) => {
+    setLocalFilters((prevFilters) => {
+      const newFilters = prevFilters.includes(value)
+        ? prevFilters.filter((f) => f !== value)
+        : [...prevFilters, value];
+      updateURL({ filterBy: newFilters });
+      return newFilters;
+    });
+  };
+
+  const updateURL = (params: {
+    sortBy?: string;
+    filterBy?: FILTER_TYPES[];
+    type?: STAMP_TYPES;
+  }) => {
+    if (typeof self !== "undefined") {
+      const url = new URL(self.location.href);
+      if (params.sortBy) url.searchParams.set("sortBy", params.sortBy);
+      if (params.filterBy !== undefined) {
+        if (params.filterBy.length > 0) {
+          url.searchParams.set("filterBy", params.filterBy.join(","));
+        } else {
+          url.searchParams.delete("filterBy");
+        }
+      }
+      if (params.type) url.searchParams.set("type", params.type);
+      if (!params.type) url.searchParams.set("type", selectedTab);
+
+      url.searchParams.set("page", "1");
+      self.history.pushState({}, "", url.toString());
+      self.dispatchEvent(
+        new CustomEvent("urlChanged", { detail: url.toString() }),
+      );
+
+      // Force page reload
+      self.location.href = url.toString();
+    }
+  };
 
   return (
-    <div class="group relative">
-      <div
-        class="bg-[#3F2A4E] hover:bg-white flex justify-between items-center p-4 min-w-[120px] w-[120px] h-[54px] rounded cursor-pointer mb-3"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+    <div class="relative">
+      <button
+        class="bg-[#3F2A4E] hover:bg-[#5503A6] text-white flex justify-between items-center p-4 min-w-[120px] w-[120px] h-[54px] rounded cursor-pointer mb-3"
+        onClick={() => setIsOpen(!isOpen)}
       >
-        <p
-          class={`${isHovered ? "text-[#022516]" : "text-[#8D9199]"} text-xl`}
-        >
-          Filter
-        </p>
+        <span class="text-xl">Filter</span>
         <img
-          src={isHovered
-            ? "/img/icon_filter_hover.png"
-            : "/img/icon_filter.png"}
+          src={isOpen ? "/img/icon_filter_hover.png" : "/img/icon_filter.png"}
           class="w-[18px] h-[12px]"
           alt="Filter icon"
         />
-      </div>
-      <div
-        class="bg-white text-[#022516] p-6 rounded absolute hidden group-hover:inline-block z-[100]"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div class="flex flex-col mb-6">
-          <span class="w-20">Filter by:</span>
-          <div class="flex flex-1 border-b border-gray-600 h-16 py-3 gap-x-5">
-            {filters.map((item) => {
-              return (
+      </button>
+      {isOpen && (
+        <div class="absolute top-full left-0 z-[100] bg-[#3E2F4C] text-white p-6 rounded-lg shadow-lg min-w-[250px]">
+          <div class="mb-6">
+            <span class="text-lg font-semibold mb-2 block">Filter by:</span>
+            <div class="flex flex-wrap border-b border-[#8A8989] py-2">
+              {filters.map((item) => (
                 <FilterItem
+                  key={`${item}-${localFilters.includes(item)}`}
                   title={item}
-                  onChange={setFilterOption}
-                  value={filterOption}
+                  onChange={handleFilterChange}
+                  value={localFilters}
                 />
-              );
-            })}
+              ))}
+            </div>
+          </div>
+          <div>
+            <span class="text-lg font-semibold mb-2 block">Sort by:</span>
+            <div class="flex flex-wrap border-b border-[#8A8989] py-2">
+              {sorts.map((item) => (
+                <SortItem
+                  key={item}
+                  title={item}
+                  onChange={handleSortChange}
+                  value={localSort === "DESC" ? "Latest" : "Oldest"}
+                />
+              ))}
+            </div>
           </div>
         </div>
-        <div class="flex flex-col">
-          <span class="w-20">Sort by:</span>
-          <div class="flex flex-1 items-center gap-x-10 border-b border-gray-600 py-3">
-            {sorts.map((item) => (
-              <SortItem
-                title={item}
-                onChange={setSortOption}
-                value={sortOption}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,11 +1,12 @@
 import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
-import { PROTOCOL_IDENTIFIERS as SUBPROTOCOLS } from "utils/protocol.ts";
+import { SUBPROTOCOLS } from "globals";
 import { getFileSuffixFromMime } from "utils/util.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
-import { StampBalance, XCPBalance } from "globals";
+import { FILTER_TYPES, STAMP_TYPES, StampBalance, XCPBalance } from "globals";
 import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$lib/database/db.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
+import { filterOptions } from "utils/filterOptions.ts";
 
 export class StampRepository {
   static sanitize(input: string): string {
@@ -16,12 +17,12 @@ export class StampRepository {
     whereConditions: string[],
     queryParams: (string | number)[],
     identifier?: string | number | (string | number)[] | undefined,
-    type?: "stamps" | "cursed" | "all",
-    ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string,
+    type?: STAMP_TYPES,
+    ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string,
     blockIdentifier?: number | string,
     collectionId?: string,
+    filterBy?: FILTER_TYPES[],
   ) {
-    // Identifier condition (stamp, tx_hash, cpid, or stamp_hash)
     if (identifier !== undefined) {
       if (Array.isArray(identifier)) {
         const numericIds = identifier.filter((id): id is number =>
@@ -68,10 +69,23 @@ export class StampRepository {
         }
       }
     } else if (type !== "all") {
-      const stampCondition = type === "stamps"
-        ? "st.stamp >= 0"
-        : "st.stamp < 0";
-      whereConditions.push(stampCondition);
+      let stampCondition: string;
+      if (type === "stamps") {
+        stampCondition = "st.stamp >= 0 and st.ident != 'SRC-20'";
+      } else if (type === "cursed") {
+        stampCondition = "st.stamp < 0";
+      } else if (type === "posh") {
+        stampCondition =
+          "st.stamp < 0 AND st.cpid NOT LIKE 'A%' and st.ident != 'SRC-20'";
+      } else if (type === "classic") {
+        stampCondition =
+          "st.stamp >= 0 AND st.cpid LIKE 'A%' and st.ident != 'SRC-20'";
+      } else {
+        stampCondition = "";
+      }
+      if (stampCondition) {
+        whereConditions.push(stampCondition);
+      }
     }
 
     // Ident condition
@@ -103,15 +117,49 @@ export class StampRepository {
       whereConditions.push("cs.collection_id = UNHEX(?)");
       queryParams.push(collectionId);
     }
+
+    // File suffix and ident condition
+    if (filterBy && filterBy.length > 0) {
+      const filterConditions: string[] = [];
+      filterBy.forEach((filter) => {
+        if (filterOptions[filter]) {
+          const { suffixFilters, ident: filterIdent } = filterOptions[filter];
+          const suffixCondition = suffixFilters.length > 0
+            ? `(${
+              suffixFilters.map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
+                .join(" OR ")
+            })`
+            : "";
+          const identCondition = filterIdent.length > 0
+            ? `(${filterIdent.map(() => "st.ident = ?").join(" OR ")})`
+            : "";
+
+          if (suffixCondition && identCondition) {
+            filterConditions.push(`(${suffixCondition} AND ${identCondition})`);
+            queryParams.push(...filterIdent);
+          } else if (suffixCondition) {
+            filterConditions.push(suffixCondition);
+          } else if (identCondition) {
+            filterConditions.push(identCondition);
+            queryParams.push(...filterIdent);
+          }
+        }
+      });
+
+      if (filterConditions.length > 0) {
+        whereConditions.push(`(${filterConditions.join(" OR ")})`);
+      }
+    }
   }
 
   static async getTotalStampCountFromDb(
     options: {
-      type?: "stamps" | "cursed" | "all";
-      ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string;
+      type?: STAMP_TYPES;
+      ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
       identifier?: string | number | (string | number)[];
       blockIdentifier?: number | string;
       collectionId?: string;
+      filterBy?: FILTER_TYPES[];
     },
   ) {
     const {
@@ -120,6 +168,7 @@ export class StampRepository {
       identifier,
       blockIdentifier,
       collectionId,
+      filterBy,
     } = options;
 
     const whereConditions: string[] = [];
@@ -133,6 +182,7 @@ export class StampRepository {
       ident,
       blockIdentifier,
       collectionId,
+      filterBy,
     );
 
     const whereClause = whereConditions.length > 0
@@ -238,21 +288,23 @@ export class StampRepository {
     options: {
       limit?: number;
       page?: number;
-      sort_order?: "asc" | "desc";
-      type?: "stamps" | "cursed" | "all";
-      ident?: typeof SUBPROTOCOLS | typeof SUBPROTOCOLS[] | string;
+      sortBy?: "asc" | "desc";
+      type?: STAMP_TYPES;
+      ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
       identifier?: string | number | (string | number)[];
       blockIdentifier?: number | string;
       allColumns?: boolean;
       noPagination?: boolean;
       cacheDuration?: number | "never";
       collectionId?: string;
+      sortColumn?: string;
+      filterBy?: FILTER_TYPES[];
     },
   ) {
     const {
       limit = SMALL_LIMIT,
       page = 1,
-      sort_order = "asc",
+      sortBy = "ASC",
       type = "stamps",
       ident,
       identifier,
@@ -261,6 +313,8 @@ export class StampRepository {
       noPagination = false,
       cacheDuration = 1000 * 60 * 3,
       collectionId,
+      sortColumn = "tx_index",
+      filterBy,
     } = options;
 
     const whereConditions: string[] = [];
@@ -274,6 +328,7 @@ export class StampRepository {
       ident,
       blockIdentifier,
       collectionId,
+      filterBy,
     );
 
     const specificColumns = `
@@ -304,8 +359,8 @@ export class StampRepository {
     const whereClause = whereConditions.length > 0
       ? `WHERE ${whereConditions.join(" AND ")}`
       : "";
-    const order = sort_order.toUpperCase() === "DESC" ? "DESC" : "ASC";
-    const orderClause = `ORDER BY st.stamp ${order}`;
+    const order = sortBy.toUpperCase() === "DESC" ? "DESC" : "ASC";
+    const orderClause = `ORDER BY st.${sortColumn} ${order}`;
 
     let limitClause = "";
     let offsetClause = "";
@@ -382,9 +437,6 @@ export class StampRepository {
         OFFSET ${offset};
       `;
 
-      console.log("Balances query:", query);
-      console.log("Balances query params:", assets);
-
       const balances = await dbManager.executeQueryWithCache(
         query,
         assets,
@@ -429,8 +481,6 @@ export class StampRepository {
       WHERE ident != 'SRC-20'
       ORDER BY cpid ASC
     `;
-
-    console.log(`Executing query:`, query);
 
     const result = await dbManager.executeQueryWithCache(
       query,

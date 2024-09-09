@@ -96,109 +96,6 @@ export function Header() {
           <div
             className={`font-black text-center flex flex-row items-center`}
           >
-            {
-              /* <a
-              href="/stamp?ident=classic"
-              f-partial={"/stamp?ident=classic"}
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("stamp");
-              }}
-              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                currentPath === "stamp" ? "border-[#7A00F5] border-b-4" : ""
-              }`}
-            >
-              STAMPS
-            </a> */
-            }
-            {
-              /* <a
-              href="/collection"
-              f-partial={"/collection"}
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("collection");
-              }}
-              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                currentPath === "collection"
-                  ? "border-[#7A00F5] border-b-4"
-                  : ""
-              }`}
-            >
-              COLLECTIONS
-            </a> */
-            }
-            {
-              /* <a
-              href="/src20"
-              f-partial={"/src20"}
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("src20");
-              }}
-              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                currentPath === "src20" ? "border-[#7A00F5] border-b-4" : ""
-              }`}
-            >
-              SRC-20
-            </a> */
-            }
-            {
-              /* <a
-              href="/block/last"
-              f-partial={"/block/last"}
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("block");
-              }}
-              className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                currentPath === "block" ? "border-[#7A00F5] border-b-4" : ""
-              }`}
-            >
-              BLOCKS
-            </a> */
-            }
-
-            {
-              /* <div className={"group relative"}>
-              <a
-                className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-lg lg:text-base font-weight-900 ${
-                  isStampingActive ? "border-[#7A00F5] border-b-4" : ""
-                }`}
-              >
-                STAMPING
-              </a>
-              <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2">
-                <a
-                  href="/stamping/stamp"
-                  f-partial={"/stamping/stamp"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("stamping/stamp");
-                  }}
-                  className={`pb-2 lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "stamping/stamp" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  STAMP
-                </a>
-                <a
-                  href="/stamping/src20"
-                  f-partial={"/stamping/src20"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("stamping/src20");
-                  }}
-                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "stamping/src20" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  SRC-20
-                </a>
-              </div>
-            </div> */
-            }
-
             <div className={"group relative"}>
               <a
                 className={`lg:px-4 lg:mx-1 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] cursor-pointer text-2xl md:text-lg font-black`}
@@ -207,8 +104,8 @@ export function Header() {
               </a>
               <div className="md:hidden md:group-hover:flex flex flex-col md:absolute md:bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-center md:text-left">
                 <a
-                  href="/stamp/?ident=posh"
-                  f-partial={"/stamp/?ident=posh"}
+                  href="/stamp/?type=posh"
+                  f-partial={"/stamp/?type=posh"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -259,8 +156,8 @@ export function Header() {
                   RECURSIVE
                 </a>
                 <a
-                  href="/stamp/?ident=all"
-                  f-partial={"/stamp/?ident=all"}
+                  href="/stamp/?type=all"
+                  f-partial={"/stamp/?type=all"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -385,8 +282,8 @@ export function Header() {
               </a>
               <div className="flex flex-col z-[100] py-2 text-center">
                 <a
-                  href="/stamp/?ident=posh"
-                  f-partial={"/stamp/?ident=posh"}
+                  href="/stamp/?type=posh"
+                  f-partial={"/stamp/?type=posh"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -437,8 +334,8 @@ export function Header() {
                   RECURSIVE
                 </a>
                 <a
-                  href="/stamp/?ident=all"
-                  f-partial={"/stamp/?ident=all"}
+                  href="/stamp/?type=all"
+                  f-partial={"/stamp/?type=all"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");

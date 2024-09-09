@@ -1,6 +1,6 @@
 import { StampRepository } from "$lib/database/index.ts";
 import { BlockService } from "$lib/services/blockService.ts";
-import { StampBalance, SUBPROTOCOLS } from "globals";
+import { FILTER_TYPES, STAMP_TYPES, StampBalance, SUBPROTOCOLS } from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
@@ -83,23 +83,23 @@ export class StampService {
   static async getStamps(options: {
     page?: number;
     limit?: number;
-    sort_order?: "asc" | "desc";
-    type?: "stamps" | "cursed" | "all";
-    ident?: SUBPROTOCOLS[];
+    type?: STAMP_TYPES;
+    ident?: SUBPROTOCOLS | SUBPROTOCOLS[];
     allColumns?: boolean;
     collectionId?: string;
     identifier?: string | number | (string | number)[];
     blockIdentifier?: number | string;
     cacheDuration?: number | "never";
     noPagination?: boolean;
-    page_size?: number;
+    sortBy?: "desc" | "asc";
+    filterBy?: FILTER_TYPES[];
   }) {
     const isMultipleStamps = Array.isArray(options.identifier);
     const isSingleStamp = !!options.identifier && !isMultipleStamps;
-    const limit = options.page_size || options.limit || BIG_LIMIT;
+    const limit = options.limit || BIG_LIMIT;
     const page = options.page || 1;
 
-    const [stamps, total] = await Promise.all([
+    const [stamps, totalResult] = await Promise.all([
       StampRepository.getStampsFromDb({
         ...options,
         limit: isSingleStamp || isMultipleStamps ? undefined : limit,
@@ -112,13 +112,16 @@ export class StampService {
         cacheDuration: isSingleStamp || isMultipleStamps
           ? "never"
           : options.cacheDuration,
+        filterBy: options.filterBy,
       }),
       StampRepository.getTotalStampCountFromDb({
         ...options,
+        filterBy: options.filterBy,
       }),
     ]);
 
-    const totalCount = total.rows[0].total;
+    const totalCount =
+      (totalResult as { rows: { total: number }[] }).rows[0]?.total || 0;
     const totalPages = Math.ceil(totalCount / limit);
 
     if (isSingleStamp) {
