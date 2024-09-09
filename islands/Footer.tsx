@@ -71,7 +71,11 @@ export function Footer() {
           <div className={"text-left md:text-right flex flex-col gap-1"}>
             <p className={"text-2xl font-black"}>RESOURCES</p>
             <div className={"flex flex-row justify-between md:flex-col gap-1"}>
-              <a href="#" className={"w-1/3 md:w-full"}>
+              <a
+                href="/faq"
+                f-partial={"/faq"}
+                className={"w-1/3 md:w-full"}
+              >
                 FAQ
               </a>
               <a
@@ -80,7 +84,11 @@ export function Footer() {
               >
                 GitHub
               </a>
-              <a href="#" className={"w-1/3 md:w-full"}>
+              <a
+                href="/presskit"
+                f-partial={"/presskit"}
+                className={"w-1/3 md:w-full"}
+              >
                 Press Kit
               </a>
             </div>

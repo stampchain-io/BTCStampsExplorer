@@ -4,6 +4,7 @@
 
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
+import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_bitcoin_notification from "./routes/api/bitcoin-notification.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
@@ -52,11 +53,13 @@ import * as $collection_index from "./routes/collection/index.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
+import * as $faq_index from "./routes/faq/index.tsx";
 import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/sharedBlockWithStampsHandler.ts";
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
 import * as $home_index from "./routes/home/index.tsx";
 import * as $index from "./routes/index.tsx";
+import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $quicknode_getPrice from "./routes/quicknode/getPrice.ts";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
@@ -66,8 +69,10 @@ import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $stamping_src20 from "./routes/stamping/src20.tsx";
 import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
 import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
+import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
+import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
 import * as $Footer from "./islands/Footer.tsx";
 import * as $Header from "./islands/Header.tsx";
@@ -127,6 +132,7 @@ const manifest = {
   routes: {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
+    "./routes/about/index.tsx": $about_index,
     "./routes/api/[...path].ts": $api_path_,
     "./routes/api/bitcoin-notification.ts": $api_bitcoin_notification,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
@@ -188,6 +194,7 @@ const manifest = {
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/docs/index.tsx": $docs_index,
+    "./routes/faq/index.tsx": $faq_index,
     "./routes/handlers/sharedBlockWithStampsHandler.ts":
       $handlers_sharedBlockWithStampsHandler,
     "./routes/handlers/sharedCollectionHandler.ts":
@@ -195,6 +202,7 @@ const manifest = {
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
     "./routes/home/index.tsx": $home_index,
     "./routes/index.tsx": $index,
+    "./routes/presskit/index.tsx": $presskit_index,
     "./routes/quicknode/getPrice.ts": $quicknode_getPrice,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
@@ -204,10 +212,12 @@ const manifest = {
     "./routes/stamping/src20.tsx": $stamping_src20,
     "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
     "./routes/stamping/stamp.tsx": $stamping_stamp,
+    "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
+    "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
     "./islands/Footer.tsx": $Footer,
     "./islands/Header.tsx": $Header,
