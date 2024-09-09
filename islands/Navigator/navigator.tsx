@@ -1,104 +1,107 @@
-import { useContext, useRef, useState } from "preact/hooks";
 import { createContext } from "preact";
+import { useContext, useEffect, useState } from "preact/hooks";
+import { FILTER_TYPES, STAMP_TYPES } from "globals";
 
-const NavigatorContext = createContext(null);
+interface NavigatorContextType {
+  setTypeOption: (page: string, type: STAMP_TYPES, reload?: boolean) => void;
+  setSortOption: (sort: string) => void;
+  setFilterOption: (filter: FILTER_TYPES) => void;
+  getSort: () => string;
+  getFilter: () => FILTER_TYPES[];
+  getType: () => STAMP_TYPES;
+  setFilter: (filters: FILTER_TYPES[]) => void;
+  setSort: (sort: string) => void;
+  setType: (type: STAMP_TYPES) => void;
+}
 
-export const useNavigator = () => useContext(NavigatorContext);
+const NavigatorContext = createContext<NavigatorContextType | undefined>(
+  undefined,
+);
 
-export const NavigatorProvider = ({ children }) => {
-  const [sortOption, setSortOption] = useState("");
-  const [filterOption, setFilterOption] = useState<string[]>([]);
-  const [typeOption, setTypeOption] = useState("");
+export const NavigatorProvider = (
+  { children }: { children: preact.ComponentChildren },
+) => {
+  const [sort, setSort] = useState<string>("DESC");
+  const [filter, setFilter] = useState<FILTER_TYPES[]>([]);
+  const [type, setType] = useState<STAMP_TYPES>("all");
 
-  const setSortOptionData = (value: string) => {
-    setSortOption(value);
-    console.log("Sort option: ", value);
-    if (globalThis.history) {
-      globalThis.history.pushState(
-        {},
-        "",
-        `/stamp?sortBy=${value}&filterBy=${filterOption}&ident=${typeOption}`,
-      );
-      window.location.reload();
-    }
-  };
+  useEffect(() => {
+    const url = new URL(self.location.href);
+    setSort(url.searchParams.get("sortBy") || "DESC");
+    setFilter(
+      (url.searchParams.get("filterBy")?.split(",").filter(
+        Boolean,
+      ) as FILTER_TYPES[]) || [],
+    );
+    setType((url.searchParams.get("type") as STAMP_TYPES) || "all");
+  }, []);
 
-  const getSortOption = () => {
-    return sortOption;
-  };
-
-  const setFilterOptionData = (value: string) => {
-    let updatedData;
-    if (filterOption.includes(value)) {
-      updatedData = [...filterOption.filter((item) => item != value)];
-    } else {
-      updatedData = [...filterOption, value];
-    }
-    setFilterOption(updatedData);
-    console.log("Filter option: ", updatedData);
-
-    if (globalThis.history) {
-      globalThis.history.pushState(
-        {},
-        "",
-        `/stamp?sortBy=${sortOption}&filterBy=${updatedData}&ident=${typeOption}`,
-      );
-      window.location.reload();
-    }
-  };
-
-  const getFilterOption = () => {
-    return filterOption;
-  };
-
-  const setTypeOptionData = (
-    prefix: string,
-    value: string,
-    identOnly: boolean = false,
+  const setTypeOption = (
+    page: string,
+    newType: STAMP_TYPES,
+    reload = false,
   ) => {
-    setTypeOption(value);
-    console.log("Type option: ", value);
-    if (globalThis.history) {
-      if (identOnly) {
-        globalThis.history.pushState(
-          {},
-          "",
-          `/${prefix}?ident=${value}`,
-        );
-      } else {
-        globalThis.history.pushState(
-          {},
-          "",
-          `/${prefix}?sortBy=${sortOption}&filterBy=${filterOption}&ident=${value}`,
-        );
-      }
-      window.location.reload();
+    const url = new URL(self.location.href);
+    url.searchParams.set("type", newType);
+    url.searchParams.set("page", "1");
+    self.history.pushState({}, "", url.toString());
+    setType(newType);
+    if (reload) {
+      self.location.reload();
     }
   };
 
-  const getTypeOption = () => {
-    return typeOption;
+  const setSortOption = (newSort: string) => {
+    const url = new URL(self.location.href);
+    url.searchParams.set("sortBy", newSort);
+    url.searchParams.set("page", "1");
+    self.history.pushState({}, "", url.toString());
+    setSort(newSort);
   };
 
-  const contextValue = {
-    sortOption,
-    setSort: setSortOption,
-    setSortOption: setSortOptionData,
-    getSort: getSortOption,
-    filterOption,
-    setFilter: setFilterOption,
-    setFilterOption: setFilterOptionData,
-    getFilter: getFilterOption,
-    typeOption,
-    setType: setTypeOption,
-    setTypeOption: setTypeOptionData,
-    getType: getTypeOption,
+  const setFilterOption = (newFilter: FILTER_TYPES) => {
+    const currentFilters = filter.includes(newFilter)
+      ? filter.filter((f) => f !== newFilter)
+      : [...filter, newFilter];
+    setFilter(currentFilters);
+
+    const url = new URL(self.location.href);
+    if (currentFilters.length > 0) {
+      url.searchParams.set("filterBy", currentFilters.join(","));
+    } else {
+      url.searchParams.delete("filterBy");
+    }
+    url.searchParams.set("page", "1");
+    self.history.pushState({}, "", url.toString());
   };
+
+  const getSort = () => sort;
+  const getFilter = () => filter;
+  const getType = () => type;
 
   return (
-    <NavigatorContext.Provider value={contextValue}>
-      {/* <span class="text-white">SortOption: {sortOption}</span> */}
+    <NavigatorContext.Provider
+      value={{
+        setTypeOption,
+        setSortOption,
+        setFilterOption,
+        getSort,
+        getFilter,
+        getType,
+        setFilter,
+        setSort,
+        setType,
+      }}
+    >
       {children}
     </NavigatorContext.Provider>
   );
+};
+
+export const useNavigator = () => {
+  const context = useContext(NavigatorContext);
+  if (context === undefined) {
+    throw new Error("useNavigator must be used within a NavigatorProvider");
+  }
+  return context;
 };

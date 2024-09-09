@@ -11,8 +11,8 @@ export default function StampSection(
           {title}
         </p>
         <a
-          href={`/stamp?ident=${type}`}
-          f-partial={`/stamp?ident=${type}`}
+          href={`/stamp?type=${type}`}
+          f-partial={`/stamp?type=${type}`}
           class="text-[#660099] text-sm md:text-base font-light border-2 border-[#660099] py-1 text-center min-w-[84px] rounded-md"
         >
           See all

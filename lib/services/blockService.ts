@@ -16,7 +16,7 @@ export class BlockService {
       StampRepository.getStampsFromDb({
         type,
         blockIdentifier,
-        sort_order: "asc",
+        sortBy: "asc",
         noPagination: true,
         cacheDuration: "never",
       }),

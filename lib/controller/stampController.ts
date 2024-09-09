@@ -1,5 +1,4 @@
 import { StampService } from "$lib/services/stampService.ts";
-import { filterData, sortData } from "utils/stampUtils.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { HolderRow, SUBPROTOCOLS } from "globals";
 import { Src20Service } from "$lib/services/src20Service.ts";
@@ -7,10 +6,17 @@ import { formatSRC20Row } from "utils/src20Utils.ts";
 import { CollectionService } from "$lib/services/collectionService.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { paginate } from "utils/util.ts";
-import { PaginatedStampBalanceResponseBody } from "globals";
+import {
+  FILTER_TYPES,
+  PaginatedStampBalanceResponseBody,
+  ProcessedHolder,
+  STAMP_TYPES,
+  StampRow,
+} from "globals";
 import { DispenserManager, XcpManager } from "$lib/services/xcpService.ts";
 import * as base64 from "base64/mod.ts";
 const NO_DISPENSERS = Symbol("NO_DISPENSERS");
+import { filterOptions } from "utils/filterOptions.ts";
 
 export class InMemoryCacheService {
   private static cache: { [key: string]: { data: any; expiry: number } } = {};
@@ -54,7 +60,7 @@ export class StampController {
     if (dispensers === NO_DISPENSERS) {
       return null;
     }
-    console.log("Dispensers from cache:", dispensers);
+    // console.log("Dispensers from cache:", dispensers);
     if (!dispensers) {
       dispensers = await DispenserManager.getDispensersByCpid(cpid);
       StampController.CacheService.set(
@@ -163,8 +169,7 @@ export class StampController {
   static async getStamps({
     page = 1,
     limit = BIG_LIMIT,
-    orderBy = "DESC",
-    sortBy = "none",
+    sortBy = "DESC",
     type = "all",
     filterBy = [],
     ident,
@@ -177,10 +182,9 @@ export class StampController {
   }: {
     page?: number;
     limit?: number;
-    orderBy?: "DESC" | "ASC";
-    sortBy?: string;
-    type?: "stamps" | "cursed" | "all";
-    filterBy?: string[];
+    sortBy?: "DESC" | "ASC";
+    type?: STAMP_TYPES;
+    filterBy?: FILTER_TYPES[] | string;
     ident?: SUBPROTOCOLS[];
     collectionId?: string;
     identifier?: string | number;
@@ -190,19 +194,43 @@ export class StampController {
     allColumns?: boolean;
   } = {}) {
     try {
+      console.log("StampController.getStamps called with filterBy:", filterBy);
+
+      const filterByArray = typeof filterBy === "string"
+        ? (filterBy
+          ? filterBy.split(",").filter(Boolean) as FILTER_TYPES[]
+          : [])
+        : filterBy;
+
+      let finalIdent = ident;
+      if (!finalIdent) {
+        if (filterByArray.length > 0) {
+          finalIdent = filterByArray.flatMap((filter) =>
+            filterOptions[filter]?.ident || []
+          );
+        } else if (type === "classic") {
+          finalIdent = ["STAMP"];
+        } else if (type === "posh") {
+          finalIdent = ["SRC-721"];
+        } else {
+          finalIdent = ["STAMP", "SRC-721"];
+        }
+      }
+
       const [stampResult, lastBlock, xcpAssets] = await Promise.all([
         StampService.getStamps({
           page,
           limit,
-          sort_order: orderBy.toLowerCase() as "asc" | "desc",
+          sortBy,
           type,
-          ident,
+          ident: finalIdent,
           allColumns,
           collectionId,
           identifier,
           blockIdentifier,
           cacheDuration,
           noPagination,
+          filterBy: filterByArray,
         }),
         BlockService.getLastBlock(),
         this.getXcpAssetsWithInMemoryCache(),
@@ -213,7 +241,7 @@ export class StampController {
       }
 
       const updatedStamps = await Promise.all(
-        stampResult.stamps.map(async (stamp) => {
+        stampResult.stamps.map(async (stamp: StampRow) => {
           const xcpAsset = xcpAssets.find((asset) =>
             asset.asset === stamp.cpid
           );
@@ -251,18 +279,13 @@ export class StampController {
         }),
       );
 
-      let stamps = updatedStamps;
-      if (sortBy !== "none" || filterBy.length > 0) {
-        stamps = sortData(filterData(stamps, filterBy), sortBy, orderBy);
-      }
-
       return {
         page: stampResult.page,
         limit: stampResult.page_size,
         totalPages: stampResult.pages,
         total: stampResult.total,
         last_block: lastBlock,
-        data: stamps,
+        data: updatedStamps,
       };
     } catch (error) {
       console.error("Error in getStamps:", error);
@@ -321,7 +344,7 @@ export class StampController {
         const serviceResult = await StampService.getStamps({
           page: 1,
           limit: category.limit,
-          sort_order: "desc",
+          sortBy: "desc",
           type: "stamps",
           ident: category.types as SUBPROTOCOLS[],
           noPagination: false,

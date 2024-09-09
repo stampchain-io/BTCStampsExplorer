@@ -10,14 +10,6 @@ export function StampContent(
     stamps: StampRow[];
   },
 ) {
-  // useEffect(() => {
-  //   if (stamps.length > 0) {
-  //     console.log("updated!!!!", stamps.length, stamps.at(0));
-
-  //     setContent([...filterData(sortData(stamps, sortOption), filterOption)]);
-  //   }
-  // }, [sortOption, filterOption]);
-
   return (
     <div name="stamps">
       <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2 md:gap-4 xl:gap-6 py-6 transition-opacity duration-700 ease-in-out">

@@ -24,9 +24,9 @@ export const sharedStampIndexHandler = (
       const result = await StampController.getStamps({
         page,
         limit,
-        orderBy: sort_order.toUpperCase(),
+        sortBy: sort_order,
         type: stampType,
-        all_columns: true,
+        allColumns: true,
       });
 
       return ResponseUtil.success(
