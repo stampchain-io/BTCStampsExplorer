@@ -1,5 +1,5 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
+import dayjs from "dayjs/";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 import Stamp from "../stampDetails/StampImage.tsx";
 import { StampKind } from "$components/StampKind.tsx";

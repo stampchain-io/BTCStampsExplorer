@@ -1,6 +1,6 @@
 import type { Signal } from "@preact/signals";
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
+import dayjs from "dayjs/";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 import { abbreviateAddress } from "$lib/utils/util.ts";
 import { BlockRow } from "globals";

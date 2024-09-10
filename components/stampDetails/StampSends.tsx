@@ -1,5 +1,5 @@
 import { abbreviateAddress } from "$lib/utils/util.ts";
-import dayjs from "$dayjs/";
+import dayjs from "dayjs/";
 import { SendRow } from "globals";
 
 /**
