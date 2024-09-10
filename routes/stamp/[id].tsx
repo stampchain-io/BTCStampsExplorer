@@ -15,6 +15,7 @@ import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
 import { CollectionService } from "$lib/services/collectionService.ts";
+import { ArtistCollection } from "$islands/collection/ArtistCollection.tsx";
 
 interface StampDetailPageProps {
   data: {
@@ -26,7 +27,7 @@ interface StampDetailPageProps {
     holders: any;
     vaults: any;
     last_block: number;
-    stamps_recent: StampRow[];
+    stamps_recent: any;
     collections: CollectionRow[];
   };
 }
@@ -39,6 +40,7 @@ interface StampData {
   dispenses: any;
   holders: any;
   last_block: number;
+  stamps_recent: any;
   collections: CollectionRow[];
 }
 
@@ -48,7 +50,8 @@ export const handler: Handlers<StampData> = {
       const url = new URL(_req.url);
       const { id } = ctx.params;
       const stampData = await StampController.getStampDetailsById(id);
-      const result = await StampController.getRecentSales();
+      const result = await StampController.getRecentSales(1, 6);
+      console.log("result: ", result);
 
       if (!stampData) {
         return new Response("Stamp not found", { status: 404 });
@@ -73,7 +76,7 @@ export const handler: Handlers<StampData> = {
 
       return ctx.render({
         ...stampData.data,
-        ...result,
+        stamps_recent: result,
         collections,
         last_block: stampData.last_block,
       });
@@ -108,10 +111,12 @@ export default function StampPage(props: StampDetailPageProps) {
     {
       title: "RECENT SALES",
       type: "recent",
-      stamps: stamps_recent,
+      stamps: stamps_recent.data,
       layout: "row",
     },
   ];
+
+  console.log(sections);
 
   return (
     <>
@@ -129,7 +134,7 @@ export default function StampPage(props: StampDetailPageProps) {
 
       <div className={"flex flex-col gap-10 md:gap-20 xl:gap-50"}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
-          <div class="flex flex-col gap-8 justify-between">
+          <div class="flex flex-col gap-8 justify-between items-center">
             <StampImage
               stamp={stamp}
               className="w-[calc(100%-80px)] md:w-full"
@@ -149,17 +154,19 @@ export default function StampPage(props: StampDetailPageProps) {
           dispensesWithRates={dispensesWithRates}
         />
 
-        {
-          /* <div>
-          <h1 class="text-3xl md:text-7xl text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+        <div>
+          <h1 class="text-3xl md:text-7xl text-left bg-clip-text text-transparent bg-gradient-to-r from-[#666666] via-[#999999] to-[#CCCCCC] font-black mb-2">
             ARTIST COLLECTIONS
           </h1>
+          <ArtistCollection />
+          <p className="font-extralight text-2xl md:text-5xl text-[#CCCCCC] mb-9">
+            OTHER COLLECTIONS
+          </p>
           <CollectionList collections={collections} />
-        </div> */
-        }
+        </div>
 
         <div>
-          <h1 class="text-3xl md:text-7xl text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+          <h1 class="text-3xl md:text-7xl text-left mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
             LATEST STAMPS
           </h1>
           <div class="flex flex-col gap-12">

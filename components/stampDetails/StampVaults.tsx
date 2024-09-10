@@ -40,16 +40,18 @@ export function StampVaults(
               <tr
                 key={index}
               >
-                <td className="pr-6 py-4">
+                <td className="pr-3 md:pr-6 py-2 md:py-4">
                   {abbreviateAddress(vault.source)}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-3 md:px-6 py-2 md:py-4">
                   {abbreviateAddress(vault.destination)}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {vault.dispense_quantity}
                 </td>
-                <td className="pl-6 py-4 text-sm">{vault.satoshirate}</td>
+                <td className="pl-3 md:pl-6 py-2 md:py-4 text-sm">
+                  {vault.satoshirate}
+                </td>
               </tr>
             ))}
           </tbody>

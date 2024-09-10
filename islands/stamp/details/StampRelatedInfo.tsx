@@ -21,46 +21,56 @@ export function StampRelatedInfo(
   }, [selectedTab]);
 
   return (
-    <div class="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
+    <div class="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6">
       <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E] overflow-y-auto">
-        <div class="flex gap-6 md:gap-8 items-end">
+        <div class="flex gap-4 md:gap-8 items-end">
           <p
-            class={selectedTab === "dispensers"
-              ? "text-[19px] text-[#8800CC] font-bold cursor-pointer pb-4 border-b-4 border-b-[#8800CC]"
-              : "text-[19px] text-[#8800cc] cursor-pointer pb-4"}
+            class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
+              selectedTab === "dispensers"
+                ? "font-bold border-b-4 border-b-[#8800CC]"
+                : ""
+            }`}
             onClick={() => setSelectedTab("dispensers")}
           >
             Dispensers
           </p>
           <p
-            class={selectedTab === "sales"
-              ? "text-[19px] text-[#8800CC] font-bold cursor-pointer pb-4 border-b-4 border-b-[#8800CC]"
-              : "text-[19px] text-[#8800cc] cursor-pointer pb-4"}
+            class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
+              selectedTab === "sales"
+                ? "font-bold border-b-4 border-b-[#8800CC]"
+                : ""
+            }`}
             onClick={() => setSelectedTab("sales")}
           >
             Sales
           </p>
           <p
-            class={selectedTab === "holders"
-              ? "text-[19px] text-[#8800CC] font-bold cursor-pointer pb-4 border-b-4 border-b-[#8800CC]"
-              : "text-[19px] text-[#8800cc] cursor-pointer pb-4"}
+            class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
+              selectedTab === "holders"
+                ? "font-bold border-b-4 border-b-[#8800CC]"
+                : ""
+            }`}
             onClick={() => setSelectedTab("holders")}
           >
             Holders
           </p>
 
           <p
-            class={selectedTab === "transfers"
-              ? "text-[19px] text-[#8800CC] font-bold cursor-pointer pb-4 border-b-4 border-b-[#8800CC]"
-              : "text-[19px] text-[#8800cc] cursor-pointer pb-4"}
+            class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
+              selectedTab === "transfers"
+                ? "font-bold border-b-4 border-b-[#8800CC]"
+                : ""
+            }`}
             onClick={() => setSelectedTab("transfers")}
           >
             Transfers
           </p>
           <p
-            class={selectedTab === "vaults"
-              ? "text-[19px] text-[#8800CC] font-bold cursor-pointer pb-4 border-b-4 border-b-[#8800CC]"
-              : "text-[19px] text-[#8800cc] cursor-pointer pb-4"}
+            class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
+              selectedTab === "vaults"
+                ? "font-bold border-b-4 border-b-[#8800CC]"
+                : ""
+            }`}
             onClick={() => setSelectedTab("vaults")}
           >
             Vaults
