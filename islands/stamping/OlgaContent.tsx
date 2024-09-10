@@ -5,13 +5,13 @@ import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
+import { fetchBTCPrice } from "$lib/utils/btc.ts";
 
 const log = (message: string, data?: any) => {
   console.log(`[OlgaContent] ${message}`, data ? data : "");
 };
 
 export function OlgaContent() {
-  console.log("OlgaContent component rendered");
   const config = useConfig();
 
   if (!config) {
@@ -56,7 +56,7 @@ export function OlgaContent() {
 
   useEffect(() => {
     if (fees && !loading) {
-      const recommendedFee = Math.round(fees.recomendedFee);
+      const recommendedFee = Math.round(fees.recommendedFee);
       setFee(recommendedFee);
     }
   }, [fees, loading]);
@@ -67,37 +67,17 @@ export function OlgaContent() {
   }, []);
 
   useEffect(() => {
-    fetchBTCPrice();
+    const fetchPrice = async () => {
+      const price = await fetchBTCPrice();
+      setBTCPrice(price);
+    };
+    fetchPrice();
   }, []);
 
   useEffect(() => {
     // Set the checkbox to checked by default
     setIsLocked(true);
   }, []);
-
-  const fetchBTCPrice = async () => {
-    try {
-      const response = await fetch(
-        "/quicknode/getPrice",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: "cg_simplePrice",
-            params: ["bitcoin", "usd", true, true, true],
-          }),
-        },
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const { price } = await response.json();
-      setBTCPrice(price);
-    } catch (error) {
-      console.error("Error fetching BTC price:", error);
-      // You might want to set a default price or show an error message to the user
-    }
-  };
 
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
@@ -199,8 +179,8 @@ export function OlgaContent() {
           filename: file.name,
           file: data,
           satsPerKB: fee,
-          service_fee: config.MINTING_SERVICE_FEE,
-          service_fee_address: config.MINTING_SERVICE_FEE_ADDRESS,
+          service_fee: config?.MINTING_SERVICE_FEE,
+          service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
         };
 
         // Add assetName to mintRequest if Posh Stamp is selected and a name is entered
@@ -233,7 +213,9 @@ export function OlgaContent() {
         );
 
         // Use txDetails to determine which inputs to sign
-        const inputsToSign = txDetails.map((input) => ({
+        const inputsToSign = txDetails.map((
+          input: { signingIndex: number },
+        ) => ({
           address: walletContext.wallet.value.address,
           signingIndexes: [input.signingIndex],
         }));
@@ -425,7 +407,8 @@ export function OlgaContent() {
               id="lockEditions"
               name="lockEditions"
               checked={isLocked}
-              onChange={(e) => setIsLocked(e.target.checked)}
+              onChange={(e: Event) =>
+                setIsLocked((e.target as HTMLInputElement).checked)}
               className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
             />
             <label
@@ -441,7 +424,8 @@ export function OlgaContent() {
               id="poshStamp"
               name="poshStamp"
               checked={isPoshStamp}
-              onChange={(e) => setIsPoshStamp(e.target.checked)}
+              onChange={(e: Event) =>
+                setIsPoshStamp((e.target as HTMLInputElement).checked)}
               className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
             />
             <label
@@ -541,8 +525,8 @@ export function OlgaContent() {
         handleChangeFee={handleChangeFee}
         type="stamp"
         fileType={file?.type}
-        fileSize={fileSize}
-        issuance={issuance}
+        fileSize={fileSize ?? undefined}
+        issuance={parseInt(issuance, 10)}
         BTCPrice={BTCPrice}
         onRefresh={fetchFees}
       />

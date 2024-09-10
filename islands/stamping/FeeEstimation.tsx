@@ -38,7 +38,7 @@ export function FeeEstimation({
 
   useEffect(() => {
     if (fees && !loading) {
-      const recommendedFee = Math.round(fees.recomendedFee);
+      const recommendedFee = Math.round(fees.recommendedFee);
       handleChangeFee(recommendedFee);
     }
   }, [fees, loading]);
@@ -116,7 +116,7 @@ export function FeeEstimation({
             EFFECTIVE FEE RATE: {fee} sat/vB
           </span>
           <span class={"text-[#F5F5F5] hidden md:block"}>
-            RECOMMENDED: {fees && fees.recomendedFee} sat/vB
+            RECOMMENDED: {fees && fees.recommendedFee} sat/vB
           </span>
         </div>
         <div class="relative">
@@ -139,7 +139,7 @@ export function FeeEstimation({
         </div>
         <div class="justify-end flex md:hidden">
           <span class={"text-[#F5F5F5]"}>
-            RECOMMENDED: {fees && fees.recomendedFee} sat/vB
+            RECOMMENDED: {fees && fees.recommendedFee} sat/vB
           </span>
         </div>
       </div>
