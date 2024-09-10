@@ -5,7 +5,7 @@ export const HomeGetStamping = () => {
     >
       <div>
         <p
-          className={"italic font-black text-4xl md:text-7xl flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-center md:text-left"}
+          className={"italic font-black text-4xl md:text-7xl flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-left"}
         >
           GET STAMPING
           <span

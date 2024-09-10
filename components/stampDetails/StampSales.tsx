@@ -51,22 +51,22 @@ export function StampSales(
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:rounded-lg">
           <thead className="text-lg font-semibold uppercase">
             <tr>
-              <th scope="col" className="pr-6 py-3">
+              <th scope="col" className="pr-3 md:pr-6 py-1 md:py-3">
                 From
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 To
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Qty
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Price (BTC)
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Confirmed
               </th>
-              <th scope="col" className="pl-6 py-3">
+              <th scope="col" className="pl-3 md:pl-6 py-1 md:py-3">
                 Close Block
               </th>
             </tr>
@@ -76,30 +76,30 @@ export function StampSales(
               <tr
                 key={index}
               >
-                <td className="pr-6 py-4">
+                <td className="pr-3 md:pr-6 py-2 md:py-4">
                   <a
                     href={`/wallet/${dispense.source}`}
                   >
                     {abbreviateAddress(dispense.source)}
                   </a>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-3 md:px-6 py-2 md:py-4">
                   <a
                     href={`/wallet/${dispense.destination}`}
                   >
                     {abbreviateAddress(dispense.destination)}
                   </a>
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {dispense.dispense_quantity}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {formatSatoshisToBTC(dispense.satoshirate)}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {dispense.confirmed ? "Yes" : "No"}
                 </td>
-                <td className="pl-6 py-4 text-sm">
+                <td className="pl-3 md:pl-6 py-2 md:py-4 text-sm">
                   {dispense.close_block_index}
                 </td>
               </tr>

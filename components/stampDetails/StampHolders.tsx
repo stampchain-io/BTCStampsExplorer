@@ -38,10 +38,10 @@ export function StampHolders(
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:rounded-lg">
           <thead className="text-lg font-semibold uppercase">
             <tr>
-              <th scope="col" className="pr-6 py-3">
+              <th scope="col" className="pr-3 md:pr-6 py-1 md:py-3">
                 Address
               </th>
-              <th scope="col" className="pl-6 py-3">
+              <th scope="col" className="pl-3 md:pl-6 py-1 md:py-3">
                 Qty
               </th>
             </tr>
@@ -51,10 +51,12 @@ export function StampHolders(
               <tr
                 key={holder.address}
               >
-                <td className="pr-6 py-4">
+                <td className="pr-3 md:pr-6 py-2 md:py-4">
                   {abbreviateAddress(holder.address)}
                 </td>
-                <td className="pl-6 py-4 text-sm">{holder.quantity}</td>
+                <td className="pl-3 md:pl-6 py-2 md:py-4 text-sm">
+                  {holder.quantity}
+                </td>
               </tr>
             ))}
           </tbody>
