@@ -1,5 +1,5 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
+import dayjs from "dayjs/";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 
@@ -12,13 +12,6 @@ import {
 
 dayjs.extend(relativeTime);
 
-/**
- * Renders a stamp card component.
- * @param stamp - The stamp row data.
- * @param kind - The kind of stamp card (cursed, stamp, named).
- * @param isRecentSale - Whether this card is being displayed in the recent sales context.
- * @returns The stamp card component.
- */
 export function StampCard({
   stamp,
   kind = "stamp",
@@ -121,12 +114,12 @@ export function StampCard({
                     ? (
                       `${getSupply(stamp.balance, stamp.divisible)}/${
                         stamp.supply < 100000 && !stamp.divisible
-                          ? getSupply(stamp.supply, stamp.divisible)
+                          ? getSupply(stamp.supply, !!stamp.divisible)
                           : "+100000"
                       }`
                     )
                     : (
-                      `1/${getSupply(stamp.supply, stamp.divisible)}`
+                      `1/${getSupply(stamp.supply, !!stamp.divisible)}`
                     )}
                 </p>
               </div>
