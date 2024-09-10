@@ -3,6 +3,8 @@ import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { useFeePolling } from "hooks/useFeePolling.tsx";
+import { fetchBTCPrice } from "$lib/utils/btc.ts";
 
 export function TransferContent() {
   const { config, isLoading } = useConfig();
@@ -18,9 +20,27 @@ export function TransferContent() {
   const [toAddress, setToAddress] = useState<string>("");
   const [token, setToken] = useState<string>("");
   const [fee, setFee] = useState<number>(780);
+  const [BTCPrice, setBTCPrice] = useState<number>(60000);
 
   const { wallet, isConnected } = walletContext;
   const { address } = wallet.value;
+
+  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
+
+  useEffect(() => {
+    if (fees && !loading) {
+      const recommendedFee = Math.round(fees.recommendedFee);
+      setFee(recommendedFee);
+    }
+  }, [fees, loading]);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      const price = await fetchBTCPrice();
+      setBTCPrice(price);
+    };
+    fetchPrice();
+  }, []);
 
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
@@ -84,6 +104,9 @@ export function TransferContent() {
         fee={fee}
         handleChangeFee={handleChangeFee}
         type="src20-transfer"
+        BTCPrice={BTCPrice}
+        onRefresh={fetchFees}
+        recommendedFee={fees?.recommendedFee}
       />
 
       <div

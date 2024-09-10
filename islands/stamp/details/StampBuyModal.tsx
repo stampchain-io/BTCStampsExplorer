@@ -89,7 +89,7 @@ const StampBuyModal = (
                 />
               </div>
               <span class="justify-end flex w-full text-[#F5F5F5] text-sm">
-                RECOMMENDED: {fees && fees.recomendedFee} sat/vB
+                RECOMMENDED: {fees && fees.recommendedFee} sat/vB
               </span>
             </div>
 

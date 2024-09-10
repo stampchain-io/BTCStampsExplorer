@@ -3,7 +3,10 @@ export const getBtcBalance = async (address: string) => {
     `https://mempool.space/api/address/${address}/utxo`,
   );
   const utxosJson = await utxos.json();
-  const balance = utxosJson.reduce((acc, utxo) => acc + utxo.value, 0);
+  const balance = utxosJson.reduce(
+    (acc: number, utxo: { value: number }) => acc + utxo.value,
+    0,
+  );
   return balance / 100000000;
 };
 
@@ -73,5 +76,29 @@ export async function getBtcAddressInfo(address: string) {
       console.error("Error fetching from QuickNode:", quickNodeError);
       throw new Error("Failed to fetch BTC address info from both sources");
     }
+  }
+}
+
+export async function fetchBTCPrice(): Promise<number> {
+  try {
+    const response = await fetch(
+      "/quicknode/getPrice",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "cg_simplePrice",
+          params: ["bitcoin", "usd", true, true, true],
+        }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const { price } = await response.json();
+    return price;
+  } catch (error) {
+    console.error("Error fetching BTC price:", error);
+    return 0; // Return a default value or throw an error based on your error handling strategy
   }
 }

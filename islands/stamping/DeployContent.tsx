@@ -1,8 +1,10 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "store/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { useFeePolling } from "hooks/useFeePolling.tsx";
+import { fetchBTCPrice } from "$lib/utils/btc.ts";
 
 export function DeployContent() {
   const { config, isLoading } = useConfig();
@@ -18,12 +20,67 @@ export function DeployContent() {
   const { wallet, isConnected } = walletContext;
   const { address } = wallet.value;
 
-  const [toAddress, setToAddress] = useState<string>("");
   const [token, setToken] = useState<string>("");
-  const [limitPerMint, setLimitPerMint] = useState<number>(0);
-  const [maxCirculation, setMaxCirculation] = useState<number>(0);
+  const [limitPerMint, setLimitPerMint] = useState<string>("");
+  const [maxCirculation, setMaxCirculation] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [fee, setFee] = useState<number>(780);
+
+  const [BTCPrice, setBTCPrice] = useState<number>(60000);
+  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
+
+  useEffect(() => {
+    if (fees && !loading) {
+      const recommendedFee = Math.round(fees.recommendedFee);
+      setFee(recommendedFee);
+    }
+  }, [fees, loading]);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      const price = await fetchBTCPrice();
+      setBTCPrice(price);
+    };
+    fetchPrice();
+  }, []);
+
+  const handleTokenChange = (e: Event) => {
+    const input = (e.target as HTMLInputElement).value.toUpperCase();
+    setToken(input.slice(0, 5));
+  };
+
+  const handleIntegerInput = (
+    value: string,
+    setter: (value: string) => void,
+    isMaxCirculation: boolean = false,
+  ) => {
+    // Remove any non-digit characters
+    const sanitizedValue = value.replace(/\D/g, "");
+
+    // Check if the value is within uint64 range
+    if (sanitizedValue === "") {
+      setter("");
+      setError("");
+    } else {
+      const bigIntValue = BigInt(sanitizedValue);
+      const maxUint64 = BigInt("18446744073709551615"); // 2^64 - 1
+      if (bigIntValue <= maxUint64) {
+        setter(sanitizedValue);
+
+        // Additional check for max circulation
+        if (isMaxCirculation) {
+          const limitPerMintValue = BigInt(limitPerMint || "0");
+          if (bigIntValue <= limitPerMintValue) {
+            setError("Max Circulation must be greater than Limit Per Mint");
+          } else {
+            setError("");
+          }
+        }
+      } else {
+        setter(maxUint64.toString());
+      }
+    }
+  };
 
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
@@ -62,7 +119,7 @@ export function DeployContent() {
 
     axiod
       .post(`${config.API_BASE_URL}/src20/create`, {
-        toAddress: toAddress,
+        toAddress: address,
         changeAddress: address,
         op: "deploy",
         tick: token,
@@ -76,6 +133,8 @@ export function DeployContent() {
       })
       .catch((error) => console.log(error));
   };
+
+  const [error, setError] = useState<string>("");
 
   return (
     <div class={"flex flex-col w-full items-center gap-8"}>
@@ -136,9 +195,10 @@ export function DeployContent() {
           <input
             type="text"
             class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Case Sensitive"
+            placeholder="Max 5 Chars"
             value={token}
-            onChange={(e: any) => setToken(e.target.value)}
+            onChange={handleTokenChange}
+            maxLength={5}
           />
         </div>
         <div class="w-full">
@@ -146,11 +206,17 @@ export function DeployContent() {
             Limit Per Mint
           </p>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-            placeholder="Positive Integer"
+            placeholder="Positive Integer (max uint64)"
             value={limitPerMint}
-            onChange={(e: any) => setLimitPerMint(e.target.value)}
+            onChange={(e: Event) =>
+              handleIntegerInput(
+                (e.target as HTMLInputElement).value,
+                setLimitPerMint,
+              )}
           />
         </div>
       </div>
@@ -160,12 +226,20 @@ export function DeployContent() {
           Max Circulation
         </p>
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-          placeholder="Positive Integer"
+          placeholder="Positive Integer (max uint64)"
           value={maxCirculation}
-          onChange={(e: any) => setMaxCirculation(e.target.value)}
+          onChange={(e: Event) =>
+            handleIntegerInput(
+              (e.target as HTMLInputElement).value,
+              setMaxCirculation,
+              true,
+            )}
         />
+        {error && <p class="text-red-500 mt-2">{error}</p>}
       </div>
 
       <FeeEstimation
@@ -175,6 +249,8 @@ export function DeployContent() {
         fileType={file?.type}
         fileSize={file?.size}
         issuance={1}
+        BTCPrice={BTCPrice}
+        onRefresh={fetchFees}
       />
 
       <div
