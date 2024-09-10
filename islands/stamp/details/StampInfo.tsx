@@ -98,19 +98,19 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
         <div
           className={"flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6"}
         >
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1">
+          <div class="flex justify-between items-center flex-col md:items-start gap-1">
             <p class="text-[#660099] font-light uppercase">TYPE</p>
             <p class="text-[#999999] uppercase">
               {stamp.locked ?? false ? "Yes" : "No"}
             </p>
           </div>
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-center gap-1">
+          <div class="flex justify-between items-center flex-col md:items-center gap-1">
             <p class="text-[#660099] font-light uppercase">DIMENSIONS</p>
             <p class="text-[#999999] uppercase">
               {stamp.divisible ? "Yes" : "No"}
             </p>
           </div>
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-end gap-1">
+          <div class="flex justify-between items-center flex-col md:items-end gap-1">
             <p class="text-[#660099] font-light uppercase">SIZE</p>
             <p class="text-[#999999] uppercase">
               {stamp.keyburn ?? false ? "Yes" : "No"}
@@ -121,19 +121,19 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
         <div
           className={"flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6"}
         >
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1">
+          <div class="flex justify-between items-center flex-col md:items-start gap-1">
             <p class="text-[#660099] font-light uppercase">Locked</p>
             <p class="text-[#999999] uppercase">
               {stamp.locked ?? false ? "Yes" : "No"}
             </p>
           </div>
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-center gap-1">
+          <div class="flex justify-between items-center flex-col md:items-center gap-1">
             <p class="text-[#660099] font-light uppercase">Divisible</p>
             <p class="text-[#999999] uppercase">
               {stamp.divisible ? "Yes" : "No"}
             </p>
           </div>
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-end gap-1">
+          <div class="flex justify-between items-center flex-col md:items-end gap-1">
             <p class="text-[#660099] font-light uppercase">Keyburned</p>
             <p class="text-[#999999] uppercase">
               {stamp.keyburn ?? false ? "Yes" : "No"}
@@ -145,14 +145,14 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-7"}
         >
           <div className={"flex justify-between"}>
-            <div class="flex flex-row md:flex-col justify-between items-start gap-1">
+            <div class="flex flex-col justify-between items-start gap-1">
               <p class="text-lg font-light text-[#660099] uppercase">Created</p>
               <p class="text-[#999999]">
                 {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
               </p>
             </div>
 
-            <div class="flex flex-row justify-between items-center md:flex-col md:items-end gap-1">
+            <div class="flex justify-between items-center flex-col md:items-end gap-1">
               <p class="text-lg font-light text-[#660099] uppercase">Block #</p>
               <a
                 href={`/block/${stamp.block_index}`}

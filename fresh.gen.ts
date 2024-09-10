@@ -92,6 +92,7 @@ import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHe
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
+import * as $collection_ArtistCollection from "./islands/collection/ArtistCollection.tsx";
 import * as $collection_CollectionCreateButton from "./islands/collection/CollectionCreateButton.tsx";
 import * as $collection_CollectionDetailsContent from "./islands/collection/CollectionDetailsContent.tsx";
 import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
@@ -241,6 +242,7 @@ const manifest = {
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
+    "./islands/collection/ArtistCollection.tsx": $collection_ArtistCollection,
     "./islands/collection/CollectionCreateButton.tsx":
       $collection_CollectionCreateButton,
     "./islands/collection/CollectionDetailsContent.tsx":

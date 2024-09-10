@@ -55,27 +55,27 @@ export function StampDispensers(
       }
       <div className="max-h-96 overflow-x-auto">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:rounded-lg">
-          <thead className="text-lg font-semibold uppercase">
+          <thead className="text-sm md:text-lg font-semibold uppercase">
             <tr>
-              <th scope="col" className="pr-6 py-3">
+              <th scope="col" className="pr-3 md:pr-6 py-1 md:py-3">
                 Address
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Escrow Qty
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Give Qty
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Remaining
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Price (BTC)
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Confirmed
               </th>
-              <th scope="col" className="pl-6 py-3">
+              <th scope="col" className="pl-3 md:pl-6 py-1 md:py-3">
                 Close Block
               </th>
             </tr>
@@ -85,27 +85,27 @@ export function StampDispensers(
               <tr
                 key={dispenser.source}
               >
-                <td className="pr-6 py-4">
+                <td className="pr-3 md:pr-6 py-2 md:py-4">
                   {/* TODO: this should popup perhaps with a barcode (or construct a trx for the wallet) similar to https://tokenscan.io/tx/0b4f6ad4eb97760cdd6bd70cc533f04030411f9fa13241ca2da53af32de0e121 */}
                   {dispenser.source}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {dispenser.escrow_quantity}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {dispenser.give_quantity}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {dispenser.give_remaining}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {/* TODO: display USD price as well */}
                   {formatSatoshisToBTC(dispenser.satoshirate)}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
                   {dispenser.confirmed ? "Yes" : "No"}
                 </td>
-                <td className="pl-6 py-4 text-sm">
+                <td className="pl-3 md:pl-6 py-2 md:py-4 text-sm">
                   {dispenser.close_block_index}
                 </td>
               </tr>
