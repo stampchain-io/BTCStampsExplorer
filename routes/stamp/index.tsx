@@ -21,38 +21,44 @@ export const handler: Handlers = {
         (url.searchParams.get("type") || "all") as STAMP_TYPES;
       const page = parseInt(url.searchParams.get("page") || "1");
       const page_size = parseInt(url.searchParams.get("limit") || "24");
+      const recentSales = url.searchParams.get("recentSales") === "true";
 
-      const ident: SUBPROTOCOLS[] = [];
-      let collectionId;
+      let result;
+      if (recentSales) {
+        result = await StampController.getRecentSales(page, page_size);
+      } else {
+        const ident: SUBPROTOCOLS[] = [];
+        let collectionId;
 
-      if (selectedTab === "posh") {
-        const poshCollection = await CollectionService.getCollectionByName(
-          "posh",
-        );
-        if (poshCollection) {
-          collectionId = poshCollection.collection_id;
-        } else {
-          throw new Error("Posh collection not found");
+        if (selectedTab === "posh") {
+          const poshCollection = await CollectionService.getCollectionByName(
+            "posh",
+          );
+          if (poshCollection) {
+            collectionId = poshCollection.collection_id;
+          } else {
+            throw new Error("Posh collection not found");
+          }
         }
+
+        result = await StampController.getStamps({
+          page,
+          limit: page_size,
+          sortBy: sortBy as "DESC" | "ASC",
+          type: selectedTab,
+          filterBy,
+          ident,
+          collectionId,
+        });
       }
 
-      const result = await StampController.getStamps({
-        page,
-        limit: page_size,
-        sortBy: sortBy as "DESC" | "ASC",
-        type: selectedTab,
-        filterBy,
-        ident,
-        collectionId,
-      });
-
-      const { data: stamps, ...restResult } = result;
+      const { data: stamps = [], ...restResult } = result;
       const data = {
         ...restResult,
-        stamps,
+        stamps: Array.isArray(stamps) ? stamps : [],
         filterBy,
         sortBy,
-        selectedTab,
+        selectedTab: recentSales ? "recent_sales" : selectedTab,
         page,
         limit: page_size,
       };
@@ -75,6 +81,10 @@ export function StampPage(props: StampPageProps) {
     selectedTab,
   } = props.data;
 
+  // Ensure stamps is an array
+  const stampsArray = Array.isArray(stamps) ? stamps : [];
+  const isRecentSales = selectedTab === "recent_sales";
+
   return (
     <div class="w-full flex flex-col items-center">
       <StampHeader
@@ -84,14 +94,15 @@ export function StampPage(props: StampPageProps) {
         type={selectedTab}
       />
       <StampContent
-        stamps={stamps}
+        stamps={stampsArray}
+        isRecentSales={isRecentSales}
       />
       <Pagination
         page={page}
         pages={totalPages}
         page_size={limit}
         type={selectedTab}
-        data_length={stamps.length}
+        data_length={stampsArray.length}
       />
     </div>
   );

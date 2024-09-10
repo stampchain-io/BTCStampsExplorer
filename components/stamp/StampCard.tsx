@@ -5,6 +5,7 @@ import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 
 import {
   abbreviateAddress,
+  formatSatoshisToBTC,
   getFileSuffixFromMime,
   getSupply,
 } from "utils/util.ts";
@@ -15,14 +16,19 @@ dayjs.extend(relativeTime);
  * Renders a stamp card component.
  * @param stamp - The stamp row data.
  * @param kind - The kind of stamp card (cursed, stamp, named).
+ * @param isRecentSale - Whether this card is being displayed in the recent sales context.
  * @returns The stamp card component.
  */
 export function StampCard({
   stamp,
   kind = "stamp",
+  isRecentSale = false,
 }: {
-  stamp: StampRow;
+  stamp: StampRow & {
+    sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
+  };
   kind: "cursed" | "stamp" | "named";
+  isRecentSale?: boolean;
 }) {
   let src: string;
   const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
@@ -59,6 +65,16 @@ export function StampCard({
     }
   };
 
+  const renderPrice = () => {
+    if (isRecentSale && stamp.sale_data) {
+      return `${formatSatoshisToBTC(stamp.sale_data.btc_amount)} BTC`;
+    } else if (Number.isFinite(stamp.floorPrice)) {
+      return `${stamp.floorPrice} BTC`;
+    } else {
+      return "priceless";
+    }
+  };
+
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
@@ -92,9 +108,7 @@ export function StampCard({
                 : abbreviateAddress(stamp.creator, 6)}
             </h3>
             <h3 className="truncate text-[13px] text-[#C7C5C5]">
-              {Number.isFinite(stamp.floorPrice)
-                ? `${stamp.floorPrice} BTC`
-                : "priceless"}
+              {renderPrice()}
             </h3>
           </div>
         </div>
