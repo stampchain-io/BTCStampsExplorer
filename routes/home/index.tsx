@@ -12,19 +12,12 @@ import { StampController } from "$lib/controller/stampController.ts";
 
 type HomePageProps = {
   data: {
-    stamps_recent: StampRow[];
+    stamps_recent: { recentSales: StampRow[] };
     stamps_src721: StampRow[];
     stamps_art: StampRow[];
     stamps_src20: StampRow[];
     stamps_posh: StampRow[];
-    stamps: StampRow[];
-    page_stamp: number;
-    pages_stamp: number;
-    page_size_stamp: number;
-    filterBy: any[];
-    sortBy: string;
     src20s: any[];
-    type: string;
   };
 };
 
@@ -32,7 +25,6 @@ export const handler: Handlers = {
   async GET(_req: Request, ctx) {
     try {
       const result = await StampController.getHomePageData();
-
       return ctx.render(result);
     } catch (error) {
       console.error(error);
@@ -43,13 +35,13 @@ export const handler: Handlers = {
 
 export default function Home(props: HomePageProps) {
   const {
-    stamps_recent,
-    stamps_src721, // FIXME: need to filter only for Recursive type 721's
-    stamps_art,
-    stamps_src20,
-    stamps_posh,
-    src20s,
-  } = props.data;
+    stamps_recent = { recentSales: [] },
+    stamps_src721 = [], // FIXME: need to filter only for Recursive type 721's
+    stamps_art = [],
+    stamps_src20 = [],
+    stamps_posh = [],
+    src20s = [],
+  } = props.data || {};
 
   return (
     <div class="flex flex-col gap-10 md:gap-24 text-white py-10 md:py-24">
@@ -64,10 +56,10 @@ export default function Home(props: HomePageProps) {
         stamps_art={stamps_art}
         stamps_posh={stamps_posh}
         stamps_src721={stamps_src721}
-        stamps_recent={stamps_recent}
+        stamps_recent={stamps_recent.recentSales}
         stamps_src20={stamps_src20}
       />
-      {/* <HomeStampChainSelected />  // Leaving this out for initial release - Add later */} 
+      {/* <HomeStampChainSelected />  // Leaving this out for initial release - Add later */}
       <HomeGetStamping />
     </div>
   );

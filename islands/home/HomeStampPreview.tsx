@@ -23,13 +23,14 @@ export function HomeStampPreview({
       type: "recent",
       stamps: stamps_recent,
       layout: "row",
+      isRecentSales: true,
     },
   ];
 
   return (
     <div>
       <h1 class="text-3xl md:text-7xl text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
-        LATEST STAMPS
+        LATEST ART STAMPS
       </h1>
       <div class="flex flex-col gap-12">
         {sections.map((section) => (

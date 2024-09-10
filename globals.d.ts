@@ -47,6 +47,7 @@ export interface StampSectionProps {
   type: string;
   stamps: StampRow[];
   layout: "grid" | "row";
+  isRecentSales?: boolean;
 }
 
 export interface SRC20Row {

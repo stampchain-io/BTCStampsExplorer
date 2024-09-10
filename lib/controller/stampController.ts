@@ -293,6 +293,29 @@ export class StampController {
     }
   }
 
+  static async getRecentSales(page?: number, limit?: number) {
+    try {
+      const { recentSales, total } = await StampService.getRecentSales(
+        page,
+        limit,
+      );
+      const lastBlock = await BlockService.getLastBlock();
+      const totalPages = limit ? Math.ceil(total / limit) : 1;
+
+      return {
+        page: page || 1,
+        limit: limit || total,
+        totalPages,
+        total,
+        last_block: lastBlock,
+        data: recentSales,
+      };
+    } catch (error) {
+      console.error("Error in getRecentSales:", error);
+      throw error;
+    }
+  }
+
   static async getStamp(id: string) {
     try {
       const result = await StampService.getStamps({
@@ -359,19 +382,6 @@ export class StampController {
     );
 
     return results;
-  }
-
-  static async getRecentSales() {
-    try {
-      const recentSales = await StampService.getRecentSales(6);
-
-      return {
-        stamps_recent: recentSales,
-      };
-    } catch (error) {
-      console.error("Error in getHomePageData:", error);
-      throw error;
-    }
   }
 
   static async getHomePageData() {

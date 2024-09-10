@@ -198,7 +198,7 @@ export class StampService {
     }));
   }
 
-  static async getRecentSales(limit: number = 20) {
+  static async getRecentSales(page?: number, limit?: number) {
     // Fetch dispense events and extract unique asset values
     const dispenseEvents = await XcpManager.fetchDispenseEvents(500); // assuming we have 20 stamp sales in last 500 dispenses
     const uniqueAssets = [
@@ -215,7 +215,7 @@ export class StampService {
       stampDetails.stamps.map((stamp) => [stamp.cpid, stamp]),
     );
 
-    const recentSales = dispenseEvents
+    const allRecentSales = dispenseEvents
       .map((event) => {
         const stamp = stampDetailsMap.get(event.params.asset);
         if (!stamp) return null;
@@ -228,11 +228,19 @@ export class StampService {
           },
         };
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .sort((a, b) => b.sale_data.block_index - a.sale_data.block_index);
 
-    return recentSales
-      .sort((a, b) => b.sale_data.block_index - a.sale_data.block_index)
-      .slice(0, limit);
+    const total = allRecentSales.length;
+
+    if (page !== undefined && limit !== undefined) {
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedSales = allRecentSales.slice(startIndex, endIndex);
+      return { recentSales: paginatedSales, total };
+    }
+
+    return { recentSales: allRecentSales, total };
   }
 
   static async getCreatorNameByAddress(
