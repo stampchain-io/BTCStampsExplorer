@@ -40,10 +40,10 @@ export default function About() {
             SRC-20 STAMPS
           </h2>
           <p className={"text-sm md:text-lg font-medium"}>
-            A fungible token layer built around a fair mint system where users
-            only pay BTC miner fees. Modeled after BRC-20, but with the
-            immutability of Stamps. History: The first official SRC-20 Token
-            (KEVIN) was deployed by Reinamora in Block 788041.
+           SRC-20 is a fungible token protocol that directly embeds transactions on Bitcoin without relying on Counterparty, 
+            as of block 796,000. Modeled after BRC-20, this layer only incurs standard BTC miner fees and ensures the immutability of the data. 
+            The first official SRC-20 token (KEVIN) was deployed by Reinamora in Block 788041. 
+            It’s an evolution from proof-of-concept into a direct-to-Bitcoin protocol for efficiency and security.
           </p>
         </div>
 
@@ -52,10 +52,8 @@ export default function About() {
             SRC-721 STAMPS
           </h2>
           <p className={"text-sm md:text-lg font-medium"}>
-            A fungible token layer built around a fair mint system where users
-            only pay BTC miner fees. Modeled after BRC-20, but with the
-            immutability of Stamps. History: The first official SRC-20 Token
-            (KEVIN) was deployed by Reinamora in Block 788041.
+            SRC-721 is a fungible token system focused on low-cost minting of NFTs on Bitcoin. It supports layered storage, reducing minting costs by referencing on-chain data through JSON files and ensuring long-term immutability. 
+            The first SRC-721 token (KEVIN) was deployed in Block 788041, modeled after BRC-20 but optimized for efficiency and data integrity via the STAMPS protocol.
           </p>
         </div>
 
@@ -64,12 +62,9 @@ export default function About() {
             OLGA STAMPS
           </h2>
           <p className={"text-sm md:text-lg font-medium"}>
-            A new transaction format that eliminates the need for Base64
-            encoding, reducing the transaction footprint by 50%. This optimized
-            format reduces the costs of the initial OP_MULTISIG format by
-            approximately 60-70%, while maintaining all original functionality.
-            Almost all Classic Stamps after block 833000 are OLGA. History: The
-            first OLGA Stamp was created in Block 833000.
+            OLGA is a new encoding format within the Stamps protocol, which eliminates the need for Base64 encoding. 
+            It reduces the transaction size by up to 50% and the cost of minting by 60-70%, maintaining all original functionality. 
+            OLGA’s first implementation happened in Block 833000. It improves storage efficiency for images on the Bitcoin blockchain, enhancing accessibility and reducing fees.
           </p>
         </div>
 
@@ -78,8 +73,9 @@ export default function About() {
             SRC-721r STAMPS
           </h2>
           <p className={"text-sm md:text-lg font-medium"}>
-            The evolution of SRC-721, allowing for complex recursive images
-            created from JavaScript and other libraries stored on Stamps.
+            SRC-721r is an evolution of the SRC-721 standard, allowing for recursive NFT creation by leveraging multiple layers of images. 
+            This allows developers to build complex images with data stored across several transactions on Stamps. 
+            Its structure maximizes cost efficiency, making it suitable for larger, more detailed art collections.
           </p>
         </div>
 
@@ -88,9 +84,9 @@ export default function About() {
             SRC-101 STAMPS
           </h2>
           <p className={"text-sm md:text-lg font-medium"}>
-            A domain name system built on Bitcoin Stamps. Currently in
-            development. Since SATs don't exist, we Stamp on the UTXO set to
-            ensure immutability. It is impossible to inscribe a Stamp.
+          SRC-101 introduces a domain name system on Bitcoin Stamps, solving the challenge of UTXO-linked assets and ensuring immutability. 
+            Unlike regular UTXO-based assets, SRC-101 names are stamped directly onto the Bitcoin blockchain, allowing for permanent records tied to user addresses. 
+            The standard prevents unintentional spending by separating stamp assets from BTC holdings.
           </p>
         </div>
       </section>
