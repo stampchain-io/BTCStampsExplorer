@@ -2,6 +2,17 @@ import { StampNavigator } from "$islands/stamp/StampNavigator.tsx"; // FIXME: st
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
 
+interface TabInfo {
+  key: string;
+  label: string;
+}
+
+const tabs: TabInfo[] = [
+  { key: "all", label: "ALL" },
+  { key: "trending", label: "TRENDING" },
+  { key: "mints", label: "MINTS" },
+];
+
 export const SRC20Header = (
   { filterBy, sortBy, selectedTab }: {
     filterBy: any[];
@@ -23,30 +34,19 @@ export const SRC20Header = (
       </div>
       <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E]">
         <div class="flex gap-6 md:gap-8 items-end">
-          <p
-            class={selectedTab === "all"
-              ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-              : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-            onClick={() => setTypeOption("src20", "all")}
-          >
-            All
-          </p>
-          <p
-            class={selectedTab === "trending"
-              ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-              : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-            onClick={() => setTypeOption("src20", "trending")}
-          >
-            Trending
-          </p>
-          <p
-            class={selectedTab === "mints"
-              ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-              : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-            onClick={() => setTypeOption("src20", "mints")}
-          >
-            Mints
-          </p>
+          {tabs.map((tab) => (
+            <p
+              key={tab.key}
+              class={`text-[19px] cursor-pointer pb-4 ${
+                selectedTab === tab.key
+                  ? "text-[#7A00F5] font-semibold border-b-4 border-b-[#7A00F5]"
+                  : "text-[#B9B9B9]"
+              }`}
+              onClick={() => setTypeOption("src20", tab.key)}
+            >
+              {tab.label}
+            </p>
+          ))}
         </div>
         <div class="flex gap-6">
           <StampNavigator initFilter={filterBy} initSort={sortBy} />
