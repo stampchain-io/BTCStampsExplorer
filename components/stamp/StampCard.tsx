@@ -67,7 +67,7 @@ export function StampCard({
 
   const renderPrice = () => {
     if (isRecentSale && stamp.sale_data) {
-      return `${formatSatoshisToBTC(stamp.sale_data.btc_amount)} BTC`;
+      return `${formatSatoshisToBTC(stamp.sale_data.btc_amount)}`;
     } else if (Number.isFinite(stamp.floorPrice)) {
       return `${stamp.floorPrice} BTC`;
     } else {
