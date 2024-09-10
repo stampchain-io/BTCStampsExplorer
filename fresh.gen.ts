@@ -101,6 +101,7 @@ import * as $collection_CollectionList from "./islands/collection/CollectionList
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeGetStamping from "./islands/home/HomeGetStamping.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
+import * as $home_HomePartners from "./islands/home/HomePartners.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
@@ -109,6 +110,7 @@ import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
+import * as $src20_SRC20Filter from "./islands/src20/SRC20Filter.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
@@ -254,6 +256,7 @@ const manifest = {
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeGetStamping.tsx": $home_HomeGetStamping,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
+    "./islands/home/HomePartners.tsx": $home_HomePartners,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
@@ -262,6 +265,7 @@ const manifest = {
     "./islands/pagination/Pagination.tsx": $pagination_Pagination,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
+    "./islands/src20/SRC20Filter.tsx": $src20_SRC20Filter,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
