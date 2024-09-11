@@ -9,12 +9,14 @@ import { StampSearchClient } from "../islands/stamp/StampSearch.tsx";
 import { NavigatorProvider } from "$islands/Navigator/navigator.tsx";
 
 export default function App({ Component }: AppProps) {
+  const defaultTitle = "Bitcoin Stamps";
+
   return (
     <html lang="en">
       <Head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Bitcoin Stamps</title>
+        <title>{defaultTitle}</title>
         <meta
           name="description"
           content="Unprunable UTXO Art, Because Sats Don't Exist"
