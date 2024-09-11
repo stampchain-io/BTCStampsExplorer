@@ -30,5 +30,7 @@
   "cSpell.words": [
     "psbt",
     "utxos"
-  ]
+  ],
+  "pieces.cloudCapabilities": "Blended",
+  "pieces.telemetry": true
 }

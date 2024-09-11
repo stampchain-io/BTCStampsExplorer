@@ -1,0 +1,16 @@
+{
+  "name": "btcstampsexplorer",
+  "version": "1.0.0",
+  "description": "CHECK ENV VARS AND PLEAS ENSURE THE DB_USER ONLY HAS READ PERMISION",
+  "main": "swagger.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
