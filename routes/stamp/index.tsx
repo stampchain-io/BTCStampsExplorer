@@ -7,6 +7,8 @@ import { StampHeader } from "$islands/stamp/StampHeader.tsx";
 import { CollectionService } from "$lib/services/collectionService.ts";
 import { FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "globals";
 
+const MAX_PAGE_SIZE = 120;
+
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
     try {
@@ -20,7 +22,8 @@ export const handler: Handlers = {
       const selectedTab =
         (url.searchParams.get("type") || "all") as STAMP_TYPES;
       const page = parseInt(url.searchParams.get("page") || "1");
-      const page_size = parseInt(url.searchParams.get("limit") || "24");
+      const requestedPageSize = parseInt(url.searchParams.get("limit") || "24");
+      const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
       const recentSales = url.searchParams.get("recentSales") === "true";
 
       let result;
