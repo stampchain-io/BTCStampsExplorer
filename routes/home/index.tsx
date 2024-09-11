@@ -6,7 +6,7 @@ import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
 import { HomeStampChainSelected } from "$islands/home/HomeStampChainSelected.tsx";
-import { HomeGetStamping } from "$islands/home/HomeGetStamping.tsx";
+import { HomePartners } from "$islands/home/HomePartners.tsx";
 
 import { StampController } from "$lib/controller/stampController.ts";
 
@@ -60,7 +60,7 @@ export default function Home(props: HomePageProps) {
         stamps_src20={stamps_src20}
       />
       {/* <HomeStampChainSelected />  // Leaving this out for initial release - Add later */}
-      <HomeGetStamping />
+      <HomePartners />
     </div>
   );
 }
