@@ -16,7 +16,9 @@ interface SortItemProps {
   value: string;
 }
 
-const FilterItem = ({ title, onChange, value }: FilterItemProps) => (
+const FilterItem = (
+  { title, onChange, value }: FilterItemProps,
+) => (
   <div
     class="flex items-center cursor-pointer py-2 px-2"
     onClick={() => onChange(title)}
@@ -43,14 +45,15 @@ const SortItem = ({ title, onChange, value }: SortItemProps) => (
 );
 
 export function StampNavigator(
-  { initFilter, initSort, initType, selectedTab }: {
+  { initFilter, initSort, initType, selectedTab, open1, handleOpen1 }: {
     initFilter?: FILTER_TYPES[];
     initSort?: string;
     initType?: STAMP_TYPES;
     selectedTab: STAMP_TYPES;
+    open1: boolean;
+    handleOpen1: (open: boolean) => void;
   },
 ) {
-  const [isOpen, setIsOpen] = useState(false);
   const [localFilters, setLocalFilters] = useState<FILTER_TYPES[]>(
     initFilter || [],
   );
@@ -62,9 +65,8 @@ export function StampNavigator(
   }, [initFilter, initSort, initType]);
 
   const handleSortChange = (value: string) => {
-    const newSortOrder = value === "Latest" ? "DESC" : "ASC";
-    setLocalSort(newSortOrder);
-    updateURL({ sortBy: newSortOrder });
+    setLocalSort(value);
+    updateURL({ sortBy: value });
   };
 
   const handleFilterChange = (value: FILTER_TYPES) => {
@@ -107,48 +109,59 @@ export function StampNavigator(
   };
 
   return (
-    <div class="relative">
+    <div class="relative flex items-center gap-3">
       <button
-        class="bg-[#3F2A4E] hover:bg-[#5503A6] text-white flex justify-between items-center p-4 min-w-[120px] w-[120px] h-[54px] rounded cursor-pointer mb-3"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => handleSortChange(localSort === "DESC" ? "ASC" : "DESC")}
+        className={"border-2 border-[#660099] px-[10px] py-[10px] rounded-md"}
       >
-        <span class="text-xl">Filter</span>
-        <img
-          src={isOpen ? "/img/icon_filter_hover.png" : "/img/icon_filter.png"}
-          class="w-[18px] h-[12px]"
-          alt="Filter icon"
-        />
+        {localSort === "DESC"
+          ? <img src="/img/stamp/SortAscending.png" alt="Sort ascending" />
+          : <img src="/img/stamp/SortDescending.png" alt="Sort descending" />}
       </button>
-      {isOpen && (
-        <div class="absolute top-full left-0 z-[100] bg-[#3E2F4C] text-white p-6 rounded-lg shadow-lg min-w-[250px]">
-          <div class="mb-6">
-            <span class="text-lg font-semibold mb-2 block">Filter by:</span>
-            <div class="flex flex-wrap border-b border-[#8A8989] py-2">
-              {filters.map((item) => (
-                <FilterItem
-                  key={`${item}-${localFilters.includes(item)}`}
-                  title={item}
-                  onChange={handleFilterChange}
-                  value={localFilters}
-                />
-              ))}
-            </div>
-          </div>
-          <div>
-            <span class="text-lg font-semibold mb-2 block">Sort by:</span>
-            <div class="flex flex-wrap border-b border-[#8A8989] py-2">
-              {sorts.map((item) => (
-                <SortItem
-                  key={item}
-                  title={item}
-                  onChange={handleSortChange}
-                  value={localSort === "DESC" ? "Latest" : "Oldest"}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <div class="border-2 border-[rgb(102,0,153)] px-[10px] py-[10px] rounded-md flex items-center gap-3 max-h-[40px]">
+        {open1 && (
+          <>
+            <button
+              className={"cursor-pointer text-sm font-black text-[#660099]"}
+              onClick={() => handleFilterChange("for_sale")}
+            >
+              FOR SALE
+            </button>
+            <button
+              className={"cursor-pointer text-sm font-black text-[#660099]"}
+              onClick={() => handleFilterChange("sold")}
+            >
+              SOLD
+            </button>
+            <button
+              className={"cursor-pointer text-sm font-black text-[#660099]"}
+              onClick={() => handleFilterChange("pixel")}
+            >
+              PIXEL
+            </button>
+            <button
+              className={"cursor-pointer text-sm font-black text-[#660099]"}
+              onClick={() => handleFilterChange("vector")}
+            >
+              VECTOR
+            </button>
+            <img
+              className={"cursor-pointer"}
+              src="/img/stamp/navigator-close.png"
+              alt="Navigator close"
+              onClick={() => handleOpen1(false)}
+            />
+          </>
+        )}
+        {!open1 && (
+          <img
+            className={"cursor-pointer"}
+            src="/img/stamp/navigator-list.png"
+            alt="Navigator list"
+            onClick={() => handleOpen1(true)}
+          />
+        )}
+      </div>
     </div>
   );
 }
