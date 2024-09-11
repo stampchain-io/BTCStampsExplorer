@@ -110,7 +110,8 @@ export default function StampPage(props: StampDetailPageProps) {
   const sections: StampSectionProps[] = [
     {
       title: "RECENT SALES",
-      type: "recent",
+      type: "stamps",
+      isRecentSales: true,
       stamps: stamps_recent.data,
       layout: "row",
     },
