@@ -1,0 +1,78 @@
+Code Style and Structure:
+
+- Write concise, technical TypeScript code based on Deno Fresh with accurate
+  examples
+- Use functional and declarative programming patterns where appropriate
+- Prefer iteration and modularization over code duplication
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading,
+  hasError)
+- Structure files: exported component, subcomponents, helpers, static content,
+  types
+
+Naming Conventions:
+
+- Use lowercase with dashes for directories (e.g., components/auth-wizard)
+- Favor named exports for components
+
+TypeScript Usage:
+
+- Use TypeScript for all code; prefer interfaces over types
+- Avoid enums; use const objects for enumerations
+- Use functional components with TypeScript interfaces
+
+Syntax and Formatting:
+
+- Use the "function" keyword for component definitions
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple
+  statements
+- Use declarative JSX
+
+Error Handling and Validation:
+
+- Prioritize error handling: handle errors and edge cases early
+- Use early returns and guard clauses
+- Implement proper error logging and user-friendly messages
+- Handle errors in route handlers and return appropriate responses
+
+UI and Styling:
+
+- Implement responsive design with Tailwind CSS; use a mobile-first approach
+
+Performance Optimization:
+
+- Use islands for client-side interactivity
+- Optimize images: use WebP format, include size data, implement lazy loading
+
+Routing:
+
+- Use file-based routing in the `routes/` directory
+- Create dynamic routes using square brackets (e.g., [id].tsx)
+- Implement _app.tsx for global layout and _404.tsx for custom 404 pages
+- Use the `<Partial>` component from "$fresh/runtime.ts" for partial page
+  updates only when needed and rely on Deno Fresh server-side rendering
+  capabilities when suitable
+
+Islands:
+
+- Place interactive components in the `islands/` directory
+- Keep islands small and focused on specific interactive functionality
+- Use islands only for components that require client-side interactivity
+- Prefer server-side rendering where possible
+
+Plugins:
+
+- Utilize Fresh plugins for extending functionality (e.g., Tailwind CSS)
+- Create custom plugins in a `plugins/` directory when needed
+- Register plugins in the `fresh.config.ts` file
+- Use plugin-specific components and utilities as provided by each plugin
+
+Fresh-specific Practices:
+
+- Use the `Head` component from "$fresh/runtime.ts" for managing document head
+- Implement server-side rendering by default, using islands only for interactive
+  components
+- Utilize Fresh's built-in static file serving from the `static/` directory
+- Take advantage of Fresh's automatic HMR (Hot Module Replacement) during
+  development
+- Use the `handler` function in route files for server-side data fetching and
+  processing
