@@ -13,14 +13,9 @@ export const SRC20Header = (
 
   return (
     <div class="text-white flex flex-col gap-8">
-      <div class="text-center">
-        <p class="text-7xl leading-normal">SRC-20</p>
-        <p class="text-[#DBDBDB] font-light">
-          Welcome to the forefront of digital collectibles, where each stamp is
-          a unique<br />
-          piece of art intertwined with the immutability of the blockchain.
-        </p>
-      </div>
+      <p className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC]">
+        SRC-20 TOKENS
+      </p>
       <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E]">
         <div class="flex gap-6 md:gap-8 items-end">
           <p
@@ -32,25 +27,35 @@ export const SRC20Header = (
             All
           </p>
           <p
-            class={selectedTab === "trending"
+            class={selectedTab === "minting"
               ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
               : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-            onClick={() => setTypeOption("src20", "trending")}
+            onClick={() => setTypeOption("src20", "minting")}
           >
-            Trending
-          </p>
-          <p
-            class={selectedTab === "mints"
-              ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-              : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
-            onClick={() => setTypeOption("src20", "mints")}
-          >
-            Mints
+            Minting
           </p>
         </div>
-        <div class="flex gap-6">
-          <StampNavigator initFilter={filterBy} initSort={sortBy} />
-          <StampSearchClient />
+        <div class="flex gap-3">
+          <button
+            className={"border-2 border-[#660099] text-[#660099] rounded-md text-sm font-black px-4 py-2"}
+          >
+            DEPLOY
+          </button>
+          <button
+            className={"border-2 border-[#660099] text-[#660099] rounded-md text-sm font-black px-4 py-2"}
+          >
+            SUPPLY
+          </button>
+          <button
+            className={"border-2 border-[#660099] text-[#660099] rounded-md text-sm font-black px-4 py-2"}
+          >
+            HOLDERS
+          </button>
+          <button
+            className={"border-2 border-[#660099] text-[#660099] rounded-md text-sm font-black px-4 py-2"}
+          >
+            MARKETCAP
+          </button>
         </div>
       </div>
     </div>

@@ -102,6 +102,7 @@ import * as $collection_CollectionList from "./islands/collection/CollectionList
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeGetStamping from "./islands/home/HomeGetStamping.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
+import * as $home_HomePartners from "./islands/home/HomePartners.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
@@ -256,6 +257,7 @@ const manifest = {
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeGetStamping.tsx": $home_HomeGetStamping,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
+    "./islands/home/HomePartners.tsx": $home_HomePartners,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
