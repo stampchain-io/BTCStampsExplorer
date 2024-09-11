@@ -1,7 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
+
+import { FILTER_TYPES, STAMP_TYPES } from "globals";
+
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { FILTER_TYPES, STAMP_TYPES } from "globals";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
 
 export const StampHeader = (
@@ -40,42 +42,73 @@ export const StampHeader = (
     };
   }, []);
 
+  const [isOpen1, setIsOpen1] = useState(false);
+  const [isOpen2, setIsOpen2] = useState(false);
+
+  const handleOpen1 = (open: boolean) => {
+    setIsOpen1(open);
+    setIsOpen2(false);
+  };
+
+  const handleOpen2 = (open: boolean) => {
+    setIsOpen1(false);
+    setIsOpen2(open);
+  };
+
   return (
     <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E]">
       <div class="flex gap-5 md:gap-11 items-end">
         <p
-          class={selectedTab === "all"
-            ? "text-[26px] text-[#7A00F5] cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-            : "text-[20px] text-[#B9B9B9] cursor-pointer pb-4"}
+          class={`cursor-pointer pb-3 text-2xl uppercase ${
+            selectedTab === "all"
+              ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
+              : "text-[#8800CC] font-light"
+          }`}
           onClick={() => handleTabClick("all")}
         >
           All
         </p>
         <p
-          class={selectedTab === "classic"
-            ? "text-[26px] text-[#7A00F5] cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-            : "text-[20px] text-[#B9B9B9] cursor-pointer pb-4"}
+          class={`cursor-pointer pb-3 text-2xl uppercase ${
+            selectedTab === "posh"
+              ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
+              : "text-[#8800CC] font-light"
+          }`}
+          onClick={() => handleTabClick("posh")}
+        >
+          Posh
+        </p>
+        <p
+          class={`cursor-pointer pb-3 text-2xl uppercase ${
+            selectedTab === "classic"
+              ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
+              : "text-[#8800CC] font-light"
+          }`}
           onClick={() => handleTabClick("classic")}
         >
           Classic
         </p>
         <p
-          class={selectedTab === "posh"
-            ? "text-[26px] text-[#7A00F5] cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
-            : "text-[20px] text-[#B9B9B9] cursor-pointer pb-4"}
-          onClick={() => handleTabClick("posh")}
+          class={`cursor-pointer pb-3 text-2xl uppercase ${
+            selectedTab === "recursive"
+              ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
+              : "text-[#8800CC] font-light"
+          }`}
+          onClick={() => handleTabClick("recursive")}
         >
-          Posh
+          Recursive
         </p>
       </div>
-      <div class="flex gap-3 md:gap-6 justify-between">
+      <div class="flex gap-3 justify-between">
         <StampNavigator
           initFilter={currentFilters}
           initSort={currentSort}
           initType={type}
           selectedTab={selectedTab}
+          open1={isOpen1}
+          handleOpen1={handleOpen1}
         />
-        <StampSearchClient />
+        <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
       </div>
     </div>
   );
