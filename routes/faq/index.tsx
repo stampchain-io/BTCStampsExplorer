@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import Accordion from "$islands/Accordion.tsx";
+import Accordion from "$components/Accordion.tsx";
 
 export default function FAQ() {
   return (
