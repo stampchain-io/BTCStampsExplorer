@@ -27,13 +27,13 @@ export const HomeGetStamping = () => {
 
       <div className={"flex gap-12 font-extrabold text-xl justify-center"}>
         <a
-          href="#"
+          href="/stamping/stamp"
           className={"border-2 border-[#999999] text-[#999999] w-[136px] h-[60px] flex justify-center items-center rounded-md"}
         >
           FAQ
         </a>
         <a
-          href="#"
+          href="/faq"
           className={"bg-[#999999] text-black w-[136px] h-[60px] flex justify-center items-center rounded-md"}
         >
           STAMP
