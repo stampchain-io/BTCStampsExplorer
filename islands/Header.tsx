@@ -104,8 +104,8 @@ export function Header() {
               </a>
               <div className="md:hidden md:group-hover:flex flex flex-col md:absolute md:bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-center md:text-left">
                 <a
-                  href="/stamp/?type=posh"
-                  f-partial={"/stamp/?type=posh"}
+                  href="/stamp?type=posh"
+                  f-partial={"/stamp?type=posh"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -117,8 +117,8 @@ export function Header() {
                   POSH
                 </a>
                 <a
-                  href="/stamp/?type=classic"
-                  f-partial={"/stamp/?type=classic"}
+                  href="/stamp?type=classic"
+                  f-partial={"/stamp?type=classic"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -130,8 +130,8 @@ export function Header() {
                   CLASSIC
                 </a>
                 <a
-                  href="/stamp/?type=classic&filterBy=recursive"
-                  f-partial={"/stamp/?type=classic&filterBy=recursive"}
+                  href="/stamp?type=classic&filterBy=recursive"
+                  f-partial={"/stamp?type=classic&filterBy=recursive"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -143,8 +143,8 @@ export function Header() {
                   RECURSIVE
                 </a>
                 <a
-                  href="/stamp/?type=all"
-                  f-partial={"/stamp/?type=all"}
+                  href="/stamp?type=all"
+                  f-partial={"/stamp?type=all"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -192,8 +192,8 @@ export function Header() {
               </a>
               <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-left">
                 <a
-                  href="/src20/?ident=all"
-                  f-partial={"/src20/?ident=all"}
+                  href="/src20?ident=all"
+                  f-partial={"/src20?ident=all"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("src20");
@@ -282,8 +282,8 @@ export function Header() {
               </a>
               <div className="flex flex-col z-[100] py-2 text-center">
                 <a
-                  href="/stamp/?type=posh"
-                  f-partial={"/stamp/?type=posh"}
+                  href="/stamp?type=posh"
+                  f-partial={"/stamp?type=posh"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -334,8 +334,8 @@ export function Header() {
                   RECURSIVE
                 </a>
                 <a
-                  href="/stamp/?type=all"
-                  f-partial={"/stamp/?type=all"}
+                  href="/stamp?type=all"
+                  f-partial={"/stamp?type=all"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -383,8 +383,8 @@ export function Header() {
               </a>
               <div className="flex flex-col z-[100] py-2 text-center">
                 <a
-                  href="/src20/?ident=all"
-                  f-partial={"/src20/?ident=all"}
+                  href="/src20?ident=all"
+                  f-partial={"/src20?ident=all"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("src20");
@@ -396,8 +396,8 @@ export function Header() {
                   ALL
                 </a>
                 <a
-                  href="/src20/?ident=trending"
-                  f-partial={"/src20/?ident=trending"}
+                  href="/src20?ident=trending"
+                  f-partial={"/src20?ident=trending"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("src20");
