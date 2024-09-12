@@ -73,6 +73,7 @@ import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
+import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
 import * as $Footer from "./islands/Footer.tsx";
 import * as $Header from "./islands/Header.tsx";
@@ -220,6 +221,7 @@ const manifest = {
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
   islands: {
+    "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
     "./islands/Footer.tsx": $Footer,
     "./islands/Header.tsx": $Header,
