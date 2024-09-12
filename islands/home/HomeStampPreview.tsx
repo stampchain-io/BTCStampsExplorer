@@ -84,11 +84,11 @@ export function HomeStampPreview({
             >
               DEPLOY // MINT
             </p>
-
+            {/* FIXME: this should just go to ann island */}
             <p className={"text-[#CCCCCC] text-2xl font-medium"}>
-              Lorem ipsum dolor sit amet, consectetur. Aenean diam libero,
-              faucibus ut sagittis at, rutrum nec eros. Donec sit amet blandit
-              arcu. Nullam ultrices a mauris non efficitur.
+              Create or mint the most immutable fungible token with SRC-20.
+              Built on top of the stamps meta-protocol SRC-20 tokens are built
+              with Bitcoin.
             </p>
           </div>
 
