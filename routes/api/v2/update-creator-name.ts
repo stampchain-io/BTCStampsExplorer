@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$lib/controller/stampController.ts";
-import { verifySignature } from "$lib/utils/cryptoUtils.ts"; // Implement this function
-import { validateCSRFToken } from "$lib/utils/securityUtils.ts"; // Implement this function
+import { verifySignature } from "$lib/utils/cryptoUtils.ts";
+import { validateCSRFToken } from "$lib/utils/securityUtils.ts";
 
 export const handler: Handlers = {
   async POST(req) {

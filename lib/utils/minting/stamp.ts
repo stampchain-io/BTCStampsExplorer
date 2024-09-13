@@ -7,6 +7,7 @@ import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
 import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 import { extractOutputs } from "utils/minting/utils.ts";
+import { XCPPayload } from "utils/xcpUtils.ts";
 
 export const burnkeys = [
   "022222222222222222222222222222222222222222222222222222222222222222",
@@ -62,15 +63,17 @@ export const transferMethod = ({
   };
 };
 
-export const mintMethod = ({
-  sourceWallet,
-  assetName,
-  qty,
-  locked,
-  divisible,
-  base64Data,
-  satsPerKB,
-}: stampMintData) => {
+export function mintMethod(
+  {
+    sourceWallet,
+    assetName,
+    qty,
+    locked,
+    divisible,
+    base64Data,
+    satsPerKB,
+  }: stampMintData,
+): XCPPayload {
   if (typeof sourceWallet !== "string") {
     throw new Error("Invalid sourceWallet parameter. Expected a string.");
   }
@@ -94,6 +97,8 @@ export const mintMethod = ({
   }
   const selectedBurnKey = burnkeys[generateRandomNumber(0, burnkeys.length)];
   return {
+    jsonrpc: "2.0",
+    id: 0,
     method: "create_issuance",
     params: {
       "source": sourceWallet,
@@ -112,7 +117,7 @@ export const mintMethod = ({
       "fee_per_kb": satsPerKB,
     },
   };
-};
+}
 
 export const mintMethodOPRETURN = ({
   sourceWallet,
@@ -126,8 +131,10 @@ export const mintMethodOPRETURN = ({
   if (typeof sourceWallet !== "string") {
     throw new Error("Invalid sourceWallet parameter. Expected a string.");
   }
-  if (typeof assetName !== "string") {
-    throw new Error("Invalid assetName parameter. Expected a string.");
+  if (assetName !== undefined && typeof assetName !== "string") {
+    throw new Error(
+      "Invalid assetName parameter. Expected a string or undefined.",
+    );
   }
 
   const quantity = typeof qty === "string" ? Number(qty) : qty;
@@ -152,23 +159,28 @@ export const mintMethodOPRETURN = ({
     throw new Error("Invalid satsPerKB parameter. Expected a positive number.");
   }
 
+  const params: Record<string, any> = {
+    source: sourceWallet,
+    quantity: quantity,
+    divisible: divisible || false,
+    description: `${description}`,
+    lock: locked || true,
+    reset: false,
+    allow_unconfirmed_inputs: true,
+    extended_tx_info: true,
+    disable_utxo_locks: false,
+    fee_per_kb: feePerKB,
+  };
+
+  if (assetName) {
+    params.asset = assetName;
+  }
+
   return {
-    "jsonrpc": "2.0",
-    "id": 0,
-    "method": "create_issuance",
-    "params": {
-      "source": sourceWallet,
-      "asset": assetName,
-      "quantity": quantity,
-      "divisible": divisible || false,
-      "description": `${description}`,
-      "lock": locked || true,
-      "reset": false,
-      "allow_unconfirmed_inputs": true,
-      "extended_tx_info": true,
-      "disable_utxo_locks": false,
-      "fee_per_kb": feePerKB,
-    },
+    jsonrpc: "2.0",
+    id: 0,
+    method: "create_issuance",
+    params,
   };
 };
 
@@ -360,7 +372,8 @@ export async function validateAndPrepareAssetName(
     return generateAvailableAssetName();
   }
   // FIXME: This will only allow named assets, not numeric to be defined.
-  // FIXME: We need to check and validate the users address has XCP in the wallet.
+  // FIXME: We need to check and validate the users address has XCP in the wallet for a cleaner error than 'insufficient funds'
+  // FIXME: this should also likely check the qty on the issuance value
 
   const upperCaseAssetName = assetName.toUpperCase();
 
@@ -372,9 +385,9 @@ export async function validateAndPrepareAssetName(
     throw new Error("Asset name must not start with 'A'.");
   }
 
-  if (!/^[B-Z0-9]{1,13}$/.test(upperCaseAssetName)) {
+  if (!/^[B-Z][A-Z]{0,12}$/.test(upperCaseAssetName)) {
     throw new Error(
-      "Asset name must contain only uppercase letters (B-Z) and numbers.",
+      "Name must start with letters (B-Z), contain only uppercase letters (A-Z), and must not exceed 13 characters.",
     );
   }
 

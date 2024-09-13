@@ -28,6 +28,7 @@ interface DispenseEvent {
   timestamp: string | null;
 }
 
+// NOTE: only the stampchain api appears to allow trx construction / issuance others get denied.
 export const xcp_public_nodes = [
   {
     name: "stampchain.io",

@@ -37,7 +37,16 @@ export async function mintCIP33ApiCall(
   },
 ) {
   try {
-    console.log("mintCIP33ApiCall", description);
+    console.log("Starting mintCIP33ApiCall with params:", {
+      sourceWallet,
+      assetName,
+      qty,
+      locked,
+      divisible,
+      description,
+      satsPerKB,
+    });
+
     const method = mintMethodOPRETURN({
       sourceWallet,
       assetName,
@@ -47,10 +56,31 @@ export async function mintCIP33ApiCall(
       description,
       satsPerKB,
     });
+
+    console.log("Mint method:", method);
+
     const response = await handleXcpV1Query(method);
+    console.log("Response from handleXcpV1Query:", response);
+
+    if (response && response.code && response.message) {
+      // This is an API error
+      throw new Error(response.message);
+    }
+
+    if (!response) {
+      throw new Error("Empty response from handleXcpV1Query");
+    }
+
+    if (!response.tx_hex) {
+      throw new Error(
+        `Invalid response from handleXcpV1Query: ${JSON.stringify(response)}`,
+      );
+    }
+
     return response;
   } catch (error) {
-    console.error("mint error", error);
+    console.error("Detailed mintCIP33ApiCall error:", error);
+    throw error;
   }
 }
 
@@ -78,10 +108,23 @@ export async function mintStampCIP33(
     satsPerKB: number;
     service_fee: number;
     service_fee_address: string;
-    prefix: "stamp" | "file";
+    prefix: "stamp" | "file" | "glyph";
   },
 ) {
   try {
+    console.log("Starting mintStampCIP33 with params:", {
+      sourceWallet,
+      assetName,
+      qty,
+      locked,
+      divisible,
+      filename,
+      satsPerKB,
+      service_fee,
+      service_fee_address,
+      prefix,
+    });
+
     const result = await mintCIP33ApiCall({
       sourceWallet,
       assetName,
@@ -91,9 +134,15 @@ export async function mintStampCIP33(
       description: `${prefix}:${filename}`,
       satsPerKB,
     });
-    if (!result.tx_hex) {
-      throw new Error("Error generating stamp transaction");
+
+    if (result.error) {
+      throw new Error(result.error.message || "Error in mintCIP33ApiCall");
     }
+
+    if (!result.tx_hex) {
+      throw new Error("tx_hex not found in mintCIP33ApiCall result");
+    }
+
     const hex = result.tx_hex;
 
     const hex_file = CIP33.base64_to_hex(file);
@@ -114,7 +163,7 @@ export async function mintStampCIP33(
 
     return psbt;
   } catch (error) {
-    console.error("mint error", error);
+    console.error("Detailed mint error:", error);
     throw error;
   }
 }

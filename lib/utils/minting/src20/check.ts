@@ -1,6 +1,5 @@
 import { BigFloat } from "bigfloat/mod.ts";
 
-import { Src20Class } from "$lib/database/index.ts";
 import { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "./src20.d.ts";
 import { isValidBitcoinAddress } from "./utils.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
@@ -25,7 +24,6 @@ export async function checkParams({
   max,
   lim,
   dec = 18,
-  client, // Optional, only needed for Deploy check
 }: {
   operation: "Mint" | "Deploy";
   toAddress: string;
@@ -36,7 +34,6 @@ export async function checkParams({
   max?: number | string | undefined;
   lim?: number | string | undefined;
   dec?: number;
-  client?: Client;
 }) {
   // Common checks for both Mint and Deploy
   if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
@@ -75,23 +72,15 @@ export async function checkParams({
       if (!dec || dec === 0) {
         throw new Error("Error: dec not found or invalid");
       }
-      // Check if tick is already deployed
-      if (client) {
-        try {
-          const token_status = await Src20Controller.getTotalCountValidSrc20Tx({
-            tick,
-            op: "DEPLOY",
-          });
-          if (token_status === 0) {
-            return { deployed: false };
-          }
-          return { deployed: true };
-        } catch (error) {
-          console.error(error);
-          throw new Error("Error: Internal server error");
-        }
-      } else {
-        throw new Error("Error: Client not provided for Deploy operation");
+      try {
+        const token_status = await Src20Controller.getTotalCountValidSrc20Tx({
+          tick,
+          op: "DEPLOY",
+        });
+        return { deployed: token_status !== 0 };
+      } catch (error) {
+        console.error(error);
+        throw new Error("Error: Internal server error");
       }
     default:
       throw new Error("Error: Invalid operation type");
@@ -154,7 +143,10 @@ export function checkDeployParams({
   feeRate,
   max,
   lim,
-  dec = 18,
+  dec = 18, // Default to 18 if not provided
+  x,
+  web,
+  email,
 }: IDeploySRC20) {
   if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
     throw new Error("Error: toAddress not found");
@@ -180,6 +172,37 @@ export function checkDeployParams({
   }
   if (!dec || dec === 0) {
     throw new Error("Error: dec not found or invalid");
+  }
+
+  // Optional validation for x (username)
+  if (x && x !== "" && (x.length > 15 || !/^[a-zA-Z0-9_]+$/.test(x))) {
+    throw new Error("Error: Invalid x username");
+  }
+
+  // Optional validation for web (website address)
+  if (
+    web && web !== "" &&
+    !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(web)
+  ) {
+    throw new Error("Error: Invalid website address");
+  }
+
+  // Optional validation for email
+  if (email && email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error("Error: Invalid email address");
+  }
+
+  // Check for dec
+  if (dec === undefined || dec === null) {
+    dec = 18; // Default to 18 if not provided
+  } else {
+    const decValue = Number(dec);
+    if (
+      isNaN(decValue) || decValue < 0 || decValue > 18 ||
+      !Number.isInteger(decValue)
+    ) {
+      throw new Error("Error: dec must be an integer between 0 and 18");
+    }
   }
 }
 
@@ -240,5 +263,18 @@ export function checkTransferParams({
   const float_amt = new BigFloat(amt);
   if (!amt || amt === "" || float_amt.lte(0)) {
     throw new Error("Error: amt not found or invalid");
+  }
+}
+
+export function performChecks(operation: string, params: any) {
+  switch (operation.toLowerCase()) {
+    case "deploy":
+      return checkDeployParams(params);
+    case "mint":
+      return checkMintParams(params);
+    case "transfer":
+      return checkTransferParams(params);
+    default:
+      throw new Error("Error: Invalid operation type");
   }
 }
