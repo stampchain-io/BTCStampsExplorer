@@ -1,4 +1,4 @@
-import { conf } from "utils/config.ts";
+import { serverConfig as conf } from "$server/config/config.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { bigFloatToString } from "utils/util.ts";
 import {
@@ -11,7 +11,7 @@ import {
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
 } from "globals";
-import { dbManager } from "$lib/database/db.ts";
+import { dbManager } from "$server/database/db.ts";
 
 export class SRC20Repository {
   static async getTotalCountValidSrc20TxFromDb(
@@ -380,5 +380,19 @@ export class SRC20Repository {
     };
 
     return response;
+  }
+
+  static async checkTickExists(tick: string): Promise<boolean> {
+    const query = `
+      SELECT COUNT(*) as count
+      FROM ${SRC20_TABLE}
+      WHERE tick = ? AND op = 'DEPLOY'
+    `;
+    const result = await dbManager.executeQueryWithCache(
+      query,
+      [tick],
+      1000 * 60,
+    ); // Cache for 1 minute
+    return (result as any).rows[0].count > 0;
   }
 }

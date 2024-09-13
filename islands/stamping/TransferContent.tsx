@@ -1,99 +1,34 @@
-import { useEffect, useState } from "preact/hooks";
-import { walletContext } from "store/wallet/wallet.ts";
-import axiod from "axiod";
-import { useConfig } from "$/hooks/useConfig.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
-import { useFeePolling } from "hooks/useFeePolling.tsx";
-import { fetchBTCPrice } from "$lib/utils/btc.ts";
-import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
+import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
 
 export function TransferContent() {
-  const { config, isLoading } = useConfig();
+  const {
+    formState,
+    handleChangeFee,
+    handleInputChange,
+    handleSubmit,
+    fetchFees,
+    isLoading,
+    config,
+    isSubmitting,
+    submissionMessage,
+  } = useSRC20Form("transfer");
 
   if (isLoading) {
-    return <div>Loading configuration...</div>;
+    return <div>Loading...</div>;
   }
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
 
-  const [toAddress, setToAddress] = useState<string>("");
-  const [token, setToken] = useState<string>("");
-  const [amt, setAmt] = useState<string>(""); // New state for amount
-  const [fee, setFee] = useState<number>(780);
-  const [BTCPrice, setBTCPrice] = useState<number>(60000);
-  const [jsonSize, setJsonSize] = useState<number>(0);
-
-  const { wallet, isConnected } = walletContext;
-  const { address } = wallet.value;
-
-  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
-
-  useEffect(() => {
-    if (fees && !loading) {
-      const recommendedFee = Math.round(fees.recommendedFee);
-      setFee(recommendedFee);
-    }
-  }, [fees, loading]);
-
-  useEffect(() => {
-    const fetchPrice = async () => {
-      const price = await fetchBTCPrice();
-      setBTCPrice(price);
-    };
-    fetchPrice();
-  }, []);
-
-  const handleChangeFee = (newFee: number) => {
-    setFee(newFee);
-  };
-
-  const handleTransfer = async () => {
-    if (!isConnected.value) {
-      alert("Connect your wallet");
-      return;
-    }
-
-    setApiError("");
-
+  const handleTransferSubmit = async () => {
     try {
-      const response = await axiod.post(`${config.API_BASE_URL}/src20/create`, {
-        fromAddress: address,
-        toAddress: toAddress,
-        op: "transfer",
-        tick: token,
-        feeRate: fee,
-        amt: amt,
-      });
-      console.log(response);
-      // Handle successful response here
+      await handleSubmit();
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.error) {
-        setApiError(error.response.data.error);
-      } else {
-        setApiError("An unexpected error occurred");
-      }
       console.error("Transfer error:", error);
     }
   };
-
-  useEffect(() => {
-    const jsonData = {
-      p: "src-20",
-      op: "transfer",
-      tick: token,
-      amt: amt, // Use the amt state here
-    };
-
-    const size = calculateJsonSize(jsonData);
-    setJsonSize(size);
-  }, [token, amt]); // Add amt to the dependency array
-
-  const [toAddressError, setToAddressError] = useState<string>("");
-  const [tokenError, setTokenError] = useState<string>("");
-  const [amtError, setAmtError] = useState<string>("");
-  const [apiError, setApiError] = useState<string>("");
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
@@ -109,11 +44,12 @@ export function TransferContent() {
           type="text"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Bitcoin Address"
-          value={toAddress}
-          onInput={(e: Event) =>
-            setToAddress((e.target as HTMLInputElement).value)}
+          value={formState.toAddress}
+          onChange={(e) => handleInputChange(e, "toAddress")}
         />
-        {toAddressError && <p class="text-red-500 mt-2">{toAddressError}</p>}
+        {formState.toAddressError && (
+          <p class="text-red-500 mt-2">{formState.toAddressError}</p>
+        )}
       </div>
 
       <div class="w-full">
@@ -124,10 +60,9 @@ export function TransferContent() {
           type="text"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Case Sensitive"
-          value={token}
-          onInput={(e: Event) => setToken((e.target as HTMLInputElement).value)}
+          value={formState.token}
+          onChange={(e) => handleInputChange(e, "token")}
         />
-        {tokenError && <p class="text-red-500 mt-2">{tokenError}</p>}
       </div>
 
       <div class="w-full">
@@ -140,33 +75,42 @@ export function TransferContent() {
           pattern="[0-9]*"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Transfer Amount"
-          value={amt}
-          onInput={(e: Event) => setAmt((e.target as HTMLInputElement).value)}
+          value={formState.amt}
+          onChange={(e) => handleInputChange(e, "amt")}
         />
-        {amtError && <p class="text-red-500 mt-2">{amtError}</p>}
       </div>
 
       <FeeEstimation
-        fee={fee}
+        fee={formState.fee}
         handleChangeFee={handleChangeFee}
         type="src20-transfer"
         fileType="application/json"
-        fileSize={jsonSize}
-        BTCPrice={BTCPrice}
+        fileSize={formState.jsonSize}
+        BTCPrice={formState.BTCPrice}
         onRefresh={fetchFees}
       />
 
-      {apiError && (
+      {formState.apiError && (
         <div class="w-full text-red-500 text-center">
-          {apiError}
+          {formState.apiError}
+        </div>
+      )}
+
+      {submissionMessage && (
+        <div class="w-full text-center font-bold">
+          {submissionMessage}
         </div>
       )}
 
       <div
-        class="w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"
-        onClick={handleTransfer}
+        class={`w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 ${
+          isSubmitting
+            ? "bg-gray-500 cursor-not-allowed"
+            : "bg-[#5503A6] cursor-pointer"
+        }`}
+        onClick={isSubmitting ? undefined : handleTransferSubmit}
       >
-        Stamp Now
+        {isSubmitting ? "Stamping..." : "Stamp Now"}
       </div>
     </div>
   );

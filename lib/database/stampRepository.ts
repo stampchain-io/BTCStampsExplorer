@@ -4,7 +4,7 @@ import { getFileSuffixFromMime } from "utils/util.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { FILTER_TYPES, STAMP_TYPES, StampBalance, XCPBalance } from "globals";
 import { summarize_issuances } from "./index.ts";
-import { dbManager } from "$lib/database/db.ts";
+import { dbManager } from "../../server/database/db.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
 import { filterOptions } from "utils/filterOptions.ts";
 

@@ -1,14 +1,13 @@
 import { Handlers } from "$fresh/server.ts";
-import { dbManager } from "$lib/database/db.ts";
-
-const API_KEY = Deno.env.get("API_KEY");
+import { dbManager } from "../../server/database/db.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 export const handler: Handlers = {
   async POST(req) {
     // Check for API key in the request headers
     const apiKey = req.headers.get("X-API-Key");
 
-    if (apiKey !== API_KEY) {
+    if (apiKey !== serverConfig.API_KEY) {
       return new Response("Unauthorized", { status: 401 });
     }
 

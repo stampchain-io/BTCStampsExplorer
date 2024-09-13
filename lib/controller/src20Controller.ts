@@ -321,4 +321,8 @@ export class Src20Controller {
     const percentage = (amountNum / totalNum) * 100;
     return percentage.toFixed(2);
   }
+
+  static async checkTickExists(tick: string): Promise<boolean> {
+    return await Src20Service.checkTickExists(tick);
+  }
 }

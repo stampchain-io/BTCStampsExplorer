@@ -82,7 +82,23 @@ const signMessage = async (message: string) => {
 
 const signPSBT = async (psbt: string) => {
   const okx = (window as any).okxwallet;
-  return await okx.bitcoin.signPsbt(psbt);
+  try {
+    const result = await okx.bitcoin.signPsbt(psbt);
+    if (result && result.hex) {
+      return { signed: true, psbt: result.hex };
+    } else {
+      return {
+        signed: false,
+        error: "Unexpected result format from OKX wallet",
+      };
+    }
+  } catch (error) {
+    console.error("Error signing PSBT:", error);
+    if (error.message && error.message.includes("User rejected")) {
+      return { signed: false, cancelled: true };
+    }
+    return { signed: false, error: error.message };
+  }
 };
 
 const broadcastRawTX = async (rawTx: string) => {
