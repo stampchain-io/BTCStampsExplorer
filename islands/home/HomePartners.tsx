@@ -7,12 +7,27 @@ export const HomePartners = () => {
         PARTNERS
       </p>
       <div className={"flex justify-between flex-col md:flex-row gap-6"}>
-        <img
-          src="/img/home/partner-bitfinity-banner.png"
-          className={"hover:bg-gradient-to-r"}
-        />
-        <img src="/img/home/partner-r8-banner.png" />
-        <img src="/img/home/partner-bitname-banner.png" />
+        <div className={"relative cursor-pointer"}>
+          <img src="/img/home/partner-bitfinity-banner.png" />
+          <div
+            className={"opacity-0 hover:opacity-100 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute w-full h-full top-0 left-0"}
+          >
+          </div>
+        </div>
+        <div className={"relative cursor-pointer"}>
+          <img src="/img/home/partner-r8-banner.png" />
+          <div
+            className={"opacity-0 hover:opacity-100 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute w-full h-full top-0 left-0"}
+          >
+          </div>
+        </div>
+        <div className={"relative cursor-pointer"}>
+          <img src="/img/home/partner-bitname-banner.png" />
+          <div
+            className={"opacity-0 hover:opacity-100 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute w-full h-full top-0 left-0"}
+          >
+          </div>
+        </div>
       </div>
     </div>
   );
