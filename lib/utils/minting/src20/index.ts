@@ -3,7 +3,7 @@ import * as bitcoin from "bitcoin";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 
 import { dbManager } from "../../../../server/database/db.ts";
-import { get_public_key_from_address } from "utils/quicknode.ts";
+import { getPublicKeyFromAddress } from "utils/quicknode.ts";
 import {
   checkDeployedTick,
   checkDeployParams,
@@ -60,7 +60,7 @@ export async function mintSRC20({
     if (utxos === null || utxos.length === 0) {
       throw new Error("No UTXO found");
     }
-    const publicKey = await get_public_key_from_address(toAddress);
+    const publicKey = await getPublicKeyFromAddress(toAddress);
     const prepare: IPrepareSRC20TX = {
       network: bitcoin.networks.bitcoin,
       utxos,
@@ -138,7 +138,7 @@ export async function deploySRC20({
       throw new Error("No UTXO found");
     }
     const utxos: UTXO[] = fetchedUtxos;
-    const publicKey = await get_public_key_from_address(toAddress);
+    const publicKey = await getPublicKeyFromAddress(toAddress);
     const prepare: IPrepareSRC20TX = {
       network: bitcoin.networks.bitcoin,
       utxos,
@@ -198,7 +198,7 @@ export async function transferSRC20({
     if (utxos === null || utxos.length === 0) {
       throw new Error("No UTXO found");
     }
-    const publicKey = await get_public_key_from_address(toAddress);
+    const publicKey = await getPublicKeyFromAddress(toAddress);
     const prepare: IPrepareSRC20TX = {
       network: bitcoin.networks.bitcoin,
       utxos,
