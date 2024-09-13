@@ -111,9 +111,12 @@ import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $hooks_useSRC20Form from "./islands/hooks/useSRC20Form.ts";
 import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
+import * as $src20_SRC20DeployMint from "./islands/src20/SRC20DeployMint.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
+import * as $src20_SRC20Navigator from "./islands/src20/SRC20Navigator.tsx";
+import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
@@ -269,9 +272,12 @@ const manifest = {
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/hooks/useSRC20Form.ts": $hooks_useSRC20Form,
     "./islands/pagination/Pagination.tsx": $pagination_Pagination,
+    "./islands/src20/SRC20DeployMint.tsx": $src20_SRC20DeployMint,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
+    "./islands/src20/SRC20Navigator.tsx": $src20_SRC20Navigator,
+    "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,

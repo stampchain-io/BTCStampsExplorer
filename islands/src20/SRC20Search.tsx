@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 
-export function StampSearchClient(
+export function SRC20SearchClient(
   { open2, handleOpen2 }: {
     open2: boolean;
     handleOpen2: (open: boolean) => void;
@@ -35,7 +35,7 @@ export function StampSearchClient(
           <img
             src="/img/stamp/search-glass.png"
             alt="Search icon"
-            class="absolute top-3 right-3 cursor-pointer"
+            class="absolute top-[15px] right-3 cursor-pointer"
             onClick={() => handleOpen2(false)}
           />
         </>
