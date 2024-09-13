@@ -1,9 +1,25 @@
 import { load } from "$std/dotenv/mod.ts";
 
-// Check if we're in a Deno environment
-const isDeno = typeof Deno !== "undefined";
+interface ServerConfig {
+  APP_ROOT: string;
+  IMAGES_SRC_PATH?: string;
+  API_BASE_URL?: string;
+  MINTING_SERVICE_FEE?: string;
+  MINTING_SERVICE_FEE_ADDRESS?: string;
+  CSRF_SECRET_KEY?: string;
+  MINTING_SERVICE_FEE_ENABLED: string;
+  MINTING_SERVICE_FEE_FIXED_SATS: string;
+  [key: string]: string | undefined;
+}
 
-let serverConfig: ServerConfig;
+// Initialize serverConfig with default values
+let serverConfig: ServerConfig = {
+  APP_ROOT: "",
+  MINTING_SERVICE_FEE_ENABLED: "0",
+  MINTING_SERVICE_FEE_FIXED_SATS: "0",
+};
+
+const isDeno = typeof Deno !== "undefined";
 
 if (isDeno) {
   const env_file = Deno.env.get("ENV") === "development"
@@ -18,31 +34,15 @@ if (isDeno) {
   const envVars = Deno.env.toObject();
 
   serverConfig = {
+    ...serverConfig,
     ...envVars,
     ...confFromFile,
     APP_ROOT: Deno.cwd(),
   };
-} else {
-  // Provide a dummy config for the client-side
-  serverConfig = {
-    APP_ROOT: "",
-  };
-}
-
-// Define an interface for the server config
-interface ServerConfig {
-  APP_ROOT: string;
-  IMAGES_SRC_PATH?: string;
-  API_BASE_URL?: string;
-  MINTING_SERVICE_FEE?: string;
-  MINTING_SERVICE_FEE_ADDRESS?: string;
-  CSRF_SECRET_KEY?: string;
-  [key: string]: string | undefined;
 }
 
 export { serverConfig };
 
-// Add a function to get client-safe config
 export function getClientConfig() {
   return {
     API_BASE_URL: serverConfig.API_BASE_URL,

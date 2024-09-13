@@ -118,16 +118,19 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
 
     if (field === "token" && operation === "deploy") {
       try {
-        // const tickExists = await Src20Controller.checkTickExists(newValue);
-        const tickExists = false;
-        if (tickExists) {
+        const response = await axiod.get(
+          `/api/v2/src20/tick/${newValue}/deploy`,
+        );
+        if (response.data && response.data.data) {
           setFormState((prev) => ({
             ...prev,
             tokenError: "This tick already exists.",
           }));
         }
       } catch (error) {
-        console.error("Error checking tick existence:", error);
+        if (error.response && error.response.status !== 404) {
+          console.error("Error checking tick existence:", error);
+        }
       }
     }
   };
