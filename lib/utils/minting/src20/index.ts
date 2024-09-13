@@ -2,7 +2,7 @@ import { Client } from "$mysql/mod.ts";
 import * as bitcoin from "bitcoin";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 
-import { dbManager } from "$lib/database/db.ts";
+import { dbManager } from "../../../../server/database/db.ts";
 import { get_public_key_from_address } from "utils/quicknode.ts";
 import {
   checkDeployedTick,

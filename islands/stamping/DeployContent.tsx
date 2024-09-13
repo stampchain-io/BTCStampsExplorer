@@ -1,213 +1,111 @@
-import { useEffect, useState } from "preact/hooks";
-import { walletContext } from "store/wallet/wallet.ts";
-import axiod from "axiod";
-import { useConfig } from "$/hooks/useConfig.ts";
+import { useState } from "preact/hooks";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
-import { useFeePolling } from "hooks/useFeePolling.tsx";
-import { fetchBTCPrice } from "$lib/utils/btc.ts";
-import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
+import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
+import axiod from "axiod";
 
 export function DeployContent() {
-  const { config, isLoading } = useConfig();
+  const {
+    formState,
+    setFormState,
+    handleChangeFee,
+    handleInputChange,
+    handleSubmit,
+    fetchFees,
+    isLoading,
+    config,
+    isSubmitting,
+    submissionMessage,
+  } = useSRC20Form("deploy");
+
+  const [fileUploadError, setFileUploadError] = useState<string | null>(null);
 
   if (isLoading) {
-    return <div>Loading configuration...</div>;
+    return <div>Loading...</div>;
   }
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
 
-  const { wallet, isConnected } = walletContext;
-  const { address } = wallet.value;
-
-  const [token, setToken] = useState<string>("");
-  const [limitPerMint, setLimitPerMint] = useState<string>("");
-  const [maxCirculation, setMaxCirculation] = useState<string>("");
-  const [file, setFile] = useState<File | null>(null);
-  const [fee, setFee] = useState<number>(780);
-
-  const [x, setX] = useState<string>("");
-  const [web, setWeb] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [dec, setDec] = useState<string>("18"); // Default to 18 decimal places
-
-  const [BTCPrice, setBTCPrice] = useState<number>(60000);
-  const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
-
-  const [jsonSize, setJsonSize] = useState<number>(0);
-
-  const [limitPerMintError, setLimitPerMintError] = useState<string>("");
-  const [maxCirculationError, setMaxCirculationError] = useState<string>("");
-
-  useEffect(() => {
-    const jsonData = {
-      p: "src-20",
-      op: "deploy",
-      tick: token,
-      max: maxCirculation,
-      lim: limitPerMint,
-      dec: dec !== "" ? dec : undefined,
-      web: web !== "" ? web : undefined,
-      x: x !== "" ? x : undefined,
-      email: email !== "" ? email : undefined,
-    };
-
-    const size = calculateJsonSize(jsonData);
-    setJsonSize(size);
-  }, [token, maxCirculation, limitPerMint, dec, web, x, email]);
-
-  useEffect(() => {
-    if (fees && !loading) {
-      const recommendedFee = Math.round(fees.recommendedFee);
-      setFee(recommendedFee);
-    }
-  }, [fees, loading]);
-
-  useEffect(() => {
-    const fetchPrice = async () => {
-      const price = await fetchBTCPrice();
-      setBTCPrice(price);
-    };
-    fetchPrice();
-  }, []);
-
-  const handleTokenChange = (e: Event) => {
-    const input = (e.target as HTMLInputElement).value.toUpperCase();
-    setToken(input.slice(0, 5));
-  };
-
-  const handleIntegerInput = (
-    value: string,
-    setter: (value: string) => void,
-    errorSetter: (error: string) => void,
-    isMaxCirculation: boolean = false,
-  ) => {
-    // Remove any non-digit characters
-    const sanitizedValue = value.replace(/\D/g, "");
-
-    // Check if the value is within uint64 range
-    if (sanitizedValue === "") {
-      setter("");
-      errorSetter("");
-    } else {
-      const bigIntValue = BigInt(sanitizedValue);
-      const maxUint64 = BigInt("18446744073709551615"); // 2^64 - 1
-      if (bigIntValue <= maxUint64) {
-        setter(sanitizedValue);
-        errorSetter("");
-
-        // Additional check for max circulation
-        if (isMaxCirculation) {
-          const limitPerMintValue = BigInt(limitPerMint || "0");
-          if (bigIntValue <= limitPerMintValue) {
-            setMaxCirculationError(
-              "Max Circulation must be greater than Limit Per Mint",
-            );
-          } else {
-            setMaxCirculationError("");
-          }
+  const handleFileChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0] || null;
+    if (file) {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width === 420 && img.height === 420) {
+          setFormState((prev) => ({ ...prev, file }));
         } else {
-          // Check if Limit Per Mint is greater than Max Circulation
-          const maxCirculationValue = BigInt(maxCirculation || "0");
-          if (
-            bigIntValue > maxCirculationValue &&
-            maxCirculationValue !== BigInt(0)
-          ) {
-            setLimitPerMintError(
-              "Limit Per Mint cannot be greater than Max Circulation",
-            );
-          } else {
-            setLimitPerMintError("");
-          }
+          setFileUploadError("Image must be exactly 420x420 pixels.");
         }
-      } else {
-        errorSetter("Value exceeds maximum allowed (2^64 - 1)");
-      }
-    }
-  };
-
-  const handleChangeFee = (newFee: number) => {
-    setFee(newFee);
-  };
-
-  const handleImage = (e: any) => {
-    const file = e.target.files[0];
-    const validTypes = ["image/gif", "image/jpeg", "image/png"];
-    const img = new Image();
-
-    img.onerror = () => {
-      alert("Invalid image file.");
-    };
-
-    img.onload = () => {
-      if (img.width === 420 && img.height === 420) {
-        setFile(file);
-        console.log(file);
-      } else {
-        alert("Image must be 420x420 pixels.");
-      }
-    };
-
-    if (validTypes.includes(file.type)) {
+      };
+      img.onerror = () => {
+        setFileUploadError("Invalid image file.");
+      };
       img.src = URL.createObjectURL(file);
     } else {
-      alert("File type must be GIF, JPG, or PNG.");
+      setFormState((prev) => ({ ...prev, file: null }));
     }
   };
 
-  const handleDecimalInput = (value: string) => {
-    const sanitizedValue = value.replace(/\D/g, "");
-    const numValue = parseInt(sanitizedValue, 10);
-    if (!isNaN(numValue) && numValue >= 0 && numValue <= 18) {
-      setDec(sanitizedValue);
-    } else if (sanitizedValue === "") {
-      setDec("");
-    }
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+
+      try {
+        const response = await axiod.post(`/api/v2/upload-src20-background`, {
+          fileData: base64String,
+          tick: formState.token,
+        });
+
+        if (response.data.success) {
+          console.log("File uploaded successfully");
+        } else {
+          throw new Error(response.data.message || "Upload failed");
+        }
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        setFileUploadError(
+          "File upload failed. The deployment will continue without the background image.",
+        );
+      }
+    };
+
+    reader.readAsDataURL(file);
   };
 
-  const [apiError, setApiError] = useState<string>("");
-
-  const handleDeploy = async () => {
-    if (!isConnected.value) {
-      alert("Connect your wallet");
-      return;
+  const handleDeploySubmit = async () => {
+    let fileUploaded = false;
+    if (formState.file) {
+      try {
+        await handleFileUpload(formState.file);
+        fileUploaded = true;
+      } catch (error) {
+        console.error("File upload failed:", error);
+        setFileUploadError(
+          "File upload failed. The deployment will continue without the background image.",
+        );
+      }
     }
-
-    setApiError("");
 
     try {
-      const response = await axiod.post(`${config.API_BASE_URL}/src20/create`, {
-        toAddress: address,
-        changeAddress: address,
-        op: "deploy",
-        tick: token,
-        feeRate: fee,
-        max: maxCirculation,
-        lim: limitPerMint,
-        dec: dec === "" ? 18 : parseInt(dec, 10),
-        x,
-        web,
-        email,
-      });
-
-      console.log(response);
-      // Handle successful response here
+      // Proceed with the main deploy process regardless of file upload result
+      await handleSubmit({ fileUploaded });
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.error) {
-        setApiError(error.response.data.error);
+      if (error.message && error.message.includes("cancelled")) {
+        // This is now handled in the useSRC20Form hook
+        console.log("Stamping cancelled");
       } else {
-        setApiError("An unexpected error occurred");
+        console.error("Stamping error:", error);
       }
-      console.error(error);
     }
   };
 
-  const [error, setError] = useState<string>("");
-
   return (
-    <div class={"flex flex-col w-full items-center gap-8"}>
-      <p class={"text-[#5503A6] text-[43px] font-medium mt-6 w-full text-left"}>
+    <div class="flex flex-col w-full items-center gap-8">
+      <p class="text-[#5503A6] text-[43px] font-medium mt-6 w-full text-left">
         DEPLOY SRC-20
       </p>
 
@@ -222,9 +120,9 @@ export function DeployContent() {
               type="file"
               class="hidden"
               accept="image/*"
-              onChange={handleImage}
+              onChange={handleFileChange}
             />
-            {file !== null && (
+            {formState.file !== null && (
               <img
                 width={324}
                 style={{
@@ -234,10 +132,10 @@ export function DeployContent() {
                   backgroundColor: "rgb(0,0,0)",
                   borderRadius: "6px",
                 }}
-                src={URL.createObjectURL(file)}
+                src={URL.createObjectURL(formState.file)}
               />
             )}
-            {file === null && (
+            {formState.file === null && (
               <label
                 for="upload"
                 class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
@@ -265,10 +163,13 @@ export function DeployContent() {
             type="text"
             class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
             placeholder="Max 5 Chars"
-            value={token}
-            onChange={handleTokenChange}
+            value={formState.token}
+            onChange={(e) => handleInputChange(e, "token")}
             maxLength={5}
           />
+          {formState.tokenError && (
+            <p class="text-red-500 mt-2">{formState.tokenError}</p>
+          )}
         </div>
         <div class="w-full">
           <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
@@ -280,16 +181,11 @@ export function DeployContent() {
             pattern="[0-9]*"
             class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
             placeholder="Positive Integer (max uint64)"
-            value={limitPerMint}
-            onChange={(e: Event) =>
-              handleIntegerInput(
-                (e.target as HTMLInputElement).value,
-                setLimitPerMint,
-                setLimitPerMintError,
-              )}
+            value={formState.lim}
+            onChange={(e) => handleInputChange(e, "lim")}
           />
-          {limitPerMintError && (
-            <p class="text-red-500 mt-2">{limitPerMintError}</p>
+          {formState.limError && (
+            <p class="text-red-500 mt-2">{formState.limError}</p>
           )}
         </div>
       </div>
@@ -304,17 +200,11 @@ export function DeployContent() {
           pattern="[0-9]*"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Positive Integer (max uint64)"
-          value={maxCirculation}
-          onChange={(e: Event) =>
-            handleIntegerInput(
-              (e.target as HTMLInputElement).value,
-              setMaxCirculation,
-              setMaxCirculationError,
-              true,
-            )}
+          value={formState.max}
+          onChange={(e) => handleInputChange(e, "max")}
         />
-        {maxCirculationError && (
-          <p class="text-red-500 mt-2">{maxCirculationError}</p>
+        {formState.maxError && (
+          <p class="text-red-500 mt-2">{formState.maxError}</p>
         )}
       </div>
 
@@ -326,9 +216,8 @@ export function DeployContent() {
           pattern="[0-9]*"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Decimal Places (0-18, default: 18)"
-          value={dec}
-          onChange={(e: Event) =>
-            handleDecimalInput((e.target as HTMLInputElement).value)}
+          value={formState.dec}
+          onChange={(e) => handleInputChange(e, "dec")}
         />
       </div>
 
@@ -338,8 +227,8 @@ export function DeployContent() {
           type="text"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="X Username (optional)"
-          value={x}
-          onChange={(e: Event) => setX((e.target as HTMLInputElement).value)}
+          value={formState.x}
+          onChange={(e) => handleInputChange(e, "x")}
         />
       </div>
 
@@ -349,8 +238,8 @@ export function DeployContent() {
           type="text"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Website (optional)"
-          value={web}
-          onChange={(e: Event) => setWeb((e.target as HTMLInputElement).value)}
+          value={formState.web}
+          onChange={(e) => handleInputChange(e, "web")}
         />
       </div>
 
@@ -360,34 +249,49 @@ export function DeployContent() {
           type="email"
           class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
           placeholder="Email (optional)"
-          value={email}
-          onChange={(e: Event) =>
-            setEmail((e.target as HTMLInputElement).value)}
+          value={formState.email}
+          onChange={(e) => handleInputChange(e, "email")}
         />
       </div>
 
       <FeeEstimation
-        fee={fee}
+        fee={formState.fee}
         handleChangeFee={handleChangeFee}
         type="src20-deploy"
         fileType="application/json"
-        fileSize={jsonSize}
+        fileSize={formState.jsonSize}
         issuance={1}
-        BTCPrice={BTCPrice}
+        BTCPrice={formState.BTCPrice}
         onRefresh={fetchFees}
       />
 
-      {apiError && (
+      {formState.apiError && (
         <div class="w-full text-red-500 text-center">
-          {apiError}
+          {formState.apiError}
+        </div>
+      )}
+
+      {fileUploadError && (
+        <div class="w-full text-yellow-500 text-center">
+          {fileUploadError}
+        </div>
+      )}
+
+      {submissionMessage && (
+        <div class="w-full text-center font-bold">
+          {submissionMessage}
         </div>
       )}
 
       <div
-        class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}
-        onClick={handleDeploy}
+        class={`w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 ${
+          isSubmitting
+            ? "bg-gray-500 cursor-not-allowed"
+            : "bg-[#5503A6] cursor-pointer"
+        }`}
+        onClick={isSubmitting ? undefined : handleDeploySubmit}
       >
-        Stamp Now
+        {isSubmitting ? "Stamping..." : "Stamp Now"}
       </div>
     </div>
   );

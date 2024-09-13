@@ -1,6 +1,7 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { MintStampInputData, TX, TXError } from "globals";
-import { conf } from "utils/config.ts";
+// import { conf } from "utils/config.ts";
+import { serverConfig as conf } from "$server/config/config.ts";
 import { mintStampCIP33 } from "utils/minting/olga/mint.ts";
 import { validateAndPrepareAssetName } from "utils/minting/stamp.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";

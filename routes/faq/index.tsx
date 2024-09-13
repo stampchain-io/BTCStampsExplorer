@@ -163,8 +163,8 @@ export default function FAQ() {
             <Accordion title="CREATE AND SEND STAMPS">
               <p className="text-sm md:text-lg font-medium">
                 1. Choose a compatible wallet.<br />
-                2. Inscribe the data by calculating transaction fees based on
-                data size and current network conditions.<br />
+                2. Stamp the data by calculating transaction fees based on data
+                size and current network conditions.<br />
                 3. Broadcast the transaction to the Bitcoin network and wait for
                 confirmation.
               </p>

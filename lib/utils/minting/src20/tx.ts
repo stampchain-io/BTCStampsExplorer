@@ -14,7 +14,7 @@ import { IPrepareSRC20TX, PSBTInput, VOUT } from "./src20.d.ts";
 
 import { selectUTXOs } from "./utxo-selector.ts";
 import { compressWithCheck } from "../zlib.ts";
-import { conf } from "utils/config.ts";
+import { serverConfig as conf } from "$server/config/config.ts";
 
 const DUST_SIZE = 777;
 

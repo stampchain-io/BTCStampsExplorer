@@ -1,4 +1,4 @@
-import { signal } from "@preact/signals";
+import { Signal, signal } from "@preact/signals";
 
 import { Wallet } from "store/wallet/wallet.d.ts";
 import {
@@ -7,11 +7,10 @@ import {
   signMessage,
   signPSBT,
 } from "./walletHelper.ts";
-// Import other wallet providers as needed
 
 interface WalletContext {
-  wallet: signal<Wallet>;
-  isConnected: signal<boolean>;
+  wallet: Signal<Wallet>;
+  isConnected: Signal<boolean>;
   updateWallet: (wallet: Wallet) => void;
   getBasicStampInfo: (address: string) => Promise<any>;
   disconnect: () => void;

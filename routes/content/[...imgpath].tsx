@@ -1,6 +1,6 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { getMimeType } from "utils/util.ts";
-import { conf } from "utils/config.ts";
+import { serverConfig as conf } from "$server/config/config.ts";
 
 export async function handler(
   req: Request,

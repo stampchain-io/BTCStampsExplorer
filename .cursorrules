@@ -8,6 +8,8 @@ Code Style and Structure:
   hasError)
 - Structure files: exported component, subcomponents, helpers, static content,
   types
+  - use the mappings in deno.json for reference to all libraries. This is the
+    replacement for import_map
 
 Naming Conventions:
 

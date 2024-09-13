@@ -1,5 +1,5 @@
 import { StampService } from "$lib/services/stampService.ts";
-import { dbManager } from "$lib/database/db.ts";
+import { dbManager } from "../../server/database/db.ts";
 
 export const xcp_v2_nodes = [
   {
