@@ -1,20 +1,46 @@
 import { load } from "$std/dotenv/mod.ts";
 
-const env_file = Deno.env.get("ENV") === "development"
-  ? "./.env.development.local"
-  : "./.env";
+// Check if we're in a Deno environment
+const isDeno = typeof Deno !== "undefined";
 
-const confFromFile = await load({
-  envPath: env_file,
-  export: true,
-});
+let serverConfig: ServerConfig;
 
-const envVars = Deno.env.toObject();
+if (isDeno) {
+  const env_file = Deno.env.get("ENV") === "development"
+    ? "./.env.development.local"
+    : "./.env";
 
-export const serverConfig = {
-  ...envVars,
-  ...confFromFile,
-};
+  const confFromFile = await load({
+    envPath: env_file,
+    export: true,
+  });
+
+  const envVars = Deno.env.toObject();
+
+  serverConfig = {
+    ...envVars,
+    ...confFromFile,
+    APP_ROOT: Deno.cwd(),
+  };
+} else {
+  // Provide a dummy config for the client-side
+  serverConfig = {
+    APP_ROOT: "",
+  };
+}
+
+// Define an interface for the server config
+interface ServerConfig {
+  APP_ROOT: string;
+  IMAGES_SRC_PATH?: string;
+  API_BASE_URL?: string;
+  MINTING_SERVICE_FEE?: string;
+  MINTING_SERVICE_FEE_ADDRESS?: string;
+  CSRF_SECRET_KEY?: string;
+  [key: string]: string | undefined;
+}
+
+export { serverConfig };
 
 // Add a function to get client-safe config
 export function getClientConfig() {

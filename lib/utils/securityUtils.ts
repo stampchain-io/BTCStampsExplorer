@@ -4,12 +4,12 @@ import {
   Payload,
   verify,
 } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
+import { serverConfig } from "$server/config/config.ts";
 
-// Ensure this is set in your environment variables
-const SECRET_KEY = Deno.env.get("CSRF_SECRET_KEY");
+const SECRET_KEY = serverConfig.CSRF_SECRET_KEY;
 
 if (!SECRET_KEY) {
-  throw new Error("CSRF_SECRET_KEY is not set in the environment variables");
+  throw new Error("CSRF_SECRET_KEY is not set in the server configuration");
 }
 
 export async function generateCSRFToken(): Promise<string> {
