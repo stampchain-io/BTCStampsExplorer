@@ -1,11 +1,11 @@
 import { Handlers } from "$fresh/server.ts";
-import { fetch_quicknode } from "utils/quicknode.ts";
+import { fetchQuicknode } from "utils/quicknode.ts";
 
 export const handler: Handlers = {
   async POST(req) {
     const { name, params } = await req.json();
     try {
-      const stampBalance = await fetch_quicknode(name, params);
+      const stampBalance = await fetchQuicknode(name, params);
       return new Response(
         JSON.stringify({ price: stampBalance.result.bitcoin.usd }),
         {

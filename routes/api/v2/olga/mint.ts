@@ -1,7 +1,7 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { MintStampInputData, TX, TXError } from "globals";
 // import { conf } from "utils/config.ts";
-import { serverConfig as conf } from "$server/config/config.ts";
+import { serverConfig } from "$server/config/config.ts";
 import { mintStampCIP33 } from "utils/minting/olga/mint.ts";
 import { validateAndPrepareAssetName } from "utils/minting/stamp.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
@@ -29,9 +29,9 @@ export const handler: Handlers<TX | TXError> = {
       assetName: assetName,
       satsPerKB: Number(body.satsPerKB),
       service_fee: body.service_fee ||
-        parseInt(conf.MINTING_SERVICE_FEE_FIXED_SATS),
+        parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS),
       service_fee_address: body.service_fee_address ||
-        conf.MINTING_SERVICE_FEE_ADDRESS,
+        serverConfig.MINTING_SERVICE_FEE_ADDRESS,
     };
 
     try {
@@ -72,7 +72,7 @@ export const handler: Handlers<TX | TXError> = {
     } catch (error) {
       console.error("Minting error:", error);
 
-      let errorMessage = error.message ||
+      const errorMessage = error.message ||
         "An unexpected error occurred during minting";
       let statusCode = 400;
 

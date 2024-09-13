@@ -3,7 +3,7 @@ import * as bitcore from "bitcore";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
 
-import { get_transaction } from "utils/quicknode.ts";
+import { getTransaction } from "utils/quicknode.ts";
 import {
   address_from_pubkeyhash,
   bin2hex,
@@ -14,7 +14,7 @@ import { IPrepareSRC20TX, PSBTInput, VOUT } from "./src20.d.ts";
 
 import { selectUTXOs } from "./utxo-selector.ts";
 import { compressWithCheck } from "../zlib.ts";
-import { serverConfig as conf } from "$server/config/config.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 const DUST_SIZE = 777;
 
@@ -120,9 +120,11 @@ export const prepareSrc20TX = async ({
   }
   console.log("cpScripts", cpScripts);
 
-  if (parseInt(conf.MINTING_SERVICE_FEE_ENABLED) === 1) {
-    const feeAddress = conf.MINTING_SERVICE_FEE_ADDRESS;
-    const feeAmount = parseInt(conf.MINTING_SERVICE_FEE_FIXED_SATS);
+  if (parseInt(serverConfig.MINTING_SERVICE_FEE_ENABLED || "0") === 1) {
+    const feeAddress = serverConfig.MINTING_SERVICE_FEE_ADDRESS || "";
+    const feeAmount = parseInt(
+      serverConfig.MINTING_SERVICE_FEE_FIXED_SATS || "0",
+    );
     vouts.push({
       address: feeAddress,
       value: feeAmount,
@@ -140,7 +142,7 @@ export const prepareSrc20TX = async ({
   }
 
   for (const input of inputs) {
-    const txDetails = await get_transaction(input.txid);
+    const txDetails = await getTransaction(input.txid);
     const inputDetails = txDetails.vout[input.vout];
     const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
 
@@ -190,7 +192,7 @@ export const prepareSrc20TX = async ({
 };
 
 // const address = "address_here_to_test";
-// const pubKey = await get_public_key_from_address(address);
+// const pubKey = await getPublicKeyFromAddress(address);
 // const utxos = await getUTXOForAddress(address);
 // if (!utxos || utxos.length === 0) {
 //   throw new Error("No UTXO found");

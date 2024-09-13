@@ -7,7 +7,7 @@ import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
 import CIP33 from "utils/minting/olga/CIP33.ts";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 import { Buffer } from "buffer";
-import { get_transaction } from "utils/quicknode.ts";
+import { getTransaction } from "utils/quicknode.ts";
 import { PSBTInput } from "utils/minting/src20/src20.d.ts";
 import {
   calculateDust,
@@ -222,7 +222,7 @@ async function generatePSBT(
   });
 
   for (const input of inputs) {
-    const txDetails = await get_transaction(input.txid);
+    const txDetails = await getTransaction(input.txid);
     const inputDetails = txDetails.vout[input.vout];
     const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
     const psbtInput: PSBTInput = {
