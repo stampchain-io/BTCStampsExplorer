@@ -126,11 +126,14 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
             ...prev,
             tokenError: "This tick already exists.",
           }));
+        } else {
+          // The tick doesn't exist, which is what we want for deployment
+          setFormState((prev) => ({ ...prev, tokenError: "" }));
         }
       } catch (error) {
-        if (error.response && error.response.status !== 404) {
-          console.error("Error checking tick existence:", error);
-        }
+        console.error("Error checking tick existence:", error);
+        // Don't set an error message here, as a failure to check doesn't necessarily mean the tick is invalid
+        setFormState((prev) => ({ ...prev, tokenError: "" }));
       }
     }
   };
@@ -145,21 +148,26 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
     if (bigIntValue <= maxUint64) {
       if (field === "max") {
         const limitValue = BigInt(formState.lim || "0");
-        if (bigIntValue <= limitValue) {
+        if (bigIntValue < limitValue) {
+          // If max is less than lim, update lim to match max
           setFormState((prev) => ({
             ...prev,
-            maxError: "Max Circulation must be greater than Limit Per Mint",
+            lim: sanitizedValue,
+            limError: "Limit Per Mint adjusted to match Max Circulation",
           }));
         } else {
-          setFormState((prev) => ({ ...prev, maxError: "" }));
+          setFormState((prev) => ({ ...prev, maxError: "", limError: "" }));
         }
       } else if (field === "lim") {
         const maxValue = BigInt(formState.max || "0");
-        if (bigIntValue > maxValue && maxValue !== BigInt(0)) {
+        if (maxValue !== BigInt(0) && bigIntValue > maxValue) {
+          // If lim is greater than max, set lim to max
           setFormState((prev) => ({
             ...prev,
-            limError: "Limit Per Mint cannot be greater than Max Circulation",
+            limError:
+              "Limit Per Mint cannot exceed Max Circulation. Adjusted to match Max Circulation.",
           }));
+          return maxValue.toString();
         } else {
           setFormState((prev) => ({ ...prev, limError: "" }));
         }
@@ -213,6 +221,7 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
         newState.limError = "Limit per mint is required";
         isValid = false;
       }
+      // Remove the check for max > lim as it's now enforced during input
     }
 
     setFormState(newState);
