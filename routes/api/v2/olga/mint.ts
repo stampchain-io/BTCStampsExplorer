@@ -4,6 +4,7 @@ import { conf } from "utils/config.ts";
 import { mintStampCIP33 } from "utils/minting/olga/mint.ts";
 import { validateAndPrepareAssetName } from "utils/minting/stamp.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
+import { Buffer } from "buffer";
 
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, _ctx: FreshContext) {
@@ -23,7 +24,7 @@ export const handler: Handlers<TX | TXError> = {
 
     const prepare = {
       ...body,
-      prefix: "stamp",
+      prefix: "stamp" as const,
       assetName: assetName,
       satsPerKB: Number(body.satsPerKB),
       service_fee: body.service_fee ||
@@ -44,12 +45,15 @@ export const handler: Handlers<TX | TXError> = {
 
       console.log("Successful mint_tx:", mint_tx);
 
-      // Extract input details from the PSBT
-      const txDetails = mint_tx.psbt.data.inputs.map((input, index) => ({
+      // Update the txDetails mapping
+      const txDetails = mint_tx.psbt.data.inputs.map((
+        input: any,
+        index: number,
+      ) => ({
         txid: input.hash
           ? Buffer.from(input.hash).reverse().toString("hex")
           : "",
-        vout: input.index,
+        vout: input.index ?? 0,
         signingIndex: index,
       }));
 
@@ -67,31 +71,18 @@ export const handler: Handlers<TX | TXError> = {
     } catch (error) {
       console.error("Minting error:", error);
 
-      let errorMessage = "An unexpected error occurred during minting";
-      let statusCode = 500;
+      let errorMessage = error.message ||
+        "An unexpected error occurred during minting";
+      let statusCode = 400;
 
-      if (error instanceof Error) {
-        errorMessage = error.message;
-        console.error("Error stack:", error.stack);
-
-        if (error.message.includes("Insufficient funds")) {
-          errorMessage =
-            "Insufficient funds in the wallet for this transaction";
-          statusCode = 400;
-        } else if (error.message.includes("UTXO selection failed")) {
-          errorMessage =
-            "Failed to select appropriate UTXOs for the transaction";
-          statusCode = 400;
-        } else if (error.message.includes("Invalid satsPerKB parameter")) {
-          errorMessage = "Invalid fee rate provided";
-          statusCode = 400;
-        } else if (
-          error.message.includes("Cannot read properties of undefined")
-        ) {
-          errorMessage =
-            "Error generating transaction: Invalid response structure";
-          statusCode = 500;
-        }
+      if (errorMessage.includes("insufficient funds")) {
+        statusCode = 400;
+      } else if (errorMessage.includes("UTXO selection failed")) {
+        statusCode = 400;
+      } else if (errorMessage.includes("Invalid satsPerKB parameter")) {
+        statusCode = 400;
+      } else {
+        statusCode = 500;
       }
 
       return ResponseUtil.error(errorMessage, statusCode);

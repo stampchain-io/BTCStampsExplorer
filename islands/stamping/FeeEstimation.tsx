@@ -210,7 +210,7 @@ export function FeeEstimation({
                 <p>{fee}</p>
               </div>
             )}
-            {(type === "stamp" || type === "src20-deploy") &&
+            {(type === "stamp") &&
               (
                 <>
                   <div class="flex flex-col md:flex-row justify-between md:gap-8">
@@ -229,14 +229,14 @@ export function FeeEstimation({
                       <p>{fee}</p>
                     </div>
                     <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-                      <p>Items to Mint</p>
+                      <p>Editions</p>
                       <p>{issuance}</p>
                     </div>
                   </div>
                 </>
               )}
             <div class="flex flex-col md:flex-row justify-between md:gap-8">
-              <div class="flex justify-between border-b border-[#8A8989] md:border-none w-full py-4">
+              <div class="flex justify-between border-b border-[#8A8989] w-full py-4">
                 <p>Miner Fee</p>
                 <p className={"flex gap-1 items-center"}>
                   {coinType === "BTC"

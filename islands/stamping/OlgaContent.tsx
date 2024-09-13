@@ -54,6 +54,11 @@ export function OlgaContent() {
   const [stampName, setStampName] = useState("");
   const { fees, loading, fetchFees } = useFeePolling(300000); // 5 minutes
 
+  const [fileError, setFileError] = useState<string>("");
+  const [issuanceError, setIssuanceError] = useState<string>("");
+  const [stampNameError, setStampNameError] = useState<string>("");
+  const [apiError, setApiError] = useState<string>("");
+
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
@@ -126,20 +131,25 @@ export function OlgaContent() {
 
   const handleImage = (e: any) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile.size > 64 * 1024) { // Check if file size is greater than 64KB
-      alert("File size must be less than 64KB.");
-      return;
+    if (selectedFile.size > 64 * 1024) {
+      setFileError("File size must be less than 64KB.");
+      setFile(null);
+      setFileSize(null);
+    } else {
+      setFileError("");
+      setFile(selectedFile);
+      setFileSize(selectedFile.size);
     }
-    setFile(selectedFile);
-    setFileSize(selectedFile.size);
     console.log(selectedFile);
   };
 
   const handleIssuanceChange = (e: Event) => {
     const value = (e.target as HTMLInputElement).value;
-    // Only allow positive integers
     if (/^\d*$/.test(value)) {
       setIssuance(value === "" ? "1" : value);
+      setIssuanceError("");
+    } else {
+      setIssuanceError("Please enter a valid number.");
     }
   };
 
@@ -147,6 +157,11 @@ export function OlgaContent() {
     const value = (e.target as HTMLInputElement).value;
     if (/^[B-Zb-z][A-Za-z]{0,12}$/.test(value)) {
       setStampName(value);
+      setStampNameError("");
+    } else {
+      setStampNameError(
+        "Invalid stamp name. Must start with B-Z and be 1-13 characters long.",
+      );
     }
   };
 
@@ -155,15 +170,11 @@ export function OlgaContent() {
       log("Starting minting process");
 
       if (!isConnected.value) {
-        log("Wallet not connected");
-        alert("Connect your wallet");
-        return;
+        throw new Error("Connect your wallet");
       }
 
       if (file === null) {
-        log("No file selected");
-        alert("Upload your file");
-        return;
+        throw new Error("Upload your file");
       }
 
       try {
@@ -183,7 +194,6 @@ export function OlgaContent() {
           service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
         };
 
-        // Add assetName to mintRequest if Posh Stamp is selected and a name is entered
         if (isPoshStamp && stampName) {
           mintRequest.assetName = stampName;
         }
@@ -212,7 +222,6 @@ export function OlgaContent() {
           walletContext.wallet.value.provider,
         );
 
-        // Use txDetails to determine which inputs to sign
         const inputsToSign = txDetails.map((
           input: { signingIndex: number },
         ) => ({
@@ -223,29 +232,21 @@ export function OlgaContent() {
         const result = await walletProvider.signPSBT(hex, inputsToSign);
 
         if (result === null) {
-          log("User cancelled the transaction");
-          alert("Transaction was cancelled by the user");
-          return;
+          throw new Error("Transaction was cancelled by the user");
         }
 
         if (typeof result === "string") {
           if (result.startsWith("0x") || result.length === 64) {
-            // This is likely a transaction ID, meaning the transaction was broadcast
             log("Transaction signed and broadcast successfully. TXID:", result);
             alert(
               `Transaction signed and broadcast successfully. TXID: ${result}`,
             );
           } else {
-            // This is likely a signed PSBT
             log("Transaction signed successfully. Signed PSBT:", result);
-            // Here you would add code to broadcast the signed PSBT
             alert(`Transaction signed successfully. Signed PSBT: ${result}`);
           }
         } else {
-          log("Unexpected result from signPSBT:", result);
-          alert(
-            "Unexpected result from signing transaction. Please try again and check the console for more details.",
-          );
+          throw new Error("Unexpected result from signing transaction");
         }
       } catch (error) {
         log("Error in minting process", error);
@@ -257,7 +258,9 @@ export function OlgaContent() {
 
       if (error.response) {
         console.error("API Error Response:", error.response);
-        if (error.response.data && error.response.data.message) {
+        if (error.response.data && error.response.data.error) {
+          errorMessage = error.response.data.error;
+        } else if (error.response.data && error.response.data.message) {
           errorMessage = error.response.data.message;
         }
       } else if (error instanceof Error) {
@@ -266,7 +269,7 @@ export function OlgaContent() {
       }
 
       log("Final error message", errorMessage);
-      alert(`Minting failed: ${errorMessage}`);
+      setApiError(errorMessage);
     }
   };
 
@@ -343,6 +346,7 @@ export function OlgaContent() {
             )}
           </div>
         </div>
+        {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
       </div>
 
       <div class="w-full">
@@ -400,6 +404,7 @@ export function OlgaContent() {
             </svg>
           </div>
         </div>
+        {issuanceError && <p class="text-red-500 mt-2">{issuanceError}</p>}
         <div className="flex gap-7">
           <div className="flex gap-2 items-center">
             <input
@@ -437,7 +442,7 @@ export function OlgaContent() {
           </div>
         </div>
         {isPoshStamp && (
-          <div className="mt-3">
+          <div className="mt-3 w-full">
             <input
               type="text"
               value={stampName}
@@ -446,6 +451,9 @@ export function OlgaContent() {
               className="p-4 text-[#F5F5F5] text-[16px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"
               maxLength={13}
             />
+            {stampNameError && (
+              <p class="text-red-500 mt-2">{stampNameError}</p>
+            )}
           </div>
         )}
       </div>
@@ -530,6 +538,12 @@ export function OlgaContent() {
         BTCPrice={BTCPrice}
         onRefresh={fetchFees}
       />
+
+      {apiError && (
+        <div class="w-full text-red-500 text-center">
+          {apiError}
+        </div>
+      )}
 
       <div
         class={"w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 bg-[#5503A6] cursor-pointer"}

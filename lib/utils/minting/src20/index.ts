@@ -89,6 +89,9 @@ export async function deploySRC20({
   max,
   lim,
   dec = 18,
+  x,
+  web,
+  email,
 }: IDeploySRC20) {
   try {
     checkDeployParams({
@@ -99,6 +102,9 @@ export async function deploySRC20({
       max,
       lim,
       dec,
+      x,
+      web,
+      email,
     });
 
     const mint_info = await checkDeployedTick(tick);
@@ -112,6 +118,9 @@ export async function deploySRC20({
       max: max,
       lim: lim,
       dec: dec,
+      x: x,
+      web: web,
+      email: email,
     };
     const transferString = JSON.stringify(src20_mint_obj);
 

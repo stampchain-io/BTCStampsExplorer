@@ -14,7 +14,7 @@ export const StampingSrc20Header = (
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
         >
-          Mint
+          MINT
         </a>
         <a
           href="/stamping/src20/deploy"
@@ -22,7 +22,7 @@ export const StampingSrc20Header = (
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
         >
-          Deploy
+          DEPLOY
         </a>
         <a
           href="/stamping/src20/transfer"
@@ -30,11 +30,11 @@ export const StampingSrc20Header = (
             ? "text-[19px] text-[#7A00F5] font-semibold cursor-pointer pb-4 border-b-4 border-b-[#7A00F5]"
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
         >
-          Transfer
+          TRANSFER
         </a>
       </div>
       <div class="flex gap-6">
-        <StampSearchClient />
+        {/* <StampSearchClient /> */}
       </div>
     </div>
   );
