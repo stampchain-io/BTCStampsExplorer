@@ -1,17 +1,20 @@
-import { HandlerContext } from "$fresh/server.ts";
+import { Handlers } from "$fresh/server.ts";
 import { getMimeType } from "utils/util.ts";
-import { serverConfig as conf } from "$server/config/config.ts";
+import { serverConfig } from "$server/config/config.ts";
 
-export async function handler(
-  req: Request,
-  ctx: HandlerContext,
-): Promise<Response> {
-  const { imgpath } = ctx.params;
+export const handler: Handlers = {
+  async GET(req, ctx) {
+    const { imgpath } = ctx.params;
+    return await serveImage(imgpath);
+  },
+};
+
+async function serveImage(imgpath: string): Promise<Response> {
   const mimeType = getMimeType(imgpath.split(".").pop() as string);
 
   // First, check if the file exists in IMAGES_SRC_PATH
-  if (conf.IMAGES_SRC_PATH !== "") {
-    const remotePath = `${conf.IMAGES_SRC_PATH}/${imgpath}`;
+  if (serverConfig.IMAGES_SRC_PATH) {
+    const remotePath = `${serverConfig.IMAGES_SRC_PATH}/${imgpath}`;
     try {
       const response = await fetch(remotePath);
       if (response.ok) {
@@ -29,7 +32,7 @@ export async function handler(
   }
 
   // If not found in IMAGES_SRC_PATH or if IMAGES_SRC_PATH is not set, check local path
-  const localPath = `${Deno.cwd()}/static/${imgpath}`;
+  const localPath = `${serverConfig.APP_ROOT}/static/${imgpath}`;
   try {
     const file = await Deno.readFile(localPath);
     return new Response(file, {
@@ -43,8 +46,13 @@ export async function handler(
   }
 
   // If file is not found in either location, serve the not-available image
+  return await serveNotAvailableImage();
+}
+
+async function serveNotAvailableImage(): Promise<Response> {
   try {
-    const notAvailablePath = `${Deno.cwd()}/static/not-available.png`;
+    const notAvailablePath =
+      `${serverConfig.APP_ROOT}/static/not-available.png`;
     const file = await Deno.readFile(notAvailablePath);
     return new Response(file, {
       status: 200,

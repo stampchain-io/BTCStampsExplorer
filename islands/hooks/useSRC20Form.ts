@@ -5,7 +5,7 @@ import { useConfig } from "$/hooks/useConfig.ts";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
 import { fetchBTCPrice } from "$lib/utils/btc.ts";
 import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+// import { Src20Controller } from "$lib/controller/src20Controller.ts";  // NEED TO CALL FROM THE API
 
 export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
   const { config, isLoading: configLoading } = useConfig();
@@ -118,7 +118,8 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
 
     if (field === "token" && operation === "deploy") {
       try {
-        const tickExists = await Src20Controller.checkTickExists(newValue);
+        // const tickExists = await Src20Controller.checkTickExists(newValue);
+        const tickExists = false;
         if (tickExists) {
           setFormState((prev) => ({
             ...prev,
