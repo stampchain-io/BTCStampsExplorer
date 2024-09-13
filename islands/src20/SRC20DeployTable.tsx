@@ -31,7 +31,7 @@ const ImageModal = (
 
 export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
   const { data } = props;
-  // console.log("SRC20DeployTable received data:", data);
+  console.log("SRC20DeployTable received data:", data);
 
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -53,73 +53,86 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         onClose={handleCloseModal}
       />
       <div class="relative overflow-x-auto shadow-md">
-        <table class="hidden md:table w-full text-sm text-left rtl:text-right text-[#F5F5F5]">
-          <thead class="bg-[#2B0E49] uppercase text-lg text-[#C184FF]">
-            <tr class="border-b border-[#B9B9B9]">
-              <th scope="col" class="px-6 py-3">#</th>
-              <th scope="col" class="px-6 py-3">image</th>
-              <th scope="col" class="px-6 py-3">tick</th>
-              <th scope="col" class="px-6 py-3">block</th>
-              <th scope="col" class="px-6 py-3">creator</th>
-              <th scope="col" class="px-6 py-3">max</th>
-              <th scope="col" class="px-6 py-3">lim</th>
-              <th scope="col" class="px-6 py-3">decimals</th>
-              <th scope="col" class="px-6 py-3">date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((src20: SRC20Row) => {
-              const href = `/src20/${convertToEmoji(src20.tick)}`;
-              return (
-                <tr class="bg-[#2B0E49] border-b border-[#B9B9B9] text-sm">
-                  <td class="px-6 py-4 uppercase">
-                    {src20.row_num}
-                  </td>
-                  <td class="px-6 py-4 uppercase cursor-pointer">
-                    <img
-                      src={`/content/${src20.tx_hash}.svg`}
-                      class="w-[65px] h-[65px]"
-                      onClick={() =>
-                        handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
-                    />
-                  </td>
-                  <td class="px-6 py-4 uppercase">
-                    <a href={href}>
+        <div class="hidden md:flex flex-col gap-6">
+          {data.map((src20: SRC20Row) => {
+            const href = `/src20/${convertToEmoji(src20.tick)}`;
+            return (
+              <div class="bg-[#2B0E49] text-sm flex justify-between">
+                <div class="px-6 py-4 uppercase cursor-pointer flex gap-6">
+                  <img
+                    src={`/content/${src20.tx_hash}.svg`}
+                    class="w-[65px] h-[65px]"
+                    onClick={() =>
+                      handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
+                  />
+                  <div>
+                    <a
+                      href={href}
+                      className={"text-2xl text-[#666666] font-bold"}
+                    >
                       {convertToEmoji(src20.tick)}
                     </a>
-                  </td>
-                  <td class="px-6 py-4">
-                    {src20.block_index}
-                  </td>
-                  <td class="px-6 py-4">
-                    {src20.destination_name
-                      ? src20.destination_name
-                      : abbreviateAddress(src20.destination)}
-                  </td>
-                  <td class="px-6 py-4">
-                    {typeof src20.max === "number"
-                      ? src20.max.toLocaleString()
-                      : Number(src20.max).toLocaleString()}
-                  </td>
-                  <td class="px-6 py-4">
-                    {typeof src20.lim === "number"
-                      ? src20.lim.toLocaleString()
-                      : Number(src20.lim).toLocaleString()}
-                  </td>
-                  <td class="px-6 py-4">
-                    {src20.deci}
-                  </td>
-                  <td class="px-6 py-4 text-sm">
-                    {new Date(src20.block_time).toLocaleString("default", {
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    <p className={"text-lg text-[#666666] font-light"}>
+                      CREATOR{" "}
+                      <span className={"font-bold text-[#999999]"}>
+                        {src20.destination_name
+                          ? src20.destination_name
+                          : abbreviateAddress(src20.destination)}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <div class="px-6 py-4 text-center">
+                  <p className={"text-lg text-[#666666] font-light"}>
+                    SUPPLY{" "}
+                    <span className={"font-bold text-[#999999]"}>
+                      {typeof src20.max === "number"
+                        ? src20.max.toLocaleString()
+                        : Number(src20.max).toLocaleString()}
+                    </span>
+                  </p>
+                  <p className={"text-lg text-[#666666] font-light"}>
+                    LIMIT{" "}
+                    <span className={"font-bold text-[#999999]"}>
+                      {typeof src20.lim === "number"
+                        ? src20.lim.toLocaleString()
+                        : Number(src20.lim).toLocaleString()}
+                    </span>
+                  </p>
+                </div>
+                <div class="px-6 py-4 text-sm text-center">
+                  <p className={"text-lg text-[#666666] font-light"}>
+                    DEPLOY{" "}
+                    <span className={"font-bold text-[#999999]"}>
+                      {new Date(src20.block_time).toLocaleString("default", {
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </p>
+                  <p className={"text-lg text-[#666666] font-light"}>
+                    HOLDERS{" "}
+                    <span className={"font-bold text-[#999999]"}>2170</span>
+                  </p>
+                </div>
+                <div class="px-6 py-4 text-right">
+                  <p className={"text-lg text-[#666666] font-light"}>
+                    MARKETCAP{" "}
+                    <span className={"font-bold text-[#999999]"}>
+                      93.15 BTC
+                    </span>
+                  </p>
+                  <p className={"text-lg text-[#666666] font-light"}>
+                    PRICE{" "}
+                    <span className={"font-bold text-[#999999]"}>
+                      13.50 SATS
+                    </span>
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
         <div class="flex md:hidden flex-col gap-3">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
