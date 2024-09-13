@@ -1,12 +1,19 @@
-import { serverConfig as conf } from "$server/config/config.ts";
+import { serverConfig } from "$server/config/config.ts";
 import { MAX_XCP_RETRIES } from "utils/constants.ts";
+import {
+  GetDecodedTx,
+  GetPublicKeyFromAddress,
+  GetRawTx,
+  GetTransaction,
+} from "$lib/types/quicknode.ts";
+import { FetchQuicknodeFunction } from "$lib/types/quicknode.ts";
 
-const { QUICKNODE_ENDPOINT, QUICKNODE_API_KEY } = conf;
+const { QUICKNODE_ENDPOINT, QUICKNODE_API_KEY } = serverConfig;
 const QUICKNODE_URL = `${QUICKNODE_ENDPOINT}/${QUICKNODE_API_KEY}`;
 
-export const fetch_quicknode = async (
-  method: string,
-  params: unknown[],
+export const fetchQuicknode: FetchQuicknodeFunction = async (
+  method,
+  params,
   retries = 0,
 ) => {
   try {
@@ -45,11 +52,11 @@ export const fetch_quicknode = async (
 
     const result = await response.json();
     return result;
-  } catch (error) {
+  } catch (_error) {
     if (retries < MAX_XCP_RETRIES) {
       console.log(`Retrying... (${retries + 1}/${MAX_XCP_RETRIES})`);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      return await fetch_quicknode(method, params, retries + 1);
+      return await fetchQuicknode(method, params, retries + 1);
     } else {
       console.error("Max retries reached. Returning null.");
       return null;
@@ -57,23 +64,25 @@ export const fetch_quicknode = async (
   }
 };
 
-export async function get_public_key_from_address(address: string) {
+export const getPublicKeyFromAddress: GetPublicKeyFromAddress = async (
+  address,
+) => {
   const method = "validateaddress";
   const params = [address];
   try {
-    const result = await fetch_quicknode(method, params);
-    return result.result.scriptPubKey;
+    const result = await fetchQuicknode(method, params);
+    return result?.result.scriptPubKey;
   } catch (error) {
     console.error(`ERROR: Error getting public key from address:`, error);
     throw error;
   }
-}
+};
 
-async function get_raw_tx(txHash: string) {
+export const getRawTx: GetRawTx = async (txHash) => {
   const method = "getrawtransaction";
   const params = [txHash, 0];
   try {
-    const result = await fetch_quicknode(method, params);
+    const result = await fetchQuicknode(method, params);
     if (!result) {
       throw new Error(`Error: No result for txHash: ${txHash}`);
     }
@@ -82,22 +91,22 @@ async function get_raw_tx(txHash: string) {
     console.error(`ERROR: Error getting raw tx:`, error);
     throw error;
   }
-}
+};
 
-async function get_decoded_tx(txHex: string) {
+export const getDecodedTx: GetDecodedTx = async (txHex) => {
   const method = "decoderawtransaction";
   const params = [txHex];
   try {
-    const result = await fetch_quicknode(method, params);
-    return result.result;
+    const result = await fetchQuicknode(method, params);
+    return result?.result;
   } catch (error) {
     console.error(`ERROR: Error getting decoded tx:`, error);
     throw error;
   }
-}
+};
 
-export async function get_transaction(txHash: string) {
-  const hex = await get_raw_tx(txHash);
-  const tx_data = await get_decoded_tx(hex);
-  return { ...tx_data, hex };
-}
+export const getTransaction: GetTransaction = async (txHash) => {
+  const hex = await getRawTx(txHash);
+  const txData = await getDecodedTx(hex);
+  return { ...txData, hex };
+};
