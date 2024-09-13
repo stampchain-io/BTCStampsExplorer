@@ -1,8 +1,7 @@
-import { serverConfig as conf } from "$server/config/config.ts";
+import { serverConfig } from "$server/config/config.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { bigFloatToString } from "utils/util.ts";
 import {
-  BIG_LIMIT,
   SRC20_BALANCE_TABLE,
   SRC20_TABLE,
 } from "utils/constants.ts";
@@ -281,7 +280,9 @@ export class SRC20Repository {
     ) => ({
       ...result,
       deploy_tx: tx_hashes_map[result.tick],
-      deploy_img: `${conf.IMAGES_SRC_PATH}/${tx_hashes_map[result.tick]}.svg`,
+      deploy_img: `${serverConfig.IMAGES_SRC_PATH}/${
+        tx_hashes_map[result.tick]
+      }.svg`,
     }));
 
     return resultsWithDeployImg;
@@ -380,19 +381,5 @@ export class SRC20Repository {
     };
 
     return response;
-  }
-
-  static async checkTickExists(tick: string): Promise<boolean> {
-    const query = `
-      SELECT COUNT(*) as count
-      FROM ${SRC20_TABLE}
-      WHERE tick = ? AND op = 'DEPLOY'
-    `;
-    const result = await dbManager.executeQueryWithCache(
-      query,
-      [tick],
-      1000 * 60,
-    ); // Cache for 1 minute
-    return (result as any).rows[0].count > 0;
   }
 }
