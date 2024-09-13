@@ -141,6 +141,16 @@ export interface XCPParams {
   }[];
   address?: string;
   asset?: string;
+  source?: string;
+  quantity?: number | string;
+  divisible?: boolean;
+  lock?: boolean;
+  description?: string;
+  reset?: boolean;
+  allow_unconfirmed_inputs?: boolean;
+  extended_tx_info?: boolean;
+  disable_utxo_locks?: boolean;
+  fee_per_kb?: number;
 }
 
 export interface XCPBalance {
@@ -457,6 +467,9 @@ export interface InputData {
   lim?: number | string;
   dec?: number;
   amt?: number | string;
+  x?: string;
+  web?: string;
+  email?: string;
 }
 
 export interface MintStampInputData {

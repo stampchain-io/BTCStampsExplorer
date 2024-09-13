@@ -17,6 +17,7 @@ interface PSBTInput {
   };
   nonWitnessUtxo?: Buffer;
   redeemScript?: Buffer;
+  sequence?: number;
 }
 
 interface UTXO {
@@ -47,14 +48,17 @@ interface IMintSRC20 {
   amt: string;
 }
 
-interface IDeploySRC20 {
-  tick: string;
-  max: number | string;
-  lim: number | string;
-  dec: number;
+export interface IDeploySRC20 {
   toAddress: string;
   changeAddress: string;
+  tick: string;
   feeRate: number;
+  max: string;
+  lim: string;
+  dec?: number;
+  x?: string;
+  web?: string;
+  email?: string;
 }
 
 interface IPrepareSRC20TX {
