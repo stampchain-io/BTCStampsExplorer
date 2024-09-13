@@ -207,8 +207,4 @@ export class Src20Service {
       throw error;
     }
   }
-
-  static async checkTickExists(tick: string): Promise<boolean> {
-    return await SRC20Repository.checkTickExists(tick);
-  }
 }
