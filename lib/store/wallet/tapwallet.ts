@@ -82,7 +82,23 @@ const signMessage = async (message: string) => {
 
 const signPSBT = async (psbt: string) => {
   const tapwallet = (window as any).tapwallet;
-  return await tapwallet.signPsbt(psbt);
+  try {
+    const result = await tapwallet.signPsbt(psbt);
+    if (result && result.hex) {
+      return { signed: true, psbt: result.hex };
+    } else {
+      return {
+        signed: false,
+        error: "Unexpected result format from TapWallet",
+      };
+    }
+  } catch (error) {
+    console.error("Error signing PSBT:", error);
+    if (error.message && error.message.includes("User rejected")) {
+      return { signed: false, cancelled: true };
+    }
+    return { signed: false, error: error.message };
+  }
 };
 
 const broadcastRawTX = async (rawTx: string) => {

@@ -13,7 +13,7 @@ import { start } from "$fresh/server.ts";
 import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
 // Import for dbManager initialization
-import "$lib/database/db.ts";
+import "./server/database/db.ts";
 
 // import twindPlugin from "$fresh/plugins/twind.ts";
 // import twindConfig from "./twind.config.ts";

@@ -1,5 +1,6 @@
 import { convertToEmoji } from "utils/util.ts";
 import { Src20Detail } from "globals";
+import * as crypto from "crypto";
 
 const src20_listing_api = [
   {
@@ -39,4 +40,15 @@ export function formatSRC20Row(row: Src20Detail) {
     lim: row.lim ? row.lim.toString() : null,
     amt: row.amt ? row.amt.toString() : null,
   };
+}
+
+export function calculateTickHash(tick: string): string {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(tick.toLowerCase());
+  const hashBuffer = crypto.createHash("sha3-256").update(data).digest();
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join(
+    "",
+  );
+  return hashHex;
 }

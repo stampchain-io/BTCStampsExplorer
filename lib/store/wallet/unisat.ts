@@ -65,8 +65,23 @@ const signMessage = async (message: string) => {
 // Sign a PSBT hex tx
 const signPSBT = async (psbt: string) => {
   const unisat = (window as any).unisat;
-  const signature = await unisat.signPSBT(psbt);
-  return signature;
+  try {
+    const signature = await unisat.signPSBT(psbt);
+    if (signature) {
+      return { signed: true, psbt: signature };
+    } else {
+      return {
+        signed: false,
+        error: "Unexpected result format from Unisat wallet",
+      };
+    }
+  } catch (error) {
+    console.error("Error signing PSBT:", error);
+    if (error.message && error.message.includes("User rejected")) {
+      return { signed: false, cancelled: true };
+    }
+    return { signed: false, error: error.message };
+  }
 };
 
 // Broadcast a raw tx

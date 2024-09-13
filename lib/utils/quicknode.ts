@@ -1,4 +1,4 @@
-import { conf } from "utils/config.ts";
+import { serverConfig as conf } from "$server/config/config.ts";
 import { MAX_XCP_RETRIES } from "utils/constants.ts";
 
 const { QUICKNODE_ENDPOINT, QUICKNODE_API_KEY } = conf;

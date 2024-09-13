@@ -46,6 +46,7 @@ import * as $api_v2_stamps_dispensers_index from "./routes/api/v2/stamps/dispens
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
 import * as $api_v2_update_creator_name from "./routes/api/v2/update-creator-name.ts";
+import * as $api_v2_upload_src20_background from "./routes/api/v2/upload-src20-background.ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
@@ -108,6 +109,7 @@ import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
+import * as $hooks_useSRC20Form from "./islands/hooks/useSRC20Form.ts";
 import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
@@ -190,6 +192,8 @@ const manifest = {
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
     "./routes/api/v2/update-creator-name.ts": $api_v2_update_creator_name,
+    "./routes/api/v2/upload-src20-background.ts":
+      $api_v2_upload_src20_background,
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/block/[id].tsx": $block_id_,
     "./routes/block/index.tsx": $block_index,
@@ -263,6 +267,7 @@ const manifest = {
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
     "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
+    "./islands/hooks/useSRC20Form.ts": $hooks_useSRC20Form,
     "./islands/pagination/Pagination.tsx": $pagination_Pagination,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
