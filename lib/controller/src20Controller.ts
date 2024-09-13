@@ -113,12 +113,12 @@ export class Src20Controller {
     try {
       const responseBody = await Src20Service.getSrc20MintProgressByTick(tick);
       if (responseBody === null) {
-        throw new Error("SRC20 mint progress not found");
+        return null; // Return null instead of throwing an error
       }
       return responseBody;
     } catch (error) {
       console.error("Error processing SRC20 mint progress request:", error);
-      throw error;
+      return null; // Return null in case of any error
     }
   }
 
@@ -231,29 +231,45 @@ export class Src20Controller {
   }
 
   static async handleDeploymentRequest(tick: string, req: Request) {
-    const [deploymentData, mintStatusData, lastBlockData] = await Promise.all([
-      this.handleSrc20TransactionsRequest(req, {
-        tick: [tick],
-        op: "DEPLOY",
-        limit: 1,
-        page: 1,
-      }),
-      this.handleSrc20MintProgressRequest(tick),
-      this.handleSrc20TransactionsRequest(req, {
-        limit: 1,
-        page: 1,
-        sort: "DESC",
-      }),
-    ]);
+    try {
+      const [deploymentData, mintStatusData, lastBlockData] = await Promise.all(
+        [
+          this.handleSrc20TransactionsRequest(req, {
+            tick: [tick],
+            op: "DEPLOY",
+            limit: 1,
+            page: 1,
+          }),
+          this.handleSrc20MintProgressRequest(tick).catch(() => null),
+          this.handleSrc20TransactionsRequest(req, {
+            limit: 1,
+            page: 1,
+            sort: "DESC",
+          }),
+        ],
+      );
 
-    return {
-      last_block: lastBlockData.last_block,
-      mint_status: mintStatusData,
-      data: {
-        ...deploymentData.data[0],
-        tick: convertToEmoji(deploymentData.data[0].tick),
-      },
-    };
+      // If deploymentData is empty, it means the tick doesn't exist
+      if (!deploymentData.data || deploymentData.data.length === 0) {
+        return {
+          last_block: lastBlockData.last_block,
+          mint_status: null,
+          data: null,
+        };
+      }
+
+      return {
+        last_block: lastBlockData.last_block,
+        mint_status: mintStatusData,
+        data: {
+          ...deploymentData.data[0],
+          tick: convertToEmoji(deploymentData.data[0].tick),
+        },
+      };
+    } catch (error) {
+      console.error("Error in handleDeploymentRequest:", error);
+      throw error;
+    }
   }
 
   static async handleTickPageRequest(tick: string) {
