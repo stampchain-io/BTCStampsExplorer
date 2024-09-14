@@ -57,15 +57,15 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
             return (
-              <div class="bg-[#2B0E49] text-sm flex justify-between">
-                <div class="px-6 py-4 uppercase cursor-pointer flex gap-6">
+              <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between rounded-md">
+                <div class="p-3 uppercase cursor-pointer flex gap-6">
                   <img
                     src={`/content/${src20.tx_hash}.svg`}
                     class="w-[65px] h-[65px]"
                     onClick={() =>
                       handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
                   />
-                  <div>
+                  <div className={"flex flex-col justify-between"}>
                     <a
                       href={href}
                       className={"text-2xl text-[#666666] font-bold"}
@@ -82,7 +82,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     </p>
                   </div>
                 </div>
-                <div class="px-6 py-4 text-center">
+                <div class="p-3 text-center flex flex-col justify-center">
                   <p className={"text-lg text-[#666666] font-light"}>
                     SUPPLY{" "}
                     <span className={"font-bold text-[#999999]"}>
@@ -100,7 +100,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     </span>
                   </p>
                 </div>
-                <div class="px-6 py-4 text-sm text-center">
+                <div class="p-3 text-sm text-center flex flex-col justify-center">
                   <p className={"text-lg text-[#666666] font-light"}>
                     DEPLOY{" "}
                     <span className={"font-bold text-[#999999]"}>
@@ -115,7 +115,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     <span className={"font-bold text-[#999999]"}>2170</span>
                   </p>
                 </div>
-                <div class="px-6 py-4 text-right">
+                <div class="p-3 text-right flex flex-col justify-center">
                   <p className={"text-lg text-[#666666] font-light"}>
                     MARKETCAP{" "}
                     <span className={"font-bold text-[#999999]"}>

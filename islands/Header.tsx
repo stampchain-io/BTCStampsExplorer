@@ -63,13 +63,13 @@ export function Header() {
             onClick={() => {
               setCurrentPath("home");
             }}
-            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-2xl md:text-5xl font-black italic px-1"}
+            className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-2xl md:text-5xl font-black italic pr-1"}
           >
             STAMPCHAIN
           </a>
           <button
             onClick={toggleMenu}
-            className="px-3 py-1 text-blue-600 lg:hidden z-[100]"
+            className="text-blue-600 lg:hidden z-[100]"
             id="navbar-toggle"
           >
             {open && (
@@ -192,8 +192,8 @@ export function Header() {
               </a>
               <div className="hidden group-hover:flex flex-col absolute bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-left">
                 <a
-                  href="/src20?ident=all"
-                  f-partial={"/src20?ident=all"}
+                  href="/src20?type=all"
+                  f-partial={"/src20?type=all"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("src20");
@@ -383,8 +383,8 @@ export function Header() {
               </a>
               <div className="flex flex-col z-[100] py-2 text-center">
                 <a
-                  href="/src20?ident=all"
-                  f-partial={"/src20?ident=all"}
+                  href="/src20?type=all"
+                  f-partial={"/src20?type=all"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("src20");
@@ -396,8 +396,8 @@ export function Header() {
                   ALL
                 </a>
                 <a
-                  href="/src20?ident=trending"
-                  f-partial={"/src20?ident=trending"}
+                  href="/src20?type=trending"
+                  f-partial={"/src20?type=trending"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("src20");

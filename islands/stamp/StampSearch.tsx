@@ -26,7 +26,7 @@ export function StampSearchClient(
         <>
           <input
             type="text"
-            className="min-w-[220px] md:min-w-[360px] h-[40px] bg-gradient-to-r from-[#8800CC] via-[#7700AA] to-[#660099] px-4 py-2 rounded text-[13px] text-[#8D9199]"
+            className="min-w-[260px] md:min-w-[360px] h-[40px] bg-gradient-to-r from-[#8800CC] via-[#7700AA] to-[#660099] px-4 py-2 rounded text-[13px] text-[#8D9199]"
             placeholder="stamp #, CPID, wallet address, tx_hash"
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}

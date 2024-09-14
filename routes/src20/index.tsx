@@ -14,7 +14,7 @@ export const handler: Handlers = {
       const url = new URL(req.url);
       const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
       const sortBy = url.searchParams.get("sortBy") || "ASC";
-      const selectedTab = url.searchParams.get("ident") || "all";
+      const selectedTab = url.searchParams.get("type") || "all";
       const page = Number(url.searchParams.get("page")) || 1;
       const limit = Number(url.searchParams.get("limit")) || 11;
 

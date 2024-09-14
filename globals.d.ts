@@ -1,8 +1,17 @@
 // General Types ---------------------------------------------------------------
 
 export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
-export type STAMP_TYPES = "all" | "stamps" | "cursed" | "classic" | "posh";
+export type STAMP_TYPES =
+  | "all"
+  | "stamps"
+  | "cursed"
+  | "classic"
+  | "posh"
+  | "recursive";
 export type FILTER_TYPES = "vector" | "pixel" | "recursive";
+export type SRC20_TYPES =
+  | "all"
+  | "minting";
 
 import Big from "$Big";
 
