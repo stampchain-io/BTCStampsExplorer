@@ -5,6 +5,7 @@ import { leatherProvider } from "$lib/store/wallet/leather.ts";
 import { okxProvider } from "$lib/store/wallet/okx.ts";
 import { tapWalletProvider } from "$lib/store/wallet/tapwallet.ts";
 import { phantomProvider } from "$lib/store/wallet/phantom.ts";
+import { showConnectWalletModal } from "$lib/store/wallet/wallet.ts";
 
 interface WalletConnectorProps {
   providerKey: WalletProviderKey;
@@ -46,9 +47,10 @@ export const WalletConnector = (
     try {
       await connectFunction((message: string, type: string) => {
         addToast(message, type);
-        console.log(message); // Changed from console.error to console.log for consistency
+        console.log(message);
       });
       toggleModal();
+      showConnectWalletModal.value = false; // Hide the modal after successful connection
     } catch (error) {
       const errorMessage =
         `Failed to connect to ${providerKey} wallet: ${error.message}`;

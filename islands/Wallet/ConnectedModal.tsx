@@ -1,8 +1,8 @@
-import { walletContext } from "store/wallet/wallet.ts";
+import { showConnectWalletModal, walletContext } from "store/wallet/wallet.ts";
 
 interface Props {
-  toggleModal: Function;
-  handleCloseModal: Function;
+  toggleModal: () => void;
+  handleCloseModal: (event: MouseEvent) => void;
 }
 
 export const ConnectedModal = ({ toggleModal, handleCloseModal }: Props) => {
@@ -10,21 +10,27 @@ export const ConnectedModal = ({ toggleModal, handleCloseModal }: Props) => {
     console.log("Disconnecting wallet...");
     walletContext.disconnect();
     toggleModal();
+    showConnectWalletModal.value = false;
   };
 
   return (
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm"
+      class={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50 backdrop-filter backdrop-blur-sm ${
+        showConnectWalletModal.value ? "" : "hidden"
+      }`}
       onClick={handleCloseModal}
     >
       <div class="relative p-4 w-full max-w-2xl h-auto">
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
             <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-              Connect your wallet
+              Wallet Connected
             </h3>
             <button
-              onClick={toggleModal}
+              onClick={() => {
+                toggleModal();
+                showConnectWalletModal.value = false;
+              }}
               type="button"
               class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
               data-modal-hide="default-modal"

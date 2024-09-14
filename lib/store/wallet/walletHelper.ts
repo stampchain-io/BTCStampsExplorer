@@ -31,14 +31,19 @@ export const signMessage = async (wallet: Wallet, message: string) => {
 export const signPSBT = async (wallet: Wallet, psbt: string) => {
   if (!wallet.provider) throw new Error("No wallet provider specified");
   const provider = getWalletProvider(wallet.provider);
-  const result = await provider.signPSBT(psbt);
+  try {
+    const result = await provider.signPSBT(psbt);
 
-  if (result.signed) {
-    return result.psbt || result.txid;
-  } else if (result.cancelled) {
-    throw new Error("Transaction cancelled by user");
-  } else {
-    throw new Error(result.error || "Failed to sign PSBT");
+    if (result.signed) {
+      return result.psbt || result.txid;
+    } else if (result.cancelled) {
+      throw new Error("Transaction cancelled by user");
+    } else {
+      throw new Error(result.error || "Failed to sign PSBT");
+    }
+  } catch (error) {
+    console.error("Error in signPSBT:", error);
+    throw error;
   }
 };
 

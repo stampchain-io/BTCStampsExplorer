@@ -232,7 +232,8 @@ export function OlgaContent() {
         const result = await walletProvider.signPSBT(hex, inputsToSign);
 
         if (result === null) {
-          throw new Error("Transaction was cancelled by the user");
+          setApiError("Transaction was cancelled by the user");
+          return;
         }
 
         if (typeof result === "string") {
@@ -266,6 +267,14 @@ export function OlgaContent() {
       } else if (error instanceof Error) {
         errorMessage = error.message;
         console.error("Error stack:", error.stack);
+      }
+
+      if (errorMessage.includes("insufficient funds")) {
+        if (isPoshStamp) {
+          errorMessage = "Insufficient BTC or XCP in User's Wallet";
+        } else {
+          errorMessage = "Insufficient BTC in User's Wallet";
+        }
       }
 
       log("Final error message", errorMessage);

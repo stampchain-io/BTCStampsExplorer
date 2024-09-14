@@ -12,6 +12,8 @@ export function TransferContent() {
     config,
     isSubmitting,
     submissionMessage,
+    walletError,
+    apiError,
   } = useSRC20Form("transfer");
 
   if (isLoading) {
@@ -90,9 +92,15 @@ export function TransferContent() {
         onRefresh={fetchFees}
       />
 
-      {formState.apiError && (
+      {apiError && (
         <div class="w-full text-red-500 text-center">
-          {formState.apiError}
+          {apiError}
+        </div>
+      )}
+
+      {walletError && (
+        <div class="w-full text-red-500 text-center">
+          {walletError}
         </div>
       )}
 

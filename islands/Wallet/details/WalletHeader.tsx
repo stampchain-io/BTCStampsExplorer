@@ -1,5 +1,6 @@
 import { useRef, useState } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/navigator.tsx";
+import { WalletModal } from "../WalletModal.tsx";
 
 export const WalletHeader = ({
   selectedTab,
@@ -150,6 +151,7 @@ export const WalletHeader = ({
           History
         </p>
       </div>
+      <WalletModal connectors={[]} />
     </div>
   );
 };
