@@ -58,14 +58,21 @@ async function handleMint(body: InputData) {
   if (!body.amt) {
     return ResponseUtil.error("Error: amt is required for mint operation", 400);
   }
-  const hex = await mintSRC20({
-    toAddress: body.toAddress,
-    changeAddress: body.changeAddress,
-    tick: body.tick,
-    feeRate: body.feeRate,
-    amt: body.amt.toString(),
-  });
-  return ResponseUtil.success(hex);
+  try {
+    const hex = await mintSRC20({
+      toAddress: body.toAddress,
+      changeAddress: body.changeAddress,
+      tick: body.tick,
+      feeRate: body.feeRate,
+      amt: body.amt.toString(),
+    });
+    if (typeof hex === "object" && "error" in hex) {
+      return ResponseUtil.error(hex.error, 400);
+    }
+    return ResponseUtil.success(hex);
+  } catch (error) {
+    return ResponseUtil.error(error.message, 400);
+  }
 }
 
 async function handleTransfer(body: InputData) {

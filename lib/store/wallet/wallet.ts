@@ -71,6 +71,8 @@ export const getBasicStampInfo = async (address: string) => {
   return { stampBalance };
 };
 
+export const showConnectWalletModal = signal<boolean>(false);
+
 export const walletContext: WalletContext = {
   wallet: signal<Wallet>(initialWallet),
   isConnected: signal<boolean>(false),
@@ -95,5 +97,8 @@ export const walletContext: WalletContext = {
   },
   broadcastPSBT: async (psbtHex: string) => {
     return await broadcastPSBT(walletContext.wallet.value, psbtHex);
+  },
+  showConnectModal: () => {
+    showConnectWalletModal.value = true;
   },
 };

@@ -1,11 +1,12 @@
 import { ComponentChildren } from "preact";
 import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
 import { WalletConnector } from "./connectors/Wallet.connector.tsx";
+import { showConnectWalletModal } from "store/wallet/wallet.ts";
 
 interface Props {
   connectors: ComponentChildren[];
-  toggleModal: Function;
-  handleCloseModal: Function;
+  toggleModal: () => void;
+  handleCloseModal: (event: MouseEvent) => void;
 }
 
 export const ConnectorsModal = (
@@ -15,7 +16,9 @@ export const ConnectorsModal = (
 
   return (
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
+      class={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm ${
+        showConnectWalletModal.value ? "" : "hidden"
+      }`}
       onClick={handleCloseModal}
     >
       <div class="relative p-4 w-full max-w-2xl h-auto">
@@ -25,7 +28,10 @@ export const ConnectorsModal = (
               Connect your wallet
             </h3>
             <button
-              onClick={toggleModal}
+              onClick={() => {
+                toggleModal();
+                showConnectWalletModal.value = false;
+              }}
               type="button"
               class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
               data-modal-hide="default-modal"

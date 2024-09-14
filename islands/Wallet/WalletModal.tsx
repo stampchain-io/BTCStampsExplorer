@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { ComponentChildren } from "preact";
-import { walletContext } from "store/wallet/wallet.ts";
+import { showConnectWalletModal, walletContext } from "store/wallet/wallet.ts";
 import { abbreviateAddress } from "utils/util.ts";
 import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { ConnectedModal } from "./ConnectedModal.tsx";
@@ -212,10 +212,10 @@ const WalletPopup = (
 };
 
 interface Props {
-  connectors: ComponentChildren[];
+  connectors?: ComponentChildren[];
 }
 
-export const WalletModal = ({ connectors }: Props) => {
+export const WalletModal = ({ connectors = [] }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { wallet, isConnected, disconnect } = walletContext;
@@ -225,9 +225,14 @@ export const WalletModal = ({ connectors }: Props) => {
   const [path, setPath] = useState<string | null>(null);
 
   useEffect(() => {
-    // Set the path state only on the client side
     setPath(window.location.pathname?.split("/")[1] || null);
   }, []);
+
+  useEffect(() => {
+    if (showConnectWalletModal.value) {
+      setIsModalOpen(true);
+    }
+  }, [showConnectWalletModal.value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -255,6 +260,7 @@ export const WalletModal = ({ connectors }: Props) => {
       setIsPopupOpen(!isPopupOpen);
     } else {
       setIsModalOpen(!isModalOpen);
+      showConnectWalletModal.value = true;
     }
   };
 
@@ -278,7 +284,10 @@ export const WalletModal = ({ connectors }: Props) => {
       {isModalOpen && !isConnected.value && (
         <ConnectorsModal
           connectors={connectors}
-          toggleModal={() => setIsModalOpen(false)}
+          toggleModal={() => {
+            setIsModalOpen(false);
+            showConnectWalletModal.value = false;
+          }}
           handleCloseModal={handleCloseModal}
         />
       )}

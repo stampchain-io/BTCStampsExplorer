@@ -13,6 +13,7 @@ export function MintContent() {
     isSubmitting,
     submissionMessage,
     walletError,
+    apiError,
   } = useSRC20Form("mint");
 
   if (isLoading) {
@@ -81,9 +82,9 @@ export function MintContent() {
         onRefresh={fetchFees}
       />
 
-      {formState.apiError && (
+      {apiError && (
         <div class="w-full text-red-500 text-center">
-          {formState.apiError}
+          {apiError}
         </div>
       )}
 

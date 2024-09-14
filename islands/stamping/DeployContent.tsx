@@ -15,6 +15,8 @@ export function DeployContent() {
     config,
     isSubmitting,
     submissionMessage,
+    walletError,
+    apiError,
   } = useSRC20Form("deploy");
 
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
@@ -94,12 +96,7 @@ export function DeployContent() {
       // Proceed with the main deploy process regardless of file upload result
       await handleSubmit({ fileUploaded });
     } catch (error) {
-      if (error.message && error.message.includes("cancelled")) {
-        // This is now handled in the useSRC20Form hook
-        console.log("Stamping cancelled");
-      } else {
-        console.error("Stamping error:", error);
-      }
+      console.error("Deployment error:", error);
     }
   };
 
@@ -265,9 +262,9 @@ export function DeployContent() {
         onRefresh={fetchFees}
       />
 
-      {formState.apiError && (
+      {apiError && (
         <div class="w-full text-red-500 text-center">
-          {formState.apiError}
+          {apiError}
         </div>
       )}
 
@@ -280,6 +277,12 @@ export function DeployContent() {
       {submissionMessage && (
         <div class="w-full text-center font-bold">
           {submissionMessage}
+        </div>
+      )}
+
+      {walletError && (
+        <div class="w-full text-red-500 text-center">
+          {walletError}
         </div>
       )}
 
