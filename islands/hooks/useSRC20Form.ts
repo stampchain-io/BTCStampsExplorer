@@ -1,11 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
-import { walletContext } from "store/wallet/wallet.ts";
+import { showConnectWalletModal, walletContext } from "store/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
 import { fetchBTCPrice } from "$lib/utils/btc.ts";
 import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
-// import { Src20Controller } from "$lib/controller/src20Controller.ts";  // NEED TO CALL FROM THE API
 
 export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
   const { config, isLoading: configLoading } = useConfig();
@@ -230,23 +229,24 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
 
   const handleSubmit = async (additionalData = {}) => {
     if (!isConnected.value) {
-      setWalletError("Please connect your wallet");
+      console.log("Wallet not connected. Showing connect modal.");
+      showConnectWalletModal.value = true;
       return;
     }
 
     setWalletError(null);
+    setApiError("");
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
     setSubmissionMessage("Please wait...");
-    setFormState((prev) => ({ ...prev, apiError: "" }));
 
     try {
       if (!config) throw new Error("Configuration not loaded");
 
-      const response = await axiod.post(`${config.API_BASE_URL}/src20/create`, {
+      const response = await axiod.post(`/api/v2/src20/create`, {
         toAddress: operation === "transfer" ? formState.toAddress : address,
         fromAddress: operation === "transfer" ? address : undefined,
         changeAddress: address,
@@ -267,39 +267,36 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
         ...additionalData,
       });
 
-      console.log(response);
+      console.log("API Response:", response.data);
 
       // Handle wallet interaction
-      const walletResult = await walletContext.signPSBT(response.data.psbt);
+      const walletResult = await walletContext.signPSBT(response.data.hex);
 
       if (walletResult === null) {
         setSubmissionMessage("Transaction cancelled by user");
       } else {
         setSubmissionMessage("Transaction signed successfully");
+        // You might want to broadcast the signed transaction here
+        // const broadcastResult = await walletContext.broadcastPSBT(walletResult);
+        // console.log("Broadcast result:", broadcastResult);
       }
 
       return response.data;
     } catch (error) {
-      if (error.message === "Transaction cancelled by user") {
-        setSubmissionMessage("Transaction cancelled by user");
-      } else if (
-        error.response && error.response.data && error.response.data.error
-      ) {
-        setFormState((prev) => ({
-          ...prev,
-          apiError: error.response.data.error,
-        }));
-      } else {
-        setFormState((prev) => ({
-          ...prev,
-          apiError: "An unexpected error occurred",
-        }));
-      }
       console.error(`${operation} error:`, error);
+      if (error.response && error.response.data && error.response.data.error) {
+        setApiError(error.response.data.error);
+      } else if (error.message) {
+        setApiError(error.message);
+      } else {
+        setApiError("An unexpected error occurred");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const [apiError, setApiError] = useState<string>("");
 
   return {
     formState,
@@ -313,5 +310,10 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
     isSubmitting,
     submissionMessage,
     walletError,
+    setApiError,
+    apiError,
+    showConnectModal: () => {
+      showConnectWalletModal.value = true;
+    },
   };
 }
