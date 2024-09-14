@@ -122,26 +122,26 @@ export function SRC20Navigator(
         {open1 && (
           <>
             <button
-              className={"cursor-pointer text-sm font-black text-[#660099]"}
-              onClick={() => handleFilterChange("for_sale")}
+              className={"cursor-pointer text-xs md:text-sm font-black text-[#660099]"}
+              onClick={() => handleFilterChange("marketcap")}
             >
               MARKETCAP
             </button>
             <button
-              className={"cursor-pointer text-sm font-black text-[#660099]"}
-              onClick={() => handleFilterChange("sold")}
+              className={"cursor-pointer text-xs md:text-sm font-black text-[#660099]"}
+              onClick={() => handleFilterChange("deploy")}
             >
               DEPLOY
             </button>
             <button
-              className={"cursor-pointer text-sm font-black text-[#660099]"}
-              onClick={() => handleFilterChange("pixel")}
+              className={"cursor-pointer text-xs md:text-sm font-black text-[#660099]"}
+              onClick={() => handleFilterChange("supply")}
             >
               SUPPLY
             </button>
             <button
-              className={"cursor-pointer text-sm font-black text-[#660099]"}
-              onClick={() => handleFilterChange("vector")}
+              className={"cursor-pointer text-xs md:text-sm font-black text-[#660099]"}
+              onClick={() => handleFilterChange("holders")}
             >
               HOLDERS
             </button>
