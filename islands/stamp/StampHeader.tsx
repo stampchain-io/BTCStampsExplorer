@@ -56,10 +56,10 @@ export const StampHeader = (
   };
 
   return (
-    <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E]">
+    <div class="flex flex-col-reverse lg:flex-row justify-between gap-3 w-full border-b border-[#3F2A4E]">
       <div class="flex gap-5 md:gap-11 items-end">
         <p
-          class={`cursor-pointer pb-3 text-2xl uppercase ${
+          class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
             selectedTab === "all"
               ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
               : "text-[#8800CC] font-light"
@@ -69,7 +69,7 @@ export const StampHeader = (
           All
         </p>
         <p
-          class={`cursor-pointer pb-3 text-2xl uppercase ${
+          class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
             selectedTab === "posh"
               ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
               : "text-[#8800CC] font-light"
@@ -79,7 +79,7 @@ export const StampHeader = (
           Posh
         </p>
         <p
-          class={`cursor-pointer pb-3 text-2xl uppercase ${
+          class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
             selectedTab === "classic"
               ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
               : "text-[#8800CC] font-light"
@@ -89,7 +89,7 @@ export const StampHeader = (
           Classic
         </p>
         <p
-          class={`cursor-pointer pb-3 text-2xl uppercase ${
+          class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
             selectedTab === "recursive"
               ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
               : "text-[#8800CC] font-light"
@@ -99,7 +99,7 @@ export const StampHeader = (
           Recursive
         </p>
       </div>
-      <div class="flex gap-3 justify-between">
+      <div class="flex gap-3 pb-1 md:pb-3 justify-between">
         <StampNavigator
           initFilter={currentFilters}
           initSort={currentSort}
