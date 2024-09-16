@@ -29,29 +29,22 @@ export interface UTXO {
   size?: number;
 }
 
-export interface SRC20Input {
+export interface IPrepareSRC20TX {
   network: string;
-  utxos: UTXO[];
   changeAddress: string;
   toAddress: string;
   feeRate: number;
   transferString: string;
-  action: string;
+  enableRBF?: boolean;
 }
 
-export interface IMintSRC20 {
-  toAddress: string;
-  changeAddress: string;
-  feeRate: number;
+export interface IMintSRC20 extends Omit<IPrepareSRC20TX, "transferString"> {
   tick: string;
   amt: string;
 }
 
-export interface IDeploySRC20 {
-  toAddress: string;
-  changeAddress: string;
+export interface IDeploySRC20 extends Omit<IPrepareSRC20TX, "transferString"> {
   tick: string;
-  feeRate: number;
   max: string;
   lim: string;
   dec?: number;
@@ -62,14 +55,11 @@ export interface IDeploySRC20 {
   description?: string;
 }
 
-export interface IPrepareSRC20TX {
-  network: string;
-  utxos: UTXO[];
-  changeAddress: string;
-  toAddress: string;
-  feeRate: number;
-  transferString: string;
-  enableRBF?: boolean;
+export interface ITransferSRC20
+  extends Omit<IPrepareSRC20TX, "transferString"> {
+  fromAddress: string;
+  tick: string;
+  amt: string;
 }
 
 export interface IPrepareSRC20TXResult {
@@ -77,14 +67,6 @@ export interface IPrepareSRC20TXResult {
   fee: number;
   change: number;
   inputsToSign: Array<{ index: number }>;
-}
-
-export interface ITransferSRC20 {
-  toAddress: string;
-  fromAddress: string;
-  tick: string;
-  feeRate: number;
-  amt: string;
 }
 
 export interface SRC20OperationResult {
