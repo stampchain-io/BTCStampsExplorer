@@ -15,9 +15,19 @@ export async function handleSRC20Operation(
 ): Promise<TX | TXError> {
   let result;
 
+  const commonParams = {
+    network: "mainnet",
+    changeAddress: body.changeAddress,
+    toAddress: body.toAddress,
+    feeRate: body.feeRate,
+  };
+
   switch (operation) {
     case "deploy":
-      result = await deploySRC20(prepareDeploy(body));
+      result = await deploySRC20({
+        ...commonParams,
+        ...prepareDeploy(body),
+      } as IDeploySRC20);
       break;
     case "mint":
       if (!body.amt) {
@@ -26,7 +36,10 @@ export async function handleSRC20Operation(
           400,
         );
       }
-      result = await mintSRC20(prepareMint(body));
+      result = await mintSRC20({
+        ...commonParams,
+        ...prepareMint(body),
+      } as IMintSRC20);
       break;
     case "transfer":
       if (!body.fromAddress) {
@@ -41,7 +54,10 @@ export async function handleSRC20Operation(
           400,
         );
       }
-      result = await transferSRC20(prepareTransfer(body));
+      result = await transferSRC20({
+        ...commonParams,
+        ...prepareTransfer(body),
+      } as ITransferSRC20);
       break;
     default:
       return ResponseUtil.error("Invalid operation", 400);

@@ -6,23 +6,23 @@ import { selectUTXOs } from "./utxo-selector.ts";
 import { bin2hex, hex2bin, scramble } from "../utils.ts";
 import { compressWithCheck } from "../zlib.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/src20.d.ts";
+import { IPrepareSRC20TX, PSBTInput, UTXO, VOUT } from "$lib/types/src20.d.ts";
 import { getTransaction } from "../../quicknode.ts";
+import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
 
 const RECIPIENT_DUST = 789;
-const MULTISIG_DUST = 809; // Increase from 777
+const MULTISIG_DUST = 809;
 const CHANGE_DUST = 1000;
 const THIRD_PUBKEY =
   "020202020202020202020202020202020202020202020202020202020202020202";
 
 export const prepareSrc20TX = async ({
   network,
-  utxos,
   changeAddress,
   toAddress,
   feeRate,
   transferString,
-  enableRBF = true, // Add this parameter with a default value of true
+  enableRBF = true,
 }: IPrepareSRC20TX) => {
   try {
     console.log("Starting prepareSrc20TX");
@@ -32,6 +32,12 @@ export const prepareSrc20TX = async ({
     console.log("Using network:", psbtNetwork);
 
     const psbt = new bitcoin.Psbt({ network: psbtNetwork });
+
+    // Fetch UTXOs
+    const utxos = await getUTXOForAddress(changeAddress);
+    if (!utxos || utxos.length === 0) {
+      throw new Error("No UTXOs found for the given address");
+    }
 
     // Compress and encrypt the transfer string
     let transferHex = await compressWithCheck(`stamp:${transferString}`);
@@ -101,6 +107,10 @@ export const prepareSrc20TX = async ({
       vouts,
       feeRate,
     );
+
+    if (selectedUtxos.length === 0) {
+      throw new Error("Unable to select suitable UTXOs for the transaction");
+    }
 
     // Add inputs to PSBT
     for (const input of selectedUtxos) {

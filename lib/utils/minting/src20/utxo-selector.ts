@@ -88,46 +88,51 @@ export function selectUTXOs(
   vouts: Output[],
   feePerByte: number,
   sigops_rate = 0,
+  rbfBuffer = 1.5, // Add a buffer for potential fee increase
 ): { inputs: UTXO[]; change: number; fee: number } {
   feePerByte = Math.floor(feePerByte * (sigops_rate || SIGOPS_RATE));
   console.log("Fee per byte:", feePerByte);
   utxos.sort((a, b) => b.value - a.value);
-  
+
   // Ensure all outputs meet the dust threshold
-  const adjustedVouts = vouts.map(vout => ({
+  const adjustedVouts = vouts.map((vout) => ({
     ...vout,
-    value: Math.max(vout.value, CHANGE_DUST)
+    value: Math.max(vout.value, CHANGE_DUST),
   }));
 
   let totalVoutsSize = 0;
   for (const vout of adjustedVouts) {
     totalVoutsSize += estimateVoutSize(vout);
   }
-  
+
   let totalUtxosSize = 0;
   let totalValue = 0;
   const selectedUTXOs: UTXO[] = [];
   const targetValue = adjustedVouts.reduce((acc, vout) => acc + vout.value, 0);
-  
+
   for (const utxo of utxos) {
     selectedUTXOs.push(utxo);
     totalValue += utxo.value;
     totalUtxosSize += utxo.size;
-    const estimatedFee = (totalUtxosSize + totalVoutsSize + estimateFixedTransactionSize()) * feePerByte;
+    const estimatedFee =
+      (totalUtxosSize + totalVoutsSize + estimateFixedTransactionSize()) *
+      feePerByte * rbfBuffer;
     if (totalValue >= targetValue + estimatedFee + CHANGE_DUST) {
       break;
     }
   }
-  
+
   const new_sigops_rate = calculate_sigops_rate(selectedUTXOs, adjustedVouts);
-  const finalFee = (totalUtxosSize + totalVoutsSize + estimateFixedTransactionSize()) * feePerByte;
+  const finalFee =
+    (totalUtxosSize + totalVoutsSize + estimateFixedTransactionSize()) *
+    feePerByte;
 
   if (Math.abs(new_sigops_rate - sigops_rate) > 0.01) {
     return selectUTXOs(utxos, vouts, feePerByte, new_sigops_rate);
   }
 
   let change = totalValue - targetValue - finalFee;
-  
+
   // Handle dust change
   if (change > 0 && change < CHANGE_DUST) {
     finalFee += change;

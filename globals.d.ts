@@ -448,7 +448,7 @@ export interface BlockTickHandlerContext {
 
 // Post Request Types ----------------------------------------------------------
 export interface TX {
-  hex: string;
+  psbtHex: string;
   fee: number;
   change: number;
 }
@@ -459,6 +459,7 @@ export interface TXError {
 export interface InputData {
   op: string;
   toAddress: string;
+  publicKey?: string;
   changeAddress: string;
   fromAddress?: string;
   tick: string;
@@ -470,6 +471,8 @@ export interface InputData {
   x?: string;
   web?: string;
   email?: string;
+  tg?: string;
+  description?: string;
 }
 
 export interface MintStampInputData {
