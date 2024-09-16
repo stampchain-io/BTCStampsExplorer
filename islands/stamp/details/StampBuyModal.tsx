@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
-import { useFeePolling } from "hooks/useFeePolling.tsx";
-import StampImage from "$components/stampDetails/StampImage.tsx";
 import { StampRow } from "globals";
+import { useFeePolling } from "hooks/useFeePolling.tsx";
+import StampImage from "./StampImage.tsx";
 
 interface Props {
   stamp: StampRow;
