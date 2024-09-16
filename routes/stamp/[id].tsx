@@ -4,13 +4,13 @@ import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 
 import StampSection from "$components/stamp/StampSection.tsx";
-import { StampImage } from "$components/stampDetails/StampImage.tsx";
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
 
 import { HomeGetStamping } from "$islands/home/HomeGetStamping.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
-import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
+import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
+import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
