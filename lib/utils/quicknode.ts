@@ -83,15 +83,33 @@ export const getRawTx: GetRawTx = async (txHash) => {
   const params = [txHash, 0];
   try {
     const result = await fetchQuicknode(method, params);
-    if (!result) {
-      throw new Error(`Error: No result for txHash: ${txHash}`);
+    if (!result || !result.result) {
+      return await fallbackGetRawTx(txHash);
     }
     return result.result;
   } catch (error) {
-    console.error(`ERROR: Error getting raw tx:`, error);
-    throw error;
+    console.error(`ERROR: Error getting raw tx from QuickNode:`, error);
+    return await fallbackGetRawTx(txHash);
   }
 };
+
+async function fallbackGetRawTx(txHash: string): Promise<string> {
+  console.log(`Attempting fallback for transaction: ${txHash}`);
+  try {
+    const response = await fetch(
+      `https://blockchain.info/rawtx/${txHash}?format=hex`,
+    );
+    if (!response.ok) {
+      throw new Error(`Blockchain.info API error: ${response.status}`);
+    }
+    const rawTx = await response.text();
+    // Format the response to match QuickNode's format
+    return rawTx;
+  } catch (error) {
+    console.error(`ERROR: Fallback failed for tx:`, error);
+    throw new Error(`Unable to retrieve transaction ${txHash} from any source`);
+  }
+}
 
 export const getDecodedTx: GetDecodedTx = async (txHex) => {
   const method = "decoderawtransaction";
