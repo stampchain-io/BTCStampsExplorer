@@ -66,18 +66,24 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
     throw new Error("No addresses received from Leather wallet");
   }
 
+  // Prioritize p2wpkh (Native SegWit) address, but also allow p2tr (Taproot) as fallback
   const btcAddress = addresses.find((addr) =>
-    addr.symbol === "BTC" && addr.type === "p2wpkh"
+    addr.symbol === "BTC" && (addr.type === "p2wpkh" || addr.type === "p2tr")
   );
 
   if (!btcAddress) {
-    throw new Error("No BTC p2wpkh address found in the received addresses");
+    throw new Error(
+      "No compatible BTC address found in the received addresses",
+    );
   }
+
+  console.log(`Using BTC address type: ${btcAddress.type}`);
 
   const _wallet = {} as Wallet;
   _wallet.address = btcAddress.address;
   _wallet.accounts = [btcAddress.address];
   _wallet.publicKey = btcAddress.publicKey;
+  _wallet.addressType = btcAddress.type; // Store the address type for future reference
 
   const btcBalance = await getBtcBalance(btcAddress.address);
   _wallet.btcBalance = {

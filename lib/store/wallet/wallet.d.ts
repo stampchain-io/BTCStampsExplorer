@@ -26,4 +26,5 @@ export interface Wallet {
   type?: "legacy" | "segwit";
   provider?: WalletProviderKey;
   network?: "mainnet" | "testnet";
+  addressType?: "p2wpkh" | "p2tr";
 }

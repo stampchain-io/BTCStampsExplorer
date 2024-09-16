@@ -38,6 +38,7 @@ export const initialWallet: Wallet = {
   type: undefined,
   provider: undefined,
   network: undefined,
+  addressType: undefined,
 };
 
 let initialWalletState;
