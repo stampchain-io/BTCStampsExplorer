@@ -4,6 +4,11 @@ export const handler: Handlers = {
   GET(req) {
     const url = new URL(req.url);
 
+    // Exclude API routes
+    if (url.pathname.startsWith("/api/")) {
+      return new Response("Not Found", { status: 404 });
+    }
+
     // Check if the URL matches the old pattern or is the asset.html page
     if (
       url.pathname === "/asset.html" || url.pathname.startsWith("/asset.html")

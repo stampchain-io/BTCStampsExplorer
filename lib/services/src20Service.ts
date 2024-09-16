@@ -130,14 +130,16 @@ export class Src20Service {
       const src20 = await SRC20Repository.getSrc20BalanceFromDb(params);
 
       if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
-        throw new Error("SRC20 balance not found");
+        // Return an empty response instead of throwing an error
+        return params.address && params.tick ? {} : [];
       }
 
       return params.address && params.tick ? src20[0] : src20;
     } catch (error) {
       console.error("Error in fetchSrc20Balance:", error);
       console.error("Params:", params);
-      throw error;
+      // Return an empty response for any other errors as well
+      return params.address && params.tick ? {} : [];
     }
   }
 

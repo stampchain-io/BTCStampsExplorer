@@ -60,7 +60,8 @@ export class Src20Controller {
         const fetchedTotalCount = await Src20Service.getTotalSrc20BalanceCount(
           balanceParams,
         );
-        const limit = balanceParams.limit || fetchedData.length;
+        const limit = balanceParams.limit ||
+          (Array.isArray(fetchedData) ? fetchedData.length : 0);
         const page = balanceParams.page || 1;
 
         restructuredResult = {
@@ -78,7 +79,11 @@ export class Src20Controller {
     } catch (error) {
       console.error("Error processing SRC20 balance request:", error);
       console.error("Params:", JSON.stringify(balanceParams));
-      throw error;
+      // Return an empty response instead of throwing an error
+      return {
+        last_block: await BlockService.getLastBlock(),
+        data: balanceParams.address && balanceParams.tick ? {} : [],
+      };
     }
   }
 
@@ -163,7 +168,9 @@ export class Src20Controller {
         : null;
 
       const stampsTotal = stampsData.total || 0;
-      const src20Total = src20Data.data.length;
+      const src20Total = Array.isArray(src20Data.data)
+        ? src20Data.data.length
+        : 0;
       const totalItems = stampsTotal + src20Total;
       const totalPages = Math.ceil(totalItems / limit);
 
@@ -171,7 +178,7 @@ export class Src20Controller {
         btc: btcData,
         data: {
           stamps: stampsData.stamps,
-          src20: src20Data.data,
+          src20: Array.isArray(src20Data.data) ? src20Data.data : [],
         },
         pagination: {
           page,
@@ -289,7 +296,7 @@ export class Src20Controller {
       this.handleAllSrc20DataForTickRequest(tick),
     ]);
 
-    if (!mintProgressResponse || !allSrc20DataResponse || !balanceResponse) {
+    if (!mintProgressResponse || !allSrc20DataResponse) {
       throw new Error("Failed to fetch SRC20 data");
     }
 
@@ -305,15 +312,19 @@ export class Src20Controller {
       total_transfers: total_transfers,
       mints: mints,
       total_mints: total_mints,
-      total_holders: balanceResponse.data.length,
-      holders: balanceResponse.data.map((row) => {
-        const amt = this.formatAmount(row.amt || "0");
-        const totalMinted = this.formatAmount(
-          mintProgressResponse.total_minted || "1",
-        );
-        const percentage = this.calculatePercentage(amt, totalMinted);
-        return { ...row, amt, percentage };
-      }),
+      total_holders: Array.isArray(balanceResponse.data)
+        ? balanceResponse.data.length
+        : 0,
+      holders: Array.isArray(balanceResponse.data)
+        ? balanceResponse.data.map((row) => {
+          const amt = this.formatAmount(row.amt || "0");
+          const totalMinted = this.formatAmount(
+            mintProgressResponse.total_minted || "1",
+          );
+          const percentage = this.calculatePercentage(amt, totalMinted);
+          return { ...row, amt, percentage };
+        })
+        : [],
       mint_status: {
         ...mintProgressResponse,
         max_supply: mintProgressResponse.max_supply?.toString() || "0",
