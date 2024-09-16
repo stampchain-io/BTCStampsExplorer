@@ -2,8 +2,8 @@ import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
 import { abbreviateAddress } from "utils/util.ts";
-import Stamp from "../stampDetails/StampImage.tsx";
 import { StampKind } from "$components/StampKind.tsx";
+import Stamp from "$islands/stamp/details/StampImage.tsx";
 import { BlockInfo, SendRow } from "globals";
 dayjs.extend(relativeTime);
 
