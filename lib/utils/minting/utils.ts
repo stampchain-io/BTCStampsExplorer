@@ -1,6 +1,4 @@
-import * as bitcore from "npm:bitcore";
 import * as btc from "bitcoin";
-
 import { Output } from "utils/minting/src20/utils.d.ts";
 
 export function scramble(key, str) {
@@ -51,13 +49,6 @@ export function bin2hex(s) {
     o += n.length < 2 ? "0" + n : n;
   }
   return o;
-}
-
-export function address_from_pubkeyhash(pubkeyhash) {
-  const publicKey = new bitcore.default.PublicKey(pubkeyhash);
-  const address = bitcore.default.Address.fromPublicKey(publicKey);
-
-  return address.toString();
 }
 
 export function extractOutputs(tx: btc.Transaction, address: string) {

@@ -15,7 +15,12 @@ interface WalletContext {
   getBasicStampInfo: (address: string) => Promise<any>;
   disconnect: () => void;
   signMessage: (message: string) => Promise<any>;
-  signPSBT: (psbt: string) => Promise<any>;
+  signPSBT: (
+    wallet: Wallet,
+    psbt: string,
+    inputsToSign: any[],
+    enableRBF?: boolean,
+  ) => Promise<any>;
   broadcastRawTX: (rawTx: string) => Promise<any>;
   broadcastPSBT: (psbtHex: string) => Promise<any>;
 }
@@ -89,8 +94,18 @@ export const walletContext: WalletContext = {
   signMessage: async (message: string) => {
     return await signMessage(walletContext.wallet.value, message);
   },
-  signPSBT: async (psbt: string) => {
-    return await signPSBT(walletContext.wallet.value, psbt);
+  signPSBT: async (
+    wallet: Wallet,
+    psbt: string,
+    inputsToSign: any[],
+    enableRBF = true,
+  ) => {
+    console.log("Entering signPSBT in walletContext");
+    console.log("Wallet provider:", wallet.provider);
+    console.log("PSBT length:", psbt.length);
+    console.log("Number of inputs to sign:", inputsToSign.length);
+    console.log("Enable RBF:", enableRBF);
+    return await signPSBT(wallet, psbt, inputsToSign, enableRBF);
   },
   broadcastRawTX: async (rawTx: string) => {
     return await broadcastRawTX(walletContext.wallet.value, rawTx);

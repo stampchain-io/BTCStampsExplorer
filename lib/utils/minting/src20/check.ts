@@ -1,6 +1,10 @@
 import { BigFloat } from "bigfloat/mod.ts";
 
-import { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "./src20.d.ts";
+import {
+  IDeploySRC20,
+  IMintSRC20,
+  ITransferSRC20,
+} from "$lib/types/src20.d.ts";
 import { isValidBitcoinAddress } from "./utils.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
@@ -170,8 +174,8 @@ export function checkDeployParams({
   if (!lim || lim === "" || float_lim.lte(0) || float_lim.gt(float_max)) {
     throw new Error("Error: lim not found or invalid");
   }
-  if (!dec || dec === 0) {
-    throw new Error("Error: dec not found or invalid");
+  if (dec < 0 || dec > 18) {
+    throw new Error("dec value invalid");
   }
 
   // Optional validation for x (username)
