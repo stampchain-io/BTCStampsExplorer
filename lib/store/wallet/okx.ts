@@ -1,7 +1,7 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { Wallet } from "./wallet.d.ts";
-import { getBtcBalance } from "utils/btc.ts";
+import { SignPSBTResult } from "$lib/types/src20.d.ts";
 
 export const isOKXInstalled = signal<boolean>(false);
 
@@ -80,10 +80,18 @@ const signMessage = async (message: string) => {
   }
 };
 
-const signPSBT = async (psbt: string) => {
+const signPSBT = async (
+  psbtHex: string,
+  inputsToSign?: { index: number }[],
+  enableRBF = true,
+): Promise<SignPSBTResult> => {
   const okx = (window as any).okxwallet;
   try {
-    const result = await okx.bitcoin.signPsbt(psbt);
+    const result = await okx.bitcoin.signPsbt({
+      psbt: psbtHex,
+      inputsToSign,
+      options: { enableRBF },
+    });
     if (result && result.hex) {
       return { signed: true, psbt: result.hex };
     } else {

@@ -1,6 +1,7 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { Wallet } from "./wallet.d.ts";
+import { SignPSBTResult } from "$lib/types/src20.d.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -85,13 +86,17 @@ const signMessage = async (message: string) => {
   }
 };
 
-const signPSBT = async (psbtHex: string) => {
+const signPSBT = async (
+  psbtHex: string,
+  _inputsToSign?: { index: number }[],
+  enableRBF = true,
+): Promise<SignPSBTResult> => {
   const provider = getProvider();
   if (!provider) {
     throw new Error("Phantom wallet not connected");
   }
   try {
-    const result = await provider.signPSBT(psbtHex);
+    const result = await provider.signPSBT(psbtHex, { enableRBF });
     if (result && result.hex) {
       return { signed: true, psbt: result.hex };
     } else {

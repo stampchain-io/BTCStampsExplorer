@@ -1,7 +1,7 @@
 import { signal } from "@preact/signals";
-
 import { walletContext } from "./wallet.ts";
 import { Wallet } from "./wallet.d.ts";
+import { SignPSBTResult } from "$lib/types/src20.d.ts";
 
 export const isUnisatInstalled = signal<boolean>(false);
 
@@ -63,10 +63,14 @@ const signMessage = async (message: string) => {
 };
 
 // Sign a PSBT hex tx
-const signPSBT = async (psbt: string) => {
+const signPSBT = async (
+  psbtHex: string,
+  _inputsToSign?: { index: number }[],
+  enableRBF = true,
+): Promise<SignPSBTResult> => {
   const unisat = (window as any).unisat;
   try {
-    const signature = await unisat.signPSBT(psbt);
+    const signature = await unisat.signPsbt(psbtHex, { enableRBF });
     if (signature) {
       return { signed: true, psbt: signature };
     } else {

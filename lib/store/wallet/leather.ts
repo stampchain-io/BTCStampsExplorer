@@ -2,6 +2,7 @@ import { signal } from "@preact/signals";
 import { Wallet } from "./wallet.d.ts";
 import { walletContext } from "./wallet.ts";
 import { getBtcBalance } from "utils/btc.ts";
+import { SignPSBTResult } from "$lib/types/src20.d.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -117,45 +118,63 @@ const signMessage = async (message: string) => {
   }
 };
 
-export const signPSBT = async (psbtHex: string, inputsToSign?: any[]) => {
+export const signPSBT = async (
+  psbtHex: string,
+  inputsToSign?: { index: number }[],
+  enableRBF = true, // Add this parameter
+): Promise<SignPSBTResult> => {
+  console.log("Entering Leather signPSBT function");
+  console.log("PSBT hex length:", psbtHex.length);
+  console.log("Number of inputs to sign:", inputsToSign?.length);
+
   const leatherProvider = (window as any).LeatherProvider;
   if (typeof leatherProvider === "undefined") {
-    throw new Error("Leather wallet not connected");
+    console.error("Leather wallet not connected");
+    return { signed: false, error: "Leather wallet not connected" };
   }
 
   try {
+    console.log("Calling Leather provider signPsbt method");
+    console.log("Input parameters:", {
+      hex: psbtHex.substring(0, 50) + "...", // Log first 50 characters of hex
+      network: "mainnet",
+      broadcast: true,
+      inputsToSign: inputsToSign || undefined,
+      rbf: enableRBF, // Add this parameter
+    });
+
     const result = await leatherProvider.request(
       "signPsbt",
       {
         hex: psbtHex,
         network: "mainnet",
         broadcast: true,
-        inputsToSign: inputsToSign,
+        inputsToSign: inputsToSign || undefined,
+        rbf: enableRBF, // Add this parameter
       },
     );
 
-    console.log("PSBT signing result:", result);
+    console.log("Leather signPsbt result:", JSON.stringify(result, null, 2));
 
-    if (result && result.result && result.result.hex) {
-      console.log("PSBT signed successfully", result.result.hex);
-      return { signed: true, psbt: result.result.hex };
-    } else if (result && result.result && result.result.txid) {
-      console.log("Transaction broadcast successfully", result.result.txid);
-      return { signed: true, txid: result.result.txid };
-    } else {
-      console.error("Unexpected result format from Leather wallet", result);
-      return {
-        signed: false,
-        error: "Unexpected result format from Leather wallet",
-      };
+    if (result && result.result) {
+      if (result.result.hex) {
+        return { signed: true, psbt: result.result.hex };
+      } else if (result.result.txid) {
+        return { signed: true, txid: result.result.txid };
+      }
     }
+
+    return {
+      signed: false,
+      error: "Unexpected result format from Leather wallet",
+    };
   } catch (error) {
-    console.error("Error signing PSBT:", error);
+    console.error("Error signing PSBT with Leather:", error);
+    console.log("Error details:", JSON.stringify(error, null, 2));
     if (error.message && error.message.includes("User rejected")) {
-      console.log("User cancelled the transaction");
       return { signed: false, cancelled: true };
     }
-    return { signed: false, error: error.message };
+    return { signed: false, error: error.message || "Unknown error occurred" };
   }
 };
 
