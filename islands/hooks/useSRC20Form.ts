@@ -184,10 +184,11 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
   const handleDecimalInput = (value: string): string => {
     const sanitizedValue = value.replace(/\D/g, "");
     const numValue = parseInt(sanitizedValue, 10);
-    if (!isNaN(numValue) && numValue >= 0 && numValue <= 18) {
+    if (
+      sanitizedValue === "" ||
+      (!isNaN(numValue) && numValue >= 0 && numValue <= 18)
+    ) {
       return sanitizedValue;
-    } else if (sanitizedValue === "") {
-      return "";
     }
     return formState.dec;
   };
@@ -228,6 +229,8 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
   };
 
   const handleSubmit = async (additionalData = {}) => {
+    console.log("Entering handleSubmit in useSRC20Form");
+
     if (!isConnected.value) {
       console.log("Wallet not connected. Showing connect modal.");
       showConnectWalletModal.value = true;
@@ -267,18 +270,36 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
         ...additionalData,
       });
 
-      console.log("API Response:", response.data);
+      console.log("API Response received:", response.data);
+      console.log("Preparing to sign PSBT");
+      console.log("PSBT hex length:", response.data.hex.length);
+      console.log(
+        "Number of inputs to sign:",
+        response.data.inputsToSign?.length,
+      );
 
       // Handle wallet interaction
-      const walletResult = await walletContext.signPSBT(response.data.hex);
+      console.log("Calling walletContext.signPSBT");
+      const walletResult = await walletContext.signPSBT(
+        wallet.value,
+        response.data.hex,
+        response.data.inputsToSign || [],
+        true, // Enable RBF
+      );
 
-      if (walletResult === null) {
-        setSubmissionMessage("Transaction cancelled by user");
-      } else {
+      console.log("Wallet signing result:", walletResult);
+
+      if (walletResult.signed) {
+        console.log("Transaction signed successfully");
         setSubmissionMessage("Transaction signed successfully");
-        // You might want to broadcast the signed transaction here
-        // const broadcastResult = await walletContext.broadcastPSBT(walletResult);
-        // console.log("Broadcast result:", broadcastResult);
+      } else if (walletResult.cancelled) {
+        console.log("Transaction signing cancelled by user");
+        setSubmissionMessage("Transaction signing cancelled by user");
+      } else {
+        console.log("Transaction signing failed:", walletResult.error);
+        setSubmissionMessage(
+          `Transaction signing failed: ${walletResult.error}`,
+        );
       }
 
       return response.data;

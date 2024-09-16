@@ -1,7 +1,7 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { Wallet } from "./wallet.d.ts";
-import { getBtcBalance } from "utils/btc.ts";
+import { SignPSBTResult } from "$lib/types/src20.d.ts";
 
 export const isTapWalletInstalled = signal<boolean>(false);
 
@@ -80,10 +80,14 @@ const signMessage = async (message: string) => {
   }
 };
 
-const signPSBT = async (psbt: string) => {
+const signPSBT = async (
+  psbtHex: string,
+  _inputsToSign?: { index: number }[],
+  enableRBF = true,
+): Promise<SignPSBTResult> => {
   const tapwallet = (window as any).tapwallet;
   try {
-    const result = await tapwallet.signPsbt(psbt);
+    const result = await tapwallet.signPsbt(psbtHex, { enableRBF });
     if (result && result.hex) {
       return { signed: true, psbt: result.hex };
     } else {

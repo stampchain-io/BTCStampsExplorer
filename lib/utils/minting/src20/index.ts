@@ -1,9 +1,4 @@
-import { Client } from "$mysql/mod.ts";
-import * as bitcoin from "bitcoin";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
-
-import { dbManager } from "../../../../server/database/db.ts";
-import { getPublicKeyFromAddress } from "utils/quicknode.ts";
 import {
   checkDeployedTick,
   checkDeployParams,
@@ -12,14 +7,14 @@ import {
   checkMintParams,
   checkTransferParams,
 } from "utils/minting/src20/check.ts";
-import { prepareSrc20TX } from "./tx.ts";
-import { getUTXOForAddress } from "./utils.ts";
+import { prepareSrc20TX } from "utils/minting/src20/tx.ts";
+import { getUTXOForAddress } from "utils/minting/src20//utils.ts";
 import {
   IDeploySRC20,
   IMintSRC20,
   IPrepareSRC20TX,
   ITransferSRC20,
-} from "utils/minting/src20/src20.d.ts";
+} from "$lib/types/src20.d.ts";
 
 export async function mintSRC20({
   toAddress,
@@ -37,7 +32,6 @@ export async function mintSRC20({
       amt,
     });
 
-    const client: Client = await dbManager.getClient();
     const mint_info = await checkMintedOut(
       tick,
       amt,
@@ -60,19 +54,18 @@ export async function mintSRC20({
     if (utxos === null || utxos.length === 0) {
       throw new Error("No UTXO found");
     }
-    const publicKey = await getPublicKeyFromAddress(toAddress);
+
     const prepare: IPrepareSRC20TX = {
-      network: bitcoin.networks.bitcoin,
+      network: "mainnet",
       utxos,
       changeAddress,
       toAddress,
       feeRate,
       transferString,
-      publicKey,
     };
-    const psbtHex = await prepareSrc20TX(prepare);
-    dbManager.releaseClient(client);
-    return psbtHex;
+    const { psbtHex, inputsToSign } = await prepareSrc20TX(prepare);
+
+    return { hex: psbtHex, inputsToSign };
   } catch (error) {
     console.log(error.message);
     return {
@@ -92,6 +85,8 @@ export async function deploySRC20({
   x,
   web,
   email,
+  tg,
+  description,
 }: IDeploySRC20) {
   try {
     checkDeployParams({
@@ -105,26 +100,29 @@ export async function deploySRC20({
       x,
       web,
       email,
+      tg,
+      description,
     });
 
     const mint_info = await checkDeployedTick(tick);
     if (mint_info.deployed === true) {
       throw new Error(`Error: Token ${tick} already deployed`);
     }
-    const src20_mint_obj = {
+    const src20DeployObj = {
       op: "DEPLOY",
       p: "SRC-20",
       tick: tick,
       max: max,
       lim: lim,
-      dec: dec,
-      x: x,
-      web: web,
-      email: email,
+      ...(dec >= 0 && dec < 18 && { dec }), // Include dec only if it is between 0 and 17
+      ...(x && { x }),
+      ...(web && { web }),
+      ...(email && { email }),
+      ...(tg && { tg }),
+      ...(description && { description }),
     };
-    const transferString = JSON.stringify(src20_mint_obj);
 
-    // TODO: check for overmint
+    const transferString = JSON.stringify(src20DeployObj);
 
     // Modified: Use toAddress or changeAddress for fetching UTXOs
     const fetchedUtxos = await getUTXOForAddress(toAddress);
@@ -138,18 +136,17 @@ export async function deploySRC20({
       throw new Error("No UTXO found");
     }
     const utxos: UTXO[] = fetchedUtxos;
-    const publicKey = await getPublicKeyFromAddress(toAddress);
+
     const prepare: IPrepareSRC20TX = {
-      network: bitcoin.networks.bitcoin,
+      network: "mainnet",
       utxos,
       changeAddress,
       toAddress,
       feeRate,
       transferString,
-      publicKey,
     };
-    const psbtHex = await prepareSrc20TX(prepare);
-    return psbtHex;
+    const { psbtHex, inputsToSign } = await prepareSrc20TX(prepare);
+    return { psbtHex, inputsToSign };
   } catch (error) {
     console.error(error);
     return {
@@ -173,9 +170,7 @@ export async function transferSRC20({
       feeRate,
       amt,
     });
-    const client = await dbManager.getClient();
     const has_enough_balance = await checkEnoughBalance(
-      client,
       fromAddress,
       tick,
       amt,
@@ -198,15 +193,14 @@ export async function transferSRC20({
     if (utxos === null || utxos.length === 0) {
       throw new Error("No UTXO found");
     }
-    const publicKey = await getPublicKeyFromAddress(toAddress);
+
     const prepare: IPrepareSRC20TX = {
-      network: bitcoin.networks.bitcoin,
+      network: "mainnet",
       utxos,
       changeAddress: fromAddress,
       toAddress,
       feeRate,
       transferString,
-      publicKey,
     };
     const psbtHex = await prepareSrc20TX(prepare);
     return psbtHex;

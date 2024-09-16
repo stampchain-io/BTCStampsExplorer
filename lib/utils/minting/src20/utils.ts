@@ -1,6 +1,6 @@
 import * as bitcoin from "bitcoin";
-import { estimateInputSize } from "utils/minting/src20/utxo-selector.ts";
-import { SRC20Row } from "globals";
+import { estimateInputSize } from "./utxo-selector.ts";
+import { hex } from "@scure/base";
 
 const MAX_RETRIES = 3;
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
@@ -86,7 +86,7 @@ async function fetchUTXOsFromBlockchainAPI(address: string) {
         value: tx.value,
         script: tx.script,
         index: tx.tx_index,
-        size: estimateInputSize(tx.script),
+        size: estimateInputSize(hex.decode(tx.script)), // Convert string to Uint8Array
       };
       return formatedUTXO;
     });
@@ -119,7 +119,7 @@ async function fetchUTXOsFromBlockCypherAPI(address: string) {
         },
         value: tx.value,
         script: tx.script,
-        size: estimateInputSize(tx.script),
+        size: estimateInputSize(hex.decode(tx.script)), // Convert string to Uint8Array
       };
       return formatedUTXO;
     });
