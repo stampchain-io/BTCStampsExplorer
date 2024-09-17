@@ -117,6 +117,48 @@ export async function compressWithCheck(data: string) {
     return hexString;
   }
 }
+
+export async function decompressWithCheck(hexString: string): Promise<string> {
+  try {
+    await initializeForas();
+  } catch {
+    // Handle the case where WebAssembly initialization fails
+    return hexToString(hexString); // Return original string as fallback
+  }
+
+  try {
+    // First, try to decompress assuming it's compressed data
+    const decompressed = await zLibUncompress(hexString);
+
+    // If decompression succeeds and results in a valid string, return it
+    if (decompressed && decompressed !== hexString) {
+      return decompressed;
+    }
+  } catch {
+    // Decompression failed, which might mean the data wasn't compressed
+  }
+
+  // If decompression failed or returned the same string, assume it's not compressed
+  // and try to convert from hex to string
+  return hexToString(hexString);
+}
+
+function hexToString(hexString: string): string {
+  // Remove any whitespace and make sure the string has an even number of characters
+  hexString = hexString.replace(/\s/g, "");
+  if (hexString.length % 2 !== 0) {
+    hexString = "0" + hexString;
+  }
+
+  // Convert hex to bytes
+  const bytes = new Uint8Array(
+    hexString.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? [],
+  );
+
+  // Convert bytes to string
+  return new TextDecoder().decode(bytes);
+}
+
 //const strs = [
 //  '{"p":"src-20", "op": "deploy", "tick":"PEPE", "dec":"8", "max":"100000000, "lim":"10000"}',
 //  '{"p":"src-20", "op": "mint", "tick":"PEPE", "amt":"1000000"}',
