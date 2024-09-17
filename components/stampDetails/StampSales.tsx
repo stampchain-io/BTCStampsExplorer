@@ -58,7 +58,7 @@ export function StampSales(
                 To
               </th>
               <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
-                Qty
+                Quantity
               </th>
               <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Price (BTC)
