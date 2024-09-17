@@ -38,10 +38,9 @@ export const prepareSrc20TX = async ({
     if (!utxos || utxos.length === 0) {
       throw new Error("No UTXOs found for the given address");
     }
-
-    // Compress and encrypt the transfer string
-    let transferHex = await compressWithCheck(`stamp:${transferString}`);
-    console.log("Compressed transferHex", transferHex);
+    const compressedTransferString = await compressWithCheck(transferString);
+    const stampPrefixHex = Buffer.from("stamp:").toString("hex");
+    let transferHex = stampPrefixHex + compressedTransferString;
 
     // Pad the transfer hex
     const count = (transferHex.length / 2).toString(16).padStart(4, "0");
