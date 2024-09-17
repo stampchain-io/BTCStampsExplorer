@@ -22,7 +22,7 @@ export function StampSends({ sends }: { sends: SendRow[] }) {
             <tr>
               <th scope="col" className="pr-6 py-3">From</th>
               <th scope="col" className="px-6 py-3">To</th>
-              <th scope="col" className="px-6 py-3">Qty</th>
+              <th scope="col" className="px-6 py-3">Quantity</th>
               {/* <th scope="col" className="px-6 py-3">Unit Price</th> */}
               <th scope="col" className="px-6 py-3">Memo</th>
               <th scope="col" className="px-6 py-3">Tx hash</th>

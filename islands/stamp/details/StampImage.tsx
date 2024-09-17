@@ -3,8 +3,47 @@ import { useEffect, useState } from "preact/hooks";
 import { StampRow } from "globals";
 import { mimeTypesArray } from "utils/util.ts";
 
-import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
+import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";
+import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
+
+const RightPanel = (
+  { toggleCodeModal, toggleFullScreenModal, showCodeButton }: {
+    toggleCodeModal: () => void;
+    toggleFullScreenModal: () => void;
+    showCodeButton: boolean;
+  },
+) => {
+  return (
+    <div className={"flex justify-between p-5 bg-[#1F002E]"}>
+      <div className={"flex gap-4"}>
+        <a href="#">
+          <img src="/img/stamp/Copy.png" />
+        </a>
+        <a href="#">
+          <img src="/img/stamp/InstagramLogo.png" />
+        </a>
+        <a href="#">
+          <img src="/img/stamp/XLogo.png" />
+        </a>
+      </div>
+      <div className={"flex gap-4"}>
+        {showCodeButton && (
+          <img
+            src="/img/stamp/Code.png"
+            className="cursor-pointer"
+            onClick={toggleCodeModal}
+          />
+        )}
+        <img
+          src="/img/stamp/CornersOut.png"
+          className="cursor-pointer"
+          onClick={toggleFullScreenModal}
+        />
+      </div>
+    </div>
+  );
+};
 
 export const StampImage = (
   { stamp, className, flag }: {
@@ -13,15 +52,20 @@ export const StampImage = (
     flag?: boolean;
   },
 ) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleCloseModal = (event: MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      setIsModalOpen(false);
-    }
+  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const handleCloseCodeModal = () => {
+    setIsCodeModalOpen(false);
+  };
+  const toggleCodeModal = () => {
+    setIsCodeModalOpen(!isCodeModalOpen);
   };
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
+  const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState(false);
+  const handleCloseFullScreenModal = () => {
+    setIsFullScreenModalOpen(false);
+  };
+  const toggleFullScreenModal = () => {
+    setIsFullScreenModalOpen(!isCodeModalOpen);
   };
 
   const getStampSrc = () => {
@@ -40,13 +84,11 @@ export const StampImage = (
   };
 
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
-
   useEffect(() => {
     if (stamp.stamp_mimetype === "text/html") {
       fetchHtmlContent();
     }
   }, [stamp]);
-
   const fetchHtmlContent = async () => {
     try {
       const response = await fetch(src);
@@ -63,126 +105,103 @@ export const StampImage = (
 
   const src = getStampSrc();
 
-  if (src === "/content/not-available.png") {
-    return (
-      <div className="stamp-container">
-        <img
-          width="100%"
-          loading="lazy"
-          className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
-          src={src}
-          alt="Not Available"
-        />
-      </div>
-    );
-  }
+  return (
+    <>
+      {src === "/content/not-available.png" && (
+        <div className="stamp-container">
+          <img
+            width="100%"
+            loading="lazy"
+            className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
+            src={src}
+            alt="Not Available"
+          />
+        </div>
+      )}
 
-  if (stamp.stamp_mimetype === "text/html") {
-    return (
-      <>
+      {(src !== "/content/not-available.png" &&
+        stamp.stamp_mimetype === "text/html") &&
+        (
+          <div
+            className={`${className} flex flex-col gap-4`}
+          >
+            <div className={"p-6 bg-[#1F002E]"}>
+              <iframe
+                width="100%"
+                height="100%"
+                scrolling="no"
+                className={`${className} aspect-square rounded-lg`}
+                sandbox="allow-scripts allow-same-origin"
+                src={src}
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.src = stamp.stamp_url;
+                }}
+                title="Stamp"
+              />
+            </div>
+            {flag && (
+              <RightPanel
+                toggleCodeModal={toggleCodeModal}
+                toggleFullScreenModal={toggleFullScreenModal}
+                showCodeButton={true}
+              />
+            )}
+          </div>
+        )}
+
+      {(src !== "/content/not-available.png" &&
+        stamp.stamp_mimetype === "text/plain") && (
+        <TextContentIsland src={src} />
+      )}
+
+      {src !== "/content/not-available.png" &&
+        stamp.stamp_mimetype !== "text/html" &&
+        stamp.stamp_mimetype !== "text/plain" && (
         <div
           className={`${className} flex flex-col gap-4`}
         >
           <div className={"p-6 bg-[#1F002E]"}>
-            <iframe
-              width="100%"
-              height="100%"
-              scrolling="no"
-              className={`${className} aspect-square rounded-lg`}
-              sandbox="allow-scripts allow-same-origin"
-              src={src}
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.src = stamp.stamp_url;
-              }}
-              title="Stamp"
-            />
+            <div className="stamp-container ">
+              <img
+                width="100%"
+                loading="lazy"
+                className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg pixelart stamp-image`}
+                src={src}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "/content/not-available.png";
+                }}
+                alt="Stamp"
+              />
+            </div>
           </div>
           {flag && (
-            <div className={"flex justify-between p-5 bg-[#1F002E]"}>
-              <div className={"flex gap-4"}>
-                <a href="#">
-                  <img src="/img/stamp/Copy.png" />
-                </a>
-                <a href="#">
-                  <img src="/img/stamp/InstagramLogo.png" />
-                </a>
-                <a href="#">
-                  <img src="/img/stamp/XLogo.png" />
-                </a>
-              </div>
-              <div className={"flex gap-4"}>
-                <img
-                  src="/img/stamp/Code.png"
-                  className="cursor-pointer"
-                  onClick={toggleModal}
-                />
-                <a href="#">
-                  <img src="/img/stamp/CornersOut.png" />
-                </a>
-              </div>
-            </div>
+            <RightPanel
+              toggleCodeModal={toggleCodeModal}
+              toggleFullScreenModal={toggleFullScreenModal}
+              showCodeButton={false}
+            />
           )}
         </div>
-        {isModalOpen && (
-          <StampCodeModal
-            src={htmlContent}
-            toggleModal={() => setIsModalOpen(false)}
-            handleCloseModal={handleCloseModal}
-          />
-        )}
-      </>
-    );
-  }
-
-  if (stamp.stamp_mimetype === "text/plain") {
-    return <TextContentIsland src={src} />;
-  }
-
-  return (
-    <div
-      className={`${className} flex flex-col gap-4`}
-    >
-      <div className={"p-6 bg-[#1F002E]"}>
-        <div className="stamp-container ">
-          <img
-            width="100%"
-            loading="lazy"
-            className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg pixelart stamp-image`}
-            src={src}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "/content/not-available.png";
-            }}
-            alt="Stamp"
-          />
-        </div>
-      </div>
-      {flag && (
-        <div className={"flex justify-between p-5 bg-[#1F002E]"}>
-          <div className={"flex gap-4"}>
-            <a href="#">
-              <img src="/img/stamp/Copy.png" />
-            </a>
-            <a href="#">
-              <img src="/img/stamp/InstagramLogo.png" />
-            </a>
-            <a href="#">
-              <img src="/img/stamp/XLogo.png" />
-            </a>
-          </div>
-          <div className={"flex gap-4"}>
-            {
-              /* <a href="#">
-              <img src="/img/stamp/Code.png" />
-            </a> */
-            }
-            <a href="#">
-              <img src="/img/stamp/CornersOut.png" />
-            </a>
-          </div>
-        </div>
       )}
-    </div>
+
+      {isCodeModalOpen && (
+        <StampCodeModal
+          src={htmlContent || ""}
+          toggleModal={() => setIsCodeModalOpen(false)}
+          handleCloseModal={handleCloseCodeModal}
+        />
+      )}
+
+      {isFullScreenModalOpen && (
+        <StampImageFullScreen
+          src={src}
+          toggleModal={() => setIsFullScreenModalOpen(false)}
+          handleCloseModal={handleCloseFullScreenModal}
+        />
+      )}
+    </>
   );
 };
 

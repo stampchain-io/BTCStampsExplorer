@@ -3,46 +3,21 @@ import { StampRow } from "globals";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
 import StampImage from "./StampImage.tsx";
 
-interface StampCodeModalProps {
+interface StampImageFullScreenProps {
   src: string;
   toggleModal: () => void;
   handleCloseModal: () => void;
 }
 
-const StampCodeModal = (
-  { src, toggleModal, handleCloseModal }: StampCodeModalProps,
+const StampImageFullScreen = (
+  { src, toggleModal, handleCloseModal }: StampImageFullScreenProps,
 ) => {
-  const [formattedSrc, setFormattedSrc] = useState("");
-
-  useEffect(() => {
-    setFormattedSrc(formatHtmlSource(src));
-  }, [src]);
-
-  function formatHtmlSource(html: string): string {
-    let formatted = html.replace(/</g, "\n<").replace(/>/g, ">\n");
-    let indent = 0;
-    let result = "";
-
-    formatted.split("\n").forEach((line) => {
-      line = line.trim();
-      if (line.match(/^<\//) && indent > 0) {
-        indent -= 2;
-      }
-      result += " ".repeat(indent) + line + "\n";
-      if (line.match(/^<[^/]/) && !line.match(/\/>/)) {
-        indent += 2;
-      }
-    });
-
-    return result.trim();
-  }
-
   return (
     <div
       class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
       onClick={handleCloseModal}
     >
-      <div class="relative p-4 w-4/5 h-auto">
+      <div class="relative p-4 w-full max-w-[800px] h-auto">
         <div class="relative bg-white rounded-lg shadow overflow-hidden">
           <div class="flex flex-col gap-4 items-center justify-between p-4 md:p-5 rounded-t">
             <button
@@ -68,9 +43,17 @@ const StampCodeModal = (
               </svg>
               <span class="sr-only">Close modal</span>
             </button>
-            <pre class="text-sm text-gray-800 whitespace-pre-wrap break-words">
-              <code>{src}</code>
-            </pre>
+            <img
+              width="100%"
+              loading="lazy"
+              className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg pixelart stamp-image`}
+              src={src}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src =
+                  "/content/not-available.png";
+              }}
+              alt="Stamp"
+            />
           </div>
         </div>
       </div>
@@ -78,4 +61,4 @@ const StampCodeModal = (
   );
 };
 
-export default StampCodeModal;
+export default StampImageFullScreen;

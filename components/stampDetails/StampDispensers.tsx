@@ -61,16 +61,16 @@ export function StampDispensers(
                 Address
               </th>
               <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
-                Escrow Qty
+                Escrow
               </th>
               <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
-                Give Qty
+                Give
               </th>
               <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Remaining
               </th>
               <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
-                Price (BTC)
+                Price
               </th>
               <th scope="col" className="px-3 md:px-6 py-1 md:py-3">
                 Confirmed

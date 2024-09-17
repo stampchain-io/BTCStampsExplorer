@@ -21,11 +21,8 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleCloseModal = (event: MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      setIsModalOpen(false);
-    }
+    setIsModalOpen(false);
   };
-
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };

@@ -42,7 +42,7 @@ export function StampHolders(
                 Address
               </th>
               <th scope="col" className="pl-3 md:pl-6 py-1 md:py-3">
-                Qty
+                Quantity
               </th>
             </tr>
           </thead>
