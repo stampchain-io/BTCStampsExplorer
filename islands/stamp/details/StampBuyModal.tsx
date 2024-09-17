@@ -7,8 +7,8 @@ interface Props {
   stamp: StampRow;
   fee: number;
   handleChangeFee: (fee: number) => void;
-  toggleModal: Function;
-  handleCloseModal: Function;
+  toggleModal: () => void;
+  handleCloseModal: () => void;
 }
 
 const StampBuyModal = (
@@ -22,7 +22,7 @@ const StampBuyModal = (
       class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
       onClick={handleCloseModal}
     >
-      <div class="relative p-4 w-full max-w-80 h-auto">
+      <div class="relative p-4 w-full max-w-[360px] h-auto">
         <div class="relative bg-white rounded-lg shadow dark:bg-[#0B0B0B] overflow-hidden">
           <div class="flex flex-col gap-4 items-center justify-between p-4 md:p-5 rounded-t">
             <button
