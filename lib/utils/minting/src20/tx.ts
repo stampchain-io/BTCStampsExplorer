@@ -1,14 +1,17 @@
+// lib/utils/minting/src20/tx.ts
+
 import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
 import { selectUTXOs } from "./utxo-selector.ts";
-import { bin2hex, hex2bin, scramble } from "../utils.ts";
+import { arc4, bin2hex, hex2bin } from "../utils.ts";
 import { compressWithCheck } from "../zlib.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { IPrepareSRC20TX, PSBTInput, UTXO, VOUT } from "$lib/types/src20.d.ts";
+import { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/src20.d.ts";
 import { getTransaction } from "../../quicknode.ts";
-import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
+import { getUTXOForAddress } from "./utils.ts";
+import * as msgpack from "https://deno.land/x/msgpack@v1.4/mod.ts";
 
 const RECIPIENT_DUST = 789;
 const MULTISIG_DUST = 809;
@@ -38,44 +41,89 @@ export const prepareSrc20TX = async ({
     if (!utxos || utxos.length === 0) {
       throw new Error("No UTXOs found for the given address");
     }
-    const compressedTransferString = await compressWithCheck(transferString);
-    const stampPrefixHex = Buffer.from("stamp:").toString("hex");
-    let transferHex = stampPrefixHex + compressedTransferString;
 
-    // Pad the transfer hex
-    const count = (transferHex.length / 2).toString(16).padStart(4, "0");
-    transferHex = count + transferHex;
-    const remaining = transferHex.length % (62 * 2);
-    if (remaining > 0) {
-      transferHex = transferHex.padEnd(
-        transferHex.length + (62 * 2 - remaining),
-        "0",
+    let transferDataBytes: Uint8Array;
+    const stampPrefixBytes = new TextEncoder().encode("stamp:");
+
+    const transferData = JSON.parse(transferString);
+    const msgpackData = msgpack.encode(transferData);
+    const { compressedData, compressed } = await compressWithCheck(msgpackData);
+
+    if (compressed) {
+      // Compression successful
+      transferDataBytes = compressedData;
+    } else {
+      // Compression failed, use original JSON data
+      transferDataBytes = new TextEncoder().encode(
+        JSON.stringify(transferData),
       );
     }
-    console.log("Padded transferHex", transferHex);
+
+    // Add stamp prefix
+    const dataWithPrefix = new Uint8Array([
+      ...stampPrefixBytes,
+      ...transferDataBytes,
+    ]);
+
+    // Calculate the length of the data (including the "stamp:" prefix)
+    // but excluding any trailing null bytes
+    let dataLength = dataWithPrefix.length;
+    while (dataLength > 0 && dataWithPrefix[dataLength - 1] === 0) {
+      dataLength--;
+    }
+
+    // Add 2-byte length prefix (big-endian)
+    const lengthPrefix = new Uint8Array([
+      (dataLength >> 8) & 0xff, // High byte
+      dataLength & 0xff, // Low byte
+    ]);
+    console.log("length", lengthPrefix);
+
+    let payloadBytes = new Uint8Array([
+      ...lengthPrefix,
+      ...dataWithPrefix,
+    ]);
+
+    // Pad the data to multiple of 62 bytes
+    const padLength = (62 - (payloadBytes.length % 62)) % 62;
+    if (padLength > 0) {
+      const padding = new Uint8Array(padLength); // zeros
+      payloadBytes = new Uint8Array([...payloadBytes, ...padding]);
+    }
+    console.log("Padded payload:", bin2hex(payloadBytes));
 
     // ARC4 encode using the first UTXO's txid as the key
-    const encryption = bin2hex(
-      scramble(hex2bin(utxos[0].txid), hex2bin(transferHex)),
-    );
-    console.log("Encrypted data", encryption);
+    const txidBytes = hex2bin(utxos[0].txid); // Uint8Array
+    console.log("ARC4 key (hex):", bin2hex(txidBytes));
 
-    // Create chunks and multisig scripts
-    const chunks = encryption.match(/.{1,124}/g) || [];
+    // Use the arc4 function for encryption
+    const encryptedDataBytes = arc4(txidBytes, payloadBytes);
+    console.log("Encrypted data (hex):", bin2hex(encryptedDataBytes));
+
+    // Split encrypted data into chunks of 62 bytes
+    const chunks: Uint8Array[] = [];
+    for (let i = 0; i < encryptedDataBytes.length; i += 62) {
+      chunks.push(encryptedDataBytes.slice(i, i + 62));
+    }
+
     const multisigScripts = chunks.map((chunk) => {
-      const pubkey_seg1 = chunk.substring(0, 62);
-      const pubkey_seg2 = chunk.substring(62, 124);
-      let pubkey1, pubkey2;
+      const pubkey_seg1 = bin2hex(chunk.slice(0, 31)); // First 31 bytes (62 hex chars)
+      const pubkey_seg2 = bin2hex(chunk.slice(31, 62)); // Next 31 bytes (62 hex chars)
+      let pubkey1: string, pubkey2: string;
 
       do {
         const first_byte = Math.random() > 0.5 ? "02" : "03";
-        const second_byte = crypto.randomBytes(1).toString("hex");
+        const second_byte = crypto.randomBytes(1)[0]
+          .toString(16)
+          .padStart(2, "0");
         pubkey1 = first_byte + pubkey_seg1 + second_byte;
       } while (!isValidPubkey(pubkey1));
 
       do {
         const first_byte = Math.random() > 0.5 ? "02" : "03";
-        const second_byte = crypto.randomBytes(1).toString("hex");
+        const second_byte = crypto.randomBytes(1)[0]
+          .toString(16)
+          .padStart(2, "0");
         pubkey2 = first_byte + pubkey_seg2 + second_byte;
       } while (!isValidPubkey(pubkey2));
 
@@ -92,20 +140,21 @@ export const prepareSrc20TX = async ({
     ];
 
     // Add minting service fee if enabled
-    if (parseInt(serverConfig.MINTING_SERVICE_FEE_ENABLED || "0") === 1) {
+    if (parseInt(serverConfig.MINTING_SERVICE_FEE_ENABLED || "0", 10) === 1) {
       const feeAddress = serverConfig.MINTING_SERVICE_FEE_ADDRESS || "";
       const feeAmount = parseInt(
         serverConfig.MINTING_SERVICE_FEE_FIXED_SATS || "0",
+        10,
       );
       vouts.push({ address: feeAddress, value: feeAmount });
     }
 
     // Select UTXOs
-    const { inputs: selectedUtxos, change, fee: estimatedFee } = selectUTXOs(
-      utxos,
-      vouts,
-      feeRate,
-    );
+    const {
+      inputs: selectedUtxos,
+      change,
+      fee: estimatedFee,
+    } = selectUTXOs(utxos, vouts, feeRate);
 
     if (selectedUtxos.length === 0) {
       throw new Error("Unable to select suitable UTXOs for the transaction");
