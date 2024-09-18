@@ -1,6 +1,6 @@
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 
-import { FILTER_TYPES, SRC20_TYPES } from "globals";
+import { SRC20_FILTER_TYPES, SRC20_TYPES } from "globals";
 
 import { SRC20Navigator } from "$islands/src20/SRC20Navigator.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
@@ -8,7 +8,7 @@ import { useNavigator } from "$islands/Navigator/navigator.tsx";
 
 export const SRC20Header = (
   { filterBy, sortBy, selectedTab, type }: {
-    filterBy: any[];
+    filterBy: SRC20_FILTER_TYPES | SRC20_FILTER_TYPES[];
     sortBy: string;
     selectedTab: string;
     type: SRC20_TYPES;
@@ -16,7 +16,7 @@ export const SRC20Header = (
 ) => {
   const { setTypeOption } = useNavigator();
 
-  const [currentFilters, setCurrentFilters] = useState<FILTER_TYPES[]>(
+  const [currentFilters, setCurrentFilters] = useState<SRC20_FILTER_TYPES[]>(
     filterBy,
   );
   const [currentSort, setCurrentSort] = useState<string>(sortBy);

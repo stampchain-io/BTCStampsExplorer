@@ -1,13 +1,13 @@
 import { useEffect, useState } from "preact/hooks";
-import { FILTER_TYPES, STAMP_TYPES } from "globals";
+import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
 
-const filters: FILTER_TYPES[] = ["pixel", "recursive", "vector"];
+const filters: STAMP_FILTER_TYPES[] = ["pixel", "recursive", "vector"];
 const sorts = ["Latest", "Oldest"];
 
 interface FilterItemProps {
-  title: FILTER_TYPES;
-  value: FILTER_TYPES[];
-  onChange: (id: FILTER_TYPES) => void;
+  title: STAMP_FILTER_TYPES;
+  value: STAMP_FILTER_TYPES[];
+  onChange: (id: STAMP_FILTER_TYPES) => void;
 }
 
 interface SortItemProps {
@@ -46,7 +46,7 @@ const SortItem = ({ title, onChange, value }: SortItemProps) => (
 
 export function StampNavigator(
   { initFilter, initSort, initType, selectedTab, open1, handleOpen1 }: {
-    initFilter?: FILTER_TYPES[];
+    initFilter?: STAMP_FILTER_TYPES[];
     initSort?: string;
     initType?: STAMP_TYPES;
     selectedTab: STAMP_TYPES;
@@ -54,7 +54,7 @@ export function StampNavigator(
     handleOpen1: (open: boolean) => void;
   },
 ) {
-  const [localFilters, setLocalFilters] = useState<FILTER_TYPES[]>(
+  const [localFilters, setLocalFilters] = useState<STAMP_FILTER_TYPES[]>(
     initFilter || [],
   );
   const [localSort, setLocalSort] = useState<string>(initSort || "DESC");
@@ -69,7 +69,7 @@ export function StampNavigator(
     updateURL({ sortBy: value });
   };
 
-  const handleFilterChange = (value: FILTER_TYPES) => {
+  const handleFilterChange = (value: STAMP_FILTER_TYPES) => {
     setLocalFilters((prevFilters) => {
       const newFilters = prevFilters.includes(value)
         ? prevFilters.filter((f) => f !== value)
@@ -81,7 +81,7 @@ export function StampNavigator(
 
   const updateURL = (params: {
     sortBy?: string;
-    filterBy?: FILTER_TYPES[];
+    filterBy?: STAMP_FILTER_TYPES[];
     type?: STAMP_TYPES;
   }) => {
     if (typeof self !== "undefined") {

@@ -18,7 +18,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
         limit: Number(params.get("limit")) || undefined,
         page: Number(params.get("page")) || undefined,
         amt: Number(params.get("amt")) || undefined,
-        sort: params.get("sort") || undefined,
+        sortBy: params.get("sort") || undefined,
       };
 
       const result = await Src20Controller.handleSrc20BalanceRequest(

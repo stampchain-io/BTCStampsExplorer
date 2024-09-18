@@ -17,7 +17,7 @@ export const handler: Handlers = {
         limit,
         page,
         op: url.searchParams.get("op") || undefined,
-        sort: url.searchParams.get("sort") || "ASC",
+        sortBy: url.searchParams.get("sort") || "ASC",
       };
 
       const { src20_txs, total, lastBlock, mint_status } = await Src20Controller

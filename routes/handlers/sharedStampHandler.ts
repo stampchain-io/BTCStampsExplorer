@@ -17,14 +17,14 @@ export const sharedStampIndexHandler = (
     try {
       const url = new URL(req.url);
       const { limit, page } = getPaginationParams(url);
-      const sort_order =
-        (url.searchParams.get("sort_order")?.toUpperCase() as "ASC" | "DESC") ||
+      const sortBy =
+        (url.searchParams.get("sort")?.toUpperCase() as "ASC" | "DESC") ||
         "ASC";
 
       const result = await StampController.getStamps({
         page,
         limit,
-        sortBy: sort_order,
+        sortBy,
         type: stampType,
         allColumns: true,
       });

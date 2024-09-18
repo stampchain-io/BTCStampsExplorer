@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 
-import { FILTER_TYPES, STAMP_TYPES } from "globals";
+import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
@@ -8,14 +8,14 @@ import { useNavigator } from "$islands/Navigator/navigator.tsx";
 
 export const StampHeader = (
   { filterBy, sortBy, selectedTab, type }: {
-    filterBy: FILTER_TYPES[];
+    filterBy: STAMP_FILTER_TYPES[];
     sortBy: string;
     selectedTab: STAMP_TYPES;
     type: STAMP_TYPES;
   },
 ) => {
   const { setTypeOption } = useNavigator();
-  const [currentFilters, setCurrentFilters] = useState<FILTER_TYPES[]>(
+  const [currentFilters, setCurrentFilters] = useState<STAMP_FILTER_TYPES[]>(
     filterBy,
   );
   const [currentSort, setCurrentSort] = useState<string>(sortBy);
@@ -28,7 +28,8 @@ export const StampHeader = (
     const handleUrlChange = (event: CustomEvent) => {
       const url = new URL(event.detail);
       const newFilters =
-        url.searchParams.get("filterBy")?.split(",") as FILTER_TYPES[] || [];
+        url.searchParams.get("filterBy")?.split(",") as STAMP_FILTER_TYPES[] ||
+        [];
       const newSort = url.searchParams.get("sortBy") || "DESC";
       setCurrentFilters(newFilters);
       setCurrentSort(newSort);

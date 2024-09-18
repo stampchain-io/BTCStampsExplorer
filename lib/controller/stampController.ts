@@ -7,9 +7,10 @@ import { CollectionService } from "$lib/services/collectionService.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { paginate } from "utils/util.ts";
 import {
-  FILTER_TYPES,
   PaginatedStampBalanceResponseBody,
   ProcessedHolder,
+  STAMP_FILTER_TYPES,
+  STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   StampRow,
 } from "globals";
@@ -169,7 +170,7 @@ export class StampController {
   static async getStamps({
     page = 1,
     limit = BIG_LIMIT,
-    sortBy = "DESC",
+    sortBy = "ASC",
     type = "all",
     filterBy = [],
     ident,
@@ -179,44 +180,72 @@ export class StampController {
     cacheDuration,
     noPagination = false,
     allColumns = false,
+    sortColumn = "tx_index",
+    suffixFilters,
   }: {
     page?: number;
     limit?: number;
     sortBy?: "DESC" | "ASC";
     type?: STAMP_TYPES;
-    filterBy?: FILTER_TYPES[] | string;
+    filterBy?: STAMP_FILTER_TYPES[] | string;
     ident?: SUBPROTOCOLS[];
+    suffixFilters?: STAMP_SUFFIX_FILTERS[];
     collectionId?: string;
     identifier?: string | number;
     blockIdentifier?: number | string;
     cacheDuration?: number | "never";
     noPagination?: boolean;
     allColumns?: boolean;
+    sortColumn?: string;
   } = {}) {
     try {
       console.log("StampController.getStamps called with filterBy:", filterBy);
 
       const filterByArray = typeof filterBy === "string"
-        ? (filterBy
-          ? filterBy.split(",").filter(Boolean) as FILTER_TYPES[]
-          : [])
+        ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
         : filterBy;
 
-      let finalIdent = ident;
-      if (!finalIdent) {
-        if (filterByArray.length > 0) {
-          finalIdent = filterByArray.flatMap((filter) =>
-            filterOptions[filter]?.ident || []
-          );
-        } else if (type === "classic") {
+      // Initialize ident based on type
+      let finalIdent: SUBPROTOCOLS[] = ident || [];
+      if ((!ident || ident.length === 0) && type) {
+        if (type === "classic") {
           finalIdent = ["STAMP"];
         } else if (type === "posh") {
           finalIdent = ["SRC-721"];
-        } else {
+        } else if (type === "stamps") {
           finalIdent = ["STAMP", "SRC-721"];
+        } else if (type === "src20") {
+          finalIdent = ["SRC-20"];
+        } else if (type === "all") {
+          finalIdent = []; // We'll handle 'all' in the repository
+        } else {
+          finalIdent = [];
         }
       }
 
+      let filterSuffixFilters: STAMP_SUFFIX_FILTERS[] = [];
+      if (filterByArray.length > 0) {
+        // Extract ident and suffixFilters from filterBy
+        const identFromFilter = filterByArray.flatMap((filter) =>
+          filterOptions[filter]?.ident || []
+        );
+        filterSuffixFilters = filterByArray.flatMap((filter) =>
+          filterOptions[filter]?.suffixFilters || []
+        );
+
+        // Combine ident from type and filterBy, removing duplicates
+        if (identFromFilter.length > 0) {
+          finalIdent = Array.from(new Set([...finalIdent, ...identFromFilter]));
+        }
+
+        // When filterBy is defined, suffixFilters are limited to those in filterOptions
+        suffixFilters = filterSuffixFilters;
+      } else if (!suffixFilters || suffixFilters.length === 0) {
+        // If suffixFilters are not provided, use all possible suffixes
+        suffixFilters = []; // No suffix filter applied
+      }
+
+      // Pass ident, filterBy, and suffixFilters to the service/repository
       const [stampResult, lastBlock, xcpAssets] = await Promise.all([
         StampService.getStamps({
           page,
@@ -224,6 +253,7 @@ export class StampController {
           sortBy,
           type,
           ident: finalIdent,
+          suffixFilters,
           allColumns,
           collectionId,
           identifier,
@@ -231,6 +261,7 @@ export class StampController {
           cacheDuration,
           noPagination,
           filterBy: filterByArray,
+          sortColumn,
         }),
         BlockService.getLastBlock(),
         this.getXcpAssetsWithInMemoryCache(),
@@ -367,7 +398,7 @@ export class StampController {
         const serviceResult = await StampService.getStamps({
           page: 1,
           limit: category.limit,
-          sortBy: "desc",
+          sortBy: "DESC",
           type: "stamps",
           ident: category.types as SUBPROTOCOLS[],
           noPagination: false,
@@ -399,7 +430,7 @@ export class StampController {
             page: 1,
             limit: 10,
           }),
-          CollectionService.getCollectionByName("posh", 4, "asc"),
+          CollectionService.getCollectionByName("posh", 4, "DESC"),
           StampService.getRecentSales(6),
         ]);
 

@@ -11,7 +11,7 @@ export const handler: Handlers = {
 
     const params: SRC20TrxRequestParams = {
       op: url.searchParams.get("op") ?? undefined,
-      sort: url.searchParams.get("sort") ?? "ASC",
+      sortBy: url.searchParams.get("sort") ?? "ASC",
       page,
       limit,
     };

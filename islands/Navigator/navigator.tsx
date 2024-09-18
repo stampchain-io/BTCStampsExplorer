@@ -1,15 +1,15 @@
 import { createContext } from "preact";
 import { useContext, useEffect, useState } from "preact/hooks";
-import { FILTER_TYPES, STAMP_TYPES } from "globals";
+import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
 
 interface NavigatorContextType {
   setTypeOption: (page: string, type: STAMP_TYPES, reload?: boolean) => void;
   setSortOption: (sort: string) => void;
-  setFilterOption: (filter: FILTER_TYPES) => void;
+  setFilterOption: (filter: STAMP_FILTER_TYPES) => void;
   getSort: () => string;
-  getFilter: () => FILTER_TYPES[];
+  getFilter: () => STAMP_FILTER_TYPES[];
   getType: () => STAMP_TYPES;
-  setFilter: (filters: FILTER_TYPES[]) => void;
+  setFilter: (filters: STAMP_FILTER_TYPES[]) => void;
   setSort: (sort: string) => void;
   setType: (type: STAMP_TYPES) => void;
 }
@@ -22,7 +22,7 @@ export const NavigatorProvider = (
   { children }: { children: preact.ComponentChildren },
 ) => {
   const [sort, setSort] = useState<string>("DESC");
-  const [filter, setFilter] = useState<FILTER_TYPES[]>([]);
+  const [filter, setFilter] = useState<STAMP_FILTER_TYPES[]>([]);
   const [type, setType] = useState<STAMP_TYPES>("all");
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const NavigatorProvider = (
     setFilter(
       (url.searchParams.get("filterBy")?.split(",").filter(
         Boolean,
-      ) as FILTER_TYPES[]) || [],
+      ) as STAMP_FILTER_TYPES[]) || [],
     );
     setType((url.searchParams.get("type") as STAMP_TYPES) || "all");
   }, []);
@@ -59,7 +59,7 @@ export const NavigatorProvider = (
     setSort(newSort);
   };
 
-  const setFilterOption = (newFilter: FILTER_TYPES) => {
+  const setFilterOption = (newFilter: STAMP_FILTER_TYPES) => {
     const currentFilters = filter.includes(newFilter)
       ? filter.filter((f) => f !== newFilter)
       : [...filter, newFilter];

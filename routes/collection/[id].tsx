@@ -1,8 +1,7 @@
 import { Pagination } from "$islands/pagination/Pagination.tsx";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
-import { StampRow } from "globals";
-
+import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "globals";
 import { CollectionDetailsHeader } from "$islands/collection/CollectionDetailsHeader.tsx";
 import { CollectionDetailsContent } from "$islands/collection/CollectionDetailsContent.tsx";
 
@@ -28,15 +27,17 @@ export const handler: Handlers = {
     const { id } = ctx.params;
 
     const url = new URL(req.url);
-    const orderBy = url.searchParams.get("order")?.toUpperCase() == "ASC"
+    const sortBy = url.searchParams.get("sortBy")?.toUpperCase() == "ASC"
       ? "ASC"
       : "DESC";
-    const sortBy = url.searchParams.get("sortBy") || "none";
-    const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+    const filterBy =
+      url.searchParams.get("filterBy")?.split(",").map((f) =>
+        f as STAMP_FILTER_TYPES
+      ) || [];
     const selectedTab = url.searchParams.get("ident") || "all";
-    const ident = selectedTab === "all"
-      ? ["STAMP", "SRC-721", "SRC-20"]
-      : ["STAMP", "SRC-721"];
+    const ident: SUBPROTOCOLS[] = selectedTab === "all"
+      ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]
+      : ["STAMP", "SRC-721"] as SUBPROTOCOLS[];
     const page = parseInt(url.searchParams.get("page") || "1");
     const page_size = parseInt(
       url.searchParams.get("limit") || "20",
@@ -57,7 +58,6 @@ export const handler: Handlers = {
     const result = await StampController.getStamps({
       page,
       limit: page_size,
-      orderBy: orderBy as "ASC" | "DESC",
       sortBy,
       type,
       filterBy,

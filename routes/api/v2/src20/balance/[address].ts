@@ -17,7 +17,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         limit,
         page,
         amt: Number(params.get("amt")) || 0,
-        sort: params.get("sort") || "ASC",
+        sortBy: params.get("sort") || "ASC",
         includePagination: params.get("includePagination") !== "false",
       };
 

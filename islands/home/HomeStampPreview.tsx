@@ -21,7 +21,12 @@ export function HomeStampPreview({
   const sections1: StampSectionProps[] = [
     { title: "POSH", type: "posh", stamps: stamps_posh, layout: "grid" },
     { title: "CLASSIC", type: "classic", stamps: stamps_art, layout: "grid" },
-    { title: "RECURSIVE", type: "posh", stamps: stamps_posh, layout: "grid" },
+    {
+      title: "RECURSIVE",
+      type: "stamps",
+      stamps: stamps_src721,
+      layout: "grid", // FIXME: also need to add the additional recursive for filter
+    },
   ];
 
   const sections2: StampSectionProps[] = [

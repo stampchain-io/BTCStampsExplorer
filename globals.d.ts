@@ -1,17 +1,25 @@
 // General Types ---------------------------------------------------------------
 
 export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
-export type STAMP_TYPES =
+export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
   | "all"
   | "stamps"
   | "cursed"
   | "classic"
   | "posh"
-  | "recursive";
-export type FILTER_TYPES = "vector" | "pixel" | "recursive";
+  | "src20"; // Note this is only for showing the src20 images, not actual SRC-20 details
+// | "recursive"; this is a filter not a type when passed to the db
+// see filterOptions
+export type STAMP_FILTER_TYPES = "vector" | "pixel" | "recursive";
+export type STAMP_SUFFIX_FILTERS = [
+  "gif" | "jpg" | "png" | "webp" | "bmp" | "jpeg",
+  ...("gif" | "jpg" | "png" | "webp" | "bmp" | "jpeg")[],
+];
 export type SRC20_TYPES =
   | "all"
   | "minting";
+
+export type SRC20_FILTER_TYPES = ""; // TBD
 
 import Big from "$Big";
 
@@ -243,7 +251,8 @@ export interface SRC20TrxRequestParams {
   op?: string | string[] | null;
   limit?: number;
   page?: number;
-  sort?: string;
+  sort?: string; // sort is only used on API requests
+  sortBy?: string;
   tx_hash?: string | null;
   address?: string | null;
   noPagination?: boolean;

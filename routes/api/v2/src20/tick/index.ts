@@ -11,7 +11,7 @@ export const handler: Handlers = {
       const { limit, page } = getPaginationParams(url);
 
       const params: SRC20TrxRequestParams = {
-        sort: url.searchParams.get("sort") || "ASC",
+        sortBy: url.searchParams.get("sort") || "ASC",
         limit,
         page,
       };
