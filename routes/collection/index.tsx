@@ -22,10 +22,9 @@ type CollectionPageProps = {
 export const handler: Handlers = {
   async GET(req: Request, ctx: FreshContext) {
     const url = new URL(req.url);
-    const orderBy = url.searchParams.get("order")?.toUpperCase() == "ASC"
+    const sortBy = url.searchParams.get("sortBy")?.toUpperCase() == "ASC"
       ? "ASC"
       : "DESC";
-    const sortBy = url.searchParams.get("sortBy") || "none";
     const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
     const selectedTab = url.searchParams.get("ident") || "all";
     const page = parseInt(url.searchParams.get("page") || "1");

@@ -1,10 +1,7 @@
 import { serverConfig } from "$server/config/config.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import { bigFloatToString } from "utils/util.ts";
-import {
-  SRC20_BALANCE_TABLE,
-  SRC20_TABLE,
-} from "utils/constants.ts";
+import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "utils/constants.ts";
 import {
   SRC20BalanceRequestParams,
   SRC20SnapshotRequestParams,
@@ -89,7 +86,7 @@ export class SRC20Repository {
       op,
       limit,
       page,
-      sort = "ASC",
+      sortBy = "ASC",
       tx_hash,
       address,
     } = params;
@@ -138,8 +135,8 @@ export class SRC20Repository {
       queryParams.push(address, address);
     }
 
-    const validOrder = ["ASC", "DESC"].includes(sort.toUpperCase())
-      ? sort.toUpperCase()
+    const validOrder = ["ASC", "DESC"].includes(sortBy.toUpperCase())
+      ? sortBy.toUpperCase()
       : "ASC";
 
     if (limit !== undefined) {
@@ -200,7 +197,7 @@ export class SRC20Repository {
       tick,
       limit,
       page,
-      sort: sortBy = "DESC",
+      sortBy: sortBy = "DESC",
       sortField = "amt",
     } = params;
     const queryParams = [];

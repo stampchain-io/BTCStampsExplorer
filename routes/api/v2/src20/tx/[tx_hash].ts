@@ -12,7 +12,7 @@ export const handler: Handlers = {
       tx_hash,
       limit: undefined,
       page: undefined,
-      sort: url.searchParams.get("sort") || "ASC",
+      sortBy: url.searchParams.get("sort") || "ASC",
       noPagination: true,
       singleResult: true,
     };

@@ -1,6 +1,11 @@
 import { StampRepository } from "$lib/database/index.ts";
 import { BlockService } from "$lib/services/blockService.ts";
-import { FILTER_TYPES, STAMP_TYPES, StampBalance, SUBPROTOCOLS } from "globals";
+import {
+  STAMP_FILTER_TYPES,
+  STAMP_TYPES,
+  StampBalance,
+  SUBPROTOCOLS,
+} from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
@@ -91,32 +96,46 @@ export class StampService {
     blockIdentifier?: number | string;
     cacheDuration?: number | "never";
     noPagination?: boolean;
-    sortBy?: "desc" | "asc";
-    filterBy?: FILTER_TYPES[];
+    sortBy?: "DESC" | "ASC";
+    filterBy?: STAMP_FILTER_TYPES[];
+    suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    sortColumn?: string;
   }) {
-    const isMultipleStamps = Array.isArray(options.identifier);
-    const isSingleStamp = !!options.identifier && !isMultipleStamps;
-    const limit = options.limit || BIG_LIMIT;
-    const page = options.page || 1;
+    const {
+      page = 1,
+      limit = BIG_LIMIT,
+      type,
+      ident,
+      allColumns,
+      collectionId,
+      identifier,
+      blockIdentifier,
+      cacheDuration,
+      noPagination,
+      sortBy,
+      filterBy,
+      suffixFilters,
+      sortColumn,
+    } = options;
+
+    const isMultipleStamps = Array.isArray(identifier);
+    const isSingleStamp = !!identifier && !isMultipleStamps;
 
     const [stamps, totalResult] = await Promise.all([
       StampRepository.getStampsFromDb({
         ...options,
         limit: isSingleStamp || isMultipleStamps ? undefined : limit,
-        allColumns: isSingleStamp || isMultipleStamps
-          ? true
-          : options.allColumns,
-        noPagination: isSingleStamp || isMultipleStamps
-          ? true
-          : options.noPagination,
+        allColumns: isSingleStamp || isMultipleStamps ? true : allColumns,
+        noPagination: isSingleStamp || isMultipleStamps ? true : noPagination,
         cacheDuration: isSingleStamp || isMultipleStamps
           ? "never"
-          : options.cacheDuration,
-        filterBy: options.filterBy,
+          : cacheDuration,
+        filterBy,
+        suffixFilters,
       }),
       StampRepository.getTotalStampCountFromDb({
         ...options,
-        filterBy: options.filterBy,
+        filterBy,
       }),
     ]);
 
@@ -134,7 +153,7 @@ export class StampService {
       return { stamps: stamps.rows, total: stamps.rows.length };
     }
 
-    const paginatedData = options.noPagination
+    const paginatedData = noPagination
       ? stamps.rows
       : stamps.rows.slice(0, limit);
 

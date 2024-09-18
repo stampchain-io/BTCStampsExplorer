@@ -151,7 +151,7 @@ export class Src20Controller {
             address,
             limit: subLimit,
             page,
-            sort: "ASC",
+            sortBy: "ASC",
           }),
           BlockService.getLastBlock(),
         ]);
@@ -211,7 +211,7 @@ export class Src20Controller {
     limit: number;
     page: number;
     op?: string;
-    sort?: string;
+    sortBy?: string;
   }) {
     const [src20_txs, total, lastBlock, mint_status] = await Promise.all([
       this.getValidSrc20Tx(params),
@@ -251,7 +251,7 @@ export class Src20Controller {
           this.handleSrc20TransactionsRequest(req, {
             limit: 1,
             page: 1,
-            sort: "DESC",
+            sortBy: "DESC",
           }),
         ],
       );
@@ -282,7 +282,7 @@ export class Src20Controller {
   static async handleTickPageRequest(tick: string) {
     const balanceParams = {
       tick,
-      sort: "DESC",
+      sortBy: "DESC",
       includePagination: false,
     };
 

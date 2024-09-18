@@ -61,11 +61,11 @@ export class CollectionService {
     const collections: Collection[] = await Promise.all(
       collectionsResult.rows.map(async (row: any) => {
         const stampResult = await StampController.getStamps({
-          limit: 100, // Increased limit to get more stamps
+          limit: 100,
           collectionId: row.collection_id,
           noPagination: true,
           type: "all",
-          orderBy: "DESC",
+          sortBy: "DESC",
         });
 
         let lowestFloorPrice = Infinity;
@@ -103,7 +103,7 @@ export class CollectionService {
   static async getCollectionByName(
     collectionName: string,
     limit: number = 10,
-    orderBy: "asc" | "desc" = "desc",
+    sortBy: "ASC" | "DESC" = "DESC",
   ): Promise<Collection | null> {
     const collectionResult = await CollectionRepository.getCollectionByName(
       collectionName,
@@ -115,11 +115,14 @@ export class CollectionService {
 
     const row = collectionResult.rows[0];
     const stamps = await StampController.getStamps({
+      page: 1,
       limit: limit,
       collectionId: row.collection_id,
       noPagination: true,
       type: "all",
-      orderBy: orderBy === "asc" ? "ASC" : "DESC",
+      sortBy: sortBy === "ASC" ? "ASC" : "DESC",
+      // Include suffixFilters if necessary
+      // suffixFilters: [],
     });
 
     return {

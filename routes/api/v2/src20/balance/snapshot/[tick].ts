@@ -18,7 +18,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
         limit,
         page,
         amt: Number(params.get("amt")) || 0,
-        sort: params.get("sort") || "DESC",
+        sortBy: params.get("sort") || "DESC",
       };
 
       const result = await Src20Controller.handleSrc20SnapshotRequest(

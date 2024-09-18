@@ -4,6 +4,7 @@ import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
 import { IdentHandlerContext, PaginatedStampResponseBody } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { SUBPROTOCOLS } from "globals";
 
 export const handler: Handlers<IdentHandlerContext> = {
   async GET(req, ctx) {
@@ -17,16 +18,16 @@ export const handler: Handlers<IdentHandlerContext> = {
 
     const url = new URL(req.url);
     const { limit, page } = getPaginationParams(url);
-    const sort = (url.searchParams.get("sort") as "asc" | "desc") ||
-      "asc";
+    const sortBy = (url.searchParams.get("sort") as "ASC" | "DESC") ||
+      "ASC";
 
     try {
       const result = await StampController.getStamps({
         page,
         limit,
-        orderBy: sort.toUpperCase(),
+        sortBy,
         type: "stamps",
-        ident: [ident.toUpperCase()],
+        ident: [ident.toUpperCase() as SUBPROTOCOLS],
         allColumns: true,
       });
 

@@ -5,7 +5,7 @@ import { StampController } from "$lib/controller/stampController.ts";
 import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { StampHeader } from "$islands/stamp/StampHeader.tsx";
 import { CollectionService } from "$lib/services/collectionService.ts";
-import { FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "globals";
+import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "globals";
 
 const MAX_PAGE_SIZE = 120;
 
@@ -17,7 +17,7 @@ export const handler: Handlers = {
       const filterBy = url.searchParams.get("filterBy")
         ? (url.searchParams.get("filterBy")?.split(",").filter(
           Boolean,
-        ) as FILTER_TYPES[])
+        ) as STAMP_FILTER_TYPES[])
         : [];
       const selectedTab =
         (url.searchParams.get("type") || "all") as STAMP_TYPES;
@@ -91,7 +91,7 @@ export function StampPage(props: StampPageProps) {
   return (
     <div class="w-full flex flex-col items-center">
       <StampHeader
-        filterBy={filterBy as FILTER_TYPES[]}
+        filterBy={filterBy as STAMP_FILTER_TYPES[]}
         sortBy={sortBy}
         selectedTab={selectedTab}
         type={selectedTab}

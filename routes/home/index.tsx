@@ -40,7 +40,6 @@ export default function Home(props: HomePageProps) {
     stamps_art = [],
     stamps_src20 = [],
     stamps_posh = [],
-    src20s = [],
   } = props.data || {};
 
   return (

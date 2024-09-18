@@ -2,7 +2,13 @@ import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { SUBPROTOCOLS } from "globals";
 import { getFileSuffixFromMime } from "utils/util.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
-import { FILTER_TYPES, STAMP_TYPES, StampBalance, XCPBalance } from "globals";
+import {
+  STAMP_FILTER_TYPES,
+  STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES,
+  StampBalance,
+  XCPBalance,
+} from "globals";
 import { summarize_issuances } from "./index.ts";
 import { dbManager } from "../../server/database/db.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
@@ -21,7 +27,8 @@ export class StampRepository {
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string,
     blockIdentifier?: number | string,
     collectionId?: string,
-    filterBy?: FILTER_TYPES[],
+    filterBy?: STAMP_FILTER_TYPES[],
+    suffixFilters?: STAMP_SUFFIX_FILTERS[],
   ) {
     if (identifier !== undefined) {
       if (Array.isArray(identifier)) {
@@ -68,28 +75,35 @@ export class StampRepository {
           queryParams.push(identifier);
         }
       }
-    } else if (type !== "all") {
-      let stampCondition: string;
+    }
+
+    // Type-based stamp condition
+    let stampCondition = "";
+    if (type !== "all") {
       if (type === "stamps") {
-        stampCondition = "st.stamp >= 0 and st.ident != 'SRC-20'";
+        stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
       } else if (type === "cursed") {
         stampCondition = "st.stamp < 0";
       } else if (type === "posh") {
         stampCondition =
-          "st.stamp < 0 AND st.cpid NOT LIKE 'A%' and st.ident != 'SRC-20'";
+          "st.stamp < 0 AND st.cpid NOT LIKE 'A%' AND st.ident != 'SRC-20'";
       } else if (type === "classic") {
         stampCondition =
-          "st.stamp >= 0 AND st.cpid LIKE 'A%' and st.ident != 'SRC-20'";
-      } else {
-        stampCondition = "";
+          "st.stamp >= 0 AND st.cpid LIKE 'A%' AND st.ident != 'SRC-20'";
+      } else if (type === "src20") {
+        stampCondition = "st.ident = 'SRC-20'";
       }
       if (stampCondition) {
-        whereConditions.push(stampCondition);
+        whereConditions.push(`(${stampCondition})`);
       }
+    } else {
+      // For 'all' type, only exclude 'SRC-20'
+      stampCondition = "st.ident != 'SRC-20'";
+      whereConditions.push(`(${stampCondition})`);
     }
 
     // Ident condition
-    if (ident) {
+    if (ident && ident.length > 0) {
       const identList = Array.isArray(ident) ? ident : [ident];
       if (identList.length > 0) {
         const identCondition = identList.map(() => "st.ident = ?").join(" OR ");
@@ -118,30 +132,45 @@ export class StampRepository {
       queryParams.push(collectionId);
     }
 
-    // File suffix and ident condition
+    // File suffix condition from suffixFilters
+    if (suffixFilters && suffixFilters.length > 0) {
+      const suffixCondition = suffixFilters.map((suffix) =>
+        `st.stamp_url LIKE '%${suffix}'`
+      ).join(" OR ");
+      whereConditions.push(`(${suffixCondition})`);
+    }
+
+    // **FilterBy conditions**
     if (filterBy && filterBy.length > 0) {
       const filterConditions: string[] = [];
+
       filterBy.forEach((filter) => {
         if (filterOptions[filter]) {
-          const { suffixFilters, ident: filterIdent } = filterOptions[filter];
-          const suffixCondition = suffixFilters.length > 0
+          const { suffixFilters: filterSuffixes, ident: filterIdent } =
+            filterOptions[filter];
+
+          const suffixCondition = filterSuffixes && filterSuffixes.length > 0
             ? `(${
-              suffixFilters.map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
+              filterSuffixes.map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
                 .join(" OR ")
             })`
             : "";
-          const identCondition = filterIdent.length > 0
+
+          const identCondition = filterIdent && filterIdent.length > 0
             ? `(${filterIdent.map(() => "st.ident = ?").join(" OR ")})`
             : "";
 
+          // Add ident parameters to queryParams
+          if (filterIdent && filterIdent.length > 0) {
+            queryParams.push(...filterIdent.map(String));
+          }
+
           if (suffixCondition && identCondition) {
-            filterConditions.push(`(${suffixCondition} AND ${identCondition})`);
-            queryParams.push(...filterIdent);
-          } else if (suffixCondition) {
-            filterConditions.push(suffixCondition);
+            filterConditions.push(`(${identCondition} AND ${suffixCondition})`);
           } else if (identCondition) {
             filterConditions.push(identCondition);
-            queryParams.push(...filterIdent);
+          } else if (suffixCondition) {
+            filterConditions.push(suffixCondition);
           }
         }
       });
@@ -159,7 +188,7 @@ export class StampRepository {
       identifier?: string | number | (string | number)[];
       blockIdentifier?: number | string;
       collectionId?: string;
-      filterBy?: FILTER_TYPES[];
+      filterBy?: STAMP_FILTER_TYPES[];
     },
   ) {
     const {
@@ -288,7 +317,7 @@ export class StampRepository {
     options: {
       limit?: number;
       page?: number;
-      sortBy?: "asc" | "desc";
+      sortBy?: "ASC" | "DESC";
       type?: STAMP_TYPES;
       ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
       identifier?: string | number | (string | number)[];
@@ -298,7 +327,8 @@ export class StampRepository {
       cacheDuration?: number | "never";
       collectionId?: string;
       sortColumn?: string;
-      filterBy?: FILTER_TYPES[];
+      filterBy?: STAMP_FILTER_TYPES[];
+      suffixFilters?: STAMP_SUFFIX_FILTERS[];
     },
   ) {
     const {
@@ -315,6 +345,7 @@ export class StampRepository {
       collectionId,
       sortColumn = "tx_index",
       filterBy,
+      suffixFilters,
     } = options;
 
     const whereConditions: string[] = [];
@@ -329,6 +360,7 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
+      suffixFilters,
     );
 
     const specificColumns = `

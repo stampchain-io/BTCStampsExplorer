@@ -55,7 +55,7 @@ export class Src20Service {
           : sanitizedParams.tick,
         limit: sanitizedParams.limit || BIG_LIMIT,
         page: sanitizedParams.page || 1,
-        sort: sanitizedParams.sort || "ASC",
+        sortBy: sanitizedParams.sortBy || "ASC",
       };
 
       // Remove the op property if it's undefined
@@ -107,7 +107,7 @@ export class Src20Service {
       const params: SRC20TrxRequestParams = {
         tick,
         op: ["DEPLOY", "MINT", "TRANSFER"],
-        sort: "DESC",
+        sortBy: "DESC",
       };
 
       const result = await SRC20Repository.getValidSrc20TxFromDb(params);
@@ -152,7 +152,7 @@ export class Src20Service {
         amt: params.amt || 0,
         limit: params.limit,
         page: params.page,
-        sort: params.sort || "DESC",
+        sortBy: params.sortBy || "DESC",
       };
 
       const balanceResponse = await this.fetchSrc20Balance(balanceParams);
