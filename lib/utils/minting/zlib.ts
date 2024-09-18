@@ -1,54 +1,41 @@
+// lib/utils/minting/zlib.ts
+
 import { Foras, Memory, unzlib, zlib } from "compress";
+import { arraysEqual } from "utils/minting/utils.ts";
 
 let initialized = false;
 
-export function stringToHex(str: string) {
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(str);
-  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-async function zLibCompress(data: string) {
+async function zLibCompress(data: Uint8Array): Promise<Uint8Array> {
   try {
     await initializeForas();
   } catch {
-    // Handle the case where WebAssembly initialization fails
-    return stringToHex(data); // Return hex string as fallback
+    return data; // Return original data if initialization fails in debug mode
   }
 
   try {
-    const bytes = new TextEncoder().encode(data);
-    const mem = new Memory(bytes);
+    const mem = new Memory(data);
     const compressed = zlib(mem).copyAndDispose();
-    const hexString = Array.from(compressed).map((b) =>
-      b.toString(16).padStart(2, "0")
-    ).join("");
-    return hexString;
+    return compressed;
   } catch {
-    // Handle compression failure
-    return stringToHex(data); // Return hex string as fallback
+    return data; // Return original data if compression fails
   }
 }
 
-async function zLibUncompress(hexString: string) {
+export async function zLibUncompress(
+  data: Uint8Array,
+): Promise<Uint8Array> {
   try {
     await initializeForas();
   } catch {
-    // Handle the case where WebAssembly initialization fails
-    return hexString; // Return original hex string as fallback
+    return data; // Return original data if initialization fails
   }
 
   try {
-    const compressed = new Uint8Array(
-      hexString.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? [],
-    );
-    const comp_mem = new Memory(compressed);
+    const comp_mem = new Memory(data);
     const uncompressed = unzlib(comp_mem).copyAndDispose();
-    const decode = new TextDecoder().decode(uncompressed);
-    return decode;
+    return uncompressed;
   } catch {
-    // Handle decompression failure
-    return hexString; // Return original hex string as fallback
+    return data; // Return original data if decompression fails
   }
 }
 
@@ -64,109 +51,38 @@ async function initializeForas() {
   }
 }
 
-export async function compressWithCheck(data: string) {
-  // Convert the data string to a byte array to check its length in bytes
-  const encoder = new TextEncoder();
-  const dataBytes = encoder.encode(data);
-
-  let hexString;
-
-  // Only compress if data is more than 32 bytes
-  if (dataBytes.length > 32) {
-    let compressed;
+export async function compressWithCheck(
+  data: Uint8Array,
+): Promise<{ compressedData: Uint8Array; compressed: boolean }> {
+  if (data.length > 32) {
+    let compressed: Uint8Array;
     try {
       compressed = await zLibCompress(data);
     } catch {
-      compressed = stringToHex(data); // Fallback to hex string if compression fails
+      compressed = data;
     }
 
-    if (compressed === "") {
-      return stringToHex(data); // Return hex string if compression results in an empty string
+    if (compressed.length === 0) {
+      return { compressedData: data, compressed: false };
     }
 
-    let uncompressed;
+    let uncompressed: Uint8Array;
     try {
-      uncompressed = await zLibUncompress(compressed || "");
+      uncompressed = await zLibUncompress(compressed);
     } catch {
-      uncompressed = data; // Fallback to original data if decompression fails
+      uncompressed = data;
     }
 
-    if (uncompressed !== data) {
-      return stringToHex(data); // Return hex string if decompression does not match original data
+    if (!arraysEqual(uncompressed, data)) {
+      return { compressedData: data, compressed: false };
     }
 
-    hexString = stringToHex(data);
-    // Check if hexString is an empty string
-    if (hexString === "") {
-      return stringToHex(data); // Return hex string if conversion results in an empty string
+    if (compressed.length < data.length) {
+      return { compressedData: compressed, compressed: true };
+    } else {
+      return { compressedData: data, compressed: false };
     }
-
-    // Use the compressed data if it's shorter than the original hex string
-    if (compressed.length < hexString.length) {
-      return compressed; // compressed is already in hex format
-    }
-    // If compressed data is not shorter, return the original data's hex string
-    return hexString;
   } else {
-    // If data is 32 bytes or less, directly return its hex string
-    hexString = stringToHex(data);
-    // Check if hexString is an empty string
-    if (hexString === "") {
-      return stringToHex(data); // Return hex string if conversion results in an empty string
-    }
-    return hexString;
+    return { compressedData: data, compressed: false };
   }
 }
-
-export async function decompressWithCheck(hexString: string): Promise<string> {
-  try {
-    await initializeForas();
-  } catch {
-    // Handle the case where WebAssembly initialization fails
-    return hexToString(hexString); // Return original string as fallback
-  }
-
-  try {
-    // First, try to decompress assuming it's compressed data
-    const decompressed = await zLibUncompress(hexString);
-
-    // If decompression succeeds and results in a valid string, return it
-    if (decompressed && decompressed !== hexString) {
-      return decompressed;
-    }
-  } catch {
-    // Decompression failed, which might mean the data wasn't compressed
-  }
-
-  // If decompression failed or returned the same string, assume it's not compressed
-  // and try to convert from hex to string
-  return hexToString(hexString);
-}
-
-function hexToString(hexString: string): string {
-  // Remove any whitespace and make sure the string has an even number of characters
-  hexString = hexString.replace(/\s/g, "");
-  if (hexString.length % 2 !== 0) {
-    hexString = "0" + hexString;
-  }
-
-  // Convert hex to bytes
-  const bytes = new Uint8Array(
-    hexString.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? [],
-  );
-
-  // Convert bytes to string
-  return new TextDecoder().decode(bytes);
-}
-
-//const strs = [
-//  '{"p":"src-20", "op": "deploy", "tick":"PEPE", "dec":"8", "max":"100000000, "lim":"10000"}',
-//  '{"p":"src-20", "op": "mint", "tick":"PEPE", "amt":"1000000"}',
-//  '{"p":"src-20", "op": "transfer", "tick":"PEPE", "amt":"1000000"}',
-//  '{"p":"src-20", "op": "mpma", "amt": ["1000000", "1000000", "1000000"], "tick": "PEPE", "detinations": ["1Lbcfr7sAHTD9CgdQo3HTMTkV8LK4ZnX71", "1Lbcfr7sAHTD9CgdQo3HTMTkV8LK4ZnX71", "1Lbcfr7sAHTD9CgdQo3HTMTkV8LK4ZnX71"]}',
-//];
-//
-//strs.forEach(async (str) => {
-//  const hex = await compressWithCheck(str);
-//  console.log(hex);
-//});
