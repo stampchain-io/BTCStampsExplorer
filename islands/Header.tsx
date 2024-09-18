@@ -104,19 +104,6 @@ export function Header() {
               </a>
               <div className="md:hidden md:group-hover:flex flex flex-col md:absolute md:bg-[#222] rounded top-[-10px] lg:top-[25px] left-[100px] lg:left-[15px] z-[100] py-2 text-center md:text-left">
                 <a
-                  href="/stamp?type=posh"
-                  f-partial={"/stamp?type=posh"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("stamp");
-                  }}
-                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "stamp" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  POSH
-                </a>
-                <a
                   href="/stamp?type=classic"
                   f-partial={"/stamp?type=classic"}
                   onClick={() => {
@@ -127,33 +114,7 @@ export function Header() {
                     currentPath === "stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  CLASSIC
-                </a>
-                <a
-                  href="/stamp?type=classic&filterBy=recursive"
-                  f-partial={"/stamp?type=classic&filterBy=recursive"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("stamp");
-                  }}
-                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "stamp" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  RECURSIVE
-                </a>
-                <a
-                  href="/stamp?type=all"
-                  f-partial={"/stamp?type=all"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("stamp");
-                  }}
-                  className={`lg:px-4 mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg lg:text-base font-weight-900 ${
-                    currentPath === "stamp" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  VIEW ALL
+                  ALL
                 </a>
                 <a
                   href="/collection"
@@ -179,7 +140,7 @@ export function Header() {
                     currentPath === "stamping/stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  STAMP
+                  STAMPING
                 </a>
               </div>
             </div>
@@ -282,60 +243,8 @@ export function Header() {
               </a>
               <div className="flex flex-col z-[100] py-2 text-center">
                 <a
-                  href="/stamp?type=posh"
-                  f-partial={"/stamp?type=posh"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("stamp");
-                  }}
-                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  POSH
-                </a>
-                <a
-                  href="#"
-                  f-partial={"#"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("#");
-                  }}
-                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  PIXEL
-                </a>
-                <a
-                  href="#"
-                  f-partial={"#"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("#");
-                  }}
-                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  VECTOR
-                </a>
-                <a
-                  href="#"
-                  f-partial={"#"}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath("#");
-                  }}
-                  className={`mx-2 transition-colors duration-300 no-underline hover:text-gray-600 text-[#8800CC] text-lg font-weight-900 ${
-                    currentPath === "#" ? "text-[#7A00F5]" : ""
-                  }`}
-                >
-                  RECURSIVE
-                </a>
-                <a
                   href="/stamp?type=all"
-                  f-partial={"/stamp?type=all"}
+                  f-partial={"/stamp?type=classic"}
                   onClick={() => {
                     toggleMenu();
                     setCurrentPath("stamp");
@@ -344,7 +253,7 @@ export function Header() {
                     currentPath === "stamp" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  VIEW ALL
+                  ALL
                 </a>
                 <a
                   href="/collection"
@@ -370,7 +279,7 @@ export function Header() {
                     currentPath === "#" ? "text-[#7A00F5]" : ""
                   }`}
                 >
-                  STAMP
+                  STAMPING
                 </a>
               </div>
             </div>
