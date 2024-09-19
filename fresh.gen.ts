@@ -107,6 +107,7 @@ import * as $home_HomePartners from "./islands/home/HomePartners.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
+import * as $home_HomeStampchain from "./islands/home/HomeStampchain.tsx";
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $hooks_useSRC20Form from "./islands/hooks/useSRC20Form.ts";
@@ -271,6 +272,7 @@ const manifest = {
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
+    "./islands/home/HomeStampchain.tsx": $home_HomeStampchain,
     "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/hooks/useSRC20Form.ts": $hooks_useSRC20Form,

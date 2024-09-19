@@ -67,7 +67,8 @@ export default function App({ Component }: AppProps) {
           content="strict-origin-when-cross-origin"
         />
       </Head>
-      <body className="bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-['Work_Sans']">
+      <body class="relative bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-work-sans">
+        <div class="background-gradient"></div>
         <ToastProvider>
           <NavigatorProvider>
             <div className="flex flex-col min-h-screen">
