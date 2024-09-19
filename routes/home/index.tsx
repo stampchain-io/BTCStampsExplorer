@@ -18,6 +18,7 @@ type HomePageProps = {
     stamps_src20: StampRow[];
     stamps_posh: StampRow[];
     src20s: any[];
+    collectionData: CollectionRow[];
   };
 };
 
@@ -36,14 +37,16 @@ export const handler: Handlers = {
 export default function Home(props: HomePageProps) {
   const {
     stamps_recent = { recentSales: [] },
-    stamps_src721 = [], // FIXME: need to filter only for Recursive type 721's
+    stamps_src721 = [],
     stamps_art = [],
     stamps_src20 = [],
     stamps_posh = [],
+    collectionData = [],
   } = props.data || {};
 
   return (
-    <div class="flex flex-col gap-10 md:gap-24 text-white py-10 md:py-24">
+    <div class="relative flex flex-col gap-10 md:gap-24 text-white py-10 md:py-24">
+      <div class="background-gradient"></div>
       <HomeHeader />
       <HomeCarousel />
       {
@@ -57,6 +60,7 @@ export default function Home(props: HomePageProps) {
         stamps_src721={stamps_src721}
         stamps_recent={stamps_recent.recentSales}
         stamps_src20={stamps_src20}
+        collectionData={collectionData}
       />
       {/* <HomeStampChainSelected />  // Leaving this out for initial release - Add later */}
       <HomePartners />

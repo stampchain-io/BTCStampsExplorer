@@ -3,6 +3,8 @@ import { StampRow, StampSectionProps } from "globals";
 
 import StampSection from "$components/stamp/StampSection.tsx";
 import { HomeGetStamping } from "$islands/home/HomeGetStamping.tsx";
+import { HomeStampchain } from "$islands/home//HomeStampchain.tsx";
+import { CollectionList } from "$islands/collection/CollectionList.tsx";
 import { SRC20DeployMint } from "$islands/src20/SRC20DeployMint.tsx";
 
 export function HomeStampPreview({
@@ -11,27 +13,37 @@ export function HomeStampPreview({
   stamps_art = [],
   stamps_src20 = [],
   stamps_posh = [],
+  collectionData = [],
 }: {
   stamps_art: StampRow[];
   stamps_posh: StampRow[];
   stamps_src721: StampRow[];
   stamps_recent: StampRow[];
   stamps_src20: StampRow[];
+  collectionData: CollectionRow[];
 }) {
-  const sections1: StampSectionProps[] = [
+  const SectionsLatestArtStamps: StampSectionProps[] = [
+    {
+      title: "ON-CHAIN MARVELS",
+      type: "all",
+      stamps: stamps_art,
+      layout: "grid",
+    },
+  ];
+
+  const SectionsCollections: StampSectionProps[] = [
     { title: "POSH", type: "posh", stamps: stamps_posh, layout: "grid" },
-    { title: "CLASSIC", type: "classic", stamps: stamps_art, layout: "grid" },
     {
       title: "RECURSIVE",
       type: "stamps",
       stamps: stamps_src721,
-      layout: "grid", // FIXME: also need to add the additional recursive for filter
+      layout: "row",
     },
   ];
 
-  const sections2: StampSectionProps[] = [
+  const SectionsRecentSales: StampSectionProps[] = [
     {
-      title: "ALL STAMPS",
+      title: "HOT STAMPS",
       type: "recent",
       stamps: stamps_recent,
       layout: "row",
@@ -39,49 +51,64 @@ export function HomeStampPreview({
     },
   ];
 
-  const sections3: StampSectionProps[] = [
+  const SectionSRC20: StampSectionProps[] = [
     {
       title: "ALL TOKENS",
       type: "src20",
       stamps: stamps_src20,
       layout: "row",
-      isRecentSales: true,
     },
   ];
 
   return (
     <div className={"flex flex-col gap-18 md:gap-36"}>
       <div>
-        <h1 class="text-3xl md:text-7xl text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+        <h1 class="text-[60px] leading-normal text-left mb-8 font-black
+                    bg-gradient-to-r from-gradient-start to-gradient-end
+                    bg-clip-text text-transparent">
           LATEST ART STAMPS
         </h1>
         <div class="flex flex-col gap-12">
-          {sections1.map((section) => (
+          {SectionsLatestArtStamps.map((section) => (
+            <StampSection key={section.type} {...section} />
+          ))}
+        </div>
+      </div>
+      <div>
+        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+          COLLECTIONS
+        </h1>
+        <div class="flex flex-col gap-12">
+          {SectionsCollections.map((section) => (
+            <StampSection key={section.type} {...section} />
+          ))}
+        </div>
+      </div>
+      {/* FEATURED COLLECTIONS */}
+      <CollectionList collections={collectionData} />
+
+      <div>
+        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+          RECENT SALES
+        </h1>
+        <div class="flex flex-col gap-12">
+          {SectionsRecentSales.map((section) => (
             <StampSection key={section.type} {...section} />
           ))}
         </div>
       </div>
       <HomeGetStamping />
       <div>
-        <h1 class="text-3xl md:text-7xl text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
-          RECENT SALES
-        </h1>
-        <div class="flex flex-col gap-12">
-          {sections2.map((section) => (
-            <StampSection key={section.type} {...section} />
-          ))}
-        </div>
-      </div>
-      <div>
-        <h1 class="text-3xl md:text-7xl text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
           SRC-20 TOKENS
         </h1>
         <div class="flex flex-col gap-12">
-          {sections3.map((section) => (
+          {SectionSRC20.map((section) => (
             <StampSection key={section.type} {...section} />
           ))}
         </div>
-        <SRC20DeployMint />
+        <HomeStampchain />
+        {/* <SRC20DeployMint /> */}
       </div>
     </div>
   );

@@ -417,22 +417,32 @@ export class StampController {
 
   static async getHomePageData() {
     try {
-      const [stampCategories, src20Result, poshCollection, recentSales] =
-        await Promise.all([
-          this.getMultipleStampCategories([
-            { types: ["STAMP", "SRC-721"], limit: 6 },
-            { types: ["SRC-721"], limit: 6 },
-            { types: ["STAMP"], limit: 12 },
-            { types: ["SRC-20"], limit: 6 },
-          ]),
-          Src20Service.fetchAndFormatSrc20Data({
-            op: "DEPLOY",
-            page: 1,
-            limit: 10,
-          }),
-          CollectionService.getCollectionByName("posh", 4, "DESC"),
-          StampService.getRecentSales(6),
-        ]);
+      const [
+        stampCategories,
+        src20Result,
+        poshCollection,
+        recentSales,
+        collectionData,
+      ] = await Promise.all([
+        this.getMultipleStampCategories([
+          { types: ["STAMP", "SRC-721"], limit: 6 },
+          { types: ["SRC-721"], limit: 6 },
+          { types: ["STAMP"], limit: 16 },
+          { types: ["SRC-20"], limit: 6 },
+        ]),
+        Src20Service.fetchAndFormatSrc20Data({
+          op: "DEPLOY",
+          page: 1,
+          limit: 10,
+        }),
+        CollectionService.getCollectionByName("posh", 8, "DESC"),
+        StampService.getRecentSales(6),
+        CollectionService.getCollectionNames({
+          limit: 4,
+          page: 1,
+          creator: "",
+        }),
+      ]);
 
       return {
         stamps_recent: recentSales,
@@ -441,6 +451,7 @@ export class StampController {
         stamps_src20: stampCategories[3].stamps,
         stamps_posh: poshCollection ? poshCollection.stamps : [],
         src20s: src20Result.data.map(formatSRC20Row),
+        collectionData: collectionData.data,
       };
     } catch (error) {
       console.error("Error in getHomePageData:", error);
