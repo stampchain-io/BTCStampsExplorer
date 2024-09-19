@@ -112,7 +112,7 @@ export const StampImage = (
           <img
             width="100%"
             loading="lazy"
-            className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
+            className={`max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
             src={src}
             alt="Not Available"
           />
@@ -166,7 +166,7 @@ export const StampImage = (
               <img
                 width="100%"
                 loading="lazy"
-                className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg pixelart stamp-image`}
+                className={`max-w-none object-contain rounded-lg pixelart stamp-image`}
                 src={src}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
