@@ -1,67 +1,86 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
+import { Chart } from "$fresh_charts/mod.ts";
 
-import { abbreviateAddress } from "utils/util.ts";
+interface HolderInfoType {
+  address: string;
+  quantity: number;
+}
 
-dayjs.extend(relativeTime);
+const getGradientColor = (percentage: number) => {
+  const startColor = "#F68E5C";
+  const endColor = "#5053EA";
 
-export function StampHolders(
-  { holders }: { holders: { address: string; quantity: number }[] },
-) {
+  const r = Math.round(
+    (1 - percentage / 100) * parseInt(startColor.slice(1, 3), 16) +
+      (percentage / 100) * parseInt(endColor.slice(1, 3), 16),
+  );
+  const g = Math.round(
+    (1 - percentage / 100) * parseInt(startColor.slice(3, 5), 16) +
+      (percentage / 100) * parseInt(endColor.slice(3, 5), 16),
+  );
+  const b = Math.round(
+    (1 - percentage / 100) * parseInt(startColor.slice(5, 7), 16) +
+      (percentage / 100) * parseInt(endColor.slice(5, 7), 16),
+  );
+
+  return `rgba(${r}, ${g}, ${b}, 0.5)`; // Adjust alpha as needed
+};
+
+export const StampHolders = ({ holders }: { holders: HolderInfoType[] }) => {
+  const totalQuantity = holders.reduce(
+    (sum, holder) => sum + holder.quantity,
+    0,
+  );
+
+  const holdersWithPercentage = holders.map((holder) => ({
+    ...holder,
+    percentage: (holder.quantity / totalQuantity) * 100,
+  }));
+
+  const topHolders = holdersWithPercentage
+    .sort((a, b) => b.percentage - a.percentage)
+    .slice(0, 3);
+
+  const percentages = topHolders.map((holder) => holder.percentage);
+  const topLabels = topHolders.map((holder) =>
+    `${holder.address.slice(0, 6)}...${holder.address.slice(-4)} (${
+      holder.percentage.toFixed(2)
+    }%)`
+  );
+
+  const backgroundColors = percentages.map((percentage) =>
+    getGradientColor(percentage)
+  );
+
   return (
-    <div className="relative shadow-md max-w-256">
-      {
-        /* <p class="text-[#F5F5F5] text-[26px] font-semibold">
-        Holders ({holders.length})
-      </p> */
-      }
-      {
-        /* <div className={"custom-scrollbar max-h-96 overflow-x-auto"}>
-        <div className="w-full min-h-96 h-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-[#2B0E49] py-6 pl-7">
-          <div
-            className={"border border-[#B9B9B9] border-l-0 border-b-0 min-h-96 h-full"}
-          >
-            {holders.map((holder) => (
-              <div
-                className="border-b border-[#B9B9B9] flex justify-between text-[#F5F5F5] text-lg"
-                key={holder.address}
-              >
-                <p className="pr-6 py-4">{abbreviateAddress(holder.address)}</p>
-                <p className="pr-6 py-4">{holder.quantity}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div> */
-      }
-      <div className="max-h-96 overflow-x-auto">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:rounded-lg">
-          <thead className="text-lg font-semibold uppercase">
-            <tr>
-              <th scope="col" className="pr-3 md:pr-6 py-1 md:py-3">
-                Address
-              </th>
-              <th scope="col" className="pl-3 md:pl-6 py-1 md:py-3">
-                Quantity
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {holders.map((holder) => (
-              <tr
-                key={holder.address}
-              >
-                <td className="pr-3 md:pr-6 py-2 md:py-4">
-                  {abbreviateAddress(holder.address)}
-                </td>
-                <td className="pl-3 md:pl-6 py-2 md:py-4 text-sm">
-                  {holder.quantity}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div class="flex justify-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6">
+      <Chart
+        type="pie"
+        width={350}
+        options={{
+          devicePixelRatio: 1,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                boxWidth: 10,
+                font: {
+                  size: 10,
+                },
+              },
+            },
+          },
+        }}
+        data={{
+          labels: topLabels,
+          datasets: [{
+            label: "Top Holders",
+            data: percentages,
+            backgroundColor: backgroundColors,
+            borderColor: backgroundColors,
+            borderWidth: 1,
+          }],
+        }}
+      />
     </div>
   );
-}
+};
