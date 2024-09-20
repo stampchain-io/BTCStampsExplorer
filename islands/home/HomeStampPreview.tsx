@@ -3,7 +3,7 @@ import { StampRow, StampSectionProps } from "globals";
 
 import StampSection from "$components/stamp/StampSection.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { StampChainModule } from "$islands/modules/Stampchain.tsx";
+import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
 import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
