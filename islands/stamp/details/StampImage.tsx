@@ -125,7 +125,9 @@ export const StampImage = (
           <div
             className={`${className} flex flex-col gap-4`}
           >
-            <div className={"p-6 bg-[#1F002E]"}>
+            <div
+              className={"p-6 bg-[#1F002E] flex justify-center items-center"}
+            >
               <iframe
                 width="100%"
                 height="100%"
@@ -161,7 +163,7 @@ export const StampImage = (
         <div
           className={`${className} flex flex-col gap-4`}
         >
-          <div className={"p-6 bg-[#1F002E]"}>
+          <div className={"p-6 bg-[#1F002E] justify-center items-center"}>
             <div className="stamp-container ">
               <img
                 width="100%"
@@ -199,6 +201,14 @@ export const StampImage = (
           src={src}
           toggleModal={() => setIsFullScreenModalOpen(false)}
           handleCloseModal={handleCloseFullScreenModal}
+          typeFlag={(src !== "/content/not-available.png" &&
+              stamp.stamp_mimetype === "text/html")
+            ? 1
+            : ((src !== "/content/not-available.png" &&
+                stamp.stamp_mimetype !== "text/html" &&
+                stamp.stamp_mimetype !== "text/plain")
+              ? 2
+              : 0)}
         />
       )}
     </>

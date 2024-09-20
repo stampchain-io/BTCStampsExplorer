@@ -101,18 +101,19 @@ import * as $collection_CollectionDetailsHeader from "./islands/collection/Colle
 import * as $collection_CollectionHeader from "./islands/collection/CollectionHeader.tsx";
 import * as $collection_CollectionList from "./islands/collection/CollectionList.tsx";
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
-import * as $home_HomeGetStamping from "./islands/home/HomeGetStamping.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
-import * as $home_HomePartners from "./islands/home/HomePartners.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
-import * as $home_HomeStampchain from "./islands/home/HomeStampchain.tsx";
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $hooks_useSRC20Form from "./islands/hooks/useSRC20Form.ts";
+import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
+import * as $modules_FAQ from "./islands/modules/FAQ.tsx";
+import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
+import * as $modules_Partners from "./islands/modules/Partners.tsx";
+import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
-import * as $src20_SRC20DeployMint from "./islands/src20/SRC20DeployMint.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
@@ -266,18 +267,19 @@ const manifest = {
     "./islands/collection/CollectionHeader.tsx": $collection_CollectionHeader,
     "./islands/collection/CollectionList.tsx": $collection_CollectionList,
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
-    "./islands/home/HomeGetStamping.tsx": $home_HomeGetStamping,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
-    "./islands/home/HomePartners.tsx": $home_HomePartners,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
-    "./islands/home/HomeStampchain.tsx": $home_HomeStampchain,
     "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/hooks/useSRC20Form.ts": $hooks_useSRC20Form,
+    "./islands/modules/DeployMint.tsx": $modules_DeployMint,
+    "./islands/modules/FAQ.tsx": $modules_FAQ,
+    "./islands/modules/GetStamping.tsx": $modules_GetStamping,
+    "./islands/modules/Partners.tsx": $modules_Partners,
+    "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/pagination/Pagination.tsx": $pagination_Pagination,
-    "./islands/src20/SRC20DeployMint.tsx": $src20_SRC20DeployMint,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,

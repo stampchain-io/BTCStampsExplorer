@@ -4,7 +4,7 @@ import { SRC20TrxRequestParams } from "globals";
 import { Pagination } from "$islands/pagination/Pagination.tsx";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
-import { SRC20DeployMint } from "$islands/src20/SRC20DeployMint.tsx";
+import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
@@ -89,7 +89,7 @@ export default function SRC20Page(props: any) {
         type={"src20"}
         data_length={src20s.length}
       />
-      <SRC20DeployMint />
+      <DeployMintModule />
     </div>
   );
 }

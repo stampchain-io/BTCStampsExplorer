@@ -21,7 +21,7 @@ export function StampRelatedInfo(
 
   return (
     <div className={"grid grid-cols-1 md:grid-cols-2 gap-6"}>
-      <StampHolders holders={holders} />
+      {/* <StampHolders holders={holders} /> */}
       <div className={"flex flex-col gap-6"}>
         <div class="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6">
           <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E] overflow-y-auto">
