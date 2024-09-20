@@ -3,6 +3,11 @@ import { dbManager } from "../../server/database/db.ts";
 
 export const xcp_v2_nodes = [
   {
+    name: "stampchain.io",
+    url:
+      "https://k6e0ufzq8h.execute-api.us-east-1.amazonaws.com/beta/counterpartyproxy/v2",
+  },
+  {
     name: "counterparty.io",
     url: "https://api.counterparty.io:4000/v2",
   },
@@ -68,12 +73,38 @@ export async function fetchXcpV2WithCache<T>(
   return await dbManager.handleCache(
     cacheKey,
     async () => {
-      const url = `${xcp_v2_nodes[0].url}${endpoint}?${queryParams.toString()}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      for (const node of xcp_v2_nodes) {
+        const url = `${node.url}${endpoint}?${queryParams.toString()}`;
+        console.log(`Attempting to fetch from URL: ${url}`);
+
+        try {
+          const response = await fetch(url);
+          console.log(`Response status from ${node.name}: ${response.status}`);
+
+          if (!response.ok) {
+            const errorBody = await response.text();
+            console.error(
+              `Error response body from ${node.name}: ${errorBody}`,
+            );
+            continue; // Try the next node
+          }
+
+          const data = await response.json();
+          console.log(`Successful response from ${node.name}`);
+          return data;
+        } catch (error) {
+          console.error(`Fetch error for ${url}:`, error);
+          // Continue to the next node
+        }
       }
-      return await response.json();
+
+      // If all nodes fail, return a minimal data structure
+      console.error("All nodes failed. Returning minimal data structure.");
+      return {
+        result: [],
+        next_cursor: null,
+        result_count: 0,
+      } as T;
     },
     cacheTimeout,
   );
@@ -88,7 +119,7 @@ export class DispenserManager {
   static async getDispensersByCpid(
     cpid: string,
     filter: "open" | "closed" | "all" = "open",
-  ): Promise<[]> {
+  ): Promise<any[]> {
     const endpoint = `/assets/${cpid}/dispensers`;
     let allDispensers: any[] = [];
     let cursor: string | null = null;
@@ -97,7 +128,6 @@ export class DispenserManager {
     while (true) {
       const queryParams = new URLSearchParams({
         limit: limit.toString(),
-        // verbose: "true",
       });
       if (cursor) {
         queryParams.append("cursor", cursor);
@@ -110,7 +140,15 @@ export class DispenserManager {
         );
 
         if (!response || !Array.isArray(response.result)) {
+          console.warn(
+            `Unexpected response structure for cpid ${cpid}:`,
+            response,
+          );
           break;
+        }
+
+        if (response.result.length === 0) {
+          break; // No more results
         }
 
         const dispensers = response.result.map((dispenser: any) => ({
@@ -124,16 +162,15 @@ export class DispenserManager {
           satoshirate: dispenser.satoshirate,
           btcrate: dispenser.satoshirate / 100000000,
           origin: dispenser.origin,
-          confirmed: dispenser.confirmed, // whether or not this is in the mempool
+          confirmed: dispenser.confirmed,
           close_block_index: dispenser.close_block_index,
         }));
 
         allDispensers = allDispensers.concat(dispensers);
 
-        // Check if there's a next cursor
         cursor = response.next_cursor || null;
         if (!cursor) {
-          break; // No more pages
+          break;
         }
       } catch (error) {
         console.error(`Error fetching dispensers for cpid ${cpid}:`, error);
@@ -141,6 +178,7 @@ export class DispenserManager {
       }
     }
 
+    // Apply filtering
     const filteredDispensers = filter === "all"
       ? allDispensers
       : allDispensers.filter((dispenser) =>
@@ -280,10 +318,9 @@ export class DispenserManager {
 
         allDispenses = allDispenses.concat(dispenses);
 
-        // Check if there's a next cursor
         cursor = response.next_cursor || null;
         if (!cursor) {
-          break; // No more pages
+          break;
         }
       } catch (error) {
         console.error(
@@ -322,39 +359,64 @@ export class XcpManager {
     }
   }
 
-  static async getAllXcpAssets(maxRecords = 1000): Promise<any[]> { // TODO: maxRecords is used for dev testing, remove when we go to production
+  static async getAllXcpAssets(maxRecords = 1000): Promise<any[]> {
     let allAssets: any[] = [];
     let cursor: string | null = null;
     const endpoint = "/assets";
 
+    console.log(`Starting to fetch XCP assets, max records: ${maxRecords}`);
+
     do {
       const remainingRecords = maxRecords - allAssets.length;
-      const queryLimit = Math.min(remainingRecords, 1000); // Limit to 1000 per request
+      const queryLimit = Math.min(remainingRecords, 1000);
+
+      console.log(
+        `Fetching batch of assets. Cursor: ${cursor}, Limit: ${queryLimit}`,
+      );
 
       const queryParams = new URLSearchParams({ limit: queryLimit.toString() });
       if (cursor) {
         queryParams.append("cursor", cursor);
       }
 
-      const response = await this.fetchXcpV2WithCache<any>(
-        endpoint,
-        queryParams,
-      );
+      try {
+        const response = await this.fetchXcpV2WithCache<any>(
+          endpoint,
+          queryParams,
+        );
 
-      if (!response || !Array.isArray(response.result)) {
-        break;
-      }
+        console.log(
+          `Received response. Result count: ${response.result?.length}`,
+        );
 
-      allAssets = allAssets.concat(response.result);
-      cursor = response.next_cursor || null;
+        if (!response || !Array.isArray(response.result)) {
+          console.warn("Unexpected response structure:", response);
+          break;
+        }
 
-      // Break the loop if we've reached or exceeded the maxRecords
-      if (allAssets.length >= maxRecords) {
+        allAssets = allAssets.concat(response.result);
+        cursor = response.next_cursor || null;
+
+        console.log(
+          `Total assets fetched: ${allAssets.length}, Next cursor: ${cursor}`,
+        );
+
+        if (allAssets.length >= maxRecords) {
+          console.log(
+            `Reached or exceeded maxRecords (${maxRecords}). Stopping.`,
+          );
+          break;
+        }
+      } catch (error) {
+        console.error("Error fetching assets batch:", error);
         break;
       }
     } while (cursor);
 
-    // Trim the result to exactly maxRecords if we've exceeded it
+    console.log(
+      `Finished fetching XCP assets. Total fetched: ${allAssets.length}`,
+    );
+
     return allAssets.slice(0, maxRecords);
   }
 
