@@ -1,4 +1,4 @@
-export const SRC20DeployMint = () => {
+export const DeployMintModule = () => {
   return (
     <div
       className={"flex flex-col md:flex-row justify-between md:items-end gap-16 md:gap-32"}

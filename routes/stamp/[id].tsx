@@ -6,7 +6,7 @@ import { Head } from "$fresh/runtime.ts";
 import StampSection from "$components/stamp/StampSection.tsx";
 import { StampShare } from "$components/stampDetails/StampShare.tsx";
 
-import { HomeGetStamping } from "$islands/home/HomeGetStamping.tsx";
+import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
 import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
@@ -177,7 +177,7 @@ export default function StampPage(props: StampDetailPageProps) {
           </div>
         </div>
 
-        <HomeGetStamping />
+        <GetStampingModule />
       </div>
     </>
   );

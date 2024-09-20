@@ -2,10 +2,10 @@ import { StampRow, StampSectionProps } from "globals";
 // import { Partial } from "$fresh/runtime.ts";
 
 import StampSection from "$components/stamp/StampSection.tsx";
-import { HomeGetStamping } from "$islands/home/HomeGetStamping.tsx";
-import { HomeStampchain } from "$islands/home//HomeStampchain.tsx";
+import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
+import { StampChainModule } from "$islands/modules/Stampchain.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
-import { SRC20DeployMint } from "$islands/src20/SRC20DeployMint.tsx";
+import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
 export function HomeStampPreview({
   stamps_recent = [],
@@ -97,7 +97,7 @@ export function HomeStampPreview({
           ))}
         </div>
       </div>
-      <HomeGetStamping />
+      <GetStampingModule />
       <div>
         <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
           SRC-20 TOKENS
@@ -107,8 +107,8 @@ export function HomeStampPreview({
             <StampSection key={section.type} {...section} />
           ))}
         </div>
-        <HomeStampchain />
-        {/* <SRC20DeployMint /> */}
+        <StampChainModule />
+        {/* <DeployMintModule /> */}
       </div>
     </div>
   );

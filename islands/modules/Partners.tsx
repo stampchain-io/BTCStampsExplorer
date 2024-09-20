@@ -1,4 +1,4 @@
-export const HomePartners = () => {
+export const PartnersModule = () => {
   return (
     <div>
       <p
