@@ -284,6 +284,8 @@ export function DeployContent() {
           issuance={1}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
+          isSubmitting={isSubmitting}
+          onSubmit={handleDeploySubmit}
         />
 
         {apiError && (
@@ -309,17 +311,6 @@ export function DeployContent() {
             {walletError}
           </div>
         )}
-
-        <div
-          class={`w-full text-white text-center font-bold border-[0.5px] border-[#8A8989] rounded-md mt-4 py-6 px-4 ${
-            isSubmitting
-              ? "bg-gray-500 cursor-not-allowed"
-              : "bg-[#5503A6] cursor-pointer"
-          }`}
-          onClick={isSubmitting ? undefined : handleDeploySubmit}
-        >
-          {isSubmitting ? "Stamping..." : "Stamp Now"}
-        </div>
       </div>
     </div>
   );
