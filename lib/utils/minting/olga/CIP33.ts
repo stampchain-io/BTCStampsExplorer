@@ -46,7 +46,7 @@ export class CIP33 {
     return btoa(hex);
   }
 
-  static file_to_addresses(file_hex: string, network = "bitcoin") {
+  static file_to_addresses(file_hex: string, network = "bitcoin"): string[] {
     let file_size: string | number = file_hex.length / 2;
     file_size = file_size.toString(16).padStart(4, "0");
     const hex = file_size + file_hex;
@@ -62,7 +62,9 @@ export class CIP33 {
       addresses.push(this.cip33_hex_to_bech32(element, network));
     }
 
-    return addresses;
+    return addresses.filter((address): address is string =>
+      address !== undefined
+    );
   }
 
   static addresses_to_hex(addresses: string[]) {

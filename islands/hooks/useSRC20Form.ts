@@ -6,7 +6,12 @@ import { useFeePolling } from "hooks/useFeePolling.tsx";
 import { fetchBTCPrice } from "$lib/utils/btc.ts";
 import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
 
-export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
+export function useSRC20Form(
+  operation: "mint" | "deploy" | "transfer",
+  trxType: "olga" | "multisig",
+) {
+  console.log("useSRC20Form initialized with:", { operation, trxType });
+
   const { config, isLoading: configLoading } = useConfig();
   const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000); // 5 minutes
 
@@ -15,6 +20,7 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
     token: "",
     amt: "",
     fee: 0,
+    feeError: "",
     BTCPrice: 0,
     jsonSize: 0,
     apiError: "",
@@ -28,6 +34,7 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
     limError: "",
     dec: "18",
     x: "",
+    tg: "",
     web: "",
     email: "",
     file: null as File | null,
@@ -61,7 +68,7 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
 
   useEffect(() => {
     const jsonData = {
-      p: "src-20",
+      p: "SRC-20",
       op: operation,
       tick: formState.token,
       amt: formState.amt,
@@ -70,6 +77,7 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
         lim: formState.lim,
         dec: formState.dec,
         x: formState.x,
+        tg: formState.tg,
         web: formState.web,
         email: formState.email,
       }),
@@ -87,6 +95,7 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
         formState.lim,
         formState.dec,
         formState.x,
+        formState.tg,
         formState.web,
         formState.email,
       ]
@@ -212,6 +221,11 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
       isValid = false;
     }
 
+    if (formState.fee <= 0) {
+      newState.feeError = "Fee must be set";
+      isValid = false;
+    }
+
     if (operation === "deploy") {
       if (!formState.max) {
         newState.maxError = "Max circulation is required";
@@ -221,7 +235,6 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
         newState.limError = "Limit per mint is required";
         isValid = false;
       }
-      // Remove the check for max > lim as it's now enforced during input
     }
 
     setFormState(newState);
@@ -229,6 +242,7 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
   };
 
   const handleSubmit = async (additionalData = {}) => {
+    console.log("handleSubmit called with trxType:", trxType);
     console.log("Entering handleSubmit in useSRC20Form");
 
     if (!isConnected.value) {
@@ -239,6 +253,7 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
 
     setWalletError(null);
     setApiError("");
+
     if (!validateForm()) {
       return;
     }
@@ -249,28 +264,71 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
     try {
       if (!config) throw new Error("Configuration not loaded");
 
-      const response = await axiod.post(`/api/v2/src20/create`, {
-        toAddress: operation === "transfer" ? formState.toAddress : address,
-        fromAddress: operation === "transfer" ? address : undefined,
-        changeAddress: address,
-        op: operation,
-        tick: formState.token,
-        feeRate: formState.fee,
-        amt: formState.amt,
-        service_fee: config?.MINTING_SERVICE_FEE,
-        service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
-        ...(operation === "deploy" && {
-          max: formState.max,
-          lim: formState.lim,
-          dec: formState.dec,
-          x: formState.x,
-          web: formState.web,
-          email: formState.email,
-        }),
-        ...additionalData,
-      });
+      let endpoint, requestData;
 
-      console.log("API Response received:", response.data);
+      console.log("Preparing request data for operation:", operation);
+
+      if (trxType === "olga") {
+        endpoint = "/api/v2/src20/v2create";
+        requestData = {
+          sourceWallet: address,
+          toAddress: operation === "transfer" ? formState.toAddress : address,
+          src20Action: {
+            p: "SRC-20",
+            op: operation,
+            tick: formState.token,
+            amt: formState.amt,
+            ...(operation === "deploy" && {
+              max: formState.max,
+              lim: formState.lim,
+              dec: formState.dec,
+              x: formState.x,
+              tg: formState.tg,
+              web: formState.web,
+              email: formState.email,
+            }),
+          },
+          satsPerKB: formState.fee,
+          service_fee: config?.MINTING_SERVICE_FEE,
+          service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
+        };
+      } else {
+        endpoint = "/api/v2/src20/create";
+        requestData = {
+          toAddress: operation === "transfer" ? formState.toAddress : address,
+          fromAddress: operation === "transfer" ? address : undefined,
+          changeAddress: address,
+          op: operation,
+          tick: formState.token,
+          feeRate: formState.fee,
+          amt: formState.amt,
+          service_fee: config?.MINTING_SERVICE_FEE,
+          service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
+          ...(operation === "deploy" && {
+            max: formState.max,
+            lim: formState.lim,
+            dec: formState.dec,
+            x: formState.x,
+            tg: formState.tg,
+            web: formState.web,
+            email: formState.email,
+          }),
+          ...additionalData,
+        };
+      }
+
+      console.log("Sending request to:", endpoint);
+      console.log("Request data:", JSON.stringify(requestData, null, 2));
+      const response = await axiod.post(endpoint, requestData);
+      console.log("Full API response:", JSON.stringify(response.data, null, 2));
+
+      if (!response.data || !response.data.hex) {
+        console.log("Invalid response from server: missing transaction data");
+        throw new Error(
+          "Invalid response from server: missing transaction data",
+        );
+      }
+
       console.log("Preparing to sign PSBT");
       console.log("PSBT hex length:", response.data.hex.length);
       console.log(
@@ -292,6 +350,9 @@ export function useSRC20Form(operation: "mint" | "deploy" | "transfer") {
       if (walletResult.signed) {
         console.log("Transaction signed successfully");
         setSubmissionMessage("Transaction signed successfully");
+        if (walletResult.psbt) {
+          console.log("Signed PSBT:", walletResult.psbt);
+        }
       } else if (walletResult.cancelled) {
         console.log("Transaction signing cancelled by user");
         setSubmissionMessage("Transaction signing cancelled by user");
