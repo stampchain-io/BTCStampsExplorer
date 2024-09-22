@@ -9,7 +9,8 @@
     "fakebuild": "echo 'fake build'",
     "preview": "deno run -A main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
-    "decode": "deno run -A utils/decode_src20_tx.ts"
+    "decode": "deno run -A utils/decodeSrc20MsigTx.ts",
+    "decode_olga": "deno run -A utils/decodeSrc20OlgaTx.ts"
   },
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
