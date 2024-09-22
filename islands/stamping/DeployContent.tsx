@@ -3,7 +3,10 @@ import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
 import axiod from "axiod";
 
-export function DeployContent() {
+export function DeployContent(
+  { trxType = "multisig" }: { trxType?: "olga" | "multisig" },
+) {
+  console.log("DeployContent trxType:", trxType);
   const {
     formState,
     setFormState,
@@ -17,7 +20,7 @@ export function DeployContent() {
     submissionMessage,
     walletError,
     apiError,
-  } = useSRC20Form("deploy");
+  } = useSRC20Form("deploy", trxType);
 
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
 
