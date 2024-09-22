@@ -25,6 +25,14 @@ import * as $api_v2_docs from "./routes/api/v2/docs.ts";
 import * as $api_v2_error from "./routes/api/v2/error.ts";
 import * as $api_v2_health from "./routes/api/v2/health.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
+import * as $api_v2_src101_deploy_hash_tokenid_ from "./routes/api/v2/src101/[deploy_hash]/[tokenid].ts";
+import * as $api_v2_src101_deploy_hash_address_address_btc_ from "./routes/api/v2/src101/[deploy_hash]/address/[address_btc].ts";
+import * as $api_v2_src101_deploy_hash_deploy from "./routes/api/v2/src101/[deploy_hash]/deploy.ts";
+import * as $api_v2_src101_deploy_hash_total from "./routes/api/v2/src101/[deploy_hash]/total.ts";
+import * as $api_v2_src101_balance_address_ from "./routes/api/v2/src101/balance/[address].ts";
+import * as $api_v2_src101_index from "./routes/api/v2/src101/index.ts";
+import * as $api_v2_src101_index_deploy_hash_index_ from "./routes/api/v2/src101/index/[deploy_hash]/[index].ts";
+import * as $api_v2_src101_tx_tx_hash_ from "./routes/api/v2/src101/tx/[tx_hash].ts";
 import * as $api_v2_src20_op_ from "./routes/api/v2/src20/[...op].ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
@@ -169,6 +177,20 @@ const manifest = {
     "./routes/api/v2/error.ts": $api_v2_error,
     "./routes/api/v2/health.ts": $api_v2_health,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
+    "./routes/api/v2/src101/[deploy_hash]/[tokenid].ts":
+      $api_v2_src101_deploy_hash_tokenid_,
+    "./routes/api/v2/src101/[deploy_hash]/address/[address_btc].ts":
+      $api_v2_src101_deploy_hash_address_address_btc_,
+    "./routes/api/v2/src101/[deploy_hash]/deploy.ts":
+      $api_v2_src101_deploy_hash_deploy,
+    "./routes/api/v2/src101/[deploy_hash]/total.ts":
+      $api_v2_src101_deploy_hash_total,
+    "./routes/api/v2/src101/balance/[address].ts":
+      $api_v2_src101_balance_address_,
+    "./routes/api/v2/src101/index.ts": $api_v2_src101_index,
+    "./routes/api/v2/src101/index/[deploy_hash]/[index].ts":
+      $api_v2_src101_index_deploy_hash_index_,
+    "./routes/api/v2/src101/tx/[tx_hash].ts": $api_v2_src101_tx_tx_hash_,
     "./routes/api/v2/src20/[...op].ts": $api_v2_src20_op_,
     "./routes/api/v2/src20/balance/[address].ts":
       $api_v2_src20_balance_address_,
