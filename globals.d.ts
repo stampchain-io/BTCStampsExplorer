@@ -269,6 +269,68 @@ interface MintStatus {
   limit: number | null;
 }
 
+interface SRC101DeployDetail{
+  tx_hash: string;
+  block_index: number;
+  p: string;
+  op: string;
+  tick: string | null;
+  tick_hash: string | null;
+  name: string | null;
+  description: string | null;
+  wla: string | null;
+  imglp: string | null;
+  imgf: string | null;
+  creator: string;
+  pri: number | null;
+  lim: number | null;
+  mintstart: number | null;
+  mintend: number | null;
+  owner: string | null;
+  block_time: string;
+  recipients: string[];
+}
+
+interface SRC101Balance {
+  address: string;
+  p: string;
+  deploy_hash: string;
+  tokenid: string;
+  tokenid_utf8: string;
+  expire_timestamp: number;
+  last_update: number;
+  address_btc: string;
+  address_eth: string;
+  txt_data: string;
+  img: string;
+}
+
+interface Src101Detail {
+  tx_hash: string;
+  block_index: number;
+  p: string;
+  op: string;
+  tick: string | null;
+  tick_hash: string | null;
+  name: string | null;
+  tokenid: string | null;
+  tokenid_utf8: string | null;
+  description: string | null;
+  wla: string | null;
+  imglp: string | null;
+  imgf: string | null;
+  deploy_hash: string | null;
+  creator: string;
+  pri: number | null;
+  dua: number | null;
+  lim: number | null;
+  mintstart: number | null;
+  mintend: number | null;
+  owner: string | null;
+  toaddress: string | null;
+  destination: string;
+  block_time: string;
+}
 // Request Types ---------------------------------------------------------------
 
 export interface PaginationQueryParams {
@@ -305,6 +367,51 @@ export interface SRC20BalanceRequestParams {
   includePagination?: boolean;
 }
 
+export interface SRC101TokenidsParams{
+  deploy_hash: string;
+  address_btc: string;
+  prim: boolean;
+  limit?: number;
+  page?: number;
+  sort?: string;
+}
+
+export interface SRC101ValidTxTotalCountParams{
+  tick?: string;
+  op?: string;
+  block_index?: string;
+  deploy_hash?:string;
+  tx_hash?: string;
+  address?: string;
+}
+
+export interface SRC101OwnerParams{
+  deploy_hash?: string;
+  tokenid?: string;
+  index?: number;
+  limit?: number;
+  page?: number;
+  sort?: string;
+}
+
+export interface SRC101ValidTxParams{
+  tick?: string;
+  op?: string;
+  block_index?: string;
+  deploy_hash?:string;
+  tx_hash?: string;
+  address?: string;
+  limit?: number;
+  page?: number;
+}
+
+export interface Src101BalanceParams{
+  address: string | null;
+  limit?: number;
+  page?: number;
+  sort?: string;
+}
+
 // Response Types --------------------------------------------------------------
 
 export interface Pagination {
@@ -327,6 +434,21 @@ export interface PaginatedStampBalanceResponseBody extends Pagination {
 export interface PaginatedSrc20ResponseBody extends Pagination {
   last_block: number;
   data: Src20Detail[];
+}
+
+export interface PaginatedSrc101ResponseBody extends Pagination {
+  last_block: number;
+  data: Src101Detail[];
+}
+
+export interface TotalSrc101ResponseBody {
+  last_block: number;
+  data: number;
+}
+
+export interface TokenidSrc101ResponseBody extends Pagination  {
+  last_block: number;
+  data: string;
 }
 
 export interface PaginatedTickResponseBody extends Pagination {
@@ -367,6 +489,17 @@ export interface Src20BalanceResponseBody {
   data: SRC20Balance;
   pagination?: Pagination;
 }
+
+export interface Src101BalanceResponseBody extends Pagination {
+  last_block: number;
+  data: SRC101Balance;
+}
+
+export interface Src101DeployDetailResponseBody {
+  last_block: number;
+  data: SRC101DeployDetail;
+}
+
 export interface Src20SnapshotResponseBody extends Pagination {
   snapshot_block: number;
   data: Src20SnapShotDetail[];
@@ -422,8 +555,8 @@ export type PaginatedResponseBody =
   | ErrorResponseBody;
 
 export interface BlockCountHandlerContext {
-  params: { number: string };
-}
+    params: { number: string };
+  }
 export interface BlockInfoResponseBody {
   block_info: BlockRow;
   issuances: StampRow[];
