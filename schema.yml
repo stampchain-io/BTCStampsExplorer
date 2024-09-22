@@ -693,7 +693,296 @@ paths:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
 
+  /api/v2/src101/:
+    get:
+      summary: Get paginated valid SRC-101 transactions
+      description: Retrieve paginated valid SRC-101 transactions with optional limit and page parameters
+      parameters:
+        - in: query
+          name: limit
+          example: 2
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+          description: The maximum number of transactions to retrieve per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
+      responses:
+        '200':
+          description: Successful response with paginated SRC-101 transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
+  /api/v2/src101/tx/{tx_hash}:
+    get:
+      summary: Get paginated valid SRC-101 transactions
+      description: Retrieve paginated valid SRC-101 transactions with optional limit and page parameters
+      parameters:
+        - in: path
+          name: tx_hash
+          example: "11e4b91d35040f3bc71c5c0f80be9f0ebc3c7073bdcee01651914062dde5733e"
+          schema:
+            type: string
+          description: The hash of the transaction.
+      responses:
+        '200':
+          description: Successful response with paginated SRC-101 transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+  /api/v2/src101/{deploy_hash}/deploy:
+    get:
+      summary: Get SRC-101 deploy detail
+      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+      parameters:
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+          description: The hash of the deploy transaction.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with deployment details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+  /api/v2/src101/{deploy_hash}/total:
+    get:
+      summary: Get total of SRC-101
+      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+      parameters:
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+          description: The hash of the deploy transaction.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with deployment details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalSrc101ResponseBody'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+  /api/v2/src101/{deploy_hash}/address/{address_btc}:
+    get:
+      summary: Get tokenid of SRC-101 by address_btc
+      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            example: 2
+            minimum: 1
+            default: 50
+          description: The maximum number of transactions to retrieve per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: DESC
+            enum: [ASC, DESC]
+          description: Sort order [ASC, DESC]
+        - in: query
+          name: prim
+          required: true
+          example: "true"
+          schema:
+            type: string
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+          description: The hash of the deploy transaction.
+          schema:
+            type: string
+        - in: path
+          name: address_btc
+          required: true
+          example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
+          schema:
+            type: string
+        responses:
+        '200':
+          description: Successful response with deployment details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenidSrc101ResponseBody'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+  /api/v2/src101/balance/{address}:
+    get:
+      summary: Get SRC-101 balances by BTC wallet address
+      parameters:
+        - in: path
+          name: address
+          required: true
+          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
+          schema:
+            type: string
+          description: The address of the wallet
+        - in: query
+          name: limit
+          example: 2
+          schema:
+            type: integer
+            minimum: 1
+            default: 200
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSrc101BalanceResponseBody'
+        '404':
+          description: Address Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+  /api/v2/src101/{deploy_hash}/{tokenid}:
+    get:
+      summary: Get SRC-101 bitname info by deploy_hash and tokenid
+      parameters:
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "9f4f8e7ba2eb8daf36f9d38b502315d23807aa7a55858acc1c73066b30506ab7"
+          schema:
+            type: string
+          description: Txid of the deploy transaction
+        - in: path
+          name: tokenid
+          required: true
+          example: "c3VwZXJib3k="
+          schema:
+            type: string
+          description: 
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Src101BalanceResponseBody'
+        '404':
+          description: tokenid/deploy_hash Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
+  /api/v2/src101/index/{deploy_hash}/{index}:
+    get:
+      summary: Get SRC-101 bitname info by deploy_hash and index
+      parameters:
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "9f4f8e7ba2eb8daf36f9d38b502315d23807aa7a55858acc1c73066b30506ab7"
+          schema:
+            type: string
+          description: Txid of the deploy transaction
+        - in: path
+          name: index
+          required: true
+          example: 1
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Src101BalanceResponseBody'
+        '404':
+          description: tokenid/deploy_hash Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
 
   /api/v2/stamps:
@@ -1350,7 +1639,100 @@ components:
           oneOf:
             - type: number
             - type: string
-    
+    SRC101Balance:
+      type: object
+      properties:
+        address:
+          type: string
+        p:
+          type: string
+        deploy_hash:
+          type: string
+        tokenid:
+          type: string
+        tokenid_utf8:
+          type: string
+        expire_timestamp:
+          type: number
+        last_update:
+          type: number
+        address_btc:
+          type: string
+        address_eth:
+          type: string
+        txt_data:
+          type: string
+        img:
+          type: string
+    Src101Detail:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+        block_index:
+          type: number
+        p:
+          type: string
+        op:
+          type: string
+        tick:
+          oneOf:
+            - type: string
+        tick_hash:
+          oneOf:
+            - type: string
+        name:
+          oneOf:
+            - type: string
+        tokenid:
+          oneOf:
+            - type: string
+        tokenid_utf8:
+          oneOf:
+            - type: string
+        description:
+          oneOf:
+            - type: string
+        wla:
+          oneOf:
+            - type: string
+        imglp:
+          oneOf:
+            - type: string
+        imgf:
+          oneOf:
+            - type: string    
+        deploy_hash:
+          oneOf:
+            - type: string
+        creator:
+          oneOf:
+            - type: string
+        pri:
+          oneOf:
+            - type: number
+        dua:
+          oneOf:
+            - type: number
+        lim:
+          oneOf:
+            - type: number
+        mintstart:
+          oneOf:
+            - type: number
+        mintend:
+          oneOf:
+            - type: number
+        owner:
+          oneOf:
+            - type: string
+        toaddress:
+          oneOf:
+            - type: string
+        destination:
+          type: string
+        block_time:
+          type: string
     StampBalance:
       type: object
       properties:
@@ -1490,6 +1872,35 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Src20Detail"
+
+    TotalSrc101ResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: number
+
+    TokenidSrc101ResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: string
+
+    PaginatedSrc101ResponseBody:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            last_block:
+              type: number
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Src101Detail"
     PaginatedTickResponseBody:
       type: object
       allOf:
@@ -1557,6 +1968,22 @@ components:
           type: number
         data:
           $ref: "#/components/schemas/SRC20Balance"
+    Src101BalanceResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          $ref: "#/components/schemas/SRC101Balance"
+    PaginatedSrc101BalanceResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SRC101Balance"
     PaginatedBalanceResponseBody:
       type: object
       allOf:

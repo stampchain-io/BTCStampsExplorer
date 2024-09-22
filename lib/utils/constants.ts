@@ -5,6 +5,9 @@ export const STAMP_TABLE = "StampTableV4";
 export const BLOCK_TABLE = "blocks";
 export const SRC20_TABLE = "SRC20Valid";
 export const SRC20_BALANCE_TABLE = "balances";
+export const SRC101_TABLE = "SRC101Valid";
+export const SRC101_OWNERS_TABLE = "owners";
+export const SRC101_RECIPIENTS_TABLE = "recipients";
 export const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
 
 export const BIG_LIMIT = 200;
