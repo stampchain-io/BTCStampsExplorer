@@ -5,12 +5,12 @@ export function Footer() {
     >
       <div className={"py-2 md:py-10 xl:py-20 flex flex-col gap-4"}>
         <div
-          className={"flex flex-col-reverse md:flex-row justify-between gap-4 text-sm md:text-lg"}
+          className={"flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg"}
         >
           <div
-            className={"text-left flex flex-col justify-between gap-1 w-full"}
+            className={"text-left flex flex-col justify-center md:justify-between gap-1 w-full"}
           >
-            <div className={"flex flex-col gap-1"}>
+            <div className={"flex flex-col gap-1 items-center md:items-start"}>
               <p
                 className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-4xl md:text-7xl font-black italic"}
               >
@@ -20,6 +20,12 @@ export function Footer() {
                 IMMORTALISED ART - STORED ON BITCOIN
               </p>
               <div className={"flex gap-6"}>
+                <a href="#">
+                  <img
+                    src="/img/footer/EnvelopeSimple.png"
+                    className={"w-11 h-10"}
+                  />
+                </a>
                 <a href="https://x.com/Stampchain">
                   <img src="/img/footer/XLogo.png" />
                 </a>
@@ -36,48 +42,55 @@ export function Footer() {
             </div>
           </div>
 
-          <div className={"flex justify-between w-full"}>
-            <div className={"text-left flex flex-col gap-1"}>
-              <p className={"text-2xl font-black"}>STAMPS</p>
+          <div className={"flex justify-center md:justify-between w-full"}>
+            <div className={"text-left hidden md:flex flex-col gap-1"}>
+              <p className={"text-2xl font-black"}>ART STAMPS</p>
               <a href="#">
-                View All
+                All
               </a>
               <a href="#">
-                Selected Series
+                COLLECTIONS
               </a>
               <a href="#">
-                Vendingmachine
-              </a>
-              <a href="#">
-                Stamping
-              </a>
-              <a href="#">
-                Collab
+                STAMPING
               </a>
             </div>
 
-            <div className={"text-right flex flex-col gap-1"}>
-              <p className={"text-2xl font-black"}>RESOURCES</p>
-              <a
-                href="/faq"
-                f-partial={"/faq"}
-              >
-                FAQ
-              </a>
-              <a href="https://github.com/stampchain-io/">
-                GitHub
-              </a>
-              <a
-                href="/presskit"
-                f-partial={"/presskit"}
-              >
-                Press Kit
-              </a>
-              <a href="#">
-                Support
-              </a>
-              <a href="#">
-                Disclaimer
+            <div
+              className={"text-right flex flex-col items-center md:items-end gap-1"}
+            >
+              <p className={"text-2xl font-black hidden md:block"}>RESOURCES</p>
+              <div className={"flex flex-row md:flex-col gap-1"}>
+                <a
+                  href="/about"
+                  f-partial={"/about"}
+                >
+                  ABOUT
+                </a>
+                <a
+                  href="/faq"
+                  f-partial={"/faq"}
+                >
+                  FAQ
+                </a>
+                <a
+                  href="https://github.com/stampchain-io/"
+                  className={"hidden md:block"}
+                >
+                  GITHUB
+                </a>
+                <a
+                  href="/presskit"
+                  f-partial={"/presskit"}
+                >
+                  PRESS KIT
+                </a>
+                <a href="#">
+                  TERMS OF SERVICE
+                </a>
+              </div>
+              <a href="#" className={"text-[#440066]"}>
+                STAMPCHAIN @ 2024
               </a>
             </div>
           </div>

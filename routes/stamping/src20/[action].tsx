@@ -33,12 +33,14 @@ export default function StampingSrc20Page(
         {selectedTab === "deploy" && <DeployContent trxType={trxType} />}
         {selectedTab === "transfer" && <TransferContent trxType={trxType} />}
       </div>
-      <div className={"flex gap-6 w-full"}>
-        <div className={"w-1/2"}>
+      <div className={"flex flex-col md:flex-row gap-6 w-full px-2 md:px-0"}>
+        <div className={"w-full md:w-1/2"}>
           <FAQModule />
         </div>
         {selectedTab === "mint" && (
-          <div className={"w-1/2 flex flex-col gap-4 items-end"}>
+          <div
+            className={"w-full md:w-1/2 flex flex-col gap-4 items-start md:items-end"}
+          >
             <h1
               className={"bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-3xl md:text-6xl font-black"}
             >
@@ -51,7 +53,9 @@ export default function StampingSrc20Page(
           </div>
         )}
         {selectedTab === "deploy" && (
-          <div className={"w-1/2 flex flex-col gap-4 items-end"}>
+          <div
+            className={"w-full md:w-1/2 flex flex-col gap-4 items-start md:items-end"}
+          >
             <h1
               className={"bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-3xl md:text-6xl font-black"}
             >
@@ -64,7 +68,9 @@ export default function StampingSrc20Page(
           </div>
         )}
         {selectedTab === "transfer" && (
-          <div className={"w-1/2 flex flex-col gap-4 items-end"}>
+          <div
+            className={"w-full md:w-1/2 flex flex-col gap-4 items-start md:items-end"}
+          >
             <h1
               className={"bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-3xl md:text-6xl font-black"}
             >
