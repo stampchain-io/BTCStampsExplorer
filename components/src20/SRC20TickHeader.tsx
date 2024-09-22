@@ -29,20 +29,27 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
         </div>
         <StampSearchClient />
       </div>
-      <div class="flex w-full flex-col md:flex-row gap-20 items-center justify-between">
-        <img
-          src={`/content/${deployment.tx_hash}.svg`}
-          class="w-full md:w-2/5 h-full rounded-lg"
-        />
-
-        <div class="relative w-full md:w-3/5 overflow-x-auto flex flex-col gap-8 text-white">
+      <div class="flex w-full flex-col md:flex-row items-start gap-10 md:gap-20">
+        <div
+          className={"w-full md:w-1/2 flex gap-6 p-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]"}
+        >
+          <img
+            src={`/content/${deployment.tx_hash}.svg`}
+            class="max-w-[135px] rounded-lg"
+          />
           <div class="flex flex-col gap-3">
-            <p class="text-5xl uppercase text-[#7A00F5]">
+            <p class="text-3xl md:text-6xl uppercase font-black text-[#660099]">
               {convertToEmoji(deployment.tick)}
             </p>
-            <p></p>
+            <p className={"text-sm text-[#CCCCCC] font-medium"}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sed
+              dolor ac urna bibendum vehicula. Maecenas vel viverra leo. Donec
+              viverra nunc non lacus eleifend tristique.
+            </p>
           </div>
-          <hr class="border-[#3F2A4E] border-2" />
+        </div>
+
+        <div class="relative w-full md:w-1/2 overflow-x-auto flex flex-col gap-8 text-white bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
           <div class="flex flex-col gap-3">
             <p class="text-[#7A00F5] text-2xl font-semibold">Properties</p>
             <div class="flex justify-between">
@@ -74,7 +81,6 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
               </div>
             </div>
           </div>
-          <hr class="border-[#3F2A4E] border-2" />
           <div class="flex flex-col gap-3">
             <p class="text-[#7A00F5] text-2xl font-semibold">Others</p>
             <div class="flex justify-between">

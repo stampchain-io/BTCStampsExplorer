@@ -284,8 +284,8 @@ export function OlgaContent() {
 
   return (
     <div class={"flex flex-col w-full items-center gap-8"}>
-      <p class={"text-[#5503A6] text-[43px] font-medium mt-6 w-full text-left"}>
-        MINT STAMP (OLGA)
+      <p class="text-[#5503A6] text-3xl md:text-6xl font-black mt-6 w-full text-center">
+        STAMP
       </p>
 
       <div>

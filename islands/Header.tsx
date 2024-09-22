@@ -215,9 +215,9 @@ export function Header() {
 
         {/* Mobile Navbar */}
         <div
-          className={`duration-500 flex flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808] scroll-none p-6 pt-[120px] ${
+          className={`duration-500 flex flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none p-6 pt-[120px] ${
             open ? "translate-x-0" : "translate-x-full"
-          }`}
+          } backdrop-blur-md`}
           id="navbar-collapse"
         >
           <a
@@ -341,6 +341,9 @@ export function Header() {
           <div
             class={`gap-6 items-center justify-center flex`}
           >
+            <a href="#">
+              <img src="/img/footer/EnvelopeSimple.png" class="w-12" />
+            </a>
             <a href="https://x.com/Stampchain">
               <img src="/img/footer/XLogo.png" class="w-12" />
             </a>
