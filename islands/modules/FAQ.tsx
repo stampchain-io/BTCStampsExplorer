@@ -21,12 +21,14 @@ export const FAQModule = () => {
         amet, tempor iaculis metus. Suspendisse potenti.
       </p>
 
-      <a
-        href="/faq"
-        className={"bg-[#999999] text-black w-[136px] h-[60px] flex justify-center items-center rounded-md"}
-      >
-        FAQ
-      </a>
+      <div className={"flex justify-end md:justify-start"}>
+        <a
+          href="/faq"
+          className={"border-2 border-[#999999] rounded-md bg-transparent text-[#999999] font-extrabold w-[136px] h-[60px] flex justify-center items-center"}
+        >
+          FAQ
+        </a>
+      </div>
     </div>
   );
 };

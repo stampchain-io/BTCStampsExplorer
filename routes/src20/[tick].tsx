@@ -45,17 +45,19 @@ export const SRC20TickPage = (props) => {
         total_transfers={total_transfers}
       />
       <div class="w-full flex flex-col md:flex-row gap-20 justify-center">
-        <div class="w-full md:w-2/5 h-full">
+        <div class="w-full h-full bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
           <SRC20DetailsTab
             holders={holders}
             transfers={transfers}
             mints={mints}
           />
         </div>
-        <div class="relative w-full md:w-3/5 flex justify-center">
+        {
+          /* <div class="relative w-full md:w-3/5 flex justify-center">
           <HoldersInfo holders={holders} />
-          {/* <TransfersInfo transfers={transfers} /> */}
-        </div>
+          <TransfersInfo transfers={transfers} />
+        </div> */
+        }
       </div>
     </div>
   );
