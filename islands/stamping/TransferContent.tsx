@@ -1,7 +1,9 @@
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
 
-export function TransferContent() {
+export function TransferContent(
+  { trxType = "multisig" }: { trxType?: "olga" | "multisig" },
+) {
   const {
     formState,
     handleChangeFee,
@@ -14,7 +16,7 @@ export function TransferContent() {
     submissionMessage,
     walletError,
     apiError,
-  } = useSRC20Form("transfer");
+  } = useSRC20Form("transfer", trxType);
 
   if (isLoading) {
     return <div>Loading...</div>;

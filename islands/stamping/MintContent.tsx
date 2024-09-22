@@ -1,7 +1,9 @@
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
 
-export function MintContent() {
+export function MintContent(
+  { trxType = "multisig" }: { trxType?: "olga" | "multisig" },
+) {
   const {
     formState,
     handleChangeFee,
@@ -14,7 +16,7 @@ export function MintContent() {
     submissionMessage,
     walletError,
     apiError,
-  } = useSRC20Form("mint");
+  } = useSRC20Form("mint", trxType);
 
   if (isLoading) {
     return <div>Loading...</div>;

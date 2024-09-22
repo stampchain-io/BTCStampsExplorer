@@ -1,30 +1,37 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { StampingSrc20PageProps } from "globals";
 import { StampingSrc20Header } from "$islands/stamping/StampingSrc20Header.tsx";
 import { MintContent } from "$islands/stamping/MintContent.tsx";
 import { DeployContent } from "$islands/stamping/DeployContent.tsx";
 import { TransferContent } from "$islands/stamping/TransferContent.tsx";
 import { FAQModule } from "$islands/modules/FAQ.tsx";
 
-export const handler: Handlers = {
-  GET(_req, ctx) {
+interface StampingSrc20PageProps {
+  selectedTab: string;
+  trxType: "multisig" | "olga";
+}
+
+export const handler: Handlers<StampingSrc20PageProps> = {
+  GET(req, ctx) {
+    const url = new URL(req.url);
     const action = ctx.params.action || "mint";
-    return ctx.render({ selectedTab: action });
+    const trxType = url.searchParams.get("trxType") as "multisig" | "olga" ||
+      "multisig";
+    return ctx.render({ selectedTab: action, trxType });
   },
 };
 
 export default function StampingSrc20Page(
   { data }: PageProps<StampingSrc20PageProps>,
 ) {
-  const { selectedTab } = data;
+  const { selectedTab, trxType } = data;
 
   return (
     <div className={"flex flex-col gap-16"}>
       <StampingSrc20Header selectedTab={selectedTab} />
       <div className="self-center max-w-[680px] mx-auto">
-        {selectedTab === "mint" && <MintContent />}
-        {selectedTab === "deploy" && <DeployContent />}
-        {selectedTab === "transfer" && <TransferContent />}
+        {selectedTab === "mint" && <MintContent trxType={trxType} />}
+        {selectedTab === "deploy" && <DeployContent trxType={trxType} />}
+        {selectedTab === "transfer" && <TransferContent trxType={trxType} />}
       </div>
       <div className={"flex gap-6 w-full"}>
         <div className={"w-1/2"}>
