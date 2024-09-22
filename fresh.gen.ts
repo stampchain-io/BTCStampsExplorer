@@ -37,6 +37,7 @@ import * as $api_v2_src20_tick_tick_deploy from "./routes/api/v2/src20/tick/[tic
 import * as $api_v2_src20_tick_tick_index from "./routes/api/v2/src20/tick/[tick]/index.ts";
 import * as $api_v2_src20_tick_index from "./routes/api/v2/src20/tick/index.ts";
 import * as $api_v2_src20_tx_tx_hash_ from "./routes/api/v2/src20/tx/[tx_hash].ts";
+import * as $api_v2_src20_v2create from "./routes/api/v2/src20/v2create.ts";
 import * as $api_v2_stamps_id_ from "./routes/api/v2/stamps/[id].ts";
 import * as $api_v2_stamps_balance_address_ from "./routes/api/v2/stamps/balance/[address].tsx";
 import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
@@ -134,6 +135,7 @@ import * as $stamping_DeployContent from "./islands/stamping/DeployContent.tsx";
 import * as $stamping_FeeEstimation from "./islands/stamping/FeeEstimation.tsx";
 import * as $stamping_MintContent from "./islands/stamping/MintContent.tsx";
 import * as $stamping_OlgaContent from "./islands/stamping/OlgaContent.tsx";
+import * as $stamping_SRC20DeployOlgaContent from "./islands/stamping/SRC20DeployOlgaContent.tsx";
 import * as $stamping_StampingSrc20Header from "./islands/stamping/StampingSrc20Header.tsx";
 import * as $stamping_TransferContent from "./islands/stamping/TransferContent.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
@@ -188,6 +190,7 @@ const manifest = {
     "./routes/api/v2/src20/tick/[tick]/index.ts": $api_v2_src20_tick_tick_index,
     "./routes/api/v2/src20/tick/index.ts": $api_v2_src20_tick_index,
     "./routes/api/v2/src20/tx/[tx_hash].ts": $api_v2_src20_tx_tx_hash_,
+    "./routes/api/v2/src20/v2create.ts": $api_v2_src20_v2create,
     "./routes/api/v2/stamps/[id].ts": $api_v2_stamps_id_,
     "./routes/api/v2/stamps/balance/[address].tsx":
       $api_v2_stamps_balance_address_,
@@ -303,6 +306,8 @@ const manifest = {
     "./islands/stamping/FeeEstimation.tsx": $stamping_FeeEstimation,
     "./islands/stamping/MintContent.tsx": $stamping_MintContent,
     "./islands/stamping/OlgaContent.tsx": $stamping_OlgaContent,
+    "./islands/stamping/SRC20DeployOlgaContent.tsx":
+      $stamping_SRC20DeployOlgaContent,
     "./islands/stamping/StampingSrc20Header.tsx": $stamping_StampingSrc20Header,
     "./islands/stamping/TransferContent.tsx": $stamping_TransferContent,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
