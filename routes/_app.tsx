@@ -72,11 +72,11 @@ export default function App({ Component }: AppProps) {
         <ToastProvider>
           <NavigatorProvider>
             <div className="flex flex-col min-h-screen">
+              <Header />
               <div
-                className="px-2 pt-8 mx-auto flex flex-col gap-5 max-w-7xl w-full flex-grow"
+                className="px-6 md:px-12 flex flex-col flex-grow gap-5 max-w-[1440px] mx-auto w-full"
                 f-client-nav
               >
-                <Header />
                 <Partial name="body">
                   <Component />
                 </Partial>

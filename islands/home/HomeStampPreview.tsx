@@ -61,11 +61,9 @@ export function HomeStampPreview({
   ];
 
   return (
-    <div className={"flex flex-col gap-18 md:gap-36"}>
-      <div>
-        <h1 class="text-[60px] leading-normal text-left mb-8 font-black
-                    bg-gradient-to-r from-gradient-start to-gradient-end
-                    bg-clip-text text-transparent">
+    <div className="flex flex-col gap-16 md:gap-36">
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-gradient-start to-gradient-end bg-clip-text text-transparent">
           LATEST ART STAMPS
         </h1>
         <div class="flex flex-col gap-12">
@@ -74,8 +72,9 @@ export function HomeStampPreview({
           ))}
         </div>
       </div>
-      <div>
-        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">
           COLLECTIONS
         </h1>
         <div class="flex flex-col gap-12">
@@ -84,11 +83,12 @@ export function HomeStampPreview({
           ))}
         </div>
       </div>
+
       {/* FEATURED COLLECTIONS */}
       <CollectionList collections={collectionData} />
 
-      <div>
-        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">
           RECENT SALES
         </h1>
         <div class="flex flex-col gap-12">
@@ -97,9 +97,11 @@ export function HomeStampPreview({
           ))}
         </div>
       </div>
+
       <GetStampingModule />
-      <div>
-        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">
           SRC-20 TOKENS
         </h1>
         <div class="flex flex-col gap-12">
