@@ -1,3 +1,4 @@
+import { useState } from "preact/hooks";
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
@@ -30,6 +31,8 @@ export function StampCard({
   kind: "cursed" | "stamp" | "named";
   isRecentSale?: boolean;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   let src: string;
   const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
@@ -78,7 +81,9 @@ export function StampCard({
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
-      className="bg-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-2 rounded-lg @container transition-all"
+      className="bg-[#2E0F4D] border-2 border-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-3 rounded-lg transition-all hover:border-2 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative flex overflow-hidden">
         <div className="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden image-rendering-pixelated">
@@ -89,7 +94,11 @@ export function StampCard({
       </div>
       <div className="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
         <div className="flex justify-center items-center text-black">
-          <h3 className="text-[13px] font-normal text-white/80 text-lg">
+          <h3
+            className={`text-[13px] font-normal text-lg transition-colors duration-300 ${
+              isHovered ? "text-[#AA00FF]" : "text-white/80"
+            }`}
+          >
             {Number(stamp.stamp ?? 0) >= 0 ||
                 (stamp.cpid && stamp.cpid.charAt(0) === "A")
               ? `${stamp.stamp}`
@@ -119,7 +128,7 @@ export function StampCard({
                 <p className="leading-4">
                   {stamp.ident !== "SRC-20" && stamp.balance
                     ? (
-                      `${getSupply(stamp.balance, stamp.divisible)}/${
+                      `${getSupply(Number(stamp.balance), stamp.divisible)}/${
                         stamp.supply < 100000 && !stamp.divisible
                           ? getSupply(stamp.supply, stamp.divisible)
                           : "+100000"
