@@ -54,7 +54,7 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="px-6 xl:px-12 mt-[36px] md:mt-[68px] max-w-[1440px] w-full mx-auto md:flex items-center justify-between">
+    <header className="px-6 xl:px-12 my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex items-center justify-between">
       <div className="flex justify-between items-center">
         <a
           href="/home"
