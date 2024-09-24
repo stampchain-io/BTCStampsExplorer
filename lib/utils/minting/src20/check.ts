@@ -4,7 +4,7 @@ import {
   IDeploySRC20,
   IMintSRC20,
   ITransferSRC20,
-} from "$lib/types/src20.d.ts";
+} from "$lib/types/index.d.ts";
 import { isValidBitcoinAddress } from "./utils.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 

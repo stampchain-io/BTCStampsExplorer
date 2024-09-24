@@ -1,6 +1,6 @@
 import { Signal, signal } from "@preact/signals";
 
-import { Wallet } from "store/wallet/wallet.d.ts";
+import { Wallet } from "$lib/types/index.d.ts";
 import {
   broadcastPSBT,
   broadcastRawTX,

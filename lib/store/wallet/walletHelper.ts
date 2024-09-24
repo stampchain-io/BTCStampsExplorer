@@ -1,10 +1,9 @@
 import { leatherProvider } from "./leather.ts";
 import { okxProvider } from "./okx.ts";
 import { unisatProvider } from "./unisat.ts";
-import { Wallet } from "./wallet.d.ts";
 import { tapWalletProvider } from "./tapwallet.ts";
 import { phantomProvider } from "./phantom.ts";
-import { SignPSBTResult } from "$lib/types/src20.d.ts";
+import { SignPSBTResult, Wallet } from "$lib/types/index.d.ts";
 
 interface WalletProvider {
   signMessage: (message: string) => Promise<string>;
