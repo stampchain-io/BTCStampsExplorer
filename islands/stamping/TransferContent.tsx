@@ -40,9 +40,7 @@ export function TransferContent(
         TRANSFER
       </p>
 
-      <div
-        className={"flex flex-col gap-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full"}
-      >
+      <div className="flex flex-col gap-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
         <div class="w-full">
           {
             /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
@@ -61,7 +59,7 @@ export function TransferContent(
           )}
         </div>
 
-        <div className={"w-full flex gap-6"}>
+        <div className="w-full flex gap-6">
           <div class="w-full">
             {
               /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
@@ -96,9 +94,7 @@ export function TransferContent(
         </div>
       </div>
 
-      <div
-        className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full"}
-      >
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

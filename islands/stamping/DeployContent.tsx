@@ -105,14 +105,12 @@ export function DeployContent(
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="text-[#5503A6] text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] text-3xl md:text-6xl font-black mt-6 w-full text-center">
         DEPLOY
       </p>
 
-      <div
-        className={"flex flex-col md:flex-row gap-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6 w-full"}
-      >
-        <div>
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6 w-full flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
           <div class="flex flex-col md:flex-row gap-8">
             <div
               id="image-preview"
@@ -155,129 +153,111 @@ export function DeployContent(
               )}
             </div>
           </div>
+
+          <div className="flex flex-col gap-6 w-full">
+            <div class="w-full">
+              <input
+                type="text"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                placeholder="Token ticker name"
+                value={formState.token}
+                onChange={(e) => handleInputChange(e, "token")}
+                maxLength={5}
+              />
+              {formState.tokenError && (
+                <p class="text-red-500 mt-2">{formState.tokenError}</p>
+              )}
+            </div>
+
+            <div class="w-full">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                placeholder="Limit pr. mint"
+                value={formState.lim}
+                onChange={(e) => handleInputChange(e, "lim")}
+              />
+              {formState.limError && (
+                <p class="text-red-500 mt-2">{formState.limError}</p>
+              )}
+            </div>
+
+            <div class="w-full">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                placeholder="Supply"
+                value={formState.max}
+                onChange={(e) => handleInputChange(e, "max")}
+              />
+              {formState.maxError && (
+                <p class="text-red-500 mt-2">{formState.maxError}</p>
+              )}
+            </div>
+
+            <div class="w-full">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                placeholder="Decimal amount"
+                value={formState.dec}
+                onChange={(e) => handleInputChange(e, "dec")}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className={"flex flex-col gap-6 w-full"}>
-          <div class="w-full">
-            {
-              /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-              Token
-            </p> */
-            }
-            <input
-              type="text"
-              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-              placeholder="Token ticker name"
-              value={formState.token}
-              onChange={(e) => handleInputChange(e, "token")}
-              maxLength={5}
-            />
-            {formState.tokenError && (
-              <p class="text-red-500 mt-2">{formState.tokenError}</p>
-            )}
-          </div>
+        <textarea
+          type="text"
+          class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+          placeholder="Description"
+          rows={5}
+          // value={formState.description}
+          // onChange={(e) => handleInputChange(e, "description")}
+        />
 
-          <div class="w-full">
-            {
-              /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-              Limit Per Mint
-            </p> */
-            }
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-              placeholder="Positive Integer (max uint64)"
-              value={formState.lim}
-              onChange={(e) => handleInputChange(e, "lim")}
-            />
-            {formState.limError && (
-              <p class="text-red-500 mt-2">{formState.limError}</p>
-            )}
-          </div>
+        <div className="w-full flex gap-6">
+          <input
+            type="text"
+            class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+            placeholder="X"
+            value={formState.x}
+            onChange={(e) => handleInputChange(e, "x")}
+          />
+          <input
+            type="text"
+            class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+            placeholder="Website"
+            value={formState.web}
+            onChange={(e) => handleInputChange(e, "web")}
+          />
+        </div>
 
-          <div class="w-full">
-            {
-              /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-              Max Circulation
-            </p> */
-            }
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-              placeholder="Positive Integer (max uint64)"
-              value={formState.max}
-              onChange={(e) => handleInputChange(e, "max")}
-            />
-            {formState.maxError && (
-              <p class="text-red-500 mt-2">{formState.maxError}</p>
-            )}
-          </div>
-
-          <div class="w-full">
-            {
-              /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-              Decimal Places
-            </p> */
-            }
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-              placeholder="Decimal Places (0-18, default: 18)"
-              value={formState.dec}
-              onChange={(e) => handleInputChange(e, "dec")}
-            />
-          </div>
-
-          {
-            /* <div class="w-full">
-            <p class="text-lg font-semibold text-[#F5F5F5] mb-3">X Username</p>
-            <input
-              type="text"
-              class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-              placeholder="X Username (optional)"
-              value={formState.x}
-              onChange={(e) => handleInputChange(e, "x")}
-            />
-          </div> */
-          }
-
-          {
-            /* <div class="w-full">
-            <p class="text-lg font-semibold text-[#F5F5F5] mb-3">Website</p>
-            <input
-              type="text"
-              class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-              placeholder="Website (optional)"
-              value={formState.web}
-              onChange={(e) => handleInputChange(e, "web")}
-            />
-          </div> */
-          }
-
-          {
-            /* <div class="w-full">
-            <p class="text-lg font-semibold text-[#F5F5F5] mb-3">Email</p>
-            <input
-              type="email"
-              class="px-3 py-6 bg-[#6E6E6E] text-sm text-[#F5F5F5] w-full"
-              placeholder="Email (optional)"
-              value={formState.email}
-              onChange={(e) => handleInputChange(e, "email")}
-            />
-          </div> */
-          }
+        <div className="w-full flex gap-6">
+          <input
+            type="email"
+            class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+            placeholder="Telegram"
+            // value={formState.telegram}
+            // onChange={(e) => handleInputChange(e, "telegram")}
+          />
+          <input
+            type="email"
+            class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+            placeholder="Email"
+            value={formState.email}
+            onChange={(e) => handleInputChange(e, "email")}
+          />
         </div>
       </div>
 
-      <div
-        className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full"}
-      >
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
