@@ -17,6 +17,7 @@ import {
 import { DispenserManager, XcpManager } from "$lib/services/xcpService.ts";
 import * as base64 from "base64/mod.ts";
 import { filterOptions } from "utils/filterOptions.ts";
+import { Dispense, Dispenser } from "$lib/types/index.d.ts";
 
 export class StampController {
   static async getStampDetailsById(
@@ -84,34 +85,75 @@ export class StampController {
   }
 
   private static calculatePrices(
-    dispensers: any[],
-    dispenses: any[],
-    stamp: any,
+    dispensers: Dispenser[],
+    dispenses: Dispense[],
+    stamp: StampRow,
   ) {
+    console.log("Entering calculatePrices method");
+    console.log("Dispensers:", JSON.stringify(dispensers, null, 2));
+    console.log("Dispenses:", JSON.stringify(dispenses, null, 2));
+    console.log("Stamp:", JSON.stringify(stamp, null, 2));
+
     let floorPrice: string | number = "priceless";
     let marketCap: string | number = "priceless";
 
     if (dispensers && dispensers.length > 0) {
-      const openDispensers = dispensers.filter(
-        (dispenser) => dispenser.give_remaining > 0,
-      );
+      console.log("Dispensers array is not empty");
+      const openDispensers = dispensers.filter((dispenser) => {
+        console.log("Checking dispenser:", JSON.stringify(dispenser, null, 2));
+        return dispenser && dispenser.give_remaining > 0;
+      });
+      console.log("Open dispensers:", JSON.stringify(openDispensers, null, 2));
+
       if (openDispensers.length > 0) {
+        console.log("There are open dispensers");
         const lowestBtcRate = Math.min(
-          ...openDispensers.map((dispenser) =>
-            dispenser.satoshirate / 100000000
-          ),
+          ...openDispensers.map((dispenser) => {
+            console.log(
+              "Processing dispenser:",
+              JSON.stringify(dispenser, null, 2),
+            );
+            if (dispenser && dispenser.satoshirate !== undefined) {
+              return dispenser.satoshirate / 100000000;
+            } else {
+              console.log("Warning: dispenser or satoshirate is undefined");
+              return Infinity;
+            }
+          }),
         );
-        floorPrice = lowestBtcRate;
+        console.log("Lowest BTC rate:", lowestBtcRate);
+        floorPrice = lowestBtcRate !== Infinity ? lowestBtcRate : "priceless";
       }
+    } else {
+      console.log("Dispensers array is empty or undefined");
     }
 
     if (dispenses && dispenses.length > 0 && stamp.supply) {
+      console.log("Calculating market cap");
       const mostRecentDispense = dispenses[0];
-      const recentPrice = mostRecentDispense.dispenser_details.satoshirate /
-        100000000;
-      marketCap = recentPrice * stamp.supply;
+      console.log(
+        "Most recent dispense:",
+        JSON.stringify(mostRecentDispense, null, 2),
+      );
+
+      // Find the parent dispenser for the most recent dispense
+      const parentDispenser = dispensers.find((d) =>
+        d.tx_hash === mostRecentDispense.dispenser_tx_hash
+      );
+
+      if (parentDispenser && parentDispenser.satoshirate !== undefined) {
+        const recentPrice = parentDispenser.satoshirate / 100000000; // Convert satoshis to BTC
+        marketCap = recentPrice * stamp.supply;
+        console.log("Calculated market cap:", marketCap);
+      } else {
+        console.log(
+          "Warning: Parent dispenser not found or satoshirate is missing for the most recent dispense",
+        );
+      }
     }
 
+    console.log("Final floorPrice:", floorPrice);
+    console.log("Final marketCap:", marketCap);
     return { floorPrice, marketCap };
   }
 
@@ -179,7 +221,7 @@ export class StampController {
         );
         filterSuffixFilters = filterByArray.flatMap((filter) =>
           filterOptions[filter]?.suffixFilters || []
-        ) as STAMP_SUFFIX_FILTERS;
+        ) as STAMP_SUFFIX_FILTERS[];
 
         // Combine ident from type and filterBy, removing duplicates
         if (identFromFilter.length > 0) {
