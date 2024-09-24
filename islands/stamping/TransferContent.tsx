@@ -42,15 +42,10 @@ export function TransferContent(
 
       <div className="flex flex-col gap-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
         <div class="w-full">
-          {
-            /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Transfer To Address <span class="text-[#FF2D2D]">*</span>
-        </p> */
-          }
           <input
             type="text"
             class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-            placeholder="Bitcoin Address"
+            placeholder="Recipient address"
             value={formState.toAddress}
             onChange={(e) => handleInputChange(e, "toAddress")}
           />
@@ -61,32 +56,22 @@ export function TransferContent(
 
         <div className="w-full flex gap-6">
           <div class="w-full">
-            {
-              /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Token
-        </p> */
-            }
             <input
               type="text"
               class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-              placeholder="Case Sensitive"
+              placeholder="Token"
               value={formState.token}
               onChange={(e) => handleInputChange(e, "token")}
             />
           </div>
 
           <div class="w-full">
-            {
-              /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Amount
-        </p> */
-            }
             <input
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-              placeholder="Transfer Amount"
+              placeholder="Amount"
               value={formState.amt}
               onChange={(e) => handleInputChange(e, "amt")}
             />
