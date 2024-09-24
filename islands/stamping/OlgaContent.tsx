@@ -283,16 +283,16 @@ export function OlgaContent() {
   };
 
   return (
-    <div class={"flex flex-col w-full items-center gap-8"}>
+    <div class="flex flex-col w-full items-center gap-8">
       <p class="text-[#5503A6] text-3xl md:text-6xl font-black mt-6 w-full text-center">
         STAMP
       </p>
 
-      <div>
-        <div class="flex flex-col md:flex-row gap-8">
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full flex flex-col md:flex-row gap-8">
+        <div className="flex gap-8">
           <div
             id="image-preview"
-            class="relative max-w-sm border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]"
+            class="relative rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]"
           >
             <input
               id="upload"
@@ -303,7 +303,7 @@ export function OlgaContent() {
             />
             {file !== null && (
               <img
-                width={324}
+                width={120}
                 style={{
                   height: "100%",
                   objectFit: "contain",
@@ -321,20 +321,20 @@ export function OlgaContent() {
               >
                 <img
                   src="/img/mint/icon-image-upload.png"
-                  class="w-20 h-20"
+                  class="w-10 h-10"
                   alt=""
                 />
-                <h5 class="text-[#F5F5F5] text-2xl font-semibold">
+                <h5 class="text-[#F5F5F5] text-sm font-semibold">
                   Upload Image
                 </h5>
               </label>
             )}
           </div>
 
-          <div class="max-w-sm p-6 mb-4 border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]">
+          <div class="p-6 mb-4 rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]">
             {file !== null && (
               <img
-                width={350}
+                width={120}
                 style={{
                   height: "100%",
                   objectFit: "contain",
@@ -345,139 +345,140 @@ export function OlgaContent() {
               />
             )}
             {file === null && (
-              <label class="cursor-pointer">
-                <h5 class="text-[25px] font-semibold text-[#F5F5F5]">
-                  Preview
-                </h5>
-                <span id="filename" class="text-gray-500 bg-gray-200 z-50">
-                </span>
-              </label>
+              <h5 class="cursor-pointer text-sm font-semibold text-[#F5F5F5]">
+                Preview
+              </h5>
             )}
           </div>
-        </div>
-        {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
-      </div>
 
-      <div class="w-full">
-        <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-          Editions
-        </p>
-        <div class={"flex gap-[18px] w-full mb-3"}>
-          <input
-            type="text"
-            value={issuance}
-            onInput={handleIssuanceChange}
-            class={"p-4 text-[#F5F5F5] text-[24px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"}
-          />
-          <div
-            class={"w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"}
-            onClick={() =>
-              setIssuance((
-                prev,
-              ) => (parseInt(prev) > 1
-                ? (parseInt(prev) - 1).toString()
-                : "1")
-              )}
-          >
-            <svg
-              width="32"
-              height="4"
-              viewBox="0 0 32 4"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect width="32" height="4" fill="#D9D9D9" />
-            </svg>
-          </div>
-          <div
-            class={"w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"}
-            onClick={() =>
-              setIssuance((prev) => (parseInt(prev) + 1).toString())}
-          >
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 32 32"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect y="14" width="32" height="4" fill="#D9D9D9" />
-              <rect
-                x="14"
-                y="32"
-                width="32"
-                height="4"
-                transform="rotate(-90 14 32)"
-                fill="#D9D9D9"
-              />
-            </svg>
-          </div>
+          {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
         </div>
-        {issuanceError && <p class="text-red-500 mt-2">{issuanceError}</p>}
-        <div className="flex gap-7">
-          <div className="flex gap-2 items-center">
-            <input
-              type="checkbox"
-              id="lockEditions"
-              name="lockEditions"
-              checked={isLocked}
-              onChange={(e: Event) =>
-                setIsLocked((e.target as HTMLInputElement).checked)}
-              className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
-            />
-            <label
-              htmlFor="lockEditions"
-              className="text-[#B9B9B9] text-[16px] font-semibold"
-            >
-              Lock Editions
-            </label>
-          </div>
-          <div className="flex gap-2 items-center">
-            <input
-              type="checkbox"
-              id="poshStamp"
-              name="poshStamp"
-              checked={isPoshStamp}
-              onChange={(e: Event) =>
-                setIsPoshStamp((e.target as HTMLInputElement).checked)}
-              className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
-            />
-            <label
-              htmlFor="poshStamp"
-              className="text-[#B9B9B9] text-[16px] font-semibold"
-            >
-              Posh Stamp
-            </label>
-          </div>
-        </div>
-        {isPoshStamp && (
-          <div className="mt-3 w-full">
+
+        <div class="w-full">
+          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
+            Editions
+          </p>
+          <div class="flex gap-[18px] w-full mb-3">
             <input
               type="text"
-              value={stampName}
-              onInput={handleStampNameChange}
-              placeholder="Stamp Name (max 13 chars, can't start with A)"
-              className="p-4 text-[#F5F5F5] text-[16px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"
-              maxLength={13}
+              value={issuance}
+              onInput={handleIssuanceChange}
+              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
             />
-            {stampNameError && (
-              <p class="text-red-500 mt-2">{stampNameError}</p>
-            )}
+            {
+              /* <div
+              class="w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"
+              onClick={() =>
+                setIssuance((
+                  prev,
+                ) => (parseInt(prev) > 1
+                  ? (parseInt(prev) - 1).toString()
+                  : "1")
+                )}
+            >
+              <svg
+                width="32"
+                height="4"
+                viewBox="0 0 32 4"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect width="32" height="4" fill="#D9D9D9" />
+              </svg>
+            </div> */
+            }
+            {
+              /* <div
+              class="w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"
+              onClick={() =>
+                setIssuance((prev) => (parseInt(prev) + 1).toString())}
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect y="14" width="32" height="4" fill="#D9D9D9" />
+                <rect
+                  x="14"
+                  y="32"
+                  width="32"
+                  height="4"
+                  transform="rotate(-90 14 32)"
+                  fill="#D9D9D9"
+                />
+              </svg>
+            </div> */
+            }
           </div>
-        )}
+          {issuanceError && <p class="text-red-500 mt-2">{issuanceError}</p>}
+          <div className="flex gap-7">
+            <div className="flex gap-2 items-center">
+              <input
+                type="checkbox"
+                id="lockEditions"
+                name="lockEditions"
+                checked={isLocked}
+                onChange={(e: Event) =>
+                  setIsLocked((e.target as HTMLInputElement).checked)}
+                className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
+              />
+              <label
+                htmlFor="lockEditions"
+                className="text-[#B9B9B9] text-[16px] font-semibold"
+              >
+                Lock Editions
+              </label>
+            </div>
+            <div className="flex gap-2 items-center">
+              <input
+                type="checkbox"
+                id="poshStamp"
+                name="poshStamp"
+                checked={isPoshStamp}
+                onChange={(e: Event) =>
+                  setIsPoshStamp((e.target as HTMLInputElement).checked)}
+                className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
+              />
+              <label
+                htmlFor="poshStamp"
+                className="text-[#B9B9B9] text-[16px] font-semibold"
+              >
+                Posh Stamp
+              </label>
+            </div>
+          </div>
+          {isPoshStamp && (
+            <div className="mt-3 w-full">
+              <input
+                type="text"
+                value={stampName}
+                onInput={handleStampNameChange}
+                placeholder="Stamp Name (max 13 chars, can't start with A)"
+                className="p-4 text-[#F5F5F5] text-[16px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"
+                maxLength={13}
+              />
+              {stampNameError && (
+                <p class="text-red-500 mt-2">{stampNameError}</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* FIXME: FINALIZE OPTIMIZATION ROUTINE */}
       {
         /* <div
-        class={"bg-[#6E6E6E] w-full"}
+        class="bg-[#6E6E6E] w-full"
       >
-        <p class={"text-[#F5F5F5] text-[22px] font-semibold px-6 py-[15px]"}>
+        <p class="text-[#F5F5F5] text-[22px] font-semibold px-6 py-[15px]">
           Optimization
         </p>
         <hr />
         <div class="grid grid-cols-2 md:grid-cols-4 justify-between gap-4 py-6 px-6">
-          <div class={"flex items-center"}>
+          <div class="flex items-center">
             <input
               id="default-radio-1"
               type="radio"
@@ -491,7 +492,7 @@ export function OlgaContent() {
               None
             </label>
           </div>
-          <div class={"flex items-center"}>
+          <div class="flex items-center">
             <input
               id="default-radio-2"
               type="radio"
@@ -505,7 +506,7 @@ export function OlgaContent() {
               Max compression
             </label>
           </div>
-          <div class={"flex items-center"}>
+          <div class="flex items-center">
             <input
               id="default-radio-2"
               type="radio"
@@ -519,7 +520,7 @@ export function OlgaContent() {
               Balanced
             </label>
           </div>
-          <div class={"flex items-center"}>
+          <div class="flex items-center">
             <input
               id="default-radio-2"
               type="radio"
@@ -537,24 +538,26 @@ export function OlgaContent() {
       </div> */
       }
 
-      <FeeEstimation
-        fee={fee}
-        handleChangeFee={handleChangeFee}
-        type="stamp"
-        fileType={file?.type}
-        fileSize={fileSize ?? undefined}
-        issuance={parseInt(issuance, 10)}
-        BTCPrice={BTCPrice}
-        onRefresh={fetchFees}
-        isSubmitting={false}
-        onSubmit={handleMint}
-      />
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
+        <FeeEstimation
+          fee={fee}
+          handleChangeFee={handleChangeFee}
+          type="stamp"
+          fileType={file?.type}
+          fileSize={fileSize ?? undefined}
+          issuance={parseInt(issuance, 10)}
+          BTCPrice={BTCPrice}
+          onRefresh={fetchFees}
+          isSubmitting={false}
+          onSubmit={handleMint}
+        />
 
-      {apiError && (
-        <div class="w-full text-red-500 text-center">
-          {apiError}
-        </div>
-      )}
+        {apiError && (
+          <div class="w-full text-red-500 text-center">
+            {apiError}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
