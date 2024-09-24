@@ -1,12 +1,12 @@
 import { serverConfig } from "$server/config/config.ts";
 import { MAX_XCP_RETRIES } from "utils/constants.ts";
 import {
+  FetchQuicknodeFunction,
   GetDecodedTx,
   GetPublicKeyFromAddress,
   GetRawTx,
   GetTransaction,
-} from "$lib/types/quicknode.ts";
-import { FetchQuicknodeFunction } from "$lib/types/quicknode.ts";
+} from "$lib/types/index.d.ts";
 
 const { QUICKNODE_ENDPOINT, QUICKNODE_API_KEY } = serverConfig;
 const QUICKNODE_URL = `${QUICKNODE_ENDPOINT}/${QUICKNODE_API_KEY}`;

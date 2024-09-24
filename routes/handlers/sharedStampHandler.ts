@@ -43,7 +43,7 @@ export const sharedStampIdHandler: Handlers = {
   async GET(_req: Request, ctx) {
     try {
       const { id } = ctx.params;
-      const stampData = await StampController.getStampDetailsById(id);
+      const stampData = await StampController.getStampDetailsById(id, "all");
       if (!stampData) {
         return ResponseUtil.error("Stamp not found", 404);
       }

@@ -5,7 +5,7 @@ import {
   IDeploySRC20,
   IMintSRC20,
   ITransferSRC20,
-} from "$lib/types/src20.d.ts";
+} from "$lib/types/index.d.ts";
 
 type SRC20Operation = "deploy" | "mint" | "transfer";
 

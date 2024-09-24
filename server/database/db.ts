@@ -37,6 +37,7 @@ class DatabaseManager {
   private readonly MAX_POOL_SIZE = 10;
   private logger: ReturnType<typeof getLogger>;
   private redisAvailableAtStartup = false;
+  private inMemoryCache: { [key: string]: { data: any; expiry: number } } = {};
 
   constructor(private config: DatabaseConfig) {
     this.MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
@@ -230,7 +231,7 @@ class DatabaseManager {
       if (this.redisAvailableAtStartup) {
         this.connectToRedisInBackground();
       }
-      return await fetchData();
+      return this.handleInMemoryCache(key, fetchData, cacheDuration);
     }
     const cachedData = await this.getCachedData(key);
     if (cachedData) {
@@ -255,7 +256,7 @@ class DatabaseManager {
         this.redisAvailable = false;
       }
     }
-    return null;
+    return this.getInMemoryCachedData(key);
   }
 
   private async setCachedData(
@@ -279,6 +280,41 @@ class DatabaseManager {
         this.redisAvailable = false;
       }
     }
+    this.setInMemoryCachedData(key, data, expiry);
+  }
+
+  private handleInMemoryCache<T>(
+    key: string,
+    fetchData: () => Promise<T>,
+    cacheDuration: number | "never",
+  ): Promise<T> {
+    const cachedData = this.getInMemoryCachedData(key);
+    if (cachedData) {
+      return Promise.resolve(cachedData as T);
+    }
+
+    return fetchData().then((data) => {
+      this.setInMemoryCachedData(key, data, cacheDuration);
+      return data;
+    });
+  }
+
+  private getInMemoryCachedData(key: string): unknown | null {
+    const item = this.inMemoryCache[key];
+    if (item && item.expiry > Date.now()) {
+      return item.data;
+    }
+    delete this.inMemoryCache[key];
+    return null;
+  }
+
+  private setInMemoryCachedData(
+    key: string,
+    data: unknown,
+    expiry: number | "never",
+  ): void {
+    const expiryTime = expiry === "never" ? Infinity : Date.now() + expiry;
+    this.inMemoryCache[key] = { data, expiry: expiryTime };
   }
 
   public async invalidateCacheByPattern(pattern: string): Promise<void> {
@@ -298,6 +334,16 @@ class DatabaseManager {
           this.connectToRedisInBackground();
         }
         this.redisAvailable = false;
+      }
+    }
+    this.invalidateInMemoryCacheByPattern(pattern);
+  }
+
+  private invalidateInMemoryCacheByPattern(pattern: string): void {
+    const regex = new RegExp(pattern);
+    for (const key in this.inMemoryCache) {
+      if (regex.test(key)) {
+        delete this.inMemoryCache[key];
       }
     }
   }
