@@ -1,8 +1,6 @@
 import { useSignal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
-// import IconCircleChevronsRight from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/circle-chevrons-right.tsx";
-// import IconCircleChevronsLeft from "https://deno.land/x/tabler_icons_tsx@0.0.3/tsx/circle-chevrons-left.tsx";
 
 interface CarouselProps {
   showNavigation?: boolean;
@@ -76,9 +74,9 @@ const Carousel = (props: CarouselProps) => {
           key={index}
           src={slide.url}
           alt={slide.alt}
-          class={`absolute origin-center transition-all duration-500 h-auto object-fit ${
+          class={`absolute origin-center transition-all duration-500 h-auto object-fit rounded-xl ${
             index === currentSlide.value
-              ? "left-1/2 -translate-x-1/2 w-[calc(30%+200px)] z-10 opacity-100 blur-none"
+              ? "left-1/2 -translate-x-1/2 w-[calc(30%+200px)] z-10 opacity-100 blur-none border-4 border-[#9900EE] shadow-[0px_0px_20px_#9900EE]"
               : (index === (currentSlide.value - 1 + SLIDE_DATA.length) %
                   SLIDE_DATA.length
                 ? "left-[16.67%] -translate-x-1/2 top-[100px] w-1/3 z-0 opacity-50 blur-sm"
@@ -86,75 +84,20 @@ const Carousel = (props: CarouselProps) => {
           }`}
         />
       ))}
-      {
-        /* {SLIDE_DATA.map((slide, index) => {
-        return (
-          (
-            <div
-              className={`flex-col md:flex-row gap-4 md:gap-16 2xl:gap-32 justify-center items-center transition-all duration-500 ${
-                index === currentSlide.value
-                  ? "flex opacity-100"
-                  : "hidden opacity-0"
-              }`}
-            >
-              <img
-                key={index}
-                src={slide.url}
-                alt={slide.alt}
-                class={`origin-center h-auto object-content max-w-[400px] md:w-1/2 z-10`}
-              />
-              <div className={"text-center md:text-left md:w-1/2"}>
-                <p
-                  className={"bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black text-4xl md:text-5xl 2xl:text-7xl"}
-                >
-                  {slide.title}
-                </p>
-                <p
-                  className={"font-semibold text-xl md:text-2xl 2xl:text-4xl text-[#FF00E9]"}
-                >
-                  {slide.subTitle}
-                </p>
-                <p
-                  className={"font-medium text-xl md:text-2xl 2xl:text-4xl text-[#DBDBDB]"}
-                >
-                  {slide.description}
-                </p>
-              </div>
-            </div>
-          )
-        );
-      })} */
-      }
       {SHOW_NAVIGATION && (
-        <>
-          {
-            /* <button
-            onClick={previousSlide}
-            class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
-          >
-            <IconCircleChevronsLeft />
-          </button>
-          <button
-            onClick={nextSlide}
-            class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full"
-          >
-            <IconCircleChevronsRight />
-          </button> */
-          }
-          <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-2 z-[19]">
-            {SLIDE_DATA.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                class={`w-[44px] md:w-[88px] h-0 border-2 rounded-[4px] ${
-                  index === currentSlide.value
-                    ? "border-[#7A00F5]"
-                    : "border-[#3F2A4E]"
-                }`}
-              />
-            ))}
-          </div>
-        </>
+        <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-2 z-[19]">
+          {SLIDE_DATA.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              class={`w-[44px] md:w-[88px] h-0 border-2 rounded-[4px] ${
+                index === currentSlide.value
+                  ? "border-[#7A00F5]"
+                  : "border-[#3F2A4E]"
+              }`}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
