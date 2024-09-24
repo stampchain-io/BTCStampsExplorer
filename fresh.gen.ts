@@ -141,7 +141,7 @@ import * as $stamping_TransferContent from "./islands/stamping/TransferContent.t
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import * as $upload_UploadTickHeader from "./islands/upload/UploadTickHeader.tsx";
-import { type Manifest } from "$fresh/server.ts";
+import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {

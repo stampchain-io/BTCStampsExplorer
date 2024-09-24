@@ -1,6 +1,6 @@
 import * as bitcoin from "bitcoin";
 import { estimateInputSize } from "./utxo-selector.ts";
-import { UTXO } from "$lib/types/src20.d.ts";
+import { UTXO } from "$lib/types/index.d.ts";
 
 const MAX_RETRIES = 3;
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";

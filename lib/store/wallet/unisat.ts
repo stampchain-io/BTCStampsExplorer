@@ -1,7 +1,6 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
-import { Wallet } from "./wallet.d.ts";
-import { SignPSBTResult } from "$lib/types/src20.d.ts";
+import { SignPSBTResult, Wallet } from "$lib/types/index.d.ts";
 
 export const isUnisatInstalled = signal<boolean>(false);
 

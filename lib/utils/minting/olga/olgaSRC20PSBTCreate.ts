@@ -4,7 +4,7 @@ import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
 import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 import { getTransaction } from "utils/quicknode.ts";
-import { PSBTInput } from "$lib/types/src20.d.ts";
+import { PSBTInput } from "$lib/types/index.d.ts";
 import CIP33 from "utils/minting/olga/CIP33.ts";
 import {
   calculateDust,

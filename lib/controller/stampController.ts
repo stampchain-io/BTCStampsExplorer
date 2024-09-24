@@ -16,67 +16,15 @@ import {
 } from "globals";
 import { DispenserManager, XcpManager } from "$lib/services/xcpService.ts";
 import * as base64 from "base64/mod.ts";
-const NO_DISPENSERS = Symbol("NO_DISPENSERS");
 import { filterOptions } from "utils/filterOptions.ts";
 
-export class InMemoryCacheService {
-  private static cache: { [key: string]: { data: any; expiry: number } } = {};
-
-  static set(key: string, data: any, duration: number): void {
-    const expiry = Date.now() + duration;
-    this.cache[key] = { data, expiry };
-  }
-
-  static get(key: string): any | null {
-    const item = this.cache[key];
-    if (item && item.expiry > Date.now()) {
-      return item.data;
-    }
-    delete this.cache[key];
-    return null;
-  }
-}
-
 export class StampController {
-  private static CacheService = InMemoryCacheService;
-
-  private static async getXcpAssetsWithInMemoryCache(): Promise<any[]> {
-    const cacheKey = "xcp_assets";
-    const cacheDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
-
-    let xcpAssets = StampController.CacheService.get(cacheKey);
-    if (!xcpAssets) {
-      xcpAssets = await XcpManager.getAllXcpAssets();
-      StampController.CacheService.set(cacheKey, xcpAssets, cacheDuration);
-    }
-
-    return xcpAssets;
-  }
-
-  private static async getDispensersWithCache(cpid: string): Promise<any[]> {
-    const cacheKey = `dispensers_${cpid}`;
-    const cacheDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
-
-    let dispensers = StampController.CacheService.get(cacheKey);
-    if (dispensers === NO_DISPENSERS) {
-      return null;
-    }
-    // console.log("Dispensers from cache:", dispensers);
-    if (!dispensers) {
-      dispensers = await DispenserManager.getDispensersByCpid(cpid);
-      StampController.CacheService.set(
-        cacheKey,
-        dispensers ?? NO_DISPENSERS,
-        cacheDuration,
-      );
-    }
-
-    return dispensers;
-  }
-
-  static async getStampDetailsById(id: string) {
+  static async getStampDetailsById(
+    id: string,
+    stampType: STAMP_TYPES = "all",
+  ) {
     try {
-      const res = await StampService.getStampDetailsById(id, "all");
+      const res = await StampService.getStampDetailsById(id, "all", stampType);
       if (!res) {
         return null;
       }
@@ -231,7 +179,7 @@ export class StampController {
         );
         filterSuffixFilters = filterByArray.flatMap((filter) =>
           filterOptions[filter]?.suffixFilters || []
-        );
+        ) as STAMP_SUFFIX_FILTERS;
 
         // Combine ident from type and filterBy, removing duplicates
         if (identFromFilter.length > 0) {
@@ -245,8 +193,7 @@ export class StampController {
         suffixFilters = []; // No suffix filter applied
       }
 
-      // Pass ident, filterBy, and suffixFilters to the service/repository
-      const [stampResult, lastBlock, xcpAssets] = await Promise.all([
+      const [stampResult, lastBlock] = await Promise.all([
         StampService.getStamps({
           page,
           limit,
@@ -264,25 +211,39 @@ export class StampController {
           sortColumn,
         }),
         BlockService.getLastBlock(),
-        this.getXcpAssetsWithInMemoryCache(),
       ]);
 
       if (!stampResult) {
         throw new Error("No stamps found");
       }
 
-      const updatedStamps = await Promise.all(
-        stampResult.stamps.map(async (stamp: StampRow) => {
+      // Prepare concurrent calls for XCP assets and dispensers
+      const cpids = stampResult.stamps.map((stamp: StampRow) => stamp.cpid);
+      const xcpAssetsPromise = XcpManager.getXcpAssetsByCpids(cpids);
+
+      const dispenserPromises = stampResult.stamps.map((stamp: StampRow) =>
+        (stamp.ident === "STAMP" || stamp.ident === "SRC-721")
+          ? DispenserManager.getDispensersByCpid(stamp.cpid)
+          : Promise.resolve(null)
+      );
+
+      // Wait for all promises to resolve
+      const [xcpAssets, ...dispensers] = await Promise.all([
+        xcpAssetsPromise,
+        ...dispenserPromises,
+      ]);
+
+      const updatedStamps = stampResult.stamps.map(
+        (stamp: StampRow, index: number) => {
           const xcpAsset = xcpAssets.find((asset) =>
             asset.asset === stamp.cpid
           );
           let floorPrice: string | number | undefined = undefined;
 
           if (stamp.ident === "STAMP" || stamp.ident === "SRC-721") {
-            const dispensers = await this.getDispensersWithCache(stamp.cpid);
-
-            if (dispensers && dispensers.length > 0) {
-              const openDispensers = dispensers.filter(
+            const dispensersForStamp = dispensers[index];
+            if (dispensersForStamp && dispensersForStamp.length > 0) {
+              const openDispensers = dispensersForStamp.filter(
                 (dispenser) => dispenser.give_remaining > 0,
               );
               if (openDispensers.length > 0) {
@@ -307,7 +268,7 @@ export class StampController {
             locked: xcpAsset?.locked ?? stamp.locked,
             ...(floorPrice !== undefined && { floorPrice }),
           };
-        }),
+        },
       );
 
       return {

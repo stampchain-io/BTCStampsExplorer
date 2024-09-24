@@ -2,36 +2,47 @@ import { StampRepository } from "$lib/database/index.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import {
   STAMP_FILTER_TYPES,
+  STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
-  StampBalance,
   SUBPROTOCOLS,
 } from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { mimeTypes } from "utils/util.ts";
+import { DispenserFilter } from "$lib/types/index.d.ts";
 
 export class StampService {
   static async getStampDetailsById(
     id: string,
-    filter: "open" | "closed" | "all" = "all",
+    dispenserFilter: DispenserFilter = "all",
+    stampType: STAMP_TYPES = "all",
   ) {
+    console.log(`Fetching stamp details for ID: ${id}, Type: ${stampType}`);
     const stampResult = await this.getStamps({
       identifier: id,
       allColumns: true,
       noPagination: true,
       cacheDuration: "never",
+      type: stampType,
     });
 
+    console.log("Stamp result:", JSON.stringify(stampResult, null, 2));
+
     if (!stampResult) {
+      console.error(`Stamp ${id} not found in getStamps result`);
       throw new Error(`Error: Stamp ${id} not found`);
     }
 
     const stamp = this.extractStamp(stampResult);
+    console.log("Extracted stamp:", JSON.stringify(stamp, null, 2));
+
     const cpid = stamp.cpid;
 
     const [asset, holders, dispensers, sends, dispenses, total, lastBlock] =
-      await this.fetchRelatedData(stamp, cpid, filter);
+      await this.fetchRelatedData(stamp, cpid, dispenserFilter);
+
+    console.log("Related data fetched successfully");
 
     return {
       last_block: lastBlock,
@@ -41,13 +52,18 @@ export class StampService {
       sends,
       dispensers,
       dispenses,
-      total: total.rows[0].total,
+      total: total.rows[0]?.total,
     };
   }
 
   private static extractStamp(stampResult: any) {
+    console.log(
+      "Extracting stamp from result:",
+      JSON.stringify(stampResult, null, 2),
+    );
     if (Array.isArray(stampResult.rows)) {
       if (stampResult.rows.length === 0) {
+        console.error("Stamp not found: empty rows array");
         throw new Error(`Error: Stamp not found`);
       }
       return stampResult.rows[0];
@@ -61,12 +77,16 @@ export class StampService {
   private static async fetchRelatedData(
     stamp: any,
     cpid: string,
-    filter: string,
+    filter: DispenserFilter,
   ) {
     const isStampOrSrc721 = stamp.ident === "STAMP" ||
       stamp.ident === "SRC-721";
 
-    return await Promise.all([
+    console.log(
+      `Fetching related data for CPID: ${cpid}, Filter: ${filter}, IsStampOrSrc721: ${isStampOrSrc721}`,
+    );
+
+    const results = await Promise.all([
       isStampOrSrc721 ? XcpManager.getXcpAsset(cpid) : Promise.resolve(null),
       isStampOrSrc721
         ? XcpManager.getXcpHoldersByCpid(cpid)
@@ -83,6 +103,14 @@ export class StampService {
       StampRepository.getTotalStampCountFromDb({ type: "stamps" }),
       BlockService.getLastBlock(),
     ]);
+
+    console.log(
+      `Fetched related data for CPID: ${cpid}, Results: ${
+        JSON.stringify(results)
+      }`,
+    );
+
+    return results;
   }
 
   static async getStamps(options: {
@@ -104,18 +132,10 @@ export class StampService {
     const {
       page = 1,
       limit = BIG_LIMIT,
-      type,
-      ident,
-      allColumns,
-      collectionId,
       identifier,
-      blockIdentifier,
-      cacheDuration,
-      noPagination,
-      sortBy,
       filterBy,
       suffixFilters,
-      sortColumn,
+      ...restOptions
     } = options;
 
     const isMultipleStamps = Array.isArray(identifier);
@@ -123,18 +143,25 @@ export class StampService {
 
     const [stamps, totalResult] = await Promise.all([
       StampRepository.getStampsFromDb({
-        ...options,
+        ...restOptions,
+        page,
         limit: isSingleStamp || isMultipleStamps ? undefined : limit,
-        allColumns: isSingleStamp || isMultipleStamps ? true : allColumns,
-        noPagination: isSingleStamp || isMultipleStamps ? true : noPagination,
+        allColumns: isSingleStamp || isMultipleStamps
+          ? true
+          : restOptions.allColumns,
+        noPagination: isSingleStamp || isMultipleStamps
+          ? true
+          : restOptions.noPagination,
         cacheDuration: isSingleStamp || isMultipleStamps
           ? "never"
-          : cacheDuration,
+          : restOptions.cacheDuration,
+        identifier,
         filterBy,
         suffixFilters,
       }),
       StampRepository.getTotalStampCountFromDb({
-        ...options,
+        ...restOptions,
+        identifier,
         filterBy,
       }),
     ]);
@@ -153,7 +180,7 @@ export class StampService {
       return { stamps: stamps.rows, total: stamps.rows.length };
     }
 
-    const paginatedData = noPagination
+    const paginatedData = restOptions.noPagination
       ? stamps.rows
       : stamps.rows.slice(0, limit);
 

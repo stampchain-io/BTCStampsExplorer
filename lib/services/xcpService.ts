@@ -1,5 +1,6 @@
 import { StampService } from "$lib/services/stampService.ts";
 import { dbManager } from "../../server/database/db.ts";
+import { DispenserFilter } from "$lib/types/index.d.ts";
 
 export const xcp_v2_nodes = [
   {
@@ -62,13 +63,16 @@ export const xcp_public_nodes = [
   },
 ];
 
-const cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
-
 export async function fetchXcpV2WithCache<T>(
   endpoint: string,
   queryParams: URLSearchParams,
 ): Promise<T> {
   const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
+  const cacheTimeout = 1000 * 60 * 5; // 5 minutes
+
+  console.log(
+    `Fetching XCP V2 with cache. Endpoint: ${endpoint}, QueryParams: ${queryParams.toString()}`,
+  );
 
   return await dbManager.handleCache(
     cacheKey,
@@ -113,17 +117,18 @@ export async function fetchXcpV2WithCache<T>(
 // {"result": {"status": "Healthy"}}%
 
 export class DispenserManager {
-  private static cacheTimeout: number = 1000 * 60 * 5; // 5 minutes
   private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
   static async getDispensersByCpid(
     cpid: string,
-    filter: "open" | "closed" | "all" = "open",
+    filter: DispenserFilter = "open",
   ): Promise<any[]> {
     const endpoint = `/assets/${cpid}/dispensers`;
     let allDispensers: any[] = [];
     let cursor: string | null = null;
     const limit = 1000;
+
+    console.log(`Fetching dispensers for CPID: ${cpid}, Filter: ${filter}`);
 
     while (true) {
       const queryParams = new URLSearchParams({
@@ -140,15 +145,8 @@ export class DispenserManager {
         );
 
         if (!response || !Array.isArray(response.result)) {
-          console.warn(
-            `Unexpected response structure for cpid ${cpid}:`,
-            response,
-          );
+          console.log(`No more results for CPID: ${cpid}`);
           break;
-        }
-
-        if (response.result.length === 0) {
-          break; // No more results
         }
 
         const dispensers = response.result.map((dispenser: any) => ({
@@ -168,8 +166,11 @@ export class DispenserManager {
 
         allDispensers = allDispensers.concat(dispensers);
 
-        cursor = response.next_cursor || null;
-        if (!cursor) {
+        if (response.next_cursor && response.next_cursor !== cursor) {
+          cursor = response.next_cursor;
+          console.log(`New cursor for CPID ${cpid}: ${cursor}`);
+        } else {
+          console.log(`No more pages for CPID ${cpid}`);
           break;
         }
       } catch (error) {
@@ -186,6 +187,10 @@ export class DispenserManager {
           ? dispenser.give_remaining > 0
           : dispenser.give_remaining === 0
       );
+
+    console.log(
+      `Fetched dispensers for CPID: ${cpid}, Count: ${filteredDispensers.length}`,
+    );
 
     return filteredDispensers;
   }
@@ -250,7 +255,15 @@ export class DispenserManager {
       noPagination: true,
     });
 
-    const stampMap = new Map(stamps.stamps.map((stamp) => [stamp.cpid, stamp]));
+    // Handle the possibility of `stamps` being `null`
+    if (!stamps || !stamps.stamps) {
+      throw new Error("Failed to fetch stamps");
+    }
+
+    // Explicitly type the `stamp` parameter
+    const stampMap = new Map(
+      stamps.stamps.map((stamp: { cpid: string }) => [stamp.cpid, stamp]),
+    );
 
     const filteredDispensers = allDispensers.filter((dispenser) =>
       stampMap.has(dispenser.cpid)
@@ -283,6 +296,8 @@ export class DispenserManager {
     let cursor: string | null = null;
     const limit = 1000;
 
+    console.log(`Fetching dispenses for CPID: ${cpid}`);
+
     while (true) {
       const queryParams = new URLSearchParams({
         limit: limit.toString(),
@@ -299,6 +314,7 @@ export class DispenserManager {
         );
 
         if (!response || !Array.isArray(response.result)) {
+          console.log(`No more results for CPID: ${cpid}`);
           break;
         }
 
@@ -310,16 +326,19 @@ export class DispenserManager {
           destination: dispense.destination,
           dispenser_tx_hash: dispense.dispenser_tx_hash,
           dispense_quantity: dispense.dispense_quantity,
-          confirmed: dispense.confirmed, // whether or not this is in the mempool
+          confirmed: dispense.confirmed,
           btc_amount: dispense.btc_amount_normalized,
-          close_block_index: dispense.dispenser.close_block_index,
-          dispenser_details: dispense.dispenser,
+          close_block_index: dispense.dispenser?.close_block_index ?? null,
+          dispenser_details: dispense.dispenser || null,
         }));
 
         allDispenses = allDispenses.concat(dispenses);
 
-        cursor = response.next_cursor || null;
-        if (!cursor) {
+        if (response.next_cursor && response.next_cursor !== cursor) {
+          cursor = response.next_cursor;
+          console.log(`New cursor for CPID ${cpid}: ${cursor}`);
+        } else {
+          console.log(`No more pages for CPID ${cpid}`);
           break;
         }
       } catch (error) {
@@ -330,6 +349,10 @@ export class DispenserManager {
         break;
       }
     }
+
+    console.log(
+      `Fetched dispenses for CPID: ${cpid}, Count: ${allDispenses.length}`,
+    );
 
     return allDispenses;
   }
@@ -342,6 +365,8 @@ export class XcpManager {
     const endpoint = `/assets/${cpid}`;
     const queryParams = new URLSearchParams();
 
+    console.log(`Fetching XCP asset for CPID: ${cpid}`);
+
     try {
       const response = await this.fetchXcpV2WithCache<any>(
         endpoint,
@@ -351,6 +376,12 @@ export class XcpManager {
       if (!response || typeof response !== "object") {
         throw new Error(`Invalid response for asset ${cpid}`);
       }
+
+      console.log(
+        `Fetched XCP asset for CPID: ${cpid}, Response: ${
+          JSON.stringify(response)
+        }`,
+      );
 
       return response;
     } catch (error) {
@@ -420,16 +451,17 @@ export class XcpManager {
     return allAssets.slice(0, maxRecords);
   }
 
-  static getXcpHoldersByCpid = async (cpid: string) => {
+  static async getXcpHoldersByCpid(cpid: string): Promise<any[]> {
     const endpoint = `/assets/${cpid}/balances`;
     let allHolders: any[] = [];
     let cursor: string | null = null;
     const limit = 1000;
 
+    console.log(`Fetching XCP holders for CPID: ${cpid}`);
+
     while (true) {
       const queryParams = new URLSearchParams({
         limit: limit.toString(),
-        // verbose: "true", // Only returns asset_info divisible, locked data (not supply)
       });
       if (cursor) {
         queryParams.append("cursor", cursor);
@@ -442,6 +474,7 @@ export class XcpManager {
         );
 
         if (!response || !Array.isArray(response.result)) {
+          console.log(`No more results for CPID: ${cpid}`);
           break;
         }
 
@@ -454,30 +487,40 @@ export class XcpManager {
 
         allHolders = allHolders.concat(holders);
 
-        // Check if there's a next cursor
-        cursor = response.next_cursor || null;
-        if (!cursor) {
-          break; // No more pages
+        if (response.next_cursor && response.next_cursor !== cursor) {
+          cursor = response.next_cursor;
+          console.log(`New cursor for CPID ${cpid}: ${cursor}`);
+        } else {
+          console.log(`No more pages for CPID ${cpid}`);
+          break;
         }
       } catch (error) {
-        console.error(
-          `Error fetching holders for cpid ${cpid}:`,
-          error,
-        );
+        console.error(`Error fetching holders for cpid ${cpid}:`, error);
         break;
       }
     }
 
-    return allHolders;
-  };
+    console.log(
+      `Fetched XCP holders for CPID: ${cpid}, Count: ${allHolders.length}`,
+    );
 
-  static getXcpBalancesByAddress = async (address: string) => {
+    return allHolders;
+  }
+
+  static getXcpBalancesByAddress = async (
+    address: string,
+    maxIterations = 100,
+  ) => {
     const endpoint = `/addresses/${address}/balances`;
     let allBalances: any[] = [];
     let cursor: string | null = null;
     const limit = 1000;
+    let iterations = 0;
 
-    while (true) {
+    console.log(`Fetching XCP balances for address: ${address}`);
+
+    while (iterations < maxIterations) {
+      iterations++;
       const queryParams = new URLSearchParams({ limit: limit.toString() });
       if (cursor) {
         queryParams.append("cursor", cursor);
@@ -490,6 +533,7 @@ export class XcpManager {
         );
 
         if (!response || !Array.isArray(response.result)) {
+          console.warn(`Unexpected response structure for address ${address}`);
           break;
         }
 
@@ -503,28 +547,54 @@ export class XcpManager {
 
         allBalances = allBalances.concat(balances);
 
-        // Check if there's a next cursor
-        cursor = response.next_cursor || null;
-        if (!cursor) {
+        console.log(
+          `Iteration ${iterations}: Fetched ${balances.length} balances. Total: ${allBalances.length}`,
+        );
+
+        if (response.next_cursor) {
+          cursor = response.next_cursor;
+          console.log(`New cursor: ${cursor}`);
+        } else {
+          console.log("No more pages to fetch");
           break; // No more pages
+        }
+
+        if (
+          response.result_count && allBalances.length >= response.result_count
+        ) {
+          console.log(`Fetched all ${response.result_count} balances`);
+          break;
         }
       } catch (error) {
         console.error(
-          `Error fetching balances for address ${address}:`,
+          `Error fetching balances for address ${address} (iteration ${iterations}):`,
           error,
         );
+        // Implement exponential backoff here if needed
         break;
       }
+    }
+
+    if (iterations >= maxIterations) {
+      console.warn(
+        `Reached maximum iterations (${maxIterations}) for address ${address}. Fetched ${allBalances.length} balances.`,
+      );
+    } else {
+      console.log(
+        `Completed fetching balances for address ${address}. Total balances: ${allBalances.length}`,
+      );
     }
 
     return allBalances;
   };
 
-  static getXcpSendsByCPID = async (cpid: string) => {
+  static async getXcpSendsByCPID(cpid: string): Promise<any[]> {
     const endpoint = `/assets/${cpid}/sends`;
     let allSends: any[] = [];
     let cursor: string | null = null;
     const limit = 1000;
+
+    console.log(`Fetching XCP sends for CPID: ${cpid}`);
 
     while (true) {
       const queryParams = new URLSearchParams({ limit: limit.toString() });
@@ -539,6 +609,7 @@ export class XcpManager {
         );
 
         if (!response || !Array.isArray(response.result)) {
+          console.log(`No more results for CPID: ${cpid}`);
           break;
         }
 
@@ -554,22 +625,25 @@ export class XcpManager {
 
         allSends = allSends.concat(sends);
 
-        // Check if there's a next cursor
-        cursor = response.next_cursor || null;
-        if (!cursor) {
-          break; // No more pages
+        if (response.next_cursor && response.next_cursor !== cursor) {
+          cursor = response.next_cursor;
+          console.log(`New cursor for CPID ${cpid}: ${cursor}`);
+        } else {
+          console.log(`No more pages for CPID ${cpid}`);
+          break;
         }
       } catch (error) {
-        console.error(
-          `Error fetching sends for cpid ${cpid}:`,
-          error,
-        );
+        console.error(`Error fetching sends for cpid ${cpid}:`, error);
         break;
       }
     }
 
+    console.log(
+      `Fetched XCP sends for CPID: ${cpid}, Count: ${allSends.length}`,
+    );
+
     return allSends;
-  };
+  }
 
   private static getDispenseEvents(
     cursor: string | null = null,
@@ -646,5 +720,16 @@ export class XcpManager {
     } while (cursor);
 
     return allEvents;
+  }
+
+  static async getXcpAssetsByCpids(cpids: string[]): Promise<any[]> {
+    console.log(`Fetching XCP assets for CPIDs: ${cpids.join(", ")}`);
+
+    const assetPromises = cpids.map((cpid) => this.getXcpAsset(cpid));
+    const assets = await Promise.all(assetPromises);
+
+    console.log(`Fetched ${assets.length} XCP assets`);
+
+    return assets.filter((asset) => asset !== null);
   }
 }
