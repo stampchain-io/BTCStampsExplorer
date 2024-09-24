@@ -157,10 +157,11 @@ export function FeeEstimation({
           </button>
         </div>
       </div>
-      <p className="flex">
-        Estimated -{" "}
+      <p className="flex font-bold">
+        <span className="text-[#666666] font-light">Estimated:{" "}</span>
         {coinType === "BTC" ? total.toFixed(6) : (total * BTCPrice).toFixed(2)}
-        &nbsp;<span className="coin"></span>
+        {" "}
+        <span className="coin"></span>
       </p>
       <p className="flex items-center">
         Details
@@ -214,44 +215,51 @@ export function FeeEstimation({
           {(type === "stamp") &&
             (
               <>
-                <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-                  <p>File Type</p>
-                  <p>{fileType}</p>
-                </div>
-                <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-                  <p>File Size</p>
-                  <p>{fileSize} bytes</p>
-                </div>
-                <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-                  <p>Sats per byte</p>
-                  <p>{fee}</p>
-                </div>
-                <div class="flex justify-between w-full border-b border-[#8A8989] py-4">
-                  <p>Editions</p>
-                  <p>{issuance}</p>
-                </div>
+                <p className="font-medium text-xs">
+                  <span className="text-[#666666] font-light">File Type:</span>
+                  {" "}
+                  {fileType}
+                </p>
+                <p className="font-medium text-xs">
+                  <span className="text-[#666666] font-light">File Size:</span>
+                  {" "}
+                  {fileSize} bytes
+                </p>
+                <p className="font-medium text-xs">
+                  <span className="text-[#666666] font-light">
+                    Sats per byte:
+                  </span>{" "}
+                  {fee}
+                </p>
+                <p className="font-medium text-xs">
+                  <span className="text-[#666666] font-light">Editions:</span>
+                  {" "}
+                  {issuance}
+                </p>
               </>
             )}
-          <p className="flex gap-1 items-center">
-            Miner Fee&nbsp;&nbsp;
+          <p className="flex gap-1 items-center text-xs font-medium">
+            <span className="font-light text-[#666666]">Miner Fee:</span>{" "}
             {coinType === "BTC"
               ? txfee.toFixed(8)
               : (txfee * BTCPrice).toFixed(2)} <span className="coin" />
           </p>
-          <p className="flex gap-1 items-center">
-            Minting Fee&nbsp;&nbsp;
+          <p className="flex gap-1 items-center text-xs font-medium">
+            <span className="font-light text-[#666666]">Minting Fee:</span>{" "}
             {coinType === "BTC"
               ? mintfee.toFixed(6)
               : (mintfee * BTCPrice).toFixed(2)} <span className="coin" />
           </p>
-          <p className="flex gap-1 items-center">
-            Multisig Dust&nbsp;&nbsp;
+          <p className="flex gap-1 items-center text-xs font-medium">
+            <span className="font-light text-[#666666]">Multisig Dust</span>
+            {" "}
             {coinType === "BTC"
               ? dust.toFixed(6)
               : (dust * BTCPrice).toFixed(2)} <span className="coin" />
           </p>
-          <p className="flex gap-1 items-center">
-            Total Estimated&nbsp;&nbsp;
+          <p className="flex gap-1 items-center text-xs font-medium">
+            <span className="font-light text-[#666666]">Total Estimated</span>
+            {" "}
             {coinType === "BTC"
               ? total.toFixed(8)
               : (total * BTCPrice).toFixed(2)} <span className="coin" />

@@ -103,6 +103,24 @@ export function DeployContent(
     }
   };
 
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const handleShowAdvancedOptions = () => {
+    const switchToggle = document.querySelector("#switch-toggle");
+    if (!switchToggle) return;
+    if (showAdvancedOptions === true) {
+      switchToggle.classList.add("translate-x-full");
+      setTimeout(() => {
+        switchToggle.innerHTML = btcIcon;
+      }, 150);
+    } else {
+      switchToggle.classList.remove("translate-x-full");
+      setTimeout(() => {
+        switchToggle.innerHTML = usdIcon;
+      }, 150);
+    }
+    setShowAdvancedOptions(!showAdvancedOptions);
+  };
+
   return (
     <div class="flex flex-col w-full items-center gap-8">
       <p class="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] text-3xl md:text-6xl font-black mt-6 w-full text-center">
@@ -155,7 +173,7 @@ export function DeployContent(
           </div>
 
           <div className="flex flex-col gap-6 w-full">
-            <div class="w-full">
+            <div class="w-full flex gap-6">
               <input
                 type="text"
                 class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
@@ -164,6 +182,16 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "token")}
                 maxLength={5}
               />
+              <button
+                class="!w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+                onClick={handleShowAdvancedOptions}
+              >
+                <div
+                  id="switch-toggle"
+                  class="coin w-6 h-6 relative rounded-full transition duration-500 transform text-white translate-x-full"
+                >
+                </div>
+              </button>
               {formState.tokenError && (
                 <p class="text-red-500 mt-2">{formState.tokenError}</p>
               )}
@@ -213,48 +241,50 @@ export function DeployContent(
           </div>
         </div>
 
-        <textarea
-          type="text"
-          class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-          placeholder="Description"
-          rows={5}
-          // value={formState.description}
-          // onChange={(e) => handleInputChange(e, "description")}
-        />
-
-        <div className="w-full flex gap-6">
-          <input
-            type="text"
-            class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-            placeholder="X"
-            value={formState.x}
-            onChange={(e) => handleInputChange(e, "x")}
-          />
-          <input
-            type="text"
-            class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-            placeholder="Website"
-            value={formState.web}
-            onChange={(e) => handleInputChange(e, "web")}
-          />
-        </div>
-
-        <div className="w-full flex gap-6">
-          <input
-            type="email"
-            class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-            placeholder="Telegram"
-            // value={formState.telegram}
-            // onChange={(e) => handleInputChange(e, "telegram")}
-          />
-          <input
-            type="email"
-            class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-            placeholder="Email"
-            value={formState.email}
-            onChange={(e) => handleInputChange(e, "email")}
-          />
-        </div>
+        {showAdvancedOptions && (
+          <>
+            <textarea
+              type="text"
+              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+              placeholder="Description"
+              rows={5}
+              // value={formState.description}
+              // onChange={(e) => handleInputChange(e, "description")}
+            />
+            <div className="w-full flex gap-6">
+              <input
+                type="text"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                placeholder="X"
+                value={formState.x}
+                onChange={(e) => handleInputChange(e, "x")}
+              />
+              <input
+                type="text"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                placeholder="Website"
+                value={formState.web}
+                onChange={(e) => handleInputChange(e, "web")}
+              />
+            </div>
+            <div className="w-full flex gap-6">
+              <input
+                type="email"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                placeholder="Telegram"
+                // value={formState.telegram}
+                // onChange={(e) => handleInputChange(e, "telegram")}
+              />
+              <input
+                type="email"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                placeholder="Email"
+                value={formState.email}
+                onChange={(e) => handleInputChange(e, "email")}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">

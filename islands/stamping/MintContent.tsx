@@ -43,11 +43,6 @@ export function MintContent(
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
         <div className="flex flex-col gap-6 w-full">
           <div class="w-full">
-            {
-              /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            Token
-          </p> */
-            }
             <input
               type="text"
               class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
@@ -61,11 +56,6 @@ export function MintContent(
           </div>
 
           <div class="w-full">
-            {
-              /* <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-              Mint Amount
-            </p> */
-            }
             <input
               type="text"
               inputMode="numeric"
