@@ -730,6 +730,8 @@ export class XcpManager {
 
     console.log(`Fetched ${assets.length} XCP assets`);
 
-    return assets.filter((asset) => asset !== null);
+    return assets.filter((asset) => asset !== null).map((asset) =>
+      asset.result
+    );
   }
 }
