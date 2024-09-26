@@ -112,20 +112,29 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                   </p>
                   <p className={"text-lg text-[#666666] font-light"}>
                     HOLDERS{" "}
-                    <span className={"font-bold text-[#999999]"}>2170</span>
+                    <span className={"font-bold text-[#999999]"}>
+                      {typeof src20.holders === "number"
+                        ? src20.holders.toLocaleString()
+                        : Number(src20.holders).toLocaleString()}
+                    </span>
                   </p>
                 </div>
                 <div class="p-3 text-right flex flex-col justify-center">
                   <p className={"text-lg text-[#666666] font-light"}>
                     MARKETCAP{" "}
                     <span className={"font-bold text-[#999999]"}>
-                      93.15 BTC
+                      {typeof src20.mcap === "number"
+                        ? src20.mcap.toFixed(2).toLocaleString()
+                        : Number(src20.mcap).toFixed(2).toLocaleString()}
                     </span>
                   </p>
                   <p className={"text-lg text-[#666666] font-light"}>
                     PRICE{" "}
                     <span className={"font-bold text-[#999999]"}>
-                      13.50 SATS
+                      {typeof src20.floor_unit_price === "number"
+                        ? src20.floor_unit_price.toFixed(10).toLocaleString()
+                        : Number(src20.floor_unit_price).toFixed(10)
+                          .toLocaleString()}
                     </span>
                   </p>
                 </div>
@@ -180,7 +189,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                 </div>
                 <div class="w-full flex justify-between pr-6">
                   <div>
-                    <p>Max:</p>
+                    <p>Supply:</p>
                     <p class="text-lg">
                       {typeof src20.max === "number"
                         ? src20.max.toLocaleString()
@@ -196,12 +205,6 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     </p>
                   </div>
                   <div>
-                    <p>Supply:</p>
-                    <p class="text-lg">
-                      {typeof src20.amt === "number"
-                        ? src20.amt.toLocaleString()
-                        : Number(src20.amt).toLocaleString()}
-                    </p>
                   </div>
                 </div>
               </div>

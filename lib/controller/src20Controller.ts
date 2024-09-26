@@ -9,6 +9,10 @@ import { StampService } from "$lib/services/stampService.ts";
 import { getBtcAddressInfo } from "utils/btc.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { convertToEmoji } from "utils/util.ts";
+import {
+  MarketListingSummary,
+  Src20MktService,
+} from "$lib/services/src20MktService.ts";
 
 export class Src20Controller {
   static async getTotalCountValidSrc20Tx(
@@ -347,5 +351,51 @@ export class Src20Controller {
     if (totalNum === 0) return "0.00";
     const percentage = (amountNum / totalNum) * 100;
     return percentage.toFixed(2);
+  }
+
+  static async fetchSrc20DetailsWithHolders(
+    req: Request,
+    params: SRC20TrxRequestParams,
+  ) {
+    try {
+      const [resultData, marketData] = await Promise.all([
+        this.handleSrc20TransactionsRequest(req, params),
+        Src20MktService.fetchMarketListingSummary(),
+      ]);
+
+      const marketDataMap = new Map<string, MarketListingSummary>(
+        marketData.map((item) => [item.tick, item]),
+      );
+
+      const src20sWithHolders = await Promise.all(
+        resultData.data.map(async (row: any) => {
+          const balanceParams: SRC20BalanceRequestParams = {
+            tick: row.tick,
+            includePagination: true,
+          };
+          const balanceResult = await this.handleSrc20BalanceRequest(
+            balanceParams,
+          );
+
+          const marketInfo = marketDataMap.get(row.tick) ||
+            { mcap: 0, floor_unit_price: 0 };
+
+          return {
+            ...row,
+            holders: balanceResult.total,
+            mcap: marketInfo.mcap,
+            floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)), // Convert to decimal
+          };
+        }),
+      );
+
+      return {
+        ...resultData,
+        data: src20sWithHolders,
+      };
+    } catch (error) {
+      console.error("Error fetching SRC20 details with holders:", error);
+      throw error;
+    }
   }
 }

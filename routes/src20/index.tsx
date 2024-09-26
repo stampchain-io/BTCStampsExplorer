@@ -25,7 +25,7 @@ export const handler: Handlers = {
         sort: sortBy,
       };
 
-      const resultData = await Src20Controller.handleSrc20TransactionsRequest(
+      const resultData = await Src20Controller.fetchSrc20DetailsWithHolders(
         req,
         params,
       );
@@ -51,6 +51,7 @@ export const handler: Handlers = {
     }
   },
 };
+
 export default function SRC20Page(props: any) {
   // console.log("SRC20Page received props:", props);
 
