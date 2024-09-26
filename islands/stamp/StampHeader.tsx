@@ -4,7 +4,7 @@ import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
+import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
 export const StampHeader = (
   { filterBy, sortBy, selectedTab, type }: {

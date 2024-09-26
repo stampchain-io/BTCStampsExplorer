@@ -1,4 +1,4 @@
-import { useToast } from "./toast.tsx";
+import { useToast } from "./ToastProvider.tsx";
 
 type ToastComponentProps = {
   message: string;

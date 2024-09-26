@@ -1,4 +1,4 @@
-import { StampCard } from "$components/stamp/StampCard.tsx";
+import { StampCard } from "./StampCard.tsx";
 import { StampRow } from "globals";
 
 export function StampContent({ stamps, isRecentSales = false }: {
