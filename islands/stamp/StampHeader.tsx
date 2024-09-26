@@ -20,10 +20,10 @@ export const StampHeader = (
   );
   const [currentSort, setCurrentSort] = useState<string>(sortBy);
 
-  const handleTabClick = (tabType) => {
+  const handleTabClick = (tabType: STAMP_TYPES) => {
     setTypeOption("stamp", tabType, true);
     if (tabType === "all" || tabType === "collection") {
-      window.location.href = "/collection"; // Redirect to /collection page
+      window.location.href = "/collection"; // Redirect to /collection page FIXME: may just want to make the collectinn page part of the tabs here
     }
   };
 

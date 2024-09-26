@@ -74,7 +74,7 @@ export default function SRC20Page(props: any) {
   if (!src20s || src20s.length === 0) {
     return <div>No SRC20 data available</div>;
   }
-
+  // FIXME : if this is on a minting tab then it needs to go to a SRC20MintTable which shows the mint status based upon handleSrc20MintProgressRequest or similar
   return (
     <div class="flex flex-col gap-8">
       <SRC20Header

@@ -9,6 +9,7 @@ interface ServerConfig {
   CSRF_SECRET_KEY?: string;
   MINTING_SERVICE_FEE_ENABLED: string;
   MINTING_SERVICE_FEE_FIXED_SATS: string;
+  OPENSTAMP_API_KEY: string;
   [key: string]: string | undefined;
 }
 
