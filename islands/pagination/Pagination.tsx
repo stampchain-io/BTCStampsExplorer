@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
+import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);

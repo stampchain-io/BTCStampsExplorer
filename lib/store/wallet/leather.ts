@@ -1,8 +1,7 @@
 import { signal } from "@preact/signals";
-import { Wallet } from "./wallet.d.ts";
 import { walletContext } from "./wallet.ts";
 import { getBtcBalance } from "utils/btc.ts";
-import { SignPSBTResult } from "$lib/types/src20.d.ts";
+import { SignPSBTResult, Wallet } from "$lib/types/index.d.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";

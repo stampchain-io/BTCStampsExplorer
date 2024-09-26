@@ -11,10 +11,15 @@ export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
 // | "recursive"; this is a filter not a type when passed to the db
 // see filterOptions
 export type STAMP_FILTER_TYPES = "vector" | "pixel" | "recursive";
-export type STAMP_SUFFIX_FILTERS = [
-  "gif" | "jpg" | "png" | "webp" | "bmp" | "jpeg",
-  ...("gif" | "jpg" | "png" | "webp" | "bmp" | "jpeg")[],
-];
+export type STAMP_SUFFIX_FILTERS =
+  | "gif"
+  | "jpg"
+  | "png"
+  | "webp"
+  | "bmp"
+  | "jpeg"
+  | "svg"
+  | "html";
 export type SRC20_TYPES =
   | "all"
   | "minting";

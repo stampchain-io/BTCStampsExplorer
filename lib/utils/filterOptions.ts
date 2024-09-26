@@ -1,7 +1,11 @@
-import { STAMP_FILTER_TYPES, SUBPROTOCOLS } from "globals";
+import {
+  STAMP_FILTER_TYPES,
+  STAMP_SUFFIX_FILTERS,
+  SUBPROTOCOLS,
+} from "globals";
 
 export const filterOptions: Record<STAMP_FILTER_TYPES, {
-  suffixFilters: string[];
+  suffixFilters: STAMP_SUFFIX_FILTERS[];
   ident: SUBPROTOCOLS[];
 }> = {
   "vector": {

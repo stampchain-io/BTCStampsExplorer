@@ -91,10 +91,18 @@ export function Footer() {
             >
               PRESS KIT
             </a>
-            <a href="#" className="hidden md:block hover:text-[#AA00FF]">
+            <a
+              href="/termsofservice"
+              f-partial="/termsofservice"
+              className="hidden md:block hover:text-[#AA00FF]"
+            >
               TERMS OF SERVICE
             </a>
-            <a href="#" className="block md:hidden hover:text-[#AA00FF]">
+            <a
+              href="/termsofservice"
+              f-partial="/termsofservice"
+              className="block md:hidden hover:text-[#AA00FF]"
+            >
               ToS
             </a>
           </div>

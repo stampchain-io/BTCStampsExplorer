@@ -12,7 +12,7 @@ import {
   IMintSRC20,
   IPrepareSRC20TX,
   ITransferSRC20,
-} from "$lib/types/src20.d.ts";
+} from "$lib/types/index.d.ts";
 
 interface SRC20Operation {
   op: string;

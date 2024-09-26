@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
+import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
 export const CollectionHeader = (
   { filterBy, sortBy, selectedTab }: {
