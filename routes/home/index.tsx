@@ -2,10 +2,10 @@ import { StampRow } from "globals";
 import { Handlers } from "$fresh/server.ts";
 
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
-import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
+// import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
-import { HomeStampChainSelected } from "$islands/home/HomeStampChainSelected.tsx";
+// import { HomeStampChainSelected } from "$islands/home/HomeStampChainSelected.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
 
 import { StampController } from "$lib/controller/stampController.ts";
@@ -46,14 +46,13 @@ export default function Home(props: HomePageProps) {
 
   return (
     <div class="relative flex flex-col gap-10 md:gap-24 text-white py-10 md:py-24">
-      <div class="background-gradient"></div>
       <HomeHeader />
+
       <HomeCarousel />
-      {
-        /* <div class="flex flex-col gap-10">
-        <HomeTable data={src20s} />
-      </div> */
-      }
+
+      {/* Leaving this out for initial release */}
+      {/* <HomeTable data={src20s} /> */}
+
       <HomeStampPreview
         stamps_art={stamps_art}
         stamps_posh={stamps_posh}
@@ -62,7 +61,10 @@ export default function Home(props: HomePageProps) {
         stamps_src20={stamps_src20}
         collectionData={collectionData}
       />
-      {/* <HomeStampChainSelected />  // Leaving this out for initial release - Add later */}
+
+      {/* Leaving this out for initial release - Add later */}
+      {/* <HomeStampChainSelected /> */}
+
       <PartnersModule />
     </div>
   );

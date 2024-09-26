@@ -24,36 +24,36 @@ export const WALLET_PROVIDERS: Record<
   unisat: {
     name: "Unisat",
     logo: {
-      full: "/img/unisat/logo_unisat_full_white.png",
-      small: "/img/unisat/logo_unisat.png",
+      full: "/img/wallet/unisat/logo_unisat_full_white.png",
+      small: "/img/wallet/unisat/logo_unisat.png",
     },
   },
   leather: {
     name: "Leather",
     logo: {
-      full: "/img/leather/logo_leather.svg",
-      small: "/img/leather/logo_leather.svg",
+      full: "/img/wallet/leather/logo_leather.svg",
+      small: "/img/wallet/leather/logo_leather.svg",
     },
   },
   okx: {
     name: "OKX",
     logo: {
-      full: "/img/okx/logo_okx.svg",
-      small: "/img/okx/logo_okx.svg",
+      full: "/img/wallet/okx/logo_okx.svg",
+      small: "/img/wallet/okx/logo_okx.svg",
     },
   },
   tapwallet: {
     name: "TapWallet",
     logo: {
-      small: "/img/tapwallet/logo_tapwallet.png",
-      full: "/img/tapwallet/logo_tapwallet.png",
+      small: "/img/wallet/tapwallet/logo_tapwallet.png",
+      full: "/img/wallet/tapwallet/logo_tapwallet.png",
     },
   },
   phantom: {
     name: "Phantom",
     logo: {
-      full: "/img/phantom/logo_phantom.svg",
-      small: "/img/phantom/logo_phantom.svg",
+      full: "/img/wallet/phantom/logo_phantom.svg",
+      small: "/img/wallet/phantom/logo_phantom.svg",
     },
   },
 };

@@ -1,6 +1,6 @@
 import { WALLET_PROVIDERS, WalletProviderKey } from "utils/constants.ts";
 import { unisatProvider } from "store/wallet/unisat.ts";
-import { useToast } from "$islands/Toast/toast.tsx";
+import { useToast } from "$islands/Toast/ToastProvider.tsx";
 import { leatherProvider } from "$lib/store/wallet/leather.ts";
 import { okxProvider } from "$lib/store/wallet/okx.ts";
 import { tapWalletProvider } from "$lib/store/wallet/tapwallet.ts";

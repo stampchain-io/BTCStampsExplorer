@@ -4,7 +4,7 @@ import { SRC20_FILTER_TYPES, SRC20_TYPES } from "globals";
 
 import { SRC20Navigator } from "$islands/src20/SRC20Navigator.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
+import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
 export const SRC20Header = (
   { filterBy, sortBy, selectedTab, type }: {

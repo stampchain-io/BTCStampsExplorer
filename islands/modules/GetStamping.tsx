@@ -15,7 +15,7 @@ export const GetStampingModule = () => {
           options.<br />
           <br />
           Support for png/jpg/gif low-fi pixel art and hi-res svg/html vector
-          art - up to 65kB.
+          art - up to 64kB.
         </p>
       </div>
 

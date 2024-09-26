@@ -145,9 +145,51 @@ export default function FAQ() {
                 To start creating, sending, and storing Bitcoin Stamps, you'll
                 need a compatible wallet. Some options include:
                 <ul className="list-disc list-inside mt-2">
-                  <li>Unisat</li>
-                  <li>Xverse</li>
-                  <li>Leather</li>
+                  <li>
+                    <a
+                      href="https://unisat.io/download"
+                      target="_blank"
+                      className="underline"
+                    >
+                      Unisat
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://leather.io/install-extension"
+                      target="_blank"
+                      className="underline"
+                    >
+                      Leather
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://www.okx.com/web3"
+                      target="_blank"
+                      className="underline"
+                    >
+                      OKX
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://tapwallet.io/"
+                      target="_blank"
+                      className="underline"
+                    >
+                      TapWallet
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://phantom.app/download"
+                      target="_blank"
+                      className="underline"
+                    >
+                      Phantom
+                    </a>
+                  </li>
                 </ul>
               </p>
             </Accordion>

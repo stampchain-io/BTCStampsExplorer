@@ -77,12 +77,10 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
-import * as $Footer from "./islands/Footer.tsx";
-import * as $Header from "./islands/Header.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
-import * as $Navigator_navigator from "./islands/Navigator/navigator.tsx";
+import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
-import * as $Toast_toast from "./islands/Toast/toast.tsx";
+import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
 import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
@@ -109,6 +107,8 @@ import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewD
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $hooks_useSRC20Form from "./islands/hooks/useSRC20Form.ts";
+import * as $layout_Footer from "./islands/layout/Footer.tsx";
+import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
 import * as $modules_FAQ from "./islands/modules/FAQ.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
@@ -120,6 +120,7 @@ import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Navigator from "./islands/src20/SRC20Navigator.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
+import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
@@ -238,12 +239,10 @@ const manifest = {
   islands: {
     "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
-    "./islands/Footer.tsx": $Footer,
-    "./islands/Header.tsx": $Header,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
-    "./islands/Navigator/navigator.tsx": $Navigator_navigator,
+    "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
-    "./islands/Toast/toast.tsx": $Toast_toast,
+    "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
     "./islands/Wallet/ConnectedModal.tsx": $Wallet_ConnectedModal,
     "./islands/Wallet/ConnectorsModal.tsx": $Wallet_ConnectorsModal,
@@ -277,6 +276,8 @@ const manifest = {
     "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/hooks/useSRC20Form.ts": $hooks_useSRC20Form,
+    "./islands/layout/Footer.tsx": $layout_Footer,
+    "./islands/layout/Header.tsx": $layout_Header,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,
     "./islands/modules/FAQ.tsx": $modules_FAQ,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
@@ -288,6 +289,7 @@ const manifest = {
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Navigator.tsx": $src20_SRC20Navigator,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
+    "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,

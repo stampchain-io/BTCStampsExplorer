@@ -11,6 +11,8 @@ export default {
     extend: {
       fontFamily: {
         "work-sans": ['"Work Sans"', "sans-serif"],
+        "courier-prime": ['"Courier Prime"', "sans-serif"],
+        "micro-5": ['"Micro 5"', "sans-serif"],
       },
       colors: {
         "gradient-start": "#7200B4",
