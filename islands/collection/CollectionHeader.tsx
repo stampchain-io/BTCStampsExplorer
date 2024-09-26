@@ -22,7 +22,7 @@ export const CollectionHeader = (
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
           onClick={() => setTypeOption("collection", "all")}
         >
-          All
+          ALL
         </p>
         <p
           class={selectedTab === "stamps"
@@ -38,7 +38,7 @@ export const CollectionHeader = (
             : "text-[19px] text-[#B9B9B9] cursor-pointer pb-4"}
           onClick={() => setTypeOption("collection", "posh")}
         >
-          Posh
+          POSH
         </p>
       </div>
       <div class="flex gap-3 md:gap-6 justify-between">
