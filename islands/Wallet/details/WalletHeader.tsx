@@ -1,5 +1,5 @@
 import { useRef, useState } from "preact/hooks";
-import { useNavigator } from "$islands/Navigator/navigator.tsx";
+import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 import { WalletModal } from "../WalletModal.tsx";
 
 export const WalletHeader = ({
