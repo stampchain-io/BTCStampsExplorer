@@ -10,7 +10,7 @@ export const StampHeader = (
   { filterBy, sortBy, selectedTab, type }: {
     filterBy: STAMP_FILTER_TYPES[];
     sortBy: string;
-    selectedTab: STAMP_TYPES;
+    selectedTab: string;
     type: STAMP_TYPES;
   },
 ) => {
@@ -20,8 +20,11 @@ export const StampHeader = (
   );
   const [currentSort, setCurrentSort] = useState<string>(sortBy);
 
-  const handleTabClick = (tabType: STAMP_TYPES) => {
+  const handleTabClick = (tabType) => {
     setTypeOption("stamp", tabType, true);
+    if (tabType === "all" || tabType === "collection") {
+      window.location.href = "/collection"; // Redirect to /collection page
+    }
   };
 
   useEffect(() => {
@@ -67,37 +70,17 @@ export const StampHeader = (
           }`}
           onClick={() => handleTabClick("all")}
         >
-          All
+          ALL
         </p>
         <p
           class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
-            selectedTab === "posh"
+            selectedTab === "collection"
               ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
               : "text-[#8800CC] font-light"
           }`}
-          onClick={() => handleTabClick("posh")}
+          onClick={() => handleTabClick("collection")}
         >
-          Posh
-        </p>
-        <p
-          class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
-            selectedTab === "classic"
-              ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
-              : "text-[#8800CC] font-light"
-          }`}
-          onClick={() => handleTabClick("classic")}
-        >
-          Classic
-        </p>
-        <p
-          class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
-            selectedTab === "recursive"
-              ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
-              : "text-[#8800CC] font-light"
-          }`}
-          onClick={() => handleTabClick("recursive")}
-        >
-          Recursive
+          COLLECTIONS
         </p>
       </div>
       <div class="flex gap-3 pb-1 md:pb-3 justify-between">
