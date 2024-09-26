@@ -17,7 +17,7 @@ export const SRC20Header = (
   const { setTypeOption } = useNavigator();
 
   const [currentFilters, setCurrentFilters] = useState<SRC20_FILTER_TYPES[]>(
-    filterBy,
+    Array.isArray(filterBy) ? filterBy : [filterBy],
   );
   const [currentSort, setCurrentSort] = useState<string>(sortBy);
 
@@ -57,7 +57,7 @@ export const SRC20Header = (
                 ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
                 : "text-[#8800CC] font-light"
             }`}
-            onClick={() => setTypeOption("src20", "minting", true)}
+            onClick={() => setTypeOption("src20", "mint", true)}
           >
             Minting
           </p>
