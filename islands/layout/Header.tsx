@@ -141,8 +141,8 @@ export function Header() {
           </a>
           <div className="hidden group-hover:flex flex-col absolute top-[30px] left-0 z-[100]">
             <a
-              href="/src20?type=all"
-              f-partial="/src20?type=all"
+              href="/src20"
+              f-partial="/src20"
               onClick={() => {
                 toggleMenu();
                 setCurrentPath("src20");
@@ -271,8 +271,8 @@ export function Header() {
             </a>
             <div className="flex flex-col z-[100] text-center">
               <a
-                href="/src20?type=all"
-                f-partial="/src20?type=all"
+                href="/src20"
+                f-partial="/src20"
                 onClick={() => {
                   toggleMenu();
                   setCurrentPath("src20");
