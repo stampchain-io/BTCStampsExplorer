@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { FeeEstimation } from "../FeeEstimation.tsx";
 import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
 import axiod from "axiod";
 

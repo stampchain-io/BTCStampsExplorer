@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <footer className="px-6 md:px-12 py-6 md:py-[72px] text-[#8800CC] font-bold max-w-[1440px] w-full mx-auto flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg">
+    <footer className="px-3 md:px-6 xl:px-12 py-6 md:py-[72px] text-[#8800CC] font-bold max-w-[1440px] w-full mx-auto flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg">
       <div className="w-full flex flex-col gap-1 items-center md:items-start">
         <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#7700BB] to-[#AA00FF] text-4xl md:text-7xl italic">
           STAMPCHAIN
