@@ -1,4 +1,4 @@
-import { OlgaContent } from "$islands/stamping/OlgaContent.tsx";
+import { OlgaContent } from "$islands/src20/olga/OlgaContent.tsx";
 
 export function StampingStampPage() {
   return (

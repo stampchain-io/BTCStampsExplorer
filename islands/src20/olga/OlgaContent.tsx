@@ -3,7 +3,7 @@ import { walletContext } from "$lib/store/wallet/wallet.ts";
 import { getWalletProvider } from "$lib/store/wallet/walletHelper.ts";
 import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { FeeEstimation } from "../FeeEstimation.tsx";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
 import { fetchBTCPrice } from "$lib/utils/btc.ts";
 

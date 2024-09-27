@@ -15,7 +15,7 @@ export default function TermsOfService() {
           <p className="font-extralight text-2xl md:text-5xl">
             TO OUR LEGAL TERMS
           </p>
-          <p className="font-extralight">
+          <p className="font-extralight text-xs md:text-base">
             LAST UPDATED <span className="font-medium">SEPTEMBER 11 2024</span>
           </p>
         </div>
@@ -81,7 +81,7 @@ export default function TermsOfService() {
         </p>
       </section>
 
-      <div className="flex flex-col gap-5 text-lg font-courier-prime">
+      <div className="flex flex-col gap-5 text-xs md:text-lg font-courier-prime">
         <section>
           1. OUR SERVICES<br />
           The information provided when using the Services is not intended for
