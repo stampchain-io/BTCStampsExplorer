@@ -22,7 +22,9 @@ export type STAMP_SUFFIX_FILTERS =
   | "html";
 export type SRC20_TYPES =
   | "all"
-  | "minting";
+  | "deploy"
+  | "mint"
+  | "transfer";
 
 export type SRC20_FILTER_TYPES = ""; // TBD
 
