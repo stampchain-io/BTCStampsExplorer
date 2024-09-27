@@ -115,11 +115,19 @@ import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
+import * as $src20_FeeEstimation from "./islands/src20/FeeEstimation.tsx";
 import * as $src20_SRC20DeployTable from "./islands/src20/SRC20DeployTable.tsx";
 import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Navigator from "./islands/src20/SRC20Navigator.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
+import * as $src20_deploy_DeployContent from "./islands/src20/deploy/DeployContent.tsx";
+import * as $src20_deploy_RecentDeploy from "./islands/src20/deploy/RecentDeploy.tsx";
+import * as $src20_mint_MintContent from "./islands/src20/mint/MintContent.tsx";
+import * as $src20_mint_PopularMinting from "./islands/src20/mint/PopularMinting.tsx";
+import * as $src20_olga_OlgaContent from "./islands/src20/olga/OlgaContent.tsx";
+import * as $src20_transfer_LatestTransfer from "./islands/src20/transfer/LatestTransfer.tsx";
+import * as $src20_transfer_TransferContent from "./islands/src20/transfer/TransferContent.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
@@ -132,13 +140,6 @@ import * as $stamp_details_StampImageFullScreen from "./islands/stamp/details/St
 import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
 import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
-import * as $stamping_DeployContent from "./islands/stamping/DeployContent.tsx";
-import * as $stamping_FeeEstimation from "./islands/stamping/FeeEstimation.tsx";
-import * as $stamping_MintContent from "./islands/stamping/MintContent.tsx";
-import * as $stamping_OlgaContent from "./islands/stamping/OlgaContent.tsx";
-import * as $stamping_SRC20DeployOlgaContent from "./islands/stamping/SRC20DeployOlgaContent.tsx";
-import * as $stamping_StampingSrc20Header from "./islands/stamping/StampingSrc20Header.tsx";
-import * as $stamping_TransferContent from "./islands/stamping/TransferContent.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import * as $upload_UploadTickHeader from "./islands/upload/UploadTickHeader.tsx";
@@ -284,11 +285,21 @@ const manifest = {
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/pagination/Pagination.tsx": $pagination_Pagination,
+    "./islands/src20/FeeEstimation.tsx": $src20_FeeEstimation,
     "./islands/src20/SRC20DeployTable.tsx": $src20_SRC20DeployTable,
     "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Navigator.tsx": $src20_SRC20Navigator,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
+    "./islands/src20/deploy/DeployContent.tsx": $src20_deploy_DeployContent,
+    "./islands/src20/deploy/RecentDeploy.tsx": $src20_deploy_RecentDeploy,
+    "./islands/src20/mint/MintContent.tsx": $src20_mint_MintContent,
+    "./islands/src20/mint/PopularMinting.tsx": $src20_mint_PopularMinting,
+    "./islands/src20/olga/OlgaContent.tsx": $src20_olga_OlgaContent,
+    "./islands/src20/transfer/LatestTransfer.tsx":
+      $src20_transfer_LatestTransfer,
+    "./islands/src20/transfer/TransferContent.tsx":
+      $src20_transfer_TransferContent,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
@@ -304,14 +315,6 @@ const manifest = {
       $stamp_details_StampRelatedInfo,
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
-    "./islands/stamping/DeployContent.tsx": $stamping_DeployContent,
-    "./islands/stamping/FeeEstimation.tsx": $stamping_FeeEstimation,
-    "./islands/stamping/MintContent.tsx": $stamping_MintContent,
-    "./islands/stamping/OlgaContent.tsx": $stamping_OlgaContent,
-    "./islands/stamping/SRC20DeployOlgaContent.tsx":
-      $stamping_SRC20DeployOlgaContent,
-    "./islands/stamping/StampingSrc20Header.tsx": $stamping_StampingSrc20Header,
-    "./islands/stamping/TransferContent.tsx": $stamping_TransferContent,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
     "./islands/upload/UploadTickHeader.tsx": $upload_UploadTickHeader,

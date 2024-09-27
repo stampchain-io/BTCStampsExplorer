@@ -54,7 +54,7 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="px-6 xl:px-12 my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex items-center justify-between">
+    <header className="px-3 md:px-6 xl:px-12 my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex items-center justify-between">
       <div className="flex justify-between items-center">
         <a
           href="/home"
@@ -88,11 +88,11 @@ export function Header() {
 
       {/* Desktop Navbar */}
       <div className="hidden md:flex justify-between items-center gap-6 xl:gap-12 font-black text-[#8800CC]">
-        <div className="group relative">
-          <a className="hover:text-[#AA00FF] text-lg xl:text-xl cursor-pointer text-center">
+        <div className="group relative cursor-pointer">
+          <a className="hover:text-[#AA00FF] text-lg xl:text-xl text-center">
             ART STAMPS
           </a>
-          <div className="hidden group-hover:flex flex-col absolute top-[30px] left-0 z-[100]">
+          <div className="hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full">
             <a
               href="/stamp?type=classic"
               f-partial="/stamp?type=classic"
@@ -135,11 +135,11 @@ export function Header() {
           </div>
         </div>
 
-        <div className="group relative">
-          <a className="hover:text-[#AA00FF] text-lg xl:text-xl cursor-pointer text-center">
+        <div className="group relative cursor-pointer">
+          <a className="hover:text-[#AA00FF] text-lg xl:text-xl text-center">
             SRC-20 TOKENS
           </a>
-          <div className="hidden group-hover:flex flex-col absolute top-[30px] left-0 z-[100]">
+          <div className="hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full">
             <a
               href="/src20"
               f-partial="/src20"
@@ -222,7 +222,7 @@ export function Header() {
             <a className="hover:text-[#AA00FF] cursor-pointer text-2xl text-[#660099]">
               ART STAMPS
             </a>
-            <div className="flex flex-col z-[100] text-center">
+            <div className="flex flex-col text-center">
               <a
                 href="/stamp?type=all"
                 f-partial="/stamp?type=classic"
@@ -269,7 +269,7 @@ export function Header() {
             <a className="hover:text-[#AA00FF] cursor-pointer text-2xl text-[#660099]">
               SRC-20 TOKENS
             </a>
-            <div className="flex flex-col z-[100] text-center">
+            <div className="flex flex-col text-center">
               <a
                 href="/src20"
                 f-partial="/src20"
