@@ -1,11 +1,11 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 
-import { MintContent } from "$islands/src20/mint/MintContent.tsx";
-import PopularMinting from "$islands/src20/mint/PopularMinting.tsx";
-import { DeployContent } from "$islands/src20/deploy/DeployContent.tsx";
-import RecentDeploy from "$islands/src20/deploy/RecentDeploy.tsx";
-import { TransferContent } from "$islands/src20/transfer/TransferContent.tsx";
-import LatestTransfer from "$islands/src20/transfer/LatestTransfer.tsx";
+import { MintContent } from "$islands/stamping/src20/mint/MintContent.tsx";
+import PopularMinting from "$islands/stamping/src20/mint/PopularMinting.tsx";
+import { DeployContent } from "$islands/stamping/src20/deploy/DeployContent.tsx";
+import RecentDeploy from "$islands/stamping/src20/deploy/RecentDeploy.tsx";
+import { TransferContent } from "$islands/stamping/src20/transfer/TransferContent.tsx";
+import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx";
 
 import { FAQModule } from "$islands/modules/FAQ.tsx";
 
@@ -33,7 +33,7 @@ export default function StampingSrc20Page(
     <div className="flex flex-col gap-16">
       {/* <StampingSrc20Header selectedTab={selectedTab} /> */}
 
-      <div className="self-center max-w-[680px] mx-auto">
+      <div className="self-center w-[680px] mx-auto">
         {selectedTab === "mint" && <MintContent trxType={trxType} />}
         {selectedTab === "deploy" && <DeployContent trxType={trxType} />}
         {selectedTab === "transfer" && <TransferContent trxType={trxType} />}

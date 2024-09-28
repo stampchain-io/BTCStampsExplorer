@@ -159,9 +159,9 @@ export function FeeEstimation({
       </div>
       <p className="flex font-bold">
         <span className="text-[#666666] font-light">Estimated:{" "}</span>
-        {coinType === "BTC" ? total.toFixed(6) : (total * BTCPrice).toFixed(2)}
-        {" "}
-        <span className="coin"></span>
+        {coinType === "BTC"
+          ? (total.toFixed(6) + " " + coinType)
+          : ((total * BTCPrice).toFixed(2) + " " + coinType)}
       </p>
       <p className="flex items-center">
         Details
@@ -241,28 +241,28 @@ export function FeeEstimation({
           <p className="flex gap-1 items-center text-xs font-medium">
             <span className="font-light text-[#666666]">Miner Fee:</span>{" "}
             {coinType === "BTC"
-              ? txfee.toFixed(8)
-              : (txfee * BTCPrice).toFixed(2)} <span className="coin" />
+              ? (txfee.toFixed(8) + " " + coinType)
+              : ((txfee * BTCPrice).toFixed(2) + " " + coinType)}
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
             <span className="font-light text-[#666666]">Minting Fee:</span>{" "}
             {coinType === "BTC"
-              ? mintfee.toFixed(6)
-              : (mintfee * BTCPrice).toFixed(2)} <span className="coin" />
+              ? (mintfee.toFixed(6) + " " + coinType)
+              : ((mintfee * BTCPrice).toFixed(2) + " " + coinType)}
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
             <span className="font-light text-[#666666]">Multisig Dust</span>
             {" "}
             {coinType === "BTC"
-              ? dust.toFixed(6)
-              : (dust * BTCPrice).toFixed(2)} <span className="coin" />
+              ? (dust.toFixed(6) + " " + coinType)
+              : ((dust * BTCPrice).toFixed(2) + " " + coinType)}
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
             <span className="font-light text-[#666666]">Total Estimated</span>
             {" "}
             {coinType === "BTC"
-              ? total.toFixed(8)
-              : (total * BTCPrice).toFixed(2)} <span className="coin" />
+              ? (total.toFixed(8) + " " + coinType)
+              : ((total * BTCPrice).toFixed(2) + " " + coinType)}
           </p>
           <button onClick={onRefresh}>Refresh Fees</button>
         </div>
