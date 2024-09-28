@@ -1,5 +1,5 @@
-import { useState } from "preact/hooks";
-import { FeeEstimation } from "../FeeEstimation.tsx";
+import { useEffect, useState } from "preact/hooks";
+import { FeeEstimation } from "../../FeeEstimation.tsx";
 import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
 import axiod from "axiod";
 
@@ -105,21 +105,31 @@ export function DeployContent(
 
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const handleShowAdvancedOptions = () => {
-    const switchToggle = document.querySelector("#switch-toggle");
+    const switchToggle = document.querySelector("#switch-toggle-advanced");
     if (!switchToggle) return;
     if (showAdvancedOptions === true) {
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
-        switchToggle.innerHTML = btcIcon;
+        switchToggle.innerHTML =
+          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
       }, 150);
     } else {
       switchToggle.classList.remove("translate-x-full");
       setTimeout(() => {
-        switchToggle.innerHTML = usdIcon;
+        switchToggle.innerHTML =
+          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
       }, 150);
     }
     setShowAdvancedOptions(!showAdvancedOptions);
   };
+
+  useEffect(() => {
+    const coins = document.getElementsByClassName("coin-1");
+    for (let i = 0; i < coins.length; i++) {
+      coins[i].innerHTML =
+        `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+    }
+  }, []);
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
@@ -176,19 +186,19 @@ export function DeployContent(
             <div class="w-full flex gap-6">
               <input
                 type="text"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Token ticker name"
                 value={formState.token}
                 onChange={(e) => handleInputChange(e, "token")}
                 maxLength={5}
               />
               <button
-                class="!w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+                class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
                 onClick={handleShowAdvancedOptions}
               >
                 <div
-                  id="switch-toggle"
-                  class="coin w-6 h-6 relative rounded-full transition duration-500 transform text-white translate-x-full"
+                  id="switch-toggle-advanced"
+                  class="coin-1 w-6 h-6 relative rounded-full transition duration-500 transform text-white translate-x-full flex justify-center items-center"
                 >
                 </div>
               </button>
@@ -202,7 +212,7 @@ export function DeployContent(
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Limit pr. mint"
                 value={formState.lim}
                 onChange={(e) => handleInputChange(e, "lim")}
@@ -217,7 +227,7 @@ export function DeployContent(
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Supply"
                 value={formState.max}
                 onChange={(e) => handleInputChange(e, "max")}
@@ -232,7 +242,7 @@ export function DeployContent(
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Decimal amount"
                 value={formState.dec}
                 onChange={(e) => handleInputChange(e, "dec")}
@@ -242,10 +252,14 @@ export function DeployContent(
         </div>
 
         {showAdvancedOptions && (
-          <>
+          <div
+            className={`flex flex-col gap-6 transition-all duration-300 ${
+              showAdvancedOptions ? "h-full" : "h-0"
+            }`}
+          >
             <textarea
               type="text"
-              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
               placeholder="Description"
               rows={5}
               // value={formState.description}
@@ -254,14 +268,14 @@ export function DeployContent(
             <div className="w-full flex gap-6">
               <input
                 type="text"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="X"
                 value={formState.x}
                 onChange={(e) => handleInputChange(e, "x")}
               />
               <input
                 type="text"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Website"
                 value={formState.web}
                 onChange={(e) => handleInputChange(e, "web")}
@@ -270,20 +284,20 @@ export function DeployContent(
             <div className="w-full flex gap-6">
               <input
                 type="email"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Telegram"
                 // value={formState.telegram}
                 // onChange={(e) => handleInputChange(e, "telegram")}
               />
               <input
                 type="email"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Email"
                 value={formState.email}
                 onChange={(e) => handleInputChange(e, "email")}
               />
             </div>
-          </>
+          </div>
         )}
       </div>
 
