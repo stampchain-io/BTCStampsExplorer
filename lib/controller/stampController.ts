@@ -260,10 +260,11 @@ export class StampController {
       }
 
       // Prepare concurrent calls for XCP assets and dispensers
-      const cpids = stampResult.stamps.map((stamp: StampRow) => stamp.cpid);
-      const xcpAssetsPromise = XcpManager.getXcpAssetsByCpids(cpids);
+      // const cpids = stampResult.stamps.map((stamp: StampRow) => stamp.cpid);
+      // const xcpAssetsPromise = XcpManager.getXcpAssetsByCpids(cpids); // FIXME: need a better way to handle these excessive API calls
 
       const dispenserPromises = stampResult.stamps.map((stamp: StampRow) =>
+        // FIXME: need a better way to handle these excessive API calls
         (stamp.ident === "STAMP" || stamp.ident === "SRC-721")
           ? DispenserManager.getDispensersByCpid(stamp.cpid)
           : Promise.resolve(null)
@@ -271,7 +272,7 @@ export class StampController {
 
       // Wait for all promises to resolve
       const [xcpAssets, ...dispensers] = await Promise.all([
-        xcpAssetsPromise,
+        // xcpAssetsPromise,
         ...dispenserPromises,
       ]);
 

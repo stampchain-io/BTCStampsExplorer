@@ -60,23 +60,18 @@ export class CollectionService {
 
     const collections: Collection[] = await Promise.all(
       collectionsResult.rows.map(async (row: any) => {
-        const stampResult = await StampController.getStamps({
-          limit: 100,
+        const stampResult = await StampController.getStamps({ // FIZME: this doesn't appear to be fetching the stamp impage properly
+          limit: 1,
           collectionId: row.collection_id,
-          noPagination: true,
+          // noPagination: true,
           type: "all",
-          sortBy: "DESC",
+          sortBy: "ASC",
         });
 
-        let lowestFloorPrice = Infinity;
+        // let lowestFloorPrice = Infinity;
         let firstStampImage = null;
 
         for (const stamp of stampResult.data) {
-          if (
-            typeof stamp.floorPrice === "number" && !isNaN(stamp.floorPrice)
-          ) {
-            lowestFloorPrice = Math.min(lowestFloorPrice, stamp.floorPrice);
-          }
           if (!firstStampImage && stamp.stamp_url) {
             firstStampImage = stamp.stamp_url;
           }
@@ -87,7 +82,6 @@ export class CollectionService {
           collection_name: row.collection_name,
           creators: row.creators ? row.creators.split(",") : [],
           first_stamp_image: firstStampImage,
-          floorPrice: lowestFloorPrice !== Infinity ? lowestFloorPrice : null,
         };
       }),
     );
