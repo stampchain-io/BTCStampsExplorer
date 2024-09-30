@@ -107,7 +107,7 @@ export function DeployContent(
   const handleShowAdvancedOptions = () => {
     const switchToggle = document.querySelector("#switch-toggle-advanced");
     if (!switchToggle) return;
-    if (showAdvancedOptions === true) {
+    if (showAdvancedOptions !== true) {
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
@@ -124,9 +124,9 @@ export function DeployContent(
   };
 
   useEffect(() => {
-    const coins = document.getElementsByClassName("coin-1");
-    for (let i = 0; i < coins.length; i++) {
-      coins[i].innerHTML =
+    const advancedToggle = document.getElementById("switch-toggle-advanced");
+    if (advancedToggle) {
+      advancedToggle.innerHTML =
         `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
     }
   }, []);
@@ -139,47 +139,45 @@ export function DeployContent(
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6 w-full flex flex-col gap-6">
         <div className="flex flex-col md:flex-row gap-6">
-          <div class="flex flex-col md:flex-row gap-8">
-            <div
-              id="image-preview"
-              class="relative max-w-sm border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer w-[324px] h-[324px] content-center bg-[#2B0E49]"
-            >
-              <input
-                id="upload"
-                type="file"
-                class="hidden"
-                accept="image/*"
-                onChange={handleFileChange}
+          <div
+            id="image-preview"
+            class="relative max-w-sm border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer min-w-[324px] h-[324px] content-center bg-[#2B0E49]"
+          >
+            <input
+              id="upload"
+              type="file"
+              class="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            {formState.file !== null && (
+              <img
+                width={324}
+                style={{
+                  height: "100%",
+                  objectFit: "contain",
+                  imageRendering: "pixelated",
+                  backgroundColor: "rgb(0,0,0)",
+                  borderRadius: "6px",
+                }}
+                src={URL.createObjectURL(formState.file)}
               />
-              {formState.file !== null && (
+            )}
+            {formState.file === null && (
+              <label
+                for="upload"
+                class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
+              >
                 <img
-                  width={324}
-                  style={{
-                    height: "100%",
-                    objectFit: "contain",
-                    imageRendering: "pixelated",
-                    backgroundColor: "rgb(0,0,0)",
-                    borderRadius: "6px",
-                  }}
-                  src={URL.createObjectURL(formState.file)}
+                  src="/img/mint/icon-image-upload.png"
+                  class="w-20 h-20"
+                  alt=""
                 />
-              )}
-              {formState.file === null && (
-                <label
-                  for="upload"
-                  class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
-                >
-                  <img
-                    src="/img/mint/icon-image-upload.png"
-                    class="w-20 h-20"
-                    alt=""
-                  />
-                  <h5 class="text-[#F5F5F5] text-2xl font-semibold">
-                    Upload Image
-                  </h5>
-                </label>
-              )}
-            </div>
+                <h5 class="text-[#F5F5F5] text-2xl font-semibold">
+                  Upload Image
+                </h5>
+              </label>
+            )}
           </div>
 
           <div className="flex flex-col gap-6 w-full">
@@ -198,7 +196,7 @@ export function DeployContent(
               >
                 <div
                   id="switch-toggle-advanced"
-                  class="coin-1 w-6 h-6 relative rounded-full transition duration-500 transform text-white translate-x-full flex justify-center items-center"
+                  class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center"
                 >
                 </div>
               </button>
@@ -265,7 +263,7 @@ export function DeployContent(
               // value={formState.description}
               // onChange={(e) => handleInputChange(e, "description")}
             />
-            <div className="w-full flex gap-6">
+            <div className="w-full flex flex-col md:flex-row gap-6">
               <input
                 type="text"
                 class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
@@ -281,7 +279,7 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "web")}
               />
             </div>
-            <div className="w-full flex gap-6">
+            <div className="w-full flex flex-col md:flex-row gap-6">
               <input
                 type="email"
                 class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"

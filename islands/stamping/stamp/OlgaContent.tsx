@@ -109,6 +109,34 @@ export function OlgaContent() {
     else setCoinType("BTC");
   };
 
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const handleShowAdvancedOptions = () => {
+    const switchToggle = document.querySelector("#switch-toggle-advanced");
+    if (!switchToggle) return;
+    if (showAdvancedOptions !== true) {
+      switchToggle.classList.add("translate-x-full");
+      setTimeout(() => {
+        switchToggle.innerHTML =
+          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+      }, 150);
+    } else {
+      switchToggle.classList.remove("translate-x-full");
+      setTimeout(() => {
+        switchToggle.innerHTML =
+          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+      }, 150);
+    }
+    setShowAdvancedOptions(!showAdvancedOptions);
+  };
+
+  useEffect(() => {
+    const advancedToggle = document.getElementById("switch-toggle-advanced");
+    if (advancedToggle) {
+      advancedToggle.innerHTML =
+        `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+    }
+  }, []);
+
   const toBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -288,184 +316,158 @@ export function OlgaContent() {
         STAMP
       </p>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full flex flex-col md:flex-row gap-8">
-        <div className="flex gap-8">
-          <div
-            id="image-preview"
-            class="relative rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]"
-          >
-            <input
-              id="upload"
-              type="file"
-              class="hidden"
-              accept="image/*"
-              onChange={handleImage}
-            />
-            {file !== null && (
-              <img
-                width={120}
-                style={{
-                  height: "100%",
-                  objectFit: "contain",
-                  imageRendering: "pixelated",
-                  backgroundColor: "rgb(0,0,0)",
-                  borderRadius: "6px",
-                }}
-                src={URL.createObjectURL(file)}
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="flex gap-8">
+            <div
+              id="image-preview"
+              class="relative rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]"
+            >
+              <input
+                id="upload"
+                type="file"
+                class="hidden"
+                accept="image/*"
+                onChange={handleImage}
               />
-            )}
-            {file === null && (
-              <label
-                for="upload"
-                class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
-              >
+              {file !== null && (
                 <img
-                  src="/img/mint/icon-image-upload.png"
-                  class="w-10 h-10"
-                  alt=""
+                  width={120}
+                  style={{
+                    height: "100%",
+                    objectFit: "contain",
+                    imageRendering: "pixelated",
+                    backgroundColor: "rgb(0,0,0)",
+                    borderRadius: "6px",
+                  }}
+                  src={URL.createObjectURL(file)}
                 />
-                <h5 class="text-[#F5F5F5] text-sm font-semibold">
-                  Upload Image
-                </h5>
-              </label>
-            )}
-          </div>
-
-          <div class="p-6 mb-4 rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]">
-            {file !== null && (
-              <img
-                width={120}
-                style={{
-                  height: "100%",
-                  objectFit: "contain",
-                  imageRendering: "pixelated",
-                  backgroundColor: "rgb(0,0,0)",
-                }}
-                src={URL.createObjectURL(file)}
-              />
-            )}
-            {file === null && (
-              <h5 class="cursor-pointer text-sm font-semibold text-[#F5F5F5]">
-                Preview
-              </h5>
-            )}
-          </div>
-
-          {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
-        </div>
-
-        <div class="w-full">
-          <p class="text-lg font-semibold text-[#F5F5F5] mb-3">
-            Editions
-          </p>
-          <div class="flex gap-[18px] w-full mb-3">
-            <input
-              type="text"
-              value={issuance}
-              onInput={handleIssuanceChange}
-              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md"
-            />
-            {
-              /* <div
-              class="w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"
-              onClick={() =>
-                setIssuance((
-                  prev,
-                ) => (parseInt(prev) > 1
-                  ? (parseInt(prev) - 1).toString()
-                  : "1")
-                )}
-            >
-              <svg
-                width="32"
-                height="4"
-                viewBox="0 0 32 4"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect width="32" height="4" fill="#D9D9D9" />
-              </svg>
-            </div> */
-            }
-            {
-              /* <div
-              class="w-[60px] flex items-center justify-center p-[14px] cursor-pointer bg-[#6E6E6E]"
-              onClick={() =>
-                setIssuance((prev) => (parseInt(prev) + 1).toString())}
-            >
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 32 32"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect y="14" width="32" height="4" fill="#D9D9D9" />
-                <rect
-                  x="14"
-                  y="32"
-                  width="32"
-                  height="4"
-                  transform="rotate(-90 14 32)"
-                  fill="#D9D9D9"
-                />
-              </svg>
-            </div> */
-            }
-          </div>
-          {issuanceError && <p class="text-red-500 mt-2">{issuanceError}</p>}
-          <div className="flex gap-7">
-            <div className="flex gap-2 items-center">
-              <input
-                type="checkbox"
-                id="lockEditions"
-                name="lockEditions"
-                checked={isLocked}
-                onChange={(e: Event) =>
-                  setIsLocked((e.target as HTMLInputElement).checked)}
-                className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
-              />
-              <label
-                htmlFor="lockEditions"
-                className="text-[#B9B9B9] text-[16px] font-semibold"
-              >
-                Lock Editions
-              </label>
-            </div>
-            <div className="flex gap-2 items-center">
-              <input
-                type="checkbox"
-                id="poshStamp"
-                name="poshStamp"
-                checked={isPoshStamp}
-                onChange={(e: Event) =>
-                  setIsPoshStamp((e.target as HTMLInputElement).checked)}
-                className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
-              />
-              <label
-                htmlFor="poshStamp"
-                className="text-[#B9B9B9] text-[16px] font-semibold"
-              >
-                Posh Stamp
-              </label>
-            </div>
-          </div>
-          {isPoshStamp && (
-            <div className="mt-3 w-full">
-              <input
-                type="text"
-                value={stampName}
-                onInput={handleStampNameChange}
-                placeholder="Stamp Name (max 13 chars, can't start with A)"
-                className="p-4 text-[#F5F5F5] text-[16px] font-semibold border border-[#B9B9B9] w-full bg-[#6E6E6E]"
-                maxLength={13}
-              />
-              {stampNameError && (
-                <p class="text-red-500 mt-2">{stampNameError}</p>
+              )}
+              {file === null && (
+                <label
+                  for="upload"
+                  class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
+                >
+                  <img
+                    src="/img/mint/icon-image-upload.png"
+                    class="w-10 h-10"
+                    alt=""
+                  />
+                  <h5 class="text-[#F5F5F5] text-sm font-semibold">
+                    Upload Image
+                  </h5>
+                </label>
               )}
             </div>
-          )}
+
+            <div class="p-6 rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]">
+              {file !== null && (
+                <img
+                  width={120}
+                  style={{
+                    height: "100%",
+                    objectFit: "contain",
+                    imageRendering: "pixelated",
+                    backgroundColor: "rgb(0,0,0)",
+                  }}
+                  src={URL.createObjectURL(file)}
+                />
+              )}
+              {file === null && (
+                <h5 class="cursor-pointer text-sm font-semibold text-[#F5F5F5]">
+                  Preview
+                </h5>
+              )}
+            </div>
+
+            {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
+          </div>
+
+          <div class="w-full flex flex-col justify-between items-end">
+            <button
+              class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+              onClick={handleShowAdvancedOptions}
+            >
+              <div
+                id="switch-toggle-advanced"
+                class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center"
+              >
+              </div>
+            </button>
+            <div className="flex gap-7 items-center">
+              <p class="text-base md:text-2xl font-semibold text-[#999999] uppercase">
+                Editions
+              </p>
+              <input
+                type="text"
+                value={issuance}
+                onInput={handleIssuanceChange}
+                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-[100px] outline-none rounded-md"
+              />
+            </div>
+            {issuanceError && <p class="text-red-500 mt-2">{issuanceError}</p>}
+          </div>
         </div>
+
+        {showAdvancedOptions && (
+          <div>
+            <div className="flex gap-7">
+              <div className="flex gap-2 items-center">
+                <input
+                  type="checkbox"
+                  id="lockEditions"
+                  name="lockEditions"
+                  checked={isLocked}
+                  onChange={(e: Event) =>
+                    setIsLocked((e.target as HTMLInputElement).checked)}
+                  className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
+                />
+                <label
+                  htmlFor="lockEditions"
+                  className="text-[#B9B9B9] text-[16px] font-semibold"
+                >
+                  Lock Editions
+                </label>
+              </div>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="checkbox"
+                  id="poshStamp"
+                  name="poshStamp"
+                  checked={isPoshStamp}
+                  onChange={(e: Event) =>
+                    setIsPoshStamp((e.target as HTMLInputElement).checked)}
+                  className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
+                />
+                <label
+                  htmlFor="poshStamp"
+                  className="text-[#B9B9B9] text-[16px] font-semibold"
+                >
+                  Posh Stamp
+                </label>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <div className="w-full">
+                <p className="text-xs md:text-lg font-medium text-[#999999]">
+                  POSH
+                </p>
+                <input
+                  type="text"
+                  value={stampName}
+                  onInput={handleStampNameChange}
+                  placeholder="Stamp Name (max 13 chars, can't start with A)"
+                  className="p-4 text-[#F5F5F5] font-semibold rounded-md w-full bg-[#6E6E6E] outline-none"
+                  maxLength={13}
+                  disabled={isPoshStamp}
+                />
+                {stampNameError && (
+                  <p class="text-red-500 mt-2">{stampNameError}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* FIXME: FINALIZE OPTIMIZATION ROUTINE */}

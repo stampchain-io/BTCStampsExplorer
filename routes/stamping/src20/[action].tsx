@@ -33,7 +33,7 @@ export default function StampingSrc20Page(
     <div className="flex flex-col gap-16">
       {/* <StampingSrc20Header selectedTab={selectedTab} /> */}
 
-      <div className="self-center w-[680px] mx-auto">
+      <div className="self-center max-w-[680px] w-full mx-auto">
         {selectedTab === "mint" && <MintContent trxType={trxType} />}
         {selectedTab === "deploy" && <DeployContent trxType={trxType} />}
         {selectedTab === "transfer" && <TransferContent trxType={trxType} />}

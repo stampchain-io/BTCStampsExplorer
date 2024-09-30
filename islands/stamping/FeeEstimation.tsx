@@ -125,24 +125,6 @@ export function FeeEstimation({
             <span className="text-[#666666] font-light">RECOMMENDED:</span>{" "}
             {fees && fees.recommendedFee} sat/vB
           </p>
-          <div class="relative">
-            <label for="labels-range-input" class="sr-only">
-              Labels range
-            </label>
-            <input
-              id="labels-range-input"
-              type="range"
-              value={fee}
-              min="1"
-              max="264"
-              step="1"
-              onInput={(e) =>
-                handleChangeFee(
-                  parseInt((e.target as HTMLInputElement).value, 10),
-                )}
-              class="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#999999]"
-            />
-          </div>
         </div>
         <div className="flex gap-1 items-center justify-end w-1/2">
           <button
@@ -156,6 +138,24 @@ export function FeeEstimation({
             </div>
           </button>
         </div>
+      </div>
+      <div class="relative w-full md:w-1/2">
+        <label for="labels-range-input" class="sr-only">
+          Labels range
+        </label>
+        <input
+          id="labels-range-input"
+          type="range"
+          value={fee}
+          min="1"
+          max="264"
+          step="1"
+          onInput={(e) =>
+            handleChangeFee(
+              parseInt((e.target as HTMLInputElement).value, 10),
+            )}
+          class="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#999999]"
+        />
       </div>
       <p className="flex font-bold">
         <span className="text-[#666666] font-light">Estimated:{" "}</span>
@@ -282,7 +282,12 @@ export function FeeEstimation({
               className="text-[#999999] text-xs font-medium"
             >
               I agree to the{" "}
-              <span className="text-[#8800CC]">terms of service</span>
+              <span className="block md:hidden text-[#8800CC]">
+                ToS
+              </span>
+              <span className="hidden md:block text-[#8800CC]">
+                terms of service
+              </span>
             </label>
           </div>
           <button
