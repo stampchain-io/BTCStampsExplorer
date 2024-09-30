@@ -139,6 +139,7 @@ import * as $stamping_src20_mint_MintContent from "./islands/stamping/src20/mint
 import * as $stamping_src20_mint_PopularMinting from "./islands/stamping/src20/mint/PopularMinting.tsx";
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
+import * as $stamping_stamp_LatestStamps from "./islands/stamping/stamp/LatestStamps.tsx";
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
@@ -318,6 +319,7 @@ const manifest = {
       $stamping_src20_transfer_LatestTransfer,
     "./islands/stamping/src20/transfer/TransferContent.tsx":
       $stamping_src20_transfer_TransferContent,
+    "./islands/stamping/stamp/LatestStamps.tsx": $stamping_stamp_LatestStamps,
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
