@@ -212,7 +212,7 @@ export function Header() {
             toggleMenu();
             setCurrentPath("collection");
           }}
-          className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-6 pr-2"
+          className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 md:left-6 pr-2"
         >
           STAMPCHAIN
         </a>
@@ -284,19 +284,6 @@ export function Header() {
                 ALL
               </a>
               <a
-                href="/src20?type=trending"
-                f-partial="/src20?type=trending"
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath("src20");
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === "src20" ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                TRENDING
-              </a>
-              <a
                 href="/stamping/src20/deploy"
                 f-partial="/stamping/src20/deploy"
                 onClick={() => {
@@ -308,6 +295,32 @@ export function Header() {
                 }`}
               >
                 DEPLOY
+              </a>
+              <a
+                href="/stamping/src20/mint"
+                f-partial="/stamping/src20/mint"
+                onClick={() => {
+                  toggleMenu();
+                  setCurrentPath("stamping/src20");
+                }}
+                className={`hover:text-[#AA00FF] ${
+                  currentPath === "stamping/src20" ? "text-[#AA00FF]" : ""
+                }`}
+              >
+                MINT
+              </a>
+              <a
+                href="/stamping/src20/transfer"
+                f-partial="/stamping/src20/transfer"
+                onClick={() => {
+                  toggleMenu();
+                  setCurrentPath("stamping/src20");
+                }}
+                className={`hover:text-[#AA00FF] ${
+                  currentPath === "stamping/src20" ? "text-[#AA00FF]" : ""
+                }`}
+              >
+                TRANSFER
               </a>
             </div>
           </div>
