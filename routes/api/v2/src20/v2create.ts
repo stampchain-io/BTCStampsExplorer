@@ -3,8 +3,6 @@ import { ResponseUtil } from "utils/responseUtil.ts";
 import { prepareSrc20PSBT } from "$lib/utils/minting/olga/olgaSRC20PSBTCreate.ts";
 import { TX, TXError } from "globals";
 
-// Remove the SRC20InputData import if it's not used elsewhere in the file
-
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, _ctx: FreshContext) {
     let body;
