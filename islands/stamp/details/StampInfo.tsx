@@ -48,7 +48,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
             # {stamp.stamp}
           </p>
           <a
-            href={`https://xcp.dev/asset/${stamp.cpid}`}
+            href={`https://explorer.unspendablelabs.com/assets/${stamp.cpid}`}
             target="_blank"
             rel="noopener noreferrer"
             class="text-[#660099] text-4xl font-bold overflow-hidden text-ellipsis whitespace-nowrap block"
