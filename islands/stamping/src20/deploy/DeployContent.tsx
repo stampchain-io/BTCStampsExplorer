@@ -184,7 +184,7 @@ export function DeployContent(
             <div class="w-full flex gap-6">
               <input
                 type="text"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Token ticker name"
                 value={formState.token}
                 onChange={(e) => handleInputChange(e, "token")}
@@ -210,7 +210,7 @@ export function DeployContent(
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Limit pr. mint"
                 value={formState.lim}
                 onChange={(e) => handleInputChange(e, "lim")}
@@ -225,7 +225,7 @@ export function DeployContent(
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Supply"
                 value={formState.max}
                 onChange={(e) => handleInputChange(e, "max")}
@@ -240,7 +240,7 @@ export function DeployContent(
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Decimal amount"
                 value={formState.dec}
                 onChange={(e) => handleInputChange(e, "dec")}
@@ -252,12 +252,12 @@ export function DeployContent(
         {showAdvancedOptions && (
           <div
             className={`flex flex-col gap-6 transition-all duration-300 ${
-              showAdvancedOptions ? "h-full" : "h-0"
+              showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
             }`}
           >
             <textarea
               type="text"
-              class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+              class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
               placeholder="Description"
               rows={5}
               // value={formState.description}
@@ -266,14 +266,14 @@ export function DeployContent(
             <div className="w-full flex flex-col md:flex-row gap-6">
               <input
                 type="text"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="X"
                 value={formState.x}
                 onChange={(e) => handleInputChange(e, "x")}
               />
               <input
                 type="text"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Website"
                 value={formState.web}
                 onChange={(e) => handleInputChange(e, "web")}
@@ -282,14 +282,14 @@ export function DeployContent(
             <div className="w-full flex flex-col md:flex-row gap-6">
               <input
                 type="email"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Telegram"
                 // value={formState.telegram}
                 // onChange={(e) => handleInputChange(e, "telegram")}
               />
               <input
                 type="email"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Email"
                 value={formState.email}
                 onChange={(e) => handleInputChange(e, "email")}
@@ -311,6 +311,7 @@ export function DeployContent(
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleDeploySubmit}
+          buttonName="Deploy"
         />
 
         {apiError && (
