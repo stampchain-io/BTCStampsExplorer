@@ -129,10 +129,35 @@ export function OlgaContent() {
     setShowAdvancedOptions(!showAdvancedOptions);
   };
 
+  const handleSwitchLocked = () => {
+    const switchToggle = document.querySelector("#switch-toggle-locked");
+    if (!switchToggle) return;
+    if (isLocked) {
+      switchToggle.classList.add("translate-x-full");
+      setTimeout(() => {
+        switchToggle.innerHTML =
+          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+      }, 150);
+    } else {
+      switchToggle.classList.remove("translate-x-full");
+      setTimeout(() => {
+        switchToggle.innerHTML =
+          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+      }, 150);
+    }
+    setIsLocked(!isLocked);
+  };
+
   useEffect(() => {
     const advancedToggle = document.getElementById("switch-toggle-advanced");
     if (advancedToggle) {
       advancedToggle.innerHTML =
+        `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+    }
+
+    const lockedToggle = document.getElementById("switch-toggle-locked");
+    if (lockedToggle) {
+      lockedToggle.innerHTML =
         `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
     }
   }, []);
@@ -383,7 +408,7 @@ export function OlgaContent() {
             {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
           </div>
 
-          <div class="w-full flex flex-col justify-between items-end">
+          <div class="w-full flex flex-row-reverse md:flex-col justify-between items-center md:items-end">
             <button
               class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
               onClick={handleShowAdvancedOptions}
@@ -394,7 +419,7 @@ export function OlgaContent() {
               >
               </div>
             </button>
-            <div className="flex gap-7 items-center">
+            <div className="flex gap-6 items-center">
               <p class="text-base md:text-2xl font-semibold text-[#999999] uppercase">
                 Editions
               </p>
@@ -402,17 +427,21 @@ export function OlgaContent() {
                 type="text"
                 value={issuance}
                 onInput={handleIssuanceChange}
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-[100px] outline-none rounded-md"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-[72px] outline-none rounded-md focus:bg-[#CCCCCC]"
               />
             </div>
             {issuanceError && <p class="text-red-500 mt-2">{issuanceError}</p>}
           </div>
         </div>
 
-        {showAdvancedOptions && (
-          <div>
-            <div className="flex gap-7">
-              <div className="flex gap-2 items-center">
+        <div
+          className={`mt-6 transition-all duration-500 ${
+            showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
+          }`}
+        >
+          <div className="flex gap-7 justify-between">
+            {
+              /* <div className="flex gap-2 items-center">
                 <input
                   type="checkbox"
                   id="lockEditions"
@@ -428,8 +457,20 @@ export function OlgaContent() {
                 >
                   Lock Editions
                 </label>
+              </div> */
+            }
+            <button
+              class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+              onClick={handleSwitchLocked}
+            >
+              <div
+                id="switch-toggle-locked"
+                class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center"
+              >
               </div>
-              <div className="flex gap-2 items-center">
+            </button>
+            {
+              /* <div className="flex gap-2 items-center">
                 <input
                   type="checkbox"
                   id="poshStamp"
@@ -445,29 +486,40 @@ export function OlgaContent() {
                 >
                   Posh Stamp
                 </label>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <div className="w-full">
-                <p className="text-xs md:text-lg font-medium text-[#999999]">
-                  POSH
-                </p>
-                <input
-                  type="text"
-                  value={stampName}
-                  onInput={handleStampNameChange}
-                  placeholder="Stamp Name (max 13 chars, can't start with A)"
-                  className="p-4 text-[#F5F5F5] font-semibold rounded-md w-full bg-[#6E6E6E] outline-none"
-                  maxLength={13}
-                  disabled={isPoshStamp}
-                />
-                {stampNameError && (
-                  <p class="text-red-500 mt-2">{stampNameError}</p>
-                )}
-              </div>
-            </div>
+              </div> */
+            }
+            <img
+              src={isPoshStamp
+                ? "/img/stamping/LockSimple.svg"
+                : "/img/stamping/LockSimpleOpen.svg"}
+              className="bg-[#999999] p-3 rounded-md cursor-pointer"
+              onClick={() => setIsPoshStamp(!isPoshStamp)}
+            />
           </div>
-        )}
+          <div className="flex items-end gap-3">
+            <div className="w-full">
+              <p className="text-xs md:text-lg font-medium text-[#999999]">
+                POSH
+              </p>
+              <input
+                type="text"
+                value={stampName}
+                onInput={handleStampNameChange}
+                placeholder="Stamp Name (max 13 chars, can't start with A)"
+                className="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                maxLength={13}
+                disabled={isPoshStamp}
+              />
+              {stampNameError && (
+                <p class="text-red-500 mt-2">{stampNameError}</p>
+              )}
+            </div>
+            <img
+              src="/img/stamping/CornersOut.svg"
+              className="bg-[#999999] p-3 rounded-md cursor-pointer"
+            />
+          </div>
+        </div>
       </div>
 
       {/* FIXME: FINALIZE OPTIMIZATION ROUTINE */}
@@ -552,6 +604,7 @@ export function OlgaContent() {
           onRefresh={fetchFees}
           isSubmitting={false}
           onSubmit={handleMint}
+          buttonName="Stamp"
         />
 
         {apiError && (

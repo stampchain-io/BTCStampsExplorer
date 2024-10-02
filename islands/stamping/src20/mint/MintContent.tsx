@@ -59,7 +59,7 @@ export function MintContent(
             <div class="w-full">
               <input
                 type="text"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Token"
                 value={formState.token}
                 onChange={(e) => handleInputChange(e, "token")}
@@ -74,7 +74,7 @@ export function MintContent(
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                class="p-4 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Amount"
                 value={formState.amt}
                 onChange={(e) => handleInputChange(e, "amt")}
@@ -120,6 +120,7 @@ export function MintContent(
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleMintSubmit}
+          buttonName="Mint"
         />
 
         {apiError && (

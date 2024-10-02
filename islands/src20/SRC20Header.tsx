@@ -57,7 +57,7 @@ export const SRC20Header = (
                 ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
                 : "text-[#8800CC] font-light"
             }`}
-            onClick={() => setTypeOption("src20", "mint", true)}
+            onClick={() => setTypeOption("src20", "minting", true)}
           >
             Minting
           </p>

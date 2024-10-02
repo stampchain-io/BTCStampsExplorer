@@ -27,8 +27,12 @@ export class Src20MktService {
       this.fetchOpenStampMarketData().catch(() => []),
     ]);
 
+    console.log("openStampData: ", openStampData);
+
     const openStampDataMap = new Map<string, OpenStampMarketData>(
-      openStampData.map((item) => [item.name.toUpperCase(), item]),
+      Array.isArray(openStampData)
+        ? openStampData.map((item) => [item.name.toUpperCase(), item])
+        : [],
     );
 
     return stampscanData.map((item) => {
