@@ -1,9 +1,12 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TrxRequestParams } from "globals";
 
-import { Pagination } from "$islands/pagination/Pagination.tsx";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
-import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
+import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
+import { SRC20MintingTable } from "$islands/src20/minting/SRC20MintingTable.tsx";
+import LatestMints from "$islands/src20/minting/LatestMints.tsx";
+
+import { Pagination } from "$islands/pagination/Pagination.tsx";
 import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
@@ -82,7 +85,8 @@ export default function SRC20Page(props: any) {
         sortBy={sortBy}
         selectedTab={selectedTab}
       />
-      <SRC20DeployTable data={data.src20s} />
+      {selectedTab === "all" && <SRC20DeployTable data={data.src20s} />}
+      {selectedTab === "minting" && <SRC20MintingTable data={data.src20s} />}
       <Pagination
         page={page}
         pages={totalPages}
@@ -90,7 +94,8 @@ export default function SRC20Page(props: any) {
         type={"src20"}
         data_length={src20s.length}
       />
-      <DeployMintModule />
+      {selectedTab === "all" && <DeployMintModule />}
+      {selectedTab === "minting" && <LatestMints />}
     </div>
   );
 }

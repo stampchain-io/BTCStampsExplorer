@@ -29,9 +29,9 @@ const ImageModal = (
   );
 };
 
-export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
+export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
   const { data } = props;
-  console.log("SRC20DeployTable received data:", data);
+  console.log("SRC20MintingTable received data:", data);
 
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -53,11 +53,12 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         onClose={handleCloseModal}
       />
       <div class="relative overflow-x-auto shadow-md">
+        {/* Desktop View */}
         <div class="hidden md:flex flex-col gap-6">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
             return (
-              <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between rounded-md">
+              <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between items-center rounded-md">
                 <div class="p-3 uppercase cursor-pointer flex gap-6">
                   <img
                     src={`/content/${src20.tx_hash}.svg`}
@@ -65,83 +66,65 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     onClick={() =>
                       handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
                   />
-                  <div className={"flex flex-col justify-between"}>
+                  <div className="flex flex-col justify-between">
                     <a
                       href={href}
-                      className={"text-2xl text-[#666666] font-bold"}
+                      className="text-2xl text-[#666666] font-bold"
                     >
                       {convertToEmoji(src20.tick)}
                     </a>
-                    <p className={"text-lg text-[#666666] font-light"}>
-                      CREATOR{" "}
-                      <span className={"font-bold text-[#999999]"}>
-                        {src20.destination_name
-                          ? src20.destination_name
-                          : abbreviateAddress(src20.destination)}
-                      </span>
-                    </p>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-lg font-light text-[#999999]">
+                        PROGRESS <span className="font-bold">28.17%</span>
+                      </p>
+                      <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
+                        <div className="absolute left-0 top-0 w-[80px] h-1 bg-[#660099] rounded-full" />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="p-3 text-center flex flex-col justify-center">
-                  <p className={"text-lg text-[#666666] font-light"}>
+                  <p className="text-lg text-[#666666] font-light">
                     SUPPLY{" "}
-                    <span className={"font-bold text-[#999999]"}>
-                      {typeof src20.max === "number"
-                        ? src20.max.toLocaleString()
-                        : Number(src20.max).toLocaleString()}
+                    <span className="font-bold text-[#999999]">
+                      {Number(src20.max).toLocaleString()}
                     </span>
                   </p>
-                  <p className={"text-lg text-[#666666] font-light"}>
+                  <p className="text-lg text-[#666666] font-light">
                     LIMIT{" "}
-                    <span className={"font-bold text-[#999999]"}>
-                      {typeof src20.lim === "number"
-                        ? src20.lim.toLocaleString()
-                        : Number(src20.lim).toLocaleString()}
+                    <span className="font-bold text-[#999999]">
+                      {Number(src20.lim).toLocaleString()}
                     </span>
                   </p>
                 </div>
                 <div class="p-3 text-sm text-center flex flex-col justify-center">
-                  <p className={"text-lg text-[#666666] font-light"}>
+                  <p className="text-lg text-[#666666] font-light">
                     DEPLOY{" "}
-                    <span className={"font-bold text-[#999999]"}>
+                    <span className="font-bold text-[#999999]">
                       {new Date(src20.block_time).toLocaleString("default", {
                         month: "short",
                         year: "numeric",
                       })}
                     </span>
                   </p>
-                  <p className={"text-lg text-[#666666] font-light"}>
+                  <p className="text-lg text-[#666666] font-light">
                     HOLDERS{" "}
-                    <span className={"font-bold text-[#999999]"}>
-                      {typeof src20.holders === "number"
-                        ? src20.holders.toLocaleString()
-                        : Number(src20.holders).toLocaleString()}
+                    <span className="font-bold text-[#999999]">
+                      {Number(src20.holders).toLocaleString()}
                     </span>
                   </p>
                 </div>
-                <div class="p-3 text-right flex flex-col justify-center">
-                  <p className={"text-lg text-[#666666] font-light"}>
-                    MARKETCAP{" "}
-                    <span className={"font-bold text-[#999999]"}>
-                      {typeof src20.mcap === "number"
-                        ? src20.mcap.toFixed(2).toLocaleString()
-                        : Number(src20.mcap).toFixed(2).toLocaleString()}
-                    </span>
-                  </p>
-                  <p className={"text-lg text-[#666666] font-light"}>
-                    PRICE{" "}
-                    <span className={"font-bold text-[#999999]"}>
-                      {typeof src20.floor_unit_price === "number"
-                        ? src20.floor_unit_price.toFixed(10).toLocaleString()
-                        : Number(src20.floor_unit_price).toFixed(10)
-                          .toLocaleString()}
-                    </span>
-                  </p>
+                <div class="p-3 text-sm text-center flex flex-col justify-center">
+                  <button className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]">
+                    Mint
+                  </button>
                 </div>
               </div>
             );
           })}
         </div>
+
+        {/* Mobile View */}
         <div class="flex md:hidden flex-col gap-3">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
@@ -172,40 +155,46 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                         {src20.block_index}
                       </span>
                     </p>
-                    <div class="flex justify-between">
-                      <p>
-                        Creator:{" "}
-                        <span class="text-lg font-medium">
-                          {src20.destination_name
-                            ? src20.destination_name
-                            : abbreviateAddress(src20.destination)}
-                        </span>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-lg font-light text-[#999999]">
+                        PROGRESS <span className="font-bold">28.17%</span>
                       </p>
-                      <p class="text-sm">
-                        {Number(src20.deci)?.toLocaleString()}
-                      </p>
+                      <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
+                        <div className="absolute left-0 top-0 w-[80px] h-1 bg-[#660099] rounded-full" />
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="w-full flex justify-between pr-6">
-                  <div>
-                    <p>Supply:</p>
-                    <p class="text-lg">
-                      {typeof src20.max === "number"
-                        ? src20.max.toLocaleString()
-                        : Number(src20.max).toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                    <p>Lim:</p>
-                    <p class="text-lg">
-                      {typeof src20.lim === "number"
-                        ? src20.lim.toLocaleString()
-                        : Number(src20.lim).toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                  </div>
+                <div class="w-full flex justify-between">
+                  <p className="text-lg text-[#666666] font-light">
+                    SUPPLY{" "}
+                    <span className="font-bold text-[#999999]">
+                      {Number(src20.max).toLocaleString()}
+                    </span>
+                  </p>
+                  <p className="text-lg text-[#666666] font-light">
+                    LIMIT{" "}
+                    <span className="font-bold text-[#999999]">
+                      {Number(src20.lim).toLocaleString()}
+                    </span>
+                  </p>
+                </div>
+                <div class="w-full flex justify-between">
+                  <p className="text-lg text-[#666666] font-light">
+                    DEPLOY{" "}
+                    <span className="font-bold text-[#999999]">
+                      {new Date(src20.block_time).toLocaleString("default", {
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </p>
+                  <p className="text-lg text-[#666666] font-light">
+                    HOLDERS{" "}
+                    <span className="font-bold text-[#999999]">
+                      {Number(src20.holders).toLocaleString()}
+                    </span>
+                  </p>
                 </div>
               </div>
             );

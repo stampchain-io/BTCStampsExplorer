@@ -16,6 +16,7 @@ interface FeeEstimationProps {
   onRefresh: () => void;
   isSubmitting: boolean;
   onSubmit: () => void;
+  buttonName: string;
 }
 
 export function FeeEstimation({
@@ -29,6 +30,7 @@ export function FeeEstimation({
   onRefresh,
   isSubmitting,
   onSubmit,
+  buttonName,
 }: FeeEstimationProps) {
   const { fees, loading } = useFeePolling();
   console.log(fees);
@@ -158,7 +160,9 @@ export function FeeEstimation({
         />
       </div>
       <p className="flex font-bold">
-        <span className="text-[#666666] font-light">Estimated:{" "}</span>
+        <span className="text-[#666666] font-light uppercase">
+          Estimated:{" "}
+        </span>
         {coinType === "BTC"
           ? (total.toFixed(6) + " " + coinType)
           : ((total * BTCPrice).toFixed(2) + " " + coinType)}
@@ -204,7 +208,7 @@ export function FeeEstimation({
             )}
         </span>
       </p>
-      <div className="flex justify-between items-end gap-6">
+      <div className="flex justify-between gap-6">
         <div className={`${visible ? "visible" : "invisible"}`}>
           {type === "src20" && (
             <div class="flex justify-between border-b border-[#8A8989] py-4">
@@ -279,7 +283,7 @@ export function FeeEstimation({
             />
             <label
               htmlFor="lockEditions"
-              className="text-[#999999] text-xs font-medium"
+              className="text-[#999999] text-xs font-medium contents"
             >
               I agree to the{" "}
               <span className="block md:hidden text-[#8800CC]">
@@ -291,14 +295,15 @@ export function FeeEstimation({
             </label>
           </div>
           <button
-            class={`text-white text-center font-bold rounded-md mt-4 py-4 px-6 ${
+            class={`text-black text-center uppercase font-bold rounded-md mt-4 py-3 px-6 ${
               isSubmitting
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-[#5503A6] cursor-pointer"
             }`}
             onClick={isSubmitting ? undefined : onSubmit}
+            disabled={isSubmitting}
           >
-            {isSubmitting ? "Stamping..." : "Stamp Now"}
+            {buttonName}
           </button>
         </div>
       </div>
