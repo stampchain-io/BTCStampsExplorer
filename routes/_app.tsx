@@ -98,7 +98,7 @@ export default function App({ Component }: AppProps) {
           />
           <img
             src="/img/bg-gradient/footer-bottom-left.svg"
-            className="absolute top-[9200px] left-0"
+            className="absolute bottom-0 left-0 min-w-[1920px]"
           />
         </div>
 
