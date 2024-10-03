@@ -378,7 +378,7 @@ export class StampController {
 
   static async getMultipleStampCategories(
     categories: {
-      types: string[];
+      idents: SUBPROTOCOLS[];
       limit: number;
     }[],
   ) {
@@ -388,13 +388,13 @@ export class StampController {
           page: 1,
           limit: category.limit,
           sortBy: "DESC",
-          type: "stamps",
-          ident: category.types as SUBPROTOCOLS[],
+          type: "all",
+          ident: category.idents,
           noPagination: false,
         });
 
         return {
-          types: category.types,
+          types: category.idents,
           stamps: serviceResult?.stamps ?? [],
           total: serviceResult?.total ?? 0,
         };
@@ -413,10 +413,10 @@ export class StampController {
         collectionData,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { types: ["STAMP", "SRC-721"], limit: 6 },
-          { types: ["SRC-721"], limit: 6 },
-          { types: ["STAMP"], limit: 16 },
-          { types: ["SRC-20"], limit: 6 },
+          { idents: ["STAMP", "SRC-721"], limit: 6 },
+          { idents: ["SRC-721"], limit: 6 },
+          { idents: ["STAMP"], limit: 16 },
+          { idents: ["SRC-20"], limit: 6 },
         ]),
         Src20Service.fetchAndFormatSrc20Data({
           op: "DEPLOY",
@@ -454,12 +454,12 @@ export class StampController {
       }
 
       return {
-        stamps_recent: recentSales.data.recentSales,
+        stamps_recent: recentSales.data,
         stamps_src721: stampCategories[1].stamps,
         stamps_art: stampCategories[2].stamps,
         stamps_src20: stampCategories[3].stamps,
-        stamps_posh: stamps_posh, // Include the "posh" stamps
-        src20s: src20Result.data.map(formatSRC20Row),
+        stamps_posh: stamps_posh,
+        src20s: src20Result.data, // .map(formatSRC20Row),
         collectionData: collectionData.data,
       };
     } catch (error) {
