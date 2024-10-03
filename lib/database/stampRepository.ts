@@ -22,11 +22,11 @@ export class StampRepository {
   private static buildIdentifierConditions(
     whereConditions: string[],
     queryParams: (string | number)[],
-    identifier?: string | number | (string | number)[] | undefined,
+    identifier?: string | number | (string | number)[],
     type?: STAMP_TYPES,
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string,
     blockIdentifier?: number | string,
-    collectionId?: string,
+    collectionId?: string | string[],
     filterBy?: STAMP_FILTER_TYPES[],
     suffixFilters?: STAMP_SUFFIX_FILTERS[],
   ) {
@@ -97,9 +97,9 @@ export class StampRepository {
         whereConditions.push(`(${stampCondition})`);
       }
     } else {
-      // For 'all' type, only exclude 'SRC-20'
-      stampCondition = "st.ident != 'SRC-20'";
-      whereConditions.push(`(${stampCondition})`);
+      // For 'all' type, only exclude 'SRC-20'- this messes up the api/block route
+      // stampCondition = "st.ident != 'SRC-20'";
+      // whereConditions.push(`(${stampCondition})`);
     }
 
     // Ident condition
@@ -128,8 +128,17 @@ export class StampRepository {
     }
 
     if (collectionId) {
-      whereConditions.push("cs.collection_id = UNHEX(?)");
-      queryParams.push(collectionId);
+      if (Array.isArray(collectionId)) {
+        whereConditions.push(
+          `cs1.collection_id IN (${
+            collectionId.map(() => "UNHEX(?)").join(",")
+          })`,
+        );
+        queryParams.push(...collectionId);
+      } else {
+        whereConditions.push("cs1.collection_id = UNHEX(?)");
+        queryParams.push(collectionId);
+      }
     }
 
     // File suffix condition from suffixFilters
@@ -187,8 +196,9 @@ export class StampRepository {
       ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
       identifier?: string | number | (string | number)[];
       blockIdentifier?: number | string;
-      collectionId?: string;
+      collectionId?: string | string[];
       filterBy?: STAMP_FILTER_TYPES[];
+      suffixFilters?: STAMP_SUFFIX_FILTERS[];
     },
   ) {
     const {
@@ -198,6 +208,7 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
+      suffixFilters,
     } = options;
 
     const whereConditions: string[] = [];
@@ -212,18 +223,33 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
+      suffixFilters,
     );
 
     const whereClause = whereConditions.length > 0
       ? `WHERE ${whereConditions.join(" AND ")}`
       : "";
 
-    const queryTotal = `
-    SELECT COUNT(*) AS total
-    FROM ${STAMP_TABLE} AS st
-    ${collectionId ? "JOIN collection_stamps cs ON st.stamp = cs.stamp" : ""}
-    ${whereClause}
+    // Build join clause
+    let joinClause = `
+      LEFT JOIN creator AS cr ON st.creator = cr.address
     `;
+
+    // Include collection_stamps join only if collectionId is provided
+    if (collectionId) {
+      joinClause = `
+        JOIN collection_stamps cs1 ON st.stamp = cs1.stamp
+        ${joinClause}
+      `;
+    }
+
+    const queryTotal = `
+      SELECT COUNT(*) AS total
+      FROM ${STAMP_TABLE} AS st
+      ${joinClause}
+      ${whereClause}
+    `;
+
     const resultTotal = await dbManager.executeQueryWithCache(
       queryTotal,
       queryParams,
@@ -325,10 +351,12 @@ export class StampRepository {
       allColumns?: boolean;
       noPagination?: boolean;
       cacheDuration?: number | "never";
-      collectionId?: string;
+      collectionId?: string | string[];
       sortColumn?: string;
       filterBy?: STAMP_FILTER_TYPES[];
       suffixFilters?: STAMP_SUFFIX_FILTERS[];
+      groupBy?: string;
+      groupBySubquery?: boolean;
     },
   ) {
     const {
@@ -346,6 +374,8 @@ export class StampRepository {
       sortColumn = "tx_index",
       filterBy,
       suffixFilters,
+      groupBy,
+      groupBySubquery = false,
     } = options;
 
     const whereConditions: string[] = [];
@@ -363,7 +393,8 @@ export class StampRepository {
       suffixFilters,
     );
 
-    const specificColumns = `
+    // Build base columns for select clause
+    const baseColumns = `
       st.stamp, 
       st.block_index, 
       st.cpid, 
@@ -385,12 +416,21 @@ export class StampRepository {
       st.file_hash
     `;
 
-    const selectClause = allColumns
+    // Initialize select clause
+    let selectClause = allColumns
       ? "st.*, cr.creator AS creator_name"
-      : specificColumns;
+      : baseColumns;
+
+    // Only include collection_id in select clause if collectionId is provided
+    if (collectionId) {
+      selectClause += `,
+      HEX(cs1.collection_id) AS collection_id`;
+    }
+
     const whereClause = whereConditions.length > 0
       ? `WHERE ${whereConditions.join(" AND ")}`
       : "";
+
     const order = sortBy.toUpperCase() === "DESC" ? "DESC" : "ASC";
     const orderClause = `ORDER BY st.${sortColumn} ${order}`;
 
@@ -398,29 +438,90 @@ export class StampRepository {
     let offsetClause = "";
 
     if (!noPagination) {
-      limitClause = `LIMIT ${limit}`;
+      limitClause = `LIMIT ?`;
       const offset = Math.max(0, (page - 1) * limit);
-      offsetClause = `OFFSET ${offset}`;
+      offsetClause = `OFFSET ?`;
+      queryParams.push(limit, offset);
+    }
+
+    // Build join clause
+    let joinClause = `
+      LEFT JOIN creator AS cr ON st.creator = cr.address
+    `;
+
+    // Include collection_stamps join only if collectionId is provided
+    if (collectionId) {
+      joinClause = `
+        JOIN collection_stamps cs1 ON st.stamp = cs1.stamp
+        ${joinClause}
+      `;
+    }
+
+    let groupByClause = "";
+
+    if (groupBy && groupBySubquery && collectionId) {
+      const collectionIdPlaceholders = Array.isArray(collectionId)
+        ? collectionId.map(() => "UNHEX(?)").join(", ")
+        : "UNHEX(?)";
+
+      joinClause += `
+        JOIN (
+          SELECT ${groupBy}, MAX(stamp) as first_stamp
+          FROM collection_stamps
+          WHERE collection_id IN (${collectionIdPlaceholders})
+          GROUP BY ${groupBy}
+        ) fs ON cs1.${groupBy} = fs.${groupBy} AND st.stamp = fs.first_stamp
+      `;
+
+      // Add collectionId to queryParams if it's not already there
+      if (Array.isArray(collectionId)) {
+        queryParams.push(...collectionId);
+      } else {
+        queryParams.push(collectionId);
+      }
+    } else if (groupBy) {
+      groupByClause = `GROUP BY ${groupBy}`;
     }
 
     const query = `
-    SELECT ${selectClause}
-    FROM ${STAMP_TABLE} AS st
-    ${collectionId ? "JOIN collection_stamps cs ON st.stamp = cs.stamp" : ""}
-    LEFT JOIN creator AS cr ON st.creator = cr.address
-    ${whereClause}
-    ${orderClause}
-    ${limitClause}
-    ${offsetClause}
+      SELECT ${selectClause}
+      FROM ${STAMP_TABLE} AS st
+      ${joinClause}
+      ${whereClause}
+      ${groupByClause}
+      ${orderClause}
+      ${limitClause}
+      ${offsetClause}
     `;
 
-    const result = await dbManager.executeQueryWithCache(
+    // Execute the data query
+    const dataResult = await dbManager.executeQueryWithCache(
       query,
       queryParams,
       cacheDuration,
     );
 
-    return result;
+    // Get total count
+    const totalResult = await this.getTotalStampCountFromDb({
+      type,
+      ident,
+      identifier,
+      blockIdentifier,
+      collectionId,
+      filterBy,
+      suffixFilters,
+    });
+
+    const total = totalResult.rows[0]?.total || 0;
+    const totalPages = noPagination ? 1 : Math.ceil(total / limit);
+
+    return {
+      stamps: dataResult.rows,
+      page,
+      page_size: limit,
+      pages: totalPages,
+      total,
+    };
   }
   /**
    * Retrieves stamp balances for a given address using a database client.

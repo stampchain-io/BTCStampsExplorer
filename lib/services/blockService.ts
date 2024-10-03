@@ -29,7 +29,7 @@ export class BlockService {
     return {
       last_block,
       block_info: block_info.rows[0],
-      data: data.rows,
+      data: data.stamps,
     };
   }
 

@@ -14,16 +14,14 @@ import {
   STAMP_TYPES,
   StampRow,
 } from "globals";
-import { DispenserManager, XcpManager } from "$lib/services/xcpService.ts";
+import { DispenserManager } from "$lib/services/xcpService.ts";
 import * as base64 from "base64/mod.ts";
 import { filterOptions } from "utils/filterOptions.ts";
 import { Dispense, Dispenser } from "$lib/types/index.d.ts";
+import { CollectionController } from "$lib/controller/collectionController.ts";
 
 export class StampController {
-  static async getStampDetailsById(
-    id: string,
-    stampType: STAMP_TYPES = "all",
-  ) {
+  static async getStampDetailsById(id: string, stampType: STAMP_TYPES = "all") {
     try {
       const res = await StampService.getStampDetailsById(id, "all", stampType);
       if (!res) {
@@ -180,7 +178,7 @@ export class StampController {
     filterBy?: STAMP_FILTER_TYPES[] | string;
     ident?: SUBPROTOCOLS[];
     suffixFilters?: STAMP_SUFFIX_FILTERS[];
-    collectionId?: string;
+    collectionId?: string | string[];
     identifier?: string | number;
     blockIdentifier?: number | string;
     cacheDuration?: number | "never";
@@ -259,28 +257,18 @@ export class StampController {
         throw new Error("No stamps found");
       }
 
-      // Prepare concurrent calls for XCP assets and dispensers
-      // const cpids = stampResult.stamps.map((stamp: StampRow) => stamp.cpid);
-      // const xcpAssetsPromise = XcpManager.getXcpAssetsByCpids(cpids); // FIXME: need a better way to handle these excessive API calls
-
+      // Prepare concurrent calls for dispensers
       const dispenserPromises = stampResult.stamps.map((stamp: StampRow) =>
-        // FIXME: need a better way to handle these excessive API calls
         (stamp.ident === "STAMP" || stamp.ident === "SRC-721")
           ? DispenserManager.getDispensersByCpid(stamp.cpid)
           : Promise.resolve(null)
       );
 
-      // Wait for all promises to resolve
-      const [xcpAssets, ...dispensers] = await Promise.all([
-        // xcpAssetsPromise,
-        ...dispenserPromises,
-      ]);
+      // Wait for all dispenser promises to resolve
+      const dispensers = await Promise.all(dispenserPromises);
 
       const updatedStamps = stampResult.stamps.map(
         (stamp: StampRow, index: number) => {
-          const xcpAsset = xcpAssets.find((asset) =>
-            asset.asset === stamp.cpid
-          );
           let floorPrice: string | number | undefined = undefined;
 
           if (stamp.ident === "STAMP" || stamp.ident === "SRC-721") {
@@ -291,8 +279,8 @@ export class StampController {
               );
               if (openDispensers.length > 0) {
                 const lowestBtcRate = Math.min(
-                  ...openDispensers.map((dispenser) =>
-                    dispenser.satoshirate / 100000000
+                  ...openDispensers.map(
+                    (dispenser) => dispenser.satoshirate / 100000000,
                   ),
                 );
                 floorPrice = lowestBtcRate;
@@ -306,9 +294,6 @@ export class StampController {
 
           return {
             ...stamp,
-            divisible: xcpAsset?.divisible ?? stamp.divisible,
-            supply: xcpAsset?.supply ?? stamp.supply,
-            locked: xcpAsset?.locked ?? stamp.locked,
             ...(floorPrice !== undefined && { floorPrice }),
           };
         },
@@ -424,7 +409,6 @@ export class StampController {
       const [
         stampCategories,
         src20Result,
-        poshCollection,
         recentSales,
         collectionData,
       ] = await Promise.all([
@@ -439,21 +423,42 @@ export class StampController {
           page: 1,
           limit: 10,
         }),
-        CollectionService.getCollectionByName("posh", 8, "DESC"),
-        StampService.getRecentSales(6),
-        CollectionService.getCollectionNames({
+        this.getRecentSales(1, 6),
+        CollectionController.getCollectionNames({
           limit: 4,
           page: 1,
           creator: "",
         }),
       ]);
 
+      // Fetch the "posh" collection to get its collection_id
+      const poshCollection = await CollectionService.getCollectionByName(
+        "posh",
+      );
+
+      let stamps_posh = [];
+      if (poshCollection) {
+        const poshCollectionId = poshCollection.collection_id;
+
+        // Fetch stamps from the "posh" collection with limit and sortBy
+        const poshStampsResult = await this.getStamps({
+          collectionId: poshCollectionId,
+          page: 1,
+          limit: 8, // Limit to 8 stamps
+          sortBy: "DESC", // Adjust sort order if needed
+        });
+
+        stamps_posh = poshStampsResult.data; // Extract the stamps array
+      } else {
+        console.warn("Posh collection not found");
+      }
+
       return {
-        stamps_recent: recentSales,
+        stamps_recent: recentSales.data.recentSales,
         stamps_src721: stampCategories[1].stamps,
         stamps_art: stampCategories[2].stamps,
         stamps_src20: stampCategories[3].stamps,
-        stamps_posh: poshCollection ? poshCollection.stamps : [],
+        stamps_posh: stamps_posh, // Include the "posh" stamps
         src20s: src20Result.data.map(formatSRC20Row),
         collectionData: collectionData.data,
       };

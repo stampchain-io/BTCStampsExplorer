@@ -24,10 +24,11 @@ type CollectionPageProps = {
 
 export const handler: Handlers = {
   async GET(req: Request, ctx: FreshContext) {
-    const { id } = ctx.params;
+    // Decode the collection name to handle spaces and special characters
+    const id = decodeURIComponent(ctx.params.id);
 
     const url = new URL(req.url);
-    const sortBy = url.searchParams.get("sortBy")?.toUpperCase() == "ASC"
+    const sortBy = url.searchParams.get("sortBy")?.toUpperCase() === "ASC"
       ? "ASC"
       : "DESC";
     const filterBy =
@@ -39,43 +40,38 @@ export const handler: Handlers = {
       ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]
       : ["STAMP", "SRC-721"] as SUBPROTOCOLS[];
     const page = parseInt(url.searchParams.get("page") || "1");
-    const page_size = parseInt(
-      url.searchParams.get("limit") || "20",
-    );
+    const page_size = parseInt(url.searchParams.get("limit") || "20");
 
-    let collectionId;
-    const type: "stamps" | "cursed" | "all" | undefined = "all";
-    const collection = await CollectionService.getCollectionByName(
-      id,
-    );
+    const type: "stamps" | "cursed" | "all" = "all";
+
+    const collection = await CollectionService.getCollectionByName(id);
 
     if (collection) {
-      collectionId = collection.collection_id;
+      const collectionId = collection.collection_id;
+      const result = await StampController.getStamps({
+        page,
+        limit: page_size,
+        sortBy,
+        type,
+        filterBy,
+        ident,
+        collectionId,
+      });
+
+      const data = {
+        id,
+        stamps: result.data,
+        page: result.page,
+        pages: result.totalPages,
+        page_size: result.limit,
+        filterBy,
+        sortBy,
+        selectedTab,
+      };
+      return await ctx.render(data);
     } else {
-      throw new Error("Posh collection not found");
+      throw new Error("Collection not found");
     }
-
-    const result = await StampController.getStamps({
-      page,
-      limit: page_size,
-      sortBy,
-      type,
-      filterBy,
-      ident,
-      collectionId,
-    });
-
-    const data = {
-      id,
-      stamps: result.data,
-      page: result.page,
-      pages: result.totalPages,
-      page_size: result.limit,
-      filterBy,
-      sortBy,
-      selectedTab,
-    };
-    return await ctx.render(data);
   },
 };
 
@@ -93,7 +89,7 @@ export default function Collection(props: CollectionPageProps) {
 
   return (
     <div class="flex flex-col gap-8">
-      <CollectionDetailsHeader id={id} />
+      <CollectionDetailsHeader id={id} filterBy={filterBy} sortBy={sortBy} />
       <CollectionDetailsContent stamps={stamps} />
       <Pagination
         page={page}

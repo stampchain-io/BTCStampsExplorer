@@ -14,7 +14,7 @@ import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
-import { CollectionService } from "$lib/services/collectionService.ts";
+import { CollectionController } from "$lib/controller/collectionController.ts";
 import { ArtistCollection } from "$islands/collection/ArtistCollection.tsx";
 
 interface StampDetailPageProps {
@@ -61,7 +61,7 @@ export const handler: Handlers<StampData> = {
       const page_size = parseInt(
         url.searchParams.get("limit") || "20",
       );
-      const collectionsData = await CollectionService.getCollectionNames({
+      const collectionsData = await CollectionController.getCollectionNames({
         limit: page_size,
         page: page,
         creator: "",
