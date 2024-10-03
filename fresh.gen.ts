@@ -35,6 +35,7 @@ import * as $api_v2_src20_create from "./routes/api/v2/src20/create.ts";
 import * as $api_v2_src20_index from "./routes/api/v2/src20/index.ts";
 import * as $api_v2_src20_tick_tick_deploy from "./routes/api/v2/src20/tick/[tick]/deploy.ts";
 import * as $api_v2_src20_tick_tick_index from "./routes/api/v2/src20/tick/[tick]/index.ts";
+import * as $api_v2_src20_tick_tick_mint_data from "./routes/api/v2/src20/tick/[tick]/mint_data.ts";
 import * as $api_v2_src20_tick_index from "./routes/api/v2/src20/tick/index.ts";
 import * as $api_v2_src20_tx_tx_hash_ from "./routes/api/v2/src20/tx/[tx_hash].ts";
 import * as $api_v2_src20_v2create from "./routes/api/v2/src20/v2create.ts";
@@ -194,6 +195,8 @@ const manifest = {
     "./routes/api/v2/src20/tick/[tick]/deploy.ts":
       $api_v2_src20_tick_tick_deploy,
     "./routes/api/v2/src20/tick/[tick]/index.ts": $api_v2_src20_tick_tick_index,
+    "./routes/api/v2/src20/tick/[tick]/mint_data.ts":
+      $api_v2_src20_tick_tick_mint_data,
     "./routes/api/v2/src20/tick/index.ts": $api_v2_src20_tick_index,
     "./routes/api/v2/src20/tx/[tx_hash].ts": $api_v2_src20_tx_tx_hash_,
     "./routes/api/v2/src20/v2create.ts": $api_v2_src20_v2create,

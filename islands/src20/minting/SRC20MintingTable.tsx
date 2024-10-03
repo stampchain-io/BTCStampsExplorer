@@ -45,6 +45,9 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
     setModalOpen(!isModalOpen);
   };
 
+  // Define the desired trxType, e.g., 'olga' or 'multisig'
+  const trxType = "olga"; // or use a state/context variable if dynamic
+
   return (
     <>
       <ImageModal
@@ -60,6 +63,9 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
 
             const progress = src20.progress || "0";
             const progressWidth = `${progress}%`;
+
+            // Determine whether to show the Mint button
+            const showMintButton = progress !== "100";
 
             return (
               <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between items-center rounded-md">
@@ -121,10 +127,26 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
                     </span>
                   </p>
                 </div>
+                {/* Mint Button Cell */}
                 <div class="p-3 text-sm text-center flex flex-col justify-center">
-                  <button className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]">
-                    Mint
-                  </button>
+                  {showMintButton
+                    ? (
+                      <a
+                        href={`/stamping/src20/mint?tick=${
+                          encodeURIComponent(
+                            src20.tick,
+                          )
+                        }&trxType=${encodeURIComponent(trxType)}`}
+                      >
+                        <button className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]">
+                          Mint
+                        </button>
+                      </a>
+                    )
+                    : (
+                      // Empty placeholder to maintain cell size
+                      <div style={{ width: "84px", height: "48px" }}></div>
+                    )}
                 </div>
               </div>
             );
@@ -138,6 +160,8 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
 
             const progress = src20.progress || "0";
             const progressWidth = `${progress}%`;
+
+            const showMintButton = progress !== "100";
 
             return (
               <div class="text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2">
@@ -210,6 +234,20 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
                     </span>
                   </p>
                 </div>
+                {/* Mint Button */}
+                {showMintButton && (
+                  <div class="w-full flex justify-end mt-2">
+                    <a
+                      href={`/stamping/src20/mint?tick=${
+                        encodeURIComponent(src20.tick)
+                      }&trxType=${encodeURIComponent(trxType)}`}
+                    >
+                      <button className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]">
+                        Mint
+                      </button>
+                    </a>
+                  </div>
+                )}
               </div>
             );
           })}
