@@ -1,12 +1,12 @@
 export function Footer() {
   return (
-    <footer className="px-3 md:px-6 xl:px-12 py-6 md:py-[72px] text-[#8800CC] font-medium max-w-[1440px] w-full mx-auto flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg">
+    <footer className="px-3 md:px-6 xl:px-12 py-6 sm:py-9 md:py-[72px] text-[#8800CC] font-medium max-w-[1440px] w-full mx-auto flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg">
       <div className="w-full flex flex-col gap-1 items-center md:items-start">
-        <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#7700BB] to-[#AA00FF] text-4xl md:text-7xl italic font-black">
+        <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#7700BB] to-[#AA00FF] text-3xl md:text-6xl italic font-black">
           STAMPCHAIN
           <span className="font-extralight pr-1">.IO</span>
         </p>
-        <p className="text-sm md:text-2xl font-light mb-2 md:mb-0">
+        <p className="text-xs md:text-xl font-light mb-2 md:mb-0">
           IMMORTALISED ART - STORED ON BITCOIN
         </p>
         <div className="flex gap-6">
@@ -65,9 +65,16 @@ export function Footer() {
             <a
               href="/about"
               f-partial="/about"
-              className="hover:text-[#AA00FF]"
+              className="hidden md:block hover:text-[#AA00FF]"
             >
               STAMPCHAIN
+            </a>
+            <a
+              href="/about"
+              f-partial="/about"
+              className="block md:hidden hover:text-[#AA00FF]"
+            >
+              ABOUT
             </a>
             <a href="#" className="hover:text-[#AA00FF]">
               DONATE
@@ -81,7 +88,7 @@ export function Footer() {
             </a>
             <a
               href="https://github.com/stampchain-io/"
-              className="hidden md:block"
+              className="hover:text-[#AA00FF]"
               target="_blank"
             >
               MEDIA
@@ -100,17 +107,19 @@ export function Footer() {
             >
               TERMS OF SERVICE
             </a>
+          </div>
+          <div className="flex gap-6">
+            <a href="#" className="text-[#440066]">
+              <span className="italic">STAMPCHAIN</span> @ 2024
+            </a>
             <a
               href="/termsofservice"
               f-partial="/termsofservice"
               className="block md:hidden hover:text-[#AA00FF]"
             >
-              ToS
+              TERMS OF SERVICE
             </a>
           </div>
-          <a href="#" className="text-[#440066]">
-            <span className="italic">STAMPCHAIN</span> @ 2024
-          </a>
         </div>
       </div>
     </footer>

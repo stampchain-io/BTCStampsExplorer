@@ -44,6 +44,8 @@ export function FeeEstimation({
 
   const [isLocked, setIsLocked] = useState(false);
 
+  const [tosAgreed, setToSAgreed] = useState(false);
+
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
@@ -274,34 +276,28 @@ export function FeeEstimation({
           <div className="flex gap-2 justify-end items-center">
             <input
               type="checkbox"
-              id="lockEditions"
-              name="lockEditions"
-              checked={isLocked}
+              id="tosAgreed"
+              name="tosAgreed"
+              checked={tosAgreed}
               onChange={(e: Event) =>
-                setIsLocked((e.target as HTMLInputElement).checked)}
+                setToSAgreed((e.target as HTMLInputElement).checked)}
               className="w-3 h-3 bg-[#262424] border border-[#7F7979]"
             />
             <label
-              htmlFor="lockEditions"
+              htmlFor="tosAgreed"
               className="text-[#999999] text-xs font-medium contents"
             >
               I agree to the{" "}
-              <span className="block md:hidden text-[#8800CC]">
-                ToS
-              </span>
+              <span className="block md:hidden text-[#8800CC]">ToS</span>
               <span className="hidden md:block text-[#8800CC]">
                 terms of service
               </span>
             </label>
           </div>
           <button
-            class={`text-black text-center uppercase font-bold rounded-md mt-4 py-3 px-6 ${
-              isSubmitting
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-[#5503A6] cursor-pointer"
-            }`}
-            onClick={isSubmitting ? undefined : onSubmit}
-            disabled={isSubmitting}
+            className="text-black text-center uppercase font-bold rounded-md mt-4 py-3 px-6 bg-[#5503A6] cursor-pointer disabled:bg-gray-500 disabled:cursor-not-allowed"
+            onClick={(isSubmitting || !tosAgreed) ? undefined : onSubmit}
+            disabled={isSubmitting || !tosAgreed}
           >
             {buttonName}
           </button>
