@@ -9,7 +9,6 @@ import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
 
 import { StampController } from "$lib/controller/stampController.ts";
-
 type HomePageProps = {
   data: {
     stamps_recent: { recentSales: StampRow[] };
@@ -36,7 +35,7 @@ export const handler: Handlers = {
 
 export default function Home(props: HomePageProps) {
   const {
-    stamps_recent = { recentSales: [] },
+    stamps_recent = [],
     stamps_src721 = [],
     stamps_art = [],
     stamps_src20 = [],
@@ -57,7 +56,7 @@ export default function Home(props: HomePageProps) {
         stamps_art={stamps_art}
         stamps_posh={stamps_posh}
         stamps_src721={stamps_src721}
-        stamps_recent={stamps_recent.recentSales}
+        stamps_recent={stamps_recent}
         stamps_src20={stamps_src20}
         collectionData={collectionData}
       />
