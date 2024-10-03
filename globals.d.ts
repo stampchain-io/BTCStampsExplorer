@@ -92,6 +92,7 @@ export interface SRC20Row {
   block_time: Date;
   status: string;
   row_num: number;
+  progress?: string | null;
 }
 
 interface SendRow {

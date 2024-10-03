@@ -57,6 +57,10 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
         <div class="hidden md:flex flex-col gap-6">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
+
+            const progress = src20.progress || "0";
+            const progressWidth = `${progress}%`;
+
             return (
               <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between items-center rounded-md">
                 <div class="p-3 uppercase cursor-pointer flex gap-6">
@@ -75,10 +79,13 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
                     </a>
                     <div className="flex flex-col gap-1">
                       <p className="text-lg font-light text-[#999999]">
-                        PROGRESS <span className="font-bold">28.17%</span>
+                        PROGRESS <span className="font-bold">{progress}%</span>
                       </p>
                       <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
-                        <div className="absolute left-0 top-0 w-[80px] h-1 bg-[#660099] rounded-full" />
+                        <div
+                          className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
+                          style={{ width: progressWidth }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -128,6 +135,10 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
         <div class="flex md:hidden flex-col gap-3">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
+
+            const progress = src20.progress || "0";
+            const progressWidth = `${progress}%`;
+
             return (
               <div class="text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2">
                 <div class="w-full flex items-center gap-2 mb-2">
@@ -157,10 +168,13 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
                     </p>
                     <div className="flex flex-col gap-1">
                       <p className="text-lg font-light text-[#999999]">
-                        PROGRESS <span className="font-bold">28.17%</span>
+                        PROGRESS <span className="font-bold">{progress}%</span>
                       </p>
                       <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
-                        <div className="absolute left-0 top-0 w-[80px] h-1 bg-[#660099] rounded-full" />
+                        <div
+                          className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
+                          style={{ width: progressWidth }}
+                        />
                       </div>
                     </div>
                   </div>
