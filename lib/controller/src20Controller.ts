@@ -377,14 +377,24 @@ export class Src20Controller {
             balanceParams,
           );
 
-          const marketInfo = marketDataMap.get(row.tick) ||
-            { mcap: 0, floor_unit_price: 0 };
+          const marketInfo = marketDataMap.get(row.tick) || {
+            mcap: 0,
+            floor_unit_price: 0,
+          };
+
+          const mintProgress = await this.handleSrc20MintProgressRequest(
+            row.tick,
+          );
+          const progress = mintProgress ? mintProgress.progress : null;
 
           return {
             ...row,
             holders: balanceResult.total,
             mcap: marketInfo.mcap,
-            floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)), // Convert to decimal
+            floor_unit_price: Number(
+              marketInfo.floor_unit_price.toFixed(10),
+            ),
+            progress,
           };
         }),
       );
