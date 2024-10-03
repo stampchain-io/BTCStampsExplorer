@@ -1,10 +1,8 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
-
 import { CollectionHeader } from "$islands/collection/CollectionHeader.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
 import { Pagination } from "$islands/pagination/Pagination.tsx";
-
-import { CollectionService } from "$lib/services/collectionService.ts";
+import { CollectionController } from "$lib/controller/collectionController.ts";
 
 type CollectionPageProps = {
   data: {
@@ -28,28 +26,19 @@ export const handler: Handlers = {
     const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
     const selectedTab = url.searchParams.get("ident") || "all";
     const page = parseInt(url.searchParams.get("page") || "1");
-    const page_size = parseInt(
-      url.searchParams.get("limit") || "20",
-    );
+    const page_size = parseInt(url.searchParams.get("limit") || "20");
 
-    const collectionsData = await CollectionService.getCollectionNames({
+    const collectionsData = await CollectionController.getCollectionNames({
       limit: page_size,
       page: page,
       creator: "",
     });
 
-    const { collections, pages, pag, limit } = {
-      collections: collectionsData.data,
-      pages: collectionsData.totalPages,
-      pag: collectionsData.page,
-      limit: collectionsData.limit,
-    };
-
     const data = {
-      collections,
-      page: pag,
-      pages,
-      page_size: limit,
+      collections: collectionsData.data,
+      page: collectionsData.page,
+      pages: collectionsData.totalPages,
+      page_size: collectionsData.limit,
       filterBy,
       sortBy,
       selectedTab,

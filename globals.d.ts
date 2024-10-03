@@ -516,10 +516,9 @@ export interface MintStampInputData {
 export interface Collection {
   collection_id: string;
   collection_name: string;
-  creators: string[];
-  stamps: StampRow[];
+  creators: string;
+  stamp_count: number;
   first_stamp_image?: string | null;
-  floorPrice?: number | null;
 }
 
 export interface CollectionQueryParams extends PaginationQueryParams {
