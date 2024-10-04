@@ -19,7 +19,7 @@
     "axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
     "redis": "https://deno.land/x/redis@v0.32.4/mod.ts",
     "$Big": "https://esm.sh/big.js@6.2.1",
-    "$fresh/": "https://deno.land/x/fresh@1.7.1/",
+    "$fresh/": "https://deno.land/x/fresh@1.7.2/",
     "preact": "https://esm.sh/preact@10.19.6",
     "preact/": "https://esm.sh/preact@10.19.6/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.1.0",
