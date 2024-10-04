@@ -24,12 +24,14 @@ export function StampCard({
   stamp,
   kind = "stamp",
   isRecentSale = false,
+  showInfo = true,
 }: {
   stamp: StampRow & {
     sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
   };
   kind: "cursed" | "stamp" | "named";
   isRecentSale?: boolean;
+  showInfo?: boolean;
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -92,66 +94,68 @@ export function StampCard({
           </div>
         </div>
       </div>
-      <div className="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
-        <div className="flex justify-center items-center text-black">
-          <h3
-            className={`text-[13px] font-normal text-lg transition-colors duration-300 ${
-              isHovered ? "text-[#AA00FF]" : "text-white/80"
-            }`}
-          >
-            {Number(stamp.stamp ?? 0) >= 0 ||
-                (stamp.cpid && stamp.cpid.charAt(0) === "A")
-              ? `${stamp.stamp}`
-              : `${stamp.cpid}`}
-          </h3>
-        </div>
-        <div>
-          <div className="flex justify-between text-black">
-            {/* <h3 className="text-white text-[11px]">Creator :</h3> */}
-            {/* <h3 className="text-white text-[11px]">Floor :</h3> */}
-          </div>
-          <div className="flex justify-between">
-            <h3 className="truncate text-[13px] text-[#C7C5C5]">
-              {stamp.creator_name
-                ? stamp.creator_name
-                : abbreviateAddress(stamp.creator, 6)}
-            </h3>
-            <h3 className="truncate text-[13px] text-[#C7C5C5]">
-              {renderPrice()}
+      {showInfo && (
+        <div className="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
+          <div className="flex justify-center items-center text-black">
+            <h3
+              className={`text-[13px] font-normal text-lg transition-colors duration-300 ${
+                isHovered ? "text-[#AA00FF]" : "text-white/80"
+              }`}
+            >
+              {Number(stamp.stamp ?? 0) >= 0 ||
+                  (stamp.cpid && stamp.cpid.charAt(0) === "A")
+                ? `${stamp.stamp}`
+                : `${stamp.cpid}`}
             </h3>
           </div>
-        </div>
-        <div className="flex flex-1 flex-col justify-end rounded-b-lg text-white">
-          <div className="flex items-center gap-x-2 justify-between pt-1">
-            <div className="bg-foreground-1 transition-all hover:bg-foreground-1-hover">
-              <div className="center h-[18px] text-[12px] gap-x-1">
-                <p className="leading-4">
-                  {stamp.ident !== "SRC-20" && stamp.balance
-                    ? (
-                      `${getSupply(Number(stamp.balance), stamp.divisible)}/${
-                        stamp.supply < 100000 && !stamp.divisible
-                          ? getSupply(stamp.supply, stamp.divisible)
-                          : "+100000"
-                      }`
-                    )
-                    : (
-                      `1/${getSupply(stamp.supply, stamp.divisible)}`
-                    )}
-                </p>
-              </div>
+          <div>
+            <div className="flex justify-between text-black">
+              {/* <h3 className="text-white text-[11px]">Creator :</h3> */}
+              {/* <h3 className="text-white text-[11px]">Floor :</h3> */}
             </div>
-            <p className="truncate text-[12px] rounded-lg uppercase">
-              {stamp.ident && stamp.ident === "SRC-20"
-                ? "SRC-20"
-                : stamp.ident && stamp.ident === "SRC-721"
-                ? "SRC-721"
-                : stamp.stamp_mimetype
-                ? stamp.stamp_mimetype.split("/")[1]
-                : "TEXT"}
-            </p>
+            <div className="flex justify-between">
+              <h3 className="truncate text-[13px] text-[#C7C5C5]">
+                {stamp.creator_name
+                  ? stamp.creator_name
+                  : abbreviateAddress(stamp.creator, 6)}
+              </h3>
+              <h3 className="truncate text-[13px] text-[#C7C5C5]">
+                {renderPrice()}
+              </h3>
+            </div>
+          </div>
+          <div className="flex flex-1 flex-col justify-end rounded-b-lg text-white">
+            <div className="flex items-center gap-x-2 justify-between pt-1">
+              <div className="bg-foreground-1 transition-all hover:bg-foreground-1-hover">
+                <div className="center h-[18px] text-[12px] gap-x-1">
+                  <p className="leading-4">
+                    {stamp.ident !== "SRC-20" && stamp.balance
+                      ? (
+                        `${getSupply(Number(stamp.balance), stamp.divisible)}/${
+                          stamp.supply < 100000 && !stamp.divisible
+                            ? getSupply(stamp.supply, stamp.divisible)
+                            : "+100000"
+                        }`
+                      )
+                      : (
+                        `1/${getSupply(stamp.supply, stamp.divisible)}`
+                      )}
+                  </p>
+                </div>
+              </div>
+              <p className="truncate text-[12px] rounded-lg uppercase">
+                {stamp.ident && stamp.ident === "SRC-20"
+                  ? "SRC-20"
+                  : stamp.ident && stamp.ident === "SRC-721"
+                  ? "SRC-721"
+                  : stamp.stamp_mimetype
+                  ? stamp.stamp_mimetype.split("/")[1]
+                  : "TEXT"}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </a>
   );
 }

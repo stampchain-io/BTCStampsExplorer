@@ -43,6 +43,8 @@ export default function Home(props: HomePageProps) {
     collectionData = [],
   } = props.data || {};
 
+  console.log("stamps_src20: ", stamps_src20);
+
   return (
     <div class="relative flex flex-col gap-10 md:gap-24 text-white py-10 md:py-24">
       <HomeHeader />
