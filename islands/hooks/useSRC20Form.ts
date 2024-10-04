@@ -7,17 +7,18 @@ import { fetchBTCPrice } from "$lib/utils/btc.ts";
 import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
 
 export function useSRC20Form(
-  operation: "mint" | "deploy" | "transfer",
-  trxType: "olga" | "multisig",
+  action: string,
+  trxType: "olga" | "multisig" = "multisig",
+  initialToken?: string,
 ) {
-  console.log("useSRC20Form initialized with:", { operation, trxType });
+  console.log("useSRC20Form initialized with:", { action, trxType });
 
   const { config, isLoading: configLoading } = useConfig();
   const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000); // 5 minutes
 
   const [formState, setFormState] = useState({
     toAddress: "",
-    token: "",
+    token: initialToken || "",
     amt: "",
     fee: 0,
     feeError: "",
@@ -69,10 +70,10 @@ export function useSRC20Form(
   useEffect(() => {
     const jsonData = {
       p: "SRC-20",
-      op: operation,
+      op: action,
       tick: formState.token,
       amt: formState.amt,
-      ...(operation === "deploy" && {
+      ...(action === "deploy" && {
         max: formState.max,
         lim: formState.lim,
         dec: formState.dec,
@@ -88,8 +89,8 @@ export function useSRC20Form(
   }, [
     formState.token,
     formState.amt,
-    operation,
-    ...(operation === "deploy"
+    action,
+    ...(action === "deploy"
       ? [
         formState.max,
         formState.lim,
@@ -124,7 +125,7 @@ export function useSRC20Form(
       [`${field}Error`]: "",
     }));
 
-    if (field === "token" && operation === "deploy") {
+    if (field === "token" && action === "deploy") {
       try {
         const response = await axiod.get(
           `/api/v2/src20/tick/${newValue}/deploy`,
@@ -211,12 +212,12 @@ export function useSRC20Form(
       isValid = false;
     }
 
-    if (operation !== "deploy" && !formState.amt) {
+    if (action !== "deploy" && !formState.amt) {
       newState.amtError = "Amount is required";
       isValid = false;
     }
 
-    if (operation === "transfer" && !formState.toAddress) {
+    if (action === "transfer" && !formState.toAddress) {
       newState.toAddressError = "To Address is required";
       isValid = false;
     }
@@ -226,7 +227,7 @@ export function useSRC20Form(
       isValid = false;
     }
 
-    if (operation === "deploy") {
+    if (action === "deploy") {
       if (!formState.max) {
         newState.maxError = "Max circulation is required";
         isValid = false;
@@ -266,19 +267,19 @@ export function useSRC20Form(
 
       let endpoint, requestData;
 
-      console.log("Preparing request data for operation:", operation);
+      console.log("Preparing request data for action:", action);
 
       if (trxType === "olga") {
         endpoint = "/api/v2/src20/v2create";
         requestData = {
           sourceWallet: address,
-          toAddress: operation === "transfer" ? formState.toAddress : address,
+          toAddress: action === "transfer" ? formState.toAddress : address,
           src20Action: {
             p: "SRC-20",
-            op: operation,
+            op: action,
             tick: formState.token,
             amt: formState.amt,
-            ...(operation === "deploy" && {
+            ...(action === "deploy" && {
               max: formState.max,
               lim: formState.lim,
               dec: formState.dec,
@@ -295,16 +296,16 @@ export function useSRC20Form(
       } else {
         endpoint = "/api/v2/src20/create";
         requestData = {
-          toAddress: operation === "transfer" ? formState.toAddress : address,
-          fromAddress: operation === "transfer" ? address : undefined,
+          toAddress: action === "transfer" ? formState.toAddress : address,
+          fromAddress: action === "transfer" ? address : undefined,
           changeAddress: address,
-          op: operation,
+          op: action,
           tick: formState.token,
           feeRate: formState.fee,
           amt: formState.amt,
           service_fee: config?.MINTING_SERVICE_FEE,
           service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
-          ...(operation === "deploy" && {
+          ...(action === "deploy" && {
             max: formState.max,
             lim: formState.lim,
             dec: formState.dec,
@@ -365,7 +366,7 @@ export function useSRC20Form(
 
       return response.data;
     } catch (error) {
-      console.error(`${operation} error:`, error);
+      console.error(`${action} error:`, error);
       if (error.response && error.response.data && error.response.data.error) {
         setApiError(error.response.data.error);
       } else if (error.message) {

@@ -1,9 +1,21 @@
 import { FeeEstimation } from "../../FeeEstimation.tsx";
 import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
+import { useEffect, useState } from "preact/hooks";
+import axiod from "axiod";
 
-export function MintContent(
-  { trxType = "multisig" }: { trxType?: "olga" | "multisig" },
-) {
+interface MintContentProps {
+  trxType?: "olga" | "multisig";
+  tick?: string | null;
+  mintStatus?: any;
+  holders?: number;
+}
+
+export function MintContent({
+  trxType = "multisig",
+  tick,
+  mintStatus: initialMintStatus,
+  holders: initialHolders,
+}: MintContentProps) {
   const {
     formState,
     handleChangeFee,
@@ -16,7 +28,67 @@ export function MintContent(
     submissionMessage,
     walletError,
     apiError,
-  } = useSRC20Form("mint", trxType);
+    setFormState,
+  } = useSRC20Form("mint", trxType, tick);
+
+  const [mintStatus, setMintStatus] = useState<any>(initialMintStatus || null);
+  const [holders, setHolders] = useState<number>(initialHolders || 0);
+  const [error, setError] = useState<string | null>(null);
+
+  // Adjusted useEffect hook to always fetch data when token changes
+  useEffect(() => {
+    const fetchData = async () => {
+      if (formState.token) {
+        try {
+          setError(null);
+          const currentTick = formState.token;
+
+          // Fetch combined mint data
+          const response = await axiod.get(
+            `/api/v2/src20/tick/${currentTick}/mint_data`,
+          );
+          const data = response.data;
+
+          if (!data || data.error || !data.mintStatus) {
+            setError("Token not deployed");
+            setMintStatus(null);
+            setHolders(0);
+          } else {
+            setMintStatus(data.mintStatus);
+            setHolders(data.holders || 0);
+
+            // Pre-populate amt with limit value
+            if (data.mintStatus.limit) {
+              setFormState((prevState) => ({
+                ...prevState,
+                amt: data.mintStatus.limit.toString(),
+              }));
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching mint data:", err);
+          setError("Error fetching token data");
+          setMintStatus(null);
+          setHolders(0);
+        }
+      } else {
+        setMintStatus(null);
+        setHolders(0);
+        setError(null);
+      }
+    };
+
+    fetchData();
+  }, [formState.token, setFormState]);
+
+  // Calculate progress and other values
+  const progress = mintStatus ? mintStatus.progress : "0";
+  const progressWidth = `${progress}%`;
+  const maxSupply = mintStatus
+    ? Number(mintStatus.max_supply).toLocaleString()
+    : "0";
+  const limit = mintStatus ? Number(mintStatus.limit).toLocaleString() : "0";
+  const minters = holders ? holders.toString() : "0";
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -39,6 +111,13 @@ export function MintContent(
       <p class="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] text-3xl md:text-6xl font-black mt-6 w-full text-center">
         MINT SRC-20
       </p>
+
+      {/* Display error if any */}
+      {error && (
+        <div className="w-full text-red-500 text-center font-bold">
+          {error}
+        </div>
+      )}
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-6 w-full">
         <div className="w-full flex flex-col md:flex-row gap-6">
@@ -88,22 +167,25 @@ export function MintContent(
         <div className="flex justify-between text-[#999999] items-end">
           <div className="flex flex-col gap-1">
             <p className="text-base md:text-2xl font-light">
-              PROGRESS <span className="font-bold">30.00%</span>
+              PROGRESS <span className="font-bold">{progress}%</span>
             </p>
             <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
-              <div className="absolute left-0 top-0 w-[80px] h-1 bg-[#660099] rounded-full">
+              <div
+                className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
+                style={{ width: progressWidth }}
+              >
               </div>
             </div>
           </div>
           <div className="text-right text-xs md:text-base font-light">
             <p>
-              SUPPLY <span className="font-bold">10.000.000.000</span>
+              SUPPLY <span className="font-bold">{maxSupply}</span>
             </p>
             <p>
-              LIMIT <span className="font-bold">5.000.000</span>
+              LIMIT <span className="font-bold">{limit}</span>
             </p>
             <p>
-              MINTERS <span className="font-bold">32</span>
+              MINTERS <span className="font-bold">{minters}</span>
             </p>
           </div>
         </div>
