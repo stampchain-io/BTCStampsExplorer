@@ -270,7 +270,7 @@ export function FeeEstimation({
               ? (total.toFixed(8) + " " + coinType)
               : ((total * BTCPrice).toFixed(2) + " " + coinType)}
           </p>
-          <button onClick={onRefresh}>Refresh Fees</button>
+          {/* <button onClick={onRefresh}>Refresh Fees</button> */}
         </div>
         <div className="flex flex-col items-end">
           <div className="flex gap-2 justify-end items-center">

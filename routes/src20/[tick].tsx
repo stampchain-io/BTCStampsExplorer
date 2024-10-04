@@ -17,23 +17,46 @@ export const handler: Handlers = {
       return await ctx.render(body);
     } catch (error) {
       console.error(error);
-      return ctx.renderNotFound();
+      // Optionally, you can pass an error message to the page
+      return ctx.render({ error: error.message });
     }
   },
 };
 
-export const SRC20TickPage = (props) => {
+interface SRC20TickPageProps {
+  data: {
+    deployment: any;
+    total_holders: number;
+    holders: any[];
+    mint_status: any;
+    total_mints: number;
+    total_transfers: number;
+    // Add error property if needed
+    error?: string;
+  };
+}
+
+function SRC20TickPage(props: SRC20TickPageProps) {
   const {
     deployment,
-    transfers,
-    mints,
     total_holders,
     holders,
     mint_status,
     total_mints,
-    last_block,
     total_transfers,
+    error, // Extract error message if present
   } = props.data;
+
+  if (error) {
+    return (
+      <div class="text-center text-red-500">
+        {error}
+      </div>
+    );
+  }
+
+  // Continue with existing component rendering
+  const tick = deployment.tick;
 
   return (
     <div class="flex flex-col gap-8">
@@ -48,19 +71,12 @@ export const SRC20TickPage = (props) => {
         <div class="w-full h-full bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
           <SRC20DetailsTab
             holders={holders}
-            transfers={transfers}
-            mints={mints}
+            tick={tick} // Pass tick prop
           />
         </div>
-        {
-          /* <div class="relative w-full md:w-3/5 flex justify-center">
-          <HoldersInfo holders={holders} />
-          <TransfersInfo transfers={transfers} />
-        </div> */
-        }
       </div>
     </div>
   );
-};
+}
 
 export default SRC20TickPage;

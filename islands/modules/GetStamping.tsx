@@ -10,12 +10,10 @@ export const GetStampingModule = () => {
         </p>
 
         <p className="text-[#CCCCCC] text-base md:text-2xl font-medium">
-          Stamp Posh or Classic stamps cheap and effortlessly with built in
-          compression tools, custom fee selection and frictionless Posh naming
-          options.<br />
-          <br />
-          Support for png/jpg/gif low-fi pixel art and hi-res svg/html vector
-          art - up to 64kB.
+          Effortlessly create immutableBitcoin Stamps with custom fee selection
+          and optional Posh Stamp Collection naming options. Supports low-fi
+          pixel art (png/jpg/gif) and hi-res vector art (svg/html) up to 64kB.
+          Explore SRC-721R for recursive stamps with unlimited size constraints.
         </p>
       </div>
 
