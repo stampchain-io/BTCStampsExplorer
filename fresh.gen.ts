@@ -121,6 +121,7 @@ import * as $src20_SRC20Navigator from "./islands/src20/SRC20Navigator.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
 import * as $src20_all_SRC20DeployTable from "./islands/src20/all/SRC20DeployTable.tsx";
 import * as $src20_minting_LatestMints from "./islands/src20/minting/LatestMints.tsx";
+import * as $src20_minting_SRC20MintingItem from "./islands/src20/minting/SRC20MintingItem.tsx";
 import * as $src20_minting_SRC20MintingTable from "./islands/src20/minting/SRC20MintingTable.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
@@ -139,6 +140,7 @@ import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/
 import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
 import * as $stamping_src20_mint_MintContent from "./islands/stamping/src20/mint/MintContent.tsx";
 import * as $stamping_src20_mint_PopularMinting from "./islands/stamping/src20/mint/PopularMinting.tsx";
+import * as $stamping_src20_mint_StampingMintingItem from "./islands/stamping/src20/mint/StampingMintingItem.tsx";
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_ImageFullScreen from "./islands/stamping/stamp/ImageFullScreen.tsx";
@@ -295,6 +297,8 @@ const manifest = {
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
     "./islands/src20/all/SRC20DeployTable.tsx": $src20_all_SRC20DeployTable,
     "./islands/src20/minting/LatestMints.tsx": $src20_minting_LatestMints,
+    "./islands/src20/minting/SRC20MintingItem.tsx":
+      $src20_minting_SRC20MintingItem,
     "./islands/src20/minting/SRC20MintingTable.tsx":
       $src20_minting_SRC20MintingTable,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
@@ -321,6 +325,8 @@ const manifest = {
       $stamping_src20_mint_MintContent,
     "./islands/stamping/src20/mint/PopularMinting.tsx":
       $stamping_src20_mint_PopularMinting,
+    "./islands/stamping/src20/mint/StampingMintingItem.tsx":
+      $stamping_src20_mint_StampingMintingItem,
     "./islands/stamping/src20/transfer/LatestTransfer.tsx":
       $stamping_src20_transfer_LatestTransfer,
     "./islands/stamping/src20/transfer/TransferContent.tsx":

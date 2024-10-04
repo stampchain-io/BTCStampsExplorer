@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 
 import { SRC20Row } from "globals";
 
-import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
+import SRC20MintingItem from "$islands/src20/minting/SRC20MintingItem.tsx";
 
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
@@ -53,164 +53,13 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
         onClose={handleCloseModal}
       />
       <div class="relative overflow-x-auto shadow-md">
-        {/* Desktop View */}
-        <div class="hidden md:flex flex-col gap-6">
+        <div class="flex flex-col gap-3 md:gap-6">
           {data.map((src20: SRC20Row) => {
-            const href = `/src20/${convertToEmoji(src20.tick)}`;
-
-            const progress = src20.progress || "0";
-            const progressWidth = `${progress}%`;
-
             return (
-              <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between items-center rounded-md">
-                <div class="p-3 uppercase cursor-pointer flex gap-6">
-                  <img
-                    src={`/content/${src20.tx_hash}.svg`}
-                    class="w-[65px] h-[65px]"
-                    onClick={() =>
-                      handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
-                  />
-                  <div className="flex flex-col justify-between">
-                    <a
-                      href={href}
-                      className="text-2xl text-[#666666] font-bold"
-                    >
-                      {convertToEmoji(src20.tick)}
-                    </a>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-lg font-light text-[#999999]">
-                        PROGRESS <span className="font-bold">{progress}%</span>
-                      </p>
-                      <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
-                        <div
-                          className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
-                          style={{ width: progressWidth }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="p-3 text-center flex flex-col justify-center">
-                  <p className="text-lg text-[#666666] font-light">
-                    SUPPLY{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.max).toLocaleString()}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    LIMIT{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.lim).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-                <div class="p-3 text-sm text-center flex flex-col justify-center">
-                  <p className="text-lg text-[#666666] font-light">
-                    DEPLOY{" "}
-                    <span className="font-bold text-[#999999]">
-                      {new Date(src20.block_time).toLocaleString("default", {
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    HOLDERS{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.holders).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-                <div class="p-3 text-sm text-center flex flex-col justify-center">
-                  <button className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]">
-                    Mint
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Mobile View */}
-        <div class="flex md:hidden flex-col gap-3">
-          {data.map((src20: SRC20Row) => {
-            const href = `/src20/${convertToEmoji(src20.tick)}`;
-
-            const progress = src20.progress || "0";
-            const progressWidth = `${progress}%`;
-
-            return (
-              <div class="text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2">
-                <div class="w-full flex items-center gap-2 mb-2">
-                  <img
-                    src={`/content/${src20.tx_hash}.svg`}
-                    class="w-[74px] h-[74px] rounded-[3px]"
-                    onClick={() =>
-                      handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
-                  />
-                  <div class="w-full">
-                    <div class="flex justify-between">
-                      <a href={href} class="text-xl">
-                        {convertToEmoji(src20.tick)}
-                      </a>
-                      <p class="text-sm">
-                        {new Date(src20.block_time).toLocaleString("default", {
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                    <p>
-                      Block:{" "}
-                      <span class="text-lg font-medium">
-                        {src20.block_index}
-                      </span>
-                    </p>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-lg font-light text-[#999999]">
-                        PROGRESS <span className="font-bold">{progress}%</span>
-                      </p>
-                      <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
-                        <div
-                          className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
-                          style={{ width: progressWidth }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-full flex justify-between">
-                  <p className="text-lg text-[#666666] font-light">
-                    SUPPLY{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.max).toLocaleString()}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    LIMIT{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.lim).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-                <div class="w-full flex justify-between">
-                  <p className="text-lg text-[#666666] font-light">
-                    DEPLOY{" "}
-                    <span className="font-bold text-[#999999]">
-                      {new Date(src20.block_time).toLocaleString("default", {
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    HOLDERS{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.holders).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-              </div>
+              <SRC20MintingItem
+                src20={src20}
+                handleImageInteraction={handleImageInteraction}
+              />
             );
           })}
         </div>
