@@ -10,8 +10,9 @@ export const StampChainModule = () => {
         </p>
 
         <p className="text-[#CCCCCC] text-base md:text-2xl font-medium">
-          Brought to you by the creators of Bitcoin Stamps. Stampchain is the OG
-          resource for all things Stamps.
+          Your premier destination for all things Bitcoin Stamps. As the OG
+          resource, we offer unparalleled expertise and tools for the Stamps
+          ecosystem.
           <br />
         </p>
       </div>
