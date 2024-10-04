@@ -50,7 +50,7 @@ export const handler: Handlers = {
           op: "DEPLOY",
           page,
           limit,
-          sort: sortBy,
+          sortBy, // Changed from 'sort: sortBy' to 'sortBy'
         };
 
         const excludeFullyMinted = selectedTab === "minting";
