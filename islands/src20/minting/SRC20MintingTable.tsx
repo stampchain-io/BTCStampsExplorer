@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 
 import { SRC20Row } from "globals";
 
-import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
+import SRC20MintingItem from "$islands/src20/minting/SRC20MintingItem.tsx";
 
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
@@ -56,8 +56,7 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
         onClose={handleCloseModal}
       />
       <div class="relative overflow-x-auto shadow-md">
-        {/* Desktop View */}
-        <div class="hidden md:flex flex-col gap-6">
+        <div class="flex flex-col gap-3 md:gap-6">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
 
