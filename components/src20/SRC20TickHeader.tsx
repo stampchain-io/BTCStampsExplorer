@@ -9,14 +9,16 @@ interface SRC20TickHeaderProps {
   total_transfers: number;
 }
 
-export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
+export function SRC20TickHeader(props: SRC20TickHeaderProps) {
   const {
-    deployment,
-    mint_status,
-    total_holders,
-    total_mints,
-    total_transfers,
+    deployment = {},
+    mint_status = {},
+    total_holders = 0,
+    total_mints = 0,
+    total_transfers = 0,
   } = props;
+
+  const tickValue = deployment.tick ? convertToEmoji(deployment.tick) : "N/A";
 
   return (
     <>
@@ -24,7 +26,7 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
         <div className="text-xl text-[#7A00F5] font-medium flex gap-1 items-center">
           <img src="/img/icon_arrow_left.png" alt="" className="w-5 h-10" />
           <p className="uppercase">
-            SRC20 {">"} {convertToEmoji(deployment.tick)}
+            SRC20 {">"} {tickValue}
           </p>
         </div>
         <StampSearchClient />
@@ -39,12 +41,14 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
           />
           <div class="flex flex-col gap-3">
             <p class="text-3xl md:text-6xl uppercase font-black text-[#660099]">
-              {convertToEmoji(deployment.tick)}
+              {tickValue}
             </p>
-            <p className={"text-sm text-[#CCCCCC] font-medium"}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sed
-              dolor ac urna bibendum vehicula. Maecenas vel viverra leo. Donec
-              viverra nunc non lacus eleifend tristique.
+            <p class="text-sm text-[#CCCCCC] font-medium">
+              This is an SRC-20 token, there are many like it, but this one is
+              {" "}
+              {deployment.tick.toUpperCase()}. This was deployed on block{" "}
+              {deployment.block_index}{" "}
+              without a description on the deploy. We hope you enjoy.
             </p>
           </div>
         </div>
@@ -87,7 +91,7 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
               <div class="w-1/3 flex items-center justify-start">
                 <div class="flex flex-col">
                   <p class="text-2xl font-semibold">
-                    {convertToEmoji(deployment.tick)}
+                    {tickValue}
                   </p>
                   <p class="text-base">Tick</p>
                 </div>
@@ -139,4 +143,4 @@ export const SRC20TickHeader = (props: SRC20TickHeaderProps) => {
       </div>
     </>
   );
-};
+}

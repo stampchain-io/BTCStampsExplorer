@@ -27,7 +27,7 @@ export function SRC20SearchClient(
           <input
             type="text"
             className="min-w-[260px] md:min-w-[360px] h-[40px] bg-gradient-to-r from-[#8800CC] via-[#7700AA] to-[#660099] px-4 py-2 rounded text-[13px] text-[#8D9199]"
-            placeholder="stamp #, CPID, wallet address, tx_hash"
+            placeholder="Token Name"
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
             onKeyPress={handleKeyPress}

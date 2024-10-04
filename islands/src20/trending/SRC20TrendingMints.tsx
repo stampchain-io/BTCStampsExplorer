@@ -1,10 +1,8 @@
 import { useState } from "preact/hooks";
-
 import { SRC20Row } from "globals";
+import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
 
-import SRC20MintingItem from "$islands/src20/minting/SRC20MintingItem.tsx";
-
-type SRC20BalanceTableProps = {
+type SRC20TrendingMintsProps = {
   data: SRC20Row[];
 };
 
@@ -29,9 +27,8 @@ const ImageModal = (
   );
 };
 
-export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
+export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
   const { data } = props;
-  console.log("SRC20MintingTable received data:", data);
 
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -56,14 +53,13 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
         onClose={handleCloseModal}
       />
       <div class="relative overflow-x-auto shadow-md">
-        <div class="flex flex-col gap-3 md:gap-6">
+        {/* Desktop View */}
+        <div class="hidden md:flex flex-col gap-6">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
 
             const progress = src20.progress || "0";
             const progressWidth = `${progress}%`;
-
-            // No need to check for showMintButton since all tokens are not fully minted
 
             return (
               <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between items-center rounded-md">

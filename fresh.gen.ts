@@ -35,6 +35,7 @@ import * as $api_v2_src20_create from "./routes/api/v2/src20/create.ts";
 import * as $api_v2_src20_index from "./routes/api/v2/src20/index.ts";
 import * as $api_v2_src20_tick_tick_deploy from "./routes/api/v2/src20/tick/[tick]/deploy.ts";
 import * as $api_v2_src20_tick_tick_index from "./routes/api/v2/src20/tick/[tick]/index.ts";
+import * as $api_v2_src20_tick_tick_mint_data from "./routes/api/v2/src20/tick/[tick]/mint_data.ts";
 import * as $api_v2_src20_tick_index from "./routes/api/v2/src20/tick/index.ts";
 import * as $api_v2_src20_tx_tx_hash_ from "./routes/api/v2/src20/tx/[tx_hash].ts";
 import * as $api_v2_src20_v2create from "./routes/api/v2/src20/v2create.ts";
@@ -123,6 +124,7 @@ import * as $src20_all_SRC20DeployTable from "./islands/src20/all/SRC20DeployTab
 import * as $src20_minting_LatestMints from "./islands/src20/minting/LatestMints.tsx";
 import * as $src20_minting_SRC20MintingItem from "./islands/src20/minting/SRC20MintingItem.tsx";
 import * as $src20_minting_SRC20MintingTable from "./islands/src20/minting/SRC20MintingTable.tsx";
+import * as $src20_trending_SRC20TrendingMints from "./islands/src20/trending/SRC20TrendingMints.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
@@ -196,6 +198,8 @@ const manifest = {
     "./routes/api/v2/src20/tick/[tick]/deploy.ts":
       $api_v2_src20_tick_tick_deploy,
     "./routes/api/v2/src20/tick/[tick]/index.ts": $api_v2_src20_tick_tick_index,
+    "./routes/api/v2/src20/tick/[tick]/mint_data.ts":
+      $api_v2_src20_tick_tick_mint_data,
     "./routes/api/v2/src20/tick/index.ts": $api_v2_src20_tick_index,
     "./routes/api/v2/src20/tx/[tx_hash].ts": $api_v2_src20_tx_tx_hash_,
     "./routes/api/v2/src20/v2create.ts": $api_v2_src20_v2create,
@@ -301,6 +305,8 @@ const manifest = {
       $src20_minting_SRC20MintingItem,
     "./islands/src20/minting/SRC20MintingTable.tsx":
       $src20_minting_SRC20MintingTable,
+    "./islands/src20/trending/SRC20TrendingMints.tsx":
+      $src20_trending_SRC20TrendingMints,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,

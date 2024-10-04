@@ -18,17 +18,19 @@ import { stripTrailingZeros } from "utils/util.ts";
 
 export class Src20Service {
   static async getTotalCountValidSrc20Tx(params: {
-    tick?: string;
-    op?: string;
-  }): Promise<number> {
+    tick?: string | string[];
+    op?: string | string[];
+  }, excludeFullyMinted: boolean = false): Promise<number> {
     const result = await SRC20Repository.getTotalCountValidSrc20TxFromDb(
       params,
+      excludeFullyMinted,
     );
     return result.rows[0].total;
   }
 
   static async fetchAndFormatSrc20Data(
     params: SRC20TrxRequestParams = {},
+    excludeFullyMinted: boolean = false,
   ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
     try {
       const sanitizedParams = {
@@ -48,13 +50,23 @@ export class Src20Service {
           : params.tx_hash,
       };
 
+      // Ensure limit and page have default numeric values
+      const limit = Number.isFinite(Number(sanitizedParams.limit)) &&
+          Number(sanitizedParams.limit) > 0
+        ? Number(sanitizedParams.limit)
+        : 50; // Default limit
+      const page = Number.isFinite(Number(sanitizedParams.page)) &&
+          Number(sanitizedParams.page) > 0
+        ? Math.max(1, Number(sanitizedParams.page))
+        : 1;
+
       const queryParams: SRC20TrxRequestParams = {
         ...sanitizedParams,
         tick: Array.isArray(sanitizedParams.tick)
           ? sanitizedParams.tick[0]
           : sanitizedParams.tick,
-        limit: sanitizedParams.limit || BIG_LIMIT,
-        page: sanitizedParams.page || 1,
+        limit,
+        page,
         sortBy: sanitizedParams.sortBy || "ASC",
       };
 
@@ -64,8 +76,11 @@ export class Src20Service {
       }
 
       const [data, totalResult, lastBlock] = await Promise.all([
-        SRC20Repository.getValidSrc20TxFromDb(queryParams),
-        SRC20Repository.getTotalCountValidSrc20TxFromDb(queryParams),
+        SRC20Repository.getValidSrc20TxFromDb(queryParams, excludeFullyMinted),
+        SRC20Repository.getTotalCountValidSrc20TxFromDb(
+          queryParams,
+          excludeFullyMinted, // Passed excludeFullyMinted here
+        ),
         BlockService.getLastBlock(),
       ]);
 
@@ -104,19 +119,19 @@ export class Src20Service {
 
   static async fetchAllSrc20DataForTick(tick: string) {
     try {
-      const params: SRC20TrxRequestParams = {
-        tick,
-        op: ["DEPLOY", "MINT", "TRANSFER"],
-        sortBy: "DESC",
+      const result = await SRC20Repository.getDeploymentAndCountsForTick(tick);
+
+      if (!result) {
+        return { deployment: null, total_mints: 0, total_transfers: 0 };
+      }
+
+      const { deployment, total_mints, total_transfers } = result;
+
+      return {
+        deployment,
+        total_mints,
+        total_transfers,
       };
-
-      const result = await SRC20Repository.getValidSrc20TxFromDb(params);
-
-      const deployment = result.rows.find((row) => row.op === "DEPLOY");
-      const mints = result.rows.filter((row) => row.op === "MINT");
-      const transfers = result.rows.filter((row) => row.op === "TRANSFER");
-
-      return { deployment, mints, transfers };
     } catch (error) {
       console.error("Error in fetchAllSrc20DataForTick:", error);
       throw error;
@@ -127,6 +142,19 @@ export class Src20Service {
     params: SRC20BalanceRequestParams,
   ): Promise<Src20BalanceResponseBody> {
     try {
+      // Ensure limit and page have default values if undefined
+      const limit =
+        Number.isFinite(Number(params.limit)) && Number(params.limit) > 0
+          ? Number(params.limit)
+          : 50; // Default limit
+      const page =
+        Number.isFinite(Number(params.page)) && Number(params.page) > 0
+          ? Math.max(1, Number(params.page))
+          : 1;
+
+      params.limit = limit;
+      params.page = page;
+
       const src20 = await SRC20Repository.getSrc20BalanceFromDb(params);
 
       if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
@@ -206,6 +234,39 @@ export class Src20Service {
       return await SRC20Repository.getTotalSrc20BalanceCount(params);
     } catch (error) {
       console.error("Error getting total SRC20 balance count:", error);
+      throw error;
+    }
+  }
+
+  static async fetchTrendingSrc20Data(
+    limit: number = 50,
+    page: number = 1,
+    transactionCount: number = 1000,
+  ): Promise<PaginatedSrc20ResponseBody> {
+    try {
+      const offset = limit * (page - 1);
+      const data = await SRC20Repository.getTrendingSrc20TxFromDb(
+        limit,
+        offset,
+        transactionCount,
+      );
+
+      const totalResult = await SRC20Repository.getTrendingSrc20TotalCount(
+        transactionCount,
+      );
+      const total = totalResult.rows[0].total;
+      const pagination = paginate(total, page, limit);
+
+      const mappedData = this.mapTransactionData(data.rows);
+      const formattedData = this.formatTransactionData(mappedData, {});
+
+      return {
+        ...pagination,
+        last_block: await BlockService.getLastBlock(),
+        data: formattedData,
+      };
+    } catch (error) {
+      console.error("Error in fetchTrendingSrc20Data:", error);
       throw error;
     }
   }
