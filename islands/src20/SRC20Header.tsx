@@ -35,10 +35,25 @@ export const SRC20Header = (
   };
 
   return (
-    <div class="text-white flex flex-col gap-8">
-      <p className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC]">
-        SRC-20 TOKENS
-      </p>
+    <div className="tabs">
+      <a
+        href="/src20?type=all"
+        className={selectedTab === "all" ? "active" : ""}
+      >
+        All
+      </a>
+      <a
+        href="/src20?type=minting"
+        className={selectedTab === "minting" ? "active" : ""}
+      >
+        Minting
+      </a>
+      <a
+        href="/src20?type=trending"
+        className={selectedTab === "trending" ? "active" : ""}
+      >
+        Trending
+      </a>
       <div class="flex flex-col-reverse lg:flex-row justify-between gap-3 w-full border-b border-[#3F2A4E]">
         <div class="flex gap-6 md:gap-8 items-end">
           <p
@@ -60,6 +75,16 @@ export const SRC20Header = (
             onClick={() => setTypeOption("src20", "minting", true)}
           >
             Minting
+          </p>
+          <p
+            class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
+              selectedTab === "trending"
+                ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
+                : "text-[#8800CC] font-light"
+            }`}
+            onClick={() => setTypeOption("src20", "trending", true)}
+          >
+            Trending
           </p>
         </div>
         <div class="flex gap-3 pb-1 md:pb-3 justify-between">

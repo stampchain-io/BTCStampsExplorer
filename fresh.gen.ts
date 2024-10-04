@@ -123,6 +123,7 @@ import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
 import * as $src20_all_SRC20DeployTable from "./islands/src20/all/SRC20DeployTable.tsx";
 import * as $src20_minting_LatestMints from "./islands/src20/minting/LatestMints.tsx";
 import * as $src20_minting_SRC20MintingTable from "./islands/src20/minting/SRC20MintingTable.tsx";
+import * as $src20_trending_SRC20TrendingMints from "./islands/src20/trending/SRC20TrendingMints.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
@@ -300,6 +301,8 @@ const manifest = {
     "./islands/src20/minting/LatestMints.tsx": $src20_minting_LatestMints,
     "./islands/src20/minting/SRC20MintingTable.tsx":
       $src20_minting_SRC20MintingTable,
+    "./islands/src20/trending/SRC20TrendingMints.tsx":
+      $src20_trending_SRC20TrendingMints,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
