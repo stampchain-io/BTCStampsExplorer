@@ -84,8 +84,17 @@ export function HomeStampPreview({
         </div>
       </div>
 
-      {/* FEATURED COLLECTIONS */}
-      <CollectionList collections={collectionData} />
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#666666] via-[#999999] to-[#CCCCCC] bg-clip-text text-transparent">
+          FEATURED COLLECTIONS
+        </h1>
+        <p className="text-[#CCCCCC] text-2xl md:text-5xl font-extralight">
+          LOREM IPSUM DOLOR
+        </p>
+
+        {/* FEATURED COLLECTIONS */}
+        <CollectionList collections={collectionData} />
+      </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
         <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">

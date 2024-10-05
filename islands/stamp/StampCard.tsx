@@ -83,7 +83,7 @@ export function StampCard({
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
-      className="bg-[#2E0F4D] border-2 border-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-3 rounded-lg transition-all hover:border-2 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
+      className="bg-[#2E0F4D] border-2 border-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-[6px] sm:p-3 rounded-lg transition-all hover:border-2 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

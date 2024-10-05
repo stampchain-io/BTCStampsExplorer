@@ -120,19 +120,16 @@ export function MintContent({
       )}
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-6 w-full">
-        <div className="w-full flex flex-col md:flex-row gap-6">
+        <div className="w-full flex gap-6">
           <div
             id="image-preview"
-            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[120px] w-[120px] h-[120px] content-center bg-[#2B0E49] flex flex-col"
+            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[120px] w-[120px] h-[120px] content-center bg-[#660099] flex flex-col"
           >
             <img
               src="/img/mint/icon-image-upload.png"
-              class="w-10 h-10"
+              class="w-16 h-16"
               alt=""
             />
-            <h5 class="text-[#F5F5F5] text-sm font-semibold">
-              Upload Image
-            </h5>
           </div>
           <div className="flex flex-col gap-6 w-full">
             <div class="w-full">

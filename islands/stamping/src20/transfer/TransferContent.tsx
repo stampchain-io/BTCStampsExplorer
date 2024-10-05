@@ -54,7 +54,7 @@ export function TransferContent(
           )}
         </div>
 
-        <div className="w-full flex gap-6">
+        <div className="w-full flex flex-col md:flex-row gap-6">
           <div class="w-full">
             <input
               type="text"
