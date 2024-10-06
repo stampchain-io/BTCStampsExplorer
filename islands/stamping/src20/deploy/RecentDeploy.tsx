@@ -30,7 +30,7 @@ const RecentDeploy = () => {
         RECENT DEPLOYS
       </h1>
       <p className="text-2xl md:text-5xl text-[#AA00FF]">LOREM IPSUM</p>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {Array(8).fill(0).map((_, index) => {
           return (
             <StampCard

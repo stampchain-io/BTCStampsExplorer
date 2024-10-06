@@ -309,7 +309,7 @@ export function OlgaContent() {
       </p>
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex gap-8">
           <div className="flex gap-8">
             <div
               id="image-preview"
@@ -352,7 +352,8 @@ export function OlgaContent() {
               )}
             </div>
 
-            <div class="p-6 rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]">
+            {
+              /* <div class="p-6 rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]">
               {file !== null && (
                 <img
                   width={120}
@@ -370,12 +371,13 @@ export function OlgaContent() {
                   Preview
                 </h5>
               )}
-            </div>
+            </div> */
+            }
 
             {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
           </div>
 
-          <div class="w-full flex flex-row-reverse md:flex-col justify-between items-center md:items-end">
+          <div class="w-full flex flex-col justify-between items-end">
             <button
               class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
               onClick={handleShowAdvancedOptions}
@@ -394,7 +396,7 @@ export function OlgaContent() {
                 type="text"
                 value={issuance}
                 onInput={handleIssuanceChange}
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-[72px] outline-none rounded-md focus:bg-[#CCCCCC]"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-[48px] outline-none rounded-md focus:bg-[#CCCCCC] text-center"
               />
             </div>
             {issuanceError && <p class="text-red-500 mt-2">{issuanceError}</p>}
