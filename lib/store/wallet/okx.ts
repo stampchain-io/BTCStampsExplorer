@@ -4,7 +4,9 @@ import { SignPSBTResult, Wallet } from "$lib/types/index.d.ts";
 
 export const isOKXInstalled = signal<boolean>(false);
 
-export const connectOKX = async (addToast) => {
+export const connectOKX = async (
+  addToast: (message: string, type: string) => void,
+) => {
   try {
     const okx = (window as any).okxwallet;
     if (!okx) {
@@ -15,7 +17,7 @@ export const connectOKX = async (addToast) => {
       return;
     }
     const result = await okx.bitcoin.connect();
-    await handleAccountsChanged([result.address]);
+    await handleAccountsChanged();
     addToast("Successfully connected to OKX wallet", "success");
   } catch (error) {
     addToast(`Failed to connect to OKX wallet: ${error.message}`, "error");
@@ -33,34 +35,48 @@ export const checkOKX = () => {
   return false;
 };
 
-const handleAccountsChanged = async (accounts: string[]) => {
-  if (accounts.length === 0) {
-    walletContext.disconnect();
+// Modified the function to fetch multiple addresses
+const handleAccountsChanged = async () => {
+  const okx = (window as any).okxwallet;
+  if (!okx || !okx.bitcoin) {
+    console.error("OKX wallet not connected");
     return;
   }
 
-  const okx = (window as any).okxwallet;
-  const _wallet = {} as Wallet;
-  _wallet.address = accounts[0];
-  _wallet.accounts = accounts;
+  try {
+    const accounts: string[] = await okx.bitcoin.requestAccounts();
+    if (!accounts || accounts.length === 0) {
+      console.error("No accounts found in OKX wallet");
+      walletContext.disconnect();
+      return;
+    }
 
-  const publicKey = await okx.bitcoin.getPublicKey();
-  _wallet.publicKey = publicKey;
+    const address = accounts[0];
+    const balanceInfo = await okx.bitcoin.getBalance();
 
-  const balance = await okx.bitcoin.getBalance();
-  _wallet.btcBalance = {
-    confirmed: balance.confirmed,
-    unconfirmed: balance.unconfirmed,
-    total: balance.total,
-  };
+    const _wallet: Wallet = {
+      address,
+      accounts,
+      publicKey: await okx.bitcoin.getPublicKey(),
+      btcBalance: {
+        confirmed: balanceInfo.confirmed,
+        unconfirmed: balanceInfo.unconfirmed,
+        total: balanceInfo.total,
+      },
+      // Assign other necessary properties
+      network: "mainnet",
+      provider: "okx",
+    };
 
-  const basicInfo = await walletContext.getBasicStampInfo(accounts[0]);
-  _wallet.stampBalance = basicInfo.stampBalance;
-  _wallet.network = "mainnet";
-  _wallet.provider = "okx";
+    // Fetch stamp balance or other custom balances if needed
+    const basicInfo = await walletContext.getBasicStampInfo(address);
+    _wallet.stampBalance = basicInfo.stampBalance;
 
-  walletContext.isConnected.value = true;
-  walletContext.updateWallet(_wallet);
+    walletContext.isConnected.value = true;
+    walletContext.updateWallet(_wallet);
+  } catch (error) {
+    console.error("Error fetching account from OKX wallet:", error);
+  }
 };
 
 const signMessage = async (message: string) => {

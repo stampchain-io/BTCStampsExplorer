@@ -106,8 +106,21 @@ export function TransferContent(
         )}
 
         {submissionMessage && (
-          <div class="w-full text-center font-bold">
-            {submissionMessage}
+          <div class="w-full text-center font-bold text-white">
+            {submissionMessage.message}
+            {submissionMessage.txid && (
+              <>
+                &nbsp;TXID:&nbsp;
+                <a
+                  href={`https://mempool.space/tx/${submissionMessage.txid}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-blue-500 underline"
+                >
+                  {submissionMessage.txid}
+                </a>
+              </>
+            )}
           </div>
         )}
       </div>

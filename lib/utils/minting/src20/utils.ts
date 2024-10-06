@@ -7,13 +7,18 @@ const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
 const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
 
-export function isValidBitcoinAddress(address: string) {
-  try {
-    bitcoin.address.toOutputScript(address);
-    return true;
-  } catch (_e) {
-    return false;
-  }
+export function isValidBitcoinAddress(address: string): boolean {
+  const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // Legacy P2PKH
+  const p2shRegex = /^3[1-9A-HJ-NP-Za-km-z]{25,34}$/; // P2SH
+  const bech32Regex = /^(bc1q)[0-9a-z]{38,59}$/; // Bech32 P2WPKH
+  const taprootRegex = /^(bc1p)[0-9a-z]{58}$/; // Bech32m P2TR (Taproot)
+
+  return (
+    p2pkhRegex.test(address) ||
+    p2shRegex.test(address) ||
+    bech32Regex.test(address) ||
+    taprootRegex.test(address)
+  );
 }
 
 function reverseEndian(hexString: string): string {
@@ -28,21 +33,41 @@ function reverseEndian(hexString: string): string {
 }
 
 function formatUTXOs(data: any[], address: string): UTXO[] {
-  return data.map((tx: any) => ({
-    txid: tx.txid || reverseEndian(tx.tx_hash),
-    vout: tx.vout || tx.tx_output_n,
-    value: tx.value,
-    address: address,
-    script: tx.script,
-    size: tx.size || estimateInputSize(tx.script),
-    status: {
-      confirmed: tx.confirmations > 0,
-      block_height: tx.block_height,
-      block_hash: undefined,
-      block_time: tx.confirmed ? new Date(tx.confirmed).getTime() : undefined,
-    },
-    index: tx.tx_index,
-  }));
+  return data.map((tx: any) => {
+    let txid = tx.txid ?? tx.tx_hash;
+    if (tx.tx_hash) {
+      // Reverse endianness for APIs that provide tx_hash in big-endian
+      txid = reverseEndian(tx.tx_hash);
+    }
+    const vout = tx.vout ?? tx.tx_output_n ?? tx.n;
+    if (typeof vout === "undefined") {
+      throw new Error(
+        `UTXO is missing 'vout' information: ${JSON.stringify(tx)}`,
+      );
+    }
+    const value = tx.value ?? tx.amount ?? tx.value_sat;
+    if (typeof value === "undefined") {
+      throw new Error(
+        `UTXO is missing 'value' information: ${JSON.stringify(tx)}`,
+      );
+    }
+    return {
+      txid,
+      vout,
+      value,
+      address: address,
+      script: tx.script ?? tx.scriptpubkey,
+      size: tx.size ?? estimateInputSize(tx.script ?? tx.scriptpubkey),
+      status: {
+        confirmed: tx.status?.confirmed ?? tx.confirmations > 0,
+        block_height: tx.status?.block_height ?? tx.block_height,
+        block_hash: tx.status?.block_hash ?? tx.block_hash,
+        block_time: tx.status?.block_time ??
+          (tx.confirmed ? new Date(tx.confirmed).getTime() : undefined),
+      },
+      index: tx.tx_index ?? vout,
+    };
+  });
 }
 
 async function fetchUTXOsFromBlockchainAPI(address: string): Promise<UTXO[]> {
@@ -60,6 +85,22 @@ async function fetchUTXOsFromBlockchainAPI(address: string): Promise<UTXO[]> {
   }
 }
 
+async function fetchUTXOsFromBlockstreamAPI(address: string): Promise<UTXO[]> {
+  try {
+    const endpoint = `https://blockstream.info/api/address/${address}/utxo`;
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    if (Array.isArray(data) && data.length > 0) {
+      return formatUTXOs(data, address);
+    } else {
+      throw new Error("No UTXOs found");
+    }
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
 async function fetchUTXOsFromBlockCypherAPI(address: string): Promise<UTXO[]> {
   try {
     const endpoint =
@@ -68,6 +109,10 @@ async function fetchUTXOsFromBlockCypherAPI(address: string): Promise<UTXO[]> {
     const data = await response.json();
     if (data.error) {
       throw new Error(data.error);
+    }
+    if (!data.txrefs) {
+      console.warn("No UTXOs found in data.txrefs");
+      return [];
     }
     return formatUTXOs(data.txrefs, address);
   } catch (error) {
@@ -81,10 +126,12 @@ async function fetchUTXOsFromMempoolAPI(address: string): Promise<UTXO[]> {
     const endpoint = `${MEMPOOL_API_BASE_URL}/address/${address}/utxo`;
     const response = await fetch(endpoint);
     const data = await response.json();
-    if (data.error) {
-      throw new Error(data.error);
+    if (Array.isArray(data) && data.length > 0) {
+      return formatUTXOs(data, address);
+    } else {
+      console.warn("No UTXOs found in Mempool.space API");
+      return [];
     }
-    return formatUTXOs(data, address);
   } catch (error) {
     console.error(error);
     return [];
@@ -95,6 +142,22 @@ export async function getUTXOForAddress(
   address: string,
   retries = 0,
 ): Promise<UTXO[] | null> {
+  try {
+    const utxos = await fetchUTXOsFromMempoolAPI(address);
+    if (utxos.length > 0) {
+      return utxos;
+    }
+  } catch (error) {
+    console.error("Mempool API failed:", error);
+  }
+  try {
+    const utxos = await fetchUTXOsFromBlockstreamAPI(address);
+    if (utxos.length > 0) {
+      return utxos;
+    }
+  } catch (error) {
+    console.error("Blockstream API failed:", error);
+  }
   try {
     const utxos = await fetchUTXOsFromBlockchainAPI(address);
     if (utxos.length > 0) {
@@ -111,15 +174,6 @@ export async function getUTXOForAddress(
     }
   } catch (error) {
     console.error("BlockCypher API failed:", error);
-  }
-
-  try {
-    const utxos = await fetchUTXOsFromMempoolAPI(address);
-    if (utxos.length > 0) {
-      return utxos;
-    }
-  } catch (error) {
-    console.error("Mempool API failed:", error);
   }
 
   if (retries < MAX_RETRIES) {

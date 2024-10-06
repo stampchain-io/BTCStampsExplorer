@@ -163,10 +163,33 @@ export const prepareSrc20TX = async ({
     // Add inputs to PSBT
     for (const input of selectedUtxos) {
       const txDetails = await getTransaction(input.txid);
+
+      // Check if txDetails and txDetails.vout are defined
+      if (!txDetails || !txDetails.vout) {
+        throw new Error(
+          `Transaction details not found for txid: ${input.txid}`,
+        );
+      }
+
       const inputDetails = txDetails.vout[input.vout];
-      const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith(
+
+      // Check if inputDetails is defined
+      if (!inputDetails) {
+        throw new Error(
+          `No vout found at index ${input.vout} for transaction ${input.txid}`,
+        );
+      }
+
+      const isWitnessUtxo = inputDetails.scriptPubKey?.type?.startsWith(
         "witness",
       );
+
+      // Ensure scriptPubKey and type are defined
+      if (typeof isWitnessUtxo === "undefined") {
+        throw new Error(
+          `scriptPubKey.type is undefined for txid: ${input.txid}, vout: ${input.vout}`,
+        );
+      }
 
       const psbtInput: PSBTInput = {
         hash: input.txid,

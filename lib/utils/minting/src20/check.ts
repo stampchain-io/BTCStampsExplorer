@@ -140,42 +140,68 @@ export async function checkDeployedTick(
   }
 }
 
-export function checkDeployParams({
-  toAddress,
-  changeAddress,
-  tick,
-  feeRate,
-  max,
-  lim,
-  dec = 18, // Default to 18 if not provided
-  x,
-  web,
-  email,
-}: IDeploySRC20) {
-  if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
-    throw new Error("Error: toAddress not found");
+export function checkDeployParams(params: IDeploySRC20) {
+  const {
+    toAddress,
+    changeAddress,
+    tick,
+    feeRate,
+    max,
+    lim,
+    dec = 18,
+    x,
+    web,
+    email,
+  } = params;
+
+  // Validate toAddress
+  if (!toAddress || toAddress.trim() === "") {
+    throw new Error("Error: toAddress not provided");
   }
-  if (
-    !changeAddress || changeAddress === "" || !isValidBitcoinAddress(toAddress)
-  ) {
-    throw new Error("Error: changeAddress not found");
+  if (!isValidBitcoinAddress(toAddress)) {
+    throw new Error("Error: toAddress is invalid or unsupported");
   }
-  if (!feeRate) {
-    throw new Error("Error: feeRate not found");
+
+  // Validate changeAddress
+  if (!changeAddress || changeAddress.trim() === "") {
+    throw new Error("Error: changeAddress not provided");
   }
-  if (!tick || tick === "") {
-    throw new Error("Error: tick not found");
+  if (!isValidBitcoinAddress(changeAddress)) {
+    throw new Error("Error: changeAddress is invalid or unsupported");
   }
+
+  // Validate feeRate
+  if (!feeRate || isNaN(feeRate)) {
+    throw new Error("Error: feeRate not provided or invalid");
+  }
+
+  // Validate tick
+  if (!tick || tick.trim() === "") {
+    throw new Error("Error: tick not provided");
+  }
+
+  // Validate max
   const float_max = new BigFloat(max);
   if (!max || max === "" || float_max.lte(0)) {
     throw new Error("Error: max not found or invalid");
   }
+
+  // Validate lim
   const float_lim = new BigFloat(lim);
-  if (!lim || lim === "" || float_lim.lte(0) || float_lim.gt(float_max)) {
+  if (
+    !lim || lim === "" || float_lim.lte(0) ||
+    float_lim.gt(float_max)
+  ) {
     throw new Error("Error: lim not found or invalid");
   }
-  if (dec < 0 || dec > 18) {
-    throw new Error("dec value invalid");
+
+  // Validate dec
+  const decValue = Number(dec);
+  if (
+    isNaN(decValue) || decValue < 0 || decValue > 18 ||
+    !Number.isInteger(decValue)
+  ) {
+    throw new Error("Error: dec must be an integer between 0 and 18");
   }
 
   // Optional validation for x (username)
@@ -196,18 +222,7 @@ export function checkDeployParams({
     throw new Error("Error: Invalid email address");
   }
 
-  // Check for dec
-  if (dec === undefined || dec === null) {
-    dec = 18; // Default to 18 if not provided
-  } else {
-    const decValue = Number(dec);
-    if (
-      isNaN(decValue) || decValue < 0 || decValue > 18 ||
-      !Number.isInteger(decValue)
-    ) {
-      throw new Error("Error: dec must be an integer between 0 and 18");
-    }
-  }
+  // If all validations pass, function completes without throwing an error
 }
 
 export async function checkEnoughBalance(

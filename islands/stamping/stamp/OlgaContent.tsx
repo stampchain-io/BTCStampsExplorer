@@ -43,6 +43,17 @@ export function OlgaContent() {
   const [stampNameError, setStampNameError] = useState<string>("");
   const [apiError, setApiError] = useState<string>("");
 
+  // Add the submissionMessage state
+  const [submissionMessage, setSubmissionMessage] = useState<
+    {
+      message: string;
+      txid?: string;
+    } | null
+  >(null);
+
+  // Add the addressError state
+  const [addressError, setAddressError] = useState<string>("");
+
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
@@ -62,6 +73,30 @@ export function OlgaContent() {
     // Set the checkbox to checked by default
     setIsLocked(true);
   }, []);
+
+  useEffect(() => {
+    // Validate wallet address on component mount and when the wallet changes
+    validateWalletAddress(wallet.value.address);
+  }, [wallet.value.address]);
+
+  const validateWalletAddress = (address: string) => {
+    // Regular expressions for supported address types
+    const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // Starts with '1' (Legacy)
+    const bech32Regex = /^bc1q[0-9a-z]{38,59}$/; // Starts with 'bc1q' (Bech32 P2WPKH)
+
+    if (
+      p2pkhRegex.test(address) ||
+      bech32Regex.test(address)
+    ) {
+      // Supported address
+      setAddressError("");
+    } else {
+      // Unsupported address
+      setAddressError(
+        "Connected wallet address type is unsupported for minting.",
+      );
+    }
+  };
 
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
@@ -178,6 +213,11 @@ export function OlgaContent() {
 
   const handleMint = async () => {
     try {
+      // Before proceeding, check if there's an address error
+      if (addressError) {
+        throw new Error(addressError);
+      }
+
       log("Starting minting process");
 
       if (!isConnected.value) {
@@ -192,6 +232,9 @@ export function OlgaContent() {
         log("Converting file to base64");
         const data = await toBase64(file);
         log("File converted to base64", { fileSize: data.length });
+
+        // Do not convert fee rate; use it directly
+        console.log(`User-selected fee rate: ${fee} sat/vB`);
 
         log("Preparing mint request");
         const mintRequest: any = {
@@ -221,6 +264,7 @@ export function OlgaContent() {
         }
 
         log("Response data", response.data);
+        console.log("txDetails:", response.data.txDetails);
 
         if (!response.data.hex) {
           throw new Error("Invalid response structure: missing hex field");
@@ -233,30 +277,42 @@ export function OlgaContent() {
           walletContext.wallet.value.provider,
         );
 
-        const inputsToSign = txDetails.map((
-          input: { signingIndex: number },
-        ) => ({
-          address: walletContext.wallet.value.address,
-          signingIndexes: [input.signingIndex],
-        }));
+        // Correctly construct inputsToSign with index
+        const inputsToSign = txDetails.map(
+          (input: { signingIndex: number }) => {
+            if (typeof input.signingIndex !== "number") {
+              throw new Error(
+                "signingIndex is missing or invalid in txDetails",
+              );
+            }
+            return {
+              index: input.signingIndex,
+            };
+          },
+        );
+        console.log("Constructed inputsToSign:", inputsToSign);
 
         const result = await walletProvider.signPSBT(hex, inputsToSign);
+        console.log("Result from walletProvider.signPSBT:", result);
 
-        if (result === null) {
-          setApiError("Transaction was cancelled by the user");
+        if (!result || !result.signed) {
+          const errorMsg = result?.error || "Unknown error signing transaction";
+          setApiError(`Transaction signing failed: ${errorMsg}`);
+          console.error("Transaction signing failed:", errorMsg);
           return;
         }
 
-        if (typeof result === "string") {
-          if (result.startsWith("0x") || result.length === 64) {
-            log("Transaction signed and broadcast successfully. TXID:", result);
-            alert(
-              `Transaction signed and broadcast successfully. TXID: ${result}`,
-            );
-          } else {
-            log("Transaction signed successfully. Signed PSBT:", result);
-            alert(`Transaction signed successfully. Signed PSBT: ${result}`);
-          }
+        // Inside the try block after successful operations
+        if (result.txid) {
+          log(
+            "Transaction signed and broadcast successfully. TXID:",
+            result.txid,
+          );
+          setSubmissionMessage({
+            message: "Transaction broadcasted successfully.",
+            txid: result.txid,
+          });
+          setApiError(""); // Clear any previous errors
         } else {
           throw new Error("Unexpected result from signing transaction");
         }
@@ -268,12 +324,19 @@ export function OlgaContent() {
       console.error("Unexpected error in handleMint:", error);
       let errorMessage = "An unexpected error occurred during minting";
 
-      if (error.response) {
-        console.error("API Error Response:", error.response);
-        if (error.response.data && error.response.data.error) {
-          errorMessage = error.response.data.error;
-        } else if (error.response.data && error.response.data.message) {
-          errorMessage = error.response.data.message;
+      if (error.response && error.response.data) {
+        const responseData = error.response.data;
+        if (responseData.error) {
+          errorMessage = responseData.error;
+        } else if (responseData.message) {
+          errorMessage = responseData.message;
+        } else if (responseData.data && responseData.data.message) {
+          errorMessage = responseData.data.message;
+        } else if (
+          responseData.data && responseData.data.args &&
+          responseData.data.args[0]
+        ) {
+          errorMessage = responseData.data.args[0];
         }
       } else if (error instanceof Error) {
         errorMessage = error.message;
@@ -281,15 +344,14 @@ export function OlgaContent() {
       }
 
       if (errorMessage.includes("insufficient funds")) {
-        if (isPoshStamp) {
-          errorMessage = "Insufficient BTC or XCP in User's Wallet";
-        } else {
-          errorMessage = "Insufficient BTC in User's Wallet";
-        }
+        errorMessage = isPoshStamp
+          ? "Insufficiently Sized UTXO, BTC or XCP in User's Wallet"
+          : "Insufficiently Sized UTXO or BTC in User's Wallet";
       }
 
-      log("Final error message", errorMessage);
+      console.error("Final error message:", errorMessage);
       setApiError(errorMessage);
+      setSubmissionMessage(null);
     }
   };
 
@@ -307,6 +369,13 @@ export function OlgaContent() {
       <p class="text-[#5503A6] text-3xl md:text-6xl font-black mt-6 w-full text-center">
         STAMP
       </p>
+
+      {/* Display address error if any */}
+      {addressError && (
+        <div class="w-full text-red-500 text-center font-bold">
+          {addressError}
+        </div>
+      )}
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
         <div className="flex flex-col md:flex-row gap-8">
@@ -580,6 +649,25 @@ export function OlgaContent() {
         {apiError && (
           <div class="w-full text-red-500 text-center">
             {apiError}
+          </div>
+        )}
+
+        {submissionMessage && (
+          <div class="w-full text-center font-bold text-white">
+            {submissionMessage.message}
+            {submissionMessage.txid && (
+              <>
+                &nbsp;TXID:&nbsp;
+                <a
+                  href={`https://mempool.space/tx/${submissionMessage.txid}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-blue-500 underline"
+                >
+                  {submissionMessage.txid}
+                </a>
+              </>
+            )}
           </div>
         )}
       </div>
