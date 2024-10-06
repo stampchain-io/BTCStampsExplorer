@@ -138,46 +138,57 @@ export function DeployContent(
       </p>
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6 w-full flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div
-            id="image-preview"
-            class="relative max-w-sm border border-[#F5F5F5] rounded-md items-center mx-auto text-center cursor-pointer min-w-[324px] h-[324px] content-center bg-[#2B0E49]"
-          >
-            <input
-              id="upload"
-              type="file"
-              class="hidden"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-            {formState.file !== null && (
-              <img
-                width={324}
-                style={{
-                  height: "100%",
-                  objectFit: "contain",
-                  imageRendering: "pixelated",
-                  backgroundColor: "rgb(0,0,0)",
-                  borderRadius: "6px",
-                }}
-                src={URL.createObjectURL(formState.file)}
+        <div className="flex gap-6">
+          <div className="flex flex-col gap-6">
+            <div
+              id="image-preview"
+              class="relative max-w-sm rounded-[3px] items-center mx-auto text-center cursor-pointer min-w-[120px] h-[120px] content-center bg-[#660099]"
+            >
+              <input
+                id="upload"
+                type="file"
+                class="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
               />
-            )}
-            {formState.file === null && (
-              <label
-                for="upload"
-                class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
-              >
+              {formState.file !== null && (
                 <img
-                  src="/img/mint/icon-image-upload.png"
-                  class="w-20 h-20"
-                  alt=""
+                  width={324}
+                  style={{
+                    height: "100%",
+                    objectFit: "contain",
+                    imageRendering: "pixelated",
+                    backgroundColor: "rgb(0,0,0)",
+                    borderRadius: "6px",
+                  }}
+                  src={URL.createObjectURL(formState.file)}
                 />
-                <h5 class="text-[#F5F5F5] text-2xl font-semibold">
-                  Upload Image
-                </h5>
-              </label>
-            )}
+              )}
+              {formState.file === null && (
+                <label
+                  for="upload"
+                  class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
+                >
+                  <img
+                    src="/img/mint/icon-image-upload.png"
+                    class="w-16 h-16"
+                    alt=""
+                  />
+                </label>
+              )}
+            </div>
+
+            <div class="w-full">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+                placeholder="Decimal amount"
+                value={formState.dec}
+                onChange={(e) => handleInputChange(e, "dec")}
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-6 w-full">
@@ -234,18 +245,6 @@ export function DeployContent(
                 <p class="text-red-500 mt-2">{formState.maxError}</p>
               )}
             </div>
-
-            <div class="w-full">
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Decimal amount"
-                value={formState.dec}
-                onChange={(e) => handleInputChange(e, "dec")}
-              />
-            </div>
           </div>
         </div>
 
@@ -263,7 +262,7 @@ export function DeployContent(
               // value={formState.description}
               // onChange={(e) => handleInputChange(e, "description")}
             />
-            <div className="w-full flex flex-col md:flex-row gap-6">
+            <div className="w-full flex gap-6">
               <input
                 type="text"
                 class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
@@ -279,7 +278,7 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "web")}
               />
             </div>
-            <div className="w-full flex flex-col md:flex-row gap-6">
+            <div className="w-full flex gap-6">
               <input
                 type="email"
                 class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"

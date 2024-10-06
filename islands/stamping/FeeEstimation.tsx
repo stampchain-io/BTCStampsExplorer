@@ -287,7 +287,7 @@ export function FeeEstimation({
               htmlFor="tosAgreed"
               className="text-[#999999] text-xs font-medium contents"
             >
-              I agree to the{" "}
+              I AGREE TO THE{" "}
               <span className="block md:hidden text-[#8800CC]">ToS</span>
               <span className="hidden md:block text-[#8800CC]">
                 terms of service
