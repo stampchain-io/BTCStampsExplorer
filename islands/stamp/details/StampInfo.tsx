@@ -7,7 +7,7 @@ import StampBuyModal from "./StampBuyModal.tsx";
 
 import { StampRow } from "globals";
 
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 dayjs.extend(relativeTime);
 
@@ -34,12 +34,54 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
   };
 
   const timestamp = new Date(stamp.block_time);
-  const _kind = stamp.is_btc_stamp
+  const _type = stamp.is_btc_stamp
     ? "stamp"
     : stamp.cpid.startsWith("A")
     ? "cursed"
-    : "named";
+    : "posh";
 
+  const editionCount = stamp.divisible
+    ? (stamp.supply / 100000000).toFixed(2)
+    : stamp.supply > 100000
+    ? "+100000"
+    : stamp.supply;
+
+  const editionLabel = stamp.supply === 1 ? "edition" : "editions";
+  const [imageDimensions, setImageDimensions] = useState<
+    { width: number; height: number } | null
+  >(null);
+  const [imageSize, setImageSize] = useState<number | null>(null);
+
+  const fileExtension = stamp.stamp_url
+    ? stamp.stamp_url.split(".").pop()?.split("?")[0].toLowerCase()
+    : "unknown";
+
+  useEffect(() => {
+    if (stamp.stamp_mimetype.startsWith("image/") && stamp.stamp_url) {
+      // Create an Image object to get dimensions
+      const img = new Image();
+      img.onload = () => {
+        setImageDimensions({
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+        });
+      };
+      img.onerror = () => {
+        console.error("Failed to load image for dimensions.");
+      };
+      img.src = stamp.stamp_url;
+
+      // Fetch the image to get file size
+      fetch(stamp.stamp_url)
+        .then((response) => response.blob())
+        .then((blob) => {
+          setImageSize(blob.size);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch image size:", error);
+        });
+    }
+  }, [stamp.stamp_mimetype, stamp.stamp_url]);
   return (
     <>
       <div className={"flex flex-col gap-4"}>
@@ -69,9 +111,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           </p>
 
           <p class="text-[#666666] font-bold text-3xl">
-            {stamp.divisible
-              ? (stamp.supply / 100000000).toFixed(2)
-              : (stamp.supply > 100000 ? "+100000" : stamp.supply)} edition
+            {editionCount} {editionLabel}
           </p>
 
           <p class="text-[#666666] font-medium text-2xl">
@@ -98,19 +138,21 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           <div class="flex justify-between items-center flex-col md:items-start gap-1">
             <p class="text-[#660099] font-light uppercase">TYPE</p>
             <p class="text-[#999999] uppercase">
-              {stamp.locked ?? false ? "Yes" : "No"}
+              {fileExtension}
             </p>
           </div>
           <div class="flex justify-between items-center flex-col md:items-center gap-1">
             <p class="text-[#660099] font-light uppercase">DIMENSIONS</p>
             <p class="text-[#999999] uppercase">
-              {stamp.divisible ? "Yes" : "No"}
+              {imageDimensions
+                ? `${imageDimensions.width} x ${imageDimensions.height}px`
+                : "N/A"}
             </p>
           </div>
           <div class="flex justify-between items-center flex-col md:items-end gap-1">
             <p class="text-[#660099] font-light uppercase">SIZE</p>
             <p class="text-[#999999] uppercase">
-              {stamp.keyburn ?? false ? "Yes" : "No"}
+              {imageSize ? `${(imageSize / 1024).toFixed(2)} KB` : "N/A"}
             </p>
           </div>
         </div>
