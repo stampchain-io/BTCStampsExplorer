@@ -23,7 +23,7 @@ export function OlgaContent() {
   }
 
   const { wallet, isConnected } = walletContext;
-  const { address } = wallet.value;
+  const address = isConnected.value ? wallet.value.address : undefined;
 
   type FileType = File | null;
 
@@ -51,8 +51,10 @@ export function OlgaContent() {
     } | null
   >(null);
 
-  // Add the addressError state
-  const [addressError, setAddressError] = useState<string>("");
+  // Initialize addressError as undefined
+  const [addressError, setAddressError] = useState<string | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (fees && !loading) {
@@ -74,22 +76,24 @@ export function OlgaContent() {
     setIsLocked(true);
   }, []);
 
+  // Update useEffect to handle changes in isConnected and address
   useEffect(() => {
-    // Validate wallet address on component mount and when the wallet changes
-    validateWalletAddress(wallet.value.address);
-  }, [wallet.value.address]);
+    if (isConnected.value && address) {
+      validateWalletAddress(address);
+    } else {
+      // Clear the address error when no wallet is connected
+      setAddressError(undefined);
+    }
+  }, [address, isConnected.value]);
 
   const validateWalletAddress = (address: string) => {
     // Regular expressions for supported address types
-    const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // Starts with '1' (Legacy)
-    const bech32Regex = /^bc1q[0-9a-z]{38,59}$/; // Starts with 'bc1q' (Bech32 P2WPKH)
+    const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // P2PKH (Legacy)
+    const bech32Regex = /^bc1q[0-9a-z]{38,59}$/; // Bech32 P2WPKH
 
-    if (
-      p2pkhRegex.test(address) ||
-      bech32Regex.test(address)
-    ) {
+    if (p2pkhRegex.test(address) || bech32Regex.test(address)) {
       // Supported address
-      setAddressError("");
+      setAddressError(undefined);
     } else {
       // Unsupported address
       setAddressError(
@@ -370,8 +374,7 @@ export function OlgaContent() {
         STAMP
       </p>
 
-      {/* Display address error if any */}
-      {addressError && (
+      {isConnected.value && addressError && (
         <div class="w-full text-red-500 text-center font-bold">
           {addressError}
         </div>
@@ -648,28 +651,31 @@ export function OlgaContent() {
           buttonName="Stamp"
         />
 
-        {apiError && (
-          <div class="w-full text-red-500 text-center">
-            {apiError}
-          </div>
-        )}
-
         {submissionMessage && (
-          <div class="w-full text-center font-bold text-white">
-            {submissionMessage.message}
+          <div class="w-full text-center text-white mt-4">
+            <p>{submissionMessage.message}</p>
             {submissionMessage.txid && (
-              <>
-                &nbsp;TXID:&nbsp;
+              <div
+                class="overflow-x-auto"
+                style={{ maxWidth: "100%" }}
+              >
+                <span>TXID:&nbsp;</span>
                 <a
                   href={`https://mempool.space/tx/${submissionMessage.txid}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-blue-500 underline"
+                  class="text-blue-500 underline whitespace-nowrap"
                 >
                   {submissionMessage.txid}
                 </a>
-              </>
+              </div>
             )}
+          </div>
+        )}
+
+        {apiError && (
+          <div class="w-full text-red-500 text-center mt-4">
+            {apiError}
           </div>
         )}
       </div>
