@@ -1,6 +1,5 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { MintStampInputData, TX, TXError } from "globals";
-// import { conf } from "utils/config.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { mintStampCIP33 } from "utils/minting/olga/mint.ts";
 import { validateAndPrepareAssetName } from "utils/minting/stamp.ts";
@@ -46,18 +45,30 @@ export const handler: Handlers<TX | TXError> = {
 
       console.log("Successful mint_tx:", mint_tx);
 
-      // Update the txDetails mapping
-      const txDetails = mint_tx.psbt.data.inputs.map((
-        input: any,
-        index: number,
-      ) => ({
-        txid: input.hash
-          ? Buffer.from(input.hash).reverse().toString("hex")
-          : "",
-        vout: input.index ?? 0,
-        signingIndex: index,
-      }));
+      // Update the txDetails mapping without changing the API response format
+      const txInputs = mint_tx.psbt.txInputs;
+      const txDetails = txInputs.map((input: any, index: number) => {
+        let txid = "";
+        let vout = 0;
 
+        if (input.hash && typeof input.index === "number") {
+          txid = Buffer.from(input.hash).reverse().toString("hex");
+          vout = input.index;
+        } else {
+          throw new Error(
+            `Unable to extract txid and vout for input at index ${index}`,
+          );
+        }
+
+        // Ensure signingIndex corresponds to the correct input index
+        return {
+          txid,
+          vout,
+          signingIndex: index, // This ensures the signingIndex matches the input index
+        };
+      });
+
+      // Return the API response with the same format
       return ResponseUtil.success({
         hex: mint_tx.psbt.toHex(),
         base64: mint_tx.psbt.toBase64(),

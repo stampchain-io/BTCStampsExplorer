@@ -42,13 +42,16 @@ export function useSRC20Form(
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionMessage, setSubmissionMessage] = useState<string | null>(
-    null,
-  );
+  const [submissionMessage, setSubmissionMessage] = useState<
+    {
+      message: string;
+      txid?: string;
+    } | null
+  >(null);
   const [walletError, setWalletError] = useState<string | null>(null);
 
-  const { wallet, isConnected } = walletContext;
-  const { address } = wallet.value;
+  const { wallet } = walletContext;
+  const address = wallet.value.address; // This will be the selected address
 
   const isLoading = configLoading || feeLoading;
 
@@ -246,7 +249,7 @@ export function useSRC20Form(
     console.log("handleSubmit called with trxType:", trxType);
     console.log("Entering handleSubmit in useSRC20Form");
 
-    if (!isConnected.value) {
+    if (!walletContext.isConnected.value) {
       console.log("Wallet not connected. Showing connect modal.");
       showConnectWalletModal.value = true;
       return;
@@ -260,7 +263,7 @@ export function useSRC20Form(
     }
 
     setIsSubmitting(true);
-    setSubmissionMessage("Please wait...");
+    setSubmissionMessage({ message: "Please wait..." });
 
     try {
       if (!config) throw new Error("Configuration not loaded");
@@ -350,18 +353,21 @@ export function useSRC20Form(
 
       if (walletResult.signed) {
         console.log("Transaction signed successfully");
-        setSubmissionMessage("Transaction signed successfully");
-        if (walletResult.psbt) {
-          console.log("Signed PSBT:", walletResult.psbt);
-        }
+        // Include txid in the submissionMessage
+        setSubmissionMessage({
+          message: "Transaction broadcasted successfully.",
+          txid: walletResult.txid,
+        });
       } else if (walletResult.cancelled) {
         console.log("Transaction signing cancelled by user");
-        setSubmissionMessage("Transaction signing cancelled by user");
+        setSubmissionMessage({
+          message: "Transaction signing cancelled by user.",
+        });
       } else {
         console.log("Transaction signing failed:", walletResult.error);
-        setSubmissionMessage(
-          `Transaction signing failed: ${walletResult.error}`,
-        );
+        setSubmissionMessage({
+          message: `Transaction signing failed: ${walletResult.error}`,
+        });
       }
 
       return response.data;
