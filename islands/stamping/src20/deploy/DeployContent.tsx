@@ -313,39 +313,42 @@ export function DeployContent(
           buttonName="Deploy"
         />
 
+        {submissionMessage && (
+          <div class="w-full text-center text-white mt-4">
+            <p>{submissionMessage.message}</p>
+            {submissionMessage.txid && (
+              <div
+                class="overflow-x-auto"
+                style={{ maxWidth: "100%" }}
+              >
+                <span>TXID:&nbsp;</span>
+                <a
+                  href={`https://mempool.space/tx/${submissionMessage.txid}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-blue-500 underline whitespace-nowrap"
+                >
+                  {submissionMessage.txid}
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+
         {apiError && (
-          <div class="w-full text-red-500 text-center">
+          <div class="w-full text-red-500 text-center mt-4">
             {apiError}
           </div>
         )}
 
         {fileUploadError && (
-          <div class="w-full text-yellow-500 text-center">
+          <div class="w-full text-yellow-500 text-center mt-4">
             {fileUploadError}
           </div>
         )}
 
-        {submissionMessage && (
-          <div class="w-full text-center font-bold text-white">
-            {submissionMessage.message}
-            {submissionMessage.txid && (
-              <>
-                &nbsp;TXID:&nbsp;
-                <a
-                  href={`https://mempool.space/tx/${submissionMessage.txid}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-blue-500 underline"
-                >
-                  {submissionMessage.txid}
-                </a>
-              </>
-            )}
-          </div>
-        )}
-
         {walletError && (
-          <div class="w-full text-red-500 text-center">
+          <div class="w-full text-red-500 text-center mt-4">
             {walletError}
           </div>
         )}
