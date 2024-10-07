@@ -157,24 +157,23 @@ const StampBuyModal = (
 
   return (
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
       onClick={handleCloseModal}
     >
       <div class="relative p-4 w-full max-w-[360px] h-auto">
         <div
-          class="relative bg-white rounded-lg shadow dark:bg-[#0B0B0B] overflow-hidden"
+          class="relative bg-[#0B0B0B] rounded-lg shadow overflow-hidden"
           onClick={(e) => e.stopPropagation()} // Prevent click from closing the modal
         >
           <div class="flex flex-col gap-4 items-center justify-between p-4 md:p-5 rounded-t">
             <button
               onClick={toggleModal}
               type="button"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-              data-modal-hide="default-modal"
+              class="text-gray-400 hover:bg-gray-600 hover:text-white rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+              aria-label="Close modal"
             >
               <svg
                 class="w-3 h-3"
-                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 14 14"
@@ -184,10 +183,9 @@ const StampBuyModal = (
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                  d="M1 1l6 6m0 0l6 6M7 7l6-6M7 7L1 13"
                 />
               </svg>
-              <span class="sr-only">Close modal</span>
             </button>
             <StampImage stamp={stamp} className="w-[200px] !p-2" flag={false} />
             <p
