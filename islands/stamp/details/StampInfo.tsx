@@ -129,12 +129,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             {stamp.stamp_mimetype}
           </span>
 
-          <button
-            className={"border-[3px] border-[#660099] rounded-md text-xl leading-6 text-[#660099] px-6 py-4 float-right mt-28"}
-            onClick={toggleModal}
-          >
-            BUY
-          </button>
+          {lowestPriceDispenser && (
+            <button
+              className={"border-[3px] border-[#660099] rounded-md text-xl leading-6 text-[#660099] px-6 py-4 float-right mt-28"}
+              onClick={toggleModal}
+            >
+              BUY
+            </button>
+          )}
         </div>
 
         <div
