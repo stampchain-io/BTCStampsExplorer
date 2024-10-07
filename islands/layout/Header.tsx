@@ -220,7 +220,7 @@ export function Header() {
             </a>
             <div className="flex flex-col text-center">
               <a
-                href="/stamp?type=all"
+                href="/stamp?type=classic"
                 f-partial="/stamp?type=classic"
                 onClick={() => {
                   toggleMenu();
