@@ -29,6 +29,7 @@ interface StampDetailPageProps {
     last_block: number;
     stamps_recent: any;
     collections: CollectionRow[];
+    lowestPriceDispenser: any; // Add this property
   };
 }
 
@@ -42,6 +43,7 @@ interface StampData {
   last_block: number;
   stamps_recent: any;
   collections: CollectionRow[];
+  lowestPriceDispenser: any;
 }
 
 export const handler: Handlers<StampData> = {
@@ -74,11 +76,26 @@ export const handler: Handlers<StampData> = {
         limit: collectionsData.limit,
       };
 
+      // Find the lowest price open dispenser
+      const openDispensers = stampData.data.dispensers.filter((d) =>
+        d.give_remaining > 0
+      );
+      const lowestPriceDispenser = openDispensers.reduce(
+        (lowest, dispenser) => {
+          if (!lowest || dispenser.satoshirate < lowest.satoshirate) {
+            return dispenser;
+          }
+          return lowest;
+        },
+        null,
+      );
+
       return ctx.render({
         ...stampData.data,
         stamps_recent: result,
         collections,
         last_block: stampData.last_block,
+        lowestPriceDispenser,
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
@@ -96,6 +113,7 @@ export default function StampPage(props: StampDetailPageProps) {
     dispensers,
     dispenses,
     stamps_recent,
+    lowestPriceDispenser,
   } = props.data;
 
   const title = stamp.name
@@ -144,7 +162,10 @@ export default function StampPage(props: StampDetailPageProps) {
             {/* <StampShare stamp={stamp} /> */}
           </div>
           <div>
-            <StampInfo stamp={stamp} />
+            <StampInfo
+              stamp={stamp}
+              lowestPriceDispenser={lowestPriceDispenser}
+            />
           </div>
         </div>
 

@@ -11,7 +11,12 @@ import { useEffect, useState } from "preact/hooks";
 
 dayjs.extend(relativeTime);
 
-export function StampInfo({ stamp }: { stamp: StampRow }) {
+interface StampInfoProps {
+  stamp: StampRow;
+  lowestPriceDispenser: any;
+}
+
+export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   console.log("stamp: ", stamp);
 
   const [fee, setFee] = useState<number>(0);
@@ -233,6 +238,7 @@ export function StampInfo({ stamp }: { stamp: StampRow }) {
           handleChangeFee={handleChangeFee}
           toggleModal={() => setIsModalOpen(false)}
           handleCloseModal={handleCloseModal}
+          dispenser={lowestPriceDispenser} // Pass the dispenser to the modal
         />
       )}
 

@@ -734,4 +734,303 @@ export class XcpManager {
       asset.result
     );
   }
+
+  static async createDispense(
+    address: string,
+    dispenser: string,
+    quantity: number,
+    options: {
+      encoding?: string;
+      fee_per_kb?: number;
+      regular_dust_size?: number;
+      multisig_dust_size?: number;
+      pubkeys?: string;
+      allow_unconfirmed_inputs?: boolean;
+      exact_fee?: number;
+      fee_provided?: number;
+      unspent_tx_hash?: string;
+      dust_return_pubkey?: string;
+      disable_utxo_locks?: boolean;
+      p2sh_pretx_txid?: string;
+      segwit?: boolean;
+      confirmation_target?: number;
+      exclude_utxos?: string;
+      inputs_set?: string;
+      return_psbt?: boolean;
+      return_only_data?: boolean;
+      extended_tx_info?: boolean;
+      old_style_api?: boolean;
+      verbose?: boolean;
+      show_unconfirmed?: boolean;
+    } = {},
+  ): Promise<any> {
+    const endpoint = `/addresses/${address}/compose/dispense`;
+    const queryParams = new URLSearchParams();
+
+    queryParams.append("dispenser", dispenser);
+    queryParams.append("quantity", quantity.toString());
+
+    // Append optional parameters if provided
+    for (const [key, value] of Object.entries(options)) {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, value.toString());
+      }
+    }
+
+    for (const node of xcp_v2_nodes) {
+      const url = `${node.url}${endpoint}?${queryParams.toString()}`;
+      console.log(`Attempting to fetch from URL: ${url}`);
+
+      try {
+        const response = await fetch(url);
+        console.log(`Response status from ${node.name}: ${response.status}`);
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error(`Error response body from ${node.name}: ${errorBody}`);
+          continue; // Try the next node
+        }
+
+        const data = await response.json();
+        console.log(`Successful response from ${node.name}`);
+        return data;
+      } catch (error) {
+        console.error(`Fetch error for ${url}:`, error);
+        // Continue to the next node
+      }
+    }
+
+    throw new Error("All nodes failed to compose dispense transaction.");
+  }
+
+  static async composeAttach(
+    address: string,
+    asset: string,
+    quantity: number,
+    options: {
+      destination?: string;
+      encoding?: string;
+      fee_per_kb?: number;
+      regular_dust_size?: number;
+      multisig_dust_size?: number;
+      pubkeys?: string;
+      allow_unconfirmed_inputs?: boolean;
+      exact_fee?: number;
+      fee_provided?: number;
+      unspent_tx_hash?: string;
+      dust_return_pubkey?: string;
+      disable_utxo_locks?: boolean;
+      p2sh_pretx_txid?: string;
+      segwit?: boolean;
+      confirmation_target?: number;
+      exclude_utxos?: string;
+      inputs_set?: string;
+      return_psbt?: boolean;
+      return_only_data?: boolean;
+      extended_tx_info?: boolean;
+      old_style_api?: boolean;
+      verbose?: boolean;
+      show_unconfirmed?: boolean;
+    } = {},
+  ): Promise<any> {
+    const endpoint = `/addresses/${address}/compose/attach`;
+    const queryParams = new URLSearchParams();
+
+    queryParams.append("asset", asset);
+    queryParams.append("quantity", quantity.toString());
+
+    // Append optional parameters if provided
+    if (options.destination) {
+      queryParams.append("destination", options.destination);
+    }
+
+    for (const [key, value] of Object.entries(options)) {
+      if (value !== undefined && value !== null && key !== "destination") {
+        queryParams.append(key, value.toString());
+      }
+    }
+
+    for (const node of xcp_v2_nodes) {
+      const url = `${node.url}${endpoint}?${queryParams.toString()}`;
+      console.log(`Attempting to fetch from URL: ${url}`);
+
+      try {
+        const response = await fetch(url);
+        console.log(`Response status from ${node.name}: ${response.status}`);
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error(`Error response body from ${node.name}: ${errorBody}`);
+          continue; // Try the next node
+        }
+
+        const data = await response.json();
+        console.log(`Successful response from ${node.name}`);
+        return data;
+      } catch (error) {
+        console.error(`Fetch error for ${url}:`, error);
+        // Continue to the next node
+      }
+    }
+
+    throw new Error("All nodes failed to compose attach transaction.");
+  }
+
+  static async composeDetach(
+    utxo: string,
+    destination: string,
+    asset: string,
+    quantity: number,
+    options: {
+      encoding?: string;
+      fee_per_kb?: number;
+      regular_dust_size?: number;
+      multisig_dust_size?: number;
+      pubkeys?: string;
+      allow_unconfirmed_inputs?: boolean;
+      exact_fee?: number;
+      fee_provided?: number;
+      unspent_tx_hash?: string;
+      dust_return_pubkey?: string;
+      disable_utxo_locks?: boolean;
+      p2sh_pretx_txid?: string;
+      segwit?: boolean;
+      confirmation_target?: number;
+      exclude_utxos?: string;
+      inputs_set?: string;
+      return_psbt?: boolean;
+      return_only_data?: boolean;
+      extended_tx_info?: boolean;
+      old_style_api?: boolean;
+      verbose?: boolean;
+      show_unconfirmed?: boolean;
+    } = {},
+  ): Promise<any> {
+    const endpoint = `/utxos/${utxo}/compose/detach`;
+    const queryParams = new URLSearchParams();
+
+    queryParams.append("destination", destination);
+    queryParams.append("asset", asset);
+    queryParams.append("quantity", quantity.toString());
+
+    // Append optional parameters if provided
+    for (const [key, value] of Object.entries(options)) {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, value.toString());
+      }
+    }
+
+    for (const node of xcp_v2_nodes) {
+      const url = `${node.url}${endpoint}?${queryParams.toString()}`;
+      console.log(`Attempting to fetch from URL: ${url}`);
+
+      try {
+        const response = await fetch(url);
+        console.log(`Response status from ${node.name}: ${response.status}`);
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error(`Error response body from ${node.name}: ${errorBody}`);
+          continue; // Try the next node
+        }
+
+        const data = await response.json();
+        console.log(`Successful response from ${node.name}`);
+        return data;
+      } catch (error) {
+        console.error(`Fetch error for ${url}:`, error);
+        // Continue to the next node
+      }
+    }
+
+    throw new Error("All nodes failed to compose detach transaction.");
+  }
+
+  static async composeDispenser(
+    address: string,
+    asset: string,
+    give_quantity: number,
+    escrow_quantity: number,
+    mainchainrate: number,
+    status: number,
+    options: {
+      open_address?: string;
+      oracle_address?: string;
+      encoding?: string;
+      fee_per_kb?: number;
+      regular_dust_size?: number;
+      multisig_dust_size?: number;
+      pubkeys?: string;
+      allow_unconfirmed_inputs?: boolean;
+      exact_fee?: number;
+      fee_provided?: number;
+      unspent_tx_hash?: string;
+      dust_return_pubkey?: string;
+      disable_utxo_locks?: boolean;
+      p2sh_pretx_txid?: string;
+      segwit?: boolean;
+      confirmation_target?: number;
+      exclude_utxos?: string;
+      inputs_set?: string;
+      return_psbt?: boolean;
+      return_only_data?: boolean;
+      extended_tx_info?: boolean;
+      old_style_api?: boolean;
+      verbose?: boolean;
+      show_unconfirmed?: boolean;
+    } = {},
+  ): Promise<any> {
+    const endpoint = `/addresses/${address}/compose/dispenser`;
+    const queryParams = new URLSearchParams();
+
+    queryParams.append("asset", asset);
+    queryParams.append("give_quantity", give_quantity.toString());
+    queryParams.append("escrow_quantity", escrow_quantity.toString());
+    queryParams.append("mainchainrate", mainchainrate.toString());
+    queryParams.append("status", status.toString());
+
+    if (options.open_address) {
+      queryParams.append("open_address", options.open_address);
+    }
+    if (options.oracle_address) {
+      queryParams.append("oracle_address", options.oracle_address);
+    }
+
+    // Append other optional parameters if provided
+    for (const [key, value] of Object.entries(options)) {
+      if (
+        value !== undefined &&
+        value !== null &&
+        key !== "open_address" &&
+        key !== "oracle_address"
+      ) {
+        queryParams.append(key, value.toString());
+      }
+    }
+
+    for (const node of xcp_v2_nodes) {
+      const url = `${node.url}${endpoint}?${queryParams.toString()}`;
+      console.log(`Attempting to fetch from URL: ${url}`);
+
+      try {
+        const response = await fetch(url);
+        console.log(`Response status from ${node.name}: ${response.status}`);
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error(`Error response body from ${node.name}: ${errorBody}`);
+          continue; // Try the next node
+        }
+
+        const data = await response.json();
+        console.log(`Successful response from ${node.name}`);
+        return data;
+      } catch (error) {
+        console.error(`Fetch error for ${url}:`, error);
+        // Continue to the next node
+      }
+    }
+
+    throw new Error("All nodes failed to compose dispenser transaction.");
+  }
 }
