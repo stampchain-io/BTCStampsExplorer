@@ -40,7 +40,7 @@ export function TransferContent(
         TRANSFER
       </p>
 
-      <div className="flex flex-col gap-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
+      <div className="flex flex-col gap-3 md:gap-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
         <div class="w-full">
           <input
             type="text"
@@ -54,32 +54,28 @@ export function TransferContent(
           )}
         </div>
 
-        <div className="w-full flex flex-col md:flex-row gap-6">
-          <div class="w-full">
-            <input
-              type="text"
-              class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-              placeholder="Token"
-              value={formState.token}
-              onChange={(e) => handleInputChange(e, "token")}
-            />
-          </div>
+        <div className="w-full flex flex-col md:flex-row gap-3 md:gap-6">
+          <input
+            type="text"
+            class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+            placeholder="Token"
+            value={formState.token}
+            onChange={(e) => handleInputChange(e, "token")}
+          />
 
-          <div class="w-full">
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-              placeholder="Amount"
-              value={formState.amt}
-              onChange={(e) => handleInputChange(e, "amt")}
-            />
-          </div>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+            placeholder="Amount"
+            value={formState.amt}
+            onChange={(e) => handleInputChange(e, "amt")}
+          />
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

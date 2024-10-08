@@ -77,13 +77,28 @@ export default function StampingSrc20Page(
         {selectedTab === "transfer" && <TransferContent trxType={trxType} />}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6 w-full px-2 md:px-0">
-        <div className="w-full md:w-1/2">
+      <div
+        className={`flex flex-col gap-6 w-full ${
+          selectedTab === "mint" ? "lg:flex-row" : "md:flex-row"
+        }`}
+      >
+        <div
+          className={`w-full ${
+            selectedTab === "mint" ? "lg:w-1/2" : "md:w-1/2"
+          }`}
+        >
           <FAQModule />
+          {selectedTab === "mint" && <RecentDeploy />}
         </div>
-        {selectedTab === "mint" && <PopularMinting />}
-        {selectedTab === "deploy" && <RecentDeploy />}
-        {selectedTab === "transfer" && <LatestTransfer />}
+        <div
+          className={`w-full ${
+            selectedTab === "mint" ? "lg:w-1/2" : "md:w-1/2"
+          }`}
+        >
+          {selectedTab === "mint" && <PopularMinting />}
+          {selectedTab === "deploy" && <RecentDeploy />}
+          {selectedTab === "transfer" && <LatestTransfer />}
+        </div>
       </div>
     </div>
   );

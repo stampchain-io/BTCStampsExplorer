@@ -52,7 +52,7 @@ export function DeployContent(
     }
   };
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = (file: File) => {
     if (!file) return;
 
     const reader = new FileReader();
@@ -137,12 +137,12 @@ export function DeployContent(
         DEPLOY
       </p>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6 w-full flex flex-col gap-6">
-        <div className="flex gap-6">
-          <div className="flex flex-col gap-6">
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6 w-full flex flex-col gap-3 md:gap-6">
+        <div className="flex gap-3 md:gap-6">
+          <div className="flex flex-col gap-3 md:gap-6 !w-[108px] md:!w-[120px]">
             <div
               id="image-preview"
-              class="relative max-w-sm rounded-[3px] items-center mx-auto text-center cursor-pointer min-w-[120px] h-[120px] content-center bg-[#660099]"
+              class="relative rounded-[3px] items-center text-center cursor-pointer min-w-[108px] md:min-w-[120px] h-[108px] md:h-[120px] content-center bg-[#660099]"
             >
               <input
                 id="upload"
@@ -170,29 +170,27 @@ export function DeployContent(
                   class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
                 >
                   <img
-                    src="/img/mint/icon-image-upload.png"
-                    class="w-16 h-16"
+                    src="/img/stamping/image-upload.svg"
+                    class="w-12 h-12"
                     alt=""
                   />
                 </label>
               )}
             </div>
 
-            <div class="w-full">
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Decimal amount"
-                value={formState.dec}
-                onChange={(e) => handleInputChange(e, "dec")}
-              />
-            </div>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+              placeholder="Decimal amount"
+              value={formState.dec}
+              onChange={(e) => handleInputChange(e, "dec")}
+            />
           </div>
 
-          <div className="flex flex-col gap-6 w-full">
-            <div class="w-full flex gap-6">
+          <div className="flex flex-col gap-3 md:gap-6 w-full">
+            <div class="w-full flex gap-3 md:gap-6">
               <input
                 type="text"
                 class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
@@ -250,7 +248,7 @@ export function DeployContent(
 
         {showAdvancedOptions && (
           <div
-            className={`flex flex-col gap-6 transition-all duration-300 ${
+            className={`flex flex-col gap-3 md:gap-6 transition-all duration-300 ${
               showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
             }`}
           >
@@ -262,7 +260,7 @@ export function DeployContent(
               // value={formState.description}
               // onChange={(e) => handleInputChange(e, "description")}
             />
-            <div className="w-full flex gap-6">
+            <div className="w-full flex gap-3 md:gap-6">
               <input
                 type="text"
                 class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
@@ -278,7 +276,7 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "web")}
               />
             </div>
-            <div className="w-full flex gap-6">
+            <div className="w-full flex gap-3 md:gap-6">
               <input
                 type="email"
                 class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
@@ -298,7 +296,7 @@ export function DeployContent(
         )}
       </div>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
