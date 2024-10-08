@@ -1,17 +1,58 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 
+interface NavLink {
+  title: string;
+  href: string;
+  subLinks?: NavLink[];
+}
+
+const navLinks: NavLink[] = [
+  {
+    title: "ART STAMPS",
+    href: "#",
+    subLinks: [
+      { title: "ALL", href: "/stamp?type=classic" },
+      { title: "COLLECTIONS", href: "/collection" },
+      { title: "STAMPING", href: "/stamping/stamp" },
+    ],
+  },
+  {
+    title: "SRC-20 TOKENS",
+    href: "#",
+    subLinks: [
+      { title: "ALL", href: "/src20" },
+      { title: "TRENDY", href: "/src20?type=trending" },
+      { title: "DEPLOY", href: "/stamping/src20/deploy" },
+      { title: "MINT", href: "/stamping/src20/mint" },
+      { title: "TRANSFER", href: "/stamping/src20/transfer" },
+    ],
+  },
+];
+
+const socialLinks = [
+  { href: "#", icon: "/img/footer/EnvelopeSimple.png" },
+  { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.png" },
+  { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.png" },
+  { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.png" },
+  {
+    href: "https://github.com/stampchain-io/",
+    icon: "/img/footer/GithubLogo.png",
+  },
+];
+
 export function Header() {
   const [open, setOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState<string | null>(null);
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
 
   useEffect(() => {
     // Set initial path
-    setCurrentPath((globalThis?.location?.pathname)?.split("/")[1] || null);
+    setCurrentPath(globalThis?.location?.pathname || null);
 
     // Update path on route change
     const handleRouteChange = () => {
-      setCurrentPath((globalThis?.location?.pathname)?.split("/")[1] || null);
+      setCurrentPath(globalThis?.location?.pathname || null);
     };
 
     // Listen for route changes
@@ -21,16 +62,6 @@ export function Header() {
       globalThis.removeEventListener("popstate", handleRouteChange);
     };
   }, []);
-
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const toggleWalletModal = () => setIsWalletModalOpen(!isWalletModalOpen);
-
-  const toggleMenu = () => {
-    const isMobileScreen = globalThis.matchMedia("(max-width: 1024px)").matches;
-    if (!isMobileScreen) return;
-    setOpen(!open);
-    document.body.style.overflow = !open ? "hidden" : "";
-  };
 
   useEffect(() => {
     const handleOrientationChange = () => {
@@ -48,6 +79,62 @@ export function Header() {
       );
     };
   }, [open]);
+
+  const toggleWalletModal = () => setIsWalletModalOpen(!isWalletModalOpen);
+
+  const toggleMenu = () => {
+    const isMobileScreen = globalThis.matchMedia("(max-width: 1024px)").matches;
+    if (!isMobileScreen) return;
+    setOpen(!open);
+    document.body.style.overflow = !open ? "hidden" : "";
+  };
+
+  const renderNavLinks = (isMobile = false) => (
+    <>
+      {navLinks.map((link) => (
+        <div
+          key={link.title}
+          className={`group relative cursor-pointer ${
+            isMobile ? "flex flex-col gap-[6px] text-lg" : ""
+          }`}
+        >
+          <a
+            className={`hover:text-[#AA00FF] ${
+              isMobile
+                ? "text-2xl text-[#660099]"
+                : "text-lg xl:text-xl text-center"
+            }`}
+          >
+            {link.title}
+          </a>
+          <div
+            className={`${
+              isMobile
+                ? "flex flex-col text-center"
+                : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
+            }`}
+          >
+            {link.subLinks?.map((subLink) => (
+              <a
+                key={subLink.href}
+                href={subLink.href}
+                f-partial={subLink.href}
+                onClick={() => {
+                  toggleMenu();
+                  setCurrentPath(subLink.href);
+                }}
+                className={`hover:text-[#AA00FF] ${
+                  currentPath === subLink.href ? "text-[#AA00FF]" : ""
+                }`}
+              >
+                {subLink.title}
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
 
   return (
     <header className="px-3 sm:px-6 xl:px-12 my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex items-center justify-between">
@@ -84,113 +171,7 @@ export function Header() {
 
       {/* Desktop Navbar */}
       <div className="hidden md:flex justify-between items-center gap-6 xl:gap-12 font-black text-[#8800CC]">
-        <div className="group relative cursor-pointer">
-          <a className="hover:text-[#AA00FF] text-lg xl:text-xl text-center">
-            ART STAMPS
-          </a>
-          <div className="hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full">
-            <a
-              href="/stamp?type=classic"
-              f-partial="/stamp?type=classic"
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("stamp");
-              }}
-              className={`hover:text-[#AA00FF] ${
-                currentPath === "stamp" ? "text-[#AA00FF]" : ""
-              }`}
-            >
-              ALL
-            </a>
-            <a
-              href="/collection"
-              f-partial="/collection"
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("collection");
-              }}
-              className={`hover:text-[#AA00FF] ${
-                currentPath === "collection" ? "text-[#AA00FF]" : ""
-              }`}
-            >
-              COLLECTIONS
-            </a>
-            <a
-              href="/stamping/stamp"
-              f-partial="/stamping/stamp"
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("#");
-              }}
-              className={`hover:text-[#AA00FF] ${
-                currentPath === "stamping/stamp" ? "text-[#AA00FF]" : ""
-              }`}
-            >
-              STAMPING
-            </a>
-          </div>
-        </div>
-
-        <div className="group relative cursor-pointer">
-          <a className="hover:text-[#AA00FF] text-lg xl:text-xl text-center">
-            SRC-20 TOKENS
-          </a>
-          <div className="hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full">
-            <a
-              href="/src20"
-              f-partial="/src20"
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("src20");
-              }}
-              className={`hover:text-[#AA00FF] ${
-                currentPath === "src20" ? "text-[#AA00FF]" : ""
-              }`}
-            >
-              ALL
-            </a>
-            <a
-              href="/stamping/src20/deploy"
-              f-partial="/stamping/src20/deploy"
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("src20");
-              }}
-              className={`hover:text-[#AA00FF] ${
-                currentPath === "stamping/src20" ? "text-[#AA00FF]" : ""
-              }`}
-            >
-              DEPLOY
-            </a>
-            <a
-              href="/stamping/src20/mint"
-              f-partial="/stamping/src20/mint"
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("src20");
-              }}
-              className={`hover:text-[#AA00FF] ${
-                currentPath === "stamping/src20" ? "text-[#AA00FF]" : ""
-              }`}
-            >
-              MINT
-            </a>
-            <a
-              href="/stamping/src20/transfer"
-              f-partial="/stamping/src20/transfer"
-              onClick={() => {
-                toggleMenu();
-                setCurrentPath("stamping/src20");
-              }}
-              className={`hover:text-[#AA00FF] ${
-                currentPath === "stamping/src20" ? "text-[#AA00FF]" : ""
-              }`}
-            >
-              TRANSFER
-            </a>
-          </div>
-        </div>
-
+        {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>
 
@@ -214,132 +195,16 @@ export function Header() {
         </a>
 
         <div className="font-black text-center flex flex-col items-center justify-between gap-12">
-          <div className="flex flex-col gap-[6px] text-lg">
-            <a className="hover:text-[#AA00FF] cursor-pointer text-2xl text-[#660099]">
-              ART STAMPS
-            </a>
-            <div className="flex flex-col text-center">
-              <a
-                href="/stamp?type=classic"
-                f-partial="/stamp?type=classic"
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath("stamp");
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === "stamp" ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                ALL
-              </a>
-              <a
-                href="/collection"
-                f-partial="/collection"
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath("collection");
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === "collection" ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                COLLECTIONS
-              </a>
-              <a
-                href="/stamping/stamp"
-                f-partial="/stamping/stamp"
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath("#");
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === "#" ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                STAMPING
-              </a>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-[6px] text-lg">
-            <a className="hover:text-[#AA00FF] cursor-pointer text-2xl text-[#660099]">
-              SRC-20 TOKENS
-            </a>
-            <div className="flex flex-col text-center">
-              <a
-                href="/src20"
-                f-partial="/src20"
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath("src20");
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === "src20" ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                ALL
-              </a>
-              <a
-                href="/stamping/src20/deploy"
-                f-partial="/stamping/src20/deploy"
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath("stamping/src20");
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === "stamping/src20" ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                DEPLOY
-              </a>
-              <a
-                href="/stamping/src20/mint"
-                f-partial="/stamping/src20/mint"
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath("stamping/src20");
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === "stamping/src20" ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                MINT
-              </a>
-              <a
-                href="/stamping/src20/transfer"
-                f-partial="/stamping/src20/transfer"
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath("stamping/src20");
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === "stamping/src20" ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                TRANSFER
-              </a>
-            </div>
-          </div>
-
+          {renderNavLinks(true)}
           <ConnectWallet toggleModal={toggleWalletModal} />
         </div>
 
-        <div class="gap-6 items-center justify-center flex">
-          <a href="#">
-            <img src="/img/footer/EnvelopeSimple.png" class="w-12" />
-          </a>
-          <a href="https://x.com/Stampchain">
-            <img src="/img/footer/XLogo.png" class="w-12" />
-          </a>
-          <a href="https://discord.gg/PCZU6xrt">
-            <img src="/img/footer/DiscordLogo.png" class="w-12" />
-          </a>
-          <a href="https://t.me/BitcoinStamps">
-            <img src="/img/footer/TelegramLogo.png" class="w-12" />
-          </a>
-          <a href="https://github.com/stampchain-io/">
-            <img src="/img/footer/GithubLogo.png" class="w-12" />
-          </a>
+        <div className="flex justify-center items-center gap-6">
+          {socialLinks.map((link) => (
+            <a key={link.href} href={link.href}>
+              <img src={link.icon} className="w-12" alt="" />
+            </a>
+          ))}
         </div>
       </div>
     </header>

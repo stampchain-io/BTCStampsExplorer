@@ -60,44 +60,56 @@ export default function StampingSrc20Page(
 ) {
   const { selectedTab, trxType, tick, mintStatus, holders } = data;
 
-  return (
-    <div className="flex flex-col gap-16">
-      {/* <StampingSrc20Header selectedTab={selectedTab} /> */}
+  const isMint = selectedTab === "mint";
+  const flexDirection = isMint ? "lg:flex-row" : "md:flex-row";
+  const columnWidth = isMint ? "lg:w-1/2" : "md:w-1/2";
 
-      <div className="self-center max-w-[680px] w-full mx-auto">
-        {selectedTab === "mint" && (
+  const renderContent = () => {
+    switch (selectedTab) {
+      case "mint":
+        return (
           <MintContent
             trxType={trxType}
             tick={tick}
             mintStatus={mintStatus}
             holders={holders}
           />
-        )}
-        {selectedTab === "deploy" && <DeployContent trxType={trxType} />}
-        {selectedTab === "transfer" && <TransferContent trxType={trxType} />}
+        );
+      case "deploy":
+        return <DeployContent trxType={trxType} />;
+      case "transfer":
+        return <TransferContent trxType={trxType} />;
+      default:
+        return null;
+    }
+  };
+
+  const renderSidebar = () => {
+    switch (selectedTab) {
+      case "mint":
+        return <PopularMinting />;
+      case "deploy":
+        return <RecentDeploy />;
+      case "transfer":
+        return <LatestTransfer />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-16">
+      <div className="self-center max-w-[680px] w-full mx-auto">
+        {renderContent()}
       </div>
 
-      <div
-        className={`flex flex-col gap-6 w-full ${
-          selectedTab === "mint" ? "lg:flex-row" : "md:flex-row"
-        }`}
-      >
-        <div
-          className={`w-full ${
-            selectedTab === "mint" ? "lg:w-1/2" : "md:w-1/2"
-          }`}
-        >
+      <div className={`flex flex-col gap-6 w-full ${flexDirection}`}>
+        <div className={`w-full ${columnWidth}`}>
           <FAQModule />
-          {selectedTab === "mint" && <RecentDeploy />}
+          {isMint && <RecentDeploy />}
         </div>
-        <div
-          className={`w-full ${
-            selectedTab === "mint" ? "lg:w-1/2" : "md:w-1/2"
-          }`}
-        >
-          {selectedTab === "mint" && <PopularMinting />}
-          {selectedTab === "deploy" && <RecentDeploy />}
-          {selectedTab === "transfer" && <LatestTransfer />}
+        <div className={`w-full ${columnWidth}`}>
+          {renderSidebar()}
         </div>
       </div>
     </div>

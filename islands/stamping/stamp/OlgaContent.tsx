@@ -8,8 +8,11 @@ import { fetchBTCPrice } from "$lib/utils/btc.ts";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
 
+import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
+
 import ImageFullScreen from "./ImageFullScreen.tsx";
-import { FeeEstimation } from "../FeeEstimation.tsx";
+import { InputField } from "$islands/stamping/InputField.tsx";
 
 const log = (message: string, data?: any) => {
   console.log(`[OlgaContent] ${message}`, data ? data : "");
@@ -385,7 +388,7 @@ export function OlgaContent() {
           <div className="flex gap-8">
             <div
               id="image-preview"
-              class="relative rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]"
+              class="relative rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#660099]"
             >
               <input
                 id="upload"
@@ -413,13 +416,10 @@ export function OlgaContent() {
                   class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
                 >
                   <img
-                    src="/img/mint/icon-image-upload.png"
-                    class="w-10 h-10"
+                    src="/img/stamping/image-upload.svg"
+                    class="w-12 h-12"
                     alt=""
                   />
-                  <h5 class="text-[#F5F5F5] text-sm font-semibold">
-                    Upload Image
-                  </h5>
                 </label>
               )}
             </div>
@@ -464,14 +464,15 @@ export function OlgaContent() {
               <p class="text-base md:text-2xl font-semibold text-[#999999] uppercase">
                 Editions
               </p>
-              <input
-                type="text"
-                value={issuance}
-                onInput={handleIssuanceChange}
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-[48px] outline-none rounded-md focus:bg-[#CCCCCC] text-center"
-              />
+              <div className="w-12">
+                <InputField
+                  type="text"
+                  value={issuance}
+                  onChange={(e) => handleIssuanceChange(e)}
+                  error={issuanceError}
+                />
+              </div>
             </div>
-            {issuanceError && <p class="text-red-500 mt-2">{issuanceError}</p>}
           </div>
         </div>
 
@@ -481,25 +482,6 @@ export function OlgaContent() {
           }`}
         >
           <div className="flex gap-7 justify-between">
-            {
-              /* <div className="flex gap-2 items-center">
-                <input
-                  type="checkbox"
-                  id="lockEditions"
-                  name="lockEditions"
-                  checked={isLocked}
-                  onChange={(e: Event) =>
-                    setIsLocked((e.target as HTMLInputElement).checked)}
-                  className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
-                />
-                <label
-                  htmlFor="lockEditions"
-                  className="text-[#B9B9B9] text-[16px] font-semibold"
-                >
-                  Lock Editions
-                </label>
-              </div> */
-            }
             <button
               class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
               onClick={handleIsPoshStamp}
@@ -510,25 +492,6 @@ export function OlgaContent() {
               >
               </div>
             </button>
-            {
-              /* <div className="flex gap-2 items-center">
-                <input
-                  type="checkbox"
-                  id="poshStamp"
-                  name="poshStamp"
-                  checked={isPoshStamp}
-                  onChange={(e: Event) =>
-                    setIsPoshStamp((e.target as HTMLInputElement).checked)}
-                  className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
-                />
-                <label
-                  htmlFor="poshStamp"
-                  className="text-[#B9B9B9] text-[16px] font-semibold"
-                >
-                  Posh Stamp
-                </label>
-              </div> */
-            }
             <img
               src={isLocked
                 ? "/img/stamping/LockSimple.svg"
@@ -542,18 +505,15 @@ export function OlgaContent() {
               <p className="text-xs md:text-lg font-medium text-[#999999]">
                 POSH
               </p>
-              <input
+              <InputField
                 type="text"
                 value={stampName}
-                onInput={handleStampNameChange}
+                onChange={(e) => handleStampNameChange(e)}
                 placeholder="Stamp Name (max 13 chars, can't start with A)"
-                className="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 maxLength={13}
                 disabled={!isPoshStamp}
+                error={stampNameError}
               />
-              {stampNameError && (
-                <p class="text-red-500 mt-2">{stampNameError}</p>
-              )}
             </div>
             <img
               src="/img/stamping/CornersOut.svg"
@@ -651,33 +611,10 @@ export function OlgaContent() {
           buttonName="Stamp"
         />
 
-        {submissionMessage && (
-          <div class="w-full text-center text-white mt-4">
-            <p>{submissionMessage.message}</p>
-            {submissionMessage.txid && (
-              <div
-                class="overflow-x-auto"
-                style={{ maxWidth: "100%" }}
-              >
-                <span>TXID:&nbsp;</span>
-                <a
-                  href={`https://mempool.space/tx/${submissionMessage.txid}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-blue-500 underline whitespace-nowrap"
-                >
-                  {submissionMessage.txid}
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-
-        {apiError && (
-          <div class="w-full text-red-500 text-center mt-4">
-            {apiError}
-          </div>
-        )}
+        <StatusMessages
+          submissionMessage={submissionMessage}
+          apiError={apiError}
+        />
       </div>
 
       {isFullScreenModalOpen && (

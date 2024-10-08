@@ -1,5 +1,8 @@
-import { FeeEstimation } from "../../FeeEstimation.tsx";
 import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
+
+import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
+import { InputField } from "$islands/stamping/InputField.tsx";
 
 export function TransferContent(
   { trxType = "multisig" }: { trxType?: "olga" | "multisig" },
@@ -41,33 +44,26 @@ export function TransferContent(
       </p>
 
       <div className="flex flex-col gap-3 md:gap-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
-        <div class="w-full">
-          <input
-            type="text"
-            class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-            placeholder="Recipient address"
-            value={formState.toAddress}
-            onChange={(e) => handleInputChange(e, "toAddress")}
-          />
-          {formState.toAddressError && (
-            <p class="text-red-500 mt-2">{formState.toAddressError}</p>
-          )}
-        </div>
+        <InputField
+          type="text"
+          placeholder="Recipient address"
+          value={formState.toAddress}
+          onChange={(e) => handleInputChange(e, "toAddress")}
+          error={formState.toAddressError}
+        />
 
         <div className="w-full flex flex-col md:flex-row gap-3 md:gap-6">
-          <input
+          <InputField
             type="text"
-            class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
             placeholder="Token"
             value={formState.token}
             onChange={(e) => handleInputChange(e, "token")}
           />
 
-          <input
+          <InputField
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
-            class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
             placeholder="Amount"
             value={formState.amt}
             onChange={(e) => handleInputChange(e, "amt")}
@@ -89,39 +85,11 @@ export function TransferContent(
           buttonName="Transfer"
         />
 
-        {submissionMessage && (
-          <div class="w-full text-center text-white mt-4">
-            <p>{submissionMessage.message}</p>
-            {submissionMessage.txid && (
-              <div
-                class="overflow-x-auto"
-                style={{ maxWidth: "100%" }}
-              >
-                <span>TXID:&nbsp;</span>
-                <a
-                  href={`https://mempool.space/tx/${submissionMessage.txid}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-blue-500 underline whitespace-nowrap"
-                >
-                  {submissionMessage.txid}
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-
-        {apiError && (
-          <div class="w-full text-red-500 text-center mt-4">
-            {apiError}
-          </div>
-        )}
-
-        {walletError && (
-          <div class="w-full text-red-500 text-center mt-4">
-            {walletError}
-          </div>
-        )}
+        <StatusMessages
+          submissionMessage={submissionMessage}
+          apiError={apiError}
+          walletError={walletError}
+        />
       </div>
     </div>
   );
