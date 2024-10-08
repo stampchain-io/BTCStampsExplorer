@@ -25,12 +25,12 @@ const mock_stamp = {
 
 const LatestTransfer = () => {
   return (
-    <div className="w-full md:w-1/2 flex flex-col gap-4 items-start md:items-end">
+    <div className="flex flex-col gap-4 items-start md:items-end">
       <h1 className="bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-3xl md:text-6xl font-black">
-        LATEST TRANSFERS
+        RECENT TRANSFERS
       </h1>
       <p className="text-2xl md:text-5xl text-[#AA00FF]">BLOCK #860325</p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 md:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4">
         {Array(8).fill(0).map((_, index) => {
           return (
             <StampCard
@@ -43,9 +43,11 @@ const LatestTransfer = () => {
           );
         })}
       </div>
-      <a className="text-[#8800CC] text-sm md:text-base font-extrabold border-2 border-[#8800CC] py-1 text-center min-w-[132px] rounded-md cursor-pointer">
+      {
+        /* <a className="text-[#8800CC] text-sm md:text-base font-extrabold border-2 border-[#8800CC] py-1 text-center min-w-[132px] rounded-md cursor-pointer">
         View All
-      </a>
+      </a> */
+      }
     </div>
   );
 };

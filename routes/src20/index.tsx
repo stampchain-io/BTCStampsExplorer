@@ -110,7 +110,6 @@ export default function SRC20Page(props: any) {
         selectedTab={selectedTab}
       />
       {selectedTab === "all" && <SRC20DeployTable data={data.src20s} />}
-      {selectedTab === "minting" && <SRC20MintingTable data={data.src20s} />}
       {selectedTab === "trending" && <SRC20TrendingMints data={data.src20s} />}
       <Pagination
         page={page}
@@ -120,7 +119,6 @@ export default function SRC20Page(props: any) {
         data_length={src20s.length}
       />
       {selectedTab === "all" && <DeployMintModule />}
-      {selectedTab === "minting" && <LatestMints />}
       {selectedTab === "trending" && <DeployMintModule />}
     </div>
   );

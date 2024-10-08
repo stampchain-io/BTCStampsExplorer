@@ -119,19 +119,19 @@ export function MintContent({
         </div>
       )}
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-6 w-full">
-        <div className="w-full flex gap-6">
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 flex flex-col gap-3 md:gap-6 w-full">
+        <div className="w-full flex gap-3 md:gap-6">
           <div
             id="image-preview"
-            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[120px] w-[120px] h-[120px] content-center bg-[#660099] flex flex-col"
+            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[108px] md:min-w-[120px] w-[108px] md:w-[120px] h-[108px] md:h-[120px] content-center bg-[#660099] flex flex-col"
           >
             <img
-              src="/img/mint/icon-image-upload.png"
-              class="w-16 h-16"
+              src="/img/stamping/image-upload.svg"
+              class="w-12 h-12"
               alt=""
             />
           </div>
-          <div className="flex flex-col gap-6 w-full">
+          <div className="flex flex-col gap-3 md:gap-6 w-full">
             <div class="w-full">
               <input
                 type="text"
@@ -188,7 +188,7 @@ export function MintContent({
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
+      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

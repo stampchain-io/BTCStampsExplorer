@@ -43,12 +43,6 @@ export const SRC20Header = (
         All
       </a>
       <a
-        href="/src20?type=minting"
-        className={selectedTab === "minting" ? "active" : ""}
-      >
-        Minting
-      </a>
-      <a
         href="/src20?type=trending"
         className={selectedTab === "trending" ? "active" : ""}
       >
@@ -65,16 +59,6 @@ export const SRC20Header = (
             onClick={() => setTypeOption("src20", "all", true)}
           >
             All
-          </p>
-          <p
-            class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
-              selectedTab === "minting"
-                ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
-                : "text-[#8800CC] font-light"
-            }`}
-            onClick={() => setTypeOption("src20", "minting", true)}
-          >
-            Minting
           </p>
           <p
             class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
