@@ -1,7 +1,11 @@
-import { useEffect, useState } from "preact/hooks";
-import { FeeEstimation } from "../../FeeEstimation.tsx";
-import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
 import axiod from "axiod";
+import { useEffect, useState } from "preact/hooks";
+
+import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
+
+import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
+import { InputField } from "$islands/stamping/InputField.tsx";
 
 export function DeployContent(
   { trxType = "multisig" }: { trxType?: "olga" | "multisig" },
@@ -178,11 +182,10 @@ export function DeployContent(
               )}
             </div>
 
-            <input
+            <InputField
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
               placeholder="Decimal amount"
               value={formState.dec}
               onChange={(e) => handleInputChange(e, "dec")}
@@ -191,12 +194,12 @@ export function DeployContent(
 
           <div className="flex flex-col gap-3 md:gap-6 w-full">
             <div class="w-full flex gap-3 md:gap-6">
-              <input
+              <InputField
                 type="text"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
                 placeholder="Token ticker name"
                 value={formState.token}
                 onChange={(e) => handleInputChange(e, "token")}
+                error={formState.tokenError}
                 maxLength={5}
               />
               <button
@@ -209,91 +212,73 @@ export function DeployContent(
                 >
                 </div>
               </button>
-              {formState.tokenError && (
-                <p class="text-red-500 mt-2">{formState.tokenError}</p>
-              )}
             </div>
 
-            <div class="w-full">
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Limit pr. mint"
-                value={formState.lim}
-                onChange={(e) => handleInputChange(e, "lim")}
-              />
-              {formState.limError && (
-                <p class="text-red-500 mt-2">{formState.limError}</p>
-              )}
-            </div>
+            <InputField
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="Limit pr. mint"
+              value={formState.lim}
+              onChange={(e) => handleInputChange(e, "lim")}
+              error={formState.limError}
+            />
 
-            <div class="w-full">
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Supply"
-                value={formState.max}
-                onChange={(e) => handleInputChange(e, "max")}
-              />
-              {formState.maxError && (
-                <p class="text-red-500 mt-2">{formState.maxError}</p>
-              )}
-            </div>
+            <InputField
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="Supply"
+              value={formState.max}
+              onChange={(e) => handleInputChange(e, "max")}
+              error={formState.maxError}
+            />
           </div>
         </div>
 
-        {showAdvancedOptions && (
-          <div
-            className={`flex flex-col gap-3 md:gap-6 transition-all duration-300 ${
-              showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
-            }`}
-          >
-            <textarea
+        <div
+          className={`flex flex-col gap-3 md:gap-6 transition-all duration-300 ${
+            showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
+          }`}
+        >
+          <textarea
+            type="text"
+            class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+            placeholder="Description"
+            rows={5}
+            // value={formState.description}
+            // onChange={(e) => handleInputChange(e, "description")}
+          />
+          <div className="w-full flex gap-3 md:gap-6">
+            <InputField
               type="text"
-              class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-              placeholder="Description"
-              rows={5}
-              // value={formState.description}
-              // onChange={(e) => handleInputChange(e, "description")}
+              placeholder="X"
+              value={formState.x}
+              onChange={(e) => handleInputChange(e, "x")}
             />
-            <div className="w-full flex gap-3 md:gap-6">
-              <input
-                type="text"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="X"
-                value={formState.x}
-                onChange={(e) => handleInputChange(e, "x")}
-              />
-              <input
-                type="text"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Website"
-                value={formState.web}
-                onChange={(e) => handleInputChange(e, "web")}
-              />
-            </div>
-            <div className="w-full flex gap-3 md:gap-6">
-              <input
-                type="email"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Telegram"
-                // value={formState.telegram}
-                // onChange={(e) => handleInputChange(e, "telegram")}
-              />
-              <input
-                type="email"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Email"
-                value={formState.email}
-                onChange={(e) => handleInputChange(e, "email")}
-              />
-            </div>
+            <InputField
+              type="text"
+              placeholder="Website"
+              value={formState.web}
+              onChange={(e) => handleInputChange(e, "web")}
+            />
           </div>
-        )}
+          <div className="w-full flex gap-3 md:gap-6">
+            <InputField
+              type="text"
+              placeholder="Telegram"
+              value=""
+              // value={formState.telegram}
+              onChange={(e) => handleInputChange(e, "telegram")}
+            />
+            <InputField
+              type="email"
+              placeholder="Email"
+              value={formState.email}
+              onChange={(e) => handleInputChange(e, "email")}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
@@ -311,45 +296,12 @@ export function DeployContent(
           buttonName="Deploy"
         />
 
-        {submissionMessage && (
-          <div class="w-full text-center text-white mt-4">
-            <p>{submissionMessage.message}</p>
-            {submissionMessage.txid && (
-              <div
-                class="overflow-x-auto"
-                style={{ maxWidth: "100%" }}
-              >
-                <span>TXID:&nbsp;</span>
-                <a
-                  href={`https://mempool.space/tx/${submissionMessage.txid}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-blue-500 underline whitespace-nowrap"
-                >
-                  {submissionMessage.txid}
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-
-        {apiError && (
-          <div class="w-full text-red-500 text-center mt-4">
-            {apiError}
-          </div>
-        )}
-
-        {fileUploadError && (
-          <div class="w-full text-yellow-500 text-center mt-4">
-            {fileUploadError}
-          </div>
-        )}
-
-        {walletError && (
-          <div class="w-full text-red-500 text-center mt-4">
-            {walletError}
-          </div>
-        )}
+        <StatusMessages
+          submissionMessage={submissionMessage}
+          apiError={apiError}
+          fileUploadError={fileUploadError}
+          walletError={walletError}
+        />
       </div>
     </div>
   );

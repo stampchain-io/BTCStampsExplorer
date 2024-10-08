@@ -139,6 +139,8 @@ import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx
 import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
 import * as $stamping_FeeEstimation from "./islands/stamping/FeeEstimation.tsx";
+import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
+import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
 import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/deploy/DeployContent.tsx";
 import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
 import * as $stamping_src20_mint_MintContent from "./islands/stamping/src20/mint/MintContent.tsx";
@@ -325,6 +327,8 @@ const manifest = {
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
     "./islands/stamping/FeeEstimation.tsx": $stamping_FeeEstimation,
+    "./islands/stamping/InputField.tsx": $stamping_InputField,
+    "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
     "./islands/stamping/src20/deploy/DeployContent.tsx":
       $stamping_src20_deploy_DeployContent,
     "./islands/stamping/src20/deploy/RecentDeploy.tsx":
