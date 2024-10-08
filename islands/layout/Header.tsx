@@ -67,14 +67,14 @@ export function Header() {
         >
           {open && (
             <img
-              src="/img/header/menu-close.png"
+              src="/img/header/menu-close.svg"
               alt="menu"
               className="w-6 h-6"
             />
           )}
           {!open && (
             <img
-              src="/img/header/menu-open.png"
+              src="/img/header/menu-open.svg"
               alt="menu"
               className="w-6 h-6"
             />

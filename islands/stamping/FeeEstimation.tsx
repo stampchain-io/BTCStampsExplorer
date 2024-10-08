@@ -255,7 +255,7 @@ export function FeeEstimation({
           {/* <button onClick={onRefresh}>Refresh Fees</button> */}
         </div>
         <div className="flex flex-col items-end">
-          <div className="flex gap-2 justify-end items-center">
+          <div className="flex gap-1 md:gap-2 justify-end items-center">
             <input
               type="checkbox"
               id="tosAgreed"
