@@ -1,7 +1,49 @@
-import { FeeEstimation } from "../../FeeEstimation.tsx";
-import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
-import { useEffect, useState } from "preact/hooks";
 import axiod from "axiod";
+import { useEffect, useState } from "preact/hooks";
+
+import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
+
+import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
+import { InputField } from "$islands/stamping/InputField.tsx";
+
+interface MintProgressProps {
+  progress: string;
+  progressWidth: string;
+  maxSupply: string;
+  limit: string;
+  minters: string;
+}
+const MintProgress = (
+  { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
+) => {
+  return (
+    <div className="flex justify-between text-[#999999] items-end">
+      <div className="flex flex-col gap-1">
+        <p className="text-base md:text-2xl font-light">
+          PROGRESS <span className="font-bold">{progress}%</span>
+        </p>
+        <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
+          <div
+            className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
+            style={{ width: progressWidth }}
+          />
+        </div>
+      </div>
+      <div className="text-right text-xs md:text-base font-light">
+        <p>
+          SUPPLY <span className="font-bold">{maxSupply}</span>
+        </p>
+        <p>
+          LIMIT <span className="font-bold">{limit}</span>
+        </p>
+        <p>
+          MINTERS <span className="font-bold">{minters}</span>
+        </p>
+      </div>
+    </div>
+  );
+};
 
 interface MintContentProps {
   trxType?: "olga" | "multisig";
@@ -132,60 +174,32 @@ export function MintContent({
             />
           </div>
           <div className="flex flex-col gap-3 md:gap-6 w-full">
-            <div class="w-full">
-              <input
-                type="text"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Token"
-                value={formState.token}
-                onChange={(e) => handleInputChange(e, "token")}
-              />
-              {formState.tokenError && (
-                <p class="text-red-500 mt-2">{formState.tokenError}</p>
-              )}
-            </div>
+            <InputField
+              type="text"
+              placeholder="Token"
+              value={formState.token}
+              onChange={(e) => handleInputChange(e, "token")}
+              error={formState.tokenError}
+            />
 
-            <div class="w-full">
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
-                placeholder="Amount"
-                value={formState.amt}
-                onChange={(e) => handleInputChange(e, "amt")}
-              />
-              {formState.amtError && (
-                <p class="text-red-500 mt-2">{formState.amtError}</p>
-              )}
-            </div>
+            <InputField
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="Amount"
+              value={formState.amt}
+              onChange={(e) => handleInputChange(e, "amt")}
+              error={formState.amtError}
+            />
           </div>
         </div>
-        <div className="flex justify-between text-[#999999] items-end">
-          <div className="flex flex-col gap-1">
-            <p className="text-base md:text-2xl font-light">
-              PROGRESS <span className="font-bold">{progress}%</span>
-            </p>
-            <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
-              <div
-                className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
-                style={{ width: progressWidth }}
-              >
-              </div>
-            </div>
-          </div>
-          <div className="text-right text-xs md:text-base font-light">
-            <p>
-              SUPPLY <span className="font-bold">{maxSupply}</span>
-            </p>
-            <p>
-              LIMIT <span className="font-bold">{limit}</span>
-            </p>
-            <p>
-              MINTERS <span className="font-bold">{minters}</span>
-            </p>
-          </div>
-        </div>
+        <MintProgress
+          progress={progress}
+          progressWidth={progressWidth}
+          maxSupply={maxSupply}
+          limit={limit}
+          minters={minters}
+        />
       </div>
 
       <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
@@ -202,40 +216,11 @@ export function MintContent({
           buttonName="Mint"
         />
 
-        {/* Adjusted submissionMessage display */}
-        {submissionMessage && (
-          <div class="w-full text-center text-white mt-4">
-            <p>{submissionMessage.message}</p>
-            {submissionMessage.txid && (
-              <div
-                class="overflow-x-auto"
-                style={{ maxWidth: "100%" }}
-              >
-                <span>TXID:&nbsp;</span>
-                <a
-                  href={`https://mempool.space/tx/${submissionMessage.txid}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-blue-500 underline whitespace-nowrap"
-                >
-                  {submissionMessage.txid}
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-
-        {apiError && (
-          <div class="w-full text-red-500 text-center mt-4">
-            {apiError}
-          </div>
-        )}
-
-        {walletError && (
-          <div class="w-full text-red-500 text-center mt-4">
-            {walletError}
-          </div>
-        )}
+        <StatusMessages
+          submissionMessage={submissionMessage}
+          apiError={apiError}
+          walletError={walletError}
+        />
       </div>
     </div>
   );
