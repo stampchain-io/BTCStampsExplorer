@@ -25,7 +25,7 @@ export function HomeStampPreview({
   const SectionsLatestArtStamps: StampSectionProps[] = [
     {
       title: "ON-CHAIN MARVELS",
-      type: "all",
+      type: "classic",
       stamps: stamps_art,
       layout: "grid",
     },
