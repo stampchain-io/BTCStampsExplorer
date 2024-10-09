@@ -48,10 +48,10 @@ export default function PressKit() {
               STAMP AI MEMES
             </h2>
             <p className="text-sm md:text-lg font-medium">
-              A fungible token layer built around a fair mint system where users
-              only pay BTC miner fees. Modeled after BRC-20, but with the
-              immutability of Stamps. History: The first official SRC-20 Token
-              (KEVIN) was deployed by Reinamora in Block 788041.
+              A token layer built around a fair mint system where users only pay
+              BTC miner fees. Modeled after BRC-20, but with the immutability of
+              Stamps. History: The first official SRC-20 Token (KEVIN) was
+              deployed by Reinamora in Block 788041.
             </p>
           </div>
 
@@ -140,10 +140,10 @@ export default function PressKit() {
               IMAGE
             </h2>
             <p className="text-sm md:text-lg font-medium">
-              A fungible token layer built around a fair mint system where users
-              only pay BTC miner fees. Modeled after BRC-20, but with the
-              immutability of Stamps. History: The first official SRC-20 Token
-              (KEVIN) was deployed by Reinamora in Block 788041.
+              A token layer built around a fair mint system where users only pay
+              BTC miner fees. Modeled after BRC-20, but with the immutability of
+              Stamps. History: The first official SRC-20 Token (KEVIN) was
+              deployed by Reinamora in Block 788041.
             </p>
           </div>
 
