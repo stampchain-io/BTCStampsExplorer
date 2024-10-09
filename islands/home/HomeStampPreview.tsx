@@ -35,7 +35,7 @@ export function HomeStampPreview({
     { title: "POSH", type: "posh", stamps: stamps_posh, layout: "grid" },
     {
       title: "RECURSIVE",
-      type: "stamps",
+      filterBy: "recursive",
       stamps: stamps_src721,
       layout: "row",
     },

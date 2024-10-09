@@ -68,10 +68,11 @@ export interface StampRow {
 
 export interface StampSectionProps {
   title: string;
-  type: string;
+  type?: string;
   stamps: StampRow[];
   layout: "grid" | "row";
   isRecentSales?: boolean;
+  filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
 }
 
 export interface SRC20Row {

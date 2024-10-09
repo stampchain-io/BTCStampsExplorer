@@ -2,14 +2,31 @@ import { StampRow, StampSectionProps } from "globals";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 
 export default function StampSection(
-  { title, type, stamps, layout, isRecentSales }: StampSectionProps,
+  { title, type, stamps, layout, isRecentSales, filterBy }: StampSectionProps,
 ) {
-  // Ensure stamps is an array
   const stampArray = Array.isArray(stamps) ? stamps : [];
 
-  const seeAllLink = isRecentSales
-    ? `/stamp?recentSales=true`
-    : `/stamp?type=${type}`;
+  const params = new URLSearchParams();
+
+  if (isRecentSales) {
+    params.append("recentSales", "true");
+  } else {
+    if (type) {
+      params.append("type", type);
+    }
+
+    const filterArray = typeof filterBy === "string"
+      ? [filterBy]
+      : Array.isArray(filterBy)
+      ? filterBy
+      : [];
+
+    if (filterArray.length > 0) {
+      params.append("filterBy", filterArray.join(","));
+    }
+  }
+
+  const seeAllLink = `/stamp?${params.toString()}`;
 
   return (
     <div>
