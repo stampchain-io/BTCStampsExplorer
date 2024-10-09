@@ -8,7 +8,7 @@ export const connectOKX = async (
   addToast: (message: string, type: string) => void,
 ) => {
   try {
-    const okx = (window as any).okxwallet;
+    const okx = (globalThis as any).okxwallet;
     if (!okx) {
       addToast(
         "OKX wallet not detected. Please install the OKX extension.",
@@ -25,7 +25,7 @@ export const connectOKX = async (
 };
 
 export const checkOKX = () => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   if (okx && okx.bitcoin) {
     isOKXInstalled.value = true;
     okx.bitcoin.on("accountsChanged", handleAccountsChanged);
@@ -37,7 +37,7 @@ export const checkOKX = () => {
 
 // Modified the function to fetch multiple addresses
 const handleAccountsChanged = async () => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   if (!okx || !okx.bitcoin) {
     console.error("OKX wallet not connected");
     return;
@@ -80,7 +80,7 @@ const handleAccountsChanged = async () => {
 };
 
 const signMessage = async (message: string) => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   if (!okx || !okx.bitcoin) {
     throw new Error("OKX wallet not connected");
   }
@@ -100,7 +100,7 @@ const signPSBT = async (
   inputsToSign?: { index: number }[],
   enableRBF = true,
 ): Promise<SignPSBTResult> => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   try {
     const result = await okx.bitcoin.signPsbt({
       psbt: psbtHex,
@@ -125,12 +125,12 @@ const signPSBT = async (
 };
 
 const broadcastRawTX = async (rawTx: string) => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   return await okx.bitcoin.pushTx(rawTx);
 };
 
 const broadcastPSBT = async (psbtHex: string) => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   return await okx.bitcoin.pushPsbt(psbtHex);
 };
 

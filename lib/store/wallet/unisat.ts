@@ -7,7 +7,7 @@ export const isUnisatInstalled = signal<boolean>(false);
 export const connectUnisat = async (
   addToast: (message: string, type: "error" | "success") => void,
 ) => {
-  const unisat = (window as any).unisat;
+  const unisat = (globalThis as any).unisat;
   if (!unisat) {
     addToast("Unisat not installed", "error");
     return;
@@ -27,7 +27,7 @@ const handleAccountsChanged = async (_accounts: string[]) => {
     return;
   }
   const _wallet = {} as Wallet;
-  const unisat = (window as any).unisat;
+  const unisat = (globalThis as any).unisat;
   _wallet.accounts = _accounts;
   const address = _accounts[0];
   _wallet.address = address;
@@ -43,7 +43,7 @@ const handleAccountsChanged = async (_accounts: string[]) => {
   walletContext.updateWallet(_wallet);
 };
 
-const unisat = (window as any).unisat;
+const unisat = (globalThis as any).unisat;
 unisat?.on("accountsChanged", handleAccountsChanged);
 
 // Sign a PSBT hex transaction with Unisat
@@ -54,7 +54,7 @@ export const signPSBT = async (
   },
 ): Promise<SignPSBTResult> => {
   try {
-    const unisat = (window as any).unisat;
+    const unisat = (globalThis as any).unisat;
     if (!unisat) {
       throw new Error("Unisat wallet not connected");
     }
