@@ -1,5 +1,6 @@
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
 import { convertToEmoji } from "utils/util.ts";
+import { useState } from "preact/hooks";
 
 interface SRC20TickHeaderProps {
   deployment: any;
@@ -20,6 +21,13 @@ export function SRC20TickHeader(props: SRC20TickHeaderProps) {
 
   const tickValue = deployment.tick ? convertToEmoji(deployment.tick) : "N/A";
 
+  // Add state for the search component
+  const [isOpen2, setIsOpen2] = useState(false);
+
+  const handleOpen2 = (open: boolean) => {
+    setIsOpen2(open);
+  };
+
   return (
     <>
       <div class="flex justify-between items-end gap-6 border-b-2 pb-3 border-[#3F2A4E]">
@@ -29,7 +37,7 @@ export function SRC20TickHeader(props: SRC20TickHeaderProps) {
             SRC20 {">"} {tickValue}
           </p>
         </div>
-        <StampSearchClient />
+        <SRC20SearchClient open2={isOpen2} handleOpen2={handleOpen2} />
       </div>
       <div class="flex w-full flex-col md:flex-row items-start gap-10 md:gap-20">
         <div
