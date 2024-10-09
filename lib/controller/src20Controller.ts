@@ -507,4 +507,13 @@ export class Src20Controller {
       throw error;
     }
   }
+
+  static async handleSearchRequest(query: string) {
+    try {
+      return await Src20Service.searchSrc20Data(query);
+    } catch (error) {
+      console.error("Error processing search request:", error);
+      throw error;
+    }
+  }
 }

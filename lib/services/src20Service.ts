@@ -270,4 +270,8 @@ export class Src20Service {
       throw error;
     }
   }
+
+  static async searchSrc20Data(query: string) {
+    return await SRC20Repository.searchValidSrc20TxFromDb(query);
+  }
 }
