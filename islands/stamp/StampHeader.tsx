@@ -22,8 +22,8 @@ export const StampHeader = (
 
   const handleTabClick = (tabType: STAMP_TYPES) => {
     setTypeOption("stamp", tabType, true);
-    if (tabType === "all" || tabType === "collection") {
-      window.location.href = "/collection"; // Redirect to /collection page FIXME: may just want to make the collectinn page part of the tabs here
+    if (tabType === "collection") {
+      window.location.href = "/collection";
     }
   };
 

@@ -40,10 +40,10 @@ export default function About() {
             SRC-20 STAMPS
           </h2>
           <p className={"text-sm md:text-lg font-medium"}>
-            A fungible token layer built around a fair mint system where users
-            only pay BTC miner fees. Modeled after BRC-20, but with the
-            immutability of Stamps. History: The first official SRC-20 Token
-            (KEVIN) was deployed by Reinamora in Block 788041.
+            A token layer built around a fair mint system where users only pay
+            BTC miner fees. Modeled after BRC-20, but with the immutability of
+            Stamps. History: The first official SRC-20 Token (KEVIN) was
+            deployed by Reinamora in Block 788041.
           </p>
         </div>
 
@@ -52,10 +52,9 @@ export default function About() {
             SRC-721 STAMPS
           </h2>
           <p className={"text-sm md:text-lg font-medium"}>
-            A fungible token layer built around a fair mint system where users
-            only pay BTC miner fees. Modeled after BRC-20, but with the
-            immutability of Stamps. History: The first official SRC-20 Token
-            (KEVIN) was deployed by Reinamora in Block 788041.
+            A token layer built around recursion in order to reduce minting
+            costs by several orders of magnitude. Initially conceived by Derp,
+            it activated at block 792370.
           </p>
         </div>
 
