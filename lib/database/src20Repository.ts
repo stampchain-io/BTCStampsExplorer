@@ -587,4 +587,32 @@ export class SRC20Repository {
       total_transfers: row.total_transfers,
     };
   }
+
+  // Add the new method here
+  static async searchValidSrc20TxFromDb(query: string) {
+    const sanitizedQuery = query.replace(/[^\w-]/g, "");
+
+    const sqlQuery = `
+      SELECT DISTINCT tick
+      FROM ${SRC20_TABLE}
+      WHERE
+        tick LIKE ? OR
+        tx_hash LIKE ? OR
+        creator LIKE ? OR
+        destination LIKE ?
+      LIMIT 10;
+    `;
+
+    const searchParam = `%${sanitizedQuery}%`;
+    const queryParams = [searchParam, searchParam, searchParam, searchParam];
+
+    const result = await dbManager.executeQueryWithCache(
+      sqlQuery,
+      queryParams,
+      1000 * 60 * 2, // Cache duration: 2 minutes
+    );
+
+    // Map the results to an array of tick names
+    return result.rows.map((row: { tick: string }) => ({ tick: row.tick }));
+  }
 }
