@@ -13,8 +13,7 @@
         "--inspect-wait",
         "-A",
         "--watch=static/,routes/,components/,islands/",
-        "./main.ts",
-        "--host"
+        "./main.ts"
       ],
       "attachSimplePort": 9229
     }

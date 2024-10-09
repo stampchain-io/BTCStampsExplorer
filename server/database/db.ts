@@ -1,3 +1,5 @@
+import "$/server/config/env.ts";
+
 import { Client } from "$mysql/mod.ts";
 import { connect, Redis } from "redis";
 import * as crypto from "crypto";

@@ -4,31 +4,23 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-if (!Deno.env.get("ENV")) {
-  Deno.env.set("ENV", "production");
-}
-
-import { loadSync } from "@std/dotenv";
-
-const currentDir = Deno.cwd();
-const envFilePath = Deno.env.get("ENV") === "development"
-  ? `${currentDir}/.env.development.local`
-  : `${currentDir}/.env`;
-
-// Debugging
-console.log("Loading environment variables from:", envFilePath);
-
-loadSync({
-  envPath: envFilePath,
-  export: true,
-});
-
 import "$/globals.d.ts";
 import { start } from "$fresh/server.ts";
+import build from "$fresh/dev.ts";
 import manifest from "$/fresh.gen.ts";
-import { Manifest } from "$fresh/server.ts";
 import config from "$/fresh.config.ts";
 
 import "$server/database/db.ts";
 
-await start(manifest as unknown as Manifest, config);
+if (import.meta.main) {
+  if (Deno.args.includes("build")) {
+    console.log("Running build...");
+    globalThis.SKIP_REDIS_CONNECTION = true;
+    await build(import.meta.url, "./main.ts", config);
+    console.log("Build completed.");
+    Deno.exit(0);
+  } else {
+    console.log("Starting server...");
+    await start(manifest, config);
+  }
+}
