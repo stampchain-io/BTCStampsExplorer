@@ -23,8 +23,8 @@ export const connectPhantom = async (addToast) => {
 };
 
 const getProvider = () => {
-  if ("phantom" in window) {
-    const provider = window.phantom?.bitcoin;
+  if ("phantom" in globalThis) {
+    const provider = globalThis.phantom?.bitcoin;
     if (provider?.isPhantom) {
       return provider;
     }

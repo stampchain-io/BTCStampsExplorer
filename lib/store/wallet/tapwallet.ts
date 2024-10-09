@@ -6,7 +6,7 @@ export const isTapWalletInstalled = signal<boolean>(false);
 
 export const connectTapWallet = async (addToast) => {
   try {
-    const tapwallet = (window as any).tapwallet;
+    const tapwallet = (globalThis as any).tapwallet;
     if (!tapwallet) {
       addToast(
         "TapWallet not detected. Please install the TapWallet extension.",
@@ -23,7 +23,7 @@ export const connectTapWallet = async (addToast) => {
 };
 
 export const checkTapWallet = () => {
-  const tapwallet = (window as any).tapwallet;
+  const tapwallet = (globalThis as any).tapwallet;
   if (tapwallet) {
     isTapWalletInstalled.value = true;
     tapwallet.on("accountsChanged", handleAccountsChanged);
@@ -39,7 +39,7 @@ const handleAccountsChanged = async (accounts: string[]) => {
     return;
   }
 
-  const tapwallet = (window as any).tapwallet;
+  const tapwallet = (globalThis as any).tapwallet;
   const _wallet = {} as Wallet;
   _wallet.address = accounts[0];
   _wallet.accounts = accounts;
@@ -64,7 +64,7 @@ const handleAccountsChanged = async (accounts: string[]) => {
 };
 
 const signMessage = async (message: string) => {
-  const tapwallet = (window as any).tapwallet;
+  const tapwallet = (globalThis as any).tapwallet;
   if (!tapwallet) {
     throw new Error("TapWallet not connected");
   }
@@ -84,7 +84,7 @@ const signPSBT = async (
   _inputsToSign?: { index: number }[],
   enableRBF = true,
 ): Promise<SignPSBTResult> => {
-  const tapwallet = (window as any).tapwallet;
+  const tapwallet = (globalThis as any).tapwallet;
   try {
     const result = await tapwallet.signPsbt(psbtHex, { enableRBF });
     if (result && result.hex) {
@@ -105,12 +105,12 @@ const signPSBT = async (
 };
 
 const broadcastRawTX = async (rawTx: string) => {
-  const tapwallet = (window as any).tapwallet;
+  const tapwallet = (globalThis as any).tapwallet;
   return await tapwallet.pushTx({ rawtx: rawTx });
 };
 
 const broadcastPSBT = async (psbtHex: string) => {
-  const tapwallet = (window as any).tapwallet;
+  const tapwallet = (globalThis as any).tapwallet;
   return await tapwallet.pushPsbt(psbtHex);
 };
 

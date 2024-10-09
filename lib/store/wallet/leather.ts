@@ -17,7 +17,7 @@ type AddToastFunction = (message: string, type: string) => void;
 export const isLeatherInstalled = signal<boolean>(false);
 
 export const checkLeather = () => {
-  if (typeof window !== "undefined" && "LeatherProvider" in window) {
+  if (typeof globalThis !== "undefined" && "LeatherProvider" in globalThis) {
     isLeatherInstalled.value = true;
     return true;
   }
@@ -36,7 +36,7 @@ export const connectLeather = async (addToast: AddToastFunction) => {
       return;
     }
 
-    const leatherProvider = (window as any).LeatherProvider;
+    const leatherProvider = (globalThis as any).LeatherProvider;
     const response = await leatherProvider.request("getAddresses");
 
     let addresses;
@@ -101,7 +101,7 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
 };
 
 const signMessage = async (message: string) => {
-  const leatherProvider = (window as any).LeatherProvider;
+  const leatherProvider = (globalThis as any).LeatherProvider;
   if (typeof leatherProvider === "undefined") {
     throw new Error("Leather wallet not connected");
   }
@@ -132,7 +132,7 @@ export const signPSBT = async (
   console.log("PSBT hex length:", psbtHex.length);
   console.log("Number of inputs to sign:", inputsToSign?.length);
 
-  const leatherProvider = (window as any).LeatherProvider;
+  const leatherProvider = (globalThis as any).LeatherProvider;
   if (typeof leatherProvider === "undefined") {
     console.error("Leather wallet not connected");
     return { signed: false, error: "Leather wallet not connected" };
