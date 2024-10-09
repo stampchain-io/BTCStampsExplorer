@@ -101,10 +101,10 @@ class DatabaseManager {
 
   async executeQuery<T>(query: string, params: unknown[]): Promise<T> {
     for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
+      let client: Client | null = null;
       try {
-        const client = await this.getClient();
+        client = await this.getClient();
         const result = await client.execute(query, params);
-        this.releaseClient(client);
         return result as T;
       } catch (error) {
         this.logger.error(
@@ -113,6 +113,11 @@ class DatabaseManager {
         );
         if (attempt === this.MAX_RETRIES) {
           throw error;
+        }
+      } finally {
+        if (client) {
+          this.releaseClient(client);
+          client = null;
         }
       }
       await new Promise((resolve) => setTimeout(resolve, this.RETRY_INTERVAL));
@@ -141,6 +146,7 @@ class DatabaseManager {
   }
 
   private createConnection(): Promise<Client> {
+    console.log("poolLength:" + this.pool.length)
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
     const charset= 'utf8mb4'
     return new Client().connect({
