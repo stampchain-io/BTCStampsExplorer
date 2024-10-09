@@ -46,7 +46,7 @@ export const Pagination = (
       return `/${type}?page=${pageNum}`;
     }
 
-    const url = new URL(window.location.href);
+    const url = new URL(globalThis.location.href);
     url.searchParams.set("page", pageNum.toString());
     url.searchParams.set("limit", page_size.toString());
 

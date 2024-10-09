@@ -30,7 +30,7 @@ export function SRC20SearchClient(
   }, [searchTerm]);
 
   const handleResultClick = (tick: string) => {
-    window.location.href = `/src20/${tick}`;
+    globalThis.location.href = `/src20/${tick}`;
   };
 
   return (

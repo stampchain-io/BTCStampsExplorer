@@ -40,7 +40,7 @@ function RightPanel(
     const xShareUrl = `https://x.com/intent/post?text=${
       encodeURIComponent(text)
     }&url=${encodeURIComponent(url)}`;
-    window.open(xShareUrl, "_blank", "noopener,noreferrer");
+    globalThis.open(xShareUrl, "_blank", "noopener,noreferrer");
   };
 
   const copyLink = () => {

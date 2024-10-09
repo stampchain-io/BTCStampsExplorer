@@ -10,7 +10,7 @@ export function StampSearchClient(
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
-      window.location.href = `/stamp/${searchTerm.trim()}`;
+      globalThis.location.href = `/stamp/${searchTerm.trim()}`;
     }
   };
 

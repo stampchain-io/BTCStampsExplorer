@@ -23,7 +23,7 @@ export const StampHeader = (
   const handleTabClick = (tabType: STAMP_TYPES) => {
     setTypeOption("stamp", tabType, true);
     if (tabType === "collection") {
-      window.location.href = "/collection";
+      globalThis.location.href = "/collection";
     }
   };
 

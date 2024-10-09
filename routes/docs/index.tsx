@@ -21,7 +21,7 @@ export const handler: Handlers = {
   <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-bundle.js"></script>
   <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-standalone-preset.js"></script>
   <script>
-    window.onload = function() {
+    globalThis.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
         url: "swagger/openapi.yml", // Path to your OpenAPI YAML file
