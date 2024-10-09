@@ -1,3 +1,5 @@
+import "$/server/config/env.ts";
+
 type ServerConfig = {
   readonly APP_ROOT: string;
   readonly IMAGES_SRC_PATH?: string;
