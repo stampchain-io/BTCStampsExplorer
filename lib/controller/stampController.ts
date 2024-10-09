@@ -2,7 +2,6 @@ import { StampService } from "$lib/services/stampService.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { HolderRow, SUBPROTOCOLS } from "globals";
 import { Src20Service } from "$lib/services/src20Service.ts";
-import { formatSRC20Row } from "utils/src20Utils.ts";
 import { CollectionService } from "$lib/services/collectionService.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { paginate } from "utils/util.ts";
@@ -15,7 +14,7 @@ import {
   StampRow,
 } from "globals";
 import { DispenserManager } from "$lib/services/xcpService.ts";
-import * as base64 from "base64/mod.ts";
+import { decodeBase64 } from "@std/encoding";
 import { filterOptions } from "utils/filterOptions.ts";
 import { Dispense, Dispenser } from "$lib/types/index.d.ts";
 import { CollectionController } from "$lib/controller/collectionController.ts";
@@ -500,7 +499,7 @@ export class StampController {
             },
           });
         case "base64":
-          return new Response(base64.toUint8Array(result.base64), {
+          return new Response(decodeBase64(result.base64), {
             headers: {
               "Content-Type": result.mimeType || "application/octet-stream",
             },

@@ -541,7 +541,6 @@ export interface SRC20SnapshotRequestParams {
 }
 
 export interface Config {
-  API_BASE_URL: string;
   MINTING_SERVICE_FEE_ENABLED: boolean;
   MINTING_SERVICE_FEE: string | null;
   MINTING_SERVICE_FEE_ADDRESS: string | null;

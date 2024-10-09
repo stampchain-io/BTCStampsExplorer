@@ -6,8 +6,14 @@ export const handler: Handlers = {
   async POST(req) {
     // Check for API key in the request headers
     const apiKey = req.headers.get("X-API-Key");
+    const expectedApiKey = serverConfig.API_KEY;
 
-    if (apiKey !== serverConfig.API_KEY) {
+    if (!expectedApiKey) {
+      console.error("API_KEY is not set in the server configuration");
+      return new Response("Server Error", { status: 500 });
+    }
+
+    if (apiKey !== expectedApiKey) {
       return new Response("Unauthorized", { status: 401 });
     }
 

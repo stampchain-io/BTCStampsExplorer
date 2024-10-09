@@ -225,7 +225,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
   const [path, setPath] = useState<string | null>(null);
 
   useEffect(() => {
-    setPath(window.location.pathname?.split("/")[1] || null);
+    setPath(globalThis.location.pathname?.split("/")[1] || null);
   }, []);
 
   useEffect(() => {
@@ -297,9 +297,9 @@ export const WalletModal = ({ connectors = [] }: Props) => {
           logout={() => {
             disconnect();
             setIsPopupOpen(false);
-            if (path === "wallet" && typeof window !== "undefined") {
-              window.history.pushState({}, "", "/");
-              window.location.reload();
+            if (path === "wallet" && typeof globalThis !== "undefined") {
+              globalThis.history.pushState({}, "", "/");
+              globalThis.location.reload();
             }
           }}
           onClose={() => setIsPopupOpen(false)}

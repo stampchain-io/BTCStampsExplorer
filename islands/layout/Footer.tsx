@@ -88,7 +88,7 @@ export function Footer() {
                 }`}
                 target={link.isExternal ? "_blank" : undefined}
               >
-                {link.title === "STAMPCHAIN" && window.innerWidth < 768
+                {link.title === "STAMPCHAIN" && globalThis.innerWidth < 768
                   ? "ABOUT"
                   : link.title}
               </a>

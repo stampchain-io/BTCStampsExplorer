@@ -7,13 +7,11 @@ import {
   getLogger,
   LogRecord,
   setup,
-} from "$std/log/mod.ts";
+} from "@std/log";
 import {
   deadline,
-  DeadlineError,
-} from "https://deno.land/std@0.201.0/async/mod.ts";
+} from "@std/async";
 
-// Define a configuration interface
 interface DatabaseConfig {
   DB_HOST: string;
   DB_USER: string;
@@ -54,7 +52,7 @@ class DatabaseManager {
     setup({
       handlers: {
         console: new ConsoleHandler("DEBUG"),
-        file: new FileHandler("WARNING", {
+        file: new FileHandler("WARN", {
           filename: "./db.log",
           formatter: (logRecord: LogRecord) =>
             `${logRecord.levelName} ${logRecord.msg}`,
@@ -161,7 +159,7 @@ class DatabaseManager {
     try {
       await this.connectToRedis();
     } catch (error) {
-      if (error instanceof DeadlineError) {
+      if (error instanceof Error && error.name === "AbortError") {
         this.logger.error("Redis connection timed out:", error);
       } else {
         this.logger.error("Failed to connect to Redis at startup:", error);

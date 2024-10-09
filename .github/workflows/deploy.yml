@@ -29,7 +29,7 @@ jobs:
         run: deno task build
 
       # - name: Start Deno app
-      #   run: deno run -A dev.ts &
+      #   run: deno run -A main.ts &
       #   env:
       #     PORT: 8000
 

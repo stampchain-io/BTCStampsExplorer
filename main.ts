@@ -4,25 +4,31 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import "$/globals.d.ts";
-import { Manifest } from "$fresh/server.ts";
-
-import "$std/dotenv/load.ts";
-
-import { start } from "$fresh/server.ts";
-import manifest from "$/fresh.gen.ts";
-import config from "$/fresh.config.ts";
-// Import for dbManager initialization
-import "./server/database/db.ts";
-
-// import twindPlugin from "$fresh/plugins/twind.ts";
-// import twindConfig from "./twind.config.ts";
-
-async function startApp() {
-  await start(manifest as unknown as Manifest, config);
+if (!Deno.env.get("ENV")) {
+  Deno.env.set("ENV", "production");
 }
 
-startApp().catch((error) => {
-  console.error("Failed to start application:", error);
-  Deno.exit(1);
+import { loadSync } from "@std/dotenv";
+
+const currentDir = Deno.cwd();
+const envFilePath = Deno.env.get("ENV") === "development"
+  ? `${currentDir}/.env.development.local`
+  : `${currentDir}/.env`;
+
+// Debugging
+console.log("Loading environment variables from:", envFilePath);
+
+loadSync({
+  envPath: envFilePath,
+  export: true,
 });
+
+import "$/globals.d.ts";
+import { start } from "$fresh/server.ts";
+import manifest from "$/fresh.gen.ts";
+import { Manifest } from "$fresh/server.ts";
+import config from "$/fresh.config.ts";
+
+import "$server/database/db.ts";
+
+await start(manifest as unknown as Manifest, config);
