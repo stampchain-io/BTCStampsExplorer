@@ -1,20 +1,21 @@
 {
   "lock": false,
+  "lockfile": "deno.lock",
   "tasks": {
     "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
-    "start": "deno run -A main.ts",
-    "dev": "export ENV=development && deno run -A --watch=static/,routes/,components/,islands/ main.ts --host",
+    "start": "deno task check_version && deno run -A main.ts",
+    "dev": "deno task check_version && deno run -A --watch=static/,routes/,components/,islands/ main.ts --host",
     "build": "deno run -A main.ts build",
     "docs": "deno run --allow-read --allow-write swagger.js",
     "fakebuild": "echo 'fake build'",
     "preview": "deno run -A main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "decode": "deno run -A utils/decodeSrc20MsigTx.ts",
-    "decode_olga": "deno run -A utils/decodeSrc20OlgaTx.ts"
+    "decode_olga": "deno run -A utils/decodeSrc20OlgaTx.ts",
+    "check_version": "deno run --allow-run --allow-env utils/check_deno_version.ts"
   },
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
-  "nodeModulesDir": true,
   "imports": {
     "axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
     "redis": "https://deno.land/x/redis@v0.32.4/mod.ts",
@@ -65,6 +66,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "strict": true
+    "strict": true,
+    "types": ["npm:@types/node"]
   }
 }
