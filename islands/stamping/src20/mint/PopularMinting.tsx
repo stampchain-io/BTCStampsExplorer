@@ -1,6 +1,10 @@
 import StampingMintingItem from "$islands/stamping/src20/mint/StampingMintingItem.tsx";
 
 const PopularMinting = ({ transactions }) => {
+  if (!transactions || transactions.length === 0) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-4 items-start md:items-end">
       <h1 className="bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-3xl md:text-6xl font-black">
