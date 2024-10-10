@@ -11,6 +11,8 @@ type ServerConfig = {
   readonly MINTING_SERVICE_FEE_FIXED_SATS: string;
   readonly OPENSTAMP_API_KEY: string;
   readonly API_KEY?: string;
+  readonly QUICKNODE_ENDPOINT?: string;
+  readonly QUICKNODE_API_KEY?: string;
   [key: string]: string | undefined;
 };
 
@@ -40,7 +42,12 @@ const serverConfig: ServerConfig = {
   get API_KEY() {
     return Deno.env.get("API_KEY");
   },
-  // Add other getters as needed
+  get QUICKNODE_ENDPOINT() {
+    return Deno.env.get("QUICKNODE_ENDPOINT");
+  },
+  get QUICKNODE_API_KEY() {
+    return Deno.env.get("QUICKNODE_API_KEY");
+  },
 };
 
 export { serverConfig };

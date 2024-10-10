@@ -17,13 +17,18 @@ interface StampingSrc20PageProps {
   tick?: string | null;
   mintStatus?: any;
   holders?: number;
+  recentTransactions: {
+    deploy: any[];
+    mint: any[];
+    transfer: any[];
+  };
 }
 
 export const handler: Handlers<StampingSrc20PageProps> = {
   async GET(req, ctx) {
     const url = new URL(req.url);
     const action = ctx.params.action || "mint";
-    const trxType = url.searchParams.get("trxType") as "multisig" | "olga" ||
+    const trxType = (url.searchParams.get("trxType") as "multisig" | "olga") ||
       "multisig";
     const tick = url.searchParams.get("tick") || null;
 
@@ -45,12 +50,16 @@ export const handler: Handlers<StampingSrc20PageProps> = {
       holders = balanceData.total || 0;
     }
 
+    // Fetch recent transactions for each operation
+    const recentTransactions = await Src20Controller.fetchRecentTransactions();
+
     return ctx.render({
       selectedTab: action,
       trxType,
       tick,
       mintStatus,
       holders,
+      recentTransactions,
     });
   },
 };
@@ -58,7 +67,14 @@ export const handler: Handlers<StampingSrc20PageProps> = {
 export default function StampingSrc20Page(
   { data }: PageProps<StampingSrc20PageProps>,
 ) {
-  const { selectedTab, trxType, tick, mintStatus, holders } = data;
+  const {
+    selectedTab,
+    trxType,
+    tick,
+    mintStatus,
+    holders,
+    recentTransactions,
+  } = data;
 
   const isMint = selectedTab === "mint";
   const flexDirection = isMint ? "lg:flex-row" : "md:flex-row";
@@ -87,11 +103,11 @@ export default function StampingSrc20Page(
   const renderSidebar = () => {
     switch (selectedTab) {
       case "mint":
-        return <PopularMinting />;
+        return <PopularMinting transactions={recentTransactions.mint} />;
       case "deploy":
-        return <RecentDeploy />;
+        return <RecentDeploy transactions={recentTransactions.deploy} />;
       case "transfer":
-        return <LatestTransfer />;
+        return <LatestTransfer transactions={recentTransactions.transfer} />;
       default:
         return null;
     }
