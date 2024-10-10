@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { SRC20HoldersInfo } from "$components/src20/SRC20HoldersInfo.tsx";
-import { SRC20TX } from "$components/src20/SRC20TX.tsx";
+import { SRC20TX } from "$islands/src20/SRC20TX.tsx";
 
 type SRC20DetailsTabProps = {
   holders: any[];

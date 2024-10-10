@@ -122,6 +122,8 @@ import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Navigator from "./islands/src20/SRC20Navigator.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
+import * as $src20_SRC20TX from "./islands/src20/SRC20TX.tsx";
+import * as $src20_SRC20TickHeader from "./islands/src20/SRC20TickHeader.tsx";
 import * as $src20_all_SRC20DeployTable from "./islands/src20/all/SRC20DeployTable.tsx";
 import * as $src20_minting_LatestMints from "./islands/src20/minting/LatestMints.tsx";
 import * as $src20_minting_SRC20MintingItem from "./islands/src20/minting/SRC20MintingItem.tsx";
@@ -305,6 +307,8 @@ const manifest = {
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Navigator.tsx": $src20_SRC20Navigator,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
+    "./islands/src20/SRC20TX.tsx": $src20_SRC20TX,
+    "./islands/src20/SRC20TickHeader.tsx": $src20_SRC20TickHeader,
     "./islands/src20/all/SRC20DeployTable.tsx": $src20_all_SRC20DeployTable,
     "./islands/src20/minting/LatestMints.tsx": $src20_minting_LatestMints,
     "./islands/src20/minting/SRC20MintingItem.tsx":
