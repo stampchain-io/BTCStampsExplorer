@@ -122,7 +122,7 @@ export default function StampingSrc20Page(
       <div className={`flex flex-col gap-6 w-full ${flexDirection}`}>
         <div className={`w-full ${columnWidth}`}>
           <FAQModule />
-          {isMint && <RecentDeploy />}
+          {isMint && <RecentDeploy transactions={recentTransactions.deploy} />}
         </div>
         <div className={`w-full ${columnWidth}`}>
           {renderSidebar()}
