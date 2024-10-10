@@ -89,9 +89,8 @@ import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
-import * as $Wallet_details_HistoryContent from "./islands/Wallet/details/HistoryContent.tsx";
-import * as $Wallet_details_MyItemsContent from "./islands/Wallet/details/MyItemsContent.tsx";
-import * as $Wallet_details_TransactionsContent from "./islands/Wallet/details/TransactionsContent.tsx";
+import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
+import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
@@ -268,12 +267,8 @@ const manifest = {
     "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
-    "./islands/Wallet/details/HistoryContent.tsx":
-      $Wallet_details_HistoryContent,
-    "./islands/Wallet/details/MyItemsContent.tsx":
-      $Wallet_details_MyItemsContent,
-    "./islands/Wallet/details/TransactionsContent.tsx":
-      $Wallet_details_TransactionsContent,
+    "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
+    "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
     "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
