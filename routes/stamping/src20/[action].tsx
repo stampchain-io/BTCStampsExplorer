@@ -22,6 +22,7 @@ interface StampingSrc20PageProps {
     mint: any[];
     transfer: any[];
   };
+  trendingTokens: any[];
 }
 
 export const handler: Handlers<StampingSrc20PageProps> = {
@@ -37,7 +38,6 @@ export const handler: Handlers<StampingSrc20PageProps> = {
 
     if (tick) {
       // Fetch mint status and holders on the server
-      // Fetch mint status
       mintStatus = await Src20Controller.handleSrc20MintProgressRequest(tick);
 
       // Fetch holders count
@@ -50,8 +50,36 @@ export const handler: Handlers<StampingSrc20PageProps> = {
       holders = balanceData.total || 0;
     }
 
-    // Fetch recent transactions for each operation
-    const recentTransactions = await Src20Controller.fetchRecentTransactions();
+    // Initialize variables
+    let recentTransactions = {
+      deploy: [],
+      mint: [],
+      transfer: [],
+    };
+    let trendingTokens = [];
+
+    if (action === "mint") {
+      // Fetch trending tokens for PopularMinting
+      const limit = 8;
+      const page = 1;
+      const transactionCount = 1000; // Adjust as needed
+
+      const trendingData = await Src20Controller.fetchTrendingTokens(
+        req,
+        limit,
+        page,
+        transactionCount,
+      );
+
+      trendingTokens = trendingData.data;
+
+      // Fetch recent deploys for RecentDeploy
+      const recentDeploysData = await Src20Controller.fetchRecentTransactions();
+
+      recentTransactions.deploy = recentDeploysData.deploy;
+    } else {
+      recentTransactions = await Src20Controller.fetchRecentTransactions();
+    }
 
     return ctx.render({
       selectedTab: action,
@@ -60,6 +88,7 @@ export const handler: Handlers<StampingSrc20PageProps> = {
       mintStatus,
       holders,
       recentTransactions,
+      trendingTokens,
     });
   },
 };
@@ -74,6 +103,7 @@ export default function StampingSrc20Page(
     mintStatus,
     holders,
     recentTransactions,
+    trendingTokens,
   } = data;
 
   const isMint = selectedTab === "mint";
@@ -103,7 +133,7 @@ export default function StampingSrc20Page(
   const renderSidebar = () => {
     switch (selectedTab) {
       case "mint":
-        return <PopularMinting transactions={recentTransactions.mint} />;
+        return <PopularMinting transactions={trendingTokens} />;
       case "deploy":
         return <RecentDeploy transactions={recentTransactions.deploy} />;
       case "transfer":

@@ -8,31 +8,37 @@ interface StampingMintingItemProps {
   src20: SRC20Row;
 }
 
-const StampingMintingItem = (
-  { src20 }: StampingMintingItemProps,
-) => {
+const StampingMintingItem = ({ src20 }: StampingMintingItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const href = `/src20/${convertToEmoji(src20.tick)}`;
+  const href = `/src20/${encodeURIComponent(convertToEmoji(src20.tick))}`;
+  const mintHref = `/stamping/src20/mint?tick=${
+    encodeURIComponent(src20.tick)
+  }`;
 
   const progress = src20.progress || "0";
   const progressWidth = `${progress}%`;
 
+  const handleMintClick = () => {
+    globalThis.location.href = mintHref;
+  };
+
   return (
     <div
-      class="flex bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm justify-between items-center rounded-md hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] w-full"
+      className="flex bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm justify-between items-center rounded-md hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div class="p-3 uppercase cursor-pointer flex gap-6">
+      <div className="p-3 uppercase cursor-pointer flex gap-6">
         <img
-          src={`/content/${src20.tx_hash}.svg`}
-          class="w-[65px] h-[65px]"
+          src={src20.stamp_url || `/content/${src20.tx_hash}.svg`}
+          className="w-[65px] h-[65px]"
+          alt={src20.tick}
         />
         <div className="flex flex-col justify-between">
           <a
             href={href}
-            class={`text-2xl font-bold ${
+            className={`text-2xl font-bold ${
               isHovered ? "text-[#AA00FF]" : "text-[#666666]"
             }`}
           >
@@ -77,13 +83,16 @@ const StampingMintingItem = (
         <p className="text-lg text-[#666666] font-light">
           MINTERS{" "}
           <span className="font-bold text-[#999999]">
-            {Number(src20.holders).toLocaleString()}
+            {Number(src20.holders || 0).toLocaleString()}
           </span>
         </p>
       </div>
 
-      <div class="p-3 text-sm text-center flex flex-col justify-center">
-        <button className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]">
+      <div className="p-3 text-sm text-center flex flex-col justify-center">
+        <button
+          onClick={handleMintClick}
+          className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]"
+        >
           Mint
         </button>
       </div>
