@@ -4,8 +4,6 @@ import { SRC20DetailsTab } from "$islands/src20/SRC20DetailsTab.tsx";
 import { convertEmojiToTick } from "utils/util.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
-import { HoldersInfo } from "$components/HoldersInfo.tsx";
-import { TransfersInfo } from "$components/TransfersInfo.tsx";
 
 export const handler: Handlers = {
   async GET(_req: Request, ctx) {
