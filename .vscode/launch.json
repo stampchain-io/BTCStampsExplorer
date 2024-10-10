@@ -2,19 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Deno: Dev",
+      "name": "Deno: Dev (Debug)",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
-      "outputCapture": "std",
       "runtimeArgs": [
         "run",
-        "--inspect-wait",
+        "--inspect",
         "-A",
-        "--watch=static/,routes/,components/,islands/",
         "./main.ts"
       ],
+      "outputCapture": "std",
       "attachSimplePort": 9229
     }
   ]

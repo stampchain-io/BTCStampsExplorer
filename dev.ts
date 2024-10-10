@@ -3,8 +3,6 @@ import "preact/debug";
 import dev from "$fresh/dev.ts";
 import config from "$/fresh.config.ts";
 
-import "$std/dotenv/load.ts";
-
 const isBuildMode = Deno.args.includes("build");
 
 if (isBuildMode) {
