@@ -516,4 +516,51 @@ export class Src20Controller {
       throw error;
     }
   }
+
+  static async fetchRecentTransactions() {
+    const limit = 8;
+    const page = 1;
+
+    const [deployTransactions, mintTransactions, transferTransactions] =
+      await Promise.all([
+        Src20Service.fetchAndFormatSrc20Data({
+          op: "DEPLOY",
+          limit,
+          page,
+          sortBy: "DESC",
+        }),
+        Src20Service.fetchAndFormatSrc20Data({
+          op: "MINT",
+          limit,
+          page,
+          sortBy: "DESC",
+        }),
+        Src20Service.fetchAndFormatSrc20Data({
+          op: "TRANSFER",
+          limit,
+          page,
+          sortBy: "DESC",
+        }),
+      ]);
+
+    // Enrich transactions with stamp_url and stamp_mimetype
+    const mapTransactions = (transactions: any[]) =>
+      transactions.map((tx: any) => ({
+        ...tx,
+        stamp_url: `https://stampchain.io/stamps/${tx.tx_hash}.svg`,
+        stamp_mimetype: "image/svg+xml",
+        // Map additional properties to match the expected shape
+        // stamp: tx.block_index,
+        // cpid: tx.tx_hash,
+        block_time: tx.block_time,
+        creator: tx.creator,
+        creator_name: tx.creator_name,
+      }));
+
+    return {
+      deploy: mapTransactions(deployTransactions.data),
+      mint: mapTransactions(mintTransactions.data),
+      transfer: mapTransactions(transferTransactions.data),
+    };
+  }
 }
