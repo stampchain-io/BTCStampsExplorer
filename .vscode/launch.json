@@ -14,7 +14,10 @@
         "./main.ts"
       ],
       "outputCapture": "std",
-      "attachSimplePort": 9229
+      "attachSimplePort": 9229,
+      "env": {
+        "PATH": "${env:HOME}/.deno/bin:${env:PATH}"
+      }
     }
   ]
 }
