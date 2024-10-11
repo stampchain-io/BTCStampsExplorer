@@ -5,11 +5,11 @@ export const FAQModule = () => {
         FAQ
       </p>
       <p className="flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-left text-3xl md:text-6xl font-extralight text-[#CCCCCC]">
-        Let's Stamp!
+        Let's Deploy!
       </p>
 
       <p className="text-[#999999] text-base md:text-2xl font-medium">
-        Deploy
+        Deplooooy
                 
       </p>
 
