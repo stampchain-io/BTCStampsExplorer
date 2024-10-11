@@ -73,6 +73,7 @@ export interface StampSectionProps {
   layout: "grid" | "row";
   isRecentSales?: boolean;
   filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
+  showDetails?: boolean;
 }
 
 export interface SRC20Row {
