@@ -45,11 +45,10 @@ const SortItem = ({ title, onChange, value }: SortItemProps) => (
 );
 
 export function StampNavigator(
-  { initFilter, initSort, initType, selectedTab, open1, handleOpen1 }: {
+  { initFilter, initSort, initType, open1, handleOpen1 }: {
     initFilter?: STAMP_FILTER_TYPES[];
     initSort?: string;
     initType?: STAMP_TYPES;
-    selectedTab: STAMP_TYPES;
     open1: boolean;
     handleOpen1: (open: boolean) => void;
   },
@@ -95,7 +94,7 @@ export function StampNavigator(
         }
       }
       if (params.type) url.searchParams.set("type", params.type);
-      if (!params.type) url.searchParams.set("type", selectedTab);
+      // if (!params.type) url.searchParams.set("type", selectedTab);
 
       url.searchParams.set("page", "1");
       self.history.pushState({}, "", url.toString());

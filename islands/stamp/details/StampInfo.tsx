@@ -25,17 +25,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleCloseModal = (event: MouseEvent) => {
+  const handleCloseModal = () => {
     setIsModalOpen(false);
   };
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).catch((err) => {
-      console.error("Failed to copy text: ", err);
-    });
   };
 
   const timestamp = new Date(stamp.block_time);
@@ -98,11 +92,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             href={`https://explorer.unspendablelabs.com/assets/${stamp.cpid}`}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-[#660099] text-4xl font-bold overflow-hidden text-ellipsis whitespace-nowrap block"
+            className="text-[#660099] text-4xl font-bold overflow-hidden text-ellipsis whitespace-nowrap block"
           >
             {stamp.cpid}
           </a>
-          <p class="hidden md:block text-[#8800CC] overflow-hidden text-ellipsis whitespace-nowrap text-4xl font-light">
+          <p className="hidden md:block text-[#8800CC] overflow-hidden text-ellipsis whitespace-nowrap text-4xl font-light">
             by{" "}
             <span className={"font-bold"}>
               {stamp.creator_name
@@ -115,50 +109,47 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </span>
           </p>
 
-          <p class="text-[#666666] font-bold text-3xl">
+          <p className="text-[#666666] font-bold text-3xl">
             {editionCount} {editionLabel}
           </p>
 
-          <p class="text-[#666666] font-medium text-2xl">
-            {typeof stamp.floorPrice === "number"
-              ? `${stamp.floorPrice} BTC`
-              : stamp.floorPrice}
-          </p>
+          <div className="flex flex-col gap-6 items-end mt-6">
+            {/* TODO: display USD price as well */}
+            <p className="text-[#666666] font-medium text-2xl">
+              {typeof stamp.floorPrice === "number"
+                ? `${stamp.floorPrice} BTC`
+                : stamp.floorPrice}
+            </p>
 
-          <span class="inline-block border-2 border-[#666666] text-[#666666] font-medium text-lg rounded p-2">
-            {stamp.stamp_mimetype}
-          </span>
-
-          {lowestPriceDispenser && (
-            <button
-              className={"border-[3px] border-[#660099] rounded-md text-xl leading-6 text-[#660099] px-6 py-4 float-right mt-28"}
-              onClick={toggleModal}
-            >
-              BUY
-            </button>
-          )}
+            {lowestPriceDispenser && (
+              <button
+                className="bg-[#8800CC] rounded-md font-extrabold text-[#080808] px-6 py-4 float-right"
+                onClick={toggleModal}
+              >
+                BUY
+              </button>
+            )}
+          </div>
         </div>
 
-        <div
-          className={"flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6"}
-        >
-          <div class="flex justify-between items-center flex-col md:items-start gap-1">
-            <p class="text-[#660099] font-light uppercase">TYPE</p>
-            <p class="text-[#999999] uppercase">
+        <div className="flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
+          <div className="flex justify-between items-center flex-col md:items-start gap-1">
+            <p className="text-[#666666] font-light uppercase">TYPE</p>
+            <p className="text-[#999999] uppercase font-medium">
               {fileExtension}
             </p>
           </div>
-          <div class="flex justify-between items-center flex-col md:items-center gap-1">
-            <p class="text-[#660099] font-light uppercase">DIMENSIONS</p>
-            <p class="text-[#999999] uppercase">
+          <div className="flex justify-between items-center flex-col md:items-center gap-1">
+            <p className="text-[#666666] font-light uppercase">DIMENSIONS</p>
+            <p className="text-[#999999] uppercase font-medium">
               {imageDimensions
                 ? `${imageDimensions.width} x ${imageDimensions.height}px`
                 : "N/A"}
             </p>
           </div>
-          <div class="flex justify-between items-center flex-col md:items-end gap-1">
-            <p class="text-[#660099] font-light uppercase">SIZE</p>
-            <p class="text-[#999999] uppercase">
+          <div className="flex justify-between items-center flex-col md:items-end gap-1">
+            <p className="text-[#666666] font-light uppercase">SIZE</p>
+            <p className="text-[#999999] uppercase font-medium">
               {imageSize ? `${(imageSize / 1024).toFixed(2)} KB` : "N/A"}
             </p>
           </div>
@@ -167,68 +158,58 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         <div
           className={"flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6"}
         >
-          <div class="flex justify-between items-center flex-col md:items-start gap-1">
-            <p class="text-[#660099] font-light uppercase">Locked</p>
-            <p class="text-[#999999] uppercase">
+          <div className="flex justify-between items-center flex-col md:items-start gap-1">
+            <p className="text-[#666666] font-light uppercase">Locked</p>
+            <p className="text-[#999999] uppercase font-medium">
               {stamp.locked ?? false ? "Yes" : "No"}
             </p>
           </div>
-          <div class="flex justify-between items-center flex-col md:items-center gap-1">
-            <p class="text-[#660099] font-light uppercase">Divisible</p>
-            <p class="text-[#999999] uppercase">
+          <div className="flex justify-between items-center flex-col md:items-center gap-1">
+            <p className="text-[#666666] font-light uppercase">Divisible</p>
+            <p className="text-[#999999] uppercase font-medium">
               {stamp.divisible ? "Yes" : "No"}
             </p>
           </div>
-          <div class="flex justify-between items-center flex-col md:items-end gap-1">
-            <p class="text-[#660099] font-light uppercase">Keyburned</p>
-            <p class="text-[#999999] uppercase">
+          <div className="flex justify-between items-center flex-col md:items-end gap-1">
+            <p className="text-[#666666] font-light uppercase">Keyburned</p>
+            <p className="text-[#999999] uppercase font-medium">
               {stamp.keyburn ?? false ? "Yes" : "No"}
             </p>
           </div>
         </div>
 
         <div
-          className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-7"}
+          className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex justify-between gap-7"}
         >
-          <div className={"flex justify-between"}>
-            <div class="flex flex-col justify-between items-start gap-1">
-              <p class="text-lg font-light text-[#660099] uppercase">Created</p>
-              <p class="text-[#999999]">
-                {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
-              </p>
-            </div>
-
-            <div class="flex justify-between items-center flex-col md:items-end gap-1">
-              <p class="text-lg font-light text-[#660099] uppercase">Block #</p>
-              <a
-                href={`/block/${stamp.block_index}`}
-                class="text-[#999999] hover:underline"
-              >
-                {stamp.block_index}
-              </a>
-            </div>
+          <div className="flex flex-col justify-between items-start gap-1">
+            <p className="text-lg font-light text-[#666666] uppercase">
+              Created
+            </p>
+            <p className="text-[#999999] font-medium">
+              {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
+            </p>
           </div>
-
-          <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1">
-            <p class="text-lg font-light text-[#660099] uppercase">TX hash</p>
-            <div class="flex justify-between items-center md:w-full gap-2">
-              <a
-                href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block md:hidden text-[#60626F]"
-              >
-                {abbreviateAddress(stamp.tx_hash, 12)}
-              </a>
-              <a
-                href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="hidden md:block text-[#999999] overflow-hidden text-ellipsis whitespace-nowrap"
-              >
-                {stamp.tx_hash}
-              </a>
-            </div>
+          <div className="flex justify-between items-center flex-col md:items-center gap-1">
+            <p className="text-[#666666] font-light uppercase">TX hash</p>
+            <a
+              href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#999999] font-medium"
+            >
+              {abbreviateAddress(stamp.tx_hash, 4)}
+            </a>
+          </div>
+          <div className="flex justify-between items-center flex-col md:items-end gap-1">
+            <p className="text-lg font-light text-[#666666] uppercase">
+              Block #
+            </p>
+            <a
+              href={`/block/${stamp.block_index}`}
+              className="text-[#999999] hover:underline font-medium"
+            >
+              {stamp.block_index}
+            </a>
           </div>
         </div>
       </div>
@@ -243,147 +224,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           dispenser={lowestPriceDispenser} // Pass the dispenser to the modal
         />
       )}
-
-      {
-        /* <div class="flex flex-col text-gray-200 font-semibold bg-[#2B0E49]">
-        <div class="flex items-center truncate text-[#C184FF] text-2xl md:text-5xl p-6 pb-0">
-          <p>
-            # {stamp.stamp}
-          </p>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <a
-            href={`https://xcp.dev/asset/${stamp.cpid}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-[#60626F]"
-          >
-            {stamp.cpid}
-          </a>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Creator</p>
-          <div class="flex justify-between items-center md:w-full gap-2">
-            <p class="block md:hidden text-[#60626F]">
-              {stamp.creator_name
-                ? stamp.creator_name
-                : (
-                  <a href={`/wallet/${stamp.creator}`}>
-                    {abbreviateAddress(stamp.creator, 12)}
-                  </a>
-                )}
-            </p>
-            <p class="hidden md:block text-[#60626F] overflow-hidden text-ellipsis whitespace-nowrap">
-              {stamp.creator_name
-                ? stamp.creator_name
-                : (
-                  <a href={`/wallet/${stamp.creator}`}>
-                    {stamp.creator}
-                  </a>
-                )}
-            </p>
-            <img
-              src="/img/icon_copy_to_clipboard.png"
-              className="w-4 h-5 cursor-pointer"
-              onClick={() => copyToClipboard(stamp.creator)}
-              alt="Copy to clipboard"
-            />
-          </div>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Editions</p>
-          <p class="text-[#60626F]">
-            {stamp.divisible
-              ? (stamp.supply / 100000000).toFixed(2)
-              : stamp.supply > 100000
-              ? "+100000"
-              : stamp.supply}
-          </p>
-        </div>
-        <div class="flex justify-between items-end gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Created</p>
-          <p class="text-[#60626F]">
-            {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
-          </p>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Block #</p>
-          <div class="flex justify-between items-center md:w-full gap-2">
-            <a
-              href={`/block/${stamp.block_index}`}
-              class="text-[#60626F] hover:underline"
-            >
-              {stamp.block_index}
-            </a>
-            <img
-              src="/img/icon_copy_to_clipboard.png"
-              className="w-4 h-5 cursor-pointer"
-              onClick={() => copyToClipboard(stamp.block_index.toString())}
-              alt="Copy to clipboard"
-            />
-          </div>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">TX hash</p>
-          <div class="flex justify-between items-center md:w-full gap-2">
-            <a
-              href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="block md:hidden text-[#60626F]"
-            >
-              {abbreviateAddress(stamp.tx_hash, 12)}
-            </a>
-            <a
-              href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hidden md:block text-[#60626F] overflow-hidden text-ellipsis whitespace-nowrap"
-            >
-              {stamp.tx_hash}
-            </a>
-            <img
-              src="/img/icon_copy_to_clipboard.png"
-              className="w-4 h-5 cursor-pointer"
-              onClick={() => copyToClipboard(stamp.tx_hash)}
-              alt="Copy to clipboard"
-            />
-          </div>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Locked</p>
-          <p class="text-[#60626F]">{stamp.locked ?? false ? "Yes" : "No"}</p>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Divisible</p>
-          <p class="text-[#60626F]">{stamp.divisible ? "Yes" : "No"}</p>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Keyburned</p>
-          <p class="text-[#60626F]">{stamp.keyburn ?? false ? "Yes" : "No"}</p>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Floor Price</p>
-          <p class="text-[#60626F]">
-            {typeof stamp.floorPrice === "number"
-              ? `${stamp.floorPrice} BTC`
-              : stamp.floorPrice}
-          </p>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Market Cap</p>
-          <p class="text-[#60626F]">
-            {typeof stamp.marketCap === "number"
-              ? `${parseFloat(stamp.marketCap.toFixed(8)).toString()} BTC`
-              : stamp.marketCap}
-          </p>
-        </div>
-        <div class="flex flex-row justify-between items-center md:flex-col md:items-start gap-1 truncate border-b border-[#60626F] text-[#F5F5F5] px-6 py-4">
-          <p class="text-xl font-semibold">Vault Address</p>
-          <p class="text-[#60626F]">pending</p>
-        </div>
-      </div> */
-      }
     </>
   );
 }
