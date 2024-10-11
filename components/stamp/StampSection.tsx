@@ -55,6 +55,7 @@ export default function StampSection(
               stamp={stamp}
               kind="stamp"
               isRecentSale={isRecentSales}
+              abbreviationLength={layout === "grid" ? 8 : 6}
             />
           </div>
         ))}

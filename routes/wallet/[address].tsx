@@ -62,6 +62,7 @@ export default function Wallet(props: WalletPageProps) {
         filterBy={filterBy}
         sortBy={sortBy}
         selectedTab={selectedTab}
+        address={address},
         type={type}
       />
       <WalletDetails />
@@ -69,3 +70,4 @@ export default function Wallet(props: WalletPageProps) {
     </div>
   );
 }
+<WalletHeader selectedTab={selectedTab} address={address} />

@@ -25,6 +25,7 @@ export function StampCard({
   kind = "stamp",
   isRecentSale = false,
   showInfo = true,
+  abbreviationLength = 6,
 }: {
   stamp: StampRow & {
     sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
@@ -32,6 +33,7 @@ export function StampCard({
   kind: "cursed" | "stamp" | "named";
   isRecentSale?: boolean;
   showInfo?: boolean;
+  abbreviationLength?: number;
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -76,16 +78,35 @@ export function StampCard({
     } else if (Number.isFinite(stamp.floorPrice)) {
       return `${stamp.floorPrice} BTC`;
     } else {
-      return "priceless";
+      return "NOT LISTED";
     }
   };
+
+  const shouldDisplayHash = Number(stamp.stamp ?? 0) >= 0 ||
+    (stamp.cpid && stamp.cpid.charAt(0) === "A");
+
+  const supplyDisplay = stamp.ident !== "SRC-20" && stamp.balance
+    ? `${getSupply(stamp.balance, stamp.divisible)}/${
+      stamp.supply < 100000 && !stamp.divisible
+        ? getSupply(stamp.supply, stamp.divisible)
+        : "+100000"
+    }`
+    : `1/${getSupply(stamp.supply, stamp.divisible)}`;
+
+  const creatorDisplay = stamp.creator_name
+    ? stamp.creator_name
+    : abbreviateAddress(stamp.creator, abbreviationLength);
 
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
-      className="bg-[#2E0F4D] border-2 border-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-[6px] sm:p-3 rounded-lg transition-all hover:border-2 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
+      className="border-2 border-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-[6px] sm:p-3 rounded-[6px] transition-all hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={{
+        background:
+          "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
+      }}
     >
       <div className="relative flex overflow-hidden">
         <div className="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden image-rendering-pixelated">
@@ -95,63 +116,39 @@ export function StampCard({
         </div>
       </div>
       {showInfo && (
-        <div className="flex grow flex-col pt-1 font-title text-[13px] font-medium text-text">
-          <div className="flex justify-center items-center text-black">
-            <h3
-              className={`text-[13px] font-normal text-lg transition-colors duration-300 ${
-                isHovered ? "text-[#AA00FF]" : "text-white/80"
-              }`}
-            >
+        <div className="flex grow flex-col pt-1 font-title font-medium text-text">
+          {/* Stamp Number with Gradient */}
+          <div className="text-center">
+            {shouldDisplayHash && (
+              <span className="text-[#666666] text-[30px] font-light font-work-sans">
+                #
+              </span>
+            )}
+            <span className="text-[30px] font-black font-work-sans bg-gradient-to-r from-[#666666] to-[#999999] bg-clip-text text-transparent">
               {Number(stamp.stamp ?? 0) >= 0 ||
                   (stamp.cpid && stamp.cpid.charAt(0) === "A")
                 ? `${stamp.stamp}`
                 : `${stamp.cpid}`}
-            </h3>
+            </span>
           </div>
-          <div>
-            <div className="flex justify-between text-black">
-              {/* <h3 className="text-white text-[11px]">Creator :</h3> */}
-              {/* <h3 className="text-white text-[11px]">Floor :</h3> */}
-            </div>
-            <div className="flex justify-between">
-              <h3 className="truncate text-[13px] text-[#C7C5C5]">
-                {stamp.creator_name
-                  ? stamp.creator_name
-                  : abbreviateAddress(stamp.creator, 6)}
-              </h3>
-              <h3 className="truncate text-[13px] text-[#C7C5C5]">
+
+          {/* Creator Name or Abbreviated Address */}
+          <div className="text-center text-[#999999] text-[20px] font-bold font-work-sans break-words">
+            {creatorDisplay}
+          </div>
+
+          {/* Price and Supply */}
+          <div className="flex justify-between mt-2">
+            {/* Render Price on the Left */}
+            <div>
+              <span className="text-[#999999] text-[16px] font-medium font-work-sans">
                 {renderPrice()}
-              </h3>
+              </span>
             </div>
-          </div>
-          <div className="flex flex-1 flex-col justify-end rounded-b-lg text-white">
-            <div className="flex items-center gap-x-2 justify-between pt-1">
-              <div className="bg-foreground-1 transition-all hover:bg-foreground-1-hover">
-                <div className="center h-[18px] text-[12px] gap-x-1">
-                  <p className="leading-4">
-                    {stamp.ident !== "SRC-20" && stamp.balance
-                      ? (
-                        `${getSupply(Number(stamp.balance), stamp.divisible)}/${
-                          stamp.supply < 100000 && !stamp.divisible
-                            ? getSupply(stamp.supply, stamp.divisible)
-                            : "+100000"
-                        }`
-                      )
-                      : (
-                        `1/${getSupply(stamp.supply, stamp.divisible)}`
-                      )}
-                  </p>
-                </div>
-              </div>
-              <p className="truncate text-[12px] rounded-lg uppercase">
-                {stamp.ident && stamp.ident === "SRC-20"
-                  ? "SRC-20"
-                  : stamp.ident && stamp.ident === "SRC-721"
-                  ? "SRC-721"
-                  : stamp.stamp_mimetype
-                  ? stamp.stamp_mimetype.split("/")[1]
-                  : "TEXT"}
-              </p>
+
+            {/* Supply on the Right */}
+            <div className="text-right text-[#666666] text-[18px] font-bold font-work-sans">
+              {supplyDisplay}
             </div>
           </div>
         </div>
