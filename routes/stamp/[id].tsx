@@ -4,10 +4,7 @@ import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 
 import StampSection from "$components/stamp/StampSection.tsx";
-import { StampShare } from "$components/stampDetails/StampShare.tsx";
 
-import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { CollectionList } from "$islands/collection/CollectionList.tsx";
 import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
@@ -15,7 +12,6 @@ import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
 import { CollectionController } from "$lib/controller/collectionController.ts";
-import { ArtistCollection } from "$islands/collection/ArtistCollection.tsx";
 
 interface StampDetailPageProps {
   data: {
@@ -159,7 +155,6 @@ export default function StampPage(props: StampDetailPageProps) {
               className="w-[calc(100%-80px)] md:w-full"
               flag={true}
             />
-            {/* <StampShare stamp={stamp} /> */}
           </div>
           <div>
             <StampInfo
@@ -177,17 +172,6 @@ export default function StampPage(props: StampDetailPageProps) {
         />
 
         <div>
-          <h1 class="text-3xl md:text-7xl text-left bg-clip-text text-transparent bg-gradient-to-r from-[#666666] via-[#999999] to-[#CCCCCC] font-black mb-2">
-            ARTIST COLLECTIONS
-          </h1>
-          <ArtistCollection />
-          <p className="font-extralight text-2xl md:text-5xl text-[#CCCCCC] mb-9">
-            OTHER COLLECTIONS
-          </p>
-          <CollectionList collections={collections} />
-        </div>
-
-        <div>
           <h1 class="text-3xl md:text-7xl text-left mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
             LATEST STAMPS
           </h1>
@@ -197,8 +181,6 @@ export default function StampPage(props: StampDetailPageProps) {
             ))}
           </div>
         </div>
-
-        <GetStampingModule />
       </div>
     </>
   );
