@@ -26,6 +26,7 @@ export function StampCard({
   isRecentSale = false,
   showInfo = true,
   abbreviationLength = 6,
+  showDetails = false,
 }: {
   stamp: StampRow & {
     sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
@@ -34,6 +35,7 @@ export function StampCard({
   isRecentSale?: boolean;
   showInfo?: boolean;
   abbreviationLength?: number;
+  showDetails?: boolean;
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -54,7 +56,7 @@ export function StampCard({
           loading="lazy"
           sandbox="allow-scripts allow-same-origin"
           src={src}
-          className="h-full w-fit max-w-full object-contain items-center standalone:h-full standalone:w-auto"
+          className="h-full w-fit max-w-full object-contain items-center"
         />
       );
     } else {
@@ -66,7 +68,7 @@ export function StampCard({
             e.currentTarget.src = `/not-available.png`;
           }}
           alt={`Stamp No. ${stamp.stamp}`}
-          className="h-full w-full object-contain items-center standalone:h-full standalone:w-auto pixelart"
+          className="h-full w-full object-contain items-center pixelart"
         />
       );
     }
@@ -100,57 +102,73 @@ export function StampCard({
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
-      className="border-2 border-[#2E0F4D] text-white group relative z-10 flex h-full w-full grow flex-col p-[6px] sm:p-3 rounded-[6px] transition-all hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="
+        border-2 border-[#2E0F4D] text-white group relative z-0 flex flex-col
+        p-[6px] sm:p-3 rounded-[6px] transition-all
+        hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]
+        w-full max-w-[220px] lg:max-w-[348px] xl:max-w-[220px] 2xl:max-w-[318px]
+      "
       style={{
         background:
           "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
       }}
     >
-      <div className="relative flex overflow-hidden">
-        <div className="pointer-events-none relative aspect-square min-h-[70px] grow overflow-hidden image-rendering-pixelated">
-          <div className="center relative aspect-square overflow-hidden">
+      {/* Image Container */}
+      <div className="relative w-full">
+        <div className="
+            aspect-square
+            overflow-hidden
+            image-rendering-pixelated
+            w-full
+          ">
+          <div className="center relative w-full h-full">
             {renderContent()}
           </div>
         </div>
       </div>
+
+      {/* Info Section */}
       {showInfo && (
-        <div className="flex grow flex-col pt-1 font-title font-medium text-text">
-          {/* Stamp Number with Gradient */}
-          <div className="text-center">
-            {shouldDisplayHash && (
-              <span className="text-[#666666] text-3xl font-light font-work-sans">
-                #
-              </span>
-            )}
-            <span className="text-3xl font-black bg-gradient-to-r from-[#666666] to-[#999999] bg-clip-text text-transparent">
-              {Number(stamp.stamp ?? 0) >= 0 ||
-                  (stamp.cpid && stamp.cpid.charAt(0) === "A")
-                ? `${stamp.stamp}`
-                : `${stamp.cpid}`}
-            </span>
-          </div>
+        <div className="flex flex-col pt-1 font-title font-medium text-text">
+          {/* Conditionally render the additional text */}
+          {showDetails && (
+            <>
+              {/* Stamp Number */}
+              <div className="text-center">
+                {shouldDisplayHash && (
+                  <span className="text-[#666666] text-3xl font-light font-work-sans">
+                    #
+                  </span>
+                )}
+                <span className="sm:text-l md:text-l lg:text-2xl xl:text-2xl 2xl:text-3xl font-black bg-gradient-to-r from-[#666666] to-[#999999] bg-clip-text text-transparent">
+                  {Number(stamp.stamp ?? 0) >= 0 ||
+                      (stamp.cpid && stamp.cpid.charAt(0) === "A")
+                    ? `${stamp.stamp}`
+                    : `${stamp.cpid}`}
+                </span>
+              </div>
 
-          {/* Creator Name or Abbreviated Address */}
-          <div className="text-center text-[#999999] text-xl font-bold font-work-sans break-words">
-            {creatorDisplay}
-          </div>
+              {/* Creator Name or Abbreviated Address */}
+              <div className="text-center text-[#999999] text-base md:text-base lg:text-lg xl:text-lg 2xl:text-xl font-bold font-work-sans break-words">
+                {creatorDisplay}
+              </div>
 
-          {/* Price and Supply */}
-          <div className="flex justify-between mt-2">
-            {/* Render Price on the Left */}
-            <div>
-              <span className="text-[#999999] text-base font-medium font-work-sans">
-                {renderPrice()}
-              </span>
-            </div>
+              {/* Price and Supply */}
+              <div className="flex justify-between mt-2">
+                {/* Render Price on the Left */}
+                <div>
+                  <span className="text-[#999999] text-sm sm:text-xs md:text-sm lg:text-sm xl:text-base 2xl:text-lg font-medium font-work-sans">
+                    {renderPrice()}
+                  </span>
+                </div>
 
-            {/* Supply on the Right */}
-            <div className="text-right text-[#666666] text-lg font-bold font-work-sans">
-              {supplyDisplay}
-            </div>
-          </div>
+                {/* Supply on the Right */}
+                <div className="text-right text-[#666666] text-sm sm:text-xs md:text-sm lg:text-sm xl:text-base 2xl:text-lg font-bold font-work-sans">
+                  {supplyDisplay}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </a>
