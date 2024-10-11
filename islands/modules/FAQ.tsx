@@ -5,14 +5,20 @@ export const FAQModule = () => {
         FAQ
       </p>
       <p className="flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-left text-3xl md:text-6xl font-extralight text-[#CCCCCC]">
-        READ THE MANUAL
+        Let's Stamp!
       </p>
 
       <p className="text-[#999999] text-base md:text-2xl font-medium">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sed dolor
-        ac urna bibendum vehicula. Maecenas vel viverra leo. Donec viverra nunc
-        non lacus eleifend tristique. Maecenas eros nibh, ornare eu erat sit
-        amet, tempor iaculis metus. Suspendisse potenti.
+        Click the icon to upload your artwork in a supported format.
+        Use the TOGGLE to switch between CLASSIC and POSH Art, and add a STAMP NAME.
+        EDITIONS sets the number of copies you want to create.
+        The LOCK icon is enabled by default, preventing future changes to the EDITIONS.
+        FEES shows the suggested amount, and you can adjust it with the slider. Lowering the fee may delay your art being stamped.
+        Fees are displayed in BTC by default, but you can switch to USDT using the TOGGLE.
+        All related costs are listed under the DETAILS section.
+        Accept the terms and conditions to enable the STAMP button.
+        The STAMP button will submit your transaction with all the provided information.
+                
       </p>
 
       <div className="flex justify-end md:justify-start">
