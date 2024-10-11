@@ -10,6 +10,8 @@ import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
 import WalletDetails from "$islands/Wallet/details/WalletDetails.tsx";
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
 
+import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
+
 type WalletPageProps = {
   data: {
     data: {
@@ -46,21 +48,24 @@ export const handler: Handlers = {
   },
 };
 
-/**
- * Renders the wallet page with the provided data.
- *
- * @param {WalletPageProps} props - The props containing the data for the wallet page.
- * @returns {JSX.Element} The rendered wallet page.
- */
-
 export default function Wallet(props: WalletPageProps) {
   const { stamps, src20, btc } = props.data.data;
   const { selectedTab, address } = props.data;
+
+  const filterBy: STAMP_FILTER_TYPES[] = [];
+  const sortBy = "DESC";
+  const type: STAMP_TYPES = "all";
+
   return (
     <div class="flex flex-col gap-8">
-      <WalletHeader selectedTab={selectedTab} address={address} />
+      <WalletHeader
+        filterBy={filterBy}
+        sortBy={sortBy}
+        selectedTab={selectedTab}
+        type={type}
+      />
       <WalletDetails />
-      <WalletContent />
+      <WalletContent stamps={stamps} src20={src20} />
     </div>
   );
 }
