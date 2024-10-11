@@ -1,7 +1,7 @@
 import { OlgaContent } from "$islands/stamping/stamp/OlgaContent.tsx";
 import LatestStamps from "$islands/stamping/stamp/LatestStamps.tsx";
 
-import { FAQModule } from "$islands/modules/FAQ.tsx";
+import { FAQModule } from "$islands/modules/FAQStamping.tsx";
 
 export function StampingStampPage() {
   return (
