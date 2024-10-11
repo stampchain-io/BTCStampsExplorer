@@ -63,7 +63,7 @@ export function HomeStampPreview({
   return (
     <div className="flex flex-col gap-16 md:gap-36">
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-gradient-start to-gradient-end bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           LATEST ART STAMPS
         </h1>
         <div class="flex flex-col gap-12">
@@ -74,7 +74,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           COLLECTIONS
         </h1>
         <div class="flex flex-col gap-12">
@@ -97,7 +97,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           RECENT SALES
         </h1>
         <div class="flex flex-col gap-12">

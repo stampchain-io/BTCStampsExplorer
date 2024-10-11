@@ -30,14 +30,14 @@ export default function StampSection(
 
   return (
     <div>
-      <div class="flex justify-between items-end mb-4">
-        <p class="text-2xl md:text-3xl text-[#AA00FF] font-light">
+      <div className="flex justify-between items-end mb-4">
+        <h3 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           {title}
-        </p>
+        </h3>
         <a
           href={seeAllLink}
           f-partial={seeAllLink}
-          class="text-[#660099] text-sm md:text-base font-light border-2 border-[#660099] py-1 text-center min-w-[84px] rounded-md"
+          className="text-[#660099] text-sm md:text-base font-light border-2 border-[#660099] py-1 text-center min-w-[84px] rounded-md"
         >
           See all
         </a>
