@@ -120,11 +120,11 @@ export function StampCard({
           {/* Stamp Number with Gradient */}
           <div className="text-center">
             {shouldDisplayHash && (
-              <span className="text-[#666666] text-[30px] font-light font-work-sans">
+              <span className="text-[#666666] text-3xl font-light font-work-sans">
                 #
               </span>
             )}
-            <span className="text-[30px] font-black font-work-sans bg-gradient-to-r from-[#666666] to-[#999999] bg-clip-text text-transparent">
+            <span className="text-3xl font-black bg-gradient-to-r from-[#666666] to-[#999999] bg-clip-text text-transparent">
               {Number(stamp.stamp ?? 0) >= 0 ||
                   (stamp.cpid && stamp.cpid.charAt(0) === "A")
                 ? `${stamp.stamp}`
@@ -133,7 +133,7 @@ export function StampCard({
           </div>
 
           {/* Creator Name or Abbreviated Address */}
-          <div className="text-center text-[#999999] text-[20px] font-bold font-work-sans break-words">
+          <div className="text-center text-[#999999] text-xl font-bold font-work-sans break-words">
             {creatorDisplay}
           </div>
 
@@ -141,13 +141,13 @@ export function StampCard({
           <div className="flex justify-between mt-2">
             {/* Render Price on the Left */}
             <div>
-              <span className="text-[#999999] text-[16px] font-medium font-work-sans">
+              <span className="text-[#999999] text-base font-medium font-work-sans">
                 {renderPrice()}
               </span>
             </div>
 
             {/* Supply on the Right */}
-            <div className="text-right text-[#666666] text-[18px] font-bold font-work-sans">
+            <div className="text-right text-[#666666] text-lg font-bold font-work-sans">
               {supplyDisplay}
             </div>
           </div>
