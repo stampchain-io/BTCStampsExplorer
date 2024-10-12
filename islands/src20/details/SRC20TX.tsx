@@ -71,23 +71,23 @@ export function SRC20TX(props: SRC20TXProps) {
         return (
           <tr
             key={tx.tx_hash}
-            class="w-full table table-fixed text-xs text-[#F5F5F5] border-b border-[#B9B9B9]"
+            class="w-full table table-fixed text-xs"
           >
-            <td class="px-6 py-4">{tx.block_index}</td>
-            <td class="px-6 py-4">{abbreviateAddress(tx.creator)}</td>
-            <td class="px-6 py-4">{abbreviateAddress(tx.destination)}</td>
-            <td class="px-6 py-4">{stripTrailingZeros(tx.amt)}</td>
+            <td class="px-3 py-2">{tx.block_index}</td>
+            <td class="px-3 py-2">{abbreviateAddress(tx.creator)}</td>
+            <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
+            <td class="px-3 py-2">{stripTrailingZeros(tx.amt)}</td>
           </tr>
         );
       } else if (type === "MINT") {
         return (
           <tr
             key={tx.tx_hash}
-            class="w-full table table-fixed text-xs text-[#F5F5F5] border-b border-[#B9B9B9]"
+            class="w-full table table-fixed text-xs"
           >
-            <td class="px-6 py-4">{tx.block_index}</td>
-            <td class="px-6 py-4">{abbreviateAddress(tx.destination)}</td>
-            <td class="px-6 py-4">{stripTrailingZeros(tx.amt)}</td>
+            <td class="px-3 py-2">{tx.block_index}</td>
+            <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
+            <td class="px-3 py-2">{stripTrailingZeros(tx.amt)}</td>
           </tr>
         );
       }
@@ -97,23 +97,23 @@ export function SRC20TX(props: SRC20TXProps) {
 
   return (
     <div
-      class="relative shadow-md sm:rounded-lg w-full overflow-y-auto max-h-[600px]"
+      class="relative shadow-md sm:rounded-lg w-full overflow-y-auto max-h-[250px]"
       ref={containerRef}
       onScroll={handleScroll}
     >
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead class="table-fixed text-lg font-semibold uppercase text-[#C184FF] border-b border-[#B9B9B9]">
+      <table class="w-full text-sm text-left rtl:text-right">
+        <thead class="table-fixed text-lg font-semibold uppercase text-[#666666]">
           {tableHeaders()}
         </thead>
-        <tbody class="table-fixed">{renderRows()}</tbody>
+        <tbody class="table-fixed text-[#999999]">{renderRows()}</tbody>
       </table>
       {isFetching && (
-        <div class="flex justify-center items-center py-4 text-white">
+        <div class="flex justify-center items-center py-4 text-[#999999]">
           Loading more data...
         </div>
       )}
       {!hasMoreData && (
-        <div class="flex justify-center items-center py-4 text-white">
+        <div class="flex justify-center items-center py-4 text-[#999999]">
           No more data to load.
         </div>
       )}

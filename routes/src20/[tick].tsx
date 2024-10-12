@@ -1,9 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
-import { SRC20TickHeader } from "$islands/src20/SRC20TickHeader.tsx";
-import { SRC20DetailsTab } from "$islands/src20/SRC20DetailsTab.tsx";
+import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
+import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
 import { convertEmojiToTick } from "utils/util.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
+import { SRC20HoldersInfo } from "$components/src20/SRC20HoldersInfo.tsx";
 
 export const handler: Handlers = {
   async GET(_req: Request, ctx) {
@@ -58,21 +59,17 @@ function SRC20TickPage(props: SRC20TickPageProps) {
 
   return (
     <div class="flex flex-col gap-8">
-      <SRC20TickHeader
-        deployment={deployment}
-        mint_status={mint_status}
-        total_holders={total_holders}
-        total_mints={total_mints}
-        total_transfers={total_transfers}
-      />
-      <div class="w-full flex flex-col md:flex-row gap-20 justify-center">
-        <div class="w-full h-full bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
-          <SRC20DetailsTab
-            holders={holders}
-            tick={tick} // Pass tick prop
-          />
-        </div>
+      <div className="flex flex-col lg:flex-row gap-8">
+        <SRC20TickHeader
+          deployment={deployment}
+          mint_status={mint_status}
+          total_holders={total_holders}
+          total_mints={total_mints}
+          total_transfers={total_transfers}
+        />
+        <SRC20HoldersInfo holders={holders} />
       </div>
+      <SRC20DetailsTab tick={tick} />
     </div>
   );
 }
