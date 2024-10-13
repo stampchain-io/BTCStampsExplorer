@@ -1,0 +1,24 @@
+.purple-gradient {
+  background: linear-gradient(to right, #440066, #660099, #8800CC);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+
+}
+
+.gray-gradient {
+  background: linear-gradient(to right, #CCCCCC, #999999, #666666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.logo-gradient {
+  background: linear-gradient(to right, #440066, #660099, #8800CC, #AA00FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}

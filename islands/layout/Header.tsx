@@ -189,7 +189,7 @@ export function Header() {
             toggleMenu();
             setCurrentPath("collection");
           }}
-          className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
+          className="bg-clip-text text-transparent logo-gradient text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
         >
           STAMPCHAIN
         </a>

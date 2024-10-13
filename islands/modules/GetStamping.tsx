@@ -2,7 +2,7 @@ export const GetStampingModule = () => {
   return (
     <div className="flex flex-col md:flex-row justify-between md:items-end gap-8 sm:gap-16 md:gap-32">
       <div>
-        <p className="font-black text-4xl md:text-7xl flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-left">
+        <p className="font-black text-4xl md:text-7xl flex flex-col gray-gradient text-left">
           GET STAMPING
           <span className="text-3xl md:text-6xl font-extralight text-[#999999]">
             IMMORTALISE YOUR ART
