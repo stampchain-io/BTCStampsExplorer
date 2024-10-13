@@ -160,53 +160,48 @@ const StampBuyModal = (
       class="fixed inset-0 z-50 flex items-center justify-center bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
       onClick={handleCloseModal}
     >
-      <div class="relative p-4 w-full max-w-[360px] h-auto">
+      <div class="relative w-full max-w-[360px] h-auto">
         <div
           class="relative bg-[#0B0B0B] rounded-lg shadow overflow-hidden"
           onClick={(e) => e.stopPropagation()} // Prevent click from closing the modal
         >
-          <div class="flex flex-col gap-4 items-center justify-between p-4 md:p-5 rounded-t">
-            <button
+          <div class="flex flex-col gap-4 items-center justify-between p-4">
+            <img
               onClick={toggleModal}
-              type="button"
-              class="text-gray-400 hover:bg-gray-600 hover:text-white rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
-              aria-label="Close modal"
-            >
-              <svg
-                class="w-3 h-3"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 14"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 1l6 6m0 0l6 6M7 7l6-6M7 7L1 13"
-                />
-              </svg>
-            </button>
-            <StampImage stamp={stamp} className="w-[200px] !p-2" flag={false} />
-            <p
-              className={"bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-2xl font-black text-center"}
-            >
-              BUY STAMP #{stamp.stamp}
+              class="w-6 h-6 ms-auto cursor-pointer"
+              alt="Close modal"
+              src="/img/wallet/icon-close.svg"
+            />
+
+            <p className="text-5xl bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC]">
+              BUY
             </p>
-            <div className={"flex justify-between items-center w-full"}>
-              <p className={"text-[#999999] flex flex-col"}>
-                QUANTITY
-                <span className={"text-[#666666]"}>max {maxQuantity}</span>
-              </p>
-              <input
-                type="number"
-                min="1"
-                max={maxQuantity}
-                value={quantity}
-                onChange={handleQuantityChange}
-                className={"bg-[#999999] text-[#666666] font-bold text-xl rounded-md p-3"}
+
+            <div className="flex justify-between">
+              <StampImage
+                stamp={stamp}
+                className="w-[200px] !p-2"
+                flag={false}
               />
+              <div>
+                <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-2xl font-black text-center">
+                  #{stamp.stamp}
+                </p>
+                <p className="text-xl font-bold text-[#999999]">EDITIONS</p>
+                <div className="flex justify-between items-center w-full">
+                  <span className="text-[#666666]">max {maxQuantity}</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max={maxQuantity}
+                    value={quantity}
+                    onChange={handleQuantityChange}
+                    className="bg-[#999999] text-[#666666] font-bold text-xl rounded-md p-3"
+                  />
+                </div>
+              </div>
             </div>
+
             <div className={"flex flex-col w-full"}>
               <span class="flex justify-between w-full text-[#F5F5F5]">
                 FEE: {fee} sat/vB
