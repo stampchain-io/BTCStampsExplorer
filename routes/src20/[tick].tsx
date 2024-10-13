@@ -16,7 +16,6 @@ export const handler: Handlers = {
       return await ctx.render(body);
     } catch (error) {
       console.error(error);
-      // Optionally, you can pass an error message to the page
       return ctx.render({ error: error.message });
     }
   },
@@ -62,10 +61,10 @@ function SRC20TickPage(props: SRC20TickPageProps) {
       <div className="flex flex-col lg:flex-row gap-8">
         <SRC20TickHeader
           deployment={deployment}
-          mint_status={mint_status}
-          total_holders={total_holders}
-          total_mints={total_mints}
-          total_transfers={total_transfers}
+          mintStatus={mint_status}
+          totalHolders={total_holders}
+          totalMints={total_mints}
+          totalTransfers={total_transfers}
         />
         <SRC20HoldersInfo holders={holders} />
       </div>

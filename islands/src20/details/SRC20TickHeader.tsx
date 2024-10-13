@@ -1,15 +1,27 @@
-import { convertToEmoji } from "utils/util.ts";
+import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
 
 interface Deployment {
-  tick: string;
-  tx_hash: string;
+  amt: number;
   block_index: number;
   block_time: string;
+  creator: string;
+  deci: number;
+  destination: string;
+  lim: number;
   max: number;
+  op: string;
+  p: string;
+  tick: string;
+  tx_hash: string;
 }
 
-// TODO:Add relevant properties here
 interface MintStatus {
+  decimals: number;
+  limit: number;
+  max_supply: number;
+  progress: number;
+  total_minted: number;
+  total_mints: number;
 }
 
 interface SRC20TickHeaderProps {
@@ -51,16 +63,18 @@ function StatItem(
 
 export function SRC20TickHeader({
   deployment,
-  mintStatus,
+  mintStatus, // FIXME: these are displayed in the transfer / mints tables
   totalHolders,
   totalMints,
   totalTransfers,
 }: SRC20TickHeaderProps) {
   const tickValue = deployment.tick ? convertToEmoji(deployment.tick) : "N/A";
-  const deployDate = new Date(deployment.block_time).toLocaleString("default", {
-    month: "short",
-    year: "numeric",
-  });
+  const deployDate = new Date(deployment.block_time).toLocaleDateString(
+    undefined,
+    {
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+  );
 
   return (
     <div class="flex w-full flex-col gap-6">
@@ -78,7 +92,9 @@ export function SRC20TickHeader({
                 {tickValue}
               </p>
               <p className="text-[#666666] text-2xl font-light">CREATOR</p>
-              <p className="text-[#999999] text-2xl font-bold">ARWYN</p>
+              <p className="text-[#999999] text-2xl font-bold">
+                ${deployment.creator}
+              </p>
             </div>
           </div>
           <div class="flex flex-col gap-2 justify-end items-start ml-auto">
@@ -97,7 +113,7 @@ export function SRC20TickHeader({
               />
               <StatItem
                 label="TX ID"
-                value="14592...4387"
+                value={abbreviateAddress(deployment.tx_hash)}
                 direction="row"
               />
             </div>
@@ -115,19 +131,19 @@ export function SRC20TickHeader({
       <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
         <StatItem label="Supply" value={deployment.max} direction="col" />
         <div>
-          <StatItem label="DECIMALS" value="18" direction="row" />
-          <StatItem label="LIMIT" value="420000" direction="row" />
+          <StatItem label="DECIMALS" value={deployment.deci} direction="row" />
+          <StatItem label="LIMIT" value={deployment.lim} direction="row" />
         </div>
       </div>
       <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
         <StatItem
-          label="MARKETCAP"
+          label="MARKETCAP" // FIXME: Placeholder
           value="931593"
           currency="BTC"
           direction="col"
         />
         <StatItem
-          label="24H VOLUME"
+          label="24H VOLUME" // FIXME: Placeholder
           value="13427"
           currency="BTC"
           direction="col"
@@ -136,7 +152,7 @@ export function SRC20TickHeader({
       <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
         <StatItem label="PRICE" value="33" currency="SATS" direction="col" />
         <StatItem
-          label="24H CHANGE"
+          label="24H CHANGE" // FIXME: Placeholder
           value="11"
           currency="SATS"
           direction="col"

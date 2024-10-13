@@ -47,10 +47,10 @@ export function SRC20TX(props: SRC20TXProps) {
     if (type === "TRANSFER") {
       return (
         <tr class="w-full table table-fixed">
-          <th scope="col" class="px-6 py-3">block</th>
           <th scope="col" class="px-6 py-3">from</th>
           <th scope="col" class="px-6 py-3">to</th>
           <th scope="col" class="px-6 py-3">amount</th>
+          <th scope="col" class="px-6 py-3">date</th>
         </tr>
       );
     } else if (type === "MINT") {
@@ -65,6 +65,11 @@ export function SRC20TX(props: SRC20TXProps) {
     return null;
   };
 
+  const formatDate = (date: Date) => {
+    const locale = navigator.language || "en-US";
+    return date.toLocaleDateString(locale);
+  };
+
   const renderRows = () => {
     return data.map((tx) => {
       if (type === "TRANSFER") {
@@ -73,10 +78,11 @@ export function SRC20TX(props: SRC20TXProps) {
             key={tx.tx_hash}
             class="w-full table table-fixed text-xs"
           >
-            <td class="px-3 py-2">{tx.block_index}</td>
+            {/* <td class="px-3 py-2">{tx.block_index}</td> */}
             <td class="px-3 py-2">{abbreviateAddress(tx.creator)}</td>
             <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
             <td class="px-3 py-2">{stripTrailingZeros(tx.amt)}</td>
+            <td class="px-3 py-2">{formatDate(new Date(tx.block_time))}</td>
           </tr>
         );
       } else if (type === "MINT") {
