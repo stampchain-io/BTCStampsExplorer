@@ -560,7 +560,7 @@ export class SRC20Repository {
     const result = await dbManager.executeQueryWithCache(
       query,
       params,
-      "never",
+      1000 * 60 * 10,
     );
 
     if (!result.rows || result.rows.length === 0) {
