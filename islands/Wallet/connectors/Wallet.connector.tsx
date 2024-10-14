@@ -12,45 +12,33 @@ interface WalletConnectorProps {
   toggleModal: () => void;
 }
 
-type AddToastFunction = (message: string, type: string) => void;
+const walletConnectors = {
+  unisat: unisatProvider.connectUnisat,
+  leather: leatherProvider.connectLeather,
+  okx: okxProvider.connectOKX,
+  tapwallet: tapWalletProvider.connectTapWallet,
+  phantom: phantomProvider.connectPhantom,
+} as const;
 
-export const WalletConnector = (
+export function WalletConnector(
   { providerKey, toggleModal }: WalletConnectorProps,
-) => {
-  const { addToast } = useToast() ??
-    { addToast: (() => {}) as AddToastFunction };
+) {
+  const { addToast = () => {} } = useToast() ?? {};
   const providerInfo = WALLET_PROVIDERS[providerKey];
-
-  console.log(`Rendering wallet connector for ${providerKey}:`, providerInfo);
-
-  const connectFunction = (() => {
-    switch (providerKey) {
-      case "unisat":
-        return (toast: AddToastFunction) => unisatProvider.connectUnisat(toast);
-      case "leather":
-        return (toast: AddToastFunction) =>
-          leatherProvider.connectLeather(toast);
-      case "okx":
-        return (toast: AddToastFunction) => okxProvider.connectOKX(toast);
-      case "tapwallet":
-        return (toast: AddToastFunction) =>
-          tapWalletProvider.connectTapWallet(toast);
-      case "phantom":
-        return (toast: AddToastFunction) =>
-          phantomProvider.connectPhantom(toast);
-      default:
-        return () => {};
-    }
-  })();
 
   const handleConnect = async () => {
     try {
+      const connectFunction = walletConnectors[providerKey];
+      if (!connectFunction) {
+        throw new Error(`Unsupported wallet provider: ${providerKey}`);
+      }
+
       await connectFunction((message: string, type: string) => {
         addToast(message, type);
         console.log(message);
       });
       toggleModal();
-      showConnectWalletModal.value = false; // Hide the modal after successful connection
+      showConnectWalletModal.value = false;
     } catch (error) {
       const errorMessage =
         `Failed to connect to ${providerKey} wallet: ${error.message}`;
@@ -64,16 +52,16 @@ export const WalletConnector = (
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      className="cursor-pointer flex items-center p-4 md:p-5 border rounded-lg border-gray-200 hover:border-gray-300 focus:border-gray-300 dark:border-[#8800CC] dark:hover:border-gray-500 dark:focus:border-gray-500 transition-colors ease-in-out duration-150"
+      className="cursor-pointer flex justify-between items-center p-4 bg-gradient-to-br from-[#0A000F00] via-[#14001F] to-[#1F002E] border rounded-lg border-[#8800CC] transition-colors ease-in-out duration-150 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
     >
-      <p className="text-md text-gray-200 uppercase md:text-base font-medium">
+      <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-2xl uppercase font-black">
         {providerInfo.name}
       </p>
       <img
         src={providerInfo.logo.small}
         alt={providerInfo.name}
-        className="w-8 h-8 ml-auto"
+        className="w-8 h-8"
       />
     </div>
   );
-};
+}

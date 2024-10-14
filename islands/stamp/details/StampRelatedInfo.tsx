@@ -1,91 +1,65 @@
 import { useState } from "preact/hooks";
 
-import { StampHolders } from "$components/stampDetails/StampHolders.tsx";
-import { StampSends } from "$components/stampDetails/StampSends.tsx";
+// import { StampHolders } from "$components/stampDetails/StampHolders.tsx";
 import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
 import { StampSales } from "$components/stampDetails/StampSales.tsx";
-import { StampVaults } from "$components/stampDetails/StampVaults.tsx";
+import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
+// import { StampVaults } from "$components/stampDetails/StampVaults.tsx";
+
+// TODO: Replace 'any' with a more specific type
+interface StampRelatedInfoProps {
+  sends: any;
+  dispensers: any;
+  holders: any;
+  dispensesWithRates: any;
+}
+
+type TabType = "dispensers" | "sales" | "transfers";
+
+const tabs: Array<{ id: TabType; label: string }> = [
+  { id: "dispensers", label: "Dispensers" },
+  { id: "sales", label: "Sales" },
+  { id: "transfers", label: "Transfers" },
+];
 
 export function StampRelatedInfo(
-  { sends, dispensers, holders, dispensesWithRates }: {
-    sends: any;
-    dispensers: any;
-    holders: any;
-    dispensesWithRates: any;
-  },
+  { sends, dispensers, holders, dispensesWithRates }: StampRelatedInfoProps,
 ) {
-  const [selectedTab1, setSelectedTab1] = useState("dispensers");
-  const [selectedTab2, setSelectedTab2] = useState("vaults");
+  const [selectedTab, setSelectedTab] = useState("dispensers");
 
   console.log("holders: ", holders);
 
+  const renderTabContent = () => {
+    switch (selectedTab) {
+      case "dispensers":
+        return <StampDispensers dispensers={dispensers} />;
+      case "sales":
+        return <StampSales dispenses={dispensesWithRates} />;
+      case "transfers":
+        return <StampTransfers sends={sends} />;
+    }
+  };
+
   return (
-    <div className={"grid grid-cols-1 md:grid-cols-2 gap-6"}>
+    <>
       {/* <StampHolders holders={holders} /> */}
-      <div className={"flex flex-col gap-6"}>
-        <div class="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6">
-          <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E] overflow-y-auto">
-            <div class="flex gap-4 md:gap-8 items-end">
-              <p
-                class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
-                  selectedTab1 === "dispensers"
-                    ? "font-bold border-b-4 border-b-[#8800CC]"
-                    : ""
-                }`}
-                onClick={() => setSelectedTab1("dispensers")}
-              >
-                Dispensers
-              </p>
-              <p
-                class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
-                  selectedTab1 === "sales"
-                    ? "font-bold border-b-4 border-b-[#8800CC]"
-                    : ""
-                }`}
-                onClick={() => setSelectedTab1("sales")}
-              >
-                Sales
-              </p>
-            </div>
-          </div>
-          {selectedTab1 === "dispensers" && (
-            <StampDispensers dispensers={dispensers} />
-          )}
-          {selectedTab1 === "sales" && (
-            <StampSales
-              dispenses={dispensesWithRates}
-            />
-          )}
+
+      <div class="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6">
+        <div class="flex justify-between w-full overflow-y-auto text-[#666666] text-sm md:text-[19px]">
+          {tabs.map(({ id, label }) => (
+            <p
+              key={id}
+              class={`cursor-pointer pb-4 ${
+                selectedTab === id ? "font-bold" : ""
+              }`}
+              onClick={() => setSelectedTab(id)}
+            >
+              {label}
+            </p>
+          ))}
         </div>
-        <div class="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6">
-          <div class="flex flex-col-reverse lg:flex-row justify-between w-full border-b border-[#3F2A4E] overflow-y-auto">
-            <div class="flex gap-4 md:gap-8 items-end">
-              <p
-                class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
-                  selectedTab2 === "vaults"
-                    ? "font-bold border-b-4 border-b-[#8800CC]"
-                    : ""
-                }`}
-                onClick={() => setSelectedTab2("vaults")}
-              >
-                Vaults
-              </p>
-              <p
-                class={`text-sm md:text-[19px] text-[#8800CC] cursor-pointer pb-4 ${
-                  selectedTab2 === "transfers"
-                    ? "font-bold border-b-4 border-b-[#8800CC]"
-                    : ""
-                }`}
-                onClick={() => setSelectedTab2("transfers")}
-              >
-                Transfers
-              </p>
-            </div>
-          </div>
-          {selectedTab2 === "vaults" && <StampVaults vaults={[]} />}
-          {selectedTab2 === "transfers" && <StampSends sends={sends} />}
-        </div>
+        {renderTabContent()}
       </div>
-    </div>
+    </>
   );
 }

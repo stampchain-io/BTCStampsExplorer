@@ -1,11 +1,10 @@
 import { StampRow, StampSectionProps } from "globals";
-// import { Partial } from "$fresh/runtime.ts";
 
 import StampSection from "$components/stamp/StampSection.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
-import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
+// import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
 export function HomeStampPreview({
   stamps_recent = [],
@@ -28,16 +27,24 @@ export function HomeStampPreview({
       type: "classic",
       stamps: stamps_art,
       layout: "grid",
+      showDetails: false,
     },
   ];
 
   const SectionsCollections: StampSectionProps[] = [
-    { title: "POSH", type: "posh", stamps: stamps_posh, layout: "grid" },
+    {
+      title: "POSH",
+      type: "posh",
+      stamps: stamps_posh,
+      layout: "grid",
+      showDetails: false,
+    },
     {
       title: "RECURSIVE",
       filterBy: "recursive",
       stamps: stamps_src721,
       layout: "row",
+      showDetails: false,
     },
   ];
 
@@ -48,6 +55,7 @@ export function HomeStampPreview({
       stamps: stamps_recent,
       layout: "row",
       isRecentSales: true,
+      showDetails: true,
     },
   ];
 
@@ -57,13 +65,14 @@ export function HomeStampPreview({
       type: "src20",
       stamps: stamps_src20,
       layout: "row",
+      showDetails: false,
     },
   ];
 
   return (
     <div className="flex flex-col gap-16 md:gap-36">
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-gradient-start to-gradient-end bg-clip-text text-transparent">
+        <h1 className="text-5xl 2xl:text-6xl  font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           LATEST ART STAMPS
         </h1>
         <div class="flex flex-col gap-12">
@@ -74,7 +83,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">
+        <h1 className="text-5xl 2xl:text-6xl font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           COLLECTIONS
         </h1>
         <div class="flex flex-col gap-12">
@@ -85,7 +94,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#666666] via-[#999999] to-[#CCCCCC] bg-clip-text text-transparent">
+        <h1 class="text-5xl 2xl:text-6xl  font-black bg-gradient-to-r from-[#666666] via-[#999999] to-[#CCCCCC] bg-clip-text text-transparent">
           FEATURED COLLECTIONS
         </h1>
         <p className="text-[#CCCCCC] text-2xl md:text-5xl font-extralight">
@@ -97,7 +106,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">
+        <h1 className="text-5xl 2xl:text-6xl  font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           RECENT SALES
         </h1>
         <div class="flex flex-col gap-12">
@@ -110,7 +119,7 @@ export function HomeStampPreview({
       <GetStampingModule />
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-3xl md:text-6xl font-black bg-gradient-to-r from-[#7200B4] to-[#FF00E9] bg-clip-text text-transparent">
+        <h1 className="text-5xl 2xl:text-6xl  font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           SRC-20 TOKENS
         </h1>
         <div class="flex flex-col gap-12">

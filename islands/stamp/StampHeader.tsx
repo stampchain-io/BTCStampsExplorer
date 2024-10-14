@@ -7,10 +7,9 @@ import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
 export const StampHeader = (
-  { filterBy, sortBy, selectedTab, type }: {
+  { filterBy, sortBy, type }: {
     filterBy: STAMP_FILTER_TYPES[];
     sortBy: string;
-    selectedTab: string;
     type: STAMP_TYPES;
   },
 ) => {
@@ -19,13 +18,6 @@ export const StampHeader = (
     filterBy,
   );
   const [currentSort, setCurrentSort] = useState<string>(sortBy);
-
-  const handleTabClick = (tabType: STAMP_TYPES) => {
-    setTypeOption("stamp", tabType, true);
-    if (tabType === "collection") {
-      globalThis.location.href = "/collection";
-    }
-  };
 
   useEffect(() => {
     const handleUrlChange = (event: CustomEvent) => {
@@ -60,35 +52,15 @@ export const StampHeader = (
   };
 
   return (
-    <div class="flex flex-col-reverse lg:flex-row justify-between gap-3 w-full border-b border-[#3F2A4E]">
-      <div class="flex gap-5 md:gap-11 items-end">
-        <p
-          class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
-            selectedTab === "all"
-              ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
-              : "text-[#8800CC] font-light"
-          }`}
-          onClick={() => handleTabClick("all")}
-        >
-          ALL
-        </p>
-        <p
-          class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
-            selectedTab === "collection"
-              ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
-              : "text-[#8800CC] font-light"
-          }`}
-          onClick={() => handleTabClick("collection")}
-        >
-          COLLECTIONS
-        </p>
-      </div>
-      <div class="flex gap-3 pb-1 md:pb-3 justify-between">
+    <div class="flex flex-col-reverse lg:flex-row justify-between gap-3 w-full">
+      <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] text-3xl md:text-6xl font-black">
+        ART STAMPS
+      </p>
+      <div class="flex gap-3 justify-between">
         <StampNavigator
           initFilter={currentFilters}
           initSort={currentSort}
           initType={type}
-          selectedTab={selectedTab}
           open1={isOpen1}
           handleOpen1={handleOpen1}
         />
