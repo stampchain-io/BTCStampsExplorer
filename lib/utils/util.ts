@@ -76,6 +76,18 @@ export function formatSatoshisToBTC(satoshis: number): string {
   return stripTrailingZeros(btc) + " BTC";
 }
 
+export function formatNumber(value: number, decimals: number = 8): string {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+export function formatDate(date: Date): string {
+  const locale = navigator.language || "en-US";
+  return date.toLocaleDateString(locale);
+}
+
 export function stripTrailingZeros(num: number | string): string {
   const str = num.toString();
   const parts = str.split(".");

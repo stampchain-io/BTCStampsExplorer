@@ -1,16 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
 import { SRC20TX } from "./SRC20TX.tsx";
+import { SRC20Row } from "globals";
 
 interface SRC20DetailsTabProps {
   tick: string;
-}
-
-// TODO: Define the structure of a transaction here
-interface Transaction {
-  // id: string;
-  // amount: number;
-  // timestamp: string;
-  // ... other fields
 }
 
 type TabType = "TRANSFER" | "MINT";
@@ -21,7 +14,7 @@ const LIMIT = 50;
 export function SRC20DetailsTab({ tick }: SRC20DetailsTabProps) {
   const [selectedTab, setSelectedTab] = useState<TabType>("TRANSFER");
   const [transactions, setTransactions] = useState<
-    Record<TabType, Transaction[]>
+    Record<TabType, SRC20Row[]>
   >({
     TRANSFER: [],
     MINT: [],
@@ -30,7 +23,7 @@ export function SRC20DetailsTab({ tick }: SRC20DetailsTabProps) {
   const fetchMoreTransactions = async (
     page: number,
     type: TabType,
-  ): Promise<Transaction[]> => {
+  ): Promise<SRC20Row[]> => {
     try {
       const response = await fetch(
         `/api/v2/src20/tick/${tick}?op=${type}&page=${page}&limit=${LIMIT}&sort=DESC`,
