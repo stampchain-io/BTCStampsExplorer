@@ -33,7 +33,7 @@ const WalletHeader = ({
   };
 
   return (
-    <div class="flex flex-col-reverse lg:flex-row justify-between gap-3 w-full border-b border-[#3F2A4E]">
+    <div class="flex flex-col-reverse lg:flex-row justify-between gap-3 w-full">
       <div class="flex gap-5 md:gap-11 items-end">
         <h1 className="text-5xl text-[#660099] font-black">WALLET</h1>
       </div>

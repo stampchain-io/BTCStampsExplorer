@@ -54,15 +54,24 @@ function RightPanel(
   return (
     <div className="flex justify-between p-5 bg-[#1F002E]">
       <div className="flex gap-4">
-        <button onClick={copyLink}>
-          <img src="/img/stamp/Copy.png" alt="Copy Link" />
-        </button>
-        <button onClick={shareContent}>
-          <img src="/img/stamp/InstagramLogo.png" alt="Share to Instagram" />
-        </button>
-        <button onClick={shareToX}>
-          <img src="/img/stamp/XLogo.png" alt="Share to X" />
-        </button>
+        <img
+          src="/img/stamp/Copy.png"
+          alt="Copy Link"
+          className="cursor-pointer"
+          onClick={copyLink}
+        />
+        <img
+          src="/img/stamp/InstagramLogo.png"
+          alt="Share to Instagram"
+          className="cursor-pointer"
+          onClick={shareContent}
+        />
+        <img
+          src="/img/stamp/XLogo.png"
+          alt="Share to X"
+          className="cursor-pointer"
+          onClick={shareToX}
+        />
       </div>
       <div className="flex gap-4">
         {showCodeButton && (
@@ -198,8 +207,8 @@ export function StampImage(
       {src !== "/content/not-available.png" &&
         stamp.stamp_mimetype !== "text/html" &&
         stamp.stamp_mimetype !== "text/plain" && (
-        <div className={`${className} flex flex-col gap-4`}>
-          <div className="p-6 bg-[#1F002E] justify-center items-center">
+        <div className="flex flex-col gap-4">
+          <div className={`${className} p-6 bg-[#1F002E]`}>
             <div className="stamp-container">
               <img
                 width="100%"
