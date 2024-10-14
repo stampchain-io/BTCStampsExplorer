@@ -1,7 +1,10 @@
 import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
-import { MarketListingSummary, Deployment, MintStatus } from "$lib/types/index.d.ts";
+import {
+  Deployment,
+  MarketListingSummary,
+  MintStatus,
+} from "$lib/types/index.d.ts";
 import { formatNumber } from "utils/util.ts";
-
 
 export interface SRC20TickHeaderProps {
   deployment: Deployment;
@@ -87,8 +90,8 @@ export function SRC20TickHeader({
               </p>
               <p className="text-[#666666] text-2xl font-light">CREATOR</p>
               <p className="text-[#999999] text-2xl font-bold">
-                {/* FIXME: need to pass creator_name as well */}
-                {deployment.creator}
+                {deployment.creator_name ||
+                  abbreviateAddress(deployment.creator)}
               </p>
             </div>
           </div>

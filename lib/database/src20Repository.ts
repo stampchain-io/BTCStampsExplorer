@@ -547,9 +547,12 @@ export class SRC20Repository {
     const query = `
       SELECT 
         dep.*,
+        creator_info.creator AS creator_name,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'MINT') AS total_mints,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
       FROM ${SRC20_TABLE} dep
+      LEFT JOIN 
+        creator creator_info ON dep.destination = creator_info.address
       WHERE dep.tick = ? AND dep.op = 'DEPLOY'
       LIMIT 1
     `;
@@ -557,7 +560,7 @@ export class SRC20Repository {
     const result = await dbManager.executeQueryWithCache(
       query,
       params,
-      1000 * 60 * 2, // Cache duration
+      "never",
     );
 
     if (!result.rows || result.rows.length === 0) {
@@ -568,20 +571,19 @@ export class SRC20Repository {
 
     return {
       deployment: {
-        // Map deployment fields from row
-        tick: row.tick, // Ensure 'tick' is included
+        tick: row.tick,
         tx_hash: row.tx_hash,
         block_index: row.block_index,
         p: row.p,
         op: row.op,
         creator: row.creator,
+        creator_name: row.creator_name,
         amt: row.amt,
         deci: row.deci,
         lim: row.lim,
         max: row.max,
         destination: row.destination,
         block_time: row.block_time,
-        // Include any other fields you need
       },
       total_mints: row.total_mints,
       total_transfers: row.total_transfers,
