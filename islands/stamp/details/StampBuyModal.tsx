@@ -165,7 +165,7 @@ const StampBuyModal = (
           class="relative bg-[#0B0B0B] rounded-lg shadow overflow-hidden"
           onClick={(e) => e.stopPropagation()} // Prevent click from closing the modal
         >
-          <div class="flex flex-col gap-4 items-center justify-between p-4">
+          <div class="space-y-4 p-4">
             <img
               onClick={toggleModal}
               class="w-6 h-6 ms-auto cursor-pointer"
@@ -173,39 +173,48 @@ const StampBuyModal = (
               src="/img/wallet/icon-close.svg"
             />
 
-            <p className="text-5xl bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC]">
+            <p className="font-black text-5xl text-center bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC]">
               BUY
             </p>
 
             <div className="flex justify-between">
               <StampImage
                 stamp={stamp}
-                className="w-[200px] !p-2"
+                className="w-[144px] !p-3 border-2 border-[#9900EE] rounded-md shadow-[0px_0px_20px_#9900EE]"
                 flag={false}
               />
-              <div>
+              <div className="flex flex-col justify-between items-end">
                 <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-2xl font-black text-center">
                   #{stamp.stamp}
                 </p>
-                <p className="text-xl font-bold text-[#999999]">EDITIONS</p>
-                <div className="flex justify-between items-center w-full">
-                  <span className="text-[#666666]">max {maxQuantity}</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max={maxQuantity}
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                    className="bg-[#999999] text-[#666666] font-bold text-xl rounded-md p-3"
-                  />
+                <div>
+                  <p className="text-xl font-bold text-[#999999]">EDITIONS</p>
+                  <div className="flex justify-between items-center w-full gap-3">
+                    <span className="text-[#666666]">MAX {maxQuantity}</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={maxQuantity}
+                      value={quantity}
+                      onChange={handleQuantityChange}
+                      className="bg-[#999999] text-[#666666] font-bold text-xl rounded-md p-3"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className={"flex flex-col w-full"}>
-              <span class="flex justify-between w-full text-[#F5F5F5]">
-                FEE: {fee} sat/vB
-              </span>
+            <div className="flex flex-col w-full">
+              <p class="text-[#999999] font-light">
+                FEE <span className="font-bold">{fee}</span> SAT/vB
+              </p>
+              <p class="text-xs font-light text-[#999999]">
+                RECOMMENDED{" "}
+                <span className="font-medium">
+                  {fees && fees.recommendedFee}
+                </span>{" "}
+                SAT/vB
+              </p>
               <div class="relative w-full">
                 <label htmlFor="labels-range-input" class="sr-only">
                   Labels range
@@ -224,55 +233,53 @@ const StampBuyModal = (
                   class="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#3F2A4E]"
                 />
               </div>
-              <span class="justify-end flex w-full text-[#F5F5F5] text-sm">
-                RECOMMENDED: {fees && fees.recommendedFee} sat/vB
-              </span>
             </div>
 
-            <div className={"flex flex-col items-end w-full text-[#999999]"}>
-              <p
-                className={"font-medium text-base flex justify-between w-full"}
-              >
-                ESTIMATE
-                <span className={"font-bold"}>
-                  {(totalPrice / 1e8).toFixed(8)} BTC
-                </span>
-              </p>
-              {/* Optionally display USD value if available */}
-            </div>
-            <div className="flex gap-2 items-center">
+            <p className="text-lg font-light text-[#999999]">
+              ESTIMATE{" "}
+              <span className="font-bold">
+                {(totalPrice / 1e8).toFixed(8)}
+              </span>{" "}
+              BTC
+            </p>
+            {/* Optionally display USD value if available */}
+
+            <div className="flex justify-end gap-2 items-center">
               <input
                 type="checkbox"
                 id="lockEditions"
                 name="lockEditions"
                 checked={isLocked}
-                onChange={(e) => setIsLocked(e.target.checked)}
-                className="w-5 h-5 bg-[#262424] border border-[#7F7979]"
+                onChange={(e) => {
+                  const target = e.target as HTMLInputElement;
+                  setIsLocked(target.checked);
+                }}
+                className="w-3 h-3"
               />
               <label
                 htmlFor="lockEditions"
-                className="text-[#999999] text-[12px] font-medium"
+                className="text-[#999999] text-[10px] font-medium"
               >
-                I agree to the{" "}
-                <span className={"text-[#8800CC]"}>terms and conditions</span>
+                I AGREE TO THE <span className="text-[#8800CC]">ToS</span>
               </label>
             </div>
-            <div className={"flex gap-6"}>
+            <div className="flex justify-end gap-6">
               <button
-                className={"border-2 border-[#8800CC] text-[#8800CC] min-w-[114px] h-[48px] rounded-md font-extrabold"}
+                className="border-2 border-[#8800CC] text-[#8800CC] w-[108px] h-[48px] rounded-md font-extrabold"
                 onClick={toggleModal}
                 disabled={isSubmitting}
               >
                 CANCEL
               </button>
               <button
-                className={"bg-[#8800CC] text-[#330033] min-w-[114px] h-[48px] rounded-md font-extrabold"}
+                className="bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold"
                 onClick={handleBuyClick}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Processing..." : "BUY"}
               </button>
             </div>
+
             {/* Error message */}
             {error && <div className="text-red-500 mt-2">{error}</div>}
             {/* Success message */}
