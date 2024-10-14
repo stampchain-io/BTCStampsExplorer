@@ -1,35 +1,15 @@
 import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
+import { MarketListingSummary, Deployment, MintStatus } from "$lib/types/index.d.ts";
+import { formatNumber } from "utils/util.ts";
 
-interface Deployment {
-  amt: number;
-  block_index: number;
-  block_time: string;
-  creator: string;
-  deci: number;
-  destination: string;
-  lim: number;
-  max: number;
-  op: string;
-  p: string;
-  tick: string;
-  tx_hash: string;
-}
 
-interface MintStatus {
-  decimals: number;
-  limit: number;
-  max_supply: number;
-  progress: number;
-  total_minted: number;
-  total_mints: number;
-}
-
-interface SRC20TickHeaderProps {
+export interface SRC20TickHeaderProps {
   deployment: Deployment;
   mintStatus: MintStatus;
   totalHolders: number;
   totalMints: number;
   totalTransfers: number;
+  marketInfo?: MarketListingSummary;
 }
 
 function StatItem(
@@ -53,9 +33,7 @@ function StatItem(
         }`}
       >
         {value}
-        {currency
-          ? <span className="font-extralight">&nbsp;{currency}</span>
-          : ""}
+        {currency ? <span class="font-extralight">&nbsp;{currency}</span> : ""}
       </p>
     </div>
   );
@@ -63,10 +41,11 @@ function StatItem(
 
 export function SRC20TickHeader({
   deployment,
-  mintStatus, // FIXME: these are displayed in the transfer / mints tables
+  mintStatus,
   totalHolders,
   totalMints,
   totalTransfers,
+  marketInfo,
 }: SRC20TickHeaderProps) {
   const tickValue = deployment.tick ? convertToEmoji(deployment.tick) : "N/A";
   const deployDate = new Date(deployment.block_time).toLocaleDateString(
@@ -75,6 +54,21 @@ export function SRC20TickHeader({
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
   );
+
+  // Provide default values for marketInfo properties
+  const floorUnitPriceBTC = marketInfo?.floor_unit_price ?? 0;
+  const sum1dBTC = marketInfo?.sum_1d ?? 0;
+  const mcapBTC = marketInfo?.mcap ?? 0;
+
+  // Convert floorUnitPrice from BTC to Satoshis
+  const floorUnitPriceSats = Math.round(floorUnitPriceBTC * 1e8);
+
+  // Format BTC values to 8 decimal places
+  const sum1dBTCFormatted = formatNumber(sum1dBTC, 4);
+  const mcapBTCFormatted = formatNumber(mcapBTC, 4);
+
+  // Format Satoshi value with commas (no decimals needed)
+  const floorUnitPriceSatsFormatted = floorUnitPriceSats.toLocaleString();
 
   return (
     <div class="flex w-full flex-col gap-6">
@@ -93,7 +87,8 @@ export function SRC20TickHeader({
               </p>
               <p className="text-[#666666] text-2xl font-light">CREATOR</p>
               <p className="text-[#999999] text-2xl font-bold">
-                ${deployment.creator}
+                {/* FIXME: need to pass creator_name as well */}
+                {deployment.creator}
               </p>
             </div>
           </div>
@@ -128,33 +123,53 @@ export function SRC20TickHeader({
         </p>
       </div>
 
+      {/* Token Information */}
       <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
-        <StatItem label="Supply" value={deployment.max} direction="col" />
+        <StatItem
+          label="Supply"
+          value={formatNumber(deployment.max, 0)}
+          direction="col"
+        />
         <div>
           <StatItem label="DECIMALS" value={deployment.deci} direction="row" />
-          <StatItem label="LIMIT" value={deployment.lim} direction="row" />
+          <StatItem
+            label="LIMIT"
+            value={formatNumber(deployment.lim, 0)}
+            direction="row"
+          />
         </div>
       </div>
+
+      {/* Market Information */}
       <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
+        {/* Market Cap in BTC */}
         <StatItem
-          label="MARKETCAP" // FIXME: Placeholder
-          value="931593"
+          label="MARKET CAP"
+          value={mcapBTCFormatted}
           currency="BTC"
           direction="col"
         />
+        {/* 24H Volume in BTC */}
         <StatItem
-          label="24H VOLUME" // FIXME: Placeholder
-          value="13427"
+          label="24H VOLUME"
+          value={sum1dBTCFormatted}
           currency="BTC"
           direction="col"
         />
       </div>
+
       <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
-        <StatItem label="PRICE" value="33" currency="SATS" direction="col" />
+        {/* Price in Satoshis */}
         <StatItem
-          label="24H CHANGE" // FIXME: Placeholder
-          value="11"
+          label="PRICE"
+          value={floorUnitPriceSatsFormatted}
           currency="SATS"
+          direction="col"
+        />
+        <StatItem
+          label="24H CHANGE"
+          value="N/A" // FIXME: not available from API mcap request
+          currency="%"
           direction="col"
         />
       </div>

@@ -102,3 +102,27 @@ export interface SignPSBTResult {
   cancelled?: boolean;
   error?: string;
 }
+
+export interface Deployment {
+  amt: number;
+  block_index: number;
+  block_time: string;
+  creator: string;
+  deci: number;
+  destination: string;
+  lim: number;
+  max: number;
+  op: string;
+  p: string;
+  tick: string;
+  tx_hash: string;
+}
+
+export interface MintStatus {
+  decimals: number;
+  limit: number;
+  max_supply: number;
+  progress: number;
+  total_minted: number;
+  total_mints: number;
+}

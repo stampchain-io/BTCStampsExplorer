@@ -5,6 +5,7 @@ import { convertEmojiToTick } from "utils/util.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
 import { SRC20HoldersInfo } from "$components/src20/SRC20HoldersInfo.tsx";
+import { MarketListingSummary } from "$lib/types/index.d.ts";
 
 export const handler: Handlers = {
   async GET(_req: Request, ctx) {
@@ -13,10 +14,11 @@ export const handler: Handlers = {
       tick = convertEmojiToTick(tick);
       set_precision(-4);
       const body = await Src20Controller.handleTickPageRequest(tick);
-      return await ctx.render(body);
+
+      return await ctx.render(body); // No need to modify marketInfo here
     } catch (error) {
       console.error(error);
-      return ctx.render({ error: error.message });
+      return ctx.render({ error: (error as Error).message });
     }
   },
 };
@@ -29,8 +31,8 @@ interface SRC20TickPageProps {
     mint_status: any;
     total_mints: number;
     total_transfers: number;
-    // Add error property if needed
     error?: string;
+    marketInfo?: MarketListingSummary; // Updated type
   };
 }
 
@@ -42,7 +44,8 @@ function SRC20TickPage(props: SRC20TickPageProps) {
     mint_status,
     total_mints,
     total_transfers,
-    error, // Extract error message if present
+    error,
+    marketInfo,
   } = props.data;
 
   if (error) {
@@ -53,7 +56,6 @@ function SRC20TickPage(props: SRC20TickPageProps) {
     );
   }
 
-  // Continue with existing component rendering
   const tick = deployment.tick;
 
   return (
@@ -65,6 +67,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
           totalHolders={total_holders}
           totalMints={total_mints}
           totalTransfers={total_transfers}
+          marketInfo={marketInfo} // Now contains data for current tick
         />
         <SRC20HoldersInfo holders={holders} />
       </div>

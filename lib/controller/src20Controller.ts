@@ -9,10 +9,8 @@ import { StampService } from "$lib/services/stampService.ts";
 import { getBtcAddressInfo } from "utils/btc.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { convertToEmoji } from "utils/util.ts";
-import {
-  MarketListingSummary,
-  Src20MktService,
-} from "$lib/services/src20MktService.ts";
+import { Src20MktService } from "$lib/services/src20MktService.ts";
+import { MarketListingSummary } from "$lib/types/index.d.ts";
 
 export class Src20Controller {
   static async getTotalCountValidSrc20Tx(
@@ -311,16 +309,23 @@ export class Src20Controller {
         balanceResponse,
         mintProgressResponse,
         allSrc20DataResponse,
+        marketData,
       ] = await Promise.all([
         this.handleSrc20BalanceRequest(balanceParams),
         this.handleSrc20MintProgressRequest(tick),
         this.handleAllSrc20DataForTickRequest(tick),
+        Src20MktService.fetchMarketListingSummary(),
       ]);
 
       // Check if deployment is null
       if (!allSrc20DataResponse || !allSrc20DataResponse.deployment) {
         throw new Error(`Deployment data not found for tick: ${tick}`);
       }
+
+      // Extract market info for the current tick
+      const marketInfoForTick = marketData.find(
+        (item) => item.tick.toUpperCase() === tick.toUpperCase(),
+      );
 
       const { deployment, total_mints, total_transfers } = allSrc20DataResponse;
 
@@ -351,10 +356,10 @@ export class Src20Controller {
           limit: mintProgressResponse?.limit?.toString() || "0",
         },
         total_transactions: totalCount,
+        marketInfo: marketInfoForTick,
       };
     } catch (error) {
       console.error("Error in handleTickPageRequest:", error);
-      // Optionally, you can throw an error or return a default response
       throw error;
     }
   }
@@ -390,7 +395,11 @@ export class Src20Controller {
 
       const enrichedData = [];
 
-      for (const row of resultData.data) {
+      for (
+        const row of Array.isArray(resultData.data)
+          ? resultData.data
+          : [resultData.data]
+      ) {
         const balanceParams: SRC20BalanceRequestParams = {
           tick: row.tick,
           includePagination: true,

@@ -1,15 +1,16 @@
-import { abbreviateAddress, stripTrailingZeros } from "utils/util.ts";
+import { abbreviateAddress, formatDate, formatNumber } from "utils/util.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
+import { SRC20Row } from "globals";
 
 type SRC20TXProps = {
-  txs: any[];
-  type: string; // "MINT" or "TRANSFER"
-  fetchMoreData: (page: number) => Promise<any[]>;
+  txs: SRC20Row[];
+  type: "MINT" | "TRANSFER";
+  fetchMoreData: (page: number) => Promise<SRC20Row[]>;
 };
 
 export function SRC20TX(props: SRC20TXProps) {
   const { txs, type, fetchMoreData } = props;
-  const [data, setData] = useState<any[]>(txs || []);
+  const [data, setData] = useState<SRC20Row[]>(txs || []);
   const [page, setPage] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
   const [hasMoreData, setHasMoreData] = useState(true);
@@ -65,35 +66,33 @@ export function SRC20TX(props: SRC20TXProps) {
     return null;
   };
 
-  const formatDate = (date: Date) => {
-    const locale = navigator.language || "en-US";
-    return date.toLocaleDateString(locale);
-  };
-
   const renderRows = () => {
     return data.map((tx) => {
+      // Ensure amt is a valid number
+      let amtValue = Number(tx.amt);
+      if (isNaN(amtValue)) {
+        console.warn(`Invalid amount value: ${tx.amt}`);
+        amtValue = 0;
+      }
+
+      // Format the amt value
+      const formattedAmt = formatNumber(amtValue, 0);
+
       if (type === "TRANSFER") {
         return (
-          <tr
-            key={tx.tx_hash}
-            class="w-full table table-fixed text-xs"
-          >
-            {/* <td class="px-3 py-2">{tx.block_index}</td> */}
+          <tr key={tx.tx_hash} class="w-full table table-fixed text-xs">
             <td class="px-3 py-2">{abbreviateAddress(tx.creator)}</td>
             <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
-            <td class="px-3 py-2">{stripTrailingZeros(tx.amt)}</td>
+            <td class="px-3 py-2">{formattedAmt}</td>
             <td class="px-3 py-2">{formatDate(new Date(tx.block_time))}</td>
           </tr>
         );
       } else if (type === "MINT") {
         return (
-          <tr
-            key={tx.tx_hash}
-            class="w-full table table-fixed text-xs"
-          >
+          <tr key={tx.tx_hash} class="w-full table table-fixed text-xs">
             <td class="px-3 py-2">{tx.block_index}</td>
             <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
-            <td class="px-3 py-2">{stripTrailingZeros(tx.amt)}</td>
+            <td class="px-3 py-2">{formattedAmt}</td>
           </tr>
         );
       }
