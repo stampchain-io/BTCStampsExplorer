@@ -7,7 +7,7 @@ import RecentDeploy from "$islands/stamping/src20/deploy/RecentDeploy.tsx";
 import { TransferContent } from "$islands/stamping/src20/transfer/TransferContent.tsx";
 import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx";
 
-import { FAQModule } from "$islands/modules/FAQ.tsx";
+import { FAQModule } from "$islands/modules/FAQMint.tsx";
 
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
