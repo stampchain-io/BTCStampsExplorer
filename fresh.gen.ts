@@ -113,6 +113,10 @@ import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
 import * as $modules_FAQ from "./islands/modules/FAQ.tsx";
+import * as $modules_FAQDeploy from "./islands/modules/FAQDeploy.tsx";
+import * as $modules_FAQMint from "./islands/modules/FAQMint.tsx";
+import * as $modules_FAQStamping from "./islands/modules/FAQStamping.tsx";
+import * as $modules_FAQTransfer from "./islands/modules/FAQTransfer.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
@@ -294,6 +298,10 @@ const manifest = {
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,
     "./islands/modules/FAQ.tsx": $modules_FAQ,
+    "./islands/modules/FAQDeploy.tsx": $modules_FAQDeploy,
+    "./islands/modules/FAQMint.tsx": $modules_FAQMint,
+    "./islands/modules/FAQStamping.tsx": $modules_FAQStamping,
+    "./islands/modules/FAQTransfer.tsx": $modules_FAQTransfer,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
