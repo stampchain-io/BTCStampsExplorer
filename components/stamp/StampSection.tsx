@@ -1,5 +1,6 @@
 import { StampRow, StampSectionProps } from "globals";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
+import { ViewAllButton } from "$components/ViewAllButton.tsx";
 
 export default function StampSection(
   { title, type, stamps, layout, isRecentSales, filterBy, showDetails = false }:
@@ -60,16 +61,7 @@ export default function StampSection(
         )}
       </div>
 
-      {/* 'VIEW ALL' Button at the Bottom Right */}
-      <div className="flex justify-end mt-4">
-        <a
-          href={seeAllLink}
-          f-partial={seeAllLink}
-          className="text-[#660099] text-sm md:text-base font-light border-2 border-[#660099] py-1 px-4 text-center min-w-[84px] rounded-md"
-        >
-          VIEW ALL
-        </a>
-      </div>
+      <ViewAllButton href={seeAllLink} />
     </div>
   );
 }

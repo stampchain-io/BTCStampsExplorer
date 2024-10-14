@@ -108,6 +108,7 @@ export interface Deployment {
   block_index: number;
   block_time: string;
   creator: string;
+  creator_name: string;
   deci: number;
   destination: string;
   lim: number;

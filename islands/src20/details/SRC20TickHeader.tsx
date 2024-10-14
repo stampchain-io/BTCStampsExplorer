@@ -91,7 +91,7 @@ export function SRC20TickHeader({
               <p className="text-[#666666] text-2xl font-light">CREATOR</p>
               <p className="text-[#999999] text-2xl font-bold">
                 {deployment.creator_name ||
-                  abbreviateAddress(deployment.creator)}
+                  abbreviateAddress(deployment.destination)}
               </p>
             </div>
           </div>
