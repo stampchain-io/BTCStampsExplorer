@@ -48,10 +48,10 @@ export function SRC20TX(props: SRC20TXProps) {
     if (type === "TRANSFER") {
       return (
         <tr class="w-full table table-fixed">
+          <th scope="col" class="px-6 py-3">block</th>
           <th scope="col" class="px-6 py-3">from</th>
           <th scope="col" class="px-6 py-3">to</th>
           <th scope="col" class="px-6 py-3">amount</th>
-          <th scope="col" class="px-6 py-3">date</th>
         </tr>
       );
     } else if (type === "MINT") {
@@ -102,23 +102,23 @@ export function SRC20TX(props: SRC20TXProps) {
 
   return (
     <div
-      class="relative shadow-md sm:rounded-lg w-full overflow-y-auto max-h-[250px]"
+      class="relative shadow-md sm:rounded-lg w-full overflow-y-auto max-h-[600px]"
       ref={containerRef}
       onScroll={handleScroll}
     >
-      <table class="w-full text-sm text-left rtl:text-right">
-        <thead class="table-fixed text-lg font-semibold uppercase text-[#666666]">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+        <thead class="table-fixed text-lg font-semibold uppercase text-[#C184FF] border-b border-[#B9B9B9]">
           {tableHeaders()}
         </thead>
-        <tbody class="table-fixed text-[#999999]">{renderRows()}</tbody>
+        <tbody class="table-fixed">{renderRows()}</tbody>
       </table>
       {isFetching && (
-        <div class="flex justify-center items-center py-4 text-[#999999]">
+        <div class="flex justify-center items-center py-4 text-white">
           Loading more data...
         </div>
       )}
       {!hasMoreData && (
-        <div class="flex justify-center items-center py-4 text-[#999999]">
+        <div class="flex justify-center items-center py-4 text-white">
           No more data to load.
         </div>
       )}

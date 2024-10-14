@@ -26,6 +26,7 @@ export default function App({ Component }: AppProps) {
         />
         <meta name="author" content="Stampchain.io" />
         <link rel="stylesheet" href="/styles.css" />
+        <link rel="stylesheet" href="/gradients.css" />
 
         {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

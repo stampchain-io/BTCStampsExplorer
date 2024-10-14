@@ -121,13 +121,13 @@ import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
+import * as $src20_SRC20DetailsTab from "./islands/src20/SRC20DetailsTab.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Navigator from "./islands/src20/SRC20Navigator.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
+import * as $src20_SRC20TX from "./islands/src20/SRC20TX.tsx";
+import * as $src20_SRC20TickHeader from "./islands/src20/SRC20TickHeader.tsx";
 import * as $src20_all_SRC20DeployTable from "./islands/src20/all/SRC20DeployTable.tsx";
-import * as $src20_details_SRC20DetailsTab from "./islands/src20/details/SRC20DetailsTab.tsx";
-import * as $src20_details_SRC20TX from "./islands/src20/details/SRC20TX.tsx";
-import * as $src20_details_SRC20TickHeader from "./islands/src20/details/SRC20TickHeader.tsx";
 import * as $src20_minting_LatestMints from "./islands/src20/minting/LatestMints.tsx";
 import * as $src20_minting_SRC20MintingItem from "./islands/src20/minting/SRC20MintingItem.tsx";
 import * as $src20_minting_SRC20MintingTable from "./islands/src20/minting/SRC20MintingTable.tsx";
@@ -306,15 +306,13 @@ const manifest = {
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/pagination/Pagination.tsx": $pagination_Pagination,
+    "./islands/src20/SRC20DetailsTab.tsx": $src20_SRC20DetailsTab,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Navigator.tsx": $src20_SRC20Navigator,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
+    "./islands/src20/SRC20TX.tsx": $src20_SRC20TX,
+    "./islands/src20/SRC20TickHeader.tsx": $src20_SRC20TickHeader,
     "./islands/src20/all/SRC20DeployTable.tsx": $src20_all_SRC20DeployTable,
-    "./islands/src20/details/SRC20DetailsTab.tsx":
-      $src20_details_SRC20DetailsTab,
-    "./islands/src20/details/SRC20TX.tsx": $src20_details_SRC20TX,
-    "./islands/src20/details/SRC20TickHeader.tsx":
-      $src20_details_SRC20TickHeader,
     "./islands/src20/minting/LatestMints.tsx": $src20_minting_LatestMints,
     "./islands/src20/minting/SRC20MintingItem.tsx":
       $src20_minting_SRC20MintingItem,

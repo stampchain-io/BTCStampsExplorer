@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
-import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
+import { SRC20TickHeader } from "$islands/src20/SRC20TickHeader.tsx";
+import { SRC20DetailsTab } from "$islands/src20/SRC20DetailsTab.tsx";
 import { convertEmojiToTick } from "utils/util.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
@@ -71,7 +71,6 @@ function SRC20TickPage(props: SRC20TickPageProps) {
         />
         <SRC20HoldersInfo holders={holders} />
       </div>
-      <SRC20DetailsTab tick={tick} />
     </div>
   );
 }
