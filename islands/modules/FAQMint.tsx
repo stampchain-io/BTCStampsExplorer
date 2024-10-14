@@ -8,9 +8,14 @@ export const FAQModule = () => {
         Let's Mint!
       </p>
 
-      <p className="text-[#999999] text-base md:text-2xl font-medium">
-        Miiiiiiint
-                
+      <p className="text-[#999999] text-base md:text-2xl font-medium">Start typing a token name to filter and select the correct ticker. The ticker logo and name will be shown along with the maximum limit per mint.
+        Double-check that the displayed information matches the ticker you wish to mint.
+        If Progress is near 95%, be cautious as you risk losing funds. At 100% or above, your funds will be lost.
+        FEES displays the suggested amount, which can be adjusted using the slider. Reducing the fee may slow down the stamping process.
+        Fees are shown in BTC by default, but you can switch to USDT using the toggle.
+        All related costs are listed in the DETAILS section.
+        Accept the terms and conditions to enable the MINT button.
+        The MINT button will submit your transaction with all the provided details.        
       </p>
 
       <div className="flex justify-end md:justify-start">
