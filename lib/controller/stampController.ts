@@ -18,6 +18,7 @@ import { decodeBase64 } from "@std/encoding";
 import { filterOptions } from "utils/filterOptions.ts";
 import { Dispense, Dispenser } from "$lib/types/index.d.ts";
 import { CollectionController } from "$lib/controller/collectionController.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
 export class StampController {
   static async getStampDetailsById(id: string, stampType: STAMP_TYPES = "all") {
@@ -408,6 +409,7 @@ export class StampController {
       const [
         stampCategories,
         src20Result,
+        trendingSrc20s, // <-- Add this line
         recentSales,
         collectionData,
       ] = await Promise.all([
@@ -415,13 +417,17 @@ export class StampController {
           { idents: ["STAMP", "SRC-721"], limit: 6 },
           { idents: ["SRC-721"], limit: 6 },
           { idents: ["STAMP"], limit: 16 },
-          { idents: ["SRC-20"], limit: 6 },
+          // Removed SRC20 from stamp categories
         ]),
-        Src20Service.fetchAndFormatSrc20Data({
+        // Fetch SRC20 data for the SRC20DeployTable
+        Src20Controller.fetchSrc20DetailsWithHolders(null, {
           op: "DEPLOY",
           page: 1,
-          limit: 10,
+          limit: 5,
+          sortBy: "ASC",
         }),
+        // Fetch trending SRC20 tokens for SRC20TrendingMints component
+        Src20Controller.fetchTrendingTokens(null, 5, 1, 1000), // <-- Added this line
         this.getRecentSales(1, 6),
         CollectionController.getCollectionNames({
           limit: 4,
@@ -456,9 +462,9 @@ export class StampController {
         stamps_recent: recentSales.data,
         stamps_src721: stampCategories[1].stamps,
         stamps_art: stampCategories[2].stamps,
-        stamps_src20: stampCategories[3].stamps,
-        stamps_posh: stamps_posh,
-        src20s: src20Result.data, // .map(formatSRC20Row),
+        stamps_posh,
+        src20s: src20Result.data,
+        trendingSrc20s: trendingSrc20s.data, // <-- Add this line
         collectionData: collectionData.data,
       };
     } catch (error) {

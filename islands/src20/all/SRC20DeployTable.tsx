@@ -56,6 +56,11 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         {/* Desktop View */}
         <div class="hidden md:flex flex-col gap-6">
           {data.map((src20: SRC20Row) => {
+            // Ensure src20.tick is defined
+            if (!src20.tick) {
+              console.warn("src20.tick is undefined for src20:", src20);
+              return null;
+            }
             const href = `/src20/${convertToEmoji(src20.tick)}`;
             return (
               <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between rounded-md">
@@ -138,6 +143,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         <div class="flex md:hidden flex-col gap-3">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
+            // Ensure src20.tick is defined
             return (
               <div class="text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2">
                 <div class="w-full flex items-center gap-2 mb-2">

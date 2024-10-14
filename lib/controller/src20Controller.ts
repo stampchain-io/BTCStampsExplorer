@@ -379,13 +379,13 @@ export class Src20Controller {
   }
 
   static async fetchSrc20DetailsWithHolders(
-    req: Request,
+    _req: Request | null, // Allow for null
     params: SRC20TrxRequestParams,
     excludeFullyMinted: boolean = false,
   ) {
     try {
       const [resultData, marketData] = await Promise.all([
-        this.handleSrc20TransactionsRequest(req, params, excludeFullyMinted),
+        this.handleSrc20TransactionsRequest(_req, params, excludeFullyMinted),
         Src20MktService.fetchMarketListingSummary(),
       ]);
 
@@ -450,7 +450,7 @@ export class Src20Controller {
   }
 
   static async fetchTrendingTokens(
-    req: Request,
+    _req: Request | null, // Allow for null
     limit: number,
     page: number,
     transactionCount: number,
