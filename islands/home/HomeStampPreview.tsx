@@ -118,7 +118,8 @@ export function HomeStampPreview({
 
       <GetStampingModule />
 
-      <div className="flex flex-col gap-4 md:gap-8">
+      {
+        /* <div className="flex flex-col gap-4 md:gap-8">
         <h1 className="text-5xl 2xl:text-6xl  font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           SRC-20 TOKENS
         </h1>
@@ -126,10 +127,10 @@ export function HomeStampPreview({
           {SectionSRC20.map((section) => (
             <StampSection key={section.type} {...section} />
           ))}
-        </div>
-        <StampChainModule />
-        {/* <DeployMintModule /> */}
-      </div>
+        </div> */
+      }
+      {/* <DeployMintModule /> */}
     </div>
+    // </div>
   );
 }
