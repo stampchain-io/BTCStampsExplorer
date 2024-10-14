@@ -92,6 +92,8 @@ import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connector
 import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
 import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
+import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
+import * as $Wallet_details_WalletSendModal from "./islands/Wallet/details/WalletSendModal.tsx";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
@@ -274,6 +276,10 @@ const manifest = {
     "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
     "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
     "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
+    "./islands/Wallet/details/WalletReceiveModal.tsx":
+      $Wallet_details_WalletReceiveModal,
+    "./islands/Wallet/details/WalletSendModal.tsx":
+      $Wallet_details_WalletSendModal,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,

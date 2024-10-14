@@ -82,7 +82,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     }
   }, [stamp.stamp_mimetype, stamp.stamp_url]);
   return (
-    <>
+    <div>
       <div className={"flex flex-col gap-4"}>
         <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
           <p className={"text-6xl font-bold text-[#8800CC]"}>
@@ -224,6 +224,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           dispenser={lowestPriceDispenser} // Pass the dispenser to the modal
         />
       )}
-    </>
+    </div>
   );
 }

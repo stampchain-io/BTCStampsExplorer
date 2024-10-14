@@ -1,12 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 .image-rendering-pixelated {
   position: relative;
 }
-
 .image-rendering-pixelated::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -16,14 +16,12 @@
   background-size: 3px;
   z-index: 1;
 }
-
 .image-rendering-pixelated img,
 .image-rendering-pixelated iframe,
 .image-rendering-pixelated > div {
   position: relative;
   z-index: 2;
 }
-
 .image-rendering-pixelated img {
   mix-blend-mode: multiply;
 }
@@ -110,7 +108,7 @@
 }
 
 .stamp-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -137,10 +135,23 @@
   height: 100%;
   transform: rotate(166.26deg);
   transform-origin: top left;
-  opacity: 0.20;
-  background: linear-gradient(158deg, #8800CC 33%, #660099 66%, rgba(68, 0, 102, 0) 100%);
+  opacity: 0.2;
+  background: linear-gradient(
+    158deg,
+    #8800cc 33%,
+    #660099 66%,
+    rgba(68, 0, 102, 0) 100%
+  );
   box-shadow: 100px 100px 100px;
   border-radius: 9999px;
   filter: blur(100px);
   overflow: hidden;
+}
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }

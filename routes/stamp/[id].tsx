@@ -147,21 +147,16 @@ export default function StampPage(props: StampDetailPageProps) {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <div className={"flex flex-col gap-10 md:gap-20 xl:gap-50"}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
-          <div class="flex flex-col gap-8 justify-between items-center">
-            <StampImage
-              stamp={stamp}
-              className="w-[calc(100%-80px)] md:w-full"
-              flag={true}
-            />
-          </div>
-          <div>
-            <StampInfo
-              stamp={stamp}
-              lowestPriceDispenser={lowestPriceDispenser}
-            />
-          </div>
+      <div className="flex flex-col gap-10 md:gap-20 xl:gap-50">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <StampImage
+            stamp={stamp}
+            flag={true}
+          />
+          <StampInfo
+            stamp={stamp}
+            lowestPriceDispenser={lowestPriceDispenser}
+          />
         </div>
 
         <StampRelatedInfo
