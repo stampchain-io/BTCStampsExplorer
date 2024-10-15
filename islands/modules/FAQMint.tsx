@@ -8,7 +8,8 @@ export const FAQModule = () => {
         Mint
       </p>
 
-      <p className="text-[#999999] text-base md:text-2xl font-medium">Start typing a token name to filter and select the correct ticker. The ticker logo and name will be shown along with the maximum limit per mint.
+      <p className="text-[#999999] text-base md:text-2xl font-small">
+        Start typing a token name to filter and select the correct ticker. The ticker logo and name will be shown along with the maximum limit per mint.
         Double-check that the displayed information matches the ticker you wish to mint.<br />
         If Progress is near 95%, be cautious as you risk losing funds. At 100% or above, your funds will be lost.<br />
         FEES displays the suggested amount, which can be adjusted using the slider. Reducing the fee may slow down the stamping process.<br />
