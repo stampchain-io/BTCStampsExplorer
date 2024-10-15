@@ -11,6 +11,8 @@ import { BlockService } from "$lib/services/blockService.ts";
 import { convertToEmoji } from "utils/util.ts";
 import { Src20MktService } from "$lib/services/src20MktService.ts";
 import { MarketListingSummary } from "$lib/types/index.d.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 export class Src20Controller {
   static async getTotalCountValidSrc20Tx(
@@ -159,18 +161,25 @@ export class Src20Controller {
   ) {
     try {
       const subLimit = Math.ceil(limit / 2);
-      const [btcInfo, stampsResponse, src20Response, lastBlock] = await Promise
-        .allSettled([
-          getBtcAddressInfo(address),
-          StampService.getStampBalancesByAddress(address, subLimit, page),
-          this.handleSrc20BalanceRequest({
-            address,
-            limit: subLimit,
-            page,
-            sortBy: "ASC",
-          }),
-          BlockService.getLastBlock(),
-        ]);
+
+      const [
+        btcInfo,
+        stampsResponse,
+        src20Response,
+        lastBlock,
+        btcPrice,
+      ] = await Promise.allSettled([
+        getBtcAddressInfo(address),
+        StampService.getStampBalancesByAddress(address, subLimit, page),
+        this.handleSrc20BalanceRequest({
+          address,
+          limit: subLimit,
+          page,
+          sortBy: "ASC",
+        }),
+        BlockService.getLastBlock(),
+        fetchBTCPriceInUSD(serverConfig.API_BASE_URL),
+      ]);
 
       const btcData = btcInfo.status === "fulfilled" ? btcInfo.value : null;
       const stampsData = stampsResponse.status === "fulfilled"
@@ -182,6 +191,7 @@ export class Src20Controller {
       const lastBlockData = lastBlock.status === "fulfilled"
         ? lastBlock.value
         : null;
+      const usdPrice = btcPrice.status === "fulfilled" ? btcPrice.value : 0;
 
       const stampsTotal = stampsData.total || 0;
       const src20Total = Array.isArray(src20Data.data)
@@ -190,8 +200,16 @@ export class Src20Controller {
       const totalItems = stampsTotal + src20Total;
       const totalPages = Math.ceil(totalItems / limit);
 
+      const walletData = {
+        balance: btcData?.balance ?? 0,
+        usdValue: (btcData?.balance ?? 0) * usdPrice,
+        address,
+        fee: btcData?.fee_per_vbyte ?? 0, // FIXME: Update to fetch next block fee
+        btcPrice: usdPrice,
+      };
+
       return {
-        btc: btcData,
+        btc: walletData,
         data: {
           stamps: stampsData.stamps,
           src20: Array.isArray(src20Data.data) ? src20Data.data : [],

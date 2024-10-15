@@ -28,3 +28,11 @@ export interface Wallet {
   network?: "mainnet" | "testnet";
   addressType?: "p2wpkh" | "p2tr";
 }
+
+interface WalletData {
+  address: string;
+  balance: number;
+  fee: number;
+  usdValue: number;
+  btcPrice: number;
+}

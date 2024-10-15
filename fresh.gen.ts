@@ -8,6 +8,7 @@ import * as $_app from "./routes/_app.tsx";
 import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_bitcoin_notification from "./routes/api/bitcoin-notification.ts";
+import * as $api_getBTCPrice from "./routes/api/getBTCPrice.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
@@ -172,6 +173,7 @@ const manifest = {
     "./routes/about/index.tsx": $about_index,
     "./routes/api/[...path].ts": $api_path_,
     "./routes/api/bitcoin-notification.ts": $api_bitcoin_notification,
+    "./routes/api/getBTCPrice.ts": $api_getBTCPrice,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
