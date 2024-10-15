@@ -88,7 +88,7 @@ export function selectUTXOs(
   vouts: Output[],
   feePerByte: number,
   sigops_rate = 0,
-  rbfBuffer = 1.5, // Add a buffer for potential fee increase
+  rbfBuffer = 1.5,
 ): { inputs: UTXO[]; change: number; fee: number } {
   feePerByte = Math.floor(feePerByte * (sigops_rate || SIGOPS_RATE));
   console.log("Fee per byte:", feePerByte);
@@ -123,7 +123,7 @@ export function selectUTXOs(
   }
 
   const new_sigops_rate = calculate_sigops_rate(selectedUTXOs, adjustedVouts);
-  const finalFee =
+  let finalFee =
     (totalUtxosSize + totalVoutsSize + estimateFixedTransactionSize()) *
     feePerByte;
 
