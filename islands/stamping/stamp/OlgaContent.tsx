@@ -3,7 +3,7 @@ import axiod from "axiod";
 
 import { walletContext } from "$lib/store/wallet/wallet.ts";
 import { getWalletProvider } from "$lib/store/wallet/walletHelper.ts";
-import { fetchBTCPrice } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 
 import { useConfig } from "$/hooks/useConfig.ts";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
@@ -68,7 +68,7 @@ export function OlgaContent() {
 
   useEffect(() => {
     const fetchPrice = async () => {
-      const price = await fetchBTCPrice();
+      const price = await fetchBTCPriceInUSD();
       setBTCPrice(price);
     };
     fetchPrice();

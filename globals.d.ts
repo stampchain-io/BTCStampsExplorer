@@ -275,7 +275,8 @@ export interface SRC20BalanceRequestParams {
   amt?: number;
   limit?: number;
   page?: number;
-  sort?: string;
+  sortBy?: string;
+  sortField?: string;
   includePagination?: boolean;
 }
 
@@ -538,7 +539,7 @@ export interface SRC20SnapshotRequestParams {
   limit: number;
   page: number;
   amt: number;
-  sort: string;
+  sortBy?: string;
 }
 
 export interface Config {

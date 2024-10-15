@@ -3,7 +3,7 @@ import { showConnectWalletModal, walletContext } from "store/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$/hooks/useConfig.ts";
 import { useFeePolling } from "hooks/useFeePolling.tsx";
-import { fetchBTCPrice } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
 
 export function useSRC20Form(
@@ -64,7 +64,7 @@ export function useSRC20Form(
 
   useEffect(() => {
     const fetchPrice = async () => {
-      const price = await fetchBTCPrice();
+      const price = await fetchBTCPriceInUSD();
       setFormState((prev) => ({ ...prev, BTCPrice: price }));
     };
     fetchPrice();

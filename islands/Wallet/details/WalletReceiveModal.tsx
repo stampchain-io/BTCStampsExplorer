@@ -1,4 +1,6 @@
 import { ComponentChildren } from "preact";
+import { useEffect, useState } from "preact/hooks";
+import QRCode from "qrcode";
 
 interface Props {
   onClose: () => void;
@@ -9,6 +11,15 @@ function WalletReceiveModal({ onClose, address }: Props) {
   const handleModalClick = (e: MouseEvent) => {
     e.stopPropagation();
   };
+
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+
+  useEffect(() => {
+    const bitcoinUri = `bitcoin:${address}`;
+    QRCode.toDataURL(bitcoinUri)
+      .then((url: string) => setQrCodeDataUrl(url))
+      .catch((err: Error) => console.error(err));
+  }, [address]);
 
   return (
     <div
@@ -23,7 +34,9 @@ function WalletReceiveModal({ onClose, address }: Props) {
           <div class="space-y-4 p-4">
             <CloseButton onClick={onClose} />
             <ModalTitle>RECEIVE</ModalTitle>
-            <img src="/img/wallet/qr-codes.svg" alt="QR Code" class="mx-auto" />
+            {qrCodeDataUrl && (
+              <img src={qrCodeDataUrl} alt="QR Code" class="mx-auto" />
+            )}
             <p class="break-words text-center text-[#999999]">
               {formatAddress(address)}
             </p>

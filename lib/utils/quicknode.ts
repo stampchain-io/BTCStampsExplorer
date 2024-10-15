@@ -17,49 +17,47 @@ export const fetchQuicknode: FetchQuicknodeFunction = async (
   retries = 0,
 ) => {
   try {
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-    const body = JSON.stringify({
-      method,
-      params,
-    });
-    const options: RequestInit = {
+    const response = await fetch(QUICKNODE_URL, {
       method: "POST",
-      headers: headers,
-      body: body,
-      redirect: "follow",
-    };
-    const response = await fetch(QUICKNODE_URL, options);
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: 1,
+        jsonrpc: "2.0",
+        method,
+        params,
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
-        `Error: response for method: ${method} at ${QUICKNODE_ENDPOINT} unsuccessful. Response: ${response.status} - ${errorText}`,
+        `Error: response for method: ${method} unsuccessful. Response: ${response.status} - ${errorText}`,
       );
 
-      // Handle specific fatal HTTP responses
       if (
         response.status === 402 ||
-        response.status >= 400 && response.status < 500
+        (response.status >= 400 && response.status < 500)
       ) {
         throw new Error(`Fatal error: ${response.status} - ${errorText}`);
       }
 
       throw new Error(
-        `Error: response for method: ${method} at ${QUICKNODE_ENDPOINT} unsuccessful. Response: ${response.status}`,
+        `Error: response for method: ${method} unsuccessful. Response: ${response.status}`,
       );
     }
 
     const result = await response.json();
     return result;
-  } catch (_error) {
+  } catch (error) {
     if (retries < MAX_XCP_RETRIES) {
       console.log(`Retrying... (${retries + 1}/${MAX_XCP_RETRIES})`);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return await fetchQuicknode(method, params, retries + 1);
     } else {
       console.error("Max retries reached. Returning null.");
-      return null;
+      throw error;
     }
   }
 };

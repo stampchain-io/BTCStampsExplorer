@@ -2,38 +2,33 @@ import { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
 import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
+import { WalletData } from "$lib/types/index.d.ts";
 
-interface WalletData {
-  balance: number;
-  usdValue: number;
-  address: string;
-  fee: number;
-  btcPrice: number;
-}
-
-function WalletDetails() {
-  const [fee, setFee] = useState<number>(6);
+function WalletDetails(
+  { walletData, stampsTotal, src20Total, stampsCreated }: {
+    walletData: WalletData;
+    stampsTotal: number;
+    src20Total: number;
+    stampsCreated: number;
+  },
+) {
+  const [fee, setFee] = useState<number>(walletData.fee);
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
-
-  // Mock data - replace with actual data fetching logic
-  const walletData: WalletData = {
-    balance: 0.04206900,
-    usdValue: 3023.83,
-    address: "bc1qhkl6k0h9yvc0mpfk805gtkckd3v858d7hlls5q",
-    fee: 6,
-    btcPrice: 69420,
-  };
 
   return (
     <div>
       <div className="flex flex-col md:flex-row gap-6 items-stretch">
         <WalletOverview
-          walletData={walletData}
+          walletData={{ ...walletData, fee }}
           onSend={() => setIsSendModalOpen(true)}
           onReceive={() => setIsReceiveModalOpen(true)}
         />
-        <WalletStats />
+        <WalletStats
+          stampsTotal={stampsTotal}
+          src20Total={src20Total}
+          stampsCreated={stampsCreated}
+        />
       </div>
 
       {isSendModalOpen && (
@@ -66,12 +61,12 @@ function WalletOverview(
       <div className="flex justify-between">
         <div>
           <p className="text-[#999999] text-5xl">
-            <span className="font-light">{walletData.balance.toFixed(8)}</span>
+            <span className="font-light">{walletData.balance}</span>
             &nbsp;
             <span className="font-extralight">BTC</span>
           </p>
           <p className="text-[#666666] text-2xl">
-            {walletData.usdValue.toFixed(2)} USD
+            {walletData.usdValue.toLocaleString()} USD
           </p>
           <p className="text-[#8800CC] font-medium">{walletData.address}</p>
         </div>
@@ -117,26 +112,37 @@ function WalletOverview(
   );
 }
 
-function WalletStats() {
+function WalletStats(
+  { stampsTotal, src20Total, stampsCreated }: {
+    stampsTotal: number;
+    src20Total: number;
+    stampsCreated: number;
+  },
+) {
   return (
     <div className="w-full lg:w-1/2 flex flex-col gap-6">
-      <StampStats />
-      <TokenStats />
+      <StampStats stampsTotal={stampsTotal} stampsCreated={stampsCreated} />
+      <TokenStats src20Total={src20Total} />
     </div>
   );
 }
 
-function StampStats() {
+function StampStats(
+  { stampsTotal, stampsCreated }: {
+    stampsTotal: number;
+    stampsCreated: number;
+  },
+) {
   return (
     <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-6">
       <div className="flex justify-between">
-        <StatItem label="STAMPS" value="52" />
+        <StatItem label="STAMPS" value={stampsTotal.toString()} />
         <StatItem
           label="VALUE"
           value={
             <>
               <span className="font-light">
-                0,00694200
+                N/A
               </span>&nbsp;<span className="font-extralight">BTC</span>
             </>
           }
@@ -144,24 +150,24 @@ function StampStats() {
         />
       </div>
       <div className="flex justify-between">
-        <StatItem label="BY ME" value="42" />
-        <StatItem label="DIPSPENSERS" value="9" align="center" />
-        <StatItem label="TOTAL SOLD" value="217" align="right" />
+        <StatItem label="BY ME" value={stampsCreated.toString()} />
+        <StatItem label="DISPENSERS" value="N/A" align="center" />
+        <StatItem label="TOTAL SOLD" value="N/A" align="right" />
       </div>
     </div>
   );
 }
 
-function TokenStats() {
+function TokenStats({ src20Total }: { src20Total: number }) {
   return (
     <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] flex justify-between p-6">
-      <StatItem label="TOKENS" value="6" />
+      <StatItem label="TOKENS" value={src20Total.toString()} />
       <StatItem
         label="VALUE"
         value={
           <>
             <span className="font-light">
-              0,00694200
+              N/A
             </span>&nbsp;<span className="font-extralight">BTC</span>
           </>
         }
