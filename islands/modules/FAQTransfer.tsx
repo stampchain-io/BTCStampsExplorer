@@ -26,7 +26,7 @@ export const FAQModule = () => {
           f-partial="/faq"
           className="border md:border-2 border-[#999999] rounded-md bg-transparent text-[#999999] font-extrabold w-[63px] md:w-[84px] h-[36px] md:h-[48px] flex justify-center items-center"
         >
-          Step by step: How to Transfer
+          Step by step how to Transfer
         </a>
       </div>
     </div>
