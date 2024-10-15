@@ -9,7 +9,7 @@ export const FAQModule = () => {
       </p>
 
       <p className="text-[#999999] text-base md:text-2xl font-medium">
-       Transfer
+       Transfer<br />
                 
       </p>
 
