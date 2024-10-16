@@ -2,10 +2,9 @@ import { useEffect, useState } from "preact/hooks";
 
 import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
 
-import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
-import { Filter } from "$islands/filter.tsx";
+import { Filter } from "$islands/Filter.tsx";
 import { Sort } from "$islands/Sort.tsx";
 
 export const StampHeader = (
