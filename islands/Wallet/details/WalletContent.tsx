@@ -17,6 +17,7 @@ function WalletContent({ stamps, src20 }: WalletContentProps) {
             kind="stamp"
             isRecentSale={false}
             showInfo={true}
+            showDetails={true}
           />
         ))}
       </div>
