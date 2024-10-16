@@ -2,6 +2,7 @@ import { useState } from "preact/hooks";
 
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { Filter } from "$islands/filter.tsx";
 
 import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
 
@@ -38,14 +39,32 @@ const WalletHeader = ({
         <h1 className="text-5xl text-[#660099] font-black">WALLET</h1>
       </div>
       <div class="flex gap-3 pb-1 md:pb-3 justify-between">
-        <StampNavigator
+        <Filter
+          initFilter={filterBy}
+          initSort={sortBy}
+          initType={type}
+          selectedTab={selectedTab}
+          open={isOpen1}
+          handleOpen={handleOpen1}
+          filterButtons={[
+            "all",
+            "stamps",
+            "collections",
+            "dispensers",
+            "tokens",
+          ]}
+          isStamp={false}
+        />
+        {
+          /* <StampNavigator
           initFilter={filterBy}
           initSort={sortBy}
           initType={type}
           selectedTab={selectedTab}
           open1={isOpen1}
           handleOpen1={handleOpen1}
-        />
+        /> */
+        }
         <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
       </div>
     </div>

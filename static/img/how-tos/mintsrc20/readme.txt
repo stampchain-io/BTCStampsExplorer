@@ -1,1 +1,0 @@
-directory with all screenshots

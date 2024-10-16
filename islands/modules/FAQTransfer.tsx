@@ -9,15 +9,18 @@ export const FAQModule = () => {
       </p>
 
       <p className="text-[#999999] text-base md:text-2xl font-medium">
-        Recepient address must start with 1 if classic,  or with bc1q if SegWit.<br /> 
+        Recepient address must start with 1 if classic, or with bc1q if
+        SegWit.<br />
         Start typing the token to access to your list of tokens.<br />
         Enter the amount of tokens that you want to transfer. <br />
-        FEES shows the suggested amount, and you can adjust it with the slider. Lowering the fee may delay your art being stamped.<br />
-        Fees are displayed in BTC by default, but you can switch to USDT using the TOGGLE.<br />
+        FEES shows the suggested amount, and you can adjust it with the slider.
+        Lowering the fee may delay your art being stamped.<br />
+        Fees are displayed in BTC by default, but you can switch to USDT using
+        the TOGGLE.<br />
         All related costs are listed under the DETAILS section.<br />
         Accept the terms and conditions to enable the Transfer button.<br />
-        The Transfer button will submit your transaction with all the provided information.<br />
-                      
+        The Transfer button will submit your transaction with all the provided
+        information.<br />
       </p>
 
       <div className="flex justify-end md:justify-start">

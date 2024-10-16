@@ -1,71 +1,61 @@
 import { useEffect, useState } from "preact/hooks";
 import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
 
-const filters: STAMP_FILTER_TYPES[] = ["pixel", "recursive", "vector"];
-const sorts = ["Latest", "Oldest"];
-
-interface FilterItemProps {
-  title: STAMP_FILTER_TYPES;
-  value: STAMP_FILTER_TYPES[];
-  onChange: (id: STAMP_FILTER_TYPES) => void;
+interface StampNavigatorProps {
+  initFilter?: STAMP_FILTER_TYPES[];
+  initSort?: "ASC" | "DESC";
+  initType?: STAMP_TYPES;
+  open1: boolean;
+  handleOpen1: (open: boolean) => void;
 }
 
-interface SortItemProps {
-  title: string;
-  onChange: (id: string) => void;
-  value: string;
-}
-
-const FilterItem = (
-  { title, onChange, value }: FilterItemProps,
-) => (
-  <div
-    class="flex items-center cursor-pointer py-2 px-2"
-    onClick={() => onChange(title)}
-  >
-    <input
-      type="checkbox"
-      checked={value.includes(title)}
-      class="form-checkbox h-5 w-5 text-[#8800CC] border-[#8A8989] rounded bg-[#3F2A4E] focus:ring-[#8800CC]"
-      onChange={() => onChange(title)}
-    />
-    <span class="text-white ml-2">{title}</span>
-  </div>
-);
-
-const SortItem = ({ title, onChange, value }: SortItemProps) => (
-  <div
-    class={`flex items-center cursor-pointer py-2 px-2 ${
-      value === title ? "text-[#8800CC]" : "text-white"
-    }`}
-    onClick={() => onChange(title)}
-  >
-    <span>{title}</span>
-  </div>
-);
-
-export function StampNavigator(
-  { initFilter, initSort, initType, open1, handleOpen1 }: {
-    initFilter?: STAMP_FILTER_TYPES[];
-    initSort?: string;
-    initType?: STAMP_TYPES;
-    open1: boolean;
-    handleOpen1: (open: boolean) => void;
-  },
-) {
+export function StampNavigator({
+  initFilter = [],
+  initSort = "DESC",
+  initType,
+  open1,
+  handleOpen1,
+}: StampNavigatorProps) {
   const [localFilters, setLocalFilters] = useState<STAMP_FILTER_TYPES[]>(
-    initFilter || [],
+    initFilter,
   );
-  const [localSort, setLocalSort] = useState<string>(initSort || "DESC");
+  const [localSort, setLocalSort] = useState<"ASC" | "DESC">(initSort);
 
   useEffect(() => {
-    if (initFilter) setLocalFilters(initFilter);
-    if (initSort) setLocalSort(initSort);
+    setLocalFilters(initFilter);
+    setLocalSort(initSort);
   }, [initFilter, initSort, initType]);
 
-  const handleSortChange = (value: string) => {
-    setLocalSort(value);
-    updateURL({ sortBy: value });
+  const updateURL = (
+    params: Partial<{
+      sortBy: "ASC" | "DESC";
+      filterBy: STAMP_FILTER_TYPES[];
+      type: STAMP_TYPES;
+    }>,
+  ) => {
+    if (typeof self === "undefined") return;
+
+    const url = new URL(self.location.href);
+    if (params.sortBy) url.searchParams.set("sortBy", params.sortBy);
+    if (params.filterBy !== undefined) {
+      params.filterBy.length > 0
+        ? url.searchParams.set("filterBy", params.filterBy.join(","))
+        : url.searchParams.delete("filterBy");
+    }
+    if (params.type) url.searchParams.set("type", params.type);
+    url.searchParams.set("page", "1");
+
+    self.history.pushState({}, "", url.toString());
+    self.dispatchEvent(
+      new CustomEvent("urlChanged", { detail: url.toString() }),
+    );
+    self.location.href = url.toString();
+  };
+
+  const handleSortChange = () => {
+    const newSort = localSort === "DESC" ? "ASC" : "DESC";
+    setLocalSort(newSort);
+    updateURL({ sortBy: newSort });
   };
 
   const handleFilterChange = (value: STAMP_FILTER_TYPES) => {
@@ -78,88 +68,57 @@ export function StampNavigator(
     });
   };
 
-  const updateURL = (params: {
-    sortBy?: string;
-    filterBy?: STAMP_FILTER_TYPES[];
-    type?: STAMP_TYPES;
-  }) => {
-    if (typeof self !== "undefined") {
-      const url = new URL(self.location.href);
-      if (params.sortBy) url.searchParams.set("sortBy", params.sortBy);
-      if (params.filterBy !== undefined) {
-        if (params.filterBy.length > 0) {
-          url.searchParams.set("filterBy", params.filterBy.join(","));
-        } else {
-          url.searchParams.delete("filterBy");
-        }
-      }
-      if (params.type) url.searchParams.set("type", params.type);
-      // if (!params.type) url.searchParams.set("type", selectedTab);
-
-      url.searchParams.set("page", "1");
-      self.history.pushState({}, "", url.toString());
-      self.dispatchEvent(
-        new CustomEvent("urlChanged", { detail: url.toString() }),
-      );
-
-      // Force page reload
-      self.location.href = url.toString();
-    }
-  };
+  const filterButtons: STAMP_FILTER_TYPES[] = [
+    "pixel",
+    "vector",
+    "for_sale",
+    "trendy sales",
+    "sold",
+  ];
 
   return (
     <div class="relative flex items-center gap-3">
       <button
-        onClick={() => handleSortChange(localSort === "DESC" ? "ASC" : "DESC")}
-        className={"border-2 border-[#660099] px-[10px] py-[10px] rounded-md"}
+        onClick={handleSortChange}
+        class="border-2 border-[#660099] px-[10px] py-[10px] rounded-md"
       >
-        {localSort === "DESC"
-          ? <img src="/img/stamp/SortAscending.png" alt="Sort ascending" />
-          : <img src="/img/stamp/SortDescending.png" alt="Sort descending" />}
+        <img
+          src={`/img/stamp/Sort${
+            localSort === "DESC" ? "Ascending" : "Descending"
+          }.png`}
+          alt={`Sort ${localSort === "DESC" ? "ascending" : "descending"}`}
+        />
       </button>
-      <div class="border-2 border-[rgb(102,0,153)] px-[10px] py-[10px] rounded-md flex items-center gap-3 max-h-[40px]">
-        {open1 && (
-          <>
-            <button
-              className={"cursor-pointer text-sm font-black text-[#660099]"}
-              onClick={() => handleFilterChange("for_sale")}
-            >
-              FOR SALE
-            </button>
-            <button
-              className={"cursor-pointer text-sm font-black text-[#660099]"}
-              onClick={() => handleFilterChange("sold")}
-            >
-              SOLD
-            </button>
-            <button
-              className={"cursor-pointer text-sm font-black text-[#660099]"}
-              onClick={() => handleFilterChange("pixel")}
-            >
-              PIXEL
-            </button>
-            <button
-              className={"cursor-pointer text-sm font-black text-[#660099]"}
-              onClick={() => handleFilterChange("vector")}
-            >
-              VECTOR
-            </button>
+      <div class="border-2 border-[#660099] px-6 py-4 rounded-md flex flex-col items-center gap-1 relative">
+        {open1
+          ? (
+            <>
+              <img
+                class="cursor-pointer absolute top-5 right-2"
+                src="/img/stamp/navigator-close.png"
+                alt="Navigator close"
+                onClick={() => handleOpen1(false)}
+              />
+              <p className="text-lg font-black text-[#AA00FF] mb-1">FILTERS</p>
+              {filterButtons.map((filter) => (
+                <button
+                  key={filter}
+                  class="cursor-pointer text-xs md:text-sm font-black text-[#660099] hover:text-[#AA00FF]"
+                  onClick={() => handleFilterChange(filter)}
+                >
+                  {filter.toUpperCase()}
+                </button>
+              ))}
+            </>
+          )
+          : (
             <img
-              className={"cursor-pointer"}
-              src="/img/stamp/navigator-close.png"
-              alt="Navigator close"
-              onClick={() => handleOpen1(false)}
+              class="cursor-pointer"
+              src="/img/stamp/navigator-list.png"
+              alt="Navigator list"
+              onClick={() => handleOpen1(true)}
             />
-          </>
-        )}
-        {!open1 && (
-          <img
-            className={"cursor-pointer"}
-            src="/img/stamp/navigator-list.png"
-            alt="Navigator list"
-            onClick={() => handleOpen1(true)}
-          />
-        )}
+          )}
       </div>
     </div>
   );
