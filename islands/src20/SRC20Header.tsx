@@ -2,8 +2,7 @@ import { useState } from "preact/hooks";
 
 import { SRC20_FILTER_TYPES, SRC20_TYPES } from "globals";
 
-import { SRC20Navigator } from "$islands/src20/SRC20Navigator.tsx";
-import { Filter } from "$islands/filter.tsx";
+import { Filter } from "$islands/Filter.tsx";
 import { Sort } from "$islands/Sort.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
