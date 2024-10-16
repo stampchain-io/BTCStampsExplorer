@@ -36,7 +36,8 @@
 @media (max-width: 768px) {
   /* Adjust the max-width as needed */
   ::-webkit-scrollbar {
-    width: 8px; /* Smaller width for mobile */
+    width: 8px;
+    /* Smaller width for mobile */
     height: 8px;
     border-radius: 14px;
   }
@@ -61,7 +62,8 @@
 
 /* New custom scrollbar styles for specific class */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 28px; /* Custom width */
+  width: 28px;
+  /* Custom width */
   height: 20px;
   border-radius: 0px;
 }
@@ -69,26 +71,30 @@
 @media (max-width: 768px) {
   /* Adjust the max-width as needed */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 17px; /* Smaller width for mobile */
+    width: 17px;
+    /* Smaller width for mobile */
     height: 14px;
     border-radius: 0px;
   }
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #2b0e49; /* Custom track color */
+  background: #2b0e49;
+  /* Custom track color */
   padding: 4px;
   border-radius: 0px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #b9b9b9; /* Custom handle color */
+  background: #b9b9b9;
+  /* Custom handle color */
   border-radius: 0px;
   background-clip: padding-box;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #d9d9d9; /* Custom handle hover color */
+  background: #d9d9d9;
+  /* Custom handle hover color */
 }
 
 .pixelart {
