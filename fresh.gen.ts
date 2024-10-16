@@ -81,8 +81,10 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
+import * as $Filter from "./islands/Filter.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
+import * as $Sort from "./islands/Sort.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
@@ -112,6 +114,7 @@ import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewD
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $hooks_useSRC20Form from "./islands/hooks/useSRC20Form.ts";
+import * as $hooks_useURLUpdate from "./islands/hooks/useURLUpdate.ts";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
@@ -265,8 +268,10 @@ const manifest = {
   islands: {
     "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
+    "./islands/Filter.tsx": $Filter,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
+    "./islands/Sort.tsx": $Sort,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
@@ -302,6 +307,7 @@ const manifest = {
     "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/hooks/useSRC20Form.ts": $hooks_useSRC20Form,
+    "./islands/hooks/useURLUpdate.ts": $hooks_useURLUpdate,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,

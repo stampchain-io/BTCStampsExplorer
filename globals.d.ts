@@ -10,7 +10,12 @@ export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
   | "src20"; // Note this is only for showing the src20 images, not actual SRC-20 details
 // | "recursive"; this is a filter not a type when passed to the db
 // see filterOptions
-export type STAMP_FILTER_TYPES = "vector" | "pixel" | "recursive";
+export type STAMP_FILTER_TYPES =
+  | "pixel"
+  | "vector"
+  | "for sale"
+  | "trendy sales"
+  | "sold";
 export type STAMP_SUFFIX_FILTERS =
   | "gif"
   | "jpg"
@@ -26,7 +31,26 @@ export type SRC20_TYPES =
   | "mint"
   | "transfer";
 
-export type SRC20_FILTER_TYPES = ""; // TBD
+export type SRC20_FILTER_TYPES =
+  | "minting"
+  | "trendy mints"
+  | "deploy"
+  | "supply"
+  | "marketcap"
+  | "holders"
+  | "volume"
+  | "price change";
+export type WALLET_FILTER_TYPES =
+  | "all"
+  | "stamps"
+  | "collections"
+  | "dispensers"
+  | "tokens";
+export type COLLECTION_FILTER_TYPES =
+  | "all"
+  | "posh"
+  | "recursive"
+  | "artists";
 
 import Big from "$Big";
 
