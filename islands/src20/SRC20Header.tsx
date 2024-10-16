@@ -3,6 +3,8 @@ import { useState } from "preact/hooks";
 import { SRC20_FILTER_TYPES, SRC20_TYPES } from "globals";
 
 import { SRC20Navigator } from "$islands/src20/SRC20Navigator.tsx";
+import { Filter } from "$islands/filter.tsx";
+import { Sort } from "$islands/Sort.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
@@ -72,14 +74,36 @@ export const SRC20Header = (
           </p>
         </div>
         <div class="flex gap-3 pb-1 md:pb-3 justify-between">
-          <SRC20Navigator
+          <Sort initSort={currentSort} />
+          <Filter
+            initFilter={currentFilters}
+            initSort={currentSort}
+            initType={type}
+            selectedTab={selectedTab}
+            open={isOpen1}
+            handleOpen={handleOpen1}
+            filterButtons={[
+              "minting",
+              "trendy mints",
+              "deploy",
+              "supply",
+              "marketcap",
+              "holders",
+              "volume",
+              "price change",
+            ]}
+            isStamp={false}
+          />
+          {
+            /* <SRC20Navigator
             initFilter={currentFilters}
             initSort={currentSort}
             initType={type}
             selectedTab={selectedTab}
             open1={isOpen1}
             handleOpen1={handleOpen1}
-          />
+          /> */
+          }
           <SRC20SearchClient open2={isOpen2} handleOpen2={handleOpen2} />
         </div>
       </div>

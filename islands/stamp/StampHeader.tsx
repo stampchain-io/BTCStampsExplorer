@@ -5,6 +5,8 @@ import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
 import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
+import { Filter } from "$islands/filter.tsx";
+import { Sort } from "$islands/Sort.tsx";
 
 export const StampHeader = (
   { filterBy, sortBy, type }: {
@@ -57,13 +59,31 @@ export const StampHeader = (
         ART STAMPS
       </p>
       <div class="flex gap-3 justify-between">
-        <StampNavigator
+        <Sort initSort={currentSort} />
+        <Filter
+          initFilter={currentFilters}
+          initSort={currentSort}
+          initType={type}
+          open={isOpen1}
+          handleOpen={handleOpen1}
+          filterButtons={[
+            "pixel",
+            "vector",
+            "for_sale",
+            "trendy sales",
+            "sold",
+          ]}
+          isStamp={true}
+        />
+        {
+          /* <StampNavigator
           initFilter={currentFilters}
           initSort={currentSort}
           initType={type}
           open1={isOpen1}
           handleOpen1={handleOpen1}
-        />
+        /> */
+        }
         <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
       </div>
     </div>
