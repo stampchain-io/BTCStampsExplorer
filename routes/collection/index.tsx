@@ -1,7 +1,7 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { CollectionHeader } from "$islands/collection/CollectionHeader.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
-import { Pagination } from "$islands/pagination/Pagination.tsx";
+import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
 import { CollectionController } from "$lib/controller/collectionController.ts";
 
 type CollectionPageProps = {

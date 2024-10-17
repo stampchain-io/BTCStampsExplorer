@@ -7,7 +7,7 @@ import { SRC20MintingTable } from "$islands/src20/minting/SRC20MintingTable.tsx"
 import LatestMints from "$islands/src20/minting/LatestMints.tsx";
 import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.tsx";
 
-import { Pagination } from "$islands/pagination/Pagination.tsx";
+import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
 import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
 import { Src20Controller } from "$lib/controller/src20Controller.ts";

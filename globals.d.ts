@@ -29,7 +29,8 @@ export type SRC20_TYPES =
   | "all"
   | "deploy"
   | "mint"
-  | "transfer";
+  | "transfer"
+  | "trending";
 
 export type SRC20_FILTER_TYPES =
   | "minting"
@@ -400,8 +401,8 @@ export type StampPageProps = {
     page: number;
     totalPages: number;
     limit: number;
-    selectedTab: "all" | "classic" | "posh";
-    sortBy: string;
+    selectedTab: "all" | "classic" | "posh" | "recent_sales";
+    sortBy: any;
     filterBy: string[];
   };
 };
