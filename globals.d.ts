@@ -1,7 +1,59 @@
 // General Types ---------------------------------------------------------------
 
-type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
-import Big from "https://esm.sh/big.js";
+export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
+export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
+  | "all"
+  | "stamps"
+  | "cursed"
+  | "classic"
+  | "posh"
+  | "src20"; // Note this is only for showing the src20 images, not actual SRC-20 details
+// | "recursive"; this is a filter not a type when passed to the db
+// see filterOptions
+export type STAMP_FILTER_TYPES =
+  | "pixel"
+  | "vector"
+  | "for sale"
+  | "trendy sales"
+  | "sold";
+export type STAMP_SUFFIX_FILTERS =
+  | "gif"
+  | "jpg"
+  | "png"
+  | "webp"
+  | "bmp"
+  | "jpeg"
+  | "svg"
+  | "html";
+export type SRC20_TYPES =
+  | "all"
+  | "deploy"
+  | "mint"
+  | "transfer"
+  | "trending";
+
+export type SRC20_FILTER_TYPES =
+  | "minting"
+  | "trendy mints"
+  | "deploy"
+  | "supply"
+  | "marketcap"
+  | "holders"
+  | "volume"
+  | "price change";
+export type WALLET_FILTER_TYPES =
+  | "all"
+  | "stamps"
+  | "collections"
+  | "dispensers"
+  | "tokens";
+export type COLLECTION_FILTER_TYPES =
+  | "all"
+  | "posh"
+  | "recursive"
+  | "artists";
+
+import Big from "$Big";
 
 interface BlockRow {
   block_index: number;
@@ -16,7 +68,7 @@ interface BlockRow {
   issuances?: number;
   sends?: number;
 }
-interface StampRow {
+export interface StampRow {
   stamp: number | null;
   block_index: number;
   cpid: string;
@@ -28,13 +80,46 @@ interface StampRow {
   stamp_mimetype: string;
   stamp_url: string;
   supply: number;
-  timestamp: Date;
+  block_time: Date;
   tx_hash: string;
   ident: SUBPROTOCOLS;
   creator_name: string | null;
   stamp_hash: string;
   is_btc_stamp: number;
   file_hash: string;
+  floorPrice?: number;
+  balance?: number | string;
+}
+
+export interface StampSectionProps {
+  title: string;
+  type?: string;
+  stamps: StampRow[];
+  layout: "grid" | "row";
+  isRecentSales?: boolean;
+  filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
+  showDetails?: boolean;
+}
+
+export interface SRC20Row {
+  tx_hash: string;
+  block_index: number;
+  p: string;
+  op: string;
+  tick: string;
+  tick_hash: string;
+  creator: string;
+  creator_name: string | null;
+  amt?: string | bigint;
+  deci?: number;
+  max?: string | bigint;
+  lim?: string | bigint;
+  destination: string;
+  destination_name?: string;
+  block_time: Date;
+  status: string;
+  row_num: number;
+  progress?: string | null;
 }
 
 interface SendRow {
@@ -43,7 +128,7 @@ interface SendRow {
   cpid: string | null;
   tick: string | null;
   memo: string;
-  quantity: bigint;
+  quantity: string | bigint;
   tx_hash: string;
   block_index: number;
   satoshirate: number | null;
@@ -51,10 +136,15 @@ interface SendRow {
   block_time: Date;
 }
 
-interface HolderRow {
+export interface HolderRow {
   address: string;
   quantity: number;
-  divisible: number;
+  divisible: boolean;
+}
+
+export interface ProcessedHolder {
+  address: string;
+  quantity: number;
 }
 
 export interface DispenseRow {
@@ -67,7 +157,7 @@ export interface DispenseRow {
   dispense_quantity: number;
 }
 
-interface DispenserRow {
+export interface DispenserRow {
   tx_hash: string;
   block_index: number;
   source: string;
@@ -81,13 +171,13 @@ interface DispenserRow {
   dispenses: DispenseRow[];
 }
 
-interface BlockInfo {
+export interface BlockInfo {
   block_info: BlockRow;
   issuances: StampRow[];
   sends: SendRow[];
 }
 
-interface BtcInfo {
+export interface BtcInfo {
   address: string;
   balance: number;
   txCount: number;
@@ -95,7 +185,7 @@ interface BtcInfo {
   unconfirmedTxCount: number;
 }
 
-interface XCPParams {
+export interface XCPParams {
   filters?: {
     field: string;
     op: string;
@@ -103,9 +193,24 @@ interface XCPParams {
   }[];
   address?: string;
   asset?: string;
+  source?: string;
+  quantity?: number | string;
+  divisible?: boolean;
+  lock?: boolean;
+  description?: string;
+  reset?: boolean;
+  allow_unconfirmed_inputs?: boolean;
+  extended_tx_info?: boolean;
+  disable_utxo_locks?: boolean;
+  fee_per_kb?: number;
 }
 
-interface SRC20Balance {
+export interface XCPBalance {
+  cpid: string;
+  quantity: number;
+}
+
+export interface SRC20Balance {
   address: string;
   p: string;
   tick: string;
@@ -116,7 +221,7 @@ interface SRC20Balance {
   deploy_img: string;
 }
 
-interface Src20Detail {
+export interface Src20Detail {
   tx_hash: string;
   block_index: number;
   p: string;
@@ -133,13 +238,13 @@ interface Src20Detail {
   destination_name: string;
 }
 
-interface Src20SnapShotDetail {
+export interface Src20SnapShotDetail {
   tick: string;
   address: string;
   balance: Big;
 }
 
-interface StampBalance {
+export interface StampBalance {
   cpid: string;
   stamp: number;
   stamp_base64: string;
@@ -177,22 +282,27 @@ export interface PaginatedRequest extends Request {
 
 export interface SRC20TrxRequestParams {
   block_index?: number | null;
-  tick?: string | null;
-  op?: string | null;
+  tick?: string | string[] | null;
+  op?: string | string[] | null;
   limit?: number;
   page?: number;
-  sort?: string;
+  sort?: string; // sort is only used on API requests
+  sortBy?: string;
   tx_hash?: string | null;
   address?: string | null;
+  noPagination?: boolean;
+  singleResult?: boolean;
 }
 
 export interface SRC20BalanceRequestParams {
-  address?: string | null;
-  tick?: string | null;
-  amt?: number | null;
+  address?: string;
+  tick?: string;
+  amt?: number;
   limit?: number;
   page?: number;
-  sort?: string;
+  sortBy?: string;
+  sortField?: string;
+  includePagination?: boolean;
 }
 
 // Response Types --------------------------------------------------------------
@@ -255,16 +365,18 @@ export interface PaginatedSrc20BalanceResponseBody extends Pagination {
 export interface Src20BalanceResponseBody {
   last_block: number;
   data: SRC20Balance;
+  pagination?: Pagination;
 }
 export interface Src20SnapshotResponseBody extends Pagination {
   snapshot_block: number;
   data: Src20SnapShotDetail[];
+  pagination?: Pagination;
 }
 
 export interface PaginatedBalanceResponseBody extends Pagination {
   last_block: number;
   btc: BtcInfo;
-  data: StampsAndSrc20[];
+  data: StampsAndSrc20;
 }
 
 export interface StampResponseBody {
@@ -282,6 +394,25 @@ export interface PaginatedIdResponseBody extends Pagination {
   data: StampRow[];
 }
 
+export type StampPageProps = {
+  data: {
+    stamps: StampRow[];
+    total: number;
+    page: number;
+    totalPages: number;
+    limit: number;
+    selectedTab: "all" | "classic" | "posh" | "recent_sales";
+    sortBy: any;
+    filterBy: string[];
+  };
+};
+
+type MintPageProps = {
+  data: {
+    selectedTab: "mint" | "deploy" | "transfer";
+  };
+};
+
 export interface ErrorResponseBody {
   error: string;
 }
@@ -290,6 +421,9 @@ export type PaginatedResponseBody =
   | PaginatedStampResponseBody
   | ErrorResponseBody;
 
+export interface BlockCountHandlerContext {
+  params: { number: string };
+}
 export interface BlockInfoResponseBody {
   block_info: BlockRow;
   issuances: StampRow[];
@@ -336,6 +470,7 @@ export interface BlockHandlerContext {
   params: {
     block_index: string;
   };
+  url: URL;
 }
 
 export interface AddressTickHandlerContext {
@@ -365,16 +500,9 @@ export interface BlockTickHandlerContext {
   };
 }
 
-export interface AddressTickHandlerContext {
-  params: {
-    address: string;
-    tick: string | number;
-  };
-}
-
 // Post Request Types ----------------------------------------------------------
 export interface TX {
-  hex: string;
+  psbtHex: string;
   fee: number;
   change: number;
 }
@@ -385,6 +513,7 @@ export interface TXError {
 export interface InputData {
   op: string;
   toAddress: string;
+  publicKey?: string;
   changeAddress: string;
   fromAddress?: string;
   tick: string;
@@ -393,6 +522,11 @@ export interface InputData {
   lim?: number | string;
   dec?: number;
   amt?: number | string;
+  x?: string;
+  web?: string;
+  email?: string;
+  tg?: string;
+  description?: string;
 }
 
 export interface MintStampInputData {
@@ -407,3 +541,46 @@ export interface MintStampInputData {
   service_fee: number;
   service_fee_address: string;
 }
+
+export interface Collection {
+  collection_id: string;
+  collection_name: string;
+  creators: string;
+  stamp_count: number;
+  first_stamp_image?: string | null;
+}
+
+export interface CollectionQueryParams extends PaginationQueryParams {
+  creator?: string;
+}
+
+export interface PaginatedCollectionResponseBody extends Pagination {
+  last_block: number;
+  data: Collection[];
+}
+
+export interface SRC20SnapshotRequestParams {
+  tick: string;
+  limit: number;
+  page: number;
+  amt: number;
+  sortBy?: string;
+}
+
+export interface Config {
+  MINTING_SERVICE_FEE_ENABLED: boolean;
+  MINTING_SERVICE_FEE: string | null;
+  MINTING_SERVICE_FEE_ADDRESS: string | null;
+}
+
+declare global {
+  interface GlobalThis {
+    SKIP_REDIS_CONNECTION: boolean | undefined;
+    LeatherProvider: {
+      request: (method: string, params?: any) => Promise<any>;
+      // Add other known properties and methods of LeatherProvider here
+    };
+  }
+}
+
+export {};

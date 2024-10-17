@@ -1,56 +1,55 @@
-import { useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import { getCurrentBlock, getRecommendedFees } from "utils/mempool.ts";
 
-export const useFeePolling = (intervalDuration = 30000) => {
-  const [fees, setFees] = useState(null);
+interface Fees {
+  economyFee: number;
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  recommendedFee: number; // Keep this spelling to match previous usage
+  block: number;
+  _economyFee: number;
+  _fastestFee: number;
+  _halfHourFee: number;
+  _hourFee: number;
+}
+
+export const useFeePolling = (intervalDuration = 300000) => {
+  const [fees, setFees] = useState<Fees | null>(null);
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    let intervalId;
-    let progressInterval;
+  const fetchFees = useCallback(async () => {
+    try {
+      const newFees = await getRecommendedFees();
+      const block = await getCurrentBlock();
 
-    const fetchFees = async () => {
-      try {
-        const newFees = await getRecommendedFees();
-        const block = await getCurrentBlock();
-
-        const allFees = {
+      if (newFees && block) {
+        const allFees: Fees = {
           ...newFees,
           _economyFee: newFees.economyFee,
           _fastestFee: newFees.fastestFee,
           _halfHourFee: newFees.halfHourFee,
           _hourFee: newFees.hourFee,
-          economyFee: newFees.economyFee * 3,
-          fastestFee: newFees.fastestFee * 2,
-          recomendedFee: newFees.fastestFee * 3,
+          economyFee: newFees.economyFee,
+          fastestFee: newFees.fastestFee,
+          recommendedFee: newFees.fastestFee,
           block: block,
         };
         setFees(allFees);
-        setProgress(0);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching fees:", error);
-        setLoading(false);
       }
-    };
-
-    fetchFees();
-    intervalId = setInterval(fetchFees, intervalDuration);
-
-    progressInterval = setInterval(() => {
-      setProgress((prevProgress) => {
-        return prevProgress >= 100
-          ? 100
-          : prevProgress + (100 * 1000 / intervalDuration);
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(intervalId);
-      clearInterval(progressInterval);
-    };
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching fees:", error);
+      setLoading(false);
+    }
   }, []);
 
-  return { fees, loading, progress };
+  useEffect(() => {
+    fetchFees();
+    const intervalId = setInterval(fetchFees, intervalDuration);
+
+    return () => clearInterval(intervalId);
+  }, [fetchFees, intervalDuration]);
+
+  return { fees, loading, fetchFees };
 };

@@ -1,36 +1,23 @@
 import { BigFloat } from "bigfloat/mod.ts";
-import { Client } from "$mysql/mod.ts";
 
-import { Src20Class } from "$lib/database/index.ts";
-import { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "./src20.d.ts";
+import {
+  IDeploySRC20,
+  IMintSRC20,
+  ITransferSRC20,
+} from "$lib/types/index.d.ts";
 import { isValidBitcoinAddress } from "./utils.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
-export async function checkMintedOut(
-  client: Client,
-  tick: string,
-  amount: string,
-) {
+export async function checkMintedOut(tick: string, amount: string) {
   try {
-    const mint_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client(
-        client,
-        tick,
-      );
-    if (!mint_status) {
-      throw new Error("Tick not found");
-    }
-    const { max_supply, total_minted } = mint_status;
-    if (new BigFloat(total_minted).add(new BigFloat(amount)).gt(max_supply)) {
-      return { ...mint_status, minted_out: true };
-    }
-    return { ...mint_status, minted_out: false };
+    const result = await Src20Controller.handleCheckMintedOut(tick, amount);
+    return result;
   } catch (error) {
     console.error(error);
     throw new Error("Error: Internal server error");
   }
 }
 
-// TODO: Implement and replace mint/deploy functions
 export async function checkParams({
   operation, // "Mint" or "Deploy"
   toAddress,
@@ -41,7 +28,6 @@ export async function checkParams({
   max,
   lim,
   dec = 18,
-  client, // Optional, only needed for Deploy check
 }: {
   operation: "Mint" | "Deploy";
   toAddress: string;
@@ -52,7 +38,6 @@ export async function checkParams({
   max?: number | string | undefined;
   lim?: number | string | undefined;
   dec?: number;
-  client?: Client;
 }) {
   // Common checks for both Mint and Deploy
   if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
@@ -91,21 +76,15 @@ export async function checkParams({
       if (!dec || dec === 0) {
         throw new Error("Error: dec not found or invalid");
       }
-      // Check if tick is already deployed
-      if (client) {
-        try {
-          const token_status = await Src20Class
-            .get_total_valid_src20_tx_with_client(client, tick, "DEPLOY");
-          if (!token_status.rows[0]["total"]) {
-            return { deployed: false };
-          }
-          return { deployed: true };
-        } catch (error) {
-          console.error(error);
-          throw new Error("Error: Internal server error");
-        }
-      } else {
-        throw new Error("Error: Client not provided for Deploy operation");
+      try {
+        const token_status = await Src20Controller.getTotalCountValidSrc20Tx({
+          tick,
+          op: "DEPLOY",
+        });
+        return { deployed: token_status !== 0 };
+      } catch (error) {
+        console.error(error);
+        throw new Error("Error: Internal server error");
       }
     default:
       throw new Error("Error: Invalid operation type");
@@ -138,18 +117,16 @@ export function checkMintParams({
     throw new Error("Error: amt not found or invalid");
   }
 }
+
 export async function checkDeployedTick(
-  client: Client,
   tick: string,
 ) {
   try {
-    const token_status = await Src20Class
-      .get_total_valid_src20_tx_with_client(
-        client,
-        tick,
-        "DEPLOY",
-      );
-    if (!token_status.rows[0]["total"]) {
+    const token_status = await Src20Controller.getTotalCountValidSrc20Tx({
+      tick,
+      op: "DEPLOY",
+    });
+    if (token_status === 0) {
       return {
         deployed: false,
       };
@@ -163,62 +140,114 @@ export async function checkDeployedTick(
   }
 }
 
-export function checkDeployParams({
-  toAddress,
-  changeAddress,
-  tick,
-  feeRate,
-  max,
-  lim,
-  dec = 18,
-}: IDeploySRC20) {
-  if (!toAddress || toAddress === "" || !isValidBitcoinAddress(toAddress)) {
-    throw new Error("Error: toAddress not found");
+export function checkDeployParams(params: IDeploySRC20) {
+  const {
+    toAddress,
+    changeAddress,
+    tick,
+    feeRate,
+    max,
+    lim,
+    dec = 18,
+    x,
+    web,
+    email,
+  } = params;
+
+  // Validate toAddress
+  if (!toAddress || toAddress.trim() === "") {
+    throw new Error("Error: toAddress not provided");
   }
-  if (
-    !changeAddress || changeAddress === "" || !isValidBitcoinAddress(toAddress)
-  ) {
-    throw new Error("Error: changeAddress not found");
+  if (!isValidBitcoinAddress(toAddress)) {
+    throw new Error("Error: toAddress is invalid or unsupported");
   }
-  if (!feeRate) {
-    throw new Error("Error: feeRate not found");
+
+  // Validate changeAddress
+  if (!changeAddress || changeAddress.trim() === "") {
+    throw new Error("Error: changeAddress not provided");
   }
-  if (!tick || tick === "") {
-    throw new Error("Error: tick not found");
+  if (!isValidBitcoinAddress(changeAddress)) {
+    throw new Error("Error: changeAddress is invalid or unsupported");
   }
+
+  // Validate feeRate
+  if (!feeRate || isNaN(feeRate)) {
+    throw new Error("Error: feeRate not provided or invalid");
+  }
+
+  // Validate tick
+  if (!tick || tick.trim() === "") {
+    throw new Error("Error: tick not provided");
+  }
+
+  // Validate max
   const float_max = new BigFloat(max);
   if (!max || max === "" || float_max.lte(0)) {
     throw new Error("Error: max not found or invalid");
   }
+
+  // Validate lim
   const float_lim = new BigFloat(lim);
-  if (!lim || lim === "" || float_lim.lte(0) || float_lim.gt(float_max)) {
+  if (
+    !lim || lim === "" || float_lim.lte(0) ||
+    float_lim.gt(float_max)
+  ) {
     throw new Error("Error: lim not found or invalid");
   }
-  if (!dec || dec === 0) {
-    throw new Error("Error: dec not found or invalid");
+
+  // Validate dec
+  const decValue = Number(dec);
+  if (
+    isNaN(decValue) || decValue < 0 || decValue > 18 ||
+    !Number.isInteger(decValue)
+  ) {
+    throw new Error("Error: dec must be an integer between 0 and 18");
   }
+
+  // Optional validation for x (username)
+  if (x && x !== "" && (x.length > 15 || !/^[a-zA-Z0-9_]+$/.test(x))) {
+    throw new Error("Error: Invalid x username");
+  }
+
+  // Optional validation for web (website address)
+  if (
+    web && web !== "" &&
+    !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(web)
+  ) {
+    throw new Error("Error: Invalid website address");
+  }
+
+  // Optional validation for email
+  if (email && email !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error("Error: Invalid email address");
+  }
+
+  // If all validations pass, function completes without throwing an error
 }
 
 export async function checkEnoughBalance(
-  client: Client,
   address: string,
   tick: string,
   amount: string,
 ) {
   try {
-    const balance_address_tick_data = await Src20Class
-      .get_src20_balance_with_client(
-        client,
-        address,
-        tick,
-      );
+    const params = {
+      address,
+      tick,
+      limit: 1,
+      page: 1,
+    };
 
-    if (!balance_address_tick_data) {
-      console.error("balance_address_tick_data is undefined");
+    const balanceData = await Src20Controller.handleSrc20BalanceRequest(params);
+
+    if (!balanceData || !balanceData.data) {
+      console.error("No SRC-20 token balance found");
       throw new Error("No SRC-20 token balance found");
     }
 
-    if (new BigFloat(amount).gt(balance_address_tick_data.amt)) {
+    const balance = balanceData.data.amt;
+
+    if (new BigFloat(amount).gt(balance)) {
       throw new Error("Error: Not enough SRC-20 token balance");
     }
 
@@ -253,5 +282,18 @@ export function checkTransferParams({
   const float_amt = new BigFloat(amt);
   if (!amt || amt === "" || float_amt.lte(0)) {
     throw new Error("Error: amt not found or invalid");
+  }
+}
+
+export function performChecks(operation: string, params: any) {
+  switch (operation.toLowerCase()) {
+    case "deploy":
+      return checkDeployParams(params);
+    case "mint":
+      return checkMintParams(params);
+    case "transfer":
+      return checkTransferParams(params);
+    default:
+      throw new Error("Error: Invalid operation type");
   }
 }
