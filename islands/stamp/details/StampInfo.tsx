@@ -201,7 +201,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </a>
           </div>
           <div className="flex justify-between items-center flex-col md:items-end gap-1">
-            <p className="text-lg font-light text-[#666666] uppercase">
+            <p className="text-lg font-light text-[#666666] uppercase text-nowrap">
               Block #
             </p>
             <a
