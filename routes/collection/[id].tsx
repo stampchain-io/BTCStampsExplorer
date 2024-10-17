@@ -1,4 +1,4 @@
-import { Pagination } from "$islands/pagination/Pagination.tsx";
+import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
 import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "globals";

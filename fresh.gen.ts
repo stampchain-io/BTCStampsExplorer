@@ -81,10 +81,8 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
-import * as $Filter from "./islands/Filter.tsx";
 import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
-import * as $Sort from "./islands/Sort.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
@@ -106,6 +104,10 @@ import * as $collection_CollectionDetailsContent from "./islands/collection/Coll
 import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
 import * as $collection_CollectionHeader from "./islands/collection/CollectionHeader.tsx";
 import * as $collection_CollectionList from "./islands/collection/CollectionList.tsx";
+import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
+import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
+import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
+import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
@@ -126,9 +128,7 @@ import * as $modules_FAQTransfer from "./islands/modules/FAQTransfer.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
-import * as $pagination_Pagination from "./islands/pagination/Pagination.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
-import * as $src20_SRC20Navigator from "./islands/src20/SRC20Navigator.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
 import * as $src20_all_SRC20DeployTable from "./islands/src20/all/SRC20DeployTable.tsx";
 import * as $src20_details_SRC20DetailsTab from "./islands/src20/details/SRC20DetailsTab.tsx";
@@ -141,7 +141,6 @@ import * as $src20_trending_SRC20TrendingMints from "./islands/src20/trending/SR
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
-import * as $stamp_StampNavigator from "./islands/stamp/StampNavigator.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_details_StampBuyModal from "./islands/stamp/details/StampBuyModal.tsx";
 import * as $stamp_details_StampCodeModal from "./islands/stamp/details/StampCodeModal.tsx";
@@ -269,10 +268,8 @@ const manifest = {
   islands: {
     "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
-    "./islands/Filter.tsx": $Filter,
     "./islands/MempoolWeather.tsx": $MempoolWeather,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
-    "./islands/Sort.tsx": $Sort,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
@@ -300,6 +297,10 @@ const manifest = {
       $collection_CollectionDetailsHeader,
     "./islands/collection/CollectionHeader.tsx": $collection_CollectionHeader,
     "./islands/collection/CollectionList.tsx": $collection_CollectionList,
+    "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
+    "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
+    "./islands/datacontrol/Search.tsx": $datacontrol_Search,
+    "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
@@ -320,9 +321,7 @@ const manifest = {
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
-    "./islands/pagination/Pagination.tsx": $pagination_Pagination,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
-    "./islands/src20/SRC20Navigator.tsx": $src20_SRC20Navigator,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
     "./islands/src20/all/SRC20DeployTable.tsx": $src20_all_SRC20DeployTable,
     "./islands/src20/details/SRC20DetailsTab.tsx":
@@ -340,7 +339,6 @@ const manifest = {
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
-    "./islands/stamp/StampNavigator.tsx": $stamp_StampNavigator,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/stamp/details/StampBuyModal.tsx": $stamp_details_StampBuyModal,
     "./islands/stamp/details/StampCodeModal.tsx": $stamp_details_StampCodeModal,
