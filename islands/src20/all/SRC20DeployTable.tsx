@@ -140,7 +140,11 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         </div>
 
         {/* Mobile View */}
+<<<<<<< HEAD
         <div class="flex xl:hidden flex-col gap-3 p-2">
+=======
+        <div class="flex xl:hidden flex-col gap-3">
+>>>>>>> ea7dbdd (update hamburger & src20 tokens & add graph on stamp detail)
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
             // Ensure src20.tick is defined
