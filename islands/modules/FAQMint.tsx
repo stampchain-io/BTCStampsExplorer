@@ -45,11 +45,12 @@ export const FAQModule = () => {
         <a
           href="/faq"
           f-partial="/faq"
-          className="border md:border-2 border-[#999999] rounded-md bg-transparent text-[#999999] font-extrabold w-[63px] md:w-[84px] h-[36px] md:h-[48px] flex justify-center items-center"
-        >
-          READ ALL
-        </a>
+          className="border md:border-2 border-[#999999] rounded-md bg-transparent text-[#999999] font-extrabold text-sm md:text-base w-[63px] md:w-[84px] h-[36px] md:h-[48px] flex justify-center items-center"
+      >
+      READ ALL
+      </a>
       </div>
+
     </div>
   );
 };
