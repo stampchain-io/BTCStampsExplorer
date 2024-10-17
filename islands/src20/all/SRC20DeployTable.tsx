@@ -54,7 +54,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
       />
       <div class="relative overflow-x-auto shadow-md">
         {/* Desktop View */}
-        <div class="hidden md:flex flex-col gap-6">
+        <div class="hidden xl:flex flex-col gap-6">
           {data.map((src20: SRC20Row) => {
             // Ensure src20.tick is defined
             if (!src20.tick) {
@@ -140,7 +140,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         </div>
 
         {/* Mobile View */}
-        <div class="flex md:hidden flex-col gap-3">
+        <div class="flex xl:hidden flex-col gap-3">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
             // Ensure src20.tick is defined
@@ -158,79 +158,45 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                       <a href={href} class="text-xl">
                         {convertToEmoji(src20.tick)}
                       </a>
-                      <p class="text-sm">
-                        {new Date(src20.block_time).toLocaleString("default", {
-                          month: "short",
-                          year: "numeric",
-                        })}
+                      <p className="text-lg text-[#666666] font-light">
+                        SUPPLY{" "}
+                        <span className="font-bold text-[#999999]">
+                          {Number(src20.max).toLocaleString()}
+                        </span>
                       </p>
                     </div>
-                    <p>
-                      Block:{" "}
-                      <span class="text-lg font-medium">
-                        {src20.block_index}
-                      </span>
-                    </p>
-                    <div class="flex justify-between">
-                      <p>
-                        Creator:{" "}
-                        <span class="text-lg font-medium">
+                    <div className="flex justify-between">
+                      <p className="text-lg text-[#666666] font-light">
+                        MARKETCAP{" "}
+                        <span className="font-bold text-[#999999]">
+                          {Number(src20.mcap).toFixed(2).toLocaleString()}
+                        </span>
+                      </p>
+                      <p className="text-lg text-[#666666] font-light">
+                        CREATOR{" "}
+                        <span className="font-bold text-[#999999]">
                           {src20.destination_name
                             ? src20.destination_name
                             : abbreviateAddress(src20.destination)}
                         </span>
                       </p>
-                      <p class="text-sm">
-                        {Number(src20.deci)?.toLocaleString()}
+                    </div>
+                    <div class="flex justify-between">
+                      <p className="text-lg text-[#666666] font-light">
+                        PRICE{" "}
+                        <span className="font-bold text-[#999999]">
+                          {Number(src20.floor_unit_price).toFixed(10)
+                            .toLocaleString()}
+                        </span>
+                      </p>
+                      <p className="text-lg text-[#666666] font-light">
+                        HOLDERS{" "}
+                        <span className="font-bold text-[#999999]">
+                          {Number(src20.holders).toLocaleString()}
+                        </span>
                       </p>
                     </div>
                   </div>
-                </div>
-                <div class="w-full flex justify-between">
-                  <p className="text-lg text-[#666666] font-light">
-                    SUPPLY{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.max).toLocaleString()}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    LIMIT{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.lim).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-                <div class="w-full flex justify-between">
-                  <p className="text-lg text-[#666666] font-light">
-                    DEPLOY{" "}
-                    <span className="font-bold text-[#999999]">
-                      {new Date(src20.block_time).toLocaleString("default", {
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    HOLDERS{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.holders).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-                <div class="w-full flex justify-between">
-                  <p className="text-lg text-[#666666] font-light">
-                    MARKETCAP{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.mcap).toFixed(2).toLocaleString()}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    PRICE{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.floor_unit_price).toFixed(10)
-                        .toLocaleString()}
-                    </span>
-                  </p>
                 </div>
               </div>
             );

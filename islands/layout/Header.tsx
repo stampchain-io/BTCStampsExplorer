@@ -94,7 +94,7 @@ export function Header() {
       {navLinks.map((link) => (
         <div
           key={link.title}
-          className={`group relative cursor-pointer ${
+          className={`group relative cursor-pointer text-nowrap ${
             isMobile ? "flex flex-col gap-[6px] text-lg" : ""
           }`}
         >
@@ -138,7 +138,7 @@ export function Header() {
 
   return (
     <header className="px-3 sm:px-6 xl:px-12 my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex items-center justify-between">
-      <div className="flex justify-between items-center">
+      <div className="w-full flex justify-between items-center">
         <a
           href="/home"
           f-partial={"/home"}
@@ -149,7 +149,7 @@ export function Header() {
         </a>
         <button
           onClick={toggleMenu}
-          className="text-blue-600 md:hidden z-[100]"
+          className="text-blue-600 lg:hidden block z-[100]"
           id="navbar-toggle"
         >
           {open && (
@@ -170,14 +170,14 @@ export function Header() {
       </div>
 
       {/* Desktop Navbar */}
-      <div className="hidden md:flex justify-between items-center gap-6 xl:gap-12 font-black text-[#8800CC]">
+      <div className="hidden lg:flex justify-between items-center gap-6 xl:gap-12 font-black text-[#8800CC]">
         {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex md:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 py-6 sm:py-9 pt-[120px] backdrop-blur-md font-black text-[#8800CC] ${
+        className={`duration-500 flex lg:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 py-6 sm:py-9 pt-[120px] backdrop-blur-md font-black text-[#8800CC] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"
@@ -189,12 +189,12 @@ export function Header() {
             toggleMenu();
             setCurrentPath("collection");
           }}
-          className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
+          className="hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
         >
           STAMPCHAIN
         </a>
 
-        <div className="font-black text-center flex flex-col items-center justify-between gap-12">
+        <div className="font-black text-center flex flex-col items-center justify-between gap-12 mt-12">
           {renderNavLinks(true)}
           <ConnectWallet toggleModal={toggleWalletModal} />
         </div>

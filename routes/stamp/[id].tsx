@@ -12,6 +12,7 @@ import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
 import { CollectionController } from "$lib/controller/collectionController.ts";
+import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
 
 interface StampDetailPageProps {
   data: {
@@ -148,7 +149,7 @@ export default function StampPage(props: StampDetailPageProps) {
       </Head>
 
       <div className="flex flex-col gap-10 md:gap-20 xl:gap-50">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <StampImage
             stamp={stamp}
             flag={true}
@@ -158,6 +159,10 @@ export default function StampPage(props: StampDetailPageProps) {
             lowestPriceDispenser={lowestPriceDispenser}
           />
         </div>
+
+        <StampRelatedGraph
+          stamp={stamp}
+        />
 
         <StampRelatedInfo
           sends={sends}
