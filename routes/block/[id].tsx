@@ -6,8 +6,8 @@ import BlockGeneral from "$components/block/BlockGeneral.tsx";
 import BlockCurrency from "$components/block/BlockCurrency.tsx";
 import BlockNetwork from "$components/block/BlockNetwork.tsx";
 import BlockTransactions from "$islands/block/BlockTransactions.tsx";
-import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+// import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
+// import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { BlockController } from "$lib/controller/blockController.ts";
 
 type BlockPageProps = {
@@ -67,8 +67,10 @@ export function BlockPage(props: BlockPageProps) {
           </div>
         </div>
         <div class="flex justify-between w-full md:w-auto gap-6">
-          <StampNavigator initFilter={filterBy} initSort={sortBy} />
-          <StampSearchClient />
+          {
+            /* <StampNavigator initFilter={filterBy} initSort={sortBy} />
+          <StampSearchClient /> */
+          }
         </div>
       </div>
       <div className={"flex flex-col md:flex-row justify-between gap-3"}>
