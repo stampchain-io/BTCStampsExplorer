@@ -54,7 +54,11 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
       />
       <div class="relative overflow-x-auto shadow-md">
         {/* Desktop View */}
+<<<<<<< HEAD
         <div class="hidden xl:flex flex-col gap-6 p-2">
+=======
+        <div class="hidden xl:flex flex-col gap-6">
+>>>>>>> ea7dbdd (update hamburger & src20 tokens & add graph on stamp detail)
           {data.map((src20: SRC20Row) => {
             // Ensure src20.tick is defined
             if (!src20.tick) {
