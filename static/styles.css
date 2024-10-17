@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.primary-gradient {
+  background: linear-gradient(to right, #1f002e00, #14001f7f, #1f002eff);
+}
+
 .image-rendering-pixelated {
   position: relative;
 }
