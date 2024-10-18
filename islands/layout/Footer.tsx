@@ -36,7 +36,7 @@ const socialLinks = [
 export function Footer() {
   return (
     <footer className="px-3 md:px-6 xl:px-12 py-6 sm:py-9 md:py-[72px] text-[#8800CC] font-medium max-w-[1440px] w-full mx-auto flex flex-col lg:flex-row justify-between gap-4 text-sm md:text-lg">
-      <div className="w-full flex flex-col gap-1 items-center md:items-start">
+      <div className="w-full flex flex-col gap-1 items-center lg:items-start">
         <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#7700BB] to-[#AA00FF] text-3xl md:text-6xl italic font-black">
           STAMPCHAIN
           <span className="font-extralight pr-1">.IO</span>
