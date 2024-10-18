@@ -57,7 +57,7 @@ function WalletOverview(
   },
 ) {
   return (
-    <div className="w-full lg:w-1/2 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] flex flex-col justify-between p-6">
+    <div className="w-full lg:w-1/2 dark-gradient flex flex-col justify-between p-6">
       <div className="flex justify-between">
         <div>
           <p className="text-[#999999] text-5xl">
@@ -134,7 +134,7 @@ function StampStats(
   },
 ) {
   return (
-    <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex flex-col gap-6">
+    <div className="dark-gradient p-6 flex flex-col gap-6">
       <div className="flex justify-between">
         <StatItem label="STAMPS" value={stampsTotal.toString()} />
         <StatItem
@@ -160,7 +160,7 @@ function StampStats(
 
 function TokenStats({ src20Total }: { src20Total: number }) {
   return (
-    <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] flex justify-between p-6">
+    <div className="dark-gradient flex justify-between p-6">
       <StatItem label="TOKENS" value={src20Total.toString()} />
       <StatItem
         label="VALUE"

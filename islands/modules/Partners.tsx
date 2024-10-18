@@ -1,26 +1,34 @@
-export const PartnersModule = () => {
+interface Partner {
+  name: string;
+  imageSrc: string;
+}
+
+const partners: Partner[] = [
+  { name: "Bitfinity", imageSrc: "/img/home/partner-bitfinity-banner.png" },
+  { name: "R8", imageSrc: "/img/home/partner-r8-banner.png" },
+  { name: "Bitname", imageSrc: "/img/home/partner-bitname-banner.png" },
+];
+
+function PartnerCard({ imageSrc, name }: Partner) {
+  return (
+    <div className="relative cursor-pointer">
+      <img src={imageSrc} alt={`${name} banner`} loading="lazy" />
+      <div className="opacity-0 hover:opacity-100 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute inset-0 transition-opacity duration-300" />
+    </div>
+  );
+}
+
+export function PartnersModule() {
   return (
     <div>
-      <p className="font-black text-3xl md:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-3">
+      <h2 className="font-black text-3xl md:text-6xl gray-gradient4 mb-3">
         PARTNERS
-      </p>
+      </h2>
       <div className="flex justify-between items-center flex-col md:flex-row gap-3 md:gap-6">
-        <div className="relative cursor-pointer">
-          <img src="/img/home/partner-bitfinity-banner.png" />
-          <div className="opacity-0 hover:opacity-100 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute w-full h-full top-0 left-0">
-          </div>
-        </div>
-        <div className="relative cursor-pointer">
-          <img src="/img/home/partner-r8-banner.png" />
-          <div className="opacity-0 hover:opacity-100 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute w-full h-full top-0 left-0">
-          </div>
-        </div>
-        <div className="relative cursor-pointer">
-          <img src="/img/home/partner-bitname-banner.png" />
-          <div className="opacity-0 hover:opacity-100 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute w-full h-full top-0 left-0">
-          </div>
-        </div>
+        {partners.map((partner) => (
+          <PartnerCard key={partner.name} {...partner} />
+        ))}
       </div>
     </div>
   );
-};
+}

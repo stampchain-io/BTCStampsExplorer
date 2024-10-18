@@ -39,7 +39,7 @@ export function SRC20SearchClient(
         <>
           <input
             type="text"
-            class="min-w-[260px] md:min-w-[360px] h-[40px] bg-gradient-to-r from-[#8800CC] via-[#7700AA] to-[#660099] px-4 py-2 rounded text-[13px] text-[#8D9199]"
+            class="min-w-[260px] md:min-w-[360px] h-[40px] purple-bg-gradient px-4 py-2 rounded text-[13px] text-[#8D9199]"
             placeholder="Token Name, Tx Hash, or Address"
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}

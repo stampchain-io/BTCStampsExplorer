@@ -84,7 +84,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   return (
     <div>
       <div className={"flex flex-col gap-4"}>
-        <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
+        <div className="dark-gradient p-6">
           <p className={"text-6xl font-bold text-[#8800CC]"}>
             # {stamp.stamp}
           </p>
@@ -132,7 +132,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           </div>
         </div>
 
-        <div className="flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6">
+        <div className="flex justify-between items-center dark-gradient p-6">
           <div className="flex justify-between items-center flex-col md:items-start gap-1">
             <p className="text-[#666666] font-light uppercase">TYPE</p>
             <p className="text-[#999999] uppercase font-medium">
@@ -156,7 +156,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         </div>
 
         <div
-          className={"flex justify-between items-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6"}
+          className={"flex justify-between items-center dark-gradient p-6"}
         >
           <div className="flex justify-between items-center flex-col md:items-start gap-1">
             <p className="text-[#666666] font-light uppercase">Locked</p>
@@ -179,7 +179,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         </div>
 
         <div
-          className={"bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 flex justify-between gap-7"}
+          className={"dark-gradient p-6 flex justify-between gap-7"}
         >
           <div className="flex flex-col justify-between items-start gap-1">
             <p className="text-lg font-light text-[#666666] uppercase">

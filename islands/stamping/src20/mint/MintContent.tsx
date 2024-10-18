@@ -150,7 +150,7 @@ export function MintContent({
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="purple-gradient1 text-3xl md:text-6xl font-black mt-6 w-full text-center">
         MINT SRC-20
       </p>
 
@@ -161,7 +161,7 @@ export function MintContent({
         </div>
       )}
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 flex flex-col gap-3 md:gap-6 w-full">
+      <div className="dark-gradient p-3 md:p-6 flex flex-col gap-3 md:gap-6 w-full">
         <div className="w-full flex gap-3 md:gap-6">
           <div
             id="image-preview"
@@ -202,7 +202,7 @@ export function MintContent({
         />
       </div>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
+      <div className="dark-gradient p-3 md:p-6 w-full">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

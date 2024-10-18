@@ -2,13 +2,13 @@ export default function TermsOfService() {
   return (
     <div className="text-[#CCCCCC] flex flex-col gap-16 md:gap-36 py-24 md:py-48">
       <section className="text-center max-w-5xl mx-auto">
-        <h1 className="text-4xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#CCCCCC] via-[#999999] to-[#666666]">
+        <h1 className="text-4xl md:text-7xl font-bold gray-gradient1">
           TERMS OF SERVICE
         </h1>
       </section>
 
       <section className="flex flex-col gap-6">
-        <p className="text-3xl md:text-6xl bg-clip-text text-transparent font-black bg-gradient-to-r from-[#666666] via-[#999999] to-[#CCCCCC]">
+        <p className="text-3xl md:text-6xl font-black gray-gradient3">
           AGREEMENT
         </p>
         <div className="flex justify-between items-end">

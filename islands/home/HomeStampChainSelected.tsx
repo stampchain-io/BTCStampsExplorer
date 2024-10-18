@@ -2,7 +2,7 @@ export const HomeStampChainSelected = () => {
   return (
     <div>
       <p
-        className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#8800CC] text-4xl md:text-7xl font-black"}
+        className={"purple-gradient1 text-4xl md:text-7xl font-black"}
       >
         <span className={"italic"}>STAMPCHAIN</span> SELECTED
       </p>
@@ -13,7 +13,7 @@ export const HomeStampChainSelected = () => {
         <div className={"flex flex-col justify-between"}>
           <div>
             <p
-              className={"bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] flex flex-col text-3xl md:text-6xl font-bold"}
+              className={"gray-gradient4 flex flex-col text-3xl md:text-6xl font-bold"}
             >
               CURATED STAMPS
               <span className={"text-2xl md:text-5xl font-light"}>
@@ -34,7 +34,7 @@ export const HomeStampChainSelected = () => {
               S1 - OCTOBER
             </p>
             <p
-              className={"bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] font-black text-4xl md:text-7xl"}
+              className={"purple-gradient2 font-black text-4xl md:text-7xl"}
             >
               CONNOISSEUR
             </p>

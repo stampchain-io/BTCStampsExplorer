@@ -34,7 +34,7 @@ export const ConnectorsModal = (
           alt="Close modal"
         />
 
-        <h3 class="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC]">
+        <h3 class="text-5xl font-black purple-gradient1">
           CONNECT<br />
           <span className="text-4xl font-extralight text-[#AA00FF]">
             YOUR WALLET
