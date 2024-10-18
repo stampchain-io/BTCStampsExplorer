@@ -102,6 +102,8 @@ export function StampCard({
   return (
     <a
       href={`/stamp/${stamp.tx_hash}`}
+      target="_top"
+      f-partial={`/stamp/${stamp.tx_hash}`}
       className="
         border-2 border-[#2E0F4D] text-white group relative z-0 flex flex-col
         p-[6px] sm:p-3 rounded-[6px] transition-all

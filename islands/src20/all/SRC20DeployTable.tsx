@@ -54,7 +54,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
       />
       <div class="relative overflow-x-auto shadow-md">
         {/* Desktop View */}
-        <div class="hidden xl:flex flex-col gap-6">
+        <div class="hidden xl:flex flex-col gap-6 p-2">
           {data.map((src20: SRC20Row) => {
             // Ensure src20.tick is defined
             if (!src20.tick) {
@@ -63,7 +63,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
             }
             const href = `/src20/${convertToEmoji(src20.tick)}`;
             return (
-              <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between rounded-md">
+              <div class="bg-gradient-to-br from-transparent from-0% via-[#14001F] to-[#1F002E] text-sm flex justify-between rounded-md hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
                 <div class="p-3 uppercase cursor-pointer flex gap-6">
                   <img
                     src={`/content/${src20.tx_hash}.svg`}
@@ -74,7 +74,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                   <div className="flex flex-col justify-between">
                     <a
                       href={href}
-                      className="text-2xl text-[#666666] font-bold"
+                      className="text-2xl text-[#666666] font-bold hover:text-[#AA00FF]"
                     >
                       {convertToEmoji(src20.tick)}
                     </a>
@@ -140,12 +140,12 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         </div>
 
         {/* Mobile View */}
-        <div class="flex xl:hidden flex-col gap-3">
+        <div class="flex xl:hidden flex-col gap-3 p-2">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
             // Ensure src20.tick is defined
             return (
-              <div class="text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2">
+              <div class="text-[#F5F5F5] bg-gradient-to-br from-transparent from-0% via-[#14001F] to-[#1F002E] hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] p-2">
                 <div class="w-full flex items-center gap-2 mb-2">
                   <img
                     src={`/content/${src20.tx_hash}.svg`}
