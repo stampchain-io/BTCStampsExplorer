@@ -201,11 +201,7 @@ export function Header() {
             toggleMenu();
             setCurrentPath("collection");
           }}
-<<<<<<< HEAD
-          className="lg:block hidden purple-gradient2 text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
-=======
-          className="hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
->>>>>>> ea7dbdd (update hamburger & src20 tokens & add graph on stamp detail)
+          className="lg:block hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
         >
           STAMPCHAIN
         </a>
