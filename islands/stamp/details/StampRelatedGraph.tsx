@@ -54,7 +54,7 @@ export function StampRelatedGraph({ stamp }: StampRelatedGraphProps) {
   console.log("stamp: ", stamp);
 
   return (
-    <div className="flex justify-between items-center bg-gradient-to-br primary-gradient p-6 relative">
+    <div className="flex justify-between items-center dark-gradient p-6 relative">
       <div className="p-6 absolute top-0 right-0 text-center">
         <p className="text-[#666666] font-light uppercase">HOLDERS</p>
         <p className="text-[#999999] font-light uppercase lg:text-[32px] md:text-[30px]">

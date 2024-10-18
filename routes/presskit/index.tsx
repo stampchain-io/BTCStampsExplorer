@@ -3,7 +3,7 @@ export default function PressKit() {
     <div className="text-[#CCCCCC] flex flex-col gap-16 md:gap-36 py-24 md:py-48">
       <section className="text-center max-w-5xl mx-auto">
         <h1 className="text-3xl md:text-6xl font-bold">
-          <span className="text-4xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#CCCCCC] via-[#999999] to-[#666666]">
+          <span className="text-4xl md:text-7xl font-black gray-gradient1">
             PRESS KIT
           </span>
           <br />
@@ -14,7 +14,7 @@ export default function PressKit() {
       <section className="flex flex-col md:flex-row gap-6 md:gap-12">
         <div className="flex flex-col gap-6 md:gap-12 w-full md:w-1/2">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-2">
+            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
               BITCOIN STAMPS
             </h1>
             <h2 className="text-2xl md:text-5xl font-extralight mb-3">
@@ -106,7 +106,7 @@ export default function PressKit() {
       <section className="flex flex-col md:flex-row gap-6 md:gap-12">
         <div className="flex flex-col gap-6 md:gap-12 w-full md:w-1/2">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-2">
+            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
               STAMPCHAIN
             </h1>
             <h2 className="text-2xl md:text-5xl font-extralight mb-3">
@@ -164,10 +164,10 @@ export default function PressKit() {
         </div>
 
         <div className="flex flex-col items-center md:items-end gap-6 md:gap-12 w-full md:w-1/2">
-          <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-4xl md:text-7xl font-black italic px-2">
+          <p className="purple-gradient2 text-4xl md:text-7xl font-black italic px-2">
             STAMPCHAIN
           </p>
-          <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-4xl md:text-7xl font-black italic px-2">
+          <p className="purple-gradient2 text-4xl md:text-7xl font-black italic px-2">
             STAMPCHAIN<span className="font-extralight">.IO</span>
           </p>
           <div className="flex gap-6">

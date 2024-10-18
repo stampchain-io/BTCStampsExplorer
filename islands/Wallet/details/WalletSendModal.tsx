@@ -91,7 +91,7 @@ function CloseButton({ onClick }: { onClick: () => void }) {
 
 function ModalTitle({ children }: { children: string }) {
   return (
-    <p class="font-black text-5xl text-center bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC]">
+    <p class="font-black text-5xl text-center purple-gradient1">
       {children}
     </p>
   );

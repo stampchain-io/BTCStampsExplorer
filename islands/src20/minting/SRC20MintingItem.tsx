@@ -24,7 +24,7 @@ const SRC20MintingItem = (
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Desktop View */}
-      <div class="hidden md:flex bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm justify-between items-center rounded-md hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
+      <div class="hidden md:flex dark-gradient text-sm justify-between items-center rounded-md hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
         <div class="p-3 uppercase cursor-pointer flex gap-6">
           <img
             src={`/content/${src20.tx_hash}.svg`}

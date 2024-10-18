@@ -64,7 +64,7 @@ export default function Home(props: HomePageProps) {
       />
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl 2xl:text-6xl  font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
+        <h1 className="text-5xl 2xl:text-6xl  font-black purple-gradient1">
           SRC-20 TOKENS
         </h1>
         {/* SRC20DeployTable section */}

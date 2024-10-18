@@ -62,7 +62,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
             const progressWidth = `${progress}%`;
 
             return (
-              <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between items-center rounded-md">
+              <div class="dark-gradient text-sm flex justify-between items-center rounded-md">
                 <div class="p-3 uppercase cursor-pointer flex gap-6">
                   <img
                     src={`/content/${src20.tx_hash}.svg`}

@@ -75,7 +75,7 @@ export function SRC20TickHeader({
 
   return (
     <div class="flex w-full flex-col gap-6">
-      <div class="w-full flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
+      <div class="w-full flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 dark-gradient">
         <div class="flex flex-col md:flex-row justify-between gap-3 w-full">
           <div className="flex gap-3">
             <img
@@ -127,7 +127,7 @@ export function SRC20TickHeader({
       </div>
 
       {/* Token Information */}
-      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
+      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between dark-gradient">
         <StatItem
           label="Supply"
           value={formatNumber(deployment.max, 0)}
@@ -144,7 +144,7 @@ export function SRC20TickHeader({
       </div>
 
       {/* Market Information */}
-      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
+      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between dark-gradient">
         {/* Market Cap in BTC */}
         <StatItem
           label="MARKET CAP"
@@ -161,7 +161,7 @@ export function SRC20TickHeader({
         />
       </div>
 
-      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
+      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between dark-gradient">
         {/* Price in Satoshis */}
         <StatItem
           label="PRICE"
