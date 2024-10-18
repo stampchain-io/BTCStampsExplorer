@@ -43,7 +43,7 @@ export function TransferContent(
         TRANSFER
       </p>
 
-      <div className="flex flex-col gap-3 md:gap-6 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
+      <div className="flex flex-col gap-3 md:gap-6 dark-gradient p-3 md:p-6 w-full">
         <InputField
           type="text"
           placeholder="Recipient address"
@@ -71,7 +71,7 @@ export function TransferContent(
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
+      <div className="dark-gradient p-3 md:p-6 w-full">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

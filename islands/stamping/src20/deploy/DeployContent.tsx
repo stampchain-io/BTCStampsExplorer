@@ -137,11 +137,11 @@ export function DeployContent(
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="purple-gradient1 text-3xl md:text-6xl font-black mt-6 w-full text-center">
         DEPLOY
       </p>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6 w-full flex flex-col gap-3 md:gap-6">
+      <div className="dark-gradient p-2 md:p-6 w-full flex flex-col gap-3 md:gap-6">
         <div className="flex gap-3 md:gap-6">
           <div className="flex flex-col gap-3 md:gap-6 !w-[108px] md:!w-[120px]">
             <div
@@ -281,7 +281,7 @@ export function DeployContent(
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6 w-full">
+      <div className="dark-gradient p-3 md:p-6 w-full">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

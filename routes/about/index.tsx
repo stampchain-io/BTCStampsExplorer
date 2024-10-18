@@ -4,7 +4,7 @@ export default function About() {
       <section className={"text-[#CCCCCC] flex flex-col gap-6 md:gap-12"}>
         <div>
           <h1
-            className={"text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-2"}
+            className={"text-3xl md:text-6xl font-black gray-gradient4 mb-2"}
           >
             ABOUT
           </h1>

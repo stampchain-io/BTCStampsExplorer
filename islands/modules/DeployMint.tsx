@@ -2,7 +2,7 @@ export const DeployMintModule = () => {
   return (
     <div className="flex flex-col md:flex-row justify-between md:items-end gap-8 sm:gap-16 md:gap-32">
       <div>
-        <p className="font-light text-2xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-left">
+        <p className="font-light text-2xl md:text-5xl gray-gradient4 text-left">
           DEPLOY // MINT
         </p>
         <p className="text-[#CCCCCC] text-base md:text-2xl font-medium">

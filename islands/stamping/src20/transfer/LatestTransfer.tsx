@@ -9,7 +9,7 @@ const LatestTransfer = ({ transactions }) => {
 
   return (
     <div className="flex flex-col gap-4 items-start md:items-end">
-      <h1 className="bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-3xl md:text-6xl font-black">
+      <h1 className="purple-gradient4 text-3xl md:text-6xl font-black">
         RECENT TRANSFERS
       </h1>
       {stamps.length > 0 && (

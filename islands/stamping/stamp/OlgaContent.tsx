@@ -383,7 +383,7 @@ export function OlgaContent() {
         </div>
       )}
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
+      <div className="dark-gradient p-6 w-full">
         <div className="flex gap-8">
           <div className="flex gap-8">
             <div
@@ -596,7 +596,7 @@ export function OlgaContent() {
       </div> */
       }
 
-      <div className="bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-6 w-full">
+      <div className="dark-gradient p-6 w-full">
         <FeeEstimation
           fee={fee}
           handleChangeFee={handleChangeFee}

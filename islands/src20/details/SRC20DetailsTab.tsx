@@ -50,7 +50,7 @@ export function SRC20DetailsTab({ tick }: SRC20DetailsTabProps) {
   }, [selectedTab, tick]);
 
   return (
-    <div class="w-full h-full bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-3 md:p-6">
+    <div class="w-full h-full dark-gradient p-3 md:p-6">
       <div class="flex justify-between gap-12 text-2xl cursor-pointer mb-5">
         {TABS.map((tab) => (
           <p

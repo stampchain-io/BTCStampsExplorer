@@ -173,7 +173,7 @@ const StampBuyModal = (
               src="/img/wallet/icon-close.svg"
             />
 
-            <p className="font-black text-5xl text-center bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC]">
+            <p className="font-black text-5xl text-center purple-gradient1">
               BUY
             </p>
 
@@ -184,7 +184,7 @@ const StampBuyModal = (
                 flag={false}
               />
               <div className="flex flex-col justify-between items-end">
-                <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#AA00FF] via-[#660099] to-[#440066] text-2xl font-black text-center">
+                <p className="purple-gradient4 text-2xl font-black text-center">
                   #{stamp.stamp}
                 </p>
                 <div>

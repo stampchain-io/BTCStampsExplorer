@@ -1,10 +1,10 @@
 export const FAQModule = () => {
   return (
     <div className="flex flex-col gap-4">
-      <p className="font-black text-4xl md:text-7xl flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] via-[#999999] to-[#CCCCCC] text-left">
+      <p className="font-black text-4xl md:text-7xl flex flex-col gray-gradient3 text-left">
         How to
       </p>
-      <p className="flex flex-col bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-left text-3xl md:text-6xl font-extralight text-[#CCCCCC]">
+      <p className="flex flex-col gray-gradient4 text-left text-3xl md:text-6xl font-extralight text-[#CCCCCC]">
         Stamp
       </p>
 

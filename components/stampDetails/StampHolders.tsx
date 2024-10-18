@@ -67,7 +67,7 @@ export const StampHolders = ({ holders }: { holders: HolderInfoType[] }) => {
   );
 
   return (
-    <div class="flex justify-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6">
+    <div class="flex justify-center dark-gradient p-2 md:p-6">
       {
         /* <Chart
         type="pie"

@@ -52,9 +52,9 @@ export function WalletConnector(
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      className="cursor-pointer flex justify-between items-center p-4 bg-gradient-to-br from-[#0A000F00] via-[#14001F] to-[#1F002E] border rounded-lg border-[#8800CC] transition-colors ease-in-out duration-150 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
+      className="cursor-pointer flex justify-between items-center p-4 dark-gradient border rounded-lg border-[#8800CC] transition-colors ease-in-out duration-150 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
     >
-      <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] text-2xl uppercase font-black">
+      <p className="gray-gradient4 text-2xl uppercase font-black">
         {providerInfo.name}
       </p>
       <img

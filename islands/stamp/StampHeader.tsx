@@ -57,7 +57,7 @@ export const StampHeader = (
 
   return (
     <div class="flex flex-col-reverse lg:flex-row justify-between items-center gap-3 w-full">
-      <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] text-3xl md:text-6xl font-black">
+      <p className="purple-gradient1 text-3xl md:text-6xl font-black">
         ART STAMPS
       </p>
       <div class="flex gap-3 justify-between h-[40px]">

@@ -142,7 +142,7 @@ export function StampCard({
                     #
                   </span>
                 )}
-                <span className="sm:text-l md:text-l lg:text-2xl xl:text-2xl 2xl:text-3xl font-black bg-gradient-to-r from-[#666666] to-[#999999] bg-clip-text text-transparent">
+                <span className="sm:text-l md:text-l lg:text-2xl xl:text-2xl 2xl:text-3xl font-black gray-gradient4">
                   {Number(stamp.stamp ?? 0) >= 0 ||
                       (stamp.cpid && stamp.cpid.charAt(0) === "A")
                     ? `${stamp.stamp}`
