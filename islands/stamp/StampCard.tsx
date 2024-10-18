@@ -102,33 +102,31 @@ export function StampCard({
     : abbreviateAddress(stamp.creator, abbreviationLength);
 
   return (
-    <div className=" relative">
-      <a
-        href={`/stamp/${stamp.tx_hash}`}
-        target="_top"
-        f-partial={`/stamp/${stamp.tx_hash}`}
-        className="
-          border-2 border-[#2E0F4D] text-white group relative z-0 flex flex-col
-          p-[6px] sm:p-3 rounded-[6px] transition-all
-          hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]
-          w-full max-w-[220px] lg:max-w-[348px] xl:max-w-[220px] 2xl:max-w-[318px]
-        "
-        style={{
-          background:
-            "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
-        }}
-      >
-        {/* Image Container */}
-        <div className="relative w-full">
-          <div className="
-              aspect-square
-              overflow-hidden
-              image-rendering-pixelated
-              w-full
-            ">
-            <div className="center relative w-full h-full">
-              {renderContent()}
-            </div>
+    <a
+      href={`/stamp/${stamp.tx_hash}`}
+      target="_top"
+      f-partial={`/stamp/${stamp.tx_hash}`}
+      className="
+        border-2 border-[#2E0F4D] text-white group relative z-0 flex flex-col
+        p-[6px] sm:p-3 rounded-[6px] transition-all
+        hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]
+        w-full max-w-[220px] lg:max-w-[348px] xl:max-w-[220px] 2xl:max-w-[318px]
+      "
+      style={{
+        background:
+          "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
+      }}
+    >
+      {/* Image Container */}
+      <div className="relative w-full">
+        <div className="
+            aspect-square
+            overflow-hidden
+            image-rendering-pixelated
+            w-full
+          ">
+          <div className="center relative w-full h-full">
+            {renderContent()}
           </div>
         </div>
 
