@@ -272,7 +272,7 @@ export class StampRepository {
   ) {
     try {
       const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
-      const assets = xcp_balances.map((balance: any) => balance.cpid);
+      const assets = xcp_balances.map((balance: XCPBalance) => balance.cpid);
       if (assets.length === 0) {
         return {
           rows: [
@@ -290,9 +290,7 @@ export class StampRepository {
           LEFT JOIN 
             creator cr ON st.creator = cr.address
           WHERE 
-            st.cpid IN (${
-        assets.map((asset: string) => `'${asset}'`).join(",")
-      })
+            st.cpid IN (${assets.map(() => "?").join(",")})
         `;
       const balances = await dbManager.executeQueryWithCache(
         query,
@@ -302,7 +300,13 @@ export class StampRepository {
       return balances;
     } catch (error) {
       console.error("Error getting balances: ", error);
-      return [];
+      return {
+        rows: [
+          {
+            total: 0,
+          },
+        ],
+      };
     }
   }
 
@@ -543,6 +547,10 @@ export class StampRepository {
     try {
       const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
       const assets = xcp_balances.map((balance: XCPBalance) => balance.cpid);
+
+      if (assets.length === 0) {
+        return [];
+      }
 
       const query = `
         SELECT 

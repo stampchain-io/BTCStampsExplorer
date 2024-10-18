@@ -1,5 +1,4 @@
 import { useCallback } from "preact/hooks";
-import { STAMP_TYPES } from "globals";
 import {
   COLLECTION_FILTER_TYPES,
   SRC20_FILTER_TYPES,
@@ -16,8 +15,6 @@ type FilterTypes =
 interface URLUpdateParams {
   sortBy?: "ASC" | "DESC";
   filterBy?: FilterTypes[];
-  type?: STAMP_TYPES;
-  selectedTab?: STAMP_TYPES;
 }
 
 export function useURLUpdate() {
@@ -33,9 +30,6 @@ export function useURLUpdate() {
         ? url.searchParams.set("filterBy", params.filterBy.join(","))
         : url.searchParams.delete("filterBy");
     }
-
-    if (params.type) url.searchParams.set("type", params.type);
-    if (params.selectedTab) url.searchParams.set("type", params.selectedTab);
 
     url.searchParams.set("page", "1");
 
