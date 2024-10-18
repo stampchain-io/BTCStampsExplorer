@@ -28,6 +28,15 @@ const navLinks: NavLink[] = [
       { title: "TRANSFER", href: "/stamping/src20/transfer" },
     ],
   },
+  {
+    title: "STAMPCHAIN",
+    href: "#",
+    subLinks: [
+      { title: "ABOUT", href: "/about" },
+      { title: "DONATE", href: "#" },
+      { title: "CONTACT", href: "#" },
+    ],
+  },
 ];
 
 const socialLinks = [
@@ -89,52 +98,55 @@ export function Header() {
     document.body.style.overflow = !open ? "hidden" : "";
   };
 
-  const renderNavLinks = (isMobile = false) => (
-    <>
-      {navLinks.map((link) => (
-        <div
-          key={link.title}
-          className={`group relative cursor-pointer text-nowrap ${
-            isMobile ? "flex flex-col gap-[6px] text-lg" : ""
-          }`}
-        >
-          <a
-            className={`hover:text-[#AA00FF] ${
-              isMobile
-                ? "text-2xl text-[#660099]"
-                : "text-lg xl:text-xl text-center"
-            }`}
-          >
-            {link.title}
-          </a>
+  const renderNavLinks = (isMobile = false) => {
+    const filteredNavLinks = isMobile ? navLinks : navLinks.slice(0, 2);
+    return (
+      <>
+        {filteredNavLinks.map((link) => (
           <div
-            className={`${
-              isMobile
-                ? "flex flex-col text-center"
-                : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
+            key={link.title}
+            className={`group relative cursor-pointer text-nowrap ${
+              isMobile ? "flex flex-col gap-[6px] text-lg" : ""
             }`}
           >
-            {link.subLinks?.map((subLink) => (
-              <a
-                key={subLink.href}
-                href={subLink.href}
-                f-partial={subLink.href}
-                onClick={() => {
-                  toggleMenu();
-                  setCurrentPath(subLink.href);
-                }}
-                className={`hover:text-[#AA00FF] ${
-                  currentPath === subLink.href ? "text-[#AA00FF]" : ""
-                }`}
-              >
-                {subLink.title}
-              </a>
-            ))}
+            <a
+              className={`hover:text-[#AA00FF] ${
+                isMobile
+                  ? "text-2xl text-[#660099]"
+                  : "text-lg xl:text-xl text-center"
+              }`}
+            >
+              {link.title}
+            </a>
+            <div
+              className={`${
+                isMobile
+                  ? "flex flex-col text-center"
+                  : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
+              }`}
+            >
+              {link.subLinks?.map((subLink) => (
+                <a
+                  key={subLink.href}
+                  href={subLink.href}
+                  f-partial={subLink.href}
+                  onClick={() => {
+                    toggleMenu();
+                    setCurrentPath(subLink.href);
+                  }}
+                  className={`hover:text-[#AA00FF] text-lg md:text-base sm:text-base ${
+                    currentPath === subLink.href ? "text-[#AA00FF]" : ""
+                  }`}
+                >
+                  {subLink.title}
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-    </>
-  );
+        ))}
+      </>
+    );
+  };
 
   return (
     <header className="px-3 sm:px-6 xl:px-12 my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex items-center justify-between">
@@ -189,7 +201,7 @@ export function Header() {
             toggleMenu();
             setCurrentPath("collection");
           }}
-          className="hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
+          className="lg:block hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
         >
           STAMPCHAIN
         </a>

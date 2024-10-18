@@ -4,23 +4,22 @@ interface FooterLink {
   isExternal?: boolean;
 }
 
-const artStampLinks: FooterLink[] = [
-  { title: "ALL", href: "/stamp?type=classic" },
-  { title: "COLLECTIONS", href: "/collection" },
-  { title: "STAMPING", href: "/stamping/stamp" },
+const resourcesStampLinks: FooterLink[] = [
+  { title: "ABOUT", href: "/about" },
+  { title: "DONATE", href: "#" },
+  { title: "CONTACT", href: "#" },
+  { title: "TERMS OF SERVICE", href: "/termsofservice" },
 ];
 
-const aboutLinks: FooterLink[] = [
-  { title: "STAMPCHAIN", href: "/about" },
-  { title: "DONATE", href: "#" },
+const stapmChainLinks: FooterLink[] = [
   { title: "FAQ", href: "/faq" },
+  { title: "HOW-TO", href: "#" },
   {
     title: "MEDIA",
     href: "https://github.com/stampchain-io/",
     isExternal: true,
   },
   { title: "PRESS KIT", href: "/presskit" },
-  { title: "TERMS OF SERVICE", href: "/termsofservice" },
 ];
 
 const socialLinks = [
@@ -37,7 +36,7 @@ const socialLinks = [
 export function Footer() {
   return (
     <footer className="px-3 md:px-6 xl:px-12 py-6 sm:py-9 md:py-[72px] text-[#8800CC] font-medium max-w-[1440px] w-full mx-auto flex flex-col lg:flex-row justify-between gap-4 text-sm md:text-lg">
-      <div className="w-full flex flex-col gap-1 items-center md:items-start">
+      <div className="w-full flex flex-col gap-1 items-center lg:items-start">
         <p className="bg-clip-text text-transparent bg-gradient-to-r from-[#440066] via-[#7700BB] to-[#AA00FF] text-3xl md:text-6xl italic font-black">
           STAMPCHAIN
           <span className="font-extralight pr-1">.IO</span>
@@ -56,8 +55,8 @@ export function Footer() {
 
       <div className="flex justify-end lg:justify-between w-full">
         <div className="hidden lg:flex flex-col gap-1">
-          <p className="text-lg font-black">ART STAMPS</p>
-          {artStampLinks.map((link) => (
+          <p className="text-lg font-black">RESOURCES</p>
+          {resourcesStampLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -69,12 +68,12 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="text-right flex flex-col items-center md:items-end gap-6 md:gap-1 w-full md:w-auto">
-          <p className="text-lg font-black hidden md:block">
-            ABOUT
+        <div className="text-right flex flex-col items-center lg:items-end gap-6 lg:gap-1 w-full lg:w-auto">
+          <p className="text-lg font-black hidden lg:block">
+            STAMPCHAIN
           </p>
-          <div className="flex flex-row md:flex-col justify-between w-full max-w-[320px] gap-1 leading-4">
-            {aboutLinks.map((link) => (
+          <div className="flex flex-row lg:flex-col justify-between w-full max-w-[320px] gap-1 leading-4">
+            {stapmChainLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
