@@ -1,14 +1,33 @@
-// routes/src20/tick
-import { handleSrc20TransactionsRequest } from "$lib/database/src20Transactions.ts";
-import { FreshContext } from "$fresh/server.ts";
+import { Handlers } from "$fresh/server.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { ResponseUtil } from "utils/responseUtil.ts";
+import { SRC20TrxRequestParams } from "globals";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 
-export const handler = (
-  req: Request,
-  _ctx: FreshContext,
-): Promise<Response> => {
-  const params = {
-    op: "DEPLOY",
-  };
+export const handler: Handlers = {
+  async GET(req) {
+    try {
+      const url = new URL(req.url);
+      const { limit, page } = getPaginationParams(url);
 
-  return handleSrc20TransactionsRequest(req, params);
+      const params: SRC20TrxRequestParams = {
+        sortBy: url.searchParams.get("sort") || "ASC",
+        limit,
+        page,
+      };
+
+      const op = url.searchParams.get("op");
+      if (op) {
+        params.op = op;
+      }
+
+      const result = await Src20Controller.handleSrc20TransactionsRequest(
+        req,
+        params,
+      );
+      return ResponseUtil.success(result);
+    } catch (error) {
+      return ResponseUtil.handleError(error, "Error processing request");
+    }
+  },
 };
