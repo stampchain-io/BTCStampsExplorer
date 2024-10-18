@@ -9,7 +9,7 @@ export default function Error404() {
       <div class="px-4 py-8 mx-auto">
         <div class="max-w-screen-md mx-auto flex flex-col items-center justify-center">
           <div class="flex flex-col justify-center items-center">
-            <div class="purple-gradient1 xl:text-6xl md:text-5xl text-3xl font-black">
+            <div class="bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent xl:text-6xl md:text-5xl text-3xl font-black">
               LOOKING
             </div>
             <div class="text-[#AA00FF] md:text-3xl text-2xl">
