@@ -13,7 +13,7 @@ function WalletDetails(
   },
 ) {
   const [fee, setFee] = useState<number>(walletData.fee);
-  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [isSendModalOpen, setIsSendModalOpen] = useState(true);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
 
   return (

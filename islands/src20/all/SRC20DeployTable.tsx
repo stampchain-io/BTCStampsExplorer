@@ -74,7 +74,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                   <div className="flex flex-col justify-between">
                     <a
                       href={href}
-                      className="text-2xl text-[#666666] font-bold hover:text-[#AA00FF]"
+                      className="text-2xl text-[#666666] font-bold hover:text-[#AA00FF] uppercase"
                     >
                       {convertToEmoji(src20.tick)}
                     </a>
@@ -155,7 +155,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                   />
                   <div class="w-full">
                     <div class="flex justify-between">
-                      <a href={href} class="text-xl">
+                      <a href={href} class="text-xl uppercase">
                         {convertToEmoji(src20.tick)}
                       </a>
                       <p className="text-lg text-[#666666] font-light">

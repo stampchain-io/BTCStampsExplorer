@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import { StampRow } from "globals";
 import { mimeTypesArray } from "utils/util.ts";
@@ -101,6 +101,33 @@ export function StampImage(
   },
 ) {
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const imgScopeRef = useRef(null);
+  const [transform, setTransform] = useState("");
+
+  const updateTransform = () => {
+    if (!imgScopeRef.current) return;
+    const width = imgScopeRef.current.clientWidth;
+    console.log("counting====>", (width + 50) / 648);
+
+    setTransform(
+      `scale(${(width + 50) / 648}))`,
+    );
+  };
+
+  useEffect(() => {
+    console.log("here");
+    // Set initial transform
+    updateTransform();
+
+    // Add event listener to handle window resize
+    window.addEventListener("resize", updateTransform);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", updateTransform);
+    };
+  }, []);
+
   const handleCloseCodeModal = () => {
     setIsCodeModalOpen(false);
   };
@@ -171,15 +198,19 @@ export function StampImage(
       {src !== "/content/not-available.png" &&
         stamp.stamp_mimetype === "text/html" && (
         <div className={`${className} flex flex-col gap-4`}>
-          <div className="p-6 bg-[#1F002E] flex justify-center items-center">
+          <div
+            className="p-6 bg-[#1F002E] flex justify-center items-center relative w-full h-full pt-[56.25%]"
+            ref={imgScopeRef}
+          >
             <iframe
               width="100%"
               height="100%"
               scrolling="no"
-              className={`${className} aspect-square rounded-lg`}
+              className={`${className} aspect-square rounded-lg absolute top-0 left-0`}
               sandbox="allow-scripts allow-same-origin"
               src={src}
               loading="lazy"
+              style={{ transform }}
               onError={(e) => {
                 e.currentTarget.src = stamp.stamp_url;
               }}
