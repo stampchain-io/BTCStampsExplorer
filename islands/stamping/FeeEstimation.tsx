@@ -239,6 +239,7 @@ export function FeeEstimation({
               : `${(mintfee * BTCPrice).toFixed(2)} ${coinType}`}
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
+            {/* FIXME: multisig dust  only applies to multisig SRC-20 tokens, not olga(p2swsh) stamps or src-20 */}
             <span className="font-light text-[#666666]">Multisig Dust</span>
             {" "}
             {coinType === "BTC"

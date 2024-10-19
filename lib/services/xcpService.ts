@@ -1,6 +1,6 @@
 import { StampService } from "$lib/services/stampService.ts";
 import { dbManager } from "../../server/database/db.ts";
-import { DispenserFilter } from "$lib/types/index.d.ts";
+import { DispenserFilter, Fairminter } from "$lib/types/index.d.ts";
 
 export const xcp_v2_nodes = [
   {
@@ -11,6 +11,10 @@ export const xcp_v2_nodes = [
   {
     name: "counterparty.io",
     url: "https://api.counterparty.io:4000/v2",
+  },
+  {
+    name: "dev.counterparty.io",
+    url: "https://dev.counterparty.io:4000/v2",
   },
 ];
 
@@ -1032,5 +1036,152 @@ export class XcpManager {
     }
 
     throw new Error("All nodes failed to compose dispenser transaction.");
+  }
+
+  static async composeFairmint(
+    address: string,
+    asset: string,
+    quantity: number,
+    options: {
+      encoding?: string;
+      fee_per_kb?: number;
+      regular_dust_size?: number;
+      multisig_dust_size?: number;
+      pubkeys?: string;
+      // Default allow_unconfirmed_inputs to true
+      allow_unconfirmed_inputs?: boolean;
+      exact_fee?: number;
+      fee_provided?: number;
+      unspent_tx_hash?: string;
+      dust_return_pubkey?: string;
+      disable_utxo_locks?: boolean;
+      p2sh_pretx_txid?: string;
+      segwit?: boolean;
+      confirmation_target?: number;
+      exclude_utxos?: string;
+      inputs_set?: string;
+      return_psbt?: boolean;
+      return_only_data?: boolean;
+      extended_tx_info?: boolean;
+      old_style_api?: boolean;
+      verbose?: boolean;
+      show_unconfirmed?: boolean;
+    } = {},
+  ): Promise<any> {
+    const endpoint = `/addresses/${address}/compose/fairmint`;
+    const queryParams = new URLSearchParams();
+
+    queryParams.append("asset", asset);
+    queryParams.append("quantity", quantity.toString());
+
+    // Set default options
+    options.allow_unconfirmed_inputs = options.allow_unconfirmed_inputs ?? true;
+    options.return_psbt = options.return_psbt ?? true;
+
+    // Append optional parameters
+    for (const [key, value] of Object.entries(options)) {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, value.toString());
+      }
+    }
+
+    for (const node of xcp_v2_nodes) {
+      const url = `${node.url}${endpoint}?${queryParams.toString()}`;
+      console.log(`Attempting to fetch from URL: ${url}`);
+
+      try {
+        const response = await fetch(url);
+        console.log(`Response status from ${node.name}: ${response.status}`);
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error(`Error response body from ${node.name}: ${errorBody}`);
+          continue; // Try the next node
+        }
+
+        const data = await response.json();
+        console.log(`Successful response from ${node.name}`, data);
+        return data;
+      } catch (error) {
+        console.error(`Fetch error for ${url}:`, error);
+        // Continue to the next node
+      }
+    }
+
+    throw new Error("All nodes failed to compose fairmint transaction.");
+  }
+
+  static async getFairminters(): Promise<Fairminter[]> {
+    const endpoint = "/fairminters";
+    let allFairminters: Fairminter[] = [];
+    let cursor: string | null = null;
+    const limit = 1000;
+
+    while (true) {
+      const queryParams = new URLSearchParams({
+        limit: limit.toString(),
+      });
+      if (cursor) {
+        queryParams.append("cursor", cursor);
+      }
+
+      try {
+        const response = await this.fetchXcpV2WithCache<any>(
+          endpoint,
+          queryParams,
+        );
+
+        if (!response || !Array.isArray(response.result)) {
+          console.log("No more results for fairminters");
+          break;
+        }
+
+        const fairminters = response.result.map((entry: any) => ({
+          tx_hash: entry.tx_hash,
+          tx_index: entry.tx_index,
+          block_index: entry.block_index,
+          source: entry.source,
+          asset: entry.asset,
+          asset_parent: entry.asset_parent,
+          asset_longname: entry.asset_longname,
+          description: entry.description,
+          price: entry.price,
+          quantity_by_price: entry.quantity_by_price,
+          hard_cap: entry.hard_cap,
+          burn_payment: entry.burn_payment,
+          max_mint_per_tx: entry.max_mint_per_tx,
+          premint_quantity: entry.premint_quantity,
+          start_block: entry.start_block,
+          end_block: entry.end_block,
+          minted_asset_commission_int: entry.minted_asset_commission_int,
+          soft_cap: entry.soft_cap,
+          soft_cap_deadline_block: entry.soft_cap_deadline_block,
+          lock_description: entry.lock_description,
+          lock_quantity: entry.lock_quantity,
+          divisible: entry.divisible,
+          pre_minted: entry.pre_minted,
+          status: entry.status,
+          paid_quantity: entry.paid_quantity,
+          confirmed: entry.confirmed,
+        }));
+
+        allFairminters = allFairminters.concat(fairminters);
+
+        if (response.next_cursor && response.next_cursor !== cursor) {
+          cursor = response.next_cursor;
+          console.log(`New cursor for fairminters: ${cursor}`);
+        } else {
+          console.log("No more pages for fairminters");
+          break;
+        }
+      } catch (error) {
+        console.error("Error fetching fairminters:", error);
+        break;
+      }
+    }
+
+    console.log(`Fetched fairminters, Count: ${allFairminters.length}`);
+
+    return allFairminters;
   }
 }
