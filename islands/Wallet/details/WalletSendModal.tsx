@@ -54,14 +54,62 @@ function WalletSendModal({ fee, handleChangeFee, onClose }: Props) {
             handleChangeFee={handleChangeFee}
             recommendedFee={fees?.recommendedFee}
           />
-
-          <p class="text-lg font-light text-[#999999]">
-            ESTIMATE{" "}
-            <span class="font-bold">
-              {(parseFloat(amount) || 0).toFixed(8)}
-            </span>{" "}
-            BTC
-          </p>
+          <div class="flex flex-col">
+            <p class="text-lg font-light text-[#999999]">
+              ESTIMATE{" "}
+              <span class="font-bold">
+                {(parseFloat(amount) || 0).toFixed(8)}
+              </span>{" "}
+              BTC
+            </p>
+            <div class="bg-transparent collapse-arrow">
+              <input
+                type="checkbox"
+                id="collapse-toggle"
+                class="peer hidden"
+              />
+              <label
+                for="collapse-toggle"
+                class="collapse-title text-xl font-medium text-[#999999] cursor-pointer flex items-center gap-1"
+              >
+                DETAILS
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-4 h-4 transition-transform duration-300 block peer-checked:hidden"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="m17 14l-5-5l-5 5"
+                  />
+                </svg>
+              </label>
+              <div class="collapse-content hidden peer-checked:block transition-all duration-300 ease-in-out max-h-0 peer-checked:max-h-screen overflow-hidden">
+                <div class="flex flex-col">
+                  <p class="text-xs font-light text-[#999999]">
+                    BYTES <span className="font-medium">443</span>
+                    {" "}
+                  </p>
+                  <p class="text-xs font-light text-[#999999]">
+                    SATS PR BYTE <span className="font-medium">4</span>
+                    {" "}
+                  </p>
+                  <p class="text-xs font-light text-[#999999]">
+                    MINER FEE <span className="font-medium">4322</span> SATS
+                  </p>
+                  <p class="text-xs font-light text-[#999999]">
+                    SERVICE FEE <span className="font-medium">5555</span> SATS
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <AgreementCheckbox isAgreed={isAgreed} setIsAgreed={setIsAgreed} />
           <ActionButtons
@@ -109,12 +157,14 @@ function AmountInput(
         0 <span className="font-extralight">USD</span>
       </p>
       <p class="text-xs font-medium">MAX</p>
-      <input
+      {
+        /* <input
         value={amount}
         onInput={(e) => setAmount((e.target as HTMLInputElement).value)}
         placeholder="Enter amount"
         class="bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium rounded-md px-6 py-3 w-full outline-none"
-      />
+      /> */
+      }
     </div>
   );
 }
