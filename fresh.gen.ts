@@ -25,6 +25,8 @@ import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
 import * as $api_v2_docs from "./routes/api/v2/docs.ts";
 import * as $api_v2_error from "./routes/api/v2/error.ts";
+import * as $api_v2_fairmint_compose from "./routes/api/v2/fairmint/compose.ts";
+import * as $api_v2_fairmint_index from "./routes/api/v2/fairmint/index.ts";
 import * as $api_v2_health from "./routes/api/v2/health.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src20_op_ from "./routes/api/v2/src20/[...op].ts";
@@ -60,6 +62,7 @@ import * as $collection_index from "./routes/collection/index.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
+import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
 import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/sharedBlockWithStampsHandler.ts";
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
@@ -108,12 +111,14 @@ import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
+import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
+import * as $hooks_useFairmintForm from "./islands/hooks/useFairmintForm.ts";
 import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
 import * as $hooks_useSRC20Form from "./islands/hooks/useSRC20Form.ts";
 import * as $hooks_useURLUpdate from "./islands/hooks/useURLUpdate.ts";
@@ -197,6 +202,8 @@ const manifest = {
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
     "./routes/api/v2/docs.ts": $api_v2_docs,
     "./routes/api/v2/error.ts": $api_v2_error,
+    "./routes/api/v2/fairmint/compose.ts": $api_v2_fairmint_compose,
+    "./routes/api/v2/fairmint/index.ts": $api_v2_fairmint_index,
     "./routes/api/v2/health.ts": $api_v2_health,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/src20/[...op].ts": $api_v2_src20_op_,
@@ -243,6 +250,7 @@ const manifest = {
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/docs/index.tsx": $docs_index,
+    "./routes/fairmint.tsx": $fairmint,
     "./routes/faq/index.tsx": $faq_index,
     "./routes/handlers/sharedBlockWithStampsHandler.ts":
       $handlers_sharedBlockWithStampsHandler,
@@ -301,12 +309,14 @@ const manifest = {
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
+    "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
     "./islands/home/HomeTable.tsx": $home_HomeTable,
+    "./islands/hooks/useFairmintForm.ts": $hooks_useFairmintForm,
     "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
     "./islands/hooks/useSRC20Form.ts": $hooks_useSRC20Form,
     "./islands/hooks/useURLUpdate.ts": $hooks_useURLUpdate,
