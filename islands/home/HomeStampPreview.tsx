@@ -72,7 +72,7 @@ export function HomeStampPreview({
   return (
     <div className="flex flex-col gap-16 md:gap-36">
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl md:text-5xl lg:text-6xl font-black purple-gradient1">
+        <h1 className="text-5xl md:text-5xl lg:text-6xl font-black purple-gradient">
           LATEST ART STAMPS
         </h1>
         <div class="flex flex-col gap-12">
@@ -83,7 +83,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl md:text-5xl lg:text-6xl font-black purple-gradient1">
+        <h1 className="text-5xl md:text-5xl lg:text-6xl font-black purple-gradient bg-clip-text text-transparent">
           COLLECTIONS
         </h1>
         <div class="flex flex-col gap-12">
@@ -94,7 +94,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-5xl md:text-5xl lg:text-6xl  font-black gray-gradient1">
+        <h1 class="text-5xl md:text-5xl lg:text-6xl  font-black gray-gradient">
           FEATURED COLLECTIONS
         </h1>
         <p className="text-[#CCCCCC] text-2xl md:text-5xl font-extralight">
@@ -106,7 +106,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl md:text-5xl lg:text-6xl  font-black purple-gradient1">
+        <h1 className="text-5xl md:text-5xl lg:text-6xl  font-black purple-gradient">
           RECENT SALES
         </h1>
         <div class="flex flex-col gap-12">
