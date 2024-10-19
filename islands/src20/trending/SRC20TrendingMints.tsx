@@ -54,7 +54,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
       />
       <div class="relative overflow-x-auto shadow-md">
         {/* Desktop View */}
-        <div class="hidden md:flex flex-col gap-6">
+        <div class="hidden xl:flex flex-col gap-6 p-2">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
 
@@ -62,7 +62,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
             const progressWidth = `${progress}%`;
 
             return (
-              <div class="dark-gradient text-sm flex justify-between items-center rounded-md">
+              <div class="bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] text-sm flex justify-between items-center rounded-md hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
                 <div class="p-3 uppercase cursor-pointer flex gap-6">
                   <img
                     src={`/content/${src20.tx_hash}.svg`}
@@ -141,7 +141,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
         </div>
 
         {/* Mobile View */}
-        <div class="flex md:hidden flex-col gap-3">
+        <div class="flex xl:hidden flex-col gap-3 p-2">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
 
@@ -149,7 +149,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
             const progressWidth = `${progress}%`;
 
             return (
-              <div class="text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2">
+              <div class="text-[#F5F5F5] bg-gradient-to-r from-transparent to-[#14001F] via-[#1F002E] p-2 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
                 <div class="w-full flex items-center gap-2 mb-2">
                   <img
                     src={`/content/${src20.tx_hash}.svg`}
@@ -159,68 +159,54 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                   />
                   <div class="w-full">
                     <div class="flex justify-between">
-                      <a href={href} class="text-xl">
+                      <a href={href} class="text-xl uppercase">
                         {convertToEmoji(src20.tick)}
                       </a>
-                      <p class="text-sm">
-                        {new Date(src20.block_time).toLocaleString("default", {
-                          month: "short",
-                          year: "numeric",
-                        })}
+                      <p className="text-lg text-[#666666] font-light">
+                        SUPPLY{" "}
+                        <span className="font-bold text-[#999999]">
+                          {Number(src20.max).toLocaleString()}
+                        </span>
                       </p>
                     </div>
-                    <p>
+                    {
+                      /* <p>
                       Block:{" "}
                       <span class="text-lg font-medium">
                         {src20.block_index}
                       </span>
-                    </p>
-                    <div className="flex flex-col gap-1">
+                    </p> */
+                    }
+                    <div className="flex justify-between">
                       <p className="text-lg font-light text-[#999999]">
                         PROGRESS <span className="font-bold">{progress}%</span>
                       </p>
-                      <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
+                      <p className="text-lg text-[#666666] font-light">
+                        LIMIT{" "}
+                        <span className="font-bold text-[#999999]">
+                          {Number(src20.lim).toLocaleString()}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="min-w-[200px] h-1 bg-[#999999] relative rounded-full">
                         <div
                           className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
                           style={{ width: progressWidth }}
                         />
                       </div>
+                      <p className="text-lg text-[#666666] font-light">
+                        MINTERS{" "}
+                        <span className="font-bold text-[#999999]">
+                          {Number(src20.holders).toLocaleString()}
+                        </span>
+                      </p>
                     </div>
                   </div>
                 </div>
-                <div class="w-full flex justify-between">
-                  <p className="text-lg text-[#666666] font-light">
-                    SUPPLY{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.max).toLocaleString()}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    LIMIT{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.lim).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-                <div class="w-full flex justify-between">
-                  <p className="text-lg text-[#666666] font-light">
-                    DEPLOY{" "}
-                    <span className="font-bold text-[#999999]">
-                      {new Date(src20.block_time).toLocaleString("default", {
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </p>
-                  <p className="text-lg text-[#666666] font-light">
-                    HOLDERS{" "}
-                    <span className="font-bold text-[#999999]">
-                      {Number(src20.holders).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
                 {/* Mint Button */}
-                <div class="w-full flex justify-end mt-2">
+                {
+                  /* <div class="w-full flex justify-end mt-2">
                   <a
                     href={`/stamping/src20/mint?tick=${
                       encodeURIComponent(
@@ -232,7 +218,8 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                       Mint
                     </button>
                   </a>
-                </div>
+                </div> */
+                }
               </div>
             );
           })}
