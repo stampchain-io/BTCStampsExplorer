@@ -22,7 +22,7 @@ const navLinks: NavLink[] = [
     href: "#",
     subLinks: [
       { title: "ALL", href: "/src20" },
-      { title: "TRENDY", href: "/src20?type=trending" },
+      { title: "TRENDING", href: "/src20?type=trending" },
       { title: "DEPLOY", href: "/stamping/src20/deploy" },
       { title: "MINT", href: "/stamping/src20/mint" },
       { title: "TRANSFER", href: "/stamping/src20/transfer" },

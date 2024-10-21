@@ -70,7 +70,7 @@ export const StampHeader = (
             "pixel",
             "vector",
             "for sale",
-            "trendy sales",
+            "trending sales",
             "sold",
           ]}
         />

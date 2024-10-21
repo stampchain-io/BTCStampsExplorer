@@ -14,7 +14,7 @@ export type STAMP_FILTER_TYPES =
   | "pixel"
   | "vector"
   | "for sale"
-  | "trendy sales"
+  | "trending sales"
   | "sold";
 export type STAMP_SUFFIX_FILTERS =
   | "gif"
@@ -34,7 +34,7 @@ export type SRC20_TYPES =
 
 export type SRC20_FILTER_TYPES =
   | "minting"
-  | "trendy mints"
+  | "trending mints"
   | "deploy"
   | "supply"
   | "marketcap"
