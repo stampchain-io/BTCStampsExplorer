@@ -279,7 +279,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
         <button
           type="button"
           ref={buttonRef}
-          onClick={toggleModal}
+          // onClick={toggleModal}
           class={`${
             isConnected.value && address
               ? "text-[#8800CC] border-[#8800CC] border-2 rounded-md"
@@ -292,7 +292,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
         </button>
 
         {isConnected.value && address && (
-          <div class="absolute top-full left-0 mt-2 pt-1 bg-black text-[#8800CC] border-[#8800CC] border-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="absolute z-1000 top-full left-0 mt-2 pt-1 bg-black text-[#8800CC] border-[#8800CC] border-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <a
               href={isConnected.value && address ? `/wallet/${address}` : "#"}
               class="px-4 py-2 text-center hover:text-[#AA00FF] cursor-pointer"
