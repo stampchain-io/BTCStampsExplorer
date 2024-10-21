@@ -65,7 +65,7 @@ export const SRC20Header = (
             handleOpen={handleOpen1}
             filterButtons={[
               "minting",
-              "trendy mints",
+              "trending mints",
               "deploy",
               "supply",
               "marketcap",

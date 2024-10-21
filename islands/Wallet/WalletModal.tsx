@@ -271,15 +271,49 @@ export const WalletModal = ({ connectors = [] }: Props) => {
   };
 
   return (
-    <div className="relative" ref={modalRef}>
-      <button
-        ref={buttonRef}
-        onClick={toggleModal}
-        class="bg-[#8800CC] hover:bg-[#9911DD] px-5 py-3 rounded font-black text-[#080808]"
-        type="button"
-      >
-        {isConnected.value && address ? abbreviateAddress(address) : "CONNECT"}
-      </button>
+    <div
+      className="relative "
+      ref={modalRef}
+    >
+      <div class="relative inline-block group ">
+        <button
+          type="button"
+          ref={buttonRef}
+          onClick={toggleModal}
+          class={`${
+            isConnected.value && address
+              ? "text-[#8800CC] border-[#8800CC] border-2 rounded-md"
+              : "bg-[#8800CC] hover:bg-[#9911DD] text-[#080808] "
+          }  px-5 py-3 rounded font-black`}
+        >
+          {isConnected.value && address
+            ? abbreviateAddress(address)
+            : "CONNECT"}
+        </button>
+
+        {isConnected.value && address && (
+          <div class="absolute top-full left-0 mt-2 pt-1 bg-black text-[#8800CC] border-[#8800CC] border-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <a
+              href={isConnected.value && address ? `/wallet/${address}` : "#"}
+              class="px-4 py-2 text-center hover:text-[#AA00FF] cursor-pointer"
+            >
+              DASHBOARD
+            </a>
+            <button
+              onClick={() => {
+                disconnect();
+                if (path === "wallet" && typeof globalThis !== "undefined") {
+                  globalThis.history.pushState({}, "", "/");
+                  globalThis.location.reload();
+                }
+              }}
+              class="px-4 py-2 text-center hover:text-[#AA00FF] cursor-pointer"
+            >
+              SIGN OUT
+            </button>
+          </div>
+        )}
+      </div>
 
       {isModalOpen && !isConnected.value && (
         <ConnectorsModal

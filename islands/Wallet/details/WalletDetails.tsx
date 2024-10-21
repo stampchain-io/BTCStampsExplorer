@@ -3,6 +3,7 @@ import { useState } from "preact/hooks";
 import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletData } from "$lib/types/index.d.ts";
+import { Button } from "$components/Button.tsx";
 
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated }: {
@@ -18,7 +19,7 @@ function WalletDetails(
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row gap-6 items-stretch">
+      <div className="flex flex-col gap-6 items-stretch">
         <WalletOverview
           walletData={{ ...walletData, fee }}
           onSend={() => setIsSendModalOpen(true)}
@@ -56,44 +57,62 @@ function WalletOverview(
     onReceive: () => void;
   },
 ) {
+  const [hideBalance, setHideBalance] = useState<boolean>(false);
+
+  const copy = async () => {
+    if (!hideBalance) {
+      await navigator.clipboard.writeText(walletData.address);
+    }
+  };
+
   return (
-    <div className="w-full lg:w-1/2 dark-gradient flex flex-col justify-between p-6">
+    <div className="w-full dark-gradient flex flex-col justify-between p-6">
       <div className="flex justify-between">
-        <div>
-          <p className="text-[#999999] text-5xl">
-            <span className="font-light">{walletData.balance}</span>
+        <div className={`${hideBalance ? "blur-sm" : ""}`}>
+          <p className="text-[#999999] text-5xl select-none">
+            <span className="font-light">
+              {hideBalance ? "***" : walletData.balance}
+            </span>
             &nbsp;
             <span className="font-extralight">BTC</span>
           </p>
-          <p className="text-[#666666] text-2xl">
-            {walletData.usdValue.toLocaleString()} USD
+          <p className="text-[#666666] text-2xl  select-none">
+            {hideBalance ? "******" : walletData.usdValue.toLocaleString()} USD
           </p>
-          <p className="text-[#8800CC] font-medium">{walletData.address}</p>
         </div>
         <div>
-          <img
-            src="/img/wallet/icon-hide-balance.svg"
-            className="w-8 h-8"
-            alt="Hide balance"
-          />
+          <button class="" onClick={() => setHideBalance(!hideBalance)}>
+            {hideBalance
+              ? (
+                <img
+                  src="/img/wallet/icon-unhide-balance.svg"
+                  className="w-8 h-8"
+                  alt="Hide balance"
+                />
+              )
+              : (
+                <img
+                  src="/img/wallet/icon-hide-balance.svg"
+                  className="w-8 h-8"
+                  alt="Hide balance"
+                />
+              )}
+          </button>
         </div>
       </div>
       <div className="flex justify-between">
-        <div>
-          <p className="text-lg">
-            <span className="text-[#666666]">FEE</span>
-            &nbsp;
-            <span className="text-[#999999]">{walletData.fee} SAT/vB</span>
-          </p>
-          <p className="text-lg">
-            <span className="text-[#666666]">BTC</span>
-            &nbsp;
-            <span className="text-[#999999]">
-              {walletData.btcPrice.toLocaleString()} USD
-            </span>
+        <div className="flex items-center">
+          <p className="text-[#8800CC] font-medium select-none sm:block md:text-sm text-xs hidden">
+            {walletData.address}
           </p>
         </div>
         <div className="flex gap-3">
+          <img
+            src="/img/wallet/icon-copy.svg"
+            className="w-8 h-8 cursor-pointer"
+            alt="Copy"
+            onClick={copy}
+          />
           <img
             src="/img/wallet/icon-arrow-square-out.svg"
             className="w-8 h-8 cursor-pointer"
@@ -106,6 +125,16 @@ function WalletOverview(
             alt="Receive"
             onClick={onReceive}
           />
+          <a
+            href={`https://mempool.space/address/${walletData.address}`}
+            target="_blank"
+          >
+            <img
+              src="/img/wallet/icon-history.svg"
+              className="w-8 h-8 cursor-pointer"
+              alt="History"
+            />
+          </a>
         </div>
       </div>
     </div>
@@ -120,8 +149,9 @@ function WalletStats(
   },
 ) {
   return (
-    <div className="w-full lg:w-1/2 flex flex-col gap-6">
+    <div className="w-full flex flex-col md:flex-row gap-6">
       <StampStats stampsTotal={stampsTotal} stampsCreated={stampsCreated} />
+      <DispenserStats />
       <TokenStats src20Total={src20Total} />
     </div>
   );
@@ -134,25 +164,21 @@ function StampStats(
   },
 ) {
   return (
-    <div className="dark-gradient p-6 flex flex-col gap-6">
+    <div className="w-full dark-gradient p-6 flex flex-col gap-6">
       <div className="flex justify-between">
         <StatItem label="STAMPS" value={stampsTotal.toString()} />
-        <StatItem
-          label="VALUE"
-          value={
-            <>
-              <span className="font-light">
-                N/A
-              </span>&nbsp;<span className="font-extralight">BTC</span>
-            </>
-          }
-          align="right"
-        />
-      </div>
-      <div className="flex justify-between">
         <StatItem label="BY ME" value={stampsCreated.toString()} />
-        <StatItem label="DISPENSERS" value="N/A" align="center" />
-        <StatItem label="TOTAL SOLD" value="N/A" align="right" />
+      </div>
+    </div>
+  );
+}
+
+function DispenserStats() {
+  return (
+    <div className="w-full dark-gradient p-6 flex flex-col gap-6">
+      <div className="flex justify-between">
+        <StatItem label="DISPENSERS" value="N/A" align="left" />
+        <StatItem label="SOLD" value="N/A" align="right" />
       </div>
     </div>
   );
@@ -160,7 +186,7 @@ function StampStats(
 
 function TokenStats({ src20Total }: { src20Total: number }) {
   return (
-    <div className="dark-gradient flex justify-between p-6">
+    <div className="w-full dark-gradient flex justify-between p-6">
       <StatItem label="TOKENS" value={src20Total.toString()} />
       <StatItem
         label="VALUE"
