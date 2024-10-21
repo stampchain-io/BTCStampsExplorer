@@ -20,7 +20,7 @@ export const UploadImageHeader = () => {
     console.log("wallet", wallet);
     if (
       wallet === null
-    ) window.location.href = "/upload";
+    ) globalThis.location.href = "/upload";
   }, [wallet]);
 
   return (

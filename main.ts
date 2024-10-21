@@ -4,24 +4,23 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import "$std/dotenv/load.ts";
-
+import "$/globals.d.ts";
 import { start } from "$fresh/server.ts";
-import manifest from "./fresh.gen.ts";
-import config from "./fresh.config.ts";
-import { conf } from "utils/config.ts";
-import { connectToRedisInBackground as ConnectRedis } from "utils/cache.ts";
+import build from "$fresh/dev.ts";
+import manifest from "$/fresh.gen.ts";
+import config from "$/fresh.config.ts";
 
-async function startApp() {
-  if (conf.CACHE?.toLowerCase() === "true") {
-    console.log("Initiating Connection to Redis");
-    ConnectRedis();
+import "$server/database/db.ts";
+
+if (import.meta.main) {
+  if (Deno.args.includes("build")) {
+    console.log("Running build...");
+    globalThis.SKIP_REDIS_CONNECTION = true;
+    await build(import.meta.url, "./main.ts", config);
+    console.log("Build completed.");
+    Deno.exit(0);
+  } else {
+    console.log("Starting server...");
+    await start(manifest, config);
   }
-  // Start your server
-  await start(manifest, config);
 }
-
-startApp().catch((error) => {
-  console.error("Failed to start application:", error);
-  Deno.exit(1);
-});

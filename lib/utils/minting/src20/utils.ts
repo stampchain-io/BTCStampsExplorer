@@ -1,17 +1,24 @@
 import * as bitcoin from "bitcoin";
 import { estimateInputSize } from "./utxo-selector.ts";
+import { UTXO } from "$lib/types/index.d.ts";
 
 const MAX_RETRIES = 3;
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
+const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
 
-export function isValidBitcoinAddress(address) {
-  try {
-    bitcoin.address.toOutputScript(address);
-    return true;
-  } catch (e) {
-    return false;
-  }
+export function isValidBitcoinAddress(address: string): boolean {
+  const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // Legacy P2PKH
+  const p2shRegex = /^3[1-9A-HJ-NP-Za-km-z]{25,34}$/; // P2SH
+  const bech32Regex = /^(bc1q)[0-9a-z]{38,59}$/; // Bech32 P2WPKH
+  const taprootRegex = /^(bc1p)[0-9a-z]{58}$/; // Bech32m P2TR (Taproot)
+
+  return (
+    p2pkhRegex.test(address) ||
+    p2shRegex.test(address) ||
+    bech32Regex.test(address) ||
+    taprootRegex.test(address)
+  );
 }
 
 function reverseEndian(hexString: string): string {
@@ -25,45 +32,45 @@ function reverseEndian(hexString: string): string {
   return result;
 }
 
-// export async function fetchPricefromBlockCypherAPI(
-//   tx_hash: string,
-//   source: string,
-// ): Promise<number | null> {
-//   // lookup tx_hash details from api, look in the outputs  key to match the source var
-//   // with the outputs key addresses and return satoshirate from the addresses value that mamtches the
-//   // source var - the returned value is  the sale price of the dispense
-//   // {
-//   // "outputs": [
-//   //   {
-//   //     "value": 85380,
-//   //     "script": "0014b991d97a78403dfe523f721a7bdc61f2636d4b35",
-//   //     "addresses": [
-//   //       "bc1qhxgaj7ncgq7lu53lwgd8hhrp7f3k6je4mzmp8r"
-//   //     ],
-//   //     "script_type": "pay-to-witness-pubkey-hash"
-//   //   }, ...
-//   //  ]
-//   try {
-//     const endpoint = `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/txs/${tx_hash}`;
-//     const response = await fetch(endpoint);
-//     const data = await response.json();
-//     if (data.error) {
-//       throw new Error(data.error);
-//     }
-//     const outputs = data.outputs;
-//     for (const output of outputs) {
-//       if (output.addresses.includes(source)) {
-//         return output.value;
-//       }
-//     }
-//     return null;
-//   } catch (error) {
-//     console.error(error);
-//     return null;
-//   }
-// }
+function formatUTXOs(data: any[], address: string): UTXO[] {
+  return data.map((tx: any) => {
+    let txid = tx.txid ?? tx.tx_hash;
+    if (tx.tx_hash) {
+      // Reverse endianness for APIs that provide tx_hash in big-endian
+      txid = reverseEndian(tx.tx_hash);
+    }
+    const vout = tx.vout ?? tx.tx_output_n ?? tx.n;
+    if (typeof vout === "undefined") {
+      throw new Error(
+        `UTXO is missing 'vout' information: ${JSON.stringify(tx)}`,
+      );
+    }
+    const value = tx.value ?? tx.amount ?? tx.value_sat;
+    if (typeof value === "undefined") {
+      throw new Error(
+        `UTXO is missing 'value' information: ${JSON.stringify(tx)}`,
+      );
+    }
+    return {
+      txid,
+      vout,
+      value,
+      address: address,
+      script: tx.script ?? tx.scriptpubkey,
+      size: tx.size ?? estimateInputSize(tx.script ?? tx.scriptpubkey),
+      status: {
+        confirmed: tx.status?.confirmed ?? tx.confirmations > 0,
+        block_height: tx.status?.block_height ?? tx.block_height,
+        block_hash: tx.status?.block_hash ?? tx.block_hash,
+        block_time: tx.status?.block_time ??
+          (tx.confirmed ? new Date(tx.confirmed).getTime() : undefined),
+      },
+      index: tx.tx_index ?? vout,
+    };
+  });
+}
 
-async function fetchUTXOsFromBlockchainAPI(address: string) {
+async function fetchUTXOsFromBlockchainAPI(address: string): Promise<UTXO[]> {
   try {
     const endpoint = `${BLOCKCHAIN_API_BASE_URL}/unspent?active=${address}`;
     const response = await fetch(endpoint);
@@ -71,32 +78,30 @@ async function fetchUTXOsFromBlockchainAPI(address: string) {
     if (data.error) {
       throw new Error(data.message);
     }
-    const formatedUtxos = data.unspent_outputs.map((tx: UTXOFromBlockchain) => {
-      const formatedUTXO: UTXO = {
-        txid: tx.tx_hash_big_endian,
-        tx_hash: tx.tx_hash,
-        vout: tx.tx_output_n,
-        status: {
-          confirmed: tx.confirmations > 0,
-          block_height: undefined,
-          block_hash: undefined,
-          block_time: undefined,
-        },
-        value: tx.value,
-        script: tx.script,
-        index: tx.tx_index,
-        size: estimateInputSize(tx.script),
-      };
-      return formatedUTXO;
-    });
-    return formatedUtxos;
+    return formatUTXOs(data.unspent_outputs, address);
   } catch (error) {
     console.error(error);
-    return null;
+    return [];
   }
 }
 
-async function fetchUTXOsFromBlockCypherAPI(address: string) {
+async function fetchUTXOsFromBlockstreamAPI(address: string): Promise<UTXO[]> {
+  try {
+    const endpoint = `https://blockstream.info/api/address/${address}/utxo`;
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    if (Array.isArray(data) && data.length > 0) {
+      return formatUTXOs(data, address);
+    } else {
+      throw new Error("No UTXOs found");
+    }
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+async function fetchUTXOsFromBlockCypherAPI(address: string): Promise<UTXO[]> {
   try {
     const endpoint =
       `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/addrs/${address}?unspentOnly=true&includeScript=true`;
@@ -105,27 +110,31 @@ async function fetchUTXOsFromBlockCypherAPI(address: string) {
     if (data.error) {
       throw new Error(data.error);
     }
-    const formatedUtxos = data.txrefs.map((tx: UTXOFromBlockCypher) => {
-      const formatedUTXO: UTXO = {
-        txid: reverseEndian(tx.tx_hash),
-        tx_hash: tx.tx_hash,
-        vout: tx.tx_output_n,
-        status: {
-          confirmed: tx.confirmations > 0,
-          block_height: tx.block_height,
-          block_hash: undefined,
-          block_time: new Date(tx.confirmed).getTime(),
-        },
-        value: tx.value,
-        script: tx.script,
-        size: estimateInputSize(tx.script),
-      };
-      return formatedUTXO;
-    });
-    return formatedUtxos;
+    if (!data.txrefs) {
+      console.warn("No UTXOs found in data.txrefs");
+      return [];
+    }
+    return formatUTXOs(data.txrefs, address);
   } catch (error) {
     console.error(error);
-    return null;
+    return [];
+  }
+}
+
+async function fetchUTXOsFromMempoolAPI(address: string): Promise<UTXO[]> {
+  try {
+    const endpoint = `${MEMPOOL_API_BASE_URL}/address/${address}/utxo`;
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    if (Array.isArray(data) && data.length > 0) {
+      return formatUTXOs(data, address);
+    } else {
+      console.warn("No UTXOs found in Mempool.space API");
+      return [];
+    }
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 }
 
@@ -134,18 +143,44 @@ export async function getUTXOForAddress(
   retries = 0,
 ): Promise<UTXO[] | null> {
   try {
-    let utxos = await fetchUTXOsFromBlockchainAPI(address);
-    if (!utxos || utxos.length === 0) {
-      utxos = await fetchUTXOsFromBlockCypherAPI(address);
+    const utxos = await fetchUTXOsFromMempoolAPI(address);
+    if (utxos.length > 0) {
+      return utxos;
     }
-    return utxos;
   } catch (error) {
-    if (retries < MAX_RETRIES) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return await getUTXOForAddress(address, retries + 1);
-    } else {
-      console.error(error);
-      return null;
+    console.error("Mempool API failed:", error);
+  }
+  try {
+    const utxos = await fetchUTXOsFromBlockstreamAPI(address);
+    if (utxos.length > 0) {
+      return utxos;
     }
+  } catch (error) {
+    console.error("Blockstream API failed:", error);
+  }
+  try {
+    const utxos = await fetchUTXOsFromBlockchainAPI(address);
+    if (utxos.length > 0) {
+      return utxos;
+    }
+  } catch (error) {
+    console.error("Blockchain API failed:", error);
+  }
+
+  try {
+    const utxos = await fetchUTXOsFromBlockCypherAPI(address);
+    if (utxos.length > 0) {
+      return utxos;
+    }
+  } catch (error) {
+    console.error("BlockCypher API failed:", error);
+  }
+
+  if (retries < MAX_RETRIES) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return await getUTXOForAddress(address, retries + 1);
+  } else {
+    console.error("All API calls failed");
+    return null;
   }
 }

@@ -1,208 +1,253 @@
-import * as bitcoin from "bitcoin";
-import * as bitcore from "bitcore";
+// lib/utils/minting/src20/tx.ts
+
+import * as bitcoin from "bitcoinjs-lib";
+import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
-
-import { get_transaction } from "utils/quicknode.ts";
-import {
-  address_from_pubkeyhash,
-  bin2hex,
-  hex2bin,
-  scramble,
-} from "utils/minting/utils.ts";
-import { IPrepareSRC20TX, PSBTInput, VOUT } from "./src20.d.ts";
-
 import { selectUTXOs } from "./utxo-selector.ts";
-import { compressWithCheck } from "../zlib.ts";
-import { conf } from "utils/config.ts";
+import { arc4, bin2hex, hex2bin } from "utils/minting/utils.ts";
+import { compressWithCheck } from "utils/minting/zlib.ts";
+import { serverConfig } from "$server/config/config.ts";
+import { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/index.d.ts";
+import { getTransaction } from "utils/quicknode.ts";
+import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
+import * as msgpack from "msgpack";
 
-const DUST_SIZE = 777;
+const RECIPIENT_DUST = 789;
+const MULTISIG_DUST = 809;
+const CHANGE_DUST = 1000;
+const THIRD_PUBKEY =
+  "020202020202020202020202020202020202020202020202020202020202020202";
 
 export const prepareSrc20TX = async ({
   network,
-  utxos,
   changeAddress,
   toAddress,
   feeRate,
   transferString,
-  publicKey,
+  enableRBF = true,
 }: IPrepareSRC20TX) => {
-  console.log("prepareSrc20TX inputs", {
-    network,
-    utxos,
-    changeAddress,
-    toAddress,
-    feeRate,
-    transferString,
-    publicKey,
-  });
+  try {
+    console.log("Starting prepareSrc20TX");
+    const psbtNetwork = network === "testnet"
+      ? bitcoin.networks.testnet
+      : bitcoin.networks.bitcoin;
+    console.log("Using network:", psbtNetwork);
 
-  const psbtNetwork = network === "testnet"
-    ? bitcoin.networks.testnet
-    : bitcoin.networks.bitcoin;
-  console.log("psbtNetwork", psbtNetwork);
+    const psbt = new bitcoin.Psbt({ network: psbtNetwork });
 
-  const psbt = new bitcoin.Psbt({ network: psbtNetwork });
-  const sortedUtxos = utxos.sort((a, b) => b.value - a.value); // TODO: check for pending trx on this UTXO
-  console.log("sortedUtxos", sortedUtxos);
-
-  const vouts: VOUT[] = [{ address: toAddress, value: 789 }];
-  let transferHex = await compressWithCheck(`stamp:${transferString}`);
-  console.log("Initial transferHex", transferHex);
-
-  const count = (transferHex.length / 2).toString(16);
-  let padding = "";
-  for (let i = count.length; i < 4; i++) {
-    padding += "0";
-  }
-  transferHex = padding + count + transferHex;
-
-  const remaining = transferHex.length % (62 * 2);
-  if (remaining > 0) {
-    for (let i = 0; i < 62 * 2 - remaining; i++) {
-      transferHex += "0";
+    // Fetch UTXOs
+    const utxos = await getUTXOForAddress(changeAddress);
+    if (!utxos || utxos.length === 0) {
+      throw new Error("No UTXOs found for the given address");
     }
-  }
-  console.log("Initial transferHex", transferHex);
 
-  const encryption = bin2hex(
-    scramble(hex2bin(sortedUtxos[0].txid), hex2bin(transferHex)),
-  );
-  let chunks = [];
-  for (let i = 0; i < encryption.length; i = i + 62 * 2) {
-    chunks.push(encryption.substring(i, i + 62 * 2));
-  }
-  chunks = chunks.map((datachunk) => {
-    const pubkey_seg1 = datachunk.substring(0, 62);
-    const pubkey_seg2 = datachunk.substring(62, 124);
-    let second_byte;
-    let pubkeyhash;
-    let address1 = "";
-    let address2 = "";
-    let hash1;
-    while (address1.length == 0) {
-      const first_byte = Math.random() > 0.5 ? "02" : "03";
-      second_byte = crypto.randomBytes(1).toString("hex");
-      pubkeyhash = first_byte + pubkey_seg1 + second_byte;
+    let transferDataBytes: Uint8Array;
+    const stampPrefixBytes = new TextEncoder().encode("stamp:");
 
-      if (bitcore.default.PublicKey.isValid(pubkeyhash)) {
-        hash1 = pubkeyhash;
-        address1 = address_from_pubkeyhash(pubkeyhash);
-      }
-    }
-    let hash2;
-    console.log("Chunks", chunks);
+    const transferData = JSON.parse(transferString);
+    const msgpackData = msgpack.encode(transferData);
+    const { compressedData, compressed } = await compressWithCheck(msgpackData);
 
-    while (address2.length == 0) {
-      const first_byte = Math.random() > 0.5 ? "02" : "03";
-      second_byte = crypto.randomBytes(1).toString("hex");
-      pubkeyhash = first_byte + pubkey_seg2 + second_byte;
-
-      if (bitcore.default.PublicKey.isValid(pubkeyhash)) {
-        hash2 = pubkeyhash;
-        address2 = address_from_pubkeyhash(pubkeyhash);
-      }
-    }
-    const data_hashes = [hash1, hash2];
-    return data_hashes;
-  });
-
-  const cpScripts = chunks.map((each) => {
-    return `5121${each[0]}21${
-      each[1]
-    }2102020202020202020202020202020202020202020202020202020202020202020253ae`;
-  });
-  for (const cpScriptHex of cpScripts) {
-    vouts.push({
-      script: Buffer.from(cpScriptHex, "hex"),
-      value: DUST_SIZE,
-    });
-  }
-  console.log("cpScripts", cpScripts);
-
-  if (parseInt(conf.MINTING_SERVICE_FEE_ENABLED) === 1) {
-    const feeAddress = conf.MINTING_SERVICE_FEE_ADDRESS;
-    const feeAmount = parseInt(conf.MINTING_SERVICE_FEE_FIXED_SATS);
-    vouts.push({
-      address: feeAddress,
-      value: feeAmount,
-    });
-  }
-
-  let feeTotal = 0;
-  for (const vout of vouts) {
-    feeTotal += vout.value;
-  }
-
-  const { inputs, fee, change } = selectUTXOs(sortedUtxos, vouts, feeRate);
-  if (!inputs) {
-    throw new Error(`Not enough BTC balance`);
-  }
-
-  for (const input of inputs) {
-    const txDetails = await get_transaction(input.txid);
-    const inputDetails = txDetails.vout[input.vout];
-    const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
-
-    const psbtInput: PSBTInput = {
-      hash: input.txid,
-      index: input.vout,
-    };
-    if (isWitnessUtxo) {
-      psbtInput.witnessUtxo = {
-        script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
-        value: input.value,
-      };
+    if (compressed) {
+      // Compression successful
+      transferDataBytes = compressedData;
     } else {
-      psbtInput.nonWitnessUtxo = Buffer.from(txDetails.hex, "hex");
+      // Compression failed, use original JSON data
+      transferDataBytes = new TextEncoder().encode(
+        JSON.stringify(transferData),
+      );
     }
 
-    // 3xxxx: needs to add redeem for p2sh
-    if (changeAddress.startsWith("3")) {
-      const redeem = bitcoin.payments.p2wpkh({
-        pubkey: Buffer.from(publicKey, "hex"),
-      });
-      psbtInput.redeemScript = redeem.output;
+    // Add stamp prefix
+    const dataWithPrefix = new Uint8Array([
+      ...stampPrefixBytes,
+      ...transferDataBytes,
+    ]);
+
+    // Calculate the length of the data (including the "stamp:" prefix)
+    // but excluding any trailing null bytes
+    let dataLength = dataWithPrefix.length;
+    while (dataLength > 0 && dataWithPrefix[dataLength - 1] === 0) {
+      dataLength--;
     }
-    psbt.addInput(psbtInput);
-  }
-  for (const vout of vouts) {
-    psbt.addOutput(vout);
-  }
-  psbt.addOutput({
-    address: changeAddress,
-    value: change,
-  });
 
-  const psbtHex = psbt.toHex();
-  console.log("Final vouts", vouts);
-  console.log("Fee total", feeTotal);
+    // Add 2-byte length prefix (big-endian)
+    const lengthPrefix = new Uint8Array([
+      (dataLength >> 8) & 0xff, // High byte
+      dataLength & 0xff, // Low byte
+    ]);
+    console.log("length", lengthPrefix);
 
-  // note!!!!!
-  // -- selectSrc20UTXOs needs to be updated to properly estimate fee before going live! (more accurate fee estimation now with sigops estimated with 2.5X)
-  // -- getTransaction needs to be updated, should use local node probably before going live! (Using quicknode now for getTransaction)
-  // -- this psbt will need to be signed! (Signed on the client side)
-  return {
-    hex: psbtHex,
-    fee: fee,
-    change: change,
-  };
+    let payloadBytes = new Uint8Array([
+      ...lengthPrefix,
+      ...dataWithPrefix,
+    ]);
+
+    // Pad the data to multiple of 62 bytes
+    const padLength = (62 - (payloadBytes.length % 62)) % 62;
+    if (padLength > 0) {
+      const padding = new Uint8Array(padLength); // zeros
+      payloadBytes = new Uint8Array([...payloadBytes, ...padding]);
+    }
+    console.log("Padded payload:", bin2hex(payloadBytes));
+
+    // ARC4 encode using the first UTXO's txid as the key
+    const txidBytes = hex2bin(utxos[0].txid); // Uint8Array
+    console.log("ARC4 key (hex):", bin2hex(txidBytes));
+
+    // Use the arc4 function for encryption
+    const encryptedDataBytes = arc4(txidBytes, payloadBytes);
+    console.log("Encrypted data (hex):", bin2hex(encryptedDataBytes));
+
+    // Split encrypted data into chunks of 62 bytes
+    const chunks: Uint8Array[] = [];
+    for (let i = 0; i < encryptedDataBytes.length; i += 62) {
+      chunks.push(encryptedDataBytes.slice(i, i + 62));
+    }
+
+    const multisigScripts = chunks.map((chunk) => {
+      const pubkey_seg1 = bin2hex(chunk.slice(0, 31)); // First 31 bytes (62 hex chars)
+      const pubkey_seg2 = bin2hex(chunk.slice(31, 62)); // Next 31 bytes (62 hex chars)
+      let pubkey1: string, pubkey2: string;
+
+      do {
+        const first_byte = Math.random() > 0.5 ? "02" : "03";
+        const second_byte = crypto.randomBytes(1)[0]
+          .toString(16)
+          .padStart(2, "0");
+        pubkey1 = first_byte + pubkey_seg1 + second_byte;
+      } while (!isValidPubkey(pubkey1));
+
+      do {
+        const first_byte = Math.random() > 0.5 ? "02" : "03";
+        const second_byte = crypto.randomBytes(1)[0]
+          .toString(16)
+          .padStart(2, "0");
+        pubkey2 = first_byte + pubkey_seg2 + second_byte;
+      } while (!isValidPubkey(pubkey2));
+
+      return `5121${pubkey1}21${pubkey2}21${THIRD_PUBKEY}53ae`;
+    });
+
+    // Prepare outputs
+    const vouts: VOUT[] = [
+      { address: toAddress, value: RECIPIENT_DUST },
+      ...multisigScripts.map((script) => ({
+        script: Buffer.from(script, "hex"),
+        value: MULTISIG_DUST,
+      })),
+    ];
+
+    // Add minting service fee if enabled
+    if (parseInt(serverConfig.MINTING_SERVICE_FEE_ENABLED || "0", 10) === 1) {
+      const feeAddress = serverConfig.MINTING_SERVICE_FEE_ADDRESS || "";
+      const feeAmount = parseInt(
+        serverConfig.MINTING_SERVICE_FEE_FIXED_SATS || "0",
+        10,
+      );
+      vouts.push({ address: feeAddress, value: feeAmount });
+    }
+
+    // Select UTXOs
+    const {
+      inputs: selectedUtxos,
+      change,
+      fee: estimatedFee,
+    } = selectUTXOs(utxos, vouts, feeRate);
+
+    if (selectedUtxos.length === 0) {
+      throw new Error("Unable to select suitable UTXOs for the transaction");
+    }
+
+    // Add inputs to PSBT
+    for (const input of selectedUtxos) {
+      const txDetails = await getTransaction(input.txid);
+
+      // Check if txDetails and txDetails.vout are defined
+      if (!txDetails || !txDetails.vout) {
+        throw new Error(
+          `Transaction details not found for txid: ${input.txid}`,
+        );
+      }
+
+      const inputDetails = txDetails.vout[input.vout];
+
+      // Check if inputDetails is defined
+      if (!inputDetails) {
+        throw new Error(
+          `No vout found at index ${input.vout} for transaction ${input.txid}`,
+        );
+      }
+
+      const isWitnessUtxo = inputDetails.scriptPubKey?.type?.startsWith(
+        "witness",
+      );
+
+      // Ensure scriptPubKey and type are defined
+      if (typeof isWitnessUtxo === "undefined") {
+        throw new Error(
+          `scriptPubKey.type is undefined for txid: ${input.txid}, vout: ${input.vout}`,
+        );
+      }
+
+      const psbtInput: PSBTInput = {
+        hash: input.txid,
+        index: input.vout,
+        sequence: enableRBF ? 0xfffffffd : 0xffffffff, // Set sequence for RBF
+      };
+
+      if (isWitnessUtxo) {
+        psbtInput.witnessUtxo = {
+          script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
+          value: input.value,
+        };
+      } else {
+        psbtInput.nonWitnessUtxo = Buffer.from(txDetails.hex, "hex");
+      }
+
+      psbt.addInput(psbtInput);
+    }
+
+    // Add outputs to PSBT
+    vouts.forEach((vout) => {
+      if ("address" in vout && vout.address) {
+        psbt.addOutput({ address: vout.address, value: vout.value });
+      } else if ("script" in vout && vout.script) {
+        psbt.addOutput({ script: vout.script, value: vout.value });
+      }
+    });
+
+    // Add change output
+    if (change > CHANGE_DUST) {
+      psbt.addOutput({ address: changeAddress, value: change });
+    }
+
+    const psbtHex = psbt.toHex();
+
+    console.log("Final transaction details:");
+    console.log("Inputs:", selectedUtxos);
+    console.log("Outputs:", vouts);
+    console.log("Change:", change);
+    console.log("Fee:", estimatedFee);
+
+    return {
+      psbtHex,
+      fee: estimatedFee,
+      change,
+      inputsToSign: selectedUtxos.map((_, index) => ({ index })),
+    };
+  } catch (error) {
+    console.error("Error in prepareSrc20TX:", error);
+    throw error;
+  }
 };
 
-// const address = "address_here_to_test";
-// const pubKey = await get_public_key_from_address(address);
-// const utxos = await getUTXOForAddress(address);
-// if (!utxos || utxos.length === 0) {
-//   throw new Error("No UTXO found");
-// }
-// const psbt = await prepareSrc20TX({
-//   network: "mainnet",
-//   utxos,
-//   changeAddress: address,
-//   toAddress: address,
-//   feeRate: 70,
-//   transferString:
-//     '{"p": "src-20","op": "deploy","tick": "PSBT","max": "21000000", "lim": "10000"}',
-//   publicKey: pubKey,
-// });
-// console.log(psbt);
+function isValidPubkey(pubkey: string): boolean {
+  try {
+    const pubkeyBuffer = Buffer.from(pubkey, "hex");
+    return ecc.isPoint(pubkeyBuffer);
+  } catch {
+    return false;
+  }
+}

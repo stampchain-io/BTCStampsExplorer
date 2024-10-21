@@ -1,0 +1,65 @@
+/* Text Gradient Colors */
+.purple-gradient1 {
+  background: linear-gradient(to right, #440066, #660099, #8800cc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.purple-gradient2 {
+  background: linear-gradient(to right, #440066, #660099, #8800cc, #aa00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.purple-gradient3 {
+  background: linear-gradient(to right, #8800cc, #660099, #440066);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.purple-gradient4 {
+  background: linear-gradient(to right, #aa00ff, #8800cc, #660099, #440066);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.gray-gradient1 {
+  background: linear-gradient(to right, #cccccc, #999999, #666666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.gray-gradient2 {
+  background: linear-gradient(to right, #999999, #666666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.gray-gradient3 {
+  background: linear-gradient(to right, #666666, #999999, #cccccc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.gray-gradient4 {
+  background: linear-gradient(to right, #666666, #999999);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+/* Background Gradient Colors */
+.dark-gradient {
+  background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff);
+}
+.purple-bg-gradient {
+  background: linear-gradient(to right, #8800cc, #7700aa, #660099);
+}
