@@ -29,7 +29,7 @@ export interface Dispense {
   dispenser_details: any | null;
 }
 
-interface Fairminter {
+export interface Fairminter {
   tx_hash: string;
   tx_index: number;
   block_index: number;
@@ -56,4 +56,13 @@ interface Fairminter {
   status: string;
   paid_quantity: number | null;
   confirmed: boolean;
+}
+
+export interface XcpBalance {
+  address: string | null;
+  cpid: string;
+  quantity: number;
+  utxo: string;
+  utxo_address: string;
+  divisible: boolean;
 }

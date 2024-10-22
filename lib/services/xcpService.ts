@@ -1,6 +1,6 @@
 import { StampService } from "$lib/services/stampService.ts";
 import { dbManager } from "../../server/database/db.ts";
-import { DispenserFilter, Fairminter } from "$lib/types/index.d.ts";
+import { DispenserFilter, Fairminter, XcpBalance } from "$lib/types/index.d.ts";
 
 export const xcp_v2_nodes = [
   {
@@ -514,7 +514,7 @@ export class XcpManager {
   static getXcpBalancesByAddress = async (
     address: string,
     maxIterations = 100,
-  ) => {
+  ): Promise<XcpBalance[]> => {
     const endpoint = `/addresses/${address}/balances`;
     let allBalances: any[] = [];
     let cursor: string | null = null;
@@ -544,8 +544,11 @@ export class XcpManager {
         const balances = response.result
           .filter((balance: any) => balance.quantity > 0)
           .map((balance: any) => ({
+            address: balance.address || null, // NOTE: empty if tied to a UTXO
             cpid: balance.asset,
             quantity: balance.quantity,
+            utxo: balance.utxo || "",
+            utxo_address: balance.utxo_address || "",
             divisible: balance.divisible,
           }));
 
