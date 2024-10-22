@@ -77,9 +77,27 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
                   <div className="flex flex-col justify-between">
                     <a
                       href={href}
-                      className="text-2xl text-[#666666] font-bold"
+                      className="text-2xl text-[#666666] font-bold flex gap-4"
                     >
                       {convertToEmoji(src20.tick)}
+                      <div className="flex gap-2">
+                        <img
+                          width="20px"
+                          src="/img/src20/details/EnvelopeSimple.svg"
+                        />
+                        <img
+                          width="20px"
+                          src="/img/src20/details/Globe.svg"
+                        />
+                        <img
+                          width="20px"
+                          src="/img/src20/details/TelegramLogo.svg"
+                        />
+                        <img
+                          width="20px"
+                          src="/img/src20/details/XLogo.svg"
+                        />
+                      </div>
                     </a>
                     <div className="flex flex-col gap-1">
                       <p className="text-lg font-light text-[#999999]">
