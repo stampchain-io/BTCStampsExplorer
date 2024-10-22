@@ -7,8 +7,8 @@ import {
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   StampBalance,
-  XCPBalance,
 } from "globals";
+import { XcpBalance } from "$lib/types/index.d.ts";
 import { summarize_issuances } from "./index.ts";
 import { dbManager } from "../../server/database/db.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
@@ -272,7 +272,7 @@ export class StampRepository {
   ) {
     try {
       const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
-      const assets = xcp_balances.map((balance: XCPBalance) => balance.cpid);
+      const assets = xcp_balances.map((balance: XcpBalance) => balance.cpid);
       if (assets.length === 0) {
         return {
           rows: [
@@ -545,8 +545,10 @@ export class StampRepository {
   ): Promise<StampBalance[]> {
     const offset = (page - 1) * limit;
     try {
+      // FIXME: this is likely a bit redundant since we are fetching updated balances on the indexer every 20 blocks now - may want to increase that polling interval
+      // However this will be needed to fetch realtime UTXO attaches if needed here.
       const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
-      const assets = xcp_balances.map((balance: XCPBalance) => balance.cpid);
+      const assets = xcp_balances.map((balance: XcpBalance) => balance.cpid);
 
       if (assets.length === 0) {
         return [];

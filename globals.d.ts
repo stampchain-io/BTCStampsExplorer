@@ -205,11 +205,6 @@ export interface XCPParams {
   fee_per_kb?: number;
 }
 
-export interface XCPBalance {
-  cpid: string;
-  quantity: number;
-}
-
 export interface SRC20Balance {
   address: string;
   p: string;
