@@ -2,7 +2,7 @@ import { StampCard } from "$islands/stamp/StampCard.tsx";
 
 const RecentDeploy = ({ transactions }) => {
   // Map transactions to match the expected shape by StampCard
-  const stamps = transactions.map((tx) => ({
+  const stamps = transactions.slice(0, 16).map((tx) => ({
     ...tx,
     // Ensure all required properties for StampCard are included
   }));

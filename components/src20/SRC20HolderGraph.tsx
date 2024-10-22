@@ -1,21 +1,12 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 import { Chart } from "$fresh_charts/mod.ts";
-import { ChartColors, transparentize } from "$fresh_charts/utils.ts";
-
-import { StampRow } from "globals";
-
-import { useEffect, useState } from "preact/hooks";
 
 dayjs.extend(relativeTime);
 
-interface StampRelatedGraphProps {
-  stamp: StampRow;
-}
-
 const DoughnutConfig = {
   type: "doughnut",
-  svgClass: "w-full h-1/2",
+  svgClass: "w-full",
   options: {
     responsive: true,
     maintainAspectRatio: false,
@@ -50,16 +41,18 @@ const DoughnutConfig = {
   },
 };
 
-export function StampRelatedGraph() {
+export function SRC20HolderGraph() {
   return (
     <div className="flex justify-between items-center bg-gradient-to-br primary-gradient p-6 relative">
-      <div className="p-6 absolute top-0 right-0 text-center">
-        <p className="text-[#666666] font-light uppercase">HOLDERS</p>
+      <div className="p-6 absolute top-0 md:right-0 text-center ">
+        <p className="text-[#666666] font-light uppercase">
+          HOLDERS
+        </p>
         <p className="text-[#999999] font-light uppercase lg:text-[32px] md:text-[30px]">
           1
         </p>
       </div>
-      <div className="lg:flex md:block w-full gap-3">
+      <div className="w-full gap-3 flex flex-col xl:flex-col md:flex-row sm:flex-col">
         <div>
           <div className="flex justify-between items-center flex-col md:items-start gap-1">
             <Chart {...DoughnutConfig} />
