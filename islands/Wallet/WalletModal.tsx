@@ -279,7 +279,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
         <button
           type="button"
           ref={buttonRef}
-          // onClick={toggleModal}
+          onClick={toggleModal}
           class={`${
             isConnected.value && address
               ? "text-[#8800CC] border-[#8800CC] border-2 rounded-md"
