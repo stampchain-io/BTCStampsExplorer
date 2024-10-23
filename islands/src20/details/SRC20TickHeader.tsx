@@ -133,14 +133,33 @@ export function SRC20TickHeader({
           value={formatNumber(deployment.max, 0)}
           direction="col"
         />
-        <div>
-          <StatItem label="DECIMALS" value={deployment.deci} direction="row" />
-          <StatItem
-            label="LIMIT"
-            value={formatNumber(deployment.lim, 0)}
-            direction="row"
-          />
-        </div>
+        <StatItem
+          label="LIMIT"
+          value={formatNumber(deployment.lim, 0)}
+          direction="col"
+        />
+        <StatItem label="DECIMALS" value={deployment.deci} direction="col" />
+      </div>
+
+      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between dark-gradient">
+        {/* Price in Satoshis */}
+        <StatItem
+          label="PRICE"
+          value={floorUnitPriceSatsFormatted}
+          currency="SATS"
+          direction="col"
+        />
+        <StatItem
+          label="24H CHANGE"
+          value="N/A" // FIXME: not available from API mcap request
+          currency="%"
+          direction="col"
+        />
+        <StatItem
+          label="Holders"
+          value="N/A" // FIXME: not available from API mcap request
+          direction="col"
+        />
       </div>
 
       {/* Market Information */}
@@ -159,20 +178,11 @@ export function SRC20TickHeader({
           currency="BTC"
           direction="col"
         />
-      </div>
-
-      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between dark-gradient">
-        {/* Price in Satoshis */}
+        {/* 7 DAY Volume in BTC */}
         <StatItem
-          label="PRICE"
-          value={floorUnitPriceSatsFormatted}
-          currency="SATS"
-          direction="col"
-        />
-        <StatItem
-          label="24H CHANGE"
-          value="N/A" // FIXME: not available from API mcap request
-          currency="%"
+          label="7 DAY VOLUME"
+          value={sum1dBTCFormatted * 7}
+          currency="BTC"
           direction="col"
         />
       </div>
