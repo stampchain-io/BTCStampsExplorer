@@ -1,5 +1,7 @@
 import { Buffer } from "buffer";
 import type { Output, UTXO } from "utils/minting/src20/utils.d.ts";
+import { getUTXOForAddress } from "./src20/utils.ts";
+import { XcpManager } from "$lib/services/xcpService.ts";
 
 const CHANGE_DUST = 1000; // This should match the value in tx.ts
 
@@ -151,4 +153,63 @@ export function selectUTXOs(
   }
 
   return { inputs: selectedUTXOs, change, fee: finalFee };
+}
+
+export async function selectUTXOsForTransaction(
+  address: string,
+  vouts: Output[],
+  feeRate: number,
+  sigops_rate = 0,
+  rbfBuffer = 1.5,
+): Promise<{
+  inputs: UTXO[];
+  change: number;
+  fee: number;
+}> {
+  // Fetch UTXOs for the address
+  let utxos = await getUTXOForAddress(address) as UTXO[];
+  if (!utxos || utxos.length === 0) {
+    throw new Error("No UTXOs found for the given address");
+  }
+
+  // Fetch stamps balance to get UTXOs to exclude
+  try {
+    const stampBalances = await XcpManager.getXcpBalancesByAddress(
+      address,
+      undefined, // cpid
+      true, // utxoOnly
+    );
+
+    const utxosToExclude = new Set<string>();
+
+    // Collect UTXOs to exclude
+    for (const balance of stampBalances) {
+      if (balance.utxo) {
+        utxosToExclude.add(balance.utxo);
+      }
+    }
+
+    // Filter out UTXOs that are in the stamps balance
+    utxos = utxos.filter(
+      (utxo) => !utxosToExclude.has(`${utxo.txid}:${utxo.vout}`),
+    );
+
+    console.log(
+      `Excluded ${utxosToExclude.size} UTXOs from stamps balance`,
+    );
+  } catch (error) {
+    console.error("Error fetching stamps balance:", error);
+    // Decide whether to proceed without excluding UTXOs or throw an error
+    // For safety, you might choose to throw an error
+    throw new Error("Failed to fetch stamps balance for UTXO exclusion");
+  }
+
+  if (!utxos || utxos.length === 0) {
+    throw new Error(
+      "No UTXOs available for transaction after excluding stamps UTXOs",
+    );
+  }
+
+  // Proceed with UTXO selection using the filtered UTXO list
+  return selectUTXOs(utxos, vouts, feeRate, sigops_rate, rbfBuffer);
 }

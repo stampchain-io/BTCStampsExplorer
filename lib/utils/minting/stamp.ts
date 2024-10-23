@@ -1,13 +1,11 @@
 import * as btc from "bitcoin";
 import { Buffer } from "buffer";
-
 import { generateRandomNumber } from "utils/util.ts";
 import { handleXcpV1Query } from "utils/xcpUtils.ts";
-import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
-import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
-import { UTXO } from "utils/minting/src20/utils.d.ts";
+import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
 import { extractOutputs } from "utils/minting/utils.ts";
 import { XCPPayload } from "utils/xcpUtils.ts";
+import { getTransaction } from "utils/quicknode.ts";
 
 export const burnkeys = [
   "022222222222222222222222222222222222222222222222222222222222222222",
@@ -164,7 +162,7 @@ export const mintMethodOPRETURN = ({
     quantity: quantity,
     divisible: divisible || false,
     description: `${description}`,
-    lock: locked || true,
+    lock: locked ?? true,
     reset: false,
     allow_unconfirmed_inputs: true,
     extended_tx_info: true,
@@ -257,7 +255,7 @@ export async function mintStamp(
       throw new Error("Error generating stamp transaction");
     }
     const hex = result.tx_hex;
-    const psbt = convertTXToPSBT(
+    const psbt = await convertTXToPSBT(
       hex,
       sourceWallet,
       satsPerKB,
@@ -281,45 +279,65 @@ async function convertTXToPSBT(
   const psbt = new btc.Psbt({ network: btc.networks.bitcoin });
   const txObj = btc.Transaction.fromHex(tx);
   const vouts = extractOutputs(txObj, address);
+
   vouts.push({
     value: service_fee,
     address: recipient_fee,
   });
 
-  const utxos = await getUTXOForAddress(address) as UTXO[];
-  const { inputs: pre, change: change_pre } = selectUTXOs(
-    utxos,
+  const { inputs, change } = await selectUTXOsForTransaction(
+    address,
     vouts,
     fee_per_kb,
   );
-  console.log("Change:", change_pre);
-  console.log("Pre:", pre);
 
-  vouts.push({
-    value: change_pre,
-    address: address,
-  });
-
-  const { inputs } = selectUTXOs(utxos, vouts, fee_per_kb);
-
-  for (const input of inputs) {
-    if (input.script.startsWith("0014") || input.script.startsWith("0020")) {
-      input.witnessUtxo = {
-        script: Buffer.from(input.script, "hex"),
-        value: input.value,
-      };
-    }
-    psbt.addInput({
-      hash: input.txid,
-      index: input.vout,
-      sequence: 0xfffffffd,
-      witnessUtxo: input.witnessUtxo || undefined,
+  if (change > 0) {
+    vouts.push({
+      value: change,
+      address: address,
     });
   }
 
   for (const out of vouts) {
-    console.log(out);
     psbt.addOutput(out);
+  }
+
+  // Add inputs to PSBT
+  for (const input of inputs) {
+    const txDetails = await getTransaction(input.txid);
+
+    // Ensure txDetails are available
+    if (!txDetails) {
+      throw new Error(`Failed to fetch transaction details for ${input.txid}`);
+    }
+
+    const inputDetails = txDetails.vout[input.vout];
+
+    if (!inputDetails || !inputDetails.scriptPubKey) {
+      throw new Error(
+        `Failed to get scriptPubKey for input ${input.txid}:${input.vout}`,
+      );
+    }
+
+    const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
+
+    const psbtInput = {
+      hash: input.txid,
+      index: input.vout,
+      sequence: 0xfffffffd, // Enable RBF
+    };
+
+    if (isWitnessUtxo) {
+      psbtInput["witnessUtxo"] = {
+        script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
+        value: input.value,
+      };
+    } else {
+      // For non-witness inputs, we need the full transaction hex
+      psbtInput["nonWitnessUtxo"] = Buffer.from(txDetails.hex, "hex");
+    }
+
+    psbt.addInput(psbtInput);
   }
 
   return psbt;

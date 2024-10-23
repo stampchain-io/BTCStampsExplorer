@@ -1,7 +1,5 @@
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "buffer";
-import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
-import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 import { getTransaction } from "utils/quicknode.ts";
 import { PSBTInput } from "$lib/types/index.d.ts";
@@ -13,6 +11,7 @@ import {
 } from "utils/minting/feeCalculations.ts";
 import * as msgpack from "msgpack";
 import { compressWithCheck } from "../zlib.ts";
+import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
 
 const DUST_SIZE = 420; // Min is 330
 const STAMP_PREFIX = "stamp:";
@@ -153,18 +152,12 @@ export async function prepareSrc20PSBT({
     totalOutputValue += service_fee;
   }
 
-  const utxos = await getUTXOForAddress(sourceWallet) as UTXO[];
-  let totalInputValue = 0;
-  utxos.forEach((utxo) => (totalInputValue += utxo.value));
-
-  let inputs, change;
-
-  try {
-    ({ inputs, change } = selectUTXOs(utxos, vouts, satsPerKB));
-  } catch (error) {
-    console.error(error);
-    throw Error(error.message);
-  }
+  // Replace with selectUTXOsForTransaction
+  const { inputs, change } = await selectUTXOsForTransaction(
+    sourceWallet,
+    vouts,
+    satsPerKB,
+  );
 
   totalOutputValue += change;
 

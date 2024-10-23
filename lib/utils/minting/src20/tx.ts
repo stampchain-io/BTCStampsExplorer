@@ -4,13 +4,12 @@ import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
-import { selectUTXOs } from "./utxo-selector.ts";
+import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
 import { arc4, bin2hex, hex2bin } from "utils/minting/utils.ts";
 import { compressWithCheck } from "utils/minting/zlib.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/index.d.ts";
 import { getTransaction } from "utils/quicknode.ts";
-import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
 import * as msgpack from "msgpack";
 
 const RECIPIENT_DUST = 789;
@@ -35,12 +34,6 @@ export const prepareSrc20TX = async ({
     console.log("Using network:", psbtNetwork);
 
     const psbt = new bitcoin.Psbt({ network: psbtNetwork });
-
-    // Fetch UTXOs
-    const utxos = await getUTXOForAddress(changeAddress);
-    if (!utxos || utxos.length === 0) {
-      throw new Error("No UTXOs found for the given address");
-    }
 
     let transferDataBytes: Uint8Array;
     const stampPrefixBytes = new TextEncoder().encode("stamp:");
@@ -92,8 +85,25 @@ export const prepareSrc20TX = async ({
     }
     console.log("Padded payload:", bin2hex(payloadBytes));
 
+    // Prepare outputs (vouts) without the multisigScripts yet
+    const vouts: VOUT[] = [
+      { address: toAddress, value: RECIPIENT_DUST },
+      // Multisig scripts will be added later
+    ];
+
+    // Use selectUTXOsForTransaction to fetch UTXOs and select inputs
+    const {
+      inputs: selectedUtxos,
+      change,
+      fee: estimatedFee,
+    } = await selectUTXOsForTransaction(changeAddress, vouts, feeRate);
+
+    if (selectedUtxos.length === 0) {
+      throw new Error("Unable to select suitable UTXOs for the transaction");
+    }
+
     // ARC4 encode using the first UTXO's txid as the key
-    const txidBytes = hex2bin(utxos[0].txid); // Uint8Array
+    const txidBytes = hex2bin(selectedUtxos[0].txid); // Uint8Array
     console.log("ARC4 key (hex):", bin2hex(txidBytes));
 
     // Use the arc4 function for encryption
@@ -130,14 +140,13 @@ export const prepareSrc20TX = async ({
       return `5121${pubkey1}21${pubkey2}21${THIRD_PUBKEY}53ae`;
     });
 
-    // Prepare outputs
-    const vouts: VOUT[] = [
-      { address: toAddress, value: RECIPIENT_DUST },
+    // Add multisig outputs to vouts
+    vouts.push(
       ...multisigScripts.map((script) => ({
         script: Buffer.from(script, "hex"),
         value: MULTISIG_DUST,
       })),
-    ];
+    );
 
     // Add minting service fee if enabled
     if (parseInt(serverConfig.MINTING_SERVICE_FEE_ENABLED || "0", 10) === 1) {
@@ -147,17 +156,6 @@ export const prepareSrc20TX = async ({
         10,
       );
       vouts.push({ address: feeAddress, value: feeAmount });
-    }
-
-    // Select UTXOs
-    const {
-      inputs: selectedUtxos,
-      change,
-      fee: estimatedFee,
-    } = selectUTXOs(utxos, vouts, feeRate);
-
-    if (selectedUtxos.length === 0) {
-      throw new Error("Unable to select suitable UTXOs for the transaction");
     }
 
     // Add inputs to PSBT
