@@ -1,4 +1,4 @@
-import * as bitcoin from "bitcoinjs-lib";
+import * as bitcoin from "bitcoin";
 import { Buffer } from "buffer";
 import { arc4, bin2hex, hex2bin } from "$lib/utils/minting/utils.ts";
 import { zLibUncompress } from "$lib/utils/minting/zlib.ts";

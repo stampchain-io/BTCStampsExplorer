@@ -1,4 +1,4 @@
-import * as bitcoin from "bitcoinjs-lib";
+import * as bitcoin from "bitcoin";
 import { Buffer } from "buffer";
 import { UTXO } from "utils/minting/src20/utils.d.ts";
 import { getTransaction } from "utils/quicknode.ts";
