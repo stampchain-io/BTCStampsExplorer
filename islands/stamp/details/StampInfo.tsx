@@ -24,7 +24,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     setFee(newFee);
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };

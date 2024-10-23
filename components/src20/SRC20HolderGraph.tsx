@@ -43,7 +43,7 @@ const DoughnutConfig = {
 
 export function SRC20HolderGraph() {
   return (
-    <div className="flex justify-between items-center bg-gradient-to-br primary-gradient p-6 relative">
+    <div className="flex justify-between items-center bg-gradient-to-br primary-gradient p-6 relative -z-1">
       <div className="p-6 absolute top-0 md:right-0 text-center ">
         <p className="text-[#666666] font-light uppercase">
           HOLDERS

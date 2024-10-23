@@ -256,8 +256,9 @@ export const WalletModal = ({ connectors = [] }: Props) => {
   }, [isPopupOpen]);
 
   const toggleModal = () => {
-    if (isConnected) {
-      setIsPopupOpen(!isPopupOpen);
+    if (isConnected.value) {
+      console.log("connected");
+      // setIsPopupOpen(!isPopupOpen);
     } else {
       setIsModalOpen(!isModalOpen);
       showConnectWalletModal.value = true;

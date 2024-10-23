@@ -29,6 +29,7 @@ const StampBuyModal = (
   const [totalPrice, setTotalPrice] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -251,24 +252,38 @@ const StampBuyModal = (
                 <label
                   for="collapse-toggle"
                   class="collapse-title text-xl font-medium text-[#999999] cursor-pointer flex items-center gap-1"
+                  onClick={() => setVisible(!visible)}
                 >
                   DETAILS
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 transition-transform duration-300 block peer-checked:hidden"
-                    width="1em"
-                    height="1em"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="1.5"
-                      d="m17 14l-5-5l-5 5"
-                    />
-                  </svg>
+                  {!visible
+                    ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="1em"
+                        height="1em"
+                        viewBox="0 0 24 24"
+                      >
+                        {/* Up arrow icon */}
+                        <path
+                          fill="white"
+                          d="M12 8l6 6H6l6-6z"
+                        />
+                      </svg>
+                    )
+                    : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="1em"
+                        height="1em"
+                        viewBox="0 0 24 24"
+                      >
+                        {/* Down arrow icon */}
+                        <path
+                          fill="white"
+                          d="M12 16l-6-6h12l-6 6z"
+                        />
+                      </svg>
+                    )}
                 </label>
                 <div class="collapse-content hidden peer-checked:block transition-all duration-300 ease-in-out max-h-0 peer-checked:max-h-screen overflow-hidden">
                   <div class="flex flex-col">

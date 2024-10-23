@@ -14,7 +14,7 @@ function WalletDetails(
   },
 ) {
   const [fee, setFee] = useState<number>(walletData.fee);
-  const [isSendModalOpen, setIsSendModalOpen] = useState(true);
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
 
   return (
@@ -149,7 +149,7 @@ function WalletStats(
   },
 ) {
   return (
-    <div className="w-full flex flex-col md:flex-row gap-6">
+    <div className="w-full flex flex-col md:flex-row gap-6 ">
       <StampStats stampsTotal={stampsTotal} stampsCreated={stampsCreated} />
       <DispenserStats />
       <TokenStats src20Total={src20Total} />
@@ -164,7 +164,7 @@ function StampStats(
   },
 ) {
   return (
-    <div className="w-full dark-gradient p-6 flex flex-col gap-6">
+    <div className="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer">
       <div className="flex justify-between">
         <StatItem label="STAMPS" value={stampsTotal.toString()} />
         <StatItem label="BY ME" value={stampsCreated.toString()} />
@@ -175,7 +175,7 @@ function StampStats(
 
 function DispenserStats() {
   return (
-    <div className="w-full dark-gradient p-6 flex flex-col gap-6">
+    <div className="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer">
       <div className="flex justify-between">
         <StatItem label="DISPENSERS" value="N/A" align="left" />
         <StatItem label="SOLD" value="N/A" align="right" />
@@ -186,7 +186,7 @@ function DispenserStats() {
 
 function TokenStats({ src20Total }: { src20Total: number }) {
   return (
-    <div className="w-full dark-gradient flex justify-between p-6">
+    <div className="w-full dark-gradient flex justify-between p-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer">
       <StatItem label="TOKENS" value={src20Total.toString()} />
       <StatItem
         label="VALUE"
