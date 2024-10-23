@@ -1,5 +1,4 @@
-import * as bitcoin from "bitcoin";
-import { estimateInputSize } from "./utxo-selector.ts";
+import { estimateInputSize } from "../utxoSelector.ts";
 import { UTXO } from "$lib/types/index.d.ts";
 
 const MAX_RETRIES = 3;

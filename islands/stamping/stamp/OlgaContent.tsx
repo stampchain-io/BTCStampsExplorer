@@ -321,7 +321,15 @@ export function OlgaContent() {
           });
           setApiError(""); // Clear any previous errors
         } else {
-          throw new Error("Unexpected result from signing transaction");
+          console.log(
+            "Transaction signed successfully, but txid not returned.",
+          );
+          setSubmissionMessage({
+            message:
+              "Transaction signed and broadcasted successfully. Please check your wallet or a block explorer for confirmation.",
+            txid: undefined,
+          });
+          setApiError("");
         }
       } catch (error) {
         log("Error in minting process", error);
