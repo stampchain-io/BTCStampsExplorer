@@ -513,15 +513,22 @@ export class XcpManager {
 
   static getXcpBalancesByAddress = async (
     address: string,
+    cpid?: string,
+    utxoOnly: boolean = false,
     maxIterations = 100,
   ): Promise<XcpBalance[]> => {
-    const endpoint = `/addresses/${address}/balances`;
-    let allBalances: any[] = [];
+    const baseEndpoint = `/addresses/${address}/balances`;
+    const endpoint = cpid ? `${baseEndpoint}/${cpid}` : baseEndpoint;
+    let allBalances: XcpBalance[] = [];
     let cursor: string | null = null;
     const limit = 1000;
     let iterations = 0;
 
-    console.log(`Fetching XCP balances for address: ${address}`);
+    console.log(
+      `Fetching XCP balances for address: ${address}${
+        cpid ? `, CPID: ${cpid}` : ""
+      }${utxoOnly ? ", UTXO only" : ""}`,
+    );
 
     while (iterations < maxIterations) {
       iterations++;
@@ -536,21 +543,49 @@ export class XcpManager {
           queryParams,
         );
 
-        if (!response || !Array.isArray(response.result)) {
+        if (!response) {
           console.warn(`Unexpected response structure for address ${address}`);
           break;
         }
 
-        const balances = response.result
-          .filter((balance: any) => balance.quantity > 0)
-          .map((balance: any) => ({
-            address: balance.address || null, // NOTE: empty if tied to a UTXO
-            cpid: balance.asset,
-            quantity: balance.quantity,
-            utxo: balance.utxo || "",
-            utxo_address: balance.utxo_address || "",
-            divisible: balance.divisible,
-          }));
+        let balances: XcpBalance[];
+
+        if (cpid) {
+          // Handle single balance response for specific CPID
+          if (response.result && response.result.quantity > 0) {
+            balances = [{
+              address: response.result.address || null,
+              cpid: response.result.asset,
+              quantity: response.result.quantity,
+              utxo: response.result.utxo || "",
+              utxo_address: response.result.utxo_address || "",
+              divisible: response.result.divisible || false,
+            }];
+          } else {
+            balances = [];
+          }
+        } else {
+          // Handle multiple balances response
+          if (!Array.isArray(response.result)) {
+            console.warn(`Unexpected result structure for address ${address}`);
+            break;
+          }
+          balances = response.result
+            .filter((balance: any) => balance.quantity > 0)
+            .map((balance: any) => ({
+              address: balance.address || null,
+              cpid: balance.asset,
+              quantity: balance.quantity,
+              utxo: balance.utxo || "",
+              utxo_address: balance.utxo_address || "",
+              divisible: balance.divisible || false,
+            }));
+        }
+
+        // Apply UTXO-only filter after fetching the balances
+        if (utxoOnly) {
+          balances = balances.filter((balance) => balance.utxo !== "");
+        }
 
         allBalances = allBalances.concat(balances);
 
@@ -558,13 +593,13 @@ export class XcpManager {
           `Iteration ${iterations}: Fetched ${balances.length} balances. Total: ${allBalances.length}`,
         );
 
-        if (response.next_cursor) {
-          cursor = response.next_cursor;
-          console.log(`New cursor: ${cursor}`);
-        } else {
+        if (cpid || !response.next_cursor) {
           console.log("No more pages to fetch");
-          break; // No more pages
+          break; // No pagination for specific CPID or no more pages
         }
+
+        cursor = response.next_cursor;
+        console.log(`New cursor: ${cursor}`);
 
         if (
           response.result_count && allBalances.length >= response.result_count
@@ -577,7 +612,6 @@ export class XcpManager {
           `Error fetching balances for address ${address} (iteration ${iterations}):`,
           error,
         );
-        // Implement exponential backoff here if needed
         break;
       }
     }
