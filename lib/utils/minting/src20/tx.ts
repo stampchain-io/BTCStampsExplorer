@@ -1,6 +1,6 @@
 // lib/utils/minting/src20/tx.ts
 
-import * as bitcoin from "bitcoinjs-lib";
+import * as bitcoin from "bitcoin";
 import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";

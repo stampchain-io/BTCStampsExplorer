@@ -58,7 +58,6 @@
     "$handlers/": "./routes/handlers/",
     "$/": "./",
     "$server/": "./server/",
-    "bitcoinjs-lib": "npm:bitcoinjs-lib@6.1.6",
     "tiny-secp256k1": "npm:tiny-secp256k1@2.2.3",
     "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts",
     "qrcode": "https://esm.sh/qrcode@1.5.1"
