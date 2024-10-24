@@ -1,6 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
-import { createPSBT, validateUTXOOwnership } from "../../server/btc_server.ts";
+import {
+  createPSBT,
+  validateUTXOOwnership,
+} from "../../../../server/btc_server.ts";
 import { Buffer } from "buffer";
 
 interface CreatePSBTInput {
@@ -58,7 +61,10 @@ export const handler: Handlers = {
         { headers: { "Content-Type": "application/json" } },
       );
     } catch (error) {
-      console.error("Error processing request in /api/create_psbt:", error);
+      console.error(
+        "Error processing request in /api/v2/trx/create_psbt:",
+        error,
+      );
       if (error instanceof SyntaxError) {
         return ResponseUtil.error("Invalid JSON in request body", 400);
       }

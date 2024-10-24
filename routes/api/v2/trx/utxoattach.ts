@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
-import { XcpManager } from "../../lib/services/xcpService.ts";
+import { XcpManager } from "../../../../lib/services/xcpService.ts";
 import { Buffer } from "buffer";
 
 interface UtxoAttachInput {

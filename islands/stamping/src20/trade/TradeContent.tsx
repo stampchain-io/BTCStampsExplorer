@@ -83,7 +83,7 @@ export function TradeContent() {
       }
 
       // Create PSBT by calling the backend API
-      const response = await fetch("/api/create_psbt", {
+      const response = await fetch("/api/v2/trx/create_psbt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -171,7 +171,7 @@ export function TradeContent() {
       };
 
       // Call the backend API
-      const response = await fetch("/api/utxoattach", {
+      const response = await fetch("/api/v2/trx/utxoattach", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -239,7 +239,7 @@ export function TradeContent() {
     try {
       const { sellerPsbtHex, buyerUtxo } = buyerFormState;
 
-      const response = await fetch("/api/complete_psbt", {
+      const response = await fetch("/api/v2/trx/complete_psbt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
