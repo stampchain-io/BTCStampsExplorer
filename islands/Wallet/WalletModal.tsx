@@ -19,39 +19,39 @@ const WalletPopup = (
 
   useEffect(() => {
     const fetchCreatorName = async () => {
-      if (wallet.value.address) {
+      if (wallet.address) {
         try {
           const response = await fetch(
-            `/api/v2/creator-name?address=${wallet.value.address}`,
+            `/api/v2/creator-name?address=${wallet.address}`,
           );
           if (response.ok) {
             const data = await response.json();
             const displayValue = data.creatorName ||
-              abbreviateAddress(wallet.value.address);
+              abbreviateAddress(wallet.address);
             setDisplayName(displayValue);
             if (displayNameRef.current) {
               displayNameRef.current.value = displayValue;
             }
           } else {
             console.error("Failed to fetch creator name");
-            setDisplayName(abbreviateAddress(wallet.value.address));
+            setDisplayName(abbreviateAddress(wallet.address));
           }
         } catch (error) {
           console.error("Error fetching creator name:", error);
-          setDisplayName(abbreviateAddress(wallet.value.address));
+          setDisplayName(abbreviateAddress(wallet.address));
         }
       }
     };
 
     fetchCreatorName();
-  }, [wallet.value.address]);
+  }, [wallet.address]);
 
   const handleUpdateDisplayName = async () => {
     if (displayNameRef.current) {
       const newDisplayName = displayNameRef.current.value.trim();
       if (
         newDisplayName &&
-        newDisplayName !== abbreviateAddress(wallet.value.address)
+        newDisplayName !== abbreviateAddress(wallet.address)
       ) {
         try {
           const timestamp = Date.now().toString();
@@ -76,7 +76,7 @@ const WalletPopup = (
           console.log("CSRF Token received:", csrfToken);
 
           const requestBody = {
-            address: wallet.value.address,
+            address: wallet.address,
             newName: newDisplayName,
             signature,
             timestamp,
@@ -128,7 +128,7 @@ const WalletPopup = (
       <div class="flex justify-between items-end">
         <p className="text-[24px] font-normal">Wallet</p>
         <a
-          href={`/wallet/${wallet.value.address}`}
+          href={`/wallet/${wallet.address}`}
           className="underline cursor-pointer font-normal"
         >
           View Wallet
@@ -190,7 +190,7 @@ const WalletPopup = (
       <hr /> */
       }
       <p className="font-normal">My address</p>
-      <p class="text-[14px] break-all font-normal">{wallet.value.address}</p>
+      <p class="text-[14px] break-all font-normal">{wallet.address}</p>
       {
         /* <p
         class="text-[14px] text-[#8B51C0] flex gap-[5px] items-center cursor-pointer"
@@ -219,7 +219,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { wallet, isConnected, disconnect } = walletContext;
-  const { address } = wallet.value;
+  const { address } = wallet;
   const modalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [path, setPath] = useState<string | null>(null);
@@ -256,7 +256,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
   }, [isPopupOpen]);
 
   const toggleModal = () => {
-    if (isConnected.value) {
+    if (isConnected) {
       setIsPopupOpen(!isPopupOpen);
     } else {
       setIsModalOpen(!isModalOpen);
@@ -281,20 +281,18 @@ export const WalletModal = ({ connectors = [] }: Props) => {
           ref={buttonRef}
           onClick={toggleModal}
           class={`${
-            isConnected.value && address
+            isConnected && address
               ? "text-[#8800CC] border-[#8800CC] border-2 rounded-md"
               : "bg-[#8800CC] hover:bg-[#9911DD] text-[#080808] "
           }  px-5 py-3 rounded font-black`}
         >
-          {isConnected.value && address
-            ? abbreviateAddress(address)
-            : "CONNECT"}
+          {isConnected && address ? abbreviateAddress(address) : "CONNECT"}
         </button>
 
-        {isConnected.value && address && (
+        {isConnected && address && (
           <div class="absolute z-1000 top-full left-0 mt-2 pt-1 bg-black text-[#8800CC] border-[#8800CC] border-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <a
-              href={isConnected.value && address ? `/wallet/${address}` : "#"}
+              href={isConnected && address ? `/wallet/${address}` : "#"}
               class="px-4 py-2 text-center hover:text-[#AA00FF] cursor-pointer"
             >
               DASHBOARD
@@ -315,7 +313,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
         )}
       </div>
 
-      {isModalOpen && !isConnected.value && (
+      {isModalOpen && !isConnected && (
         <ConnectorsModal
           connectors={connectors}
           toggleModal={() => {
@@ -326,7 +324,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
         />
       )}
 
-      {isPopupOpen && isConnected.value && (
+      {isPopupOpen && isConnected && (
         <WalletPopup
           logout={() => {
             disconnect();
