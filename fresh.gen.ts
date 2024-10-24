@@ -52,6 +52,9 @@ import * as $api_v2_stamps_dispensers_id_ from "./routes/api/v2/stamps/dispenser
 import * as $api_v2_stamps_dispensers_index from "./routes/api/v2/stamps/dispensers/index.ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
+import * as $api_v2_trx_complete_psbt from "./routes/api/v2/trx/complete_psbt.ts";
+import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
+import * as $api_v2_trx_utxoattach from "./routes/api/v2/trx/utxoattach.ts";
 import * as $api_v2_update_creator_name from "./routes/api/v2/update-creator-name.ts";
 import * as $api_v2_upload_src20_background from "./routes/api/v2/upload-src20-background.ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
@@ -76,6 +79,7 @@ import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
+import * as $stamp_trade from "./routes/stamp/trade.tsx";
 import * as $stamping_src20 from "./routes/stamping/src20.tsx";
 import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
 import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
@@ -163,6 +167,7 @@ import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/d
 import * as $stamping_src20_mint_MintContent from "./islands/stamping/src20/mint/MintContent.tsx";
 import * as $stamping_src20_mint_PopularMinting from "./islands/stamping/src20/mint/PopularMinting.tsx";
 import * as $stamping_src20_mint_StampingMintingItem from "./islands/stamping/src20/mint/StampingMintingItem.tsx";
+import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/trade/TradeContent.tsx";
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_ImageFullScreen from "./islands/stamping/stamp/ImageFullScreen.tsx";
@@ -239,6 +244,9 @@ const manifest = {
       $api_v2_stamps_dispensers_index,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
+    "./routes/api/v2/trx/complete_psbt.ts": $api_v2_trx_complete_psbt,
+    "./routes/api/v2/trx/create_psbt.ts": $api_v2_trx_create_psbt,
+    "./routes/api/v2/trx/utxoattach.ts": $api_v2_trx_utxoattach,
     "./routes/api/v2/update-creator-name.ts": $api_v2_update_creator_name,
     "./routes/api/v2/upload-src20-background.ts":
       $api_v2_upload_src20_background,
@@ -266,6 +274,7 @@ const manifest = {
     "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
     "./routes/stamp/index.tsx": $stamp_index,
+    "./routes/stamp/trade.tsx": $stamp_trade,
     "./routes/stamping/src20.tsx": $stamping_src20,
     "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
     "./routes/stamping/stamp.tsx": $stamping_stamp,
@@ -375,6 +384,8 @@ const manifest = {
       $stamping_src20_mint_PopularMinting,
     "./islands/stamping/src20/mint/StampingMintingItem.tsx":
       $stamping_src20_mint_StampingMintingItem,
+    "./islands/stamping/src20/trade/TradeContent.tsx":
+      $stamping_src20_trade_TradeContent,
     "./islands/stamping/src20/transfer/LatestTransfer.tsx":
       $stamping_src20_transfer_LatestTransfer,
     "./islands/stamping/src20/transfer/TransferContent.tsx":
