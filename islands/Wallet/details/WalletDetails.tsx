@@ -6,11 +6,12 @@ import { WalletData } from "$lib/types/index.d.ts";
 import { Button } from "$components/Button.tsx";
 
 function WalletDetails(
-  { walletData, stampsTotal, src20Total, stampsCreated }: {
+  { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
     walletData: WalletData;
     stampsTotal: number;
     src20Total: number;
     stampsCreated: number;
+    setShowItem: (type: string) => void;
   },
 ) {
   const [fee, setFee] = useState<number>(walletData.fee);
@@ -26,6 +27,7 @@ function WalletDetails(
           onReceive={() => setIsReceiveModalOpen(true)}
         />
         <WalletStats
+          setShowItem={setShowItem}
           stampsTotal={stampsTotal}
           src20Total={src20Total}
           stampsCreated={stampsCreated}
@@ -142,29 +144,42 @@ function WalletOverview(
 }
 
 function WalletStats(
-  { stampsTotal, src20Total, stampsCreated }: {
+  { stampsTotal, src20Total, stampsCreated, setShowItem = () => {} }: {
     stampsTotal: number;
     src20Total: number;
     stampsCreated: number;
+    setShowItem: (type: string) => void;
   },
 ) {
+  const handleType = (type: string) => {
+    setShowItem(type);
+  };
+
   return (
     <div className="w-full flex flex-col md:flex-row gap-6 ">
-      <StampStats stampsTotal={stampsTotal} stampsCreated={stampsCreated} />
-      <DispenserStats />
-      <TokenStats src20Total={src20Total} />
+      <StampStats
+        stampsTotal={stampsTotal}
+        stampsCreated={stampsCreated}
+        handleType={handleType}
+      />
+      <DispenserStats handleType={handleType} />
+      <TokenStats src20Total={src20Total} handleType={handleType} />
     </div>
   );
 }
 
 function StampStats(
-  { stampsTotal, stampsCreated }: {
+  { stampsTotal, stampsCreated, handleType }: {
     stampsTotal: number;
     stampsCreated: number;
+    handleType: (type: string) => void;
   },
 ) {
   return (
-    <div className="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer">
+    <div
+      className="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      onClick={() => handleType("stamp")}
+    >
       <div className="flex justify-between">
         <StatItem label="STAMPS" value={stampsTotal.toString()} />
         <StatItem label="BY ME" value={stampsCreated.toString()} />
@@ -173,9 +188,14 @@ function StampStats(
   );
 }
 
-function DispenserStats() {
+function DispenserStats(
+  { handleType }: { handleType: (type: string) => void },
+) {
   return (
-    <div className="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer">
+    <div
+      className="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      onClick={() => handleType("dispenser")}
+    >
       <div className="flex justify-between">
         <StatItem label="DISPENSERS" value="N/A" align="left" />
         <StatItem label="SOLD" value="N/A" align="right" />
@@ -184,9 +204,17 @@ function DispenserStats() {
   );
 }
 
-function TokenStats({ src20Total }: { src20Total: number }) {
+function TokenStats(
+  { src20Total, handleType }: {
+    src20Total: number;
+    handleType: (type: string) => void;
+  },
+) {
   return (
-    <div className="w-full dark-gradient flex justify-between p-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer">
+    <div
+      className="w-full dark-gradient flex justify-between p-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      onClick={() => handleType("token")}
+    >
       <StatItem label="TOKENS" value={src20Total.toString()} />
       <StatItem
         label="VALUE"
