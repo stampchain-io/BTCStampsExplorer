@@ -96,7 +96,6 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
   _wallet.network = "mainnet";
   _wallet.provider = "leather";
 
-  walletContext.isConnected.value = true;
   walletContext.updateWallet(_wallet);
 };
 
@@ -126,7 +125,8 @@ const signMessage = async (message: string) => {
 export const signPSBT = async (
   psbtHex: string,
   inputsToSign?: { index: number }[],
-  enableRBF = true, // Add this parameter
+  enableRBF = true,
+  sighashTypes?: number[],
 ): Promise<SignPSBTResult> => {
   console.log("Entering Leather signPSBT function");
   console.log("PSBT hex length:", psbtHex.length);
@@ -145,7 +145,8 @@ export const signPSBT = async (
       network: "mainnet",
       broadcast: true,
       inputsToSign: inputsToSign || undefined,
-      rbf: enableRBF, // Add this parameter
+      rbf: enableRBF,
+      sighashTypes: sighashTypes || undefined, // Pass sighashTypes if provided
     });
 
     const result = await leatherProvider.request(
@@ -155,7 +156,8 @@ export const signPSBT = async (
         network: "mainnet",
         broadcast: true,
         inputsToSign: inputsToSign || undefined,
-        rbf: enableRBF, // Add this parameter
+        rbf: enableRBF,
+        sighashTypes: sighashTypes || undefined, // Pass sighashTypes if provided
       },
     );
 

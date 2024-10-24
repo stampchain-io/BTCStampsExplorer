@@ -81,26 +81,51 @@ const signMessage = async (message: string) => {
 
 const signPSBT = async (
   psbtHex: string,
-  _inputsToSign?: { index: number }[],
+  inputsToSign?: { index: number }[],
   enableRBF = true,
+  sighashTypes?: number[],
+  autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
   const tapwallet = (globalThis as any).tapwallet;
+  if (!tapwallet) {
+    throw new Error("TapWallet not connected");
+  }
   try {
-    const result = await tapwallet.signPsbt(psbtHex, { enableRBF });
-    if (result && result.hex) {
-      return { signed: true, psbt: result.hex };
+    const options: any = {
+      // Include options based on TapWallet's API
+      enableRBF,
+      // Add any other necessary options
+    };
+
+    if (inputsToSign && inputsToSign.length > 0) {
+      options.inputsToSign = inputsToSign.map((input) => ({
+        index: input.index,
+        // Include `sighashTypes` if supported
+        sighashTypes: sighashTypes || undefined,
+      }));
+    }
+
+    // Sign the PSBT
+    const signedPsbtHex = await tapwallet.signPsbt(psbtHex, options);
+
+    if (!signedPsbtHex) {
+      throw new Error("Failed to sign PSBT with TapWallet");
+    }
+
+    if (autoBroadcast) {
+      // Broadcast the signed PSBT
+      const txid = await tapwallet.pushPsbt(signedPsbtHex);
+      return { signed: true, txid };
     } else {
-      return {
-        signed: false,
-        error: "Unexpected result format from TapWallet",
-      };
+      // Return the signed PSBT for further handling
+      return { signed: true, psbt: signedPsbtHex };
     }
   } catch (error) {
-    console.error("Error signing PSBT:", error);
+    console.error("Error signing PSBT with TapWallet:", error);
     if (error.message && error.message.includes("User rejected")) {
       return { signed: false, cancelled: true };
     }
-    return { signed: false, error: error.message };
+    return { signed: false, error: error.message || "Unknown error occurred" };
   }
 };
 
