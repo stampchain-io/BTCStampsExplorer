@@ -70,6 +70,12 @@ export default function Wallet(props: WalletPageProps) {
   const { page, limit, totalPages, total } = pagination;
   const stampsCreated =
     stamps.filter((stamp) => stamp.creator === address).length;
+  const showItem: string = "stamp";
+  // const [showItem, setShowItem] = useState<string>("stamp");
+
+  const handleShowItem = (itemType: string) => {
+    console.log(itemType);
+  };
 
   return (
     <div class="flex flex-col gap-8">
@@ -85,6 +91,7 @@ export default function Wallet(props: WalletPageProps) {
         stampsTotal={stampsTotal}
         src20Total={src20Total}
         stampsCreated={stampsCreated}
+        setShowItem={handleShowItem}
       />
       <WalletContent
         stamps={stamps}
@@ -94,6 +101,7 @@ export default function Wallet(props: WalletPageProps) {
         totalPages={totalPages}
         total={total}
         address={address}
+        showItem={showItem}
       />
     </div>
   );
