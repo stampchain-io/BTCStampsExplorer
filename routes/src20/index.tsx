@@ -1,65 +1,125 @@
-import { HandlerContext } from "$fresh/server.ts";
+import { Handlers } from "$fresh/server.ts";
+import { SRC20TrxRequestParams } from "globals";
 
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
-import { paginate } from "utils/util.ts";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
-import { SRC20DeployTable } from "$islands/src20/SRC20DeployTable.tsx";
+import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
+import { SRC20MintingTable } from "$islands/src20/minting/SRC20MintingTable.tsx";
+import LatestMints from "$islands/src20/minting/LatestMints.tsx";
+import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.tsx";
 
-//TODO: Add pagination
+import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
+import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
-export const handler = {
-  async GET(req: Request, ctx: HandlerContext) {
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
+
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-      const limit = Number(url.searchParams.get("limit")) || 1000;
+      const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
+      const sortBy = url.searchParams.get("sortBy") || "ASC";
+      const selectedTab = url.searchParams.get("type") || "all";
       const page = Number(url.searchParams.get("page")) || 1;
+      const limit = Number(url.searchParams.get("limit")) || 11;
 
-      const client = await getClient();
-      const data = await Src20Class.get_valid_src20_tx_with_client(
-        client,
-        null,
-        null,
-        "DEPLOY",
-        limit,
-        page,
-      );
-      const total = await Src20Class.get_total_valid_src20_tx_with_client(
-        client,
-        null,
-        "DEPLOY",
-      );
-      const last_block = await CommonClass.get_last_block_with_client(client);
+      let data;
 
-      const pagination = paginate(total.rows[0]["total"], page, limit);
+      if (selectedTab === "trending") {
+        const transactionCount =
+          Number(url.searchParams.get("transactionCount")) || 1000; // Allow dynamic adjustment if needed
+        const trendingData = await Src20Controller.fetchTrendingTokens(
+          req,
+          limit,
+          page,
+          transactionCount,
+        );
 
-      const body = {
-        ...pagination,
-        last_block: last_block.rows[0]["last_block"],
-        data: data.rows.map((row) => {
-          return {
-            ...row,
-            max: row.max ? row.max.toString() : null,
-            lim: row.lim ? row.lim.toString() : null,
-            amt: row.amt ? row.amt.toString() : null,
-          };
-        }),
-      };
-      return await ctx.render(body);
+        data = {
+          src20s: trendingData.data || [],
+          total: trendingData.total || 0,
+          page: trendingData.page || 1,
+          totalPages: trendingData.totalPages || 1,
+          limit: trendingData.limit || limit,
+          filterBy,
+          sortBy,
+          selectedTab,
+        };
+      } else {
+        // Existing code for 'all' and 'minting' tabs
+        const params: SRC20TrxRequestParams = {
+          op: "DEPLOY",
+          page,
+          limit,
+          sortBy, // Changed from 'sort: sortBy' to 'sortBy'
+        };
+
+        const excludeFullyMinted = selectedTab === "minting";
+
+        const resultData = await Src20Controller.fetchSrc20DetailsWithHolders(
+          req,
+          params,
+          excludeFullyMinted,
+        );
+
+        data = {
+          src20s: resultData.data || [],
+          total: resultData.total || 0,
+          page: resultData.page || 1,
+          totalPages: resultData.totalPages || 1,
+          limit: resultData.limit || limit,
+          filterBy,
+          sortBy,
+          selectedTab,
+        };
+      }
+
+      return ctx.render({ data });
     } catch (error) {
       console.error(error);
-      const body = { error: `Error: Internal server error` };
-      return ctx.render(body);
+      return ctx.render({ error: `Error: Internal server error` });
     }
   },
 };
 
-export function SRC20Page(props) {
-  const { data, total, page, pages, limit } = props.data;
+export default function SRC20Page(props: any) {
+  if (!props || !props.data) {
+    return <div>Error: No data received</div>;
+  }
+
+  const { data } = props.data;
+  const {
+    src20s = [],
+    total = 0,
+    page = 1,
+    totalPages = 1,
+    limit = 11,
+    filterBy = [],
+    sortBy = "ASC",
+    selectedTab,
+  } = data;
+
+  if (!src20s || src20s.length === 0) {
+    return <div>No SRC20 data available</div>;
+  }
+
   return (
     <div class="flex flex-col gap-8">
-      <SRC20Header />
-      <SRC20DeployTable data={data} />
+      <SRC20Header
+        filterBy={filterBy}
+        sortBy={sortBy}
+        selectedTab={selectedTab}
+      />
+      {selectedTab === "all" && <SRC20DeployTable data={data.src20s} />}
+      {selectedTab === "trending" && <SRC20TrendingMints data={data.src20s} />}
+      <Pagination
+        page={page}
+        pages={totalPages}
+        page_size={limit}
+        type={"src20"}
+        data_length={src20s.length}
+      />
+      {selectedTab === "all" && <DeployMintModule />}
+      {selectedTab === "trending" && <DeployMintModule />}
     </div>
   );
 }
-export default SRC20Page;

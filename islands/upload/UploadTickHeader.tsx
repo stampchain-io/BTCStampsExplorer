@@ -169,7 +169,7 @@ export const UploadTickHeader = (props: SRC20TickHeaderProps) => {
               <div class="w-2/5 flex items-center justify-center">
                 <div class="flex flex-col">
                   <p class="text-2xl font-semibold">{total_sends}</p>
-                  <p class="text-base">Total Sends</p>
+                  <p class="text-base">Total Transfers</p>
                 </div>
               </div>
               <div class="border-r border-[#ffffff49]"></div>

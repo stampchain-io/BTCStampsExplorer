@@ -1,13 +1,31 @@
-import { signal } from "@preact/signals";
+import { Signal, signal } from "@preact/signals";
 
-import { Wallet } from "./wallet.d.ts";
+import { Wallet } from "$lib/types/index.d.ts";
+import {
+  broadcastPSBT,
+  broadcastRawTX,
+  signMessage,
+  signPSBT,
+} from "./walletHelper.ts";
 
 interface WalletContext {
-  wallet: signal<Wallet>;
-  isConnected: signal<boolean>;
+  readonly wallet: Wallet;
+  readonly isConnected: boolean;
   updateWallet: (wallet: Wallet) => void;
   getBasicStampInfo: (address: string) => Promise<any>;
   disconnect: () => void;
+  signMessage: (message: string) => Promise<any>;
+  signPSBT: (
+    wallet: Wallet,
+    psbt: string,
+    inputsToSign: any[],
+    enableRBF?: boolean,
+    sighashTypes?: number[],
+    autoBroadcast?: boolean,
+  ) => Promise<any>;
+  broadcastRawTX: (rawTx: string) => Promise<any>;
+  broadcastPSBT: (psbtHex: string) => Promise<any>;
+  showConnectModal: () => void;
 }
 
 export const initialWallet: Wallet = {
@@ -23,6 +41,7 @@ export const initialWallet: Wallet = {
   type: undefined,
   provider: undefined,
   network: undefined,
+  addressType: undefined,
 };
 
 let initialWalletState;
@@ -36,18 +55,18 @@ try {
   initialWalletState = initialWallet;
 }
 
-export const wallet = signal<Wallet>(initialWalletState);
-export const isConnected = signal<boolean>(initialConnected);
+export const walletSignal = signal<Wallet>(initialWalletState);
+export const isConnectedSignal = signal<boolean>(initialConnected);
 
 export const updateWallet = (_wallet: Wallet) => {
-  wallet.value = _wallet;
-  console.log("updateWallet", _wallet);
+  walletSignal.value = _wallet;
   localStorage.setItem("wallet", JSON.stringify(_wallet));
+  isConnectedSignal.value = true;
 };
 
 export const disconnect = () => {
-  wallet.value = initialWallet;
-  isConnected.value = false;
+  walletSignal.value = initialWallet;
+  isConnectedSignal.value = false;
   localStorage.removeItem("wallet");
 };
 
@@ -61,10 +80,50 @@ export const getBasicStampInfo = async (address: string) => {
   return { stampBalance };
 };
 
+export const showConnectWalletModal = signal<boolean>(false);
+
 export const walletContext: WalletContext = {
-  wallet,
-  isConnected,
+  get wallet() {
+    return walletSignal.value;
+  },
+  get isConnected() {
+    return isConnectedSignal.value;
+  },
   updateWallet,
-  getBasicStampInfo,
   disconnect,
+  getBasicStampInfo,
+  signMessage: async (message: string) => {
+    return await signMessage(walletContext.wallet, message);
+  },
+  signPSBT: async (
+    wallet: Wallet,
+    psbt: string,
+    inputsToSign: any[],
+    enableRBF = true,
+    sighashTypes?: number[],
+    autoBroadcast = true,
+  ) => {
+    console.log("Entering signPSBT in walletContext");
+    console.log("Wallet provider:", wallet.provider);
+    console.log("PSBT length:", psbt.length);
+    console.log("Number of inputs to sign:", inputsToSign.length);
+    console.log("Enable RBF:", enableRBF);
+    return await signPSBT(
+      wallet,
+      psbt,
+      inputsToSign,
+      enableRBF,
+      sighashTypes,
+      autoBroadcast,
+    );
+  },
+  broadcastRawTX: async (rawTx: string) => {
+    return await broadcastRawTX(walletContext.wallet, rawTx);
+  },
+  broadcastPSBT: async (psbtHex: string) => {
+    return await broadcastPSBT(walletContext.wallet, psbtHex);
+  },
+  showConnectModal: () => {
+    showConnectWalletModal.value = true;
+  },
 };
