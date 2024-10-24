@@ -21,9 +21,7 @@ const StampBuyModal = (
   { stamp, fee, handleChangeFee, toggleModal, handleCloseModal, dispenser }:
     Props,
 ) => {
-  const { wallet } = walletContext;
-  const connected = walletContext.isConnected.value;
-  const { fees, loading } = useFeePolling();
+  const { wallet, isConnected } = walletContext;
 
   const [quantity, setQuantity] = useState(1);
   const [maxQuantity, setMaxQuantity] = useState(1);
@@ -66,9 +64,9 @@ const StampBuyModal = (
     setSuccessMessage("");
 
     try {
-      if (!connected || !wallet.value) {
+      if (!isConnected || !wallet) {
         setError("Please connect your wallet.");
-        showConnectWalletModal.value = true; // Show wallet connect modal
+        showConnectWalletModal.value = true;
         setIsSubmitting(false);
         return;
       }
@@ -86,7 +84,7 @@ const StampBuyModal = (
 
       // Prepare the request body
       const requestBody = {
-        address: wallet.value.address,
+        address: wallet.address,
         dispenser: dispenser.source,
         quantity: totalPrice, // Total BTC amount in satoshis
         options,
@@ -120,7 +118,7 @@ const StampBuyModal = (
       // Sign PSBT using walletContext
       const inputsToSign = []; // Adjust as needed based on your PSBT
       const signResult = await walletContext.signPSBT(
-        wallet.value,
+        wallet,
         psbtHex,
         inputsToSign,
         true, // Enable RBF

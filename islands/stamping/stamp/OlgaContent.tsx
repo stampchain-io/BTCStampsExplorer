@@ -26,7 +26,7 @@ export function OlgaContent() {
   }
 
   const { wallet, isConnected } = walletContext;
-  const address = isConnected.value ? wallet.value.address : undefined;
+  const address = isConnected ? wallet.address : undefined;
 
   type FileType = File | null;
 
@@ -81,13 +81,13 @@ export function OlgaContent() {
 
   // Update useEffect to handle changes in isConnected and address
   useEffect(() => {
-    if (isConnected.value && address) {
+    if (isConnected && address) {
       validateWalletAddress(address);
     } else {
       // Clear the address error when no wallet is connected
       setAddressError(undefined);
     }
-  }, [address, isConnected.value]);
+  }, [address, isConnected]);
 
   const validateWalletAddress = (address: string) => {
     // Regular expressions for supported address types
@@ -227,7 +227,7 @@ export function OlgaContent() {
 
       log("Starting minting process");
 
-      if (!isConnected.value) {
+      if (!isConnected) {
         throw new Error("Connect your wallet");
       }
 
@@ -281,7 +281,7 @@ export function OlgaContent() {
         log("Extracted data from response", { hex, base64, txDetails, cpid });
 
         const walletProvider = getWalletProvider(
-          walletContext.wallet.value.provider,
+          wallet.provider,
         );
 
         // Correctly construct inputsToSign with index
@@ -385,7 +385,7 @@ export function OlgaContent() {
         STAMP
       </p>
 
-      {isConnected.value && addressError && (
+      {isConnected && addressError && (
         <div class="w-full text-red-500 text-center font-bold">
           {addressError}
         </div>

@@ -29,7 +29,7 @@ export function useFairmintForm(fairminters: any[]) {
   const [apiError, setApiError] = useState("");
 
   const { wallet } = walletContext;
-  const address = wallet.value.address;
+  const address = wallet.address;
 
   useEffect(() => {
     setIsLoading(configLoading || feeLoading);
@@ -66,7 +66,7 @@ export function useFairmintForm(fairminters: any[]) {
   };
 
   const handleSubmit = async () => {
-    if (!walletContext.isConnected.value) {
+    if (!walletContext.isConnected) {
       showConnectWalletModal.value = true;
       return;
     }
@@ -109,7 +109,7 @@ export function useFairmintForm(fairminters: any[]) {
       console.log("psbtHex:", psbtHex);
 
       const { signed, txid, error } = await walletContext.signPSBT(
-        wallet.value,
+        wallet,
         psbtHex,
         [],
         true,

@@ -51,7 +51,7 @@ export function useSRC20Form(
   const [walletError, setWalletError] = useState<string | null>(null);
 
   const { wallet } = walletContext;
-  const address = wallet.value.address; // This will be the selected address
+  const address = wallet.address;
 
   const isLoading = configLoading || feeLoading;
 
@@ -249,7 +249,7 @@ export function useSRC20Form(
     console.log("handleSubmit called with trxType:", trxType);
     console.log("Entering handleSubmit in useSRC20Form");
 
-    if (!walletContext.isConnected.value) {
+    if (!walletContext.isConnected) {
       console.log("Wallet not connected. Showing connect modal.");
       showConnectWalletModal.value = true;
       return;
@@ -343,7 +343,7 @@ export function useSRC20Form(
       // Handle wallet interaction
       console.log("Calling walletContext.signPSBT");
       const walletResult = await walletContext.signPSBT(
-        wallet.value,
+        wallet,
         response.data.hex,
         response.data.inputsToSign || [],
         true, // Enable RBF

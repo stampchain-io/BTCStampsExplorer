@@ -19,7 +19,7 @@ export const connectUnisat = async (
 
 const handleAccountsChanged = async (_accounts: string[]) => {
   console.log("handleAccountsChanged", _accounts);
-  if (walletContext.wallet.value.accounts[0] === _accounts[0]) {
+  if (walletContext.wallet.address === _accounts[0]) {
     return;
   }
   if (_accounts.length === 0) {
@@ -39,19 +39,18 @@ const handleAccountsChanged = async (_accounts: string[]) => {
   _wallet.stampBalance = basicInfo.stampBalance;
   _wallet.network = "mainnet";
   _wallet.provider = "unisat";
-  walletContext.isConnected.value = true;
   walletContext.updateWallet(_wallet);
 };
 
 const unisat = (globalThis as any).unisat;
 unisat?.on("accountsChanged", handleAccountsChanged);
 
-// Sign a PSBT hex transaction with Unisat
 export const signPSBT = async (
   psbtHex: string,
-  options?: {
-    inputsToSign?: { index: number }[];
-  },
+  inputsToSign?: { index: number; sighashTypes?: number[] }[],
+  enableRBF = true,
+  sighashTypes?: number[],
+  autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
   try {
     const unisat = (globalThis as any).unisat;
@@ -61,12 +60,11 @@ export const signPSBT = async (
 
     // Prepare options for signing
     const unisatOptions: any = {
-      // Set autoFinalized to true to let Unisat finalize the PSBT
-      autoFinalized: true,
+      autoFinalized: true, // Default is true
     };
 
-    if (options?.inputsToSign && options.inputsToSign.length > 0) {
-      unisatOptions.toSignInputs = options.inputsToSign.map((input, idx) => {
+    if (inputsToSign && inputsToSign.length > 0) {
+      unisatOptions.toSignInputs = inputsToSign.map((input, idx) => {
         if (typeof input.index !== "number") {
           throw new Error(
             `Input at position ${idx} is missing 'index' property`,
@@ -74,7 +72,8 @@ export const signPSBT = async (
         }
         return {
           index: input.index,
-          address: walletContext.wallet.value.address,
+          address: walletContext.wallet.address,
+          sighashTypes: input.sighashTypes || sighashTypes,
         };
       });
     }
@@ -85,10 +84,15 @@ export const signPSBT = async (
     console.log("Unisat signPsbt result (signedPsbtHex):", signedPsbtHex);
 
     if (signedPsbtHex && typeof signedPsbtHex === "string") {
-      // Broadcast the signed PSBT using Unisat's pushPsbt method
-      const txid = await unisat.pushPsbt(signedPsbtHex);
-      console.log("Transaction broadcasted with txid:", txid);
-      return { signed: true, txid };
+      if (autoBroadcast) {
+        // Broadcast the signed PSBT using Unisat's pushPsbt method
+        const txid = await unisat.pushPsbt(signedPsbtHex);
+        console.log("Transaction broadcasted with txid:", txid);
+        return { signed: true, txid };
+      } else {
+        // Return the signed PSBT for further handling
+        return { signed: true, psbt: signedPsbtHex };
+      }
     } else {
       return {
         signed: false,
@@ -96,10 +100,10 @@ export const signPSBT = async (
       };
     }
   } catch (error) {
-    console.error(
-      "Error signing and broadcasting transaction with Unisat:",
-      error,
-    );
+    console.error("Error signing PSBT with Unisat:", error);
+    if (error.message && error.message.includes("User rejected")) {
+      return { signed: false, cancelled: true };
+    }
     return {
       signed: false,
       error: error.message || "Unknown error occurred",
