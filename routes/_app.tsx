@@ -25,8 +25,13 @@ export default function App({ Component }: AppProps) {
           content="Bitcoin, Stamps, UTXO, Art, Blockchain"
         />
         <meta name="author" content="Stampchain.io" />
+        <link rel="stylesheet" href="/carousel.css" />
         <link rel="stylesheet" href="/styles.css" />
         <link rel="stylesheet" href="/gradients.css" />
+        <link
+          rel="stylesheet"
+          href="https://esm.sh/swiper/swiper-bundle.min.css"
+        />
 
         {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
