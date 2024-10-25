@@ -78,22 +78,30 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     >
                       {convertToEmoji(src20.tick)}
                       <div className="flex gap-2">
-                        <img
-                          width="20px"
-                          src="/img/src20/details/EnvelopeSimple.svg"
-                        />
-                        <img
-                          width="20px"
-                          src="/img/src20/details/Globe.svg"
-                        />
-                        <img
-                          width="20px"
-                          src="/img/src20/details/TelegramLogo.svg"
-                        />
-                        <img
-                          width="20px"
-                          src="/img/src20/details/XLogo.svg"
-                        />
+                        {src20.email && (
+                          <img
+                            width="25px"
+                            src="/img/src20/details/EnvelopeSimple.svg"
+                          />
+                        )}
+                        {src20.web && (
+                          <img
+                            width="25px"
+                            src="/img/src20/details/Globe.svg"
+                          />
+                        )}
+                        {src20.tg && (
+                          <img
+                            width="25px"
+                            src="/img/src20/details/TelegramLogo.svg"
+                          />
+                        )}
+                        {src20.x && (
+                          <img
+                            width="25px"
+                            src="/img/src20/details/XLogo.svg"
+                          />
+                        )}
                       </div>
                     </a>
                     <p className="text-lg text-[#666666] font-light">
@@ -176,22 +184,30 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                       <a href={href} class="flex gap-4 text-xl uppercase">
                         {convertToEmoji(src20.tick)}
                         <div className="flex gap-2">
-                          <img
-                            width="20px"
-                            src="/img/src20/details/EnvelopeSimple.svg"
-                          />
-                          <img
-                            width="20px"
-                            src="/img/src20/details/Globe.svg"
-                          />
-                          <img
-                            width="20px"
-                            src="/img/src20/details/TelegramLogo.svg"
-                          />
-                          <img
-                            width="20px"
-                            src="/img/src20/details/XLogo.svg"
-                          />
+                          {src20.email && (
+                            <img
+                              width="18px"
+                              src="/img/src20/details/EnvelopeSimple.svg"
+                            />
+                          )}
+                          {src20.web && (
+                            <img
+                              width="18px"
+                              src="/img/src20/details/Globe.svg"
+                            />
+                          )}
+                          {src20.tg && (
+                            <img
+                              width="18px"
+                              src="/img/src20/details/TelegramLogo.svg"
+                            />
+                          )}
+                          {src20.x && (
+                            <img
+                              width="18px"
+                              src="/img/src20/details/XLogo.svg"
+                            />
+                          )}
                         </div>
                       </a>
                       <p className="text-lg text-[#666666] font-light">

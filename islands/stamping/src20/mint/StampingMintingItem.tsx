@@ -31,8 +31,10 @@ const StampingMintingItem = ({ src20 }: StampingMintingItemProps) => {
     >
       <div className="p-3 uppercase cursor-pointer flex gap-6">
         <img
-          src={src20.stamp_url || `/content/${src20.tx_hash}.svg`}
-          className="w-[65px] h-[65px]"
+          src={src20.stamp_url || src20.deploy_img ||
+            `/content/${src20.tx_hash}.svg` ||
+            `/content/${src20.deploy_tx}`}
+          className="w-[75px] h-[75px]"
           alt={src20.tick}
         />
         <div className="flex flex-col justify-between">
@@ -57,12 +59,14 @@ const StampingMintingItem = ({ src20 }: StampingMintingItemProps) => {
               PROGRESS
             </p>
 
-            <div className="hidden md:block min-w-[200px] h-1 bg-[#999999] relative rounded-full">
-              <div
-                className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
-                style={{ width: progressWidth }}
-              />
-            </div>
+            {(progress !== "100") && (
+              <div className="hidden md:block min-w-[200px] h-1 bg-[#999999] relative rounded-full">
+                <div
+                  className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
+                  style={{ width: progressWidth }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -88,14 +92,16 @@ const StampingMintingItem = ({ src20 }: StampingMintingItemProps) => {
         </p>
       </div>
 
-      <div className="p-3 text-sm text-center flex flex-col justify-center">
-        <button
-          onClick={handleMintClick}
-          className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]"
-        >
-          Mint
-        </button>
-      </div>
+      {progress !== "100" && (
+        <div className="p-3 text-sm text-center flex flex-col justify-center">
+          <button
+            onClick={handleMintClick}
+            className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]"
+          >
+            Mint
+          </button>
+        </div>
+      )}
     </div>
   );
 };

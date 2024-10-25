@@ -34,6 +34,22 @@ const SLIDE_DATA = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
   },
+  {
+    url: "/img/home/carousel1.png",
+    alt: "Slide 4",
+    title: "PEPE",
+    subTitle: "BY VOGELMANN",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
+  },
+  {
+    url: "/img/home/carousel2.png",
+    alt: "Slide 5",
+    title: "PEPE",
+    subTitle: "BY VOGELMANN",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
+  },
 ];
 
 const Carousel = (props: CarouselProps) => {
@@ -79,7 +95,7 @@ const Carousel = (props: CarouselProps) => {
               ? "left-1/2 -translate-x-1/2 w-[calc(30%+200px)] z-10 opacity-100 blur-none border-4 border-[#9900EE] shadow-[0px_0px_20px_#9900EE]"
               : (index === (currentSlide.value - 1 + SLIDE_DATA.length) %
                   SLIDE_DATA.length
-                ? "left-[16.67%] -translate-x-1/2 top-[100px] w-1/3 z-0 opacity-50 blur-sm"
+                ? "left-[16.67%] -translate-x-1/2 top-[80px] w-1/3 z-0 opacity-50 blur-sm"
                 : "left-[83.33%] -translate-x-1/2 top-[100px] w-1/3 z-0 opacity-50 blur-sm")
           }`}
         />

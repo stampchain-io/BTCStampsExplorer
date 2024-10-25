@@ -97,15 +97,16 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             {stamp.cpid}
           </a>
           <p className="hidden md:block text-[#8800CC] overflow-hidden text-ellipsis whitespace-nowrap text-4xl font-light">
-            by{" "}
+            BY{" "}
             <span className={"font-bold"}>
-              {stamp.creator_name
-                ? stamp.creator_name
-                : (
-                  <a href={`/wallet/${stamp.creator}`}>
-                    {stamp.creator}
-                  </a>
-                )}
+              {stamp.creator_name ? stamp.creator_name : (
+                <a
+                  className="text-[#8800CC]"
+                  href={`/wallet/${stamp.creator}`}
+                >
+                  Stampchain
+                </a>
+              )}
             </span>
           </p>
 
