@@ -94,7 +94,7 @@ export function HomeStampPreview({
       </div>
 
       <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-5xl md:text-5xl lg:text-6xl  font-black gray-gradient">
+        <h1 class="text-5xl md:text-5xl lg:text-6xl  font-black gray-gradient1">
           FEATURED COLLECTIONS
         </h1>
         <p className="text-[#CCCCCC] text-2xl md:text-5xl font-extralight">
