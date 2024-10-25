@@ -1,5 +1,5 @@
 import { StampService } from "$lib/services/stampService.ts";
-import { dbManager } from "../../server/database/db.ts";
+import { dbManager } from "$server/database/db.ts";
 import { DispenserFilter, Fairminter, XcpBalance } from "$lib/types/index.d.ts";
 
 export const xcp_v2_nodes = [
@@ -850,7 +850,6 @@ export class XcpManager {
     quantity: number,
     options: {
       destination?: string;
-      encoding?: string;
       fee_per_kb?: number;
       regular_dust_size?: number;
       multisig_dust_size?: number;
@@ -863,7 +862,7 @@ export class XcpManager {
       disable_utxo_locks?: boolean;
       p2sh_pretx_txid?: string;
       segwit?: boolean;
-      confirmation_target?: number;
+      confirmation_target?: number; // pass a value for block target
       exclude_utxos?: string;
       inputs_set?: string;
       return_psbt?: boolean;
@@ -877,12 +876,29 @@ export class XcpManager {
     const endpoint = `/addresses/${address}/compose/attach`;
     const queryParams = new URLSearchParams();
 
+    queryParams.append("multisig_dust_size", "788");
     queryParams.append("asset", asset);
     queryParams.append("quantity", quantity.toString());
+    queryParams.append("return_psbt", "true");
+    queryParams.append("verbose", "true");
+
+    // The API expects sat/kB
+    if (options.fee_per_kb) {
+      console.log(`Setting fee rate to ${options.fee_per_kb} sat/kB`);
+      queryParams.append(
+        "fee_per_kb",
+        Math.floor(options.fee_per_kb).toString(),
+      );
+    }
+
+    // if address is a segwit address, set segwit to true
+    if (address.startsWith("bc1")) {
+      queryParams.append("segwit", "true");
+    }
 
     // Append optional parameters if provided
     if (options.destination) {
-      queryParams.append("destination", options.destination);
+      queryParams.append("inputs_set", options.destination);
     }
 
     for (const [key, value] of Object.entries(options)) {
@@ -890,6 +906,8 @@ export class XcpManager {
         queryParams.append(key, value.toString());
       }
     }
+
+    let lastError: string | null = null;
 
     for (const node of xcp_v2_nodes) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
@@ -902,18 +920,53 @@ export class XcpManager {
         if (!response.ok) {
           const errorBody = await response.text();
           console.error(`Error response body from ${node.name}: ${errorBody}`);
-          continue; // Try the next node
+
+          try {
+            const errorJson = JSON.parse(errorBody);
+            if (errorJson.error) {
+              // Store the error message but clean it up first
+              const errorMessage = errorJson.error;
+              if (errorMessage.includes("Insufficient BTC")) {
+                // Extract just the relevant part of the error message
+                const match = errorMessage.match(
+                  /Insufficient BTC at address .+? Need: .+? BTC \(Including fee: .+? BTC\), available: .+? BTC/,
+                );
+                if (match) {
+                  lastError = match[0];
+                } else {
+                  lastError = errorMessage;
+                }
+                throw new Error(lastError);
+              }
+            }
+          } catch (parseError) {
+            // If JSON parsing fails, continue to next node
+            continue;
+          }
+          continue;
         }
 
         const data = await response.json();
-        console.log(`Successful response from ${node.name}`);
+        console.log(`Successful response from ${node.name}`, data);
         return data;
       } catch (error) {
+        // If this is an insufficient funds error, throw it immediately
+        if (
+          error instanceof Error && error.message.includes("Insufficient BTC")
+        ) {
+          throw error;
+        }
+        // Otherwise log and continue to next node
         console.error(`Fetch error for ${url}:`, error);
-        // Continue to the next node
       }
     }
 
+    // If we have a stored error message, throw that instead of generic message
+    if (lastError) {
+      throw new Error(lastError);
+    }
+
+    // Only throw generic error if all nodes fail and no specific error was caught
     throw new Error("All nodes failed to compose attach transaction.");
   }
 

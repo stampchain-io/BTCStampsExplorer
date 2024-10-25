@@ -124,13 +124,14 @@ const signMessage = async (message: string) => {
 
 export const signPSBT = async (
   psbtHex: string,
-  inputsToSign?: { index: number }[],
+  inputsToSign: { index: number }[],
   enableRBF = true,
   sighashTypes?: number[],
+  autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
   console.log("Entering Leather signPSBT function");
   console.log("PSBT hex length:", psbtHex.length);
-  console.log("Number of inputs to sign:", inputsToSign?.length);
+  console.log("Number of inputs to sign:", inputsToSign.length);
 
   const leatherProvider = (globalThis as any).LeatherProvider;
   if (typeof leatherProvider === "undefined") {
@@ -139,34 +140,28 @@ export const signPSBT = async (
   }
 
   try {
-    console.log("Calling Leather provider signPsbt method");
-    console.log("Input parameters:", {
-      hex: psbtHex.substring(0, 50) + "...", // Log first 50 characters of hex
+    const requestParams = {
+      hex: psbtHex,
       network: "mainnet",
-      broadcast: true,
+      broadcast: autoBroadcast,
       inputsToSign: inputsToSign || undefined,
       rbf: enableRBF,
       sighashTypes: sighashTypes || undefined, // Pass sighashTypes if provided
-    });
+    };
 
-    const result = await leatherProvider.request(
-      "signPsbt",
-      {
-        hex: psbtHex,
-        network: "mainnet",
-        broadcast: true,
-        inputsToSign: inputsToSign || undefined,
-        rbf: enableRBF,
-        sighashTypes: sighashTypes || undefined, // Pass sighashTypes if provided
-      },
-    );
+    console.log("Calling Leather provider signPsbt method");
+    console.log("Input parameters:", requestParams);
+
+    const result = await leatherProvider.request("signPsbt", requestParams);
 
     console.log("Leather signPsbt result:", JSON.stringify(result, null, 2));
 
     if (result && result.result) {
       if (result.result.hex) {
+        // For PSBTs that are not fully signed
         return { signed: true, psbt: result.result.hex };
       } else if (result.result.txid) {
+        // For fully signed and broadcasted transactions
         return { signed: true, txid: result.result.txid };
       }
     }

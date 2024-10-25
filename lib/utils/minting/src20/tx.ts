@@ -5,7 +5,7 @@ import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
 import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
-import { arc4, bin2hex, hex2bin } from "utils/minting/utils.ts";
+import { arc4, bin2hex, hex2bin } from "../transactionUtils.ts";
 import { compressWithCheck } from "utils/minting/zlib.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/index.d.ts";
@@ -122,7 +122,7 @@ export const prepareSrc20TX = async ({
       let pubkey1: string, pubkey2: string;
 
       do {
-        const first_byte = Math.random() > 0.5 ? "02" : "03";
+        const first_byte = crypto.randomBytes(1)[0] & 1 ? "02" : "03";
         const second_byte = crypto.randomBytes(1)[0]
           .toString(16)
           .padStart(2, "0");
@@ -130,7 +130,7 @@ export const prepareSrc20TX = async ({
       } while (!isValidPubkey(pubkey1));
 
       do {
-        const first_byte = Math.random() > 0.5 ? "02" : "03";
+        const first_byte = crypto.randomBytes(1)[0] & 1 ? "02" : "03";
         const second_byte = crypto.randomBytes(1)[0]
           .toString(16)
           .padStart(2, "0");

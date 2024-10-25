@@ -1,10 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
-import {
-  createPSBT,
-  validateUTXOOwnership,
-} from "../../../../server/btc_server.ts";
-import { Buffer } from "buffer";
+import { createPSBT, validateUTXOOwnership } from "$server/btc_server.ts";
 
 interface CreatePSBTInput {
   utxo: string;
