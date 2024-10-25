@@ -60,7 +60,9 @@
     "$server/": "./server/",
     "tiny-secp256k1": "npm:tiny-secp256k1@2.2.3",
     "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts",
-    "qrcode": "https://esm.sh/qrcode@1.5.1"
+    "qrcode": "https://esm.sh/qrcode@1.5.1",
+    "swiper/": "https://esm.sh/swiper@11.1.14/",
+    "swiper": "https://esm.sh/swiper@11.1.14"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
