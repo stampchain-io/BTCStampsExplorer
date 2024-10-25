@@ -31,28 +31,6 @@ export function arc4(key: Uint8Array, data: Uint8Array): Uint8Array {
   return result;
 }
 
-export function hex2bin(hexString: string): Uint8Array {
-  const normalizedHex = hexString.replace(/\s/g, "");
-  const bytes = new Uint8Array(
-    normalizedHex.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? [],
-  );
-  return bytes;
-}
-
-export function bin2hex(data: Uint8Array): string {
-  return Array.from(data)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-export function arraysEqual(a: Uint8Array, b: Uint8Array): boolean {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; ++i) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
 export function extractOutputs(tx: bitcoin.Transaction, address: string) {
   const outputs = [];
   for (const vout of tx.outs) {
@@ -84,13 +62,4 @@ export function extractOutputs(tx: bitcoin.Transaction, address: string) {
     }
   }
   return outputs as Output[];
-}
-
-export function hexToBytes(hex: string): Uint8Array {
-  if (hex.length % 2 !== 0) throw new Error("Invalid hex string");
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < bytes.length; i++) {
-    bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
-  }
-  return bytes;
 }
