@@ -1,4 +1,4 @@
-import * as btc from "bitcoin";
+import * as btc from "bitcoinjs-lib";
 import { mintMethodOPRETURN } from "utils/minting/stamp.ts";
 import { handleXcpV1Query } from "utils/xcpUtils.ts";
 import { extractOutputs } from "utils/minting/utils.ts";

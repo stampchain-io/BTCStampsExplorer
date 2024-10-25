@@ -1,4 +1,4 @@
-import * as btc from "bitcoin";
+import * as btc from "bitcoinjs-lib";
 import { Buffer } from "buffer";
 import { generateRandomNumber } from "utils/util.ts";
 import { handleXcpV1Query } from "utils/xcpUtils.ts";
