@@ -1,7 +1,9 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import Carousel from "../Carousel.tsx";
+import Carousel3D from "$islands/Carousel3D.tsx";
 
 export const HomeCarousel = () => {
+  return <Carousel3D />;
   return (
     <>
       {IS_BROWSER
