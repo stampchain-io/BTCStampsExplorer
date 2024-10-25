@@ -1,7 +1,7 @@
 // lib/utils/minting/zlib.ts
 
 import { Foras, Memory, unzlib, zlib } from "compress";
-import { arraysEqual } from "./transactionUtils.ts";
+import { arraysEqual } from "$lib/utils/binary/baseUtils.ts";
 
 let initialized = false;
 
