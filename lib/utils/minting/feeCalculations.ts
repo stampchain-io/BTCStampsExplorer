@@ -1,6 +1,5 @@
 import type { Output } from "$lib/types/index.d.ts";
 import { estimateP2WSHTransactionSize } from "./transactionSizes.ts";
-import { Buffer } from "buffer";
 
 // Frontend constants
 const DUST_SIZE = 333;
@@ -12,11 +11,14 @@ const SCRIPT_SIZES = {
 };
 
 // Frontend-only script size estimation
-function getScriptSize(script?: string | Buffer): number {
-  // Handle Buffer or convert to string if needed
-  const scriptStr = Buffer.isBuffer(script) ? script.toString("hex") : script;
+function getScriptSize(script?: string | Uint8Array): number {
+  if (!script) return SCRIPT_SIZES.P2WPKH; // Default to P2WPKH
 
-  if (!scriptStr) return SCRIPT_SIZES.P2WPKH; // Default to P2WPKH
+  // If it's a Uint8Array, convert to hex string
+  const scriptStr = script instanceof Uint8Array
+    ? Array.from(script).map((b) => b.toString(16).padStart(2, "0")).join("")
+    : script;
+
   if (typeof scriptStr !== "string") return SCRIPT_SIZES.P2WPKH;
 
   if (scriptStr.startsWith("76a914")) return SCRIPT_SIZES.P2PKH;
