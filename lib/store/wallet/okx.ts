@@ -93,7 +93,7 @@ const signMessage = async (message: string) => {
 
 const signPSBT = async (
   psbtHex: string,
-  inputsToSign?: { index: number }[],
+  inputsToSign: { index: number }[],
   enableRBF = true,
   sighashTypes?: number[],
   autoBroadcast = true,
@@ -105,9 +105,10 @@ const signPSBT = async (
     };
 
     if (inputsToSign && inputsToSign.length > 0) {
-      options.toSignInputs = inputsToSign.map((input) => ({
+      options.toSignInputs = inputsToSign.map((input, idx) => ({
         index: input.index,
-        sighashTypes: sighashTypes,
+        // Assign sighashTypes per input if available
+        sighashTypes: sighashTypes ? [sighashTypes[idx]] : undefined,
       }));
     }
 

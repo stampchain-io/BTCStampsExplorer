@@ -9,6 +9,11 @@ const SIGHASH_SINGLE = 0x03;
 const SIGHASH_ANYONECANPAY = 0x80;
 const SIGHASH_SINGLE_ANYONECANPAY = SIGHASH_SINGLE | SIGHASH_ANYONECANPAY; // 131
 
+// Add constants at the top
+const SATS_PER_KB_MULTIPLIER = 1000; // Convert vB to kB
+const MIN_FEE_RATE_VB = 1; // minimum sat/vB
+const MAX_FEE_RATE_VB = 500; // maximum sat/vB
+
 export function TradeContent() {
   // Destructure walletContext to get wallet, isConnected, and showConnectModal
   const { wallet, isConnected, showConnectModal } = walletContext;
@@ -26,7 +31,7 @@ export function TradeContent() {
   const [attachFormState, setAttachFormState] = useState({
     cpid: "",
     quantity: "",
-    feePerKB: "",
+    feeRateVB: "", // Changed from feePerKB to feeRateVB to indicate sat/vB
     utxo: "",
     psbtHex: "",
   });
@@ -35,6 +40,8 @@ export function TradeContent() {
   const [buyerFormState, setBuyerFormState] = useState({
     sellerPsbtHex: "",
     buyerUtxo: "",
+    salePrice: "",
+    feeRate: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -147,14 +154,30 @@ export function TradeContent() {
     setApiError(null);
 
     try {
-      const { cpid, quantity, feePerKB, utxo } = attachFormState;
+      const { cpid, quantity, feeRateVB, utxo } = attachFormState;
 
       // Validate inputs
-      if (!cpid || !quantity || !feePerKB || !utxo) {
+      if (!cpid || !quantity || !feeRateVB || !utxo) {
         setApiError("Please fill in all fields with valid values.");
         setIsSubmitting(false);
         return;
       }
+
+      // Parse and validate fee rate
+      const parsedFeeRate = parseInt(feeRateVB, 10);
+      if (parsedFeeRate < MIN_FEE_RATE_VB || parsedFeeRate > MAX_FEE_RATE_VB) {
+        setApiError(
+          `Fee rate must be between ${MIN_FEE_RATE_VB} and ${MAX_FEE_RATE_VB} sat/vB`,
+        );
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Convert fee rate from sat/vB to sat/kB (multiply by 1000)
+      const feeRateKB = parsedFeeRate * SATS_PER_KB_MULTIPLIER;
+      console.log(
+        `Converting fee rate: ${parsedFeeRate} sat/vB = ${feeRateKB} sat/kB`,
+      );
 
       // Prepare the request body
       const requestBody = {
@@ -166,7 +189,7 @@ export function TradeContent() {
           return_psbt: true,
           extended_tx_info: true,
           regular_dust_size: 588,
-          fee_per_kb: parseInt(feePerKB, 10),
+          fee_per_kb: feeRateKB, // This should now be 15000 for 15 sat/vB
         },
       };
 
@@ -186,6 +209,16 @@ export function TradeContent() {
 
       const data = await response.json();
       const psbtHex = data.psbt;
+      let inputsToSign = data.inputsToSign;
+
+      // Validate 'inputsToSign' structure
+      inputsToSign = inputsToSign.map((input) => {
+        if (typeof input.index === "number") {
+          return { index: input.index };
+        } else {
+          throw new Error(`Invalid index in inputsToSign: ${input.index}`);
+        }
+      });
 
       console.log("Received PSBT hex:", psbtHex);
 
@@ -193,16 +226,14 @@ export function TradeContent() {
       const walletResult = await walletContext.signPSBT(
         wallet,
         psbtHex,
-        [], // Inputs to sign (if any)
+        inputsToSign,
         true, // Enable RBF
-        undefined, // Sighash types
-        false, // Set autoBroadcast to false
+        undefined, // Omit sighashTypes to use default
+        true, // Set autoBroadcast to true
       );
 
       if (walletResult.signed) {
-        setSubmissionMessage(
-          "PSBT signed successfully. Here's the signed PSBT hex:",
-        );
+        setSubmissionMessage("Transaction signed and broadcast successfully!");
         setAttachFormState((prev) => ({ ...prev, psbtHex: walletResult.psbt }));
       } else if (walletResult.cancelled) {
         setSubmissionMessage("PSBT signing cancelled by user.");
@@ -237,8 +268,24 @@ export function TradeContent() {
     setApiError(null);
 
     try {
-      const { sellerPsbtHex, buyerUtxo } = buyerFormState;
+      const { sellerPsbtHex, buyerUtxo, feeRate } = buyerFormState;
 
+      // Validate inputs
+      if (!sellerPsbtHex || !buyerUtxo || !feeRate) {
+        setApiError("Please fill in all fields");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Parse fee rate as integer
+      const parsedFeeRate = parseInt(feeRate, 10);
+      if (isNaN(parsedFeeRate) || parsedFeeRate <= 0) {
+        setApiError("Invalid fee rate");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Call the API to complete the PSBT
       const response = await fetch("/api/v2/trx/complete_psbt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -246,36 +293,40 @@ export function TradeContent() {
           sellerPsbtHex,
           buyerUtxo,
           buyerAddress: address,
+          feeRate: parsedFeeRate, // Use parsed fee rate
         }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Error completing PSBT: ${errorData.error}`);
+        const text = await response.text();
+        throw new Error(`Server error: ${text}`);
       }
 
       const data = await response.json();
-      const completedPsbtHex = data.psbt;
+      const completedPsbt = data.completedPsbt;
 
-      // Sign the completed PSBT
-      const walletResult = await walletContext.signPSBT(
+      if (!completedPsbt) {
+        throw new Error("Received empty PSBT from server");
+      }
+
+      // Sign the completed PSBT with the wallet
+      const signResult = await walletContext.signPSBT(
         wallet,
-        completedPsbtHex,
-        [{ index: 1 }], // Assuming buyer's input is at index 1
+        completedPsbt,
+        [{ index: 1 }], // Buyer's input is at index 1
         true, // Enable RBF
-        [1], // SIGHASH_ALL
-        true, // Broadcast the transaction
+        [SIGHASH_SINGLE_ANYONECANPAY], // Use the same sighash as seller
+        true, // autoBroadcast
       );
 
-      if (walletResult.signed) {
-        setSubmissionMessage("Swap completed and broadcast successfully!");
-      } else {
-        throw new Error(
-          walletResult.error || "Failed to sign or broadcast the transaction",
-        );
+      if (!signResult.signed) {
+        console.error("Sign result:", signResult);
+        throw new Error(signResult.error || "Failed to sign PSBT");
       }
+
+      setSubmissionMessage("Swap completed and broadcast successfully!");
     } catch (error) {
-      console.error("Error completing swap:", error);
+      console.error("Complete swap error:", error);
       setApiError(error.message);
     } finally {
       setIsSubmitting(false);
@@ -358,9 +409,9 @@ export function TradeContent() {
           />
           <InputField
             type="number"
-            placeholder="Fee per KB (sat/kB)"
-            value={attachFormState.feePerKB}
-            onChange={(e) => handleAttachInputChange(e, "feePerKB")}
+            placeholder="Fee Rate (sat/vB)" // Updated placeholder
+            value={attachFormState.feeRateVB} // Updated name
+            onChange={(e) => handleAttachInputChange(e, "feeRateVB")} // Updated name
             min="1"
           />
           <InputField
@@ -416,6 +467,14 @@ export function TradeContent() {
             placeholder="Your UTXO (e.g., txid:vout)"
             value={buyerFormState.buyerUtxo}
             onChange={(e) => handleBuyerInputChange(e, "buyerUtxo")}
+          />
+          {/* Add this input field in the buyer section */}
+          <InputField
+            type="number"
+            placeholder="Fee Rate (sat/vB)"
+            value={buyerFormState.feeRate}
+            onChange={(e) => handleBuyerInputChange(e, "feeRate")}
+            min="1"
           />
         </div>
         <div className="flex justify-end gap-6 mt-6">

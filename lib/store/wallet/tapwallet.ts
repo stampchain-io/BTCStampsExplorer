@@ -92,15 +92,12 @@ const signPSBT = async (
   }
   try {
     const options: any = {
-      // Include options based on TapWallet's API
       enableRBF,
-      // Add any other necessary options
     };
 
     if (inputsToSign && inputsToSign.length > 0) {
       options.inputsToSign = inputsToSign.map((input) => ({
         index: input.index,
-        // Include `sighashTypes` if supported
         sighashTypes: sighashTypes || undefined,
       }));
     }

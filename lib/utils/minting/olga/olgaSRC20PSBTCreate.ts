@@ -1,14 +1,14 @@
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "buffer";
-import { UTXO } from "utils/minting/src20/utils.d.ts";
+import { UTXO } from "$lib/types/index.d.ts";
 import { getTransaction } from "utils/quicknode.ts";
 import { PSBTInput } from "$lib/types/index.d.ts";
 import CIP33 from "utils/minting/olga/CIP33.ts";
 import {
   calculateDust,
   calculateMiningFee,
-  estimateP2WSHTransactionSize,
 } from "utils/minting/feeCalculations.ts";
+import { estimateP2WSHTransactionSize } from "../transactionSizes.ts";
 import * as msgpack from "msgpack";
 import { compressWithCheck } from "../zlib.ts";
 import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";

@@ -1,6 +1,10 @@
 import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "buffer";
-import { arc4, bin2hex, hex2bin } from "$lib/utils/minting/utils.ts";
+import {
+  arc4,
+  bin2hex,
+  hex2bin,
+} from "../lib/utils/minting/transactionUtils.ts";
 import { zLibUncompress } from "$lib/utils/minting/zlib.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
 import * as msgpack from "msgpack";

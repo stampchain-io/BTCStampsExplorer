@@ -1,4 +1,31 @@
+import type { Output } from "$lib/types/index.d.ts";
+import { estimateP2WSHTransactionSize } from "./transactionSizes.ts";
+import { Buffer } from "buffer";
+
+// Frontend constants
 const DUST_SIZE = 333;
+const SCRIPT_SIZES = {
+  P2PKH: 25,
+  P2WPKH: 22,
+  P2WSH: 34,
+  P2TR: 65,
+};
+
+// Frontend-only script size estimation
+function getScriptSize(script?: string | Buffer): number {
+  // Handle Buffer or convert to string if needed
+  const scriptStr = Buffer.isBuffer(script) ? script.toString("hex") : script;
+
+  if (!scriptStr) return SCRIPT_SIZES.P2WPKH; // Default to P2WPKH
+  if (typeof scriptStr !== "string") return SCRIPT_SIZES.P2WPKH;
+
+  if (scriptStr.startsWith("76a914")) return SCRIPT_SIZES.P2PKH;
+  if (scriptStr.startsWith("0014")) return SCRIPT_SIZES.P2WPKH;
+  if (scriptStr.startsWith("0020")) return SCRIPT_SIZES.P2WSH;
+  if (scriptStr.startsWith("5120")) return SCRIPT_SIZES.P2TR;
+
+  return scriptStr.length / 2;
+}
 
 export function calculateDust(fileSize: number): number {
   const outputCount = Math.ceil(fileSize / 32);
@@ -62,18 +89,27 @@ export function estimateTransactionVSize(fileSize: number): number {
   return virtualSize;
 }
 
-export function estimateP2WSHTransactionSize(fileSize: number): number {
-  const outputVB = Math.ceil(fileSize / 32) * 43;
-  const overHeadVB = 185; // estimate based on 1 input 1 op return and 2 outputs
-  const totalSizeInB = overHeadVB + outputVB;
-  return totalSizeInB;
-}
-
 export function calculateMiningFee(
   fileSize: number,
   feeSatsPerVByte: number,
 ): number {
-  const totalVSize = estimateTransactionVSize(fileSize);
-  const totalMiningFee = totalVSize * feeSatsPerVByte;
-  return totalMiningFee;
+  const vsize = estimateP2WSHTransactionSize(fileSize);
+  return vsize * feeSatsPerVByte;
+}
+
+export function estimateFee(outputs: Output[], feeRate: number): number {
+  const outputSize = outputs.reduce((acc, output) => {
+    // Handle both script and address cases
+    const scriptSize = output.script
+      ? getScriptSize(output.script)
+      : SCRIPT_SIZES.P2WPKH; // Default for address-only outputs
+
+    return acc + (8 + 1 + scriptSize); // 8 bytes value, 1 byte script length
+  }, 0);
+
+  const transactionOverhead = 10; // Version, locktime, segwit marker
+  const estimatedInputSize = 68; // Assume P2WPKH input
+  const totalSize = outputSize + transactionOverhead + estimatedInputSize;
+
+  return Math.ceil(totalSize * feeRate);
 }

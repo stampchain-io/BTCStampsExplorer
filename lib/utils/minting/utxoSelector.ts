@@ -1,7 +1,8 @@
 import { Buffer } from "buffer";
-import type { Output, UTXO } from "utils/minting/src20/utils.d.ts";
-import { getUTXOForAddress } from "./src20/utils.ts";
+import type { Output, UTXO } from "$lib/types/index.d.ts";
+import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { XcpManager } from "$lib/services/xcpService.ts";
+import { TX_SIZES } from "./transactionSizes.ts";
 
 const CHANGE_DUST = 1000; // This should match the value in tx.ts
 
@@ -22,42 +23,46 @@ function isP2TR(script: string): boolean {
 }
 
 function calculateSizeP2WPKH(script: string): number {
-  const baseInputSize = 32 + 4 + 4 + 1;
-  const witnessSize = 1 + 72 + 1 + 33;
-  const witnessWeight = witnessSize * 0.25;
+  // First validate that this is actually a P2WPKH script
+  if (!isP2WPKH(script)) {
+    console.warn("Non-P2WPKH script provided to calculateSizeP2WPKH:", script);
+    return 0;
+  }
 
-  return Math.floor(baseInputSize + witnessWeight) + 1;
+  // Use constants from transactionSizes.ts
+  const baseSize = TX_SIZES.P2WSH_INPUT; // Previous output (36) + sequence (4) + script length (1)
+  const witnessSize = TX_SIZES.WITNESS_OVERHEAD + // Count and length fields
+    TX_SIZES.WITNESS_STACK_ITEM; // Signature + pubkey
+
+  // Calculate weight units and convert to vbytes
+  const totalWeight = (baseSize * 4) + witnessSize;
+  return Math.ceil(totalWeight / 4);
 }
 
 export function estimateInputSize(script: string): number {
   let scriptSigSize = 0;
   if (isP2PKH(script)) {
-    scriptSigSize = 108;
+    scriptSigSize = 108; // Legacy P2PKH
   } else if (isP2SH(script)) {
-    scriptSigSize = 260;
+    scriptSigSize = 260; // P2SH
   } else if (isP2WPKH(script)) {
     scriptSigSize = calculateSizeP2WPKH(script);
   } else if (isP2TR(script)) {
-    scriptSigSize = 65; // Taproot input size (32 bytes prevout + 4 bytes nSequence + 1 byte scriptSig length + 1 byte witness items count + 1 byte signature length + 64 bytes signature + 1 byte control block length + 32 bytes internal key)
+    // Use Taproot constants if we add them to TX_SIZES
+    scriptSigSize = 65; // Taproot input size
   }
 
-  const txidSize = 32;
-  const voutSize = 4;
-  const sequenceSize = 4;
-
-  return txidSize + voutSize + sequenceSize + scriptSigSize;
+  return TX_SIZES.VERSION + TX_SIZES.LOCKTIME + scriptSigSize;
 }
 
 function estimateVoutSize(vout: Output): number {
-  let size = 0;
   if ("address" in vout) {
-    // Assume P2TR output size for Taproot addresses
-    size = 43; // 8 bytes value + 1 byte scriptPubKey length + 34 bytes scriptPubKey (1 byte OP_1 + 32 bytes public key)
+    return TX_SIZES.P2WPKH_OUTPUT; // Default to P2WPKH output size
   } else if ("script" in vout) {
     const scriptSize = Buffer.from(vout.script as string, "hex").length;
-    size = scriptSize + 8;
+    return scriptSize + 8; // 8 bytes for value
   }
-  return size;
+  return TX_SIZES.P2WPKH_OUTPUT; // Default
 }
 
 function estimateFixedTransactionSize(): number {

@@ -2,6 +2,8 @@ import { convertToEmoji } from "utils/util.ts";
 import { Src20Detail } from "globals";
 import * as crypto from "crypto";
 
+// FIXME: this should be consolidated with the src20MktService.ts
+
 const src20_listing_api = [
   {
     name: "stampscan_listing_summary",

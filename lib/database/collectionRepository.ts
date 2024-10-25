@@ -1,5 +1,5 @@
 import { SMALL_LIMIT } from "constants";
-import { dbManager } from "../../server/database/db.ts";
+import { dbManager } from "$server/database/db.ts";
 import { Collection } from "globals";
 export class CollectionRepository {
   static async getCollections(

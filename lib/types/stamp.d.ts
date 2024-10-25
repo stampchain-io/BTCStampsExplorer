@@ -1,4 +1,4 @@
-interface stampTransferData {
+export interface stampTransferData {
   sourceWallet: string;
   destinationWallet: string;
   assetName: string;
@@ -7,7 +7,7 @@ interface stampTransferData {
   satsPerKB: number;
 }
 
-interface stampMintData {
+export interface stampMintData {
   sourceWallet: string;
   destinationWallet?: string;
   assetName?: string;

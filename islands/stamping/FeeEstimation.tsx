@@ -3,7 +3,9 @@ import { useFeePolling } from "hooks/useFeePolling.tsx";
 import {
   calculateDust,
   calculateMiningFee,
+  estimateFee,
 } from "utils/minting/feeCalculations.ts";
+import type { Output } from "$lib/types/index.d.ts";
 
 interface FeeEstimationProps {
   fee: number;
@@ -17,6 +19,9 @@ interface FeeEstimationProps {
   isSubmitting: boolean;
   onSubmit: () => void;
   buttonName: string;
+  // New props to handle addresses
+  recipientAddress?: string;
+  userAddress?: string;
 }
 
 export function FeeEstimation({
@@ -31,14 +36,15 @@ export function FeeEstimation({
   isSubmitting,
   onSubmit,
   buttonName,
+  recipientAddress,
+  userAddress,
 }: FeeEstimationProps) {
   const { fees, loading } = useFeePolling();
-  console.log(fees);
 
   const [visible, setVisible] = useState(true);
-  const [txfee, setTxfee] = useState(0.001285);
-  const [mintfee, setMintfee] = useState(0.00000);
-  const [dust, setDust] = useState(0.000333);
+  const [txfee, setTxfee] = useState(0.0);
+  const [mintfee, setMintfee] = useState(0.0);
+  const [dust, setDust] = useState(0.0);
   const [total, setTotal] = useState(0.0);
   const [coinType, setCoinType] = useState("BTC");
 
@@ -54,23 +60,21 @@ export function FeeEstimation({
   }, [fees, loading]);
 
   useEffect(() => {
-    if (fileSize) {
-      const newDust = calculateDust(fileSize) / 100000000; // Convert satoshis to BTC
-      setDust(newDust);
-    }
-  }, [fileSize]);
-
-  useEffect(() => {
     if (fileSize && fee) {
-      console.log("[FeeEstimation] Recalculating fees", { fileSize, fee });
-      const newTxfee = calculateMiningFee(fileSize, fee) / 100000000; // Convert sats to BTC
+      let newTxfee = 0;
+      if (type === "stamp") {
+        const newDust = calculateDust(fileSize) / 1e8;
+        setDust(newDust);
+        newTxfee = calculateMiningFee(fileSize, fee) / 1e8;
+      } else {
+        const outputs: Output[] = [];
+        // Add your output construction logic here
+        newTxfee = estimateFee(outputs, fee) / 1e8;
+      }
       setTxfee(newTxfee);
-
-      const newTotal = newTxfee + mintfee + dust;
-      setTotal(newTotal);
-      console.log("[FeeEstimation] Updated fees", { newTxfee, newTotal });
+      // Rest of your fee calculation logic
     }
-  }, [fee, fileSize, mintfee, dust]);
+  }, [fileSize, fee, type]);
 
   // Define the coin icons
   const btcIcon = (
@@ -106,6 +110,14 @@ export function FeeEstimation({
   const handleChangeCoin = () => {
     setCoinType((prevType) => (prevType === "BTC" ? "USDT" : "BTC"));
   };
+
+  // Define outputs based on your context. For example:
+  const outputs: Output[] = [
+    // Populate this array with the outputs relevant to your transaction
+  ];
+
+  // Calculate the estimated fee based on the output size and sigops
+  const estimatedFee = estimateFee(outputs, fee);
 
   return (
     <div className="text-[#999999]">

@@ -3,7 +3,7 @@ import { Buffer } from "buffer";
 import { generateRandomNumber } from "utils/util.ts";
 import { handleXcpV1Query } from "utils/xcpUtils.ts";
 import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
-import { extractOutputs } from "utils/minting/utils.ts";
+import { extractOutputs } from "./transactionUtils.ts";
 import { XCPPayload } from "utils/xcpUtils.ts";
 import { getTransaction } from "utils/quicknode.ts";
 

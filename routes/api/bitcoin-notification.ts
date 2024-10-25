@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { dbManager } from "../../server/database/db.ts";
+import { dbManager } from "$server/database/db.ts";
 import { serverConfig } from "$server/config/config.ts";
 
 export const handler: Handlers = {

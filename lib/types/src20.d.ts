@@ -20,15 +20,6 @@ export interface PSBTInput {
   sequence?: number;
 }
 
-export interface UTXO {
-  txid: string;
-  vout: number;
-  value: number;
-  address: string;
-  script: string;
-  size?: number;
-}
-
 export interface IPrepareSRC20TX {
   network: string;
   changeAddress: string;

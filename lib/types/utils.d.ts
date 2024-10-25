@@ -1,4 +1,4 @@
-interface UTXOFromBlockCypher {
+export interface UTXOFromBlockCypher {
   tx_hash: string;
   block_height: number;
   tx_input_n: number;
@@ -13,7 +13,7 @@ interface UTXOFromBlockCypher {
   size: number;
 }
 
-interface UTXOFromBlockchain {
+export interface UTXOFromBlockchain {
   tx_hash_big_endian: string;
   tx_hash: string;
   tx_output_n: number;
@@ -24,19 +24,19 @@ interface UTXOFromBlockchain {
   tx_index: number;
 }
 
-interface UTXO {
+export interface UTXO {
   txid: string;
-  tx_hash: string;
   vout: number;
+  value: number;
+  address: string;
+  script: string;
+  size: number;
   status: {
     confirmed: boolean;
     block_height?: number;
     block_hash?: string;
     block_time?: number;
   };
-  value: number;
-  script: string;
-  size: number;
   index?: number;
 }
 

@@ -5,7 +5,7 @@ import {
   IMintSRC20,
   ITransferSRC20,
 } from "$lib/types/index.d.ts";
-import { isValidBitcoinAddress } from "./utils.ts";
+import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
 export async function checkMintedOut(tick: string, amount: string) {
