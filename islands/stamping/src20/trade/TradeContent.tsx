@@ -265,25 +265,31 @@ export function TradeContent() {
 
     setIsSubmitting(true);
     setSubmissionMessage("Please wait...");
-    setApiError(null);
+    setApiError("");
 
     try {
       const { sellerPsbtHex, buyerUtxo, feeRate } = buyerFormState;
 
-      // Validate inputs
-      if (!sellerPsbtHex || !buyerUtxo || !feeRate) {
-        setApiError("Please fill in all fields");
+      // Field validation
+      if (!sellerPsbtHex.trim()) {
+        setApiError("Seller PSBT Hex is required.");
         setIsSubmitting(false);
         return;
       }
 
-      // Parse fee rate as integer
-      const parsedFeeRate = parseInt(feeRate, 10);
-      if (isNaN(parsedFeeRate) || parsedFeeRate <= 0) {
-        setApiError("Invalid fee rate");
+      if (!buyerUtxo.trim()) {
+        setApiError("Your UTXO is required.");
         setIsSubmitting(false);
         return;
       }
+
+      if (!feeRate || isNaN(Number(feeRate)) || Number(feeRate) <= 0) {
+        setApiError("Fee Rate must be a positive number.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const parsedFeeRate = Number(feeRate);
 
       // Call the API to complete the PSBT
       const response = await fetch("/api/v2/trx/complete_psbt", {
@@ -293,7 +299,7 @@ export function TradeContent() {
           sellerPsbtHex,
           buyerUtxo,
           buyerAddress: address,
-          feeRate: parsedFeeRate, // Use parsed fee rate
+          feeRate: parsedFeeRate,
         }),
       });
 
@@ -327,7 +333,7 @@ export function TradeContent() {
       setSubmissionMessage("Swap completed and broadcast successfully!");
     } catch (error) {
       console.error("Complete swap error:", error);
-      setApiError(error.message);
+      setApiError(error.message || "An unexpected error occurred.");
     } finally {
       setIsSubmitting(false);
     }

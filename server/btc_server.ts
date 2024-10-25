@@ -5,6 +5,8 @@ import { estimateInputSize, estimateVoutSize } from "$server/utils/utxoSelector.
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { estimateFee } from "utils/minting/feeCalculations.ts";
 import * as crypto from "crypto";
+import * as ecc from "tiny-secp256k1";
+
 
 export async function createPSBT(
   utxo: string,
@@ -168,123 +170,126 @@ export async function validateUTXOOwnership(
 
 export async function completePSBT(
   sellerPsbtHex: string,
-  buyerUtxo: string,
+  buyerUtxoString: string,
   buyerAddress: string,
   feeRate: number,
 ): Promise<string> {
   console.log(`Starting completePSBT with feeRate: ${feeRate} sat/vB`);
 
-  const sellerPsbt = Psbt.fromHex(sellerPsbtHex);
-  const network = networks.bitcoin; // Use the appropriate network
+  const network = getAddressNetwork(buyerAddress);
 
-  // Extract seller's input and partial signatures
-  const sellerInput = sellerPsbt.data.inputs[0];
-  const sellerTxInput = sellerPsbt.txInputs[0]; // Correctly get hash and index
-  const sellerOutput = sellerPsbt.txOutputs[0];
+  // Parse the seller's PSBT
+  const psbt = Psbt.fromHex(sellerPsbtHex, { network });
 
-  const sellerInputValue = sellerInput.witnessUtxo?.value;
-
-  if (!sellerInput.witnessUtxo || sellerInputValue === undefined) {
-    throw new Error("Invalid seller input: missing witness UTXO value");
+  // **Validate Seller's UTXO**
+  const sellerTxInput = psbt.txInputs[0];
+  if (!sellerTxInput) {
+    throw new Error("Seller's txInput not found in PSBT");
   }
 
-  console.log(`Seller input value: ${sellerInputValue} sats`);
+  // Extract seller's input details
+  const sellerInputTxid = Buffer.from(sellerTxInput.hash).reverse().toString("hex");
+  const sellerInputVout = sellerTxInput.index;
 
-  // Parse buyer's UTXO
-  const [txid, voutStr] = buyerUtxo.split(":");
-  const vout = parseInt(voutStr, 10);
-
-  // Fetch buyer's UTXO details
-  const txInfo = await getUTXOForAddress(buyerAddress, txid, vout, true);
-
-  if (!txInfo || !txInfo.utxo) {
-    throw new Error(`UTXO ${buyerUtxo} not found for address ${buyerAddress}`);
+  // Get seller's address from witnessUtxo
+  const sellerWitnessUtxo = psbt.data.inputs[0].witnessUtxo;
+  if (!sellerWitnessUtxo) {
+    throw new Error("Seller's witnessUtxo not found");
   }
 
-  const buyerInputValue = txInfo.utxo.value;
-  console.log(`Buyer input value: ${buyerInputValue} sats`);
+  const sellerAddress = getAddressFromScript(sellerWitnessUtxo.script, network);
 
-  // Create a new PSBT
-  const psbt = new Psbt({ network });
+  // Validate seller's UTXO
+  const sellerUtxoInfo = await getUTXOForAddress(
+    sellerAddress,
+    sellerInputTxid,
+    sellerInputVout,
+  );
 
-  // Add seller's input, including their partial signature
+  if (!sellerUtxoInfo || !sellerUtxoInfo.utxo) {
+    throw new Error("Seller's UTXO not found or already spent");
+  }
+
+  // **Process Buyer's UTXO**
+  const [buyerTxid, buyerVoutStr] = buyerUtxoString.split(":");
+  const buyerVout = parseInt(buyerVoutStr, 10);
+
+  // Validate buyer's UTXO
+  const buyerUtxoInfo = await getUTXOForAddress(
+    buyerAddress,
+    buyerTxid,
+    buyerVout,
+  );
+
+  if (!buyerUtxoInfo || !buyerUtxoInfo.utxo) {
+    throw new Error("Buyer's UTXO not found or already spent");
+  }
+
+  const buyerUtxo = buyerUtxoInfo.utxo;
+
+  if (!buyerUtxo.script || buyerUtxo.value === undefined) {
+    throw new Error("Incomplete buyer UTXO data.");
+  }
+
+  // Add buyer's input to the PSBT
   psbt.addInput({
-    hash: sellerTxInput.hash.toString('hex'), // Ensure hash is in hex string format
-    index: sellerTxInput.index,
-    witnessUtxo: sellerInput.witnessUtxo,
-    sighashType: Transaction.SIGHASH_SINGLE | Transaction.SIGHASH_ANYONECANPAY,
-    partialSig: sellerInput.partialSig,
-  });
-
-  // Add buyer's input
-  psbt.addInput({
-    hash: txid,
-    index: vout,
+    hash: buyerTxid,
+    index: buyerVout,
     witnessUtxo: {
-      script: Buffer.from(txInfo.utxo.script, "hex"),
-      value: buyerInputValue,
+      script: Buffer.from(buyerUtxo.script, "hex"),
+      value: buyerUtxo.value,
     },
-    sequence: 0xfffffffd, // Enable RBF
-    sighashType: Transaction.SIGHASH_SINGLE | Transaction.SIGHASH_ANYONECANPAY,
   });
 
-  // Calculate fees and outputs
-  const salePrice = sellerOutput.value;
+  // **Calculate Total Input and Output Values**
+  const totalInputValue = psbt.data.inputs.reduce(
+    (sum, input) => sum + (input.witnessUtxo?.value || 0),
+    0,
+  );
 
-  // Estimate transaction size
-  const inputSize = estimateInputSize("P2WPKH") * 2; // Seller and buyer inputs
-  const outputSize = estimateVoutSize("P2WPKH") * 2; // Seller's output and buyer's change
-  const txSize = inputSize + outputSize + 10; // Approximate transaction size
-  const calculatedFee = Math.ceil(feeRate * txSize);
-
-  const totalInputs = sellerInputValue + buyerInputValue;
-  const outputsTotal = salePrice;
-
-  const buyerChange = totalInputs - outputsTotal - calculatedFee;
-
-  console.log(`Total inputs: ${totalInputs} sats`);
-  console.log(`Sale price (output to seller): ${salePrice} sats`);
-
-  // Add outputs in correct order
-  // First, seller's output (must be at the same index as in seller's PSBT)
-  psbt.addOutput({
-    address: sellerOutput.address ||
-      payments.p2wpkh({ pubkey: sellerOutput.script, network }).address,
-    value: salePrice,
-  });
-
-  // If buyer has change, add buyer's change output
-  if (buyerChange > 546) { // Dust threshold
-    psbt.addOutput({
-      address: buyerAddress,
-      value: buyerChange,
-    });
-    console.log(`Added buyer change output: ${buyerChange} sats`);
-  } else {
-    console.log(
-      `Buyer change (${buyerChange} sats) is below dust threshold, not adding change output.`,
-    );
-  }
-
-  // Final validation
-  const finalInputsTotal = totalInputs;
-  const finalOutputsTotal = psbt.txOutputs.reduce(
+  const totalOutputValue = psbt.txOutputs.reduce(
     (sum, output) => sum + output.value,
     0,
   );
-  const finalFee = finalInputsTotal - finalOutputsTotal;
 
-  console.log(`Final fee: ${finalFee} sats`);
+  // **Prepare Outputs Array for Fee Estimation**
+  const outputs = psbt.txOutputs.map((output) => {
+    return {
+      script: output.script.toString("hex"),
+      value: output.value,
+    };
+  });
 
-  if (finalFee !== calculatedFee) {
-    console.warn(
-      `Final fee (${finalFee} sats) does not match calculated fee (${calculatedFee} sats).`,
-    );
+  // **Estimate the Fee**
+  const estimatedFee = estimateFee(outputs, feeRate);
+
+  // **Calculate Change**
+  const changeValue = totalInputValue - totalOutputValue - estimatedFee;
+
+  if (changeValue < 0) {
+    throw new Error("Insufficient funds to cover outputs and fees.");
   }
 
-  if (finalOutputsTotal > finalInputsTotal) {
-    throw new Error("Outputs exceed inputs after adjustments");
+  // **Add Change Output if Necessary**
+  if (changeValue > 0) {
+    psbt.addOutput({
+      address: buyerAddress,
+      value: changeValue,
+    });
   }
 
+  // Return the updated PSBT hex without signing
   return psbt.toHex();
 }
+
+// Helper function to get address from scriptPubKey
+function getAddressFromScript(script: Buffer, network: networks.Network): string {
+  const payment = payments.p2wpkh({ output: script, network });
+  if (!payment.address) {
+    throw new Error("Failed to derive address from script");
+  }
+  return payment.address;
+}
+
+
+
