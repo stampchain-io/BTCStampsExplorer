@@ -5,6 +5,7 @@ const MAX_RETRIES = 3;
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
 const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
+const BLOCKSTREAM_API_BASE_URL = "https://blockstream.info/api";
 
 export function isValidBitcoinAddress(address: string): boolean {
   const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // Legacy P2PKH
@@ -50,13 +51,19 @@ function formatUTXOs(data: any[], address: string): UTXO[] {
         `UTXO is missing 'value' information: ${JSON.stringify(tx)}`,
       );
     }
+    const script = tx.script ?? tx.scriptpubkey;
+    if (typeof script === "undefined") {
+      throw new Error(
+        `UTXO is missing 'script' information: ${JSON.stringify(tx)}`,
+      );
+    }
     return {
       txid,
       vout,
       value,
       address: address,
-      script: tx.script ?? tx.scriptpubkey,
-      size: tx.size ?? estimateInputSize(tx.script ?? tx.scriptpubkey),
+      script,
+      size: tx.size ?? estimateInputSize(script),
       status: {
         confirmed: tx.status?.confirmed ?? tx.confirmations > 0,
         block_height: tx.status?.block_height ?? tx.block_height,
@@ -86,7 +93,7 @@ async function fetchUTXOsFromBlockchainAPI(address: string): Promise<UTXO[]> {
 
 async function fetchUTXOsFromBlockstreamAPI(address: string): Promise<UTXO[]> {
   try {
-    const endpoint = `https://blockstream.info/api/address/${address}/utxo`;
+    const endpoint = `${BLOCKSTREAM_API_BASE_URL}/api/address/${address}/utxo`;
     const response = await fetch(endpoint);
     const data = await response.json();
     if (Array.isArray(data) && data.length > 0) {
@@ -143,6 +150,7 @@ export async function getUTXOForAddress(
 ): Promise<UTXO[] | null> {
   try {
     const utxos = await fetchUTXOsFromMempoolAPI(address);
+    console.log("UTXOs from Mempool API:", utxos);
     if (utxos.length > 0) {
       return utxos;
     }
@@ -182,4 +190,233 @@ export async function getUTXOForAddress(
     console.error("All API calls failed");
     return null;
   }
+}
+
+// Add new constants for transaction info endpoints
+const MEMPOOL_TX_API = "https://mempool.space/api/tx";
+const BLOCKSTREAM_TX_API = "https://blockstream.info/api/tx";
+const BLOCKCHAIN_TX_API = "https://blockchain.info/rawtx";
+
+interface AncestorInfo {
+  fees: number;
+  vsize: number;
+  effectiveRate: number;
+}
+
+async function getAncestorInfoFromMempool(
+  txid: string,
+): Promise<AncestorInfo | null> {
+  try {
+    const response = await fetch(`${MEMPOOL_TX_API}/${txid}`);
+    if (!response.ok) return null;
+
+    const tx = await response.json();
+    return {
+      fees: tx.ancestor_fees || 0,
+      vsize: tx.ancestor_size || 0,
+      effectiveRate: tx.effective_fee_rate || 0,
+    };
+  } catch (error) {
+    console.warn("Failed to fetch ancestor info from mempool.space:", error);
+    return null;
+  }
+}
+
+async function getAncestorInfoFromBlockstream(
+  txid: string,
+): Promise<AncestorInfo | null> {
+  try {
+    const response = await fetch(`${BLOCKSTREAM_TX_API}/${txid}`);
+    if (!response.ok) return null;
+
+    const tx = await response.json();
+    // Blockstream API has different field names
+    return {
+      fees: tx.fee || 0,
+      vsize: tx.weight ? Math.ceil(tx.weight / 4) : 0,
+      effectiveRate: tx.fee && tx.weight ? (tx.fee / (tx.weight / 4)) : 0,
+    };
+  } catch (error) {
+    console.warn("Failed to fetch ancestor info from blockstream:", error);
+    return null;
+  }
+}
+
+async function getAncestorInfoFromBlockchain(
+  txid: string,
+): Promise<AncestorInfo | null> {
+  try {
+    const response = await fetch(`${BLOCKCHAIN_TX_API}/${txid}`);
+    if (!response.ok) return null;
+
+    const tx = await response.json();
+    return {
+      fees: tx.fee || 0,
+      vsize: tx.size || 0, // Note: This is not vsize but actual size
+      effectiveRate: tx.fee && tx.size ? (tx.fee / tx.size) : 0,
+    };
+  } catch (error) {
+    console.warn("Failed to fetch ancestor info from blockchain.info:", error);
+    return null;
+  }
+}
+
+export async function getAncestorInfo(
+  txid: string,
+  retries = 0,
+): Promise<AncestorInfo | null> {
+  // Try mempool.space first
+  const mempoolInfo = await getAncestorInfoFromMempool(txid);
+  if (mempoolInfo) return mempoolInfo;
+
+  // Try blockstream.info next
+  const blockstreamInfo = await getAncestorInfoFromBlockstream(txid);
+  if (blockstreamInfo) return blockstreamInfo;
+
+  // Try blockchain.info last
+  const blockchainInfo = await getAncestorInfoFromBlockchain(txid);
+  if (blockchainInfo) return blockchainInfo;
+
+  // If all APIs fail and we haven't exceeded retries, try again
+  if (retries < MAX_RETRIES) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return getAncestorInfo(txid, retries + 1);
+  }
+
+  console.error("All APIs failed to fetch ancestor info");
+  return null;
+}
+
+// Move relevant functions from btc.ts and btc_server.ts
+interface DetailedUTXO {
+  value: number;
+  scriptPubKey: string;
+  hex?: string;
+}
+
+async function fetchDetailedUTXOFromMempool(
+  txid: string,
+  vout: number,
+): Promise<DetailedUTXO | null> {
+  try {
+    const response = await fetch(`${MEMPOOL_API_BASE_URL}/tx/${txid}`);
+    if (!response.ok) return null;
+
+    const txData = await response.json();
+    const output = txData.vout[vout];
+    if (!output) return null;
+
+    return {
+      value: output.value,
+      scriptPubKey: output.scriptpubkey,
+      hex: txData.hex,
+    };
+  } catch (error) {
+    console.warn("Failed to fetch UTXO details from mempool.space:", error);
+    return null;
+  }
+}
+
+async function fetchDetailedUTXOFromBlockstream(
+  txid: string,
+  vout: number,
+): Promise<DetailedUTXO | null> {
+  try {
+    const response = await fetch(`${BLOCKSTREAM_API_BASE_URL}/tx/${txid}`);
+    if (!response.ok) return null;
+
+    const txData = await response.json();
+    const output = txData.vout[vout];
+    if (!output) return null;
+
+    return {
+      value: output.value,
+      scriptPubKey: output.scriptpubkey,
+      hex: txData.hex,
+    };
+  } catch (error) {
+    console.warn("Failed to fetch UTXO details from blockstream:", error);
+    return null;
+  }
+}
+
+async function fetchDetailedUTXOFromBlockchain(
+  txid: string,
+  vout: number,
+): Promise<DetailedUTXO | null> {
+  try {
+    const response = await fetch(`${BLOCKCHAIN_API_BASE_URL}/rawtx/${txid}`);
+    if (!response.ok) return null;
+
+    const txData = await response.json();
+    const output = txData.out[vout];
+    if (!output) return null;
+
+    return {
+      value: output.value,
+      scriptPubKey: output.script,
+      // Blockchain.info doesn't provide raw hex
+    };
+  } catch (error) {
+    console.warn("Failed to fetch UTXO details from blockchain.info:", error);
+    return null;
+  }
+}
+
+async function fetchDetailedUTXOFromBlockCypher(
+  txid: string,
+  vout: number,
+): Promise<DetailedUTXO | null> {
+  try {
+    const response = await fetch(
+      `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/txs/${txid}?includeHex=true`,
+    );
+    if (!response.ok) return null;
+
+    const txData = await response.json();
+    const output = txData.outputs[vout];
+    if (!output) return null;
+
+    return {
+      value: output.value,
+      scriptPubKey: output.script,
+      hex: txData.hex,
+    };
+  } catch (error) {
+    console.warn("Failed to fetch UTXO details from blockcypher:", error);
+    return null;
+  }
+}
+
+export async function fetchDetailedUTXO(
+  txid: string,
+  vout: number,
+  retries = 0,
+): Promise<DetailedUTXO> {
+  // Try mempool.space first
+  const mempoolResult = await fetchDetailedUTXOFromMempool(txid, vout);
+  if (mempoolResult) return mempoolResult;
+
+  // Try blockstream.info next
+  const blockstreamResult = await fetchDetailedUTXOFromBlockstream(txid, vout);
+  if (blockstreamResult) return blockstreamResult;
+
+  // Try blockchain.info
+  const blockchainResult = await fetchDetailedUTXOFromBlockchain(txid, vout);
+  if (blockchainResult) return blockchainResult;
+
+  // Try blockcypher last
+  const blockcypherResult = await fetchDetailedUTXOFromBlockCypher(txid, vout);
+  if (blockcypherResult) return blockcypherResult;
+
+  // If all APIs fail and we haven't exceeded retries, try again
+  if (retries < MAX_RETRIES) {
+    console.log(`Retrying fetchDetailedUTXO (attempt ${retries + 1})`);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return fetchDetailedUTXO(txid, vout, retries + 1);
+  }
+
+  throw new Error(
+    `Failed to fetch UTXO details for ${txid}:${vout} from any API`,
+  );
 }

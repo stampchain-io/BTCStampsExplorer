@@ -1,4 +1,4 @@
-const requiredVersion = "2.0.0";
+const requiredVersion = "2.0.2";
 const currentVersion = Deno.version.deno;
 
 if (currentVersion !== requiredVersion) {
