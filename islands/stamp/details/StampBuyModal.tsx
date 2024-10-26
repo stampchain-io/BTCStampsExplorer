@@ -1,12 +1,12 @@
 // islands/stamp/details/StampBuyModal.tsx
 import { useEffect, useState } from "preact/hooks";
 import { StampRow } from "globals";
-import { useFeePolling } from "hooks/useFeePolling.tsx";
+import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import StampImage from "./StampImage.tsx";
 import {
   showConnectWalletModal,
   walletContext,
-} from "$lib/store/wallet/wallet.ts";
+} from "$client/wallet/wallet.ts";
 
 interface Props {
   stamp: StampRow;

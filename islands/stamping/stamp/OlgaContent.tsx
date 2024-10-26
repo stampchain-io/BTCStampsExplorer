@@ -1,12 +1,12 @@
 import { useEffect, useState } from "preact/hooks";
 import axiod from "axiod";
 
-import { walletContext } from "$lib/store/wallet/wallet.ts";
-import { getWalletProvider } from "$lib/store/wallet/walletHelper.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { getWalletProvider } from "$client/wallet/walletHelper.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 
-import { useConfig } from "$/hooks/useConfig.ts";
-import { useFeePolling } from "hooks/useFeePolling.tsx";
+import { useConfig } from "$client/hooks/useConfig.ts";
+import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";

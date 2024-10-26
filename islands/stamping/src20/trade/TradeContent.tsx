@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
-import { walletContext } from "$lib/store/wallet/wallet.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 
 // Define the constants directly

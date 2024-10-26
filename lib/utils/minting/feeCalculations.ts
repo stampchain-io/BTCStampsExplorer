@@ -1,4 +1,4 @@
-import type { Output } from "$lib/types/index.d.ts";
+import type { Output } from "$types/index.d.ts";
 import { estimateP2WSHTransactionSize } from "./transactionSizes.ts";
 
 // Frontend constants

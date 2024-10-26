@@ -1,5 +1,5 @@
 import { prepareSrc20TX } from "./tx.ts";
-import { IPrepareSRC20TX } from "$lib/types/index.d.ts";
+import { IPrepareSRC20TX } from "$types/index.d.ts";
 
 export async function createRBFTransaction(
   originalTxParams: IPrepareSRC20TX,

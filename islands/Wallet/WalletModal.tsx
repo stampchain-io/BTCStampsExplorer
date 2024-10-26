@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { ComponentChildren } from "preact";
-import { showConnectWalletModal, walletContext } from "store/wallet/wallet.ts";
-import { abbreviateAddress } from "utils/util.ts";
+import {
+  showConnectWalletModal,
+  walletContext,
+} from "$client/wallet/wallet.ts";
+import { abbreviateAddress } from "$lib/utils/util.ts";
 import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { ConnectedModal } from "./ConnectedModal.tsx";
-import { StampController } from "$lib/controller/stampController.ts";
+import { StampController } from "$server/controller/stampController.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 
 const WalletPopup = (

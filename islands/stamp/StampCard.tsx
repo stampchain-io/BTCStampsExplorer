@@ -9,7 +9,7 @@ import {
   formatSatoshisToBTC,
   getFileSuffixFromMime,
   getSupply,
-} from "utils/util.ts";
+} from "$lib/utils/util.ts";
 
 dayjs.extend(relativeTime);
 

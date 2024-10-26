@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 const API_DOCS = {
   version: "2.0.0",

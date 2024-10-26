@@ -1,10 +1,10 @@
 import { StampPageProps } from "globals";
 import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
 import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$lib/controller/stampController.ts";
+import { StampController } from "$server/controller/stampController.ts";
 import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { StampHeader } from "$islands/stamp/StampHeader.tsx";
-import { CollectionService } from "$lib/services/collectionService.ts";
+import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "globals";
 
 const MAX_PAGE_SIZE = 120;

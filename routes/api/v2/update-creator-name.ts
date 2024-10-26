@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$lib/controller/stampController.ts";
+import { StampController } from "$server/controller/stampController.ts";
 import { verifySignature } from "$lib/utils/cryptoUtils.ts";
 import { validateCSRFToken } from "$lib/utils/securityUtils.ts";
 

@@ -1,4 +1,4 @@
-import { abbreviateAddress, stripTrailingZeros } from "utils/util.ts";
+import { abbreviateAddress, stripTrailingZeros } from "$lib/utils/util.ts";
 
 type SRC20HoldersInfoProps = {
   holders: any[];

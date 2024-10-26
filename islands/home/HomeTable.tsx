@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
-import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
+import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
 
 export function HomeTable({ data = [] }: { data: SRC20Row[] }) {
   const [selectedTab, setSelectedTab] = useState("Top");

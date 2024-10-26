@@ -5,14 +5,14 @@ import {
   checkMintedOut,
   checkMintParams,
   checkTransferParams,
-} from "utils/minting/src20/check.ts";
-import { prepareSrc20TX } from "utils/minting/src20/tx.ts";
+} from "$lib/utils/minting/src20/check.ts";
+import { prepareSrc20TX } from "$lib/utils/minting/src20/tx.ts";
 import {
   IDeploySRC20,
   IMintSRC20,
   IPrepareSRC20TX,
   ITransferSRC20,
-} from "$lib/types/index.d.ts";
+} from "$types/index.d.ts";
 
 interface SRC20Operation {
   op: string;

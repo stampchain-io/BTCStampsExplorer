@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { BlockController } from "$lib/controller/blockController.ts";
+import { BlockController } from "$server/controller/blockController.ts";
 import { BlockHandlerContext, ErrorResponseBody } from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 export const handler: Handlers<BlockHandlerContext> = {
   async GET(req, ctx) {

@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
-import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
+import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
 
 type SRC20TrendingMintsProps = {
   data: SRC20Row[];

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "preact/hooks";
-import { useFeePolling } from "hooks/useFeePolling.tsx";
+import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import {
   calculateDust,
   calculateMiningFee,
   estimateFee,
-} from "utils/minting/feeCalculations.ts";
-import type { Output } from "$lib/types/index.d.ts";
+} from "$lib/utils/minting/feeCalculations.ts";
+import type { Output } from "$types/index.d.ts";
 
 interface FeeEstimationProps {
   fee: number;

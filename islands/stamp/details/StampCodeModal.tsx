@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { StampRow } from "globals";
-import { useFeePolling } from "hooks/useFeePolling.tsx";
+import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import StampImage from "./StampImage.tsx";
 
 interface StampCodeModalProps {

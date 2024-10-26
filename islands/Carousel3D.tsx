@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "preact/hooks";
-import createCarouselSlider from "$lib/utils/carousel-slider.ts";
+import createCarouselSlider from "$client/utils/carousel-slider.ts";
 
 interface SlideData {
   url: string;

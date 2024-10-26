@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { fetchQuicknode } from "utils/quicknode.ts";
+import { fetchQuicknode } from "$lib/utils/quicknode.ts";
 
 export const handler: Handlers = {
   async GET(req) {

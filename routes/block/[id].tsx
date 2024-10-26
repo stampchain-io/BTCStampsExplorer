@@ -8,7 +8,7 @@ import BlockNetwork from "$components/block/BlockNetwork.tsx";
 import BlockTransactions from "$islands/block/BlockTransactions.tsx";
 // import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
 // import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { BlockController } from "$lib/controller/blockController.ts";
+import { BlockController } from "$server/controller/blockController.ts";
 
 type BlockPageProps = {
   params: {

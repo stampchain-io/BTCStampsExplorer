@@ -1,4 +1,4 @@
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { Handlers } from "$fresh/server.ts";
 
@@ -7,7 +7,7 @@ import WalletDetails from "$islands/Wallet/details/WalletDetails.tsx";
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
 
 import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
-import { WalletData } from "$lib/types/index.d.ts";
+import { WalletData } from "$types/index.d.ts";
 
 type WalletPageProps = {
   data: {

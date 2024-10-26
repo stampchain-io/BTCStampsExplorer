@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { useFeePolling } from "hooks/useFeePolling.tsx";
+import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 
 export default function BlockTransactions() {
   const { fees } = useFeePolling();

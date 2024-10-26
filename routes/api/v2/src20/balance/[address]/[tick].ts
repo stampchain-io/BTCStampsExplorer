@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { AddressTickHandlerContext } from "globals";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
-import { convertEmojiToTick } from "utils/util.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { convertEmojiToTick } from "$lib/utils/util.ts";
 
 export const handler: Handlers<AddressTickHandlerContext> = {
   async GET(req, ctx) {

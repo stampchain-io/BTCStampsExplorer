@@ -30,6 +30,7 @@ import * as $api_v2_fairmint_index from "./routes/api/v2/fairmint/index.ts";
 import * as $api_v2_health from "./routes/api/v2/health.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src20_op_ from "./routes/api/v2/src20/[...op].ts";
+import * as $api_v2_src20_operation_ from "./routes/api/v2/src20/[operation].ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
 import * as $api_v2_src20_balance_address_tick_ from "./routes/api/v2/src20/balance/[address]/[tick].ts";
 import * as $api_v2_src20_balance_snapshot_tick_ from "./routes/api/v2/src20/balance/snapshot/[tick].ts";
@@ -89,7 +90,6 @@ import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
 import * as $Carousel3D from "./islands/Carousel3D.tsx";
-import * as $MempoolWeather from "./islands/MempoolWeather.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
@@ -123,10 +123,6 @@ import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSele
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
 import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
-import * as $hooks_useFairmintForm from "./islands/hooks/useFairmintForm.ts";
-import * as $hooks_useFeePolling from "./islands/hooks/useFeePolling.tsx";
-import * as $hooks_useSRC20Form from "./islands/hooks/useSRC20Form.ts";
-import * as $hooks_useURLUpdate from "./islands/hooks/useURLUpdate.ts";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
@@ -213,6 +209,7 @@ const manifest = {
     "./routes/api/v2/health.ts": $api_v2_health,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/src20/[...op].ts": $api_v2_src20_op_,
+    "./routes/api/v2/src20/[operation].ts": $api_v2_src20_operation_,
     "./routes/api/v2/src20/balance/[address].ts":
       $api_v2_src20_balance_address_,
     "./routes/api/v2/src20/balance/[address]/[tick].ts":
@@ -287,7 +284,6 @@ const manifest = {
     "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
     "./islands/Carousel3D.tsx": $Carousel3D,
-    "./islands/MempoolWeather.tsx": $MempoolWeather,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
@@ -327,10 +323,6 @@ const manifest = {
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
     "./islands/home/HomeTable.tsx": $home_HomeTable,
-    "./islands/hooks/useFairmintForm.ts": $hooks_useFairmintForm,
-    "./islands/hooks/useFeePolling.tsx": $hooks_useFeePolling,
-    "./islands/hooks/useSRC20Form.ts": $hooks_useSRC20Form,
-    "./islands/hooks/useURLUpdate.ts": $hooks_useURLUpdate,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,

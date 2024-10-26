@@ -1,6 +1,6 @@
-import { xcp_public_nodes, xcp_v2_nodes } from "../services/xcpService.ts";
+import { xcp_public_nodes, xcp_v2_nodes } from "$server/services/xcpService.ts";
 import { XCPParams } from "globals";
-import { dbManager } from "$server/database/db.ts";
+import { dbManager } from "$server/db.ts";
 
 export interface XCPPayload {
   jsonrpc: string;

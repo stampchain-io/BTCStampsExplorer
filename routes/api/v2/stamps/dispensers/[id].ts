@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { DispenserResponseBody, DispenserRow, IdHandlerContext } from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
-import { BlockController } from "$lib/controller/blockController.ts";
-import { DispenserManager } from "$lib/services/xcpService.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { BlockController } from "$server/controller/blockController.ts";
+import { DispenserManager } from "$server/services/xcpService.ts";
 
 export const handler: Handlers<IdHandlerContext> = {
   async GET(req, ctx) {

@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { InputData, TX, TXError } from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
-import { performChecks } from "utils/minting/src20/check.ts";
-import { handleSRC20Operation } from "utils/minting/src20Handler.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { performChecks } from "$lib/utils/minting/src20/check.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request) {
@@ -17,8 +17,11 @@ export const handler: Handlers<TX | TXError> = {
       // Perform checks
       performChecks(body.op, body);
 
-      // Handle the operation
-      return await handleSRC20Operation(body.op.toLowerCase(), body);
+      // Use SRC20Service.TransactionService instead of direct import
+      return await SRC20Service.TransactionService.handleOperation(
+        body.op.toLowerCase(),
+        body,
+      );
     } catch (error) {
       console.error("Error processing request:", error);
       if (error instanceof SyntaxError) {

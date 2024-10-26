@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {

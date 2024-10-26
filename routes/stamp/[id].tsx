@@ -9,9 +9,9 @@ import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 
-import { StampController } from "$lib/controller/stampController.ts";
-import { StampService } from "$lib/services/stampService.ts";
-import { CollectionController } from "$lib/controller/collectionController.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { StampService } from "$server/services/stampService.ts";
+import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
 
 interface StampDetailPageProps {

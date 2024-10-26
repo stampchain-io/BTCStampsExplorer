@@ -1,7 +1,7 @@
-import { walletContext } from "store/wallet/wallet.ts";
-import { leatherProvider } from "store/wallet/leather.ts";
-import { okxProvider } from "store/wallet/okx.ts";
-import { unisatProvider } from "store/wallet/unisat.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
+import { leatherProvider } from "$client/wallet/leather.ts";
+import { okxProvider } from "$client/wallet/okx.ts";
+import { unisatProvider } from "$client/wallet/unisat.ts";
 
 export async function signMessage(
   message: string,
