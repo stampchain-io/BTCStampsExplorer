@@ -28,6 +28,30 @@ type HomePageProps = {
 
 export const handler: Handlers = {
   async GET(_req: Request, ctx) {
+    const headers = Object.fromEntries(_req.headers);
+    const url = new URL(_req.url);
+
+    // Only handle CSS requests for carousel when on home route
+    if (
+      headers.accept?.includes("text/css") &&
+      url.pathname === "/carousel.css"
+    ) {
+      const cssFile = await Deno.readFile("./static/carousel.css");
+      return new Response(cssFile, {
+        headers: { "Content-Type": "text/css" },
+      });
+    }
+
+    // Skip other asset requests
+    if (headers["sec-fetch-dest"] === "style") {
+      return new Response(null, { status: 204 });
+    }
+
+    // Only process actual page requests
+    if (headers["sec-fetch-dest"] !== "document") {
+      return new Response(null, { status: 204 });
+    }
+
     try {
       const result = await StampController.getHomePageData();
       return ctx.render(result);
