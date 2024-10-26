@@ -1,11 +1,10 @@
 import { StampRow, StampSectionProps } from "globals";
-// import { Partial } from "$fresh/runtime.ts";
 
 import StampSection from "$components/stamp/StampSection.tsx";
-import { HomeGetStamping } from "$islands/home/HomeGetStamping.tsx";
-import { HomeStampchain } from "$islands/home//HomeStampchain.tsx";
+import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
+import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
-import { SRC20DeployMint } from "$islands/src20/SRC20DeployMint.tsx";
+// import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
 export function HomeStampPreview({
   stamps_recent = [],
@@ -25,19 +24,27 @@ export function HomeStampPreview({
   const SectionsLatestArtStamps: StampSectionProps[] = [
     {
       title: "ON-CHAIN MARVELS",
-      type: "all",
+      type: "classic",
       stamps: stamps_art,
       layout: "grid",
+      showDetails: false,
     },
   ];
 
   const SectionsCollections: StampSectionProps[] = [
-    { title: "POSH", type: "posh", stamps: stamps_posh, layout: "grid" },
+    {
+      title: "POSH",
+      type: "posh",
+      stamps: stamps_posh,
+      layout: "grid",
+      showDetails: false,
+    },
     {
       title: "RECURSIVE",
-      type: "stamps",
+      filterBy: "recursive",
       stamps: stamps_src721,
       layout: "row",
+      showDetails: false,
     },
   ];
 
@@ -48,6 +55,7 @@ export function HomeStampPreview({
       stamps: stamps_recent,
       layout: "row",
       isRecentSales: true,
+      showDetails: true,
     },
   ];
 
@@ -57,15 +65,14 @@ export function HomeStampPreview({
       type: "src20",
       stamps: stamps_src20,
       layout: "row",
+      showDetails: false,
     },
   ];
 
   return (
-    <div className={"flex flex-col gap-18 md:gap-36"}>
-      <div>
-        <h1 class="text-[60px] leading-normal text-left mb-8 font-black
-                    bg-gradient-to-r from-gradient-start to-gradient-end
-                    bg-clip-text text-transparent">
+    <div className="flex flex-col gap-16 md:gap-36">
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 className="text-5xl md:text-5xl lg:text-6xl font-black purple-gradient">
           LATEST ART STAMPS
         </h1>
         <div class="flex flex-col gap-12">
@@ -74,8 +81,9 @@ export function HomeStampPreview({
           ))}
         </div>
       </div>
-      <div>
-        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 className="text-5xl md:text-5xl lg:text-6xl font-black purple-gradient bg-clip-text text-transparent">
           COLLECTIONS
         </h1>
         <div class="flex flex-col gap-12">
@@ -84,11 +92,21 @@ export function HomeStampPreview({
           ))}
         </div>
       </div>
-      {/* FEATURED COLLECTIONS */}
-      <CollectionList collections={collectionData} />
 
-      <div>
-        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 class="text-5xl md:text-5xl lg:text-6xl  font-black gray-gradient">
+          FEATURED COLLECTIONS
+        </h1>
+        <p className="text-[#CCCCCC] text-2xl md:text-5xl font-extralight">
+          LOREM IPSUM DOLOR
+        </p>
+
+        {/* FEATURED COLLECTIONS */}
+        <CollectionList collections={collectionData} />
+      </div>
+
+      <div className="flex flex-col gap-4 md:gap-8">
+        <h1 className="text-5xl md:text-5xl lg:text-6xl  font-black purple-gradient">
           RECENT SALES
         </h1>
         <div class="flex flex-col gap-12">
@@ -97,19 +115,22 @@ export function HomeStampPreview({
           ))}
         </div>
       </div>
-      <HomeGetStamping />
-      <div>
-        <h1 class="text-[60px] leading-normal text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+
+      <GetStampingModule />
+
+      {
+        /* <div className="flex flex-col gap-4 md:gap-8">
+        <h1 className="text-5xl 2xl:text-6xl  font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
           SRC-20 TOKENS
         </h1>
         <div class="flex flex-col gap-12">
           {SectionSRC20.map((section) => (
             <StampSection key={section.type} {...section} />
           ))}
-        </div>
-        <HomeStampchain />
-        {/* <SRC20DeployMint /> */}
-      </div>
+        </div> */
+      }
+      {/* <DeployMintModule /> */}
     </div>
+    // </div>
   );
 }

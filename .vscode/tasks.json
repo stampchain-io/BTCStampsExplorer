@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Deno: Run with Watch",
+      "type": "shell",
+      "command": "deno run -A --watch=static/,routes/,components/,islands/ ./main.ts",
+      "problemMatcher": []
+    }
+  ]
+}

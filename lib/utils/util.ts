@@ -63,14 +63,29 @@ export const getFileSuffixFromMime = (mimetype: string): string => {
  * @param number - The number of characters to keep at the beginning and end of the address. Default is 6.
  * @returns The shortened address.
  */
-export function abbreviateAddress(address?: string): string {
+export function abbreviateAddress(
+  address?: string,
+  sliceLength: number = 4,
+): string {
   if (!address) return "";
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  return `${address.slice(0, sliceLength)}...${address.slice(-sliceLength)}`;
 }
 
 export function formatSatoshisToBTC(satoshis: number): string {
   const btc = (satoshis / 100000000).toFixed(8);
   return stripTrailingZeros(btc) + " BTC";
+}
+
+export function formatNumber(value: number, decimals: number = 8): string {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+export function formatDate(date: Date): string {
+  const locale = navigator.language || "en-US";
+  return date.toLocaleDateString(locale);
 }
 
 export function stripTrailingZeros(num: number | string): string {

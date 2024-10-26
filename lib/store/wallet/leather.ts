@@ -1,8 +1,7 @@
 import { signal } from "@preact/signals";
-import { Wallet } from "./wallet.d.ts";
 import { walletContext } from "./wallet.ts";
 import { getBtcBalance } from "utils/btc.ts";
-import { SignPSBTResult } from "$lib/types/src20.d.ts";
+import { SignPSBTResult, Wallet } from "$lib/types/index.d.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -18,7 +17,7 @@ type AddToastFunction = (message: string, type: string) => void;
 export const isLeatherInstalled = signal<boolean>(false);
 
 export const checkLeather = () => {
-  if (typeof window !== "undefined" && "LeatherProvider" in window) {
+  if (typeof globalThis !== "undefined" && "LeatherProvider" in globalThis) {
     isLeatherInstalled.value = true;
     return true;
   }
@@ -37,7 +36,7 @@ export const connectLeather = async (addToast: AddToastFunction) => {
       return;
     }
 
-    const leatherProvider = (window as any).LeatherProvider;
+    const leatherProvider = (globalThis as any).LeatherProvider;
     const response = await leatherProvider.request("getAddresses");
 
     let addresses;
@@ -97,12 +96,11 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
   _wallet.network = "mainnet";
   _wallet.provider = "leather";
 
-  walletContext.isConnected.value = true;
   walletContext.updateWallet(_wallet);
 };
 
 const signMessage = async (message: string) => {
-  const leatherProvider = (window as any).LeatherProvider;
+  const leatherProvider = (globalThis as any).LeatherProvider;
   if (typeof leatherProvider === "undefined") {
     throw new Error("Leather wallet not connected");
   }
@@ -126,46 +124,44 @@ const signMessage = async (message: string) => {
 
 export const signPSBT = async (
   psbtHex: string,
-  inputsToSign?: { index: number }[],
-  enableRBF = true, // Add this parameter
+  inputsToSign: { index: number }[],
+  enableRBF = true,
+  sighashTypes?: number[],
+  autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
   console.log("Entering Leather signPSBT function");
   console.log("PSBT hex length:", psbtHex.length);
-  console.log("Number of inputs to sign:", inputsToSign?.length);
+  console.log("Number of inputs to sign:", inputsToSign.length);
 
-  const leatherProvider = (window as any).LeatherProvider;
+  const leatherProvider = (globalThis as any).LeatherProvider;
   if (typeof leatherProvider === "undefined") {
     console.error("Leather wallet not connected");
     return { signed: false, error: "Leather wallet not connected" };
   }
 
   try {
-    console.log("Calling Leather provider signPsbt method");
-    console.log("Input parameters:", {
-      hex: psbtHex.substring(0, 50) + "...", // Log first 50 characters of hex
+    const requestParams = {
+      hex: psbtHex,
       network: "mainnet",
-      broadcast: true,
+      broadcast: autoBroadcast,
       inputsToSign: inputsToSign || undefined,
-      rbf: enableRBF, // Add this parameter
-    });
+      rbf: enableRBF,
+      sighashTypes: sighashTypes || undefined, // Pass sighashTypes if provided
+    };
 
-    const result = await leatherProvider.request(
-      "signPsbt",
-      {
-        hex: psbtHex,
-        network: "mainnet",
-        broadcast: true,
-        inputsToSign: inputsToSign || undefined,
-        rbf: enableRBF, // Add this parameter
-      },
-    );
+    console.log("Calling Leather provider signPsbt method");
+    console.log("Input parameters:", requestParams);
+
+    const result = await leatherProvider.request("signPsbt", requestParams);
 
     console.log("Leather signPsbt result:", JSON.stringify(result, null, 2));
 
     if (result && result.result) {
       if (result.result.hex) {
+        // For PSBTs that are not fully signed
         return { signed: true, psbt: result.result.hex };
       } else if (result.result.txid) {
+        // For fully signed and broadcasted transactions
         return { signed: true, txid: result.result.txid };
       }
     }

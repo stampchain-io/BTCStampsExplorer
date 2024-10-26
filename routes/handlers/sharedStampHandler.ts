@@ -17,13 +17,15 @@ export const sharedStampIndexHandler = (
     try {
       const url = new URL(req.url);
       const { limit, page } = getPaginationParams(url);
+      const maxLimit = 500;
+      const effectiveLimit = Math.min(limit, maxLimit);
       const sortBy =
         (url.searchParams.get("sort")?.toUpperCase() as "ASC" | "DESC") ||
         "ASC";
 
       const result = await StampController.getStamps({
         page,
-        limit,
+        limit: effectiveLimit,
         sortBy,
         type: stampType,
         allColumns: true,
@@ -43,7 +45,7 @@ export const sharedStampIdHandler: Handlers = {
   async GET(_req: Request, ctx) {
     try {
       const { id } = ctx.params;
-      const stampData = await StampController.getStampDetailsById(id);
+      const stampData = await StampController.getStampDetailsById(id, "all");
       if (!stampData) {
         return ResponseUtil.error("Stamp not found", 404);
       }

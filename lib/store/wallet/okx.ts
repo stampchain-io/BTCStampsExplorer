@@ -1,13 +1,14 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
-import { Wallet } from "./wallet.d.ts";
-import { SignPSBTResult } from "$lib/types/src20.d.ts";
+import { SignPSBTResult, Wallet } from "$lib/types/index.d.ts";
 
 export const isOKXInstalled = signal<boolean>(false);
 
-export const connectOKX = async (addToast) => {
+export const connectOKX = async (
+  addToast: (message: string, type: string) => void,
+) => {
   try {
-    const okx = (window as any).okxwallet;
+    const okx = (globalThis as any).okxwallet;
     if (!okx) {
       addToast(
         "OKX wallet not detected. Please install the OKX extension.",
@@ -15,8 +16,8 @@ export const connectOKX = async (addToast) => {
       );
       return;
     }
-    const result = await okx.bitcoin.connect();
-    await handleAccountsChanged([result.address]);
+    await okx.bitcoin.requestAccounts();
+    await handleAccountsChanged();
     addToast("Successfully connected to OKX wallet", "success");
   } catch (error) {
     addToast(`Failed to connect to OKX wallet: ${error.message}`, "error");
@@ -24,7 +25,7 @@ export const connectOKX = async (addToast) => {
 };
 
 export const checkOKX = () => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   if (okx && okx.bitcoin) {
     isOKXInstalled.value = true;
     okx.bitcoin.on("accountsChanged", handleAccountsChanged);
@@ -34,38 +35,48 @@ export const checkOKX = () => {
   return false;
 };
 
-const handleAccountsChanged = async (accounts: string[]) => {
-  if (accounts.length === 0) {
-    walletContext.disconnect();
+const handleAccountsChanged = async () => {
+  const okx = (globalThis as any).okxwallet;
+  if (!okx || !okx.bitcoin) {
+    console.error("OKX wallet not connected");
     return;
   }
 
-  const okx = (window as any).okxwallet;
-  const _wallet = {} as Wallet;
-  _wallet.address = accounts[0];
-  _wallet.accounts = accounts;
+  try {
+    const accounts: string[] = await okx.bitcoin.getAccounts();
+    if (!accounts || accounts.length === 0) {
+      console.error("No accounts found in OKX wallet");
+      walletContext.disconnect();
+      return;
+    }
 
-  const publicKey = await okx.bitcoin.getPublicKey();
-  _wallet.publicKey = publicKey;
+    const address = accounts[0];
+    const balanceInfo = await okx.bitcoin.getBalance();
 
-  const balance = await okx.bitcoin.getBalance();
-  _wallet.btcBalance = {
-    confirmed: balance.confirmed,
-    unconfirmed: balance.unconfirmed,
-    total: balance.total,
-  };
+    const _wallet: Wallet = {
+      address,
+      accounts,
+      publicKey: await okx.bitcoin.getPublicKey(),
+      btcBalance: {
+        confirmed: balanceInfo.confirmed,
+        unconfirmed: balanceInfo.unconfirmed,
+        total: balanceInfo.total,
+      },
+      network: "mainnet",
+      provider: "okx",
+    };
 
-  const basicInfo = await walletContext.getBasicStampInfo(accounts[0]);
-  _wallet.stampBalance = basicInfo.stampBalance;
-  _wallet.network = "mainnet";
-  _wallet.provider = "okx";
+    const basicInfo = await walletContext.getBasicStampInfo(address);
+    _wallet.stampBalance = basicInfo.stampBalance;
 
-  walletContext.isConnected.value = true;
-  walletContext.updateWallet(_wallet);
+    walletContext.updateWallet(_wallet);
+  } catch (error) {
+    console.error("Error fetching account from OKX wallet:", error);
+  }
 };
 
 const signMessage = async (message: string) => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   if (!okx || !okx.bitcoin) {
     throw new Error("OKX wallet not connected");
   }
@@ -82,18 +93,38 @@ const signMessage = async (message: string) => {
 
 const signPSBT = async (
   psbtHex: string,
-  inputsToSign?: { index: number }[],
+  inputsToSign: { index: number }[],
   enableRBF = true,
+  sighashTypes?: number[],
+  autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   try {
-    const result = await okx.bitcoin.signPsbt({
-      psbt: psbtHex,
-      inputsToSign,
-      options: { enableRBF },
-    });
-    if (result && result.hex) {
-      return { signed: true, psbt: result.hex };
+    const options: any = {
+      autoFinalized: true, // Default is true
+    };
+
+    if (inputsToSign && inputsToSign.length > 0) {
+      options.toSignInputs = inputsToSign.map((input, idx) => ({
+        index: input.index,
+        // Assign sighashTypes per input if available
+        sighashTypes: sighashTypes ? [sighashTypes[idx]] : undefined,
+      }));
+    }
+
+    const signedPsbtHex = await okx.bitcoin.signPsbt(psbtHex, options);
+
+    console.log("OKX signPsbt result:", signedPsbtHex);
+
+    if (signedPsbtHex && typeof signedPsbtHex === "string") {
+      if (autoBroadcast) {
+        // Broadcast the signed PSBT
+        const txid = await okx.bitcoin.pushPsbt(signedPsbtHex);
+        return { signed: true, txid };
+      } else {
+        // Return the signed PSBT
+        return { signed: true, psbt: signedPsbtHex };
+      }
     } else {
       return {
         signed: false,
@@ -101,7 +132,7 @@ const signPSBT = async (
       };
     }
   } catch (error) {
-    console.error("Error signing PSBT:", error);
+    console.error("Error signing PSBT with OKX:", error);
     if (error.message && error.message.includes("User rejected")) {
       return { signed: false, cancelled: true };
     }
@@ -110,12 +141,12 @@ const signPSBT = async (
 };
 
 const broadcastRawTX = async (rawTx: string) => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   return await okx.bitcoin.pushTx(rawTx);
 };
 
 const broadcastPSBT = async (psbtHex: string) => {
-  const okx = (window as any).okxwallet;
+  const okx = (globalThis as any).okxwallet;
   return await okx.bitcoin.pushPsbt(psbtHex);
 };
 

@@ -10,16 +10,48 @@ export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
   | "src20"; // Note this is only for showing the src20 images, not actual SRC-20 details
 // | "recursive"; this is a filter not a type when passed to the db
 // see filterOptions
-export type STAMP_FILTER_TYPES = "vector" | "pixel" | "recursive";
-export type STAMP_SUFFIX_FILTERS = [
-  "gif" | "jpg" | "png" | "webp" | "bmp" | "jpeg",
-  ...("gif" | "jpg" | "png" | "webp" | "bmp" | "jpeg")[],
-];
+export type STAMP_FILTER_TYPES =
+  | "pixel"
+  | "vector"
+  | "for sale"
+  | "trending sales"
+  | "sold";
+export type STAMP_SUFFIX_FILTERS =
+  | "gif"
+  | "jpg"
+  | "png"
+  | "webp"
+  | "bmp"
+  | "jpeg"
+  | "svg"
+  | "html";
 export type SRC20_TYPES =
   | "all"
-  | "minting";
+  | "deploy"
+  | "mint"
+  | "transfer"
+  | "trending";
 
-export type SRC20_FILTER_TYPES = ""; // TBD
+export type SRC20_FILTER_TYPES =
+  | "minting"
+  | "trending mints"
+  | "deploy"
+  | "supply"
+  | "marketcap"
+  | "holders"
+  | "volume"
+  | "price change";
+export type WALLET_FILTER_TYPES =
+  | "all"
+  | "stamps"
+  | "collections"
+  | "dispensers"
+  | "tokens";
+export type COLLECTION_FILTER_TYPES =
+  | "all"
+  | "posh"
+  | "recursive"
+  | "artists";
 
 import Big from "$Big";
 
@@ -61,10 +93,12 @@ export interface StampRow {
 
 export interface StampSectionProps {
   title: string;
-  type: string;
+  type?: string;
   stamps: StampRow[];
   layout: "grid" | "row";
   isRecentSales?: boolean;
+  filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
+  showDetails?: boolean;
 }
 
 export interface SRC20Row {
@@ -85,6 +119,7 @@ export interface SRC20Row {
   block_time: Date;
   status: string;
   row_num: number;
+  progress?: string | null;
 }
 
 interface SendRow {
@@ -168,11 +203,6 @@ export interface XCPParams {
   extended_tx_info?: boolean;
   disable_utxo_locks?: boolean;
   fee_per_kb?: number;
-}
-
-export interface XCPBalance {
-  cpid: string;
-  quantity: number;
 }
 
 export interface SRC20Balance {
@@ -327,7 +357,8 @@ export interface SRC20BalanceRequestParams {
   amt?: number;
   limit?: number;
   page?: number;
-  sort?: string;
+  sortBy?: string;
+  sortField?: string;
   includePagination?: boolean;
 }
 
@@ -498,8 +529,8 @@ export type StampPageProps = {
     page: number;
     totalPages: number;
     limit: number;
-    selectedTab: "all" | "classic" | "posh";
-    sortBy: string;
+    selectedTab: "all" | "classic" | "posh" | "recent_sales";
+    sortBy: any;
     filterBy: string[];
   };
 };
@@ -642,10 +673,9 @@ export interface MintStampInputData {
 export interface Collection {
   collection_id: string;
   collection_name: string;
-  creators: string[];
-  stamps: StampRow[];
+  creators: string;
+  stamp_count: number;
   first_stamp_image?: string | null;
-  floorPrice?: number | null;
 }
 
 export interface CollectionQueryParams extends PaginationQueryParams {
@@ -662,11 +692,10 @@ export interface SRC20SnapshotRequestParams {
   limit: number;
   page: number;
   amt: number;
-  sort: string;
+  sortBy?: string;
 }
 
 export interface Config {
-  API_BASE_URL: string;
   MINTING_SERVICE_FEE_ENABLED: boolean;
   MINTING_SERVICE_FEE: string | null;
   MINTING_SERVICE_FEE_ADDRESS: string | null;

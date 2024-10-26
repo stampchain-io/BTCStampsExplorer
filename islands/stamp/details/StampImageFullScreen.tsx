@@ -7,10 +7,11 @@ interface StampImageFullScreenProps {
   src: string;
   toggleModal: () => void;
   handleCloseModal: () => void;
+  typeFlag: number;
 }
 
 const StampImageFullScreen = (
-  { src, toggleModal, handleCloseModal }: StampImageFullScreenProps,
+  { src, toggleModal, handleCloseModal, typeFlag }: StampImageFullScreenProps,
 ) => {
   return (
     <div
@@ -43,17 +44,34 @@ const StampImageFullScreen = (
               </svg>
               <span class="sr-only">Close modal</span>
             </button>
-            <img
-              width="100%"
-              loading="lazy"
-              className={`mx-10 md:mx-0 max-w-none object-contain rounded-lg pixelart stamp-image`}
-              src={src}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  "/content/not-available.png";
-              }}
-              alt="Stamp"
-            />
+            {typeFlag === 1 && (
+              <iframe
+                width="100%"
+                height="100%"
+                scrolling="no"
+                className={`aspect-square rounded-lg`}
+                sandbox="allow-scripts allow-same-origin"
+                src={src}
+                loading="lazy"
+                // onError={(e) => {
+                //   e.currentTarget.src = stamp.stamp_url;
+                // }}
+                title="Stamp"
+              />
+            )}
+            {typeFlag === 2 && (
+              <img
+                width="100%"
+                loading="lazy"
+                className={`max-w-none object-contain rounded-lg pixelart stamp-image`}
+                src={src}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "/content/not-available.png";
+                }}
+                alt="Stamp"
+              />
+            )}
           </div>
         </div>
       </div>

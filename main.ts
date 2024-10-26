@@ -5,24 +5,22 @@
 /// <reference lib="deno.ns" />
 
 import "$/globals.d.ts";
-import { Manifest } from "$fresh/server.ts";
-
-import "$std/dotenv/load.ts";
-
 import { start } from "$fresh/server.ts";
+import build from "$fresh/dev.ts";
 import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
-// Import for dbManager initialization
-import "./server/database/db.ts";
 
-// import twindPlugin from "$fresh/plugins/twind.ts";
-// import twindConfig from "./twind.config.ts";
+import "$server/database/db.ts";
 
-async function startApp() {
-  await start(manifest as unknown as Manifest, config);
+if (import.meta.main) {
+  if (Deno.args.includes("build")) {
+    console.log("Running build...");
+    globalThis.SKIP_REDIS_CONNECTION = true;
+    await build(import.meta.url, "./main.ts", config);
+    console.log("Build completed.");
+    Deno.exit(0);
+  } else {
+    console.log("Starting server...");
+    await start(manifest, config);
+  }
 }
-
-startApp().catch((error) => {
-  console.error("Failed to start application:", error);
-  Deno.exit(1);
-});

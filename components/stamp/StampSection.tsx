@@ -1,47 +1,67 @@
 import { StampRow, StampSectionProps } from "globals";
-import { StampCard } from "./StampCard.tsx";
+import { StampCard } from "$islands/stamp/StampCard.tsx";
+import { ViewAllButton } from "$components/ViewAllButton.tsx";
 
 export default function StampSection(
-  { title, type, stamps, layout, isRecentSales }: StampSectionProps,
+  { title, type, stamps, layout, isRecentSales, filterBy, showDetails = false }:
+    & StampSectionProps
+    & { showDetails?: boolean },
 ) {
-  // Ensure stamps is an array
   const stampArray = Array.isArray(stamps) ? stamps : [];
 
-  const seeAllLink = isRecentSales
-    ? `/stamp?recentSales=true`
-    : `/stamp?type=${type}`;
+  const params = new URLSearchParams();
+
+  if (isRecentSales) {
+    params.append("recentSales", "true");
+  } else {
+    if (type) {
+      params.append("type", type);
+    }
+
+    const filterArray = typeof filterBy === "string"
+      ? [filterBy]
+      : Array.isArray(filterBy)
+      ? filterBy
+      : [];
+
+    if (filterArray.length > 0) {
+      params.append("filterBy", filterArray.join(","));
+    }
+  }
+
+  const seeAllLink = `/stamp?${params.toString()}`;
 
   return (
     <div>
-      <div class="flex justify-between items-end mb-4">
-        <p class="text-2xl md:text-3xl text-[#AA00FF] font-light">
+      {/* Section Title */}
+      <div className="mb-4">
+        <h2 className="text-[#AA00FF] text-4xl lg:text-5xl font-extralight">
           {title}
-        </p>
-        <a
-          href={seeAllLink}
-          f-partial={seeAllLink}
-          class="text-[#660099] text-sm md:text-base font-light border-2 border-[#660099] py-1 text-center min-w-[84px] rounded-md"
-        >
-          See all
-        </a>
+        </h2>
       </div>
+
+      {/* Stamp Rows */}
       <div
-        class={layout === "grid"
-          ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-4"
-          : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4"}
+        className={layout === "grid"
+          ? "grid gap-2 md:gap-4 grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4"
+          : "grid gap-2 md:gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-6"}
       >
-        {stampArray.slice(0, layout === "grid" ? 12 : 6).map((
-          stamp: StampRow,
-        ) => (
-          <div class={layout === "grid" ? "" : "w-full"}>
-            <StampCard
-              stamp={stamp}
-              kind="stamp"
-              isRecentSale={isRecentSales}
-            />
-          </div>
-        ))}
+        {stampArray.slice(0, layout === "grid" ? 12 : 6).map(
+          (stamp: StampRow) => (
+            <div key={stamp.tx_hash}>
+              <StampCard
+                stamp={stamp}
+                kind="stamp"
+                isRecentSale={isRecentSales}
+                abbreviationLength={layout === "grid" ? 8 : 6}
+                showDetails={showDetails}
+              />
+            </div>
+          ),
+        )}
       </div>
+
+      <ViewAllButton href={seeAllLink} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { SMALL_LIMIT } from "constants";
-import { dbManager } from "../../server/database/db.ts";
-
+import { dbManager } from "$server/database/db.ts";
+import { Collection } from "globals";
 export class CollectionRepository {
   static async getCollections(
     options: {
@@ -67,7 +67,9 @@ export class CollectionRepository {
     return result.rows[0].total;
   }
 
-  static async getCollectionByName(collectionName: string) {
+  static async getCollectionByName(
+    collectionName: string,
+  ): Promise<Collection | null> {
     const query = `
       SELECT 
         HEX(c.collection_id) as collection_id,
@@ -81,10 +83,51 @@ export class CollectionRepository {
       GROUP BY c.collection_id, c.collection_name
     `;
 
-    return await dbManager.executeQueryWithCache(
+    const result = await dbManager.executeQueryWithCache(
       query,
       [collectionName],
       "never",
+    ) as QueryResult<Collection>;
+
+    return result.rows.length > 0 ? result.rows[0] : null;
+  }
+
+  static async getCollectionNames(
+    options: {
+      limit?: number;
+      page?: number;
+      creator?: string;
+    },
+  ) {
+    const { limit = SMALL_LIMIT, page = 1, creator } = options;
+    const offset = (page - 1) * limit;
+
+    let query = `
+      SELECT 
+        collection_name
+      FROM collections c
+      LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
+    `;
+
+    const queryParams: any[] = [];
+
+    if (creator) {
+      query += ` WHERE cc.creator_address = ?`;
+      queryParams.push(creator);
+    }
+
+    query += `
+      GROUP BY c.collection_id, c.collection_name
+      ORDER BY c.collection_name
+      LIMIT ? OFFSET ?
+    `;
+
+    queryParams.push(limit, offset);
+
+    return await dbManager.executeQueryWithCache(
+      query,
+      queryParams,
+      1000 * 60 * 5, // 5 minutes cache
     );
   }
 }

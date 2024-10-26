@@ -4,18 +4,15 @@ import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 
 import StampSection from "$components/stamp/StampSection.tsx";
-import { StampShare } from "$components/stampDetails/StampShare.tsx";
 
-import { HomeGetStamping } from "$islands/home/HomeGetStamping.tsx";
-import { CollectionList } from "$islands/collection/CollectionList.tsx";
 import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampService } from "$lib/services/stampService.ts";
-import { CollectionService } from "$lib/services/collectionService.ts";
-import { ArtistCollection } from "$islands/collection/ArtistCollection.tsx";
+import { CollectionController } from "$lib/controller/collectionController.ts";
+import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
 
 interface StampDetailPageProps {
   data: {
@@ -29,6 +26,7 @@ interface StampDetailPageProps {
     last_block: number;
     stamps_recent: any;
     collections: CollectionRow[];
+    lowestPriceDispenser: any; // Add this property
   };
 }
 
@@ -42,6 +40,7 @@ interface StampData {
   last_block: number;
   stamps_recent: any;
   collections: CollectionRow[];
+  lowestPriceDispenser: any;
 }
 
 export const handler: Handlers<StampData> = {
@@ -61,7 +60,7 @@ export const handler: Handlers<StampData> = {
       const page_size = parseInt(
         url.searchParams.get("limit") || "20",
       );
-      const collectionsData = await CollectionService.getCollectionNames({
+      const collectionsData = await CollectionController.getCollectionNames({
         limit: page_size,
         page: page,
         creator: "",
@@ -74,11 +73,26 @@ export const handler: Handlers<StampData> = {
         limit: collectionsData.limit,
       };
 
+      // Find the lowest price open dispenser
+      const openDispensers = stampData.data.dispensers.filter((d) =>
+        d.give_remaining > 0
+      );
+      const lowestPriceDispenser = openDispensers.reduce(
+        (lowest, dispenser) => {
+          if (!lowest || dispenser.satoshirate < lowest.satoshirate) {
+            return dispenser;
+          }
+          return lowest;
+        },
+        null,
+      );
+
       return ctx.render({
         ...stampData.data,
         stamps_recent: result,
         collections,
         last_block: stampData.last_block,
+        lowestPriceDispenser,
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
@@ -96,6 +110,7 @@ export default function StampPage(props: StampDetailPageProps) {
     dispensers,
     dispenses,
     stamps_recent,
+    lowestPriceDispenser,
   } = props.data;
 
   const title = stamp.name
@@ -133,20 +148,21 @@ export default function StampPage(props: StampDetailPageProps) {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <div className={"flex flex-col gap-10 md:gap-20 xl:gap-50"}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
-          <div class="flex flex-col gap-8 justify-between items-center">
-            <StampImage
-              stamp={stamp}
-              className="w-[calc(100%-80px)] md:w-full"
-              flag={true}
-            />
-            {/* <StampShare stamp={stamp} /> */}
-          </div>
-          <div>
-            <StampInfo stamp={stamp} />
-          </div>
+      <div className="flex flex-col gap-10 md:gap-20 xl:gap-50">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <StampImage
+            stamp={stamp}
+            flag={true}
+          />
+          <StampInfo
+            stamp={stamp}
+            lowestPriceDispenser={lowestPriceDispenser}
+          />
         </div>
+
+        <StampRelatedGraph
+          stamp={stamp}
+        />
 
         <StampRelatedInfo
           sends={sends}
@@ -154,17 +170,6 @@ export default function StampPage(props: StampDetailPageProps) {
           holders={holders}
           dispensesWithRates={dispensesWithRates}
         />
-
-        <div>
-          <h1 class="text-3xl md:text-7xl text-left bg-clip-text text-transparent bg-gradient-to-r from-[#666666] via-[#999999] to-[#CCCCCC] font-black mb-2">
-            ARTIST COLLECTIONS
-          </h1>
-          <ArtistCollection />
-          <p className="font-extralight text-2xl md:text-5xl text-[#CCCCCC] mb-9">
-            OTHER COLLECTIONS
-          </p>
-          <CollectionList collections={collections} />
-        </div>
 
         <div>
           <h1 class="text-3xl md:text-7xl text-left mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
@@ -176,8 +181,6 @@ export default function StampPage(props: StampDetailPageProps) {
             ))}
           </div>
         </div>
-
-        <HomeGetStamping />
       </div>
     </>
   );

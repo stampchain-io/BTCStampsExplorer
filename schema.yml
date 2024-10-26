@@ -7,6 +7,8 @@ externalDocs:
   description: Find out more about Stampchain
   url: 'http://stampchain.io'
 servers:
+  - url: "https://testnet.api.bitname.pro"
+    description:  Production server (uses live data)
   - url: 'https://stampchain.io'
     description:  Production server (uses live data)
   - url: "https://bitcoinstamps.xyz"

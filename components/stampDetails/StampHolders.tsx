@@ -1,4 +1,5 @@
 import { Chart } from "$fresh_charts/mod.ts";
+import { ChartColors, transparentize } from "$fresh_charts/utils.ts";
 
 interface HolderInfoType {
   address: string;
@@ -26,10 +27,20 @@ const getGradientColor = (percentage: number) => {
 };
 
 export const StampHolders = ({ holders }: { holders: HolderInfoType[] }) => {
+  console.log("holders: ", holders);
+
+  if (!holders || holders.length === 0) {
+    return <div>No holder data available</div>;
+  }
+
   const totalQuantity = holders.reduce(
     (sum, holder) => sum + holder.quantity,
     0,
   );
+
+  if (totalQuantity === 0) {
+    return <div>Invalid holder data</div>;
+  }
 
   const holdersWithPercentage = holders.map((holder) => ({
     ...holder,
@@ -39,6 +50,10 @@ export const StampHolders = ({ holders }: { holders: HolderInfoType[] }) => {
   const topHolders = holdersWithPercentage
     .sort((a, b) => b.percentage - a.percentage)
     .slice(0, 3);
+
+  if (topHolders.length === 0) {
+    return <div>No valid top holders data</div>;
+  }
 
   const percentages = topHolders.map((holder) => holder.percentage);
   const topLabels = topHolders.map((holder) =>
@@ -52,15 +67,17 @@ export const StampHolders = ({ holders }: { holders: HolderInfoType[] }) => {
   );
 
   return (
-    <div class="flex justify-center bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF] p-2 md:p-6">
-      <Chart
+    <div class="flex justify-center dark-gradient p-2 md:p-6">
+      {
+        /* <Chart
         type="pie"
         width={350}
+        height={350}
         options={{
           devicePixelRatio: 1,
           plugins: {
             legend: {
-              position: "bottom",
+              position: "bottom" as const,
               labels: {
                 boxWidth: 10,
                 font: {
@@ -69,6 +86,8 @@ export const StampHolders = ({ holders }: { holders: HolderInfoType[] }) => {
               },
             },
           },
+          responsive: true,
+          maintainAspectRatio: false,
         }}
         data={{
           labels: topLabels,
@@ -77,6 +96,23 @@ export const StampHolders = ({ holders }: { holders: HolderInfoType[] }) => {
             data: percentages,
             backgroundColor: backgroundColors,
             borderColor: backgroundColors,
+            borderWidth: 1,
+          }],
+        }}
+      /> */
+      }
+      <Chart
+        type="pie"
+        options={{
+          scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
+        }}
+        data={{
+          labels: ["1", "2", "3"],
+          datasets: [{
+            label: "Sessions",
+            data: [10, 20, 70],
+            borderColor: ChartColors.Red,
+            backgroundColor: transparentize(ChartColors.Red, 0.5),
             borderWidth: 1,
           }],
         }}

@@ -10,7 +10,7 @@ export default function FAQ() {
       <div className="text-[#CCCCCC] flex flex-col gap-16 md:gap-36 py-24 md:py-48">
         <section className="text-center max-w-5xl mx-auto">
           <h1 className="text-4xl md:text-7xl font-bold">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#CCCCCC] via-[#999999] to-[#666666]">
+            <span className="gray-gradient1">
               YOU'VE GOT QUESTIONS
             </span>
             <br />
@@ -25,7 +25,7 @@ export default function FAQ() {
 
         <section className="flex flex-col gap-6 md:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-2">
+            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
               BITCOIN STAMPS
             </h1>
             <h2 className="text-2xl md:text-5xl font-extralight mb-3">
@@ -127,7 +127,7 @@ export default function FAQ() {
 
         <section className="flex flex-col gap-6 md:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-2">
+            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
               GET STARTED
             </h1>
             <h2 className="text-2xl md:text-5xl font-extralight mb-3">
@@ -145,9 +145,51 @@ export default function FAQ() {
                 To start creating, sending, and storing Bitcoin Stamps, you'll
                 need a compatible wallet. Some options include:
                 <ul className="list-disc list-inside mt-2">
-                  <li>Unisat</li>
-                  <li>Xverse</li>
-                  <li>Leather</li>
+                  <li>
+                    <a
+                      href="https://unisat.io/download"
+                      target="_blank"
+                      className="underline"
+                    >
+                      Unisat
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://leather.io/install-extension"
+                      target="_blank"
+                      className="underline"
+                    >
+                      Leather
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://www.okx.com/web3"
+                      target="_blank"
+                      className="underline"
+                    >
+                      OKX
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://tapwallet.io/"
+                      target="_blank"
+                      className="underline"
+                    >
+                      TapWallet
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="https://phantom.app/download"
+                      target="_blank"
+                      className="underline"
+                    >
+                      Phantom
+                    </a>
+                  </li>
                 </ul>
               </p>
             </Accordion>
@@ -189,7 +231,7 @@ export default function FAQ() {
 
         <section className="flex flex-col gap-6 md:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-2">
+            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
               BUYING AND SELLING
             </h1>
             <h2 className="text-2xl md:text-5xl font-extralight mb-3">
@@ -239,7 +281,7 @@ export default function FAQ() {
 
         <section className="flex flex-col gap-6 md:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-2">
+            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
               SRC-20 TOOLS
             </h1>
             <h2 className="text-2xl md:text-5xl font-extralight mb-3">
@@ -279,7 +321,7 @@ export default function FAQ() {
 
         <section className="flex flex-col gap-6 md:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#666666] to-[#999999] mb-2">
+            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
               GENERAL FAQ
             </h1>
             <h2 className="text-2xl md:text-5xl font-extralight mb-3">

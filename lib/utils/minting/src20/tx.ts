@@ -4,14 +4,13 @@ import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
-import { selectUTXOs } from "./utxo-selector.ts";
-import { arc4, bin2hex, hex2bin } from "../utils.ts";
-import { compressWithCheck } from "../zlib.ts";
+import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
+import { arc4, bin2hex, hex2bin } from "../transactionUtils.ts";
+import { compressWithCheck } from "utils/minting/zlib.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/src20.d.ts";
-import { getTransaction } from "../../quicknode.ts";
-import { getUTXOForAddress } from "./utils.ts";
-import * as msgpack from "https://deno.land/x/msgpack@v1.4/mod.ts";
+import { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/index.d.ts";
+import { getTransaction } from "utils/quicknode.ts";
+import * as msgpack from "msgpack";
 
 const RECIPIENT_DUST = 789;
 const MULTISIG_DUST = 809;
@@ -35,12 +34,6 @@ export const prepareSrc20TX = async ({
     console.log("Using network:", psbtNetwork);
 
     const psbt = new bitcoin.Psbt({ network: psbtNetwork });
-
-    // Fetch UTXOs
-    const utxos = await getUTXOForAddress(changeAddress);
-    if (!utxos || utxos.length === 0) {
-      throw new Error("No UTXOs found for the given address");
-    }
 
     let transferDataBytes: Uint8Array;
     const stampPrefixBytes = new TextEncoder().encode("stamp:");
@@ -92,8 +85,25 @@ export const prepareSrc20TX = async ({
     }
     console.log("Padded payload:", bin2hex(payloadBytes));
 
+    // Prepare outputs (vouts) without the multisigScripts yet
+    const vouts: VOUT[] = [
+      { address: toAddress, value: RECIPIENT_DUST },
+      // Multisig scripts will be added later
+    ];
+
+    // Use selectUTXOsForTransaction to fetch UTXOs and select inputs
+    const {
+      inputs: selectedUtxos,
+      change,
+      fee: estimatedFee,
+    } = await selectUTXOsForTransaction(changeAddress, vouts, feeRate);
+
+    if (selectedUtxos.length === 0) {
+      throw new Error("Unable to select suitable UTXOs for the transaction");
+    }
+
     // ARC4 encode using the first UTXO's txid as the key
-    const txidBytes = hex2bin(utxos[0].txid); // Uint8Array
+    const txidBytes = hex2bin(selectedUtxos[0].txid); // Uint8Array
     console.log("ARC4 key (hex):", bin2hex(txidBytes));
 
     // Use the arc4 function for encryption
@@ -112,7 +122,7 @@ export const prepareSrc20TX = async ({
       let pubkey1: string, pubkey2: string;
 
       do {
-        const first_byte = Math.random() > 0.5 ? "02" : "03";
+        const first_byte = crypto.randomBytes(1)[0] & 1 ? "02" : "03";
         const second_byte = crypto.randomBytes(1)[0]
           .toString(16)
           .padStart(2, "0");
@@ -120,7 +130,7 @@ export const prepareSrc20TX = async ({
       } while (!isValidPubkey(pubkey1));
 
       do {
-        const first_byte = Math.random() > 0.5 ? "02" : "03";
+        const first_byte = crypto.randomBytes(1)[0] & 1 ? "02" : "03";
         const second_byte = crypto.randomBytes(1)[0]
           .toString(16)
           .padStart(2, "0");
@@ -130,14 +140,13 @@ export const prepareSrc20TX = async ({
       return `5121${pubkey1}21${pubkey2}21${THIRD_PUBKEY}53ae`;
     });
 
-    // Prepare outputs
-    const vouts: VOUT[] = [
-      { address: toAddress, value: RECIPIENT_DUST },
+    // Add multisig outputs to vouts
+    vouts.push(
       ...multisigScripts.map((script) => ({
         script: Buffer.from(script, "hex"),
         value: MULTISIG_DUST,
       })),
-    ];
+    );
 
     // Add minting service fee if enabled
     if (parseInt(serverConfig.MINTING_SERVICE_FEE_ENABLED || "0", 10) === 1) {
@@ -149,24 +158,36 @@ export const prepareSrc20TX = async ({
       vouts.push({ address: feeAddress, value: feeAmount });
     }
 
-    // Select UTXOs
-    const {
-      inputs: selectedUtxos,
-      change,
-      fee: estimatedFee,
-    } = selectUTXOs(utxos, vouts, feeRate);
-
-    if (selectedUtxos.length === 0) {
-      throw new Error("Unable to select suitable UTXOs for the transaction");
-    }
-
     // Add inputs to PSBT
     for (const input of selectedUtxos) {
       const txDetails = await getTransaction(input.txid);
+
+      // Check if txDetails and txDetails.vout are defined
+      if (!txDetails || !txDetails.vout) {
+        throw new Error(
+          `Transaction details not found for txid: ${input.txid}`,
+        );
+      }
+
       const inputDetails = txDetails.vout[input.vout];
-      const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith(
+
+      // Check if inputDetails is defined
+      if (!inputDetails) {
+        throw new Error(
+          `No vout found at index ${input.vout} for transaction ${input.txid}`,
+        );
+      }
+
+      const isWitnessUtxo = inputDetails.scriptPubKey?.type?.startsWith(
         "witness",
       );
+
+      // Ensure scriptPubKey and type are defined
+      if (typeof isWitnessUtxo === "undefined") {
+        throw new Error(
+          `scriptPubKey.type is undefined for txid: ${input.txid}, vout: ${input.vout}`,
+        );
+      }
 
       const psbtInput: PSBTInput = {
         hash: input.txid,

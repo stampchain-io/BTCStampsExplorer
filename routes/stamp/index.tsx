@@ -1,5 +1,5 @@
 import { StampPageProps } from "globals";
-import { Pagination } from "$islands/pagination/Pagination.tsx";
+import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$lib/controller/stampController.ts";
 import { StampContent } from "$islands/stamp/StampContent.tsx";
@@ -93,8 +93,6 @@ export function StampPage(props: StampPageProps) {
       <StampHeader
         filterBy={filterBy as STAMP_FILTER_TYPES[]}
         sortBy={sortBy}
-        selectedTab={selectedTab}
-        type={selectedTab}
       />
       <StampContent
         stamps={stampsArray}

@@ -6,20 +6,31 @@ export default function Error404() {
       <Head>
         <title>404 - Page not found</title>
       </Head>
-      <div class="px-4 py-8 mx-auto bg-[#86efac]">
+      <div class="px-4 py-8 mx-auto">
         <div class="max-w-screen-md mx-auto flex flex-col items-center justify-center">
+          <div class="flex flex-col justify-center items-center">
+            <div class="bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent xl:text-6xl md:text-5xl text-3xl font-black">
+              LOOKING
+            </div>
+            <div class="text-[#AA00FF] md:text-3xl text-2xl">
+              A LITTLE LOST
+            </div>
+          </div>
           <img
-            class="my-6"
-            src="img/stamp.jpg"
-            width="128"
-            height="128"
+            class="my-6 xl:w-[660.18px] lg:w-[479.9px] w-[360.15px]"
+            src="img/broken.png"
             alt="Bitcoin Stamps"
           />
-          <h1 class="text-4xl font-bold">404 - Page not found</h1>
-          <p class="my-4">
-            The page you were looking for doesn't exist.
-          </p>
-          <a href="/" class="underline">Go back home</a>
+          <div class="text-[#AA00FF] xl:text-5xl md:text-3xl text-2xl">
+            WANNA GO HOME
+          </div>
+          <a
+            href="/home"
+            target="_top"
+            class="bg-[#8800CC] hover:bg-[#9911DD] px-5 py-3 rounded font-black text-[#080808] mt-6"
+          >
+            Home
+          </a>
         </div>
       </div>
     </>

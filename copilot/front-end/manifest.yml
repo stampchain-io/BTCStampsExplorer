@@ -17,8 +17,8 @@ http:
   #   - name: v1.example.com
   #     hosted_zone: AN0THE9H05TED20NEID
   healthcheck: 
-    success_codes: '307'
-    path: '/'
+    success_codes: '200'
+    path: '/api/v2/health'
     port: 8000
     # healthy_threshold: 3
     # unhealthy_threshold: 2

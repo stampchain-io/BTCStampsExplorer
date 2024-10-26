@@ -1,3 +1,5 @@
+import "$/server/config/env.ts";
+
 import { Client } from "$mysql/mod.ts";
 import { connect, Redis } from "redis";
 import * as crypto from "crypto";
@@ -7,13 +9,11 @@ import {
   getLogger,
   LogRecord,
   setup,
-} from "$std/log/mod.ts";
+} from "@std/log";
 import {
   deadline,
-  DeadlineError,
-} from "https://deno.land/std@0.201.0/async/mod.ts";
+} from "@std/async";
 
-// Define a configuration interface
 interface DatabaseConfig {
   DB_HOST: string;
   DB_USER: string;
@@ -37,6 +37,7 @@ class DatabaseManager {
   private readonly MAX_POOL_SIZE = 10;
   private logger: ReturnType<typeof getLogger>;
   private redisAvailableAtStartup = false;
+  private inMemoryCache: { [key: string]: { data: any; expiry: number } } = {};
 
   constructor(private config: DatabaseConfig) {
     this.MAX_RETRIES = this.config.DB_MAX_RETRIES || 5;
@@ -53,7 +54,7 @@ class DatabaseManager {
     setup({
       handlers: {
         console: new ConsoleHandler("DEBUG"),
-        file: new FileHandler("WARNING", {
+        file: new FileHandler("WARN", {
           filename: "./db.log",
           formatter: (logRecord: LogRecord) =>
             `${logRecord.levelName} ${logRecord.msg}`,
@@ -100,10 +101,10 @@ class DatabaseManager {
 
   async executeQuery<T>(query: string, params: unknown[]): Promise<T> {
     for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
+      let client: Client | null = null;
       try {
-        const client = await this.getClient();
+        client = await this.getClient();
         const result = await client.execute(query, params);
-        this.releaseClient(client);
         return result as T;
       } catch (error) {
         this.logger.error(
@@ -112,6 +113,11 @@ class DatabaseManager {
         );
         if (attempt === this.MAX_RETRIES) {
           throw error;
+        }
+      } finally {
+        if (client) {
+          this.releaseClient(client);
+          client = null;
         }
       }
       await new Promise((resolve) => setTimeout(resolve, this.RETRY_INTERVAL));
@@ -140,13 +146,16 @@ class DatabaseManager {
   }
 
   private createConnection(): Promise<Client> {
+    console.log("poolLength:" + this.pool.length)
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
+    const charset= 'utf8mb4'
     return new Client().connect({
       hostname: DB_HOST,
       port: DB_PORT,
       username: DB_USER,
       db: DB_NAME,
       password: DB_PASSWORD,
+      charset: charset,
     });
   }
 
@@ -160,7 +169,7 @@ class DatabaseManager {
     try {
       await this.connectToRedis();
     } catch (error) {
-      if (error instanceof DeadlineError) {
+      if (error instanceof Error && error.name === "AbortError") {
         this.logger.error("Redis connection timed out:", error);
       } else {
         this.logger.error("Failed to connect to Redis at startup:", error);
@@ -230,7 +239,7 @@ class DatabaseManager {
       if (this.redisAvailableAtStartup) {
         this.connectToRedisInBackground();
       }
-      return await fetchData();
+      return this.handleInMemoryCache(key, fetchData, cacheDuration);
     }
     const cachedData = await this.getCachedData(key);
     if (cachedData) {
@@ -255,7 +264,7 @@ class DatabaseManager {
         this.redisAvailable = false;
       }
     }
-    return null;
+    return this.getInMemoryCachedData(key);
   }
 
   private async setCachedData(
@@ -279,6 +288,41 @@ class DatabaseManager {
         this.redisAvailable = false;
       }
     }
+    this.setInMemoryCachedData(key, data, expiry);
+  }
+
+  private handleInMemoryCache<T>(
+    key: string,
+    fetchData: () => Promise<T>,
+    cacheDuration: number | "never",
+  ): Promise<T> {
+    const cachedData = this.getInMemoryCachedData(key);
+    if (cachedData) {
+      return Promise.resolve(cachedData as T);
+    }
+
+    return fetchData().then((data) => {
+      this.setInMemoryCachedData(key, data, cacheDuration);
+      return data;
+    });
+  }
+
+  private getInMemoryCachedData(key: string): unknown | null {
+    const item = this.inMemoryCache[key];
+    if (item && item.expiry > Date.now()) {
+      return item.data;
+    }
+    delete this.inMemoryCache[key];
+    return null;
+  }
+
+  private setInMemoryCachedData(
+    key: string,
+    data: unknown,
+    expiry: number | "never",
+  ): void {
+    const expiryTime = expiry === "never" ? Infinity : Date.now() + expiry;
+    this.inMemoryCache[key] = { data, expiry: expiryTime };
   }
 
   public async invalidateCacheByPattern(pattern: string): Promise<void> {
@@ -298,6 +342,16 @@ class DatabaseManager {
           this.connectToRedisInBackground();
         }
         this.redisAvailable = false;
+      }
+    }
+    this.invalidateInMemoryCacheByPattern(pattern);
+  }
+
+  private invalidateInMemoryCacheByPattern(pattern: string): void {
+    const regex = new RegExp(pattern);
+    for (const key in this.inMemoryCache) {
+      if (regex.test(key)) {
+        delete this.inMemoryCache[key];
       }
     }
   }

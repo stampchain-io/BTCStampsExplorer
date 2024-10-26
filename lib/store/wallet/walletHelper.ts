@@ -1,10 +1,9 @@
 import { leatherProvider } from "./leather.ts";
 import { okxProvider } from "./okx.ts";
 import { unisatProvider } from "./unisat.ts";
-import { Wallet } from "./wallet.d.ts";
 import { tapWalletProvider } from "./tapwallet.ts";
 import { phantomProvider } from "./phantom.ts";
-import { SignPSBTResult } from "$lib/types/src20.d.ts";
+import { SignPSBTResult, Wallet } from "$lib/types/index.d.ts";
 
 interface WalletProvider {
   signMessage: (message: string) => Promise<string>;
@@ -12,6 +11,8 @@ interface WalletProvider {
     psbtHex: string,
     inputsToSign?: { index: number }[],
     enableRBF?: boolean,
+    sighashTypes?: number[],
+    autoBroadcast?: boolean,
   ) => Promise<SignPSBTResult>;
   broadcastRawTX?: (rawTx: string) => Promise<string>;
   broadcastPSBT?: (psbtHex: string) => Promise<string>;
@@ -50,6 +51,8 @@ export const signPSBT = async (
   psbtHex: string,
   inputsToSign: any[],
   enableRBF = true,
+  sighashTypes?: number[],
+  autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
   console.log("Entering signPSBT in walletHelper.ts");
   console.log("Wallet provider:", wallet.provider);
@@ -75,6 +78,8 @@ export const signPSBT = async (
       psbtHex,
       inputIndexToSign,
       enableRBF,
+      sighashTypes,
+      autoBroadcast,
     );
     console.log("PSBT signing result:", JSON.stringify(result, null, 2));
 
@@ -87,11 +92,15 @@ export const signPSBT = async (
         signed: true,
         psbt: result.psbt,
         txid: result.txid,
+        error: result.error, // Include error if any
       };
     } else if (result.cancelled) {
       return { signed: false, cancelled: true };
     } else {
-      return { signed: false, error: result.error || "Failed to sign PSBT" };
+      return {
+        signed: false,
+        error: result.error || "Failed to sign PSBT",
+      };
     }
   } catch (error) {
     console.error("Error in signPSBT:", error);

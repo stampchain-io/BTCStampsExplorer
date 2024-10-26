@@ -2,7 +2,6 @@ import { StampService } from "$lib/services/stampService.ts";
 import { BIG_LIMIT } from "utils/constants.ts";
 import { HolderRow, SUBPROTOCOLS } from "globals";
 import { Src20Service } from "$lib/services/src20Service.ts";
-import { formatSRC20Row } from "utils/src20Utils.ts";
 import { CollectionService } from "$lib/services/collectionService.ts";
 import { BlockService } from "$lib/services/blockService.ts";
 import { paginate } from "utils/util.ts";
@@ -14,69 +13,17 @@ import {
   STAMP_TYPES,
   StampRow,
 } from "globals";
-import { DispenserManager, XcpManager } from "$lib/services/xcpService.ts";
-import * as base64 from "base64/mod.ts";
-const NO_DISPENSERS = Symbol("NO_DISPENSERS");
+import { DispenserManager } from "$lib/services/xcpService.ts";
+import { decodeBase64 } from "@std/encoding";
 import { filterOptions } from "utils/filterOptions.ts";
-
-export class InMemoryCacheService {
-  private static cache: { [key: string]: { data: any; expiry: number } } = {};
-
-  static set(key: string, data: any, duration: number): void {
-    const expiry = Date.now() + duration;
-    this.cache[key] = { data, expiry };
-  }
-
-  static get(key: string): any | null {
-    const item = this.cache[key];
-    if (item && item.expiry > Date.now()) {
-      return item.data;
-    }
-    delete this.cache[key];
-    return null;
-  }
-}
+import { Dispense, Dispenser } from "$lib/types/index.d.ts";
+import { CollectionController } from "$lib/controller/collectionController.ts";
+import { Src20Controller } from "$lib/controller/src20Controller.ts";
 
 export class StampController {
-  private static CacheService = InMemoryCacheService;
-
-  private static async getXcpAssetsWithInMemoryCache(): Promise<any[]> {
-    const cacheKey = "xcp_assets";
-    const cacheDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
-
-    let xcpAssets = StampController.CacheService.get(cacheKey);
-    if (!xcpAssets) {
-      xcpAssets = await XcpManager.getAllXcpAssets();
-      StampController.CacheService.set(cacheKey, xcpAssets, cacheDuration);
-    }
-
-    return xcpAssets;
-  }
-
-  private static async getDispensersWithCache(cpid: string): Promise<any[]> {
-    const cacheKey = `dispensers_${cpid}`;
-    const cacheDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
-
-    let dispensers = StampController.CacheService.get(cacheKey);
-    if (dispensers === NO_DISPENSERS) {
-      return null;
-    }
-    // console.log("Dispensers from cache:", dispensers);
-    if (!dispensers) {
-      dispensers = await DispenserManager.getDispensersByCpid(cpid);
-      StampController.CacheService.set(
-        cacheKey,
-        dispensers ?? NO_DISPENSERS,
-        cacheDuration,
-      );
-    }
-
-    return dispensers;
-  }
-
-  static async getStampDetailsById(id: string) {
+  static async getStampDetailsById(id: string, stampType: STAMP_TYPES = "all") {
     try {
-      const res = await StampService.getStampDetailsById(id, "all");
+      const res = await StampService.getStampDetailsById(id, "all", stampType);
       if (!res) {
         return null;
       }
@@ -136,34 +83,75 @@ export class StampController {
   }
 
   private static calculatePrices(
-    dispensers: any[],
-    dispenses: any[],
-    stamp: any,
+    dispensers: Dispenser[],
+    dispenses: Dispense[],
+    stamp: StampRow,
   ) {
+    console.log("Entering calculatePrices method");
+    console.log("Dispensers:", JSON.stringify(dispensers, null, 2));
+    console.log("Dispenses:", JSON.stringify(dispenses, null, 2));
+    console.log("Stamp:", JSON.stringify(stamp, null, 2));
+
     let floorPrice: string | number = "priceless";
     let marketCap: string | number = "priceless";
 
     if (dispensers && dispensers.length > 0) {
-      const openDispensers = dispensers.filter(
-        (dispenser) => dispenser.give_remaining > 0,
-      );
+      console.log("Dispensers array is not empty");
+      const openDispensers = dispensers.filter((dispenser) => {
+        console.log("Checking dispenser:", JSON.stringify(dispenser, null, 2));
+        return dispenser && dispenser.give_remaining > 0;
+      });
+      console.log("Open dispensers:", JSON.stringify(openDispensers, null, 2));
+
       if (openDispensers.length > 0) {
+        console.log("There are open dispensers");
         const lowestBtcRate = Math.min(
-          ...openDispensers.map((dispenser) =>
-            dispenser.satoshirate / 100000000
-          ),
+          ...openDispensers.map((dispenser) => {
+            console.log(
+              "Processing dispenser:",
+              JSON.stringify(dispenser, null, 2),
+            );
+            if (dispenser && dispenser.satoshirate !== undefined) {
+              return dispenser.satoshirate / 100000000;
+            } else {
+              console.log("Warning: dispenser or satoshirate is undefined");
+              return Infinity;
+            }
+          }),
         );
-        floorPrice = lowestBtcRate;
+        console.log("Lowest BTC rate:", lowestBtcRate);
+        floorPrice = lowestBtcRate !== Infinity ? lowestBtcRate : "priceless";
       }
+    } else {
+      console.log("Dispensers array is empty or undefined");
     }
 
     if (dispenses && dispenses.length > 0 && stamp.supply) {
+      console.log("Calculating market cap");
       const mostRecentDispense = dispenses[0];
-      const recentPrice = mostRecentDispense.dispenser_details.satoshirate /
-        100000000;
-      marketCap = recentPrice * stamp.supply;
+      console.log(
+        "Most recent dispense:",
+        JSON.stringify(mostRecentDispense, null, 2),
+      );
+
+      // Find the parent dispenser for the most recent dispense
+      const parentDispenser = dispensers.find((d) =>
+        d.tx_hash === mostRecentDispense.dispenser_tx_hash
+      );
+
+      if (parentDispenser && parentDispenser.satoshirate !== undefined) {
+        const recentPrice = parentDispenser.satoshirate / 100000000; // Convert satoshis to BTC
+        marketCap = recentPrice * stamp.supply;
+        console.log("Calculated market cap:", marketCap);
+      } else {
+        console.log(
+          "Warning: Parent dispenser not found or satoshirate is missing for the most recent dispense",
+        );
+      }
     }
 
+    console.log("Final floorPrice:", floorPrice);
+    console.log("Final marketCap:", marketCap);
     return { floorPrice, marketCap };
   }
 
@@ -190,7 +178,7 @@ export class StampController {
     filterBy?: STAMP_FILTER_TYPES[] | string;
     ident?: SUBPROTOCOLS[];
     suffixFilters?: STAMP_SUFFIX_FILTERS[];
-    collectionId?: string;
+    collectionId?: string | string[];
     identifier?: string | number;
     blockIdentifier?: number | string;
     cacheDuration?: number | "never";
@@ -231,7 +219,7 @@ export class StampController {
         );
         filterSuffixFilters = filterByArray.flatMap((filter) =>
           filterOptions[filter]?.suffixFilters || []
-        );
+        ) as STAMP_SUFFIX_FILTERS[];
 
         // Combine ident from type and filterBy, removing duplicates
         if (identFromFilter.length > 0) {
@@ -245,8 +233,7 @@ export class StampController {
         suffixFilters = []; // No suffix filter applied
       }
 
-      // Pass ident, filterBy, and suffixFilters to the service/repository
-      const [stampResult, lastBlock, xcpAssets] = await Promise.all([
+      const [stampResult, lastBlock] = await Promise.all([
         StampService.getStamps({
           page,
           limit,
@@ -264,31 +251,36 @@ export class StampController {
           sortColumn,
         }),
         BlockService.getLastBlock(),
-        this.getXcpAssetsWithInMemoryCache(),
       ]);
 
       if (!stampResult) {
         throw new Error("No stamps found");
       }
 
-      const updatedStamps = await Promise.all(
-        stampResult.stamps.map(async (stamp: StampRow) => {
-          const xcpAsset = xcpAssets.find((asset) =>
-            asset.asset === stamp.cpid
-          );
+      // Prepare concurrent calls for dispensers
+      const dispenserPromises = stampResult.stamps.map((stamp: StampRow) =>
+        (stamp.ident === "STAMP" || stamp.ident === "SRC-721")
+          ? DispenserManager.getDispensersByCpid(stamp.cpid)
+          : Promise.resolve(null)
+      );
+
+      // Wait for all dispenser promises to resolve
+      const dispensers = await Promise.all(dispenserPromises);
+
+      const updatedStamps = stampResult.stamps.map(
+        (stamp: StampRow, index: number) => {
           let floorPrice: string | number | undefined = undefined;
 
           if (stamp.ident === "STAMP" || stamp.ident === "SRC-721") {
-            const dispensers = await this.getDispensersWithCache(stamp.cpid);
-
-            if (dispensers && dispensers.length > 0) {
-              const openDispensers = dispensers.filter(
+            const dispensersForStamp = dispensers[index];
+            if (dispensersForStamp && dispensersForStamp.length > 0) {
+              const openDispensers = dispensersForStamp.filter(
                 (dispenser) => dispenser.give_remaining > 0,
               );
               if (openDispensers.length > 0) {
                 const lowestBtcRate = Math.min(
-                  ...openDispensers.map((dispenser) =>
-                    dispenser.satoshirate / 100000000
+                  ...openDispensers.map(
+                    (dispenser) => dispenser.satoshirate / 100000000,
                   ),
                 );
                 floorPrice = lowestBtcRate;
@@ -302,12 +294,9 @@ export class StampController {
 
           return {
             ...stamp,
-            divisible: xcpAsset?.divisible ?? stamp.divisible,
-            supply: xcpAsset?.supply ?? stamp.supply,
-            locked: xcpAsset?.locked ?? stamp.locked,
             ...(floorPrice !== undefined && { floorPrice }),
           };
-        }),
+        },
       );
 
       return {
@@ -389,7 +378,7 @@ export class StampController {
 
   static async getMultipleStampCategories(
     categories: {
-      types: string[];
+      idents: SUBPROTOCOLS[];
       limit: number;
     }[],
   ) {
@@ -399,13 +388,13 @@ export class StampController {
           page: 1,
           limit: category.limit,
           sortBy: "DESC",
-          type: "stamps",
-          ident: category.types as SUBPROTOCOLS[],
+          type: "all",
+          ident: category.idents,
           noPagination: false,
         });
 
         return {
-          types: category.types,
+          types: category.idents,
           stamps: serviceResult?.stamps ?? [],
           total: serviceResult?.total ?? 0,
         };
@@ -420,37 +409,62 @@ export class StampController {
       const [
         stampCategories,
         src20Result,
-        poshCollection,
+        trendingSrc20s, // <-- Add this line
         recentSales,
         collectionData,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { types: ["STAMP", "SRC-721"], limit: 6 },
-          { types: ["SRC-721"], limit: 6 },
-          { types: ["STAMP"], limit: 16 },
-          { types: ["SRC-20"], limit: 6 },
+          { idents: ["STAMP", "SRC-721"], limit: 6 },
+          { idents: ["SRC-721"], limit: 6 },
+          { idents: ["STAMP"], limit: 16 },
+          // Removed SRC20 from stamp categories
         ]),
-        Src20Service.fetchAndFormatSrc20Data({
+        // Fetch SRC20 data for the SRC20DeployTable
+        Src20Controller.fetchSrc20DetailsWithHolders(null, {
           op: "DEPLOY",
           page: 1,
-          limit: 10,
+          limit: 5,
+          sortBy: "ASC",
         }),
-        CollectionService.getCollectionByName("posh", 8, "DESC"),
-        StampService.getRecentSales(6),
-        CollectionService.getCollectionNames({
+        // Fetch trending SRC20 tokens for SRC20TrendingMints component
+        Src20Controller.fetchTrendingTokens(null, 5, 1, 1000), // <-- Added this line
+        this.getRecentSales(1, 6),
+        CollectionController.getCollectionNames({
           limit: 4,
           page: 1,
           creator: "",
         }),
       ]);
 
+      // Fetch the "posh" collection to get its collection_id
+      const poshCollection = await CollectionService.getCollectionByName(
+        "posh",
+      );
+
+      let stamps_posh = [];
+      if (poshCollection) {
+        const poshCollectionId = poshCollection.collection_id;
+
+        // Fetch stamps from the "posh" collection with limit and sortBy
+        const poshStampsResult = await this.getStamps({
+          collectionId: poshCollectionId,
+          page: 1,
+          limit: 8, // Limit to 8 stamps
+          sortBy: "DESC", // Adjust sort order if needed
+        });
+
+        stamps_posh = poshStampsResult.data; // Extract the stamps array
+      } else {
+        console.warn("Posh collection not found");
+      }
+
       return {
-        stamps_recent: recentSales,
+        stamps_recent: recentSales.data,
         stamps_src721: stampCategories[1].stamps,
         stamps_art: stampCategories[2].stamps,
-        stamps_src20: stampCategories[3].stamps,
-        stamps_posh: poshCollection ? poshCollection.stamps : [],
-        src20s: src20Result.data.map(formatSRC20Row),
+        stamps_posh,
+        src20s: src20Result.data,
+        trendingSrc20s: trendingSrc20s.data, // <-- Add this line
         collectionData: collectionData.data,
       };
     } catch (error) {
@@ -491,7 +505,7 @@ export class StampController {
             },
           });
         case "base64":
-          return new Response(base64.toUint8Array(result.base64), {
+          return new Response(decodeBase64(result.base64), {
             headers: {
               "Content-Type": result.mimeType || "application/octet-stream",
             },

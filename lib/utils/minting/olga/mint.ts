@@ -1,20 +1,17 @@
-import * as btc from "bitcoin";
+import * as btc from "bitcoinjs-lib";
 import { mintMethodOPRETURN } from "utils/minting/stamp.ts";
 import { handleXcpV1Query } from "utils/xcpUtils.ts";
-import { extractOutputs } from "utils/minting/utils.ts";
-import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
-import { selectUTXOs } from "utils/minting/src20/utxo-selector.ts";
+import { extractOutputs } from "../transactionUtils.ts";
 import CIP33 from "utils/minting/olga/CIP33.ts";
-import { UTXO } from "utils/minting/src20/utils.d.ts";
 import { Buffer } from "buffer";
 import { getTransaction } from "utils/quicknode.ts";
-import { PSBTInput } from "$lib/types/src20.d.ts";
+import { PSBTInput } from "$lib/types/index.d.ts";
 import {
   calculateDust,
   calculateMiningFee,
-  estimateP2WSHTransactionSize,
 } from "utils/minting/feeCalculations.ts";
-
+import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
+import { estimateP2WSHTransactionSize } from "../transactionSizes.ts";
 const DUST_SIZE = 333;
 
 export async function mintCIP33ApiCall(
@@ -171,7 +168,7 @@ export async function mintStampCIP33(
 async function generatePSBT(
   tx: string,
   address: string,
-  fee_per_kb: number, // this is actuall fee per vbyte
+  fee_per_kb: number, // this is actually fee per vbyte
   service_fee: number,
   recipient_fee: string,
   cip33Addresses: string[],
@@ -184,6 +181,7 @@ async function generatePSBT(
   const totalDustValue = calculateDust(fileSize);
   let totalOutputValue = totalDustValue; // Initialize with dust value
 
+  // Add CIP33 addresses to outputs and update totalOutputValue
   for (let i = 0; i < cip33Addresses.length; i++) {
     const dustValue = DUST_SIZE + i;
     const cip33Address = cip33Addresses[i];
@@ -191,6 +189,7 @@ async function generatePSBT(
       value: dustValue,
       address: cip33Address,
     });
+    totalOutputValue += dustValue;
   }
 
   if (service_fee > 0 && recipient_fee) {
@@ -201,35 +200,25 @@ async function generatePSBT(
     totalOutputValue += service_fee; // Add service fee to total output value
   }
 
-  const utxos = await getUTXOForAddress(address) as UTXO[];
-  let totalInputValue = 0; // Initialize total input value
-  utxos.forEach((utxo) => totalInputValue += utxo.value); // Sum up input values
+  const { inputs, change } = await selectUTXOsForTransaction(
+    address,
+    vouts,
+    fee_per_kb,
+  );
 
-  let inputs, change;
-
-  try {
-    ({ inputs, change } = selectUTXOs(utxos, vouts, fee_per_kb));
-  } catch (error) {
-    console.error(error);
-    throw Error(error.message);
-  }
-
-  totalOutputValue += change; // Add change to total output value
-
-  vouts.push({
-    value: change,
-    address: address,
-  });
+  const totalInputValue = inputs.reduce((sum, input) => sum + input.value, 0);
 
   for (const input of inputs) {
     const txDetails = await getTransaction(input.txid);
     const inputDetails = txDetails.vout[input.vout];
     const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
+
     const psbtInput: PSBTInput = {
       hash: input.txid,
       index: input.vout,
       sequence: 0xfffffffd,
     };
+
     if (isWitnessUtxo) {
       psbtInput.witnessUtxo = {
         script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
@@ -242,11 +231,19 @@ async function generatePSBT(
     psbt.addInput(psbtInput);
   }
 
+  // Add change output if necessary and update totalOutputValue
+  if (change > 0) {
+    vouts.push({
+      value: change,
+      address: address,
+    });
+    totalOutputValue += change;
+  }
+
+  // Add outputs to PSBT
   for (const out of vouts) {
     psbt.addOutput(out);
   }
-
-  // console.log(`PSBT is instance of btc.Psbt: ${psbt instanceof btc.Psbt}`);
 
   const estimatedSize = estimateP2WSHTransactionSize(fileSize);
 
@@ -291,7 +288,7 @@ async function generatePSBT(
     feePerKb: fee_per_kb,
     estimatedTxSize: estimatedSize,
     totalInputValue: totalInputValue,
-    totalOutputValue: totalOutputValue, // includes change, dust
+    totalOutputValue: totalOutputValue, // includes change and all outputs
     totalChangeOutput: change,
     totalDustValue: totalDustValue,
     estMinerFee: estMinerFee,

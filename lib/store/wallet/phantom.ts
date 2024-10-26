@@ -1,7 +1,6 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
-import { Wallet } from "./wallet.d.ts";
-import { SignPSBTResult } from "$lib/types/src20.d.ts";
+import { SignPSBTResult, Wallet } from "$lib/types/index.d.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -24,8 +23,8 @@ export const connectPhantom = async (addToast) => {
 };
 
 const getProvider = () => {
-  if ("phantom" in window) {
-    const provider = window.phantom?.bitcoin;
+  if ("phantom" in globalThis) {
+    const provider = globalThis.phantom?.bitcoin;
     if (provider?.isPhantom) {
       return provider;
     }
@@ -50,21 +49,19 @@ const handleAccountsChanged = async (accounts: any[]) => {
     return;
   }
 
-  const provider = getProvider();
   const _wallet = {} as Wallet;
-  _wallet.address = accounts[0].address;
+  _wallet.address = accounts[0]?.address;
   _wallet.accounts = accounts.map((acc) => acc.address);
-  _wallet.publicKey = accounts[0].publicKey;
+  _wallet.publicKey = accounts[0]?.publicKey;
 
-  // Phantom doesn't provide a direct method to get balance, so we'll need to implement this separately
+  // Phantom doesn't provide a direct method to get balance
   // _wallet.btcBalance = await getBtcBalance(_wallet.address);
 
   const basicInfo = await walletContext.getBasicStampInfo(_wallet.address);
   _wallet.stampBalance = basicInfo.stampBalance;
-  _wallet.network = "mainnet"; // Phantom currently only supports mainnet
+  _wallet.network = "mainnet";
   _wallet.provider = "phantom";
 
-  walletContext.isConnected.value = true;
   walletContext.updateWallet(_wallet);
 };
 
@@ -79,26 +76,74 @@ const signMessage = async (message: string) => {
       new TextEncoder().encode(message),
     );
     console.log("Phantom wallet signature result:", result);
-    return result.signature;
+    return btoa(String.fromCharCode(...new Uint8Array(result.signature)));
   } catch (error) {
     console.error("Error signing message with Phantom wallet:", error);
     throw error;
   }
 };
 
+const hexToUint8Array = (hex: string): Uint8Array => {
+  if (hex.length % 2 !== 0) {
+    throw new Error("Invalid hex string");
+  }
+  const array = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < array.length; i++) {
+    const byte = hex.substr(i * 2, 2);
+    array[i] = parseInt(byte, 16);
+  }
+  return array;
+};
+
+const uint8ArrayToHex = (bytes: Uint8Array): string => {
+  return Array.from(bytes)
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
+
 const signPSBT = async (
   psbtHex: string,
-  _inputsToSign?: { index: number }[],
+  inputsToSign?: { index: number }[],
   enableRBF = true,
+  sighashTypes?: number[],
+  autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
   const provider = getProvider();
   if (!provider) {
     throw new Error("Phantom wallet not connected");
   }
   try {
-    const result = await provider.signPSBT(psbtHex, { enableRBF });
-    if (result && result.hex) {
-      return { signed: true, psbt: result.hex };
+    // Convert psbtHex to Uint8Array
+    const psbtBuffer = hexToUint8Array(psbtHex);
+
+    // Prepare inputsToSign
+    const inputsToSignArray = inputsToSign?.map((input) => ({
+      address: walletContext.wallet.address,
+      signingIndexes: [input.index],
+      sigHash: sighashTypes ? sighashTypes[0] : undefined,
+    }));
+
+    const result = await provider.signPSBT(psbtBuffer, {
+      inputsToSign: inputsToSignArray,
+    });
+
+    console.log("Phantom signPSBT result:", result);
+
+    if (result && result instanceof Uint8Array) {
+      // Convert the signed PSBT back to hex
+      const signedPsbtHex = uint8ArrayToHex(result);
+
+      if (autoBroadcast) {
+        // Phantom doesn't provide a direct method to broadcast
+        // You might need to use an external API to broadcast
+        // For now, we'll return an error
+        return {
+          signed: true,
+          error: "Auto-broadcasting is not supported with Phantom wallet",
+        };
+      } else {
+        return { signed: true, psbt: signedPsbtHex };
+      }
     } else {
       return {
         signed: false,
@@ -106,7 +151,7 @@ const signPSBT = async (
       };
     }
   } catch (error) {
-    console.error("Error signing PSBT:", error);
+    console.error("Error signing PSBT with Phantom:", error);
     if (error.message && error.message.includes("User rejected")) {
       return { signed: false, cancelled: true };
     }

@@ -1,12 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.primary-gradient {
+  background: linear-gradient(to right, #1f002e00, #14001f7f, #1f002eff);
+}
+
 .image-rendering-pixelated {
   position: relative;
 }
-
 .image-rendering-pixelated::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -16,14 +20,12 @@
   background-size: 3px;
   z-index: 1;
 }
-
 .image-rendering-pixelated img,
 .image-rendering-pixelated iframe,
 .image-rendering-pixelated > div {
   position: relative;
   z-index: 2;
 }
-
 .image-rendering-pixelated img {
   mix-blend-mode: multiply;
 }
@@ -38,32 +40,34 @@
 @media (max-width: 768px) {
   /* Adjust the max-width as needed */
   ::-webkit-scrollbar {
-    width: 8px; /* Smaller width for mobile */
+    width: 8px;
+    /* Smaller width for mobile */
     height: 8px;
     border-radius: 14px;
   }
 }
 
 /* Track */
-::-webkit-scrollbar-track {
-  background: #3f2a4e;
-  border-radius: 14px;
+::-webkit-scrollbar {
+  border-radius: 3px;
+  height: 24px;
+  width: 6px;
 }
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #bbb9bc;
-  border-radius: 14px;
-}
-
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #dbd9dc;
+  background: #aa00ff;
 }
-
+::-webkit-scrollbar-thumb {
+  background: #660099;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background: #333333;
+  border-radius: 3px;
+}
 /* New custom scrollbar styles for specific class */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 28px; /* Custom width */
+  width: 28px;
+  /* Custom width */
   height: 20px;
   border-radius: 0px;
 }
@@ -71,26 +75,30 @@
 @media (max-width: 768px) {
   /* Adjust the max-width as needed */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 17px; /* Smaller width for mobile */
+    width: 17px;
+    /* Smaller width for mobile */
     height: 14px;
     border-radius: 0px;
   }
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #2b0e49; /* Custom track color */
+  background: #2b0e49;
+  /* Custom track color */
   padding: 4px;
   border-radius: 0px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #b9b9b9; /* Custom handle color */
+  background: #b9b9b9;
+  /* Custom handle color */
   border-radius: 0px;
   background-clip: padding-box;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #d9d9d9; /* Custom handle hover color */
+  background: #d9d9d9;
+  /* Custom handle hover color */
 }
 
 .pixelart {
@@ -110,7 +118,7 @@
 }
 
 .stamp-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -137,10 +145,23 @@
   height: 100%;
   transform: rotate(166.26deg);
   transform-origin: top left;
-  opacity: 0.20;
-  background: linear-gradient(158deg, #8800CC 33%, #660099 66%, rgba(68, 0, 102, 0) 100%);
+  opacity: 0.2;
+  background: linear-gradient(
+    158deg,
+    #8800cc 33%,
+    #660099 66%,
+    rgba(68, 0, 102, 0) 100%
+  );
   box-shadow: 100px 100px 100px;
   border-radius: 9999px;
   filter: blur(100px);
   overflow: hidden;
+}
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }

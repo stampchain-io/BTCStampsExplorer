@@ -4,20 +4,25 @@ export default {
   content: [
     "{routes,islands,components}/**/*.{ts,tsx}",
   ],
-  target: {
-    safari: "14",
-  },
+
   theme: {
+    screens: {
+      "sm": "360px",
+      "md": "768px",
+      "lg": "768px",
+      "xl": "1024px",
+      "2xl": "1440px",
+    },
     extend: {
       fontFamily: {
         "work-sans": ['"Work Sans"', "sans-serif"],
-      },
-      colors: {
-        "gradient-start": "#7200B4",
-        "gradient-end": "#FF00E9",
-        // Add other custom colors as needed
+        "courier-prime": ['"Courier Prime"', "sans-serif"],
+        "micro-5": ['"Micro 5"', "sans-serif"],
       },
     },
+  },
+  target: {
+    safari: "14",
   },
   plugins: [],
 } satisfies Config;

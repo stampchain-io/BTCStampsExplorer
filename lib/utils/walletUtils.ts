@@ -12,13 +12,13 @@ export async function signMessage(
   console.log("Signing message:", message);
   console.log("For address:", address);
 
-  if (!wallet.value || !wallet.value.provider) {
+  if (!wallet || !wallet.provider) {
     throw new Error("Wallet not connected");
   }
 
   try {
     let signature: string;
-    switch (wallet.value.provider) {
+    switch (wallet.provider) {
       case "leather":
         signature = await leatherProvider.signMessage(message);
         break;

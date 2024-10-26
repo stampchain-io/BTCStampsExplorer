@@ -20,15 +20,6 @@ export interface PSBTInput {
   sequence?: number;
 }
 
-export interface UTXO {
-  txid: string;
-  vout: number;
-  value: number;
-  address: string;
-  script: string;
-  size?: number;
-}
-
 export interface IPrepareSRC20TX {
   network: string;
   changeAddress: string;
@@ -101,4 +92,29 @@ export interface SignPSBTResult {
   txid?: string;
   cancelled?: boolean;
   error?: string;
+}
+
+export interface Deployment {
+  amt: number;
+  block_index: number;
+  block_time: string;
+  creator: string;
+  creator_name: string;
+  deci: number;
+  destination: string;
+  lim: number;
+  max: number;
+  op: string;
+  p: string;
+  tick: string;
+  tx_hash: string;
+}
+
+export interface MintStatus {
+  decimals: number;
+  limit: number;
+  max_supply: number;
+  progress: number;
+  total_minted: number;
+  total_mints: number;
 }

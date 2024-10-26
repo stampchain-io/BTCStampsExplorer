@@ -30,9 +30,9 @@ export const useFeePolling = (intervalDuration = 300000) => {
           _fastestFee: newFees.fastestFee,
           _halfHourFee: newFees.halfHourFee,
           _hourFee: newFees.hourFee,
-          economyFee: newFees.economyFee * 2,
-          fastestFee: newFees.fastestFee * 2,
-          recommendedFee: newFees.fastestFee * 2,
+          economyFee: newFees.economyFee,
+          fastestFee: newFees.fastestFee,
+          recommendedFee: newFees.fastestFee,
           block: block,
         };
         setFees(allFees);

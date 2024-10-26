@@ -1,7 +1,6 @@
 import { StampController } from "$lib/controller/stampController.ts";
 import { Handlers } from "$fresh/server.ts";
-import { StampFileResult, StampRow } from "globals";
-import * as base64 from "base64/mod.ts";
+import { StampRow } from "globals";
 
 export const handler: Handlers<StampRow> = {
   async GET(req: Request, ctx) {

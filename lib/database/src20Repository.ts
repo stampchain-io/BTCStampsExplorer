@@ -12,6 +12,7 @@ import { dbManager } from "$server/database/db.ts";
 export class SRC20Repository {
   static async getTotalCountValidSrc20TxFromDb(
     params: SRC20TrxRequestParams,
+    excludeFullyMinted: boolean = false,
   ) {
     const {
       tick = null,
@@ -61,10 +62,17 @@ export class SRC20Repository {
       queryParams.push(tx_hash);
     }
 
+    // Additional condition to exclude fully minted tokens
+    if (excludeFullyMinted) {
+      whereConditions.push(
+        `(SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = src20.tick) < src20.max`,
+      );
+    }
+
     let sqlQuery = `
-        SELECT COUNT(*) AS total
-        FROM ${SRC20_TABLE}
-    `;
+          SELECT COUNT(*) AS total
+          FROM ${SRC20_TABLE} src20
+      `;
 
     if (whereConditions.length > 0) {
       sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
@@ -79,75 +87,86 @@ export class SRC20Repository {
 
   static async getValidSrc20TxFromDb(
     params: SRC20TrxRequestParams,
+    excludeFullyMinted: boolean = false,
   ) {
     const {
       block_index,
       tick,
       op,
-      limit,
-      page,
+      limit = 50, // Default limit
+      page = 1, // Default page
       sortBy = "ASC",
       tx_hash,
       address,
     } = params;
 
     const queryParams = [];
-    const whereConditions = [];
-    let limitOffsetClause = "";
-    let offset = 0;
+    const whereClauses = [];
 
     if (block_index !== undefined) {
-      whereConditions.push(`src20.block_index = ?`);
+      whereClauses.push(`src20.block_index = ?`);
       queryParams.push(block_index);
     }
 
     if (tick !== undefined) {
       if (Array.isArray(tick)) {
-        const tickPlaceholders = tick.map(() => "?").join(", ");
-        whereConditions.push(
-          `src20.tick IN (${tickPlaceholders})`,
-        );
+        whereClauses.push(`src20.tick IN (${tick.map(() => "?").join(", ")})`);
         queryParams.push(...tick);
       } else {
-        whereConditions.push(`src20.tick = ?`);
+        whereClauses.push(`src20.tick = ?`);
         queryParams.push(tick);
       }
     }
 
     if (op !== undefined) {
       if (Array.isArray(op)) {
-        const opPlaceholders = op.map(() => "?").join(", ");
-        whereConditions.push(`src20.op IN (${opPlaceholders})`);
+        whereClauses.push(`src20.op IN (${op.map(() => "?").join(", ")})`);
         queryParams.push(...op);
       } else {
-        whereConditions.push(`src20.op = ?`);
+        whereClauses.push(`src20.op = ?`);
         queryParams.push(op);
       }
     }
 
     if (tx_hash !== undefined) {
-      whereConditions.push(`src20.tx_hash = ?`);
+      whereClauses.push(`src20.tx_hash = ?`);
       queryParams.push(tx_hash);
     }
 
     if (address !== undefined) {
-      whereConditions.push(`(src20.creator = ? OR src20.destination = ?)`);
+      whereClauses.push(`(src20.creator = ? OR src20.destination = ?)`);
       queryParams.push(address, address);
     }
+
+    if (excludeFullyMinted) {
+      whereClauses.push(
+        `(SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = src20.tick) < src20.max`,
+      );
+    }
+
+    const whereClause = whereClauses.length > 0
+      ? `WHERE ${whereClauses.join(" AND ")}`
+      : "";
+
+    // Enforce limit and pagination
+    const safeLimit = Number.isFinite(Number(limit)) && Number(limit) > 0
+      ? Number(limit)
+      : 50; // Default limit if invalid
+    const safePage = Number.isFinite(Number(page)) && Number(page) > 0
+      ? Math.max(1, Number(page))
+      : 1;
+    const offset = safeLimit * (safePage - 1);
+
+    const limitOffsetClause = `LIMIT ? OFFSET ?`;
+    queryParams.push(safeLimit, offset);
 
     const validOrder = ["ASC", "DESC"].includes(sortBy.toUpperCase())
       ? sortBy.toUpperCase()
       : "ASC";
 
-    if (limit !== undefined) {
-      const safePage = Math.max(1, Number(page || 1));
-      const safeLimit = Number(limit);
-      offset = safeLimit * (safePage - 1);
-      limitOffsetClause = `LIMIT ? OFFSET ?`;
-      queryParams.push(safeLimit, offset);
-    }
+    const rowNumberInit = offset;
 
-    const sqlQuery = `
+    const query = `
       SELECT 
         (@row_number:=@row_number + 1) AS row_num,
         src20.tx_hash,
@@ -172,21 +191,21 @@ export class SRC20Repository {
         creator destination_info ON src20.destination = destination_info.address
       CROSS JOIN
         (SELECT @row_number := ?) AS init
-      ${
-      whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""
-    }
+      ${whereClause}
       ORDER BY 
         src20.tx_index ${validOrder}
       ${limitOffsetClause};
     `;
 
-    queryParams.unshift(offset);
+    const fullQueryParams = [rowNumberInit, ...queryParams];
 
-    return await dbManager.executeQueryWithCache(
-      sqlQuery,
-      queryParams,
-      1000 * 60 * 2,
+    const results = await dbManager.executeQueryWithCache(
+      query,
+      fullQueryParams,
+      1000 * 60 * 5, // Cache duration
     );
+
+    return results;
   }
 
   static async getSrc20BalanceFromDb(
@@ -197,7 +216,7 @@ export class SRC20Repository {
       tick,
       limit,
       page,
-      sortBy: sortBy = "DESC",
+      sortBy = "DESC",
       sortField = "amt",
     } = params;
     const queryParams = [];
@@ -222,14 +241,17 @@ export class SRC20Repository {
       }
     }
 
-    let limitOffsetClause = "";
-    if (limit !== undefined) {
-      const safePage = Math.max(1, Number(page || 1));
-      const safeLimit = Number(limit);
-      const offset = safeLimit * (safePage - 1);
-      limitOffsetClause = "LIMIT ? OFFSET ?";
-      queryParams.push(safeLimit, offset);
-    }
+    // Assign default values and validate limit and page
+    const safeLimit = Number.isFinite(Number(limit)) && Number(limit) > 0
+      ? Number(limit)
+      : 50; // Default limit
+    const safePage = Number.isFinite(Number(page)) && Number(page) > 0
+      ? Math.max(1, Number(page))
+      : 1;
+    const offset = safeLimit * (safePage - 1);
+
+    const limitOffsetClause = "LIMIT ? OFFSET ?";
+    queryParams.push(safeLimit, offset);
 
     const validOrder = ["ASC", "DESC"].includes(sortBy.toUpperCase())
       ? sortBy.toUpperCase()
@@ -240,17 +262,17 @@ export class SRC20Repository {
       : "amt";
 
     const sqlQuery = `
-    SELECT address, p, tick, amt, block_time, last_update
-    FROM ${SRC20_BALANCE_TABLE}
-    ${whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : ""}
-    ORDER BY ${validSortField} ${validOrder}, amt DESC
-    ${limitOffsetClause}
-  `;
+      SELECT address, p, tick, amt, block_time, last_update
+      FROM ${SRC20_BALANCE_TABLE}
+      ${whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : ""}
+      ORDER BY ${validSortField} ${validOrder}
+      ${limitOffsetClause}
+    `;
 
     const results = await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, //1000 * 60 * 2, // Cache duration
+      1000 * 60 * 2, // Cache duration
     );
 
     // Retrieve transaction hashes for the ticks
@@ -315,12 +337,12 @@ export class SRC20Repository {
     queryParams.push(amt);
 
     const sqlQuery = `
-        SELECT COUNT(*) AS total
-        FROM ${SRC20_BALANCE_TABLE}
-        ${
+          SELECT COUNT(*) AS total
+          FROM ${SRC20_BALANCE_TABLE}
+          ${
       whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""
     }
-      `;
+        `;
 
     const result = await dbManager.executeQueryWithCache(
       sqlQuery,
@@ -336,18 +358,16 @@ export class SRC20Repository {
   ) {
     const query = `
         SELECT 
-            src.max,
-            src.deci,
-            src.lim,
-            COUNT(CASE WHEN src.op = 'MINT' THEN 1 END) as total_mints,
-            COALESCE(SUM(balance.amt), 0) as total_minted
-        FROM ${SRC20_TABLE} as src
-        LEFT JOIN ${SRC20_BALANCE_TABLE} as balance ON src.tick = balance.tick AND src.tick_hash = balance.tick_hash
+            dep.max,
+            dep.deci,
+            dep.lim,
+            (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+            (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted
+        FROM ${SRC20_TABLE} AS dep
         WHERE 
-            src.tick = ? AND
-            src.op = 'DEPLOY'
-        GROUP BY 
-            src.max, src.deci, src.lim;
+            dep.tick = ? AND
+            dep.op = 'DEPLOY'
+        LIMIT 1;
     `;
 
     const data = await dbManager.executeQueryWithCache(
@@ -364,7 +384,7 @@ export class SRC20Repository {
     const max_supply = new BigFloat(row["max"]);
     const limit = new BigFloat(row["lim"]);
     const decimals = parseInt(row["deci"]);
-    const total_mints = parseInt(row["total_mints"]);
+    const total_mints = parseInt(row["total_mints"] ?? 0);
     const total_minted = new BigFloat(row["total_minted"] ?? 0);
     const progress = bigFloatToString(total_minted.div(max_supply).mul(100), 3);
 
@@ -378,5 +398,223 @@ export class SRC20Repository {
     };
 
     return response;
+  }
+
+  static async getTrendingSrc20TxFromDb(
+    limit: number,
+    offset: number,
+    transactionCount: number = 1000,
+  ) {
+    const query = `
+      WITH latest_mint_transactions AS (
+        SELECT tx_index, tick
+        FROM ${SRC20_TABLE}
+        WHERE op = 'MINT'
+        ORDER BY tx_index DESC
+        LIMIT ?
+      ),
+      mint_counts AS (
+        SELECT tick, COUNT(*) as mint_count
+        FROM latest_mint_transactions
+        GROUP BY tick
+      ),
+      max_supply_data AS (
+        SELECT tick, max
+        FROM ${SRC20_TABLE}
+        WHERE op = 'DEPLOY'
+      ),
+      total_minted_data AS (
+        SELECT tick, SUM(amt) as total_minted
+        FROM ${SRC20_BALANCE_TABLE}
+        GROUP BY tick
+      ),
+      mint_status AS (
+        SELECT
+          msd.tick,
+          msd.max,
+          COALESCE(tmd.total_minted, 0) as total_minted
+        FROM max_supply_data msd
+        LEFT JOIN total_minted_data tmd ON msd.tick = tmd.tick
+      )
+      SELECT
+        mc.tick,
+        mc.mint_count,
+        src20_deploy.tx_hash,
+        src20_deploy.block_index,
+        src20_deploy.p,
+        src20_deploy.op,
+        src20_deploy.creator,
+        src20_deploy.amt,
+        src20_deploy.deci,
+        src20_deploy.lim,
+        src20_deploy.max,
+        src20_deploy.destination,
+        src20_deploy.block_time,
+        mint_status.total_minted,
+        mint_status.max as max_supply,
+        creator_info.creator as creator_name
+      FROM mint_counts mc
+      JOIN ${SRC20_TABLE} src20_deploy ON mc.tick = src20_deploy.tick AND src20_deploy.op = 'DEPLOY'
+      JOIN mint_status ON mc.tick = mint_status.tick
+      LEFT JOIN creator creator_info ON src20_deploy.creator = creator_info.address
+      WHERE mint_status.total_minted < mint_status.max
+      ORDER BY mc.mint_count DESC
+      LIMIT ? OFFSET ?;
+    `;
+    const queryParams = [
+      transactionCount, // Number of recent mint transactions to consider
+      limit,
+      offset,
+    ];
+    const results = await dbManager.executeQueryWithCache(
+      query,
+      queryParams,
+      1000 * 60 * 2, // Cache duration
+    );
+    return results;
+  }
+
+  static async getTrendingSrc20TotalCount(transactionCount: number = 1000) {
+    const query = `
+      WITH latest_mint_transactions AS (
+        SELECT tx_index, tick
+        FROM ${SRC20_TABLE}
+        WHERE op = 'MINT'
+        ORDER BY tx_index DESC
+        LIMIT ?
+      ),
+      mint_counts AS (
+        SELECT tick, COUNT(*) as mint_count
+        FROM latest_mint_transactions
+        GROUP BY tick
+      ),
+      max_supply_data AS (
+        SELECT tick, max
+        FROM ${SRC20_TABLE}
+        WHERE op = 'DEPLOY'
+      ),
+      total_minted_data AS (
+        SELECT tick, SUM(amt) as total_minted
+        FROM ${SRC20_BALANCE_TABLE}
+        GROUP BY tick
+      ),
+      mint_status AS (
+        SELECT
+          msd.tick,
+          msd.max,
+          COALESCE(tmd.total_minted, 0) as total_minted
+        FROM max_supply_data msd
+        LEFT JOIN total_minted_data tmd ON msd.tick = tmd.tick
+      )
+      SELECT COUNT(*) as total
+      FROM mint_counts mc
+      JOIN mint_status ON mc.tick = mint_status.tick
+      WHERE mint_status.total_minted < mint_status.max;
+    `;
+    const queryParams = [transactionCount];
+    const results = await dbManager.executeQueryWithCache(
+      query,
+      queryParams,
+      1000 * 60 * 2,
+    );
+    return results;
+  }
+
+  static async getCountsForTick(tick: string) {
+    const query = `
+      SELECT 
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'MINT') AS total_mints,
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
+    `;
+    const params = [tick, tick];
+    const result = await dbManager.executeQueryWithCache(
+      query,
+      params,
+      1000 * 60 * 2, // Cache duration
+    );
+
+    if (!result.rows || result.rows.length === 0) {
+      return { total_mints: 0, total_transfers: 0 };
+    }
+
+    return {
+      total_mints: result.rows[0].total_mints,
+      total_transfers: result.rows[0].total_transfers,
+    };
+  }
+
+  static async getDeploymentAndCountsForTick(tick: string) {
+    const query = `
+      SELECT 
+        dep.*,
+        creator_info.creator AS creator_name,
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'MINT') AS total_mints,
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
+      FROM ${SRC20_TABLE} dep
+      LEFT JOIN 
+        creator creator_info ON dep.destination = creator_info.address
+      WHERE dep.tick = ? AND dep.op = 'DEPLOY'
+      LIMIT 1
+    `;
+    const params = [tick, tick, tick];
+    const result = await dbManager.executeQueryWithCache(
+      query,
+      params,
+      1000 * 60 * 10,
+    );
+
+    if (!result.rows || result.rows.length === 0) {
+      return null;
+    }
+
+    const row = result.rows[0];
+
+    return {
+      deployment: {
+        tick: row.tick,
+        tx_hash: row.tx_hash,
+        block_index: row.block_index,
+        p: row.p,
+        op: row.op,
+        creator: row.creator,
+        creator_name: row.creator_name,
+        amt: row.amt,
+        deci: row.deci,
+        lim: row.lim,
+        max: row.max,
+        destination: row.destination,
+        block_time: row.block_time,
+      },
+      total_mints: row.total_mints,
+      total_transfers: row.total_transfers,
+    };
+  }
+
+  // Add the new method here
+  static async searchValidSrc20TxFromDb(query: string) {
+    const sanitizedQuery = query.replace(/[^\w-]/g, "");
+
+    const sqlQuery = `
+      SELECT DISTINCT tick
+      FROM ${SRC20_TABLE}
+      WHERE
+        tick LIKE ? OR
+        tx_hash LIKE ? OR
+        creator LIKE ? OR
+        destination LIKE ?
+      LIMIT 10;
+    `;
+
+    const searchParam = `%${sanitizedQuery}%`;
+    const queryParams = [searchParam, searchParam, searchParam, searchParam];
+
+    const result = await dbManager.executeQueryWithCache(
+      sqlQuery,
+      queryParams,
+      1000 * 60 * 2, // Cache duration: 2 minutes
+    );
+
+    // Map the results to an array of tick names
+    return result.rows.map((row: { tick: string }) => ({ tick: row.tick }));
   }
 }
