@@ -26,7 +26,7 @@ const mock_stamp = {
 const LatestStamps = () => {
   return (
     <div className="w-full md:w-1/2 flex flex-col gap-4 items-start md:items-end">
-      <h1 className="purple-gradient4 text-3xl md:text-6xl font-black">
+      <h1 className="purple-gradient2 text-3xl md:text-6xl font-black">
         LATEST STAMPS
       </h1>
       <p className="text-2xl md:text-5xl text-[#AA00FF]">LOREM IPSUM</p>

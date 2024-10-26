@@ -464,7 +464,7 @@ export function OlgaContent() {
             >
               <div
                 id="switch-toggle-advanced"
-                class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center"
+                class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center bg-[#440066]"
               >
               </div>
             </button>
@@ -481,6 +481,39 @@ export function OlgaContent() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+        <div className="w-full flex justify-between items-center mt-6">
+          <button class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow">
+            <div
+              id="switch-toggle-advanced"
+              class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center bg-[#440066]"
+            >
+            </div>
+          </button>
+          <button className="min-w-12 min-h-12 bg-[#999999] rounded-md flex justify-center items-center transition duration-300 focus:outline-none shadow">
+            <img className="w-6 h-6" src="/img/stamp/Lock.png" />
+          </button>
+        </div>
+        <div className="w-full flex justify-between items-end  mt-6 gap-6">
+          <div className="w-full">
+            <p class="text-base md:text-2xl font-semibold text-[#999999] uppercase">
+              POSH
+            </p>
+            <div className="w-full">
+              <InputField
+                type="text"
+                placeholder="Named stamp"
+                value={""}
+                onChange={(e) => {}}
+                error={""}
+              />
+            </div>
+          </div>
+          <div className="flex justify-center items-end">
+            <button className="min-w-12 min-h-12 bg-[#999999] rounded-md flex justify-center items-center transition duration-300 focus:outline-none shadow">
+              <img className="w-6 h-6" src="/img/stamp/CornersOut.png" />
+            </button>
           </div>
         </div>
 
