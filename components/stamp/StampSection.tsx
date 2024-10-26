@@ -44,9 +44,9 @@ export default function StampSection(
       <div
         className={layout === "grid"
           ? "grid gap-2 md:gap-4 grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4"
-          : "grid gap-2 md:gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4"}
+          : "grid gap-2 md:gap-4 grid-cols-2 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-6"}
       >
-        {stampArray.slice(0, layout === "grid" ? 12 : 4).map(
+        {stampArray.slice(0, layout === "grid" ? 12 : 6).map(
           (stamp: StampRow) => (
             <div key={stamp.tx_hash}>
               <StampCard
