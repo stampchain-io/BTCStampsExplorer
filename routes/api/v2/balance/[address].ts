@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { AddressHandlerContext, PaginatedBalanceResponseBody } from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {

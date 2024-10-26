@@ -31,5 +31,11 @@
     "editor.defaultFormatter": "denoland.vscode-deno",
     "editor.formatOnSave": true,
     "editor.tabSize": 2
+  },
+  "[plaintext]": {
+    "editor.formatOnSave": false
+  },
+  "files.associations": {
+    ".cursorrules": "plaintext"
   }
 }

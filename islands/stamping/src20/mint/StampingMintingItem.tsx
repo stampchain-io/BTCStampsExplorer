@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 
 import { SRC20Row } from "globals";
 
-import { convertToEmoji } from "utils/util.ts";
+import { convertToEmoji } from "$lib/utils/util.ts";
 
 interface StampingMintingItemProps {
   src20: SRC20Row;

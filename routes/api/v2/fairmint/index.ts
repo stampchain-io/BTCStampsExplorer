@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { XcpManager } from "$lib/services/xcpService.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 export const handler: Handlers = {
   async GET(_req, _ctx) {

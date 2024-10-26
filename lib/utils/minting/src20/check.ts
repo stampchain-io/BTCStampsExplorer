@@ -1,12 +1,8 @@
 import { BigFloat } from "bigfloat/mod.ts";
 
-import {
-  IDeploySRC20,
-  IMintSRC20,
-  ITransferSRC20,
-} from "$lib/types/index.d.ts";
+import { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$types/index.d.ts";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export async function checkMintedOut(tick: string, amount: string) {
   try {

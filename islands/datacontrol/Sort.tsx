@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { useURLUpdate } from "hooks/useURLUpdate.ts";
+import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
 
 interface SortProps {
   initSort?: "ASC" | "DESC";

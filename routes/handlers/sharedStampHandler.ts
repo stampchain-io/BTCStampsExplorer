@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$lib/controller/stampController.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
-import { getPaginationParams } from "utils/paginationUtils.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 
 function bigIntSerializer(key: string, value: any) {
   if (typeof value === "bigint") {

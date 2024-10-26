@@ -1,7 +1,7 @@
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
 
-import { useSRC20Form } from "$islands/hooks/useSRC20Form.ts";
+import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";

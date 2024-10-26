@@ -1,7 +1,7 @@
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
-import { convertEmojiToTick } from "utils/util.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { convertEmojiToTick } from "$lib/utils/util.ts";
 import { TickHandlerContext } from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 export const handler = async (
   req: Request,

@@ -4,13 +4,13 @@ import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
-import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
+import { selectUTXOsForTransaction } from "$lib/utils/minting/utxoSelector.ts";
 import { arc4 } from "../transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { compressWithCheck } from "utils/minting/zlib.ts";
+import { compressWithCheck } from "$lib/utils/minting/zlib.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/index.d.ts";
-import { getTransaction } from "utils/quicknode.ts";
+import { IPrepareSRC20TX, PSBTInput, VOUT } from "$types/index.d.ts";
+import { getTransaction } from "$lib/utils/quicknode.ts";
 import * as msgpack from "msgpack";
 
 const RECIPIENT_DUST = 789;

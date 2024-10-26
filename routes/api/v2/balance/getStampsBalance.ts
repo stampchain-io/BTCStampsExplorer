@@ -1,4 +1,4 @@
-import { XcpManager } from "$lib/services/xcpService.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
 
 // FIXME: This is a temporary endpoint to get the stamps balance for a given address
 export async function handler(req: Request): Promise<Response> {

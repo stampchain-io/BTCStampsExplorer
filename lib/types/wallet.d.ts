@@ -1,4 +1,4 @@
-import { WalletProviderKey } from "utils/constants.ts";
+import { WalletProviderKey } from "$lib/utils/constants.ts";
 
 export interface StampBalance {
   cpid?: string;

@@ -5,7 +5,7 @@ import { StampKind } from "$components/StampKind.tsx";
 
 import Stamp from "$islands/stamp/details/StampImage.tsx";
 
-import { abbreviateAddress } from "utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/util.ts";
 import { BlockInfo, StampRow } from "globals";
 
 dayjs.extend(relativeTime);

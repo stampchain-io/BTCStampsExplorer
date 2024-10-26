@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { getMimeType } from "utils/util.ts";
+import { getMimeType } from "$lib/utils/util.ts";
 import { serverConfig } from "$server/config/config.ts";
 
 export const handler: Handlers = {

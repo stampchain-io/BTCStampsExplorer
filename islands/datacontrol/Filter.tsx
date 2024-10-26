@@ -5,7 +5,7 @@ import {
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
 } from "globals";
-import { useURLUpdate } from "hooks/useURLUpdate.ts";
+import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
 
 type FilterTypes =
   | SRC20_FILTER_TYPES

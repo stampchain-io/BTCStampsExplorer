@@ -1,4 +1,8 @@
-import { abbreviateAddress, formatDate, formatNumber } from "utils/util.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+  formatNumber,
+} from "$lib/utils/util.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { SRC20Row } from "globals";
 

@@ -1,10 +1,10 @@
-import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
+import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
 import {
   Deployment,
   MarketListingSummary,
   MintStatus,
-} from "$lib/types/index.d.ts";
-import { formatNumber } from "utils/util.ts";
+} from "$types/index.d.ts";
+import { formatNumber } from "$lib/utils/util.ts";
 
 export interface SRC20TickHeaderProps {
   deployment: Deployment;

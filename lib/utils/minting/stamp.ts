@@ -1,11 +1,11 @@
 import * as btc from "bitcoinjs-lib";
 import { Buffer } from "buffer";
-import { generateRandomNumber } from "utils/util.ts";
-import { handleXcpV1Query } from "utils/xcpUtils.ts";
-import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
+import { generateRandomNumber } from "$lib/utils/util.ts";
+import { handleXcpV1Query } from "$lib/utils/xcpUtils.ts";
+import { selectUTXOsForTransaction } from "$lib/utils/minting/utxoSelector.ts";
 import { extractOutputs } from "./transactionUtils.ts";
-import { XCPPayload } from "utils/xcpUtils.ts";
-import { getTransaction } from "utils/quicknode.ts";
+import { XCPPayload } from "$lib/utils/xcpUtils.ts";
+import { getTransaction } from "$lib/utils/quicknode.ts";
 
 export const burnkeys = [
   "022222222222222222222222222222222222222222222222222222222222222222",

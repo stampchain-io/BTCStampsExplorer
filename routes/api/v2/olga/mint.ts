@@ -1,9 +1,9 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { MintStampInputData, TX, TXError } from "globals";
 import { serverConfig } from "$server/config/config.ts";
-import { mintStampCIP33 } from "utils/minting/olga/mint.ts";
-import { validateAndPrepareAssetName } from "utils/minting/stamp.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { mintStampCIP33 } from "$lib/utils/minting/olga/mint.ts";
+import { validateAndPrepareAssetName } from "$lib/utils/minting/stamp.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { Buffer } from "buffer";
 
 export const handler: Handlers<TX | TXError> = {

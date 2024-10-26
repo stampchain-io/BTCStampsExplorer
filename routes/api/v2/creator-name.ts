@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$lib/controller/stampController.ts";
+import { StampController } from "$server/controller/stampController.ts";
 
 export const handler: Handlers = {
   async GET(req) {

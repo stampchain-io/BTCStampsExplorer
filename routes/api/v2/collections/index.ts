@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
-import { CollectionController } from "$lib/controller/collectionController.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
-import { getPaginationParams } from "utils/paginationUtils.ts";
+import { CollectionController } from "$server/controller/collectionController.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -19,7 +19,10 @@ export const handler: Handlers = {
       return ResponseUtil.success(result);
     } catch (error) {
       console.error("Error in GET handler:", error);
-      return ResponseUtil.handleError(error, "Error processing collections request");
+      return ResponseUtil.handleError(
+        error,
+        "Error processing collections request",
+      );
     }
   },
 };

@@ -10,7 +10,7 @@ import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.t
 import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
 import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {

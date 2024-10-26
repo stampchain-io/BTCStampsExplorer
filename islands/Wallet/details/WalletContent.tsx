@@ -4,7 +4,7 @@ import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
 import StampingMintingItem from "$islands/stamping/src20/mint/StampingMintingItem.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { Search } from "$islands/datacontrol/Search.tsx";
-import { abbreviateAddress, convertToEmoji } from "utils/util.ts";
+import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
 
 interface WalletContentProps {
   stamps: any[];

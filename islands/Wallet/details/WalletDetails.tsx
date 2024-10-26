@@ -2,7 +2,7 @@ import { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
 import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
-import { WalletData } from "$lib/types/index.d.ts";
+import { WalletData } from "$types/index.d.ts";
 import { Button } from "$components/Button.tsx";
 
 function WalletDetails(

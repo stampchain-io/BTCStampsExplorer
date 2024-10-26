@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { convertToEmoji } from "utils/util.ts";
+import { convertToEmoji } from "$lib/utils/util.ts";
 
 interface SRC20TickHeaderProps {
   deployment: any;

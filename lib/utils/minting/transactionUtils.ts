@@ -1,6 +1,7 @@
 // lib/utils/minting/utils.ts
 
 import * as bitcoin from "bitcoinjs-lib";
+import { Output } from "$types/index.d.ts";
 
 export function arc4(key: Uint8Array, data: Uint8Array): Uint8Array {
   const S = new Uint8Array(256);

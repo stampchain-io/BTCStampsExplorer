@@ -1,7 +1,7 @@
 import { Buffer } from "buffer";
-import type { Output, UTXO } from "$lib/types/index.d.ts";
+import type { Output, UTXO } from "$types/index.d.ts";
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
-import { XcpManager } from "$lib/services/xcpService.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
 import { TX_SIZES } from "./transactionSizes.ts";
 
 const CHANGE_DUST = 1000; // This should match the value in tx.ts

@@ -1,4 +1,7 @@
-import { showConnectWalletModal, walletContext } from "store/wallet/wallet.ts";
+import {
+  showConnectWalletModal,
+  walletContext,
+} from "$client/wallet/wallet.ts";
 
 interface Props {
   toggleModal: () => void;

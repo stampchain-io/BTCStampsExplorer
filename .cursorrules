@@ -78,3 +78,28 @@ Fresh-specific Practices:
   development
 - Use the `handler` function in route files for server-side data fetching and
   processing
+
+Directory Structure:
+
+BTCStampsExplorer/
+├── components/     # Server-side rendered components (SSR)
+├── islands/        # Client-side interactive components
+├── client/         # Client-only utilities and state
+├── server/         # Server-only code
+├── lib/
+│   ├── types/                  # Shared type definitions
+│   └── utils/
+│       └── binary/
+│           └── baseUtils.ts    # Shared binary utilities
+
+components/:
+- Server-side rendered (SSR)
+- No client-side JavaScript
+- Rendered on the server and sent as HTML
+Example: StampBalanceCard.tsx - static layout component
+
+islands/:
+- Client-side interactive components
+- Include JavaScript that runs in browser
+- Can use hooks, state, event handlers
+Example: BlockInfo.tsx - has state and useEffect

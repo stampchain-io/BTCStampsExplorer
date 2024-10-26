@@ -1,7 +1,7 @@
 import { ComponentChildren } from "preact";
 import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
 import { WalletConnector } from "./connectors/Wallet.connector.tsx";
-import { showConnectWalletModal } from "store/wallet/wallet.ts";
+import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 
 interface Props {
   connectors: ComponentChildren[];

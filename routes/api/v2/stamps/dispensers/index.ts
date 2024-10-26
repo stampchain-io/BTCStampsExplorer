@@ -3,7 +3,7 @@ import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 // import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 // import { BlockController } from "$lib/controller/blockController.ts";
-// import { DispenserManager } from "$lib/services/xcpService.ts";
+// import { DispenserManager } from "$server/services/xcpService.ts";
 
 export const handler: Handlers = {
   async GET(req) {
