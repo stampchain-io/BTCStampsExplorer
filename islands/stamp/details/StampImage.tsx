@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 
 import { StampRow } from "globals";
-import { mimeTypesArray } from "utils/util.ts";
+import { mimeTypesArray } from "$lib/utils/util.ts";
 
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";

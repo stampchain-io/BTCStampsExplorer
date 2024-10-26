@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
-import { XcpManager } from "$lib/services/xcpService.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
 import { Psbt } from "bitcoinjs-lib";
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { Buffer } from "buffer";
@@ -320,7 +320,8 @@ Expected Effective Fee Rate: ${
       console.error("Error processing utxo attach request:", error);
       return ResponseUtil.error(
         error instanceof Error ? error.message : "Internal Server Error",
-        error instanceof Error && error.message.includes("Insufficient BTC in UTXO")
+        error instanceof Error &&
+          error.message.includes("Insufficient BTC in UTXO")
           ? 400 // Use 400 for insufficient funds
           : 500, // Use 500 for other errors
       );

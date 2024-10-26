@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
-import { completePSBT } from "$server/btc_server.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { completePSBT } from "../../../../server/utils/transactions/btc_server.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {

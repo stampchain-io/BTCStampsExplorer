@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { BlockController } from "$lib/controller/blockController.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { BlockController } from "$server/controller/blockController.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { BlockHandlerContext } from "globals";
 
 export const handler: Handlers<BlockHandlerContext> = {

@@ -1,6 +1,6 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
-import { formatSatoshisToBTC } from "utils/util.ts";
+import { formatSatoshisToBTC } from "$lib/utils/util.ts";
 
 dayjs.extend(relativeTime);
 

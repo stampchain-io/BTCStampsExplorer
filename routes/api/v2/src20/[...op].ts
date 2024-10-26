@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 // TODO: add to documentation:
 // This supports multiple operations, separated by a slash.

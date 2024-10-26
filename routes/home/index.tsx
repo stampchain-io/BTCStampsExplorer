@@ -13,7 +13,7 @@ import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
 import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
-import { StampController } from "$lib/controller/stampController.ts";
+import { StampController } from "$server/controller/stampController.ts";
 type HomePageProps = {
   data: {
     stamps_recent: { recentSales: StampRow[] };

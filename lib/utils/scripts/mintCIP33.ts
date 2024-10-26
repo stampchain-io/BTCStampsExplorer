@@ -1,5 +1,8 @@
-import { generateAvailableAssetName, mintStamp } from "utils/minting/stamp.ts";
-import { mintStampCIP33 } from "utils/minting/olga/mint.ts";
+import {
+  generateAvailableAssetName,
+  mintStamp,
+} from "$lib/utils/minting/stamp.ts";
+import { mintStampCIP33 } from "$lib/utils/minting/olga/mint.ts";
 
 const testData = {
   sourceWallet: "bc1qwfmtwelj00pghxhg0nsu0jqx0f76d5nm0axxvt",

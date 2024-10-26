@@ -1,4 +1,4 @@
-import { StampController } from "$lib/controller/stampController.ts";
+import { StampController } from "$server/controller/stampController.ts";
 import { Handlers } from "$fresh/server.ts";
 import { StampRow } from "globals";
 

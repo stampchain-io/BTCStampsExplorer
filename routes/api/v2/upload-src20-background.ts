@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { saveFileToDatabase } from "$lib/database/fileOperations.ts";
+import { saveFileToDatabase } from "$server/database/fileOperations.ts";
 import { calculateTickHash } from "$lib/utils/src20Utils.ts"; // Assuming this function exists
 
 export const handler: Handlers = {

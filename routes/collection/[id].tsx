@@ -5,8 +5,8 @@ import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "globals";
 import { CollectionDetailsHeader } from "$islands/collection/CollectionDetailsHeader.tsx";
 import { CollectionDetailsContent } from "$islands/collection/CollectionDetailsContent.tsx";
 
-import { StampController } from "$lib/controller/stampController.ts";
-import { CollectionService } from "$lib/services/collectionService.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { CollectionService } from "$server/services/collectionService.ts";
 
 type CollectionPageProps = {
   data: {

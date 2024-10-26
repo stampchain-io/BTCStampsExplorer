@@ -1,9 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
-import { paginate } from "utils/util.ts";
-import { initialWallet, walletContext } from "store/wallet/wallet.ts";
+import { paginate } from "$lib/utils/util.ts";
+import { initialWallet, walletContext } from "$client/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {

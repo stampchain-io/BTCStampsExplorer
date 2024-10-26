@@ -1,16 +1,16 @@
 import * as btc from "bitcoinjs-lib";
-import { mintMethodOPRETURN } from "utils/minting/stamp.ts";
-import { handleXcpV1Query } from "utils/xcpUtils.ts";
+import { mintMethodOPRETURN } from "$lib/utils/minting/stamp.ts";
+import { handleXcpV1Query } from "$lib/utils/xcpUtils.ts";
 import { extractOutputs } from "../transactionUtils.ts";
-import CIP33 from "utils/minting/olga/CIP33.ts";
+import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
 import { Buffer } from "buffer";
-import { getTransaction } from "utils/quicknode.ts";
-import { PSBTInput } from "$lib/types/index.d.ts";
+import { getTransaction } from "$lib/utils/quicknode.ts";
+import { PSBTInput } from "$types/index.d.ts";
 import {
   calculateDust,
   calculateMiningFee,
-} from "utils/minting/feeCalculations.ts";
-import { selectUTXOsForTransaction } from "utils/minting/utxoSelector.ts";
+} from "$lib/utils/minting/feeCalculations.ts";
+import { selectUTXOsForTransaction } from "$lib/utils/minting/utxoSelector.ts";
 import { estimateP2WSHTransactionSize } from "../transactionSizes.ts";
 const DUST_SIZE = 333;
 

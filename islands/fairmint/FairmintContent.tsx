@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { useFairmintForm } from "$islands/hooks/useFairmintForm.ts";
+import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 

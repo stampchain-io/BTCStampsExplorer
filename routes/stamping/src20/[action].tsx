@@ -9,7 +9,7 @@ import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx"
 
 import { FAQModule } from "$islands/modules/FAQMint.tsx";
 
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 interface StampingSrc20PageProps {
   selectedTab: string;

@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
-import { StampController } from "$lib/controller/stampController.ts";
+import { StampController } from "$server/controller/stampController.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
 import { IdentHandlerContext, PaginatedStampResponseBody } from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { SUBPROTOCOLS } from "globals";
 

@@ -1,4 +1,4 @@
-import { convertToEmoji } from "utils/util.ts";
+import { convertToEmoji } from "$lib/utils/util.ts";
 import { Src20Detail } from "globals";
 import * as crypto from "crypto";
 

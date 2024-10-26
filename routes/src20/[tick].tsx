@@ -1,12 +1,12 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
 import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
-import { convertEmojiToTick } from "utils/util.ts";
-import { Src20Controller } from "$lib/controller/src20Controller.ts";
+import { convertEmojiToTick } from "$lib/utils/util.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
 import { SRC20HoldersInfo } from "$components/src20/SRC20HoldersInfo.tsx";
 import { SRC20HolderGraph } from "$components/src20/SRC20HolderGraph.tsx";
-import { MarketListingSummary } from "$lib/types/index.d.ts";
+import { MarketListingSummary } from "$types/index.d.ts";
 
 export const handler: Handlers = {
   async GET(_req: Request, ctx) {

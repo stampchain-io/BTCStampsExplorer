@@ -1,5 +1,5 @@
-import { estimateInputSize } from "utils/minting/utxoSelector.ts";
-import { UTXO } from "$lib/types/index.d.ts";
+import { estimateInputSize } from "$lib/utils/minting/utxoSelector.ts";
+import { UTXO } from "$types/index.d.ts";
 import { decodeBase58 } from "@std/encoding/base58";
 
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
