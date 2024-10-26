@@ -56,7 +56,10 @@ export const StampHeader = (
   };
 
   return (
-    <div class="flex flex-col-reverse lg:flex-row justify-between items-center gap-3 w-full">
+    <div 
+      class="flex flex-col-reverse lg:flex-row justify-between items-center gap-3 w-full"
+      f-partial="/stamp"
+    >
       <p className="purple-gradient1 text-3xl md:text-6xl font-black">
         ART STAMPS
       </p>

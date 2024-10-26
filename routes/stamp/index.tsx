@@ -11,8 +11,20 @@ const MAX_PAGE_SIZE = 120;
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
+    const url = new URL(req.url);
+    console.log("[Stamp Handler]", {
+      url: url.toString(),
+      pathname: url.pathname,
+      params: Object.fromEntries(url.searchParams),
+      headers: Object.fromEntries(req.headers),
+    });
+
+    // Only process requests for /stamp route
+    if (url.searchParams.has("_fresh") && !url.pathname.startsWith("/stamp")) {
+      return new Response(null, { status: 204 });
+    }
+
     try {
-      const url = new URL(req.url);
       const sortBy = url.searchParams.get("sortBy") || "DESC";
       const filterBy = url.searchParams.get("filterBy")
         ? (url.searchParams.get("filterBy")?.split(",").filter(
@@ -65,9 +77,13 @@ export const handler: Handlers = {
         page,
         limit: page_size,
       };
-      return ctx.render(data);
+
+      return ctx.render({
+        ...data,
+        partial: url.searchParams.has("_fresh"),
+      });
     } catch (error) {
-      console.error("Error fetching stamp data:", error);
+      console.error(error);
       return new Response("Internal Server Error", { status: 500 });
     }
   },
@@ -89,22 +105,24 @@ export function StampPage(props: StampPageProps) {
   const isRecentSales = selectedTab === "recent_sales";
 
   return (
-    <div class="w-full flex flex-col items-center">
-      <StampHeader
-        filterBy={filterBy as STAMP_FILTER_TYPES[]}
-        sortBy={sortBy}
-      />
-      <StampContent
-        stamps={stampsArray}
-        isRecentSales={isRecentSales}
-      />
-      <Pagination
-        page={page}
-        pages={totalPages}
-        page_size={limit}
-        type={selectedTab}
-        data_length={stampsArray.length}
-      />
+    <div class="w-full flex flex-col items-center" f-client-nav>
+      <div data-partial="/stamp">
+        <StampHeader
+          filterBy={filterBy as STAMP_FILTER_TYPES[]}
+          sortBy={sortBy}
+        />
+        <StampContent
+          stamps={stampsArray}
+          isRecentSales={isRecentSales}
+        />
+        <Pagination
+          page={page}
+          pages={totalPages}
+          page_size={limit}
+          type={selectedTab}
+          data_length={stampsArray.length}
+        />
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
 const useIsMobile = () => {
@@ -30,9 +30,6 @@ export const Pagination = (
   const maxPagesToShow = isMobile ? 2 : 4;
   const [currentPage, setCurrentPage] = useState(page);
   const totalPages = pages;
-  const startPage = Math.max(1, currentPage - maxPagesToShow);
-  const endPage = Math.min(totalPages, currentPage + maxPagesToShow);
-  const pageItems = [];
   const { getSort, getFilter, getType } = useNavigator();
   const [isClient, setIsClient] = useState(false);
 
@@ -41,7 +38,7 @@ export const Pagination = (
     setIsClient(true);
   }, [page]);
 
-  const buildPageUrl = (pageNum: number) => {
+  const buildPageUrl = useCallback((pageNum: number) => {
     if (!isClient) {
       return `/${type}?page=${pageNum}`;
     }
@@ -50,7 +47,6 @@ export const Pagination = (
     url.searchParams.set("page", pageNum.toString());
     url.searchParams.set("limit", page_size.toString());
 
-    // Preserve existing parameters
     const currentType = url.searchParams.get("type") || getType();
     const currentSort = url.searchParams.get("sortBy") || getSort();
     const currentFilter = url.searchParams.get("filterBy") ||
@@ -65,72 +61,77 @@ export const Pagination = (
     }
 
     return url.toString();
-  };
+  }, [isClient, type, page_size, getSort, getFilter, getType]);
 
-  for (let p = startPage; p <= endPage; p++) {
-    const pageUrl = buildPageUrl(p);
-    pageItems.push(
-      <li key={p}>
-        <a
-          href={pageUrl}
-          f-partial={pageUrl}
-          class={`rounded-md flex items-center justify-center px-3 h-9 w-9 leading-tight font-semibold text-[#080808] 
-            ${currentPage === p ? "bg-[#660099] " : "bg-[#440066]"}`}
-        >
-          {p}
-        </a>
-      </li>,
-    );
-  }
+  const pageItems = useMemo(() => {
+    const startPage = Math.max(1, currentPage - maxPagesToShow);
+    const endPage = Math.min(totalPages, currentPage + maxPagesToShow);
+    const items = [];
+
+    for (let p = startPage; p <= endPage; p++) {
+      const pageUrl = buildPageUrl(p);
+      items.push(
+        <li key={p}>
+          <a
+            href={pageUrl}
+            f-partial={pageUrl}
+            class={`rounded-md flex items-center justify-center px-3 h-9 w-9 leading-tight font-semibold text-[#080808] 
+              ${currentPage === p ? "bg-[#660099] " : "bg-[#440066]"}`}
+          >
+            {p}
+          </a>
+        </li>,
+      );
+    }
+    return items;
+  }, [currentPage, totalPages, maxPagesToShow, buildPageUrl]);
+
+  if (data_length === 0) return null;
 
   return (
-    <>
-      {(data_length != 0) && (
-        <nav
-          aria-label="Page navigation"
-          className="flex items-center justify-center"
-        >
-          <ul class="inline-flex items-center -space-x-px text-sm gap-2">
-            <li>
-              <a
-                href={buildPageUrl(1)}
-                f-partial={buildPageUrl(1)}
-                class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
-              >
-                {"<<"}
-              </a>
-            </li>
-            <li>
-              <a
-                href={buildPageUrl(Math.max(1, currentPage - 1))}
-                f-partial={buildPageUrl(Math.max(1, currentPage - 1))}
-                class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
-              >
-                {"<"}
-              </a>
-            </li>
-            {pageItems}
-            <li>
-              <a
-                href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-                f-partial={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-                class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
-              >
-                {">"}
-              </a>
-            </li>
-            <li>
-              <a
-                href={buildPageUrl(totalPages)}
-                f-partial={buildPageUrl(totalPages)}
-                class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
-              >
-                {">>"}
-              </a>
-            </li>
-          </ul>
-        </nav>
-      )}
-    </>
+    <nav
+      aria-label="Page navigation"
+      className="flex items-center justify-center"
+    >
+      <ul class="inline-flex items-center -space-x-px text-sm gap-2">
+        <li>
+          <a
+            href={buildPageUrl(1)}
+            f-partial={buildPageUrl(1)}
+            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
+          >
+            {"<<"}
+          </a>
+        </li>
+        <li>
+          <a
+            href={buildPageUrl(Math.max(1, currentPage - 1))}
+            f-partial={buildPageUrl(Math.max(1, currentPage - 1))}
+            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
+          >
+            {"<"}
+          </a>
+        </li>
+        {pageItems}
+        <li>
+          <a
+            href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
+            f-partial={buildPageUrl(Math.min(totalPages, currentPage + 1))}
+            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
+          >
+            {">"}
+          </a>
+        </li>
+        <li>
+          <a
+            href={buildPageUrl(totalPages)}
+            f-partial={buildPageUrl(totalPages)}
+            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
+          >
+            {">>"}
+          </a>
+        </li>
+      </ul>
+    </nav>
   );
 };
