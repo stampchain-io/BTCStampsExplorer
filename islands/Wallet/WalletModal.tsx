@@ -1,3 +1,5 @@
+// KEEP file for reference on the handleUpdateDisplayName to move into the new wallet / dashboard page
+
 import { useEffect, useRef, useState } from "preact/hooks";
 import { ComponentChildren } from "preact";
 import {
@@ -48,6 +50,8 @@ const WalletPopup = (
 
     fetchCreatorName();
   }, [wallet.address]);
+
+  // TODO: This will need to move to the new dashboard /wallet page
 
   const handleUpdateDisplayName = async () => {
     if (displayNameRef.current) {
