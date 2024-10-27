@@ -1,4 +1,4 @@
-import { estimateInputSize } from "$lib/utils/minting/utxoSelector.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
 import { UTXO } from "$types/index.d.ts";
 import { decodeBase58 } from "@std/encoding/base58";
 
@@ -97,7 +97,8 @@ function formatUTXOs(data: any[], address: string): UTXO[] | null {
         value,
         address: address,
         script,
-        size: tx.size ?? estimateInputSize(script),
+        size: tx.size ??
+          TransactionService.UTXOService.estimateInputSize(script),
         status: {
           confirmed: tx.status?.confirmed ?? tx.confirmations > 0,
           block_height: tx.status?.block_height ?? tx.block_height,

@@ -1,5 +1,5 @@
 import { StampService } from "$server/services/stampService.ts";
-import { dbManager } from "$server/db.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 import { DispenserFilter, Fairminter, XcpBalance } from "$types/index.d.ts";
 
 export const xcp_v2_nodes = [

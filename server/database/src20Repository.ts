@@ -7,7 +7,7 @@ import {
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
 } from "globals";
-import { dbManager } from "../db.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 
 export class SRC20Repository {
   static async getTotalCountValidSrc20TxFromDb(

@@ -1,3 +1,7 @@
+// lib/utils/quicknode.ts
+
+// TODO: move to server
+
 import { serverConfig } from "$server/config/config.ts";
 import { MAX_XCP_RETRIES } from "$lib/utils/constants.ts";
 import {

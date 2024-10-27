@@ -8,7 +8,7 @@ import {
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
 } from "globals";
-import { formatSRC20Row } from "$lib/utils/src20Utils.ts";
+import { SRC20UtilityService } from "./utilityService.ts";
 import { paginate, stripTrailingZeros } from "$lib/utils/util.ts";
 import { Big } from "$Big";
 
@@ -200,7 +200,7 @@ export class SRC20QueryService {
   }
 
   private static mapTransactionData(rows: any[]) {
-    return rows.map(formatSRC20Row);
+    return rows.map(SRC20UtilityService.formatSRC20Row);
   }
   private static formatTransactionData(
     mappedData: any[],

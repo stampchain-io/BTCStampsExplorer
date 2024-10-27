@@ -1,6 +1,6 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
-import { getBtcBalance } from "$lib/utils/btc.ts";
+import { getBtcBalance } from "$client/utils/btc.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 
 interface LeatherAddress {
