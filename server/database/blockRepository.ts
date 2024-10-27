@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
 import { STAMP_TABLE } from "$lib/utils/constants.ts";
-import { dbManager } from "../db.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 
 const BLOCK_FIELDS =
   `block_index, block_time, block_hash, previous_block_hash, ledger_hash, txlist_hash, messages_hash`;

@@ -1,9 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import {
-  createPSBT,
-  validateUTXOOwnership,
-} from "../../../../server/utils/transactions/btc_server.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
 
 interface CreatePSBTInput {
   utxo: string;
@@ -52,7 +49,11 @@ export const handler: Handlers = {
       });
 
       // Create PSBT
-      const psbtHex = await createPSBT(utxo, salePrice, sellerAddress);
+      const psbtHex = await TransactionService.PSBTService.createPSBT(
+        utxo,
+        salePrice,
+        sellerAddress,
+      );
       const response: CreatePSBTResponse = { psbt: psbtHex };
 
       return new Response(

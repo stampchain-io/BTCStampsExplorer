@@ -1,10 +1,12 @@
 // lib/utils/minting/src20/tx.ts
 
+// TODO: move to server and integrate with other PSBT services
+
 import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
-import { selectUTXOsForTransaction } from "$lib/utils/minting/utxoSelector.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
 import { arc4 } from "../transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { compressWithCheck } from "$lib/utils/minting/zlib.ts";
@@ -97,7 +99,11 @@ export const prepareSrc20TX = async ({
       inputs: selectedUtxos,
       change,
       fee: estimatedFee,
-    } = await selectUTXOsForTransaction(changeAddress, vouts, feeRate);
+    } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+      changeAddress,
+      vouts,
+      feeRate,
+    );
 
     if (selectedUtxos.length === 0) {
       throw new Error("Unable to select suitable UTXOs for the transaction");

@@ -1,3 +1,7 @@
+// lib/utils/minting/olga/mint.ts
+
+// TODO: move to server and integrate with other PSBT services
+
 import * as btc from "bitcoinjs-lib";
 import { mintMethodOPRETURN } from "$lib/utils/minting/stamp.ts";
 import { handleXcpV1Query } from "$lib/utils/xcpUtils.ts";
@@ -10,8 +14,8 @@ import {
   calculateDust,
   calculateMiningFee,
 } from "$lib/utils/minting/feeCalculations.ts";
-import { selectUTXOsForTransaction } from "$lib/utils/minting/utxoSelector.ts";
 import { estimateP2WSHTransactionSize } from "../transactionSizes.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
 const DUST_SIZE = 333;
 
 export async function mintCIP33ApiCall(
@@ -200,11 +204,12 @@ async function generatePSBT(
     totalOutputValue += service_fee; // Add service fee to total output value
   }
 
-  const { inputs, change } = await selectUTXOsForTransaction(
-    address,
-    vouts,
-    fee_per_kb,
-  );
+  const { inputs, change } = await TransactionService.UTXOService
+    .selectUTXOsForTransaction(
+      address,
+      vouts,
+      fee_per_kb,
+    );
 
   const totalInputValue = inputs.reduce((sum, input) => sum + input.value, 0);
 

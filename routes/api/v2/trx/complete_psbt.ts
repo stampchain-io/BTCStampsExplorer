@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { completePSBT } from "../../../../server/utils/transactions/btc_server.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {
@@ -16,12 +16,13 @@ export const handler: Handlers = {
 
       console.log(`Completing PSBT with fee rate: ${feeRate} sat/vB`);
 
-      const completedPsbtHex = await completePSBT(
-        sellerPsbtHex,
-        buyerUtxo,
-        buyerAddress,
-        feeRate,
-      );
+      const completedPsbtHex = await TransactionService.PSBTService
+        .completePSBT(
+          sellerPsbtHex,
+          buyerUtxo,
+          buyerAddress,
+          feeRate,
+        );
 
       return new Response(JSON.stringify({ completedPsbt: completedPsbtHex }), {
         headers: { "Content-Type": "application/json" },

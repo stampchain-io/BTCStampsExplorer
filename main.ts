@@ -10,7 +10,7 @@ import build from "$fresh/dev.ts";
 import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
 
-import "./server/db.ts";
+import "$server/database/databaseManager.ts";
 
 if (import.meta.main) {
   if (Deno.args.includes("build")) {
