@@ -142,12 +142,14 @@ class DatabaseManager {
 
   private createConnection(): Promise<Client> {
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
+    const charset= 'utf8mb4'
     return new Client().connect({
       hostname: DB_HOST,
       port: DB_PORT,
       username: DB_USER,
       db: DB_NAME,
       password: DB_PASSWORD,
+      charset: charset,
     });
   }
 
