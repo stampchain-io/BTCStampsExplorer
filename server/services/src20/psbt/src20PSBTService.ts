@@ -91,7 +91,7 @@ export class SRC20PSBTService {
 
     // Add inputs
     for (const input of inputs) {
-      const txDetails = await getTransaction(input.txid);
+      const txDetails = await getTransaction(input.txid); // FIXME: need to review these calls to see if we can use the failover between all endpoints in the utxo selection.
       const psbtInput = this.createPsbtInput(input, txDetails);
       psbt.addInput(psbtInput);
     }
