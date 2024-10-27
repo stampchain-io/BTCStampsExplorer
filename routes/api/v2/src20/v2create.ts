@@ -1,6 +1,6 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { prepareSrc20PSBT } from "$server/utils/transactions/olgaSRC20PSBTCreate.ts";
+import { SRC20PSBTService } from "$server/services/src20/index.ts";
 import { TX, TXError } from "globals";
 
 export const handler: Handlers<TX | TXError> = {
@@ -22,7 +22,7 @@ export const handler: Handlers<TX | TXError> = {
     } = body;
     // FIXME: need to add checks on the input
     try {
-      const psbtData = await prepareSrc20PSBT({
+      const psbtData = await SRC20PSBTService.preparePSBT({
         sourceWallet,
         toAddress,
         src20Action,

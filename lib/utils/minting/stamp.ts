@@ -1,11 +1,16 @@
+// lib/utils/minting/stamp.ts
+
+// TODO: move to server and integrate with other PSBT services
+
 import * as btc from "bitcoinjs-lib";
 import { Buffer } from "buffer";
 import { generateRandomNumber } from "$lib/utils/util.ts";
 import { handleXcpV1Query } from "$lib/utils/xcpUtils.ts";
-import { selectUTXOsForTransaction } from "$lib/utils/minting/utxoSelector.ts";
 import { extractOutputs } from "./transactionUtils.ts";
 import { XCPPayload } from "$lib/utils/xcpUtils.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
+import { stampMintData, stampTransferData } from "$types/index.d.ts";
+import { TransactionService } from "$server/services/transaction/index.ts";
 
 export const burnkeys = [
   "022222222222222222222222222222222222222222222222222222222222222222",
@@ -22,44 +27,6 @@ interface stampMintCIP33 {
   description: string;
   satsPerKB: number;
 }
-
-export const transferMethod = ({
-  sourceWallet,
-  destinationWallet,
-  assetName,
-  qty,
-  divisible,
-  satsPerKB,
-}: stampTransferData) => {
-  if (typeof sourceWallet !== "string") {
-    throw new Error("Invalid sourceWallet parameter");
-  }
-  if (typeof destinationWallet !== "string") {
-    throw new Error("Invalid destinationWallet parameter");
-  }
-  if (typeof assetName !== "string") {
-    throw new Error("Invalid assetName parameter");
-  }
-  if (typeof qty !== "number") {
-    throw new Error("Invalid qty parameter");
-  }
-  if (typeof divisible !== "boolean") {
-    throw new Error("Invalid divisible parameter");
-  }
-  if (typeof satsPerKB !== "number") {
-    throw new Error("Invalid satsPerKB parameter");
-  }
-  return {
-    method: "create_send",
-    params: {
-      "source": sourceWallet,
-      "asset": assetName,
-      "quantity": divisible ? qty * 100000000 : qty,
-      "destination": destinationWallet,
-      "fee_per_kb": satsPerKB,
-    },
-  };
-};
 
 export function mintMethod(
   {
@@ -285,11 +252,12 @@ async function convertTXToPSBT(
     address: recipient_fee,
   });
 
-  const { inputs, change } = await selectUTXOsForTransaction(
-    address,
-    vouts,
-    fee_per_kb,
-  );
+  const { inputs, change } = await TransactionService.UTXOService
+    .selectUTXOsForTransaction(
+      address,
+      vouts,
+      fee_per_kb,
+    );
 
   if (change > 0) {
     vouts.push({

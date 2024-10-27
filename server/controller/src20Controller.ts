@@ -6,10 +6,10 @@ import {
   SRC20TrxRequestParams,
 } from "globals";
 import { StampService } from "$server/services/stampService.ts";
-import { getBtcAddressInfo } from "$lib/utils/btc.ts";
+import { BTCAddressService } from "$server/services/btc/addressService.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { convertToEmoji } from "$lib/utils/util.ts";
-import { Src20MktService } from "$server/services/src20MktService.ts";
+import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { MarketListingSummary } from "$types/index.d.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 import { serverConfig } from "$server/config/config.ts";
@@ -170,7 +170,7 @@ export class Src20Controller {
         lastBlock,
         btcPrice,
       ] = await Promise.allSettled([
-        getBtcAddressInfo(address),
+        BTCAddressService.getAddressInfo(address),
         StampService.getStampBalancesByAddress(address, subLimit, page),
         this.handleSrc20BalanceRequest({
           address,
@@ -333,7 +333,7 @@ export class Src20Controller {
         this.handleSrc20BalanceRequest(balanceParams),
         this.handleSrc20MintProgressRequest(tick),
         this.handleAllSrc20DataForTickRequest(tick),
-        Src20MktService.fetchMarketListingSummary(),
+        SRC20MarketService.fetchMarketListingSummary(),
       ]);
 
       // Check if deployment is null
@@ -405,7 +405,7 @@ export class Src20Controller {
     try {
       const [resultData, marketData] = await Promise.all([
         this.handleSrc20TransactionsRequest(_req, params, excludeFullyMinted),
-        Src20MktService.fetchMarketListingSummary(),
+        SRC20MarketService.fetchMarketListingSummary(),
       ]);
 
       const marketDataMap = new Map<string, MarketListingSummary>(
@@ -481,7 +481,7 @@ export class Src20Controller {
         transactionCount,
       );
 
-      const marketData = await Src20MktService.fetchMarketListingSummary();
+      const marketData = await SRC20Service.MarketService.fetchMarketListingSummary();
       const marketDataMap = new Map<string, MarketListingSummary>(
         marketData.map((item) => [item.tick, item]),
       );

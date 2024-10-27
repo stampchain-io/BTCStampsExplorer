@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { saveFileToDatabase } from "$server/database/fileOperations.ts";
-import { calculateTickHash } from "$lib/utils/src20Utils.ts"; // Assuming this function exists
+import { SRC20UtilityService } from "$server/services/src20/utilityService.ts";
 
 export const handler: Handlers = {
   async POST(req) {
@@ -16,7 +16,7 @@ export const handler: Handlers = {
       const base64Data = fileData.split(",").pop() || fileData;
 
       // Calculate tick_hash (assuming you have a function for this)
-      const tickHash = calculateTickHash(tick);
+      const tickHash = SRC20UtilityService.calculateTickHash(tick);
 
       // Save the file to the database
       const saved = await saveFileToDatabase(tick, tickHash, base64Data);

@@ -1,4 +1,4 @@
-import { dbManager } from "../db.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 
 const SRC20_BACKGROUND_TABLE = "srcbackground";
 

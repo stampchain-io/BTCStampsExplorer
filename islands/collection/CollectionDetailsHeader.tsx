@@ -1,8 +1,5 @@
 import { useState } from "preact/hooks";
 
-// import { StampNavigator } from "$islands/stamp/StampNavigator.tsx";
-// import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-
 export const CollectionDetailsHeader = (
   { id, filterBy, sortBy }: { id: string; filterBy: any[]; sortBy: string },
 ) => {
@@ -91,10 +88,6 @@ export const CollectionDetailsHeader = (
             <option value="highToLow">Price: High to Low</option>
             <option value="recent">Date: Recent</option>
           </select>
-          {
-            /* <StampNavigator initFilter={filterBy} initSort={sortBy} />
-          <StampSearchClient /> */
-          }
         </div>
       </div>
     </div>

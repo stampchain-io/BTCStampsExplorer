@@ -10,7 +10,7 @@ import {
 } from "globals";
 import { XcpBalance } from "$types/index.d.ts";
 import { summarize_issuances } from "./index.ts";
-import { dbManager } from "../db.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
 
