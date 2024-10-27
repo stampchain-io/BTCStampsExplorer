@@ -199,7 +199,7 @@ export class StampController {
         if (type === "classic") {
           finalIdent = ["STAMP"];
         } else if (type === "posh") {
-          finalIdent = ["SRC-721"];
+          finalIdent = [];
         } else if (type === "stamps") {
           finalIdent = ["STAMP", "SRC-721"];
         } else if (type === "src20") {
