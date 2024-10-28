@@ -5,7 +5,7 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
 export function TransferContent(
-  { trxType = "multisig" }: { trxType?: "olga" | "multisig" },
+  { trxType = "olga" }: { trxType?: "olga" | "multisig" },
 ) {
   const {
     formState,

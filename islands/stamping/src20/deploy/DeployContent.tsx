@@ -8,7 +8,7 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
 export function DeployContent(
-  { trxType = "multisig" }: { trxType?: "olga" | "multisig" },
+  { trxType = "olga" }: { trxType?: "olga" | "multisig" },
 ) {
   console.log("DeployContent trxType:", trxType);
   const {
