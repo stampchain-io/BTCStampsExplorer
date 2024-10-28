@@ -1,6 +1,6 @@
 import { Buffer } from "buffer";
 import { getTransaction } from "$lib/utils/quicknode.ts";
-import { zLibUncompress } from "$lib/utils/minting/zlib.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 import * as msgpack from "msgpack";
 
 const STAMP_PREFIX = "stamp:";
@@ -53,7 +53,8 @@ async function decodeSRC20OLGATransaction(txHash: string): Promise<string> {
 
     // Try to decompress and decode the data
     try {
-      const uncompressedData = await zLibUncompress(data);
+      const uncompressedData = await SRC20Service.CompressionService
+        .zLibUncompress(data);
       console.log("Uncompressed data length:", uncompressedData.length);
 
       // Decode using MessagePack
