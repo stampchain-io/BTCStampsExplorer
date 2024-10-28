@@ -25,7 +25,6 @@ export default function App({ Component }: AppProps) {
           content="Bitcoin, Stamps, UTXO, Art, Blockchain"
         />
         <meta name="author" content="Stampchain.io" />
-        <link rel="stylesheet" href="/carousel.css" />
         <link rel="stylesheet" href="/styles.css" />
         <link rel="stylesheet" href="/gradients.css" />
         <link

@@ -1,10 +1,11 @@
 import { useState } from "preact/hooks";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
-import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
 import StampingMintingItem from "$islands/stamping/src20/mint/StampingMintingItem.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { Search } from "$islands/datacontrol/Search.tsx";
-import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/util.ts";
+import { Filter } from "$islands/datacontrol/Filter.tsx";
+import { Setting } from "$islands/datacontrol/Setting.tsx";
 
 interface WalletContentProps {
   stamps: any[];
@@ -42,10 +43,27 @@ const dispensers = [{
 }];
 
 const ItemHeader = (
-  { title = "STAMP", sortBy = "ASC", isOpen = false, handleOpen = () => {} }: {
+  {
+    title = "STAMP",
+    sortBy = "ASC",
+    isOpen = false,
+    handleOpen = () => {},
+    isOpenFilter = false,
+    handleOpenFilter = () => {},
+    sort = true,
+    search = true,
+    filter = true,
+    setting = false,
+  }: {
     title: string;
     sortBy: string;
     isOpen: boolean;
+    sort: boolean;
+    search: boolean;
+    filter: boolean;
+    setting: boolean;
+    isOpenFilter: boolean;
+    handleOpenFilter: (open: boolean) => void;
     handleOpen: (type: string) => void;
   },
 ) => {
@@ -57,17 +75,32 @@ const ItemHeader = (
         </p>
       </div>
       <div class="flex gap-3 justify-between h-[40px]">
-        <Sort initSort={sortBy} />
-        <Search
-          open={isOpen}
-          handleOpen={() => handleOpen(title)}
-          placeholder="Stamp Name, Stamp Hash, or Address"
-          searchEndpoint="/wallet/search?q="
-          onResultClick={() => {}}
-          resultDisplay={(result) => {
-            console.log(result);
-          }}
-        />
+        {setting && <Setting />}
+        {filter && (
+          <Filter
+            initFilter={[]}
+            open={isOpenFilter}
+            handleOpen={handleOpenFilter}
+            filterButtons={[
+              "all",
+              "psbt",
+              "dispensers",
+            ]}
+          />
+        )}
+        {sort && <Sort initSort={sortBy} />}
+        {search && (
+          <Search
+            open={isOpen}
+            handleOpen={() => handleOpen(title)}
+            placeholder="Stamp Name, Stamp Hash, or Address"
+            searchEndpoint="/wallet/search?q="
+            onResultClick={() => {}}
+            resultDisplay={(result) => {
+              console.log(result);
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -130,7 +163,7 @@ function DispenserItem() {
                     <p className="text-lg text-[#666666] font-light">
                       QUANTITY{" "}
                       <span className="font-bold text-[#999999]">
-                        XXXX/XXXX
+                        {dispenser.escrow_quantity}
                       </span>
                     </p>
                     <p className="text-[#666666] text-lg">
@@ -248,6 +281,11 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
   const [openS, setOpenS] = useState<boolean>(false);
   const [openT, setOpenT] = useState<boolean>(false);
   const [openD, setOpenD] = useState<boolean>(false);
+  const [openFilter, setOpenFilter] = useState<boolean>(false);
+
+  const handleOpenFilter = () => {
+    setOpenFilter(!openFilter);
+  };
 
   const handleOpen = (type: string) => {
     if (type == "STAMP") {
@@ -261,7 +299,13 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
   return (
     <>
       <div>
-        <ItemHeader sortBy={sortBy} isOpen={openS} handleOpen={handleOpen} />
+        <ItemHeader
+          sortBy={sortBy}
+          isOpen={openS}
+          handleOpen={handleOpen}
+          filter={false}
+          setting={true}
+        />
         <div className="grid grid-cols-4 md:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4 mt-6">
           {stamps.map((stamp, index) => (
             <StampCard
@@ -281,6 +325,7 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
           title="TOKENS"
           sortBy={sortBy}
           isOpen={openT}
+          filter={false}
           handleOpen={handleOpen}
         />
         <div className="mt-6">
@@ -294,10 +339,15 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
       </div>
       <div className="mt-48">
         <ItemHeader
-          title="DISPENSERS"
+          title="Listening"
           sortBy={sortBy}
           isOpen={openD}
           handleOpen={handleOpen}
+          sort={true}
+          filter={true}
+          search={true}
+          isOpenFilter={openFilter}
+          handleOpenFilter={handleOpenFilter}
         />
         <div className="mt-6">
           <DispenserItem />

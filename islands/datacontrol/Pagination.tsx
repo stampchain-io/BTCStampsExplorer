@@ -75,7 +75,7 @@ export const Pagination = (
           <a
             href={pageUrl}
             f-partial={pageUrl}
-            class={`rounded-md flex items-center justify-center px-3 h-9 w-9 leading-tight font-semibold text-[#080808] 
+            class={`rounded-md flex items-center justify-center px-3 md:h-9 md:w-9 w-7 h-7 leading-tight font-semibold text-[#080808] 
               ${currentPage === p ? "bg-[#660099] " : "bg-[#440066]"}`}
           >
             {p}
@@ -98,7 +98,7 @@ export const Pagination = (
           <a
             href={buildPageUrl(1)}
             f-partial={buildPageUrl(1)}
-            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
+            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md md:h-9 md:w-9 w-7 h-7"
           >
             {"<<"}
           </a>
@@ -107,7 +107,7 @@ export const Pagination = (
           <a
             href={buildPageUrl(Math.max(1, currentPage - 1))}
             f-partial={buildPageUrl(Math.max(1, currentPage - 1))}
-            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
+            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md md:h-9 md:w-9 w-7 h-7"
           >
             {"<"}
           </a>
@@ -117,7 +117,7 @@ export const Pagination = (
           <a
             href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
             f-partial={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
+            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md md:h-9 md:w-9 w-7 h-7"
           >
             {">"}
           </a>
@@ -126,7 +126,7 @@ export const Pagination = (
           <a
             href={buildPageUrl(totalPages)}
             f-partial={buildPageUrl(totalPages)}
-            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md h-9 w-9"
+            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md md:h-9 md:w-9 w-7 h-7"
           >
             {">>"}
           </a>

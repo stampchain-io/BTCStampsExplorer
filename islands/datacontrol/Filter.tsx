@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import {
   COLLECTION_FILTER_TYPES,
+  type LISTENING_FILTER_TYPES,
   SRC20_FILTER_TYPES,
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
@@ -11,7 +12,8 @@ type FilterTypes =
   | SRC20_FILTER_TYPES
   | STAMP_FILTER_TYPES
   | WALLET_FILTER_TYPES
-  | COLLECTION_FILTER_TYPES;
+  | COLLECTION_FILTER_TYPES
+  | LISTENING_FILTER_TYPES;
 
 interface FilterProps {
   initFilter?: FilterTypes[];
