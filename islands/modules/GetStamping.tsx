@@ -1,6 +1,6 @@
 export const GetStampingModule = () => {
   return (
-    <div className="flex flex-col md:flex-row justify-between md:items-end gap-8 sm:gap-16 md:gap-32">
+    <div className="flex flex-col md:flex-row justify-between md:items-end gap-8 md:gap-16 xl:gap-32">
       <div>
         <p className="font-black text-4xl md:text-7xl flex flex-col gray-gradient4 text-left">
           GET STAMPING

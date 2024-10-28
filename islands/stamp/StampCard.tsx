@@ -102,7 +102,7 @@ export function StampCard({
     : abbreviateAddress(stamp.creator, abbreviationLength);
 
   return (
-    <div className=" relative">
+    <div className="relative flex justify-center">
       <a
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
