@@ -1,4 +1,4 @@
-import { Chart } from "$fresh_charts/Chart.tsx";
+import { Chart } from "$fresh_charts/island.tsx";
 
 const PieChart = () => {
   const DoughnutConfig = {
