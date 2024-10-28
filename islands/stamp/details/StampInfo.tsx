@@ -104,7 +104,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   className="text-[#8800CC]"
                   href={`/wallet/${stamp.creator}`}
                 >
-                  Stampchain
+                  {stamp.creator}
                 </a>
               )}
             </span>

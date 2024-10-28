@@ -84,7 +84,6 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
             </tr>
           </thead>
           <tbody>
-            {JSON.stringify(sortedDispensers)}
             {sortedDispensers.map((dispenser) => (
               <DispenserRow key={dispenser.source} dispenser={dispenser} />
             ))}
