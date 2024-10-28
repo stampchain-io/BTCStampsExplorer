@@ -53,7 +53,7 @@ interface MintContentProps {
 }
 
 export function MintContent({
-  trxType = "multisig",
+  trxType = "olga",
   tick,
   mintStatus: initialMintStatus,
   holders: initialHolders,
