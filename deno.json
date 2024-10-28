@@ -63,9 +63,7 @@
     "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts",
     "qrcode": "https://esm.sh/qrcode@1.5.1",
     "swiper/": "https://esm.sh/swiper@11.1.14/",
-    "swiper": "https://esm.sh/swiper@11.1.14",
-    "preact-chartjs-2": "https://esm.sh/preact-chartjs-2@1.0.3",
-    "preact-chartjs-2/": "https://esm.sh/preact-chartjs-2@1.0.3/"
+    "swiper": "https://esm.sh/swiper@11.1.14"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
