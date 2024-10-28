@@ -1,3 +1,3 @@
-import { SRC20PSBTCreateService } from "./createService.ts";
+import { SRC20MultisigPSBTService } from "./src20MultisigPSBTService.ts";
 
-export { SRC20PSBTCreateService };
+export { SRC20MultisigPSBTService };

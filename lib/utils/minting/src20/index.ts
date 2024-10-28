@@ -6,7 +6,7 @@ import {
   checkMintParams,
   checkTransferParams,
 } from "$lib/utils/minting/src20/check.ts";
-import { prepareSrc20TX } from "$lib/utils/minting/src20/tx.ts";
+import { SRC20MultisigPSBTService } from "$server/services/src20/psbt/index.ts";
 import {
   IDeploySRC20,
   IMintSRC20,
@@ -39,7 +39,8 @@ async function executeSRC20Operation<T extends IPrepareSRC20TX>(
       transferString,
     };
 
-    const { psbtHex, inputsToSign } = await prepareSrc20TX(prepare);
+    const { psbtHex, inputsToSign } = await SRC20MultisigPSBTService
+      .preparePSBT(prepare);
     return { psbtHex, inputsToSign };
   } catch (error) {
     console.error(error);
