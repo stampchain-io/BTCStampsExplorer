@@ -9,15 +9,17 @@
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",
-        "--inspect",
         "-A",
+        "--inspect-wait",
+        "--watch=static/,routes/,components/,islands/",
         "./main.ts"
       ],
       "outputCapture": "std",
       "attachSimplePort": 9229,
       "env": {
         "PATH": "${env:HOME}/.deno/bin:${env:PATH}"
-      }
+      },
+      "preLaunchTask": "deno-build"
     }
   ]
 }
