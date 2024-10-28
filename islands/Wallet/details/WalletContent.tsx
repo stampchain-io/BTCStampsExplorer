@@ -163,7 +163,7 @@ function DispenserItem() {
                     <p className="text-lg text-[#666666] font-light">
                       QUANTITY{" "}
                       <span className="font-bold text-[#999999]">
-                        {dispenser.escrow_quantity}
+                        {dispenser.give_remaining}/{dispenser.escrow_quantity}
                       </span>
                     </p>
                     <p className="text-[#666666] text-lg">
