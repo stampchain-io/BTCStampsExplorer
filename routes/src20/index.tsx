@@ -1,15 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TrxRequestParams } from "globals";
-
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
-import { SRC20MintingTable } from "$islands/src20/minting/SRC20MintingTable.tsx";
-import LatestMints from "$islands/src20/minting/LatestMints.tsx";
 import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.tsx";
-
 import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
 import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
-
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
