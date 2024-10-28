@@ -54,11 +54,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
-    : abbreviateAddress(stamp.creator);
+    : abbreviateAddress(stamp.creator, 8);
 
   useEffect(() => {
     if (stamp.stamp_mimetype.startsWith("image/") && stamp.stamp_url) {
-      // Create an Image object to get dimensions
       const img = new Image();
       img.onload = () => {
         setImageDimensions({
@@ -104,9 +103,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 className="text-[#8800CC]"
                 href={`/wallet/${stamp.creator}`}
               >
-                {stamp.creator_name
-                  ? stamp.creator_name
-                  : abbreviateAddress(stamp.creator, 6)}
+                {creatorDisplay}
               </a>
             </span>
           </p>
