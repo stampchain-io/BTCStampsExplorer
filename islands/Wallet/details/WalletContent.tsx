@@ -339,7 +339,7 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
       </div>
       <div className="mt-48">
         <ItemHeader
-          title="Listening"
+          title="LISTINGS"
           sortBy={sortBy}
           isOpen={openD}
           handleOpen={handleOpen}
