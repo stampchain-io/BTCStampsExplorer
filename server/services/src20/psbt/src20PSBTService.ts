@@ -82,7 +82,6 @@ export class SRC20PSBTService {
       vouts.push(this.createAddressOutput(service_fee_address, service_fee));
     }
 
-    // Replace with selectUTXOsForTransaction
     const { inputs, change } = await TransactionService.UTXOService.selectUTXOsForTransaction(
       sourceWallet,
       vouts,

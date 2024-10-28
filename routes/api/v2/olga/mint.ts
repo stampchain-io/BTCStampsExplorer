@@ -1,8 +1,10 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { MintStampInputData, TX, TXError } from "globals";
 import { serverConfig } from "$server/config/config.ts";
-import { mintStampCIP33 } from "$lib/utils/minting/olga/mint.ts";
-import { validateAndPrepareAssetName } from "$lib/utils/minting/stamp.ts";
+import {
+  StampMintService,
+  StampValidationService,
+} from "$server/services/stamp/index.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { Buffer } from "buffer";
 
@@ -17,7 +19,9 @@ export const handler: Handlers<TX | TXError> = {
 
     let assetName;
     try {
-      assetName = await validateAndPrepareAssetName(body.assetName);
+      assetName = await StampValidationService.validateAndPrepareAssetName(
+        body.assetName,
+      );
     } catch (error) {
       return ResponseUtil.error(error.message, 400);
     }
@@ -34,7 +38,7 @@ export const handler: Handlers<TX | TXError> = {
     };
 
     try {
-      const mint_tx = await mintStampCIP33(prepare);
+      const mint_tx = await StampMintService.mintStampCIP33(prepare);
       if (!mint_tx || !mint_tx.psbt) {
         console.error("Invalid mint_tx structure:", mint_tx);
         return ResponseUtil.error(

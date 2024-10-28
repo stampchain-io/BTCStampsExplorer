@@ -234,10 +234,10 @@ function constructScriptFromAddress(address: string): string | null {
 async function tryAPIs<T>(
   endpoints: Array<{
     name: string;
-    fn: () => Promise<T | null>;
+    fn: () => Promise<T | T[] | null>;
   }>,
   maxRetries = 3,
-): Promise<T | null> {
+): Promise<T | T[] | null> {
   console.log(`\n>>> tryAPIs called with ${endpoints.length} endpoints`);
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -334,8 +334,8 @@ export async function getUTXOForAddress(
   specificTxid?: string,
   specificVout?: number,
   includeAncestors = false,
-  retries = 3, // Changed from 0 to 3 to match maxRetries in tryAPIs
-): Promise<TxInfo | null> {
+  retries = 3,
+): Promise<UTXO[] | null> {
   console.log(`
 >>> getUTXOForAddress called with:
 Address: ${address}
@@ -389,15 +389,14 @@ Retries: ${retries}
 
             return result;
           } else {
-            // Bulk UTXO fetch
+            // Bulk UTXO fetch - return all UTXOs
             const response = await fetch(
               `${MEMPOOL_API_BASE_URL}/address/${address}/utxo`,
             );
             if (!response.ok) return null;
 
             const utxos = await response.json();
-            const formattedUtxos = formatUTXOs(utxos, address);
-            return formattedUtxos?.[0] ? { utxo: formattedUtxos[0] } : null;
+            return formatUTXOs(utxos, address); // Return all formatted UTXOs
           }
         } catch (error) {
           console.error(">>> MEMPOOL: Error in function:", error);
@@ -411,7 +410,7 @@ Retries: ${retries}
         console.log(">>> BLOCKSTREAM: Starting fetch");
         try {
           if (specificTxid && specificVout !== undefined) {
-            // Similar structure for Blockstream
+            // Specific UTXO fetch remains the same
             const response = await fetch(
               `${BLOCKSTREAM_API_BASE_URL}/tx/${specificTxid}`,
             );
@@ -455,8 +454,7 @@ Retries: ${retries}
             if (!response.ok) return null;
 
             const utxos = await response.json();
-            const formattedUtxos = formatUTXOs(utxos, address);
-            return formattedUtxos?.[0] ? { utxo: formattedUtxos[0] } : null;
+            return formatUTXOs(utxos, address); // Return all formatted UTXOs
           }
         } catch (error) {
           console.error(">>> BLOCKSTREAM: Error:", error);
@@ -470,6 +468,7 @@ Retries: ${retries}
         console.log(">>> BLOCKCHAIN: Starting fetch");
         try {
           if (specificTxid && specificVout !== undefined) {
+            // Specific UTXO fetch remains the same
             const response = await fetch(
               `${BLOCKCHAIN_API_BASE_URL}/rawtx/${specificTxid}`,
             );
@@ -493,7 +492,7 @@ Retries: ${retries}
 
             return { utxo: formattedUtxos?.[0] };
           } else {
-            // Bulk UTXO fetch
+            // Bulk UTXO fetch - return all UTXOs
             const response = await fetch(
               `${BLOCKCHAIN_API_BASE_URL}/unspent?active=${address}`,
             );
@@ -502,8 +501,7 @@ Retries: ${retries}
             const data = await response.json();
             if (data.error) return null;
 
-            const formattedUtxos = formatUTXOs(data.unspent_outputs, address);
-            return formattedUtxos?.[0] ? { utxo: formattedUtxos[0] } : null;
+            return formatUTXOs(data.unspent_outputs, address); // Return all formatted UTXOs
           }
         } catch (error) {
           console.error(">>> BLOCKCHAIN: Error:", error);
@@ -517,6 +515,7 @@ Retries: ${retries}
         console.log(">>> BLOCKCYPHER: Starting fetch");
         try {
           if (specificTxid && specificVout !== undefined) {
+            // Specific UTXO fetch remains the same
             const response = await fetch(
               `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/txs/${specificTxid}?includeHex=true&includeScript=true`,
             );
@@ -547,7 +546,7 @@ Retries: ${retries}
 
             return { utxo: formattedUtxos?.[0] };
           } else {
-            // Bulk UTXO fetch
+            // Bulk UTXO fetch - return all UTXOs
             const response = await fetch(
               `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/addrs/${address}?unspentOnly=true&includeScript=true`,
             );
@@ -556,8 +555,7 @@ Retries: ${retries}
             const data = await response.json();
             if (data.error || !data.txrefs) return null;
 
-            const formattedUtxos = formatUTXOs(data.txrefs, address);
-            return formattedUtxos?.[0] ? { utxo: formattedUtxos[0] } : null;
+            return formatUTXOs(data.txrefs, address); // Return all formatted UTXOs
           }
         } catch (error) {
           console.error(">>> BLOCKCYPHER: Error:", error);
