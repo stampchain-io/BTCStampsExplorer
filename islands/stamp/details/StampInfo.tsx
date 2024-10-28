@@ -1,13 +1,10 @@
+import { useEffect, useState } from "preact/hooks";
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
-
+import StampBuyModal from "./StampBuyModal.tsx";
 import { abbreviateAddress } from "$lib/utils/util.ts";
 
-import StampBuyModal from "./StampBuyModal.tsx";
-
 import { StampRow } from "globals";
-
-import { useEffect, useState } from "preact/hooks";
 
 dayjs.extend(relativeTime);
 
@@ -55,6 +52,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     ? stamp.stamp_url.split(".").pop()?.split("?")[0].toLowerCase()
     : "unknown";
 
+  const creatorDisplay = stamp.creator_name
+    ? stamp.creator_name
+    : abbreviateAddress(stamp.creator);
+
   useEffect(() => {
     if (stamp.stamp_mimetype.startsWith("image/") && stamp.stamp_url) {
       // Create an Image object to get dimensions
@@ -99,14 +100,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           <p className="hidden md:block text-[#8800CC] overflow-hidden text-ellipsis whitespace-nowrap text-4xl font-light">
             BY{" "}
             <span className={"font-bold"}>
-              {stamp.creator_name ? stamp.creator_name : (
-                <a
-                  className="text-[#8800CC]"
-                  href={`/wallet/${stamp.creator}`}
-                >
-                  {stamp.creator}
-                </a>
-              )}
+              <a
+                className="text-[#8800CC]"
+                href={`/wallet/${stamp.creator}`}
+              >
+                {stamp.creator_name
+                  ? stamp.creator_name
+                  : abbreviateAddress(stamp.creator, 6)}
+              </a>
             </span>
           </p>
 
