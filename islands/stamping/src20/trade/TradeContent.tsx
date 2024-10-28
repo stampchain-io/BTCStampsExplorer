@@ -1,8 +1,9 @@
-import { useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 
 // Define the constants directly
 const SIGHASH_SINGLE = 0x03;
@@ -14,12 +15,33 @@ const SATS_PER_KB_MULTIPLIER = 1000; // Convert vB to kB
 const MIN_FEE_RATE_VB = 1; // minimum sat/vB
 const MAX_FEE_RATE_VB = 500; // maximum sat/vB
 
-export function TradeContent() {
-  // Destructure walletContext to get wallet, isConnected, and showConnectModal
-  const { wallet, isConnected, showConnectModal } = walletContext;
-  const address = wallet.address; // Access wallet properties directly
+// Add this constant at the top with other constants
+const MIN_UTXO_VALUE = 546; // Minimum UTXO value in satoshis
 
-  // State for the existing trade form
+// Remove the local UTXO interface and import it from types
+import type { UTXO } from "$lib/types/index.d.ts";
+
+// Add these interfaces at the top with other types
+interface InputToSign {
+  index: number;
+}
+
+interface StatusMessageType {
+  message: string;
+  txid?: string;
+}
+
+export function TradeContent() {
+  // Move all useState declarations inside the component
+  const [availableAssets, setAvailableAssets] = useState<XcpBalance[]>([]);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(false);
+  const [maxQuantity, setMaxQuantity] = useState<number | null>(null);
+  const [availableUtxos, setAvailableUtxos] = useState<UTXO[]>([]);
+  const [isLoadingUtxos, setIsLoadingUtxos] = useState(false);
+
+  const { wallet, isConnected, showConnectModal } = walletContext;
+  const address = wallet.address;
+
   const [tradeFormState, setTradeFormState] = useState({
     utxo: "",
     salePrice: "",
@@ -27,16 +49,14 @@ export function TradeContent() {
     psbtHex: "",
   });
 
-  // State for the new UTXO attach form
   const [attachFormState, setAttachFormState] = useState({
     cpid: "",
     quantity: "",
-    feeRateVB: "", // Changed from feePerKB to feeRateVB to indicate sat/vB
+    feeRateVB: "",
     utxo: "",
     psbtHex: "",
   });
 
-  // Add this to your state
   const [buyerFormState, setBuyerFormState] = useState({
     sellerPsbtHex: "",
     buyerUtxo: "",
@@ -45,9 +65,9 @@ export function TradeContent() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionMessage, setSubmissionMessage] = useState<string | null>(
-    null,
-  );
+  const [submissionMessage, setSubmissionMessage] = useState<
+    StatusMessageType | null
+  >(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
   // Fetch BTC Price
@@ -209,16 +229,11 @@ export function TradeContent() {
 
       const data = await response.json();
       const psbtHex = data.psbt;
-      let inputsToSign = data.inputsToSign;
-
-      // Validate 'inputsToSign' structure
-      inputsToSign = inputsToSign.map((input) => {
-        if (typeof input.index === "number") {
-          return { index: input.index };
-        } else {
-          throw new Error(`Invalid index in inputsToSign: ${input.index}`);
-        }
-      });
+      let inputsToSign: InputToSign[] = data.inputsToSign.map((
+        input: { index: number },
+      ) => ({
+        index: input.index,
+      }));
 
       console.log("Received PSBT hex:", psbtHex);
 
@@ -240,10 +255,10 @@ export function TradeContent() {
       } else {
         setSubmissionMessage(`PSBT signing failed: ${walletResult.error}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error creating or signing PSBT:", error);
       setApiError(
-        "An unexpected error occurred during PSBT creation or signing.",
+        error instanceof Error ? error.message : "An unexpected error occurred",
       );
     } finally {
       setIsSubmitting(false);
@@ -331,12 +346,149 @@ export function TradeContent() {
       }
 
       setSubmissionMessage("Swap completed and broadcast successfully!");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Complete swap error:", error);
-      setApiError(error.message || "An unexpected error occurred.");
+      setApiError(
+        error instanceof Error ? error.message : "An unexpected error occurred",
+      );
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Add this new function in your component
+  const handleQueryUtxos = useCallback(async () => {
+    if (!isConnected) {
+      showConnectModal();
+      return;
+    }
+
+    setIsLoadingUtxos(true);
+    setApiError(null);
+
+    try {
+      console.log("Querying UTXOs for address:", address);
+      const response = await fetch(`/api/v2/trx/utxoquery?address=${address}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch UTXOs");
+      }
+
+      const data = await response.json();
+      console.log("Raw response data:", data);
+
+      // Validate the response structure
+      if (!data || !data.utxos) {
+        console.error("Invalid response structure:", data);
+        throw new Error("Invalid response format from server");
+      }
+
+      // Ensure we have an array of UTXOs
+      if (!Array.isArray(data.utxos)) {
+        console.error("UTXOs is not an array:", data.utxos);
+        throw new Error("Server returned invalid UTXO format");
+      }
+
+      // Filter UTXOs >= 546 sats and sort them
+      const filteredAndSortedUtxos = [...data.utxos]
+        .filter((utxo: UTXO) => utxo.value >= MIN_UTXO_VALUE)
+        .sort((a: UTXO, b: UTXO) => a.value - b.value);
+
+      console.log(`Received ${data.utxos.length} total UTXOs`);
+      console.log(
+        `Filtered to ${filteredAndSortedUtxos.length} spendable UTXOs (>= ${MIN_UTXO_VALUE} sats)`,
+      );
+
+      if (filteredAndSortedUtxos.length === 0) {
+        setApiError(`No UTXOs found with value >= ${MIN_UTXO_VALUE} sats`);
+        return;
+      }
+
+      setAvailableUtxos(filteredAndSortedUtxos);
+      console.log(
+        `Successfully set ${filteredAndSortedUtxos.length} spendable UTXOs`,
+      );
+    } catch (error) {
+      console.error("Error fetching UTXOs:", error);
+      setApiError(
+        error instanceof Error ? error.message : "Failed to fetch UTXOs",
+      );
+    } finally {
+      setIsLoadingUtxos(false);
+    }
+  }, [address, isConnected]);
+
+  const handleUtxoSelection = (utxo: UTXO) => {
+    const utxoString = `${utxo.txid}:${utxo.vout}`;
+    setAttachFormState((prev) => ({ ...prev, utxo: utxoString }));
+  };
+
+  // Add this handler function
+  const handleQueryAssets = useCallback(async () => {
+    if (!isConnected) {
+      showConnectModal();
+      return;
+    }
+
+    setIsLoadingAssets(true);
+    setApiError(null);
+
+    try {
+      console.log("Querying assets for address:", address);
+      const response = await fetch("/api/v2/balance/getStampsBalance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address,
+          utxoOnly: false, // Set to true if you only want assets in UTXOs
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch assets");
+      }
+
+      const data = await response.json();
+      console.log("Raw asset response data:", data);
+
+      if (!data.stampBalance || !Array.isArray(data.stampBalance)) {
+        throw new Error("Invalid response format from server");
+      }
+
+      // Sort assets by CPID
+      const sortedAssets = [...data.stampBalance].sort((a, b) =>
+        a.cpid.localeCompare(b.cpid)
+      );
+
+      console.log(`Received ${sortedAssets.length} assets`);
+
+      if (sortedAssets.length === 0) {
+        setApiError("No assets found for this address");
+        return;
+      }
+
+      setAvailableAssets(sortedAssets);
+      console.log(`Successfully set ${sortedAssets.length} assets`);
+    } catch (error) {
+      console.error("Error fetching assets:", error);
+      setApiError(
+        error instanceof Error ? error.message : "Failed to fetch assets",
+      );
+    } finally {
+      setIsLoadingAssets(false);
+    }
+  }, [address, isConnected]);
+
+  // Add asset selection handler
+  const handleAssetSelection = (asset: XcpBalance) => {
+    setAttachFormState((prev) => ({
+      ...prev,
+      cpid: asset.cpid,
+      quantity: "", // Clear the quantity field instead of auto-filling
+    }));
+    setMaxQuantity(asset.quantity);
   };
 
   return (
@@ -398,35 +550,142 @@ export function TradeContent() {
 
       {/* New UTXO Attach Form */}
       <div className="dark-gradient p-6 w-full">
-        <h2 class="text-xl font-bold mb-4">UTXO Attach</h2>
+        <h2 class="text-xl font-bold mb-4 text-gray-400">UTXO Attach</h2>
         <div className="flex flex-col gap-4">
-          <InputField
-            type="text"
-            placeholder="Asset (cpid)"
-            value={attachFormState.cpid}
-            onChange={(e) => handleAttachInputChange(e, "cpid")}
-          />
+          {/* Asset (CPID) section with query button */}
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2 items-start">
+              <div className="flex-grow">
+                <InputField
+                  type="text"
+                  placeholder="Asset (cpid)"
+                  value={attachFormState.cpid}
+                  onChange={(e) => handleAttachInputChange(e, "cpid")}
+                />
+              </div>
+              <button
+                className="bg-[#6600CC] text-white px-4 py-2 h-[36px] rounded-md font-bold text-sm whitespace-nowrap"
+                onClick={handleQueryAssets}
+                disabled={isLoadingAssets || !isConnected}
+              >
+                {isLoadingAssets ? "Loading..." : "Query Assets"}
+              </button>
+            </div>
+
+            {/* Asset list */}
+            {availableAssets.length > 0 && (
+              <div className="mt-2 max-h-60 overflow-y-auto bg-gray-800 rounded-md">
+                <div className="p-2 border-b border-gray-700 font-bold text-sm">
+                  Available Assets (sorted by CPID)
+                </div>
+                {availableAssets.map((asset) => (
+                  <button
+                    key={asset.cpid}
+                    onClick={() => handleAssetSelection(asset)}
+                    className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-gray-700 last:border-b-0"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="truncate flex-1">
+                        {asset.cpid}
+                      </div>
+                      <div className="ml-2 text-green-400">
+                        {`${asset.quantity.toLocaleString()} units`}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Quantity input with MAX display */}
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2 items-start">
+              <div className="flex-grow relative">
+                <InputField
+                  type="number"
+                  placeholder="Quantity"
+                  value={attachFormState.quantity}
+                  onChange={(e) => {
+                    const value = parseInt(
+                      (e.target as HTMLInputElement).value,
+                    );
+                    if (!value || (maxQuantity && value <= maxQuantity)) {
+                      handleAttachInputChange(e, "quantity");
+                    }
+                  }}
+                />
+                {maxQuantity !== null && (
+                  <div className="absolute right-0 -top-6 text-sm text-gray-400">
+                    Max: {maxQuantity.toLocaleString()}
+                  </div>
+                )}
+              </div>
+            </div>
+            {attachFormState.quantity && maxQuantity &&
+              parseInt(attachFormState.quantity) > maxQuantity && (
+              <div className="text-red-500 text-sm">
+                Quantity cannot exceed {maxQuantity.toLocaleString()}
+              </div>
+            )}
+          </div>
+
           <InputField
             type="number"
-            placeholder="Quantity"
-            value={attachFormState.quantity}
-            onChange={(e) => handleAttachInputChange(e, "quantity")}
-            min="1"
+            placeholder="Fee Rate (sat/vB)"
+            value={attachFormState.feeRateVB}
+            onChange={(e) => handleAttachInputChange(e, "feeRateVB")}
           />
-          <InputField
-            type="number"
-            placeholder="Fee Rate (sat/vB)" // Updated placeholder
-            value={attachFormState.feeRateVB} // Updated name
-            onChange={(e) => handleAttachInputChange(e, "feeRateVB")} // Updated name
-            min="1"
-          />
-          <InputField
-            type="text"
-            placeholder="UTXO (e.g., txid:vout)"
-            value={attachFormState.utxo}
-            onChange={(e) => handleAttachInputChange(e, "utxo")}
-          />
+
+          {/* UTXO section with query button */}
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2 items-start">
+              <div className="flex-grow">
+                <InputField
+                  type="text"
+                  placeholder="UTXO (e.g., txid:vout)"
+                  value={attachFormState.utxo}
+                  onChange={(e) => handleAttachInputChange(e, "utxo")}
+                />
+              </div>
+              <button
+                className="bg-[#6600CC] text-white px-4 py-2 h-[36px] rounded-md font-bold text-sm whitespace-nowrap"
+                onClick={handleQueryUtxos}
+                disabled={isLoadingUtxos || !isConnected}
+              >
+                {isLoadingUtxos ? "Loading..." : "Query UTXOs"}
+              </button>
+            </div>
+
+            {/* UTXO list */}
+            {availableUtxos.length > 0 && (
+              <div className="mt-2 max-h-60 overflow-y-auto bg-gray-800 rounded-md">
+                <div className="p-2 border-b border-gray-700 font-bold text-sm">
+                  Available UTXOs ≥ {MIN_UTXO_VALUE} sats (sorted by value)
+                </div>
+                {availableUtxos.map((utxo) => (
+                  <button
+                    key={`${utxo.txid}:${utxo.vout}`}
+                    onClick={() => handleUtxoSelection(utxo)}
+                    className="w-full text-left p-2 hover:bg-gray-700 transition-colors text-sm border-b border-gray-700 last:border-b-0"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="truncate flex-1">
+                        {`${utxo.txid.substring(0, 8)}...${
+                          utxo.txid.substring(utxo.txid.length - 8)
+                        }:${utxo.vout}`}
+                      </div>
+                      <div className="ml-2 text-green-400">
+                        {`${utxo.value.toLocaleString()} sats`}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
         <div className="flex justify-end gap-6 mt-6">
           <button
             className="bg-[#8800CC] text-[#330033] w-[120px] h-[48px] rounded-md font-extrabold"
@@ -438,7 +697,9 @@ export function TradeContent() {
         </div>
 
         <StatusMessages
-          submissionMessage={submissionMessage}
+          submissionMessage={submissionMessage
+            ? { message: submissionMessage }
+            : null}
           apiError={apiError}
           walletError={null}
         />
@@ -460,7 +721,9 @@ export function TradeContent() {
 
       {/* Complete Swap (Buyer) */}
       <div className="dark-gradient p-6 w-full mt-6">
-        <h2 class="text-xl font-bold mb-4">Complete Swap (Buyer)</h2>
+        <h2 class="text-xl font-bold mb-4 text-gray-400">
+          Complete Swap (Buyer)
+        </h2>
         <div className="flex flex-col gap-4">
           <InputField
             type="text"

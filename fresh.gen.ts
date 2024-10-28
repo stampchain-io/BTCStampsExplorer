@@ -56,6 +56,7 @@ import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
 import * as $api_v2_trx_complete_psbt from "./routes/api/v2/trx/complete_psbt.ts";
 import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_utxoattach from "./routes/api/v2/trx/utxoattach.ts";
+import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
 import * as $api_v2_update_creator_name from "./routes/api/v2/update-creator-name.ts";
 import * as $api_v2_upload_src20_background from "./routes/api/v2/upload-src20-background.ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
@@ -245,6 +246,7 @@ const manifest = {
     "./routes/api/v2/trx/complete_psbt.ts": $api_v2_trx_complete_psbt,
     "./routes/api/v2/trx/create_psbt.ts": $api_v2_trx_create_psbt,
     "./routes/api/v2/trx/utxoattach.ts": $api_v2_trx_utxoattach,
+    "./routes/api/v2/trx/utxoquery.ts": $api_v2_trx_utxoquery,
     "./routes/api/v2/update-creator-name.ts": $api_v2_update_creator_name,
     "./routes/api/v2/upload-src20-background.ts":
       $api_v2_upload_src20_background,

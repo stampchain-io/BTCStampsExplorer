@@ -15,7 +15,6 @@ export class PSBTService {
     const vout = parseInt(voutStr, 10);
 
     const network = getAddressNetwork(sellerAddress);
-    // Create PSBT instance first
     const psbt = new Psbt({ network });
 
     // Fetch specific UTXO details (no ancestor info needed)
