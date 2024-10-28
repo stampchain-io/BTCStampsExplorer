@@ -1,52 +1,8 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
-import { Chart } from "$fresh_charts/mod.ts";
-import { ChartColors, transparentize } from "$fresh_charts/utils.ts";
-
-import { StampRow } from "globals";
-
-import { useEffect, useState } from "preact/hooks";
+import PieChart from "$components/stamp/PieChart.tsx";
 
 dayjs.extend(relativeTime);
-
-interface StampRelatedGraphProps {
-  stamp: StampRow;
-}
-
-const DoughnutConfig = {
-  type: "doughnut",
-  svgClass: "w-full h-1/2",
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-  },
-  data: {
-    labels: false,
-    datasets: [{
-      borderColor: [
-        "#666666",
-        "#666666",
-        "#666666",
-        "#666666",
-        "#666666",
-        "#666666",
-        "#666666",
-      ],
-      label: "Graph Holder",
-      data: [300, 50, 100, 70, 50, 30, 20, 100],
-      backgroundColor: [
-        "#8800CC",
-        "#8800CC",
-        "#8800CC",
-        "#8800CC",
-        "#8800CC",
-        "#8800CC",
-        "#8800CC",
-      ],
-      hoverOffset: 4,
-    }],
-  },
-};
 
 export function StampRelatedGraph() {
   return (
@@ -60,7 +16,7 @@ export function StampRelatedGraph() {
       <div className="lg:flex md:block w-full gap-3">
         <div>
           <div className="flex justify-between items-center flex-col md:items-start gap-1">
-            <Chart {...DoughnutConfig} />
+            <PieChart />
           </div>
         </div>
         <div className="flex justify-between items-center w-full">
