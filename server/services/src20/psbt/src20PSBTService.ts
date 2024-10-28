@@ -10,8 +10,8 @@ import {
 } from "$lib/utils/minting/feeCalculations.ts";
 import { estimateP2WSHTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import * as msgpack from "msgpack";
-import { compressWithCheck } from "$lib/utils/minting/zlib.ts";
 import { TransactionService } from "$server/services/transaction/index.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 export class SRC20PSBTService {
   private static readonly DUST_SIZE = 420; // Min is 330
@@ -162,7 +162,7 @@ export class SRC20PSBTService {
         : src20Action;
 
       const msgpackData = msgpack.encode(parsedAction);
-      const { compressedData, compressed } = await compressWithCheck(msgpackData);
+      const { compressedData, compressed } = await SRC20Service.CompressionService.compressWithCheck(msgpackData);
       actionData = compressed ? compressedData : msgpackData;
     } catch (error) {
       const actionString = JSON.stringify(src20Action);

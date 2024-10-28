@@ -2,9 +2,9 @@ import * as bitcoin from "bitcoinjs-lib";
 import { Buffer } from "buffer";
 import { arc4 } from "../lib/utils/minting/transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { zLibUncompress } from "$lib/utils/minting/zlib.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
 import * as msgpack from "msgpack";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 const STAMP_PREFIX = "stamp:";
 
@@ -73,7 +73,8 @@ async function decodeSRC20Transaction(txHash: string): Promise<string> {
 
     // Try to decompress and decode the data
     try {
-      const uncompressedData = await zLibUncompress(data);
+      const uncompressedData = await SRC20Service.CompressionService
+        .zLibUncompress(data);
       console.log("Uncompressed data (hex):", bin2hex(uncompressedData));
 
       // Decode using MessagePack

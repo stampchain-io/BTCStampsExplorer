@@ -7,7 +7,7 @@ import { Buffer } from "buffer";
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { compressWithCheck } from "$lib/utils/minting/zlib.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { IPrepareSRC20TX, PSBTInput, VOUT } from "$types/index.d.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
@@ -62,7 +62,8 @@ export class SRC20MultisigPSBTService {
 
       const transferData = JSON.parse(transferString);
       const msgpackData = msgpack.encode(transferData);
-      const { compressedData, compressed } = await compressWithCheck(msgpackData);
+      const { compressedData, compressed } = await SRC20Service.CompressionService
+        .compressWithCheck(msgpackData);
 
       transferDataBytes = compressed ? compressedData : new TextEncoder().encode(JSON.stringify(transferData));
 

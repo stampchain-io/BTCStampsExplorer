@@ -1,7 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { InputData, TX, TXError } from "globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { performChecks } from "$lib/utils/minting/src20/check.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers<TX | TXError> = {
@@ -14,8 +13,9 @@ export const handler: Handlers<TX | TXError> = {
       // Parse the JSON
       const body: InputData = JSON.parse(rawBody);
 
-      // Perform checks
-      performChecks(body.op, body);
+      // Use the utility service
+      const { UtilityService } = SRC20Service;
+      await UtilityService.performChecks(body.op, body);
 
       // Use SRC20Service.TransactionService instead of direct import
       return await SRC20Service.TransactionService.handleOperation(
