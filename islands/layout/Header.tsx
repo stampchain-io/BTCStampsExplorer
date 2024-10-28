@@ -40,13 +40,12 @@ const navLinks: NavLink[] = [
 ];
 
 const socialLinks = [
-  { href: "#", icon: "/img/footer/EnvelopeSimple.png" },
-  { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.png" },
-  { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.png" },
-  { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.png" },
+  { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.svg" },
+  { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.svg" },
+  { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.svg" },
   {
     href: "https://github.com/stampchain-io/",
-    icon: "/img/footer/GithubLogo.png",
+    icon: "/img/footer/GithubLogo.svg",
   },
 ];
 
@@ -110,7 +109,7 @@ export function Header() {
             }`}
           >
             <a
-              className={`hover:text-[#AA00FF] ${
+              className={`whitespace-nowrap hover:text-[#AA00FF] ${
                 isMobile
                   ? "text-2xl text-[#660099]"
                   : "text-lg xl:text-xl text-center"
@@ -149,13 +148,13 @@ export function Header() {
   };
 
   return (
-    <header className="px-3 sm:px-6 xl:px-12 my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex items-center justify-between">
+    <header className="px-3 sm:px-6 xl:px-12 my-[18px] sm:my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex justify-between items-center">
       <div className="w-full flex justify-between items-center">
         <a
           href="/home"
-          f-partial={"/home"}
+          f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className={"purple-gradient2 text-3xl md:text-4xl xl:text-5xl font-black italic pr-2"}
+          className="purple-gradient2 text-3xl md:text-4xl xl:text-5xl font-black italic pr-2"
         >
           STAMPCHAIN
         </a>
@@ -168,14 +167,14 @@ export function Header() {
             <img
               src="/img/header/menu-close.svg"
               alt="menu"
-              className="w-6 h-6"
+              className="w-5 h-5"
             />
           )}
           {!open && (
             <img
               src="/img/header/menu-open.svg"
               alt="menu"
-              className="w-6 h-6"
+              className="w-5 h-4"
             />
           )}
         </button>
@@ -189,7 +188,7 @@ export function Header() {
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex lg:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 py-6 sm:py-9 pt-[120px] backdrop-blur-md font-black text-[#8800CC] ${
+        className={`duration-500 flex lg:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 pb-6 pt-[77px] sm:pt-[102px] backdrop-blur-md font-black text-[#8800CC] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"
@@ -206,15 +205,27 @@ export function Header() {
           STAMPCHAIN
         </a>
 
-        <div className="font-black text-center flex flex-col items-center justify-between gap-12 mt-12">
+        <div className="font-black text-center flex flex-col items-center justify-between gap-6">
           {renderNavLinks(true)}
           <ConnectWallet toggleModal={toggleWalletModal} />
         </div>
 
-        <div className="flex justify-center items-center gap-6">
-          {socialLinks.map((link) => (
-            <a key={link.href} href={link.href}>
-              <img src={link.icon} className="w-12" alt="" />
+        <div className="flex justify-center items-center">
+          {socialLinks.map((link, index) => (
+            <a key={link.href} href={link.href} target="_blank">
+              <img
+                src={link.icon}
+                className={`w-12 ${
+                  index === 0
+                    ? "mr-[13px]"
+                    : index === 1
+                    ? "mr-[17px]"
+                    : index === 2
+                    ? "mr-[21px]"
+                    : ""
+                }`}
+                alt=""
+              />
             </a>
           ))}
         </div>
