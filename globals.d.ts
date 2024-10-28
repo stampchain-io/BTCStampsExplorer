@@ -53,7 +53,7 @@ export type COLLECTION_FILTER_TYPES =
   | "recursive"
   | "artists";
 
-export type LISTENING_FILTER_TYPES =
+export type LISTING_FILTER_TYPES =
   | "all"
   | "psbt"
   | "dispensers";
