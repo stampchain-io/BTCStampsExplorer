@@ -108,9 +108,8 @@ export function StampCard({
         target="_top"
         f-partial={`/stamp/${stamp.tx_hash}`}
         className="
-          border-2 border-[#2E0F4D] text-white group relative z-0 flex flex-col
+          text-white group relative z-0 flex flex-col
           p-[6px] sm:p-3 rounded-[6px] transition-all
-          hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]
           w-full max-w-[318px] lg:max-w-[348px] xl:max-w-[318px] 2xl:max-w-[318px]
         "
         style={{
