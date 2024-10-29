@@ -292,7 +292,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             isConnected && address
               ? "text-[#8800CC] border-[#8800CC] border-2 rounded-md"
               : "bg-[#8800CC] hover:bg-[#9911DD] text-[#080808] "
-          }  px-5 py-3 rounded font-extrabold text-sm xl:text-base`}
+          }  px-5 py-4 rounded font-extrabold text-sm leading-[16px] sm:text-base sm:leading-[19px]`}
         >
           {isConnected && address ? abbreviateAddress(address) : "CONNECT"}
         </button>
