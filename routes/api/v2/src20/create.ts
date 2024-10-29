@@ -19,7 +19,7 @@ export const handler: Handlers<TX | TXError> = {
 
       // Use SRC20Service.TransactionService instead of direct import
       return await SRC20Service.TransactionService.handleOperation(
-        body.op.toLowerCase(),
+        body.op.toLowerCase() as "deploy" | "mint" | "transfer",
         body,
       );
     } catch (error) {
