@@ -56,12 +56,15 @@ export const StampHeader = (
   };
 
   return (
-    <div 
-      class="flex flex-col-reverse lg:flex-row justify-between items-center gap-3 w-full"
+    <div
+      class="flex flex-row justify-between items-center gap-3 w-full"
       f-partial="/stamp"
     >
-      <p className="purple-gradient1 text-3xl md:text-6xl font-black">
+      <p className="purple-gradient1 text-3xl md:text-6xl font-black hidden md:block">
         ART STAMPS
+      </p>
+      <p className="purple-gradient1 text-3xl md:text-6xl font-black block md:hidden">
+        STAMPS
       </p>
       <div class="flex gap-3 justify-between h-[40px]">
         <Sort initSort={sortBy} />

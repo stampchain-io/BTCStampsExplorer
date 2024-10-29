@@ -47,7 +47,7 @@ export function Filter({
 
   return (
     <div
-      class={`border-2 border-[#660099] bg-[#0B0B0B] rounded-md flex flex-col items-center gap-1 h-fit relative z-[100] ${
+      class={`border-2 border-[#660099] bg-[#0B0B0B] rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
         open ? "px-6 py-4" : "p-[10px]"
       }`}
     >
