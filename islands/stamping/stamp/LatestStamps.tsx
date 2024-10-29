@@ -30,7 +30,7 @@ const LatestStamps = () => {
         LATEST STAMPS
       </h1>
       <p className="text-2xl md:text-5xl text-[#AA00FF]">LOREM IPSUM</p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
         {Array(8).fill(0).map((_, index) => {
           return (
             <StampCard
@@ -43,9 +43,11 @@ const LatestStamps = () => {
           );
         })}
       </div>
-      <a className="text-[#8800CC] text-sm md:text-base font-extrabold border-2 border-[#8800CC] py-1 text-center min-w-[132px] rounded-md cursor-pointer">
-        View All
-      </a>
+      <div className="w-full flex justify-end items-end">
+        <a className="text-[#660099] text-sm md:text-base font-extrabold border-2 border-[#660099] py-1 text-center min-w-[120px] rounded-md cursor-pointer">
+          View All
+        </a>
+      </div>
     </div>
   );
 };

@@ -183,45 +183,40 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                       >
                         {convertToEmoji(src20.tick)}
                       </a>
-                      <p className="text-lg text-[#666666] font-light text-right flex flex-col">
-                        SUPPLY{" "}
-                        <span className="font-bold text-[#999999]">
-                          {Number(src20.max).toLocaleString()}
-                        </span>
-                      </p>
                     </div>
-                    {
-                      /* <p>
-                      Block:{" "}
-                      <span class="text-lg font-medium">
-                        {src20.block_index}
-                      </span>
-                    </p> */
-                    }
-                    <div className="flex justify-between">
-                      <p className="text-lg font-light text-[#999999]">
-                        PROGRESS <span className="font-bold">{progress}%</span>
-                      </p>
-                      <p className="text-lg text-[#666666] font-light text-right">
-                        LIMIT{" "}
-                        <span className="font-bold text-[#999999]">
-                          {Number(src20.lim).toLocaleString()}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="min-w-[180px] h-1 bg-[#999999] relative rounded-full">
-                        <div
-                          className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
-                          style={{ width: progressWidth }}
-                        />
-                      </div>
-                      <p className="text-lg text-[#666666] font-light text-right">
-                        MINTERS{" "}
-                        <span className="font-bold text-[#999999]">
-                          {Number(src20.holders).toLocaleString()}
-                        </span>
-                      </p>
+                    <div className="flex flex-col justify-start gap-1">
+                      {progress == "100"
+                        ? (
+                          <>
+                            <p className="text-lg text-[#666666] font-light flex gap-1">
+                              PRICE{" "}
+                              <span className="font-bold text-[#999999]">
+                                {Number(src20.floor_unit_price).toFixed(10)
+                                  .toLocaleString()}
+                              </span>
+                            </p>
+                            <p className="text-lg text-[#666666] font-light flex gap-1">
+                              MARKETCAP{" "}
+                              <span className="font-bold text-[#999999]">
+                                {Number(src20.mcap).toFixed(2).toLocaleString()}
+                              </span>
+                            </p>
+                          </>
+                        )
+                        : (
+                          <div className="flex flex-col gap-1">
+                            <p className="text-lg font-light text-[#999999]">
+                              PROGRESS{" "}
+                              <span className="font-bold">{progress}%</span>
+                            </p>
+                            <div className="min-w-[180px] h-1 bg-[#999999] relative rounded-full">
+                              <div
+                                className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
+                                style={{ width: progressWidth }}
+                              />
+                            </div>
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>

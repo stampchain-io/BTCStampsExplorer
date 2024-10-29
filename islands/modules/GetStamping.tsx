@@ -18,7 +18,7 @@ export const GetStampingModule = () => {
       </div>
 
       <div className="flex flex-col gap-9 min-w-[336px]">
-        <div className="flex gap-6 font-extrabold text-sm md:text-xl justify-center">
+        <div className="flex md:gap-6 gap-1 font-extrabold text-sm md:text-xl md:justify-center justify-end">
           <a
             href="/faq"
             f-partial="/faq"
@@ -34,11 +34,13 @@ export const GetStampingModule = () => {
             STAMP
           </a>
         </div>
-        <div className="flex gap-6 text-xs md:text-lg text-[#666666]">
-          <p>
-            $<span className="font-bold">60,935.68</span>
+        <div className="flex  md:gap-6 gap-1 text-xs md:text-lg text-[#666666] md:flex-row flex-col">
+          <p className=" text-end md:text-start ">
+            $<span className="font-bold">
+              60,935.68
+            </span>
           </p>
-          <p className="font-medium">
+          <p className="font-medium  text-end md:text-start">
             Fees: <span className="font-bold">8 sat/vB</span> $0.68
           </p>
         </div>
