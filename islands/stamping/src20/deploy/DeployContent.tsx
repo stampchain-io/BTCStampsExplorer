@@ -174,7 +174,7 @@ export function DeployContent(
                   class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
                 >
                   <img
-                    src="/img/stamping/image-upload.svg"
+                    src="/img/icons/image-upload.svg"
                     class="w-12 h-12"
                     alt=""
                   />

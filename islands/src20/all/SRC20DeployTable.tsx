@@ -181,36 +181,13 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                   />
                   <div class="w-full">
                     <div class="flex justify-between">
-                      <a href={href} class="flex gap-4 text-xl uppercase">
+                      <a
+                        href={href}
+                        class="flex gap-4 text-sm md:text-xl uppercase"
+                      >
                         {convertToEmoji(src20.tick)}
-                        <div className="flex gap-2">
-                          {src20.email && (
-                            <img
-                              width="18px"
-                              src="/img/src20/details/EnvelopeSimple.svg"
-                            />
-                          )}
-                          {src20.web && (
-                            <img
-                              width="18px"
-                              src="/img/src20/details/Globe.svg"
-                            />
-                          )}
-                          {src20.tg && (
-                            <img
-                              width="18px"
-                              src="/img/src20/details/TelegramLogo.svg"
-                            />
-                          )}
-                          {src20.x && (
-                            <img
-                              width="18px"
-                              src="/img/src20/details/XLogo.svg"
-                            />
-                          )}
-                        </div>
                       </a>
-                      <p className="text-lg text-[#666666] font-light">
+                      <p className="text-xs md:text-lg text-[#666666] font-light">
                         SUPPLY{" "}
                         <span className="font-bold text-[#999999]">
                           {Number(src20.max).toLocaleString()}
@@ -218,13 +195,13 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                       </p>
                     </div>
                     <div className="flex justify-between">
-                      <p className="text-lg text-[#666666] font-light">
+                      <p className="text-xs md:text-lg text-[#666666] font-light">
                         MARKETCAP{" "}
                         <span className="font-bold text-[#999999]">
                           {Number(src20.mcap).toFixed(2).toLocaleString()}
                         </span>
                       </p>
-                      <p className="text-lg text-[#666666] font-light">
+                      <p className="text-xs md:text-lg text-[#666666] font-light">
                         CREATOR{" "}
                         <span className="font-bold text-[#999999]">
                           {src20.destination_name
@@ -234,14 +211,14 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                       </p>
                     </div>
                     <div class="flex justify-between">
-                      <p className="text-lg text-[#666666] font-light">
+                      <p className="text-xs md:text-lg text-[#666666] font-light">
                         PRICE{" "}
                         <span className="font-bold text-[#999999]">
                           {Number(src20.floor_unit_price).toFixed(10)
                             .toLocaleString()}
                         </span>
                       </p>
-                      <p className="text-lg text-[#666666] font-light">
+                      <p className="text-xs md:text-lg text-[#666666] font-light">
                         HOLDERS{" "}
                         <span className="font-bold text-[#999999]">
                           {Number(src20.holders).toLocaleString()}

@@ -168,7 +168,7 @@ export function MintContent({
             class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[108px] md:min-w-[120px] w-[108px] md:w-[120px] h-[108px] md:h-[120px] content-center bg-[#660099] flex flex-col"
           >
             <img
-              src="/img/stamping/image-upload.svg"
+              src="/img/icons/image-upload.svg"
               class="w-12 h-12"
               alt=""
             />

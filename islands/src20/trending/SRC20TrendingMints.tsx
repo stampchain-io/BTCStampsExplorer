@@ -177,28 +177,13 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                   />
                   <div class="w-full">
                     <div class="flex justify-between">
-                      <a href={href} class="text-xl uppercase flex gap-4">
+                      <a
+                        href={href}
+                        class="text-sm md:text-xl uppercase flex gap-4"
+                      >
                         {convertToEmoji(src20.tick)}
-                        <div className="flex gap-2">
-                          <img
-                            width="20px"
-                            src="/img/src20/details/EnvelopeSimple.svg"
-                          />
-                          <img
-                            width="20px"
-                            src="/img/src20/details/Globe.svg"
-                          />
-                          <img
-                            width="20px"
-                            src="/img/src20/details/TelegramLogo.svg"
-                          />
-                          <img
-                            width="20px"
-                            src="/img/src20/details/XLogo.svg"
-                          />
-                        </div>
                       </a>
-                      <p className="text-lg text-[#666666] font-light">
+                      <p className="text-xs md:text-lg text-[#666666] font-light">
                         SUPPLY{" "}
                         <span className="font-bold text-[#999999]">
                           {Number(src20.max).toLocaleString()}
@@ -214,10 +199,10 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                     </p> */
                     }
                     <div className="flex justify-between">
-                      <p className="text-lg font-light text-[#999999]">
+                      <p className="text-xs md:text-lg font-light text-[#999999]">
                         PROGRESS <span className="font-bold">{progress}%</span>
                       </p>
-                      <p className="text-lg text-[#666666] font-light">
+                      <p className="text-xs md:text-lg text-[#666666] font-light">
                         LIMIT{" "}
                         <span className="font-bold text-[#999999]">
                           {Number(src20.lim).toLocaleString()}
@@ -231,7 +216,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                           style={{ width: progressWidth }}
                         />
                       </div>
-                      <p className="text-lg text-[#666666] font-light">
+                      <p className="text-xs md:text-lg text-[#666666] font-light">
                         MINTERS{" "}
                         <span className="font-bold text-[#999999]">
                           {Number(src20.holders).toLocaleString()}
