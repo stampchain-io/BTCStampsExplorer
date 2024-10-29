@@ -306,7 +306,7 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
           filter={false}
           setting={true}
         />
-        <div className="grid grid-cols-4 md:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4 mt-6">
+        <div className="grid grid-cols-4 md:grid-cols-6 xl:grid-cols-8 gap-2 md:gap-4 mt-6">
           {stamps.map((stamp, index) => (
             <StampCard
               key={index}
