@@ -46,7 +46,6 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
 }
 .gray-gradient4 {
   background: linear-gradient(to right, #666666, #999999);

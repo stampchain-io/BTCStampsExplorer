@@ -50,7 +50,7 @@
 /* Track */
 ::-webkit-scrollbar {
   border-radius: 3px;
-  height: 24px;
+  height: 6px;
   width: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
