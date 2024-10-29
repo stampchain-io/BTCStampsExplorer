@@ -6,7 +6,7 @@ interface FooterLink {
 
 const resourcesStampLinks: FooterLink[] = [
   { title: "FAQ", href: "/faq" },
-  { title: "HOW-TO", href: "#" },
+  { title: "HOW-TO", href: "/howto" },
   {
     title: "MEDIA",
     href: "https://github.com/stampchain-io/",
