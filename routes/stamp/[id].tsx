@@ -172,7 +172,7 @@ export default function StampPage(props: StampDetailPageProps) {
         />
 
         <div>
-          <h1 class="text-3xl md:text-7xl text-left mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#7200B4] to-[#FF00E9] font-black">
+          <h1 class="text-3xl md:text-7xl text-left mb-2 bg-clip-text text-transparent purple-gradient1 font-black">
             LATEST STAMPS
           </h1>
           <div class="flex flex-col gap-12">
