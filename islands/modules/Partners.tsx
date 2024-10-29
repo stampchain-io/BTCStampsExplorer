@@ -4,9 +4,9 @@ interface Partner {
 }
 
 const partners: Partner[] = [
-  { name: "Bitfinity", imageSrc: "/img/home/partner-bitfinity-banner.png" },
-  { name: "R8", imageSrc: "/img/home/partner-r8-banner.png" },
-  { name: "Bitname", imageSrc: "/img/home/partner-bitname-banner.png" },
+  { name: "Bitfinity", imageSrc: "/img/home/partner-bitfinity-banner.svg" },
+  { name: "R8", imageSrc: "/img/home/partner-r8-banner.svg" },
+  { name: "Bitname", imageSrc: "/img/home/partner-bitname-banner.svg" },
 ];
 
 function PartnerCard({ imageSrc, name }: Partner) {

@@ -132,7 +132,7 @@ export default function StampPage(props: StampDetailPageProps) {
     },
   ];
 
-  console.log(sections);
+  console.log("stamp====>", stamp);
 
   return (
     <>

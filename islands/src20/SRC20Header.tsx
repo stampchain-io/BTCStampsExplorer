@@ -34,7 +34,7 @@ export const SRC20Header = (
 
   return (
     <div className="tabs">
-      <div class="flex flex-col-reverse lg:flex-row justify-between items-center gap-3 w-full">
+      <div class="flex flex-row justify-between items-center gap-3 w-full">
         <div class="flex gap-6 md:gap-8 items-end">
           <p
             class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
