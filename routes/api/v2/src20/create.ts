@@ -18,10 +18,12 @@ export const handler: Handlers<TX | TXError> = {
       await UtilityService.performChecks(body.op, body);
 
       // Use SRC20Service.TransactionService instead of direct import
-      return await SRC20Service.TransactionService.handleOperation(
+      const result = await SRC20Service.TransactionService.handleOperation(
         body.op.toLowerCase() as "deploy" | "mint" | "transfer",
         body,
       );
+
+      return ResponseUtil.success(result);
     } catch (error) {
       console.error("Error processing request:", error);
       if (error instanceof SyntaxError) {
