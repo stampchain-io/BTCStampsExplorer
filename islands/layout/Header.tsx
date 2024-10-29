@@ -33,16 +33,16 @@ const navLinks: NavLink[] = [
     href: "#",
     subLinks: [
       { title: "ABOUT", href: "/about" },
-      { title: "DONATE", href: "#" },
-      { title: "CONTACT", href: "#" },
+      { title: "DONATE", href: "/donate" },
+      { title: "CONTACT", href: "/contact" },
     ],
   },
 ];
 
 const socialLinks = [
   { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.svg" },
-  { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.svg" },
   { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.svg" },
+  { href: "https://discord.gg/PCZU6xrt", icon: "/img/footer/DiscordLogo.svg" },
   {
     href: "https://github.com/stampchain-io/",
     icon: "/img/footer/GithubLogo.svg",
@@ -154,7 +154,7 @@ export function Header() {
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className="purple-gradient2 text-3xl md:text-4xl xl:text-5xl font-black italic pr-2"
+          className="purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl md:text-4xl xl:text-5xl font-black italic pr-2"
         >
           STAMPCHAIN
         </a>
@@ -215,7 +215,7 @@ export function Header() {
             <a key={link.href} href={link.href} target="_blank">
               <img
                 src={link.icon}
-                className={`w-12 ${
+                className={`w-10 sm:w-12 ${
                   index === 0
                     ? "mr-[13px]"
                     : index === 1

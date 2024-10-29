@@ -62,3 +62,31 @@
 .purple-bg-gradient {
   background: linear-gradient(to right, #8800cc, #7700aa, #660099);
 }
+
+/* Hoverable Text Gradient Colors */
+.purple-hover-gradient {
+  background: linear-gradient(
+    90deg,
+    #440066 0%,
+    #660099 50%,
+    #8800cc 75%,
+    #aa00ff 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+.purple-hover-gradient:hover {
+  background: linear-gradient(
+    90deg,
+    #440066 0%,
+    #660099 25%,
+    #8800cc 50%,
+    #aa00ff 75%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
