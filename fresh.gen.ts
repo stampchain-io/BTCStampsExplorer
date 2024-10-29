@@ -73,6 +73,11 @@ import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/share
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
 import * as $home_index from "./routes/home/index.tsx";
+import * as $howto_deploytoken_index from "./routes/howto/deploytoken/index.tsx";
+import * as $howto_getstamping_index from "./routes/howto/getstamping/index.tsx";
+import * as $howto_index from "./routes/howto/index.tsx";
+import * as $howto_mint_index from "./routes/howto/mint/index.tsx";
+import * as $howto_transfer_index from "./routes/howto/transfer/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $quicknode_getPrice from "./routes/quicknode/getPrice.ts";
@@ -267,6 +272,11 @@ const manifest = {
       $handlers_sharedCollectionHandler,
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
     "./routes/home/index.tsx": $home_index,
+    "./routes/howto/deploytoken/index.tsx": $howto_deploytoken_index,
+    "./routes/howto/getstamping/index.tsx": $howto_getstamping_index,
+    "./routes/howto/index.tsx": $howto_index,
+    "./routes/howto/mint/index.tsx": $howto_mint_index,
+    "./routes/howto/transfer/index.tsx": $howto_transfer_index,
     "./routes/index.tsx": $index,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/quicknode/getPrice.ts": $quicknode_getPrice,
