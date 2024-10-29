@@ -1,3 +1,5 @@
+import { useState } from "preact/hooks";
+
 interface FooterLink {
   title: string;
   href: string;
@@ -28,16 +30,31 @@ const stapmChainLinks: FooterLink[] = [
 ];
 
 const socialLinks = [
-  { href: "https://x.com/Stampchain", icon: "/img/footer/XLogo.svg" },
-  { href: "https://t.me/BitcoinStamps", icon: "/img/footer/TelegramLogo.svg" },
-  { href: "https://discord.gg/BRYRt4bH", icon: "/img/footer/DiscordLogo.svg" },
+  {
+    href: "https://x.com/Stampchain",
+    icon: "/img/footer/XLogo.svg",
+    hoverIcon: "/img/footer/XLogo-hover.svg",
+  },
+  {
+    href: "https://t.me/BitcoinStamps",
+    icon: "/img/footer/TelegramLogo.svg",
+    hoverIcon: "/img/footer/TelegramLogo-hover.svg",
+  },
+  {
+    href: "https://discord.gg/BRYRt4bH",
+    icon: "/img/footer/DiscordLogo.svg",
+    hoverIcon: "/img/footer/DiscordLogo-hover.svg",
+  },
   {
     href: "https://github.com/stampchain-io/",
     icon: "/img/footer/GithubLogo.svg",
+    hoverIcon: "/img/footer/GithubLogo-hover.svg",
   },
 ];
 
 export function Footer() {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
     <footer className="px-3 md:px-6 xl:px-12 py-6 md:py-[72px] text-[#8800CC] font-medium max-w-[1440px] w-full mx-auto flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg">
       <div className="w-full flex flex-col gap-1 items-center md:items-start">
@@ -52,7 +69,7 @@ export function Footer() {
           {socialLinks.map((link, index) => (
             <a key={link.href} href={link.href} target="_blank">
               <img
-                src={link.icon}
+                src={hoveredIndex === index ? link.hoverIcon : link.icon}
                 className={`w-11 h-10 ${
                   index === 0
                     ? "mr-[13px]"
@@ -63,6 +80,10 @@ export function Footer() {
                     : ""
                 }`}
                 alt=""
+                onMouseEnter={() =>
+                  setHoveredIndex(index)}
+                onMouseLeave={() =>
+                  setHoveredIndex(null)}
               />
             </a>
           ))}
