@@ -34,22 +34,22 @@ export class StampValidationService {
     if (!assetName) {
       return this.generateAvailableAssetName();
     }
-  // FIXME: This will only allow named assets, not numeric to be defined.
   // FIXME: We need to check and validate the users address has XCP in the wallet for a cleaner error than 'insufficient funds'
   // FIXME: this should also likely check the qty on the issuance value
 
-
     const upperCaseAssetName = assetName.toUpperCase();
 
-    if (upperCaseAssetName.length > 13) {
-      throw new Error("Asset name must not exceed 13 characters.");
-    }
-
     if (upperCaseAssetName.startsWith("A")) {
-      throw new Error("Asset name must not start with 'A'.");
+      const numericPart = BigInt(upperCaseAssetName.slice(1));
+      const min = BigInt(26n ** 12n + 1n);
+      const max = BigInt(2n ** 64n - 1n);
+      
+      if (numericPart < min || numericPart > max) {
+    throw new Error(`Numeric assets must be between ${min} and ${max}.`);
+      }
     }
 
-    if (!/^[B-Z][A-Z]{0,12}$/.test(upperCaseAssetName)) {
+    if (!/^[B-Z][A-Z]{0,12}$/.test(upperCaseAssetName) && !upperCaseAssetName.startsWith("A")) {
       throw new Error(
         "Name must start with letters (B-Z), contain only uppercase letters (A-Z), and must not exceed 13 characters.",
       );

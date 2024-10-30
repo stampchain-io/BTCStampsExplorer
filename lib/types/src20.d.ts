@@ -1,10 +1,10 @@
-import { Buffer } from "buffer";
+import type { BufferLike } from "./utils.d.ts";
 
 type INETWORK = "mainnet" | "testnet";
 
 export interface VOUT {
   address?: string;
-  script?: Buffer;
+  script?: BufferLike;
   value: number;
 }
 
@@ -12,52 +12,12 @@ export interface PSBTInput {
   hash: string;
   index: number;
   witnessUtxo?: {
-    script: Buffer;
+    script: BufferLike;
     value: number;
   };
-  nonWitnessUtxo?: Buffer;
-  redeemScript?: Buffer;
+  nonWitnessUtxo?: BufferLike;
+  redeemScript?: BufferLike;
   sequence?: number;
-}
-
-export interface IPrepareSRC20TX {
-  network: string;
-  changeAddress: string;
-  toAddress: string;
-  feeRate: number;
-  transferString: string;
-  enableRBF?: boolean;
-}
-
-export interface IMintSRC20 extends Omit<IPrepareSRC20TX, "transferString"> {
-  tick: string;
-  amt: string;
-}
-
-export interface IDeploySRC20 extends Omit<IPrepareSRC20TX, "transferString"> {
-  tick: string;
-  max: string;
-  lim: string;
-  dec?: number;
-  x?: string;
-  web?: string;
-  email?: string;
-  tg?: string;
-  description?: string;
-}
-
-export interface ITransferSRC20
-  extends Omit<IPrepareSRC20TX, "transferString"> {
-  fromAddress: string;
-  tick: string;
-  amt: string;
-}
-
-export interface IPrepareSRC20TXResult {
-  psbtHex: string;
-  fee: number;
-  change: number;
-  inputsToSign: Array<{ index: number }>;
 }
 
 export interface SRC20OperationResult {
@@ -70,6 +30,7 @@ export type SRC20Operation = "deploy" | "mint" | "transfer";
 
 export interface InputData {
   op: SRC20Operation;
+  sourceAddress: string;
   toAddress: string;
   fromAddress?: string;
   changeAddress: string;
