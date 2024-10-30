@@ -1,41 +1,47 @@
-// Shared constants for both frontend and backend
-export const TX_SIZES = {
-  VERSION: 4,
-  MARKER: 1,
-  FLAG: 1,
-  LOCKTIME: 4,
-  P2WSH_OUTPUT: 43, // 8 (value) + 1 (script length) + 34 (script)
-  P2WPKH_OUTPUT: 31, // 8 (value) + 1 (script length) + 22 (script)
-  P2WSH_INPUT: 41, // Previous output (36) + sequence (4) + script length (1)
-  WITNESS_OVERHEAD: 2, // Count and length fields
-  WITNESS_STACK_ITEM: 107, // Typical witness stack size for P2WSH
-  P2PKH_INPUT: 148, // Previous output (36) + script length (1) + scriptSig (107) + sequence (4)
-  P2SH_INPUT: 297, // Previous output (36) + script length (1) + scriptSig (256) + sequence (4)
-  P2TR_INPUT: 65, // Taproot input size
+import { TX_CONSTANTS } from "./constants.ts";
+import type { ScriptType, TransactionSizeOptions } from "$types/index.d.ts";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 
-  // Helper method for weight to vbyte conversion
-  weightToVsize(weight: number): number {
-    return Math.ceil(weight / 4);
-  },
-};
+export function estimateTransactionSize({
+  inputs,
+  outputs,
+  includeChangeOutput = true,
+  changeOutputType = "P2WPKH",
+}: TransactionSizeOptions): number {
+  // Base transaction size
+  let size = TX_CONSTANTS.VERSION + TX_CONSTANTS.LOCKTIME;
 
-export function estimateP2WSHTransactionSize(fileSize: number): number {
-  const dataOutputCount = Math.ceil(fileSize / 32);
-  const changeOutputCount = 1;
-  const inputCount = 1; // Assume one input for estimation
+  // Check if any input is witness
+  const hasWitness = inputs.some((input) => {
+    const scriptInfo = getScriptTypeInfo(input.type);
+    return scriptInfo.isWitness;
+  });
 
-  const baseSize = TX_SIZES.VERSION + TX_SIZES.LOCKTIME;
-  const witnessSize = TX_SIZES.MARKER + TX_SIZES.FLAG +
-    (inputCount * TX_SIZES.WITNESS_STACK_ITEM);
+  // Add marker and flag if transaction has witness data
+  if (hasWitness) {
+    size += TX_CONSTANTS.MARKER + TX_CONSTANTS.FLAG;
+  }
 
-  const outputsSize = (dataOutputCount * TX_SIZES.P2WSH_OUTPUT) +
-    (changeOutputCount * TX_SIZES.P2WPKH_OUTPUT);
+  // Add input sizes
+  const inputSizes = inputs.reduce((sum, input) => {
+    const scriptInfo = getScriptTypeInfo(input.type);
+    return sum + scriptInfo.size;
+  }, 0);
+  size += inputSizes;
 
-  const inputsSize = inputCount * TX_SIZES.P2WSH_INPUT;
+  // Add output sizes
+  const outputSizes = outputs.reduce((sum, output) => {
+    const scriptInfo = getScriptTypeInfo(output.type);
+    return sum + scriptInfo.size;
+  }, 0);
+  size += outputSizes;
 
-  // Calculate weight units
-  const totalWeight = (baseSize + inputsSize + outputsSize) * 4 + witnessSize;
+  // Add change output if needed
+  if (includeChangeOutput) {
+    const changeScriptInfo = getScriptTypeInfo(changeOutputType);
+    size += changeScriptInfo.size;
+  }
 
-  // Convert to vbytes
-  return Math.ceil(totalWeight / 4);
+  // Convert to virtual size (weight units / 4)
+  return TX_CONSTANTS.weightToVsize(size);
 }

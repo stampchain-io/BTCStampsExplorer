@@ -29,6 +29,26 @@ export interface Dispense {
   dispenser_details: any | null;
 }
 
+interface DispenseEvent {
+  event_index: number;
+  event: "DISPENSE";
+  params: {
+    asset: string;
+    block_index: number;
+    btc_amount: number;
+    destination: string;
+    dispense_index: number;
+    dispense_quantity: number;
+    dispenser_tx_hash: string;
+    source: string;
+    tx_hash: string;
+    tx_index: number;
+  };
+  tx_hash: string;
+  block_index: number;
+  timestamp: string | null;
+}
+
 export interface Fairminter {
   tx_hash: string;
   tx_index: number;

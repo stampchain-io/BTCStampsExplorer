@@ -22,8 +22,11 @@ export const handler: Handlers<TX | TXError> = {
       assetName = await StampValidationService.validateAndPrepareAssetName(
         body.assetName,
       );
-    } catch (error) {
-      return ResponseUtil.error(error.message, 400);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return ResponseUtil.error(error.message, 400);
+      }
+      return ResponseUtil.error("Invalid asset name", 400);
     }
 
     const prepare = {
@@ -31,14 +34,20 @@ export const handler: Handlers<TX | TXError> = {
       prefix: "stamp" as const,
       assetName: assetName,
       satsPerKB: Number(body.satsPerKB),
-      service_fee: body.service_fee ||
-        parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS),
-      service_fee_address: body.service_fee_address ||
-        serverConfig.MINTING_SERVICE_FEE_ADDRESS,
+      // Only include service fee if it's defined
+      ...(body.service_fee && {
+        service_fee: body.service_fee ||
+          parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS),
+      }),
+      // Only include service fee address if service_fee is defined
+      ...(body.service_fee && {
+        service_fee_address: body.service_fee_address ||
+          serverConfig.MINTING_SERVICE_FEE_ADDRESS,
+      }),
     };
 
     try {
-      const mint_tx = await StampMintService.mintStampCIP33(prepare);
+      const mint_tx = await StampMintService.createStampIssuance(prepare);
       if (!mint_tx || !mint_tx.psbt) {
         console.error("Invalid mint_tx structure:", mint_tx);
         return ResponseUtil.error(
@@ -56,7 +65,8 @@ export const handler: Handlers<TX | TXError> = {
         let vout = 0;
 
         if (input.hash && typeof input.index === "number") {
-          txid = Buffer.from(input.hash).reverse().toString("hex");
+          const hashBuffer = Buffer.from(input.hash);
+          txid = hashBuffer.reverse().toString("hex");
           vout = input.index;
         } else {
           throw new Error(
@@ -64,11 +74,10 @@ export const handler: Handlers<TX | TXError> = {
           );
         }
 
-        // Ensure signingIndex corresponds to the correct input index
         return {
           txid,
           vout,
-          signingIndex: index, // This ensures the signingIndex matches the input index
+          signingIndex: index,
         };
       });
 
@@ -84,11 +93,13 @@ export const handler: Handlers<TX | TXError> = {
         change_value: mint_tx.totalChangeOutput,
         txDetails: txDetails,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Minting error:", error);
 
-      const errorMessage = error.message ||
-        "An unexpected error occurred during minting";
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "An unexpected error occurred during minting";
+
       let statusCode = 400;
 
       if (errorMessage.includes("insufficient funds")) {
