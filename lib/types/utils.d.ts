@@ -47,3 +47,15 @@ type Output = {
   script: string;
   value: number;
 };
+
+// Define BufferLike interface to match Node's Buffer API that we're using
+export interface BufferLike {
+  readonly length: number;
+  readonly buffer: ArrayBuffer;
+  [key: number]: number;
+  slice(start?: number, end?: number): BufferLike;
+  toString(encoding?: string): string;
+}
+
+// Type alias for when we might accept either Buffer or Uint8Array
+export type BinaryData = BufferLike | Uint8Array;

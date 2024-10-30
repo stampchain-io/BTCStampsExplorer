@@ -1,7 +1,8 @@
-import { InputData, TX, TXError } from "globals";
+import { TX, TXError } from "globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { deploySRC20, mintSRC20, transferSRC20 } from "./index.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$types/index.d.ts";
+import { InputData } from "$types/index.d.ts";
 
 export class SRC20TransactionService {
   static async handleOperation(

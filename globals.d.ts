@@ -509,26 +509,6 @@ export interface TX {
 export interface TXError {
   error: string;
 }
-
-export interface InputData {
-  op: string;
-  toAddress: string;
-  publicKey?: string;
-  changeAddress: string;
-  fromAddress?: string;
-  tick: string;
-  feeRate: number;
-  max?: number | string;
-  lim?: number | string;
-  dec?: number;
-  amt?: number | string;
-  x?: string;
-  web?: string;
-  email?: string;
-  tg?: string;
-  description?: string;
-}
-
 export interface MintStampInputData {
   sourceWallet: string;
   assetName?: string;
@@ -582,5 +562,4 @@ declare global {
     };
   }
 }
-
 export {};

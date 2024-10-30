@@ -21,27 +21,29 @@ export class SRC20PSBTService {
   private static readonly STAMP_PREFIX = "stamp:";
 
   static async preparePSBT({
-    sourceWallet,
+    sourceAddress,
     toAddress,
     src20Action,
     satsPerVB,
     service_fee,
     service_fee_address,
+    changeAddress,
   }: {
-    sourceWallet: string;
+    sourceAddress: string;
     toAddress: string;
     src20Action: string | object;
     satsPerVB: number;
     service_fee: number;
     service_fee_address: string;
+    changeAddress: string;
   }) {
     console.log("Entering preparePSBT with params:", {
-      sourceWallet,
+      sourceAddress,
       toAddress,
       src20Action,
       satsPerVB,
       service_fee,
-      service_fee_address,
+      service_fee_address,  
     });
 
     const network = bitcoin.networks.bitcoin;
@@ -89,7 +91,7 @@ export class SRC20PSBTService {
 
     // Calculate fees with witness data
     const { inputs, change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
-      sourceWallet,
+      sourceAddress,
       vouts,
       satsPerVB,
       0,
@@ -128,7 +130,7 @@ export class SRC20PSBTService {
     // Add change output using the same type as the input
     if (change > this.DUST_SIZE) {
       const changePayment = SRC20PSBTService.createOutputMatchingInputType(
-        sourceWallet,
+        sourceAddress,
         inputType,
         network,
       );
@@ -202,7 +204,7 @@ export class SRC20PSBTService {
       totalDustValue: vouts.reduce((sum, vout) => 
           vout.value <= this.DUST_SIZE ? sum + vout.value : sum, 0),
       estMinerFee,
-      changeAddress: sourceWallet,
+      changeAddress: sourceAddress,
     };
   }
 
