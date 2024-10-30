@@ -44,7 +44,6 @@ import * as $api_v2_src20_tick_tick_index from "./routes/api/v2/src20/tick/[tick
 import * as $api_v2_src20_tick_tick_mint_data from "./routes/api/v2/src20/tick/[tick]/mint_data.ts";
 import * as $api_v2_src20_tick_index from "./routes/api/v2/src20/tick/index.ts";
 import * as $api_v2_src20_tx_tx_hash_ from "./routes/api/v2/src20/tx/[tx_hash].ts";
-import * as $api_v2_src20_v2create from "./routes/api/v2/src20/v2create.ts";
 import * as $api_v2_stamps_id_ from "./routes/api/v2/stamps/[id].ts";
 import * as $api_v2_stamps_balance_address_ from "./routes/api/v2/stamps/balance/[address].tsx";
 import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
@@ -238,7 +237,6 @@ const manifest = {
       $api_v2_src20_tick_tick_mint_data,
     "./routes/api/v2/src20/tick/index.ts": $api_v2_src20_tick_index,
     "./routes/api/v2/src20/tx/[tx_hash].ts": $api_v2_src20_tx_tx_hash_,
-    "./routes/api/v2/src20/v2create.ts": $api_v2_src20_v2create,
     "./routes/api/v2/stamps/[id].ts": $api_v2_stamps_id_,
     "./routes/api/v2/stamps/balance/[address].tsx":
       $api_v2_stamps_balance_address_,

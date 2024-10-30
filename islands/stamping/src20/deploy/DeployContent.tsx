@@ -281,7 +281,7 @@ export function DeployContent(
         </div>
       </div>
 
-      <div className="dark-gradient p-3 md:p-6 w-full">
+      <div className="dark-gradient p-3 md:p-6 w-full z-[10]">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
