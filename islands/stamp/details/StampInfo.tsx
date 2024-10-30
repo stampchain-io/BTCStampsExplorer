@@ -102,6 +102,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               <a
                 className="text-[#8800CC]"
                 href={`/wallet/${stamp.creator}`}
+                target="_parent"
               >
                 {creatorDisplay}
               </a>

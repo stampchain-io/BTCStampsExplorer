@@ -108,6 +108,7 @@ import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletD
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
 import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
 import * as $Wallet_details_WalletSendModal from "./islands/Wallet/details/WalletSendModal.tsx";
+import * as $Wallet_details_WalletTransferModal from "./islands/Wallet/details/WalletTransferModal.tsx";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
@@ -164,6 +165,7 @@ import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampR
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
 import * as $stamping_FeeEstimation from "./islands/stamping/FeeEstimation.tsx";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
+import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
 import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/deploy/DeployContent.tsx";
 import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
@@ -311,6 +313,8 @@ const manifest = {
       $Wallet_details_WalletReceiveModal,
     "./islands/Wallet/details/WalletSendModal.tsx":
       $Wallet_details_WalletSendModal,
+    "./islands/Wallet/details/WalletTransferModal.tsx":
+      $Wallet_details_WalletTransferModal,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
@@ -379,6 +383,7 @@ const manifest = {
       $stamp_details_StampTextContent,
     "./islands/stamping/FeeEstimation.tsx": $stamping_FeeEstimation,
     "./islands/stamping/InputField.tsx": $stamping_InputField,
+    "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
     "./islands/stamping/src20/deploy/DeployContent.tsx":
       $stamping_src20_deploy_DeployContent,
