@@ -5,3 +5,4 @@ export * from "./wallet.d.ts";
 export * from "./marketData.d.ts";
 export * from "./utils.d.ts";
 export * from "./stamp.d.ts";
+export * from "./transaction.d.ts";

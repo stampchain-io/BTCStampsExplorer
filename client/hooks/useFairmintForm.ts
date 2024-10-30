@@ -6,13 +6,12 @@ import {
   walletContext,
 } from "$client/wallet/wallet.ts";
 import axiod from "axiod";
-
-// Add these two import statements
-import { decode as atob } from "https://deno.land/std@0.95.0/encoding/base64.ts";
-import { encode as hexEncode } from "https://deno.land/std@0.95.0/encoding/hex.ts";
+import { decodeBase64 } from "@std/encoding/base64";
+import { encodeHex } from "@std/encoding/hex";
+import { Config } from "globals";
 
 export function useFairmintForm(fairminters: any[]) {
-  const { config, isLoading: configLoading } = useConfig();
+  const { config, isLoading: configLoading } = useConfig<Config>();
   const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000);
   const [isLoading, setIsLoading] = useState(configLoading || feeLoading);
 
@@ -74,6 +73,11 @@ export function useFairmintForm(fairminters: any[]) {
       return;
     }
 
+    if (!config) {
+      setApiError("Configuration not loaded");
+      return;
+    }
+
     if (!formState.asset || !formState.quantity || formState.fee <= 0) {
       setApiError("Please fill in all required fields.");
       return;
@@ -91,6 +95,8 @@ export function useFairmintForm(fairminters: any[]) {
         options: {
           fee_per_kb: formState.fee * 1000, // sat/byte to sat/kB
         },
+        service_fee: config?.MINTING_SERVICE_FEE,
+        service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
       });
 
       console.log("API response:", response.data);
@@ -105,8 +111,8 @@ export function useFairmintForm(fairminters: any[]) {
       console.log("psbtBase64:", psbtBase64);
 
       // Convert the PSBT from Base64 to Hex
-      const psbtUint8Array = atob(psbtBase64);
-      const psbtHexArray = hexEncode(new Uint8Array(psbtUint8Array));
+      const psbtUint8Array = decodeBase64(psbtBase64);
+      const psbtHexArray = encodeHex(psbtUint8Array);
       const psbtHex = new TextDecoder().decode(psbtHexArray);
 
       console.log("psbtHex:", psbtHex);
@@ -133,9 +139,9 @@ export function useFairmintForm(fairminters: any[]) {
 
   const feeEstimationParams = {
     type: "fairmint",
-    fileSize: 0,
-    issuance: 1,
-    BTCPrice: 0, // Replace with actual BTC price if needed
+    inputType: "P2WPKH",
+    outputTypes: ["P2WPKH"],
+    feeRate: formState.fee,
   };
 
   return {

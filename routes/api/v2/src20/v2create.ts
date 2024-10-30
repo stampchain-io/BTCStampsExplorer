@@ -16,7 +16,7 @@ export const handler: Handlers<TX | TXError> = {
       sourceWallet,
       toAddress,
       src20Action,
-      satsPerKB,
+      satsPerVB,
       service_fee,
       service_fee_address,
     } = body;
@@ -26,7 +26,7 @@ export const handler: Handlers<TX | TXError> = {
         sourceWallet,
         toAddress,
         src20Action,
-        satsPerKB: Number(satsPerKB),
+        satsPerVB: Number(satsPerVB),
         service_fee: service_fee || 0,
         service_fee_address: service_fee_address || "",
       });

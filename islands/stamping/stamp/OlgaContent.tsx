@@ -14,15 +14,23 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import ImageFullScreen from "./ImageFullScreen.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
+import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
+
+import { Config } from "globals";
+
 const log = (message: string, data?: any) => {
   console.log(`[OlgaContent] ${message}`, data ? data : "");
 };
 
 export function OlgaContent() {
-  const config = useConfig();
+  const { config, isLoading } = useConfig<Config>();
+
+  if (isLoading) {
+    return <div>Loading configuration...</div>;
+  }
 
   if (!config) {
-    return <div>Error...</div>;
+    return <div>Error: Configuration not loaded</div>;
   }
 
   const { wallet, isConnected } = walletContext;
@@ -82,27 +90,20 @@ export function OlgaContent() {
   // Update useEffect to handle changes in isConnected and address
   useEffect(() => {
     if (isConnected && address) {
-      validateWalletAddress(address);
+      const isValid = validateWalletAddress(address);
+      if (!isValid) {
+        // Optionally disable minting or show additional UI feedback
+        setSubmissionMessage(null);
+      }
     } else {
-      // Clear the address error when no wallet is connected
       setAddressError(undefined);
     }
   }, [address, isConnected]);
 
   const validateWalletAddress = (address: string) => {
-    // Regular expressions for supported address types
-    const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // P2PKH (Legacy)
-    const bech32Regex = /^bc1q[0-9a-z]{38,59}$/; // Bech32 P2WPKH
-
-    if (p2pkhRegex.test(address) || bech32Regex.test(address)) {
-      // Supported address
-      setAddressError(undefined);
-    } else {
-      // Unsupported address
-      setAddressError(
-        "Connected wallet address type is unsupported for minting.",
-      );
-    }
+    const { isValid, error } = validateWalletAddressForMinting(address);
+    setAddressError(error);
+    return isValid;
   };
 
   const handleChangeFee = (newFee: number) => {
@@ -220,15 +221,14 @@ export function OlgaContent() {
 
   const handleMint = async () => {
     try {
-      // Before proceeding, check if there's an address error
-      if (addressError) {
-        throw new Error(addressError);
-      }
-
       log("Starting minting process");
 
       if (!isConnected) {
         throw new Error("Connect your wallet");
+      }
+
+      if (address && !validateWalletAddress(address)) {
+        throw new Error(addressError || "Invalid wallet address type");
       }
 
       if (file === null) {
@@ -244,7 +244,7 @@ export function OlgaContent() {
         console.log(`User-selected fee rate: ${fee} sat/vB`);
 
         log("Preparing mint request");
-        const mintRequest: any = {
+        const mintRequest = {
           sourceWallet: address,
           qty: issuance,
           locked: isLocked,
@@ -331,40 +331,14 @@ export function OlgaContent() {
           });
           setApiError("");
         }
-      } catch (error) {
+      } catch (error: unknown) {
         log("Error in minting process", error);
         throw error;
       }
-    } catch (error) {
-      console.error("Unexpected error in handleMint:", error);
-      let errorMessage = "An unexpected error occurred during minting";
-
-      if (error.response && error.response.data) {
-        const responseData = error.response.data;
-        if (responseData.error) {
-          errorMessage = responseData.error;
-        } else if (responseData.message) {
-          errorMessage = responseData.message;
-        } else if (responseData.data && responseData.data.message) {
-          errorMessage = responseData.data.message;
-        } else if (
-          responseData.data && responseData.data.args &&
-          responseData.data.args[0]
-        ) {
-          errorMessage = responseData.data.args[0];
-        }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-        console.error("Error stack:", error.stack);
-      }
-
-      if (errorMessage.includes("insufficient funds")) {
-        errorMessage = isPoshStamp
-          ? "Insufficiently Sized UTXO, BTC or XCP in User's Wallet"
-          : "Insufficiently Sized UTXO or BTC in User's Wallet";
-      }
-
-      console.error("Final error message:", errorMessage);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "An unexpected error occurred during minting";
       setApiError(errorMessage);
       setSubmissionMessage(null);
     }
@@ -612,11 +586,14 @@ export function OlgaContent() {
           fileType={file?.type}
           fileSize={fileSize ?? undefined}
           issuance={parseInt(issuance, 10)}
+          userAddress={address}
+          outputTypes={["P2WSH"]}
           BTCPrice={BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={false}
           onSubmit={handleMint}
           buttonName="Stamp"
+          disabled={!!addressError}
         />
 
         <StatusMessages

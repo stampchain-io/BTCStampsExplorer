@@ -1,25 +1,15 @@
-import { handleXcpV1Query } from "$lib/utils/xcpUtils.ts";
+import { XcpManager } from "$server/services/xcpService.ts";
 import { generateRandomNumber } from "$lib/utils/util.ts";
 
 export class StampValidationService {
-  // FIXME: convert to xcpv2 API endpoint
   static async checkAssetAvailability(assetName: string): Promise<boolean> {
     try {
-      const method = {
-        "jsonrpc": "2.0",
-        "id": 0,
-        "method": "get_asset_info",
-        "params": {
-          "asset": assetName,
-        },
-      };
-      const result = await handleXcpV1Query(method);
-      if (!result.legth) {
-        return true;
-      }
-      return false;
-    } catch (_error) {
-      console.log(`asset: ${assetName} not available`);
+      const result = await XcpManager.getAssetInfo(assetName);
+      // If we get no result (null), the asset is available
+      return result === null;
+    } catch (error) {
+      console.error(`Error checking asset availability for ${assetName}:`, error);
+      // Only return false for non-404 errors
       return false;
     }
   }
