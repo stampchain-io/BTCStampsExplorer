@@ -83,9 +83,10 @@ export function FeeEstimation({
           isMultisig: type === "src20" && outputTypes?.includes("P2SH"),
         });
 
-      setTxfee(minerFee / 1e8);
-      setDust(dustValue / 1e8);
-      setTotal((minerFee + dustValue + (mintfee * 1e8)) / 1e8);
+      // Store values in sats instead of BTC
+      setTxfee(minerFee);
+      setDust(dustValue);
+      setTotal(minerFee + dustValue + (mintfee * 1e8));
 
       console.log(
         `Detected input type for ${userAddress}: ${detectedInputType}`,
@@ -185,8 +186,8 @@ export function FeeEstimation({
           Estimated:{" "}
         </span>
         {coinType === "BTC"
-          ? `${total.toFixed(6)} ${coinType}`
-          : `${(total * BTCPrice).toFixed(2)} ${coinType}`}
+          ? `${total.toFixed(0)} sats`
+          : `${(total / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
       </p>
       <p className="flex items-center">
         Details
@@ -258,13 +259,13 @@ export function FeeEstimation({
           <p className="flex gap-1 items-center text-xs font-medium">
             <span className="font-light text-[#666666]">Miner Fee:</span>{" "}
             {coinType === "BTC"
-              ? `${txfee.toFixed(8)} ${coinType}`
-              : `${(txfee * BTCPrice).toFixed(2)} ${coinType}`}
+              ? `${txfee.toFixed(0)} sats`
+              : `${(txfee / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
             <span className="font-light text-[#666666]">Minting Fee:</span>{" "}
             {coinType === "BTC"
-              ? `${mintfee.toFixed(6)} ${coinType}`
+              ? `${(mintfee * 1e8).toFixed(0)} sats`
               : `${(mintfee * BTCPrice).toFixed(2)} ${coinType}`}
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
@@ -272,15 +273,15 @@ export function FeeEstimation({
             <span className="font-light text-[#666666]">Multisig Dust</span>
             {" "}
             {coinType === "BTC"
-              ? `${dust.toFixed(6)} ${coinType}`
-              : `${(dust * BTCPrice).toFixed(2)} ${coinType}`}
+              ? `${dust.toFixed(0)} sats`
+              : `${(dust / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
             <span className="font-light text-[#666666]">Total Estimated</span>
             {" "}
             {coinType === "BTC"
-              ? `${total.toFixed(8)} ${coinType}`
-              : `${(total * BTCPrice).toFixed(2)} ${coinType}`}
+              ? `${total.toFixed(0)} sats`
+              : `${(total / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
           </p>
           {/* <button onClick={onRefresh}>Refresh Fees</button> */}
         </div>
