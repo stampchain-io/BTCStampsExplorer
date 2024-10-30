@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import StampingMintingItem from "$islands/stamping/src20/mint/StampingMintingItem.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
@@ -7,6 +7,8 @@ import { abbreviateAddress } from "$lib/utils/util.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import WalletTransferModal from "$islands/Wallet/details/WalletTransferModal.tsx";
+import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
 
 interface WalletContentProps {
   stamps: any[];
@@ -48,6 +50,8 @@ const ItemHeader = (
     title = "STAMP",
     sortBy = "ASC",
     isOpen = false,
+    isOpenSetting = false,
+    handleOpenSetting = () => {},
     handleOpen = () => {},
     isOpenFilter = false,
     handleOpenFilter = () => {},
@@ -64,6 +68,8 @@ const ItemHeader = (
     filter: boolean;
     setting: boolean;
     isOpenFilter: boolean;
+    isOpenSetting: boolean;
+    handleOpenSetting: (open: boolean) => void;
     handleOpenFilter: (open: boolean) => void;
     handleOpen: (type: string) => void;
   },
@@ -76,7 +82,16 @@ const ItemHeader = (
         </p>
       </div>
       <div class="flex gap-3 justify-between h-[40px]">
-        {setting && <Setting />}
+        {setting && (
+          <Setting
+            initFilter={[]}
+            open={isOpenSetting}
+            handleOpen={handleOpenSetting}
+            filterButtons={[
+              "Transfer",
+            ]}
+          />
+        )}
         {filter && (
           <Filter
             initFilter={[]}
@@ -278,11 +293,26 @@ function DispenserItem() {
 }
 
 function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
+  const [filterBy, setFilterBy] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("ASC");
   const [openS, setOpenS] = useState<boolean>(false);
   const [openT, setOpenT] = useState<boolean>(false);
   const [openD, setOpenD] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const [openSetting, setOpenSetting] = useState<boolean>(false);
+  const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
+
+  const handleOpenSettingModal = () => {
+    setOpenSettingModal(!openSettingModal);
+  };
+
+  const handleOpenSetting = () => {
+    setOpenSetting(!openSetting);
+  };
+
+  const handleCloseSettingModal = () => {
+    setOpenSettingModal(false);
+  };
 
   const handleOpenFilter = () => {
     setOpenFilter(!openFilter);
@@ -297,6 +327,24 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
       setOpenD(!openD);
     }
   };
+
+  useEffect(() => {
+    // Get the current URL
+    const currentUrl = window.location.href;
+
+    // Create a URL object
+    const url = new URL(currentUrl);
+
+    // Use URLSearchParams to get the filterBy parameter
+    const params = new URLSearchParams(url.search);
+    const filterByValue = params.get("filterBy") || "";
+
+    // Set the filterBy state
+    if (filterByValue == "Transfer") {
+      setOpenSettingModal(true);
+    }
+  }, []);
+
   return (
     <>
       <div>
@@ -306,6 +354,8 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
           handleOpen={handleOpen}
           filter={false}
           setting={true}
+          isOpenSetting={openSetting}
+          handleOpenSetting={handleOpenSetting}
         />
         <div className="grid grid-cols-4 md:grid-cols-6 xl:grid-cols-8 gap-2 md:gap-4 mt-6">
           {stamps.map((stamp, index) => (
@@ -324,11 +374,11 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
       {stamps.length && (
         <Pagination
           page={1}
-          page_size={1}
-          key="Token Card"
-          type="token_id"
+          page_size={8}
+          key="Stamp Card"
+          type="stamp_card_id"
           data_length={1}
-          pages={stamps.length / 5}
+          pages={stamps.length / 8}
         />
       )}
 
@@ -341,12 +391,17 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
           handleOpen={handleOpen}
         />
         <div className="mt-6">
-          {src20.map((src20Item, index) => (
+          <SRC20DeployTable
+            data={src20}
+          />
+          {
+            /* {src20.map((src20Item, index) => (
             <StampingMintingItem
               key={index}
               src20={src20Item}
             />
-          ))}
+          ))} */
+          }
         </div>
       </div>
 
@@ -354,11 +409,11 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
       {src20.length && (
         <Pagination
           page={1}
-          page_size={1}
-          key="Listening"
-          type="listening_id"
-          data_length={1}
-          pages={src20.length / 5}
+          page_size={8}
+          key="Token"
+          type="Token_id"
+          data_length={8}
+          pages={src20.length / 8}
         />
       )}
 
@@ -378,6 +433,13 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
           <DispenserItem />
         </div>
       </div>
+      {openSettingModal &&
+        (
+          <WalletTransferModal
+            toggleModal={handleOpenSettingModal}
+            handleCloseModal={handleCloseSettingModal}
+          />
+        )}
     </>
   );
 }

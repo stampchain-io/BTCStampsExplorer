@@ -1,15 +1,14 @@
-// islands/stamp/details/StampBuyModal.tsx
+// islands/stamp/details/WalletTransferModal.tsx
 import { useEffect, useState } from "preact/hooks";
-import { StampRow } from "globals";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import StampImage from "./StampImage.tsx";
+import StampImage from "$islands/stamp/details/StampImage.tsx";
 import {
   showConnectWalletModal,
   walletContext,
 } from "$client/wallet/wallet.ts";
+import { SelectField } from "$islands/stamping/SelectField.tsx";
 
 interface Props {
-  stamp: StampRow;
   fee: number;
   handleChangeFee: (fee: number) => void;
   toggleModal: () => void;
@@ -17,9 +16,8 @@ interface Props {
   dispenser: any;
 }
 
-const StampBuyModal = (
-  { stamp, fee, handleChangeFee, toggleModal, handleCloseModal, dispenser }:
-    Props,
+const WalletTransferModal = (
+  { fee, handleChangeFee, toggleModal, handleCloseModal, dispenser }: Props,
 ) => {
   const { wallet, isConnected } = walletContext;
   const { fees } = useFeePolling();
@@ -208,19 +206,17 @@ const StampBuyModal = (
             />
 
             <p className="font-black text-5xl text-center purple-gradient1">
-              BUY
+              Transfer
             </p>
 
             <div className="flex justify-between">
               <StampImage
-                stamp={stamp}
+                stamp={[]}
                 className="w-[144px] !p-3 border-2 border-[#9900EE] rounded-md shadow-[0px_0px_20px_#9900EE]"
                 flag={false}
               />
               <div className="flex flex-col justify-between items-end">
-                <p className="purple-gradient4 text-4xl font-black text-center">
-                  #{stamp.stamp}
-                </p>
+                <SelectField value="" onChange={() => {}} />
                 <div className="flex justify-between items-center w-full gap-3">
                   <div className="flex flex-col gap-1">
                     <p className="text-xl font-bold text-[#999999]">EDITIONS</p>
@@ -408,4 +404,4 @@ const StampBuyModal = (
   );
 };
 
-export default StampBuyModal;
+export default WalletTransferModal;

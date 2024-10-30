@@ -39,7 +39,7 @@ export function TransferContent(
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="text-[#5503A6] text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="purple-gradient1 text-3xl md:text-6xl font-black mt-6 w-full text-center">
         TRANSFER
       </p>
 
