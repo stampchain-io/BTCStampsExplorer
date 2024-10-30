@@ -39,18 +39,20 @@ export function SRC20SearchClient(
         <>
           <input
             type="text"
-            class="min-w-[260px] md:min-w-[360px] h-[40px] purple-bg-gradient px-4 py-2 rounded text-[13px] text-[#8D9199]"
+            class={`min-w-[260px] md:min-w-[360px] h-[40px] purple-bg-gradient pl-3 pr-2 py-3 text-[12px] leading-[14px] text-[#333333] font-bold placeholder:text-[#333333] outline-none ${
+              results.length > 0 ? "rounded-t" : "rounded"
+            }`}
             placeholder="Token Name, Tx Hash, or Address"
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
           />
           {results.length > 0 && (
-            <ul class="absolute top-full left-0 w-full bg-white text-black z-10 max-h-60 overflow-y-auto">
+            <ul class="absolute top-full left-0 w-full purple-bg-gradient rounded-b text-[#999999] font-bold text-[12px] leading-[14px] z-10 max-h-60 overflow-y-auto">
               {results.map((result) => (
                 <li
                   key={result.tick}
                   onClick={() => handleResultClick(result.tick)}
-                  class="cursor-pointer p-2 hover:bg-gray-200"
+                  class="cursor-pointer p-2 hover:bg-gray-600"
                 >
                   {result.tick}
                 </li>
@@ -60,7 +62,7 @@ export function SRC20SearchClient(
           <img
             src="/img/stamp/search-glass.png"
             alt="Search icon"
-            class="absolute top-3 right-3 cursor-pointer"
+            class="absolute top-[11px] right-[9px] cursor-pointer w-[18px] h-[18px]"
             onClick={() => handleOpen2(false)}
           />
         </>
