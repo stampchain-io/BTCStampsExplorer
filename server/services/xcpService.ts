@@ -1,9 +1,8 @@
-
 // TODO: Move to /server
 
 import { StampService } from "$server/services/stampService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
-import { DispenserFilter, Fairminter, XcpBalance } from "$types/index.d.ts";
+import { DispenserFilter, DispenseEvent, XcpBalance } from "$types/index.d.ts";
 
 export const xcp_v2_nodes = [
   {
@@ -21,54 +20,7 @@ export const xcp_v2_nodes = [
   },
 ];
 
-interface DispenseEvent {
-  event_index: number;
-  event: "DISPENSE";
-  params: {
-    asset: string;
-    block_index: number;
-    btc_amount: number;
-    destination: string;
-    dispense_index: number;
-    dispense_quantity: number;
-    dispenser_tx_hash: string;
-    source: string;
-    tx_hash: string;
-    tx_index: number;
-  };
-  tx_hash: string;
-  block_index: number;
-  timestamp: string | null;
-}
 
-// NOTE: only the stampchain api appears to allow trx construction / issuance others get denied.
-export const xcp_public_nodes = [
-  {
-    name: "stampchain.io",
-    url:
-      "https://k6e0ufzq8h.execute-api.us-east-1.amazonaws.com/beta/counterpartyproxy",
-    user: "rpc",
-    password: "rpc",
-  },
-  {
-    name: "xcp.dev",
-    url: "https://api.xcp.dev/0/v9_61",
-    user: "rpc",
-    password: "rpc",
-  },
-  {
-    name: "counterparty.io",
-    url: "http://api.counterparty.io:4000/",
-    user: "rpc",
-    password: "rpc",
-  },
-  {
-    name: "coindaddy",
-    url: "https://public.coindaddy.io:4001/api/rest",
-    user: "rpc",
-    password: "1234",
-  },
-];
 
 export async function fetchXcpV2WithCache<T>(
   endpoint: string,
@@ -1276,5 +1228,133 @@ export class XcpManager {
     console.log(`Fetched fairminters, Count: ${allFairminters.length}`);
 
     return allFairminters;
+  }
+
+  static async createIssuance(
+    address: string,
+    asset: string,
+    quantity: number,
+    options: IssuanceOptions = {}
+  ): Promise<any> {
+    // Validate address (sourceWallet in original)
+    if (typeof address !== "string") {
+      throw new Error("Invalid address parameter. Expected a string.");
+    }
+
+    // Validate asset (assetName in original)
+    if (asset !== undefined && typeof asset !== "string") {
+      throw new Error("Invalid asset parameter. Expected a string or undefined.");
+    }
+
+    // Validate quantity (qty in original)
+    const validatedQuantity = typeof quantity === "string" ? Number(quantity) : quantity;
+    if (isNaN(validatedQuantity) || !Number.isInteger(validatedQuantity) || validatedQuantity <= 0) {
+      throw new Error("Invalid quantity parameter. Expected a positive integer.");
+    }
+
+    // Validate options
+    if (options.lock !== undefined && typeof options.lock !== "boolean") {
+      throw new Error("Invalid lock parameter. Expected a boolean.");
+    }
+    if (options.divisible !== undefined && typeof options.divisible !== "boolean") {
+      throw new Error("Invalid divisible parameter. Expected a boolean.");
+    }
+    if (options.description !== undefined && typeof options.description !== "string") {
+      throw new Error("Invalid description parameter. Expected a string.");
+    }
+
+    // Validate fee_per_kb (satsPerKB in original)
+    const feePerKB = typeof options.fee_per_kb === "string" 
+      ? Number(options.fee_per_kb) 
+      : options.fee_per_kb;
+    if (feePerKB !== undefined && (isNaN(feePerKB) || feePerKB <= 0)) {
+      throw new Error("Invalid fee_per_kb parameter. Expected a positive number.");
+    }
+
+    const endpoint = `/addresses/${address}/compose/issuance`;
+    const queryParams = new URLSearchParams();
+
+    // Add required parameters
+    queryParams.append("asset", asset);
+    queryParams.append("quantity", validatedQuantity.toString());
+    
+    // Always set encoding to OP_RETURN for CIP33
+    queryParams.append("encoding", "opreturn");
+
+    // Add optional parameters if they exist
+    for (const [key, value] of Object.entries(options)) {
+      if (value !== undefined && key !== 'encoding') { // Skip encoding as we set it above
+        queryParams.append(key, value.toString());
+      }
+    }
+
+    // Set defaults for issuance
+    if (options.return_psbt === undefined) {
+      queryParams.append("return_psbt", "true");
+    }
+    if (options.verbose === undefined) {
+      queryParams.append("verbose", "true");
+    }
+    if (options.allow_unconfirmed_inputs === undefined) {
+      queryParams.append("allow_unconfirmed_inputs", "true");
+    }
+
+    // Use the existing cache mechanism
+    try {
+      return await this.fetchXcpV2WithCache<any>(endpoint, queryParams);
+    } catch (error) {
+      console.error("Error in createIssuance:", error);
+      if (error.message?.includes("Insufficient")) {
+        throw error;
+      }
+      if (error.message?.includes("invalid base58")) {
+        throw new Error("Invalid address format. Please use a supported Bitcoin address format.");
+      }
+      throw new Error(error.message || "Failed to create issuance transaction");
+    }
+  }
+
+  static async getAssetInfo(asset: string): Promise<any> {
+    const endpoint = `/assets/${asset}`;
+    const queryParams = new URLSearchParams({
+      verbose: "true"
+    });
+
+    try {
+      for (const node of xcp_v2_nodes) {
+        const url = `${node.url}${endpoint}?${queryParams.toString()}`;
+        console.log(`Attempting to fetch from URL: ${url}`);
+
+        try {
+          const response = await fetch(url);
+          console.log(`Response status from ${node.name}: ${response.status}`);
+
+          // If asset doesn't exist, continue to next node
+          if (response.status === 404) {
+            continue;
+          }
+
+          if (!response.ok) {
+            const errorBody = await response.text();
+            console.error(`Error response body from ${node.name}: ${errorBody}`);
+            continue;
+          }
+
+          const data = await response.json();
+          if (data && data.result) {
+            return data.result;
+          }
+        } catch (error) {
+          console.error(`Fetch error for ${url}:`, error);
+          continue;
+        }
+      }
+
+      // If we get here, the asset wasn't found on any node
+      return null;
+    } catch (error) {
+      console.error(`Error fetching asset info for ${asset}:`, error);
+      throw error; // Throw non-404 errors
+    }
   }
 }

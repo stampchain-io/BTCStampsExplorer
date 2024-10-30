@@ -8,10 +8,13 @@ import {
   calculateDust,
   calculateMiningFee,
 } from "$lib/utils/minting/feeCalculations.ts";
-import { estimateP2WSHTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
+import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import * as msgpack from "msgpack";
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
+import { UTXOService } from "$server/services/transaction/utxoService.ts";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 
 export class SRC20PSBTService {
   private static readonly DUST_SIZE = 420; // Min is 330
@@ -21,14 +24,14 @@ export class SRC20PSBTService {
     sourceWallet,
     toAddress,
     src20Action,
-    satsPerKB,
+    satsPerVB,
     service_fee,
     service_fee_address,
   }: {
     sourceWallet: string;
     toAddress: string;
     src20Action: string | object;
-    satsPerKB: number;
+    satsPerVB: number;
     service_fee: number;
     service_fee_address: string;
   }) {
@@ -36,7 +39,7 @@ export class SRC20PSBTService {
       sourceWallet,
       toAddress,
       src20Action,
-      satsPerKB,
+      satsPerVB,
       service_fee,
       service_fee_address,
     });
@@ -67,6 +70,7 @@ export class SRC20PSBTService {
     }
 
     // Add data outputs (always P2WSH)
+    const witnessOutputs = [];
     for (let i = 0; i < cip33Addresses.length; i++) {
       const dustValue = this.DUST_SIZE + i;
       const p2wshOutput = this.createP2WSHOutput(
@@ -74,6 +78,7 @@ export class SRC20PSBTService {
         dustValue,
         network,
       );
+      witnessOutputs.push(p2wshOutput);
       vouts.push(p2wshOutput);
     }
 
@@ -82,16 +87,37 @@ export class SRC20PSBTService {
       vouts.push(this.createAddressOutput(service_fee_address, service_fee));
     }
 
-    const { inputs, change } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+    // Calculate fees with witness data
+    const { inputs, change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
       sourceWallet,
       vouts,
-      satsPerKB,
+      satsPerVB,
+      0,
+      1.5,
+      { filterStampUTXOs: true, includeAncestors: true }
     );
+
+    // Calculate total input value
+    const totalInputValue = inputs.reduce((sum, input) => sum + input.value, 0);
+    const totalOutputValue = vouts.reduce((sum, vout) => sum + vout.value, 0);
+    const totalDustValue = vouts.reduce((sum, vout) => 
+        vout.value <= this.DUST_SIZE ? sum + vout.value : sum, 0);
 
     // Add inputs
     for (const input of inputs) {
-      const txDetails = await getTransaction(input.txid); // FIXME: need to review these calls to see if we can use the failover between all endpoints in the utxo selection.
-      const psbtInput = this.createPsbtInput(input, txDetails);
+      const txDetails = await getTransaction(input.txid);
+      const psbtInput = SRC20PSBTService.createPsbtInput(input, txDetails);
+      
+      // Ensure witness data is properly handled
+      if (this.isWitnessInput(input.script)) {
+        psbtInput.witnessUtxo = {
+          script: Buffer.from(input.script, 'hex'),
+          value: input.value,
+        };
+      } else {
+        psbtInput.nonWitnessUtxo = Buffer.from(txDetails.hex, 'hex');
+      }
+      
       psbt.addInput(psbtInput);
     }
 
@@ -101,7 +127,7 @@ export class SRC20PSBTService {
 
     // Add change output using the same type as the input
     if (change > this.DUST_SIZE) {
-      const changePayment = this.createOutputMatchingInputType(
+      const changePayment = SRC20PSBTService.createOutputMatchingInputType(
         sourceWallet,
         inputType,
         network,
@@ -125,28 +151,56 @@ export class SRC20PSBTService {
       }
     }
 
-    const estimatedSize = estimateP2WSHTransactionSize(hex_data.length / 2);
-    const estMinerFee = calculateMiningFee(hex_data.length / 2, satsPerKB);
+    const estimatedSize = estimateTransactionSize({
+      inputs: inputs,
+      outputs: vouts,
+      includeChangeOutput: true,
+      changeOutputType: "P2WPKH"
+    });
+    const estMinerFee = calculateMiningFee(
+      inputs.map(input => {
+        const scriptType = getScriptTypeInfo(input.script);
+        return {
+          type: scriptType.type,
+          size: input.size,
+          isWitness: scriptType.isWitness,
+          ancestor: input.ancestor
+        };
+      }),
+      witnessOutputs.map(output => ({
+        type: "P2WSH",
+        size: TX_CONSTANTS.P2WSH.size,
+        isWitness: true,
+        value: output.value
+      })),
+      satsPerVB,
+      {
+        includeChangeOutput: true,
+        changeOutputType: "P2WPKH"
+      }
+    );
 
     console.log("Final PSBT data:", {
       hex: psbt.toHex(),
       base64: psbt.toBase64(),
       estimatedTxSize: estimatedSize,
-      totalInputValue,
-      totalOutputValue,
+      totalInputValue: inputs.reduce((sum, input) => sum + input.value, 0),
+      totalOutputValue: vouts.reduce((sum, vout) => sum + vout.value, 0),
       totalChangeOutput: change,
-      totalDustValue,
+      totalDustValue: vouts.reduce((sum, vout) => 
+          vout.value <= this.DUST_SIZE ? sum + vout.value : sum, 0),
       estMinerFee,
     });
 
     return {
       psbt,
-      feePerKb: satsPerKB,
+      feePerKb: satsPerVB,
       estimatedTxSize: estimatedSize,
-      totalInputValue,
-      totalOutputValue,
+      totalInputValue: inputs.reduce((sum, input) => sum + input.value, 0),
+      totalOutputValue: vouts.reduce((sum, vout) => sum + vout.value, 0),
       totalChangeOutput: change,
-      totalDustValue,
+      totalDustValue: vouts.reduce((sum, vout) => 
+          vout.value <= this.DUST_SIZE ? sum + vout.value : sum, 0),
       estMinerFee,
       changeAddress: sourceWallet,
     };
@@ -226,10 +280,10 @@ export class SRC20PSBTService {
       sequence: 0xfffffffd, // Enable RBF
     };
 
-    const inputType = this.getInputType(inputDetails);
-
-    if (inputType === "p2wpkh" || inputType === "p2wsh") {
-      // Witness input
+    const scriptType = getScriptTypeInfo(input.script);
+    
+    if (scriptType.isWitness) {
+      // Witness input (segwit)
       psbtInput.witnessUtxo = {
         script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
         value: input.value,
@@ -289,5 +343,10 @@ export class SRC20PSBTService {
       throw new Error("Failed to generate CIP33 addresses");
     }
     return cip33Addresses;
+  }
+
+  private static isWitnessInput(script: string): boolean {
+    const scriptType = getScriptTypeInfo(script);
+    return scriptType.isWitness;
   }
 }

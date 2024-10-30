@@ -8,6 +8,7 @@ import { useConfig } from "$client/hooks/useConfig.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
+import { Config } from "globals";
 
 export function useSRC20Form(
   action: string,
@@ -16,7 +17,7 @@ export function useSRC20Form(
 ) {
   console.log("useSRC20Form initialized with:", { action, trxType });
 
-  const { config, isLoading: configLoading } = useConfig();
+  const { config, isLoading: configLoading } = useConfig<Config>();
   const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000); // 5 minutes
 
   const [formState, setFormState] = useState({
@@ -269,7 +270,9 @@ export function useSRC20Form(
     setSubmissionMessage({ message: "Please wait..." });
 
     try {
-      if (!config) throw new Error("Configuration not loaded");
+      if (!config) {
+        throw new Error("Configuration not loaded");
+      }
 
       let endpoint, requestData;
 

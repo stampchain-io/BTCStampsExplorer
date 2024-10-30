@@ -1,11 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import {
-  calculateDust,
-  calculateMiningFee,
-  estimateFee,
-} from "$lib/utils/minting/feeCalculations.ts";
-import type { Output } from "$types/index.d.ts";
+import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
+import type { Output, ScriptType } from "$types/index.d.ts";
+import { calculateTransactionFees } from "$lib/utils/minting/feeEstimator.ts";
 
 interface FeeEstimationProps {
   fee: number;
@@ -22,6 +19,9 @@ interface FeeEstimationProps {
   // New props to handle addresses
   recipientAddress?: string;
   userAddress?: string;
+  inputType?: ScriptType;
+  outputTypes?: ScriptType[];
+  disabled?: boolean;
 }
 
 export function FeeEstimation({
@@ -38,8 +38,11 @@ export function FeeEstimation({
   buttonName,
   recipientAddress,
   userAddress,
+  inputType = "P2WPKH",
+  outputTypes,
+  disabled = false,
 }: FeeEstimationProps) {
-  const { fees, loading } = useFeePolling();
+  const { fees, loading } = useFeePolling(300000);
 
   const [visible, setVisible] = useState(true);
   const [txfee, setTxfee] = useState(0.0);
@@ -52,6 +55,7 @@ export function FeeEstimation({
 
   const [tosAgreed, setToSAgreed] = useState(false);
 
+  // Update fee when recommended fee changes
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
@@ -59,22 +63,35 @@ export function FeeEstimation({
     }
   }, [fees, loading]);
 
+  // Auto-refresh fees every 5 minutes
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      onRefresh?.();
+    }, 300000);
+    return () => clearInterval(refreshInterval);
+  }, []);
+
   useEffect(() => {
     if (fileSize && fee) {
-      let newTxfee = 0;
-      if (type === "stamp") {
-        const newDust = calculateDust(fileSize) / 1e8;
-        setDust(newDust);
-        newTxfee = calculateMiningFee(fileSize, fee) / 1e8;
-      } else {
-        const outputs: Output[] = [];
-        // Add your output construction logic here
-        newTxfee = estimateFee(outputs, fee) / 1e8;
-      }
-      setTxfee(newTxfee);
-      // Rest of your fee calculation logic
+      const { minerFee, dustValue, detectedInputType } =
+        calculateTransactionFees({
+          type: type as "stamp" | "src20" | "fairmint" | "transfer",
+          fileSize,
+          userAddress,
+          outputTypes,
+          feeRate: fee,
+          isMultisig: type === "src20" && outputTypes?.includes("P2SH"),
+        });
+
+      setTxfee(minerFee / 1e8);
+      setDust(dustValue / 1e8);
+      setTotal((minerFee + dustValue + (mintfee * 1e8)) / 1e8);
+
+      console.log(
+        `Detected input type for ${userAddress}: ${detectedInputType}`,
+      );
     }
-  }, [fileSize, fee, type]);
+  }, [fileSize, fee, type, userAddress, outputTypes, mintfee]);
 
   // Define the coin icons
   const btcIcon = (
@@ -290,9 +307,15 @@ export function FeeEstimation({
             </label>
           </div>
           <button
-            className="text-black text-center uppercase font-bold rounded-md mt-4 py-3 px-6 bg-[#5503A6] cursor-pointer disabled:bg-gray-500 disabled:cursor-not-allowed"
-            onClick={isSubmitting || !tosAgreed ? undefined : onSubmit}
-            disabled={isSubmitting || !tosAgreed}
+            className={`text-black text-center uppercase font-bold rounded-md mt-4 py-3 px-6 bg-[#5503A6] cursor-pointer ${
+              disabled || isSubmitting || !tosAgreed
+                ? "bg-gray-500 cursor-not-allowed"
+                : ""
+            }`}
+            onClick={isSubmitting || !tosAgreed || disabled
+              ? undefined
+              : onSubmit}
+            disabled={isSubmitting || !tosAgreed || disabled}
           >
             {buttonName}
           </button>

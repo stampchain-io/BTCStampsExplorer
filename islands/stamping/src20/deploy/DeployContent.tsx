@@ -285,10 +285,11 @@ export function DeployContent(
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
-          type="src20-deploy"
+          type="src20"
           fileType="application/json"
           fileSize={formState.jsonSize}
-          issuance={1}
+          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
+          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}

@@ -2,54 +2,25 @@ import type { Output, UTXO } from "$types/index.d.ts";
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import * as bitcoin from "bitcoinjs-lib";
+import { calculateMiningFee } from "$lib/utils/minting/feeCalculations.ts";
+import { PSBTService } from "./psbtService.ts";
+import { 
+  isP2PKH, 
+  isP2SH, 
+  isP2WPKH, 
+  isP2TR, 
+  isP2WSH,
+  getScriptTypeInfo 
+} from "$lib/utils/scriptTypeUtils.ts";
+import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+
 
 export class UTXOService {
   private static readonly CHANGE_DUST = 1000;
 
-  private static isP2PKH(script: string): boolean {
-    return /^76a914[a-fA-F0-9]{40}88ac$/.test(script);
-  }
-
-  private static isP2SH(script: string): boolean {
-    return /^a914[a-fA-F0-9]{40}87$/.test(script);
-  }
-
-  private static isP2WPKH(script: string): boolean {
-    return /^0014[a-fA-F0-9]{40}$/.test(script);
-  }
-
-  private static isP2WSH(script: string): boolean {
-    return /^0020[a-fA-F0-9]{64}$/.test(script);
-  }
-
-  private static isP2TR(script: string): boolean {
-    return /^5120[a-fA-F0-9]{64}$/.test(script);
-  }
-
-  private static calculateSizeP2WPKH(script: string): number {
-    const baseInputSize = 32 + 4 + 4 + 1;
-    const witnessSize = 1 + 72 + 1 + 33;
-    const witnessWeight = witnessSize * 0.25;
-    return Math.floor(baseInputSize + witnessWeight) + 1;
-  }
-
   static estimateInputSize(script: string): number {
-    let scriptSigSize = 0;
-    if (this.isP2PKH(script)) {
-      scriptSigSize = 108;
-    } else if (this.isP2SH(script)) {
-      scriptSigSize = 260;
-    } else if (this.isP2WPKH(script)) {
-      scriptSigSize = this.calculateSizeP2WPKH(script);
-    } else if (this.isP2TR(script)) {
-      scriptSigSize = 65;
-    }
-
-    const txidSize = 32;
-    const voutSize = 4;
-    const sequenceSize = 4;
-
-    return txidSize + voutSize + sequenceSize + scriptSigSize;
+    const scriptType = getScriptTypeInfo(script);
+    return scriptType.size;
   }
 
   static estimateVoutSize(output: Output): number {
@@ -76,75 +47,115 @@ export class UTXOService {
     feeRate: number,
     sigops_rate = 0,
     rbfBuffer = 1.5,
+    options = { 
+      filterStampUTXOs: true,    // Default to filtering stamp UTXOs
+      includeAncestors: false    // Default to not including ancestors
+    }
   ): Promise<{
     inputs: UTXO[];
     change: number;
     fee: number;
   }> {
-    let utxos = await getUTXOForAddress(address) as UTXO[];
+    // Get UTXOs with ancestor information if requested
+    let utxos = await getUTXOForAddress(
+      address, 
+      undefined, 
+      undefined, 
+      options.includeAncestors
+    ) as UTXO[];
+
     if (!utxos || utxos.length === 0) {
       throw new Error("No UTXOs found for the given address");
     }
 
-    try {
-      const stampBalances = await XcpManager.getXcpBalancesByAddress(
-        address,
-        undefined,
-        true,
-      );
+    // Filter stamp UTXOs if requested
+    if (options.filterStampUTXOs) {
+      try {
+        const stampBalances = await XcpManager.getXcpBalancesByAddress(
+          address,
+          undefined,
+          true,
+        );
 
-      const utxosToExclude = new Set<string>();
-
-      for (const balance of stampBalances) {
-        if (balance.utxo) {
-          utxosToExclude.add(balance.utxo);
+        const utxosToExclude = new Set<string>();
+        for (const balance of stampBalances) {
+          if (balance.utxo) {
+            utxosToExclude.add(balance.utxo);
+          }
         }
+
+        utxos = utxos.filter(
+          (utxo) => !utxosToExclude.has(`${utxo.txid}:${utxo.vout}`),
+        );
+
+        console.log(`Excluded ${utxosToExclude.size} UTXOs from stamps balance`);
+      } catch (error) {
+        console.error("Error fetching stamps balance:", error);
+        throw new Error("Failed to fetch stamps balance for UTXO exclusion");
       }
-
-      utxos = utxos.filter(
-        (utxo) => !utxosToExclude.has(`${utxo.txid}:${utxo.vout}`),
-      );
-
-      console.log(`Excluded ${utxosToExclude.size} UTXOs from stamps balance`);
-    } catch (error) {
-      console.error("Error fetching stamps balance:", error);
-      throw new Error("Failed to fetch stamps balance for UTXO exclusion");
     }
 
     if (!utxos || utxos.length === 0) {
       throw new Error(
-        "No UTXOs available for transaction after excluding stamps UTXOs",
+        "No UTXOs available for transaction after filtering",
       );
     }
 
     return this.selectUTXOs(utxos, vouts, feeRate, sigops_rate, rbfBuffer);
   }
 
-  private static selectUTXOs(
+  private static async selectUTXOs(
     utxos: UTXO[],
     vouts: Output[],
     feeRate: number,
     sigops_rate: number,
     rbfBuffer: number,
   ) {
-    // Copy implementation from server/utils/transactions/utxoSelector.ts
     const totalOutputValue = vouts.reduce((sum, vout) => sum + vout.value, 0);
     let totalInputValue = 0;
-    const selectedInputs: UTXO[] = [];
+    const selectedInputs: Array<UTXO & { ancestor?: AncestorInfo }> = [];
 
-    // Sort UTXOs by value in descending order
-    utxos.sort((a, b) => b.value - a.value);
+    // Sort UTXOs by effective value
+    const utxosWithValues = utxos.map(utxo => ({
+      ...utxo,
+      effectiveValue: utxo.value - (utxo.ancestor?.fees || 0)
+    }));
 
-    for (const utxo of utxos) {
+    utxosWithValues.sort((a, b) => b.effectiveValue - a.effectiveValue);
+
+    for (const utxo of utxosWithValues) {
       selectedInputs.push(utxo);
       totalInputValue += utxo.value;
 
-      // Calculate current fee
-      const currentFee = Math.ceil(
-        (selectedInputs.length * 180 + vouts.length * 34 + 10) * feeRate,
+      // Calculate current fee with proper script type detection
+      const currentFee = calculateMiningFee(
+        selectedInputs.map(input => {
+          const scriptType = getScriptTypeInfo(input.script);
+          return {
+            type: scriptType.type,
+            size: scriptType.size,
+            isWitness: scriptType.isWitness,
+            ancestor: input.ancestor
+          };
+        }),
+        vouts.map(output => {
+          const scriptType = output.script ? 
+            getScriptTypeInfo(output.script) : 
+            { type: "P2WPKH", size: TX_CONSTANTS.P2WPKH.size, isWitness: true };
+          return {
+            type: scriptType.type,
+            size: scriptType.size,
+            isWitness: scriptType.isWitness,
+            value: output.value
+          };
+        }),
+        feeRate,
+        {
+          includeChangeOutput: true,
+          changeOutputType: "P2WPKH"
+        }
       );
 
-      // Check if we have enough to cover outputs and fees
       if (totalInputValue >= totalOutputValue + currentFee) {
         const change = totalInputValue - totalOutputValue - currentFee;
         if (change >= this.CHANGE_DUST || change === 0) {
@@ -158,5 +169,18 @@ export class UTXOService {
     }
 
     throw new Error("Insufficient funds to cover outputs and fees");
+  }
+
+  private static isWitnessInput(script: string): boolean {
+    const scriptType = getScriptTypeInfo(script);
+    return scriptType.isWitness;
+  }
+
+  private static isWitnessOutput(output: Output): boolean {
+    if (output.script) {
+      return this.isWitnessInput(output.script);
+    }
+    // For address-based outputs, check if it's a bech32 address
+    return output.address?.startsWith('bc1') || false;
   }
 }

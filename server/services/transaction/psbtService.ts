@@ -4,6 +4,8 @@ import { UTXOService } from "./utxoService.ts";
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { BTCAddressService } from "$server/services/btc/addressService.ts";
+import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 
 export class PSBTService {
   static async createPSBT(
@@ -254,7 +256,12 @@ export class PSBTService {
     });
 
     // **Estimate the Fee**
-    const estimatedFee = estimateFee(outputs, feeRate);
+    const estimatedFee = estimateFee(
+      outputs,
+      feeRate,
+      psbt.txInputs.length,
+      getScriptTypeInfo(buyerUtxo.script).type
+    );
 
     // **Calculate Change**
     const changeValue = totalInputValue - totalOutputValue - estimatedFee;
