@@ -6,6 +6,7 @@ import { Search } from "$islands/datacontrol/Search.tsx";
 import { abbreviateAddress } from "$lib/utils/util.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 interface WalletContentProps {
   stamps: any[];
@@ -320,6 +321,17 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
         </div>
       </div>
 
+      {stamps.length && (
+        <Pagination
+          page={1}
+          page_size={1}
+          key="Token Card"
+          type="token_id"
+          data_length={1}
+          pages={stamps.length / 5}
+        />
+      )}
+
       <div className="mt-48">
         <ItemHeader
           title="TOKENS"
@@ -337,6 +349,19 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
           ))}
         </div>
       </div>
+
+      {/* Listening Pagination */}
+      {src20.length && (
+        <Pagination
+          page={1}
+          page_size={1}
+          key="Listening"
+          type="listening_id"
+          data_length={1}
+          pages={src20.length / 5}
+        />
+      )}
+
       <div className="mt-48">
         <ItemHeader
           title="LISTINGS"
