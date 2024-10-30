@@ -89,6 +89,3 @@ export class SRC20OperationService {
     );
   }
 }
-
-// Export the methods directly
-export const { mintSRC20, deploySRC20, transferSRC20 } = SRC20OperationService;
