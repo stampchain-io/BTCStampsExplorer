@@ -578,7 +578,7 @@ export function OlgaContent() {
       </div> */
       }
 
-      <div className="dark-gradient p-6 w-full">
+      <div className="dark-gradient p-6 w-full z-[10]">
         <FeeEstimation
           fee={fee}
           handleChangeFee={handleChangeFee}
