@@ -48,7 +48,10 @@ const StampingMintingItem = ({ src20 }: StampingMintingItemProps) => {
           </a>
           <div className="flex flex-col gap-1">
             <p className="hidden md:block text-lg font-light text-[#999999]">
-              PROGRESS <span className="font-bold">{progress}%</span>
+              PROGRESS{" "}
+              <span className="font-bold">
+                {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0] || "0"}%
+              </span>
             </p>
 
             {/* Show on mobile only */}

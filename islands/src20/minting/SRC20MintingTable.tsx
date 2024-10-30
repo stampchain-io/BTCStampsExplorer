@@ -101,7 +101,11 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
                     </a>
                     <div className="flex flex-col gap-1">
                       <p className="text-lg font-light text-[#999999]">
-                        PROGRESS <span className="font-bold">{progress}%</span>
+                        PROGRESS{" "}
+                        <span className="font-bold">
+                          {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)
+                            ?.[0] || "0"}%
+                        </span>
                       </p>
                       <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
                         <div
@@ -199,7 +203,11 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
                     </p>
                     <div className="flex flex-col gap-1">
                       <p className="text-lg font-light text-[#999999]">
-                        PROGRESS <span className="font-bold">{progress}%</span>
+                        PROGRESS{" "}
+                        <span className="font-bold">
+                          {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)
+                            ?.[0] || "0"}%
+                        </span>
                       </p>
                       <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
                         <div
