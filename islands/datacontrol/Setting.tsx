@@ -1,91 +1,90 @@
 import { useEffect, useState } from "preact/hooks";
+import {
+  COLLECTION_FILTER_TYPES,
+  LISTING_FILTER_TYPES,
+  SRC20_FILTER_TYPES,
+  SRC20_TYPES,
+  STAMP_FILTER_TYPES,
+  WALLET_FILTER_TYPES,
+} from "globals";
+import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
 
-export interface SearchResult {
-  id?: string;
-  tick?: string;
-  [key: string]: any;
-}
+type FilterTypes =
+  | SRC20_FILTER_TYPES
+  | STAMP_FILTER_TYPES
+  | WALLET_FILTER_TYPES
+  | COLLECTION_FILTER_TYPES
+  | LISTING_FILTER_TYPES
+  | SRC20_TYPES;
 
-interface SearchProps {
+interface FilterProps {
+  initFilter?: FilterTypes[];
   open: boolean;
   handleOpen: (open: boolean) => void;
-  placeholder: string;
-  searchEndpoint: string;
-  onResultClick: (result: SearchResult) => void;
-  resultDisplay: (result: SearchResult) => string;
+  filterButtons: FilterTypes[];
 }
-
 export function Setting({
+  initFilter = [],
   open = false,
-  handleOpen = () => {},
-  placeholder = "",
-  searchEndpoint = "",
-  onResultClick = () => {},
-  resultDisplay,
-}: SearchProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-
-  const handleSearch = async () => {
-    if (searchTerm.trim()) {
-      const response = await fetch(
-        `${searchEndpoint}${encodeURIComponent(searchTerm.trim())}`,
-      );
-      const data = await response.json();
-      setResults(data.data || []);
-    } else {
-      setResults([]);
-    }
-  };
+  handleOpen,
+  filterButtons,
+}: FilterProps) {
+  const [localFilters, setLocalFilters] = useState<FilterTypes[]>(initFilter);
+  const { updateURL } = useURLUpdate();
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      handleSearch();
-    }, 300);
+    setLocalFilters(initFilter);
+  }, [initFilter]);
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
+  const handleFilterChange = (value: FilterTypes) => {
+    setLocalFilters((prevFilters) => {
+      const newFilters = prevFilters.includes(value)
+        ? prevFilters.filter((f) => f !== value)
+        : [...prevFilters, value];
+      updateURL({ filterBy: newFilters });
+      return newFilters;
+    });
+  };
 
   return (
-    <div class="relative flex items-center">
-      {open && (
-        <>
-          <input
-            type="text"
-            class="min-w-[260px] md:min-w-[360px] h-[40px] purple-bg-gradient px-4 py-2 rounded text-[13px] text-[#8D9199]"
-            placeholder={placeholder}
-            value={searchTerm}
-            onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
-          />
-          {results.length > 0 && (
-            <ul class="absolute top-full left-0 w-full bg-white text-black z-10 max-h-60 overflow-y-auto">
-              {results.map((result) => (
-                <li
-                  key={result.tick || JSON.stringify(result)}
-                  onClick={() => onResultClick(result)}
-                  class="cursor-pointer p-2 hover:bg-gray-200"
-                >
-                  {resultDisplay(result)}
-                </li>
-              ))}
-            </ul>
-          )}
+    <div
+      class={`rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
+        open ? "px-6 py-4 border-2 border-[#660099] bg-[#0B0B0B]" : ""
+      }`}
+    >
+      {open
+        ? (
+          <>
+            <img
+              class="cursor-pointer absolute top-5 right-2"
+              src="/img/stamp/navigator-close.png"
+              alt="Navigator close"
+              onClick={() => handleOpen(false)}
+            />
+            <p className="text-lg font-black text-[#AA00FF] mb-1">TOOLS</p>
+            {filterButtons.map((filter) => (
+              <button
+                key={filter}
+                class={`cursor-pointer text-xs md:text-sm font-black ${
+                  localFilters.includes(filter)
+                    ? "text-[#AA00FF]"
+                    : "text-[#660099] hover:text-[#AA00FF]"
+                }`}
+                onClick={() => handleFilterChange(filter)}
+              >
+                {filter.toUpperCase()}
+              </button>
+            ))}
+          </>
+        )
+        : (
           <img
             src="/img/wallet/icon_setting.svg"
             alt="Search icon"
-            class="absolute top-3 right-3 cursor-pointer"
-            onClick={() => handleOpen(false)}
+            class="bg-[#660099] rounded-md p-[12px] cursor-pointer"
+            onClick={() => handleOpen(true)}
           />
-        </>
-      )}
-      {!open && (
-        <img
-          src="/img/wallet/icon_setting.svg"
-          alt="Search icon"
-          class="bg-[#660099] rounded-md p-[12px] cursor-pointer"
-          onClick={() => handleOpen(true)}
-        />
-      )}
+        )}
     </div>
   );
 }
