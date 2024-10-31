@@ -266,6 +266,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                     onClick={() =>
                       handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
                   />
+
                   <div class="w-full flex flex-col">
                     <div class="flex justify-between">
                       <a href={href} class="flex gap-4 text-xl uppercase">
@@ -337,6 +338,20 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                         )}
                     </div>
                   </div>
+
+                  {progress !== "100" && (
+                    <a
+                      href={`/stamping/src20/mint?tick=${
+                        encodeURIComponent(
+                          src20.tick,
+                        )
+                      }&trxType=${encodeURIComponent(src20.tx_hash)}`}
+                    >
+                      <button className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[66px] md:w-[84px] h-[36px] md:h-[48px]">
+                        Mint
+                      </button>
+                    </a>
+                  )}
                 </div>
               </div>
             );
