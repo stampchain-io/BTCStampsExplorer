@@ -10,7 +10,7 @@ export const GetStampingModule = () => {
         <h1 className={ModulesStyles.title}>GET STAMPING</h1>
         <h2 className={ModulesStyles.subTitle}>IMMORTALISE YOUR ART</h2>
         <p className={ModulesStyles.content}>
-          Effortlessly create immutableBitcoin Stamps with custom fee selection
+          Effortlessly create immutable Bitcoin Stamps with custom fee selection
           and optional Posh Stamp Collection naming options. Supports low-fi
           pixel art (png/jpg/gif) and hi-res vector art (svg/html) up to 64kB.
           Explore SRC-721R for recursive stamps with unlimited size constraints.
