@@ -17,11 +17,20 @@ export const handler: Handlers = {
       const feeRate = url.searchParams.get("feeRate");
       const fileSize = url.searchParams.get("fileSize");
 
+      console.log("Query parameters:", {
+        address,
+        includeAncestors,
+        forTransaction,
+        type,
+        feeRate,
+        fileSize,
+      });
+
       if (!address) {
+        console.error("Missing address in request");
         return ResponseUtil.error("Address parameter is required", 400);
       }
 
-      // For transaction fee estimation with actual UTXOs
       if (forTransaction && type && feeRate) {
         try {
           // Prepare outputs based on transaction type
