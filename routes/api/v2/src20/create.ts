@@ -15,14 +15,16 @@ export const handler: Handlers<TX | TXError> = {
       const body: InputData & { trxType?: TrxType } = JSON.parse(rawBody);
       const trxType = body.trxType || "olga";
 
-      // Set sourceAddress to changeAddress if not provided, and vice versa
-      const effectiveSourceAddress = body.sourceAddress || body.changeAddress;
-      const effectiveChangeAddress = body.changeAddress || body.sourceAddress;
+      // Handle backward compatibility for fromAddress
+      const effectiveSourceAddress = body.sourceAddress || body.fromAddress ||
+        body.changeAddress;
+      const effectiveChangeAddress = body.changeAddress || body.sourceAddress ||
+        body.fromAddress;
 
       // Ensure at least one address exists
       if (!effectiveSourceAddress) {
         return ResponseUtil.error(
-          "Either sourceAddress or changeAddress is required",
+          "Either sourceAddress/fromAddress or changeAddress is required",
           400,
         );
       }
