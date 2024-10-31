@@ -29,11 +29,9 @@ export default function HowTo() {
           MANUALS
         </h2>
         <p className="mb-12">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id sem
-          vitae lacus venenatis blandit. Curabitur pharetra ipsum id mauris
-          pulvinar auctor. Ut sit amet diam condimentum, vehicula justo in.
-          Aenean tincidunt nisl mattis, bibendum velit at, dictum leo. Nam
-          tempus suscipit velit non interdum.
+           Explore our comprehensive How-To section, where you’ll find step-by-step guides for the most popular features on our platform. </n>
+          Whether you're a beginner or a pro, these guides will help you make the most out of every tool we offer. </n>
+          Need help with something that’s not covered? Let us know! Reach out to us, and we’ll be happy to create new how-tos based on your suggestions.
         </p>
       </section>
 
@@ -43,13 +41,9 @@ export default function HowTo() {
           <PlaceholderImage width={432} height={243} />
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id
-              sem vitae lacus venenatis blandit. Curabitur pharetra ipsum id
-              mauris pulvinar auctor. Ut sit amet diam condimentum, vehicula
-              justo in. Aenean tincidunt nisl mattis, bibendum velit at, dictum
-              leo non interdum pulvinar alot. Nam tempus suscipit velit non
-              interdum sem vitae lacus venenatis alot amet, consectetur dolor
-              ...
+              SRC-20 is a fungible token protocol that embeds transactions directly onto the Bitcoin blockchain, removing the need for Counterparty as of block 796,000.</n> 
+              Inspired by BRC-20, it operates with only standard BTC miner fees while preserving data immutability.</n> 
+              In this guide, you'll learn how to deploy your very own SRC-20 token!
             </p>
             <a
               href="/howto/deploytoken"

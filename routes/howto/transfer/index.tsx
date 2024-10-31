@@ -36,21 +36,22 @@ export default function HowTo() {
     <div className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-40">
       <div className="max-w-[660px] w-full mx-auto flex flex-col gap-12">
         <section>
-          <h1 className="gray-gradient3 text-6xl font-black">HEADING</h1>
+          <h1 className="gray-gradient3 text-6xl font-black">How-To</h1>
           <h2 className="text-2xl md:text-5xl font-extralight mb-3">
-            SUBHEADING
+            Transfer
           </h2>
           <p className="mb-12">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id sem
-            vitae lacus venenatis blandit. Curabitur pharetra ipsum id mauris
-            pulvinar auctor. Ut sit amet diam condimentum, vehicula justo in,
-            text link. Aenean tincidunt nisl mattis, bibendum velit at, dictum
-            leo. Nam tempus suscipit velit non interdum. Donec ullamcorper, ante
-            ac condimentum suscipit, diam lorem luctus nulla, at dictum diam
-            nunc ornare ante. Ut elementum porta ante, malesuada lacinia dolor
-            rutrum vel. Vivamus rutrum volutpat sagittis. Vestibulum ante ipsum
-            primis in faucibus orci luctus et ultrices posuere cubilia curae;
-            Nullam vel sem non enim pulvinar suscipit.
+            Recepient address must start with 1 if classic, or with bc1q if SegWit.<br />
+            Start typing the token to access to your list of tokens.<br />
+            <br />
+            Enter the amount of tokens that you want to transfer. <br />
+            <br />
+            FEES shows the suggested amount, and you can adjust it with the slider.Lowering the fee may delay your art being stamped.<br />
+            Fees are displayed in BTC by default, but you can switch to USDT using the TOGGLE.<br />
+            All related costs are listed under the DETAILS section.<br />
+            Accept the terms and conditions to enable the Transfer button.<br />
+            <br /> 
+            The Transfer button will submit your transaction with all the provided information.<br />
           </p>
           <PlaceholderImage className="w-full md:w-[660px] h-[318px]" />
           <p className="mt-6">
