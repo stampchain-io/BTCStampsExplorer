@@ -72,7 +72,7 @@ export const handler: Handlers<TX | TXError> = {
         };
 
         const psbtData = await SRC20Service.PSBTService.preparePSBT({
-          sourceAddress: body.sourceAddress, // Use sourceAddress for UTXO selection
+          sourceAddress: effectiveSourceAddress,
           toAddress: body.toAddress,
           src20Action,
           satsPerVB: Number(body.feeRate),
