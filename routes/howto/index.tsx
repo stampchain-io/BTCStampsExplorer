@@ -28,32 +28,31 @@ export default function HowTo() {
       <section className="mb-6">
         <h1 className="gray-gradient3 text-6xl font-black">HOW-TO</h1>
         <h2 className="text-2xl md:text-5xl font-extralight mb-3">
-          MANUALS
+          OUR STEP-BY-STEP GUIDES
         </h2>
-        <p className="mb-12">
+        <p className="mb-12 text-xl">
           Explore our comprehensive How-To section, where you'll find
-          step-by-step guides for the most popular features on our platform.
-          {" "}
-          <br />
+          step-by-step guides for the most popular features on our
+          platform.<br />
           Whether you're a beginner or a pro, these guides will help you make
           the most out of every tool we offer. <br />
-          Need help with something that's not covered? Let us know! Reach out to
-          us, and we'll be happy to create new how-tos based on your
-          suggestions.
+          Need help with something that's not covered? Let us know! <br />
+          Reach out to us, and we'll be happy to create new how-tos based on
+          your suggestions.
         </p>
       </section>
 
       <section>
-        <h2 className="text-2xl md:text-5xl font-extralight mb-3">TITLE</h2>
+        <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+          DEPLOY YOUR OWN TOKEN
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <PlaceholderImage width={432} height={243} />
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
-              SRC-20 is a fungible token protocol that embeds transactions
-              directly onto the Bitcoin blockchain, removing the need for
-              Counterparty as of block 796,000.<br />
-              Inspired by BRC-20, it operates with only standard BTC miner fees
-              while preserving data immutability.<br />
+              To deploy an SRC-20 token, stamp the transaction on Bitcoin with
+              the token's supply and metadata. This makes the token immutable
+              and secured by Bitcoin's blockchain.<br />
               In this guide, you'll learn how to deploy your very own SRC-20
               token!
             </p>
@@ -69,21 +68,106 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className="text-2xl md:text-5xl font-extralight mb-3">TITLE</h2>
+        <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+          MINT YOUR TOKEN
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id
-              sem vitae lacus venenatis blandit. Curabitur pharetra ipsum id
-              mauris pulvinar auctor. Ut sit amet diam condimentum, vehicula
-              justo in. Aenean tincidunt nisl mattis, bibendum velit at, dictum
-              leo non interdum pulvinar alot. Nam tempus suscipit velit non
-              interdum sem vitae lacus venenatis alot amet, consectetur dolor
-              ...
+              After deployment, token holders can mint SRC-20 tokens based on
+              the initial supply set in the contract.<br />
+              In this guide, you'll learn how to mint a SRC-20 token!
             </p>
             <a
-              href="/howto/deploytoken"
-              f-partial="/howto/deploytoken"
+              href="/howto/mint"
+              f-partial="/howto/mint"
+              className="text-base font-extrabold border-2 border-[#999999] text-[#999999] w-[138px] h-[48px] flex justify-center items-center rounded-md"
+            >
+              READ MORE
+            </a>
+          </div>
+          <PlaceholderImage width={432} height={243} />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+          STAMPING ART
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <PlaceholderImage width={432} height={243} />
+          <div className="md:col-span-2 flex flex-col gap-3">
+            <p>
+              Art is Art In this guide, you'll learn how to stamp art!
+            </p>
+            <a
+              href="/howto/getstamping"
+              f-partial="/howto/getstamping"
+              className="text-base font-extrabold border-2 border-[#999999] text-[#999999] w-[138px] h-[48px] flex justify-center items-center rounded-md"
+            >
+              READ MORE
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+          TRANSFER FUNCTIONALITY
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="md:col-span-2 flex flex-col gap-3">
+            <p>
+              Send an SOS In this guide, you'll learn how to transfer SRC-20
+              tokens and stamp art!
+            </p>
+            <a
+              href="/howto/mint"
+              f-partial="/howto/mint"
+              className="text-base font-extrabold border-2 border-[#999999] text-[#999999] w-[138px] h-[48px] flex justify-center items-center rounded-md"
+            >
+              READ MORE
+            </a>
+          </div>
+          <PlaceholderImage width={432} height={243} />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+          CREATE AND CONNECT A LEATHER WALLET
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <PlaceholderImage width={432} height={243} />
+          <div className="md:col-span-2 flex flex-col gap-3">
+            <p>
+              New to Bitcoin, Stamps, wallet and others? No worries! <br />
+              In this guide, you'll learn how to stamp art!
+            </p>
+            <a
+              href="/howto/leathercreate"
+              f-partial="/howto/leathercreate"
+              className="text-base font-extrabold border-2 border-[#999999] text-[#999999] w-[138px] h-[48px] flex justify-center items-center rounded-md"
+            >
+              READ MORE
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+          TRANSFER FUNCTIONALITY II
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="md:col-span-2 flex flex-col gap-3">
+            <p>
+              Send an SOS In this guide, you'll learn how to transfer SRC-20
+              tokens and stamp art!
+            </p>
+            <a
+              href="/howto/mint"
+              f-partial="/howto/mint"
               className="text-base font-extrabold border-2 border-[#999999] text-[#999999] w-[138px] h-[48px] flex justify-center items-center rounded-md"
             >
               READ MORE
