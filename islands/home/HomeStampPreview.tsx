@@ -97,7 +97,7 @@ export function HomeStampPreview({
         <h1 class="text-5xl md:text-5xl lg:text-6xl  font-black gray-gradient1">
           FEATURED COLLECTIONS
         </h1>
-        <p className="text-[#CCCCCC] text-2xl md:text-5xl font-extralight">
+        <p className="text-[#CCCCCC] text-2xl md:text-5xl font-extralight hidden">
           LOREM IPSUM DOLOR
         </p>
 

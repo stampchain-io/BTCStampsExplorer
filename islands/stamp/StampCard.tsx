@@ -105,8 +105,8 @@ export function StampCard({
         className="
           text-white group relative z-0 flex flex-col
           p-[6px] sm:p-3 rounded-[6px] transition-all
-          w-full max-w-[318px] md:max-w-[348px] xl:max-w-[318px]
-          hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]
+          w-full max-w-[318px] lg:max-w-[348px] xl:max-w-[318px] 2xl:max-w-[318px]
+          hover:border-[#8800CC] hover:shadow-[0px_0px_20px_#8800CC] hover:border-solid border-2 border-transparent
         "
         style={{
           background:
