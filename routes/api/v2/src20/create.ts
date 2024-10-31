@@ -15,13 +15,17 @@ export const handler: Handlers<TX | TXError> = {
       const body: InputData & { trxType?: TrxType } = JSON.parse(rawBody);
       const trxType = body.trxType || "olga";
 
-      // Ensure sourceAddress exists
-      if (!body.sourceAddress) {
-        return ResponseUtil.error("sourceAddress is required", 400);
-      }
-
-      // Use sourceAddress as changeAddress if not provided
+      // Set sourceAddress to changeAddress if not provided, and vice versa
+      const effectiveSourceAddress = body.sourceAddress || body.changeAddress;
       const effectiveChangeAddress = body.changeAddress || body.sourceAddress;
+
+      // Ensure at least one address exists
+      if (!effectiveSourceAddress) {
+        return ResponseUtil.error(
+          "Either sourceAddress or changeAddress is required",
+          400,
+        );
+      }
 
       // Validate operation for both transaction types
       const validationError = await SRC20Service.UtilityService
@@ -29,6 +33,7 @@ export const handler: Handlers<TX | TXError> = {
           body.op.toLowerCase() as "deploy" | "mint" | "transfer",
           {
             ...body,
+            sourceAddress: effectiveSourceAddress,
             changeAddress: effectiveChangeAddress,
           },
         );
