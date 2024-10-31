@@ -29,14 +29,14 @@ export default function HowTo() {
           MANUALS
         </h2>
         <p className="mb-12">
-          Explore our comprehensive How-To section, where you’ll find step-by-step guides for the most popular features on our platform. </n>
+           Explore our comprehensive How-To section, where you’ll find step-by-step guides for the most popular features on our platform. </n>
           Whether you're a beginner or a pro, these guides will help you make the most out of every tool we offer. </n>
           Need help with something that’s not covered? Let us know! Reach out to us, and we’ll be happy to create new how-tos based on your suggestions.
         </p>
       </section>
 
       <section>
-        <h2 className="text-2xl md:text-5xl font-extralight mb-3">DEPLOY TOKEN</h2>
+        <h2 className="text-2xl md:text-5xl font-extralight mb-3">TITLE</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <PlaceholderImage width={432} height={243} />
           <div className="md:col-span-2 flex flex-col gap-3">
