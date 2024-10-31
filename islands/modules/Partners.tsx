@@ -13,7 +13,7 @@ function PartnerCard({ imageSrc, name }: Partner) {
   return (
     <div className="relative cursor-pointer">
       <img src={imageSrc} alt={`${name} banner`} loading="lazy" />
-      <div className="opacity-0 hover:opacity-100 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute inset-0 transition-opacity duration-300" />
+      <div className="opacity-100 hover:opacity-0 bg-gradient-from-tr bg-gradient-to-bl from-[#CCCCCC00] via-[#9999997F] to-[#666666FF] absolute inset-0 transition-opacity duration-300" />
     </div>
   );
 }
