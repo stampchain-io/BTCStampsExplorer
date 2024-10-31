@@ -38,45 +38,45 @@ export default function HowTo() {
         <section>
           <h1 className="gray-gradient3 text-6xl font-black">HOW-TO</h1>
           <h2 className="text-2xl md:text-5xl font-extralight mb-3">
-            DEPLOY TOKEN
+            Create a Leather wallet
           </h2>
           <p className="mb-12">
-            SRC-20 is a fungible token protocol that records transactions directly on the Bitcoin blockchain, eliminating the need for Counterparty since block 796,000.<br /> 
-            Drawing inspiration from BRC-20, SRC-20 leverages standard BTC miner fees while ensuring data immutability. <br />
-            In this guide, you'll learn how to deploy your own SRC-20 token! <br/> <br/>
-            Note: Before starting, please ensure that your wallet is connected to stmapchain.io and has sufficient funds.
-            
+            Open you Chrome or Brave browser  <br />
+            <br />
+            Download the Leather.io extension for chrome from the Chrome web store.<br />
+            <br />
+            Click on "Add to Chrome". <br />
+            <br />
+            Click on "Add extension" button. <br />
+            <br />
+            Once that extension is downloaded and installed you will see this screen.
+            <br />
+            Create your wallet <br />
+            Click on "Create new wallet" button. <br />
+            <br />
+            Back up your secret key.<br/>
+            <br/>
+            Critical Reminder! Make sure to back up your secret key in a secure location. <br />
+            If you lose your secret key, you won't be able to restore or import it. <br />
+            Additionally, if someone gains access to your secret key, they will have full control of your wallet.<br />
+            Click on "I've backed it up" button. <br />
+            <br />
+            Set password. <br />
+            <br/>
+            Make sure that you have a strong password and click on "Continue" <br/>
+            <br />
+            Congratulations your wallet has been created! <br />
+                        
           </p>
           <PlaceholderImage className="w-full md:w-[660px] h-[318px]" />
           <p className="mt-6">
-            Click the icon to upload your ticker artwork in a supported format.<br/>
-            <br/>
-            The token ticker name must be unique and no longer than ## characters.<br/>
-            <br/>
-            Use the TOGGLE to switch between Simple and Expert modes to customize XXXXXXXXXXXXX.<br />
-            <br />
-            Supply defines the number of tokens, between # and ###########.<br />
-            <br/>
-            Decimals specify how many decimal places your token will have (similar to Satoshis for Bitcoin).<br />
-            <br />
-            Limit per Mint sets the maximum number of tokens that can be minted in a single session.<br />
-            <br />
-            In the Description field, provide details on the token’s utility or purpose.<br />
-            <br />
-            Fill in additional token information, such as your website, X (Twitter) handle, email, and Telegram.<br />
-            <br />
-            FEES shows the suggested amount, adjustable via the slider. Lowering the fee might slow down the stamping process.<br />
-            Fees are displayed in BTC by default, but you can toggle to switch to USDT.<br />
-            All related costs are detailed in the DETAILS section.<br />
-            Accept the terms and conditions to activate the DEPLOY button.<br />
-            <br />
-            The DEPLOY button will submit your transaction with all the provided details.<br />
+           xxxxxx
           </p>
         </section>
 
         <section className="flex flex-col gap-3">
           <h2 className="text-2xl md:text-5xl font-extralight">
-            Click on DEPLOY BUTTON
+            Click on "Add to Chrome"
           </h2>
           <p>
             When clicking on Deploy button you will have to confirm your transaction.<br />
