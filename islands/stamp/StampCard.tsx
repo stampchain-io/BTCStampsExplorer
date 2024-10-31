@@ -102,12 +102,7 @@ export function StampCard({
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
         f-partial={`/stamp/${stamp.tx_hash}`}
-        className="
-          text-white group relative z-0 flex flex-col
-          p-[6px] sm:p-3 rounded-[6px] transition-all
-          w-full max-w-[318px] lg:max-w-[348px] xl:max-w-[318px] 2xl:max-w-[318px]
-          hover:border-[#aa00ff] hover:shadow-[0px_0px_30px_#aa00ff] hover:border-solid border-2 border-transparent
-        "
+        className="text-white group relative z-0 flex flex-col p-[max(6px,min(12px,calc(6px+((100vw-360px)*0.029))))] sm:p-3 rounded-[6px] transition-all w-full max-w-[318px] lg:max-w-[348px] xl:max-w-[318px] 2xl:max-w-[318px] hover:border-[#aa00ff] hover:shadow-[0px_0px_30px_#aa00ff] hover:border-solid border-2 border-transparent"
         style={{
           background:
             "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
@@ -129,12 +124,12 @@ export function StampCard({
 
         {/* Info Section */}
         {showInfo && (
-          <div className="flex flex-col pt-1 font-medium px-[6px] xl:px-3">
+          <div className="flex flex-col font-medium px-[6px] xl:px-3">
             {/* Conditionally render the additional text */}
             {showDetails && (
               <>
                 {/* Stamp Number */}
-                <div className="text-center">
+                <div className="pt-1 text-center">
                   {shouldDisplayHash && (
                     <span className="text-[#666666] text-3xl font-light font-work-sans">
                       #
