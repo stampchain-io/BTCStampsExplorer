@@ -23,6 +23,12 @@ interface FeeEstimationProps {
   outputTypes?: ScriptType[];
   disabled?: boolean;
   utxoAncestors?: AncestorInfo[];
+  feeDetails?: {
+    minerFee?: number;
+    dustValue?: number;
+    totalValue?: number;
+    hasExactFees: boolean;
+  };
 }
 
 export function FeeEstimation({
@@ -43,6 +49,7 @@ export function FeeEstimation({
   outputTypes,
   disabled = false,
   utxoAncestors,
+  feeDetails,
 }: FeeEstimationProps) {
   const { fees, loading } = useFeePolling(300000);
 
@@ -75,28 +82,61 @@ export function FeeEstimation({
 
   useEffect(() => {
     if (fileSize && fee) {
-      const { minerFee, dustValue, detectedInputType } =
-        calculateTransactionFees({
-          type: type as "stamp" | "src20" | "fairmint" | "transfer",
-          fileSize,
-          userAddress,
-          outputTypes,
-          feeRate: fee,
-          isMultisig: type === "src20" && outputTypes?.includes("P2SH"),
-          utxoAncestors,
+      console.log("FeeEstimation: Starting fee calculation", {
+        fileSize,
+        feeRate: fee,
+        hasExactFees: feeDetails?.hasExactFees,
+        userAddress,
+        utxoAncestors: utxoAncestors?.length,
+      });
+
+      if (feeDetails?.hasExactFees) {
+        // Use exact fees from backend
+        console.log("FeeEstimation: Using exact fees from backend", {
+          minerFee: feeDetails.minerFee,
+          dustValue: feeDetails.dustValue,
+          totalValue: feeDetails.totalValue,
         });
 
-      // Store values in sats instead of BTC
-      setTxfee(minerFee);
-      setDust(dustValue);
-      setTotal(minerFee + dustValue + (mintfee * 1e8));
+        setTxfee(feeDetails.minerFee);
+        setDust(feeDetails.dustValue);
+        setTotal(feeDetails.totalValue);
+      } else {
+        // Fall back to estimation
+        console.log("FeeEstimation: Using frontend estimation");
+        const { minerFee, dustValue, detectedInputType } =
+          calculateTransactionFees({
+            type: type as "stamp" | "src20" | "fairmint" | "transfer",
+            fileSize,
+            userAddress,
+            outputTypes,
+            feeRate: fee,
+            isMultisig: type === "src20" && outputTypes?.includes("P2SH"),
+            utxoAncestors,
+          });
 
-      console.log(
-        `Detected input type for ${userAddress}: ${detectedInputType}`,
-        `Using ancestor information: ${!!utxoAncestors?.length}`,
-      );
+        console.log("FeeEstimation: Frontend calculation results", {
+          minerFee,
+          dustValue,
+          detectedInputType,
+          totalWithMintFee: minerFee + dustValue + (mintfee * 1e8),
+        });
+
+        setTxfee(minerFee);
+        setDust(dustValue);
+        setTotal(minerFee + dustValue + (mintfee * 1e8));
+      }
     }
-  }, [fileSize, fee, type, userAddress, outputTypes, mintfee, utxoAncestors]);
+  }, [
+    fileSize,
+    fee,
+    type,
+    userAddress,
+    outputTypes,
+    mintfee,
+    utxoAncestors,
+    feeDetails,
+  ]);
 
   // Define the coin icons
   const btcIcon = (
@@ -274,8 +314,7 @@ export function FeeEstimation({
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
             {/* FIXME: multisig dust  only applies to multisig SRC-20 tokens, not olga(p2swsh) stamps or src-20 */}
-            <span className="font-light text-[#666666]">Multisig Dust</span>
-            {" "}
+            <span className="font-light text-[#666666]">Trx Dust</span>{" "}
             {coinType === "BTC"
               ? `${dust.toFixed(0)} sats`
               : `${(dust / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
