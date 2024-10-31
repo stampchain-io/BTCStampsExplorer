@@ -75,7 +75,7 @@ export const Pagination = (
           <a
             href={pageUrl}
             f-partial={pageUrl}
-            class={`rounded-md flex items-center justify-center px-3 md:h-9 md:w-9 w-7 h-7 leading-tight font-semibold text-[#080808] 
+            class={`rounded-md flex items-center justify-center w-7 h-7 sm:h-9 sm:w-9 text-sm leading-[16.5px] sm:text-base sm:leading-[19px] font-medium font-work-sans text-[#080808] hover:bg-[#AA00FF] 
               ${currentPage === p ? "bg-[#660099] " : "bg-[#440066]"}`}
           >
             {p}
@@ -98,18 +98,26 @@ export const Pagination = (
           <a
             href={buildPageUrl(1)}
             f-partial={buildPageUrl(1)}
-            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md md:h-9 md:w-9 w-7 h-7"
+            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 sm:h-9 sm:w-9"
           >
-            {"<<"}
+            <img
+              src="/img/datacontrol/CaretDoubleLeft.svg"
+              alt="arrow double left"
+              className="w-[13px] h-[13px]"
+            />
           </a>
         </li>
         <li>
           <a
             href={buildPageUrl(Math.max(1, currentPage - 1))}
             f-partial={buildPageUrl(Math.max(1, currentPage - 1))}
-            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md md:h-9 md:w-9 w-7 h-7"
+            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 sm:h-9 sm:w-9"
           >
-            {"<"}
+            <img
+              src="/img/datacontrol/CaretLeft.svg"
+              alt="arrow left"
+              className="w-[13px] h-[13px]"
+            />
           </a>
         </li>
         {pageItems}
@@ -117,18 +125,26 @@ export const Pagination = (
           <a
             href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
             f-partial={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md md:h-9 md:w-9 w-7 h-7"
+            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 sm:h-9 sm:w-9"
           >
-            {">"}
+            <img
+              src="/img/datacontrol/CaretRight.svg"
+              alt="arrow right"
+              className="w-[13px] h-[13px]"
+            />
           </a>
         </li>
         <li>
           <a
             href={buildPageUrl(totalPages)}
             f-partial={buildPageUrl(totalPages)}
-            class="flex items-center justify-center px-3 leading-tight bg-[#440066] text-[#080808] rounded-md md:h-9 md:w-9 w-7 h-7"
+            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 sm:h-9 sm:w-9"
           >
-            {">>"}
+            <img
+              src="/img/datacontrol/CaretDoubleRight.svg"
+              alt="arrow double right"
+              className="w-[13px] h-[13px]"
+            />
           </a>
         </li>
       </ul>
