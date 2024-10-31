@@ -15,6 +15,7 @@ import ImageFullScreen from "./ImageFullScreen.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
+import { AncestorInfo, UTXO } from "$types/index.d.ts";
 
 import { Config } from "globals";
 
@@ -67,6 +68,11 @@ export function OlgaContent() {
     undefined,
   );
 
+  // Add state for UTXOs and their ancestors
+  const [utxoAncestors, setUtxoAncestors] = useState<AncestorInfo[]>([]);
+
+  const [isLoadingUTXOs, setIsLoadingUTXOs] = useState(false);
+
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
@@ -99,6 +105,71 @@ export function OlgaContent() {
       setAddressError(undefined);
     }
   }, [address, isConnected]);
+
+  // Fetch UTXO ancestors when wallet is connected
+  useEffect(() => {
+    if (isConnected && wallet.address) {
+      const fetchUTXOs = async () => {
+        setIsLoadingUTXOs(true);
+        try {
+          const params = new URLSearchParams();
+          if (wallet.address) {
+            params.append("address", wallet.address);
+          }
+          params.append("includeAncestors", "true");
+          params.append("forTransaction", "true");
+          params.append("type", "stamp");
+          params.append("feeRate", fee.toString());
+
+          if (fileSize) {
+            params.append("fileSize", fileSize.toString());
+          }
+
+          const response = await fetch(
+            `/api/v2/trx/utxoquery?${params.toString()}`,
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch UTXOs");
+          }
+
+          const data = await response.json();
+
+          // Handle the case where we got an estimate
+          if (data.isEstimate) {
+            setUtxoAncestors([]);
+            return;
+          }
+
+          // Properly type the UTXO data
+          const ancestors: AncestorInfo[] = (data.utxos as UTXO[])
+            .filter((utxo) => utxo.ancestor)
+            .map((utxo) => ({
+              fees: utxo.ancestor.fees,
+              vsize: utxo.ancestor.vsize,
+              effectiveRate: utxo.ancestor.effectiveRate,
+            }));
+
+          setUtxoAncestors(ancestors);
+        } catch (error) {
+          console.error("Failed to fetch UTXOs:", error);
+          // Fall back to estimation without UTXOs
+          setUtxoAncestors([]);
+        } finally {
+          setIsLoadingUTXOs(false);
+        }
+      };
+      fetchUTXOs();
+    }
+  }, [isConnected, wallet.address, fee, fileSize]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      // Clear UTXO ancestors when wallet disconnects
+      setUtxoAncestors([]);
+      console.log("Wallet not connected - using basic fee estimation");
+    }
+  }, [isConnected]);
 
   const validateWalletAddress = (address: string) => {
     const { isValid, error } = validateWalletAddressForMinting(address);
@@ -588,12 +659,14 @@ export function OlgaContent() {
           issuance={parseInt(issuance, 10)}
           userAddress={address}
           outputTypes={["P2WSH"]}
+          utxoAncestors={utxoAncestors}
           BTCPrice={BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={false}
           onSubmit={handleMint}
           buttonName="Stamp"
-          disabled={!!addressError}
+          disabled={!!addressError || isLoadingUTXOs}
+          isLoadingUTXOs={isLoadingUTXOs}
         />
 
         <StatusMessages

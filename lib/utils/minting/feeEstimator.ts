@@ -1,14 +1,20 @@
-import {
+import type {
+  AncestorInfo,
   FeeEstimationParams,
   FeeEstimationResult,
+  TransactionInput,
   TransactionOutput,
-} from "$types/transaction.d.ts";
+} from "$types/index.d.ts";
 import { TX_CONSTANTS } from "./constants.ts";
-import { calculateDust, estimateFee } from "./feeCalculations.ts";
+import {
+  calculateDust,
+  calculateMiningFee,
+} from "$lib/utils/minting/feeCalculations.ts";
 import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
 
 interface EnhancedFeeEstimationParams extends FeeEstimationParams {
   userAddress?: string;
+  utxoAncestors?: AncestorInfo[];
 }
 
 export function calculateTransactionFees({
@@ -18,52 +24,59 @@ export function calculateTransactionFees({
   outputTypes = ["P2WSH"],
   feeRate,
   isMultisig = false,
+  utxoAncestors = [],
 }: EnhancedFeeEstimationParams): FeeEstimationResult {
-  // Detect input type from address if provided, otherwise default to P2WPKH
   const detectedInputType = userAddress
     ? detectScriptType(userAddress)
     : "P2WPKH";
-
-  let outputs: TransactionOutput[] = [];
+  const outputs: TransactionOutput[] = [];
   let dustValue = 0;
 
-  switch (type) {
-    case "stamp":
-      dustValue = calculateDust(fileSize);
-      outputs = Array(Math.ceil(fileSize / 32)).fill({
-        type: "P2WSH" as const,
-        value: TX_CONSTANTS.DUST_SIZE,
-        isWitness: TX_CONSTANTS.P2WSH.isWitness,
+  if (type === "stamp") {
+    // Calculate CIP33 outputs
+    const dataChunks = Math.ceil(fileSize / 32);
+
+    // Add issuance output
+    outputs.push({
+      type: "P2PKH", // Issuance output type
+      value: TX_CONSTANTS.DUST_SIZE,
+      isWitness: false,
+      size: TX_CONSTANTS.P2PKH.size,
+    });
+
+    // Add CIP33 data outputs
+    for (let i = 0; i < dataChunks; i++) {
+      outputs.push({
+        type: "P2WSH",
+        value: TX_CONSTANTS.DUST_SIZE + i, // Match the actual dust calculation
+        isWitness: true,
         size: TX_CONSTANTS.P2WSH.size,
       });
-      break;
+    }
 
-    case "src20":
-      outputs = outputTypes.map((outputType) => ({
-        type: outputType,
-        value: isMultisig ? TX_CONSTANTS.SRC20_DUST : TX_CONSTANTS.DUST_SIZE,
-        isWitness: TX_CONSTANTS[outputType].isWitness,
-        size: TX_CONSTANTS[outputType].size,
-      }));
-      dustValue = outputs.reduce(
-        (sum, output) =>
-          sum + (output.value <= TX_CONSTANTS.DUST_SIZE ? output.value : 0),
-        0,
-      );
-      break;
+    // Add service fee output
+    outputs.push({
+      type: "P2WPKH",
+      value: TX_CONSTANTS.DUST_SIZE,
+      isWitness: true,
+      size: TX_CONSTANTS.P2WPKH.size,
+    });
 
-    case "fairmint":
-    case "transfer":
-      outputs = [{
-        type: detectedInputType,
-        value: TX_CONSTANTS.DUST_SIZE,
-        isWitness: TX_CONSTANTS[detectedInputType].isWitness,
-        size: TX_CONSTANTS[detectedInputType].size,
-      }];
-      break;
+    // Calculate total dust
+    dustValue = outputs.reduce((sum, output) => sum + output.value, 0);
   }
 
-  const minerFee = estimateFee(outputs, feeRate, 1, detectedInputType);
+  const inputs: TransactionInput[] = [{
+    type: detectedInputType,
+    isWitness: TX_CONSTANTS[detectedInputType].isWitness,
+    size: TX_CONSTANTS[detectedInputType].size,
+    ancestor: utxoAncestors?.[0]?.ancestor,
+  }];
+
+  const minerFee = calculateMiningFee(inputs, outputs, feeRate, {
+    includeChangeOutput: true,
+    changeOutputType: detectedInputType,
+  });
 
   return {
     minerFee,

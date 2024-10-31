@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import type { Output, ScriptType } from "$types/index.d.ts";
+import type { AncestorInfo, Output, ScriptType } from "$types/index.d.ts";
 import { calculateTransactionFees } from "$lib/utils/minting/feeEstimator.ts";
 
 interface FeeEstimationProps {
@@ -22,6 +22,7 @@ interface FeeEstimationProps {
   inputType?: ScriptType;
   outputTypes?: ScriptType[];
   disabled?: boolean;
+  utxoAncestors?: AncestorInfo[];
 }
 
 export function FeeEstimation({
@@ -41,6 +42,7 @@ export function FeeEstimation({
   inputType = "P2WPKH",
   outputTypes,
   disabled = false,
+  utxoAncestors,
 }: FeeEstimationProps) {
   const { fees, loading } = useFeePolling(300000);
 
@@ -81,6 +83,7 @@ export function FeeEstimation({
           outputTypes,
           feeRate: fee,
           isMultisig: type === "src20" && outputTypes?.includes("P2SH"),
+          utxoAncestors,
         });
 
       // Store values in sats instead of BTC
@@ -90,9 +93,10 @@ export function FeeEstimation({
 
       console.log(
         `Detected input type for ${userAddress}: ${detectedInputType}`,
+        `Using ancestor information: ${!!utxoAncestors?.length}`,
       );
     }
-  }, [fileSize, fee, type, userAddress, outputTypes, mintfee]);
+  }, [fileSize, fee, type, userAddress, outputTypes, mintfee, utxoAncestors]);
 
   // Define the coin icons
   const btcIcon = (
