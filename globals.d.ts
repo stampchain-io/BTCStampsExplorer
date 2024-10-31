@@ -78,7 +78,7 @@ export interface StampRow {
   block_index: number;
   cpid: string;
   creator: string;
-  divisible: number;
+  divisible: boolean;
   keyburn: number | null;
   locked: number;
   stamp_base64: string;

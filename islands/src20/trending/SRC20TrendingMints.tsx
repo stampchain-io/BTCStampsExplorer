@@ -179,6 +179,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                     onClick={() =>
                       handleImageInteraction(`/content/${src20.tx_hash}.svg`)}
                   />
+
                   <div class="w-full">
                     <div class="flex justify-between">
                       <a
@@ -223,10 +224,8 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                         )}
                     </div>
                   </div>
-                </div>
-                {/* Mint Button */}
-                {
-                  /* <div class="w-full flex justify-end mt-2">
+
+                  {/* Mint Button */}
                   <a
                     href={`/stamping/src20/mint?tick=${
                       encodeURIComponent(
@@ -234,12 +233,11 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                       )
                     }&trxType=${encodeURIComponent(trxType)}`}
                   >
-                    <button className="bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]">
+                    <button className="hidden xs:block bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[66px] md:w-[84px] h-[36px] md:h-[48px]">
                       Mint
                     </button>
                   </a>
-                </div> */
-                }
+                </div>
               </div>
             );
           })}

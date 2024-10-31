@@ -1,4 +1,3 @@
-import { useState } from "preact/hooks";
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
@@ -37,10 +36,6 @@ export function StampCard({
   abbreviationLength?: number;
   showDetails?: boolean;
 }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const goToLink = (link: string) => {
-    window.location.href = link;
-  };
   let src: string;
   const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
@@ -90,7 +85,7 @@ export function StampCard({
     (stamp.cpid && stamp.cpid.charAt(0) === "A");
 
   const supplyDisplay = stamp.ident !== "SRC-20" && stamp.balance
-    ? `${getSupply(stamp.balance, stamp.divisible)}/${
+    ? `${getSupply(Number(stamp.balance), stamp.divisible)}/${
       stamp.supply < 100000 && !stamp.divisible
         ? getSupply(stamp.supply, stamp.divisible)
         : "+100000"
@@ -110,7 +105,7 @@ export function StampCard({
         className="
           text-white group relative z-0 flex flex-col
           p-[6px] sm:p-3 rounded-[6px] transition-all
-          w-full max-w-[318px] lg:max-w-[348px] xl:max-w-[318px] 2xl:max-w-[318px]
+          w-full max-w-[318px] md:max-w-[348px] xl:max-w-[318px]
           hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]
         "
         style={{
@@ -134,7 +129,7 @@ export function StampCard({
 
         {/* Info Section */}
         {showInfo && (
-          <div className="flex flex-col pt-1 font-title font-medium text-text">
+          <div className="flex flex-col pt-1 font-medium px-[6px] xl:px-3">
             {/* Conditionally render the additional text */}
             {showDetails && (
               <>
@@ -145,7 +140,7 @@ export function StampCard({
                       #
                     </span>
                   )}
-                  <span className="sm:text-l md:text-l lg:text-2xl xl:text-2xl 2xl:text-3xl font-black bg-gradient-to-r from-[#666666] to-[#999999] bg-clip-text text-transparent">
+                  <span className="text-lg md:text-xl xl:text-2xl 2xl:text-3xl font-black bg-gradient-to-r from-[#666666] to-[#999999] bg-clip-text text-transparent">
                     {Number(stamp.stamp ?? 0) >= 0 ||
                         (stamp.cpid && stamp.cpid.charAt(0) === "A")
                       ? `${stamp.stamp}`
@@ -154,7 +149,7 @@ export function StampCard({
                 </div>
 
                 {/* Creator Name or Abbreviated Address */}
-                <div className="text-center text-[#999999] text-base md:text-base lg:text-lg xl:text-lg 2xl:text-xl font-bold font-work-sans break-words">
+                <div className="text-center text-[#999999] text-base md:text-base xl:text-lg 2xl:text-xl font-bold font-work-sans break-words truncate">
                   {creatorDisplay}
                 </div>
 
@@ -162,13 +157,13 @@ export function StampCard({
                 <div className="flex justify-between mt-2">
                   {/* Render Price on the Left */}
                   <div>
-                    <span className="text-[#999999] text-sm sm:text-xs md:text-sm lg:text-sm xl:text-base 2xl:text-lg font-medium font-work-sans">
+                    <span className="text-[#999999] text-xs md:text-sm xl:text-base 2xl:text-lg font-medium font-work-sans">
                       {renderPrice()}
                     </span>
                   </div>
 
                   {/* Supply on the Right */}
-                  <div className="text-right text-[#666666] text-sm sm:text-xs md:text-sm lg:text-sm xl:text-base 2xl:text-lg font-bold font-work-sans">
+                  <div className="text-right text-[#666666] text-xs md:text-sm xl:text-base 2xl:text-lg font-bold font-work-sans">
                     {supplyDisplay}
                   </div>
                 </div>
