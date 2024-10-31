@@ -37,6 +37,8 @@ export class SRC20PSBTService {
     service_fee_address: string;
     changeAddress: string;
   }) {
+    const effectiveChangeAddress = changeAddress || sourceAddress;
+
     console.log("Entering preparePSBT with params:", {
       sourceAddress,
       toAddress,
@@ -44,6 +46,7 @@ export class SRC20PSBTService {
       satsPerVB,
       service_fee,
       service_fee_address,  
+      changeAddress: effectiveChangeAddress,
     });
 
     const network = bitcoin.networks.bitcoin;
@@ -204,7 +207,7 @@ export class SRC20PSBTService {
       totalDustValue: vouts.reduce((sum, vout) => 
           vout.value <= this.DUST_SIZE ? sum + vout.value : sum, 0),
       estMinerFee,
-      changeAddress: sourceAddress,
+      changeAddress: changeAddress,
     };
   }
 
