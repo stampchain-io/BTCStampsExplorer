@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import axiod from "axiod";
 
 import { walletContext } from "$client/wallet/wallet.ts";
@@ -22,6 +22,17 @@ import { Config } from "globals";
 const log = (message: string, data?: any) => {
   console.log(`[OlgaContent] ${message}`, data ? data : "");
 };
+
+interface TxDetails {
+  fee: number;
+  dust: number;
+  total: number;
+  txDetails: {
+    estimatedSize: number;
+    totalInputValue: number;
+    changeOutput: number;
+  };
+}
 
 export function OlgaContent() {
   const { config, isLoading } = useConfig<Config>();
@@ -68,10 +79,7 @@ export function OlgaContent() {
     undefined,
   );
 
-  // Add state for UTXOs and their ancestors
-  const [utxoAncestors, setUtxoAncestors] = useState<AncestorInfo[]>([]);
-
-  const [isLoadingUTXOs, setIsLoadingUTXOs] = useState(false);
+  const [txDetails, setTxDetails] = useState<TxDetails | null>(null);
 
   useEffect(() => {
     if (fees && !loading) {
@@ -106,70 +114,51 @@ export function OlgaContent() {
     }
   }, [address, isConnected]);
 
-  // Fetch UTXO ancestors when wallet is connected
+  // When file is uploaded
   useEffect(() => {
-    if (isConnected && wallet.address) {
-      const fetchUTXOs = async () => {
-        setIsLoadingUTXOs(true);
+    if (isConnected && wallet.address && file) {
+      const prepareTx = async () => {
         try {
-          const params = new URLSearchParams();
-          if (wallet.address) {
-            params.append("address", wallet.address);
-          }
-          params.append("includeAncestors", "true");
-          params.append("forTransaction", "true");
-          params.append("type", "stamp");
-          params.append("feeRate", fee.toString());
+          const data = await toBase64(file);
+          const response = await axiod.post("/api/v2/olga/mint", {
+            sourceWallet: address,
+            file: data,
+            satsPerKB: fee * 1000,
+            locked: isLocked,
+            qty: issuance,
+            filename: file.name,
+            ...(isPoshStamp && stampName ? { assetName: stampName } : {}),
+            dryRun: true, // Flag for fee estimation
+          });
 
-          if (fileSize) {
-            params.append("fileSize", fileSize.toString());
-          }
-
-          const response = await fetch(
-            `/api/v2/trx/utxoquery?${params.toString()}`,
-          );
-
-          if (!response.ok) {
-            throw new Error("Failed to fetch UTXOs");
-          }
-
-          const data = await response.json();
-
-          // Handle the case where we got an estimate
-          if (data.isEstimate) {
-            setUtxoAncestors([]);
-            return;
-          }
-
-          // Properly type the UTXO data
-          const ancestors: AncestorInfo[] = (data.utxos as UTXO[])
-            .filter((utxo) => utxo.ancestor)
-            .map((utxo) => ({
-              fees: utxo.ancestor.fees,
-              vsize: utxo.ancestor.vsize,
-              effectiveRate: utxo.ancestor.effectiveRate,
-            }));
-
-          setUtxoAncestors(ancestors);
+          setTxDetails(response.data);
+          setFeeDetails({
+            minerFee: response.data.fee,
+            dustValue: response.data.dust,
+            totalValue: response.data.total,
+            hasExactFees: true,
+          });
         } catch (error) {
-          console.error("Failed to fetch UTXOs:", error);
-          // Fall back to estimation without UTXOs
-          setUtxoAncestors([]);
-        } finally {
-          setIsLoadingUTXOs(false);
+          console.error("Transaction preparation error:", error);
+          setFeeDetails({ hasExactFees: false });
         }
       };
-      fetchUTXOs();
+      prepareTx();
     }
-  }, [isConnected, wallet.address, fee, fileSize]);
+  }, [isConnected, wallet.address, file]); // Only recalculate when these change
 
+  // Handle fee rate changes without rebuilding transaction
   useEffect(() => {
-    if (!isConnected) {
-      // Clear UTXO ancestors when wallet disconnects
-      setUtxoAncestors([]);
-      console.log("Wallet not connected - using basic fee estimation");
+    if (txDetails && fee) {
+      const newFee = Math.ceil(txDetails.txDetails.estimatedSize * fee);
+      setFeeDetails({
+        minerFee: newFee,
+        dustValue: txDetails.dust,
+        totalValue: txDetails.total - txDetails.fee + newFee,
+        hasExactFees: true,
+      });
     }
-  }, [isConnected]);
+  }, [fee, txDetails]);
 
   const validateWalletAddress = (address: string) => {
     const { isValid, error } = validateWalletAddressForMinting(address);
@@ -321,7 +310,7 @@ export function OlgaContent() {
           locked: isLocked,
           filename: file.name,
           file: data,
-          satsPerKB: fee,
+          satsPerKB: fee * 1000, // Convert sat/vB to satsPerKB
           service_fee: config?.MINTING_SERVICE_FEE,
           service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
         };
@@ -403,8 +392,17 @@ export function OlgaContent() {
           setApiError("");
         }
       } catch (error: unknown) {
-        log("Error in minting process", error);
-        throw error;
+        console.error("Minting error:", error);
+
+        const errorMessage = error instanceof Error
+          ? error.message
+          : typeof error === "object" && error && "data" in error
+          ? (error.data as any)?.message || "Unknown error"
+          : "An unexpected error occurred during minting";
+
+        // Set the error message for display
+        setApiError(errorMessage);
+        setSubmissionMessage(null);
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error
@@ -423,6 +421,10 @@ export function OlgaContent() {
     if (!file) return;
     setIsFullScreenModalOpen(!isFullScreenModalOpen);
   };
+
+  const [feeDetails, setFeeDetails] = useState({
+    hasExactFees: false,
+  });
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
@@ -655,18 +657,16 @@ export function OlgaContent() {
           handleChangeFee={handleChangeFee}
           type="stamp"
           fileType={file?.type}
-          fileSize={fileSize ?? undefined}
+          fileSize={fileSize}
           issuance={parseInt(issuance, 10)}
-          userAddress={address}
-          outputTypes={["P2WSH"]}
-          utxoAncestors={utxoAncestors}
           BTCPrice={BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={false}
           onSubmit={handleMint}
           buttonName="Stamp"
-          disabled={!!addressError || isLoadingUTXOs}
-          isLoadingUTXOs={isLoadingUTXOs}
+          userAddress={address}
+          feeDetails={feeDetails}
+          disabled={!!addressError}
         />
 
         <StatusMessages

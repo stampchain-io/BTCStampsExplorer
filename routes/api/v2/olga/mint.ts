@@ -17,6 +17,8 @@ export const handler: Handlers<TX | TXError> = {
       return ResponseUtil.error("Invalid JSON format in request body", 400);
     }
 
+    const isDryRun = body.dryRun === true;
+
     let assetName;
     try {
       assetName = await StampValidationService.validateAndPrepareAssetName(
@@ -34,12 +36,10 @@ export const handler: Handlers<TX | TXError> = {
       prefix: "stamp" as const,
       assetName: assetName,
       satsPerKB: Number(body.satsPerKB),
-      // Only include service fee if it's defined
       ...(body.service_fee && {
         service_fee: body.service_fee ||
           parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS),
       }),
-      // Only include service fee address if service_fee is defined
       ...(body.service_fee && {
         service_fee_address: body.service_fee_address ||
           serverConfig.MINTING_SERVICE_FEE_ADDRESS,
@@ -48,6 +48,21 @@ export const handler: Handlers<TX | TXError> = {
 
     try {
       const mint_tx = await StampMintService.createStampIssuance(prepare);
+
+      if (isDryRun) {
+        // Return just the fee details for estimation
+        return ResponseUtil.success({
+          fee: mint_tx.estMinerFee,
+          dust: mint_tx.totalDustValue,
+          total: mint_tx.totalOutputValue,
+          txDetails: {
+            estimatedSize: mint_tx.estimatedTxSize,
+            totalInputValue: mint_tx.totalInputValue,
+            changeOutput: mint_tx.totalChangeOutput,
+          },
+        });
+      }
+
       if (!mint_tx || !mint_tx.psbt) {
         console.error("Invalid mint_tx structure:", mint_tx);
         return ResponseUtil.error(
