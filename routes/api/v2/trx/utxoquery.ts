@@ -2,96 +2,39 @@ import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
-import type { Output, ScriptType, UTXO } from "$types/index.d.ts";
-import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import type { UTXO } from "$types/index.d.ts";
 
 export const handler: Handlers = {
   async GET(req: Request) {
     try {
       const url = new URL(req.url);
       const address = url.searchParams.get("address");
-      const includeAncestors =
-        url.searchParams.get("includeAncestors") === "true";
-      const forTransaction = url.searchParams.get("forTransaction") === "true";
-      const type = url.searchParams.get("type");
-      const feeRate = url.searchParams.get("feeRate");
-      const fileSize = url.searchParams.get("fileSize");
-
-      console.log("Query parameters:", {
-        address,
-        includeAncestors,
-        forTransaction,
-        type,
-        feeRate,
-        fileSize,
-      });
+      const excludeAssets = url.searchParams.get("excludeAssets") === "true";
 
       if (!address) {
-        console.error("Missing address in request");
         return ResponseUtil.error("Address parameter is required", 400);
       }
 
-      if (forTransaction && type && feeRate) {
+      console.log("Fetching UTXOs for address:", address, {
+        excludeAssets,
+      });
+
+      if (excludeAssets) {
+        // Use selectUTXOsForTransaction to get filtered UTXOs
         try {
-          // Prepare outputs based on transaction type
-          const outputs: Output[] = [];
-          if (type === "stamp" && fileSize) {
-            const size = parseInt(fileSize);
-            const outputCount = Math.ceil(size / 32);
-
-            // Add P2WSH outputs for stamp data
-            for (let i = 0; i < outputCount; i++) {
-              const output: Output = {
-                script: "", // This will be set by the transaction service
-                value: TX_CONSTANTS.DUST_SIZE,
-                scriptType: "P2WSH" as ScriptType,
-                address: "", // This will be set by the transaction service
-              };
-              outputs.push(output);
-            }
-
-            // Add change output
-            const changeOutput: Output = {
-              script: "", // This will be set by the transaction service
-              value: 0, // Will be calculated by selectUTXOsForTransaction
-              scriptType: "P2WPKH" as ScriptType,
-              address: address, // Use the sender's address for change
-            };
-            outputs.push(changeOutput);
-          }
-
           const result = await TransactionService.UTXOService
             .selectUTXOsForTransaction(
               address,
-              outputs,
-              parseInt(feeRate),
-              0, // sigops_rate
-              1.5, // rbfBuffer
-              {
-                filterStampUTXOs: true,
-                includeAncestors,
-              },
+              [], // Empty outputs array as we just want available UTXOs
+              1, // Minimal fee rate as we're just filtering
+              0,
+              1,
+              { filterStampUTXOs: true, includeAncestors: false },
             );
-
-          if (!result || !result.inputs || result.inputs.length === 0) {
-            return new Response(
-              JSON.stringify({
-                utxos: [],
-                isEstimate: true,
-              }),
-              {
-                headers: { "Content-Type": "application/json" },
-              },
-            );
-          }
 
           return new Response(
             JSON.stringify({
-              utxos: result.inputs,
-              fee: result.fee,
-              change: result.change,
-              totalInputs: result.inputs.length,
-              outputs: outputs,
+              utxos: result.inputs.sort((a, b) => a.value - b.value),
             }),
             {
               headers: { "Content-Type": "application/json" },
@@ -99,35 +42,30 @@ export const handler: Handlers = {
           );
         } catch (error) {
           console.error("Error selecting UTXOs:", error);
-          return new Response(
-            JSON.stringify({
-              utxos: [],
-              isEstimate: true,
-            }),
-            {
-              headers: { "Content-Type": "application/json" },
-            },
-          );
+          return ResponseUtil.error("Failed to select UTXOs", 500);
         }
+      } else {
+        // Original behavior for getting all UTXOs
+        const result = await getUTXOForAddress(address);
+        console.log("Raw result from getUTXOForAddress:", result);
+
+        if (!result) {
+          console.log("No UTXOs found");
+          return ResponseUtil.error("No UTXOs found for address", 404);
+        }
+
+        const utxos: UTXO[] = Array.isArray(result) ? result : [result];
+        console.log(`Found ${utxos.length} UTXOs`);
+
+        const sortedUtxos: UTXO[] = [...utxos].sort((a, b) =>
+          a.value - b.value
+        );
+        console.log(`Sorted ${sortedUtxos.length} UTXOs`);
+
+        return new Response(JSON.stringify({ utxos: sortedUtxos }), {
+          headers: { "Content-Type": "application/json" },
+        });
       }
-
-      // Original behavior for general UTXO queries
-      console.log("Fetching all UTXOs for address:", address);
-      const utxos = await getUTXOForAddress(
-        address,
-        undefined,
-        undefined,
-        includeAncestors,
-      );
-
-      if (!utxos) {
-        return ResponseUtil.error("No UTXOs found for address", 404);
-      }
-
-      const sortedUtxos = [...utxos].sort((a, b) => a.value - b.value);
-      return new Response(JSON.stringify({ utxos: sortedUtxos }), {
-        headers: { "Content-Type": "application/json" },
-      });
     } catch (error) {
       console.error("Error in UTXO query handler:", error);
       return ResponseUtil.error(

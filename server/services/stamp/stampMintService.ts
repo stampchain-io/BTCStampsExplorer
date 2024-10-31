@@ -44,6 +44,21 @@ export class StampMintService {
     service_fee_address: string;
     prefix: "stamp" | "file" | "glyph";
   }) {
+    console.log("Starting createStampIssuance with params:", {
+      sourceWallet,
+      assetName,
+      qty,
+      locked,
+      divisible,
+      filename,
+      fileSize: Math.ceil((file.length * 3) / 4),
+      satsPerKB,
+      satsPerVB: satsPerKB / 1000,
+      service_fee,
+      service_fee_address,
+      prefix
+    });
+
     try {
       // Validate source wallet
       const sourceWalletValidation = validateWalletAddressForMinting(sourceWallet);
@@ -80,11 +95,16 @@ export class StampMintService {
       const cip33Addresses = CIP33.file_to_addresses(hex_file);
 
       const fileSize = Math.ceil((file.length * 3) / 4);
+      console.log("File and CIP33 details:", {
+        fileSize,
+        cip33AddressCount: cip33Addresses.length,
+        hex_length: hex_file.length
+      });
 
       const psbt = await this.generatePSBT(
         hex,
         sourceWallet,
-        satsPerKB,
+        satsPerKB / 1000, // Convert to sat/vB
         service_fee,
         service_fee_address,
         cip33Addresses as string[],
@@ -105,119 +125,259 @@ export class StampMintService {
   private static async generatePSBT(
     tx: string,
     address: string,
-    fee_per_kb: number,
+    satsPerVB: number,
     service_fee: number,
     recipient_fee: string,
     cip33Addresses: string[],
     fileSize: number,
   ) {
-    const psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
-    const txObj = bitcoin.Transaction.fromHex(tx);
-    const vouts = extractOutputs(txObj, address);
+    let totalOutputValue = 0;
+    let psbt;
+    let vouts = [];
+    let estMinerFee = 0;
 
-    const totalDustValue = calculateDust(fileSize);
-    let totalOutputValue = totalDustValue;
-
-    // Add CIP33 addresses to outputs
-    for (let i = 0; i < cip33Addresses.length; i++) {
-      const dustValue = TX_CONSTANTS.DUST_SIZE + i;
-      const cip33Address = cip33Addresses[i];
-      vouts.push({
-        value: dustValue,
-        address: cip33Address,
-      });
-      totalOutputValue += dustValue;
-    }
-
-    if (service_fee > 0 && recipient_fee) {
-      vouts.push({
-        value: service_fee,
-        address: recipient_fee,
-      });
-      totalOutputValue += service_fee;
-    }
-
-    const { inputs, change } = await TransactionService.UTXOService
-      .selectUTXOsForTransaction(
+    try {
+      console.log("Starting PSBT generation with params:", {
         address,
-        vouts,
-        fee_per_kb,
-      );
-
-    const totalInputValue = inputs.reduce((sum, input) => sum + input.value, 0);
-
-    // Add inputs to PSBT
-    for (const input of inputs) {
-      const txDetails = await getTransaction(input.txid);
-
-      // Ensure txDetails are available
-      if (!txDetails) {
-        throw new Error(`Failed to fetch transaction details for ${input.txid}`);
-      }
-
-      const inputDetails = txDetails.vout[input.vout];
-
-      if (!inputDetails || !inputDetails.scriptPubKey) {
-        throw new Error(
-          `Failed to get scriptPubKey for input ${input.txid}:${input.vout}`,
-        );
-      }
-
-      const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
-
-      const psbtInput = {
-        hash: input.txid,
-        index: input.vout,
-        sequence: 0xfffffffd, // Enable RBF
-      };
-
-      if (isWitnessUtxo) {
-        psbtInput["witnessUtxo"] = {
-          script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
-          value: input.value,
-        };
-      } else {
-        // For non-witness inputs, we need the full transaction hex
-        psbtInput["nonWitnessUtxo"] = Buffer.from(txDetails.hex, "hex");
-      }
-
-      psbt.addInput(psbtInput);
-    }
-
-    if (change > 0) {
-      vouts.push({
-        value: change,
-        address: address,
+        satsPerVB,
+        satsPerKB: satsPerVB * 1000,
+        service_fee,
+        recipient_fee,
+        cip33AddressCount: cip33Addresses.length,
+        fileSize
       });
-      totalOutputValue += change;
+
+      psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
+      const txObj = bitcoin.Transaction.fromHex(tx);
+      vouts = extractOutputs(txObj, address);
+
+      // Log initial vouts
+      console.log("Initial vouts from transaction:", {
+        count: vouts.length,
+        values: vouts.map(v => v.value)
+      });
+
+      // Calculate size first
+      const estimatedSize = estimateTransactionSize({
+        inputs: [{ 
+          type: "P2WPKH",
+          isWitness: true
+        }],
+        outputs: [
+          { type: "P2PKH", isWitness: false },
+          ...cip33Addresses.map(() => ({ 
+            type: "P2WSH", 
+            isWitness: true 
+          })),
+          { type: "P2WPKH", isWitness: true }
+        ],
+        includeChangeOutput: true,
+        changeOutputType: "P2WPKH"
+      });
+
+      // Add detailed size logging
+      console.log("Transaction size details:", {
+        estimatedSize,
+        inputBreakdown: {
+          txid: 32,
+          vout: 4,
+          sequence: 4,
+          witnessData: 108,
+        },
+        outputBreakdown: {
+          opReturn: 45,
+          p2wshOutputs: cip33Addresses.length * 43,
+          changeOutput: 31,
+        },
+        totalRaw: 32 + 4 + 4 + 108 + 45 + (cip33Addresses.length * 43) + 31
+      });
+
+      // Calculate exact fee needed
+      const exactFeeNeeded = Math.ceil(estimatedSize * satsPerVB);
+
+      console.log("Size and fee calculation:", {
+        estimatedSize,
+        requestedFeeRate: satsPerVB,
+        exactFeeNeeded,
+        expectedFeePerVbyte: exactFeeNeeded / estimatedSize
+      });
+
+      // Add data outputs
+      for (let i = 0; i < cip33Addresses.length; i++) {
+        const dustValue = TX_CONSTANTS.DUST_SIZE + i;
+        vouts.push({
+          value: dustValue,
+          address: cip33Addresses[i],
+        });
+        totalOutputValue += dustValue;
+      }
+
+      console.log("After adding data outputs:", {
+        totalOutputValue,
+        outputCount: vouts.length,
+        dustValues: vouts.map(v => v.value)
+      });
+
+      if (service_fee > 0 && recipient_fee) {
+        vouts.push({
+          value: service_fee,
+          address: recipient_fee,
+        });
+        totalOutputValue += service_fee;
+        console.log("Added service fee output:", {
+          service_fee,
+          newTotalOutputValue: totalOutputValue
+        });
+      }
+
+      // Get UTXO selection
+      const { inputs, initialChange } = await TransactionService.UTXOService
+        .selectUTXOsForTransaction(
+          address,
+          vouts,
+          satsPerVB,
+          0,
+          1.5,
+          { filterStampUTXOs: true, includeAncestors: true }
+        );
+
+      const totalInputValue = inputs.reduce((sum, input) => sum + input.value, 0);
+
+      console.log("UTXO selection results:", {
+        inputCount: inputs.length,
+        totalInputValue,
+        initialChange,
+        inputDetails: inputs.map(input => ({
+          value: input.value,
+          hasAncestor: !!input.ancestor,
+          ancestorFees: input.ancestor?.fees,
+          ancestorVsize: input.ancestor?.vsize
+        }))
+      });
+
+      // Calculate adjusted change
+      const adjustedChange = totalInputValue - totalOutputValue - exactFeeNeeded;
+
+      console.log("Change calculation:", {
+        totalInputValue,
+        totalOutputValue,
+        exactFeeNeeded,
+        adjustedChange,
+        difference: totalInputValue - (totalOutputValue + adjustedChange + exactFeeNeeded)
+      });
+
+      // Verify final fee rate
+      const finalTotalOutputValue = totalOutputValue + adjustedChange;
+      const actualFee = totalInputValue - finalTotalOutputValue;
+      const actualFeeRate = actualFee / estimatedSize;
+
+      console.log("Final fee verification:", {
+        requestedFeeRate: satsPerVB,
+        actualFeeRate,
+        difference: Math.abs(actualFeeRate - satsPerVB),
+        totalInputValue,
+        finalTotalOutputValue,
+        actualFee,
+        estimatedSize,
+        effectiveFeePerVbyte: actualFee / estimatedSize
+      });
+
+      // Add change output
+      if (adjustedChange > 0) {
+        vouts.push({
+          value: adjustedChange,
+          address: address,
+        });
+        console.log("Added change output:", {
+          adjustedChange,
+          finalVoutCount: vouts.length,
+          allVoutValues: vouts.map(v => v.value)
+        });
+      }
+
+      // Add inputs to PSBT
+      for (const input of inputs) {
+        const txDetails = await getTransaction(input.txid);
+
+        // Ensure txDetails are available
+        if (!txDetails) {
+          throw new Error(`Failed to fetch transaction details for ${input.txid}`);
+        }
+
+        const inputDetails = txDetails.vout[input.vout];
+
+        if (!inputDetails || !inputDetails.scriptPubKey) {
+          throw new Error(
+            `Failed to get scriptPubKey for input ${input.txid}:${input.vout}`,
+          );
+        }
+
+        const isWitnessUtxo = inputDetails.scriptPubKey.type.startsWith("witness");
+
+        const psbtInput = {
+          hash: input.txid,
+          index: input.vout,
+          sequence: 0xfffffffd, // Enable RBF
+        };
+
+        if (isWitnessUtxo) {
+          psbtInput["witnessUtxo"] = {
+            script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
+            value: input.value,
+          };
+        } else {
+          // For non-witness inputs, we need the full transaction hex
+          psbtInput["nonWitnessUtxo"] = Buffer.from(txDetails.hex, "hex");
+        }
+
+        psbt.addInput(psbtInput);
+      }
+
+      // Add outputs to PSBT
+      for (const out of vouts) {
+        psbt.addOutput(out);
+      }
+
+      // Final transaction summary
+      console.log("Final transaction structure:", {
+        inputCount: inputs.length,
+        outputCount: vouts.length,
+        totalIn: totalInputValue,
+        totalOut: finalTotalOutputValue,
+        fee: actualFee,
+        feeRate: actualFee / estimatedSize,
+        size: estimatedSize,
+        outputs: vouts.map((v, i) => ({
+          index: i,
+          value: v.value,
+          type: v.address === address ? 'change' : 'data'
+        }))
+      });
+
+      return {
+        psbt,
+        feePerKb: satsPerVB,
+        estimatedTxSize: estimatedSize,
+        totalInputValue,
+        totalOutputValue: finalTotalOutputValue,
+        totalChangeOutput: adjustedChange,
+        totalDustValue: 0,
+        estMinerFee: exactFeeNeeded,
+        changeAddress: address,
+      };
+    } catch (error) {
+      console.error("PSBT Generation Error:", {
+        error,
+        address,
+        fileSize,
+        satsPerVB,
+        totalOutputValue,
+        cip33AddressCount: cip33Addresses.length,
+        vouts: vouts.length,
+        estimatedFee: estMinerFee
+      });
+      throw error;
     }
-
-    // Add outputs to PSBT
-    for (const out of vouts) {
-      psbt.addOutput(out);
-    }
-
-    const estimatedSize = estimateTransactionSize({
-      inputs: inputs,
-      outputs: vouts,
-      includeChangeOutput: true,
-      changeOutputType: "P2WPKH"
-    });
-
-    // Calculate mining fee using the fileSize and fee_per_kb directly
-    const estMinerFee = calculateP2WSHMiningFee(fileSize, fee_per_kb);
-
-    return {
-      psbt,
-      feePerKb: fee_per_kb,
-      estimatedTxSize: estimatedSize,
-      totalInputValue,
-      totalOutputValue,
-      totalChangeOutput: change,
-      totalDustValue,
-      estMinerFee,
-      changeAddress: address,
-    };
   }
 
   static async createIssuanceTransaction({
