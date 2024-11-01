@@ -269,7 +269,7 @@ interface MintStatus {
   limit: number | null;
 }
 
-interface SRC101DeployDetail{
+interface SRC101DeployDetail {
   tx_hash: string;
   block_index: number;
   p: string;
@@ -367,7 +367,7 @@ export interface SRC20BalanceRequestParams {
   includePagination?: boolean;
 }
 
-export interface SRC101TokenidsParams{
+export interface SRC101TokenidsParams {
   deploy_hash: string;
   address_btc: string;
   prim: boolean;
@@ -376,16 +376,16 @@ export interface SRC101TokenidsParams{
   sort?: string;
 }
 
-export interface SRC101ValidTxTotalCountParams{
+export interface SRC101ValidTxTotalCountParams {
   tick?: string;
   op?: string;
   block_index?: string;
-  deploy_hash?:string;
+  deploy_hash?: string;
   tx_hash?: string;
   address?: string;
 }
 
-export interface SRC101OwnerParams{
+export interface SRC101OwnerParams {
   deploy_hash?: string;
   tokenid?: string;
   index?: number;
@@ -394,18 +394,18 @@ export interface SRC101OwnerParams{
   sort?: string;
 }
 
-export interface SRC101ValidTxParams{
+export interface SRC101ValidTxParams {
   tick?: string;
   op?: string;
   block_index?: string;
-  deploy_hash?:string;
+  deploy_hash?: string;
   tx_hash?: string;
   address?: string;
   limit?: number;
   page?: number;
 }
 
-export interface Src101BalanceParams{
+export interface Src101BalanceParams {
   address: string | null;
   limit?: number;
   page?: number;
@@ -446,7 +446,7 @@ export interface TotalSrc101ResponseBody {
   data: number;
 }
 
-export interface TokenidSrc101ResponseBody extends Pagination  {
+export interface TokenidSrc101ResponseBody extends Pagination {
   last_block: number;
   data: string;
 }
@@ -555,8 +555,8 @@ export type PaginatedResponseBody =
   | ErrorResponseBody;
 
 export interface BlockCountHandlerContext {
-    params: { number: string };
-  }
+  params: { number: string };
+}
 export interface BlockInfoResponseBody {
   block_info: BlockRow;
   issuances: StampRow[];

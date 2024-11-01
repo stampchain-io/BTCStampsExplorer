@@ -13,7 +13,21 @@ import {
 
 dayjs.extend(relativeTime);
 
-interface StampCardProps {
+/**
+ * Renders a stamp card component.
+ * @param stamp - The stamp row data.
+ * @param kind - The kind of stamp card (cursed, stamp, named).
+ * @param isRecentSale - Whether this card is being displayed in the recent sales context.
+ * @returns The stamp card component.
+ */
+export function StampCard({
+  stamp,
+  kind = "stamp",
+  isRecentSale = false,
+  showInfo = true,
+  abbreviationLength = 6,
+  showDetails = false,
+}: {
   stamp: StampRow & {
     sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
   };
@@ -22,20 +36,7 @@ interface StampCardProps {
   showInfo?: boolean;
   abbreviationLength?: number;
   showDetails?: boolean;
-  className?: string;
-  style?: JSX.CSSProperties;
-}
-
-export function StampCard({
-  stamp,
-  kind = "stamp",
-  isRecentSale = false,
-  showInfo = true,
-  abbreviationLength = 6,
-  showDetails = false,
-  className = "",
-  style,
-}: StampCardProps) {
+}) {
   let src: string;
   const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
@@ -110,7 +111,7 @@ export function StampCard({
     : abbreviateAddress(stamp.creator, abbreviationLength);
 
   return (
-    <div className="relative flex justify-center">
+    <div className={`relative flex justify-center`}>
       <a
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
@@ -166,9 +167,9 @@ export function StampCard({
 
                 {/* Price and Supply */}
                 <div className="flex justify-between mt-2">
-                  <div>
-                    <span className="text-stamp-grey text-xs mobile-lg:text-sm tablet:text-base desktop:text-lg 
-                      font-medium font-work-sans">
+                  {/* Render Price on the Left */}
+                  <div className="truncate text-nowrap">
+                    <span className="text-[#999999] text-xs md:text-sm xl:text-base 2xl:text-lg font-medium font-work-sans">
                       {renderPrice()}
                     </span>
                   </div>
