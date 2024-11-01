@@ -14,30 +14,6 @@ export const StampHeader = (
     sortBy: "ASC" | "DESC" | undefined;
   },
 ) => {
-  // const [currentFilters, setCurrentFilters] = useState<STAMP_FILTER_TYPES[]>(
-  //   filterBy,
-  // );
-  // const [currentSort, setCurrentSort] = useState<string>(sortBy);
-
-  // useEffect(() => {
-  //   const handleUrlChange = (event: CustomEvent) => {
-  //     const url = new URL(event.detail);
-  //     const newFilters =
-  //       url.searchParams.get("filterBy")?.split(",") as STAMP_FILTER_TYPES[] ||
-  //       [];
-  //     const newSort = url.searchParams.get("sortBy") || "DESC";
-  //     setCurrentFilters(newFilters);
-  //     setCurrentSort(newSort);
-  //     // Here you would typically fetch new data based on the updated filters and sort
-  //   };
-
-  //   self.addEventListener("urlChanged", handleUrlChange as EventListener);
-
-  //   return () => {
-  //     self.removeEventListener("urlChanged", handleUrlChange as EventListener);
-  //   };
-  // }, []);
-
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
   const handleOpen1 = (open: boolean) => {
@@ -49,21 +25,15 @@ export const StampHeader = (
     setIsOpen2(open);
   };
 
-  const handleResultClick = (result: SearchResult) => {
-    if (result.id) {
-      globalThis.location.href = `/stamp/${result.id}`;
-    }
-  };
-
   return (
     <div
       class="flex flex-row justify-between items-center gap-3 w-full"
       f-partial="/stamp"
     >
-      <p className="purple-gradient1 text-3xl md:text-6xl font-black hidden md:block">
+      <p className="bg-text-purple bg-clip-text text-transparent text-3xl mobile-lg:text-6xl font-black hidden mobile-lg:block">
         ART STAMPS
       </p>
-      <p className="purple-gradient1 text-3xl md:text-6xl font-black block md:hidden">
+      <p className="bg-text-purple bg-clip-text text-transparent text-3xl mobile-lg:text-6xl font-black block mobile-lg:hidden">
         STAMPS
       </p>
       <div class="flex gap-3 justify-between h-[40px]">
@@ -80,16 +50,6 @@ export const StampHeader = (
             "sold",
           ]}
         />
-        {
-          /* <Search
-          open={isOpen2}
-          handleOpen={handleOpen2}
-          placeholder="stamp #, CPID, wallet address, tx_hash"
-          searchEndpoint="/api/v2/stamp/search?q="
-          onResultClick={handleResultClick}
-          resultDisplay={(result) => result.id || ""}
-        /> */
-        }
         <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
       </div>
     </div>

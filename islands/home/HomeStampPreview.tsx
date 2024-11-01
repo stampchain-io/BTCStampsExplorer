@@ -4,7 +4,7 @@ import StampSection from "$components/stamp/StampSection.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
-// import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
+import { Collection } from "globals";
 
 export function HomeStampPreview({
   stamps_recent = [],
@@ -19,7 +19,7 @@ export function HomeStampPreview({
   stamps_src721: StampRow[];
   stamps_recent: StampRow[];
   stamps_src20: StampRow[];
-  collectionData: CollectionRow[];
+  collectionData: Collection[];
 }) {
   const SectionsLatestArtStamps: StampSectionProps[] = [
     {
@@ -70,46 +70,44 @@ export function HomeStampPreview({
   ];
 
   return (
-    <div className="flex flex-col gap-16 md:gap-36">
-      <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl md:text-5xl lg:text-6xl font-black purple-gradient1">
+    <div className="flex flex-col gap-16 mobile-lg:gap-36">
+      <div className="flex flex-col gap-4 mobile-lg:gap-8">
+        <h1 className="text-5xl mobile-lg:text-5xl desktop:text-6xl font-black bg-text-purple bg-clip-text text-transparent">
           LATEST ART STAMPS
         </h1>
-        <div class="flex flex-col gap-12">
+        <div className="flex flex-col gap-12">
           {SectionsLatestArtStamps.map((section) => (
             <StampSection key={section.type} {...section} />
           ))}
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl md:text-5xl lg:text-6xl font-black purple-gradient1 bg-clip-text text-transparent">
+      <div className="flex flex-col gap-4 mobile-lg:gap-8">
+        <h1 className="text-5xl mobile-lg:text-5xl desktop:text-6xl font-black bg-text-purple bg-clip-text text-transparent">
           COLLECTIONS
         </h1>
-        <div class="flex flex-col gap-12">
+        <div className="flex flex-col gap-12">
           {SectionsCollections.map((section) => (
             <StampSection key={section.type} {...section} />
           ))}
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 md:gap-8">
-        <h1 class="text-5xl md:text-5xl lg:text-6xl  font-black gray-gradient1">
+      <div className="flex flex-col gap-4 mobile-lg:gap-8">
+        <h1 className="text-5xl mobile-lg:text-5xl desktop:text-6xl font-black bg-text-gray bg-clip-text text-transparent">
           FEATURED COLLECTIONS
         </h1>
-        <p className="text-[#CCCCCC] text-2xl md:text-5xl font-extralight hidden">
+        <p className="text-stamp-text-primary text-2xl mobile-lg:text-5xl font-extralight hidden">
           LOREM IPSUM DOLOR
         </p>
-
-        {/* FEATURED COLLECTIONS */}
         <CollectionList collections={collectionData} />
       </div>
 
-      <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl md:text-5xl lg:text-6xl  font-black purple-gradient1">
+      <div className="flex flex-col gap-4 mobile-lg:gap-8">
+        <h1 className="text-5xl mobile-lg:text-5xl desktop:text-6xl font-black bg-text-purple bg-clip-text text-transparent">
           RECENT SALES
         </h1>
-        <div class="flex flex-col gap-12">
+        <div className="flex flex-col gap-12">
           {SectionsRecentSales.map((section) => (
             <StampSection key={section.type} {...section} />
           ))}
@@ -117,20 +115,6 @@ export function HomeStampPreview({
       </div>
 
       <GetStampingModule />
-
-      {
-        /* <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl 2xl:text-6xl  font-black bg-gradient-to-r from-[#440066] via-[#660099] to-[#8800CC] bg-clip-text text-transparent">
-          SRC-20 TOKENS
-        </h1>
-        <div class="flex flex-col gap-12">
-          {SectionSRC20.map((section) => (
-            <StampSection key={section.type} {...section} />
-          ))}
-        </div> */
-      }
-      {/* <DeployMintModule /> */}
     </div>
-    // </div>
   );
 }

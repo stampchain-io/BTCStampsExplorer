@@ -21,12 +21,13 @@ export function StampSearchClient(
   };
 
   return (
-    <div class="relative flex items-center">
+    <div className="relative flex items-center">
       {open2 && (
         <>
           <input
             type="text"
-            className="min-w-[260px] md:min-w-[360px] h-[40px] purple-bg-gradient px-4 py-2 rounded text-[13px] text-[#8D9199]"
+            className="min-w-[260px] mobile-lg:min-w-[360px] h-[40px] bg-stamp-primary 
+              px-4 py-2 rounded-stamp text-[13px] text-stamp-table-placeholder"
             placeholder="stamp #, CPID, wallet address, tx_hash"
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
@@ -35,7 +36,7 @@ export function StampSearchClient(
           <img
             src="/img/stamp/search-glass.png"
             alt="Search icon"
-            class="absolute top-3 right-3 cursor-pointer"
+            className="absolute top-3 right-3 cursor-pointer"
             onClick={() => handleOpen2(false)}
           />
         </>
@@ -44,7 +45,7 @@ export function StampSearchClient(
         <img
           src="/img/stamp/search-glass.png"
           alt="Search icon"
-          class="bg-[#660099] rounded-md p-[12px] cursor-pointer"
+          className="bg-stamp-primary rounded-stamp p-[12px] cursor-pointer"
           onClick={() => handleOpen2(true)}
         />
       )}
