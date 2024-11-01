@@ -1,4 +1,5 @@
 import { type Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 export default {
   content: [
@@ -34,11 +35,33 @@ export default {
             hover: "#AA00FF",
           },
           purple: {
-            DEFAULT: "#5503A6",
+            darkest: "#220033",
+            darker: "#440066",
+            dark: "#660099",
+            DEFAULT: "#8800CC",
+            bright: "#AA00FF",
             light: "#4F3666",
-            dark: "#3E2F4C",
             accent: "#7A00F5",
             highlight: "#AA00FF",
+          },
+          grey: {
+            darkest: "#333333",
+            darker: "#666666",
+            DEFAULT: "#999999",
+            light: "#CCCCCC",
+            bright: "#FFFFFF",
+          },
+          bg: {
+            purple: {
+              darkest: "#0A000F",
+              darker: "#14001F",
+              dark: "#1F002E",
+            },
+            grey: {
+              darkest: "#080808",
+              darker: "#0F0F0F",
+              dark: "#171717",
+            },
           },
           table: {
             text: "#DBDBDB",
@@ -66,6 +89,20 @@ export default {
             placeholder: "#8D9199",
             background: "#660099",
           },
+          scrollbar: {
+            track: "#333333",
+            thumb: "#660099",
+            hover: "#aa00ff",
+          },
+          overlay: {
+            DEFAULT: "rgba(24, 24, 24, 0.5)",
+            dark: "rgba(8, 8, 8, 0.75)",
+          },
+          border: {
+            light: "#3F2A4E",
+            DEFAULT: "#8A8989",
+            hover: "#AA00FF",
+          },
         },
       },
       backgroundImage: {
@@ -73,10 +110,8 @@ export default {
           "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
         "stamp-dark":
           "linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff)",
-        "purple-gradient": "linear-gradient(to right, #8800CC, #AA00FF)",
-        "dark-gradient": "linear-gradient(to right, #0B0B0B, #1F002E)",
-        "text-gray": "linear-gradient(to right, #666666, #999999)",
-        "text-purple": "linear-gradient(to right, #8800CC, #AA00FF)",
+        "purple-bg-gradient":
+          "linear-gradient(to right, #8800cc, #7700aa, #660099)",
         "text-purple-1": "linear-gradient(to right, #440066, #660099, #8800cc)",
         "text-purple-2":
           "linear-gradient(to right, #440066, #660099, #8800cc, #aa00ff)",
@@ -87,14 +122,20 @@ export default {
         "text-gray-2": "linear-gradient(to right, #999999, #666666)",
         "text-gray-3": "linear-gradient(to right, #666666, #999999, #cccccc)",
         "text-gray-4": "linear-gradient(to right, #666666, #999999)",
-        "stamp-purple-bg":
-          "linear-gradient(to right, #8800cc, #7700aa, #660099)",
-        "text-purple-hover": {
-          DEFAULT:
-            "linear-gradient(90deg, #440066 0%, #660099 50%, #8800cc 75%, #aa00ff 100%)",
-          hover:
-            "linear-gradient(90deg, #440066 0%, #660099 25%, #8800cc 50%, #aa00ff 75%)",
-        },
+        "text-purple-hover-default":
+          "linear-gradient(90deg, #440066 0%, #660099 50%, #8800cc 75%, #aa00ff 100%)",
+        "text-purple-hover-active":
+          "linear-gradient(90deg, #440066 0%, #660099 25%, #8800cc 50%, #aa00ff 75%)",
+        "stamp-number":
+          "linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))",
+        "stamp-hover": "linear-gradient(to right, var(--tw-gradient-stops))",
+        "stamp-bg-dark":
+          "linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to))",
+        "stamp-text-grey": "linear-gradient(to right, #666666, #999999)",
+        "stamp-text-purple":
+          "linear-gradient(to right, #440066, #660099, #8800cc)",
+        "stamp-card-bg":
+          "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",
@@ -136,8 +177,8 @@ export default {
     safari: "14",
   },
   plugins: [
-    function ({ addUtilities }) {
-      const newUtilities = {
+    plugin(function ({ addUtilities }) {
+      addUtilities({
         ".bg-clip-text": {
           "-webkit-background-clip": "text",
           "background-clip": "text",
@@ -147,12 +188,47 @@ export default {
           "text-fill-color": "transparent",
         },
         ".hover-gradient": {
+          "background-image": "var(--tw-gradient-hover-default)",
           "&:hover": {
-            "background-image": "var(--tw-gradient-hover)",
+            "background-image": "var(--tw-gradient-hover-active)",
           },
         },
-      };
-      addUtilities(newUtilities);
-    },
+        ".scrollbar-stamp": {
+          "&::-webkit-scrollbar": {
+            "width": "6px",
+            "border-radius": "3px",
+          },
+          "&::-webkit-scrollbar-track": {
+            "background-color": "var(--stamp-scrollbar-track)",
+            "border-radius": "3px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            "background-color": "var(--stamp-scrollbar-thumb)",
+            "border-radius": "3px",
+            "&:hover": {
+              "background-color": "var(--stamp-scrollbar-hover)",
+            },
+          },
+        },
+        ":root": {
+          "--stamp-scrollbar-track": "#333333",
+          "--stamp-scrollbar-thumb": "#660099",
+          "--stamp-scrollbar-hover": "#aa00ff",
+        },
+      });
+    }),
   ],
+  extend: {
+    gradientColorStops: {
+      "stamp": {
+        "from": "#666666",
+        "to": "#999999",
+      },
+      "stamp-purple": {
+        "from": "#440066",
+        "via": "#660099",
+        "to": "#8800cc",
+      },
+    },
+  },
 } satisfies Config;
