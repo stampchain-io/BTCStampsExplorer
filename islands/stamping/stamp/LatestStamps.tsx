@@ -7,26 +7,21 @@ interface LatestStampsProps {
 }
 
 export default function LatestStamps({ stamps }: LatestStampsProps) {
-  const [displayCount, setDisplayCount] = useState(9);
+  const [displayCount, setDisplayCount] = useState(8);
 
   useEffect(() => {
     const updateDisplayCount = () => {
       const width = globalThis.innerWidth;
-      if (width >= 1440) setDisplayCount(8); // desktop
-      else if (width >= 1025) setDisplayCount(9); // tablet
-      else if (width >= 769) setDisplayCount(8); // mobile-lg
-      else if (width >= 569) setDisplayCount(6); // mobile-md
-      else if (width >= 420) setDisplayCount(6); // mobile-sm
-      else setDisplayCount(4); // default
+      if (width >= 1440) setDisplayCount(8);
+      else if (width >= 1025) setDisplayCount(6);
+      else if (width >= 769) setDisplayCount(8);
+      else if (width >= 569) setDisplayCount(6);
+      else if (width >= 420) setDisplayCount(6);
+      else setDisplayCount(4);
     };
 
-    // Initial check
     updateDisplayCount();
-
-    // Add resize listener
     globalThis.addEventListener("resize", updateDisplayCount);
-
-    // Cleanup
     return () => globalThis.removeEventListener("resize", updateDisplayCount);
   }, []);
 
@@ -37,13 +32,13 @@ export default function LatestStamps({ stamps }: LatestStampsProps) {
       </h1>
 
       <div className="grid w-full gap-4
-                    grid-cols-2                    /* Default: 2x2 = 4 stamps */
-                    mobile-sm:grid-cols-3          /* 420px+: 3x2 = 6 stamps */
-                    mobile-md:grid-cols-3          /* 569px+: 3x2 = 6 stamps */
-                    mobile-lg:grid-cols-4          /* 769px+: 4x2 = 8 stamps */
-                    tablet:grid-cols-3             /* 1025px+: 3x3 = 9 stamps */
-                    desktop:grid-cols-4            /* 1440px+: 4x2 = 8 stamps */
-                    auto-rows-fr                   /* Equal height rows */
+                    grid-cols-2                    /* Default: 2 columns x 2 rows = 4 */
+                    mobile-sm:grid-cols-3          /* 420px+: 3 columns x 2 rows = 6 */
+                    mobile-md:grid-cols-3          /* 569px+: 3 columns x 2 rows = 6 */
+                    mobile-lg:grid-cols-4          /* 769px+: 4 columns x 2 rows = 8 */
+                    tablet:grid-cols-3             /* 1025px+: 3 columns x 2 rows = 6 */
+                    desktop:grid-cols-4            /* 1440px+: 4 columns x 2 rows = 8 */
+                    grid-rows-2                    /* Always 2 rows */
       ">
         {stamps.slice(0, displayCount).map((stamp) => (
           <StampCard
