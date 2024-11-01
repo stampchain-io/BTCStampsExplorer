@@ -1,13 +1,24 @@
+import { useEffect, useState } from "preact/hooks";
 import { StampRow, StampSectionProps } from "globals";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
 
 export default function StampSection(
-  { title, type, stamps, layout, isRecentSales, filterBy, showDetails = false }:
+  {
+    title,
+    type,
+    stamps,
+    layout,
+    isRecentSales,
+    filterBy,
+    showDetails = false,
+    variant = "",
+  }:
     & StampSectionProps
     & { showDetails?: boolean },
 ) {
   const stampArray = Array.isArray(stamps) ? stamps : [];
+  const [displayCount, setDisplayCount] = useState(8);
 
   const params = new URLSearchParams();
 
@@ -31,6 +42,22 @@ export default function StampSection(
 
   const seeAllLink = `/stamp?${params.toString()}`;
 
+  useEffect(() => {
+    const updateDisplayCount = () => {
+      const width = globalThis.innerWidth;
+      if (width >= 1440) setDisplayCount(layout === "grid" ? 8 : 6);
+      else if (width >= 1025) setDisplayCount(layout === "grid" ? 6 : 6);
+      else if (width >= 769) setDisplayCount(layout === "grid" ? 8 : 4);
+      else if (width >= 569) setDisplayCount(layout === "grid" ? 6 : 4);
+      else if (width >= 420) setDisplayCount(layout === "grid" ? 6 : 3);
+      else setDisplayCount(4);
+    };
+
+    updateDisplayCount();
+    globalThis.addEventListener("resize", updateDisplayCount);
+    return () => globalThis.removeEventListener("resize", updateDisplayCount);
+  }, []);
+
   return (
     <div>
       {/* Section Title */}
@@ -43,14 +70,13 @@ export default function StampSection(
       {/* Stamp Rows */}
       <div
         className={layout === "grid"
-          ? "grid gap-2 md:gap-4 grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4"
-          : "grid gap-2 md:gap-4 grid-cols-4 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-6"}
+          ? "grid w-full gap-4 grid-cols-2 mobile-sm:grid-cols-3 mobile-md:grid-cols-3 mobile-lg:grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-4 grid-rows-2"
+          : "grid w-full gap-2 grid-cols-2 mobile-sm:grid-cols-3 mobile-md:grid-cols-4 mobile-lg:grid-cols-4 tablet:grid-cols-6 desktop:grid-cols-6 grid-rows-1"}
       >
-        {stampArray.slice(0, layout === "grid" ? 12 : 6).map(
+        {stampArray.slice(0, displayCount).map(
           (stamp: StampRow, index: number) => (
             <div
               key={stamp.tx_hash}
-              className={`${index >= 4 ? "hidden md:hidden xl:block" : ""}`}
             >
               <StampCard
                 stamp={stamp}
