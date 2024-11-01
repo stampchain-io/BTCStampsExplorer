@@ -69,8 +69,9 @@ import * as $api_v2_upload_src20_background from "./routes/api/v2/upload-src20-b
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
-import * as $collection_id_ from "./routes/collection/[id].tsx";
+import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
+import * as $collection_overview_index from "./routes/collection/overview/index.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
@@ -124,8 +125,8 @@ import * as $collection_ArtistCollection from "./islands/collection/ArtistCollec
 import * as $collection_CollectionCreateButton from "./islands/collection/CollectionCreateButton.tsx";
 import * as $collection_CollectionDetailsContent from "./islands/collection/CollectionDetailsContent.tsx";
 import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
-import * as $collection_CollectionHeader from "./islands/collection/CollectionHeader.tsx";
-import * as $collection_CollectionList from "./islands/collection/CollectionList.tsx";
+import * as $collection_CollectionOverviewContent from "./islands/collection/CollectionOverviewContent.tsx";
+import * as $collection_CollectionOverviewHeader from "./islands/collection/CollectionOverviewHeader.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
@@ -281,8 +282,9 @@ const manifest = {
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/block/[id].tsx": $block_id_,
     "./routes/block/index.tsx": $block_index,
-    "./routes/collection/[id].tsx": $collection_id_,
+    "./routes/collection/details/[id].tsx": $collection_details_id_,
     "./routes/collection/index.tsx": $collection_index,
+    "./routes/collection/overview/index.tsx": $collection_overview_index,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/docs/index.tsx": $docs_index,
@@ -347,8 +349,10 @@ const manifest = {
       $collection_CollectionDetailsContent,
     "./islands/collection/CollectionDetailsHeader.tsx":
       $collection_CollectionDetailsHeader,
-    "./islands/collection/CollectionHeader.tsx": $collection_CollectionHeader,
-    "./islands/collection/CollectionList.tsx": $collection_CollectionList,
+    "./islands/collection/CollectionOverviewContent.tsx":
+      $collection_CollectionOverviewContent,
+    "./islands/collection/CollectionOverviewHeader.tsx":
+      $collection_CollectionOverviewHeader,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
