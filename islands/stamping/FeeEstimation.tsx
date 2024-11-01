@@ -233,7 +233,7 @@ export function FeeEstimation({
           ? `${total.toFixed(0)} sats`
           : `${(total / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
       </p>
-      <p className="flex items-center">
+      <p className="flex items-center uppercase">
         Details
         <span onClick={() => setVisible(!visible)} className="cursor-pointer">
           {!visible
@@ -278,18 +278,16 @@ export function FeeEstimation({
           {type === "stamp" && (
             <>
               <p className="font-medium text-xs">
-                <span className="text-[#666666] font-light">File Type:</span>
-                {" "}
+                <span className="text-[#666666] font-light">FILE</span>{" "}
                 {fileType}
               </p>
               <p className="font-medium text-xs">
-                <span className="text-[#666666] font-light">File Size:</span>
-                {" "}
+                <span className="text-[#666666] font-light">BYTES</span>{" "}
                 {fileSize} bytes
               </p>
               <p className="font-medium text-xs">
                 <span className="text-[#666666] font-light">
-                  Sats per byte:
+                  SATS PER BYTE
                 </span>{" "}
                 {fee}
               </p>
@@ -301,19 +299,20 @@ export function FeeEstimation({
             </>
           )}
           <p className="flex gap-1 items-center text-xs font-medium">
-            <span className="font-light text-[#666666]">Miner Fee:</span>{" "}
+            <span className="font-light text-[#666666]">MINER FEE</span>{" "}
             {coinType === "BTC"
               ? `${txfee.toFixed(0)} sats`
               : `${(txfee / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
           </p>
           <p className="flex gap-1 items-center text-xs font-medium">
-            <span className="font-light text-[#666666]">Minting Fee:</span>{" "}
+            <span className="font-light text-[#666666]">MINTING FEE</span>{" "}
             {coinType === "BTC"
               ? `${(mintfee * 1e8).toFixed(0)} sats`
               : `${(mintfee * BTCPrice).toFixed(2)} ${coinType}`}
           </p>
-          <p className="flex gap-1 items-center text-xs font-medium">
-            {/* FIXME: multisig dust  only applies to multisig SRC-20 tokens, not olga(p2swsh) stamps or src-20 */}
+          {/* FIXME: multisig dust  only applies to multisig SRC-20 tokens, not olga(p2swsh) stamps or src-20 */}
+          {
+            /* <p className="flex gap-1 items-center text-xs font-medium">
             <span className="font-light text-[#666666]">Trx Dust</span>{" "}
             {coinType === "BTC"
               ? `${dust.toFixed(0)} sats`
@@ -325,7 +324,8 @@ export function FeeEstimation({
             {coinType === "BTC"
               ? `${total.toFixed(0)} sats`
               : `${(total / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
-          </p>
+          </p> */
+          }
           {/* <button onClick={onRefresh}>Refresh Fees</button> */}
         </div>
         <div className="flex flex-col items-end">
