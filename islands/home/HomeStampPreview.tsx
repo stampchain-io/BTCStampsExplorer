@@ -33,14 +33,14 @@ export function HomeStampPreview({
 
   const SectionsCollections: StampSectionProps[] = [
     {
-      title: "POSH",
+      title: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
       layout: "grid",
       showDetails: false,
     },
     {
-      title: "RECURSIVE",
+      title: "RECENT RECURSIVE",
       filterBy: "recursive",
       stamps: stamps_src721,
       layout: "row",
