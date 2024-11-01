@@ -115,21 +115,18 @@ export function StampCard({
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
         f-partial={`/stamp/${stamp.tx_hash}`}
-        className={`text-white group relative z-0 flex flex-col 
-          p-stamp-card-lg mobile-md:p-3
+        className="text-white group relative z-0 flex flex-col 
+          p-stamp-card-lg mobile-md:p-3 
           rounded-stamp transition-all 
-          w-full
-          max-w-[318px] 
+          w-full max-w-[318px] 
           mobile-lg:max-w-[348px] 
           tablet:max-w-[318px] 
           desktop:max-w-[318px] 
-          hover:border-stamp-primary-hover 
-          hover:shadow-stamp 
+          hover:border-stamp-purple-bright
+          hover:shadow-stamp
           hover:border-solid 
           border-2 border-transparent
-          bg-stamp-primary
-          ${className}`}
-        style={style}
+          bg-stamp-card-bg"
       >
         {/* Image Container */}
         <div className="relative w-full">
@@ -142,31 +139,18 @@ export function StampCard({
 
         {/* Info Section */}
         {showInfo && (
-          <div className="flex flex-col font-medium px-2 mobile-sm:px-[6px] tablet:px-3">
+          <div className="flex flex-col font-medium px-[6px] tablet:px-3">
             {showDetails && (
               <>
                 {/* Stamp Number */}
                 <div className="pt-1 text-center">
                   {shouldDisplayHash && (
-                    <span className="text-stamp-text-secondary 
-                      text-base
-                      mobile-sm:text-lg 
-                      mobile-lg:text-xl 
-                      tablet:text-2xl 
-                      desktop:text-3xl 
-                      font-light font-work-sans">
+                    <span className="text-stamp-grey-darker text-lg mobile-lg:text-xl tablet:text-2xl desktop:text-3xl font-light font-work-sans">
                       #
                     </span>
                   )}
-                  <span className="text-base
-                    mobile-sm:text-lg 
-                    mobile-lg:text-xl 
-                    tablet:text-2xl 
-                    desktop:text-3xl 
-                    font-black bg-gradient-to-r 
-                    from-stamp-text-secondary 
-                    to-stamp-text-primary 
-                    bg-clip-text text-transparent">
+                  <span className="text-lg mobile-lg:text-xl tablet:text-2xl desktop:text-3xl font-black 
+                    bg-stamp-text-grey bg-clip-text text-fill-transparent">
                     {Number(stamp.stamp ?? 0) >= 0 ||
                         (stamp.cpid && stamp.cpid.charAt(0) === "A")
                       ? `${stamp.stamp}`
@@ -175,39 +159,21 @@ export function StampCard({
                 </div>
 
                 {/* Creator Name or Abbreviated Address */}
-                <div className="text-center text-stamp-text-primary 
-                  text-sm
-                  mobile-sm:text-base 
-                  mobile-lg:text-base 
-                  tablet:text-lg 
-                  desktop:text-xl 
-                  font-bold font-work-sans break-words truncate">
+                <div className="text-stamp-grey text-base mobile-lg:text-base tablet:text-lg desktop:text-xl 
+                  font-bold font-work-sans break-words truncate text-center">
                   {creatorDisplay}
                 </div>
 
                 {/* Price and Supply */}
                 <div className="flex justify-between mt-2">
-                  {/* Price */}
                   <div>
-                    <span className="text-stamp-text-primary 
-                      text-xs
-                      mobile-sm:text-xs 
-                      mobile-lg:text-sm 
-                      tablet:text-base 
-                      desktop:text-lg 
+                    <span className="text-stamp-grey text-xs mobile-lg:text-sm tablet:text-base desktop:text-lg 
                       font-medium font-work-sans">
                       {renderPrice()}
                     </span>
                   </div>
-
-                  {/* Supply */}
-                  <div className="text-right text-stamp-text-secondary 
-                    text-xs
-                    mobile-sm:text-xs 
-                    mobile-lg:text-sm 
-                    tablet:text-base 
-                    desktop:text-lg 
-                    font-bold font-work-sans">
+                  <div className="text-stamp-grey-darker text-xs mobile-lg:text-sm tablet:text-base desktop:text-lg 
+                    font-bold font-work-sans text-right">
                     {supplyDisplay}
                   </div>
                 </div>
