@@ -54,6 +54,15 @@ export function StampCard({
           sandbox="allow-scripts allow-same-origin"
           src={src}
           className="h-full w-fit max-w-full object-contain items-center pointer-events-none"
+          onError={(e) => {
+            // Show fallback content
+            e.currentTarget.style.display = "none"; // Hide the iframe
+            const fallback = document.createElement("img");
+            fallback.src = "/not-available.png"; // Fallback image
+            fallback.alt = "Content not available";
+            fallback.className = "w-full h-full object-contain rounded-lg"; // Apply the same styles
+            e.currentTarget.parentNode.appendChild(fallback);
+          }}
         />
       );
     } else {
@@ -131,7 +140,7 @@ export function StampCard({
                 {/* Stamp Number */}
                 <div className="pt-1 text-center">
                   {shouldDisplayHash && (
-                    <span className="text-[#666666] text-3xl font-light font-work-sans">
+                    <span className="text-[#666666] text-lg md:text-xl xl:text-2xl 2xl:text-3xl font-light font-work-sans">
                       #
                     </span>
                   )}
