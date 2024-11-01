@@ -1,3 +1,4 @@
+import type { JSX } from "preact";
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
@@ -12,14 +13,7 @@ import {
 
 dayjs.extend(relativeTime);
 
-export function StampCard({
-  stamp,
-  kind = "stamp",
-  isRecentSale = false,
-  showInfo = true,
-  abbreviationLength = 6,
-  showDetails = false,
-}: {
+interface StampCardProps {
   stamp: StampRow & {
     sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
   };
@@ -28,7 +22,20 @@ export function StampCard({
   showInfo?: boolean;
   abbreviationLength?: number;
   showDetails?: boolean;
-}) {
+  className?: string;
+  style?: JSX.CSSProperties;
+}
+
+export function StampCard({
+  stamp,
+  kind = "stamp",
+  isRecentSale = false,
+  showInfo = true,
+  abbreviationLength = 6,
+  showDetails = false,
+  className = "",
+  style,
+}: StampCardProps) {
   let src: string;
   const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
@@ -108,8 +115,8 @@ export function StampCard({
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
         f-partial={`/stamp/${stamp.tx_hash}`}
-        className="text-white group relative z-0 flex flex-col 
-          p-stamp-card-lg mobile-md:p-3 
+        className={`text-white group relative z-0 flex flex-col 
+          p-stamp-card-lg mobile-md:p-3
           rounded-stamp transition-all 
           w-full
           max-w-[318px] 
@@ -120,7 +127,9 @@ export function StampCard({
           hover:shadow-stamp 
           hover:border-solid 
           border-2 border-transparent
-          bg-stamp-primary"
+          bg-stamp-primary
+          ${className}`}
+        style={style}
       >
         {/* Image Container */}
         <div className="relative w-full">
