@@ -58,7 +58,7 @@ export function Footer() {
   return (
     <footer className="px-3 tablet:px-6 desktop:px-12 py-6 tablet:py-[72px] text-[#8800CC] font-medium max-w-desktop w-full mx-auto flex flex-col tablet:flex-row justify-between gap-4 text-sm tablet:text-lg">
       <div className="w-full flex flex-col gap-1 items-center tablet:items-start">
-        <p className="purple-gradient2 text-[40px] leading-[47px] mobile-768:text-[42px] mobile-768:leading-[50px] desktop:text-[56px] desktop:leading-[66px] italic font-black">
+        <p className="purple-gradient2 text-[40px] leading-[47px] mobileLg:text-[42px] mobileLg:leading-[50px] desktop:text-[56px] desktop:leading-[66px] italic font-black">
           STAMPCHAIN
           <span className="font-extralight pr-1">.IO</span>
         </p>
@@ -93,7 +93,7 @@ export function Footer() {
       <div className="flex flex-col tablet:flex-row justify-end tablet:justify-between w-full">
         <div className="flex flex-col items-center tablet:items-start gap-1 w-full tablet:w-auto">
           <p className="hidden tablet:block text-lg font-black">RESOURCES</p>
-          <div className="flex flex-row tablet:flex-col justify-center w-full gap-[18px] mobile-768:gap-6 tablet:gap-1 leading-4">
+          <div className="flex flex-row tablet:flex-col justify-center w-full gap-[18px] mobileLg:gap-6 tablet:gap-1 leading-4">
             {resourcesStampLinks.map((link, index) => (
               <a
                 key={index}

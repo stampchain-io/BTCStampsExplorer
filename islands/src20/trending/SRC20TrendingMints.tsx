@@ -233,7 +233,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                       )
                     }&trxType=${encodeURIComponent(trxType)}`}
                   >
-                    <button className="hidden mobile-420:block bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[66px] tablet:w-[84px] h-[36px] tablet:h-[48px]">
+                    <button className="hidden mobileMd:block bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[66px] tablet:w-[84px] h-[36px] tablet:h-[48px]">
                       Mint
                     </button>
                   </a>

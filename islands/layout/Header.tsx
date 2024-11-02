@@ -133,7 +133,7 @@ export function Header() {
                     toggleMenu();
                     setCurrentPath(subLink.href);
                   }}
-                  className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobile-768:text-base ${
+                  className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobileLg:text-base ${
                     currentPath === subLink.href
                       ? "text-stamp-purple-highlight"
                       : ""
@@ -150,7 +150,7 @@ export function Header() {
   };
 
   return (
-    <header className="px-3 mobile-768:px-6 desktop:px-12 my-[18px] mobile-768:my-[36px] tablet:my-[68px] max-w-desktop w-full mx-auto tablet:flex justify-between items-center">
+    <header className="px-3 mobileLg:px-6 desktop:px-12 my-[18px] mobileLg:my-[36px] tablet:my-[68px] max-w-desktop w-full mx-auto tablet:flex justify-between items-center">
       <div className="w-full flex justify-between items-center">
         <a
           href="/home"
@@ -190,7 +190,7 @@ export function Header() {
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex tablet:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 pb-6 pt-[77px] mobile-768:pt-[102px] backdrop-blur-md font-black text-[#8800CC] ${
+        className={`duration-500 flex tablet:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 pb-6 pt-[77px] mobileLg:pt-[102px] backdrop-blur-md font-black text-[#8800CC] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"
@@ -202,7 +202,7 @@ export function Header() {
             toggleMenu();
             setCurrentPath("collection");
           }}
-          className="lg:block hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 mobile-768:left-6 pr-2"
+          className="lg:block hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 mobileLg:left-6 pr-2"
         >
           STAMPCHAIN
         </a>
@@ -217,7 +217,7 @@ export function Header() {
             <a key={link.href} href={link.href} target="_blank">
               <img
                 src={link.icon}
-                className={`w-10 mobile-768:w-12 ${
+                className={`w-10 mobileLg:w-12 ${
                   index === 0
                     ? "mr-[13px]"
                     : index === 1

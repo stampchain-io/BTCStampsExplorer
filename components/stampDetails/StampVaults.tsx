@@ -18,7 +18,7 @@ export function StampVaults(
       </p> */
       }
       <div className="max-h-96 overflow-x-auto">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mobile-768:rounded-lg">
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mobileLg:rounded-lg">
           <thead className="text-lg font-semibold uppercase">
             <tr>
               <th scope="col" className="pr-6 py-3">

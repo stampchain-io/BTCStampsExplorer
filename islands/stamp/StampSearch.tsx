@@ -26,7 +26,7 @@ export function StampSearchClient(
         <>
           <input
             type="text"
-            className="min-w-[260px] mobile-768:min-w-[360px] h-[40px] 
+            className="min-w-[260px] mobileLg:min-w-[360px] h-[40px] 
               bg-purple-bg-gradient 
               px-4 py-2 
               rounded-stamp 

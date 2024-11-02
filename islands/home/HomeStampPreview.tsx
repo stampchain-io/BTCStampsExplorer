@@ -29,20 +29,20 @@ export function HomeStampPreview({
         grid w-full
         gap-[12px]
         gap-[12px]
-        mobile-360:gap-[12px]
-        mobile-768:gap-[24px]
+        mobileSm:gap-[12px]
+        mobileLg:gap-[24px]
         tablet:gap-[24px]
         desktop:gap-[24px]
         grid-cols-2
-        mobile-360:grid-cols-2
-        mobile-768:grid-cols-3
+        mobileSm:grid-cols-2
+        mobileLg:grid-cols-3
         tablet:grid-cols-3
         desktop:grid-cols-4
         auto-rows-fr
       `,
       displayCounts: {
-        "mobile-360": 8, // 2 columns x 4 rows
-        "mobile-768": 12, // 3 columns x 4 rows
+        "mobileSm": 8, // 2 columns x 4 rows
+        "mobileLg": 12, // 3 columns x 4 rows
         "tablet": 12, // 3 columns x 4 rows
         "desktop": 16, // 4 columns x 4 rows
       },
@@ -59,20 +59,20 @@ export function HomeStampPreview({
       gridClass: `
         grid w-full
         gap-[12px]
-        mobile-360:gap-[12px]
-        mobile-768:gap-[24px]
+        mobileSm:gap-[12px]
+        mobileLg:gap-[24px]
         tablet:gap-[24px]
         desktop:gap-[24px]
         grid-cols-2
-        mobile-360:grid-cols-2
-        mobile-768:grid-cols-4
+        mobileSm:grid-cols-2
+        mobileLg:grid-cols-4
         tablet:grid-cols-3
         desktop:grid-cols-4
         auto-rows-fr
       `,
       displayCounts: {
-        "mobile-360": 4, // 2 columns x 2 rows
-        "mobile-768": 8, // 4 columns x 2 rows
+        "mobileSm": 4, // 2 columns x 2 rows
+        "mobileLg": 8, // 4 columns x 2 rows
         "tablet": 6, // 3 columns x 2 rows
         "desktop": 8, // 4 columns x 2 rows
       },
@@ -86,20 +86,20 @@ export function HomeStampPreview({
       gridClass: `
         grid w-full
         gap-[12px]
-        mobile-360:gap-[12px]
-        mobile-768:gap-[24px]
+        mobileSm:gap-[12px]
+        mobileLg:gap-[24px]
         tablet:gap-[24px]
         desktop:gap-[24px]
         grid-cols-2
-        mobile-360:grid-cols-3
-        mobile-768:grid-cols-4
+        mobileSm:grid-cols-3
+        mobileLg:grid-cols-4
         tablet:grid-cols-4
         desktop:grid-cols-6
         auto-rows-fr
       `,
       displayCounts: {
-        "mobile-360": 6, // 3 columns x 2 rows
-        "mobile-768": 8, // 4 columns x 2 rows
+        "mobileSm": 6, // 3 columns x 2 rows
+        "mobileLg": 8, // 4 columns x 2 rows
         "tablet": 8, // 4 columns x 2 rows
         "desktop": 12, // 6 columns x 2 rows
       },
@@ -117,20 +117,20 @@ export function HomeStampPreview({
       gridClass: `
         grid w-full
         gap-[12px]
-        mobile-360:gap-[12px]
-        mobile-768:gap-[24px]
+        mobileSm:gap-[12px]
+        mobileLg:gap-[24px]
         tablet:gap-[24px]
         desktop:gap-[24px]
         grid-cols-2
-        mobile-360:grid-cols-3
-        mobile-768:grid-cols-4
+        mobileSm:grid-cols-3
+        mobileLg:grid-cols-4
         tablet:grid-cols-4
         desktop:grid-cols-6
         auto-rows-fr
       `,
       displayCounts: {
-        "mobile-360": 3, // 3 columns x 1 row
-        "mobile-768": 4, // 4 columns x 1 row
+        "mobileSm": 3, // 3 columns x 1 row
+        "mobileLg": 4, // 4 columns x 1 row
         "tablet": 4, // 4 columns x 1 row
         "desktop": 6, // 6 columns x 1 row
       },
@@ -149,26 +149,26 @@ export function HomeStampPreview({
 
   return (
     <div className="
-      flex flex-col gap-8 mobile-768:gap-16
+      flex flex-col gap-8 mobileLg:gap-16
       px-3 tablet:px-6 desktop:px-12 
       max-w-desktop w-full mx-auto
     ">
       {/* LATEST ART STAMPS */}
-      <div className="flex flex-col gap-4 mobile-768:gap-8">
+      <div className="flex flex-col gap-4 mobileLg:gap-8">
         <div
           class={`
             w-full
             pb-0 pt-[18px]
-            mobile-360:pb-0 mobile-360:pt-[18px]
-            mobile-768:pb-0 mobile-768:pt-[36px]
+            mobileSm:pb-0 mobileSm:pt-[18px]
+            mobileLg:pb-0 mobileLg:pt-[36px]
             tablet:pb-0 tablet:pt-[72px]
             desktop:pb-0 desktop:pt-[72px]
           `}
         >
           <h1 className="
             text-4xl
-            mobile-360:text-4xl
-            mobile-768:text-5xl
+            mobileSm:text-4xl
+            mobileLg:text-5xl
             tablet:text-5xl
             desktop:text-6xl
             font-black bg-text-purple-2 bg-clip-text text-transparent
@@ -184,21 +184,21 @@ export function HomeStampPreview({
       </div>
 
       {/* COLLECTIONS */}
-      <div className="flex flex-col gap-4 mobile-768:gap-8">
+      <div className="flex flex-col gap-4 mobileLg:gap-8">
         <div
           class={`
             w-full
             pb-0 pt-[18px]
-            mobile-360:pb-0 mobile-360:pt-[18px]
-            mobile-768:pb-0 mobile-768:pt-[36px]
+            mobileSm:pb-0 mobileSm:pt-[18px]
+            mobileLg:pb-0 mobileLg:pt-[36px]
             tablet:pb-0 tablet:pt-[72px]
             desktop:pb-0 desktop:pt-[72px]
           `}
         >
           <h1 className="
             text-4xl
-            mobile-360:text-4xl
-            mobile-768:text-5xl
+            mobileSm:text-4xl
+            mobileLg:text-5xl
             tablet:text-5xl
             desktop:text-6xl
             font-black bg-text-purple-2 bg-clip-text text-transparent
@@ -214,21 +214,21 @@ export function HomeStampPreview({
       </div>
 
       {/* FEATURED COLLECTIONS */}
-      <div className="flex flex-col gap-4 mobile-768:gap-8">
+      <div className="flex flex-col gap-4 mobileLg:gap-8">
         <div
           class={`
             w-full
             pb-0 pt-[18px]
-            mobile-360:pb-0 mobile-360:pt-[18px]
-            mobile-768:pb-0 mobile-768:pt-[36px]
+            mobileSm:pb-0 mobileSm:pt-[18px]
+            mobileLg:pb-0 mobileLg:pt-[36px]
             tablet:pb-0 tablet:pt-[72px]
             desktop:pb-0 desktop:pt-[72px]
           `}
         >
           <h1 className="
             text-4xl
-            mobile-360:text-4xl
-            mobile-768:text-5xl
+            mobileSm:text-4xl
+            mobileLg:text-5xl
             tablet:text-5xl
             desktop:text-6xl
             font-black bg-text-gray-1 bg-clip-text text-transparent
@@ -240,21 +240,21 @@ export function HomeStampPreview({
       </div>
 
       {/* RECENT SALES */}
-      <div className="flex flex-col gap-4 mobile-768:gap-8">
+      <div className="flex flex-col gap-4 mobileLg:gap-8">
         <div
           class={`
             w-full
             pb-0 pt-[18px]
-            mobile-360:pb-0 mobile-360:pt-[18px]
-            mobile-768:pb-0 mobile-768:pt-[36px]
+            mobileSm:pb-0 mobileSm:pt-[18px]
+            mobileLg:pb-0 mobileLg:pt-[36px]
             tablet:pb-0 tablet:pt-[72px]
             desktop:pb-0 desktop:pt-[72px]
           `}
         >
           <h1 className="
             text-4xl
-            mobile-360:text-4xl
-            mobile-768:text-5xl
+            mobileSm:text-4xl
+            mobileLg:text-5xl
             tablet:text-5xl
             desktop:text-6xl
             font-black bg-text-purple-2 bg-clip-text text-transparent

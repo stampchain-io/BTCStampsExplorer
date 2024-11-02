@@ -1,6 +1,10 @@
 export const StampChainModule = () => {
   return (
-    <div className="flex flex-col tablet:flex-row justify-between tablet:items-end gap-8 mobile-768:gap-16 tablet:gap-32">
+    <div class="
+      flex flex-col tablet:flex-row justify-between tablet:items-end gap-8 mobileLg:gap-16 tablet:gap-32
+      px-3 tablet:px-6 desktop:px-12 
+      max-w-desktop w-full mx-auto
+    ">
       <div>
         <p className="italic font-black text-4xl tablet:text-7xl flex flex-col gray-gradient4 text-left">
           STAMPCHAIN

@@ -90,25 +90,25 @@ export default function Home(props: HomePageProps) {
 
       {/* SRC-20 TOKENS Section */}
       <div className="
-        flex flex-col gap-8 mobile-768:gap-16
+        flex flex-col gap-8 mobileLg:gap-16
         px-3 tablet:px-6 desktop:px-12 
         max-w-desktop w-full mx-auto
       ">
-        <div className="flex flex-col gap-4 mobile-768:gap-8">
+        <div className="flex flex-col gap-4 mobileLg:gap-8">
           <div
             class={`
               w-full
               pb-0 pt-[18px]
-              mobile-360:pb-0 mobile-360:pt-[18px]
-              mobile-768:pb-0 mobile-768:pt-[36px]
+              mobileSm:pb-0 mobileSm:pt-[18px]
+              mobileLg:pb-0 mobileLg:pt-[36px]
               tablet:pb-0 tablet:pt-[72px]
               desktop:pb-0 desktop:pt-[72px]
             `}
           >
             <h1 className="
               text-4xl
-              mobile-360:text-4xl
-              mobile-768:text-5xl
+              mobileSm:text-4xl
+              mobileLg:text-5xl
               tablet:text-5xl
               desktop:text-6xl
               font-black bg-text-purple-2 bg-clip-text text-transparent
@@ -121,8 +121,8 @@ export default function Home(props: HomePageProps) {
           <div className="flex flex-col gap-4">
             <h2 class="
               text-2xl
-              mobile-360:text-2xl
-              mobile-768:text-4xl
+              mobileSm:text-2xl
+              mobileLg:text-4xl
               tablet:text-4xl
               desktop:text-5xl
               font-extralight bg-text-purple-2 bg-clip-text text-transparent
@@ -137,8 +137,8 @@ export default function Home(props: HomePageProps) {
           <div className="flex flex-col gap-4">
             <h2 class="
               text-2xl
-              mobile-360:text-2xl
-              mobile-768:text-4xl
+              mobileSm:text-2xl
+              mobileLg:text-4xl
               tablet:text-4xl
               desktop:text-5xl
               font-extralight bg-text-purple-2 bg-clip-text text-transparent

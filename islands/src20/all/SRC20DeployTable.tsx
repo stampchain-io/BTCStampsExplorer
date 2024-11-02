@@ -106,7 +106,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
                         )}
                       </div>
                     </a>
-                    <p className="text-base mobile-768:text-lg text-[#666666] font-light">
+                    <p className="text-base mobileLg:text-lg text-[#666666] font-light">
                       SUPPLY{" "}
                       <span className="font-bold text-[#999999]">
                         {Number(src20.max).toLocaleString()}

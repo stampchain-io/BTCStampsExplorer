@@ -1,6 +1,6 @@
 export const DeployMintModule = () => {
   return (
-    <div className="flex flex-col tablet:flex-row justify-between tablet:items-end gap-8 mobile-768:gap-16 tablet:gap-32">
+    <div className="flex flex-col tablet:flex-row justify-between tablet:items-end gap-8 mobileLg:gap-16 tablet:gap-32">
       <div>
         <p className="font-light text-2xl tablet:text-5xl gray-gradient4 text-left">
           DEPLOY // MINT

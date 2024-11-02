@@ -98,9 +98,9 @@ export interface StampRow {
 }
 
 export interface DisplayCountBreakpoints {
-  "mobile-360": number; // 360px+
-  "mobile-420"?: number; // 421px+ - implement in stampsection if needed
-  "mobile-768": number; // 569px+
+  "mobileSm": number; // 360px+
+  "mobileMd"?: number; // 421px+ - implement in stampsection if needed
+  "mobileLg": number; // 569px+
   "tablet": number; // 769px+
   "desktop": number; // 1025px+
 }

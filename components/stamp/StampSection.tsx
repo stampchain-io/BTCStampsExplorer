@@ -54,9 +54,9 @@ export default function StampSection(
         } else if (width >= 769) {
           setDisplayCount(displayCounts.tablet || stampArray.length);
         } else if (width >= 569) {
-          setDisplayCount(displayCounts["mobile-768"] || stampArray.length);
+          setDisplayCount(displayCounts["mobileLg"] || stampArray.length);
         } else {
-          setDisplayCount(displayCounts["mobile-360"] || stampArray.length);
+          setDisplayCount(displayCounts["mobileSm"] || stampArray.length);
         }
       } else {
         setDisplayCount(stampArray.length);
@@ -71,8 +71,8 @@ export default function StampSection(
       class={`
         w-full
         pt-[2px] pb-[18px]
-        mobile-360:pt-[2px] mobile-360:pb-[18px]
-        mobile-768:pt-[2px] mobile-768:pb-[36px]
+        mobileSm:pt-[2px] mobileSm:pb-[18px]
+        mobileLg:pt-[2px] mobileLg:pb-[36px]
         tablet:pt-[2px] tablet:pb-[72px]
         desktop:pt-[2px] desktop:pb-[72px]
       `}
@@ -81,8 +81,8 @@ export default function StampSection(
       <div class="mb-2">
         <h2 class="
           text-2xl
-          mobile-360:text-2xl
-          mobile-768:text-4xl
+          mobileSm:text-2xl
+          mobileLg:text-4xl
           tablet:text-4xl
           desktop:text-5xl
           font-extralight bg-text-purple-2 bg-clip-text text-transparent

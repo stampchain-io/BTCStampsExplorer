@@ -41,7 +41,7 @@ export function BlockPage(props: BlockPageProps) {
       {/* <BlockHeader /> */}
       <BlockTransactions />
       {
-        /* <div class="grid grid-cols-1 mobile-768:grid-cols-2 tablet:grid-cols-3 tablet:grid-cols-5 gap-4 py-2 overflow-y-auto">
+        /* <div class="grid grid-cols-1 mobileLg:grid-cols-2 tablet:grid-cols-3 tablet:grid-cols-5 gap-4 py-2 overflow-y-auto">
         {blocks.map((block: BlockRow) => (
           <BlockSelector block={block} selected={selected} />
         ))}
