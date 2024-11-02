@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Reset default margins and handle box-sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure html and body take full height without overflow */
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  position: relative; /* Create stacking context */
+}
+
+/* Main container styles */
+#root, #__fresh {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+}
+
 .primary-gradient {
   background: linear-gradient(to right, #1f002e00, #14001f7f, #1f002eff);
 }
@@ -147,14 +170,17 @@
   transform-origin: top left;
   opacity: 0.2;
   background: linear-gradient(
-    158deg,
-    #8800cc 33%,
-    #660099 66%,
-    rgba(68, 0, 102, 0) 100%
+    113deg,
+    #80c 43.44%,
+    #609 63.74%,
+    rgba(68, 0, 102, 0.00) 84.65%
   );
+
   box-shadow: 100px 100px 100px;
-  border-radius: 9999px;
-  filter: blur(100px);
+  border-radius: 1800px;
+  filter: blur(50px);
+  /* border-radius: 9999px; */
+  /* filter: blur(100px); */
   overflow: hidden;
 }
 

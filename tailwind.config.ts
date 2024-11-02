@@ -8,12 +8,13 @@ export default {
 
   theme: {
     screens: {
-      "mobile-sm": "420px",
+      "mobile-xs": "361px",
+      "mobile-sm": "421px",
       "mobile-md": "569px",
       "mobile-lg": "769px",
       "tablet": "1025px",
       "desktop": "1440px",
-      "xs": "420px",
+      "xs": "421px",
       "sm": "569px",
       "md": "769px",
       "lg": "769px",
@@ -22,6 +23,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        sans: ['"Work Sans"', "sans-serif"],
         "work-sans": ['"Work Sans"', "sans-serif"],
         "courier-prime": ['"Courier Prime"', "sans-serif"],
         "micro-5": ['"Micro 5"', "sans-serif"],
@@ -173,9 +175,6 @@ export default {
       },
     },
   },
-  target: {
-    safari: "14",
-  },
   plugins: [
     plugin(function ({ addUtilities }) {
       addUtilities({
@@ -218,17 +217,4 @@ export default {
       });
     }),
   ],
-  extend: {
-    gradientColorStops: {
-      "stamp": {
-        "from": "#666666",
-        "to": "#999999",
-      },
-      "stamp-purple": {
-        "from": "#440066",
-        "via": "#660099",
-        "to": "#8800cc",
-      },
-    },
-  },
 } satisfies Config;
