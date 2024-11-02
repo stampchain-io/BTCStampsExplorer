@@ -56,13 +56,13 @@ export function Footer() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
-    <footer className="px-3 md:px-6 xl:px-12 py-6 md:py-[72px] text-[#8800CC] font-medium max-w-[1440px] w-full mx-auto flex flex-col md:flex-row justify-between gap-4 text-sm md:text-lg">
-      <div className="w-full flex flex-col gap-1 items-center md:items-start">
-        <p className="purple-gradient2 text-[40px] leading-[47px] sm:text-[42px] sm:leading-[50px] xl:text-[56px] xl:leading-[66px] italic font-black">
+    <footer className="px-3 tablet:px-6 desktop:px-12 py-6 tablet:py-[72px] text-[#8800CC] font-medium max-w-desktop w-full mx-auto flex flex-col tablet:flex-row justify-between gap-4 text-sm tablet:text-lg">
+      <div className="w-full flex flex-col gap-1 items-center tablet:items-start">
+        <p className="purple-gradient2 text-[40px] leading-[47px] mobile-768:text-[42px] mobile-768:leading-[50px] desktop:text-[56px] desktop:leading-[66px] italic font-black">
           STAMPCHAIN
           <span className="font-extralight pr-1">.IO</span>
         </p>
-        <p className="text-base leading-[19px] xl:text-xl xl:leading-[24px] font-light mb-2 md:mb-0">
+        <p className="text-base leading-[19px] desktop:text-xl desktop:leading-[24px] font-light mb-2 tablet:mb-0">
           IMMORTALISED ART - STORED ON BITCOIN
         </p>
         <div className="flex">
@@ -90,16 +90,16 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-end md:justify-between w-full">
-        <div className="flex flex-col items-center md:items-start gap-1 w-full md:w-auto">
-          <p className="hidden md:block text-lg font-black">RESOURCES</p>
-          <div className="flex flex-row md:flex-col justify-center w-full gap-[18px] sm:gap-6 md:gap-1 leading-4">
+      <div className="flex flex-col tablet:flex-row justify-end tablet:justify-between w-full">
+        <div className="flex flex-col items-center tablet:items-start gap-1 w-full tablet:w-auto">
+          <p className="hidden tablet:block text-lg font-black">RESOURCES</p>
+          <div className="flex flex-row tablet:flex-col justify-center w-full gap-[18px] mobile-768:gap-6 tablet:gap-1 leading-4">
             {resourcesStampLinks.map((link, index) => (
               <a
                 key={index}
                 href={link.href}
                 f-partial={!link.isExternal ? link.href : undefined}
-                className="text-sm leading-[17px] xl:text-base xl:leading-[19px] font-medium hover:text-[#AA00FF]"
+                className="text-sm leading-[17px] desktop:text-base desktop:leading-[19px] font-medium hover:text-[#AA00FF]"
                 target={link.isExternal ? "_blank" : undefined}
               >
                 {link.title}
@@ -108,32 +108,35 @@ export function Footer() {
             <a
               href="/termsofservice"
               f-partial="/termsofservice"
-              className="block md:hidden leading-[19px] hover:text-[#AA00FF]"
+              className="block tablet:hidden leading-[19px] hover:text-[#AA00FF]"
             >
               TERMS
             </a>
           </div>
         </div>
 
-        <div className="text-right hidden md:flex flex-col gap-1">
+        <div className="text-right hidden tablet:flex flex-col gap-1">
           <p className="text-lg font-black">STAMPCHAIN</p>
           {stapmChainLinks.map((link, index) => (
             <a
               key={index}
               href={link.href}
               f-partial={!link.isExternal ? link.href : undefined}
-              className="text-sm leading-[17px] xl:text-base xl:leading-[19px] font-medium hover:text-[#AA00FF]"
+              className="text-sm leading-[17px] desktop:text-base desktop:leading-[19px] font-medium hover:text-[#AA00FF]"
               target={link.isExternal ? "_blank" : undefined}
             >
               {link.title}
             </a>
           ))}
-          <a href="#" className="text-[#440066] mt-5 xl:mt-2">
+          <a href="#" className="text-[#440066] mt-5 desktop:mt-2">
             <span className="italic">STAMPCHAIN</span> @ 2024
           </a>
         </div>
 
-        <a href="#" className="block md:hidden text-[#440066] text-center mt-6">
+        <a
+          href="#"
+          className="block tablet:hidden text-[#440066] text-center mt-6"
+        >
           <span className="italic">STAMPCHAIN</span> @ 2024
         </a>
       </div>

@@ -26,7 +26,7 @@ export const ConnectorsModal = (
       }`}
       onClick={handleCloseModal}
     >
-      <div class="relative w-full max-w-2xl h-auto bg-[#0B0B0B] rounded-lg shadow overflow-hidden p-4 md:p-6 flex flex-col gap-6">
+      <div class="relative w-full max-w-2xl h-auto bg-[#0B0B0B] rounded-lg shadow overflow-hidden p-4 tablet:p-6 flex flex-col gap-6">
         <img
           onClick={closeModal}
           src="/img/wallet/icon-close.svg"
@@ -41,7 +41,7 @@ export const ConnectorsModal = (
           </span>
         </h3>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 items-center">
+        <div class="grid grid-cols-1 mobile-768:grid-cols-2 gap-2 tablet:gap-4 items-center">
           {Object.keys(WALLET_PROVIDERS).map((providerKey) => (
             <WalletConnector
               key={providerKey}

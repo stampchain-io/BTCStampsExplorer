@@ -11,7 +11,7 @@ export default function BlockTransactions() {
   };
 
   return (
-    <div class="text-[#D9D9D9] flex flex-col gap-8 bg-[#2B183F] p-2 md:p-5 transition-all">
+    <div class="text-[#D9D9D9] flex flex-col gap-8 bg-[#2B183F] p-2 tablet:p-5 transition-all">
       <div className="flex justify-between">
         <p className="text-[26px]">Transactions</p>
         <div className="flex items-center gap-3">
@@ -27,19 +27,19 @@ export default function BlockTransactions() {
         </div>
       </div>
       {isExpanded && (
-        <div className="flex flex-col md:flex-row justify-between items-stretch gap-5">
+        <div className="flex flex-col tablet:flex-row justify-between items-stretch gap-5">
           <div className="flex flex-col items-center gap-5">
             <div className="flex gap-[10px]">
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#986F10]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#986F10]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#986F10]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#986F10]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#986F10]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#986F10]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#986F10]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#986F10]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#986F10]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#986F10]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#986F10]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#986F10]" />
             </div>
             <p className="text-center text-[#6E6E6E]">Transaction Fees</p>
-            <div className="bg-[#1B1D2B] py-2 md:py-4 px-3 md:px-6 w-full">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-y-5">
+            <div className="bg-[#1B1D2B] py-2 tablet:py-4 px-3 tablet:px-6 w-full">
+              <div className="grid grid-cols-2 tablet:grid-cols-4 gap-y-5">
                 <div className="md:mr-5">
                   <p className="bg-[#587206] min-w-[120px] py-1 text-center mb-5">
                     No Priority
@@ -106,15 +106,15 @@ export default function BlockTransactions() {
           <div className="border border-dashed"></div>
           <div className="flex flex-col items-center gap-5">
             <div className="flex gap-[10px]">
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#8434F0]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#8434F0]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#8434F0]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#8434F0]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#8434F0]" />
-              <div className="w-[40px] md:w-[80px] h-[40px] md:h-[80px] bg-[#8434F0]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#8434F0]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#8434F0]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#8434F0]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#8434F0]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#8434F0]" />
+              <div className="w-[40px] tablet:w-[80px] h-[40px] tablet:h-[80px] bg-[#8434F0]" />
             </div>
-            <div className="flex flex-col md:flex-row justify-between items-center w-full">
-              <p className="hidden md:block invisible text-xs">
+            <div className="flex flex-col tablet:flex-row justify-between items-center w-full">
+              <p className="hidden tablet:block invisible text-xs">
                 difficulty | <span className="text-[#8434F0]">halving</span>
               </p>
               <p className="text-[#6E6E6E]">Difficulty adjustment</p>
@@ -122,7 +122,7 @@ export default function BlockTransactions() {
                 difficulty | <span className="text-[#8434F0]">halving</span>
               </p>
             </div>
-            <div className="bg-[#1B1D2B] py-2 md:py-4 px-3 md:px-6 w-full">
+            <div className="bg-[#1B1D2B] py-2 tablet:py-4 px-3 tablet:px-6 w-full">
               <div className="flex mb-5">
                 <div className="bg-[#254FB3] w-[200px] h-8">
                 </div>
@@ -133,25 +133,27 @@ export default function BlockTransactions() {
               </div>
               <div className="flex justify-between gap-2">
                 <div>
-                  <p className="text-sm md:text-2xl text-center">
+                  <p className="text-sm tablet:text-2xl text-center">
                     ~9.4 minutes
                   </p>
-                  <p className="text-[#6E6E6E] text-xs md:text-base text-center">
+                  <p className="text-[#6E6E6E] text-xs tablet:text-base text-center">
                     Average block time
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm md:text-2xl text-center">
+                  <p className="text-sm tablet:text-2xl text-center">
                     <span className="text-[#34C440]">&#9652; 6.67</span> %
                   </p>
-                  <p className="text-[#6E6E6E] text-xs md:text-base text-center">
+                  <p className="text-[#6E6E6E] text-xs tablet:text-base text-center">
                     Previous:{" "}
                     <span className="text-[#C82D3A]">&#9662; 0.79</span> %
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm md:text-2xl text-center">In ~9 days</p>
-                  <p className="text-[#6E6E6E] text-xs md:text-base text-center">
+                  <p className="text-sm tablet:text-2xl text-center">
+                    In ~9 days
+                  </p>
+                  <p className="text-[#6E6E6E] text-xs tablet:text-base text-center">
                     June 19 at 2:38 PM
                   </p>
                 </div>

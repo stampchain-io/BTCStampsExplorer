@@ -61,7 +61,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
 
   return (
     <div class="flex flex-col gap-8">
-      <div className="flex flex-col xl:flex-row gap-8">
+      <div className="flex flex-col desktop:flex-row gap-8">
         <SRC20TickHeader
           deployment={deployment}
           mintStatus={mint_status}

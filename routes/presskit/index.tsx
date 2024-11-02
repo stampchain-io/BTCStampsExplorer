@@ -1,9 +1,9 @@
 export default function PressKit() {
   return (
-    <div className="text-[#CCCCCC] flex flex-col gap-16 md:gap-36 py-24 md:py-48">
+    <div className="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
       <section className="text-center max-w-5xl mx-auto">
-        <h1 className="text-3xl md:text-6xl font-bold">
-          <span className="text-4xl md:text-7xl font-black gray-gradient1">
+        <h1 className="text-3xl tablet:text-6xl font-bold">
+          <span className="text-4xl tablet:text-7xl font-black gray-gradient1">
             PRESS KIT
           </span>
           <br />
@@ -11,16 +11,16 @@ export default function PressKit() {
         </h1>
       </section>
 
-      <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-        <div className="flex flex-col gap-6 md:gap-12 w-full md:w-1/2">
+      <section className="flex flex-col tablet:flex-row gap-6 tablet:gap-12">
+        <div className="flex flex-col gap-6 tablet:gap-12 w-full tablet:w-1/2">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
+            <h1 className="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
               BITCOIN STAMPS
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               BRANDING
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
               diam libero, faucibus ut sagittis at, rutrum nec eros. Donec sit
               amet blandit arcu. Nullam ultrices a mauris non efficitur. Morbi
@@ -32,10 +32,10 @@ export default function PressKit() {
           </div>
 
           <div>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               TEXT
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               NFT tokens where each Stamp can utilize a built-in token layer via
               standards developed on Counterparty in 2014. Originally, Stamps
               were encouraged to be 1:1, but creators can issue up to
@@ -44,10 +44,10 @@ export default function PressKit() {
           </div>
 
           <div>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               STAMP AI MEMES
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               A token layer built around a fair mint system where users only pay
               BTC miner fees. Modeled after BRC-20, but with the immutability of
               Stamps. History: The first official SRC-20 Token (KEVIN) was
@@ -56,10 +56,10 @@ export default function PressKit() {
           </div>
 
           <div>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               PROMO BANNERS
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               A domain name system built on Bitcoin Stamps. Currently in
               development. Since SATs don't exist, we Stamp on the UTXO set to
               ensure immutability. It is impossible to inscribe a Stamp.
@@ -67,10 +67,10 @@ export default function PressKit() {
           </div>
 
           <div>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               ART STAMPS
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               A domain name system built on Bitcoin Stamps. Currently in
               development. Since SATs don't exist, we Stamp on the UTXO set to
               ensure immutability. It is impossible to inscribe a Stamp.
@@ -82,20 +82,20 @@ export default function PressKit() {
           </button>
         </div>
 
-        <div className="text-[#FFA100] flex flex-col items-center md:items-end gap-3 md:gap-6 w-full md:w-1/2 font-micro-5">
-          <p className="text-4xl md:text-7xl">BITCOIN STAMPS</p>
-          <p className="text-6xl md:text-9xl">STAMPS</p>
-          <div className="flex gap-3 md:gap-6">
+        <div className="text-[#FFA100] flex flex-col items-center tablet:items-end gap-3 tablet:gap-6 w-full tablet:w-1/2 font-micro-5">
+          <p className="text-4xl tablet:text-7xl">BITCOIN STAMPS</p>
+          <p className="text-6xl tablet:text-9xl">STAMPS</p>
+          <div className="flex gap-3 tablet:gap-6">
             <img src="/img/home/carousel1.png" className="w-20 h-20" />
             <img src="/img/home/carousel2.png" className="w-20 h-20" />
             <img src="/img/home/carousel3.png" className="w-20 h-20" />
           </div>
-          <div className="flex gap-3 md:gap-6">
+          <div className="flex gap-3 tablet:gap-6">
             <img src="/img/home/carousel1.png" className="w-20 h-20" />
             <img src="/img/home/carousel2.png" className="w-20 h-20" />
             <img src="/img/home/carousel3.png" className="w-20 h-20" />
           </div>
-          <div className="flex gap-3 md:gap-6">
+          <div className="flex gap-3 tablet:gap-6">
             <img src="/img/home/carousel1.png" className="w-20 h-20" />
             <img src="/img/home/carousel2.png" className="w-20 h-20" />
             <img src="/img/home/carousel3.png" className="w-20 h-20" />
@@ -103,16 +103,16 @@ export default function PressKit() {
         </div>
       </section>
 
-      <section className="flex flex-col md:flex-row gap-6 md:gap-12">
-        <div className="flex flex-col gap-6 md:gap-12 w-full md:w-1/2">
+      <section className="flex flex-col tablet:flex-row gap-6 tablet:gap-12">
+        <div className="flex flex-col gap-6 tablet:gap-12 w-full tablet:w-1/2">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
+            <h1 className="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
               STAMPCHAIN
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               BRANDING
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
               diam libero, faucibus ut sagittis at, rutrum nec eros. Donec sit
               amet blandit arcu. Nullam ultrices a mauris non efficitur. Morbi
@@ -124,10 +124,10 @@ export default function PressKit() {
           </div>
 
           <div>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               TEXT LOGO
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               NFT tokens where each Stamp can utilize a built-in token layer via
               standards developed on Counterparty in 2014. Originally, Stamps
               were encouraged to be 1:1, but creators can issue up to
@@ -136,10 +136,10 @@ export default function PressKit() {
           </div>
 
           <div>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               IMAGE
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               A token layer built around a fair mint system where users only pay
               BTC miner fees. Modeled after BRC-20, but with the immutability of
               Stamps. History: The first official SRC-20 Token (KEVIN) was
@@ -148,10 +148,10 @@ export default function PressKit() {
           </div>
 
           <div>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               COLOR PALETTE
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               A domain name system built on Bitcoin Stamps. Currently in
               development. Since SATs don't exist, we Stamp on the UTXO set to
               ensure immutability. It is impossible to inscribe a Stamp.
@@ -163,11 +163,11 @@ export default function PressKit() {
           </button>
         </div>
 
-        <div className="flex flex-col items-center md:items-end gap-6 md:gap-12 w-full md:w-1/2">
-          <p className="purple-gradient2 text-4xl md:text-7xl font-black italic px-2">
+        <div className="flex flex-col items-center tablet:items-end gap-6 tablet:gap-12 w-full tablet:w-1/2">
+          <p className="purple-gradient2 text-4xl tablet:text-7xl font-black italic px-2">
             STAMPCHAIN
           </p>
-          <p className="purple-gradient2 text-4xl md:text-7xl font-black italic px-2">
+          <p className="purple-gradient2 text-4xl tablet:text-7xl font-black italic px-2">
             STAMPCHAIN<span className="font-extralight">.IO</span>
           </p>
           <div className="flex gap-6">

@@ -33,27 +33,31 @@ const ARTICLE_LINKS: ArticleLink[] = [
 
 export default function HowTo() {
   return (
-    <div className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-40">
+    <div className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 tablet:mt-40">
       <div className="max-w-[660px] w-full mx-auto flex flex-col gap-12">
         <section>
           <h1 className="gray-gradient3 text-6xl font-black">How-To</h1>
-          <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+          <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
             Transfer
           </h2>
           <p className="mb-12">
-            Recepient address must start with 1 if classic, or with bc1q if SegWit.<br />
+            Recepient address must start with 1 if classic, or with bc1q if
+            SegWit.<br />
             Start typing the token to access to your list of tokens.<br />
             <br />
             Enter the amount of tokens that you want to transfer. <br />
             <br />
-            FEES shows the suggested amount, and you can adjust it with the slider.Lowering the fee may delay your art being stamped.<br />
-            Fees are displayed in BTC by default, but you can switch to USDT using the TOGGLE.<br />
+            FEES shows the suggested amount, and you can adjust it with the
+            slider.Lowering the fee may delay your art being stamped.<br />
+            Fees are displayed in BTC by default, but you can switch to USDT
+            using the TOGGLE.<br />
             All related costs are listed under the DETAILS section.<br />
             Accept the terms and conditions to enable the Transfer button.<br />
-            <br /> 
-            The Transfer button will submit your transaction with all the provided information.<br />
+            <br />
+            The Transfer button will submit your transaction with all the
+            provided information.<br />
           </p>
-          <PlaceholderImage className="w-full md:w-[660px] h-[318px]" />
+          <PlaceholderImage className="w-full tablet:w-[660px] h-[318px]" />
           <p className="mt-6">
             Ut elementum porta ante, malesuada lacinia dolor rutrum vel. Vivamus
             rutrum volutpat sagittis. Vestibulum text link primis in faucibus
@@ -63,7 +67,7 @@ export default function HowTo() {
         </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="text-2xl md:text-5xl font-extralight">
+          <h2 className="text-2xl tablet:text-5xl font-extralight">
             SUBHEADING
           </h2>
           <p>
@@ -81,8 +85,10 @@ export default function HowTo() {
         </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="text-2xl md:text-5xl font-extralight">SUBHEADING</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-6">
+          <h2 className="text-2xl tablet:text-5xl font-extralight">
+            SUBHEADING
+          </h2>
+          <div className="grid grid-cols-1 tablet:grid-cols-2 items-center gap-6">
             <div className="space-y-6">
               <p>
                 Aliquam ac convallis tellus. Proin ullamcorper eu magna in
@@ -100,11 +106,11 @@ export default function HowTo() {
                 dui nibh, finibus maximus nunc vitae, efficitur finibus enim.
                 Fusce in sem rutrum eros porttitor aliquam a id enim.
               </p>
-              <PlaceholderImage className="w-full md:w-[318px] h-[178px]" />
+              <PlaceholderImage className="w-full tablet:w-[318px] h-[178px]" />
             </div>
 
             <div className="space-y-6">
-              <PlaceholderImage className="w-full md:w-[318px] h-[424px]" />
+              <PlaceholderImage className="w-full tablet:w-[318px] h-[424px]" />
               <p>
                 Aliquam tellus. Proin ullamcorper eu magna in iaculis.
                 Pellentesque nulla ex, finibus id purus quis, dictum posuere
@@ -118,7 +124,9 @@ export default function HowTo() {
         </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="text-2xl md:text-5xl font-extralight">SUBHEADING</h2>
+          <h2 className="text-2xl tablet:text-5xl font-extralight">
+            SUBHEADING
+          </h2>
           <p className="mb-3">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id sem
             vitae lacus venenatis blandit. Curabitur pharetra ipsum id mauris
@@ -131,8 +139,8 @@ export default function HowTo() {
             Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
             posuere cubilia curae; Nullam vel sem non enim pulvinar suscipit.
           </p>
-          <PlaceholderImage className="w-full md:w-[660px] h-[372px]" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+          <PlaceholderImage className="w-full tablet:w-[660px] h-[372px]" />
+          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 mt-3">
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id
               sem vitae lacus venenatis blandit. Curabitur pharetra ipsum id
@@ -146,30 +154,30 @@ export default function HowTo() {
               ultrices posuere cubilia curae; Nullam vel sem non enim pulvinar
               suscipit.
             </p>
-            <PlaceholderImage className="w-full md:w-[318px] h-[318px]" />
+            <PlaceholderImage className="w-full tablet:w-[318px] h-[318px]" />
           </div>
         </section>
       </div>
       <section className="mt-24">
-        <h1 className="gray-gradient3 text-4xl md:text-5xl xl:text-6xl font-black">
+        <h1 className="gray-gradient3 text-4xl tablet:text-5xl desktop:text-6xl font-black">
           KEEP READING
         </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6">
           <div>
-            <h2 className="text-2xl md:text-5xl font-extralight">HOW-TO</h2>
+            <h2 className="text-2xl tablet:text-5xl font-extralight">HOW-TO</h2>
             {ARTICLE_LINKS.map(({ title, href }) => (
               <a
                 key={`${title}-${href}`}
                 href={href}
                 f-partial={href}
-                className="block gray-gradient3 text-xl md:text-2xl font-bold"
+                className="block gray-gradient3 text-xl tablet:text-2xl font-bold"
               >
                 {title}
               </a>
             ))}
           </div>
-          <div className="flex flex-col md:items-end md:text-right">
-            <h2 className="text-2xl md:text-5xl font-extralight">FAQ</h2>
+          <div className="flex flex-col tablet:items-end tablet:text-right">
+            <h2 className="text-2xl tablet:text-5xl font-extralight">FAQ</h2>
             <p>
               All you ever wanted to know about the Bitcoin Stamps protocol and
               stuff you never thought you needed to know.

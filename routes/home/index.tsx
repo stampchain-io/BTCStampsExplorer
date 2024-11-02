@@ -75,7 +75,7 @@ export default function Home(props: HomePageProps) {
   } = props.data || {};
 
   return (
-    <div class="relative flex flex-col gap-10 md:gap-24 text-white py-10 md:py-24">
+    <div class="relative flex flex-col gap-10 tablet:gap-24 text-white py-10 tablet:py-24">
       <HomeHeader />
 
       <HomeCarousel />
@@ -88,30 +88,67 @@ export default function Home(props: HomePageProps) {
         collectionData={collectionData}
       />
 
-      <div className="flex flex-col gap-4 md:gap-8">
-        <h1 className="text-5xl 2xl:text-6xl  font-black purple-gradient1">
-          SRC-20 TOKENS
-        </h1>
-        {/* SRC20DeployTable section */}
-        <div className="flex flex-col gap-4">
-          <h2 className="text-[#AA00FF] text-4xl lg:text-5xl font-extralight">
-            ALL TOKENS
-          </h2>
+      {/* SRC-20 TOKENS Section */}
+      <div className="
+        flex flex-col gap-8 mobile-768:gap-16
+        px-3 tablet:px-6 desktop:px-12 
+        max-w-desktop w-full mx-auto
+      ">
+        <div className="flex flex-col gap-4 mobile-768:gap-8">
+          <div
+            class={`
+              w-full
+              pb-0 pt-[18px]
+              mobile-360:pb-0 mobile-360:pt-[18px]
+              mobile-768:pb-0 mobile-768:pt-[36px]
+              tablet:pb-0 tablet:pt-[72px]
+              desktop:pb-0 desktop:pt-[72px]
+            `}
+          >
+            <h1 className="
+              text-4xl
+              mobile-360:text-4xl
+              mobile-768:text-5xl
+              tablet:text-5xl
+              desktop:text-6xl
+              font-black bg-text-purple-2 bg-clip-text text-transparent
+            ">
+              SRC-20 TOKENS
+            </h1>
+          </div>
+
+          {/* ALL TOKENS Section */}
+          <div className="flex flex-col gap-4">
+            <h2 class="
+              text-2xl
+              mobile-360:text-2xl
+              mobile-768:text-4xl
+              tablet:text-4xl
+              desktop:text-5xl
+              font-extralight bg-text-purple-2 bg-clip-text text-transparent
+            ">
+              ALL TOKENS
+            </h2>
+            <SRC20DeployTable data={src20s} />
+            <ViewAllButton href="/src20" />
+          </div>
+
+          {/* MINTING Section */}
+          <div className="flex flex-col gap-4">
+            <h2 class="
+              text-2xl
+              mobile-360:text-2xl
+              mobile-768:text-4xl
+              tablet:text-4xl
+              desktop:text-5xl
+              font-extralight bg-text-purple-2 bg-clip-text text-transparent
+            ">
+              MINTING
+            </h2>
+            <SRC20TrendingMints data={trendingSrc20s} />
+            <ViewAllButton href="/src20?type=trending" />
+          </div>
         </div>
-        <div class="flex flex-col gap-4">
-          <SRC20DeployTable data={src20s} />
-          <ViewAllButton href="/src20" />
-        </div>
-      </div>
-      {/* SRC20TrendingMints section */}
-      <div className="flex flex-col gap-4">
-        <h2 className="text-[#AA00FF] text-4xl lg:text-5xl font-extralight">
-          MINTING
-        </h2>
-      </div>
-      <div class="flex flex-col gap-4">
-        <SRC20TrendingMints data={trendingSrc20s} />
-        <ViewAllButton href="/src20?type=trending" />
       </div>
 
       <StampChainModule />

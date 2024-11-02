@@ -13,7 +13,7 @@ const Accordion = (
   return (
     <div className="w-full">
       <div
-        className="flex justify-between items-center cursor-pointer text-xl md:text-4xl"
+        className="flex justify-between items-center cursor-pointer text-xl tablet:text-4xl"
         onClick={toggleAccordion}
       >
         <h2 className="font-extralight">
@@ -30,7 +30,7 @@ const Accordion = (
       <div
         className={`${
           isOpen ? "max-h-[300px]" : "max-h-0"
-        } transition-all duration-500 text-sm md:text-lg font-medium overflow-hidden mt-3`}
+        } transition-all duration-500 text-sm tablet:text-lg font-medium overflow-hidden mt-3`}
       >
         {children}
       </div>

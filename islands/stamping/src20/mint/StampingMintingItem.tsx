@@ -47,7 +47,7 @@ const StampingMintingItem = ({ src20 }: StampingMintingItemProps) => {
             {convertToEmoji(src20.tick)}
           </a>
           <div className="flex flex-col gap-1">
-            <p className="hidden md:block text-lg font-light text-[#999999]">
+            <p className="hidden tablet:block text-lg font-light text-[#999999]">
               PROGRESS{" "}
               <span className="font-bold">
                 {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0] || "0"}%
@@ -55,15 +55,15 @@ const StampingMintingItem = ({ src20 }: StampingMintingItemProps) => {
             </p>
 
             {/* Show on mobile only */}
-            <span className="block md:hidden font-bold text-lg text-[#999999]">
+            <span className="block tablet:hidden font-bold text-lg text-[#999999]">
               {progress}%
             </span>
-            <p className="block md:hidden text-lg font-light text-[#999999]">
+            <p className="block tablet:hidden text-lg font-light text-[#999999]">
               PROGRESS
             </p>
 
             {(progress !== "100") && (
-              <div className="hidden md:block min-w-[200px] h-1 bg-[#999999] relative rounded-full">
+              <div className="hidden tablet:block min-w-[200px] h-1 bg-[#999999] relative rounded-full">
                 <div
                   className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
                   style={{ width: progressWidth }}
@@ -74,7 +74,7 @@ const StampingMintingItem = ({ src20 }: StampingMintingItemProps) => {
         </div>
       </div>
 
-      <div className="hidden md:flex lg:hidden flex-col items-center p-3 text-center">
+      <div className="hidden tablet:flex tablet:hidden flex-col items-center p-3 text-center">
         <p className="text-lg text-[#666666] font-light">
           SUPPLY{" "}
           <span className="font-bold text-[#999999]">

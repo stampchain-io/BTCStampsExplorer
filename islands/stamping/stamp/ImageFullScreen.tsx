@@ -14,7 +14,7 @@ const ImageFullScreen = (
     >
       <div class="relative p-4 w-full max-w-[800px] h-auto">
         <div class="relative bg-white rounded-lg shadow overflow-hidden">
-          <div class="flex flex-col gap-4 items-center justify-between p-4 md:p-5 rounded-t">
+          <div class="flex flex-col gap-4 items-center justify-between p-4 tablet:p-5 rounded-t">
             <button
               onClick={toggleModal}
               type="button"
@@ -39,7 +39,7 @@ const ImageFullScreen = (
               <span class="sr-only">Close modal</span>
             </button>
             <img
-              className="w-[300px] md:w-[640px]"
+              className="w-[300px] tablet:w-[640px]"
               style={{
                 height: "100%",
                 objectFit: "contain",

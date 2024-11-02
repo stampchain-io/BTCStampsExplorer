@@ -34,22 +34,22 @@ function TransferRow({ send }: { send: SendRow }) {
 
   return (
     <tr key={send.tx_hash}>
-      <td className="pr-3 md:pr-6 py-2 md:py-4">
+      <td className="pr-3 tablet:pr-6 py-2 tablet:py-4">
         {send.source ? abbreviateAddress(send.source) : "NULL"}
       </td>
-      <td className="px-3 md:px-6 py-2 md:py-4">
+      <td className="px-3 tablet:px-6 py-2 tablet:py-4">
         {send.destination ? abbreviateAddress(send.destination) : "NULL"}
       </td>
-      <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
+      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
         {send.quantity}
       </td>
-      <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
+      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
         {send.memo || "transfer"}
       </td>
-      <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
+      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
         {abbreviateAddress(send.tx_hash)}
       </td>
-      <td className="pl-3 md:pl-6 py-2 md:py-4 text-sm">
+      <td className="pl-3 tablet:pl-6 py-2 tablet:py-4 text-sm">
         {dayjs(send.block_time).fromNow()}
       </td>
     </tr>
@@ -66,7 +66,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
   return (
     <div className="relative shadow-md max-w-256">
       <div className="max-h-96 overflow-x-auto">
-        <table className="w-full text-sm text-left rtl:text-right text-[#666666] sm:rounded-lg">
+        <table className="w-full text-sm text-left rtl:text-right text-[#666666] mobile-768:rounded-lg">
           <thead className="text-lg uppercase">
             <tr>
               {tableHeaders.map(({ key, label }) => (

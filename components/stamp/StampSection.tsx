@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { StampRow, StampSectionProps } from "globals";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
+import { useWindowSize } from "$lib/hooks/useWindowSize.ts"; // Custom hook to get window size
 
 export default function StampSection(
   {
@@ -13,12 +14,12 @@ export default function StampSection(
     filterBy,
     showDetails = false,
     variant = "",
-  }:
-    & StampSectionProps
-    & { showDetails?: boolean },
+    gridClass,
+    displayCounts,
+  }: StampSectionProps,
 ) {
   const stampArray = Array.isArray(stamps) ? stamps : [];
-  const [displayCount, setDisplayCount] = useState(8);
+  const [displayCount, setDisplayCount] = useState(stampArray.length);
 
   const params = new URLSearchParams();
 
@@ -42,42 +43,59 @@ export default function StampSection(
 
   const seeAllLink = `/stamp?${params.toString()}`;
 
+  // Custom hook to get window size
+  const { width } = useWindowSize();
+
   useEffect(() => {
     const updateDisplayCount = () => {
-      const width = globalThis.innerWidth;
-      if (width >= 1440) setDisplayCount(layout === "grid" ? 8 : 6);
-      else if (width >= 1025) setDisplayCount(layout === "grid" ? 6 : 6);
-      else if (width >= 769) setDisplayCount(layout === "grid" ? 8 : 4);
-      else if (width >= 569) setDisplayCount(layout === "grid" ? 6 : 4);
-      else if (width >= 420) setDisplayCount(layout === "grid" ? 6 : 3);
-      else setDisplayCount(4);
+      if (displayCounts) {
+        if (width >= 1025) {
+          setDisplayCount(displayCounts.desktop || stampArray.length);
+        } else if (width >= 769) {
+          setDisplayCount(displayCounts.tablet || stampArray.length);
+        } else if (width >= 569) {
+          setDisplayCount(displayCounts["mobile-768"] || stampArray.length);
+        } else {
+          setDisplayCount(displayCounts["mobile-360"] || stampArray.length);
+        }
+      } else {
+        setDisplayCount(stampArray.length);
+      }
     };
 
     updateDisplayCount();
-    globalThis.addEventListener("resize", updateDisplayCount);
-    return () => globalThis.removeEventListener("resize", updateDisplayCount);
-  }, []);
+  }, [width, displayCounts, stampArray.length]);
 
   return (
-    <div>
+    <div
+      class={`
+        w-full
+        pt-[2px] pb-[18px]
+        mobile-360:pt-[2px] mobile-360:pb-[18px]
+        mobile-768:pt-[2px] mobile-768:pb-[36px]
+        tablet:pt-[2px] tablet:pb-[72px]
+        desktop:pt-[2px] desktop:pb-[72px]
+      `}
+    >
       {/* Section Title */}
-      <div className="mb-4">
-        <h2 className="text-[#AA00FF] text-4xl lg:text-5xl font-extralight">
+      <div class="mb-2">
+        <h2 class="
+          text-2xl
+          mobile-360:text-2xl
+          mobile-768:text-4xl
+          tablet:text-4xl
+          desktop:text-5xl
+          font-extralight bg-text-purple-2 bg-clip-text text-transparent
+        ">
           {title}
         </h2>
       </div>
 
-      {/* Stamp Rows */}
-      <div
-        className={layout === "grid"
-          ? "grid w-full gap-4 grid-cols-2 mobile-sm:grid-cols-3 mobile-md:grid-cols-3 mobile-lg:grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-4 grid-rows-2"
-          : "grid w-full gap-2 grid-cols-2 mobile-sm:grid-cols-3 mobile-md:grid-cols-4 mobile-lg:grid-cols-4 tablet:grid-cols-6 desktop:grid-cols-6 grid-rows-1"}
-      >
+      {/* Grid Container */}
+      <div class={gridClass}>
         {stampArray.slice(0, displayCount).map(
-          (stamp: StampRow, index: number) => (
-            <div
-              key={stamp.tx_hash}
-            >
+          (stamp: StampRow) => (
+            <div key={stamp.tx_hash}>
               <StampCard
                 stamp={stamp}
                 kind="stamp"

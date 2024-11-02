@@ -428,7 +428,7 @@ export function OlgaContent() {
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
         STAMP
       </p>
 
@@ -516,7 +516,7 @@ export function OlgaContent() {
               </div>
             </button>
             <div className="flex gap-6 items-center">
-              <p class="text-base md:text-2xl font-semibold text-[#999999] uppercase">
+              <p class="text-base tablet:text-2xl font-semibold text-[#999999] uppercase">
                 Editions
               </p>
               <div className="w-12">
@@ -557,7 +557,7 @@ export function OlgaContent() {
           </div>
           <div className="flex items-end gap-3">
             <div className="w-full">
-              <p className="text-xs md:text-lg font-medium text-[#999999]">
+              <p className="text-xs tablet:text-lg font-medium text-[#999999]">
                 POSH
               </p>
               <InputField
@@ -590,7 +590,7 @@ export function OlgaContent() {
           Optimization
         </p>
         <hr />
-        <div class="grid grid-cols-2 md:grid-cols-4 justify-between gap-4 py-6 px-6">
+        <div class="grid grid-cols-2 tablet:grid-cols-4 justify-between gap-4 py-6 px-6">
           <div class="flex items-center">
             <input
               id="default-radio-1"

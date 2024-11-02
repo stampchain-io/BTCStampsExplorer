@@ -8,7 +8,7 @@ export function StampContent({ stamps, isRecentSales = false }: {
   isRecentSales?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-2 mobile-lg:grid-cols-4 gap-2 mobile-lg:gap-4 tablet:gap-6 py-6 
+    <div className="grid grid-cols-2 mobile-768:grid-cols-4 gap-2 mobile-768:gap-4 tablet:gap-6 py-6 
       transition-opacity duration-700 ease-in-out">
       {stamps.map((stamp) => (
         <StampCard

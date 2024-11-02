@@ -24,7 +24,7 @@ const SRC20MintingItem = (
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Desktop View */}
-      <div class="hidden md:flex dark-gradient text-sm justify-between items-center rounded-md hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
+      <div class="hidden tablet:flex dark-gradient text-sm justify-between items-center rounded-md hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
         <div class="p-3 uppercase cursor-pointer flex gap-6">
           <img
             src={`/content/${src20.tx_hash}.svg`}
@@ -97,7 +97,7 @@ const SRC20MintingItem = (
       </div>
 
       {/* Mobile View */}
-      <div class="block md:hidden text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
+      <div class="block tablet:hidden text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]">
         <div class="w-full flex items-center gap-2 mb-2">
           <img
             src={`/content/${src20.tx_hash}.svg`}

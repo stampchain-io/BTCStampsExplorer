@@ -19,7 +19,7 @@ export default function BlockStampsTable(props: BlockStampsTableProps) {
 
   return (
     <div className="relative overflow-x-auto shadow-md max-h-196">
-      <table className="hidden md:table w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:h-auto">
+      <table className="hidden tablet:table w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mobile-768:h-auto">
         <thead className="bg-[#2B0E49] uppercase text-lg text-[#C184FF] border-b border-[#B9B9B9]">
           <tr>
             <th scope="col" className="px-6 py-3">#</th>
@@ -84,7 +84,7 @@ export default function BlockStampsTable(props: BlockStampsTableProps) {
           })}
         </tbody>
       </table>
-      <div class="flex md:hidden flex-col gap-3">
+      <div class="flex tablet:hidden flex-col gap-3">
         {issuances.map((issuance: StampRow, _index: number) => {
           const kind = issuance.is_btc_stamp
             ? "stamp"

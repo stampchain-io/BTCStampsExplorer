@@ -44,7 +44,7 @@ const StampCodeModal = (
     >
       <div class="relative p-4 w-4/5 h-auto">
         <div class="relative bg-white rounded-lg shadow overflow-hidden">
-          <div class="flex flex-col gap-4 items-center justify-between p-4 md:p-5 rounded-t">
+          <div class="flex flex-col gap-4 items-center justify-between p-4 tablet:p-5 rounded-t">
             <button
               onClick={toggleModal}
               type="button"

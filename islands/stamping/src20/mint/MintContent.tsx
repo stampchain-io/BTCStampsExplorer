@@ -20,7 +20,7 @@ const MintProgress = (
   return (
     <div className="flex justify-between text-[#999999] items-end">
       <div className="flex flex-col gap-1">
-        <p className="text-base md:text-2xl font-light">
+        <p className="text-base tablet:text-2xl font-light">
           PROGRESS{" "}
           <span className="font-bold">
             {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0] || "0"}%
@@ -33,7 +33,7 @@ const MintProgress = (
           />
         </div>
       </div>
-      <div className="text-right text-xs md:text-base font-light">
+      <div className="text-right text-xs tablet:text-base font-light">
         <p>
           SUPPLY <span className="font-bold">{maxSupply}</span>
         </p>
@@ -153,7 +153,7 @@ export function MintContent({
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
         MINT SRC-20
       </p>
 
@@ -164,11 +164,11 @@ export function MintContent({
         </div>
       )}
 
-      <div className="dark-gradient p-3 md:p-6 flex flex-col gap-3 md:gap-6 w-full">
-        <div className="w-full flex gap-3 md:gap-6">
+      <div className="dark-gradient p-3 tablet:p-6 flex flex-col gap-3 tablet:gap-6 w-full">
+        <div className="w-full flex gap-3 tablet:gap-6">
           <div
             id="image-preview"
-            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[108px] md:min-w-[120px] w-[108px] md:w-[120px] h-[108px] md:h-[120px] content-center bg-[#660099] flex flex-col"
+            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[108px] tablet:min-w-[120px] w-[108px] tablet:w-[120px] h-[108px] tablet:h-[120px] content-center bg-[#660099] flex flex-col"
           >
             <img
               src="/img/stamping/image-upload.svg"
@@ -176,7 +176,7 @@ export function MintContent({
               alt=""
             />
           </div>
-          <div className="flex flex-col gap-3 md:gap-6 w-full">
+          <div className="flex flex-col gap-3 tablet:gap-6 w-full">
             <InputField
               type="text"
               placeholder="Token"
@@ -205,7 +205,7 @@ export function MintContent({
         />
       </div>
 
-      <div className="dark-gradient p-3 md:p-6 w-full z-[10]">
+      <div className="dark-gradient p-3 tablet:p-6 w-full z-[10]">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

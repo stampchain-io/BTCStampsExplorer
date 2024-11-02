@@ -64,7 +64,7 @@ export function Filter({
             {filterButtons.map((filter) => (
               <button
                 key={filter}
-                class={`cursor-pointer text-xs md:text-sm font-black ${
+                class={`cursor-pointer text-xs tablet:text-sm font-black ${
                   localFilters.includes(filter)
                     ? "text-[#AA00FF]"
                     : "text-[#660099] hover:text-[#AA00FF]"

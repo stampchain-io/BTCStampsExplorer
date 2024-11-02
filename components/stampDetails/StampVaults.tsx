@@ -18,7 +18,7 @@ export function StampVaults(
       </p> */
       }
       <div className="max-h-96 overflow-x-auto">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 sm:rounded-lg">
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mobile-768:rounded-lg">
           <thead className="text-lg font-semibold uppercase">
             <tr>
               <th scope="col" className="pr-6 py-3">
@@ -40,16 +40,16 @@ export function StampVaults(
               <tr
                 key={index}
               >
-                <td className="pr-3 md:pr-6 py-2 md:py-4">
+                <td className="pr-3 tablet:pr-6 py-2 tablet:py-4">
                   {abbreviateAddress(vault.source)}
                 </td>
-                <td className="px-3 md:px-6 py-2 md:py-4">
+                <td className="px-3 tablet:px-6 py-2 tablet:py-4">
                   {abbreviateAddress(vault.destination)}
                 </td>
-                <td className="px-3 md:px-6 py-2 md:py-4 text-sm">
+                <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
                   {vault.dispense_quantity}
                 </td>
-                <td className="pl-3 md:pl-6 py-2 md:py-4 text-sm">
+                <td className="pl-3 tablet:pl-6 py-2 tablet:py-4 text-sm">
                   {vault.satoshirate}
                 </td>
               </tr>

@@ -76,8 +76,8 @@ const ItemHeader = (
 ) => {
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full">
-      <div class="flex gap-6 md:gap-8 items-end">
-        <p class="cursor-pointer pb-1 md:pb-3 text-2xl md:text-4xl xl:text-5xl uppercase text-[#8800CC] font-light">
+      <div class="flex gap-6 tablet:gap-8 items-end">
+        <p class="cursor-pointer pb-1 tablet:pb-3 text-2xl tablet:text-4xl desktop:text-5xl uppercase text-[#8800CC] font-light">
           {title}
         </p>
       </div>
@@ -126,7 +126,7 @@ function DispenserItem() {
   return (
     <div class="relative shadow-md">
       {/* Desktop View */}
-      <div class="hidden xl:flex flex-col gap-6 p-2">
+      <div class="hidden desktop:flex flex-col gap-6 p-2">
         {dispensers.map((dispenser) => {
           // Ensure src20.tick is defined
           return (
@@ -208,7 +208,7 @@ function DispenserItem() {
       </div>
 
       {/* Mobile View */}
-      <div class="flex xl:hidden flex-col gap-3 p-2">
+      <div class="flex desktop:hidden flex-col gap-3 p-2">
         {dispensers.map((dispenser) => {
           // Ensure src20.tick is defined
           return (
@@ -229,7 +229,7 @@ function DispenserItem() {
                   </div>
 
                   <div className="flex justify-between flex-row  w-full">
-                    <p className="text-base text-[#8800CC] font-light text-ellipsis overflow-hidden md:w-full max-w-48">
+                    <p className="text-base text-[#8800CC] font-light text-ellipsis overflow-hidden tablet:w-full max-w-48">
                       <span className="font-bold text-[#8800CC] text-base w-full">
                         {dispenser.origin
                           ? dispenser.origin
@@ -357,7 +357,7 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
           isOpenSetting={openSetting}
           handleOpenSetting={handleOpenSetting}
         />
-        <div className="grid grid-cols-4 md:grid-cols-6 xl:grid-cols-8 gap-2 md:gap-4 mt-6">
+        <div className="grid grid-cols-4 tablet:grid-cols-6 desktop:grid-cols-8 gap-2 tablet:gap-4 mt-6">
           {stamps.map((stamp, index) => (
             <StampCard
               key={index}

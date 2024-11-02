@@ -40,8 +40,8 @@ function CollectionHeader(
   };
 
   return (
-    <div class="flex flex-col-reverse lg:flex-row justify-between items-center w-full">
-      <div class="flex gap-6 md:gap-8 items-end">
+    <div class="flex flex-col-reverse tablet:flex-row justify-between items-center w-full">
+      <div class="flex gap-6 tablet:gap-8 items-end">
         {TAB_OPTIONS.map(({ key, label }) => (
           <TabButton
             key={key}

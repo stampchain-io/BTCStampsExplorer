@@ -9,19 +9,19 @@ export function StampRelatedGraph() {
     <div className="flex justify-between items-center bg-gradient-to-br primary-gradient p-6 relative">
       <div className="p-6 absolute top-0 right-0 text-center">
         <p className="text-[#666666] font-light uppercase">HOLDERS</p>
-        <p className="text-[#999999] font-light uppercase lg:text-[32px] md:text-[30px]">
+        <p className="text-[#999999] font-light uppercase tablet:text-[32px] tablet:text-[30px]">
           1
         </p>
       </div>
-      <div className="lg:flex md:block w-full gap-3">
+      <div className="lg:flex tablet:block w-full gap-3">
         <div>
-          <div className="flex justify-between items-center flex-col md:items-start gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-start gap-1">
             <PieChart />
           </div>
         </div>
         <div className="flex justify-between items-center w-full">
-          <div className="flex justify-between items-center flex-col md:items-start gap-1">
-            <div className="flex flex-col justify-center items-center md:items-start sm:items-start">
+          <div className="flex justify-between items-center flex-col tablet:items-start gap-1">
+            <div className="flex flex-col justify-center items-center tablet:items-start mobile-768:items-start">
               <p className="text-[#666666] font-light uppercase text-lg">
                 ADDRESS
               </p>
@@ -30,7 +30,7 @@ export function StampRelatedGraph() {
               </p>
             </div>
           </div>
-          <div className="flex justify-between items-center flex-col md:items-center gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-center gap-1">
             <div className="flex flex-col justify-center items-center">
               <p className="text-[#666666] font-light uppercase text-lg">
                 AMOUNT
@@ -40,8 +40,8 @@ export function StampRelatedGraph() {
               </p>
             </div>
           </div>
-          <div className="flex justify-between items-start flex-col md:items-end gap-1">
-            <div className="flex flex-col justify-center items-center md:items-end sm:items-end">
+          <div className="flex justify-between items-start flex-col tablet:items-end gap-1">
+            <div className="flex flex-col justify-center items-center tablet:items-end mobile-768:items-end">
               <p className="text-[#666666] font-light uppercase text-lg">
                 PERCENT
               </p>

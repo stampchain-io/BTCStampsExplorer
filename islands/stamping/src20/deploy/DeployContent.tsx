@@ -137,16 +137,16 @@ export function DeployContent(
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
         DEPLOY
       </p>
 
-      <div className="dark-gradient p-2 md:p-6 w-full flex flex-col gap-3 md:gap-6">
-        <div className="flex gap-3 md:gap-6">
-          <div className="flex flex-col gap-3 md:gap-6 !w-[108px] md:!w-[120px]">
+      <div className="dark-gradient p-2 tablet:p-6 w-full flex flex-col gap-3 tablet:gap-6">
+        <div className="flex gap-3 tablet:gap-6">
+          <div className="flex flex-col gap-3 tablet:gap-6 !w-[108px] tablet:!w-[120px]">
             <div
               id="image-preview"
-              class="relative rounded-[3px] items-center text-center cursor-pointer min-w-[108px] md:min-w-[120px] h-[108px] md:h-[120px] content-center bg-[#660099]"
+              class="relative rounded-[3px] items-center text-center cursor-pointer min-w-[108px] tablet:min-w-[120px] h-[108px] tablet:h-[120px] content-center bg-[#660099]"
             >
               <input
                 id="upload"
@@ -192,8 +192,8 @@ export function DeployContent(
             />
           </div>
 
-          <div className="flex flex-col gap-3 md:gap-6 w-full">
-            <div class="w-full flex gap-3 md:gap-6">
+          <div className="flex flex-col gap-3 tablet:gap-6 w-full">
+            <div class="w-full flex gap-3 tablet:gap-6">
               <InputField
                 type="text"
                 placeholder="Token ticker name"
@@ -237,7 +237,7 @@ export function DeployContent(
         </div>
 
         <div
-          className={`flex flex-col gap-3 md:gap-6 transition-all duration-300 ${
+          className={`flex flex-col gap-3 tablet:gap-6 transition-all duration-300 ${
             showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
           }`}
         >
@@ -249,7 +249,7 @@ export function DeployContent(
             // value={formState.description}
             // onChange={(e) => handleInputChange(e, "description")}
           />
-          <div className="w-full flex gap-3 md:gap-6">
+          <div className="w-full flex gap-3 tablet:gap-6">
             <InputField
               type="text"
               placeholder="X"
@@ -263,7 +263,7 @@ export function DeployContent(
               onChange={(e) => handleInputChange(e, "web")}
             />
           </div>
-          <div className="w-full flex gap-3 md:gap-6">
+          <div className="w-full flex gap-3 tablet:gap-6">
             <InputField
               type="text"
               placeholder="Telegram"
@@ -281,7 +281,7 @@ export function DeployContent(
         </div>
       </div>
 
-      <div className="dark-gradient p-3 md:p-6 w-full z-[10]">
+      <div className="dark-gradient p-3 tablet:p-6 w-full z-[10]">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

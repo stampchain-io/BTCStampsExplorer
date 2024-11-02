@@ -39,7 +39,7 @@ export default function DesignSystem() {
               <h3 className="text-xl text-stamp-grey-bright mb-4">
                 Primary Colors
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
                   name="Primary Default"
                   bgClass="bg-stamp-primary"
@@ -64,7 +64,7 @@ export default function DesignSystem() {
               <h3 className="text-xl text-stamp-grey-bright mb-4">
                 Text Colors
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 tablet:grid-cols-4 gap-4">
                 <ColorSwatch
                   name="Text Primary"
                   bgClass="bg-stamp-text-primary"

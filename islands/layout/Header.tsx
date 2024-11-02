@@ -112,7 +112,7 @@ export function Header() {
               className={`whitespace-nowrap hover:text-[#AA00FF] ${
                 isMobile
                   ? "text-2xl text-[#660099]"
-                  : "text-lg xl:text-xl text-center"
+                  : "text-lg desktop:text-xl text-center"
               }`}
             >
               {link.title}
@@ -133,8 +133,10 @@ export function Header() {
                     toggleMenu();
                     setCurrentPath(subLink.href);
                   }}
-                  className={`hover:text-[#AA00FF] text-lg md:text-base sm:text-base ${
-                    currentPath === subLink.href ? "text-[#AA00FF]" : ""
+                  className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobile-768:text-base ${
+                    currentPath === subLink.href
+                      ? "text-stamp-purple-highlight"
+                      : ""
                   }`}
                 >
                   {subLink.title}
@@ -148,19 +150,19 @@ export function Header() {
   };
 
   return (
-    <header className="px-3 sm:px-6 xl:px-12 my-[18px] sm:my-[36px] md:my-[68px] max-w-[1440px] w-full mx-auto md:flex justify-between items-center">
+    <header className="px-3 mobile-768:px-6 desktop:px-12 my-[18px] mobile-768:my-[36px] tablet:my-[68px] max-w-desktop w-full mx-auto tablet:flex justify-between items-center">
       <div className="w-full flex justify-between items-center">
         <a
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className="purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl md:text-4xl xl:text-5xl font-black italic pr-2"
+          className="purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl tablet:text-4xl desktop:text-5xl font-black italic pr-2"
         >
           STAMPCHAIN
         </a>
         <button
           onClick={toggleMenu}
-          className="text-blue-600 lg:hidden block z-[100]"
+          className="text-blue-600 tablet:hidden block z-[100]"
           id="navbar-toggle"
         >
           {open && (
@@ -181,14 +183,14 @@ export function Header() {
       </div>
 
       {/* Desktop Navbar */}
-      <div className="hidden lg:flex justify-between items-center gap-6 xl:gap-12 font-black text-[#8800CC]">
+      <div className="hidden tablet:flex justify-between items-center gap-6 desktop:gap-12 font-black text-[#8800CC]">
         {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex lg:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 pb-6 pt-[77px] sm:pt-[102px] backdrop-blur-md font-black text-[#8800CC] ${
+        className={`duration-500 flex tablet:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 pb-6 pt-[77px] mobile-768:pt-[102px] backdrop-blur-md font-black text-[#8800CC] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"
@@ -200,7 +202,7 @@ export function Header() {
             toggleMenu();
             setCurrentPath("collection");
           }}
-          className="lg:block hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 sm:left-6 pr-2"
+          className="lg:block hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 mobile-768:left-6 pr-2"
         >
           STAMPCHAIN
         </a>
@@ -215,7 +217,7 @@ export function Header() {
             <a key={link.href} href={link.href} target="_blank">
               <img
                 src={link.icon}
-                className={`w-10 sm:w-12 ${
+                className={`w-10 mobile-768:w-12 ${
                   index === 0
                     ? "mr-[13px]"
                     : index === 1

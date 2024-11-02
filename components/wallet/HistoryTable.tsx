@@ -1,7 +1,7 @@
 export function HistoryTable() {
   return (
     <div class="relative overflow-x-auto shadow-md mt-3">
-      <table class="hidden md:table w-full text-sm text-left rtl:text-right text-[#F5F5F5]">
+      <table class="hidden tablet:table w-full text-sm text-left rtl:text-right text-[#F5F5F5]">
         <thead class="bg-[#2B0E49] uppercase text-lg text-[#C184FF]">
           <tr class="border-b border-[#B9B9B9]">
             <th scope="col" class="px-6 py-3">#</th>
@@ -50,7 +50,7 @@ export function HistoryTable() {
           })}
         </tbody>
       </table>
-      <div class="flex md:hidden flex-col gap-3">
+      <div class="flex tablet:hidden flex-col gap-3">
         {[...Array(3)].map((transaction, index) => {
           return (
             <div class="text-[#F5F5F5] bg-[#2B0E49] border-2 border-[#3F2A4E] p-2">
