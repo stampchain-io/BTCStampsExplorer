@@ -1,55 +1,68 @@
 import { StampCard } from "$islands/stamp/StampCard.tsx";
+import type { StampRow } from "globals";
+import { useEffect, useState } from "preact/hooks";
 
-const mock_stamp = {
-  stamp: 548891,
-  block_index: 851847,
-  cpid: "GqgivDk87bkYkavFoERk",
-  creator: "bc1q5hue5dpy6p2k25mx5smd9qysjxuuvvjkn6h9h6",
-  creator_name: null,
-  divisible: null,
-  keyburn: 1,
-  locked: null,
-  stamp_base64: null,
-  stamp_mimetype: "image/svg+xml",
-  stamp_url:
-    "https://stampchain.io/stamps/183f422a302a727e40a8582d04a9fd24cbd64deba853d585b187fda774c18024.svg",
-  supply: null,
-  block_time: "2024-07-12T17:44:12.000Z",
-  tx_hash: "183f422a302a727e40a8582d04a9fd24cbd64deba853d585b187fda774c18024",
-  tx_index: 566963,
-  ident: "SRC-20",
-  stamp_hash: "GqgivDk87bkYkavFoERk",
-  is_btc_stamp: 1,
-  file_hash: "828c74eed07712301119019f0d47b07a",
-};
+interface LatestStampsProps {
+  stamps: StampRow[];
+}
 
-const LatestStamps = () => {
+export default function LatestStamps({ stamps }: LatestStampsProps) {
+  const [displayCount, setDisplayCount] = useState(8);
+
+  useEffect(() => {
+    const updateDisplayCount = () => {
+      const width = globalThis.innerWidth;
+      if (width >= 1440) setDisplayCount(8);
+      else if (width >= 1025) setDisplayCount(6);
+      else if (width >= 769) setDisplayCount(8);
+      else if (width >= 569) setDisplayCount(6);
+      else if (width >= 420) setDisplayCount(6);
+      else setDisplayCount(4);
+    };
+
+    updateDisplayCount();
+    globalThis.addEventListener("resize", updateDisplayCount);
+    return () => globalThis.removeEventListener("resize", updateDisplayCount);
+  }, []);
+
   return (
     <div className="w-full md:w-1/2 flex flex-col gap-4 items-start md:items-end">
-      <h1 className="purple-gradient2 text-3xl md:text-6xl font-black">
+      <h1 className="bg-text-purple-4 bg-clip-text text-fill-transparent text-3xl md:text-6xl font-black">
         LATEST STAMPS
       </h1>
-      <p className="text-2xl md:text-5xl text-[#AA00FF]">LOREM IPSUM</p>
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-        {Array(8).fill(0).map((_, index) => {
-          return (
-            <StampCard
-              key={index}
-              stamp={mock_stamp}
-              kind="stamp"
-              isRecentSale={false}
-              showInfo={false}
-            />
-          );
-        })}
+
+      <div className="grid w-full gap-4
+                    grid-cols-2                    /* Default: 2 columns x 2 rows = 4 */
+                    mobile-sm:grid-cols-3          /* 420px+: 3 columns x 2 rows = 6 */
+                    mobile-md:grid-cols-3          /* 569px+: 3 columns x 2 rows = 6 */
+                    mobile-lg:grid-cols-4          /* 769px+: 4 columns x 2 rows = 8 */
+                    tablet:grid-cols-3             /* 1025px+: 3 columns x 2 rows = 6 */
+                    desktop:grid-cols-4            /* 1440px+: 4 columns x 2 rows = 8 */
+                    grid-rows-2                    /* Always 2 rows */
+      ">
+        {stamps.slice(0, displayCount).map((stamp) => (
+          <StampCard
+            key={stamp.cpid}
+            stamp={stamp}
+            kind="stamp"
+            isRecentSale={false}
+            showInfo={false}
+          />
+        ))}
       </div>
+
       <div className="w-full flex justify-end items-end">
-        <a className="text-[#660099] text-sm md:text-base font-extrabold border-2 border-[#660099] py-1 text-center min-w-[120px] rounded-md cursor-pointer">
+        <a
+          href="/stamps"
+          className="text-stamp-purple-dark hover:text-stamp-primary-hover 
+                     text-sm md:text-base font-extrabold border-2 
+                     border-stamp-purple-dark hover:border-stamp-primary-hover 
+                     py-1 text-center min-w-[120px] rounded-md cursor-pointer 
+                     transition-colors duration-200"
+        >
           View All
         </a>
       </div>
     </div>
   );
-};
-
-export default LatestStamps;
+}

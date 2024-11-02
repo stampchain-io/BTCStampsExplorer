@@ -1,26 +1,22 @@
 export const HomeStampChainSelected = () => {
   return (
     <div>
-      <p
-        className={"purple-gradient1 text-4xl md:text-7xl font-black"}
-      >
-        <span className={"italic"}>STAMPCHAIN</span> SELECTED
+      <p className="bg-text-purple bg-clip-text text-transparent text-4xl mobile-lg:text-7xl font-black">
+        <span className="italic">STAMPCHAIN</span> SELECTED
       </p>
-      <p className={"text-[#8800CC] text-3xl md:text-6xl font-extralight"}>
+      <p className="text-stamp-primary text-3xl mobile-lg:text-6xl font-extralight">
         BESPOKE BITCOIN ART
       </p>
-      <div className={"flex flex-col md:flex-row gap-16"}>
-        <div className={"flex flex-col justify-between"}>
+      <div className="flex flex-col mobile-lg:flex-row gap-16">
+        <div className="flex flex-col justify-between">
           <div>
-            <p
-              className={"gray-gradient4 flex flex-col text-3xl md:text-6xl font-bold"}
-            >
+            <p className="bg-text-gray-4 bg-clip-text text-transparent flex flex-col text-3xl mobile-lg:text-6xl font-bold">
               CURATED STAMPS
-              <span className={"text-2xl md:text-5xl font-light"}>
+              <span className="text-2xl mobile-lg:text-5xl font-light">
                 RELEASED EVERY MONTH
               </span>
             </p>
-            <p className={"text-[#999999] font-medium text-xl md:text-4xl"}>
+            <p className="text-stamp-text-primary font-medium text-xl mobile-lg:text-4xl">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
               diam libero, faucibus ut sagittis at, rutrum nec eros. Donec sit
               amet blandit arcu. Nullam ultrices a mauris non efficitur. Morbi
@@ -28,38 +24,33 @@ export const HomeStampChainSelected = () => {
             </p>
           </div>
           <div>
-            <p
-              className={"font-extralight text-[#AA00FF] text-right text-xl md:text-4xl"}
-            >
+            <p className="font-extralight text-stamp-purple-highlight text-right text-xl mobile-lg:text-4xl">
               S1 - OCTOBER
             </p>
-            <p
-              className={"purple-gradient2 font-black text-4xl md:text-7xl"}
-            >
+            <p className="bg-text-purple-2 bg-clip-text text-transparent font-black text-4xl mobile-lg:text-7xl">
               CONNOISSEUR
             </p>
-            <p className={"text-[#AA00FF] text-xl md:text-4xl font-extralight"}>
-              BY <span className={"font-bold"}>VIVA LA VANDAL</span>
+            <p className="text-stamp-purple-highlight text-xl mobile-lg:text-4xl font-extralight">
+              BY <span className="font-bold">VIVA LA VANDAL</span>
             </p>
-            <div className={"flex gap-4 md:gap-12 mt-2 md:mt-5 font-extrabold"}>
-              <img src="/img/home/fullscreen.png" />
+            <div className="flex gap-4 mobile-lg:gap-12 mt-2 mobile-lg:mt-5 font-extrabold">
+              <img src="/img/home/fullscreen.png" alt="Fullscreen" />
               <a
                 href="#"
-                className={"border-2 border-[#8800CC] text-[#8800CC] w-[136px] h-[60px] flex justify-center items-center rounded-md"}
+                className="border-2 border-stamp-primary text-stamp-primary w-[136px] h-[60px] flex justify-center items-center rounded-md"
               >
                 DETAILS
               </a>
               <a
                 href="#"
-                className={"bg-[#8800CC] text-[#330033] w-[136px] h-[60px] flex justify-center items-center rounded-md"}
+                className="bg-stamp-primary text-stamp-button-text w-[136px] h-[60px] flex justify-center items-center rounded-md"
               >
                 BUY
               </a>
             </div>
           </div>
         </div>
-
-        <img src="/img/home/stamp.png" />
+        <img src="/img/home/stamp.png" alt="Stamp" />
       </div>
     </div>
   );

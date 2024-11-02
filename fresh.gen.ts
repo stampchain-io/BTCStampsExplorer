@@ -76,6 +76,7 @@ import * as $collection_overview_posh from "./routes/collection/overview/posh.ts
 import * as $collection_overview_recursive from "./routes/collection/overview/recursive.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
+import * as $design_system from "./routes/design-system.tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
@@ -140,7 +141,6 @@ import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
-import * as $home_HomeTable from "./islands/home/HomeTable.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
@@ -292,6 +292,7 @@ const manifest = {
       $collection_overview_recursive,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
+    "./routes/design-system.tsx": $design_system,
     "./routes/docs/index.tsx": $docs_index,
     "./routes/fairmint.tsx": $fairmint,
     "./routes/faq/index.tsx": $faq_index,
@@ -369,7 +370,6 @@ const manifest = {
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
     "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
-    "./islands/home/HomeTable.tsx": $home_HomeTable,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,
