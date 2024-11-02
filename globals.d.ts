@@ -113,7 +113,6 @@ export interface StampSectionProps {
   isRecentSales?: boolean;
   filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
   showDetails?: boolean;
-  variant?: string;
   gridClass?: string;
   displayCounts?: DisplayCountBreakpoints;
 }

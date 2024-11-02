@@ -4,6 +4,14 @@ import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts"; // Custom hook to get window size
 
+const BREAKPOINTS = {
+  desktop: 1025,
+  tablet: 769,
+  mobileLg: 569,
+  mobileMd: 421,
+  mobileSm: 360,
+} as const;
+
 export default function StampSection(
   {
     title,
@@ -13,7 +21,6 @@ export default function StampSection(
     isRecentSales,
     filterBy,
     showDetails = false,
-    variant = "",
     gridClass,
     displayCounts,
   }: StampSectionProps,
@@ -49,14 +56,34 @@ export default function StampSection(
   useEffect(() => {
     const updateDisplayCount = () => {
       if (displayCounts) {
-        if (width >= 1025) {
+        if (width >= BREAKPOINTS.desktop) {
           setDisplayCount(displayCounts.desktop || stampArray.length);
-        } else if (width >= 769) {
-          setDisplayCount(displayCounts.tablet || stampArray.length);
-        } else if (width >= 569) {
-          setDisplayCount(displayCounts["mobileLg"] || stampArray.length);
+        } else if (width >= BREAKPOINTS.tablet) {
+          setDisplayCount(
+            displayCounts.tablet || displayCounts.desktop || stampArray.length,
+          );
+        } else if (width >= BREAKPOINTS.mobileLg) {
+          setDisplayCount(
+            displayCounts.mobileLg || displayCounts.tablet ||
+              displayCounts.desktop || stampArray.length,
+          );
+        } else if (width >= BREAKPOINTS.mobileMd) {
+          setDisplayCount(
+            displayCounts.mobileMd ||
+              displayCounts.mobileLg ||
+              displayCounts.tablet ||
+              displayCounts.desktop ||
+              stampArray.length,
+          );
         } else {
-          setDisplayCount(displayCounts["mobileSm"] || stampArray.length);
+          setDisplayCount(
+            displayCounts.mobileSm ||
+              displayCounts.mobileMd ||
+              displayCounts.mobileLg ||
+              displayCounts.tablet ||
+              displayCounts.desktop ||
+              stampArray.length,
+          );
         }
       } else {
         setDisplayCount(stampArray.length);
