@@ -1,12 +1,12 @@
 import { Collection } from "globals";
 import { CollectionOverviewCard } from "../../components/collection/CollectionOverviewCard.tsx";
 
-type CollectionOverviewContentProps = {
+type CollectionOverviewArtistContentProps = {
   collections: Collection[];
 };
 
-export function CollectionOverviewContent(
-  { collections }: CollectionOverviewContentProps,
+export function CollectionOverviewArtistContent(
+  { collections }: CollectionOverviewArtistContentProps,
 ) {
   return (
     <div class="flex flex-col gap-4">

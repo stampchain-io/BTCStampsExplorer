@@ -3,6 +3,7 @@ import { Collection } from "globals";
 export function CollectionOverviewCard(
   { collection }: { collection: Collection },
 ) {
+  console.log("collection: ", collection);
   return (
     <a
       href={`/collection/${collection.collection_name}`}
@@ -26,18 +27,17 @@ export function CollectionOverviewCard(
               STAMPS <span className="font-bold text-[#999999]">XXX</span>
             </p>
             <p>
-              VOLUME <span className="font-bold text-[#999999]">X.XXXX</span>
-              {" "}
-              BTC
+              VOLUME <span className="font-bold text-[#999999]">N/A</span> BTC
             </p>
           </div>
           <div className="flex flex-col sm:flex-row justify-between w-full">
             <p>
-              FLOOR PRICE{" "}
-              <span className="font-bold text-[#999999]">X.XXXX</span> BTC
+              FLOOR PRICE <span className="font-bold text-[#999999]">N/A</span>
+              {" "}
+              BTC
             </p>
             <p>
-              MARKETCAP <span className="font-bold text-[#999999]">X.XXXX</span>
+              MARKETCAP <span className="font-bold text-[#999999]">N/A</span>
               {" "}
               BTC
             </p>

@@ -1,10 +1,10 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
 import { CollectionOverviewHeader } from "$islands/collection/CollectionOverviewHeader.tsx";
-import { CollectionOverviewContent } from "$islands/collection/CollectionOverviewContent.tsx";
+import { CollectionOverviewArtistContent } from "$islands/collection/CollectionOverviewArtistContent.tsx";
 import { Pagination } from "../../../islands/datacontrol/Pagination.tsx";
 import { CollectionController } from "$server/controller/collectionController.ts";
 
-type CollectionOverviewPageProps = {
+type CollectionOverviewArtistPageProps = {
   data: {
     collections: CollectionRow[];
     total: number;
@@ -47,7 +47,9 @@ export const handler: Handlers = {
   },
 };
 
-export default function CollectionOverview(props: CollectionOverviewPageProps) {
+export default function CollectionOverviewArtist(
+  props: CollectionOverviewArtistPageProps,
+) {
   const {
     collections,
     page,
@@ -58,10 +60,8 @@ export default function CollectionOverview(props: CollectionOverviewPageProps) {
 
   return (
     <div class="flex flex-col gap-8">
-      <CollectionOverviewHeader
-        filterBy={filterBy}
-      />
-      <CollectionOverviewContent collections={collections} />
+      <CollectionOverviewHeader />
+      <CollectionOverviewArtistContent collections={collections} />
       <Pagination
         page={page}
         pages={pages}
