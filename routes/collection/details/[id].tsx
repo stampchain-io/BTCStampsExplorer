@@ -1,4 +1,4 @@
-import { Pagination } from "../../islands/datacontrol/Pagination.tsx";
+import { Pagination } from "../../../islands/datacontrol/Pagination.tsx";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
 import { STAMP_FILTER_TYPES, StampRow, SUBPROTOCOLS } from "globals";
@@ -8,7 +8,7 @@ import { CollectionDetailsContent } from "$islands/collection/CollectionDetailsC
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 
-type CollectionPageProps = {
+type CollectionDetailsPageProps = {
   data: {
     id: string;
     stamps: StampRow[];
@@ -75,21 +75,18 @@ export const handler: Handlers = {
   },
 };
 
-export default function Collection(props: CollectionPageProps) {
+export default function CollectionDetails(props: CollectionDetailsPageProps) {
   const {
     id,
     stamps,
     page,
     pages,
     page_size,
-    filterBy,
-    sortBy,
-    selectedTab,
   } = props.data;
 
   return (
     <div class="flex flex-col gap-8">
-      <CollectionDetailsHeader id={id} filterBy={filterBy} sortBy={sortBy} />
+      <CollectionDetailsHeader id={id} />
       <CollectionDetailsContent stamps={stamps} />
       <Pagination
         page={page}

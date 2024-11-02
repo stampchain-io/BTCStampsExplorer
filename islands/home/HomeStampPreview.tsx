@@ -2,8 +2,9 @@ import { StampRow, StampSectionProps } from "globals";
 
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { CollectionList } from "$islands/collection/CollectionList.tsx";
-import { Collection } from "globals";
+import { StampChainModule } from "$islands/modules/StampChain.tsx";
+import { CollectionOverviewContent } from "../collection/CollectionOverviewContent.tsx";
+// import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
 export function HomeStampPreview({
   stamps_recent = [],
@@ -215,30 +216,16 @@ export function HomeStampPreview({
         </div>
       </div>
 
-      {/* FEATURED COLLECTIONS */}
-      <div className="flex flex-col gap-4 mobileLg:gap-8">
-        <div
-          class={`
-            w-full
-            pb-0 pt-[18px]
-            mobileSm:pb-0 mobileSm:pt-[18px]
-            mobileLg:pb-0 mobileLg:pt-[36px]
-            tablet:pb-0 tablet:pt-[72px]
-            desktop:pb-0 desktop:pt-[72px]
-          `}
-        >
-          <h1 className="
-            text-4xl
-            mobileSm:text-4xl
-            mobileLg:text-5xl
-            tablet:text-5xl
-            desktop:text-6xl
-            font-black bg-text-gray-1 bg-clip-text text-transparent
-          ">
-            FEATURED COLLECTIONS
-          </h1>
-        </div>
-        <CollectionList collections={collectionData} />
+      <div className="flex flex-col gap-4 mobile-lg:gap-8">
+        <h1 className="text-5xl mobile-lg:text-5xl desktop:text-6xl font-black bg-text-gray bg-clip-text text-transparent">
+          FEATURED COLLECTIONS
+        </h1>
+        <p className="text-stamp-text-primary text-2xl mobile-lg:text-5xl font-extralight hidden">
+          LOREM IPSUM DOLOR
+        </p>
+
+        {/* FEATURED COLLECTIONS */}
+        <CollectionOverviewContent collections={collectionData} />
       </div>
 
       {/* RECENT SALES */}
