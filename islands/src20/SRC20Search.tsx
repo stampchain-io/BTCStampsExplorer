@@ -39,7 +39,7 @@ export function SRC20SearchClient(
         <>
           <input
             type="text"
-            class={`min-w-[260px] md:min-w-[360px] h-[40px] purple-bg-gradient pl-3 pr-2 py-3 text-[12px] leading-[14px] text-[#333333] font-bold placeholder:text-[#333333] outline-none ${
+            class={`min-w-[260px] tablet:min-w-[360px] h-[40px] purple-bg-gradient pl-3 pr-2 py-3 text-[12px] leading-[14px] text-[#333333] font-bold placeholder:text-[#333333] outline-none ${
               results.length > 0 ? "rounded-t" : "rounded"
             }`}
             placeholder="Token Name, Tx Hash, or Address"

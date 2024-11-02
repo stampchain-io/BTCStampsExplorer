@@ -27,11 +27,9 @@ export function HomeHeader() {
         <TitleText class="
           font-black
           bg-text-gray-1
-          text-3xl
-          mobile-xs:text-2xl
-          mobile-sm:text-4xl
-          mobile-md:text-4xl
-          mobile-lg:text-5xl
+          text-2xl
+          mobile-360:text-2xl
+          mobile-768:text-5xl
           tablet:text-6xl
           desktop:text-7xl
         ">
@@ -45,16 +43,14 @@ export function HomeHeader() {
           font-bold
           bg-text-gray-1
           uppercase
-          text-2xl
-          mobile-xs:text-xl
-          mobile-sm:text-3xl
-          mobile-md:text-3xl
-          mobile-lg:text-4xl
+          text-xl
+          mobile-360:text-xl
+          mobile-768:text-4xl
           tablet:text-5xl
           desktop:text-6xl
           mt-1
         ">
-          BECAUSE SATS DON'T EXIST
+          BECAUSE SATS DON’T EXIST
         </TitleText>
       </p>
 
@@ -64,10 +60,8 @@ export function HomeHeader() {
         text-center
         font-medium 
         text-stamp-grey
-        mobile-xs:max-w-[310px] mobile-xs:text-base
-        mobile-sm:max-w-[310px] mobile-sm:text-base
-        mobile-md:max-w-[412px] mobile-md:text-base
-        mobile-lg:max-w-[515px] mobile-lg:text-xl
+        mobile-360:max-w-[310px] mobile-360:text-base
+        mobile-768:max-w-[515px] mobile-768:text-xl
         tablet:max-w-[618px] tablet:text-2xl
         desktop:max-w-[772px] desktop:text-3xl
       ">

@@ -41,13 +41,13 @@ export function BlockPage(props: BlockPageProps) {
       {/* <BlockHeader /> */}
       <BlockTransactions />
       {
-        /* <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 py-2 overflow-y-auto">
+        /* <div class="grid grid-cols-1 mobile-768:grid-cols-2 tablet:grid-cols-3 tablet:grid-cols-5 gap-4 py-2 overflow-y-auto">
         {blocks.map((block: BlockRow) => (
           <BlockSelector block={block} selected={selected} />
         ))}
       </div> */
       }
-      <div class="flex flex-col-reverse md:flex-row items-start justify-between gap-3">
+      <div class="flex flex-col-reverse tablet:flex-row items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-[#2B0E49]">
             <img src="/img/icon_stamp_block.png" alt="" className="w-7 h-7" />
@@ -64,10 +64,10 @@ export function BlockPage(props: BlockPageProps) {
             </p>
           </div>
         </div>
-        <div class="flex justify-between w-full md:w-auto gap-6">
+        <div class="flex justify-between w-full tablet:w-auto gap-6">
         </div>
       </div>
-      <div className={"flex flex-col md:flex-row justify-between gap-3"}>
+      <div className={"flex flex-col tablet:flex-row justify-between gap-3"}>
         <BlockGeneral />
         <BlockCurrency />
         <BlockNetwork />

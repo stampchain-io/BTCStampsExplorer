@@ -75,8 +75,8 @@ export function SRC20TickHeader({
 
   return (
     <div class="flex w-full flex-col gap-6">
-      <div class="w-full flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 dark-gradient">
-        <div class="flex flex-col md:flex-row justify-between gap-3 w-full">
+      <div class="w-full flex flex-wrap gap-3 tablet:gap-6 p-3 tablet:p-6 dark-gradient">
+        <div class="flex flex-col tablet:flex-row justify-between gap-3 w-full">
           <div className="flex gap-3">
             <img
               src={`/content/${deployment.tx_hash}.svg`}
@@ -85,7 +85,7 @@ export function SRC20TickHeader({
               loading="lazy"
             />
             <div>
-              <p class="text-3xl md:text-6xl uppercase font-black text-[#660099]">
+              <p class="text-3xl tablet:text-6xl uppercase font-black text-[#660099]">
                 {tickValue}
               </p>
               <p className="text-[#666666] text-2xl font-light">CREATOR</p>
@@ -127,7 +127,7 @@ export function SRC20TickHeader({
       </div>
 
       {/* Token Information */}
-      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between dark-gradient">
+      <div class="flex flex-wrap gap-3 tablet:gap-6 p-3 tablet:p-6 justify-between dark-gradient">
         <StatItem
           label="Supply"
           value={formatNumber(deployment.max, 0)}
@@ -141,7 +141,7 @@ export function SRC20TickHeader({
         <StatItem label="DECIMALS" value={deployment.deci} direction="col" />
       </div>
 
-      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between dark-gradient">
+      <div class="flex flex-wrap gap-3 tablet:gap-6 p-3 tablet:p-6 justify-between dark-gradient">
         {/* Price in Satoshis */}
         <StatItem
           label="PRICE"
@@ -163,7 +163,7 @@ export function SRC20TickHeader({
       </div>
 
       {/* Market Information */}
-      <div class="flex flex-wrap gap-3 md:gap-6 p-3 md:p-6 justify-between dark-gradient">
+      <div class="flex flex-wrap gap-3 tablet:gap-6 p-3 tablet:p-6 justify-between dark-gradient">
         {/* Market Cap in BTC */}
         <StatItem
           label="MARKET CAP"

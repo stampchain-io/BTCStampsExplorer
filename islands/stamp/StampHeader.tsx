@@ -30,10 +30,10 @@ export const StampHeader = (
       class="flex flex-row justify-between items-center gap-3 w-full"
       f-partial="/stamp"
     >
-      <p className="bg-text-purple bg-clip-text text-transparent text-3xl mobile-lg:text-6xl font-black hidden mobile-lg:block">
+      <p className="bg-text-purple bg-clip-text text-transparent text-3xl mobile-768:text-6xl font-black hidden mobile-768:block">
         ART STAMPS
       </p>
-      <p className="bg-text-purple bg-clip-text text-transparent text-3xl mobile-lg:text-6xl font-black block mobile-lg:hidden">
+      <p className="bg-text-purple bg-clip-text text-transparent text-3xl mobile-768:text-6xl font-black block mobile-768:hidden">
         STAMPS
       </p>
       <div class="flex gap-3 justify-between h-[40px]">

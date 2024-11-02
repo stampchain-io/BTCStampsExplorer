@@ -54,7 +54,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
       />
       <div class="relative overflow-x-auto shadow-md">
         {/* Desktop View */}
-        <div class="hidden xl:flex flex-col gap-6 p-2">
+        <div class="hidden desktop:flex flex-col gap-6 p-2">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
 
@@ -163,7 +163,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
         </div>
 
         {/* Mobile View */}
-        <div class="flex xl:hidden flex-col gap-3 p-2">
+        <div class="flex desktop:hidden flex-col gap-3 p-2">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
 
@@ -233,7 +233,7 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
                       )
                     }&trxType=${encodeURIComponent(trxType)}`}
                   >
-                    <button className="hidden xs:block bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[66px] md:w-[84px] h-[36px] md:h-[48px]">
+                    <button className="hidden mobile-420:block bg-[#8800CC] rounded-md text-[#080808] text-sm font-black w-[66px] tablet:w-[84px] h-[36px] tablet:h-[48px]">
                       Mint
                     </button>
                   </a>

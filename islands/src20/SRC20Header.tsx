@@ -35,9 +35,9 @@ export const SRC20Header = (
   return (
     <div className="tabs">
       <div class="flex flex-row justify-between items-center gap-3 w-full">
-        <div class="flex gap-6 md:gap-8 items-end">
+        <div class="flex gap-6 tablet:gap-8 items-end">
           <p
-            class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
+            class={`cursor-pointer pb-1 tablet:pb-3 text-base tablet:text-2xl uppercase ${
               selectedTab === "all"
                 ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
                 : "text-[#8800CC] font-light"
@@ -47,7 +47,7 @@ export const SRC20Header = (
             All
           </p>
           <p
-            class={`cursor-pointer pb-1 md:pb-3 text-base md:text-2xl uppercase ${
+            class={`cursor-pointer pb-1 tablet:pb-3 text-base tablet:text-2xl uppercase ${
               selectedTab === "trending"
                 ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
                 : "text-[#8800CC] font-light"

@@ -1,15 +1,15 @@
 export const GetStampingModule = () => {
   return (
-    <div className="flex flex-col md:flex-row justify-between md:items-end gap-8 md:gap-16 xl:gap-32">
+    <div className="flex flex-col tablet:flex-row justify-between tablet:items-end gap-8 tablet:gap-16 desktop:gap-32">
       <div>
-        <p className="font-black text-4xl md:text-7xl flex flex-col gray-gradient4 text-left">
+        <p className="font-black text-4xl tablet:text-7xl flex flex-col gray-gradient4 text-left">
           GET STAMPING
-          <span className="text-3xl md:text-6xl font-extralight text-[#999999]">
+          <span className="text-3xl tablet:text-6xl font-extralight text-[#999999]">
             IMMORTALISE YOUR ART
           </span>
         </p>
 
-        <p className="text-[#CCCCCC] text-base md:text-2xl font-medium">
+        <p className="text-[#CCCCCC] text-base tablet:text-2xl font-medium">
           Effortlessly create immutableBitcoin Stamps with custom fee selection
           and optional Posh Stamp Collection naming options. Supports low-fi
           pixel art (png/jpg/gif) and hi-res vector art (svg/html) up to 64kB.
@@ -18,29 +18,29 @@ export const GetStampingModule = () => {
       </div>
 
       <div className="flex flex-col gap-9 min-w-[336px]">
-        <div className="flex md:gap-6 gap-1 font-extrabold text-sm md:text-xl md:justify-center justify-end">
+        <div className="flex tablet:gap-6 gap-1 font-extrabold text-sm tablet:text-xl tablet:justify-center justify-end">
           <a
             href="/faq"
             f-partial="/faq"
-            className="border md:border-2 border-[#999999] text-[#999999] w-[90px] md:w-[136px] h-[40px] md:h-[60px] flex justify-center items-center rounded-md"
+            className="border tablet:border-2 border-[#999999] text-[#999999] w-[90px] tablet:w-[136px] h-[40px] tablet:h-[60px] flex justify-center items-center rounded-md"
           >
             FAQ
           </a>
           <a
             href="/stamping/stamp"
             f-partial="/stamping/stamp"
-            className="bg-[#999999] text-black w-[90px] md:w-[136px] h-[40px] md:h-[60px] flex justify-center items-center rounded-md"
+            className="bg-[#999999] text-black w-[90px] tablet:w-[136px] h-[40px] tablet:h-[60px] flex justify-center items-center rounded-md"
           >
             STAMP
           </a>
         </div>
-        <div className="flex  md:gap-6 gap-1 text-xs md:text-lg text-[#666666] md:flex-row flex-col">
-          <p className=" text-end md:text-start ">
+        <div className="flex  tablet:gap-6 gap-1 text-xs tablet:text-lg text-[#666666] tablet:flex-row flex-col">
+          <p className=" text-end tablet:text-start ">
             $<span className="font-bold">
               60,935.68
             </span>
           </p>
-          <p className="font-medium  text-end md:text-start">
+          <p className="font-medium  text-end tablet:text-start">
             Fees: <span className="font-bold">8 sat/vB</span> $0.68
           </p>
         </div>

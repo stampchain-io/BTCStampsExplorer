@@ -8,18 +8,12 @@ export default {
 
   theme: {
     screens: {
-      "mobile-xs": "361px",
-      "mobile-sm": "421px",
-      "mobile-md": "569px",
-      "mobile-lg": "769px",
-      "tablet": "1025px",
-      "desktop": "1440px",
-      "xs": "421px",
-      "sm": "569px",
-      "md": "769px",
-      "lg": "769px",
-      "xl": "1025px",
-      "2xl": "1440px",
+      "mobile-360": "360px", // 360 +
+      // "mobile-568": " // UNUSED - USE mobile-360
+      "mobile-420": "421px", // 421 +
+      "mobile-768": "569px", // 569 +
+      "tablet": "769px", // 769 +
+      "desktop": "1025px", // 1025 +
     },
     extend: {
       fontFamily: {
@@ -157,6 +151,14 @@ export default {
         "stamp-card": "6px",
         "stamp-card-lg": "max(6px,min(12px,calc(6px+((100vw-360px)*0.029))))",
         "search-icon": "12px",
+        "gutter-mobile": "12px", // 12px
+        "gutter-desktop": "24px", // 24px
+        "margin-mobile": "18px", // 18px
+        "margin-tablet": "36px", // 36px
+        "margin-desktop": "72px", // 72px
+        "padding-mobile": "12px", // 12px
+        "padding-tablet": "24px", // 24px
+        "padding-desktop": "48px", // 48px
       },
       borderRadius: {
         "stamp": "6px",

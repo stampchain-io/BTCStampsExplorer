@@ -7,31 +7,31 @@ export default function FAQ() {
       <Head>
         <title>Bitcoin Stamps - FAQ</title>
       </Head>
-      <div className="text-[#CCCCCC] flex flex-col gap-16 md:gap-36 py-24 md:py-48">
+      <div className="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
         <section className="text-center max-w-5xl mx-auto">
-          <h1 className="text-4xl md:text-7xl font-bold">
+          <h1 className="text-4xl tablet:text-7xl font-bold">
             <span className="gray-gradient1">
               YOU'VE GOT QUESTIONS
             </span>
             <br />
             WE'VE GOT ANSWERS
           </h1>
-          <p className="text-base md:text-3xl font-medium">
+          <p className="text-base tablet:text-3xl font-medium">
             New to Bitcoin Stamps? Curious to know more? Explore our
             comprehensive FAQ to understand this innovative technology built on
             Bitcoin.
           </p>
         </section>
 
-        <section className="flex flex-col gap-6 md:gap-12">
+        <section className="flex flex-col gap-6 tablet:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
+            <h1 className="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
               BITCOIN STAMPS
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               PERMANENCE FOR PERPETUITY
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               Bitcoin Stamps are NFTs built on the Counterparty protocol since
               2014, providing a way to store data directly on the Bitcoin
               blockchain, ensuring permanence and immutability. Here's an
@@ -40,9 +40,9 @@ export default function FAQ() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 tablet:gap-12">
             <Accordion title="CLASSIC STAMPS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 Classic Stamps are NFTs built on Counterparty standards from
                 2014. Originally intended to be 1:1, creators can now issue
                 billions of tokens per stamp. Initially, transactions utilized
@@ -55,7 +55,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="SRC-20">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 SRC-20 is a fungible token protocol that directly embeds
                 transactions on Bitcoin without relying on Counterparty, as of
                 block 796,000. Modeled after BRC-20, this layer only incurs
@@ -68,7 +68,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="SRC-721">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 SRC-721 is a standard for recursive NFT's layering multiple
                 layers of of up to 10 STAMP images. It reduces minting costs by
                 referencing on-chain data through JSON within the STAMP. The
@@ -78,7 +78,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="SRC-721r">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 SRC-721r is an evolution of the SRC-721 standard, allowing for
                 recursive NFT creation by leveraging multiple layers of data
                 utilizing not just JSON but also on-chain JS libraries to build
@@ -90,7 +90,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="SRC-101">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 SRC-101 introduces a domain name system on Bitcoin Stamps,
                 solving the challenge of UTXO-linked assets and ensuring
                 immutability. Unlike regular UTXO-based assets, SRC-101 names
@@ -102,7 +102,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="OLGA">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 OLGA is a new encoding format within the Stamps protocol, which
                 eliminates the need for Base64 encoding. It reduces the
                 transaction size by 50% and the cost of minting by 60-70%,
@@ -114,7 +114,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="POSH STAMPS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 POSH Stamps are an advanced version of cursed stamps integrated
                 with the Counterparty asset-naming system. While they do require
                 additional steps to acquire XCP to conform to the Counterparty
@@ -125,23 +125,23 @@ export default function FAQ() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-6 md:gap-12">
+        <section className="flex flex-col gap-6 tablet:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
+            <h1 className="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
               GET STARTED
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               BEGIN YOUR BITCOIN STAMPS JOURNEY
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               Ready to dive into the world of Bitcoin Stamps? Here's what you
               need to know to get started.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 tablet:gap-12">
             <Accordion title="COMPATIBLE WALLETS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 To start creating, sending, and storing Bitcoin Stamps, you'll
                 need a compatible wallet. Some options include:
                 <ul className="list-disc list-inside mt-2">
@@ -195,7 +195,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="FUND YOUR WALLET">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 Ensure that your wallet has enough Bitcoin to cover the cost of
                 transactions and inscription fees, which depend on data size and
                 network congestion.
@@ -203,7 +203,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="CREATE AND SEND STAMPS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 1. Choose a compatible wallet.<br />
                 2. Stamp the data by calculating transaction fees based on data
                 size and current network conditions.<br />
@@ -213,7 +213,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="SUPPORTED FILES AND SIZES">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 You can stamp various file types, including images, text, and
                 metadata, directly onto the Bitcoin blockchain. File size
                 limitations depend on the format (e.g., OLGA encoding) and
@@ -229,22 +229,22 @@ export default function FAQ() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-6 md:gap-12">
+        <section className="flex flex-col gap-6 tablet:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
+            <h1 className="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
               BUYING AND SELLING
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               NAVIGATE THE STAMP MARKETPLACE
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               Learn how to buy and sell Bitcoin Stamps efficiently and securely.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 tablet:gap-12">
             <Accordion title="STAMP DISPENSERS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 Stamp dispensers provide an easy way to buy Bitcoin Stamps from
                 a seller or marketplace. Simply enter the number of Stamps you
                 want and the amount of BTC required, then complete the
@@ -254,7 +254,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="FRONTRUNNING AWARENESS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 Be mindful of "frontrunning" on popular STAMP sales, where bots
                 or fast transactions may acquire STAMPS ahead of you. Use timing
                 strategies or direct transactions to reduce this risk.
@@ -262,7 +262,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="CREATING COLLECTIONS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 To create a collection, stamp a series of related assets,
                 ensuring they're stamped with consistent metadata and styles.
                 This can help you organize and showcase your art or project.
@@ -270,7 +270,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="GET FEATURED">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 To get your collection featured on popular marketplaces, ensure
                 it meets certain criteria such as originality, completeness, and
                 proper metadata stamping.
@@ -279,23 +279,23 @@ export default function FAQ() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-6 md:gap-12">
+        <section className="flex flex-col gap-6 tablet:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
+            <h1 className="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
               SRC-20 TOOLS
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               LEVERAGE FUNGIBLE TOKENS ON BITCOIN
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               Explore the capabilities of SRC-20 tokens built directly on the
               Bitcoin blockchain.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 tablet:gap-12">
             <Accordion title="DEPLOYING SRC-20 TOKENS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 To deploy an SRC-20 token, stamp the transaction on Bitcoin with
                 the token's supply and metadata. This makes the token immutable
                 and secured by Bitcoin's blockchain.
@@ -303,14 +303,14 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="MINTING SRC-20 TOKENS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 After deployment, token holders can mint additional SRC-20
                 tokens based on the initial supply set in the contract.
               </p>
             </Accordion>
 
             <Accordion title="TRANSFERRING SRC-20 TOKENS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 Transfer SRC-20 tokens between addresses using a compatible
                 wallet. Ensure that fees are calculated based on data size and
                 network congestion.
@@ -319,22 +319,22 @@ export default function FAQ() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-6 md:gap-12">
+        <section className="flex flex-col gap-6 tablet:gap-12">
           <div>
-            <h1 className="text-3xl md:text-6xl font-black gray-gradient4 mb-2">
+            <h1 className="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
               GENERAL FAQ
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+            <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
               COMMON QUESTIONS ANSWERED
             </h2>
-            <p className="text-sm md:text-lg font-medium">
+            <p className="text-sm tablet:text-lg font-medium">
               Find answers to frequently asked questions about Bitcoin Stamps.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 tablet:gap-12">
             <Accordion title="BENEFITS OVER OTHER PROTOCOLS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 Stamps provide a more permanent and immutable solution for data
                 storage compared to other protocols like Bitcoin Ordinals.
                 Stamps ensure the data remains a part of the Bitcoin blockchain
@@ -344,7 +344,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="SECURITY OF BITCOIN STAMPS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 Yes, Stamps leverage the Bitcoin blockchain's Proof-of-Work
                 (PoW) consensus mechanism, making the data tamper-proof once
                 confirmed. This ensures long-term data security.
@@ -352,7 +352,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="COMPARISON TO BITCOIN ORDINALS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 While both protocols enable data storage on the Bitcoin network,
                 Stamps are more focused on permanent and immutable storage by
                 embedding data directly into the blockchain.
@@ -360,7 +360,7 @@ export default function FAQ() {
             </Accordion>
 
             <Accordion title="TRADING AND SELLING STAMPS">
-              <p className="text-sm md:text-lg font-medium">
+              <p className="text-sm tablet:text-lg font-medium">
                 Yes, Bitcoin Stamps can be traded or sold, similar to NFTs.
                 However, the trading process is contingent on wallet support and
                 platform integration. Many marketplaces are exploring ways to

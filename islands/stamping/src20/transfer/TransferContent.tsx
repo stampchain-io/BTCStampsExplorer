@@ -39,11 +39,11 @@ export function TransferContent(
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
         TRANSFER
       </p>
 
-      <div className="flex flex-col gap-3 md:gap-6 dark-gradient p-3 md:p-6 w-full">
+      <div className="flex flex-col gap-3 tablet:gap-6 dark-gradient p-3 tablet:p-6 w-full">
         <InputField
           type="text"
           placeholder="Recipient address"
@@ -52,7 +52,7 @@ export function TransferContent(
           error={formState.toAddressError}
         />
 
-        <div className="w-full flex flex-col md:flex-row gap-3 md:gap-6">
+        <div className="w-full flex flex-col tablet:flex-row gap-3 tablet:gap-6">
           <InputField
             type="text"
             placeholder="Token"
@@ -71,7 +71,7 @@ export function TransferContent(
         </div>
       </div>
 
-      <div className="dark-gradient p-3 md:p-6 w-full z-[10]">
+      <div className="dark-gradient p-3 tablet:p-6 w-full z-[10]">
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

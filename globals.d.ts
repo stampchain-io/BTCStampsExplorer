@@ -15,7 +15,8 @@ export type STAMP_FILTER_TYPES =
   | "vector"
   | "for sale"
   | "trending sales"
-  | "sold";
+  | "sold"
+  | "recursive";
 export type STAMP_SUFFIX_FILTERS =
   | "gif"
   | "jpg"
@@ -96,6 +97,14 @@ export interface StampRow {
   balance?: number | string;
 }
 
+export interface DisplayCountBreakpoints {
+  "mobile-360": number; // 360px+
+  "mobile-420"?: number; // 421px+ - implement in stampsection if needed
+  "mobile-768": number; // 569px+
+  "tablet": number; // 769px+
+  "desktop": number; // 1025px+
+}
+
 export interface StampSectionProps {
   title: string;
   type?: string;
@@ -104,6 +113,9 @@ export interface StampSectionProps {
   isRecentSales?: boolean;
   filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
   showDetails?: boolean;
+  variant?: string;
+  gridClass?: string;
+  displayCounts?: DisplayCountBreakpoints;
 }
 
 export interface SRC20Row {
@@ -642,6 +654,7 @@ export interface TX {
 export interface TXError {
   error: string;
 }
+
 export interface MintStampInputData {
   sourceWallet: string;
   assetName?: string;

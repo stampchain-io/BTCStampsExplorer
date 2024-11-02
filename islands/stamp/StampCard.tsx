@@ -1,4 +1,3 @@
-import type { JSX } from "preact";
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
@@ -13,13 +12,6 @@ import {
 
 dayjs.extend(relativeTime);
 
-/**
- * Renders a stamp card component.
- * @param stamp - The stamp row data.
- * @param kind - The kind of stamp card (cursed, stamp, named).
- * @param isRecentSale - Whether this card is being displayed in the recent sales context.
- * @returns The stamp card component.
- */
 export function StampCard({
   stamp,
   kind = "stamp",
@@ -79,7 +71,7 @@ export function StampCard({
             e.currentTarget.src = `/not-available.png`;
           }}
           alt={`Stamp No. ${stamp.stamp}`}
-          className="h-full w-full object-contain items-center pixelart"
+          className="h-full w-full object-contain pixelart"
         />
       );
     }
@@ -111,23 +103,19 @@ export function StampCard({
     : abbreviateAddress(stamp.creator, abbreviationLength);
 
   return (
-    <div className={`relative flex justify-center`}>
+    <div class="relative flex justify-center">
       <a
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
         f-partial={`/stamp/${stamp.tx_hash}`}
-        className="text-white group relative z-0 flex flex-col 
-          p-stamp-card-lg mobile-md:p-3 
-          rounded-stamp transition-all 
-          w-full max-w-[318px] 
-          mobile-lg:max-w-[348px] 
-          tablet:max-w-[318px] 
-          desktop:max-w-[318px] 
-          hover:border-stamp-purple-bright
-          hover:shadow-stamp
-          hover:border-solid 
-          border-2 border-transparent
-          bg-stamp-card-bg"
+        class={`
+          text-white group relative z-0 flex flex-col
+          p-stamp-card-lg mobile-768:p-3
+          rounded-stamp transition-all
+          w-full
+          hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
+          bg-stamp-card-bg
+        `}
       >
         {/* Image Container */}
         <div className="relative w-full">
@@ -140,17 +128,17 @@ export function StampCard({
 
         {/* Info Section */}
         {showInfo && (
-          <div className="flex flex-col font-medium px-[6px] tablet:px-3">
+          <div class="flex flex-col font-medium px-2 tablet:px-3">
             {showDetails && (
               <>
                 {/* Stamp Number */}
-                <div className="pt-1 text-center">
+                <div class="pt-1 text-center">
                   {shouldDisplayHash && (
-                    <span className="text-stamp-grey-darker text-lg mobile-lg:text-xl tablet:text-2xl desktop:text-3xl font-light font-work-sans">
+                    <span class="text-stamp-grey-darker text-lg mobile-768:text-xl tablet:text-2xl desktop:text-3xl font-light font-work-sans">
                       #
                     </span>
                   )}
-                  <span className="text-lg mobile-lg:text-xl tablet:text-2xl desktop:text-3xl font-black 
+                  <span class="text-lg mobile-768:text-xl tablet:text-2xl desktop:text-3xl font-black 
                     bg-stamp-text-grey bg-clip-text text-fill-transparent">
                     {Number(stamp.stamp ?? 0) >= 0 ||
                         (stamp.cpid && stamp.cpid.charAt(0) === "A")
@@ -160,20 +148,20 @@ export function StampCard({
                 </div>
 
                 {/* Creator Name or Abbreviated Address */}
-                <div className="text-stamp-grey text-base mobile-lg:text-base tablet:text-lg desktop:text-xl 
+                <div class="text-stamp-grey text-base mobile-768:text-base tablet:text-lg desktop:text-xl 
                   font-bold font-work-sans break-words truncate text-center">
                   {creatorDisplay}
                 </div>
 
                 {/* Price and Supply */}
-                <div className="flex justify-between mt-2">
+                <div class="flex justify-between mt-2">
                   {/* Render Price on the Left */}
-                  <div className="truncate text-nowrap">
-                    <span className="text-[#999999] text-xs md:text-sm xl:text-base 2xl:text-lg font-medium font-work-sans">
+                  <div class="truncate text-nowrap">
+                    <span class="text-stamp-grey text-xs tablet:text-sm desktop:text-base desktop:text-base font-medium font-work-sans">
                       {renderPrice()}
                     </span>
                   </div>
-                  <div className="text-stamp-grey-darker text-xs mobile-lg:text-sm tablet:text-base desktop:text-lg 
+                  <div class="text-stamp-grey-darker text-xs mobile-768:text-sm tablet:text-base desktop:text-lg 
                     font-bold font-work-sans text-right">
                     {supplyDisplay}
                   </div>

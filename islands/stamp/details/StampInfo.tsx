@@ -96,7 +96,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           >
             {stamp.cpid}
           </a>
-          <p className="hidden md:block text-[#8800CC] overflow-hidden text-ellipsis whitespace-nowrap text-4xl font-light">
+          <p className="hidden tablet:block text-[#8800CC] overflow-hidden text-ellipsis whitespace-nowrap text-4xl font-light">
             BY{" "}
             <span className={"font-bold"}>
               <a
@@ -133,13 +133,13 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         </div>
 
         <div className="flex justify-between items-center dark-gradient p-6">
-          <div className="flex justify-between items-center flex-col md:items-start gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-start gap-1">
             <p className="text-[#666666] font-light uppercase">TYPE</p>
             <p className="text-[#999999] uppercase font-medium">
               {fileExtension}
             </p>
           </div>
-          <div className="flex justify-between items-center flex-col md:items-center gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-center gap-1">
             <p className="text-[#666666] font-light uppercase">DIMENSIONS</p>
             <p className="text-[#999999] uppercase font-medium">
               {imageDimensions
@@ -147,7 +147,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 : "N/A"}
             </p>
           </div>
-          <div className="flex justify-between items-center flex-col md:items-end gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-end gap-1">
             <p className="text-[#666666] font-light uppercase">SIZE</p>
             <p className="text-[#999999] uppercase font-medium">
               {imageSize ? `${(imageSize / 1024).toFixed(2)} KB` : "N/A"}
@@ -158,19 +158,19 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         <div
           className={"flex justify-between items-center dark-gradient p-6"}
         >
-          <div className="flex justify-between items-center flex-col md:items-start gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-start gap-1">
             <p className="text-[#666666] font-light uppercase">Locked</p>
             <p className="text-[#999999] uppercase font-medium">
               {stamp.locked ?? false ? "Yes" : "No"}
             </p>
           </div>
-          <div className="flex justify-between items-center flex-col md:items-center gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-center gap-1">
             <p className="text-[#666666] font-light uppercase">Divisible</p>
             <p className="text-[#999999] uppercase font-medium">
               {stamp.divisible ? "Yes" : "No"}
             </p>
           </div>
-          <div className="flex justify-between items-center flex-col md:items-end gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-end gap-1">
             <p className="text-[#666666] font-light uppercase">Keyburned</p>
             <p className="text-[#999999] uppercase font-medium">
               {stamp.keyburn ?? false ? "Yes" : "No"}
@@ -189,7 +189,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
             </p>
           </div>
-          <div className="flex justify-between items-center flex-col md:items-center gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-center gap-1">
             <p className="text-[#666666] font-light uppercase">TX hash</p>
             <a
               href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
@@ -200,7 +200,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               {abbreviateAddress(stamp.tx_hash, 4)}
             </a>
           </div>
-          <div className="flex justify-between items-center flex-col md:items-end gap-1">
+          <div className="flex justify-between items-center flex-col tablet:items-end gap-1">
             <p className="text-lg font-light text-[#666666] uppercase text-nowrap">
               Block #
             </p>

@@ -129,6 +129,16 @@ export default function StampPage(props: StampDetailPageProps) {
       isRecentSales: true,
       stamps: stamps_recent.data,
       layout: "row",
+      showDetails: false,
+      // FIXME: gridclass needs adjustment and this is now recent stamps
+      gridClass: ` 
+        grid w-full gap-4
+        grid-cols-2
+        mobile-420:grid-cols-3
+        mobile-768:grid-cols-4
+        tablet:grid-cols-6
+        desktop:grid-cols-6
+    `,
     },
   ];
 
@@ -148,8 +158,8 @@ export default function StampPage(props: StampDetailPageProps) {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <div className="flex flex-col gap-10 md:gap-20 xl:gap-50">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="flex flex-col gap-10 tablet:gap-20 desktop:gap-50">
+        <div className="grid grid-cols-1 tablet:grid-cols-2 gap-12">
           <StampImage
             stamp={stamp}
             flag={true}
@@ -172,7 +182,7 @@ export default function StampPage(props: StampDetailPageProps) {
         />
 
         <div>
-          <h1 class="text-3xl md:text-7xl text-left mb-2 bg-clip-text text-transparent purple-gradient1 font-black">
+          <h1 class="text-3xl tablet:text-7xl text-left mb-2 bg-clip-text text-transparent purple-gradient1 font-black">
             LATEST STAMPS
           </h1>
           <div class="flex flex-col gap-12">

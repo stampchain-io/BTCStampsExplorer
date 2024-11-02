@@ -44,8 +44,8 @@ export function StampRelatedInfo(
     <>
       {/* <StampHolders holders={holders} /> */}
 
-      <div class="dark-gradient p-2 md:p-6">
-        <div class="flex justify-between w-full overflow-y-auto text-[#666666] text-sm md:text-[19px]">
+      <div class="dark-gradient p-2 tablet:p-6">
+        <div class="flex justify-between w-full overflow-y-auto text-[#666666] text-sm tablet:text-[19px]">
           {tabs.map(({ id, label }) => (
             <p
               key={id}

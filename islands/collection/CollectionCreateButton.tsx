@@ -19,39 +19,39 @@ export function CollectionCreateButton() {
         <img src="/img/icon_create.png" class="w-4 h-4" />
         <p>Create a collection</p>
       </div>
-      <div class="bg-[#3E2F4C] text-[#F5F5F5] p-6 rounded absolute hidden group-hover:flex z-[100] flex-col gap-5 w-[calc(100vw-16px)] md:w-[650px]">
+      <div class="bg-[#3E2F4C] text-[#F5F5F5] p-6 rounded absolute hidden group-hover:flex z-[100] flex-col gap-5 w-[calc(100vw-16px)] tablet:w-[650px]">
         <div class="flex flex-col">
           <span class="text-2xl">Create a collection</span>
         </div>
-        <hr class="w-[300px] md:w-[350px]" />
+        <hr class="w-[300px] tablet:w-[350px]" />
         <div class="flex flex-col gap-1">
           <span>Name</span>
           <input
-            class="bg-[#4F3666] border border-[#8A8989] rounded w-[300px] md:w-[350px] py-2 px-3"
+            class="bg-[#4F3666] border border-[#8A8989] rounded w-[300px] tablet:w-[350px] py-2 px-3"
             onChange={(e) => setName((e.target as HTMLInputElement).value)}
           />
         </div>
-        <hr class="w-[300px] md:w-[350px]" />
+        <hr class="w-[300px] tablet:w-[350px]" />
         <div class="flex flex-col gap-1">
           <span>X (Twitter)</span>
           <input
-            class="bg-[#4F3666] border border-[#8A8989] rounded w-[300px] md:w-[350px] py-2 px-3"
+            class="bg-[#4F3666] border border-[#8A8989] rounded w-[300px] tablet:w-[350px] py-2 px-3"
             onChange={(e) => setTwitter((e.target as HTMLInputElement).value)}
           />
         </div>
-        <hr class="w-[300px] md:w-[350px]" />
+        <hr class="w-[300px] tablet:w-[350px]" />
         <div class="flex flex-col gap-1">
           <span>Website</span>
           <input
-            class="bg-[#4F3666] border border-[#8A8989] rounded w-[300px] md:w-[350px] py-2 px-3"
+            class="bg-[#4F3666] border border-[#8A8989] rounded w-[300px] tablet:w-[350px] py-2 px-3"
             onChange={(e) => setWebsite((e.target as HTMLInputElement).value)}
           />
         </div>
-        <hr class="w-[300px] md:w-[350px]" />
+        <hr class="w-[300px] tablet:w-[350px]" />
         <div class="flex flex-col gap-1">
           <span>Description</span>
           <input
-            class="bg-[#4F3666] border border-[#8A8989] rounded w-[300px] md:w-[350px] py-2 px-3"
+            class="bg-[#4F3666] border border-[#8A8989] rounded w-[300px] tablet:w-[350px] py-2 px-3"
             onChange={(e) =>
               setDescription((e.target as HTMLInputElement).value)}
           />

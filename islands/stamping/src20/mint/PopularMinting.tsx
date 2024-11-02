@@ -6,11 +6,11 @@ const PopularMinting = ({ transactions }) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 items-start md:items-end">
-      <h1 className="purple-gradient4 text-3xl md:text-6xl font-black">
+    <div className="flex flex-col gap-4 items-start tablet:items-end">
+      <h1 className="purple-gradient4 text-3xl tablet:text-6xl font-black">
         TRENDING
       </h1>
-      <p className="text-2xl md:text-5xl text-[#AA00FF]">POPULAR TOKENS</p>
+      <p className="text-2xl tablet:text-5xl text-[#AA00FF]">POPULAR TOKENS</p>
       {transactions.map((src20Item, index) => (
         <StampingMintingItem
           key={index}

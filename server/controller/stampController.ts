@@ -414,8 +414,8 @@ export class StampController {
         collectionData,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["STAMP", "SRC-721"], limit: 6 },
-          { idents: ["SRC-721"], limit: 6 },
+          { idents: ["STAMP", "SRC-721"], limit: 16 },
+          { idents: ["SRC-721"], limit: 12 },
           { idents: ["STAMP"], limit: 16 },
           // Removed SRC20 from stamp categories
         ]),
@@ -449,7 +449,7 @@ export class StampController {
         const poshStampsResult = await this.getStamps({
           collectionId: poshCollectionId,
           page: 1,
-          limit: 8, // Limit to 8 stamps
+          limit: 16, // Limit to 8 stamps
           sortBy: "DESC", // Adjust sort order if needed
         });
 

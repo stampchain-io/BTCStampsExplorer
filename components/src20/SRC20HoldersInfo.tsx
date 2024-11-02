@@ -8,7 +8,7 @@ export function SRC20HoldersInfo(props: SRC20HoldersInfoProps) {
   const { holders } = props;
 
   return (
-    <div class="relative shadow-md sm:rounded-lg w-full overflow-y-auto max-h-[600px]">
+    <div class="relative shadow-md mobile-768:rounded-lg w-full overflow-y-auto max-h-[600px]">
       <table class="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead class="table-fixed text-lg font-semibold uppercase text-[#C184FF] border-b border-[#B9B9B9]">
           <tr class="w-full table table-fixed">

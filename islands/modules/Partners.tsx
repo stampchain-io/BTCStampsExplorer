@@ -21,10 +21,10 @@ function PartnerCard({ imageSrc, name }: Partner) {
 export function PartnersModule() {
   return (
     <div>
-      <h2 className="font-black text-3xl md:text-6xl gray-gradient4 mb-3">
+      <h2 className="font-black text-3xl tablet:text-6xl gray-gradient4 mb-3">
         PARTNERS
       </h2>
-      <div className="flex justify-between items-center flex-col md:flex-row gap-3 md:gap-6">
+      <div className="flex justify-between items-center flex-col tablet:flex-row gap-3 tablet:gap-6">
         {partners.map((partner) => (
           <PartnerCard key={partner.name} {...partner} />
         ))}

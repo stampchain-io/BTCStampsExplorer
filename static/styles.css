@@ -1,27 +1,14 @@
+/* @tailwind is a valid directive for Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Reset default margins and handle box-sizing */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 /* Ensure html and body take full height without overflow */
 html, body {
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  position: relative; /* Create stacking context */
-}
-
-/* Main container styles */
-#root, #__fresh {
   min-height: 100vh;
-  width: 100%;
-  position: relative;
+  margin: 0;
+  padding: 0;
+  background-color: #000; /* Fallback color */
   overflow-x: hidden;
 }
 
@@ -163,11 +150,9 @@ html, body {
 .background-gradient {
   position: absolute;
   inset: 0;
-  z-index: -10;
   width: 100%;
   height: 100%;
-  transform: rotate(166.26deg);
-  transform-origin: top left;
+  z-index: -10;
   opacity: 0.2;
   background: linear-gradient(
     113deg,
@@ -175,13 +160,13 @@ html, body {
     #609 63.74%,
     rgba(68, 0, 102, 0.00) 84.65%
   );
-
-  box-shadow: 100px 100px 100px;
   border-radius: 1800px;
   filter: blur(50px);
-  /* border-radius: 9999px; */
-  /* filter: blur(100px); */
+  pointer-events: none;
+  transform: rotate(113deg);
+  transform-origin: top left;
   overflow: hidden;
+  box-shadow: 100px 100px 100px;
 }
 
 @layer base {

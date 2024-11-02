@@ -113,7 +113,7 @@ export default function App({ Component }: AppProps) {
             <div className="flex flex-col min-h-screen">
               <Header />
               <div
-                className="px-3 md:px-6 xl:px-12 flex flex-col flex-grow gap-5 max-w-[1440px] mx-auto w-full"
+                className="px-3 tablet:px-6 desktop:px-12 flex flex-col flex-grow gap-5 max-w-desktop mx-auto w-full"
                 f-client-nav
               >
                 <Partial name="body">

@@ -32,7 +32,7 @@ export default function createCarouselSlider(
       el: ".swiper-pagination",
       clickable: true,
       renderBullet: function (index, className) {
-        return '<button class="w-[44px] md:w-[88px] h-0 border-2 rounded-[4px] ' +
+        return '<button class="w-[44px] tablet:w-[88px] h-0 border-2 rounded-[4px] ' +
           className + '"/>';
       },
     },

@@ -66,8 +66,8 @@ export const UploadTickHeader = (props: SRC20TickHeaderProps) => {
 
   return (
     <>
-      <div class="flex w-full flex-col md:flex-row gap-4 items-center justify-center">
-        <div className={"flex w-full md:w-2/5   flex-col"}>
+      <div class="flex w-full flex-col tablet:flex-row gap-4 items-center justify-center">
+        <div className={"flex w-full tablet:w-2/5   flex-col"}>
           {!file
             ? (
               <img
@@ -139,7 +139,7 @@ export const UploadTickHeader = (props: SRC20TickHeaderProps) => {
             </svg>
           </div>
         </div>
-        <div class="relative w-full md:w-3/5 overflow-x-auto flex flex-col gap-8 text-white">
+        <div class="relative w-full tablet:w-3/5 overflow-x-auto flex flex-col gap-8 text-white">
           <div class="flex flex-col gap-5">
             <p class="text-5xl uppercase">{convertToEmoji(deployment.tick)}</p>
             <p>

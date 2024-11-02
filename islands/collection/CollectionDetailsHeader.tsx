@@ -19,7 +19,7 @@ export const CollectionDetailsHeader = (
         />
         <div class="flex flex-col justify-between">
           <p class="font-semibold text-xl text-white">COLLECTION - {id}</p>
-          <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex flex-col tablet:flex-row gap-4">
             <div class="flex gap-4">
               <div>
                 <p class="text-sm text-[#B9B9B9]">FLOOR</p>
@@ -54,8 +54,8 @@ export const CollectionDetailsHeader = (
         </div>
       </div>
       <hr class="border-2 border-[#3F2A4E]" />
-      <div class="flex flex-col-reverse md:flex-row justify-between items-center w-full">
-        <div class="hidden md:flex gap-6 md:gap-8 items-center">
+      <div class="flex flex-col-reverse tablet:flex-row justify-between items-center w-full">
+        <div class="hidden tablet:flex gap-6 tablet:gap-8 items-center">
           <img
             src={selectedCategory === "BigTiles"
               ? "/img/icon_big_tiles.png"
@@ -82,7 +82,7 @@ export const CollectionDetailsHeader = (
           <select
             name="sort"
             id="sort-select"
-            class="hidden md:block bg-[#3F2A4E] text-[#8D9199] h-[54px] min-w-[200px] px-6 rounded"
+            class="hidden tablet:block bg-[#3F2A4E] text-[#8D9199] h-[54px] min-w-[200px] px-6 rounded"
           >
             <option value="lowToHigh">Price: Low to High</option>
             <option value="highToLow">Price: High to Low</option>

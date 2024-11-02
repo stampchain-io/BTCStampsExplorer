@@ -493,7 +493,7 @@ export function TradeContent() {
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl md:text-6xl font-black mt-6 w-full text-center">
+      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
         ATTACH STAMP TO UTXO / CREATE PSBT
       </p>
 
@@ -534,7 +534,7 @@ export function TradeContent() {
         />
 
         {tradeFormState.psbtHex && (
-          <div className="dark-gradient p-3 md:p-6 w-full break-words mt-6">
+          <div className="dark-gradient p-3 tablet:p-6 w-full break-words mt-6">
             <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
               className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
@@ -705,7 +705,7 @@ export function TradeContent() {
         />
 
         {attachFormState.psbtHex && (
-          <div className="dark-gradient p-3 md:p-6 w-full break-words mt-6">
+          <div className="dark-gradient p-3 tablet:p-6 w-full break-words mt-6">
             <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
               className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"

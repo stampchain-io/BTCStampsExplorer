@@ -27,7 +27,7 @@ const WalletHeader = ({
   };
 
   return (
-    <div class="flex flex-col-reverse lg:flex-row justify-between items-center gap-3 w-full">
+    <div class="flex flex-col-reverse tablet:flex-row justify-between items-center gap-3 w-full">
       <h1 className="text-5xl text-[#660099] font-black">WALLET</h1>
       <div class="flex gap-3 justify-between h-[40px]">
         <Filter

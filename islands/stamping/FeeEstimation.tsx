@@ -209,7 +209,7 @@ export function FeeEstimation({
           </button>
         </div>
       </div>
-      <div className="relative w-full md:w-1/2">
+      <div className="relative w-full tablet:w-1/2">
         <label htmlFor="labels-range-input" className="sr-only">
           Labels range
         </label>
@@ -329,7 +329,7 @@ export function FeeEstimation({
           {/* <button onClick={onRefresh}>Refresh Fees</button> */}
         </div>
         <div className="flex flex-col items-end">
-          <div className="flex gap-1 md:gap-2 justify-end items-center">
+          <div className="flex gap-1 tablet:gap-2 justify-end items-center">
             <input
               type="checkbox"
               id="tosAgreed"
@@ -344,8 +344,8 @@ export function FeeEstimation({
               className="text-[#999999] text-xs font-medium contents"
             >
               I AGREE TO THE{" "}
-              <span className="block md:hidden text-[#8800CC]">ToS</span>
-              <span className="hidden md:block text-[#8800CC]">
+              <span className="block tablet:hidden text-[#8800CC]">ToS</span>
+              <span className="hidden tablet:block text-[#8800CC]">
                 terms of service
               </span>
             </label>

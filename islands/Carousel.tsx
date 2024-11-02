@@ -102,7 +102,7 @@ const Carousel = () => {
               <div className="swiper-slide" key={index}>
                 <div className="carousel-slider-animate-opacity">
                   <img
-                    className="w-[313px] height-[313px] md:w-[408px] md:h-[408px]"
+                    className="w-[313px] height-[313px] tablet:w-[408px] tablet:h-[408px]"
                     src={slide.url}
                     alt={slide.alt}
                   />
@@ -110,7 +110,7 @@ const Carousel = () => {
               </div>
             ))}
           </div>
-          <div class="swiper-pagination mt-12 hidden md:block"></div>
+          <div class="swiper-pagination mt-12 hidden tablet:block"></div>
         </div>
       </div>
     </div>

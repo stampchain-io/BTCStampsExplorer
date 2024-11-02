@@ -20,7 +20,7 @@ const StampImageFullScreen = (
     >
       <div class="relative p-4 w-full max-w-[800px] h-auto">
         <div class="relative bg-white rounded-lg shadow overflow-hidden">
-          <div class="flex flex-col gap-4 items-center justify-between p-4 md:p-5 rounded-t">
+          <div class="flex flex-col gap-4 items-center justify-between p-4 tablet:p-5 rounded-t">
             {typeFlag === 1 && (
               <iframe
                 width="100%"

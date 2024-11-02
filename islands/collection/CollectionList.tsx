@@ -10,7 +10,7 @@ export function CollectionList({ collections }: CollectionListProps) {
   return (
     <div class="flex flex-col gap-4">
       {/* <CollectionCreateButton /> */}
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 xl:gap-6 transition-opacity duration-700 ease-in-out">
+      <div class="grid grid-cols-2 tablet:grid-cols-4 gap-2 tablet:gap-4 desktop:gap-6 transition-opacity duration-700 ease-in-out">
         {collections.map((collection) => (
           <CollectionCard
             key={collection.collection_id}

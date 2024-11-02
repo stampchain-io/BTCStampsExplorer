@@ -56,7 +56,7 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
         onClose={handleCloseModal}
       />
       <div class="relative overflow-x-auto shadow-md">
-        <div class="flex flex-col gap-3 md:gap-6">
+        <div class="flex flex-col gap-3 tablet:gap-6">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
 
@@ -167,7 +167,7 @@ export const SRC20MintingTable = (props: SRC20BalanceTableProps) => {
         </div>
 
         {/* Mobile View */}
-        <div class="flex md:hidden flex-col gap-3">
+        <div class="flex tablet:hidden flex-col gap-3">
           {data.map((src20: SRC20Row) => {
             const href = `/src20/${convertToEmoji(src20.tick)}`;
 

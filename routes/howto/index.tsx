@@ -24,10 +24,10 @@ function PlaceholderImage({ width, height }: PlaceholderImageProps) {
 
 export default function HowTo() {
   return (
-    <div className="text-[#CCCCCC] text-xl font-medium flex flex-col gap-12 mt-20 md:mt-40">
+    <div className="text-[#CCCCCC] text-xl font-medium flex flex-col gap-12 mt-20 tablet:mt-40">
       <section className="mb-6">
         <h1 className="gray-gradient3 text-6xl font-black">HOW-TO</h1>
-        <h2 className="text-2xl md:text-5xl font-extralight mb-3">
+        <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
           MANUALS
         </h2>
         <p className="mb-12">
@@ -44,8 +44,8 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className="text-2xl md:text-5xl font-extralight mb-3">TITLE</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">TITLE</h2>
+        <div className="grid grid-cols-1 tablet:grid-cols-3 gap-3">
           <PlaceholderImage width={432} height={243} />
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
@@ -69,8 +69,8 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className="text-2xl md:text-5xl font-extralight mb-3">TITLE</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">TITLE</h2>
+        <div className="grid grid-cols-1 tablet:grid-cols-3 gap-3">
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id

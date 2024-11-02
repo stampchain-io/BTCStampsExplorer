@@ -1,21 +1,21 @@
 export default function TermsOfService() {
   return (
-    <div className="text-[#CCCCCC] flex flex-col gap-16 md:gap-36 py-24 md:py-48">
+    <div className="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
       <section className="text-center max-w-5xl mx-auto">
-        <h1 className="text-4xl md:text-7xl font-bold gray-gradient1">
+        <h1 className="text-4xl tablet:text-7xl font-bold gray-gradient1">
           TERMS OF SERVICE
         </h1>
       </section>
 
       <section className="flex flex-col gap-6">
-        <p className="text-3xl md:text-6xl font-black gray-gradient3">
+        <p className="text-3xl tablet:text-6xl font-black gray-gradient3">
           AGREEMENT
         </p>
         <div className="flex justify-between items-end">
-          <p className="font-extralight text-2xl md:text-5xl">
+          <p className="font-extralight text-2xl tablet:text-5xl">
             TO OUR LEGAL TERMS
           </p>
-          <p className="font-extralight text-xs md:text-base">
+          <p className="font-extralight text-xs tablet:text-base">
             LAST UPDATED <span className="font-medium">SEPTEMBER 11 2024</span>
           </p>
         </div>
@@ -48,8 +48,8 @@ export default function TermsOfService() {
           register for the Services. We recommend that you print a copy of these
           Legal Terms for your records.
         </p>
-        <p className="text-base md:text-2xl font-courier-prime">
-          <span className="text-xl md:text-4xl">
+        <p className="text-base tablet:text-2xl font-courier-prime">
+          <span className="text-xl tablet:text-4xl">
             TABLE OF CONTENTS<br />
           </span>
           1. OUR SERVICES<br />
@@ -81,7 +81,7 @@ export default function TermsOfService() {
         </p>
       </section>
 
-      <div className="flex flex-col gap-5 text-xs md:text-lg font-courier-prime">
+      <div className="flex flex-col gap-5 text-xs tablet:text-lg font-courier-prime">
         <section>
           1. OUR SERVICES<br />
           The information provided when using the Services is not intended for
