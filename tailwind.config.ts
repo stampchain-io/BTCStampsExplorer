@@ -8,10 +8,10 @@ export default {
 
   theme: {
     screens: {
-      "mobile-360": "360px", // 360 +
-      // "mobile-568": " // UNUSED - USE mobile-360
-      "mobile-420": "421px", // 421 +
-      "mobile-768": "569px", // 569 +
+      "mobileSm": "360px", // 360 +
+      // "mobile-568": " // UNUSED - USE mobileSm
+      "mobileMd": "421px", // 421 +
+      "mobileLg": "569px", // 569 +
       "tablet": "769px", // 769 +
       "desktop": "1025px", // 1025 +
     },
@@ -174,6 +174,9 @@ export default {
         "modal": "50",
         "tooltip": "40",
         "dropdown": "30",
+      },
+      maxWidth: {
+        "desktop": "1025px",
       },
     },
   },

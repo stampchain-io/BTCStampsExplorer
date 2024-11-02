@@ -20,8 +20,12 @@ function PartnerCard({ imageSrc, name }: Partner) {
 
 export function PartnersModule() {
   return (
-    <div>
-      <h2 className="font-black text-3xl tablet:text-6xl gray-gradient4 mb-3">
+    <div class="
+      flex flex-col gap-4
+      px-3 tablet:px-6 desktop:px-12 
+      max-w-desktop w-full mx-auto
+    ">
+      <h2 class="font-black text-3xl tablet:text-6xl gray-gradient4 mb-3">
         PARTNERS
       </h2>
       <div className="flex justify-between items-center flex-col tablet:flex-row gap-3 tablet:gap-6">

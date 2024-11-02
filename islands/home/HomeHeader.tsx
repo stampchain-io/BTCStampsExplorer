@@ -28,8 +28,8 @@ export function HomeHeader() {
           font-black
           bg-text-gray-1
           text-2xl
-          mobile-360:text-2xl
-          mobile-768:text-5xl
+          mobileSm:text-2xl
+          mobileLg:text-5xl
           tablet:text-6xl
           desktop:text-7xl
         ">
@@ -44,8 +44,8 @@ export function HomeHeader() {
           bg-text-gray-1
           uppercase
           text-xl
-          mobile-360:text-xl
-          mobile-768:text-4xl
+          mobileSm:text-xl
+          mobileLg:text-4xl
           tablet:text-5xl
           desktop:text-6xl
           mt-1
@@ -60,8 +60,8 @@ export function HomeHeader() {
         text-center
         font-medium 
         text-stamp-grey
-        mobile-360:max-w-[310px] mobile-360:text-base
-        mobile-768:max-w-[515px] mobile-768:text-xl
+        mobileSm:max-w-[310px] mobileSm:text-base
+        mobileLg:max-w-[515px] mobileLg:text-xl
         tablet:max-w-[618px] tablet:text-2xl
         desktop:max-w-[772px] desktop:text-3xl
       ">

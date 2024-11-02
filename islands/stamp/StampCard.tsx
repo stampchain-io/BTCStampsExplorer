@@ -110,7 +110,7 @@ export function StampCard({
         f-partial={`/stamp/${stamp.tx_hash}`}
         class={`
           text-white group relative z-0 flex flex-col
-          p-stamp-card-lg mobile-768:p-3
+          p-stamp-card-lg mobileLg:p-3
           rounded-stamp transition-all
           w-full
           hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
@@ -134,11 +134,11 @@ export function StampCard({
                 {/* Stamp Number */}
                 <div class="pt-1 text-center">
                   {shouldDisplayHash && (
-                    <span class="text-stamp-grey-darker text-lg mobile-768:text-xl tablet:text-2xl desktop:text-3xl font-light font-work-sans">
+                    <span class="text-stamp-grey-darker text-lg mobileLg:text-xl tablet:text-2xl desktop:text-3xl font-light font-work-sans">
                       #
                     </span>
                   )}
-                  <span class="text-lg mobile-768:text-xl tablet:text-2xl desktop:text-3xl font-black 
+                  <span class="text-lg mobileLg:text-xl tablet:text-2xl desktop:text-3xl font-black 
                     bg-stamp-text-grey bg-clip-text text-fill-transparent">
                     {Number(stamp.stamp ?? 0) >= 0 ||
                         (stamp.cpid && stamp.cpid.charAt(0) === "A")
@@ -148,7 +148,7 @@ export function StampCard({
                 </div>
 
                 {/* Creator Name or Abbreviated Address */}
-                <div class="text-stamp-grey text-base mobile-768:text-base tablet:text-lg desktop:text-xl 
+                <div class="text-stamp-grey text-base mobileLg:text-base tablet:text-lg desktop:text-xl 
                   font-bold font-work-sans break-words truncate text-center">
                   {creatorDisplay}
                 </div>
@@ -161,7 +161,7 @@ export function StampCard({
                       {renderPrice()}
                     </span>
                   </div>
-                  <div class="text-stamp-grey-darker text-xs mobile-768:text-sm tablet:text-base desktop:text-lg 
+                  <div class="text-stamp-grey-darker text-xs mobileLg:text-sm tablet:text-base desktop:text-lg 
                     font-bold font-work-sans text-right">
                     {supplyDisplay}
                   </div>

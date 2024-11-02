@@ -28,18 +28,18 @@ export default function BlockSelector(props: BlockProps) {
       class={`${
         isSelected ? "bg-blue-100 text-gray-800" : "bg-gray-800 text-blue-100"
       } transition-all transform hover:shadow-xl
-        rounded-lg overflow-hidden flex flex-col justify-between p-3 mobile-768:p-4 m-2
+        rounded-lg overflow-hidden flex flex-col justify-between p-3 mobileLg:p-4 m-2
         cursor-pointer hover:bg-gray-700 hover:text-blue-200`}
       onClick={handleClick}
     >
-      <div class="flex items-center justify-between text-sm mobile-768:text-base">
+      <div class="flex items-center justify-between text-sm mobileLg:text-base">
         <h3 class="font-bold">Block {block.block_index}</h3>
         <span>{dayjs(block.block_time).fromNow()}</span>
       </div>
       <div class="mt-1 mb-2">
         <p class="truncate">{displayAddress}</p>
       </div>
-      <div class="flex items-center justify-between text-xs mobile-768:text-sm">
+      <div class="flex items-center justify-between text-xs mobileLg:text-sm">
         <span>Stamps: {block.issuances}</span>
         {/* <span>Sends: {block.sends}</span> */}
       </div>

@@ -41,7 +41,7 @@ export const ConnectorsModal = (
           </span>
         </h3>
 
-        <div class="grid grid-cols-1 mobile-768:grid-cols-2 gap-2 tablet:gap-4 items-center">
+        <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-2 tablet:gap-4 items-center">
           {Object.keys(WALLET_PROVIDERS).map((providerKey) => (
             <WalletConnector
               key={providerKey}

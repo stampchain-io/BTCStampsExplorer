@@ -106,7 +106,7 @@ export function SRC20TX(props: SRC20TXProps) {
 
   return (
     <div
-      class="relative shadow-md mobile-768:rounded-lg w-full overflow-y-auto max-h-[250px]"
+      class="relative shadow-md mobileLg:rounded-lg w-full overflow-y-auto max-h-[250px]"
       ref={containerRef}
       onScroll={handleScroll}
     >

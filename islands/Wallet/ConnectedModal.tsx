@@ -57,7 +57,7 @@ export const ConnectedModal = ({ toggleModal, handleCloseModal }: Props) => {
             </button>
           </div>
 
-          <div class="grid mobile-768:grid-cols-2 items-center p-4 tablet:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+          <div class="grid mobileLg:grid-cols-2 items-center p-4 tablet:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
             <button
               onClick={disconnectWallet}
               class="block m-1 text-white border outline-1 border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-transparent font-medium rounded-lg text-sm px-5 py-2.5 text-center"

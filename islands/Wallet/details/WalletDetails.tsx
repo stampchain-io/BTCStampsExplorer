@@ -104,7 +104,7 @@ function WalletOverview(
       </div>
       <div className="flex justify-between">
         <div className="flex items-center">
-          <p className="text-[#8800CC] font-medium select-none mobile-768:block tablet:text-sm text-xs hidden">
+          <p className="text-[#8800CC] font-medium select-none mobileLg:block tablet:text-sm text-xs hidden">
             {walletData.address}
           </p>
         </div>

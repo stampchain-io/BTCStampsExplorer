@@ -75,7 +75,7 @@ export const Pagination = (
           <a
             href={pageUrl}
             f-partial={pageUrl}
-            class={`rounded-md flex items-center justify-center w-7 h-7 mobile-768:h-9 mobile-768:w-9 text-sm leading-[16.5px] mobile-768:text-base mobile-768:leading-[19px] font-medium font-work-sans text-[#080808] hover:bg-[#AA00FF] 
+            class={`rounded-md flex items-center justify-center w-7 h-7 mobileLg:h-9 mobileLg:w-9 text-sm leading-[16.5px] mobileLg:text-base mobileLg:leading-[19px] font-medium font-work-sans text-[#080808] hover:bg-[#AA00FF] 
               ${currentPage === p ? "bg-[#660099] " : "bg-[#440066]"}`}
           >
             {p}
@@ -98,7 +98,7 @@ export const Pagination = (
           <a
             href={buildPageUrl(1)}
             f-partial={buildPageUrl(1)}
-            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobile-768:h-9 mobile-768:w-9"
+            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
           >
             <img
               src="/img/datacontrol/CaretDoubleLeft.svg"
@@ -111,7 +111,7 @@ export const Pagination = (
           <a
             href={buildPageUrl(Math.max(1, currentPage - 1))}
             f-partial={buildPageUrl(Math.max(1, currentPage - 1))}
-            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobile-768:h-9 mobile-768:w-9"
+            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
           >
             <img
               src="/img/datacontrol/CaretLeft.svg"
@@ -125,7 +125,7 @@ export const Pagination = (
           <a
             href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
             f-partial={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobile-768:h-9 mobile-768:w-9"
+            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
           >
             <img
               src="/img/datacontrol/CaretRight.svg"
@@ -138,7 +138,7 @@ export const Pagination = (
           <a
             href={buildPageUrl(totalPages)}
             f-partial={buildPageUrl(totalPages)}
-            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobile-768:h-9 mobile-768:w-9"
+            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
           >
             <img
               src="/img/datacontrol/CaretDoubleRight.svg"

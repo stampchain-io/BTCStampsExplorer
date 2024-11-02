@@ -21,7 +21,7 @@ export function StampRelatedGraph() {
         </div>
         <div className="flex justify-between items-center w-full">
           <div className="flex justify-between items-center flex-col tablet:items-start gap-1">
-            <div className="flex flex-col justify-center items-center tablet:items-start mobile-768:items-start">
+            <div className="flex flex-col justify-center items-center tablet:items-start mobileLg:items-start">
               <p className="text-[#666666] font-light uppercase text-lg">
                 ADDRESS
               </p>
@@ -41,7 +41,7 @@ export function StampRelatedGraph() {
             </div>
           </div>
           <div className="flex justify-between items-start flex-col tablet:items-end gap-1">
-            <div className="flex flex-col justify-center items-center tablet:items-end mobile-768:items-end">
+            <div className="flex flex-col justify-center items-center tablet:items-end mobileLg:items-end">
               <p className="text-[#666666] font-light uppercase text-lg">
                 PERCENT
               </p>

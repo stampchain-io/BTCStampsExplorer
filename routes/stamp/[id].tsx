@@ -134,8 +134,8 @@ export default function StampPage(props: StampDetailPageProps) {
       gridClass: ` 
         grid w-full gap-4
         grid-cols-2
-        mobile-420:grid-cols-3
-        mobile-768:grid-cols-4
+        mobileMd:grid-cols-3
+        mobileLg:grid-cols-4
         tablet:grid-cols-6
         desktop:grid-cols-6
     `,

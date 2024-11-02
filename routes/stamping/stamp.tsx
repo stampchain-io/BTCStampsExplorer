@@ -42,15 +42,15 @@ export default function StampingStampPage({ data }: PageProps<StampPageData>) {
       grid w-full
       gap-[12px]
       grid-cols-2
-      mobile-360:grid-cols-3
-      mobile-768:grid-cols-4
+      mobileSm:grid-cols-3
+      mobileLg:grid-cols-4
       tablet:grid-cols-3
       desktop:grid-cols-4
       auto-rows-fr
     `,
     displayCounts: {
-      "mobile-360": 6, // 3 columns x 2 rows
-      "mobile-768": 8, // 4 columns x 2 rows
+      "mobileSm": 6, // 3 columns x 2 rows
+      "mobileLg": 8, // 4 columns x 2 rows
       "tablet": 6, // 3 columns x 2 rows
       "desktop": 8, // 4 columns x 2 rows
     },

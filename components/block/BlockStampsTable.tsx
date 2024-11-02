@@ -19,7 +19,7 @@ export default function BlockStampsTable(props: BlockStampsTableProps) {
 
   return (
     <div className="relative overflow-x-auto shadow-md max-h-196">
-      <table className="hidden tablet:table w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mobile-768:h-auto">
+      <table className="hidden tablet:table w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mobileLg:h-auto">
         <thead className="bg-[#2B0E49] uppercase text-lg text-[#C184FF] border-b border-[#B9B9B9]">
           <tr>
             <th scope="col" className="px-6 py-3">#</th>
