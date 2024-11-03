@@ -113,7 +113,9 @@ export function HomeStampPreview({
       stamps: stamps_recent,
       layout: "grid",
       isRecentSales: true,
-      showDetails: true,
+      showDetails: false,
+      showMinDetails: true,
+      variant: "grey",
       gridClass: `
         grid w-full
         gap-[12px]

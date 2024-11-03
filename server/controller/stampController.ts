@@ -19,6 +19,7 @@ import { filterOptions } from "$lib/utils/filterOptions.ts";
 import { Dispense, Dispenser } from "$types/index.d.ts";
 import { CollectionController } from "./collectionController.ts";
 import { Src20Controller } from "./src20Controller.ts";
+import { CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 
 export class StampController {
   static async getStampDetailsById(id: string, stampType: STAMP_TYPES = "all") {
@@ -406,33 +407,39 @@ export class StampController {
 
   static async getHomePageData() {
     try {
+      
+
       const [
         stampCategories,
         src20Result,
-        trendingSrc20s, // <-- Add this line
+        trendingSrc20s,
         recentSales,
         collectionData,
+        carouselStamps,
       ] = await Promise.all([
         this.getMultipleStampCategories([
           { idents: ["STAMP", "SRC-721"], limit: 16 },
           { idents: ["SRC-721"], limit: 12 },
           { idents: ["STAMP"], limit: 16 },
-          // Removed SRC20 from stamp categories
         ]),
-        // Fetch SRC20 data for the SRC20DeployTable
         Src20Controller.fetchSrc20DetailsWithHolders(null, {
           op: "DEPLOY",
           page: 1,
           limit: 5,
           sortBy: "ASC",
         }),
-        // Fetch trending SRC20 tokens for SRC20TrendingMints component
-        Src20Controller.fetchTrendingTokens(null, 5, 1, 1000), // <-- Added this line
+        Src20Controller.fetchTrendingTokens(null, 5, 1, 1000),
         this.getRecentSales(1, 6),
         CollectionController.getCollectionNames({
           limit: 4,
           page: 1,
           creator: "",
+        }),
+        this.getStamps({
+          identifier: CAROUSEL_STAMP_IDS,
+          allColumns: false,
+          noPagination: true,
+          cacheDuration: 1000 * 60 * 20,
         }),
       ]);
 
@@ -464,8 +471,9 @@ export class StampController {
         stamps_art: stampCategories[2].stamps,
         stamps_posh,
         src20s: src20Result.data,
-        trendingSrc20s: trendingSrc20s.data, // <-- Add this line
+        trendingSrc20s: trendingSrc20s.data,
         collectionData: collectionData.data,
+        carouselStamps: carouselStamps.data,
       };
     } catch (error) {
       console.error("Error in getHomePageData:", error);

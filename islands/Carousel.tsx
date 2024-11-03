@@ -1,90 +1,13 @@
 import { useEffect, useRef } from "preact/hooks";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
+import { StampRow } from "globals";
+import { getFileSuffixFromMime } from "$lib/utils/util.ts";
 
-interface SlideData {
-  url: string;
-  alt: string;
-  title: string;
-  subTitle: string;
-  description: string;
+interface CarouselProps {
+  stamps: StampRow[];
 }
 
-const SLIDE_DATA: SlideData[] = [
-  {
-    url: "/img/home/carousel1.png",
-    alt: "Slide 1",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-  {
-    url: "/img/home/carousel2.png",
-    alt: "Slide 2",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-  {
-    url: "/img/home/carousel3.png",
-    alt: "Slide 3",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-  {
-    url: "/img/home/carousel4.png",
-    alt: "Slide 4",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-  {
-    url: "/img/home/carousel5.png",
-    alt: "Slide 5",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-  {
-    url: "/img/home/carousel2.png",
-    alt: "Slide 2",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-  {
-    url: "/img/home/carousel5.png",
-    alt: "Slide 5",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-  {
-    url: "/img/home/carousel4.png",
-    alt: "Slide 4",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-  {
-    url: "/img/home/carousel6.png",
-    alt: "Slide 6",
-    title: "PEPE",
-    subTitle: "BY VOGELMANN",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat eu leo nec efficitur. Proin sed ipsum sed risus consectetur varius a quis magna.",
-  },
-];
-
-const Carousel = () => {
+export default function Carousel({ stamps }: CarouselProps) {
   const swiperRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -94,27 +17,47 @@ const Carousel = () => {
   }, []);
 
   return (
-    <div style={{ width: "80%", height: "500px", margin: "0 auto" }}>
-      <div className="carousel-slider h-full" loop ref={swiperRef}>
-        <div className="swiper h-full">
-          <div className="swiper-wrapper h-full">
-            {SLIDE_DATA.map((slide: SlideData, index) => (
-              <div className="swiper-slide" key={index}>
-                <div className="carousel-slider-animate-opacity">
-                  <img
-                    className="w-[313px] height-[313px] tablet:w-[408px] tablet:h-[408px]"
-                    src={slide.url}
-                    alt={slide.alt}
-                  />
+    <div
+      class={`
+        w-[90%]
+        mobileSm:w-[90%]
+        mobileLg:w-[85%]
+        tablet:w-[80%]
+        desktop:w-[80%]
+        mx-auto
+      `}
+    >
+      <div className="carousel-slider" ref={swiperRef}>
+        <div className="swiper">
+          <div className="swiper-wrapper">
+            {stamps.map((stamp: StampRow) => (
+              <div className="swiper-slide" key={stamp.tx_hash}>
+                <div className="relative w-full h-full">
+                  <div className="relative aspect-stamp w-full h-full overflow-hidden image-rendering-pixelated rounded-stamp border-2 border-transparent hover:border-stamp-purple-bright hover:shadow-stamp">
+                    <div className="absolute inset-0 bg-stamp-card-bg rounded-stamp" />
+                    <img
+                      className="relative z-10 w-full h-full object-contain pixelart"
+                      src={`/content/${stamp.tx_hash}.${
+                        getFileSuffixFromMime(stamp.stamp_mimetype)
+                      }`}
+                      alt={`Stamp #${stamp.stamp}`}
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-          <div class="swiper-pagination mt-12 hidden tablet:block"></div>
+          <div
+            class={`
+              swiper-pagination
+              hidden tablet:block
+              pt-[36px]
+            `}
+          >
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Carousel;
+}

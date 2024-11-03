@@ -1,5 +1,7 @@
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 
+// FIXME: transition this to stampsection
+
 const LatestTransfer = ({ transactions }) => {
   // Map transactions to match the expected shape by StampCard
   const stamps = transactions.map((tx) => ({
@@ -22,9 +24,8 @@ const LatestTransfer = ({ transactions }) => {
           <StampCard
             key={index}
             stamp={stamp}
-            kind="stamp"
             isRecentSale={false}
-            showInfo={false}
+            showDetails={false}
           />
         ))}
       </div>

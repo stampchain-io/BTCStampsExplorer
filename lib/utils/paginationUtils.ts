@@ -1,12 +1,12 @@
 import { PaginationQueryParams } from "globals";
 
 export function getPaginationParams(url: URL): PaginationQueryParams {
-  let defaultLimit = 24;
+  let defaultLimit = 50;
 
   if (url.pathname.includes("/wallet/")) {
-    defaultLimit = 24;
+    defaultLimit = 32;
   } else {
-    defaultLimit = 1000;
+    defaultLimit = 500;
   }
 
   const limit = Number(url.searchParams.get("limit")) || defaultLimit;

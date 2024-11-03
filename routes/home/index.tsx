@@ -24,6 +24,7 @@ type HomePageProps = {
     src20s: any[];
     trendingSrc20s: any[]; // <-- Add this line
     collectionData: CollectionRow[];
+    carouselStamps: StampRow[];
   };
 };
 
@@ -72,13 +73,14 @@ export default function Home(props: HomePageProps) {
     collectionData = [],
     src20s = [],
     trendingSrc20s = [],
+    carouselStamps = [],
   } = props.data || {};
 
   return (
     <div class="relative flex flex-col gap-10 tablet:gap-24 text-white py-10 tablet:py-24">
       <HomeHeader />
 
-      <HomeCarousel />
+      <HomeCarousel carouselStamps={carouselStamps} />
 
       <HomeStampPreview
         stamps_art={stamps_art}

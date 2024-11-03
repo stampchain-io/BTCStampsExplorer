@@ -1,10 +1,10 @@
 import Carousel from "$islands/Carousel.tsx";
-import { IS_BROWSER } from "$fresh/runtime.ts";
+import { StampRow } from "globals";
 
-export const HomeCarousel = () => {
-  if (!IS_BROWSER) {
-    return <div>Loading carousel...</div>;
-  } else {
-    return <Carousel />;
-  }
-};
+interface HomeCarouselProps {
+  carouselStamps: StampRow[];
+}
+
+export function HomeCarousel({ carouselStamps }: HomeCarouselProps) {
+  return <Carousel stamps={carouselStamps} />;
+}
