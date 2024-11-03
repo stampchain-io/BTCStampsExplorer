@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { OlgaContent } from "$islands/stamping/stamp/OlgaContent.tsx";
-import StampSection from "$components/stamp/StampSection.tsx";
+import StampSection from "$islands/stamp/StampSection.tsx";
 import { FAQModule } from "$islands/modules/FAQStamping.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import type { StampRow } from "globals";

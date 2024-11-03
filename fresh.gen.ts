@@ -163,6 +163,7 @@ import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
+import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
 import * as $stamp_details_StampBuyModal from "./islands/stamp/details/StampBuyModal.tsx";
 import * as $stamp_details_StampCodeModal from "./islands/stamp/details/StampCodeModal.tsx";
 import * as $stamp_details_StampImage from "./islands/stamp/details/StampImage.tsx";
@@ -390,6 +391,7 @@ const manifest = {
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
+    "./islands/stamp/StampSection.tsx": $stamp_StampSection,
     "./islands/stamp/details/StampBuyModal.tsx": $stamp_details_StampBuyModal,
     "./islands/stamp/details/StampCodeModal.tsx": $stamp_details_StampCodeModal,
     "./islands/stamp/details/StampImage.tsx": $stamp_details_StampImage,

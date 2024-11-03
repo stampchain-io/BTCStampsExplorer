@@ -1,6 +1,6 @@
 import { StampRow, StampSectionProps } from "globals";
 
-import StampSection from "$components/stamp/StampSection.tsx";
+import StampSection from "$islands/stamp/StampSection.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 import { CollectionList } from "$islands/collection/CollectionList.tsx";
 import { Collection } from "globals";
