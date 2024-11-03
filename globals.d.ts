@@ -115,6 +115,7 @@ export interface StampSectionProps {
   showDetails?: boolean;
   gridClass?: string;
   displayCounts?: DisplayCountBreakpoints;
+  pagination?: Pagination;
 }
 
 export interface SRC20Row {
@@ -708,3 +709,16 @@ declare global {
   }
 }
 export {};
+
+export interface PaginationProps {
+  page: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
+}
+
+export interface WalletStampSectionProps extends StampSectionProps {
+  pagination?: PaginationProps;
+  customHeader?: boolean;
+  customGridClass?: string;
+}

@@ -1,12 +1,12 @@
-import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { Handlers } from "$fresh/server.ts";
 
 import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
 import WalletDetails from "$islands/Wallet/details/WalletDetails.tsx";
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
-
-import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
+import { BTCAddressService } from "$server/services/btc/addressService.ts";
+import { serverConfig } from "$server/config/config.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 import { WalletData } from "$types/index.d.ts";
 
 type WalletPageProps = {
@@ -30,78 +30,118 @@ type WalletPageProps = {
 };
 
 export const handler: Handlers = {
-  async GET(_req, ctx) {
+  async GET(req, ctx) {
     const { address } = ctx.params;
+    const url = new URL(req.url);
+    const { limit, page } = getPaginationParams(url);
 
-    const url = new URL(_req.url);
-    const { page, limit } = getPaginationParams(url);
-    const selectedTab = url.searchParams.get("ident") || "my_items";
+    try {
+      // Fetch all required data in parallel
+      const [stampsResponse, src20Response, btcInfo, btcPrice] = await Promise
+        .all([
+          // Stamps data with pagination
+          fetch(
+            `${serverConfig.API_BASE_URL}/api/v2/stamps/balance/${address}?page=${page}&limit=${limit}`,
+          ),
+          // SRC20 data with pagination
+          fetch(
+            `${serverConfig.API_BASE_URL}/api/v2/src20/balance/${address}?page=${page}&limit=${limit}`,
+          ),
+          // BTC wallet info
+          BTCAddressService.getAddressInfo(address),
+          // BTC price
+          fetchBTCPriceInUSD(serverConfig.API_BASE_URL),
+        ]);
 
-    const responseData = await Src20Controller.handleWalletBalanceRequest(
-      address,
-      limit,
-      page,
-    );
+      const stampsData = await stampsResponse.json();
+      const src20Data = await src20Response.json();
 
-    const data = {
-      ...responseData,
-      selectedTab,
-    };
+      // Construct wallet data
+      const walletData = {
+        balance: btcInfo?.balance ?? 0,
+        usdValue: (btcInfo?.balance ?? 0) * btcPrice,
+        address,
+        fee: btcInfo?.fee_per_vbyte ?? 0,
+        btcPrice: btcPrice,
+      };
 
-    return ctx.render(data);
+      return ctx.render({
+        stamps: {
+          data: stampsData.data,
+          pagination: {
+            page: stampsData.page,
+            limit: stampsData.limit,
+            total: stampsData.total,
+            totalPages: stampsData.totalPages,
+          },
+        },
+        src20: {
+          data: src20Data.data,
+          pagination: {
+            page: src20Data.page,
+            limit: src20Data.limit,
+            total: src20Data.total,
+            totalPages: src20Data.totalPages,
+          },
+        },
+        walletData,
+        address,
+        stampsTotal: stampsData.total || 0,
+        src20Total: src20Data.total || 0,
+        selectedTab: "my_items",
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      // Return safe default state
+      return ctx.render({
+        stamps: {
+          data: [],
+          pagination: { page: 1, limit, total: 0, totalPages: 0 },
+        },
+        src20: {
+          data: [],
+          pagination: { page: 1, limit, total: 0, totalPages: 0 },
+        },
+        walletData: {
+          balance: 0,
+          usdValue: 0,
+          address,
+          fee: 0,
+          btcPrice: 0,
+        },
+        address,
+        stampsTotal: 0,
+        src20Total: 0,
+        selectedTab: "my_items",
+      });
+    }
   },
 };
 
 export default function Wallet(props: WalletPageProps) {
   const { data } = props;
-  const { stamps, src20 } = data.data;
-  const {
-    selectedTab,
-    address,
-    btc,
-    pagination,
-  } = data;
-
-  const filterBy: STAMP_FILTER_TYPES[] = [];
-  const sortBy = "DESC";
-  const type: STAMP_TYPES = "all";
-  const stampsTotal = stamps.length;
-  const src20Total = src20.length;
-  const { page, limit, totalPages, total } = pagination;
-  const stampsCreated =
-    stamps.filter((stamp) => stamp.creator === address).length;
-  const showItem: string = "stamp";
-  // const [showItem, setShowItem] = useState<string>("stamp");
-
-  const handleShowItem = (itemType: string) => {
-    console.log(itemType);
-  };
 
   return (
     <div class="flex flex-col gap-8">
       <WalletHeader
-        filterBy={filterBy}
-        sortBy={sortBy}
-        selectedTab={selectedTab}
-        address={address}
-        type={type}
+        filterBy={[]}
+        sortBy="DESC"
+        selectedTab={data.selectedTab}
+        address={data.address}
+        type="all"
       />
       <WalletDetails
-        walletData={btc}
-        stampsTotal={stampsTotal}
-        src20Total={src20Total}
-        stampsCreated={stampsCreated}
-        setShowItem={handleShowItem}
+        walletData={data.walletData}
+        stampsTotal={data.stampsTotal}
+        src20Total={data.src20Total}
+        stampsCreated={0}
+        setShowItem={() => {}}
       />
       <WalletContent
-        stamps={stamps}
-        src20={src20}
-        page={page}
-        limit={limit}
-        totalPages={totalPages}
-        total={total}
-        address={address}
-        showItem={showItem}
+        stamps={data.stamps}
+        src20={data.src20}
+        address={data.address}
+        showItem="stamp"
       />
     </div>
   );

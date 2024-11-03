@@ -1,5 +1,4 @@
 import { useEffect, useState } from "preact/hooks";
-import { StampCard } from "$islands/stamp/StampCard.tsx";
 import StampingMintingItem from "$islands/stamping/src20/mint/StampingMintingItem.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { Search } from "$islands/datacontrol/Search.tsx";
@@ -9,11 +8,30 @@ import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import WalletTransferModal from "$islands/Wallet/details/WalletTransferModal.tsx";
 import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
+import StampSection from "$islands/stamp/StampSection.tsx";
+import { StampRow } from "globals";
 
 interface WalletContentProps {
-  stamps: any[];
-  src20: any[];
+  stamps: {
+    data: StampRow[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+  src20: {
+    data: any[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
   showItem: string;
+  address: string;
 }
 
 interface DispenserProps {
@@ -31,10 +49,10 @@ interface DispensersProps {
 }
 
 const dispensers = [{
-  "tx_hash": "a22c9d9b6f501372f10e774cb59fb552b6e9b6fd13968d85e5ed1070d6e17788",
+  "tx_hash": "coming soon",
   "block_index": 851464,
   "source": "bc1q5enuu0mz6rl900uvgfvz6leeud0kzx9czkrycm",
-  "cpid": "A884818687298258698",
+  "cpid": "STAMP",
   "give_quantity": 1,
   "give_remaining": 1,
   "escrow_quantity": 1,
@@ -292,7 +310,9 @@ function DispenserItem() {
   );
 }
 
-function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
+function WalletContent(
+  { stamps, src20, address, showItem }: WalletContentProps,
+) {
   const [filterBy, setFilterBy] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("ASC");
   const [openS, setOpenS] = useState<boolean>(false);
@@ -301,6 +321,10 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
+  const [currentStampsPage, setCurrentStampsPage] = useState(
+    stamps.pagination.page,
+  );
+  const [currentSrc20Page, setCurrentSrc20Page] = useState(1);
 
   const handleOpenSettingModal = () => {
     setOpenSettingModal(!openSettingModal);
@@ -330,7 +354,7 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
 
   useEffect(() => {
     // Get the current URL
-    const currentUrl = window.location.href;
+    const currentUrl = globalThis.location.href;
 
     // Create a URL object
     const url = new URL(currentUrl);
@@ -345,6 +369,61 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
     }
   }, []);
 
+  const handleStampsPageChange = async (page: number) => {
+    try {
+      const response = await fetch(
+        `/api/v2/stamps/balance/${address}?page=${page}&limit=${stamps.pagination.limit}`,
+      );
+      const data = await response.json();
+      // Update stamps data in state
+      setCurrentStampsPage(page);
+      // You'll need to implement state management here to update the stamps data
+    } catch (error) {
+      console.error("Error fetching stamps page:", error);
+    }
+  };
+
+  const handleSrc20PageChange = async (page: number) => {
+    try {
+      // Use the src20-specific endpoint
+      const response = await fetch(
+        `/api/v2/src20/balance/${address}?page=${page}&limit=${src20.pagination.limit}`,
+      );
+      const data = await response.json();
+      // Update src20 data
+    } catch (error) {
+      console.error("Error fetching src20 page:", error);
+    }
+  };
+
+  const stampSection = {
+    title: "", // Empty title means no header
+    type: "all",
+    stamps: stamps.data,
+    layout: "grid",
+    showDetails: true,
+    gridClass: `
+      grid w-full
+      gap-[12px]
+      mobileSm:gap-[12px]
+      mobileLg:gap-[24px]
+      tablet:gap-[24px]
+      desktop:gap-[24px]
+      grid-cols-2
+      mobileSm:grid-cols-2
+      mobileLg:grid-cols-4
+      tablet:grid-cols-3
+      desktop:grid-cols-4
+      auto-rows-fr
+    `,
+    pagination: {
+      page: currentStampsPage,
+      pageSize: stamps.pagination.limit,
+      total: stamps.pagination.total,
+      onPageChange: handleStampsPageChange,
+    },
+  };
+
   return (
     <>
       <div>
@@ -357,30 +436,8 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
           isOpenSetting={openSetting}
           handleOpenSetting={handleOpenSetting}
         />
-        <div className="grid grid-cols-4 tablet:grid-cols-6 desktop:grid-cols-8 gap-2 tablet:gap-4 mt-6">
-          {stamps.map((stamp, index) => (
-            <StampCard
-              key={index}
-              stamp={stamp}
-              kind="stamp"
-              isRecentSale={false}
-              showInfo={false}
-              showDetails={true}
-            />
-          ))}
-        </div>
+        <StampSection {...stampSection} />
       </div>
-
-      {stamps.length && (
-        <Pagination
-          page={1}
-          page_size={8}
-          key="Stamp Card"
-          type="stamp_card_id"
-          data_length={1}
-          pages={stamps.length / 8}
-        />
-      )}
 
       <div className="mt-48">
         <ItemHeader
@@ -392,7 +449,7 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
         />
         <div className="mt-6">
           <SRC20DeployTable
-            data={src20}
+            data={src20.data}
           />
           {
             /* {src20.map((src20Item, index) => (
@@ -406,14 +463,14 @@ function WalletContent({ stamps, src20, showItem }: WalletContentProps) {
       </div>
 
       {/* Listening Pagination */}
-      {src20.length && (
+      {src20.data.length && (
         <Pagination
           page={1}
           page_size={8}
           key="Token"
           type="Token_id"
           data_length={8}
-          pages={src20.length / 8}
+          pages={src20.data.length / 8}
         />
       )}
 
