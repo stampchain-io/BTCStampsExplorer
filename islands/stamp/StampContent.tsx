@@ -1,6 +1,7 @@
 import { StampCard } from "./StampCard.tsx";
 import { StampRow } from "globals";
 
+// FIXME: transition this to stampsection
 export function StampContent({ stamps, isRecentSales = false }: {
   stamps: (StampRow & {
     sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
@@ -14,10 +15,9 @@ export function StampContent({ stamps, isRecentSales = false }: {
         <StampCard
           key={stamp.tx_hash}
           stamp={stamp}
-          kind="stamp"
           isRecentSale={isRecentSales}
-          showInfo={true}
           showDetails={true}
+          variant="grey"
         />
       ))}
     </div>

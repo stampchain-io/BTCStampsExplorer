@@ -2,33 +2,114 @@ import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
+import { BREAKPOINTS } from "$client/utils/constants.ts";
 
 import {
   abbreviateAddress,
-  formatSatoshisToBTC,
+  // formatSatoshisToBTC,
   getFileSuffixFromMime,
   getSupply,
 } from "$lib/utils/util.ts";
 
+import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
+
 dayjs.extend(relativeTime);
+
+// Text style constants for different breakpoints
+
+// TODO add a variant for the inline detail display
+
+const TEXT_STYLES = {
+  hashSymbol: {
+    base: "font-light text-stamp-purple-bright",
+    sizes:
+      "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl", // deviation from design
+  },
+  stampNumber: {
+    base: "font-black text-stamp-purple-bright truncate max-w-full",
+    // sizes: "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl group-data-[long-number=true]:text-sm group-data-[long-number=true]:mobileSm:text-sm group-data-[long-number=true]:mobileLg:text-base group-data-[long-number=true]:tablet:text-lg group-data-[long-number=true]:desktop:text-xl",
+    sizes:
+      "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl",
+  },
+  creator: {
+    base: "font-bold text-stamp-grey break-words text-center",
+    sizes:
+      "text-base mobileSm:text-base mobileLg:text-lg tablet:text-lg desktop:text-lg", // deviation from design
+  },
+  price: {
+    base: "font-medium text-stamp-grey  text-nowrap",
+    sizes:
+      "text-xs mobileSm:text-xs mobileLg:text-sm tablet:text-sm desktop:text-base",
+  },
+  supply: {
+    base: "font-bold text-stamp-grey-darker text-right",
+    sizes:
+      "text-sm mobileSm:text-sm mobileLg:text-base tablet:text-base desktop:text-lg",
+  },
+  minimal: {
+    hashSymbol: {
+      base: "font-light text-stamp-grey-darker",
+      sizes:
+        "text-xs mobileSm:text-xs mobileLg:text-xl tablet:text-xl desktop:text-xl",
+    },
+    stampNumber: {
+      base: "font-black text-stamp-grey-darker truncate",
+      sizes:
+        "text-xs mobileSm:text-xs mobileLg:text-xl tablet:text-xl desktop:text-xl",
+    },
+    price: {
+      base: "font-medium text-stamp-grey truncate text-nowrap",
+      sizes:
+        "text-[10px] mobileSm:text-[10px] mobileLg:text-base tablet:text-base desktop:text-base",
+    },
+  },
+  greyGradient: {
+    hashSymbol: {
+      base: "font-light text-stamp-grey-darker",
+      sizes:
+        "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-3xl",
+    },
+    stampNumber: {
+      base: "font-black text-stamp-grey-darker truncate max-w-full",
+      sizes:
+        "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl", // deviation from design
+    },
+  },
+} as const;
+
+const ABBREVIATION_LENGTHS = {
+  desktop: 8,
+  tablet: 6,
+  mobileLg: 6,
+  mobileSm: 4,
+} as const;
 
 export function StampCard({
   stamp,
-  kind = "stamp",
   isRecentSale = false,
-  showInfo = true,
-  abbreviationLength = 6,
-  showDetails = false,
+  showDetails = true,
+  showMinDetails = false,
+  variant = "default",
 }: {
   stamp: StampRow & {
     sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
   };
-  kind: "cursed" | "stamp" | "named";
   isRecentSale?: boolean;
-  showInfo?: boolean;
-  abbreviationLength?: number;
   showDetails?: boolean;
+  showMinDetails?: boolean;
+  variant?: "default" | "grey";
 }) {
+  // Add window size hook
+  const { width } = useWindowSize();
+
+  // Function to get current abbreviation length based on screen size
+  const getAbbreviationLength = () => {
+    if (width >= BREAKPOINTS.desktop) return ABBREVIATION_LENGTHS.desktop;
+    if (width >= BREAKPOINTS.tablet) return ABBREVIATION_LENGTHS.tablet;
+    if (width >= BREAKPOINTS.mobileLg) return ABBREVIATION_LENGTHS.mobileLg;
+    return ABBREVIATION_LENGTHS.mobileSm;
+  };
+
   let src: string;
   const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
   src = `/content/${stamp.tx_hash}.${suffix}`;
@@ -79,9 +160,9 @@ export function StampCard({
 
   const renderPrice = () => {
     if (isRecentSale && stamp.sale_data) {
-      return `${formatSatoshisToBTC(stamp.sale_data.btc_amount)}`;
+      return `${stamp.sale_data.btc_amount.toLocaleString()} SATS`;
     } else if (Number.isFinite(stamp.floorPrice)) {
-      return `${stamp.floorPrice} BTC`;
+      return `${Number(stamp.floorPrice).toLocaleString()} SATS`; // FIXME: this may be in BTC..
     } else {
       return "NOT LISTED";
     }
@@ -98,76 +179,134 @@ export function StampCard({
     }`
     : `1/${getSupply(stamp.supply, stamp.divisible)}`;
 
+  // Use dynamic abbreviation length
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
-    : abbreviateAddress(stamp.creator, abbreviationLength);
+    : abbreviateAddress(stamp.creator, getAbbreviationLength());
+
+  // Helper to get correct text styles based on variant
+  const getTextStyles = (type: "hashSymbol" | "stampNumber") => {
+    if (variant === "grey") {
+      return {
+        base: TEXT_STYLES.greyGradient[type].base,
+        sizes: TEXT_STYLES.greyGradient[type].sizes,
+      };
+    }
+    return {
+      base: TEXT_STYLES[type].base,
+      sizes: TEXT_STYLES[type].sizes,
+    };
+  };
+
+  // Add function to check if number is long
+  const isLongNumber = (value: string | number) => {
+    const stringValue = String(value);
+    return stringValue.length > 6;
+  };
+
+  const stampValue = Number(stamp.stamp ?? 0) >= 0 ||
+      (stamp.cpid && stamp.cpid.charAt(0) === "A")
+    ? `${stamp.stamp}`
+    : `${stamp.cpid}`;
 
   return (
-    <div class="relative flex justify-center">
+    <div class="relative flex justify-center w-full h-full">
       <a
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
         f-partial={`/stamp/${stamp.tx_hash}`}
+        data-long-number={isLongNumber(stampValue)}
         class={`
           text-white group relative z-0 flex flex-col
           p-stamp-card-lg mobileLg:p-3
           rounded-stamp transition-all
-          w-full
+          w-full h-full
           hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
           bg-stamp-card-bg
         `}
       >
-        {/* Image Container */}
-        <div className="relative w-full">
-          <div className="aspect-stamp overflow-hidden image-rendering-pixelated w-full">
+        {/* Image Container - Made more flexible */}
+        <div className="relative w-full h-full">
+          <div className="aspect-stamp w-full h-full overflow-hidden image-rendering-pixelated">
             <div className="center relative w-full h-full">
               {renderContent()}
             </div>
           </div>
         </div>
 
-        {/* Info Section */}
-        {showInfo && (
-          <div class="flex flex-col font-medium px-2 tablet:px-3">
-            {showDetails && (
-              <>
-                {/* Stamp Number */}
-                <div class="pt-1 text-center">
-                  {shouldDisplayHash && (
-                    <span class="text-stamp-grey-darker text-lg mobileLg:text-xl tablet:text-2xl desktop:text-3xl font-light font-work-sans">
-                      #
-                    </span>
-                  )}
-                  <span class="text-lg mobileLg:text-xl tablet:text-2xl desktop:text-3xl font-black 
-                    bg-stamp-text-grey bg-clip-text text-fill-transparent">
-                    {Number(stamp.stamp ?? 0) >= 0 ||
-                        (stamp.cpid && stamp.cpid.charAt(0) === "A")
-                      ? `${stamp.stamp}`
-                      : `${stamp.cpid}`}
-                  </span>
-                </div>
+        {/* Full Details Section with variant support */}
+        {showDetails && !showMinDetails && (
+          <div class="flex flex-col items-center px-2 tablet:px-3 py-2">
+            {/* Stamp Number with container */}
+            <div class="flex items-center justify-center max-w-[90%]">
+              {shouldDisplayHash && (
+                <span
+                  class={`${getTextStyles("hashSymbol").base} ${
+                    getTextStyles("hashSymbol").sizes
+                  }`}
+                >
+                  #
+                </span>
+              )}
+              <span
+                class={`${getTextStyles("stampNumber").base} ${
+                  getTextStyles("stampNumber").sizes
+                }`}
+              >
+                {stampValue}
+              </span>
+            </div>
 
-                {/* Creator Name or Abbreviated Address */}
-                <div class="text-stamp-grey text-base mobileLg:text-base tablet:text-lg desktop:text-xl 
-                  font-bold font-work-sans break-words truncate text-center">
-                  {creatorDisplay}
-                </div>
+            {/* Creator Name or Abbreviated Address */}
+            <div
+              class={`${TEXT_STYLES.creator.base} ${TEXT_STYLES.creator.sizes}`}
+            >
+              {creatorDisplay}
+            </div>
 
-                {/* Price and Supply */}
-                <div class="flex justify-between mt-2">
-                  {/* Render Price on the Left */}
-                  <div class="truncate text-nowrap">
-                    <span class="text-stamp-grey text-xs tablet:text-sm desktop:text-base desktop:text-base font-medium font-work-sans">
-                      {renderPrice()}
-                    </span>
-                  </div>
-                  <div class="text-stamp-grey-darker text-xs mobileLg:text-sm tablet:text-base desktop:text-lg 
-                    font-bold font-work-sans text-right">
-                    {supplyDisplay}
-                  </div>
-                </div>
-              </>
-            )}
+            {/* Price and Supply */}
+            <div class="flex justify-between w-full mt-2">
+              {/* Render Price on the Left */}
+              <div class="flex-1 text-left">
+                <span
+                  class={`${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`}
+                >
+                  {renderPrice()}
+                </span>
+              </div>
+              <div
+                class={`${TEXT_STYLES.supply.base} ${TEXT_STYLES.supply.sizes} flex-1 text-right`}
+              >
+                {supplyDisplay}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Minimal Details Section */}
+        {showMinDetails && !showDetails && (
+          <div class="flex flex-col items-center px-2 tablet:px-3 py-2">
+            <div class="flex items-center justify-center">
+              {shouldDisplayHash && (
+                <span
+                  class={`${TEXT_STYLES.minimal.hashSymbol.base} ${TEXT_STYLES.minimal.hashSymbol.sizes}`}
+                >
+                  #
+                </span>
+              )}
+              <span
+                class={`${TEXT_STYLES.minimal.stampNumber.base} ${TEXT_STYLES.minimal.stampNumber.sizes}`}
+              >
+                {stampValue}
+              </span>
+            </div>
+            <div class="mt-1">
+              <span
+                class={`${TEXT_STYLES.minimal.price.base} ${TEXT_STYLES.minimal.price.sizes}`}
+              >
+                {renderPrice()}
+              </span>
+            </div>
           </div>
         )}
       </a>

@@ -137,7 +137,6 @@ import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
-import * as $home_HomeStampPreviewDetails from "./islands/home/HomeStampPreviewDetails.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
@@ -360,7 +359,6 @@ const manifest = {
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
-    "./islands/home/HomeStampPreviewDetails.tsx": $home_HomeStampPreviewDetails,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,

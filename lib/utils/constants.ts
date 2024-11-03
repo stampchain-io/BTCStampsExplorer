@@ -13,6 +13,8 @@ export const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
 export const BIG_LIMIT = 200;
 export const SMALL_LIMIT = 50;
 
+export const CAROUSEL_STAMP_IDS = [771859, 746290, 722318, 764500, 757268];
+
 export type WalletProviderKey =
   | "unisat"
   | "leather"

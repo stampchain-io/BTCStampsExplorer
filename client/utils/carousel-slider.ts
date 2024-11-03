@@ -20,10 +20,11 @@ export default function createCarouselSlider(
     grabCursor: true,
     watchSlidesProgress: true,
     loop: true,
-    loopedSlides: 5,
-    loopAdditionalSlides: 5,
+    // loopedSlides: 5,
+    // loopAdditionalSlides: 5,
     slidesPerView: "auto",
     centeredSlides: true,
+    spaceBetween: 24,
     navigation: {
       nextEl: ".swiper-button-next",
       prevEl: ".swiper-button-prev",
@@ -31,9 +32,15 @@ export default function createCarouselSlider(
     pagination: {
       el: ".swiper-pagination",
       clickable: true,
+      dynamicBullets: false,
+      dynamicMainBullets: 5,
       renderBullet: function (index, className) {
-        return '<button class="w-[44px] tablet:w-[88px] h-0 border-2 rounded-[4px] ' +
-          className + '"/>';
+        return `<button class="
+          w-[44px] tablet:w-[88px] 
+          h-0 border-2 
+          rounded-[4px] 
+          ${className}
+        "/>`;
       },
     },
     autoplay: {

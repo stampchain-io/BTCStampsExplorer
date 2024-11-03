@@ -176,7 +176,7 @@ export default {
         "dropdown": "30",
       },
       maxWidth: {
-        "desktop": "1025px",
+        "desktop": "1440px",
       },
     },
   },

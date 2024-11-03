@@ -116,6 +116,8 @@ export interface StampSectionProps {
   gridClass?: string;
   displayCounts?: DisplayCountBreakpoints;
   pagination?: Pagination;
+  showMinDetails?: boolean;
+  variant?: "default" | "grey";
 }
 
 export interface SRC20Row {

@@ -372,7 +372,7 @@ function WalletContent(
   const handleStampsPageChange = async (page: number) => {
     try {
       const response = await fetch(
-        `/api/v2/stamps/balance/${address}?page=${page}&limit=${stamps.pagination.limit}`,
+        `/api/v2/stamps/balance/${address}?page=${page}&limit=${stamps.pagination.limit}`, // FIXME: need to handle src20 pagination separately
       );
       const data = await response.json();
       // Update stamps data in state
@@ -401,19 +401,19 @@ function WalletContent(
     type: "all",
     stamps: stamps.data,
     layout: "grid",
-    showDetails: true,
+    showDetails: false,
     gridClass: `
       grid w-full
       gap-[12px]
       mobileSm:gap-[12px]
       mobileLg:gap-[24px]
       tablet:gap-[24px]
-      desktop:gap-[24px]
+      desktop:gap-[12px]
       grid-cols-2
-      mobileSm:grid-cols-2
-      mobileLg:grid-cols-4
-      tablet:grid-cols-3
-      desktop:grid-cols-4
+      mobileSm:grid-cols-4
+      mobileLg:grid-cols-6
+      tablet:grid-cols-6
+      desktop:grid-cols-8
       auto-rows-fr
     `,
     pagination: {

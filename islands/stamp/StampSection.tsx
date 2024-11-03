@@ -4,26 +4,47 @@ import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { BREAKPOINTS } from "$client/utils/constants.ts";
 
-const BREAKPOINTS = {
-  desktop: 1025,
-  tablet: 769,
-  mobileLg: 569,
-  mobileMd: 421,
-  mobileSm: 360,
-} as const;
+const gridSizeClasses = {
+  small: "w-[123px] h-[123px]",
+  medium: "w-[180px] h-[180px]",
+  large: "w-[294px] h-[294px]",
+  xlarge: "w-[408px] h-[408px]",
+};
+
+// TODO: to better control the stampcard grid
+// Example of dynamic grid class with sizing
+const dynamicGridClass = `
+  grid w-full
+  gap-[12px]
+  mobileSm:gap-[12px]
+  mobileLg:gap-[24px]
+  tablet:gap-[24px]
+  desktop:gap-[24px]
+  grid-cols-2
+  mobileSm:grid-cols-2
+  mobileLg:grid-cols-4
+  tablet:grid-cols-3
+  desktop:grid-cols-4
+  [&>div]:${gridSizeClasses.small}
+  mobileLg:[&>div]:${gridSizeClasses.medium}
+  tablet:[&>div]:${gridSizeClasses.large}
+  desktop:[&>div]:${gridSizeClasses.xlarge}
+`;
 
 export default function StampSection({
   title,
   type,
   stamps,
-  layout,
   isRecentSales,
   filterBy,
   showDetails = false,
   gridClass,
   displayCounts,
   pagination,
+  showMinDetails = false,
+  variant = "default",
 }: StampSectionProps) {
   const stampArray = Array.isArray(stamps) ? stamps : [];
   const [displayCount, setDisplayCount] = useState(stampArray.length);
@@ -125,10 +146,10 @@ export default function StampSection({
             <div key={stamp.tx_hash}>
               <StampCard
                 stamp={stamp}
-                kind="stamp"
                 isRecentSale={isRecentSales}
-                abbreviationLength={layout === "grid" ? 8 : 6}
                 showDetails={showDetails}
+                showMinDetails={showMinDetails}
+                variant={variant}
               />
             </div>
           ))
