@@ -3,7 +3,7 @@ import { StampRow, StampSectionProps } from "globals";
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 
-import StampSection from "$components/stamp/StampSection.tsx";
+import StampSection from "$islands/stamp/StampSection.tsx";
 
 import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
