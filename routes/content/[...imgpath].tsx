@@ -12,7 +12,7 @@ export const handler: Handlers = {
 async function serveImage(imgpath: string): Promise<Response> {
   const mimeType = getMimeType(imgpath.split(".").pop() as string);
 
-  // First, check if the file exists in IMAGES_SRC_PATH
+  // Only try remote path
   if (serverConfig.IMAGES_SRC_PATH) {
     const remotePath = `${serverConfig.IMAGES_SRC_PATH}/${imgpath}`;
     try {
@@ -31,19 +31,19 @@ async function serveImage(imgpath: string): Promise<Response> {
     }
   }
 
-  // If not found in IMAGES_SRC_PATH or if IMAGES_SRC_PATH is not set, check local path
-  const localPath = `${serverConfig.APP_ROOT}/static/${imgpath}`;
-  try {
-    const file = await Deno.readFile(localPath);
-    return new Response(file, {
-      status: 200,
-      headers: {
-        "Content-Type": mimeType,
-      },
-    });
-  } catch (error) {
-    console.error(`Error reading local file: ${error}`);
-  }
+  // // If not found in IMAGES_SRC_PATH or if IMAGES_SRC_PATH is not set, check local path
+  // const localPath = `${serverConfig.APP_ROOT}/static/${imgpath}`;
+  // try {
+  //   const file = await Deno.readFile(localPath);
+  //   return new Response(file, {
+  //     status: 200,
+  //     headers: {
+  //       "Content-Type": mimeType,
+  //     },
+  //   });
+  // } catch (error) {
+  //   console.error(`Error reading local file: ${error}`);
+  // }
 
   // If file is not found in either location, serve the not-available image
   return await serveNotAvailableImage();
