@@ -676,6 +676,7 @@ export interface Collection {
   creators: string;
   stamp_count: number;
   first_stamp_image?: string | null;
+  stamp_images?: string[] | null;
 }
 
 export interface CollectionQueryParams extends PaginationQueryParams {

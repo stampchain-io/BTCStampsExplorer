@@ -71,7 +71,9 @@ import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
-import * as $collection_overview_index from "./routes/collection/overview/index.tsx";
+import * as $collection_overview_artist from "./routes/collection/overview/artist.tsx";
+import * as $collection_overview_posh from "./routes/collection/overview/posh.tsx";
+import * as $collection_overview_recursive from "./routes/collection/overview/recursive.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $design_system from "./routes/design-system.tsx";
@@ -126,7 +128,7 @@ import * as $collection_ArtistCollection from "./islands/collection/ArtistCollec
 import * as $collection_CollectionCreateButton from "./islands/collection/CollectionCreateButton.tsx";
 import * as $collection_CollectionDetailsContent from "./islands/collection/CollectionDetailsContent.tsx";
 import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
-import * as $collection_CollectionOverviewContent from "./islands/collection/CollectionOverviewContent.tsx";
+import * as $collection_CollectionOverviewArtistContent from "./islands/collection/CollectionOverviewArtistContent.tsx";
 import * as $collection_CollectionOverviewHeader from "./islands/collection/CollectionOverviewHeader.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
@@ -283,7 +285,10 @@ const manifest = {
     "./routes/block/index.tsx": $block_index,
     "./routes/collection/details/[id].tsx": $collection_details_id_,
     "./routes/collection/index.tsx": $collection_index,
-    "./routes/collection/overview/index.tsx": $collection_overview_index,
+    "./routes/collection/overview/artist.tsx": $collection_overview_artist,
+    "./routes/collection/overview/posh.tsx": $collection_overview_posh,
+    "./routes/collection/overview/recursive.tsx":
+      $collection_overview_recursive,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/design-system.tsx": $design_system,
@@ -349,8 +354,8 @@ const manifest = {
       $collection_CollectionDetailsContent,
     "./islands/collection/CollectionDetailsHeader.tsx":
       $collection_CollectionDetailsHeader,
-    "./islands/collection/CollectionOverviewContent.tsx":
-      $collection_CollectionOverviewContent,
+    "./islands/collection/CollectionOverviewArtistContent.tsx":
+      $collection_CollectionOverviewArtistContent,
     "./islands/collection/CollectionOverviewHeader.tsx":
       $collection_CollectionOverviewHeader,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,

@@ -481,6 +481,43 @@ export class StampController {
     }
   }
 
+  static async getCollectionPageData() {
+    try {
+      const [
+        stampCategories,
+      ] = await Promise.all([
+        this.getMultipleStampCategories([
+          { idents: ["SRC-721"], limit: 12 },
+        ]),
+      ]);
+      // Fetch the "posh" collection to get its collection_id
+      const poshCollection = await CollectionService.getCollectionByName(
+        "posh",
+      );
+      let stamps_posh = [];
+      if (poshCollection) {
+        const poshCollectionId = poshCollection.collection_id;
+        // Fetch stamps from the "posh" collection with limit and sortBy
+        const poshStampsResult = await this.getStamps({
+          collectionId: poshCollectionId,
+          page: 1,
+          limit: 12, // Limit to 8 stamps
+          sortBy: "DESC", // Adjust sort order if needed
+        });
+        stamps_posh = poshStampsResult.data; // Extract the stamps array
+      } else {
+        console.warn("Posh collection not found");
+      }
+      return {
+        stamps_src721: stampCategories[0].stamps,
+        stamps_posh,
+      };
+    } catch (error) {
+      console.error("Error in getHomePageData:", error);
+      throw error;
+    }
+  }
+
   static getIdent(type: string) {
     switch (type) {
       case "src721":

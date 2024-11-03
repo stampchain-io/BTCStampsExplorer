@@ -10,8 +10,10 @@ function CollectionOverviewHeader() {
   };
 
   return (
-    <div class="flex flex-col-reverse lg:flex-row justify-between items-center w-full">
-      <p className="purple-gradient1 text-6xl font-black">COLLECTIONS</p>
+    <div class="flex justify-between items-center w-full">
+      <p className="purple-gradient1 text-4xl mobileLg:text-6xl font-black">
+        COLLECTIONS
+      </p>
       <div class="h-[40px]">
         <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
       </div>

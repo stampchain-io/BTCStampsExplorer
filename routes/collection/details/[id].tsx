@@ -11,6 +11,7 @@ import { CollectionService } from "$server/services/collectionService.ts";
 type CollectionDetailsPageProps = {
   data: {
     id: string;
+    collection: any;
     stamps: StampRow[];
     total: number;
     page: number;
@@ -60,6 +61,7 @@ export const handler: Handlers = {
 
       const data = {
         id,
+        collection, // Add this
         stamps: result.data,
         page: result.page,
         pages: result.totalPages,
@@ -82,11 +84,12 @@ export default function CollectionDetails(props: CollectionDetailsPageProps) {
     page,
     pages,
     page_size,
+    collection,
   } = props.data;
 
   return (
     <div class="flex flex-col gap-8">
-      <CollectionDetailsHeader id={id} />
+      <CollectionDetailsHeader collection={collection} stamps={stamps} />
       <CollectionDetailsContent stamps={stamps} />
       <Pagination
         page={page}

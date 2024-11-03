@@ -464,17 +464,24 @@ export class StampRepository {
     let groupByClause = "";
 
     if (groupBy && groupBySubquery && collectionId) {
-      const collectionIdPlaceholders = Array.isArray(collectionId)
-        ? collectionId.map(() => "UNHEX(?)").join(", ")
-        : "UNHEX(?)";
+      // const collectionIdPlaceholders = Array.isArray(collectionId)
+      //   ? collectionId.map(() => "UNHEX(?)").join(", ")
+      //   : "UNHEX(?)";
 
-      joinClause += `
-        JOIN (
-          SELECT ${groupBy}, MAX(stamp) as first_stamp
-          FROM collection_stamps
-          WHERE collection_id IN (${collectionIdPlaceholders})
-          GROUP BY ${groupBy}
-        ) fs ON cs1.${groupBy} = fs.${groupBy} AND st.stamp = fs.first_stamp
+      // joinClause += `
+      //   JOIN (
+      //     SELECT ${groupBy}, MAX(stamp) as first_stamp
+      //     FROM collection_stamps
+      //     WHERE collection_id IN (${collectionIdPlaceholders})
+      //     GROUP BY ${groupBy}
+      //   ) fs ON cs1.${groupBy} = fs.${groupBy} AND st.stamp = fs.first_stamp
+      // `;
+
+      // Remove the subquery that was limiting to first stamp per collection
+      // Instead, use a simple JOIN
+      joinClause = `
+        JOIN collection_stamps cs1 ON st.stamp = cs1.stamp
+        LEFT JOIN creator AS cr ON st.creator = cr.address
       `;
 
       // Add collectionId to queryParams if it's not already there

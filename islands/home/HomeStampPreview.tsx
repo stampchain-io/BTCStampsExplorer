@@ -1,9 +1,8 @@
-import { StampRow, StampSectionProps } from "globals";
-
+import { Collection, StampRow, StampSectionProps } from "globals";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
-import { CollectionOverviewContent } from "../collection/CollectionOverviewContent.tsx";
+import { CollectionOverviewArtistContent } from "../collection/CollectionOverviewArtistContent.tsx";
 // import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 
 export function HomeStampPreview({
@@ -225,7 +224,7 @@ export function HomeStampPreview({
         </p>
 
         {/* FEATURED COLLECTIONS */}
-        <CollectionOverviewContent collections={collectionData} />
+        <CollectionOverviewArtistContent collections={collectionData} />
       </div>
 
       {/* RECENT SALES */}
