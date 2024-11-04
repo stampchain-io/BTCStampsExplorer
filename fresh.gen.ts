@@ -85,6 +85,7 @@ import * as $home_index from "./routes/home/index.tsx";
 import * as $howto_deploytoken_index from "./routes/howto/deploytoken/index.tsx";
 import * as $howto_getstamping_index from "./routes/howto/getstamping/index.tsx";
 import * as $howto_index from "./routes/howto/index.tsx";
+import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/index.tsx";
 import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.tsx";
 import * as $howto_mint_index from "./routes/howto/mint/index.tsx";
 import * as $howto_transfer_index from "./routes/howto/transfer/index.tsx";
@@ -298,6 +299,7 @@ const manifest = {
     "./routes/howto/deploytoken/index.tsx": $howto_deploytoken_index,
     "./routes/howto/getstamping/index.tsx": $howto_getstamping_index,
     "./routes/howto/index.tsx": $howto_index,
+    "./routes/howto/leatherconnect/index.tsx": $howto_leatherconnect_index,
     "./routes/howto/leathercreate/index.tsx": $howto_leathercreate_index,
     "./routes/howto/mint/index.tsx": $howto_mint_index,
     "./routes/howto/transfer/index.tsx": $howto_transfer_index,
