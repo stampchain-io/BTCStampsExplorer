@@ -1,30 +1,8 @@
 import { Head } from "$fresh/runtime.ts";
 
-interface PlaceholderImageProps {
-  width: number;
-  height: number;
-}
-
-function PlaceholderImage({ width, height }: PlaceholderImageProps) {
-  return (
-    <div
-      className="bg-gradient-to-b from-[#CC0000] via-[#CCCC00] to-[#0000CC] flex justify-center items-center mx-auto"
-      style={{ maxWidth: `${width}px`, height: `${height}px`, width: "100%" }}
-    >
-      <img
-        src="/img/icons/image-upload.svg"
-        className="w-[72px] h-[72px]"
-        alt="Placeholder"
-        width={72}
-        height={72}
-      />
-    </div>
-  );
-}
-
 export default function HowTo() {
   return (
-    <div className="text-[#CCCCCC] text-xl font-medium flex flex-col gap-12 mt-20 md:mt-40">
+    <div className="text-[#CCCCCC] text-xl font-medium flex flex-col gap-12 mt-20 md:mt-5">
       <section className="mb-6">
         <h1 className="gray-gradient3 text-6xl font-black">HOW-TO</h1>
         <h2 className="text-2xl md:text-5xl font-extralight mb-3">
@@ -47,7 +25,11 @@ export default function HowTo() {
           DEPLOY YOUR OWN TOKEN
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <PlaceholderImage width={432} height={243} />
+          <img
+            src="/img/how-tos/deploy/00.png"
+            width="432px"
+            alt="Screenshot"
+          />
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
               To deploy an SRC-20 token, stamp the transaction on Bitcoin with
@@ -66,7 +48,7 @@ export default function HowTo() {
           </div>
         </div>
       </section>
-
+      <b />
       <section>
         <h2 className="text-2xl md:text-5xl font-extralight mb-3">
           MINT YOUR TOKEN
@@ -86,19 +68,27 @@ export default function HowTo() {
               READ MORE
             </a>
           </div>
-          <PlaceholderImage width={432} height={243} />
+          <img
+            src="/img/how-tos/mintsrc20/00.png"
+            width="432px"
+            alt="Screenshot"
+          />
         </div>
       </section>
-
+      <b />
       <section>
         <h2 className="text-2xl md:text-5xl font-extralight mb-3">
           STAMPING ART
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <PlaceholderImage width={432} height={243} />
+          <img
+            src="/img/how-tos/stamping/00.png"
+            width="432px"
+            alt="Screenshot"
+          />
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
-              Art is Art In this guide, you'll learn how to stamp art!
+              Art is Art.<br />In this guide, you'll learn how to stamp art!
             </p>
             <a
               href="/howto/getstamping"
@@ -110,7 +100,7 @@ export default function HowTo() {
           </div>
         </div>
       </section>
-
+      <b />
       <section>
         <h2 className="text-2xl md:text-5xl font-extralight mb-3">
           TRANSFER FUNCTIONALITY
@@ -118,31 +108,40 @@ export default function HowTo() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
-              Send an SOS In this guide, you'll learn how to transfer SRC-20
-              tokens and stamp art!
+              Send an SOS{" "}
+              <b />In this guide, you'll learn how to transfer SRC-20 tokens and
+              stamp art!
             </p>
             <a
-              href="/howto/mint"
-              f-partial="/howto/mint"
+              href="/howto/transfer"
+              f-partial="/howto/transfer"
               className="text-base font-extrabold border-2 border-[#999999] text-[#999999] w-[138px] h-[48px] flex justify-center items-center rounded-md"
             >
               READ MORE
             </a>
           </div>
-          <PlaceholderImage width={432} height={243} />
+          <img
+            src="/img/how-tos/transfer/00.png"
+            width="432px"
+            alt="Screenshot"
+          />
         </div>
       </section>
-
+      <b />
       <section>
         <h2 className="text-2xl md:text-5xl font-extralight mb-3">
-          CREATE AND CONNECT A LEATHER WALLET
+          CREATE A LEATHER WALLET
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <PlaceholderImage width={432} height={243} />
+          <img
+            src="/img/how-tos/createleatherwallet/00.png"
+            width="432px"
+            alt="Screenshot"
+          />
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
               New to Bitcoin, Stamps, wallet and others? No worries! <br />
-              In this guide, you'll learn how to stamp art!
+              In this guide, you'll learn how to create a Leather wallet!
             </p>
             <a
               href="/howto/leathercreate"
@@ -154,26 +153,30 @@ export default function HowTo() {
           </div>
         </div>
       </section>
-
+      <b />
       <section>
         <h2 className="text-2xl md:text-5xl font-extralight mb-3">
-          TRANSFER FUNCTIONALITY II
+          CONNECT YOUR LEATHER WALLET
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="md:col-span-2 flex flex-col gap-3">
             <p>
-              Send an SOS In this guide, you'll learn how to transfer SRC-20
-              tokens and stamp art!
+              In this guide, you'll learn how connect your Leather wallet to
+              stampchain.io
             </p>
             <a
-              href="/howto/mint"
-              f-partial="/howto/mint"
+              href="/howto/leatherconnect"
+              f-partial="/howto/leatherconnect"
               className="text-base font-extrabold border-2 border-[#999999] text-[#999999] w-[138px] h-[48px] flex justify-center items-center rounded-md"
             >
               READ MORE
             </a>
           </div>
-          <PlaceholderImage width={432} height={243} />
+          <img
+            src="/img/how-tos/connectleatherwallet/00.png"
+            width="432px"
+            alt="Screenshot"
+          />
         </div>
       </section>
     </div>
