@@ -1,5 +1,4 @@
 import { useEffect, useState } from "preact/hooks";
-import StampingMintingItem from "$islands/stamping/src20/mint/StampingMintingItem.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { Search } from "$islands/datacontrol/Search.tsx";
 import { abbreviateAddress } from "$lib/utils/util.ts";
@@ -451,14 +450,6 @@ function WalletContent(
           <SRC20DeployTable
             data={src20.data}
           />
-          {
-            /* {src20.map((src20Item, index) => (
-            <StampingMintingItem
-              key={index}
-              src20={src20Item}
-            />
-          ))} */
-          }
         </div>
       </div>
 

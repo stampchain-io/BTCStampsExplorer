@@ -69,8 +69,11 @@ import * as $api_v2_upload_src20_background from "./routes/api/v2/upload-src20-b
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
-import * as $collection_id_ from "./routes/collection/[id].tsx";
+import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
+import * as $collection_overview_artist from "./routes/collection/overview/artist.tsx";
+import * as $collection_overview_posh from "./routes/collection/overview/posh.tsx";
+import * as $collection_overview_recursive from "./routes/collection/overview/recursive.tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $design_system from "./routes/design-system.tsx";
@@ -125,8 +128,8 @@ import * as $collection_ArtistCollection from "./islands/collection/ArtistCollec
 import * as $collection_CollectionCreateButton from "./islands/collection/CollectionCreateButton.tsx";
 import * as $collection_CollectionDetailsContent from "./islands/collection/CollectionDetailsContent.tsx";
 import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
-import * as $collection_CollectionHeader from "./islands/collection/CollectionHeader.tsx";
-import * as $collection_CollectionList from "./islands/collection/CollectionList.tsx";
+import * as $collection_CollectionOverviewArtistContent from "./islands/collection/CollectionOverviewArtistContent.tsx";
+import * as $collection_CollectionOverviewHeader from "./islands/collection/CollectionOverviewHeader.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
@@ -148,15 +151,13 @@ import * as $modules_FAQTransfer from "./islands/modules/FAQTransfer.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
+import * as $src20_SRC20Card from "./islands/src20/SRC20Card.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
 import * as $src20_all_SRC20DeployTable from "./islands/src20/all/SRC20DeployTable.tsx";
 import * as $src20_details_SRC20DetailsTab from "./islands/src20/details/SRC20DetailsTab.tsx";
 import * as $src20_details_SRC20TX from "./islands/src20/details/SRC20TX.tsx";
 import * as $src20_details_SRC20TickHeader from "./islands/src20/details/SRC20TickHeader.tsx";
-import * as $src20_minting_LatestMints from "./islands/src20/minting/LatestMints.tsx";
-import * as $src20_minting_SRC20MintingItem from "./islands/src20/minting/SRC20MintingItem.tsx";
-import * as $src20_minting_SRC20MintingTable from "./islands/src20/minting/SRC20MintingTable.tsx";
 import * as $src20_trending_SRC20TrendingMints from "./islands/src20/trending/SRC20TrendingMints.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
@@ -179,7 +180,6 @@ import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/
 import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
 import * as $stamping_src20_mint_MintContent from "./islands/stamping/src20/mint/MintContent.tsx";
 import * as $stamping_src20_mint_PopularMinting from "./islands/stamping/src20/mint/PopularMinting.tsx";
-import * as $stamping_src20_mint_StampingMintingItem from "./islands/stamping/src20/mint/StampingMintingItem.tsx";
 import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/trade/TradeContent.tsx";
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
@@ -280,8 +280,12 @@ const manifest = {
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/block/[id].tsx": $block_id_,
     "./routes/block/index.tsx": $block_index,
-    "./routes/collection/[id].tsx": $collection_id_,
+    "./routes/collection/details/[id].tsx": $collection_details_id_,
     "./routes/collection/index.tsx": $collection_index,
+    "./routes/collection/overview/artist.tsx": $collection_overview_artist,
+    "./routes/collection/overview/posh.tsx": $collection_overview_posh,
+    "./routes/collection/overview/recursive.tsx":
+      $collection_overview_recursive,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/design-system.tsx": $design_system,
@@ -347,8 +351,10 @@ const manifest = {
       $collection_CollectionDetailsContent,
     "./islands/collection/CollectionDetailsHeader.tsx":
       $collection_CollectionDetailsHeader,
-    "./islands/collection/CollectionHeader.tsx": $collection_CollectionHeader,
-    "./islands/collection/CollectionList.tsx": $collection_CollectionList,
+    "./islands/collection/CollectionOverviewArtistContent.tsx":
+      $collection_CollectionOverviewArtistContent,
+    "./islands/collection/CollectionOverviewHeader.tsx":
+      $collection_CollectionOverviewHeader,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
@@ -370,6 +376,7 @@ const manifest = {
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
+    "./islands/src20/SRC20Card.tsx": $src20_SRC20Card,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
     "./islands/src20/all/SRC20DeployTable.tsx": $src20_all_SRC20DeployTable,
@@ -378,11 +385,6 @@ const manifest = {
     "./islands/src20/details/SRC20TX.tsx": $src20_details_SRC20TX,
     "./islands/src20/details/SRC20TickHeader.tsx":
       $src20_details_SRC20TickHeader,
-    "./islands/src20/minting/LatestMints.tsx": $src20_minting_LatestMints,
-    "./islands/src20/minting/SRC20MintingItem.tsx":
-      $src20_minting_SRC20MintingItem,
-    "./islands/src20/minting/SRC20MintingTable.tsx":
-      $src20_minting_SRC20MintingTable,
     "./islands/src20/trending/SRC20TrendingMints.tsx":
       $src20_trending_SRC20TrendingMints,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
@@ -414,8 +416,6 @@ const manifest = {
       $stamping_src20_mint_MintContent,
     "./islands/stamping/src20/mint/PopularMinting.tsx":
       $stamping_src20_mint_PopularMinting,
-    "./islands/stamping/src20/mint/StampingMintingItem.tsx":
-      $stamping_src20_mint_StampingMintingItem,
     "./islands/stamping/src20/trade/TradeContent.tsx":
       $stamping_src20_trade_TradeContent,
     "./islands/stamping/src20/transfer/LatestTransfer.tsx":

@@ -1,9 +1,7 @@
-import { StampRow, StampSectionProps } from "globals";
-
+import { Collection, StampRow, StampSectionProps } from "globals";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { CollectionList } from "$islands/collection/CollectionList.tsx";
-import { Collection } from "globals";
+import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";
 
 export function HomeStampPreview({
   stamps_recent = [],
@@ -241,7 +239,14 @@ export function HomeStampPreview({
             FEATURED COLLECTIONS
           </h1>
         </div>
-        <CollectionList collections={collectionData} />
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
+          {collectionData.slice(0, 3).map((collection) => (
+            <CollectionListCard
+              key={collection.collection_id}
+              collection={collection}
+            />
+          ))}
+        </div>
       </div>
 
       {/* RECENT SALES */}

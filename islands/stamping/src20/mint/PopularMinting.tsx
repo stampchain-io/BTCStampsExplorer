@@ -1,4 +1,4 @@
-import StampingMintingItem from "$islands/stamping/src20/mint/StampingMintingItem.tsx";
+import { SRC20Card } from "$islands/src20/SRC20Card.tsx";
 
 const PopularMinting = ({ transactions }) => {
   if (!transactions || transactions.length === 0) {
@@ -11,12 +11,16 @@ const PopularMinting = ({ transactions }) => {
         TRENDING
       </h1>
       <p className="text-2xl tablet:text-5xl text-[#AA00FF]">POPULAR TOKENS</p>
-      {transactions.map((src20Item, index) => (
-        <StampingMintingItem
-          key={index}
-          src20={src20Item}
-        />
-      ))}
+      <div class="w-full flex flex-col gap-4">
+        {transactions.map((src20) => (
+          <SRC20Card
+            key={src20.tick}
+            src20={src20}
+            variant="minting"
+            onImageClick={() => {}}
+          />
+        ))}
+      </div>
     </div>
   );
 };
