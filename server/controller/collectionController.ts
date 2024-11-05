@@ -59,6 +59,7 @@ export class CollectionController {
         type: "all",
         sortBy: "ASC",
         allColumns: false,
+        limit: 6, // Get 6 stamps per collection
         groupBy: "collection_id", // Ensure this matches the column name
         groupBySubquery: true,
       });
@@ -91,12 +92,24 @@ export class CollectionController {
         JSON.stringify(Array.from(firstStampImageMap.entries()), null, 2),
       );
 
+      // Create a map of collection_id to array of stamp images
+      const stampImagesMap = new Map<string, string[]>();
+      
+      stampResults.stamps.forEach((stamp: { collection_id: string; stamp_url: string }) => {
+        const collectionId = stamp.collection_id.toLowerCase();
+        if (!stampImagesMap.has(collectionId)) {
+          stampImagesMap.set(collectionId, []);
+        }
+        stampImagesMap.get(collectionId)?.push(stamp.stamp_url);
+      });
+
       const collections: Collection[] = collectionsResult.data.map(
         (collection: Collection) => ({
           ...collection,
           first_stamp_image:
             firstStampImageMap.get(collection.collection_id.toLowerCase()) ||
             null,
+            stamp_images: stampImagesMap.get(collection.collection_id.toLowerCase()) || [],
         }),
       );
 

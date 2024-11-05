@@ -4,19 +4,15 @@ import { SRC20_FILTER_TYPES } from "globals";
 
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { Search, SearchResult } from "$islands/datacontrol/Search.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
-import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
 export const SRC20Header = (
-  { filterBy, sortBy, selectedTab }: {
+  { filterBy, sortBy }: {
     filterBy: SRC20_FILTER_TYPES | SRC20_FILTER_TYPES[];
     sortBy: "ASC" | "DESC" | undefined;
     selectedTab: string;
   },
 ) => {
-  const { setTypeOption } = useNavigator();
-
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
   const handleOpen1 = (open: boolean) => {
@@ -28,35 +24,12 @@ export const SRC20Header = (
     setIsOpen2(open);
   };
 
-  const handleResultClick = (result: SearchResult) => {
-    globalThis.location.href = `/src20/${result.tick}`;
-  };
-
   return (
     <div className="tabs">
       <div class="flex flex-row justify-between items-center gap-3 w-full">
-        <div class="flex gap-6 tablet:gap-8 items-end">
-          <p
-            class={`cursor-pointer pb-1 tablet:pb-3 text-base tablet:text-2xl uppercase ${
-              selectedTab === "all"
-                ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
-                : "text-[#8800CC] font-light"
-            }`}
-            onClick={() => setTypeOption("src20", "all", true)}
-          >
-            All
-          </p>
-          <p
-            class={`cursor-pointer pb-1 tablet:pb-3 text-base tablet:text-2xl uppercase ${
-              selectedTab === "trending"
-                ? "text-[#AA00FF] border-b-2 border-b-[#AA00FF] font-bold"
-                : "text-[#8800CC] font-light"
-            }`}
-            onClick={() => setTypeOption("src20", "trending", true)}
-          >
-            Trending
-          </p>
-        </div>
+        <h1 className="text-4xl mobileLg:text-6xl purple-gradient1 font-black">
+          SRC-20 TOKENS
+        </h1>
         <div class="flex gap-3 justify-between h-[40px]">
           <Sort initSort={sortBy} />
           <Filter
