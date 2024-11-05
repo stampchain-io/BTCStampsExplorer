@@ -223,6 +223,27 @@ const debug = (message: string, data?: unknown) => {
   console.log(`Carousel Debug: ${message}`, data);
 };
 
+const getVisibleIndices = (
+  currentIndex: number,
+  totalSlides: number,
+): number[] => {
+  // Calculate the middle of the visible group
+  const middleIndex = Math.floor(totalSlides / 3); // For 15 slides, this is 5
+
+  return [
+    currentIndex - 2, // Outer left
+    currentIndex - 1, // Adjacent left
+    currentIndex, // Center
+    currentIndex + 1, // Adjacent right
+    currentIndex + 2, // Outer right
+  ].map((index) => {
+    // Handle wrapping for loop
+    if (index < 0) return index + totalSlides;
+    if (index >= totalSlides) return index - totalSlides;
+    return index;
+  });
+};
+
 export default function createCarouselSlider(
   el: CarouselElement,
 ): SwiperType | undefined {
@@ -239,18 +260,52 @@ export default function createCarouselSlider(
     speed: CAROUSEL_CONFIG.ANIMATION.SPEED,
     watchSlidesProgress: true,
     allowTouchMove: true,
+    virtualTranslate: true,
 
-    // Disable Swiper's default positioning
-    cssMode: false,
-    virtualTranslate: true, // Prevent Swiper's translations
+    // Enhanced autoplay configuration
+    autoplay: {
+      delay: CAROUSEL_CONFIG.ANIMATION.AUTOPLAY,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: false,
+      waitForTransition: false,
+      enabled: true,
+    },
+
+    // Custom slide transition effect
+    effect: "custom",
 
     on: {
       beforeInit: function (swiper: SwiperType) {
-        // Force wrapper to stay centered
+        swiper.params.cssMode = false;
         swiper.wrapperEl.style.transform = "translate3d(0, 0, 0)";
         swiper.wrapperEl.style.width = "100%";
         swiper.wrapperEl.style.display = "flex";
         swiper.wrapperEl.style.justifyContent = "center";
+      },
+
+      init: function (swiper: SwiperType) {
+        // Force start autoplay
+        swiper.autoplay.start();
+
+        debug("Carousel Initialized:", {
+          autoplay: {
+            running: swiper.autoplay.running,
+            delay: CAROUSEL_CONFIG.ANIMATION.AUTOPLAY,
+          },
+          slides: {
+            total: swiper.slides.length,
+            active: swiper.activeIndex,
+          },
+        });
+      },
+
+      // Add autoplay state monitoring
+      autoplayStart: function (swiper: SwiperType) {
+        debug("Autoplay Started", { running: true });
+      },
+
+      autoplayStop: function (swiper: SwiperType) {
+        debug("Autoplay Stopped", { running: false });
       },
 
       setTranslate: function (swiper: SwiperType) {
@@ -317,7 +372,64 @@ export default function createCarouselSlider(
           });
         }
       },
+
+      afterInit: function (swiper: SwiperType) {
+        // Ensure autoplay starts properly
+        setTimeout(() => {
+          swiper.autoplay.start();
+          debug("Autoplay Started After Init", {
+            running: swiper.autoplay.running,
+            time: Date.now(),
+          });
+        }, 100);
+      },
+
+      autoplay: function (swiper: SwiperType) {
+        const currentIndex = swiper.activeIndex;
+        const nextIndex = (currentIndex + 1) % swiper.slides.length;
+
+        debug("Autoplay Moving:", {
+          current: currentIndex,
+          next: nextIndex,
+          time: Date.now(),
+        });
+
+        // Force slide movement
+        requestAnimationFrame(() => {
+          swiper.slideTo(nextIndex, CAROUSEL_CONFIG.ANIMATION.SPEED);
+        });
+      },
+
+      slideChange: function (swiper: SwiperType) {
+        debug("Slide Changed:", {
+          activeIndex: swiper.activeIndex,
+          realIndex: swiper.realIndex,
+          autoplayRunning: swiper.autoplay.running,
+          time: Date.now(),
+        });
+
+        // Ensure autoplay continues
+        if (!swiper.autoplay.running) {
+          swiper.autoplay.start();
+        }
+      },
     },
+  });
+
+  // Force autoplay to start and stay running
+  swiper.autoplay.start();
+
+  // Monitor and restart autoplay if needed
+  const autoplayMonitor = setInterval(() => {
+    if (!swiper.autoplay.running) {
+      debug("Autoplay Monitor - Restarting");
+      swiper.autoplay.start();
+    }
+  }, 1000);
+
+  // Clean up monitor on destroy
+  swiper.on("destroy", () => {
+    clearInterval(autoplayMonitor);
   });
 
   return swiper;
