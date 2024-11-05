@@ -1,93 +1,80 @@
-import { useState } from "preact/hooks";
+import { Collection, StampRow } from "globals";
 
 export const CollectionDetailsHeader = (
-  { id, filterBy, sortBy }: { id: string; filterBy: any[]; sortBy: string },
+  { collection, stamps }: { collection: Collection; stamps: StampRow[] },
 ) => {
-  const [selectedCategory, setSelectedCategory] = useState("BigTiles");
-
   return (
-    <div class="flex flex-col gap-3">
-      <div class="flex gap-4">
-        <img
-          src="/img/mock.png"
-          loading="lazy"
-          onError={(e) => {
-            e.currentTarget.src = `/not-available.png`;
-          }}
-          alt="collection image"
-          class="h-24 w-24 object-contain items-center standalone:h-24 standalone:w-auto pixelart image-rendering-pixelated"
-        />
-        <div class="flex flex-col justify-between">
-          <p class="font-semibold text-xl text-white">COLLECTION - {id}</p>
-          <div class="flex flex-col tablet:flex-row gap-4">
-            <div class="flex gap-4">
+    <div className="flex flex-col gap-3">
+      <div className="dark-gradient p-6">
+        <div className="flex gap-4">
+          <img
+            src={stamps[0].stamp_url}
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = `/not-available.png`;
+            }}
+            alt="collection image"
+            className="h-[148px] w-[148px] object-contain items-center standalone:h-24 standalone:w-auto pixelart image-rendering-pixelated"
+          />
+          <div>
+            <p className="font-black text-6xl purple-gradient3">
+              {collection.collection_name}
+            </p>
+            <p className="text-[#666666] text-xl font-light">COLLECTION BY</p>
+            <div>
+              <p className="text-[#999999] text-4xl font-black">
+                bc1qhk...hlls5q
+              </p>
               <div>
-                <p class="text-sm text-[#B9B9B9]">FLOOR</p>
-                <p class="text-lg font-semibold text-white">
-                  0.00018{" "}
-                  <span class="text-sm font-normal text-[#B9B9B9]">BTC</span>
-                </p>
-              </div>
-              <div>
-                <p class="text-sm text-[#B9B9B9]">TOTAL VOL</p>
-                <p class="text-lg font-semibold text-white">
-                  0.0019{" "}
-                  <span class="text-sm font-normal text-[#B9B9B9]">BTC</span>
-                </p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div>
-                <p class="text-sm text-[#B9B9B9]">OWNERS</p>
-                <p class="text-lg font-semibold text-white">1.1K</p>
-              </div>
-              <div>
-                <p class="text-sm text-[#B9B9B9]">LISTED</p>
-                <p class="text-lg font-semibold text-white">41</p>
-              </div>
-              <div>
-                <p class="text-sm text-[#B9B9B9]">TOTAL SUPLY</p>
-                <p class="text-lg font-semibold text-white">21K</p>
+                <img src="" alt="" />
+                <img src="" alt="" />
               </div>
             </div>
           </div>
         </div>
+        <p className="text-[#999999]">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ac
+          magna ut tellus faucibus elementum ac in dolor. Integer consequat, est
+          id mattis varius, enim lacus mollis lorem, sit amet lacinia felis erat
+          eu sem. Mauris sit amet urna ultricies, dignissim leo at, efficitur
+          lorem. Ut egestas ipsum quis fringilla dapibus. Sed at consequat
+          tellus. Duis aliquam velit ac sem luctus, ac vestibulum velit
+          malesuada.
+        </p>
       </div>
-      <hr class="border-2 border-[#3F2A4E]" />
-      <div class="flex flex-col-reverse tablet:flex-row justify-between items-center w-full">
-        <div class="hidden tablet:flex gap-6 tablet:gap-8 items-center">
-          <img
-            src={selectedCategory === "BigTiles"
-              ? "/img/icon_big_tiles.png"
-              : "/img/icon_big_tiles.png"}
-            onClick={() => setSelectedCategory("BigTiles")}
-            class="bg-[#3F2A4E] p-4 w-14 h-14 cursor-pointer"
-          />
-          <img
-            src={selectedCategory === "SmallTiles"
-              ? "/img/icon_small_tiles_selected.png"
-              : "/img/icon_small_tiles_selected.png"}
-            onClick={() => setSelectedCategory("SmallTiles")}
-            class="bg-[#3F2A4E] p-4 w-14 h-14 cursor-pointer"
-          />
-          <img
-            src={selectedCategory === "List"
-              ? "/img/icon_lists.png"
-              : "/img/icon_lists.png"}
-            onClick={() => setSelectedCategory("List")}
-            class="bg-[#3F2A4E] py-5 px-2 w-14 h-14 cursor-pointer"
-          />
+
+      <div className="flex justify-between dark-gradient p-6">
+        <div className="text-left">
+          <p className="text-[#666666] text-xl font-light">STAMPS</p>
+          <p className="text-[#999999] text-4xl font-black">{stamps.length}</p>
         </div>
-        <div class="flex gap-6">
-          <select
-            name="sort"
-            id="sort-select"
-            class="hidden tablet:block bg-[#3F2A4E] text-[#8D9199] h-[54px] min-w-[200px] px-6 rounded"
-          >
-            <option value="lowToHigh">Price: Low to High</option>
-            <option value="highToLow">Price: High to Low</option>
-            <option value="recent">Date: Recent</option>
-          </select>
+        <div className="text-center">
+          <p className="text-[#666666] text-xl font-light">EDITIONS</p>
+          <p className="text-[#999999] text-4xl font-black">N/A</p>
+        </div>
+        <div className="text-right">
+          <p className="text-[#666666] text-xl font-light">FLOOR PRICE</p>
+          <p className="text-[#999999] text-4xl font-black">
+            N/A <span className="font-extralight">BTC</span>
+          </p>
+        </div>
+      </div>
+      <div className="flex justify-between dark-gradient p-6">
+        <div className="text-left">
+          <p className="text-[#666666] text-xl font-light">MARKETCAP</p>
+          <p className="text-[#999999] text-4xl font-black">
+            N/A <span className="font-extralight">BTC</span>
+          </p>
+        </div>
+        <div className="text-center">
+          <p className="text-[#666666] text-xl font-light">TOTAL VOLUME</p>
+          <p className="text-[#999999] text-4xl font-black">
+            N/A <span className="font-extralight">BTC</span>
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-[#666666] text-xl font-light">HOLDERS</p>
+          <p className="text-[#999999] text-4xl font-black">N/A</p>
         </div>
       </div>
     </div>
