@@ -1,9 +1,11 @@
 import { StampRow, StampSectionProps } from "globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
+
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
+import StampSection from "$islands/stamp/StampSection.tsx";
 import { CollectionOverviewCard } from "$components/collection/CollectionOverviewCard.tsx";
 import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";
-import CollectionSection from "$components/collection/CollectionSection.tsx";
+
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 
@@ -76,6 +78,27 @@ export default function Collection(props: CollectionPageProps) {
       stamps: stamps_posh,
       layout: "grid",
       showDetails: false,
+      gridClass: `
+        grid w-full
+        gap-[12px]
+        mobileSm:gap-[12px]
+        mobileLg:gap-[24px]
+        tablet:gap-[24px]
+        desktop:gap-[24px]
+        grid-cols-2
+        mobileSm:grid-cols-2
+        mobileLg:grid-cols-3
+        tablet:grid-cols-3
+        desktop:grid-cols-4
+        auto-rows-fr
+      `,
+      displayCounts: {
+        "mobileSm": 6, // 2 columns x 3 rows
+        "mobileLg": 9, // 3 columns x 3 rows
+        "tablet": 9, // 3 columns x 3 rows
+        "desktop": 12, // 4 columns x 3 rows
+      },
+      viewAllLink: "/collection/overview/posh",
     },
     {
       title: "RECENT RECURSIVE",
@@ -83,30 +106,51 @@ export default function Collection(props: CollectionPageProps) {
       stamps: stamps_src721,
       layout: "row",
       showDetails: false,
+      gridClass: `
+        grid w-full
+        gap-[12px]
+        mobileSm:gap-[12px]
+        mobileLg:gap-[24px]
+        tablet:gap-[24px]
+        desktop:gap-[24px]
+        grid-cols-3
+        mobileSm:grid-cols-3
+        mobileLg:grid-cols-4
+        tablet:grid-cols-4
+        desktop:grid-cols-6
+        auto-rows-fr
+      `,
+      displayCounts: {
+        "mobileSm": 6, // 3 columns x 2 rows
+        "mobileLg": 8, // 4 columns x 2 rows
+        "tablet": 8, // 4 columns x 2 rows
+        "desktop": 12, // 6 columns x 2 rows
+      },
+      viewAllLink: "/collection/overview/recursive",
     },
   ];
 
   return (
-    <div className="text-[#CCCCCC] flex flex-col gap-36">
-      <section className="flex flex-col gap-36">
+    <div className="text-stamp-grey-light flex flex-col gap-20 mobileLg:gap-36">
+      <section className="flex flex-col gap-20 mobileLg:gap-36">
         <div className="flex flex-col gap-6">
-          <h1 className="text-6xl purple-gradient1 font-black">
+          <h1 className="text-3xl mobileLg:text-5xl desktop:text-6xl purple-gradient1 font-black">
             COLLECTIONS
           </h1>
           <div class="flex flex-col gap-12">
-            <CollectionSection
+            <StampSection
               key={SectionsCollections[0].type}
               {...SectionsCollections[0]}
             />
           </div>
         </div>
         <div className="flex flex-col gap-6">
-          <h2 className="gray-gradient3 text-6xl font-black">
+          <h1 className="text-3xl mobileLg:text-5xl desktop:text-6xl gray-gradient3 font-black">
             ESPECIALLY POSH
-            <h3 className="text-5xl font-extralight">
+            <h2 className="text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight">
               STAMP COLLECTIONS
-            </h3>
-          </h2>
+            </h2>
+          </h1>
           <div className="grid grid-cols-2 tablet:grid-cols-3 gap-6">
             {collections.slice(0, 3).map((collection) => (
               <CollectionListCard
@@ -116,7 +160,9 @@ export default function Collection(props: CollectionPageProps) {
             ))}
           </div>
           <div>
-            <h3 className="text-5xl font-extralight">NAMED ASSETS</h3>
+            <h2 className="text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight">
+              NAMED ASSETS
+            </h2>
             <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 text-xl font-medium">
               <p>
                 Posh stamps are an advanced version of cursed stamps integrated
@@ -146,27 +192,25 @@ export default function Collection(props: CollectionPageProps) {
             href="/collection/overview"
             f-partial="/collection/overview"
           >
-            <button className="bg-[#999999] font-extrabold text-[#080808] px-5 py-3 rounded-md float-right">
+            <button className="bg-stamp-grey font-extrabold text-stamp-bg-darkest px-5 py-3 rounded-md float-right">
               STAMP
             </button>
           </a>
         </div>
       </section>
-      <section className="flex flex-col gap-36">
-        <div className="flex flex-col gap-6">
-          <div class="flex flex-col gap-12">
-            <CollectionSection
-              key={SectionsCollections[1].type}
-              {...SectionsCollections[1]}
-            />
-          </div>
-        </div>
-        <div className="flex flex-col gap-6">
-          <h2 className="gray-gradient3 text-6xl font-black">
+      <section className="flex flex-col gap-20 mobileLg:gap-36">
+        <StampSection
+          key={SectionsCollections[1].type}
+          {...SectionsCollections[1]}
+        />
+        <div className="flex flex-col gap-3 mobileLg:gap-6">
+          <h1 className="text-3xl mobileLg:text-5xl desktop:text-6xl gray-gradient3 font-black">
             CUTTING EDGE
-            <h3 className="text-5xl font-extralight">SRC-721r COLLECTIONS</h3>
-          </h2>
-          <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
+            <h2 className="text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight">
+              SRC-721r COLLECTIONS
+            </h2>
+          </h1>
+          <div className="grid grid-cols-2 desktop:grid-cols-3 gap-3 mobileLg:gap-6">
             {collections.slice(0, 3).map((collection) => (
               <CollectionListCard
                 key={collection.collection_id}
@@ -175,8 +219,10 @@ export default function Collection(props: CollectionPageProps) {
             ))}
           </div>
           <div>
-            <h3 className="text-5xl font-extralight">RECURSIVE LAYERING</h3>
-            <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 text-xl font-medium">
+            <h2 className="text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight">
+              RECURSIVE LAYERING
+            </h2>
+            <div className="grid grid-cols-1 tablet:grid-cols-2 gap-3 mobileLg:gap-6 text-xl font-medium">
               <p>
                 <span className="font-bold">
                   SRC-721r allows for recursive NFT creation
@@ -203,18 +249,20 @@ export default function Collection(props: CollectionPageProps) {
             href="/"
             f-partial="/"
           >
-            <button className="border-2 border-[#999999] bg-transparent font-extrabold text-[#999999] px-5 py-3 rounded-md float-right">
+            <button className="border-2 border-stamp-grey bg-transparent font-extrabold text-stamp-grey px-5 py-3 rounded-md float-right">
               CONTACT
             </button>
           </a>
         </div>
       </section>
-      <section className="flex flex-col gap-6">
-        <h1 className="text-6xl purple-gradient1 font-black">
+      <section className="flex flex-col gap-3 mobileLg:gap-6">
+        <h1 className="text-3xl mobileLg:text-5xl desktop:text-6xl purple-gradient1 font-black">
           POPULAR ARTIST
-          <p className="text-5xl font-extralight text-[#AA00FF]">COLLECTIONS</p>
+          <h2 className="text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-bright">
+            COLLECTIONS
+          </h2>
         </h1>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3 mobileLg:gap-6">
           {collections.slice(0, 3).map((collection) => (
             <CollectionOverviewCard
               key={collection.collection_id}

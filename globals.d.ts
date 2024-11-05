@@ -118,6 +118,7 @@ export interface StampSectionProps {
   pagination?: Pagination;
   showMinDetails?: boolean;
   variant?: "default" | "grey";
+  viewAllLink?: string;
 }
 
 export interface SRC20Row {

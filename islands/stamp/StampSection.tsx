@@ -45,6 +45,7 @@ export default function StampSection({
   pagination,
   showMinDetails = false,
   variant = "default",
+  viewAllLink,
 }: StampSectionProps) {
   const stampArray = Array.isArray(stamps) ? stamps : [];
   const [displayCount, setDisplayCount] = useState(stampArray.length);
@@ -64,7 +65,7 @@ export default function StampSection({
       params.append("filterBy", filterArray.join(","));
     }
   }
-  const seeAllLink = `/stamp?${params.toString()}`;
+  const seeAllLink = viewAllLink ? viewAllLink : `/stamp?${params.toString()}`;
 
   // Handle display count updates
   useEffect(() => {
