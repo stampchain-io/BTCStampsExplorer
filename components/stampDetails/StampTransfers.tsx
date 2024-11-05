@@ -56,15 +56,9 @@ function TransferRow({ send }: { send: SendRow }) {
   );
 }
 
-/**
- * Renders a table displaying the stamp sends activity.
- *
- * @param sends - An array of `SendRow` objects representing the stamp sends.
- * @returns The rendered StampSends component.
- */
 export function StampTransfers({ sends }: StampTransfersProps) {
   return (
-    <div className="relative shadow-md max-w-256">
+    <div className="relative shadow-md max-w-[256px]">
       <div className="max-h-96 overflow-x-auto">
         <table className="w-full text-sm text-left rtl:text-right text-[#666666] mobileLg:rounded-lg">
           <thead className="text-lg uppercase">

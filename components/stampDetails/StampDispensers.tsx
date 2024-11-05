@@ -61,7 +61,7 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
   );
 
   return (
-    <div className="relative shadow-md max-w-256">
+    <div className="relative shadow-md max-w-full">
       <div className="max-h-96 overflow-x-auto">
         <table className="w-full text-sm text-left rtl:text-right text-[#666666] mobileLg:rounded-lg">
           <thead className="text-sm tablet:text-lg uppercase">

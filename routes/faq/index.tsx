@@ -8,7 +8,7 @@ export default function FAQ() {
         <title>Bitcoin Stamps - FAQ</title>
       </Head>
       <div className="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
-        <section className="text-center max-w-5xl mx-auto">
+        <section className="text-center max-w-full mx-auto">
           <h1 className="text-4xl tablet:text-7xl font-bold">
             <span className="gray-gradient1">
               YOU'VE GOT QUESTIONS

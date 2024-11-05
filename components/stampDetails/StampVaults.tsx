@@ -11,7 +11,7 @@ export function StampVaults(
   },
 ) {
   return (
-    <div className="relative shadow-md max-w-256">
+    <div className="relative shadow-md max-w-full">
       {
         /* <p class="text-[#F5F5F5] text-[26px] font-semibold">
         Vaults ({vaults.length})

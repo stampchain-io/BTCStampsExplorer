@@ -169,7 +169,11 @@ export default function StampSection({
             />
           </div>
         )
-        : <ViewAllButton href={seeAllLink} />}
+        : (
+          <div className="flex justify-end mt-6">
+            <ViewAllButton href={seeAllLink} />
+          </div>
+        )}
     </div>
   );
 }

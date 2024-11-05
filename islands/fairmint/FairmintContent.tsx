@@ -30,7 +30,7 @@ export function FairmintContent({ fairminters }: FairmintContentProps) {
   const hasFairminters = fairminters && fairminters.length > 0;
 
   return (
-    <div className="w-full max-w-lg p-4 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
+    <div className="w-full max-w-full p-4 bg-gradient-to-br from-[#1F002E00] via-[#14001F7F] to-[#1F002EFF]">
       <form className="flex flex-col gap-4">
         <label className="flex flex-col gap-1">
           <span>Select Token:</span>

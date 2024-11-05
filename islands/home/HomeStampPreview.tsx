@@ -152,11 +152,10 @@ export function HomeStampPreview({
   return (
     <div className="
       flex flex-col gap-8 mobileLg:gap-16
-      px-3 tablet:px-6 desktop:px-12 
       max-w-desktop w-full mx-auto
     ">
       {/* LATEST ART STAMPS */}
-      <div className="flex flex-col gap-4 mobileLg:gap-8">
+      <div className="flex flex-col gap-2">
         <div
           class={`
             w-full
@@ -186,7 +185,7 @@ export function HomeStampPreview({
       </div>
 
       {/* COLLECTIONS */}
-      <div className="flex flex-col gap-4 mobileLg:gap-8">
+      <div className="flex flex-col gap-2">
         <div
           class={`
             w-full
@@ -216,7 +215,7 @@ export function HomeStampPreview({
       </div>
 
       {/* FEATURED COLLECTIONS */}
-      <div className="flex flex-col gap-4 mobileLg:gap-8">
+      <div className="flex flex-col gap-2">
         <div
           class={`
             w-full
@@ -242,7 +241,7 @@ export function HomeStampPreview({
       </div>
 
       {/* RECENT SALES */}
-      <div className="flex flex-col gap-4 mobileLg:gap-8">
+      <div className="flex flex-col gap-2">
         <div
           class={`
             w-full

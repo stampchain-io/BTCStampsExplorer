@@ -139,6 +139,13 @@ export interface SRC20Row {
   status: string;
   row_num: number;
   progress?: string | null;
+  email?: boolean;
+  web?: boolean;
+  tg?: boolean;
+  x?: boolean;
+  holders: number;
+  floor_unit_price?: number;
+  mcap?: number;
 }
 
 interface SendRow {

@@ -7,15 +7,15 @@ export default {
   ],
 
   theme: {
-    screens: {
-      "mobileSm": "360px", // 360 +
-      // "mobile-568": " // UNUSED - USE mobileSm
-      "mobileMd": "421px", // 421 +
-      "mobileLg": "569px", // 569 +
-      "tablet": "769px", // 769 +
-      "desktop": "1025px", // 1025 +
-    },
     extend: {
+      screens: {
+        "mobileSm": "360px", // Custom
+        // "mobile-568": " // UNUSED - USE mobileSm
+        "mobileMd": "420px", // Custom
+        "mobileLg": "568px", // Custom
+        "tablet": "768px", // Same as Tailwind's 'md' (768px)
+        "desktop": "1024px", // Same as Tailwind's 'lg' (1024px)
+      },
       fontFamily: {
         sans: ['"Work Sans"', "sans-serif"],
         "work-sans": ['"Work Sans"', "sans-serif"],
@@ -132,6 +132,9 @@ export default {
           "linear-gradient(to right, #440066, #660099, #8800cc)",
         "stamp-card-bg":
           "linear-gradient(141deg, rgba(10, 0, 15, 0) 0%, #14001F 50%, #1F002E 100%)",
+        "slide-content":
+          "linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))",
+        "gradient-top": "var(--gradient-top)",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",
@@ -177,6 +180,10 @@ export default {
       },
       maxWidth: {
         "desktop": "1440px",
+        "none": "none",
+      },
+      lineClamp: {
+        2: "2",
       },
     },
   },
@@ -218,6 +225,9 @@ export default {
           "--stamp-scrollbar-track": "#333333",
           "--stamp-scrollbar-thumb": "#660099",
           "--stamp-scrollbar-hover": "#aa00ff",
+        },
+        ".gradient-text": {
+          "@apply bg-clip-text text-fill-transparent": {},
         },
       });
     }),
