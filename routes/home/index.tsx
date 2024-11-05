@@ -3,14 +3,10 @@ import { Handlers } from "$fresh/server.ts";
 
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
 import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
-// import { HomeTable } from "$islands/home/HomeTable.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
 // import { HomeStampChainSelected } from "$islands/home/HomeStampChainSelected.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
 import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
-// Import your Button component if you have one
-// import { Button } from "$components/Button.tsx";
-import { ViewAllButton } from "$components/ViewAllButton.tsx";
 import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { StampController } from "$server/controller/stampController.ts";
@@ -77,11 +73,9 @@ export default function Home(props: HomePageProps) {
   } = props.data || {};
 
   return (
-    <div class="relative flex flex-col gap-10 tablet:gap-24 text-white py-10 tablet:py-24">
+    <div class="layout-container flex flex-col gap-10 text-white">
       <HomeHeader />
-
       <HomeCarousel carouselStamps={carouselStamps} />
-
       <HomeStampPreview
         stamps_art={stamps_art}
         stamps_posh={stamps_posh}
@@ -89,72 +83,9 @@ export default function Home(props: HomePageProps) {
         stamps_recent={stamps_recent}
         collectionData={collectionData}
       />
-
-      {/* SRC-20 TOKENS Section */}
-      <div className="
-        flex flex-col gap-8 mobileLg:gap-16
-        px-3 tablet:px-6 desktop:px-12 
-        max-w-desktop w-full mx-auto
-      ">
-        <div className="flex flex-col gap-4 mobileLg:gap-8">
-          <div
-            class={`
-              w-full
-              pb-0 pt-[18px]
-              mobileSm:pb-0 mobileSm:pt-[18px]
-              mobileLg:pb-0 mobileLg:pt-[36px]
-              tablet:pb-0 tablet:pt-[72px]
-              desktop:pb-0 desktop:pt-[72px]
-            `}
-          >
-            <h1 className="
-              text-4xl
-              mobileSm:text-4xl
-              mobileLg:text-5xl
-              tablet:text-5xl
-              desktop:text-6xl
-              font-black bg-text-purple-2 bg-clip-text text-transparent
-            ">
-              SRC-20 TOKENS
-            </h1>
-          </div>
-
-          {/* ALL TOKENS Section */}
-          <div className="flex flex-col gap-4">
-            <h2 class="
-              text-2xl
-              mobileSm:text-2xl
-              mobileLg:text-4xl
-              tablet:text-4xl
-              desktop:text-5xl
-              font-extralight bg-text-purple-2 bg-clip-text text-transparent
-            ">
-              ALL TOKENS
-            </h2>
-            <SRC20DeployTable data={src20s} />
-            <ViewAllButton href="/src20" />
-          </div>
-
-          {/* MINTING Section */}
-          <div className="flex flex-col gap-4">
-            <h2 class="
-              text-2xl
-              mobileSm:text-2xl
-              mobileLg:text-4xl
-              tablet:text-4xl
-              desktop:text-5xl
-              font-extralight bg-text-purple-2 bg-clip-text text-transparent
-            ">
-              MINTING
-            </h2>
-            <SRC20TrendingMints data={trendingSrc20s} />
-            <ViewAllButton href="/src20?type=trending" />
-          </div>
-        </div>
-      </div>
-
+      <SRC20DeployTable data={src20s} />
+      <SRC20TrendingMints data={trendingSrc20s} />
       <StampChainModule />
-
       <PartnersModule />
     </div>
   );

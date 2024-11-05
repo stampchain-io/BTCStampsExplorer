@@ -39,6 +39,7 @@ Error Handling and Validation:
 UI and Styling:
 
 - Implement responsive design with Tailwind CSS; use a mobile-first approach
+- use class instead of className as the preferred method for Deno Fresh
 
 Performance Optimization:
 

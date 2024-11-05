@@ -30,7 +30,7 @@ export default function App({ Component }: AppProps) {
         <link rel="stylesheet" href="/gradients.css" />
         <link
           rel="stylesheet"
-          href="https://esm.sh/swiper/swiper-bundle.min.css"
+          href="https://esm.sh/swiper@11.1.14/swiper-bundle.min.css"
         />
 
         {/* Fonts */}
@@ -88,42 +88,27 @@ export default function App({ Component }: AppProps) {
           content="strict-origin-when-cross-origin"
         />
       </Head>
-      <body class="relative bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-work-sans">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img
-            src="/img/bg-gradient/header-top-left.svg"
-            className="absolute top-0 left-0"
-          />
-          <img
-            src="/img/bg-gradient/header-top-right.svg"
-            className="absolute top-[256px] right-0"
-          />
-          <img
-            src="/img/bg-gradient/body-center-left.svg"
-            className="absolute top-[4000px] left-0"
-          />
-          <img
-            src="/img/bg-gradient/footer-bottom-left.svg"
-            className="absolute bottom-0 left-0 min-w-[1920px]"
-          />
-        </div>
+      <body class="relative bg-[#0B0B0B] min-h-screen">
+        <div class="bgGradientTop" aria-hidden="true" />
 
-        <ToastProvider>
-          <NavigatorProvider>
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <div
-                className="px-3 tablet:px-6 desktop:px-12 flex flex-col flex-grow gap-5 max-w-desktop mx-auto w-full"
-                f-client-nav
-              >
-                <Partial name="body">
-                  <Component />
-                </Partial>
+        <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
+          <ToastProvider>
+            <NavigatorProvider>
+              <div class="flex flex-col min-h-screen">
+                <Header />
+                <div
+                  class="px-3 tablet:px-6 desktop:px-12 flex flex-col flex-grow gap-5 max-w-desktop mx-auto w-full"
+                  f-client-nav
+                >
+                  <Partial name="body">
+                    <Component />
+                  </Partial>
+                </div>
+                <Footer />
               </div>
-              <Footer />
-            </div>
-          </NavigatorProvider>
-        </ToastProvider>
+            </NavigatorProvider>
+          </ToastProvider>
+        </div>
       </body>
     </html>
   );

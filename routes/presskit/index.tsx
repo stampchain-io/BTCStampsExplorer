@@ -1,7 +1,7 @@
 export default function PressKit() {
   return (
     <div className="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
-      <section className="text-center max-w-5xl mx-auto">
+      <section className="text-center max-w-full mx-auto">
         <h1 className="text-3xl tablet:text-6xl font-bold">
           <span className="text-4xl tablet:text-7xl font-black gray-gradient1">
             PRESS KIT

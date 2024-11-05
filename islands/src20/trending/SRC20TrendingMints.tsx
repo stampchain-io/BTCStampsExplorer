@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
-import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
+import { convertToEmoji } from "$lib/utils/util.ts";
+import { ViewAllButton } from "$components/ViewAllButton.tsx";
 
 type SRC20TrendingMintsProps = {
   data: SRC20Row[];
@@ -46,13 +47,13 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
   const trxType = "olga"; // or use a state/context variable if dynamic
 
   return (
-    <>
+    <div className="max-w-desktop w-full mx-auto px-3 tablet:px-6 desktop:px-12">
       <ImageModal
         imgSrc={modalImg}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-      <div class="relative overflow-x-auto shadow-md">
+      <div className="relative overflow-x-auto shadow-md mb-6">
         {/* Desktop View */}
         <div class="hidden desktop:flex flex-col gap-6 p-2">
           {data.map((src20: SRC20Row) => {
@@ -243,6 +244,9 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
           })}
         </div>
       </div>
-    </>
+      <div className="flex justify-end">
+        <ViewAllButton href="/src20?type=trending" />
+      </div>
+    </div>
   );
 };
