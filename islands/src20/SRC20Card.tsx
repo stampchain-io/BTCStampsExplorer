@@ -47,22 +47,22 @@ export function SRC20Card(
           <a
             href={href}
             class={`text-2xl font-bold ${
-              isHovered ? "text-[#AA00FF]" : "text-[#666666]"
+              isHovered ? "text-[#AA00FF]" : "text-stamp-grey-darker"
             } flex gap-4`}
           >
             {convertToEmoji(src20.tick)}
             {/* Social Icons */}
             <div class="flex gap-2">
-              {src20.email && (
+              {src20.email != null && (
                 <img width="20px" src="/img/src20/details/EnvelopeSimple.svg" />
               )}
-              {src20.web && (
+              {src20.web != null && (
                 <img width="20px" src="/img/src20/details/Globe.svg" />
               )}
-              {src20.tg && (
+              {src20.tg != null && (
                 <img width="20px" src="/img/src20/details/TelegramLogo.svg" />
               )}
-              {src20.x && (
+              {src20.x != null && (
                 <img width="20px" src="/img/src20/details/XLogo.svg" />
               )}
             </div>
@@ -70,7 +70,7 @@ export function SRC20Card(
 
           {/* Progress Bar */}
           <div class="flex flex-col gap-1">
-            <p class="text-lg font-light text-[#999999]">
+            <p class="text-lg font-light text-stamp-grey">
               PROGRESS <span class="font-bold">{progress}%</span>
             </p>
             <div class="hidden mobileLg:block min-w-[260px] h-1 bg-[#999999] relative rounded-full">
@@ -87,15 +87,15 @@ export function SRC20Card(
         <>
           {/* Middle Section - Supply and Limit */}
           <div class="hidden tablet:flex p-3 text-center flex-col justify-center">
-            <p class="text-lg text-[#666666] font-light">
+            <p class="text-lg text-stamp-grey-darker font-light">
               SUPPLY{" "}
-              <span class="font-bold text-[#999999]">
+              <span class="font-bold text-stamp-grey">
                 {Number(src20.max).toLocaleString()}
               </span>
             </p>
-            <p class="text-lg text-[#666666] font-light">
+            <p class="text-lg text-stamp-grey-darker font-light">
               LIMIT{" "}
-              <span class="font-bold text-[#999999]">
+              <span class="font-bold text-stamp-grey">
                 {Number(src20.lim).toLocaleString()}
               </span>
             </p>
@@ -103,18 +103,18 @@ export function SRC20Card(
 
           {/* Right Section - Deploy Date and Holders */}
           <div class="hidden tablet:flex p-3 text-sm text-center flex-col justify-center">
-            <p class="text-lg text-[#666666] font-light">
+            <p class="text-lg text-stamp-grey-darker font-light">
               DEPLOY{" "}
-              <span class="font-bold text-[#999999]">
+              <span class="font-bold text-stamp-grey">
                 {new Date(src20.block_time).toLocaleString("default", {
                   month: "short",
                   year: "numeric",
                 })}
               </span>
             </p>
-            <p class="text-lg text-[#666666] font-light">
+            <p class="text-lg text-stamp-grey-darker font-light">
               HOLDERS{" "}
-              <span class="font-bold text-[#999999]">
+              <span class="font-bold text-stamp-grey">
                 {Number(src20.holders).toLocaleString()}
               </span>
             </p>
@@ -124,21 +124,21 @@ export function SRC20Card(
 
       {variant === "minting" && (
         <div class="hidden tablet:flex desktop:hidden p-3 text-center flex-col justify-center">
-          <p class="text-lg text-[#666666] font-light">
+          <p class="text-lg text-stamp-grey-darker font-light">
             SUPPLY{" "}
-            <span class="font-bold text-[#999999]">
+            <span class="font-bold text-stamp-grey">
               {Number(src20.max).toLocaleString()}
             </span>
           </p>
-          <p class="text-lg text-[#666666] font-light">
+          <p class="text-lg text-stamp-grey-darker font-light">
             LIMIT{" "}
-            <span class="font-bold text-[#999999]">
+            <span class="font-bold text-stamp-grey">
               {Number(src20.lim).toLocaleString()}
             </span>
           </p>
-          <p className="text-lg text-[#666666] font-light">
+          <p className="text-lg text-stamp-grey-darker font-light">
             MINTERS{" "}
-            <span className="font-bold text-[#999999]">
+            <span className="font-bold text-stamp-grey">
               {Number(src20.holders || 0).toLocaleString()}
             </span>
           </p>
