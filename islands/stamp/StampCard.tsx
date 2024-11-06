@@ -3,6 +3,8 @@ import relativeTime from "$dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
+import { isValidSVG } from "$lib/utils/util.ts";
+import { useEffect, useState } from "preact/hooks";
 
 import {
   abbreviateAddress,
@@ -117,6 +119,65 @@ export function StampCard({
     src = `/not-available.png`;
   }
 
+  // Add state for validated content
+  const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const validateSVG = async () => {
+      try {
+        const response = await fetch(src);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch SVG");
+        }
+
+        const svgContent = await response.text();
+
+        // Show fallback if content is empty, invalid SVG, or contains deploy data
+        if (
+          !svgContent || !isValidSVG(svgContent) ||
+          svgContent.includes('"p":"deploy"')
+        ) {
+          setValidatedContent(
+            <img
+              src="/not-available.png"
+              alt="Content not available"
+              className="h-full w-full object-contain pixelart"
+            />,
+          );
+          return;
+        }
+
+        // Set valid SVG content
+        setValidatedContent(
+          <img
+            src={src}
+            loading="lazy"
+            alt={`Stamp No. ${stamp.stamp}`}
+            className="h-full w-full object-contain pixelart"
+            onError={(e) => {
+              e.currentTarget.src = `/not-available.png`;
+            }}
+          />,
+        );
+      } catch {
+        setValidatedContent(
+          <img
+            src="/not-available.png"
+            alt="Content not available"
+            className="h-full w-full object-contain pixelart"
+          />,
+        );
+      }
+    };
+
+    if (suffix === "svg") {
+      validateSVG();
+    }
+  }, [src, suffix, stamp.stamp]);
+
   const renderContent = () => {
     if (stamp.stamp_mimetype === "text/plain" || suffix === "txt") {
       return <TextContentIsland src={src} />;
@@ -129,18 +190,24 @@ export function StampCard({
           src={src}
           className="h-full w-fit max-w-full object-contain items-center pointer-events-none"
           onError={(e) => {
-            // Show fallback content
-            e.currentTarget.style.display = "none"; // Hide the iframe
+            e.currentTarget.style.display = "none";
             const fallback = document.createElement("img");
-            fallback.src = "/not-available.png"; // Fallback image
+            fallback.src = "/not-available.png";
             fallback.alt = "Content not available";
             fallback.className = "w-full h-full object-contain rounded-lg";
-            // Fix for linter error by checking if parentNode exists
             const parent = e.currentTarget.parentNode;
             if (parent) {
               parent.appendChild(fallback);
             }
           }}
+        />
+      );
+    } else if (suffix === "svg") {
+      return validatedContent || (
+        <img
+          src="/not-available.png"
+          alt="Loading..."
+          className="h-full w-full object-contain pixelart"
         />
       );
     } else {

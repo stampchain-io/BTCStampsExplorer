@@ -1,4 +1,5 @@
 import { Collection } from "globals";
+import { abbreviateAddress } from "$lib/utils/util.ts";
 export function CollectionOverviewCard(
   { collection }: { collection: Collection },
 ) {
@@ -22,7 +23,12 @@ export function CollectionOverviewCard(
             {collection.collection_name}
           </p>
           <p>
-            BY <span className="font-bold">bc1qhk...hlls5q</span>
+            BY{" "}
+            <span className="font-bold">
+              {collection.creators
+                ? abbreviateAddress(collection.creators)
+                : "N/A"}
+            </span>
           </p>
           <div className="flex flex-col mobileLg:flex-row justify-between w-full">
             <p>
@@ -50,7 +56,7 @@ export function CollectionOverviewCard(
 
       <div className="grid grid-cols-4 mobileLg:grid-cols-6 desktop:grid-cols-8 gap-6">
         {collection.stamp_images &&
-          collection.stamp_images.slice(0, 8).map((imageUrl, index) => {
+          collection.stamp_images.slice(-8).reverse().map((imageUrl, index) => {
             return (
               <div
                 className={`aspect-stamp w-full h-full overflow-hidden image-rendering-pixelated ${
