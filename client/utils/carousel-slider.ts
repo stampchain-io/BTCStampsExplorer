@@ -7,9 +7,12 @@ type CarouselElement = HTMLElement | null;
 const CAROUSEL_CONFIG = {
   // Base dimensions
   SLIDES: {
-    COUNT: 5, // Always show 5 slides
+    COUNT: {
+      MOBILE: 3, // Show 3 slides on mobile
+      DESKTOP: 5, // Show 5 slides on desktop
+    },
     MAX_WIDTH: 408, // Maximum width of center slide
-    BASE_HEIGHT: 408, // Base height to maintain aspect ratio
+    CONTAINER_WIDTH_RATIO: 0.35,
   },
 
   // Scale factors for each position
@@ -47,6 +50,10 @@ const CAROUSEL_CONFIG = {
 
   DEBUG: {
     ENABLED: true,
+  },
+
+  BREAKPOINTS: {
+    MOBILE_LG: 568, // Match mobileLg breakpoint
   },
 } as const;
 
@@ -137,17 +144,15 @@ const validateLayout = (
 };
 
 const calculateDimensions = (containerWidth: number) => {
-  // Base width calculation (35% of container)
+  // Use existing calculations as they work well
   const baseWidth = Math.min(
     CAROUSEL_CONFIG.SLIDES.MAX_WIDTH,
-    containerWidth * 0.35,
+    containerWidth * CAROUSEL_CONFIG.SLIDES.CONTAINER_WIDTH_RATIO,
   );
 
-  // Calculate scaled widths
   const adjacentWidth = baseWidth * CAROUSEL_CONFIG.SCALE.ADJACENT;
   const outerWidth = baseWidth * CAROUSEL_CONFIG.SCALE.OUTER;
 
-  // Calculate visible portions after overlap
   const adjacentVisible = adjacentWidth *
     (1 - CAROUSEL_CONFIG.OVERLAP.ADJACENT);
   const outerVisible = outerWidth * (1 - CAROUSEL_CONFIG.OVERLAP.OUTER);
@@ -156,8 +161,6 @@ const calculateDimensions = (containerWidth: number) => {
   const totalWidth = baseWidth + // Center
     (2 * adjacentVisible) + // Two adjacent slides
     (2 * outerVisible); // Two outer slides
-
-  // Center offset
   const centerOffset = (containerWidth - totalWidth) / 2;
 
   // Calculate translations for proper overlap
@@ -165,27 +168,6 @@ const calculateDimensions = (containerWidth: number) => {
     (adjacentWidth * CAROUSEL_CONFIG.OVERLAP.ADJACENT);
   const outerTranslate = adjacentTranslate +
     (adjacentWidth / 2) - (outerWidth * CAROUSEL_CONFIG.OVERLAP.OUTER);
-
-  debug("Precise Calculations:", {
-    container: {
-      width: containerWidth,
-      centerOffset,
-    },
-    dimensions: {
-      base: baseWidth,
-      adjacent: adjacentWidth,
-      outer: outerWidth,
-    },
-    overlaps: {
-      adjacentVisible,
-      outerVisible,
-    },
-    translations: {
-      adjacent: adjacentTranslate,
-      outer: outerTranslate,
-    },
-    totalWidth,
-  });
 
   return {
     baseWidth,
@@ -197,10 +179,7 @@ const calculateDimensions = (containerWidth: number) => {
   };
 };
 
-const calculateTranslateX = (
-  distance: number,
-  baseWidth: number,
-): number => {
+const calculateTranslateX = (distance: number, baseWidth: number): number => {
   if (distance === 0) return 0;
 
   const direction = distance > 0 ? 1 : -1;
@@ -223,27 +202,6 @@ const debug = (message: string, data?: unknown) => {
   console.log(`Carousel Debug: ${message}`, data);
 };
 
-const getVisibleIndices = (
-  currentIndex: number,
-  totalSlides: number,
-): number[] => {
-  // Calculate the middle of the visible group
-  const middleIndex = Math.floor(totalSlides / 3); // For 15 slides, this is 5
-
-  return [
-    currentIndex - 2, // Outer left
-    currentIndex - 1, // Adjacent left
-    currentIndex, // Center
-    currentIndex + 1, // Adjacent right
-    currentIndex + 2, // Outer right
-  ].map((index) => {
-    // Handle wrapping for loop
-    if (index < 0) return index + totalSlides;
-    if (index >= totalSlides) return index - totalSlides;
-    return index;
-  });
-};
-
 export default function createCarouselSlider(
   el: CarouselElement,
 ): SwiperType | undefined {
@@ -252,9 +210,13 @@ export default function createCarouselSlider(
   const swiperEl = el.querySelector(".swiper") as HTMLElement;
   if (!swiperEl) return undefined;
 
+  const isMobile = window.innerWidth < CAROUSEL_CONFIG.BREAKPOINTS.MOBILE_LG;
+
   const swiper = new Swiper(swiperEl, {
     modules: [Autoplay, Pagination],
-    slidesPerView: 5,
+    slidesPerView: isMobile
+      ? CAROUSEL_CONFIG.SLIDES.COUNT.MOBILE
+      : CAROUSEL_CONFIG.SLIDES.COUNT.DESKTOP,
     centeredSlides: true,
     loop: true,
     speed: CAROUSEL_CONFIG.ANIMATION.SPEED,
@@ -315,6 +277,7 @@ export default function createCarouselSlider(
 
       progress: function (swiper: SwiperType) {
         const containerWidth = el.offsetWidth;
+        const isMobile = containerWidth < CAROUSEL_CONFIG.BREAKPOINTS.MOBILE_LG;
         const { baseWidth } = calculateDimensions(containerWidth);
         const centerX = containerWidth / 2;
 
@@ -329,7 +292,11 @@ export default function createCarouselSlider(
           const isCenter = distance === 0;
           const isAdjacent = Math.abs(distance) === 1;
           const isOuter = Math.abs(distance) === 2;
-          const shouldShow = Math.abs(distance) <= 2;
+
+          // Only show 3 slides on mobile
+          const shouldShow = isMobile
+            ? Math.abs(distance) <= 1 // Only center and adjacent for mobile
+            : Math.abs(distance) <= 2; // All 5 slides for desktop
 
           if (!shouldShow) {
             slideEl.style.visibility = "hidden";
@@ -338,16 +305,15 @@ export default function createCarouselSlider(
             continue;
           }
 
-          // Set base styles
+          // Keep existing styling logic
           slideEl.style.visibility = "visible";
           slideEl.style.width = `${baseWidth}px`;
           slideEl.style.position = "absolute";
 
-          // Calculate transforms
+          // Use existing scale and translation calculations
           const scale = isCenter ? 1 : isAdjacent ? 0.8 : 0.6;
           const translateX = calculateTranslateX(distance, baseWidth);
 
-          // Position from center of container
           const finalTranslateX = translateX - (baseWidth / 2);
           slideEl.style.left = `${centerX}px`;
           slideEl.style.transform =
@@ -360,16 +326,6 @@ export default function createCarouselSlider(
             : isAdjacent
             ? "blur(1px)"
             : "blur(2px)";
-
-          debug(`Slide ${i} Position:`, {
-            distance,
-            baseWidth,
-            translateX,
-            finalTranslateX,
-            centerX,
-            scale,
-            visible: shouldShow,
-          });
         }
       },
 

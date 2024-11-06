@@ -1,5 +1,5 @@
 # FROM denoland/deno:1.36.0-alpine
-FROM denoland/deno:alpine-2.0.3
+FROM denoland/deno:alpine-2.0.5
 
 ENV DENO_ENV=production
 
