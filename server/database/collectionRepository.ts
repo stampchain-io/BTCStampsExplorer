@@ -1,4 +1,4 @@
-import { SMALL_LIMIT } from "constants";
+import { SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { Collection } from "globals";
 export class CollectionRepository {
@@ -16,11 +16,20 @@ export class CollectionRepository {
       SELECT 
         HEX(c.collection_id) as collection_id,
         c.collection_name,
+        c.collection_description,
         GROUP_CONCAT(DISTINCT cc.creator_address) as creators,
-        COUNT(DISTINCT cs.stamp) as stamp_count
+        COUNT(DISTINCT cs.stamp) as stamp_count,
+        SUM(
+          CASE 
+            WHEN st.divisible = 1 THEN st.supply / 100000000
+            WHEN st.supply > 100000 THEN 100000
+            ELSE st.supply 
+          END
+        ) as total_editions
       FROM collections c
       LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
       LEFT JOIN collection_stamps cs ON c.collection_id = cs.collection_id
+      LEFT JOIN ${STAMP_TABLE} st ON cs.stamp = st.stamp
     `;
 
     const queryParams: any[] = [];
@@ -31,7 +40,7 @@ export class CollectionRepository {
     }
 
     query += `
-      GROUP BY c.collection_id, c.collection_name
+      GROUP BY c.collection_id, c.collection_name, c.collection_description
       ORDER BY c.collection_name
       LIMIT ? OFFSET ?
     `;
@@ -74,11 +83,20 @@ export class CollectionRepository {
       SELECT 
         HEX(c.collection_id) as collection_id,
         c.collection_name,
+        c.collection_description,
         GROUP_CONCAT(DISTINCT cc.creator_address) as creators,
-        COUNT(DISTINCT cs.stamp) as stamp_count
+        COUNT(DISTINCT cs.stamp) as stamp_count,
+        SUM(
+          CASE 
+            WHEN st.divisible = 1 THEN st.supply / 100000000
+            WHEN st.supply > 100000 THEN 100000
+            ELSE st.supply 
+          END
+        ) as total_editions
       FROM collections c
       LEFT JOIN collection_creators cc ON c.collection_id = cc.collection_id
       LEFT JOIN collection_stamps cs ON c.collection_id = cs.collection_id
+      LEFT JOIN ${STAMP_TABLE} st ON cs.stamp = st.stamp
       WHERE c.collection_name = ?
       GROUP BY c.collection_id, c.collection_name
     `;
@@ -117,7 +135,7 @@ export class CollectionRepository {
     }
 
     query += `
-      GROUP BY c.collection_id, c.collection_name
+      GROUP BY c.collection_id, c.collection_name, c.collection_description
       ORDER BY c.collection_name
       LIMIT ? OFFSET ?
     `;

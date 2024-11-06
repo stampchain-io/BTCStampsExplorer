@@ -221,3 +221,18 @@ export function bigFloatToString(
   // Remove trailing zeros
   return result.replace(/\.?0+$/, "");
 }
+
+export function isValidSVG(svgContent: string): boolean {
+  // Basic SVG validation - checks for valid XML structure and SVG root element
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgContent, "image/svg+xml");
+    const parserError = doc.querySelector("parsererror");
+    if (parserError) return false;
+
+    const svgElement = doc.querySelector("svg");
+    return !!svgElement;
+  } catch {
+    return false;
+  }
+}

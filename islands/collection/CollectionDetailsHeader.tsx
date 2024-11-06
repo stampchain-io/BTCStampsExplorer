@@ -1,11 +1,14 @@
 import { Collection, StampRow } from "globals";
+import { abbreviateAddress } from "$lib/utils/util.ts";
 
 export const CollectionDetailsHeader = (
   { collection, stamps }: { collection: Collection; stamps: StampRow[] },
 ) => {
+  console.log("collection: ", collection);
+
   return (
     <div className="flex flex-col gap-3">
-      <div className="dark-gradient p-6">
+      <div className="dark-gradient p-6 space-y-6">
         <div className="flex gap-4">
           <img
             src={stamps[0].stamp_url}
@@ -23,7 +26,9 @@ export const CollectionDetailsHeader = (
             <p className="text-[#666666] text-xl font-light">COLLECTION BY</p>
             <div>
               <p className="text-[#999999] text-4xl font-black">
-                bc1qhk...hlls5q
+                {collection.creators
+                  ? abbreviateAddress(collection.creators)
+                  : "N/A"}
               </p>
               <div>
                 <img src="" alt="" />
@@ -33,24 +38,22 @@ export const CollectionDetailsHeader = (
           </div>
         </div>
         <p className="text-[#999999]">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ac
-          magna ut tellus faucibus elementum ac in dolor. Integer consequat, est
-          id mattis varius, enim lacus mollis lorem, sit amet lacinia felis erat
-          eu sem. Mauris sit amet urna ultricies, dignissim leo at, efficitur
-          lorem. Ut egestas ipsum quis fringilla dapibus. Sed at consequat
-          tellus. Duis aliquam velit ac sem luctus, ac vestibulum velit
-          malesuada.
+          {collection.collection_description}
         </p>
       </div>
 
       <div className="flex justify-between dark-gradient p-6">
         <div className="text-left">
           <p className="text-[#666666] text-xl font-light">STAMPS</p>
-          <p className="text-[#999999] text-4xl font-black">{stamps.length}</p>
+          <p className="text-[#999999] text-4xl font-black">
+            {collection.stamp_count}
+          </p>
         </div>
         <div className="text-center">
           <p className="text-[#666666] text-xl font-light">EDITIONS</p>
-          <p className="text-[#999999] text-4xl font-black">N/A</p>
+          <p className="text-[#999999] text-4xl font-black">
+            {Number(collection.total_editions).toFixed(0)}
+          </p>
         </div>
         <div className="text-right">
           <p className="text-[#666666] text-xl font-light">FLOOR PRICE</p>
