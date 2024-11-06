@@ -10,13 +10,13 @@ export function HomeCarousel({ carouselStamps }: HomeCarouselProps) {
     <div class="max-w-desktop w-full mx-auto px-3 tablet:px-6 desktop:px-12">
       <div class="
         w-full
-        mobileSm:max-w-[310px]
-        mobileLg:max-w-[515px]
-        tablet:max-w-[618px]
-        desktop:max-w-[772px]
+        mobileSm:max-w-[260px] mobileSm:h-[186px]
+        mobileLg:max-w-[486px] mobileLg:h-[260px]
+        tablet:max-w-[643px] tablet:h-[341px]
+        desktop:max-w-[954px] desktop:h-[480px]
         mx-auto
         relative
-        overflow-hidden
+        overflow-visible
         flex
         justify-center
         items-center

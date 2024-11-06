@@ -148,9 +148,9 @@ html, body {
 }
 
 .bgGradientTop {
-  @apply fixed inset-0 w-full;
-  height: 100vh;
-  z-index: 0;
+  @apply fixed top-0 left-0 right-0;
+  height: 1400px;
+  z-index: 1;
   background:
     radial-gradient(
       ellipse 50% 30% at 5% 5%,
@@ -160,7 +160,7 @@ html, body {
     radial-gradient(
     ellipse 75% 100% at 20% 0,
     rgba(1, 0, 1, 0.9) 10%,
-    transparent 50%
+    transparent 70%
   ),
     radial-gradient(
     ellipse 50% 30% at 100% 10%,
@@ -175,16 +175,83 @@ html, body {
     radial-gradient(
     ellipse 60% 30% at 120% 70%,
     rgba(0, 120, 80, 0.2),
-    transparent
+    transparent 90%
   ),
-    linear-gradient(rgba(80, 0, 120, 0.3), #000000 50%);
-  pointer-events: none;
+    linear-gradient(
+    rgba(80, 0, 120, 0.3),
+    rgba(0, 0, 0, 0.8) 70%,
+    #000000 100%
+  );
 }
-
 @layer base {
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+}
+
+.bgGradientBottom {
+  @apply fixed bottom-0 left-0 right-0;
+  height: 700px;
+  z-index: 1;
+  background:
+    radial-gradient(
+      ellipse 75% 100% at 20% 100%,
+      rgba(1, 0, 1, 0.8) 10%,
+      transparent 50%
+    ),
+    radial-gradient(
+    ellipse 40% 40% at 30% 60%,
+    var(--gradient-purple),
+    transparent
+  ),
+    radial-gradient(
+    ellipse 20% 40% at 0% 90%,
+    rgba(120, 80, 0, 0.2),
+    transparent
+  ),
+    radial-gradient(
+    ellipse 20% 40% at 70% 100%,
+    var(--gradient-orange),
+    transparent
+  ),
+    radial-gradient(
+    ellipse 60% 30% at 120% 60%,
+    rgba(80, 0, 120, 0.4),
+    transparent
+  ),
+    linear-gradient(#000000, rgba(0, 120, 80, 0.2));
+  animation:
+    fadeInOutOrange 4s linear infinite alternate,
+    fadeInOutPurple 2s linear infinite alternate;
+}
+
+:root {
+  --gradient-orange: rgba(120, 80, 0, 0.1);
+  --gradient-purple: rgba(80, 0, 120, 0.15);
+}
+
+@keyframes fadeInOutOrange {
+  0% {
+    --gradient-orange: rgba(120, 80, 0, 0.1);
+  }
+  50% {
+    --gradient-orange: rgba(120, 80, 0, 0.15);
+  }
+  100% {
+    --gradient-orange: rgba(120, 80, 0, 0.2);
+  }
+}
+
+@keyframes fadeInOutPurple {
+  0% {
+    --gradient-purple: rgba(80, 0, 120, 0.15);
+  }
+  50% {
+    --gradient-purple: rgba(80, 0, 120, 0.2);
+  }
+  100% {
+    --gradient-purple: rgba(80, 0, 120, 0.25);
   }
 }

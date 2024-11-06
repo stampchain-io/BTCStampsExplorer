@@ -174,7 +174,11 @@ export function HomeStampPreview({
             desktop:text-6xl
             font-black bg-text-purple-2 bg-clip-text text-transparent
           ">
-            LATEST ART STAMPS
+            <span className="mobileSm:hidden">LATEST ART STAMPS</span>
+            <span className="hidden mobileSm:block mobileLg:hidden">
+              LATEST ART
+            </span>
+            <span className="hidden mobileLg:block">LATEST ART STAMPS</span>
           </h1>
         </div>
         <div className="flex flex-col gap-4">

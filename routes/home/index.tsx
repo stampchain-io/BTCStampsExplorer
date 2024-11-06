@@ -73,7 +73,7 @@ export default function Home(props: HomePageProps) {
   } = props.data || {};
 
   return (
-    <div class="layout-container flex flex-col gap-10 text-white">
+    <div class="layout-container flex flex-col gap-10 mt-10 text-white">
       <HomeHeader />
       <HomeCarousel carouselStamps={carouselStamps} />
       <HomeStampPreview

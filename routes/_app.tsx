@@ -90,6 +90,7 @@ export default function App({ Component }: AppProps) {
       </Head>
       <body class="relative bg-[#0B0B0B] min-h-screen">
         <div class="bgGradientTop" aria-hidden="true" />
+        <div class="bgGradientBottom" aria-hidden="true" />
 
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           <ToastProvider>
@@ -97,7 +98,7 @@ export default function App({ Component }: AppProps) {
               <div class="flex flex-col min-h-screen">
                 <Header />
                 <div
-                  class="px-3 tablet:px-6 desktop:px-12 flex flex-col flex-grow gap-5 max-w-desktop mx-auto w-full"
+                  class="px-3 pt-10 tablet:px-6 desktop:px-12 flex flex-col flex-grow gap-5 max-w-desktop mx-auto w-full"
                   f-client-nav
                 >
                   <Partial name="body">
