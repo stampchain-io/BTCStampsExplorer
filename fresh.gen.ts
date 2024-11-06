@@ -71,9 +71,7 @@ import * as $block_id_ from "./routes/block/[id].tsx";
 import * as $block_index from "./routes/block/index.tsx";
 import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
-import * as $collection_overview_artist from "./routes/collection/overview/artist.tsx";
-import * as $collection_overview_posh from "./routes/collection/overview/posh.tsx";
-import * as $collection_overview_recursive from "./routes/collection/overview/recursive.tsx";
+import * as $collection_overview_overview_ from "./routes/collection/overview/[overview].tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
 import * as $design_system from "./routes/design-system.tsx";
@@ -282,10 +280,8 @@ const manifest = {
     "./routes/block/index.tsx": $block_index,
     "./routes/collection/details/[id].tsx": $collection_details_id_,
     "./routes/collection/index.tsx": $collection_index,
-    "./routes/collection/overview/artist.tsx": $collection_overview_artist,
-    "./routes/collection/overview/posh.tsx": $collection_overview_posh,
-    "./routes/collection/overview/recursive.tsx":
-      $collection_overview_recursive,
+    "./routes/collection/overview/[overview].tsx":
+      $collection_overview_overview_,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
     "./routes/design-system.tsx": $design_system,
