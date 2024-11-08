@@ -3,6 +3,7 @@ import { SRC101Repository } from "$server/database/src101Repository.ts";
 import {
   SRC101TokenidsParams,
   SRC101OwnerParams,
+  SRC101TxParams,
   SRC101ValidTxTotalCountParams,
   SRC101BalanceParams,
 } from "globals";
@@ -12,6 +13,38 @@ import { BlockService } from "$server/services/blockService.ts";
 import { convertToEmoji, paginate } from "$lib/utils/util.ts";
 
 export class Src101Controller{
+  static async handleSrc101TXFromSRC101Table(
+    params: SRC101TxParams,
+  ){
+    try{
+      const [lastBlock, txs, totalCount] = await Promise.all([
+        BlockService.getLastBlock(),
+        Src101Service.getSrc101TXFromSRC101Table(params),
+        Src101Service.getTotalSrc101TXFromSRC101TableCount(params),
+      ]);
+      let restructuredResult: any = {
+        last_block: lastBlock,
+      };
+      const limit = params.limit;
+      const page = params.page;
+      restructuredResult = {
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit),
+        total: totalCount,
+        ...restructuredResult,
+      };
+      restructuredResult.data = txs;
+      return restructuredResult;
+    } catch (error) {
+      console.error("Error processing SRC101 request:", error);
+      // Return an empty response instead of throwing an error
+      return {
+        last_block: await BlockService.getLastBlock(),
+      };
+    }
+  }
+
   static async handleValidSrc101TxRequest(
     params:SRC101ValidTxTotalCountParams,
   ){

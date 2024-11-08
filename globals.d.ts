@@ -425,6 +425,16 @@ export interface SRC101OwnerParams {
   sort?: string;
 }
 
+export interface SRC101TxParams {
+  tick?: string;
+  op?: string;
+  valid?: number;
+  block_index?: string;
+  deploy_hash?: string;
+  limit?: number;
+  page?: number;
+}
+
 export interface SRC101ValidTxParams {
   tick?: string;
   op?: string;
