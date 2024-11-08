@@ -5,11 +5,13 @@ import {
   BIG_LIMIT,
   SRC101_OWNERS_TABLE,
   SRC101_TABLE,
+  SRC101_ALL_TABLE,
   SRC101_RECIPIENTS_TABLE,
 } from "$lib/utils/constants.ts";
 
 import {
   SRC101ValidTxTotalCountParams,
+  SRC101TxParams,
   SRC101ValidTxParams,
   SRC101TokenidsParams,
   SRC101OwnerParams,
@@ -19,6 +21,146 @@ import {
 import { dbManager } from "$server/database/databaseManager.ts";
 
 export class SRC101Repository {
+  static async getTotalSrc101TXFromSRC101TableCount(
+    params:SRC101TxParams
+  ){
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (params.tick) {
+      whereConditions.push(`tick COLLATE utf8mb4_0900_as_ci = ?`);
+      queryParams.push(params.tick);
+    }
+
+    if (params.op) {
+      whereConditions.push(`op = ?`);
+      queryParams.push(params.op);
+    }
+
+    if (params.block_index) {
+      whereConditions.push(`block_index = ?`);
+      queryParams.push(params.block_index);
+    }
+
+    if (params.deploy_hash) {
+      whereConditions.push(`deploy_hash = ?`);
+      queryParams.push(params.deploy_hash);
+    }
+
+    if (params.valid == 1) {
+      whereConditions.push(`src101.status IS NULL`);
+    } else if (params.valid == 0) {
+      whereConditions.push(`src101.status IS NOT NULL`);
+    }
+
+    let sqlQuery = `
+        SELECT COUNT(*) AS total
+        FROM ${SRC101_ALL_TABLE} src101
+    `;
+
+    if (whereConditions.length > 0) {
+      sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
+    }
+    var results = (await dbManager.executeQueryWithCache(
+      sqlQuery,
+      queryParams,
+      1000 * 60 * 2,
+    )).rows;
+    return results[0].total;
+  }
+
+  static async getSrc101TXFromSRC101Table(
+    params:SRC101TxParams
+  ){
+    const queryParams = [];
+    let whereClause = "";
+
+    if (params.block_index) {
+      whereClause += `src101.block_index = ?`;
+      queryParams.push(params.block_index);
+    }
+
+    if (params.tick) {
+      whereClause += (whereClause ? " AND " : "") + `src101.tick = ?`;
+      queryParams.push(params.tick);
+    }   
+     
+    if (params.op) {
+      whereClause += (whereClause ? " AND " : "") + `src101.op = ?`;
+      queryParams.push(params.op);
+    }
+
+    if (params.deploy_hash) {
+      whereClause += (whereClause ? " AND " : "") + `src101.deploy_hash = ?`;
+      queryParams.push(params.deploy_hash);
+    }
+
+    if (params.valid == 1) {
+      whereClause += (whereClause ? " AND " : "") + `src101.status IS NULL`;
+    } else if (params.valid == 0) {
+      whereClause += (whereClause ? " AND " : "") + `src101.status IS NOT NULL`;
+    }
+
+    const offset = params.limit && params.page ? Number(params.limit) * (Number(params.page) - 1) : 0;
+    if (params.limit) {
+      queryParams.push(params.limit, offset);
+    }
+    const validOrder = "ASC";
+
+    const sqlQuery = `
+      SELECT 
+        (@row_number:=@row_number + 1) AS row_num,
+        src101.tx_hash,
+        src101.block_index,
+        src101.p,
+        src101.op,
+        src101.root,
+        src101.name,
+        src101.tokenid_origin,
+        src101.tokenid,
+        src101.tokenid_utf8,
+        src101.description,
+        src101.tick,
+        src101.wla,
+        src101.imglp,
+        src101.imgf,
+        src101.deploy_hash,
+        src101.creator,
+        src101.pri,
+        src101.dua,
+        src101.lim,
+        src101.coef,
+        src101.owner,
+        src101.mintstart,
+        src101.mintend,
+        src101.toaddress,
+        src101.destination,
+        src101.destination_nvalue,
+        src101.block_time,
+        src101.status
+      FROM
+        ${SRC101_ALL_TABLE} src101
+      CROSS JOIN
+        (SELECT @row_number := ?) AS init
+      ${whereClause ? `WHERE ${whereClause}` : ""}
+      ORDER BY 
+        src101.tx_index ${validOrder}
+      ${params.limit ? `LIMIT ? OFFSET ?` : ""};
+    `;
+
+    queryParams.unshift(offset);
+
+    return (await dbManager.executeQueryWithCache(
+      sqlQuery,
+      queryParams,
+      1000 * 60 * 2,
+    )).rows.map((result) => {
+      return {
+        ...result,
+      };
+    })
+  }
+
   static async getTotalValidSrc101TxCount(
     params:SRC101ValidTxTotalCountParams
   ) {
@@ -44,6 +186,7 @@ export class SRC101Repository {
       whereConditions.push(`deploy_hash = ?`);
       queryParams.push(params.deploy_hash);
     }
+
     if (params.address) {
       whereConditions.push(`address = ?`);
       queryParams.push(params.address);

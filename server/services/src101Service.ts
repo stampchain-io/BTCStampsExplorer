@@ -1,7 +1,29 @@
 import { SRC101Repository } from "$server/database/src101Repository.ts";
-import { SRC101TokenidsParams, SRC101OwnerParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams } from "globals";
+import { SRC101TokenidsParams, SRC101OwnerParams, SRC101TxParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams } from "globals";
 
 export class Src101Service {
+  static async getTotalSrc101TXFromSRC101TableCount(
+    params: SRC101TxParams,
+  ){
+    try{
+      return await SRC101Repository.getTotalSrc101TXFromSRC101TableCount(params);
+    } catch (error) {
+      console.error("Error getting SRC101 Tx From SRC101 Count:", error);
+      throw error;
+    }
+  }
+
+  static async getSrc101TXFromSRC101Table(
+    params: SRC101TxParams,
+  ){
+    try{
+      return await SRC101Repository.getSrc101TXFromSRC101Table(params);
+    } catch (error) {
+      console.error("Error getting SRC101 Tx From SRC101:", error);
+      throw error;
+    }
+  }
+
   static async getTotalValidSrc101TxCount(
     params:SRC101ValidTxTotalCountParams,
   ){
