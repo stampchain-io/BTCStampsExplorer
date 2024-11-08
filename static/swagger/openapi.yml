@@ -726,6 +726,59 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
+  /api/v2/src101/tx:
+    get:
+      summary: Get paginated SRC-101 transactions
+      description: Retrieve paginated SRC-101 transactions with optional limit and page parameters
+      parameters:
+        - in: query
+          name: limit
+          example: 2
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+          description: The maximum number of transactions to retrieve per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
+        - in: query
+          name: block_index
+          schema:
+            type: integer
+          description: Block index
+        - in: query
+          name: op
+          schema:
+            type: string
+          description: Opetarion, "mint" "transfer"
+        - in: query
+          name: deploy_hash
+          schema:
+            type: string
+        - in: query
+          name: valid
+          schema:
+            type: integer
+          description: Valid is 1, inValid is 0
+      responses:
+        '200':
+          description: Successful response with paginated SRC-101 transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+
   /api/v2/src101/tx/{tx_hash}:
     get:
       summary: Get paginated valid SRC-101 transactions
