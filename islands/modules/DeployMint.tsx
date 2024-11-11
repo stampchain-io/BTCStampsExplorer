@@ -1,28 +1,34 @@
+import { ModulesStyles } from "$islands/modules/Styles.ts";
+
 export const DeployMintModule = () => {
   return (
-    <div className="flex flex-col tablet:flex-row justify-between tablet:items-end gap-8 mobileLg:gap-16 tablet:gap-32">
-      <div>
-        <p className="font-light text-2xl tablet:text-5xl gray-gradient4 text-left">
-          DEPLOY // MINT
-        </p>
-        <p className="text-[#CCCCCC] text-base tablet:text-2xl font-medium">
+    <div class="
+      grid grid-cols-1 tablet:grid-cols-3 gap-3 mobileLg:gap-6 items-end
+      max-w-desktop w-full mx-auto
+    ">
+      <div className="col-span1 tablet:col-span-2">
+        <h1 className={ModulesStyles.title}>
+          DEPLOY
+        </h1>
+        <h2 className={ModulesStyles.subTitle}>YOUR OWN TOKEN</h2>
+        <p className={ModulesStyles.content}>
           Create or mint the most immutable fungible token with SRC-20. Built on
           top of the stamps meta-protocol SRC-20 tokens are built with Bitcoin.
         </p>
       </div>
 
-      <div className="flex gap-6 tablet:gap-12 font-extrabold text-sm tablet:text-xl justify-center">
+      <div className="flex gap-3 mobileLg:gap-6 font-extrabold justify-end">
+        <a
+          href="/howto"
+          f-partial="/howto"
+          className={ModulesStyles.buttonType1 + " !w-[114px]"}
+        >
+          HOW-TO
+        </a>
         <a
           href="/stamping/src20/deploy"
           f-partial="/stamping/src20/deploy"
-          className="border tablet:border-2 border-[#999999] text-[#999999] w-[90px] tablet:w-[136px] h-[40px] tablet:h-[60px] flex justify-center items-center rounded-md"
-        >
-          MINT
-        </a>
-        <a
-          href="/stamping/src20/mint"
-          f-partial="/stamping/src20/mint"
-          className="bg-[#999999] text-black w-[90px] tablet:w-[136px] h-[40px] tablet:h-[60px] flex justify-center items-center rounded-md"
+          className={ModulesStyles.buttonType2 + " !w-[102px]"}
         >
           DEPLOY
         </a>

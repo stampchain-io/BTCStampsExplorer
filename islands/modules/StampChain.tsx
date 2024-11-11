@@ -1,31 +1,35 @@
+import { ModulesStyles } from "$islands/modules/Styles.ts";
+
 export const StampChainModule = () => {
   return (
     <div class="
-      flex flex-col tablet:flex-row justify-between tablet:items-end gap-8 mobileLg:gap-16 tablet:gap-32
-      px-3 tablet:px-6 desktop:px-12 
+      grid grid-cols-1 desktop:grid-cols-3 gap-3 mobileLg:gap-6 items-end
       max-w-desktop w-full mx-auto
     ">
-      <div>
-        <p className="italic font-black text-4xl tablet:text-7xl flex flex-col gray-gradient4 text-left">
-          STAMPCHAIN
-          <span className="not-italic text-3xl tablet:text-6xl font-extralight text-[#999999]">
-            THE CREATORS OF BITCOIN STAMPS
-          </span>
-        </p>
-
-        <p className="text-[#CCCCCC] text-base tablet:text-2xl font-medium">
+      <div className="col-span1 desktop:col-span-2">
+        <h1 className={ModulesStyles.title}>STAMPCHAIN</h1>
+        <h2 className={ModulesStyles.subTitle}>
+          THE CREATORS OF BITCOIN STAMPS
+        </h2>
+        <p className={ModulesStyles.content}>
           Your premier destination for all things Bitcoin Stamps. As the OG
           resource, we offer unparalleled expertise and tools for the Stamps
           ecosystem.
-          <br />
         </p>
       </div>
 
-      <div className="flex gap-12 font-extrabold text-sm tablet:text-xl justify-center">
+      <div className="flex gap-3 mobileLg:gap-6 font-extrabold justify-end">
+        <a
+          href="#"
+          f-partial="#"
+          className={ModulesStyles.buttonType1 + " !w-[108px]"}
+        >
+          DONATE
+        </a>
         <a
           href="/about"
           f-partial="/about"
-          className="bg-[#999999] text-black w-[90px] tablet:w-[136px] h-[40px] tablet:h-[60px] flex justify-center items-center rounded-md"
+          className={ModulesStyles.buttonType2}
         >
           ABOUT
         </a>
