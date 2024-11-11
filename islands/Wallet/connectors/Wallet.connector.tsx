@@ -1,3 +1,4 @@
+import { useState } from "preact/hooks";
 import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
 import { unisatProvider } from "$client/wallet/unisat.ts";
 import { useToast } from "$islands/Toast/ToastProvider.tsx";
@@ -26,6 +27,8 @@ export function WalletConnector(
   const { addToast = () => {} } = useToast() ?? {};
   const providerInfo = WALLET_PROVIDERS[providerKey];
 
+  const [isHovered, setIsHovered] = useState(false);
+
   const handleConnect = async () => {
     try {
       const connectFunction = walletConnectors[providerKey];
@@ -52,9 +55,15 @@ export function WalletConnector(
       onClick={handleConnect}
       role="button"
       aria-label={`Connect to ${providerInfo.name}`}
-      className="cursor-pointer flex justify-between items-center p-4 dark-gradient border rounded-lg border-[#8800CC] transition-colors ease-in-out duration-150 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
+      className="cursor-pointer flex justify-between items-center p-4 dark-gradient rounded-lg transition-colors ease-in-out duration-150 border-2 border-transparent hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <p className="gray-gradient4 text-2xl uppercase font-black">
+      <p
+        className={` text-2xl uppercase font-black ${
+          isHovered ? "text-[#AA00FF]" : "gray-gradient4"
+        }`}
+      >
         {providerInfo.name}
       </p>
       <img
