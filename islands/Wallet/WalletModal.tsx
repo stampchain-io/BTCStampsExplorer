@@ -278,48 +278,69 @@ export const WalletModal = ({ connectors = [] }: Props) => {
     }
   };
 
+  const walletSignOut = () => {
+    disconnect();
+    if (path === "wallet" && typeof globalThis !== "undefined") {
+      globalThis.history.pushState({}, "", "/");
+      globalThis.location.reload();
+    }
+  };
+
   return (
     <div
       className="relative "
       ref={modalRef}
     >
-      <div class="relative inline-block group ">
-        <button
-          type="button"
-          ref={buttonRef}
-          onClick={toggleModal}
-          class={`${
-            isConnected && address
-              ? "text-[#8800CC] border-[#8800CC] border-2 rounded-md"
-              : "bg-[#8800CC] hover:bg-[#9911DD] text-[#080808] "
-          }  px-5 py-4 rounded font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]`}
-        >
-          {isConnected && address ? abbreviateAddress(address) : "CONNECT"}
-        </button>
-
-        {isConnected && address && (
-          <div class="absolute z-1000 top-full left-0 mt-2 pt-1 bg-black text-[#8800CC] border-[#8800CC] border-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <a
-              href={isConnected && address ? `/wallet/${address}` : "#"}
-              class="px-4 py-2 text-center hover:text-[#AA00FF] cursor-pointer"
-            >
-              DASHBOARD
-            </a>
+      {isConnected && address && (
+        <>
+          <button
+            type="button"
+            ref={buttonRef}
+            onClick={() => walletSignOut()}
+            class="block tablet:hidden text-stamp-primary-dark font-extrabold text-xl mobileLg:text-2xl -mt-6 mobileLg:-mt-9"
+          >
+            CONNECTED
+          </button>
+          <div class="hidden tablet:inline-block relative  group">
             <button
-              onClick={() => {
-                disconnect();
-                if (path === "wallet" && typeof globalThis !== "undefined") {
-                  globalThis.history.pushState({}, "", "/");
-                  globalThis.location.reload();
-                }
-              }}
-              class="px-4 py-2 text-center hover:text-[#AA00FF] cursor-pointer"
+              type="button"
+              ref={buttonRef}
+              onClick={toggleModal}
+              class=" text-stamp-primary border-stamp-primary border-2 rounded-md px-5 py-4 font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
             >
-              SIGN OUT
+              {abbreviateAddress(address)}
             </button>
+
+            <div class="absolute z-1000 top-full left-0 mt-2 pt-1 bg-black text-stamp-primary border-stamp-primary border-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <a
+                href={isConnected && address ? `/wallet/${address}` : "#"}
+                class="px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer"
+              >
+                DASHBOARD
+              </a>
+              <button
+                onClick={() => walletSignOut()}
+                class="px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer"
+              >
+                SIGN OUT
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
+
+      {!(isConnected && address) && (
+        <div class="relative inline-block">
+          <button
+            type="button"
+            ref={buttonRef}
+            onClick={toggleModal}
+            class="bg-stamp-purple hover:bg-[#9911DD] text-[#080808] px-5 py-4 rounded font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
+          >
+            CONNECT
+          </button>
+        </div>
+      )}
 
       {isModalOpen && !isConnected && (
         <ConnectorsModal
