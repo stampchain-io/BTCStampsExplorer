@@ -3,11 +3,11 @@ import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 
 interface NavLink {
   title: string;
-  href: string;
+  href?: string;
   subLinks?: NavLink[];
 }
 
-const navLinks: NavLink[] = [
+const desktopNavLinks: NavLink[] = [
   {
     title: "ART STAMPS",
     href: "#",
@@ -28,14 +28,28 @@ const navLinks: NavLink[] = [
       { title: "TRANSFER", href: "/stamping/src20/transfer" },
     ],
   },
+];
+
+const mobileNavLinks: NavLink[] = [
   {
-    title: "STAMPCHAIN",
+    title: "ART STAMPS",
+    href: "/stamp?type=classic",
+  },
+  {
+    title: "COLLECTIONS",
+    href: "/collection",
+  },
+  {
+    title: "SRC-20 TOKENS",
+    href: "/src20",
+  },
+  {
+    title: "TRENDING TOKENS",
+    href: "/src20?type=trending",
+  },
+  {
+    title: "TOOLS",
     href: "#",
-    subLinks: [
-      { title: "ABOUT", href: "/about" },
-      { title: "DONATE", href: "/donate" },
-      { title: "CONTACT", href: "/contact" },
-    ],
   },
 ];
 
@@ -48,6 +62,9 @@ const socialLinks = [
     icon: "/img/footer/GithubLogo.svg",
   },
 ];
+
+const logoClassName =
+  "purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl mobileLg:text-4xl desktop:text-5xl font-black italic pr-2";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -91,14 +108,28 @@ export function Header() {
   const toggleWalletModal = () => setIsWalletModalOpen(!isWalletModalOpen);
 
   const toggleMenu = () => {
-    const isMobileScreen = globalThis.matchMedia("(max-width: 1024px)").matches;
+    const isMobileScreen = globalThis.matchMedia("(max-width: 767px)").matches;
     if (!isMobileScreen) return;
     setOpen(!open);
-    document.body.style.overflow = !open ? "hidden" : "";
+
+    // Toggle body scroll lock
+    if (!open) {
+      // When opening menu - disable body scroll
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+      document.body.style.height = "100%";
+    } else {
+      // When closing menu - enable body scroll
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.height = "";
+    }
   };
 
   const renderNavLinks = (isMobile = false) => {
-    const filteredNavLinks = isMobile ? navLinks : navLinks.slice(0, 2);
+    const filteredNavLinks = isMobile ? mobileNavLinks : desktopNavLinks;
     return (
       <>
         {filteredNavLinks.map((link) => (
@@ -109,10 +140,17 @@ export function Header() {
             }`}
           >
             <a
-              className={`whitespace-nowrap hover:text-[#AA00FF] ${
+              href={link.href}
+              f-partial={link.href}
+              onClick={() => {
+                if (!link?.href) return;
+                toggleMenu();
+                setCurrentPath(link?.href ? link?.href : null);
+              }}
+              className={`whitespace-nowrap ${
                 isMobile
-                  ? "text-2xl text-[#660099]"
-                  : "text-lg desktop:text-xl text-center"
+                  ? "text-xl mobileLg:text-2xl text-stamp-primary hover:text-stamp-primary-hover"
+                  : "text-lg desktop:text-xl text-center group-hover:text-stamp-primary-hover"
               }`}
             >
               {link.title}
@@ -120,7 +158,7 @@ export function Header() {
             <div
               className={`${
                 isMobile
-                  ? "flex flex-col text-center"
+                  ? "hidden"
                   : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
               }`}
             >
@@ -131,7 +169,7 @@ export function Header() {
                   f-partial={subLink.href}
                   onClick={() => {
                     toggleMenu();
-                    setCurrentPath(subLink.href);
+                    setCurrentPath(subLink?.href ? subLink?.href : null);
                   }}
                   className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobileLg:text-base ${
                     currentPath === subLink.href
@@ -156,13 +194,13 @@ export function Header() {
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className="purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl tablet:text-4xl desktop:text-5xl font-black italic pr-2"
+          className={logoClassName}
         >
           STAMPCHAIN
         </a>
         <button
           onClick={toggleMenu}
-          className="text-blue-600 tablet:hidden block z-[100]"
+          className="tablet:hidden block z-[100]"
           id="navbar-toggle"
         >
           {open && (
@@ -176,40 +214,30 @@ export function Header() {
             <img
               src="/img/header/menu-open.svg"
               alt="menu"
-              className="w-5 h-4"
+              className="w-5 h-5"
             />
           )}
         </button>
       </div>
 
       {/* Desktop Navbar */}
-      <div className="hidden tablet:flex justify-between items-center gap-6 desktop:gap-12 font-black text-[#8800CC]">
+      <div className="hidden tablet:flex justify-between items-center gap-6 desktop:gap-12 font-black text-stamp-primary">
         {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex tablet:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 pb-6 pt-[77px] mobileLg:pt-[102px] backdrop-blur-md font-black text-[#8800CC] ${
+        className={`duration-500 flex tablet:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] backdrop-blur-md font-black text-stamp-primary ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"
       >
-        <a
-          href="/home"
-          f-partial="/home"
-          onClick={() => {
-            toggleMenu();
-            setCurrentPath("collection");
-          }}
-          className="lg:block hidden bg-clip-text text-transparent bg-gradient-to-r from-[#440066] to-[#AA00FF] text-3xl italic absolute top-9 left-3 mobileLg:left-6 pr-2"
-        >
-          STAMPCHAIN
-        </a>
-
-        <div className="font-black text-center flex flex-col items-center justify-between gap-6">
+        <div className="font-black text-center flex flex-col items-center justify-between gap-3">
           {renderNavLinks(true)}
-          <ConnectWallet toggleModal={toggleWalletModal} />
+          <div className="mt-6 mobileLg:mt-9">
+            <ConnectWallet toggleModal={toggleWalletModal} />
+          </div>
         </div>
 
         <div className="flex justify-center items-center">
@@ -217,13 +245,13 @@ export function Header() {
             <a key={link.href} href={link.href} target="_blank">
               <img
                 src={link.icon}
-                className={`w-10 mobileLg:w-12 ${
+                className={`w-[31px] h-[31px] mobileLg:w-[46px] desktop:h-[46px] ${
                   index === 0
-                    ? "mr-[13px]"
+                    ? "mr-[12px] mobileLg:mr-[13px]"
                     : index === 1
-                    ? "mr-[17px]"
+                    ? "mr-[13px] mobileLg:mr-[17px]"
                     : index === 2
-                    ? "mr-[21px]"
+                    ? "mr-[17px] mobileLg:mr-[21px]"
                     : ""
                 }`}
                 alt=""
