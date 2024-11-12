@@ -151,6 +151,7 @@ import * as $modules_FAQTransfer from "./islands/modules/FAQTransfer.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
+import * as $modules_Styles from "./islands/modules/Styles.ts";
 import * as $src20_SRC20Card from "./islands/src20/SRC20Card.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
@@ -376,6 +377,7 @@ const manifest = {
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
+    "./islands/modules/Styles.ts": $modules_Styles,
     "./islands/src20/SRC20Card.tsx": $src20_SRC20Card,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
