@@ -1,8 +1,8 @@
 import { useEffect } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
-import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
+import { TransactionFeeDetails } from "$components/shared/modal/TransactionFeeDetails.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
+import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 
 interface Props {
   fee: number;
@@ -111,19 +111,21 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
         />
       </div>
 
-      <FeeEstimation
+      <TransactionFeeDetails
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
-        type="transfer"
+        type="send"
+        amount={parseFloat(formState.amount) || 0}
         BTCPrice={formState.BTCPrice}
-        onRefresh={() => {}}
         isSubmitting={isSubmitting}
         onSubmit={handleSendSubmit}
-        buttonName="SEND"
-        isModal={true}
         onCancel={onClose}
+        buttonName="SEND"
         className="border-t border-[#333333] pt-4"
+        userAddress={wallet?.address}
         recipientAddress={formState.recipientAddress}
+        inputType="P2WPKH"
+        outputTypes={["P2WPKH"]}
       />
 
       {error && <div class="text-red-500 mt-2">{error}</div>}

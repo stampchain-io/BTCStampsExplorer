@@ -3,9 +3,9 @@ import { useEffect, useState } from "preact/hooks";
 import type { StampRow } from "globals";
 import StampImage from "./StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
-import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
+import { TransactionFeeDetails } from "$components/shared/modal/TransactionFeeDetails.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
+import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 
 interface Props {
   stamp: StampRow;
@@ -121,7 +121,6 @@ const StampBuyModal = ({
 
   return (
     <ModalLayout onClose={handleCloseModal} title="BUY">
-      {/* Stamp preview and quantity selector */}
       <div className="flex justify-between">
         <StampImage
           stamp={stamp}
@@ -149,24 +148,22 @@ const StampBuyModal = ({
         </div>
       </div>
 
-      {/* Fee estimation and action buttons */}
-      <FeeEstimation
+      <TransactionFeeDetails
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
-        type="stamp"
-        fileType="application/json"
-        fileSize={stamp.contentLength}
+        type="buy"
+        amount={totalPrice}
         BTCPrice={formState.BTCPrice}
-        onRefresh={() => {}}
         isSubmitting={isSubmitting}
         onSubmit={handleBuyClick}
-        buttonName="BUY"
-        isModal={true}
         onCancel={toggleModal}
+        buttonName="BUY"
         className="border-t border-[#333333] pt-4"
+        userAddress={wallet?.address}
+        inputType="P2WPKH"
+        outputTypes={["P2WPKH"]}
       />
 
-      {/* Error and success messages */}
       {error && <div className="text-red-500 mt-2">{error}</div>}
       {successMessage && (
         <div className="text-green-500 mt-2">{successMessage}</div>
