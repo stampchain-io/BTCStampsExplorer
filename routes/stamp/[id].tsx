@@ -130,15 +130,16 @@ export default function StampPage(props: StampDetailPageProps) {
       stamps: stamps_recent.data,
       layout: "row",
       showDetails: false,
-      // FIXME: gridclass needs adjustment and this is now recent stamps
       gridClass: ` 
-        grid w-full gap-4
-        grid-cols-2
-        mobileMd:grid-cols-3
-        mobileLg:grid-cols-4
-        tablet:grid-cols-6
-        desktop:grid-cols-6
-    `,
+        grid w-full gap-3 mobileLg:gap-4
+        grid-cols-4 desktop:grid-cols-6
+      `,
+      displayCounts: {
+        "mobileSm": 4, // 4 columns x 1 rows
+        "mobileLg": 4, // 4 columns x 1 rows
+        "tablet": 4, // 4 columns x 1 rows
+        "desktop": 6, // 6 columns x 1 rows
+      },
     },
   ];
 

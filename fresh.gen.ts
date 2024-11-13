@@ -130,6 +130,7 @@ import * as $collection_CollectionDetailsContent from "./islands/collection/Coll
 import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
 import * as $collection_CollectionOverviewArtistContent from "./islands/collection/CollectionOverviewArtistContent.tsx";
 import * as $collection_CollectionOverviewHeader from "./islands/collection/CollectionOverviewHeader.tsx";
+import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
@@ -356,6 +357,7 @@ const manifest = {
       $collection_CollectionOverviewArtistContent,
     "./islands/collection/CollectionOverviewHeader.tsx":
       $collection_CollectionOverviewHeader,
+    "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
