@@ -1,7 +1,7 @@
 // islands/stamp/details/WalletTransferModal.tsx
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { TransactionFeeDetails } from "$components/shared/modal/TransactionFeeDetails.tsx";
 import { SelectField } from "$islands/stamping/SelectField.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
@@ -121,7 +121,11 @@ function WalletTransferModal({
         <div className="flex flex-col gap-4">
           <SelectField
             value={selectedStamp?.stamp?.toString() || ""}
-            onChange={handleStampSelect}
+            onChange={(e) => {
+              // Handle stamp selection
+              const value = (e.target as HTMLInputElement).value;
+              handleStampSelect(value);
+            }}
           />
 
           <input
@@ -135,18 +139,19 @@ function WalletTransferModal({
         </div>
       </div>
 
-      <FeeEstimation
+      <TransactionFeeDetails
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="transfer"
         BTCPrice={formState.BTCPrice}
-        onRefresh={() => {}}
         isSubmitting={isSubmitting}
         onSubmit={handleTransferSubmit}
-        buttonName="TRANSFER"
-        isModal={true}
         onCancel={toggleModal}
+        buttonName="TRANSFER"
         className="border-t border-[#333333] pt-4"
+        userAddress={wallet?.address}
+        inputType="P2WPKH"
+        outputTypes={["P2WPKH"]}
       />
 
       {error && <div className="text-red-500 mt-2">{error}</div>}
