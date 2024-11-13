@@ -20,7 +20,7 @@ export function CollectionOverviewCard(
         </div>
         <div className="text-[#666666] text-base mobileLg:text-xl font-light w-full">
           <p class="text-3xl mobileLg:text-5xl font-black purple-gradient1">
-            {collection.collection_name}
+            {collection.collection_name.toUpperCase()}
           </p>
           <p>
             BY{" "}
@@ -34,7 +34,7 @@ export function CollectionOverviewCard(
             <p>
               STAMPS{" "}
               <span className="font-bold text-[#999999]">
-                {collection.stamp_images?.length}
+                {collection.stamp_count}
               </span>
             </p>
             <p>

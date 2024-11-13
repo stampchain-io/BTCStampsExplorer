@@ -31,7 +31,7 @@ const TEXT_STYLES = {
     base: "font-black text-stamp-purple-bright truncate max-w-full",
     // sizes: "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl group-data-[long-number=true]:text-sm group-data-[long-number=true]:mobileSm:text-sm group-data-[long-number=true]:mobileLg:text-base group-data-[long-number=true]:tablet:text-lg group-data-[long-number=true]:desktop:text-xl",
     sizes:
-      "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl",
+      "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-3xl",
   },
   creator: {
     base: "font-bold text-stamp-grey break-words text-center",
@@ -227,11 +227,11 @@ export function StampCard({
 
   const renderPrice = () => {
     if (isRecentSale && stamp.sale_data) {
-      return `${stamp.sale_data.btc_amount.toLocaleString()} SATS`;
+      return `${stamp.sale_data.btc_amount.toLocaleString()} ₿`;
     } else if (Number.isFinite(stamp.floorPrice)) {
-      return `${Number(stamp.floorPrice).toLocaleString()} SATS`; // FIXME: this may be in BTC..
+      return `${Number(stamp.floorPrice).toLocaleString()} ₿`;
     } else {
-      return "NOT LISTED";
+      return "0 ₿";
     }
   };
 

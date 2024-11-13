@@ -116,7 +116,17 @@ export class StampService {
   }
 
   static async getStamps(options) {
+
+    if (options.collectionId && (!options.groupBy || !options.groupBySubquery)) {
+      options = {
+        ...options,
+        groupBy: "collection_id",
+        groupBySubquery: true
+      };
+    }
+
     const result = await StampRepository.getStampsFromDb(options);
+
 
     if (!result) {
       throw new Error("No stamps found");

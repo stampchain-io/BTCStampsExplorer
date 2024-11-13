@@ -115,16 +115,15 @@ export function StampImage(
   };
 
   useEffect(() => {
-    console.log("here");
     // Set initial transform
     updateTransform();
 
     // Add event listener to handle window resize
-    window.addEventListener("resize", updateTransform);
+    globalThis.addEventListener("resize", updateTransform);
 
     // Cleanup event listener on component unmount
     return () => {
-      window.removeEventListener("resize", updateTransform);
+      globalThis.removeEventListener("resize", updateTransform);
     };
   }, []);
 
