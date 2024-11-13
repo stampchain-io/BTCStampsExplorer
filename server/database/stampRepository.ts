@@ -361,6 +361,7 @@ export class StampRepository {
       suffixFilters?: STAMP_SUFFIX_FILTERS[];
       groupBy?: string;
       groupBySubquery?: boolean;
+      collectionStampLimit?: number;
     },
   ) {
     const {
@@ -380,6 +381,7 @@ export class StampRepository {
       suffixFilters,
       groupBy,
       groupBySubquery = false,
+      collectionStampLimit = 12,
     } = options;
 
     const whereConditions: string[] = [];
@@ -455,56 +457,89 @@ export class StampRepository {
 
     // Include collection_stamps join only if collectionId is provided
     if (collectionId) {
-      joinClause = `
-        JOIN collection_stamps cs1 ON st.stamp = cs1.stamp
-        ${joinClause}
-      `;
-    }
-
-    let groupByClause = "";
-
-    if (groupBy && groupBySubquery && collectionId) {
-      // const collectionIdPlaceholders = Array.isArray(collectionId)
-      //   ? collectionId.map(() => "UNHEX(?)").join(", ")
-      //   : "UNHEX(?)";
-      
-      // joinClause += `
-      //   JOIN (
-      //     SELECT ${groupBy}, MAX(stamp) as first_stamp
-      //     FROM collection_stamps
-      //     WHERE collection_id IN (${collectionIdPlaceholders})
-      //     GROUP BY ${groupBy}
-      //   ) fs ON cs1.${groupBy} = fs.${groupBy} AND st.stamp = fs.first_stamp
-      // `;
-
-      // Remove the subquery that was limiting to first stamp per collection
-      // Instead, use a simple JOIN
+      // Add warning if collection query is missing required parameters
+      if (!groupBy || groupBy !== "collection_id" || !groupBySubquery) {
+        console.warn(
+          "Warning: Collection query missing required parameters. For optimal collection querying, use groupBy: 'collection_id' and groupBySubquery: true"
+        );
+      }
 
       joinClause = `
         JOIN collection_stamps cs1 ON st.stamp = cs1.stamp
         LEFT JOIN creator AS cr ON st.creator = cr.address
       `;
+    }
 
-      // Add collectionId to queryParams if it's not already there
-      if (Array.isArray(collectionId)) {
-        queryParams.push(...collectionId);
-      } else {
-        queryParams.push(collectionId);
-      }
-    } else if (groupBy) {
+    let groupByClause = "";
+    if (groupBy) {
       groupByClause = `GROUP BY ${groupBy}`;
     }
 
-    const query = `
-      SELECT ${selectClause}
-      FROM ${STAMP_TABLE} AS st
-      ${joinClause}
-      ${whereClause}
-      ${groupByClause}
-      ${orderClause}
-      ${limitClause}
-      ${offsetClause}
-    `;
+    let query = ''; // Declare query variable
+
+    if (collectionId && groupBy === "collection_id") {
+      // Handle single collection case differently from multiple collections
+      if (!Array.isArray(collectionId)) {
+        // Simple query for single collection with standard pagination
+        query = `
+          SELECT ${selectClause}
+          FROM ${STAMP_TABLE} AS st
+          ${joinClause}
+          ${whereClause}
+          ${orderClause}
+          ${limitClause}
+          ${offsetClause}
+        `;
+      } else {
+        // Complex query for multiple collections with per-collection limits
+        const subQuery = `
+          WITH ValidStamps AS (
+            SELECT 
+              ${baseColumns},
+              HEX(cs1.collection_id) as collection_id,
+              ROW_NUMBER() OVER (
+                PARTITION BY cs1.collection_id 
+                ORDER BY st.${sortColumn} ${order}
+              ) as rn
+            FROM ${STAMP_TABLE} st
+            ${joinClause}
+            WHERE cs1.collection_id IN (${collectionId.map(() => "UNHEX(?)").join(",")})
+              AND (
+                st.stamp_url IS NOT NULL
+                AND st.stamp_url != ''
+                AND st.stamp_url NOT LIKE '%undefined%'
+                AND st.stamp_url NOT LIKE '%null%'
+                AND st.stamp_mimetype IS NOT NULL
+              )
+          )
+        `;
+
+        // Main query with pagination
+        query = `
+          ${subQuery}
+          SELECT *
+          FROM ValidStamps ranked_stamps
+          WHERE rn <= ${collectionStampLimit}
+          ORDER BY ${sortColumn} ${order}
+          LIMIT ? OFFSET ?
+        `;
+
+        // Add parameters for multiple collections
+        queryParams.push(...collectionId);
+      }
+    } else {
+      // Standard query for non-collection cases
+      query = `
+        SELECT ${selectClause}
+        FROM ${STAMP_TABLE} AS st
+        ${joinClause}
+        ${whereClause}
+        ${groupByClause}
+        ${orderClause}
+        ${limitClause}
+        ${offsetClause}
+      `;
+    }
 
     // Execute the data query
     const dataResult = await dbManager.executeQueryWithCache(

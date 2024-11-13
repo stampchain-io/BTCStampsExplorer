@@ -10,7 +10,7 @@ export const handler: Handlers = {
       const { limit, page } = getPaginationParams(url);
       const creator = url.searchParams.get("creator") ?? undefined;
 
-      const result = await CollectionController.getCollections({
+      const result = await CollectionController.getCollectionDetails({
         limit,
         page,
         creator,

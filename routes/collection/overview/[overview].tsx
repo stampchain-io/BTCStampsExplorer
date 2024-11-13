@@ -37,13 +37,14 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
       switch (overview) {
         case "artist": {
           const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
-          const collectionsData = await CollectionController.getCollectionNames(
-            {
-              limit: page_size,
-              page: page,
-              creator: "",
-            },
-          );
+          const collectionsData = await CollectionController
+            .getCollectionStamps(
+              {
+                limit: page_size,
+                page: page,
+                creator: "",
+              },
+            );
 
           return ctx.render({
             selectedTab: "artist",

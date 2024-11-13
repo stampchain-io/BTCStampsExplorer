@@ -60,7 +60,7 @@ export const handler: Handlers<StampData> = {
       const page_size = parseInt(
         url.searchParams.get("limit") || "20",
       );
-      const collectionsData = await CollectionController.getCollectionNames({
+      const collectionsData = await CollectionController.getCollectionStamps({
         limit: page_size,
         page: page,
         creator: "",

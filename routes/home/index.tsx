@@ -18,7 +18,7 @@ type HomePageProps = {
     stamps_art: StampRow[];
     stamps_posh: StampRow[];
     src20s: any[];
-    trendingSrc20s: any[]; // <-- Add this line
+    trendingSrc20s: any[];
     collectionData: CollectionRow[];
     carouselStamps: StampRow[];
   };

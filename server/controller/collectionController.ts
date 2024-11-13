@@ -4,16 +4,118 @@ import {
   CollectionQueryParams,
   PaginatedCollectionResponseBody,
 } from "globals";
-import { StampRepository } from "$server/database/stampRepository.ts";
+import { StampController } from "$server/controller/stampController.ts";
 
 export class CollectionController {
-  static async getCollections(
+  static async getCollectionDetails(
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
     try {
-      return await CollectionService.getCollections(params);
+      return await CollectionService.getCollectionDetails(params);
     } catch (error) {
-      console.error("Error in CollectionController.getCollections:", error);
+      console.error("Error in CollectionController.getCollectionDetails:", error);
+      throw error;
+    }
+  }
+
+  static async getCollectionStamps(
+    params: CollectionQueryParams,
+  ): Promise<PaginatedCollectionResponseBody> {
+    try {
+      const { limit = 50, page = 1, creator } = params;
+      const collectionsResult = await CollectionService.getCollectionDetails({
+        limit,
+        page,
+        creator,
+      });
+
+      if (!collectionsResult.data || !Array.isArray(collectionsResult.data)) {
+        throw new Error(
+          "Unexpected data structure from CollectionService.getCollectionDetails",
+        );
+      }
+
+      // Filter out collections with less than 2 stamps
+      const validCollections = collectionsResult.data.filter(
+        (collection: Collection) => collection.stamp_count >= 2
+      );
+
+      const collectionIds = validCollections.map(
+        (collection: Collection) => collection.collection_id,
+      );
+
+      // Calculate total limit based on number of collections
+      const totalLimit = collectionIds.length * 12;
+
+      console.log('Fetching stamps for collections:', {
+        collectionIds,
+        totalLimit,
+        collectionStampLimit: 12
+      });
+
+      const stampResults = await StampController.getStamps({
+        collectionId: collectionIds,
+        noPagination: false,
+        type: "all",
+        sortBy: "ASC",
+        allColumns: false,
+        limit: totalLimit,
+        collectionStampLimit: 12,
+        groupBy: "collection_id",
+        groupBySubquery: true
+      });
+
+      if (!stampResults.data || !Array.isArray(stampResults.data)) {
+        throw new Error(
+          "Unexpected data structure from StampController.getStamps",
+        );
+      }
+
+      // Create a map to store stamps by collection ID
+      const stampsByCollection = new Map<string, string[]>();
+
+      // Group stamps by collection ID
+      stampResults.data.forEach((stamp: { collection_id: string; stamp_url: string }) => {
+        if (!stamp.stamp_url) {
+          return;
+        }
+        
+        const collectionId = stamp.collection_id?.toUpperCase();
+        if (!collectionId) {
+          return;
+        }
+
+        if (!stampsByCollection.has(collectionId)) {
+          stampsByCollection.set(collectionId, []);
+        }
+
+        const stamps = stampsByCollection.get(collectionId)!;
+        if (stamps.length < 12 && !stamps.includes(stamp.stamp_url)) {
+          stamps.push(stamp.stamp_url);
+        }
+      });
+
+      // Map collections with their stamps
+      const collections: Collection[] = validCollections.map(
+        (collection: Collection) => {
+          const collectionId = collection.collection_id.toUpperCase();
+          const stamps = stampsByCollection.get(collectionId) || [];
+          
+          return {
+            ...collection,
+            first_stamp_image: stamps[1] || null,
+            stamp_images: stamps,
+          };
+        }
+      );
+
+      return {
+        ...collectionsResult,
+        data: collections,
+        total: validCollections.length, // Update total count to reflect filtered collections
+      };
+    } catch (error) {
+      console.error("Error in CollectionController.getCollectionStamps:", error);
       throw error;
     }
   }
@@ -22,103 +124,7 @@ export class CollectionController {
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
     try {
-      const { limit = 50, page = 1, creator } = params;
-      const collectionsResult = await CollectionService.getCollections({
-        limit,
-        page,
-        creator,
-      });
-
-      console.log(
-        "Collections result:",
-        JSON.stringify(collectionsResult, null, 2),
-      );
-
-      // Adjust the check to verify that data is an array
-      if (!collectionsResult.data || !Array.isArray(collectionsResult.data)) {
-        console.error(
-          "collectionsResult.data is not in the expected format:",
-          collectionsResult.data,
-        );
-        throw new Error(
-          "Unexpected data structure from CollectionService.getCollections",
-        );
-      }
-
-      // Use collectionsResult.data directly, since it's now an array
-      const collectionIds = collectionsResult.data.map(
-        (collection: Collection) => collection.collection_id,
-      );
-
-      console.log("Collection IDs:", collectionIds);
-
-      // Fetch first stamp for all collections in a single query
-      const stampResults = await StampRepository.getStampsFromDb({
-        collectionId: collectionIds,
-        noPagination: true,
-        type: "all",
-        sortBy: "ASC",
-        allColumns: false,
-        limit: 6, // Get 6 stamps per collection
-        groupBy: "collection_id", // Ensure this matches the column name
-        groupBySubquery: true,
-      });
-
-      console.log("Stamp results:", JSON.stringify(stampResults, null, 2));
-
-      // Make sure stampResults.stamps exists and is an array
-      if (!stampResults.stamps || !Array.isArray(stampResults.stamps)) {
-        console.error(
-          "stampResults.stamps is not in the expected format:",
-          stampResults.stamps,
-        );
-        throw new Error(
-          "Unexpected data structure from StampRepository.getStampsFromDb",
-        );
-      }
-
-      // Create a map of collection_id to first stamp image
-      const firstStampImageMap = new Map(
-        stampResults.stamps.map(
-          (stamp: { collection_id: string; stamp_url: string }) => [
-            stamp.collection_id.toLowerCase(),
-            stamp.stamp_url,
-          ],
-        ),
-      );
-
-      console.log(
-        "First stamp image map:",
-        JSON.stringify(Array.from(firstStampImageMap.entries()), null, 2),
-      );
-
-      // Create a map of collection_id to array of stamp images
-      const stampImagesMap = new Map<string, string[]>();
-      
-      stampResults.stamps.forEach((stamp: { collection_id: string; stamp_url: string }) => {
-        const collectionId = stamp.collection_id.toLowerCase();
-        if (!stampImagesMap.has(collectionId)) {
-          stampImagesMap.set(collectionId, []);
-        }
-        stampImagesMap.get(collectionId)?.push(stamp.stamp_url);
-      });
-
-      const collections: Collection[] = collectionsResult.data.map(
-        (collection: Collection) => ({
-          ...collection,
-          first_stamp_image:
-            firstStampImageMap.get(collection.collection_id.toLowerCase()) ||
-            null,
-            stamp_images: stampImagesMap.get(collection.collection_id.toLowerCase()) || [],
-        }),
-      );
-
-      console.log("Final collections:", JSON.stringify(collections, null, 2));
-
-      return {
-        ...collectionsResult,
-        data: collections,
-      };
+      return await CollectionService.getCollectionNames(params);
     } catch (error) {
       console.error("Error in CollectionController.getCollectionNames:", error);
       throw error;

@@ -36,7 +36,7 @@ export const handler: Handlers = {
       const page = parseInt(url.searchParams.get("page") || "1");
       const page_size = parseInt(url.searchParams.get("limit") || "20");
 
-      const collectionsData = await CollectionController.getCollectionNames({
+      const collectionsData = await CollectionController.getCollectionStamps({
         limit: page_size,
         page: page,
         creator: "",

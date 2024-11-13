@@ -21,13 +21,13 @@ export const CollectionDetailsHeader = (
           />
           <div>
             <p className="font-black text-6xl purple-gradient3">
-              {collection.collection_name}
+              {collection.collection_name.toUpperCase()}
             </p>
             <p className="text-[#666666] text-xl font-light">COLLECTION BY</p>
             <div>
               <p className="text-[#999999] text-4xl font-black">
                 {collection.creators
-                  ? abbreviateAddress(collection.creators)
+                  ? abbreviateAddress(collection.creators, 6)
                   : "N/A"}
               </p>
               <div>

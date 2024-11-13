@@ -171,24 +171,12 @@ export class StampController {
     allColumns = false,
     sortColumn = "tx_index",
     suffixFilters,
-  }: {
-    page?: number;
-    limit?: number;
-    sortBy?: "DESC" | "ASC";
-    type?: STAMP_TYPES;
-    filterBy?: STAMP_FILTER_TYPES[] | string;
-    ident?: SUBPROTOCOLS[];
-    suffixFilters?: STAMP_SUFFIX_FILTERS[];
-    collectionId?: string | string[];
-    identifier?: string | number;
-    blockIdentifier?: number | string;
-    cacheDuration?: number | "never";
-    noPagination?: boolean;
-    allColumns?: boolean;
-    sortColumn?: string;
+    collectionStampLimit = 12,
+    groupBy,
+    groupBySubquery,
   } = {}) {
     try {
-      console.log("StampController.getStamps called with filterBy:", filterBy);
+
 
       const filterByArray = typeof filterBy === "string"
         ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
@@ -250,55 +238,90 @@ export class StampController {
           noPagination,
           filterBy: filterByArray,
           sortColumn,
+          collectionStampLimit,
+          groupBy,
+          groupBySubquery
         }),
         BlockService.getLastBlock(),
       ]);
+
+      console.log("StampResult from service:", {
+        totalStamps: stampResult?.stamps?.length,
+        sampleStamp: stampResult?.stamps?.[0],
+        page: stampResult?.page,
+        pageSize: stampResult?.page_size,
+        total: stampResult?.total
+      });
 
       if (!stampResult) {
         throw new Error("No stamps found");
       }
 
-      // Prepare concurrent calls for dispensers
-      const dispenserPromises = stampResult.stamps.map((stamp: StampRow) =>
-        (stamp.ident === "STAMP" || stamp.ident === "SRC-721")
-          ? DispenserManager.getDispensersByCpid(stamp.cpid)
-          : Promise.resolve(null)
-      );
+      // Return data without dispenser processing for collection queries
+      if (collectionId) {
+        return {
+          page: stampResult.page,
+          limit: stampResult.page_size,
+          totalPages: stampResult.pages,
+          total: stampResult.total,
+          last_block: lastBlock,
+          data: stampResult.stamps,  // Return stamps directly without dispenser processing
+        };
+      }
 
-      // Wait for all dispenser promises to resolve
-      const dispensers = await Promise.all(dispenserPromises);
+      // Existing dispenser processing for non-collection queries
+      if (stampResult.stamps.length > 0 && 
+          (stampResult.stamps[0].ident === "STAMP" || 
+           stampResult.stamps[0].ident === "SRC-721")) {
+        // Batch dispenser requests for efficiency
+        const uniqueCpids = [...new Set(stampResult.stamps.map(stamp => stamp.cpid))];
+        const dispenserMap = new Map();
+        
+        const batchDispensers = await Promise.all(
+          uniqueCpids.map(cpid => DispenserManager.getDispensersByCpid(cpid))
+        );
+        
+        batchDispensers.forEach((dispensers, index) => {
+          dispenserMap.set(uniqueCpids[index], dispensers);
+        });
 
-      const updatedStamps = stampResult.stamps.map(
-        (stamp: StampRow, index: number) => {
-          let floorPrice: string | number | undefined = undefined;
+        // Update stamps with floor prices
+        const updatedStamps = stampResult.stamps.map(stamp => {
+          if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
+            return stamp;
+          }
 
-          if (stamp.ident === "STAMP" || stamp.ident === "SRC-721") {
-            const dispensersForStamp = dispensers[index];
-            if (dispensersForStamp && dispensersForStamp.length > 0) {
-              const openDispensers = dispensersForStamp.filter(
-                (dispenser) => dispenser.give_remaining > 0,
+          const dispensersForStamp = dispenserMap.get(stamp.cpid);
+          let floorPrice: string | number = "priceless";
+
+          if (dispensersForStamp?.length > 0) {
+            const openDispensers = dispensersForStamp.filter(
+              dispenser => dispenser.give_remaining > 0
+            );
+            if (openDispensers.length > 0) {
+              floorPrice = Math.min(
+                ...openDispensers.map(
+                  dispenser => dispenser.satoshirate / 100000000
+                )
               );
-              if (openDispensers.length > 0) {
-                const lowestBtcRate = Math.min(
-                  ...openDispensers.map(
-                    (dispenser) => dispenser.satoshirate / 100000000,
-                  ),
-                );
-                floorPrice = lowestBtcRate;
-              } else {
-                floorPrice = "priceless";
-              }
-            } else {
-              floorPrice = "priceless";
             }
           }
 
           return {
             ...stamp,
-            ...(floorPrice !== undefined && { floorPrice }),
+            floorPrice,
           };
-        },
-      );
+        });
+
+        return {
+          page: stampResult.page,
+          limit: stampResult.page_size,
+          totalPages: stampResult.pages,
+          total: stampResult.total,
+          last_block: lastBlock,
+          data: updatedStamps,
+        };
+      }
 
       return {
         page: stampResult.page,
@@ -306,7 +329,7 @@ export class StampController {
         totalPages: stampResult.pages,
         total: stampResult.total,
         last_block: lastBlock,
-        data: updatedStamps,
+        data: stampResult.stamps,
       };
     } catch (error) {
       console.error("Error in getStamps:", error);
@@ -430,7 +453,7 @@ export class StampController {
         }),
         Src20Controller.fetchTrendingTokens(null, 5, 1, 1000),
         this.getRecentSales(1, 6),
-        CollectionController.getCollectionNames({
+        CollectionController.getCollectionStamps({
           limit: 4,
           page: 1,
           creator: "",
