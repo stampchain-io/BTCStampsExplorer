@@ -6,33 +6,6 @@ import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
 
-const gridSizeClasses = {
-  small: "w-[123px] h-[123px]",
-  medium: "w-[180px] h-[180px]",
-  large: "w-[294px] h-[294px]",
-  xlarge: "w-[408px] h-[408px]",
-};
-
-// TODO: to better control the stampcard grid
-// Example of dynamic grid class with sizing
-const dynamicGridClass = `
-  grid w-full
-  gap-[12px]
-  mobileSm:gap-[12px]
-  mobileLg:gap-[24px]
-  tablet:gap-[24px]
-  desktop:gap-[24px]
-  grid-cols-2
-  mobileSm:grid-cols-2
-  mobileLg:grid-cols-4
-  tablet:grid-cols-3
-  desktop:grid-cols-4
-  [&>div]:${gridSizeClasses.small}
-  mobileLg:[&>div]:${gridSizeClasses.medium}
-  tablet:[&>div]:${gridSizeClasses.large}
-  desktop:[&>div]:${gridSizeClasses.xlarge}
-`;
-
 export default function StampSection({
   title,
   type,
@@ -81,14 +54,6 @@ export default function StampSection({
           setDisplayCount(
             displayCounts.mobileLg || displayCounts.tablet ||
               displayCounts.desktop || stampArray.length,
-          );
-        } else if (width >= BREAKPOINTS.mobileMd) {
-          setDisplayCount(
-            displayCounts.mobileMd ||
-              displayCounts.mobileLg ||
-              displayCounts.tablet ||
-              displayCounts.desktop ||
-              stampArray.length,
           );
         } else {
           setDisplayCount(

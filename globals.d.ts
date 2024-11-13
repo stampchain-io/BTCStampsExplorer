@@ -121,6 +121,12 @@ export interface StampSectionProps {
   viewAllLink?: string;
 }
 
+export interface CollectionSectionProps {
+  collections: Collection[];
+  gridClass?: string;
+  displayCounts?: DisplayCountBreakpoints;
+}
+
 export interface SRC20Row {
   tx_hash: string;
   block_index: number;

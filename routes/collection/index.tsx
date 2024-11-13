@@ -8,6 +8,7 @@ import { CollectionListCard } from "$components/collection/CollectionListCard.ts
 
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
+import CollectionSection from "$islands/collection/CollectionSection.tsx";
 
 type CollectionPageProps = {
   data: {
@@ -151,14 +152,16 @@ export default function Collection(props: CollectionPageProps) {
               STAMP COLLECTIONS
             </h2>
           </h1>
-          <div className="grid grid-cols-2 tablet:grid-cols-3 gap-6">
-            {collections.slice(0, 3).map((collection) => (
-              <CollectionListCard
-                key={collection.collection_id}
-                collection={collection}
-              />
-            ))}
-          </div>
+          <CollectionSection
+            collections={collections}
+            gridClass="grid grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6"
+            displayCounts={{
+              "mobileSm": 2, // 2 columns x 1 rows
+              "mobileLg": 2, // 2 columns x 1 rows
+              "tablet": 3, // 3 columns x 1 rows
+              "desktop": 3, // 3 columns x 1 rows
+            }}
+          />
           <div>
             <h2 className="text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight">
               NAMED ASSETS
@@ -210,14 +213,16 @@ export default function Collection(props: CollectionPageProps) {
               SRC-721r COLLECTIONS
             </h2>
           </h1>
-          <div className="grid grid-cols-2 desktop:grid-cols-3 gap-3 mobileLg:gap-6">
-            {collections.slice(0, 3).map((collection) => (
-              <CollectionListCard
-                key={collection.collection_id}
-                collection={collection}
-              />
-            ))}
-          </div>
+          <CollectionSection
+            collections={collections}
+            gridClass="grid grid-cols-2 desktop:grid-cols-3 gap-3 mobileLg:gap-6"
+            displayCounts={{
+              "mobileSm": 2, // 2 columns x 1 rows
+              "mobileLg": 2, // 2 columns x 1 rows
+              "tablet": 3, // 3 columns x 1 rows
+              "desktop": 3, // 3 columns x 1 rows
+            }}
+          />
           <div>
             <h2 className="text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight">
               RECURSIVE LAYERING

@@ -2,6 +2,7 @@ import { Collection, StampRow, StampSectionProps } from "globals";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";
+import CollectionSection from "$islands/collection/CollectionSection.tsx";
 
 export function HomeStampPreview({
   stamps_recent = [],
@@ -239,14 +240,16 @@ export function HomeStampPreview({
             FEATURED COLLECTIONS
           </h1>
         </div>
-        <div className="grid grid-cols-2 xl:grid-cols-3 gap-6">
-          {collectionData.slice(0, 3).map((collection) => (
-            <CollectionListCard
-              key={collection.collection_id}
-              collection={collection}
-            />
-          ))}
-        </div>
+        <CollectionSection
+          collections={collectionData}
+          gridClass="grid grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6"
+          displayCounts={{
+            "mobileSm": 2, // 2 columns x 1 rows
+            "mobileLg": 2, // 2 columns x 1 rows
+            "tablet": 3, // 3 columns x 1 rows
+            "desktop": 3, // 3 columns x 1 rows
+          }}
+        />
       </div>
 
       {/* RECENT SALES */}
