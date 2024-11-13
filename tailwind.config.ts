@@ -185,10 +185,6 @@ export default {
       lineClamp: {
         2: "2",
       },
-      height: {
-        "gradient-top": "max(140vh, 1400px)",
-        "gradient-bottom": "max(100vh, 700px)",
-      },
     },
   },
   plugins: [

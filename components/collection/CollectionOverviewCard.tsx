@@ -38,7 +38,7 @@ export function CollectionOverviewCard(
               </span>
             </p>
             <p>
-              VOLUME <span className="font-bold text-[#999999]">N/A</span> ₿
+              VOLUME <span className="font-bold text-[#999999]">N/A</span> BTC
             </p>
           </div>
           <div className="flex flex-col mobileLg:flex-row justify-between w-full">

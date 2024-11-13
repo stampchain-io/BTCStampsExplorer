@@ -207,13 +207,13 @@ function DispenserItem() {
                     <p className="text-base text-[#666666] font-light">
                       PRICE{" "}
                       <span className="font-bold text-[#999999]">
-                        {`${Number(dispenser.btcrate).toLocaleString()} ₿`}
+                        {`${Number(dispenser.btcrate).toLocaleString()} BTC`}
                       </span>
                     </p>
                     <p className="text-base text-[#666666] font-light">
                       {Number(dispenser.btcrate).toLocaleString()}{" "}
                       <span className="font-bold text-[#999999]">
-                        ₿
+                        BTC
                       </span>
                     </p>
                   </div>
@@ -289,13 +289,13 @@ function DispenserItem() {
                     <p className="text-base text-[#666666] font-light">
                       PRICE{" "}
                       <span className="font-bold text-[#999999]">
-                        {`${Number(dispenser.btcrate).toLocaleString()} ₿`}
+                        {`${Number(dispenser.btcrate).toLocaleString()} BTC`}
                       </span>
                     </p>
                     <p className="text-base text-[#666666] font-light">
                       {Number(dispenser.btcrate).toLocaleString()}{" "}
                       <span className="font-bold text-[#999999]">
-                        ₿
+                        BTC
                       </span>
                     </p>
                   </div>

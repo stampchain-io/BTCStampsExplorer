@@ -1,5 +1,5 @@
 import { Collection } from "globals";
-import { CollectionOverviewCard } from "../../components/collection/CollectionOverviewCard.tsx";
+import { CollectionOverviewCard } from "$components/collection/CollectionOverviewCard.tsx";
 type CollectionOverviewArtistContentProps = {
   collections: Collection[];
 };
