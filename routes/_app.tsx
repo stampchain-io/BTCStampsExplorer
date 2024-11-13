@@ -88,9 +88,11 @@ export default function App({ Component }: AppProps) {
           content="strict-origin-when-cross-origin"
         />
       </Head>
-      <body class="relative bg-[#0B0B0B] min-h-screen">
+      <body class="relative bg-stamp-dark-DEFAULT min-h-screen overflow-x-hidden">
         <div class="bgGradientTop" aria-hidden="true" />
         <div class="bgGradientBottom" aria-hidden="true" />
+
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1]" />
 
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           <ToastProvider>
