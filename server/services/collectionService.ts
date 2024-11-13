@@ -8,13 +8,13 @@ import {
 import { paginate } from "$lib/utils/util.ts";
 
 export class CollectionService {
-  static async getCollections(
+  static async getCollectionDetails(
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
     const { limit = 50, page = 1, creator } = params;
 
     const [collectionsResult, totalCollections, lastBlock] = await Promise.all([
-      CollectionRepository.getCollections({ limit, page, creator }),
+      CollectionRepository.getCollectionDetails({ limit, page, creator }),
       CollectionRepository.getTotalCollectionsByCreatorFromDb(creator),
       BlockController.getLastBlock(),
     ]);
