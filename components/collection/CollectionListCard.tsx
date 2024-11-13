@@ -1,22 +1,40 @@
 import { Collection } from "globals";
-export function CollectionListCard({ collection }: { collection: Collection }) {
+
+const containerClassName =
+  "border-2 border-stamp-grey-darker rounded-md relative w-full h-[67px] mobileLg:h-[145px] tablet:h-[122px] desktop:h-[180px]";
+const imageContentClassName =
+  "bg-center bg-no-repeat bg-[length:100%] w-full h-full";
+const gradientContentClassName =
+  "w-full h-full bg-gradient-to-r absolute left-0 top-0";
+const nameClassName =
+  "hidden mobileLg:block text-xl desktop:text-2xl font-black absolute mobileLg:left-[14px] mobileLg:bottom-[9px] tablet:left-3 tablet:bottom-[6px] desktop:left-[18px] desktop:bottom-3";
+interface CollectionListCardProps {
+  collection: Collection;
+  isDarkMode: boolean;
+}
+export function CollectionListCard(
+  { collection, isDarkMode }: CollectionListCardProps,
+) {
   return (
     <a
       href={`/collection/${collection.collection_name}`}
-      className="border-2 border-[#666666] rounded-md relative w-full h-[150px]"
+      class={containerClassName}
     >
       <div
-        className={`bg-center bg-no-repeat bg-[length:100%] w-full h-full`}
-        style={{
-          backgroundImage: `url('${collection.first_stamp_image}')`,
-        }}
+        class={imageContentClassName}
+        style={{ backgroundImage: `url('${collection.first_stamp_image}')` }}
       >
       </div>
       <div
-        className={"w-full h-full bg-gradient-to-r from-[#CCCCCC] via-[#999999BD] to-[#6666663F] absolute left-0 top-0 opacity-10"}
+        class={gradientContentClassName + " " +
+          (isDarkMode
+            ? "from-[#666666] via-[#999999BD] to-[#CCCCCC7F]"
+            : "from-[#CCCCCC] via-[#999999BD] to-[#6666667F]")}
+      />
+      <h3
+        class={nameClassName + " " +
+          (isDarkMode ? "text-stamp-grey-light" : "text-stamp-grey-darkest")}
       >
-      </div>
-      <h3 class="text-[13px] text-2xl font-black text-[#666666] absolute left-3 bottom-3">
         {collection.collection_name}
       </h3>
     </a>
