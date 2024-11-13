@@ -50,6 +50,12 @@ const mobileNavLinks: NavLink[] = [
   {
     title: "TOOLS",
     href: "#",
+    subLinks: [
+      { title: "STAMPING", href: "/stamping/stamp" },
+      { title: "DEPLOY", href: "/stamping/src20/deploy" },
+      { title: "MINT", href: "/stamping/src20/mint" },
+      { title: "TRANSFER", href: "/stamping/src20/transfer" },
+    ],
   },
 ];
 
@@ -140,16 +146,21 @@ export function Header() {
             }`}
           >
             <a
-              href={link.href}
-              f-partial={link.href}
+              href={link.subLinks ? undefined : link.href}
+              f-partial={link.subLinks ? undefined : link.href}
               onClick={() => {
+                if (link.subLinks) return;
                 if (!link?.href) return;
                 toggleMenu();
                 setCurrentPath(link?.href ? link?.href : null);
               }}
               className={`whitespace-nowrap ${
                 isMobile
-                  ? "text-xl mobileLg:text-2xl text-stamp-primary hover:text-stamp-primary-hover"
+                  ? `text-xl mobileLg:text-2xl ${
+                    link.subLinks
+                      ? "text-stamp-primary-dark"
+                      : "text-stamp-primary"
+                  } hover:text-stamp-primary-hover`
                   : "text-lg desktop:text-xl text-center group-hover:text-stamp-primary-hover"
               }`}
             >
@@ -158,7 +169,7 @@ export function Header() {
             <div
               className={`${
                 isMobile
-                  ? "hidden"
+                  ? "hidden group-hover:flex flex-col z-[100] w-full"
                   : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
               }`}
             >

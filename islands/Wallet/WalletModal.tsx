@@ -293,25 +293,29 @@ export const WalletModal = ({ connectors = [] }: Props) => {
     >
       {isConnected && address && (
         <>
-          <button
-            type="button"
-            ref={buttonRef}
-            onClick={() => walletSignOut()}
-            class="block tablet:hidden text-stamp-primary-dark font-extrabold text-xl mobileLg:text-2xl -mt-6 mobileLg:-mt-9"
-          >
-            CONNECTED
-          </button>
-          <div class="hidden tablet:inline-block relative  group">
+          <div class="inline-block relative group">
+            <button
+              type="button"
+              ref={buttonRef}
+              // onClick={() => walletSignOut()}
+              class="block tablet:hidden text-stamp-primary-dark font-extrabold text-xl mobileLg:text-2xl -mt-6 mobileLg:-mt-9"
+            >
+              CONNECTED
+            </button>
+
             <button
               type="button"
               ref={buttonRef}
               onClick={toggleModal}
-              class=" text-stamp-primary border-stamp-primary border-2 rounded-md px-5 py-4 font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
+              class="hidden tablet:block text-stamp-primary border-stamp-primary border-2 rounded-md px-5 py-4 font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
             >
               {abbreviateAddress(address)}
             </button>
 
-            <div class="absolute z-1000 top-full left-0 mt-2 pt-1 bg-black text-stamp-primary border-stamp-primary border-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="absolute z-1000 top-full left-0 mt-2 pt-1 tablet:bg-black text-stamp-primary tablet:border-stamp-primary tablet:border-2 rounded-md hidden group-hover:block transition-opacity duration-300">
+              <p class="block tablet:hidden px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer">
+                {abbreviateAddress(address)}
+              </p>
               <a
                 href={isConnected && address ? `/wallet/${address}` : "#"}
                 class="px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer"
