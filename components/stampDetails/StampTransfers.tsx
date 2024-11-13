@@ -58,7 +58,7 @@ function TransferRow({ send }: { send: SendRow }) {
 
 export function StampTransfers({ sends }: StampTransfersProps) {
   return (
-    <div className="relative shadow-md max-w-[256px]">
+    <div className="relative shadow-md max-w-full">
       <div className="max-h-96 overflow-x-auto">
         <table className="w-full text-sm text-left rtl:text-right text-[#666666] mobileLg:rounded-lg">
           <thead className="text-lg uppercase">

@@ -1,122 +1,77 @@
-import { Chart } from "$fresh_charts/mod.ts";
-import { ChartColors, transparentize } from "$fresh_charts/utils.ts";
+import { Chart } from "$fresh_charts/island.tsx";
 
-interface HolderInfoType {
-  address: string;
-  quantity: number;
+interface StampHoldersProps {
+  holders: Array<{
+    address: string | null;
+    quantity: number;
+  }>;
 }
 
-const getGradientColor = (percentage: number) => {
-  const startColor = "#F68E5C";
-  const endColor = "#5053EA";
-
-  const r = Math.round(
-    (1 - percentage / 100) * parseInt(startColor.slice(1, 3), 16) +
-      (percentage / 100) * parseInt(endColor.slice(1, 3), 16),
-  );
-  const g = Math.round(
-    (1 - percentage / 100) * parseInt(startColor.slice(3, 5), 16) +
-      (percentage / 100) * parseInt(endColor.slice(3, 5), 16),
-  );
-  const b = Math.round(
-    (1 - percentage / 100) * parseInt(startColor.slice(5, 7), 16) +
-      (percentage / 100) * parseInt(endColor.slice(5, 7), 16),
-  );
-
-  return `rgba(${r}, ${g}, ${b}, 0.5)`; // Adjust alpha as needed
-};
-
-export const StampHolders = ({ holders }: { holders: HolderInfoType[] }) => {
-  console.log("holders: ", holders);
-
-  if (!holders || holders.length === 0) {
-    return <div>No holder data available</div>;
-  }
-
+const StampHolders = ({ holders }: StampHoldersProps) => {
+  // Calculate total quantity for percentages
   const totalQuantity = holders.reduce(
     (sum, holder) => sum + holder.quantity,
     0,
   );
 
-  if (totalQuantity === 0) {
-    return <div>Invalid holder data</div>;
-  }
+  const generateColors = (count: number) => {
+    // Convert hex to RGB for easier interpolation
+    const startColor = { r: 0xaa, g: 0x00, b: 0xff };
+    const endColor = { r: 0x44, g: 0x00, b: 0x66 };
 
-  const holdersWithPercentage = holders.map((holder) => ({
-    ...holder,
-    percentage: (holder.quantity / totalQuantity) * 100,
-  }));
+    return Array(count).fill(0).map((_, index) => {
+      // Calculate interpolation factor (0 to 1)
+      const factor = count === 1 ? 0 : index / (count - 1);
 
-  const topHolders = holdersWithPercentage
-    .sort((a, b) => b.percentage - a.percentage)
-    .slice(0, 3);
+      // Interpolate between colors
+      const r = Math.round(startColor.r + (endColor.r - startColor.r) * factor);
+      const g = Math.round(startColor.g + (endColor.g - startColor.g) * factor);
+      const b = Math.round(startColor.b + (endColor.b - startColor.b) * factor);
 
-  if (topHolders.length === 0) {
-    return <div>No valid top holders data</div>;
-  }
+      // Convert back to hex
+      return `#${r.toString(16).padStart(2, "0")}${
+        g.toString(16).padStart(2, "0")
+      }${b.toString(16).padStart(2, "0")}`;
+    });
+  };
 
-  const percentages = topHolders.map((holder) => holder.percentage);
-  const topLabels = topHolders.map((holder) =>
-    `${holder.address.slice(0, 6)}...${holder.address.slice(-4)} (${
-      holder.percentage.toFixed(2)
-    }%)`
-  );
-
-  const backgroundColors = percentages.map((percentage) =>
-    getGradientColor(percentage)
-  );
-
-  return (
-    <div class="flex justify-center dark-gradient p-2 tablet:p-6">
-      {
-        /* <Chart
-        type="pie"
-        width={350}
-        height={350}
-        options={{
-          devicePixelRatio: 1,
-          plugins: {
-            legend: {
-              position: "bottom" as const,
-              labels: {
-                boxWidth: 10,
-                font: {
-                  size: 10,
-                },
-              },
+  const DoughnutConfig = {
+    type: "doughnut",
+    svgClass: "w-full h-1/2",
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (context: any) => {
+              const holder = holders[context.dataIndex];
+              const percent = ((holder.quantity / totalQuantity) * 100).toFixed(
+                2,
+              );
+              return [
+                `Address: ${holder.address || "Unknown"}`,
+                `Amount: ${holder.quantity}`,
+                `Percent: ${percent}%`,
+              ];
             },
           },
-          responsive: true,
-          maintainAspectRatio: false,
-        }}
-        data={{
-          labels: topLabels,
-          datasets: [{
-            label: "Top Holders",
-            data: percentages,
-            backgroundColor: backgroundColors,
-            borderColor: backgroundColors,
-            borderWidth: 1,
-          }],
-        }}
-      /> */
-      }
-      <Chart
-        type="pie"
-        options={{
-          scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
-        }}
-        data={{
-          labels: ["1", "2", "3"],
-          datasets: [{
-            label: "Sessions",
-            data: [10, 20, 70],
-            borderColor: ChartColors.Red,
-            backgroundColor: transparentize(ChartColors.Red, 0.5),
-            borderWidth: 1,
-          }],
-        }}
-      />
-    </div>
-  );
+        },
+      },
+    },
+    data: {
+      labels: false,
+      datasets: [{
+        borderColor: [...Array(holders.length)].fill("#666666"),
+        label: "Graph Holder",
+        data: holders.map((holder) => holder.quantity),
+        backgroundColor: generateColors(holders.length),
+        hoverOffset: 4,
+      }],
+    },
+  };
+
+  return <Chart {...DoughnutConfig} />;
 };
+
+export default StampHolders;

@@ -1,16 +1,13 @@
 import { useState } from "preact/hooks";
 
-// import { StampHolders } from "$components/stampDetails/StampHolders.tsx";
 import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
 import { StampSales } from "$components/stampDetails/StampSales.tsx";
 import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
-// import { StampVaults } from "$components/stampDetails/StampVaults.tsx";
 
 // TODO: Replace 'any' with a more specific type
 interface StampRelatedInfoProps {
   sends: any;
   dispensers: any;
-  holders: any;
   dispensesWithRates: any;
 }
 
@@ -23,11 +20,9 @@ const tabs: Array<{ id: TabType; label: string }> = [
 ];
 
 export function StampRelatedInfo(
-  { sends, dispensers, holders, dispensesWithRates }: StampRelatedInfoProps,
+  { sends, dispensers, dispensesWithRates }: StampRelatedInfoProps,
 ) {
   const [selectedTab, setSelectedTab] = useState("dispensers");
-
-  console.log("holders: ", holders);
 
   const renderTabContent = () => {
     switch (selectedTab) {
@@ -41,25 +36,21 @@ export function StampRelatedInfo(
   };
 
   return (
-    <>
-      {/* <StampHolders holders={holders} /> */}
-
-      <div class="dark-gradient p-2 tablet:p-6">
-        <div class="flex justify-between w-full overflow-y-auto text-[#666666] text-sm tablet:text-[19px]">
-          {tabs.map(({ id, label }) => (
-            <p
-              key={id}
-              class={`cursor-pointer pb-4 ${
-                selectedTab === id ? "font-bold" : ""
-              }`}
-              onClick={() => setSelectedTab(id)}
-            >
-              {label}
-            </p>
-          ))}
-        </div>
-        {renderTabContent()}
+    <div class="dark-gradient p-2 tablet:p-6">
+      <div class="flex justify-between w-full overflow-y-auto text-[#666666] text-sm tablet:text-[19px]">
+        {tabs.map(({ id, label }) => (
+          <p
+            key={id}
+            class={`cursor-pointer pb-4 ${
+              selectedTab === id ? "font-bold" : ""
+            }`}
+            onClick={() => setSelectedTab(id)}
+          >
+            {label}
+          </p>
+        ))}
       </div>
-    </>
+      {renderTabContent()}
+    </div>
   );
 }

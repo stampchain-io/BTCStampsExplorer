@@ -172,13 +172,12 @@ export default function StampPage(props: StampDetailPageProps) {
         </div>
 
         <StampRelatedGraph
-          stamp={stamp}
+          holders={holders}
         />
 
         <StampRelatedInfo
           sends={sends}
           dispensers={dispensers}
-          holders={holders}
           dispensesWithRates={dispensesWithRates}
         />
 
