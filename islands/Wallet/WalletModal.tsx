@@ -297,23 +297,22 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             <button
               type="button"
               ref={buttonRef}
-              // onClick={() => walletSignOut()}
-              class="block tablet:hidden text-stamp-primary-dark font-extrabold text-xl mobileLg:text-2xl -mt-6 mobileLg:-mt-9"
-            >
-              CONNECTED
-            </button>
-
-            <button
-              type="button"
-              ref={buttonRef}
               onClick={toggleModal}
               class="hidden tablet:block text-stamp-primary border-stamp-primary border-2 rounded-md px-5 py-4 font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
             >
               {abbreviateAddress(address)}
             </button>
 
-            <div class="absolute z-1000 top-full left-0 mt-2 pt-1 tablet:bg-black text-stamp-primary tablet:border-stamp-primary tablet:border-2 rounded-md hidden group-hover:block transition-opacity duration-300">
-              <p class="block tablet:hidden px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer">
+            <button
+              type="button"
+              ref={buttonRef}
+              class="block tablet:hidden text-stamp-primary-dark font-extrabold text-xl mobileLg:text-2xl -mt-6 mobileLg:-mt-9"
+            >
+              CONNECTED
+            </button>
+
+            <div class="absolute z-[1000] top-full -left-2 tablet:left-0 tablet:mt-2 tablet:pt-1 text-lg tablet:text-base bg-transparent tablet:bg-black text-stamp-primary tablet:border-2 tablet:border-stamp-primary rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p className="block tablet:hidden px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer">
                 {abbreviateAddress(address)}
               </p>
               <a
@@ -339,7 +338,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             type="button"
             ref={buttonRef}
             onClick={toggleModal}
-            class="bg-stamp-purple hover:bg-[#9911DD] text-[#080808] px-5 py-4 rounded font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
+            class="bg-stamp-purple hover:bg-[#9911DD] text-[#080808] px-5 py-4 rounded font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px] mt-6 mobileLg:mt-9 tablet:mt-0"
           >
             CONNECT
           </button>

@@ -19,7 +19,7 @@ export default function FAQ() {
             </span>  
           </h1>
           <p className="text-base tablet:text-3xl font-medium">
-            <span className="font-bold>
+            <span className="font-bold">
             New to Bitcoin Stamps?
             <br />
             Curious to know more?
