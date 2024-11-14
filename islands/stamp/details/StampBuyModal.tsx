@@ -4,8 +4,8 @@ import type { StampRow } from "globals";
 import StampImage from "./StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { TransactionFeeDetails } from "$components/shared/modal/TransactionFeeDetails.tsx";
-import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
+import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 
 interface Props {
   stamp: StampRow;
@@ -49,7 +49,6 @@ const StampBuyModal = ({
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
-  // Handle dispenser data
   useEffect(() => {
     if (dispenser) {
       const maxQty = Math.floor(
@@ -63,27 +62,45 @@ const StampBuyModal = ({
 
   const handleQuantityChange = (e: Event) => {
     const value = parseInt((e.target as HTMLInputElement).value, 10);
-    setQuantity(Math.max(1, Math.min(value || 1, maxQuantity)));
+    if (value > maxQuantity) {
+      setQuantity(maxQuantity);
+    } else if (value < 1 || isNaN(value)) {
+      setQuantity(1);
+    } else {
+      setQuantity(value);
+    }
   };
 
   const handleBuyClick = async () => {
     await handleSubmit(async () => {
+      // Convert fee rate from sat/vB to sat/kB
+      const feeRateKB = formState.fee * 1000;
+      console.log("Fee rate conversion:", {
+        satVB: formState.fee,
+        satKB: feeRateKB,
+      });
+
       const options = {
         return_psbt: true,
-        fee_per_kb: formState.fee,
+        fee_per_kb: feeRateKB,
       };
 
-      const requestBody = {
+      console.log("Creating dispense transaction:", {
         address: wallet.address,
         dispenser: dispenser.source,
         quantity: totalPrice,
-        options,
-      };
+        feeRate: options.fee_per_kb,
+      });
 
       const response = await fetch("/api/v2/create/dispense", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          address: wallet.address,
+          dispenser: dispenser.source,
+          quantity: totalPrice,
+          options,
+        }),
       });
 
       if (!response.ok) {
@@ -94,14 +111,17 @@ const StampBuyModal = ({
       }
 
       const responseData = await response.json();
-      if (!responseData?.result?.psbt) {
-        throw new Error("Failed to create dispense transaction.");
+      console.log("Dispense response:", responseData);
+
+      if (!responseData?.psbt || !responseData?.inputsToSign) {
+        throw new Error("Invalid response: Missing PSBT or inputsToSign");
       }
 
+      // PSBT is already in hex format with witness data from backend
       const signResult = await walletContext.signPSBT(
         wallet,
-        responseData.result.psbt,
-        [], // Empty array for inputs to sign
+        responseData.psbt,
+        responseData.inputsToSign,
         true, // Enable RBF
       );
 
