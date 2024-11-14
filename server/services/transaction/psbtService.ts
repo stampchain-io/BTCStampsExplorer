@@ -281,4 +281,201 @@ export class PSBTService {
     // Return the updated PSBT hex without signing
     return psbt.toHex();
   }
+
+  static async processCounterpartyPSBT(
+    psbtBase64: string,
+    address: string, 
+    feeRateKB: number,
+    options?: {
+      validateInputs?: boolean;
+      validateFees?: boolean;
+    }
+  ): Promise<{
+    psbt: string;
+    inputsToSign: { index: number }[];
+  }> {
+    console.log("Processing Counterparty PSBT:", {
+      psbtBase64,
+      address,
+      feeRateKB,
+      options
+    });
+
+    try {
+      // Parse PSBT from Base64
+      const psbt = Psbt.fromBase64(psbtBase64);
+      console.log("Raw PSBT Data:", psbt.data);
+
+      // Access transaction data
+      const tx = psbt.data.globalMap.unsignedTx.tx;
+      console.log("Transaction Data:", tx);
+
+      if (!tx || !tx.ins || !tx.outs) {
+        throw new Error("Invalid transaction structure in PSBT");
+      }
+
+      // Add UTXO details for each input
+      const ancestorInfos = [];
+      for (const [index, input] of tx.ins.entries()) {
+        const inputTxid = Buffer.from(input.hash).reverse().toString("hex");
+        const inputVout = input.index;
+        console.log(
+          `Processing input ${index}: txid=${inputTxid}, vout=${inputVout}`,
+        );
+
+        // Fetch UTXO details WITH ancestor info
+        const txInfo = await getUTXOForAddress(
+          address,
+          inputTxid,
+          inputVout,
+          true,
+        );
+        if (!txInfo?.utxo) {
+          throw new Error(
+            `UTXO details not found for input ${index}: ${inputTxid}:${inputVout}`,
+          );
+        }
+
+        const utxoDetails = txInfo.utxo;
+        const ancestorInfo = txInfo.ancestor;
+        ancestorInfos.push(ancestorInfo);
+
+        console.log(`UTXO Details for input ${index}:`, utxoDetails);
+        if (ancestorInfo) {
+          console.log(`Ancestor info for input ${index}:`, ancestorInfo);
+        }
+
+        if (!utxoDetails.script) {
+          throw new Error(`Missing script for input ${index}`);
+        }
+
+        // Update input with witness UTXO
+        psbt.updateInput(index, {
+          witnessUtxo: {
+            script: Buffer.from(utxoDetails.script, "hex"),
+            value: utxoDetails.value,
+          },
+        });
+
+        console.log(`Updated input ${index} with witness data`);
+      }
+
+      // Verify all inputs have UTXO data
+      tx.ins.forEach((_, index) => {
+        const inputData = psbt.data.inputs[index];
+        console.log(`Input ${index} data:`, inputData);
+
+        if (!inputData.witnessUtxo && !inputData.nonWitnessUtxo) {
+          throw new Error(
+            `Missing UTXO details for input at index ${index}`,
+          );
+        }
+      });
+
+      // Calculate and validate fees
+      const totalIn = tx.ins.reduce((sum, _, index) => {
+        const witnessUtxo = psbt.data.inputs[index]?.witnessUtxo;
+        return sum + (witnessUtxo?.value || 0);
+      }, 0);
+
+      const totalOut = tx.outs.reduce((sum, output) => sum + output.value, 0);
+      const actualFee = totalIn - totalOut;
+
+      const vsize = tx.virtualSize();
+      const requestedFeeRateVB = feeRateKB / SATS_PER_KB_MULTIPLIER;
+      const targetFee = Math.ceil(vsize * requestedFeeRateVB);
+
+      console.log(`
+Transaction Analysis:
+Total Inputs: ${tx.ins.length}
+Total Outputs: ${tx.outs.length}
+Virtual Size: ${vsize} vBytes
+Input Details: ${JSON.stringify(tx.ins.map((input, i) => ({
+    index: i,
+    txid: Buffer.from(input.hash).reverse().toString("hex"),
+    vout: input.index
+})), null, 2)}
+Output Details: ${JSON.stringify(tx.outs.map((output, i) => ({
+    index: i,
+    value: output.value,
+    scriptType: output.script[0] === 0x6a ? 'OP_RETURN' : 'P2WPKH/P2WSH'
+})), null, 2)}
+
+Fee Analysis:
+Fee Rate KB: ${feeRateKB} sat/kB
+Fee Rate VB: ${requestedFeeRateVB} sat/vB
+Total Input: ${totalIn} satoshis
+Total Output: ${totalOut} satoshis
+Actual Fee: ${actualFee} satoshis
+Target Fee: ${targetFee} satoshis
+      `);
+
+      // Validate fees if requested
+      if (options?.validateFees) {
+        // Check base fee rate
+        if (Math.abs(actualFee - targetFee) > targetFee * 0.1) { // Allow 10% variance
+          throw new Error(
+            `Unable to achieve target fee rate. ` +
+            `Target: ${requestedFeeRateVB} sat/vB (${targetFee} sats), ` +
+            `Actual: ${(actualFee/vsize).toFixed(2)} sat/vB (${actualFee} sats)`
+          );
+        }
+
+        // Check ancestor fee rates
+        for (const [index, ancestorInfo] of ancestorInfos.entries()) {
+          if (ancestorInfo) {
+            const effectiveFeeRate = (actualFee + ancestorInfo.fees) /
+              (vsize + ancestorInfo.vsize);
+
+            console.log(`
+Ancestor Fee Analysis for Input ${index}:
+Ancestor Fees: ${ancestorInfo.fees} satoshis
+Ancestor vSize: ${ancestorInfo.vsize} vBytes
+Current Tx:
+  Fee: ${actualFee} satoshis
+  vSize: ${vsize} vBytes
+Combined:
+  Total Fees: ${actualFee + ancestorInfo.fees} satoshis
+  Total vSize: ${vsize + ancestorInfo.vsize} vBytes
+  Effective Fee Rate: ${effectiveFeeRate.toFixed(2)} sat/vB
+Target Fee Rate: ${requestedFeeRateVB} sat/vB
+            `);
+
+            // Calculate required fee to achieve target rate including ancestors
+            const requiredFee = Math.ceil(
+              requestedFeeRateVB * (vsize + ancestorInfo.vsize) -
+              ancestorInfo.fees
+            );
+
+            if (requiredFee > actualFee) {
+              throw new Error(
+                `Cannot achieve target fee rate with ancestors: ` +
+                `Need ${requiredFee} sats, have ${actualFee} sats`
+              );
+            }
+          }
+        }
+      }
+
+      // Identify inputs to sign
+      const inputsToSign = tx.ins.map((_, index) => ({ index }));
+      console.log("Inputs to sign:", inputsToSign);
+
+      // Convert updated PSBT to hex
+      const updatedPsbtHex = psbt.toHex();
+      console.log("Updated PSBT Hex:", updatedPsbtHex);
+
+      return {
+        psbt: updatedPsbtHex,
+        inputsToSign,
+      };
+    } catch (error) {
+      console.error("Error processing Counterparty PSBT:", error);
+      throw new Error(
+        `Failed to process PSBT: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      );
+    }
+  }
 }
