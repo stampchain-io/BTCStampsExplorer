@@ -9,17 +9,23 @@ export default function FAQ() {
       </Head>
       <div className="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
         <section className="text-center max-w-full mx-auto">
-          <h1 className="text-4xl tablet:text-7xl font-bold">
+          <h1 className="text-4xl tablet:text-7xl font-black">
             <span className="gray-gradient1">
               YOU'VE GOT QUESTIONS
             </span>
             <br />
+            <span className="gray-gradient1">
             WE'VE GOT ANSWERS
+            </span>  
           </h1>
           <p className="text-base tablet:text-3xl font-medium">
-            New to Bitcoin Stamps? Curious to know more? Explore our
-            comprehensive FAQ to understand this innovative technology built on
-            Bitcoin.
+            <span className="font-bold>
+            New to Bitcoin Stamps?
+            <br />
+            Curious to know more?
+            </span>   
+            <br />
+            Explore our comprehensive FAQ to understand this innovative technology built on Bitcoin.
           </p>
         </section>
 
@@ -296,9 +302,20 @@ export default function FAQ() {
           <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6 tablet:gap-12">
             <Accordion title="DEPLOYING SRC-20 TOKENS">
               <p className="text-sm tablet:text-lg font-medium">
-                To deploy an SRC-20 token, stamp the transaction on Bitcoin with
+                To deploy a SRC-20 token, stamp the transaction on Bitcoin with
                 the token's supply and metadata. This makes the token immutable
                 and secured by Bitcoin's blockchain.
+                <br />
+                Visit our step-by-step guide on how to easily deploy a token.
+                <div className="flex justify-end md:justify-start">
+        <a
+          href="howto/deploytoken"
+          f-partial="howto/deploytoken"
+          className="uppercase border md:border-2 border-[#999999] rounded-md bg-transparent text-[#999999] font-extrabold w-[63px] md:w-[84px] h-[36px] md:h-[48px] flex justify-center items-center"
+        >
+          How-To
+        </a>
+      </div>
               </p>
             </Accordion>
 
@@ -306,6 +323,17 @@ export default function FAQ() {
               <p className="text-sm tablet:text-lg font-medium">
                 After deployment, token holders can mint additional SRC-20
                 tokens based on the initial supply set in the contract.
+                <br />
+                Read more about minting tokens in our How-To guide.
+                <div className="flex justify-end md:justify-start">
+        <a
+          href="/howto/mint"
+          f-partial="howto/mint"
+          className="uppercase border md:border-2 border-[#999999] rounded-md bg-transparent text-[#999999] font-extrabold w-[63px] md:w-[84px] h-[36px] md:h-[48px] flex justify-center items-center"
+        >
+          How-To
+        </a>
+      </div>
               </p>
             </Accordion>
 
