@@ -10,10 +10,16 @@ export const GetStampingModule = () => {
         <h1 className={ModulesStyles.title}>GET STAMPING</h1>
         <h2 className={ModulesStyles.subTitle}>IMMORTALISE YOUR ART</h2>
         <p className={ModulesStyles.content}>
-          Effortlessly create immutable Bitcoin Stamps with custom fee selection
-          and optional Posh Stamp Collection naming options. Supports low-fi
-          pixel art (png/jpg/gif) and hi-res vector art (svg/html) up to 64kB.
-          Explore SRC-721R for recursive stamps with unlimited size constraints.
+          <b>The Stampchain stamping machine has been revamped and refitted with sleek new naming features.</b><br />
+          <br />
+          <b>Experience greater creative freedom and adorn your treasured art with fanciful letters and posh names.</b><br />
+          By leveraging Counterparty’s asset-naming system and handling the XCP fee, we’ve made it simple and smooth for you to create Posh stamps.<br />
+          <b>Wanna stay true to classic A grade numerics?</b><br />
+          No problem, we still offer random lucky numbers - or you can choose a custom CPID number for your stamp.<br />
+          <br />
+          Either way the stamping machine handles everything, from low-fi pixel art (png/jpg/gif) to hi-res vector art (svg/html) - up to a whooping 65kB.<br />
+          <br />
+          <i>Time to get stamping!</i>
         </p>
       </div>
 
