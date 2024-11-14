@@ -4,14 +4,12 @@ import { InputField } from "$islands/stamping/InputField.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
+import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 
-// Define the constants directly
 const SIGHASH_SINGLE = 0x03;
 const SIGHASH_ANYONECANPAY = 0x80;
 const SIGHASH_SINGLE_ANYONECANPAY = SIGHASH_SINGLE | SIGHASH_ANYONECANPAY; // 131
 
-// Add constants at the top
-const SATS_PER_KB_MULTIPLIER = 1000; // Convert vB to kB
 const MIN_FEE_RATE_VB = 1; // minimum sat/vB
 const MAX_FEE_RATE_VB = 500; // maximum sat/vB
 

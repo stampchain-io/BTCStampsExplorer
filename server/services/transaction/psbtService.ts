@@ -6,6 +6,7 @@ import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { BTCAddressService } from "$server/services/btc/addressService.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 
 export class PSBTService {
   static async createPSBT(
@@ -378,49 +379,49 @@ export class PSBTService {
         return sum + (witnessUtxo?.value || 0);
       }, 0);
 
-      const totalOut = tx.outs.reduce((sum, output) => sum + output.value, 0);
-      const actualFee = totalIn - totalOut;
-
       const vsize = tx.virtualSize();
       const requestedFeeRateVB = feeRateKB / SATS_PER_KB_MULTIPLIER;
       const targetFee = Math.ceil(vsize * requestedFeeRateVB);
 
-      console.log(`
-Transaction Analysis:
-Total Inputs: ${tx.ins.length}
-Total Outputs: ${tx.outs.length}
-Virtual Size: ${vsize} vBytes
-Input Details: ${JSON.stringify(tx.ins.map((input, i) => ({
-    index: i,
-    txid: Buffer.from(input.hash).reverse().toString("hex"),
-    vout: input.index
-})), null, 2)}
-Output Details: ${JSON.stringify(tx.outs.map((output, i) => ({
-    index: i,
-    value: output.value,
-    scriptType: output.script[0] === 0x6a ? 'OP_RETURN' : 'P2WPKH/P2WSH'
-})), null, 2)}
+      // Find the change output (usually the last non-OP_RETURN output)
+      const changeOutputIndex = tx.outs.findIndex((output, index, arr) => {
+        // Skip OP_RETURN outputs
+        if (output.script[0] === 0x6a) return false;
+        // If this is the last non-OP_RETURN output, it's likely the change
+        return !arr.slice(index + 1).some(out => out.script[0] !== 0x6a);
+      });
 
-Fee Analysis:
-Fee Rate KB: ${feeRateKB} sat/kB
-Fee Rate VB: ${requestedFeeRateVB} sat/vB
-Total Input: ${totalIn} satoshis
-Total Output: ${totalOut} satoshis
-Actual Fee: ${actualFee} satoshis
-Target Fee: ${targetFee} satoshis
+      if (changeOutputIndex === -1) {
+        throw new Error("No change output found to adjust fee");
+      }
+
+      // Calculate the required change value to achieve target fee
+      const nonChangeOutputsTotal = tx.outs.reduce((sum, output, index) => 
+        index !== changeOutputIndex ? sum + output.value : sum, 0);
+      
+      const newChangeValue = totalIn - nonChangeOutputsTotal - targetFee;
+
+      if (newChangeValue < 546) { // Dust limit
+        throw new Error(`Cannot achieve target fee rate: change would be dust (${newChangeValue} sats)`);
+      }
+
+      // Update the change output with the new value
+      tx.outs[changeOutputIndex].value = newChangeValue;
+
+      // Recalculate actual fee after adjustment
+      const totalOut = tx.outs.reduce((sum, output) => sum + output.value, 0);
+      const actualFee = totalIn - totalOut;
+
+      console.log(`
+Fee Adjustment:
+Original Change Value: ${tx.outs[changeOutputIndex].value}
+New Change Value: ${newChangeValue}
+Target Fee: ${targetFee} sats (${requestedFeeRateVB} sat/vB)
+Actual Fee: ${actualFee} sats (${(actualFee/vsize).toFixed(2)} sat/vB)
       `);
 
       // Validate fees if requested
       if (options?.validateFees) {
-        // Check base fee rate
-        if (Math.abs(actualFee - targetFee) > targetFee * 0.1) { // Allow 10% variance
-          throw new Error(
-            `Unable to achieve target fee rate. ` +
-            `Target: ${requestedFeeRateVB} sat/vB (${targetFee} sats), ` +
-            `Actual: ${(actualFee/vsize).toFixed(2)} sat/vB (${actualFee} sats)`
-          );
-        }
-
         // Check ancestor fee rates
         for (const [index, ancestorInfo] of ancestorInfos.entries()) {
           if (ancestorInfo) {
@@ -441,17 +442,27 @@ Combined:
 Target Fee Rate: ${requestedFeeRateVB} sat/vB
             `);
 
-            // Calculate required fee to achieve target rate including ancestors
-            const requiredFee = Math.ceil(
-              requestedFeeRateVB * (vsize + ancestorInfo.vsize) -
-              ancestorInfo.fees
-            );
-
-            if (requiredFee > actualFee) {
-              throw new Error(
-                `Cannot achieve target fee rate with ancestors: ` +
-                `Need ${requiredFee} sats, have ${actualFee} sats`
+            // If ancestors require higher fee rate, adjust the fee again
+            if (effectiveFeeRate < requestedFeeRateVB) {
+              const requiredFee = Math.ceil(
+                requestedFeeRateVB * (vsize + ancestorInfo.vsize) -
+                ancestorInfo.fees
               );
+
+              const adjustedChangeValue = totalIn - nonChangeOutputsTotal - requiredFee;
+              if (adjustedChangeValue < 546) {
+                throw new Error(
+                  `Cannot achieve target fee rate with ancestors: change would be dust (${adjustedChangeValue} sats)`
+                );
+              }
+
+              // Update change output with adjusted value
+              tx.outs[changeOutputIndex].value = adjustedChangeValue;
+              console.log(`
+Adjusted for ancestors:
+New Change Value: ${adjustedChangeValue}
+Required Fee: ${requiredFee} sats
+              `);
             }
           }
         }
