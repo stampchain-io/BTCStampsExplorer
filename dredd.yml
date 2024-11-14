@@ -1,6 +1,6 @@
 color: true
 dry-run: null
-hookfiles: ./hooks/hooks_dev.js
+hookfiles: ./hooks/hooks_prod.js
 language: nodejs
 require: null
 server: npm start
@@ -30,5 +30,5 @@ hooks-worker-handler-port: 61321
 config: ./dredd.yml
 blueprint: schema.yml
 # endpoint: 'http://localhost:8000/'
-# endpoint: 'https://stampchain.io'
-endpoint: 'https://dev.bitcoinstamps.xyz'
+endpoint: 'https://stampchain.io'
+# endpoint: 'https://dev.bitcoinstamps.xyz'
