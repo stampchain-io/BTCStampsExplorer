@@ -3,8 +3,6 @@ import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { PSBTService } from "$server/services/transaction/psbtService.ts";
 
-const SATS_PER_KB_MULTIPLIER = 1000;
-
 interface UtxoAttachInput {
   address: string;
   asset: string;
