@@ -1,9 +1,14 @@
 import { useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { calculateTransactionFees } from "$lib/utils/minting/feeEstimator.ts";
+import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
-import type { ScriptType, TransactionSizeOptions } from "$types/index.d.ts";
+import type {
+  Output,
+  ScriptType,
+  TransactionSizeOptions,
+} from "$types/index.d.ts";
 
 interface TransactionFeeDetailsProps {
   fee: number;
@@ -42,7 +47,7 @@ export function TransactionFeeDetails({
   const [visible, setVisible] = useState(false);
   const [coinType, setCoinType] = useState("BTC");
 
-  // Use the comprehensive transaction size estimation
+  // Use both fee calculation methods
   const sizeOptions: TransactionSizeOptions = {
     inputs: [{ type: inputType }],
     outputs: outputTypes.map((type) => ({ type })),
@@ -52,8 +57,17 @@ export function TransactionFeeDetails({
 
   const txSize = estimateTransactionSize(sizeOptions);
 
-  // Use the full fee calculation utilities
-  const { minerFee, dustValue, outputs } = calculateTransactionFees({
+  // Define outputs for estimateFee
+  const outputs: Output[] = outputTypes.map((type) => ({
+    type,
+    value: TX_CONSTANTS.DUST_SIZE,
+    isWitness: TX_CONSTANTS[type].isWitness,
+    size: TX_CONSTANTS[type].size,
+  }));
+
+  // Calculate fees using both methods
+  const estimatedFee = estimateFee(outputs, fee);
+  const { minerFee, dustValue } = calculateTransactionFees({
     type: "transfer",
     userAddress: userAddress || recipientAddress,
     outputTypes,
@@ -61,11 +75,8 @@ export function TransactionFeeDetails({
     isMultisig: false,
   });
 
-  // Calculate total fee including dust outputs
-  const totalFee = minerFee + (dustValue || 0);
-  const baseSize = TX_CONSTANTS.VERSION + TX_CONSTANTS.LOCKTIME;
-  const hasWitness = inputType === "P2WPKH" || inputType === "P2WSH" ||
-    inputType === "P2TR";
+  // Use the higher fee estimation for safety
+  const totalFee = Math.max(estimatedFee, minerFee + (dustValue || 0));
 
   return (
     <div className={`text-[#999999] ${className}`}>

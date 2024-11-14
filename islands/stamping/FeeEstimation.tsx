@@ -208,33 +208,16 @@ export function FeeEstimation({
   );
 
   // Estimate details component
-  const renderEstimateDetails = () => (
-    <div>
-      <p className="flex font-bold">
-        <span className="text-[#666666] font-light uppercase">
-          Estimated:{" "}
-        </span>
-        {coinType === "BTC"
-          ? `${total.toFixed(0)} sats`
-          : `${(total / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
-      </p>
-      <div
-        className="flex items-center gap-2 uppercase cursor-pointer"
-        onClick={() => setVisible(!visible)}
-      >
-        <span>Details</span>
-        <span>{visible ? "▼" : "▲"}</span>
-      </div>
-      {visible && (
+  const renderDetails = () => {
+    if (isModal) {
+      // Modal-specific details view
+      return (
         <div className="flex flex-col gap-2 mt-2">
           {fileSize && (
             <p className="text-xs font-light text-[#999999]">
               BYTES <span className="font-medium">{fileSize}</span>
             </p>
           )}
-          <p className="text-xs font-light text-[#999999]">
-            SATS PR BYTE <span className="font-medium">{fee}</span>
-          </p>
           <p className="text-xs font-light text-[#999999]">
             MINER FEE <span className="font-medium">{txfee}</span> SATS
           </p>
@@ -249,9 +232,57 @@ export function FeeEstimation({
             </p>
           )}
         </div>
-      )}
-    </div>
-  );
+      );
+    }
+
+    // Original Content pages details view
+    return (
+      <div className={`${visible ? "visible" : "invisible"}`}>
+        {type === "src20" && (
+          <div className="flex justify-between border-b border-[#8A8989] py-4">
+            <p>Sats per byte</p>
+            <p>{fee}</p>
+          </div>
+        )}
+        {type === "stamp" && (
+          <>
+            <p className="font-medium text-xs">
+              <span className="text-[#666666] font-light">FILE</span> {fileType}
+            </p>
+            <p className="font-medium text-xs">
+              <span className="text-[#666666] font-light">BYTES</span>{" "}
+              {fileSize} bytes
+            </p>
+            <p className="font-medium text-xs">
+              <span className="text-[#666666] font-light">SATS PER BYTE</span>
+              {" "}
+              {fee}
+            </p>
+            <p className="font-medium text-xs">
+              <span className="text-[#666666] font-light">EDITIONS:</span>{" "}
+              {issuance}
+            </p>
+          </>
+        )}
+        <p className="flex gap-1 items-center text-xs font-medium">
+          <span className="font-light text-[#666666]">MINER FEE</span>{" "}
+          {txfee.toFixed(0)} sats
+        </p>
+        {mintfee > 0 && (
+          <p className="flex gap-1 items-center text-xs font-medium">
+            <span className="font-light text-[#666666]">MINTING FEE</span>{" "}
+            {(mintfee * 1e8).toFixed(0)} sats
+          </p>
+        )}
+        {dust > 0 && (
+          <p className="flex gap-1 items-center text-xs font-medium">
+            <span className="font-light text-[#666666]">DUST</span>{" "}
+            {dust.toFixed(0)} sats
+          </p>
+        )}
+      </div>
+    );
+  };
 
   // Modal actions component
   const renderModalActions = () => (
@@ -323,7 +354,34 @@ export function FeeEstimation({
         )}
       </div>
 
-      {renderEstimateDetails()}
+      <p className="flex items-center uppercase">
+        Details
+        <span onClick={() => setVisible(!visible)} className="cursor-pointer">
+          {!visible
+            ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+              >
+                <path fill="white" d="M12 8l6 6H6l6-6z" />
+              </svg>
+            )
+            : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+              >
+                <path fill="white" d="M12 16l-6-6h12l-6 6z" />
+              </svg>
+            )}
+        </span>
+      </p>
+
+      {renderDetails()}
       {renderModalActions()}
     </div>
   );
