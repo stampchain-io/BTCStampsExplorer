@@ -284,53 +284,6 @@ export function FeeEstimation({
     );
   };
 
-  // Modal actions component
-  const renderModalActions = () => (
-    <div className="flex flex-col items-end gap-4 mt-4">
-      {!isModal && (
-        <div className="flex gap-2 items-center">
-          <input
-            type="checkbox"
-            id="tosAgreed"
-            checked={tosAgreed}
-            onChange={(e) =>
-              setToSAgreed((e.target as HTMLInputElement).checked)}
-            className="w-3 h-3 bg-[#262424] border border-[#7F7979]"
-          />
-          <label
-            htmlFor="tosAgreed"
-            className="text-[#999999] text-xs font-medium"
-          >
-            I AGREE TO THE <span className="text-[#8800CC]">ToS</span>
-          </label>
-        </div>
-      )}
-
-      <div className="flex justify-end gap-6">
-        {isModal && onCancel && (
-          <button
-            className="border-2 border-[#8800CC] text-[#8800CC] w-[108px] h-[48px] rounded-md font-extrabold"
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
-            {cancelText}
-          </button>
-        )}
-        <button
-          className={`bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold ${
-            (disabled || isSubmitting || (!isModal && !tosAgreed))
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-          onClick={onSubmit}
-          disabled={disabled || isSubmitting || (!isModal && !tosAgreed)}
-        >
-          {isSubmitting ? "Processing..." : confirmText || buttonName}
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     <div className={`text-[#999999] ${className}`}>
       <div className="flex">
@@ -382,7 +335,29 @@ export function FeeEstimation({
       </p>
 
       {renderDetails()}
-      {renderModalActions()}
+
+      <div className="flex justify-end gap-6 mt-4">
+        {isModal && onCancel && (
+          <button
+            className="border-2 border-[#8800CC] text-[#8800CC] w-[108px] h-[48px] rounded-md font-extrabold"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            {cancelText}
+          </button>
+        )}
+        <button
+          className={`bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold ${
+            (disabled || isSubmitting || (!isModal && !tosAgreed))
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
+          onClick={onSubmit}
+          disabled={disabled || isSubmitting || (!isModal && !tosAgreed)}
+        >
+          {isSubmitting ? "Processing..." : confirmText || buttonName}
+        </button>
+      </div>
     </div>
   );
 }
