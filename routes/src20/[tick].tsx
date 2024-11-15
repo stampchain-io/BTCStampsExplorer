@@ -4,8 +4,7 @@ import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
 import { convertEmojiToTick } from "$lib/utils/util.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
-import { SRC20HoldersInfo } from "$components/src20/SRC20HoldersInfo.tsx";
-import { SRC20HolderGraph } from "$components/src20/SRC20HolderGraph.tsx";
+import { SRC20RelatedGraph } from "$components/src20/SRC20RelatedGraph.tsx";
 import { MarketListingSummary } from "$types/index.d.ts";
 
 export const handler: Handlers = {
@@ -61,18 +60,14 @@ function SRC20TickPage(props: SRC20TickPageProps) {
 
   return (
     <div class="flex flex-col gap-8">
-      <div className="flex flex-col desktop:flex-row gap-8">
-        <SRC20TickHeader
-          deployment={deployment}
-          mintStatus={mint_status}
-          totalHolders={total_holders}
-          totalMints={total_mints}
-          totalTransfers={total_transfers}
-          marketInfo={marketInfo} // Now contains data for current tick
-        />
-        <SRC20HolderGraph />
-        {/* <SRC20HoldersInfo holders={holders} /> */}
-      </div>
+      <SRC20TickHeader
+        deployment={deployment}
+        mintStatus={mint_status}
+        totalMints={total_mints}
+        totalTransfers={total_transfers}
+        marketInfo={marketInfo} // Now contains data for current tick
+      />
+      <SRC20RelatedGraph holders={holders} />
       <SRC20DetailsTab tick={tick} />
     </div>
   );
