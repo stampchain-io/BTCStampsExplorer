@@ -166,32 +166,34 @@ export function Header() {
             >
               {link.title}
             </a>
-            <div
-              className={`${
-                isMobile
-                  ? "hidden group-hover:flex flex-col z-[100] w-full"
-                  : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
-              }`}
-            >
-              {link.subLinks?.map((subLink) => (
-                <a
-                  key={subLink.href}
-                  href={subLink.href}
-                  f-partial={subLink.href}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath(subLink?.href ? subLink?.href : null);
-                  }}
-                  className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobileLg:text-base ${
-                    currentPath === subLink.href
-                      ? "text-stamp-purple-highlight"
-                      : ""
-                  }`}
-                >
-                  {subLink.title}
-                </a>
-              ))}
-            </div>
+            {link.subLinks && (
+              <div
+                className={`${
+                  isMobile
+                    ? "hidden group-hover:flex flex-col z-[100] w-full"
+                    : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
+                }`}
+              >
+                {link.subLinks?.map((subLink) => (
+                  <a
+                    key={subLink.href}
+                    href={subLink.href}
+                    f-partial={subLink.href}
+                    onClick={() => {
+                      toggleMenu();
+                      setCurrentPath(subLink?.href ? subLink?.href : null);
+                    }}
+                    className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobileLg:text-base ${
+                      currentPath === subLink.href
+                        ? "text-stamp-purple-highlight"
+                        : ""
+                    }`}
+                  >
+                    {subLink.title}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </>
