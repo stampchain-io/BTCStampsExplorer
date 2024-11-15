@@ -93,8 +93,8 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
                 <td class="px-6 py-4 text-sm">{send.quantity}</td>
                 <td class="px-6 py-4 text-sm">
                   {send.satoshirate
-                    ? `${send.satoshirate / 100000000} ₿`
-                    : "0 ₿"}
+                    ? `${send.satoshirate / 100000000} BTC`
+                    : "0 BTC"}
                 </td>
                 <td class="px-6 py-4 text-sm">{send.memo}</td>
                 <td class="px-6 py-4 text-sm">
