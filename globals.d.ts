@@ -93,8 +93,11 @@ export interface StampRow {
   stamp_hash: string;
   is_btc_stamp: number;
   file_hash: string;
-  floorPrice?: number;
+  floorPrice?: number | "priceless";
+  marketCap?: number | "priceless";
   balance?: number | string;
+  floorPriceUSD?: number | null;
+  marketCapUSD?: number | null;
 }
 
 export interface DisplayCountBreakpoints {

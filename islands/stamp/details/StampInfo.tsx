@@ -85,41 +85,66 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     <div>
       <div className={"flex flex-col gap-4"}>
         <div className="dark-gradient p-6">
-          <p className={"text-6xl font-bold text-[#8800CC]"}>
-            # {stamp.stamp}
+          <p className="bg-text-purple-1 bg-clip-text text-transparent text-6xl">
+            <span className="font-light">#</span>
+            <span className="font-black">{stamp.stamp}</span>
           </p>
           <a
             href={`https://explorer.unspendablelabs.com/assets/${stamp.cpid}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#660099] text-4xl font-bold overflow-hidden text-ellipsis whitespace-nowrap block"
+            className="text-[#660099] text-2xl font-bold overflow-hidden text-ellipsis whitespace-nowrap block"
           >
             {stamp.cpid}
           </a>
-          <p className="hidden tablet:block text-[#8800CC] overflow-hidden text-ellipsis whitespace-nowrap text-4xl font-light">
-            BY{" "}
-            <span className={"font-bold"}>
-              <a
-                className="text-[#8800CC]"
-                href={`/wallet/${stamp.creator}`}
-                target="_parent"
-              >
-                {creatorDisplay}
-              </a>
-            </span>
+          <p className="hidden tablet:block text-[#8800CC] overflow-hidden text-ellipsis whitespace-nowrap text-4xl mb-2">
+            <span className="font-extralight">BY{" "}</span>
+            <a
+              className="text-[#8800CC] font-light"
+              href={`/wallet/${stamp.creator}`}
+              target="_parent"
+            >
+              {creatorDisplay}
+            </a>
           </p>
 
-          <p className="text-[#666666] font-bold text-3xl">
-            {editionCount} {editionLabel}
+          <p className="text-[#666666] text-3xl">
+            <span className="font-bold">{editionCount}{" "}</span>
+            <span className="font-medium">{editionLabel}</span>
           </p>
 
-          <div className="flex flex-col gap-6 items-end mt-6">
-            {/* TODO: display USD price as well */}
-            <p className="text-[#666666] font-medium text-2xl">
-              {typeof stamp.floorPrice === "number"
-                ? `${stamp.floorPrice} BTC`
-                : stamp.floorPrice}
-            </p>
+          <div className="flex flex-col gap-4 items-end mt-6">
+            <div className="flex flex-col gap-1 w-full text-right">
+              <p className="text-[#999999] font-bold text-lg">
+                {(!stamp.floorPrice || stamp.floorPrice === "priceless") &&
+                    stamp.marketCap && typeof stamp.marketCap === "number"
+                  ? `${stamp.marketCap}`
+                  : typeof stamp.floorPrice === "number"
+                  ? `${stamp.floorPrice}`
+                  : stamp.floorPrice}
+                {(typeof stamp.floorPrice === "number" ||
+                  (stamp.marketCap && typeof stamp.marketCap === "number")) &&
+                  <span className="text-lg font-medium">{" "}BTC</span>}
+              </p>
+              {(stamp.floorPriceUSD || stamp.marketCapUSD) && (
+                <p className="text-[#999999] font-bold text-base">
+                  {stamp.floorPriceUSD
+                    ? `${
+                      stamp.floorPriceUSD.toLocaleString("en-US", {
+                        maximumFractionDigits: 2,
+                      })
+                    }`
+                    : stamp.marketCapUSD
+                    ? `${
+                      stamp.marketCapUSD.toLocaleString("en-US", {
+                        maximumFractionDigits: 2,
+                      })
+                    }`
+                    : null}
+                  <span className="text-base font-light">{" "}USD</span>
+                </p>
+              )}
+            </div>
 
             {lowestPriceDispenser && (
               <button
