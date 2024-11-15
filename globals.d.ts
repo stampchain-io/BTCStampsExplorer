@@ -98,6 +98,7 @@ export interface StampRow {
   balance?: number | string;
   floorPriceUSD?: number | null;
   marketCapUSD?: number | null;
+  recentSalePrice?: number | "priceless";
 }
 
 export interface DisplayCountBreakpoints {
