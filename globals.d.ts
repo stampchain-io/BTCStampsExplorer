@@ -46,7 +46,7 @@ export type WALLET_FILTER_TYPES =
   | "all"
   | "stamps"
   | "collections"
-  | "dispensers"
+  | "listings"
   | "tokens";
 export type COLLECTION_FILTER_TYPES =
   | "all"
@@ -56,7 +56,7 @@ export type COLLECTION_FILTER_TYPES =
 
 export type LISTING_FILTER_TYPES =
   | "all"
-  | "psbt"
+  | "atomic swaps"
   | "dispensers";
 
 import Big from "$Big";
