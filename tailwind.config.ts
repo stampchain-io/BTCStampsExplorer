@@ -11,10 +11,10 @@ export default {
       screens: {
         "mobileSm": "360px", // Custom
         // "mobile-568": " // UNUSED - USE mobileSm
-        "mobileMd": "420px", // Custom
-        "mobileLg": "568px", // Custom
-        "tablet": "768px", // Same as Tailwind's 'md' (768px)
-        "desktop": "1024px", // Same as Tailwind's 'lg' (1024px)
+        "mobileMd": "568px", // Custom
+        "mobileLg": "768px", // Custom
+        "tablet": "1024px", // Same as Tailwind's 'lg' (1024px)
+        "desktop": "1440px", // Same as Tailwind's 'xl' (1440px)
       },
       fontFamily: {
         sans: ['"Work Sans"', "sans-serif"],
@@ -179,7 +179,7 @@ export default {
         "dropdown": "30",
       },
       maxWidth: {
-        "desktop": "1440px",
+        "desktop": "1920px",
         "none": "none",
       },
       lineClamp: {

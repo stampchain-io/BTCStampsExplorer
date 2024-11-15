@@ -16,7 +16,6 @@ interface FeeEstimationProps {
   isSubmitting: boolean;
   onSubmit: () => void;
   buttonName: string;
-  // New props to handle addresses
   recipientAddress?: string;
   userAddress?: string;
   inputType?: ScriptType;
@@ -29,6 +28,12 @@ interface FeeEstimationProps {
     totalValue?: number;
     hasExactFees: boolean;
   };
+  isModal?: boolean;
+  onCancel?: () => void;
+  cancelText?: string;
+  confirmText?: string;
+  showCoinToggle?: boolean;
+  className?: string;
 }
 
 export function FeeEstimation({
@@ -50,18 +55,20 @@ export function FeeEstimation({
   disabled = false,
   utxoAncestors,
   feeDetails,
+  isModal = false,
+  onCancel,
+  cancelText = "CANCEL",
+  confirmText,
+  showCoinToggle = true,
+  className = "",
 }: FeeEstimationProps) {
   const { fees, loading } = useFeePolling(300000);
-
   const [visible, setVisible] = useState(true);
   const [txfee, setTxfee] = useState(0.0);
   const [mintfee, setMintfee] = useState(0.0);
   const [dust, setDust] = useState(0.0);
   const [total, setTotal] = useState(0.0);
   const [coinType, setCoinType] = useState("BTC");
-
-  const [isLocked, setIsLocked] = useState(false);
-
   const [tosAgreed, setToSAgreed] = useState(false);
 
   // Update fee when recommended fee changes
@@ -91,16 +98,15 @@ export function FeeEstimation({
       });
 
       if (feeDetails?.hasExactFees) {
-        // Use exact fees from backend
         console.log("FeeEstimation: Using exact fees from backend", {
           minerFee: feeDetails.minerFee,
           dustValue: feeDetails.dustValue,
           totalValue: feeDetails.totalValue,
         });
 
-        setTxfee(feeDetails.minerFee);
-        setDust(feeDetails.dustValue);
-        setTotal(feeDetails.totalValue);
+        setTxfee(feeDetails.minerFee ?? 0);
+        setDust(feeDetails.dustValue ?? 0);
+        setTotal(feeDetails.totalValue ?? 0);
       } else {
         // Fall back to estimation
         console.log("FeeEstimation: Using frontend estimation");
@@ -173,48 +179,21 @@ export function FeeEstimation({
     setCoinType((prevType) => (prevType === "BTC" ? "USDT" : "BTC"));
   };
 
-  // Define outputs based on your context. For example:
-  const outputs: Output[] = [
-    // Populate this array with the outputs relevant to your transaction
-  ];
-
-  // Calculate the estimated fee based on the output size and sigops
-  const estimatedFee = estimateFee(outputs, fee);
-
-  return (
-    <div className="text-[#999999]">
-      <div className="flex">
-        <div className="w-1/2">
-          <p className="font-bold">
-            <span className="text-[#666666] font-light">FEE:</span> {fee} sat/vB
-          </p>
-          <p className="font-medium text-xs">
-            <span className="text-[#666666] font-light">RECOMMENDED:</span>{" "}
-            {fees && fees.recommendedFee} sat/vB
-          </p>
-        </div>
-        <div className="flex gap-1 items-center justify-end w-1/2">
-          <button
-            className="w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
-            onClick={handleChangeCoin}
-          >
-            <div
-              id="switch-toggle"
-              className={`coin w-6 h-6 relative rounded-full transition duration-500 transform text-white ${
-                coinType === "BTC" ? "translate-x-full" : ""
-              }`}
-            >
-              {coinType === "BTC" ? btcIcon : usdIcon}
-            </div>
-          </button>
-        </div>
-      </div>
-      <div className="relative w-full tablet:w-1/2">
-        <label htmlFor="labels-range-input" className="sr-only">
-          Labels range
-        </label>
+  // Fee selector component
+  const renderFeeSelector = () => (
+    <div className={`flex flex-col w-full ${isModal ? "w-full" : "w-1/2"}`}>
+      <p className="text-[#999999] font-light">
+        FEE <span className="font-bold">{fee}</span> SAT/vB
+      </p>
+      {fees?.recommendedFee && (
+        <p className="text-xs font-light text-[#999999]">
+          RECOMMENDED <span className="font-medium">{fees.recommendedFee}</span>
+          {" "}
+          SAT/vB
+        </p>
+      )}
+      <div className="relative w-full">
         <input
-          id="labels-range-input"
           type="range"
           value={fee}
           min="1"
@@ -222,17 +201,112 @@ export function FeeEstimation({
           step="1"
           onInput={(e) =>
             handleChangeFee(parseInt((e.target as HTMLInputElement).value, 10))}
-          className="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#999999]"
+          className="accent-[#5E1BA1] w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-[#3F2A4E]"
         />
       </div>
-      <p className="flex font-bold">
-        <span className="text-[#666666] font-light uppercase">
-          Estimated:{" "}
-        </span>
-        {coinType === "BTC"
-          ? `${total.toFixed(0)} sats`
-          : `${(total / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
-      </p>
+    </div>
+  );
+
+  // Estimate details component
+  const renderDetails = () => {
+    if (isModal) {
+      // Modal-specific details view
+      return (
+        <div className="flex flex-col gap-2 mt-2">
+          {fileSize && (
+            <p className="text-xs font-light text-[#999999]">
+              BYTES <span className="font-medium">{fileSize}</span>
+            </p>
+          )}
+          <p className="text-xs font-light text-[#999999]">
+            MINER FEE <span className="font-medium">{txfee}</span> SATS
+          </p>
+          {mintfee > 0 && (
+            <p className="text-xs font-light text-[#999999]">
+              MINTING FEE <span className="font-medium">{mintfee}</span> SATS
+            </p>
+          )}
+          {dust > 0 && (
+            <p className="text-xs font-light text-[#999999]">
+              DUST <span className="font-medium">{dust}</span> SATS
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    // Original Content pages details view
+    return (
+      <div className={`${visible ? "visible" : "invisible"}`}>
+        {type === "src20" && (
+          <div className="flex justify-between border-b border-[#8A8989] py-4">
+            <p>Sats per byte</p>
+            <p>{fee}</p>
+          </div>
+        )}
+        {type === "stamp" && (
+          <>
+            <p className="font-medium text-xs">
+              <span className="text-[#666666] font-light">FILE</span> {fileType}
+            </p>
+            <p className="font-medium text-xs">
+              <span className="text-[#666666] font-light">BYTES</span>{" "}
+              {fileSize} bytes
+            </p>
+            <p className="font-medium text-xs">
+              <span className="text-[#666666] font-light">SATS PER BYTE</span>
+              {" "}
+              {fee}
+            </p>
+            <p className="font-medium text-xs">
+              <span className="text-[#666666] font-light">EDITIONS:</span>{" "}
+              {issuance}
+            </p>
+          </>
+        )}
+        <p className="flex gap-1 items-center text-xs font-medium">
+          <span className="font-light text-[#666666]">MINER FEE</span>{" "}
+          {txfee.toFixed(0)} sats
+        </p>
+        {mintfee > 0 && (
+          <p className="flex gap-1 items-center text-xs font-medium">
+            <span className="font-light text-[#666666]">MINTING FEE</span>{" "}
+            {(mintfee * 1e8).toFixed(0)} sats
+          </p>
+        )}
+        {dust > 0 && (
+          <p className="flex gap-1 items-center text-xs font-medium">
+            <span className="font-light text-[#666666]">DUST</span>{" "}
+            {dust.toFixed(0)} sats
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className={`text-[#999999] ${className}`}>
+      <div className="flex">
+        {renderFeeSelector()}
+        {showCoinToggle && (
+          <div className="flex gap-1 items-center justify-end w-1/2">
+            <button
+              className="w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+              onClick={handleChangeCoin}
+            >
+              <div
+                id="switch-toggle"
+                className={`coin w-6 h-6 relative rounded-full transition duration-500 transform text-white ${
+                  coinType === "BTC" ? "translate-x-full" : ""
+                }`}
+              >
+                {coinType === "BTC" ? btcIcon : usdIcon}
+              </div>
+            </button>
+          </div>
+        )}
+      </div>
+
       <p className="flex items-center uppercase">
         Details
         <span onClick={() => setVisible(!visible)} className="cursor-pointer">
@@ -244,11 +318,7 @@ export function FeeEstimation({
                 height="1em"
                 viewBox="0 0 24 24"
               >
-                {/* Up arrow icon */}
-                <path
-                  fill="white"
-                  d="M12 8l6 6H6l6-6z"
-                />
+                <path fill="white" d="M12 8l6 6H6l6-6z" />
               </svg>
             )
             : (
@@ -258,112 +328,35 @@ export function FeeEstimation({
                 height="1em"
                 viewBox="0 0 24 24"
               >
-                {/* Down arrow icon */}
-                <path
-                  fill="white"
-                  d="M12 16l-6-6h12l-6 6z"
-                />
+                <path fill="white" d="M12 16l-6-6h12l-6 6z" />
               </svg>
             )}
         </span>
       </p>
-      <div className="flex justify-between gap-6">
-        <div className={`${visible ? "visible" : "invisible"}`}>
-          {type === "src20" && (
-            <div className="flex justify-between border-b border-[#8A8989] py-4">
-              <p>Sats per byte</p>
-              <p>{fee}</p>
-            </div>
-          )}
-          {type === "stamp" && (
-            <>
-              <p className="font-medium text-xs">
-                <span className="text-[#666666] font-light">FILE</span>{" "}
-                {fileType}
-              </p>
-              <p className="font-medium text-xs">
-                <span className="text-[#666666] font-light">BYTES</span>{" "}
-                {fileSize} bytes
-              </p>
-              <p className="font-medium text-xs">
-                <span className="text-[#666666] font-light">
-                  SATS PER BYTE
-                </span>{" "}
-                {fee}
-              </p>
-              <p className="font-medium text-xs">
-                <span className="text-[#666666] font-light">Editions:</span>
-                {" "}
-                {issuance}
-              </p>
-            </>
-          )}
-          <p className="flex gap-1 items-center text-xs font-medium">
-            <span className="font-light text-[#666666]">MINER FEE</span>{" "}
-            {coinType === "BTC"
-              ? `${txfee.toFixed(0)} sats`
-              : `${(txfee / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
-          </p>
-          <p className="flex gap-1 items-center text-xs font-medium">
-            <span className="font-light text-[#666666]">MINTING FEE</span>{" "}
-            {coinType === "BTC"
-              ? `${(mintfee * 1e8).toFixed(0)} sats`
-              : `${(mintfee * BTCPrice).toFixed(2)} ${coinType}`}
-          </p>
-          {/* FIXME: multisig dust  only applies to multisig SRC-20 tokens, not olga(p2swsh) stamps or src-20 */}
-          {
-            /* <p className="flex gap-1 items-center text-xs font-medium">
-            <span className="font-light text-[#666666]">Trx Dust</span>{" "}
-            {coinType === "BTC"
-              ? `${dust.toFixed(0)} sats`
-              : `${(dust / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
-          </p>
-          <p className="flex gap-1 items-center text-xs font-medium">
-            <span className="font-light text-[#666666]">Total Estimated</span>
-            {" "}
-            {coinType === "BTC"
-              ? `${total.toFixed(0)} sats`
-              : `${(total / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
-          </p> */
-          }
-          {/* <button onClick={onRefresh}>Refresh Fees</button> */}
-        </div>
-        <div className="flex flex-col items-end">
-          <div className="flex gap-1 tablet:gap-2 justify-end items-center">
-            <input
-              type="checkbox"
-              id="tosAgreed"
-              name="tosAgreed"
-              checked={tosAgreed}
-              onChange={(e: Event) =>
-                setToSAgreed((e.target as HTMLInputElement).checked)}
-              className="w-3 h-3 bg-[#262424] border border-[#7F7979]"
-            />
-            <label
-              htmlFor="tosAgreed"
-              className="text-[#999999] text-xs font-medium contents"
-            >
-              I AGREE TO THE{" "}
-              <span className="block tablet:hidden text-[#8800CC]">ToS</span>
-              <span className="hidden tablet:block text-[#8800CC]">
-                terms of service
-              </span>
-            </label>
-          </div>
+
+      {renderDetails()}
+
+      <div className="flex justify-end gap-6 mt-4">
+        {isModal && onCancel && (
           <button
-            className={`text-black text-center uppercase font-bold rounded-md mt-4 py-3 px-6 bg-[#5503A6] cursor-pointer ${
-              disabled || isSubmitting || !tosAgreed
-                ? "bg-gray-500 cursor-not-allowed"
-                : ""
-            }`}
-            onClick={isSubmitting || !tosAgreed || disabled
-              ? undefined
-              : onSubmit}
-            disabled={isSubmitting || !tosAgreed || disabled}
+            className="border-2 border-[#8800CC] text-[#8800CC] w-[108px] h-[48px] rounded-md font-extrabold"
+            onClick={onCancel}
+            disabled={isSubmitting}
           >
-            {buttonName}
+            {cancelText}
           </button>
-        </div>
+        )}
+        <button
+          className={`bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold ${
+            (disabled || isSubmitting || (!isModal && !tosAgreed))
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
+          onClick={onSubmit}
+          disabled={disabled || isSubmitting || (!isModal && !tosAgreed)}
+        >
+          {isSubmitting ? "Processing..." : confirmText || buttonName}
+        </button>
       </div>
     </div>
   );

@@ -666,6 +666,65 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
+  /api/v2/src101/{deploy_hash}/address/{address_btc}:
+    get:
+      summary: Get tokenid of SRC-101 by address_btc
+      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            example: 2
+            minimum: 1
+            default: 50
+          description: The maximum number of transactions to retrieve per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: DESC
+            enum: [ASC, DESC]
+          description: Sort order [ASC, DESC]
+        - in: query
+          name: prim
+          required: true
+          example: "true"
+          schema:
+            type: string
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+          description: The hash of the deploy transaction.
+          schema:
+            type: string
+        - in: path
+          name: address_btc
+          required: true
+          example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
+          schema:
+            type: string
+        responses:
+        '200':
+          description: Successful response with deployment details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenidSrc101ResponseBody'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/src20/tx/{tx_hash}:
     get:
@@ -713,6 +772,59 @@ paths:
             minimum: 1
             default: 1
           description: The page number of transactions to retrieve
+      responses:
+        '200':
+          description: Successful response with paginated SRC-101 transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+                
+  /api/v2/src101/tx:
+    get:
+      summary: Get paginated SRC-101 transactions
+      description: Retrieve paginated SRC-101 transactions with optional limit and page parameters
+      parameters:
+        - in: query
+          name: limit
+          example: 2
+          schema:
+            type: integer
+            minimum: 1
+            default: 50
+          description: The maximum number of transactions to retrieve per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: The page number of transactions to retrieve
+        - in: query
+          name: block_index
+          schema:
+            type: integer
+          description: Block index
+        - in: query
+          name: op
+          schema:
+            type: string
+          description: Opetarion, "mint" "transfer"
+        - in: query
+          name: deploy_hash
+          schema:
+            type: string
+        - in: query
+          name: valid
+          schema:
+            type: integer
+          description: Valid is 1, inValid is 0
       responses:
         '200':
           description: Successful response with paginated SRC-101 transactions

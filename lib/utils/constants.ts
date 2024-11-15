@@ -6,10 +6,11 @@ export const BLOCK_TABLE = "blocks";
 export const SRC20_TABLE = "SRC20Valid";
 export const SRC20_BALANCE_TABLE = "balances";
 export const SRC101_TABLE = "SRC101Valid";
+export const SRC101_ALL_TABLE = "SRC101";
 export const SRC101_OWNERS_TABLE = "owners";
 export const SRC101_RECIPIENTS_TABLE = "recipients";
 export const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
-
+export const SATS_PER_KB_MULTIPLIER = 1000; // Convert vB to kB
 export const BIG_LIMIT = 200;
 export const SMALL_LIMIT = 50;
 

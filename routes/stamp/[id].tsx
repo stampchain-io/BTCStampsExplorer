@@ -13,6 +13,8 @@ import { StampController } from "$server/controller/stampController.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
+import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 interface StampDetailPageProps {
   data: {
@@ -87,8 +89,22 @@ export const handler: Handlers<StampData> = {
         null,
       );
 
+      const btcPrice = await fetchBTCPriceInUSD(serverConfig.API_BASE_URL);
+
+      // Calculate USD values
+      const stampWithPrices = {
+        ...stampData.data.stamp,
+        floorPriceUSD: typeof stampData.data.stamp.floorPrice === "number"
+          ? stampData.data.stamp.floorPrice * btcPrice
+          : null,
+        marketCapUSD: typeof stampData.data.stamp.marketCap === "number"
+          ? stampData.data.stamp.marketCap * btcPrice
+          : null,
+      };
+
       return ctx.render({
         ...stampData.data,
+        stamp: stampWithPrices,
         stamps_recent: result,
         collections,
         last_block: stampData.last_block,

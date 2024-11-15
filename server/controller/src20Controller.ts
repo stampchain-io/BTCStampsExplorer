@@ -322,6 +322,7 @@ export class Src20Controller {
         tick,
         sortBy: "DESC",
         includePagination: false,
+        limit: 1000000
       };
 
       const [

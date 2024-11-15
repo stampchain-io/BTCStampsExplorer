@@ -2,34 +2,80 @@
 import { Handlers } from "$fresh/server.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { PSBTService } from "$server/services/transaction/psbtService.ts";
+
+interface DispenseInput {
+  address: string;
+  dispenser: string;
+  quantity: number;
+  options: {
+    return_psbt: boolean;
+    fee_per_kb: number;
+  };
+}
 
 export const handler: Handlers = {
   async POST(req) {
     try {
-      const requestData = await req.json();
-      const {
-        address,
-        dispenser,
-        quantity,
-        options,
-      } = requestData;
+      const input: DispenseInput = await req.json();
+      console.log("Received dispense input:", input);
 
-      if (!address || !dispenser || !quantity) {
-        return ResponseUtil.error("Missing required parameters.", 400);
+      const { address, dispenser, quantity, options } = input;
+
+      // Validate fee rate
+      if (typeof options?.fee_per_kb !== "number" || options.fee_per_kb <= 0) {
+        return ResponseUtil.error("Invalid fee rate", 400);
       }
 
-      // Call createDispense on the server-side
-      const response = await XcpManager.createDispense(
-        address,
-        dispenser,
-        quantity,
-        options,
-      );
+      const feeRateKB = options.fee_per_kb;
+      console.log(`Fee rate (sat/kB): ${feeRateKB}`);
 
-      return ResponseUtil.success(response);
+      try {
+        // Get dispense transaction from XcpManager
+        const response = await XcpManager.createDispense(
+          address,
+          dispenser,
+          quantity,
+          {
+            ...options,
+            fee_per_kb: feeRateKB,
+          },
+        );
+
+        if (!response?.result?.psbt) {
+          if (response?.error) {
+            return ResponseUtil.error(response.error, 400);
+          }
+          throw new Error("Failed to create dispense transaction.");
+        }
+
+        console.log("PSBT Base64 from XCP:", response.result.psbt);
+
+        // Process PSBT using shared service
+        const processedPSBT = await PSBTService.processCounterpartyPSBT(
+          response.result.psbt,
+          address,
+          feeRateKB,
+          { validateInputs: true, validateFees: true },
+        );
+
+        return new Response(JSON.stringify(processedPSBT), {
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (error) {
+        if (
+          error instanceof Error && error.message.includes("Insufficient BTC")
+        ) {
+          return ResponseUtil.error(error.message, 400);
+        }
+        throw error;
+      }
     } catch (error) {
-      console.error("Error in /api/v2/create/dispense:", error);
-      return ResponseUtil.handleError(error, "Error processing request");
+      console.error("Error processing dispense request:", error);
+      return ResponseUtil.handleError(
+        error,
+        "Failed to process dispense request",
+      );
     }
   },
 };

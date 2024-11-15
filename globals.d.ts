@@ -93,8 +93,11 @@ export interface StampRow {
   stamp_hash: string;
   is_btc_stamp: number;
   file_hash: string;
-  floorPrice?: number;
+  floorPrice?: number | "priceless";
+  marketCap?: number | "priceless";
   balance?: number | string;
+  floorPriceUSD?: number | null;
+  marketCapUSD?: number | null;
 }
 
 export interface DisplayCountBreakpoints {
@@ -146,10 +149,10 @@ export interface SRC20Row {
   status: string;
   row_num: number;
   progress?: string | null;
-  email?: boolean;
-  web?: boolean;
-  tg?: boolean;
-  x?: boolean;
+  email?: string;
+  web?: string;
+  tg?: string;
+  x?: string;
   holders: number;
   floor_unit_price?: number;
   mcap?: number;
@@ -420,6 +423,16 @@ export interface SRC101OwnerParams {
   limit?: number;
   page?: number;
   sort?: string;
+}
+
+export interface SRC101TxParams {
+  tick?: string;
+  op?: string;
+  valid?: number;
+  block_index?: string;
+  deploy_hash?: string;
+  limit?: number;
+  page?: number;
 }
 
 export interface SRC101ValidTxParams {

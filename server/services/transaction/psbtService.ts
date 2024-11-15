@@ -6,6 +6,7 @@ import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
 import { BTCAddressService } from "$server/services/btc/addressService.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 
 export class PSBTService {
   static async createPSBT(
@@ -280,5 +281,212 @@ export class PSBTService {
 
     // Return the updated PSBT hex without signing
     return psbt.toHex();
+  }
+
+  static async processCounterpartyPSBT(
+    psbtBase64: string,
+    address: string, 
+    feeRateKB: number,
+    options?: {
+      validateInputs?: boolean;
+      validateFees?: boolean;
+    }
+  ): Promise<{
+    psbt: string;
+    inputsToSign: { index: number }[];
+  }> {
+    console.log("Processing Counterparty PSBT:", {
+      psbtBase64,
+      address,
+      feeRateKB,
+      options
+    });
+
+    try {
+      // Parse PSBT from Base64
+      const psbt = Psbt.fromBase64(psbtBase64);
+      console.log("Raw PSBT Data:", psbt.data);
+
+      // Access transaction data
+      const tx = psbt.data.globalMap.unsignedTx.tx;
+      console.log("Transaction Data:", tx);
+
+      if (!tx || !tx.ins || !tx.outs) {
+        throw new Error("Invalid transaction structure in PSBT");
+      }
+
+      // Add UTXO details for each input
+      const ancestorInfos = [];
+      for (const [index, input] of tx.ins.entries()) {
+        const inputTxid = Buffer.from(input.hash).reverse().toString("hex");
+        const inputVout = input.index;
+        console.log(
+          `Processing input ${index}: txid=${inputTxid}, vout=${inputVout}`,
+        );
+
+        // Fetch UTXO details WITH ancestor info
+        const txInfo = await getUTXOForAddress(
+          address,
+          inputTxid,
+          inputVout,
+          true,
+        );
+        if (!txInfo?.utxo) {
+          throw new Error(
+            `UTXO details not found for input ${index}: ${inputTxid}:${inputVout}`,
+          );
+        }
+
+        const utxoDetails = txInfo.utxo;
+        const ancestorInfo = txInfo.ancestor;
+        ancestorInfos.push(ancestorInfo);
+
+        console.log(`UTXO Details for input ${index}:`, utxoDetails);
+        if (ancestorInfo) {
+          console.log(`Ancestor info for input ${index}:`, ancestorInfo);
+        }
+
+        if (!utxoDetails.script) {
+          throw new Error(`Missing script for input ${index}`);
+        }
+
+        // Update input with witness UTXO
+        psbt.updateInput(index, {
+          witnessUtxo: {
+            script: Buffer.from(utxoDetails.script, "hex"),
+            value: utxoDetails.value,
+          },
+        });
+
+        console.log(`Updated input ${index} with witness data`);
+      }
+
+      // Verify all inputs have UTXO data
+      tx.ins.forEach((_, index) => {
+        const inputData = psbt.data.inputs[index];
+        console.log(`Input ${index} data:`, inputData);
+
+        if (!inputData.witnessUtxo && !inputData.nonWitnessUtxo) {
+          throw new Error(
+            `Missing UTXO details for input at index ${index}`,
+          );
+        }
+      });
+
+      // Calculate and validate fees
+      const totalIn = tx.ins.reduce((sum, _, index) => {
+        const witnessUtxo = psbt.data.inputs[index]?.witnessUtxo;
+        return sum + (witnessUtxo?.value || 0);
+      }, 0);
+
+      const vsize = tx.virtualSize();
+      const requestedFeeRateVB = feeRateKB / SATS_PER_KB_MULTIPLIER;
+      const targetFee = Math.ceil(vsize * requestedFeeRateVB);
+
+      // Find the change output (usually the last non-OP_RETURN output)
+      const changeOutputIndex = tx.outs.findIndex((output, index, arr) => {
+        // Skip OP_RETURN outputs
+        if (output.script[0] === 0x6a) return false;
+        // If this is the last non-OP_RETURN output, it's likely the change
+        return !arr.slice(index + 1).some(out => out.script[0] !== 0x6a);
+      });
+
+      if (changeOutputIndex === -1) {
+        throw new Error("No change output found to adjust fee");
+      }
+
+      // Calculate the required change value to achieve target fee
+      const nonChangeOutputsTotal = tx.outs.reduce((sum, output, index) => 
+        index !== changeOutputIndex ? sum + output.value : sum, 0);
+      
+      const newChangeValue = totalIn - nonChangeOutputsTotal - targetFee;
+
+      if (newChangeValue < 546) { // Dust limit
+        throw new Error(`Cannot achieve target fee rate: change would be dust (${newChangeValue} sats)`);
+      }
+
+      // Update the change output with the new value
+      tx.outs[changeOutputIndex].value = newChangeValue;
+
+      // Recalculate actual fee after adjustment
+      const totalOut = tx.outs.reduce((sum, output) => sum + output.value, 0);
+      const actualFee = totalIn - totalOut;
+
+      console.log(`
+Fee Adjustment:
+Original Change Value: ${tx.outs[changeOutputIndex].value}
+New Change Value: ${newChangeValue}
+Target Fee: ${targetFee} sats (${requestedFeeRateVB} sat/vB)
+Actual Fee: ${actualFee} sats (${(actualFee/vsize).toFixed(2)} sat/vB)
+      `);
+
+      // Validate fees if requested
+      if (options?.validateFees) {
+        // Check ancestor fee rates
+        for (const [index, ancestorInfo] of ancestorInfos.entries()) {
+          if (ancestorInfo) {
+            const effectiveFeeRate = (actualFee + ancestorInfo.fees) /
+              (vsize + ancestorInfo.vsize);
+
+            console.log(`
+Ancestor Fee Analysis for Input ${index}:
+Ancestor Fees: ${ancestorInfo.fees} satoshis
+Ancestor vSize: ${ancestorInfo.vsize} vBytes
+Current Tx:
+  Fee: ${actualFee} satoshis
+  vSize: ${vsize} vBytes
+Combined:
+  Total Fees: ${actualFee + ancestorInfo.fees} satoshis
+  Total vSize: ${vsize + ancestorInfo.vsize} vBytes
+  Effective Fee Rate: ${effectiveFeeRate.toFixed(2)} sat/vB
+Target Fee Rate: ${requestedFeeRateVB} sat/vB
+            `);
+
+            // If ancestors require higher fee rate, adjust the fee again
+            if (effectiveFeeRate < requestedFeeRateVB) {
+              const requiredFee = Math.ceil(
+                requestedFeeRateVB * (vsize + ancestorInfo.vsize) -
+                ancestorInfo.fees
+              );
+
+              const adjustedChangeValue = totalIn - nonChangeOutputsTotal - requiredFee;
+              if (adjustedChangeValue < 546) {
+                throw new Error(
+                  `Cannot achieve target fee rate with ancestors: change would be dust (${adjustedChangeValue} sats)`
+                );
+              }
+
+              // Update change output with adjusted value
+              tx.outs[changeOutputIndex].value = adjustedChangeValue;
+              console.log(`
+Adjusted for ancestors:
+New Change Value: ${adjustedChangeValue}
+Required Fee: ${requiredFee} sats
+              `);
+            }
+          }
+        }
+      }
+
+      // Identify inputs to sign
+      const inputsToSign = tx.ins.map((_, index) => ({ index }));
+      console.log("Inputs to sign:", inputsToSign);
+
+      // Convert updated PSBT to hex
+      const updatedPsbtHex = psbt.toHex();
+      console.log("Updated PSBT Hex:", updatedPsbtHex);
+
+      return {
+        psbt: updatedPsbtHex,
+        inputsToSign,
+      };
+    } catch (error) {
+      console.error("Error processing Counterparty PSBT:", error);
+      throw new Error(
+        `Failed to process PSBT: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      );
+    }
   }
 }

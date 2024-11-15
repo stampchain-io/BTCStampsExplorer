@@ -154,44 +154,46 @@ export function Header() {
                 toggleMenu();
                 setCurrentPath(link?.href ? link?.href : null);
               }}
-              className={`whitespace-nowrap ${
+              className={`inline-block whitespace-nowrap ${
                 isMobile
                   ? `text-xl mobileLg:text-2xl ${
                     link.subLinks
                       ? "text-stamp-primary-dark"
                       : "text-stamp-primary"
-                  } hover:text-stamp-primary-hover`
+                  }`
                   : "text-lg desktop:text-xl text-center group-hover:text-stamp-primary-hover"
               }`}
             >
               {link.title}
             </a>
-            <div
-              className={`${
-                isMobile
-                  ? "hidden group-hover:flex flex-col z-[100] w-full"
-                  : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
-              }`}
-            >
-              {link.subLinks?.map((subLink) => (
-                <a
-                  key={subLink.href}
-                  href={subLink.href}
-                  f-partial={subLink.href}
-                  onClick={() => {
-                    toggleMenu();
-                    setCurrentPath(subLink?.href ? subLink?.href : null);
-                  }}
-                  className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobileLg:text-base ${
-                    currentPath === subLink.href
-                      ? "text-stamp-purple-highlight"
-                      : ""
-                  }`}
-                >
-                  {subLink.title}
-                </a>
-              ))}
-            </div>
+            {link.subLinks && (
+              <div
+                className={`${
+                  isMobile
+                    ? "hidden group-hover:flex flex-col z-[100] w-full"
+                    : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
+                }`}
+              >
+                {link.subLinks?.map((subLink) => (
+                  <a
+                    key={subLink.href}
+                    href={subLink.href}
+                    f-partial={subLink.href}
+                    onClick={() => {
+                      toggleMenu();
+                      setCurrentPath(subLink?.href ? subLink?.href : null);
+                    }}
+                    className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobileLg:text-base ${
+                      currentPath === subLink.href
+                        ? "text-stamp-purple-highlight"
+                        : ""
+                    }`}
+                  >
+                    {subLink.title}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </>
@@ -246,9 +248,7 @@ export function Header() {
       >
         <div className="font-black text-center flex flex-col items-center justify-between gap-3">
           {renderNavLinks(true)}
-          <div className="mt-6 mobileLg:mt-9">
-            <ConnectWallet toggleModal={toggleWalletModal} />
-          </div>
+          <ConnectWallet toggleModal={toggleWalletModal} />
         </div>
 
         <div className="flex justify-center items-center">
