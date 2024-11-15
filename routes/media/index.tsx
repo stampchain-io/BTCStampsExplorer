@@ -1,12 +1,12 @@
 export default function Media() {
   const titleClassName =
-    "text-3xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
-  const subTitle1ClassName =
-    "text-xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light";
-  const subTitle2ClassName =
-    "text-lg mobileLg:text-3xl desktop:text-4xl font-bold gray-gradient3";
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+  const subTitleClassName =
+    "text-xl mobileMd:text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light";
+  const subTitle2LinkClassName =
+    "text-lg mobileMd:text-xl mobileLg:text-3xl desktop:text-4xl font-bold gray-gradient3";
   const defaultTextClassName =
-    "text-sm mobileLg:text-lg desktop:text-xl font-medium text-stamp-grey-light";
+    "text-sm mobileMd:text-base mobileLg:text-lg desktop:text-xl font-medium text-stamp-grey-light";
   const buttonClassName =
     "border-2 border-stamp-grey rounded-md text-base leading-[18.77px] font-extrabold px-6 py-4 text-stamp-grey float-right mobileLg:float-none";
 
@@ -14,7 +14,7 @@ export default function Media() {
     <div className="flex flex-col gap-24 mobileLg:gap-36">
       <section>
         <h1 className={titleClassName}>MEDIA MATTERS</h1>
-        <h2 className={subTitle1ClassName}>HONOURABLE STAMP MENTIONS</h2>
+        <h2 className={subTitleClassName}>HONOURABLE STAMP MENTIONS</h2>
         <p className={defaultTextClassName}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
           vulputate, lacus at faucibus fringilla, urna urna pretium magna, et
@@ -29,7 +29,7 @@ export default function Media() {
         <h1 className={titleClassName}>INTERVIEWS</h1>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 gap-6">
           <div className="flex flex-col gap-3 mobileLg:gap-6">
-            <h2 className={subTitle1ClassName}>RICE TVX</h2>
+            <h2 className={subTitleClassName}>RICE TVX</h2>
             <div className="relative w-full pt-[56.25%]">
               {/* 16:9 aspect ratio wrapper */}
               <iframe
@@ -53,7 +53,7 @@ export default function Media() {
             </p>
           </div>
           <div className="flex flex-col gap-3 mobileLg:gap-6">
-            <h2 className={subTitle1ClassName}>WAGE CUCKING</h2>
+            <h2 className={subTitleClassName}>WAGE CUCKING</h2>
             <div className="relative w-full pt-[56.25%]">
               {/* 16:9 aspect ratio wrapper */}
               <iframe
@@ -79,11 +79,11 @@ export default function Media() {
 
       <section>
         <h1 className={titleClassName}>IN THE NEWS</h1>
-        <h2 className={subTitle1ClassName}>COINDESK</h2>
+        <h2 className={subTitleClassName}>COINDESK</h2>
         <a
           href="https://finance.yahoo.com/video/project-bitcoin-stamps-renews-debate-164902188.html?guccounter=1"
           target="_blank"
-          className={subTitle2ClassName}
+          className={subTitle2LinkClassName}
         >
           NEW PROJECT RENEWS DEBATE OVER BITCOIN NFTS
         </a>
@@ -91,11 +91,11 @@ export default function Media() {
 
       <section>
         <h1 className={titleClassName}>ARTICLES</h1>
-        <h2 className={subTitle1ClassName}>HACKERNOON</h2>
+        <h2 className={subTitleClassName}>HACKERNOON</h2>
         <a
           href="https://hackernoon.com/what-are-bitcoin-stamps"
           target="_blank"
-          className={subTitle2ClassName}
+          className={subTitle2LinkClassName}
         >
           WHAT ARE BITCOIN STAMPS
         </a>
@@ -105,7 +105,7 @@ export default function Media() {
         <h1 className={titleClassName}>REPORTS</h1>
         <div className="grid grid-cols-1 mobileLg:grid-cols-3 gap-3 mobileLg:gap-6">
           <div className="col-span-1 mobileLg:col-span-2">
-            <h2 className={subTitle1ClassName}>SQRR - DEEP DIVE</h2>
+            <h2 className={subTitleClassName}>SQRR - DEEP DIVE</h2>
             <p className={defaultTextClassName}>
               Stamps is a blockchain protocol created by MikeInSpace that
               enables storing images on-chain on Bitcoin transaction
@@ -119,7 +119,7 @@ export default function Media() {
             <button className={buttonClassName}>DOWNLOAD</button>
           </div>
           <div className="col-span-1 mobileLg:text-right">
-            <h2 className={subTitle1ClassName}>INSIGHTS</h2>
+            <h2 className={subTitleClassName}>INSIGHTS</h2>
             <p className={defaultTextClassName}>
               <span className="font-bold">
                 Detailed monthly reports about Bitcoin Stamps.<br />
