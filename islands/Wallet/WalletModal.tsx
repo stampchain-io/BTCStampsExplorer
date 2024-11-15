@@ -263,7 +263,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
   }, [isPopupOpen]);
 
   const toggleModal = () => {
-    if (isConnected.value) {
+    if (isConnected) {
       console.log("connected");
       // setIsPopupOpen(!isPopupOpen);
     } else {
@@ -293,12 +293,12 @@ export const WalletModal = ({ connectors = [] }: Props) => {
     >
       {isConnected && address && (
         <>
-          <div class="inline-block relative group">
+          <div class="relative group">
             <button
               type="button"
               ref={buttonRef}
-              onClick={toggleModal}
-              class="hidden tablet:block text-stamp-primary border-stamp-primary border-2 rounded-md px-5 py-4 font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
+              // onClick={toggleModal}
+              class="hidden tablet:block text-stamp-primary px-5 py-4 bg-black font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px] border-2 border-stamp-primary rounded-md opacity-100 group-hover:opacity-0"
             >
               {abbreviateAddress(address)}
             </button>
@@ -306,12 +306,21 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             <button
               type="button"
               ref={buttonRef}
-              class="block tablet:hidden text-stamp-primary-dark font-extrabold text-xl mobileLg:text-2xl -mt-6 mobileLg:-mt-9"
+              class="block tablet:hidden text-stamp-primary-dark font-extrabold text-xl mobileLg:text-2xl -mt-1 mobileLg:-mt-4"
             >
               CONNECTED
             </button>
 
-            <div class="absolute z-[1000] top-full -left-2 tablet:left-0 tablet:mt-2 tablet:pt-1 text-lg tablet:text-base bg-transparent tablet:bg-black text-stamp-primary tablet:border-2 tablet:border-stamp-primary rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="z-[1000] absolute top-full tablet:top-0 -left-2 tablet:left-0 text-lg tablet:text-base bg-transparent tablet:bg-black text-stamp-primary hidden group-hover:block transition-opacity duration-300 tablet:border-2 tablet:border-stamp-primary tablet:rounded-md">
+              <button
+                type="button"
+                ref={buttonRef}
+                // onClick={toggleModal}
+                class="hidden tablet:block text-stamp-primary px-5 py-4 bg-black font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
+              >
+                {abbreviateAddress(address)}
+              </button>
+
               <p className="block tablet:hidden px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer">
                 {abbreviateAddress(address)}
               </p>
