@@ -7,9 +7,13 @@ import {
 import { formatNumber } from "$lib/utils/util.ts";
 
 export interface SRC20TickHeaderProps {
-  deployment: Deployment;
+  deployment: Deployment & {
+    email?: string;
+    web?: string;
+    tg?: string;
+    x?: string;
+  };
   mintStatus: MintStatus;
-  totalHolders: number;
   totalMints: number;
   totalTransfers: number;
   marketInfo?: MarketListingSummary;
@@ -45,7 +49,6 @@ function StatItem(
 export function SRC20TickHeader({
   deployment,
   mintStatus,
-  totalHolders,
   totalMints,
   totalTransfers,
   marketInfo,
@@ -85,9 +88,33 @@ export function SRC20TickHeader({
               loading="lazy"
             />
             <div>
-              <p class="text-3xl tablet:text-6xl uppercase font-black text-[#660099]">
-                {tickValue}
-              </p>
+              <div class="flex gap-6 items-center">
+                <p class="text-3xl tablet:text-6xl uppercase font-black text-[#660099]">
+                  {tickValue}
+                </p>
+                <div class="flex gap-2 items-center">
+                  {deployment.email && (
+                    <a href={deployment.email} target="_blank">
+                      <img src="/img/src20/details/EnvelopeSimple.svg" />
+                    </a>
+                  )}
+                  {deployment.web && (
+                    <a href={deployment.web} target="_blank">
+                      <img src="/img/src20/details/Globe.svg" />
+                    </a>
+                  )}
+                  {deployment.tg && (
+                    <a href={deployment.tg} target="_blank">
+                      <img src="/img/src20/details/TelegramLogo.svg" />
+                    </a>
+                  )}
+                  {deployment.x && (
+                    <a href={deployment.x} target="_blank">
+                      <img src="/img/src20/details/XLogo.svg" />
+                    </a>
+                  )}
+                </div>
+              </div>
               <p className="text-[#666666] text-2xl font-light">CREATOR</p>
               <p className="text-[#999999] text-2xl font-bold">
                 {deployment.creator_name ||
@@ -96,12 +123,6 @@ export function SRC20TickHeader({
             </div>
           </div>
           <div class="flex flex-col gap-2 justify-end items-start ml-auto">
-            <div className="flex gap-2">
-              <img src="/img/src20/details/EnvelopeSimple.svg" />
-              <img src="/img/src20/details/Globe.svg" />
-              <img src="/img/src20/details/TelegramLogo.svg" />
-              <img src="/img/src20/details/XLogo.svg" />
-            </div>
             <div>
               <StatItem label="Deploy" value={deployDate} direction="row" />
               <StatItem
@@ -153,11 +174,6 @@ export function SRC20TickHeader({
           label="24H CHANGE"
           value="N/A" // FIXME: not available from API mcap request
           currency="%"
-          direction="col"
-        />
-        <StatItem
-          label="Holders"
-          value="N/A" // FIXME: not available from API mcap request
           direction="col"
         />
       </div>

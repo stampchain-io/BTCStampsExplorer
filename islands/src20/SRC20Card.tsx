@@ -54,16 +54,27 @@ export function SRC20Card(
             {/* Social Icons */}
             <div class="flex gap-2">
               {src20.email != null && (
-                <img width="20px" src="/img/src20/details/EnvelopeSimple.svg" />
+                <a href={src20.email} target="_blank">
+                  <img
+                    width="20px"
+                    src="/img/src20/details/EnvelopeSimple.svg"
+                  />
+                </a>
               )}
               {src20.web != null && (
-                <img width="20px" src="/img/src20/details/Globe.svg" />
+                <a href={src20.web} target="_blank">
+                  <img width="20px" src="/img/src20/details/Globe.svg" />
+                </a>
               )}
               {src20.tg != null && (
-                <img width="20px" src="/img/src20/details/TelegramLogo.svg" />
+                <a href={src20.tg} target="_blank">
+                  <img width="20px" src="/img/src20/details/TelegramLogo.svg" />
+                </a>
               )}
               {src20.x != null && (
-                <img width="20px" src="/img/src20/details/XLogo.svg" />
+                <a href={src20.x} target="_blank">
+                  <img width="20px" src="/img/src20/details/XLogo.svg" />
+                </a>
               )}
             </div>
           </a>
