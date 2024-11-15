@@ -123,6 +123,12 @@ import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHe
 import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
 import * as $Wallet_details_WalletSendModal from "./islands/Wallet/details/WalletSendModal.tsx";
 import * as $Wallet_details_WalletTransferModal from "./islands/Wallet/details/WalletTransferModal.tsx";
+import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
+import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
+import * as $about_AboutHeader from "./islands/about/AboutHeader.tsx";
+import * as $about_AboutTeam from "./islands/about/AboutTeam.tsx";
+import * as $about_DonateEstimation from "./islands/about/DonateEstimation.tsx";
+import * as $about_DonateModal from "./islands/about/DonateModal.tsx";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
@@ -348,6 +354,12 @@ const manifest = {
       $Wallet_details_WalletSendModal,
     "./islands/Wallet/details/WalletTransferModal.tsx":
       $Wallet_details_WalletTransferModal,
+    "./islands/about/AboutContact.tsx": $about_AboutContact,
+    "./islands/about/AboutDonate.tsx": $about_AboutDonate,
+    "./islands/about/AboutHeader.tsx": $about_AboutHeader,
+    "./islands/about/AboutTeam.tsx": $about_AboutTeam,
+    "./islands/about/DonateEstimation.tsx": $about_DonateEstimation,
+    "./islands/about/DonateModal.tsx": $about_DonateModal,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,

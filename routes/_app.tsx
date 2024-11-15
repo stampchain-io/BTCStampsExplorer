@@ -88,9 +88,9 @@ export default function App({ Component }: AppProps) {
           content="strict-origin-when-cross-origin"
         />
       </Head>
-      <body class="relative bg-stamp-dark-DEFAULT min-h-screen overflow-x-hidden">
-        <div class="bgGradientTop" aria-hidden="true" />
-        <div class="bgGradientBottom" aria-hidden="true" />
+      <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden">
+        {/* <div class="bgGradientTop" aria-hidden="true" /> */}
+        {/* <div class="bgGradientBottom" aria-hidden="true" /> */}
 
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1]" />
 

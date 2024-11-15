@@ -76,6 +76,7 @@ export default {
           text: {
             primary: "#999999",
             secondary: "#666666",
+            "custom-stroke-color": "#80C",
           },
           input: {
             bg: "#4F3666",
@@ -154,6 +155,7 @@ export default {
         "stamp-card": "6px",
         "stamp-card-lg": "max(6px,min(12px,calc(6px+((100vw-360px)*0.029))))",
         "search-icon": "12px",
+        "stroke-width": "2px",
         "gutter-mobile": "12px", // 12px
         "gutter-desktop": "24px", // 24px
         "margin-mobile": "18px", // 18px
@@ -192,8 +194,14 @@ export default {
     },
   },
   plugins: [
-    plugin(function ({ addUtilities }) {
+    plugin(function ({ addUtilities, theme }) {
       addUtilities({
+        ".text-stroke": {
+          "-webkit-text-stroke-width": theme("spacing.stroke-width"),
+          "-webkit-text-stroke-color": theme(
+            "colors.stamp.text.custom-stroke-color",
+          ),
+        },
         ".bg-clip-text": {
           "-webkit-background-clip": "text",
           "background-clip": "text",
