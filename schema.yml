@@ -1096,7 +1096,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponseBody'
 
-
   /api/v2/stamps:
     get:
       summary: Get paginated stamps
@@ -1104,15 +1103,22 @@ paths:
       parameters:
         - in: query
           name: limit
-          example: 2
+          example: 500
           schema:
             type: integer
           description: The maximum number of stamps to return per page. Defaults to 50.
         - in: query
           name: page
+          example: 1
           schema:
             type: integer
           description: The page number to retrieve. Defaults to 1.
+        - in: query
+          name: sort
+          example: desc
+          schema:
+            type: string
+          description: The order of stamps.
       responses:
         '200':
           description: Successful response with paginated stamps.
