@@ -1,12 +1,12 @@
 export default function Media() {
   const titleClassName =
-    "text-3xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
   const subTitle1ClassName =
-    "text-xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light";
+    "text-xl mobileMd:text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light";
   const subTitle2ClassName =
-    "text-lg mobileLg:text-3xl desktop:text-4xl font-bold gray-gradient3";
+    "text-lg mobileMd:text-xl mobileLg:text-3xl desktop:text-4xl font-bold gray-gradient3";
   const defaultTextClassName =
-    "text-sm mobileLg:text-lg desktop:text-xl font-medium text-stamp-grey-light";
+    "text-sm mobileMd:text-base mobileLg:text-lg desktop:text-xl font-medium text-stamp-grey-light";
   const buttonClassName =
     "border-2 border-stamp-grey rounded-md text-base leading-[18.77px] font-extrabold px-6 py-4 text-stamp-grey float-right mobileLg:float-none";
 
