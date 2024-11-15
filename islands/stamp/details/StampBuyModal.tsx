@@ -125,10 +125,9 @@ const StampBuyModal = ({
         true, // Enable RBF
       );
 
-      if (signResult.signed) {
-        const txid = await walletContext.broadcastPSBT(signResult.psbt);
+      if (signResult.signed && signResult.txid) {
         setSuccessMessage(
-          `Transaction broadcasted successfully. TXID: ${txid}`,
+          `Transaction broadcasted successfully. TXID: ${signResult.txid}`,
         );
         setTimeout(toggleModal, 5000);
       } else if (signResult.cancelled) {
