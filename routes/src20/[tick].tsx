@@ -11,14 +11,25 @@ export const handler: Handlers = {
   async GET(_req: Request, ctx) {
     try {
       let { tick } = ctx.params;
+      if (!tick) {
+        return ctx.renderNotFound();
+      }
+
       tick = convertEmojiToTick(tick);
       set_precision(-4);
       const body = await Src20Controller.handleTickPageRequest(tick);
 
-      return await ctx.render(body); // No need to modify marketInfo here
+      if (!body || body.error) {
+        return ctx.renderNotFound();
+      }
+
+      return await ctx.render(body);
     } catch (error) {
-      console.error(error);
-      return ctx.render({ error: (error as Error).message });
+      console.error("Error in SRC20 tick page:", error);
+      if (error.message?.includes("not found")) {
+        return ctx.renderNotFound();
+      }
+      return new Response("Internal Server Error", { status: 500 });
     }
   },
 };

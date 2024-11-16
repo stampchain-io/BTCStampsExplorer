@@ -26,29 +26,32 @@ type CollectionDetailsPageProps = {
 
 export const handler: Handlers = {
   async GET(req: Request, ctx: FreshContext) {
-    // Decode the collection name to handle spaces and special characters
-    const id = decodeURIComponent(ctx.params.id);
+    try {
+      // Decode the collection name to handle spaces and special characters
+      const id = decodeURIComponent(ctx.params.id);
 
-    const url = new URL(req.url);
-    const sortBy = url.searchParams.get("sortBy")?.toUpperCase() === "ASC"
-      ? "ASC"
-      : "DESC";
-    const filterBy =
-      url.searchParams.get("filterBy")?.split(",").map((f) =>
+      const url = new URL(req.url);
+      const sortBy = url.searchParams.get("sortBy")?.toUpperCase() === "ASC"
+        ? "ASC"
+        : "DESC";
+      const filterBy = url.searchParams.get("filterBy")?.split(",").map((f) =>
         f as STAMP_FILTER_TYPES
       ) || [];
-    const selectedTab = url.searchParams.get("ident") || "all";
-    const ident: SUBPROTOCOLS[] = selectedTab === "all"
-      ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]
-      : ["STAMP", "SRC-721"] as SUBPROTOCOLS[];
-    const page = parseInt(url.searchParams.get("page") || "1");
-    const page_size = parseInt(url.searchParams.get("limit") || "20");
+      const selectedTab = url.searchParams.get("ident") || "all";
+      const ident: SUBPROTOCOLS[] = selectedTab === "all"
+        ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]
+        : ["STAMP", "SRC-721"] as SUBPROTOCOLS[];
+      const page = parseInt(url.searchParams.get("page") || "1");
+      const page_size = parseInt(url.searchParams.get("limit") || "20");
 
-    const type: "stamps" | "cursed" | "all" = "all";
+      const type: "stamps" | "cursed" | "all" = "all";
 
-    const collection = await CollectionService.getCollectionByName(id);
+      const collection = await CollectionService.getCollectionByName(id);
 
-    if (collection) {
+      if (!collection) {
+        return ctx.renderNotFound();
+      }
+
       const collectionId = collection.collection_id;
       const result = await StampController.getStamps({
         page,
@@ -72,8 +75,12 @@ export const handler: Handlers = {
         selectedTab,
       };
       return await ctx.render(data);
-    } else {
-      throw new Error("Collection not found");
+    } catch (error) {
+      console.error("Error in collection details:", error);
+      if (error.message?.includes("Collection not found")) {
+        return ctx.renderNotFound();
+      }
+      return new Response("Internal Server Error", { status: 500 });
     }
   },
 };
