@@ -89,7 +89,7 @@ export function FairmintContent({ fairminters }: FairmintContentProps) {
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
-          buttonName="Fairmint"
+          buttonName="FAIRMINT"
           {...feeEstimationParams}
         />
 

@@ -216,7 +216,7 @@ export function MintContent({
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleMintSubmit}
-          buttonName="Mint"
+          buttonName="MINT"
         />
 
         <StatusMessages
