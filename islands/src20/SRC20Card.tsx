@@ -8,11 +8,58 @@ interface SRC20CardProps {
   onImageClick?: (imgSrc: string) => void;
 }
 
+function ProgressBar({ progress, progressWidth }) {
+  return (
+    <div class="flex flex-col gap-1">
+      <p class="text-lg font-light text-stamp-grey">
+        PROGRESS <span class="font-bold">{progress}%</span>
+      </p>
+      <div class="hidden mobileLg:block min-w-[260px] h-1 bg-[#999999] relative rounded-full">
+        <div
+          class="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
+          style={{ width: progressWidth }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function RowStat({
+  label,
+  value,
+}) {
+  return (
+    <p class="text-lg text-stamp-grey-darker font-light">
+      {label}{" "}
+      <span class="font-bold text-stamp-grey">
+        {value}
+      </span>
+    </p>
+  );
+}
+
+function MintButton({
+  handleMintClick,
+  progress,
+}) {
+  return (
+    <div class="p-3 text-sm text-center flex flex-col justify-center">
+      <button
+        onClick={handleMintClick}
+        class="bg-[#8800CC] disabled:bg-[#440088] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]"
+        disabled={progress == "100" ? true : false}
+      >
+        Mint
+      </button>
+    </div>
+  );
+}
+
 export function SRC20Card(
   { src20, variant = "deploy", onImageClick }: SRC20CardProps,
 ) {
   const [isHovered, setIsHovered] = useState(false);
-
+  const { mcap, status } = src20;
   const href = `/src20/${encodeURIComponent(convertToEmoji(src20.tick))}`;
   const mintHref = `/stamping/src20/mint?tick=${
     encodeURIComponent(src20.tick)
@@ -80,17 +127,25 @@ export function SRC20Card(
           </a>
 
           {/* Progress Bar */}
-          <div class="flex flex-col gap-1">
-            <p class="text-lg font-light text-stamp-grey">
-              PROGRESS <span class="font-bold">{progress}%</span>
-            </p>
-            <div class="hidden mobileLg:block min-w-[260px] h-1 bg-[#999999] relative rounded-full">
-              <div
-                class="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
-                style={{ width: progressWidth }}
-              />
-            </div>
-          </div>
+          {progress !== "100" && (
+            <ProgressBar progress={progress} progressWidth={progressWidth} />
+          )}
+          {progress === "100" && (
+            <>
+              <p class="text-lg text-stamp-grey-darker font-light">
+                SUPPLY{" "}
+                <span class="font-bold text-stamp-grey">
+                  {Number(src20.max).toLocaleString()}
+                </span>
+              </p>
+              <p class="text-lg text-stamp-grey-darker font-light">
+                MARKETCAP{" "}
+                <span class="font-bold text-stamp-grey">
+                  {Number(src20.mcap).toLocaleString()}
+                </span>
+              </p>
+            </>
+          )}
         </div>
       </div>
 
@@ -98,37 +153,33 @@ export function SRC20Card(
         <>
           {/* Middle Section - Supply and Limit */}
           <div class="hidden tablet:flex p-3 text-center flex-col justify-center">
-            <p class="text-lg text-stamp-grey-darker font-light">
-              SUPPLY{" "}
-              <span class="font-bold text-stamp-grey">
-                {Number(src20.max).toLocaleString()}
-              </span>
-            </p>
-            <p class="text-lg text-stamp-grey-darker font-light">
+            {
+              /* <p class="text-lg text-stamp-grey-darker font-light">
               LIMIT{" "}
               <span class="font-bold text-stamp-grey">
                 {Number(src20.lim).toLocaleString()}
               </span>
-            </p>
+            </p> */
+            }
+            <RowStat label="PRICE" value={src20.floor_unit_price} />
+            <RowStat label="CHANGE" value={src20.tick} />
+            <RowStat label="VOLUME" value={src20.deci} />
           </div>
 
           {/* Right Section - Deploy Date and Holders */}
           <div class="hidden tablet:flex p-3 text-sm text-center flex-col justify-center">
-            <p class="text-lg text-stamp-grey-darker font-light">
-              DEPLOY{" "}
-              <span class="font-bold text-stamp-grey">
-                {new Date(src20.block_time).toLocaleString("default", {
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-            </p>
-            <p class="text-lg text-stamp-grey-darker font-light">
-              HOLDERS{" "}
-              <span class="font-bold text-stamp-grey">
-                {Number(src20.holders).toLocaleString()}
-              </span>
-            </p>
+            <RowStat
+              label="DEPLOY"
+              value={new Date(src20.block_time).toLocaleString("default", {
+                month: "short",
+                year: "numeric",
+              })}
+            />
+            <RowStat
+              label="HOLDERS"
+              value={Number(src20.holders).toLocaleString()}
+            />
+            <RowStat label="CREATOR" value={src20.creator_name} />
           </div>
         </>
       )}
@@ -157,15 +208,9 @@ export function SRC20Card(
       )}
 
       {/* Mint Button */}
-      <div class="p-3 text-sm text-center flex flex-col justify-center">
-        <button
-          onClick={handleMintClick}
-          class="bg-[#8800CC] disabled:bg-[#440088] rounded-md text-[#080808] text-sm font-black w-[84px] h-[48px]"
-          disabled={progress == "100" ? true : false}
-        >
-          Mint
-        </button>
-      </div>
+      {src20.amt === undefined && (
+        <MintButton progress={progress} handleMintClick={handleMintClick} />
+      )}
     </div>
   );
 }
