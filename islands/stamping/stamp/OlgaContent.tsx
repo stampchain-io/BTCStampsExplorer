@@ -1,22 +1,15 @@
-import { useCallback, useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
+import { useConfig } from "$client/hooks/useConfig.ts";
 import axiod from "axiod";
-
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
-
-import { useConfig } from "$client/hooks/useConfig.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-
 import ImageFullScreen from "./ImageFullScreen.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
-
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
-import { AncestorInfo, UTXO } from "$types/index.d.ts";
-
 import { Config } from "globals";
 
 const log = (message: string, data?: any) => {
@@ -32,6 +25,94 @@ interface TxDetails {
     totalInputValue: number;
     changeOutput: number;
   };
+}
+
+// Add this helper function near the top of the file
+function isValidForMinting(params: {
+  file: File | null;
+  fileError: string;
+  issuanceError: string;
+  stampNameError: string;
+  isPoshStamp: boolean;
+  stampName: string;
+  addressError?: string;
+  isConnected: boolean;
+}) {
+  const {
+    file,
+    fileError,
+    issuanceError,
+    stampNameError,
+    isPoshStamp,
+    stampName,
+    addressError,
+    isConnected,
+  } = params;
+
+  console.log("Validating minting conditions:", {
+    hasFile: !!file,
+    fileError,
+    issuanceError,
+    stampNameError,
+    isPoshStamp,
+    hasStampName: !!stampName,
+    addressError,
+    isConnected,
+  });
+
+  // Check wallet connection first
+  if (!isConnected) {
+    console.log("Validation failed: Wallet not connected");
+    return false;
+  }
+
+  // Check for file
+  if (!file) {
+    console.log("Validation failed: No file selected");
+    return false;
+  }
+
+  // Check for errors
+  if (fileError) {
+    console.log("Validation failed: File error present:", fileError);
+    return false;
+  }
+  if (issuanceError) {
+    console.log("Validation failed: Issuance error present:", issuanceError);
+    return false;
+  }
+  if (addressError) {
+    console.log("Validation failed: Address error present:", addressError);
+    return false;
+  }
+
+  // Check POSH stamp requirements
+  if (isPoshStamp && (!stampName || stampNameError)) {
+    console.log("Validation failed: POSH stamp requirements not met");
+    return false;
+  }
+
+  console.log("Validation passed: All conditions met");
+  return true;
+}
+
+interface FeeDetails {
+  hasExactFees: boolean;
+  minerFee?: number;
+  dustValue?: number;
+  totalValue?: number;
+}
+
+interface MintRequest {
+  sourceWallet: string | undefined;
+  qty: string;
+  locked: boolean;
+  filename: string;
+  file: string;
+  satsPerKB: number;
+  service_fee: string | null;
+  service_fee_address: string | null;
+  assetName?: string;
 }
 
 export function OlgaContent() {
@@ -55,7 +136,7 @@ export function OlgaContent() {
   const [issuance, setIssuance] = useState("1");
 
   const [BTCPrice, setBTCPrice] = useState<number>(60000);
-  const [fileSize, setFileSize] = useState<number | null>(null);
+  const [fileSize, setFileSize] = useState<number | undefined>(undefined);
   const [isLocked, setIsLocked] = useState(true);
   const [isPoshStamp, setIsPoshStamp] = useState(false);
   const [stampName, setStampName] = useState("");
@@ -162,6 +243,7 @@ export function OlgaContent() {
 
   const validateWalletAddress = (address: string) => {
     const { isValid, error } = validateWalletAddressForMinting(address);
+    console.log("Validating wallet address:", { address, isValid, error });
     setAddressError(error);
     return isValid;
   };
@@ -243,18 +325,42 @@ export function OlgaContent() {
     });
   };
 
-  const handleImage = (e: any) => {
-    const selectedFile = e.target.files[0];
+  const handleImage = (e: Event) => {
+    const input = e.target as HTMLInputElement;
+    const selectedFile = input.files?.[0];
+
+    console.log("Handle image called:", {
+      hasFile: !!selectedFile,
+      fileSize: selectedFile?.size,
+      fileType: selectedFile?.type,
+    });
+
+    if (!selectedFile) {
+      console.log("No file selected");
+      setFileError("No file selected");
+      setFile(null);
+      setFileSize(undefined);
+      return;
+    }
+
     if (selectedFile.size > 64 * 1024) {
+      console.log("File too large:", selectedFile.size);
       setFileError("File size must be less than 64KB.");
       setFile(null);
-      setFileSize(null);
-    } else {
-      setFileError("");
-      setFile(selectedFile);
-      setFileSize(selectedFile.size);
+      setFileSize(undefined);
+      return;
     }
-    console.log(selectedFile);
+
+    // Clear any previous errors and set the file
+    console.log("Setting valid file:", {
+      name: selectedFile.name,
+      size: selectedFile.size,
+      type: selectedFile.type,
+    });
+
+    setFileError("");
+    setFile(selectedFile);
+    setFileSize(selectedFile.size);
   };
 
   const handleIssuanceChange = (e: Event) => {
@@ -304,7 +410,7 @@ export function OlgaContent() {
         console.log(`User-selected fee rate: ${fee} sat/vB`);
 
         log("Preparing mint request");
-        const mintRequest = {
+        const mintRequest: MintRequest = {
           sourceWallet: address,
           qty: issuance,
           locked: isLocked,
@@ -422,9 +528,34 @@ export function OlgaContent() {
     setIsFullScreenModalOpen(!isFullScreenModalOpen);
   };
 
-  const [feeDetails, setFeeDetails] = useState({
+  const [feeDetails, setFeeDetails] = useState<FeeDetails>({
     hasExactFees: false,
   });
+
+  const [tosAgreed, setTosAgreed] = useState(false);
+
+  // Add a useEffect to monitor state changes
+  useEffect(() => {
+    console.log("State changed:", {
+      isConnected,
+      hasFile: !!file,
+      fileError,
+      issuanceError,
+      stampNameError,
+      isPoshStamp,
+      stampName,
+      addressError,
+    });
+  }, [
+    isConnected,
+    file,
+    fileError,
+    issuanceError,
+    stampNameError,
+    isPoshStamp,
+    stampName,
+    addressError,
+  ]);
 
   return (
     <div class="flex flex-col w-full items-center gap-8">
@@ -452,31 +583,45 @@ export function OlgaContent() {
                 accept="image/*"
                 onChange={handleImage}
               />
-              {file !== null && (
-                <img
-                  width={120}
-                  style={{
-                    height: "100%",
-                    objectFit: "contain",
-                    imageRendering: "pixelated",
-                    backgroundColor: "rgb(0,0,0)",
-                    borderRadius: "6px",
-                  }}
-                  src={URL.createObjectURL(file)}
-                />
-              )}
-              {file === null && (
-                <label
-                  for="upload"
-                  class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
-                >
-                  <img
-                    src="/img/stamping/image-upload.svg"
-                    class="w-12 h-12"
-                    alt=""
-                  />
-                </label>
-              )}
+              {file !== null
+                ? (
+                  <label
+                    for="upload"
+                    class="cursor-pointer h-full w-full flex flex-col items-center justify-center"
+                  >
+                    <img
+                      width={120}
+                      style={{
+                        height: "100%",
+                        objectFit: "contain",
+                        imageRendering: "pixelated",
+                        backgroundColor: "rgb(0,0,0)",
+                        borderRadius: "6px",
+                      }}
+                      src={URL.createObjectURL(file)}
+                      alt="Preview"
+                    />
+                    <div class="absolute inset-0 hover:bg-black hover:bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                      <img
+                        src="/img/stamping/image-upload.svg"
+                        class="w-12 h-12"
+                        alt="Change image"
+                      />
+                    </div>
+                  </label>
+                )
+                : (
+                  <label
+                    for="upload"
+                    class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
+                  >
+                    <img
+                      src="/img/stamping/image-upload.svg"
+                      class="w-12 h-12"
+                      alt="Upload image"
+                    />
+                  </label>
+                )}
             </div>
 
             {
@@ -663,10 +808,21 @@ export function OlgaContent() {
           onRefresh={fetchFees}
           isSubmitting={false}
           onSubmit={handleMint}
-          buttonName="Stamp"
+          buttonName="STAMP"
           userAddress={address}
           feeDetails={feeDetails}
-          disabled={!!addressError}
+          tosAgreed={tosAgreed}
+          onTosChange={setTosAgreed}
+          disabled={!isValidForMinting({
+            file,
+            fileError,
+            issuanceError,
+            stampNameError,
+            isPoshStamp,
+            stampName,
+            addressError,
+            isConnected,
+          })}
         />
 
         <StatusMessages
