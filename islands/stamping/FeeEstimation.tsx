@@ -347,11 +347,7 @@ export function FeeEstimation({
           </button>
         )}
         <button
-          className={`bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold ${
-            (disabled || isSubmitting || (!isModal && !tosAgreed))
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
+          className="bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold disabled:bg-stamp-purple-darker disabled:text-black disabled:cursor-not-allowed"
           onClick={onSubmit}
           disabled={disabled || isSubmitting || (!isModal && !tosAgreed)}
         >
