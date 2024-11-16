@@ -765,6 +765,11 @@ export class XcpManager {
 
     queryParams.append("dispenser", dispenser);
     queryParams.append("quantity", quantity.toString());
+    
+    // Set default dust size if not provided
+    if (!options.regular_dust_size) {
+      queryParams.append("regular_dust_size", "546"); // Bitcoin's standard dust limit
+    }
 
     // Append optional parameters if provided
     for (const [key, value] of Object.entries(options)) {
@@ -772,6 +777,8 @@ export class XcpManager {
         queryParams.append(key, value.toString());
       }
     }
+
+    let lastError: string | null = null;
 
     for (const node of xcp_v2_nodes) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
@@ -784,6 +791,14 @@ export class XcpManager {
         if (!response.ok) {
           const errorBody = await response.text();
           console.error(`Error response body from ${node.name}: ${errorBody}`);
+          try {
+            const errorJson = JSON.parse(errorBody);
+            if (errorJson.error) {
+              lastError = errorJson.error;
+            }
+          } catch (e) {
+            lastError = errorBody;
+          }
           continue; // Try the next node
         }
 
@@ -792,11 +807,12 @@ export class XcpManager {
         return data;
       } catch (error) {
         console.error(`Fetch error for ${url}:`, error);
-        // Continue to the next node
+        lastError = error.message;
       }
     }
 
-    throw new Error("All nodes failed to compose dispense transaction.");
+    // Throw the last error message instead of generic message
+    throw new Error(lastError || "All nodes failed to compose dispense transaction.");
   }
 
   static async composeAttach(

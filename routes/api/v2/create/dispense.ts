@@ -27,19 +27,21 @@ export const handler: Handlers = {
         return ResponseUtil.error("Invalid fee rate", 400);
       }
 
-      const feeRateKB = options.fee_per_kb;
-      console.log(`Fee rate (sat/kB): ${feeRateKB}`);
+      // Add dust size to options
+      const dispenserOptions = {
+        ...options,
+        regular_dust_size: 546,
+        allow_unconfirmed_inputs: true,
+        validate: true,
+      };
 
       try {
-        // Get dispense transaction from XcpManager
+        // Call XcpManager with the enhanced options
         const response = await XcpManager.createDispense(
           address,
           dispenser,
           quantity,
-          {
-            ...options,
-            fee_per_kb: feeRateKB,
-          },
+          dispenserOptions,
         );
 
         if (!response?.result?.psbt) {
@@ -55,27 +57,26 @@ export const handler: Handlers = {
         const processedPSBT = await PSBTService.processCounterpartyPSBT(
           response.result.psbt,
           address,
-          feeRateKB,
+          options.fee_per_kb,
           { validateInputs: true, validateFees: true },
         );
 
         return new Response(JSON.stringify(processedPSBT), {
           headers: { "Content-Type": "application/json" },
         });
-      } catch (error) {
-        if (
-          error instanceof Error && error.message.includes("Insufficient BTC")
-        ) {
-          return ResponseUtil.error(error.message, 400);
-        }
-        throw error;
+      } catch (error: unknown) {
+        // Pass through the specific error message
+        const errorMessage = error instanceof Error
+          ? error.message
+          : "Unknown error";
+        return ResponseUtil.error(errorMessage, 400);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error processing dispense request:", error);
-      return ResponseUtil.handleError(
-        error,
-        "Failed to process dispense request",
-      );
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "Failed to process dispense request";
+      return ResponseUtil.error(errorMessage, 400);
     }
   },
 };
