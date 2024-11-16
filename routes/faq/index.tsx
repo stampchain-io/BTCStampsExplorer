@@ -2,62 +2,64 @@ import { Head } from "$fresh/runtime.ts";
 import Accordion from "$islands/Accordion.tsx";
 
 export default function FAQ() {
+  const bodyClassName =
+    "flex flex-col gap-24 tablet:gap-36 py-24 tablet:py-36";
+  const titleClassName =
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+  const titleGradientFlippedClassName =
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
+  const subTitleClassName =
+    "text-xl mobileMd:text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light";
+  const bodyTextClassName =
+    "text-sm mobileMd:text-base mobileLg:text-lg desktop:text-xl font-medium text-stamp-grey-light";
+  const bodyTextLargeClassName =
+    "text-base mobileMd:text-lg mobileLg:text-xl desktop:text-2xl font-medium text-stamp-grey-light";
+  const buttonClassName =
+    "border-2 border-stamp-grey rounded-md text-sm mobileMd:text-base leading-[18.77px] font-extrabold px-6 py-4 text-stamp-grey hover:bg-stamp-grey float-right";
+
   return (
-    <>
-      <Head>
-        <title>Bitcoin Stamps - FAQ</title>
-      </Head>
-      <div class="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
-        <section class="text-center max-w-full mx-auto">
-          <h1 class="text-4xl tablet:text-7xl font-black">
-            <span class="gray-gradient1">
-              YOU'VE GOT QUESTIONS
-            </span>
+      <div className={bodyClassName}>
+        <section className="text-center max-w-full mx-auto">
+          <h1 className={titleGradientFlippedClassName}>
+            YOU'VE GOT QUESTIONS
             <br />
-            <span class="gray-gradient1">
-              WE'VE GOT ANSWERS
-            </span>
+            <span className="font-bold">WE'VE GOT ANSWERS</span>
           </h1>
-          <p class="text-base tablet:text-3xl font-medium">
-            <span class="font-bold">
-              New to Bitcoin Stamps?
-              <br />
-              Curious to know more?
-            </span>
+          <p className={bodyTextLargeClassName}>
+            <b>New to Bitcoin Stamps? Curious to know more?</b>
             <br />
             Explore our comprehensive FAQ to understand this innovative
             technology built on Bitcoin.
           </p>
         </section>
 
-        <section class="flex flex-col gap-6 tablet:gap-12">
+        <section className="flex flex-col gap-6 tablet:gap-12">
           <div>
-            <h1 class="text-3xl tablet:text-6xl font-black gray-gradient4 mb-2">
-              BITCOIN STAMPS
-            </h1>
-            <h2 class="text-2xl tablet:text-5xl font-extralight mb-3">
-              PERMANENCE FOR PERPETUITY
-            </h2>
-            <p class="text-sm tablet:text-lg font-medium">
+            <h1 className={titleClassName}>BITCOIN STAMPS</h1>
+            <h2 className={subTitleClassName}>PERMANENCE FOR PERPETUITY</h2>
+            <p className={bodyTextClassName}>
               Bitcoin Stamps are NFTs built on the Counterparty protocol since
               2014, providing a way to store data directly on the Bitcoin
-              blockchain, ensuring permanence and immutability. Here's an
-              overview of the various stamp types and their historical
-              significance:
+              blockchain, ensuring permanence and immutability.<br />
+              <br />
+              <b>Here's an overview of the various stamp types and their historical
+              significance:</b>
             </p>
           </div>
 
-          <div class="grid grid-cols-1 tablet:grid-cols-2 gap-6 tablet:gap-12">
+          <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-6 tablet:gap-12">
             <Accordion title="CLASSIC STAMPS">
-              <p class="text-sm tablet:text-lg font-medium">
+              <p className={bodyTextClassName}>
                 Classic Stamps are NFTs built on Counterparty standards from
-                2014. Originally intended to be 1:1, creators can now issue
-                billions of tokens per stamp. Initially, transactions utilized
-                OP_MULTISIG and Base64 encoding, but newer formats like OLGA and
-                P2WSH are now included. The goal was to prevent accidental
-                spending and improve the resilience of Ordinals data. The first
-                Bitcoin Stamp (Stamp 0) was created by Mikeinspace at Block
-                779652.
+                2014. <br />
+                Originally intended to be 1:1, creators can now issue
+                billions of tokens per stamp. <br />
+                Initially, transactions utilized OP_MULTISIG and Base64 encoding, 
+                but newer formats like OLGA and P2WSH are now included. The goal was to 
+                prevent accidental spending and improve the resilience of Ordinals data. <br />
+                <br />
+                <b>The first Bitcoin Stamp (Stamp 0) was created by MikeinSpace at Block
+                779652.</b>
               </p>
             </Accordion>
 
