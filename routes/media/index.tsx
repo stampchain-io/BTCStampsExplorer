@@ -8,10 +8,10 @@ export default function Media() {
   const defaultTextClassName =
     "text-sm mobileMd:text-base mobileLg:text-lg desktop:text-xl font-medium text-stamp-grey-light";
   const buttonClassName =
-    "border-2 border-stamp-grey rounded-md text-base leading-[18.77px] font-extrabold px-6 py-4 text-stamp-grey float-right mobileLg:float-none";
+    "border-2 border-stamp-grey rounded-md text-base leading-[18.77px] font-extrabold px-6 py-4 text-stamp-grey inline-flex items-center justify-center";
 
   return (
-    <div className="flex flex-col gap-24 mobileLg:gap-36">
+    <div className="flex flex-col gap-12 mobileLg:gap-24">
       <section>
         <h1 className={titleClassName}>MEDIA MATTERS</h1>
         <h2 className={subTitleClassName}>HONOURABLE STAMP MENTIONS</h2>
@@ -116,7 +116,9 @@ export default function Media() {
               In addition, using a Counterparty transaction ...<br />
               <br />
             </p>
-            <button className={buttonClassName}>DOWNLOAD</button>
+            <div className="flex justify-start">
+              <button className={buttonClassName}>DOWNLOAD</button>
+            </div>
           </div>
           <div className="col-span-1 mobileLg:text-right">
             <h2 className={subTitleClassName}>INSIGHTS</h2>
@@ -129,7 +131,9 @@ export default function Media() {
               with multiple stats and illustrative charts.<br />
               <br />
             </p>
-            <button className={buttonClassName}>READ</button>
+            <div className="flex justify-end">
+              <button className={buttonClassName}>READ</button>
+            </div>
           </div>
         </div>
       </section>
