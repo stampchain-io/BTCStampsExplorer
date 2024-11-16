@@ -18,7 +18,7 @@ export default function Error404() {
           </div>
           <img
             class="my-6 desktop:w-[660.18px] tablet:w-[479.9px] w-[360.15px]"
-            src="img/broken.png"
+            src="/img/broken.png"
             alt="Bitcoin Stamps"
           />
           <div class="text-[#AA00FF] desktop:text-5xl tablet:text-3xl text-2xl">

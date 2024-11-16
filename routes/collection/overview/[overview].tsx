@@ -24,16 +24,22 @@ interface CollectionOverviewPageProps {
 
 export const handler: Handlers<CollectionOverviewPageProps> = {
   async GET(req: Request, ctx: FreshContext) {
-    const url = new URL(req.url);
-    const overview = ctx.params.overview || "artist";
-    const sortBy = url.searchParams.get("sortBy")?.toUpperCase() == "ASC"
-      ? "ASC"
-      : "DESC";
-    const page = parseInt(url.searchParams.get("page") || "1");
-    const requestedPageSize = parseInt(url.searchParams.get("limit") || "24");
-    const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
-
     try {
+      const overview = ctx.params.overview || "artist";
+
+      // Validate overview parameter first
+      if (!["artist", "posh", "recursive"].includes(overview)) {
+        return ctx.renderNotFound();
+      }
+
+      const url = new URL(req.url);
+      const sortBy = url.searchParams.get("sortBy")?.toUpperCase() == "ASC"
+        ? "ASC"
+        : "DESC";
+      const page = parseInt(url.searchParams.get("page") || "1");
+      const requestedPageSize = parseInt(url.searchParams.get("limit") || "24");
+      const page_size = Math.min(requestedPageSize, MAX_PAGE_SIZE);
+
       switch (overview) {
         case "artist": {
           const filterBy = url.searchParams.get("filterBy")?.split(",") || [];
@@ -67,7 +73,9 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
           const poshCollection = await CollectionService.getCollectionByName(
             "posh",
           );
-          if (!poshCollection) throw new Error("Posh collection not found");
+          if (!poshCollection) {
+            return ctx.renderNotFound();
+          }
 
           const result = await StampController.getStamps({
             page,
@@ -115,10 +123,13 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
         }
 
         default:
-          return new Response("Not Found", { status: 404 });
+          return ctx.renderNotFound();
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error in collection overview:", error);
+      if (error.message?.includes("not found")) {
+        return ctx.renderNotFound();
+      }
       return new Response("Internal Server Error", { status: 500 });
     }
   },

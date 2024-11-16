@@ -27,69 +27,94 @@ interface StampingSrc20PageProps {
 
 export const handler: Handlers<StampingSrc20PageProps> = {
   async GET(req, ctx) {
-    const url = new URL(req.url);
-    const action = ctx.params.action || "mint";
-    const trxType = (url.searchParams.get("trxType") as "multisig" | "olga") ||
-      "multisig";
-    const tick = url.searchParams.get("tick") || null;
+    try {
+      const url = new URL(req.url);
+      const action = ctx.params.action || "mint";
 
-    let mintStatus = null;
-    let holders = 0;
+      // Validate action parameter first
+      if (!["mint", "deploy", "transfer"].includes(action)) {
+        return ctx.renderNotFound();
+      }
 
-    if (tick) {
-      // Fetch mint status and holders on the server
-      mintStatus = await Src20Controller.handleSrc20MintProgressRequest(tick);
+      const trxType =
+        (url.searchParams.get("trxType") as "multisig" | "olga") ||
+        "multisig";
+      const tick = url.searchParams.get("tick") || null;
 
-      // Fetch holders count
-      const balanceData = await Src20Controller.handleSrc20BalanceRequest({
+      let mintStatus = null;
+      let holders = 0;
+
+      if (tick) {
+        try {
+          // Fetch mint status and holders on the server
+          mintStatus = await Src20Controller.handleSrc20MintProgressRequest(
+            tick,
+          );
+
+          // Fetch holders count
+          const balanceData = await Src20Controller.handleSrc20BalanceRequest({
+            tick,
+            includePagination: true,
+            limit: 1,
+            page: 1,
+          });
+          holders = balanceData.total || 0;
+        } catch (error) {
+          console.error("Error fetching SRC20 data:", error);
+          if (error.message?.includes("not found")) {
+            return ctx.renderNotFound();
+          }
+          throw error; // Re-throw other errors to be caught by outer try-catch
+        }
+      }
+
+      // Initialize variables
+      let recentTransactions = {
+        deploy: [],
+        mint: [],
+        transfer: [],
+      };
+      const trendingTokens: any[] = [];
+
+      if (action === "mint") {
+        // Fetch trending tokens for PopularMinting
+        const limit = 8;
+        const page = 1;
+        const transactionCount = 1000;
+
+        const trendingData = await Src20Controller.fetchTrendingTokens(
+          req,
+          limit,
+          page,
+          transactionCount,
+        );
+
+        trendingTokens.push(...trendingData.data);
+
+        // Fetch recent deploys for RecentDeploy
+        const recentDeploysData = await Src20Controller
+          .fetchRecentTransactions();
+        recentTransactions.deploy = recentDeploysData.deploy;
+      } else {
+        recentTransactions = await Src20Controller.fetchRecentTransactions();
+      }
+
+      return ctx.render({
+        selectedTab: action,
+        trxType,
         tick,
-        includePagination: true,
-        limit: 1,
-        page: 1,
+        mintStatus,
+        holders,
+        recentTransactions,
+        trendingTokens,
       });
-      holders = balanceData.total || 0;
+    } catch (error) {
+      console.error("Error in stamping SRC20:", error);
+      if ((error as Error).message?.includes("not found")) {
+        return ctx.renderNotFound();
+      }
+      return new Response("Internal Server Error", { status: 500 });
     }
-
-    // Initialize variables
-    let recentTransactions = {
-      deploy: [],
-      mint: [],
-      transfer: [],
-    };
-    let trendingTokens = [];
-
-    if (action === "mint") {
-      // Fetch trending tokens for PopularMinting
-      const limit = 8;
-      const page = 1;
-      const transactionCount = 1000; // Adjust as needed
-
-      const trendingData = await Src20Controller.fetchTrendingTokens(
-        req,
-        limit,
-        page,
-        transactionCount,
-      );
-
-      trendingTokens = trendingData.data;
-
-      // Fetch recent deploys for RecentDeploy
-      const recentDeploysData = await Src20Controller.fetchRecentTransactions();
-
-      recentTransactions.deploy = recentDeploysData.deploy;
-    } else {
-      recentTransactions = await Src20Controller.fetchRecentTransactions();
-    }
-
-    return ctx.render({
-      selectedTab: action,
-      trxType,
-      tick,
-      mintStatus,
-      holders,
-      recentTransactions,
-      trendingTokens,
-    });
   },
 };
 
