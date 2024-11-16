@@ -154,7 +154,7 @@ class DatabaseManager {
   }
 
   private async initializeRedisConnection(): Promise<void> {
-    if (true) {
+    if (globalThis.SKIP_REDIS_CONNECTION) {
       this.logger.info("Skipping Redis connection for build process");
       return;
     }
