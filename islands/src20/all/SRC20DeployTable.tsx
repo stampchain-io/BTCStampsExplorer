@@ -47,7 +47,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         onClose={handleCloseModal}
       />
 
-      <div class="flex flex-col gap-6 p-2 mb-6">
+      <div class="flex flex-col gap-6">
         {data.map((src20) => (
           <SRC20Card
             src20={src20}
