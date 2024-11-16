@@ -88,7 +88,7 @@ const StampBuyModal = ({
       console.log("Creating dispense transaction:", {
         address: wallet.address,
         dispenser: dispenser.source,
-        quantity: totalPrice,
+        quantity: quantity,
         feeRate: options.fee_per_kb,
       });
 
@@ -98,7 +98,7 @@ const StampBuyModal = ({
         body: JSON.stringify({
           address: wallet.address,
           dispenser: dispenser.source,
-          quantity: totalPrice,
+          quantity: quantity,
           options,
         }),
       });
