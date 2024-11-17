@@ -1,4 +1,4 @@
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import dayjs from "$dayjs/";
 
 interface SendRow {

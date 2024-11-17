@@ -9,8 +9,9 @@ import {
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { BIG_LIMIT } from "$lib/utils/constants.ts";
-import { mimeTypes } from "$lib/utils/util.ts";
+import { getMimeType, getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import { DispenserFilter } from "$types/index.d.ts";
+import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 
 export class StampService {
   static async getStampDetailsById(
@@ -137,24 +138,27 @@ export class StampService {
 
   static async getStampFile(id: string) {
     const result = await StampRepository.getStampFilenameByIdFromDb(id);
-    const fileName = result?.fileName;
-    const base64 = result?.base64;
-    const mimeType = result?.stamp_mimetype;
-    if (!fileName) {
+    if (!result?.fileName || !result?.stamp_mimetype) {
       return { type: "notFound" };
     }
 
-    const fileExtension = fileName.split(".").pop()?.toLowerCase();
-    if (
-      !fileExtension || !Object.values(mimeTypes).includes(fileExtension as any)
-    ) {
-      if (base64) {
-        return { type: "base64", base64: base64, mimeType: mimeType };
+    const suffix = getFileSuffixFromMime(result.stamp_mimetype);
+    if (suffix === "unknown") {
+      if (result.base64) {
+        return { 
+          type: "base64", 
+          base64: result.base64, 
+          mimeType: result.stamp_mimetype 
+        };
       }
       return { type: "notFound" };
     }
 
-    return { type: "redirect", fileName: fileName, base64: base64 };
+    return { 
+      type: "redirect", 
+      fileName: result.fileName, 
+      base64: result.base64 
+    };
   }
 
   static async getStampBalancesByAddress(
@@ -210,7 +214,9 @@ export class StampService {
         return {
           ...stamp,
           sale_data: {
-            btc_amount: event.params.btc_amount / 100000000,
+            btc_amount: Number(formatBTCAmount(event.params.btc_amount, { 
+              includeSymbol: false 
+            })),
             block_index: event.block_index,
             tx_hash: event.tx_hash,
           },

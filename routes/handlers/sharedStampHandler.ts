@@ -2,13 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-
-function bigIntSerializer(key: string, value: any) {
-  if (typeof value === "bigint") {
-    return value.toString();
-  }
-  return value;
-}
+import { jsonStringifyWithBigInt } from "$lib/utils/formatUtils.ts";
 
 export const sharedStampIndexHandler = (
   stampType: "stamps" | "cursed",
@@ -18,7 +12,7 @@ export const sharedStampIndexHandler = (
       const url = new URL(req.url);
       const { limit, page } = getPaginationParams(url);
       const maxLimit = 500;
-      const effectiveLimit = Math.min(limit, maxLimit);
+      const effectiveLimit = Math.min(limit ?? maxLimit, maxLimit);
       const sortBy =
         (url.searchParams.get("sort")?.toUpperCase() as "ASC" | "DESC") ||
         "ASC";
@@ -32,10 +26,14 @@ export const sharedStampIndexHandler = (
       });
 
       return ResponseUtil.success(
-        JSON.parse(JSON.stringify(result, bigIntSerializer)),
+        JSON.parse(jsonStringifyWithBigInt(result)),
       );
     } catch (error) {
-      console.error(`Error fetching paginated ${stampType}: ${error.message}`);
+      if (error instanceof Error) {
+        console.error(
+          `Error fetching paginated ${stampType}: ${error.message}`,
+        );
+      }
       return ResponseUtil.error(`Error: Internal server error`, 500);
     }
   },

@@ -1,7 +1,7 @@
 import { SRC20Row } from "globals";
 import { useEffect, useState } from "preact/hooks";
-import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
-
+import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
 };

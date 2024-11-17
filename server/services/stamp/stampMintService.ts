@@ -5,7 +5,7 @@ import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
 import { Buffer } from "buffer";
 import * as bitcoin from "bitcoinjs-lib";
-import { generateRandomNumber } from "$lib/utils/util.ts";
+import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
 import type { stampMintData, stampMintCIP33, PSBTInput } from "$types/index.d.ts";
 import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
 import { PSBTService } from "$server/services/transaction/psbtService.ts";

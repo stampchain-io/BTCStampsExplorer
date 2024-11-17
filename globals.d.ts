@@ -61,7 +61,7 @@ export type LISTING_FILTER_TYPES =
 
 import Big from "$Big";
 
-interface BlockRow {
+export interface BlockRow {
   block_index: number;
   block_hash: string;
   block_time: number | Date;

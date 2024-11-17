@@ -1,5 +1,5 @@
 import { XcpManager } from "$server/services/xcpService.ts";
-import { generateRandomNumber } from "$lib/utils/util.ts";
+import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
 
 export class StampValidationService {
   static async checkAssetAvailability(assetName: string): Promise<boolean> {

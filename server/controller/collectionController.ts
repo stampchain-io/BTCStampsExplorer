@@ -5,6 +5,7 @@ import {
   PaginatedCollectionResponseBody,
 } from "globals";
 import { StampController } from "$server/controller/stampController.ts";
+import { getStampImageUrl } from "$lib/utils/imageUtils.ts";
 
 export class CollectionController {
   static async getCollectionDetails(
@@ -75,8 +76,12 @@ export class CollectionController {
       const stampsByCollection = new Map<string, string[]>();
 
       // Group stamps by collection ID
-      stampResults.data.forEach((stamp: { collection_id: string; stamp_url: string }) => {
-        if (!stamp.stamp_url) {
+      stampResults.data.forEach((stamp: { 
+        collection_id: string; 
+        tx_hash: string;
+        stamp_mimetype: string;
+      }) => {
+        if (!stamp.tx_hash || !stamp.stamp_mimetype) {
           return;
         }
         
@@ -90,8 +95,9 @@ export class CollectionController {
         }
 
         const stamps = stampsByCollection.get(collectionId)!;
-        if (stamps.length < 12 && !stamps.includes(stamp.stamp_url)) {
-          stamps.push(stamp.stamp_url);
+        const imageUrl = getStampImageUrl(stamp);
+        if (stamps.length < 12 && !stamps.includes(imageUrl)) {
+          stamps.push(imageUrl);
         }
       });
 

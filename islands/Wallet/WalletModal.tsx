@@ -6,10 +6,9 @@ import {
   showConnectWalletModal,
   walletContext,
 } from "$client/wallet/wallet.ts";
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { ConnectedModal } from "./ConnectedModal.tsx";
-import { StampController } from "$server/controller/stampController.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 
 const WalletPopup = (

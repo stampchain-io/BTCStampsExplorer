@@ -1,6 +1,6 @@
 import { BlockService } from "$server/services/blockService.ts";
 import { BlockInfoResponseBody, StampBlockResponseBody } from "globals";
-import { isIntOr32ByteHex } from "$lib/utils/util.ts";
+import { isIntOr32ByteHex } from "$lib/utils/formatUtils.ts";
 
 export class BlockController {
   static async getLastXBlocks(num: number) {

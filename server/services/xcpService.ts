@@ -3,6 +3,7 @@
 import { StampService } from "$server/services/stampService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { DispenserFilter, DispenseEvent, XcpBalance } from "$types/index.d.ts";
+import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 
 export const xcp_v2_nodes = [
   {
@@ -117,7 +118,9 @@ export class DispenserManager {
           give_remaining: dispenser.give_remaining,
           escrow_quantity: dispenser.escrow_quantity,
           satoshirate: dispenser.satoshirate,
-          btcrate: dispenser.satoshirate / 100000000,
+          btcrate: Number(formatSatoshisToBTC(dispenser.satoshirate, { 
+            includeSymbol: false 
+          })),
           origin: dispenser.origin,
           confirmed: dispenser.confirmed,
           close_block_index: dispenser.close_block_index,
@@ -188,7 +191,9 @@ export class DispenserManager {
           give_remaining: event.params.give_remaining,
           escrow_quantity: event.params.escrow_quantity,
           satoshirate: event.params.satoshirate,
-          btcrate: event.params.satoshirate / 100000000,
+          btcrate: Number(formatSatoshisToBTC(event.params.satoshirate, { 
+            includeSymbol: false 
+          })),
           origin: event.params.origin,
         }));
 

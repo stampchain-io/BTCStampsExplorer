@@ -1,4 +1,4 @@
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import SRC20Holders from "$components/src20/SRC20Holders.tsx";
 
 interface Holder {

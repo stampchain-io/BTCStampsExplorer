@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 
 import { StampRow } from "globals";
-import { mimeTypesArray } from "$lib/utils/util.ts";
-import { handleImageError } from "$lib/utils/imageUtils.ts";
+import {
+  getStampImageUrl,
+  handleImageError,
+  NOT_AVAILABLE_IMAGE,
+} from "$lib/utils/imageUtils.ts";
 
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";
@@ -144,18 +147,10 @@ export function StampImage(
   };
 
   const getStampSrc = () => {
-    if (!stamp.stamp_url) return "/content/not-available.png";
-
-    const urlParts = stamp.stamp_url.split("/");
-    const filenameParts = urlParts[urlParts.length - 1].split(".");
-    const txHash = filenameParts[0];
-    const suffix = filenameParts[1];
-
-    if (!mimeTypesArray.includes(stamp.stamp_mimetype || "")) {
-      return "/content/not-available.png";
+    if (!stamp.tx_hash || !stamp.stamp_mimetype) {
+      return NOT_AVAILABLE_IMAGE;
     }
-
-    return `/content/${txHash}.${suffix}`;
+    return getStampImageUrl(stamp);
   };
 
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
@@ -183,7 +178,7 @@ export function StampImage(
 
   return (
     <>
-      {src === "/content/not-available.png" && (
+      {src === NOT_AVAILABLE_IMAGE && (
         <div className="stamp-container">
           <img
             width="100%"
@@ -195,7 +190,7 @@ export function StampImage(
         </div>
       )}
 
-      {src !== "/content/not-available.png" &&
+      {src !== NOT_AVAILABLE_IMAGE &&
         stamp.stamp_mimetype === "text/html" && (
         <div className={`${className} flex flex-col gap-4`}>
           <div
@@ -226,14 +221,14 @@ export function StampImage(
         </div>
       )}
 
-      {src !== "/content/not-available.png" &&
+      {src !== NOT_AVAILABLE_IMAGE &&
         stamp.stamp_mimetype === "text/plain" && (
         <TextContentIsland
           src={src}
         />
       )}
 
-      {src !== "/content/not-available.png" &&
+      {src !== NOT_AVAILABLE_IMAGE &&
         stamp.stamp_mimetype !== "text/html" &&
         stamp.stamp_mimetype !== "text/plain" && (
         <div className="flex flex-col gap-4">
@@ -273,10 +268,10 @@ export function StampImage(
           src={src}
           toggleModal={handleCloseFullScreenModal}
           handleCloseModal={handleCloseFullScreenModal}
-          typeFlag={src !== "/content/not-available.png" &&
+          typeFlag={src !== NOT_AVAILABLE_IMAGE &&
               stamp.stamp_mimetype === "text/html"
             ? 1
-            : src !== "/content/not-available.png" &&
+            : src !== NOT_AVAILABLE_IMAGE &&
                 stamp.stamp_mimetype !== "text/html" &&
                 stamp.stamp_mimetype !== "text/plain"
             ? 2

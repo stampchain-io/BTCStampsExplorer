@@ -1,5 +1,7 @@
-import { abbreviateAddress } from "$lib/utils/util.ts";
-import { formatSatoshisToBTC } from "$lib/utils/util.ts";
+import {
+  abbreviateAddress,
+  formatSatoshisToBTC,
+} from "$lib/utils/formatUtils.ts";
 
 interface Dispense {
   source: string;

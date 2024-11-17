@@ -2,7 +2,7 @@ import {
   abbreviateAddress,
   formatDate,
   formatNumber,
-} from "$lib/utils/util.ts";
+} from "$lib/utils/formatUtils.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { SRC20Row } from "globals";
 

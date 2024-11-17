@@ -2,7 +2,12 @@ import { useEffect, useState } from "preact/hooks";
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 import StampBuyModal from "./StampBuyModal.tsx";
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import {
+  abbreviateAddress,
+  formatBTCAmount,
+  formatDate,
+} from "$lib/utils/formatUtils.ts";
+import { getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "globals";
 
@@ -48,9 +53,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   >(null);
   const [imageSize, setImageSize] = useState<number | null>(null);
 
-  const fileExtension = stamp.stamp_url
-    ? stamp.stamp_url.split(".").pop()?.split("?")[0].toLowerCase()
-    : "unknown";
+  const fileExtension = getFileSuffixFromMime(stamp.stamp_mimetype);
 
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
@@ -118,9 +121,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               <p className="text-[#999999] font-bold text-sm mobileLg:text-base tablet:text-2xl desktop:text-3xl">
                 {(!stamp.floorPrice || stamp.floorPrice === "priceless") &&
                     stamp.marketCap && typeof stamp.marketCap === "number"
-                  ? `${stamp.marketCap}`
+                  ? formatBTCAmount(stamp.marketCap)
                   : typeof stamp.floorPrice === "number"
-                  ? `${stamp.floorPrice}`
+                  ? formatBTCAmount(stamp.floorPrice)
                   : stamp.floorPrice}
                 {(typeof stamp.floorPrice === "number" ||
                   (stamp.marketCap && typeof stamp.marketCap === "number")) &&
@@ -217,7 +220,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               Created
             </p>
             <p className="text-[#999999] font-medium">
-              {timestamp.toLocaleDateString()} ({dayjs(timestamp).fromNow()})
+              {formatDate(timestamp)} ({dayjs(timestamp).fromNow()})
             </p>
           </div>
           <div className="flex justify-between items-center flex-col tablet:items-center gap-1">

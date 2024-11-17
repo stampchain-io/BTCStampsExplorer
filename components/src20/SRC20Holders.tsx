@@ -1,5 +1,5 @@
 import { Chart } from "$fresh_charts/mod.ts";
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 interface SRC20HoldersProps {
   holders: Array<{
