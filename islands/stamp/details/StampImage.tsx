@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 
 import { StampRow } from "globals";
 import { mimeTypesArray } from "$lib/utils/util.ts";
+import { handleImageError } from "$lib/utils/imageUtils.ts";
 
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";
@@ -210,9 +211,7 @@ export function StampImage(
               src={src}
               loading="lazy"
               style={{ transform }}
-              onError={(e) => {
-                e.currentTarget.src = stamp.stamp_url;
-              }}
+              onError={handleImageError}
               title="Stamp"
             />
           </div>
@@ -245,10 +244,7 @@ export function StampImage(
                 loading="lazy"
                 className="max-w-none object-contain rounded-lg pixelart stamp-image"
                 src={src}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "/content/not-available.png";
-                }}
+                onError={handleImageError}
                 alt="Stamp"
               />
             </div>

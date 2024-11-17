@@ -20,11 +20,26 @@ export class ResponseUtil {
     });
   }
 
-  static custom<T>(body: T, status: number): Response {
-    return new Response(JSON.stringify(body), {
-      status,
-      headers: { "Content-Type": "application/json" },
-    });
+  static custom<T>(
+    body: T,
+    status: number,
+    headers?: HeadersInit,
+  ): Response {
+    const defaultHeaders = { "Content-Type": "application/json" };
+    const responseHeaders = headers
+      ? { ...defaultHeaders, ...headers }
+      : defaultHeaders;
+
+    return new Response(
+      // Only stringify if the body isn't already a Buffer/ArrayBuffer
+      body instanceof ArrayBuffer || body instanceof Uint8Array
+        ? body
+        : JSON.stringify(body),
+      {
+        status,
+        headers: responseHeaders,
+      },
+    );
   }
 
   static notFound(message: string = "Resource not found"): Response {

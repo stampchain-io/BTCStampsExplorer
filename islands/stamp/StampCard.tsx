@@ -5,6 +5,7 @@ import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
 import { isValidSVG } from "$lib/utils/util.ts";
 import { useEffect, useState } from "preact/hooks";
+import { handleImageError } from "$lib/utils/imageUtils.ts";
 
 import {
   abbreviateAddress,
@@ -189,15 +190,22 @@ export function StampCard({
           sandbox="allow-scripts allow-same-origin"
           src={src}
           className="h-full w-fit max-w-full object-contain items-center pointer-events-none"
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-            const fallback = document.createElement("img");
-            fallback.src = "/not-available.png";
-            fallback.alt = "Content not available";
-            fallback.className = "w-full h-full object-contain rounded-lg";
-            const parent = e.currentTarget.parentNode;
-            if (parent) {
-              parent.appendChild(fallback);
+          onError={handleImageError}
+          onLoad={(e) => {
+            try {
+              const iframe = e.currentTarget;
+              const iframeDoc = iframe.contentDocument;
+              if (iframeDoc) {
+                // Ensure all scripts are loaded in order
+                const scripts = Array.from(
+                  iframeDoc.getElementsByTagName("script"),
+                );
+                scripts.forEach((script) => {
+                  script.setAttribute("defer", "");
+                });
+              }
+            } catch (error) {
+              console.error("Error setting up iframe:", error);
             }
           }}
         />
@@ -215,9 +223,7 @@ export function StampCard({
         <img
           src={src}
           loading="lazy"
-          onError={(e) => {
-            e.currentTarget.src = `/not-available.png`;
-          }}
+          onError={handleImageError}
           alt={`Stamp No. ${stamp.stamp}`}
           className="h-full w-full object-contain pixelart"
         />

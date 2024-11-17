@@ -1,7 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
-import { StampRow } from "globals";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import StampImage from "./StampImage.tsx";
+import { handleImageError } from "$lib/utils/imageUtils.ts";
 
 interface StampImageFullScreenProps {
   src: string;
@@ -30,9 +27,6 @@ const StampImageFullScreen = (
                 sandbox="allow-scripts allow-same-origin"
                 src={src}
                 loading="lazy"
-                // onError={(e) => {
-                //   e.currentTarget.src = stamp.stamp_url;
-                // }}
                 title="Stamp"
               />
             )}
@@ -42,10 +36,7 @@ const StampImageFullScreen = (
                 loading="lazy"
                 className={`max-w-none object-contain rounded-lg pixelart stamp-image`}
                 src={src}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "/content/not-available.png";
-                }}
+                onError={handleImageError}
                 alt="Stamp"
               />
             )}

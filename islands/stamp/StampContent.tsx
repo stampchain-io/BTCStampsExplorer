@@ -1,4 +1,4 @@
-import { StampCard } from "./StampCard.tsx";
+import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { StampRow } from "globals";
 
 // FIXME: transition this to stampsection
