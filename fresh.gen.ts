@@ -190,7 +190,6 @@ import * as $stamping_stamp_ImageFullScreen from "./islands/stamping/stamp/Image
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
-import * as $upload_UploadTickHeader from "./islands/upload/UploadTickHeader.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -433,7 +432,6 @@ const manifest = {
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
-    "./islands/upload/UploadTickHeader.tsx": $upload_UploadTickHeader,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

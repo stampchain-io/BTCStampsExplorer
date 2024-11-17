@@ -1,5 +1,6 @@
 import { Collection, StampRow } from "globals";
 import { abbreviateAddress } from "$lib/utils/util.ts";
+import { handleImageError } from "$lib/utils/imageUtils.ts";
 
 export const CollectionDetailsHeader = (
   { collection, stamps }: { collection: Collection; stamps: StampRow[] },
@@ -13,9 +14,7 @@ export const CollectionDetailsHeader = (
           <img
             src={stamps[0].stamp_url}
             loading="lazy"
-            onError={(e) => {
-              e.currentTarget.src = `/not-available.png`;
-            }}
+            onError={handleImageError}
             alt="collection image"
             className="h-[148px] w-[148px] object-contain items-center standalone:h-24 standalone:w-auto pixelart image-rendering-pixelated"
           />
