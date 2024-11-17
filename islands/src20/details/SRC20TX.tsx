@@ -88,7 +88,13 @@ export function SRC20TX(props: SRC20TXProps) {
             <td class="px-3 py-2">{abbreviateAddress(tx.creator)}</td>
             <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
             <td class="px-3 py-2">{formattedAmt}</td>
-            <td class="px-3 py-2">{formatDate(new Date(tx.block_time))}</td>
+            <td class="px-3 py-2">
+              {formatDate(new Date(tx.block_time), {
+                month: "numeric",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </td>
           </tr>
         );
       } else if (type === "MINT") {

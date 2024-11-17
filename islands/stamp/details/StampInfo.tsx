@@ -1,6 +1,4 @@
 import { useEffect, useState } from "preact/hooks";
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
 import StampBuyModal from "./StampBuyModal.tsx";
 import {
   abbreviateAddress,
@@ -10,8 +8,6 @@ import {
 import { getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "globals";
-
-dayjs.extend(relativeTime);
 
 interface StampInfoProps {
   stamp: StampRow;
@@ -220,7 +216,12 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               Created
             </p>
             <p className="text-[#999999] font-medium">
-              {formatDate(timestamp)} ({dayjs(timestamp).fromNow()})
+              {formatDate(new Date(stamp.block_time), {
+                month: "numeric",
+                day: "numeric",
+                year: "numeric",
+                includeRelative: true,
+              })}
             </p>
           </div>
           <div className="flex justify-between items-center flex-col tablet:items-center gap-1">

@@ -1,5 +1,4 @@
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import dayjs from "$dayjs/";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 
 interface SendRow {
   source: string;
@@ -26,12 +25,6 @@ const tableHeaders = [
 ];
 
 function TransferRow({ send }: { send: SendRow }) {
-  const kind = send.is_btc_stamp
-    ? "stamp"
-    : (send.cpid && send.cpid.startsWith("A"))
-    ? "cursed"
-    : "named";
-
   return (
     <tr key={send.tx_hash}>
       <td className="pr-3 tablet:pr-6 py-2 tablet:py-4">
@@ -50,7 +43,9 @@ function TransferRow({ send }: { send: SendRow }) {
         {abbreviateAddress(send.tx_hash)}
       </td>
       <td className="pl-3 tablet:pl-6 py-2 tablet:py-4 text-sm">
-        {dayjs(send.block_time).fromNow()}
+        {formatDate(new Date(send.block_time), {
+          includeRelative: true,
+        })}
       </td>
     </tr>
   );

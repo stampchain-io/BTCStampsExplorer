@@ -1,10 +1,14 @@
-import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
+import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import {
   Deployment,
   MarketListingSummary,
   MintStatus,
 } from "$types/index.d.ts";
-import { formatNumber } from "$lib/utils/util.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+  formatNumber,
+} from "$lib/utils/formatUtils.ts";
 
 export interface SRC20TickHeaderProps {
   deployment: Deployment & {
@@ -54,12 +58,10 @@ export function SRC20TickHeader({
   marketInfo,
 }: SRC20TickHeaderProps) {
   const tickValue = deployment.tick ? convertToEmoji(deployment.tick) : "N/A";
-  const deployDate = new Date(deployment.block_time).toLocaleDateString(
-    undefined,
-    {
-      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-  );
+  const deployDate = formatDate(new Date(deployment.block_time), {
+    month: "short",
+    year: "numeric",
+  });
 
   // Provide default values for marketInfo properties
   const floorUnitPriceBTC = marketInfo?.floor_unit_price ?? 0;

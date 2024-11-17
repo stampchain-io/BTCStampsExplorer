@@ -1,14 +1,7 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
-
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { StampKind } from "$components/StampKind.tsx";
-
 import Stamp from "$islands/stamp/details/StampImage.tsx";
-
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { BlockInfo, StampRow } from "globals";
-
-dayjs.extend(relativeTime);
 
 interface BlockStampsTableProps {
   block: BlockInfo;
@@ -77,7 +70,9 @@ export default function BlockStampsTable(props: BlockStampsTableProps) {
                     : "N/A"}
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  {dayjs(Number(block_info.block_time)).fromNow()}
+                  {formatDate(new Date(Number(block_info.block_time)), {
+                    includeRelative: true,
+                  })}
                 </td>
               </tr>
             );
@@ -115,7 +110,9 @@ export default function BlockStampsTable(props: BlockStampsTableProps) {
                       : "N/A"}
                   </div>
                 </div>
-                {dayjs(Number(block_info.block_time)).fromNow()}
+                {formatDate(new Date(Number(block_info.block_time)), {
+                  includeRelative: true,
+                })}
               </div>
               <div className="flex justify-between text-lg">
                 <div>

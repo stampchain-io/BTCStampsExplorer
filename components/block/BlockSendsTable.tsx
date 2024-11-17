@@ -1,12 +1,11 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
-
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatDate,
+  formatSatoshisToBTC,
+} from "$lib/utils/formatUtils.ts";
 import { StampKind } from "$components/StampKind.tsx";
 import Stamp from "$islands/stamp/details/StampImage.tsx";
-import { BlockInfo } from "globals";
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
-dayjs.extend(relativeTime);
+import { BlockInfo, SendRow } from "globals";
 
 interface BlockSendsTableProps {
   block: BlockInfo;
@@ -102,7 +101,9 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
                   {abbreviateAddress(send.tx_hash)}
                 </td>
                 <td class="px-6 py-4 text-sm">
-                  {dayjs(Number(block_info.block_time)).fromNow()}
+                  {formatDate(new Date(Number(block_info.block_time)), {
+                    includeRelative: true,
+                  })}
                 </td>
               </tr>
             );
