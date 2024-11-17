@@ -100,7 +100,7 @@ export default function App({ Component }: AppProps) {
               <div class="flex flex-col min-h-screen">
                 <Header />
                 <div
-                  class="px-3 pt-10 tablet:px-6 desktop:px-12 flex flex-col flex-grow gap-5 max-w-desktop mx-auto w-full"
+                  class="flex flex-col flex-grow px-3 mobileMd:px-6 desktop:px-12 py-12 mobileLg:py-24 desktop:py-36 max-w-desktop mx-auto w-full"
                   f-client-nav
                 >
                   <Partial name="body">
