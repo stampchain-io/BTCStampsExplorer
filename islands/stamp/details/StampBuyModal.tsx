@@ -98,7 +98,7 @@ const StampBuyModal = ({
         body: JSON.stringify({
           address: wallet.address,
           dispenser: dispenser.source,
-          quantity: quantity,
+          quantity: totalPrice,
           options,
         }),
       });
