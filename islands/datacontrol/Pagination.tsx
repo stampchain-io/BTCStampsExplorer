@@ -63,9 +63,11 @@ export const Pagination = (
     return url.toString();
   }, [isClient, type, page_size, getSort, getFilter, getType]);
 
-  const pageItems = useMemo(() => {
+  const [pageItems, includeGoToStart, includeGoToEnd] = useMemo(() => {
     const startPage = Math.max(1, currentPage - maxPagesToShow);
     const endPage = Math.min(totalPages, currentPage + maxPagesToShow);
+    const includeGoToEnd = endPage < totalPages;
+    const includeGoToStart = startPage > 1;
     const items = [];
 
     for (let p = startPage; p <= endPage; p++) {
@@ -83,7 +85,7 @@ export const Pagination = (
         </li>,
       );
     }
-    return items;
+    return [items, includeGoToStart, includeGoToEnd];
   }, [currentPage, totalPages, maxPagesToShow, buildPageUrl]);
 
   if (data_length === 0) return null;
@@ -94,59 +96,67 @@ export const Pagination = (
       className="flex items-center justify-center"
     >
       <ul class="inline-flex items-center -space-x-px text-sm gap-2">
-        <li>
-          <a
-            href={buildPageUrl(1)}
-            f-partial={buildPageUrl(1)}
-            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
-          >
-            <img
-              src="/img/datacontrol/CaretDoubleLeft.svg"
-              alt="arrow double left"
-              className="w-[13px] h-[13px]"
-            />
-          </a>
-        </li>
-        <li>
-          <a
-            href={buildPageUrl(Math.max(1, currentPage - 1))}
-            f-partial={buildPageUrl(Math.max(1, currentPage - 1))}
-            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
-          >
-            <img
-              src="/img/datacontrol/CaretLeft.svg"
-              alt="arrow left"
-              className="w-[13px] h-[13px]"
-            />
-          </a>
-        </li>
+        {includeGoToStart && (
+          <li>
+            <a
+              href={buildPageUrl(1)}
+              f-partial={buildPageUrl(1)}
+              class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
+            >
+              <img
+                src="/img/datacontrol/CaretDoubleLeft.svg"
+                alt="arrow double left"
+                className="w-[13px] h-[13px]"
+              />
+            </a>
+          </li>
+        )}
+        {currentPage !== 1 && (
+          <li>
+            <a
+              href={buildPageUrl(Math.max(1, currentPage - 1))}
+              f-partial={buildPageUrl(Math.max(1, currentPage - 1))}
+              class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
+            >
+              <img
+                src="/img/datacontrol/CaretLeft.svg"
+                alt="arrow left"
+                className="w-[13px] h-[13px]"
+              />
+            </a>
+          </li>
+        )}
         {pageItems}
-        <li>
-          <a
-            href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-            f-partial={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
-          >
-            <img
-              src="/img/datacontrol/CaretRight.svg"
-              alt="arrow right"
-              className="w-[13px] h-[13px]"
-            />
-          </a>
-        </li>
-        <li>
-          <a
-            href={buildPageUrl(totalPages)}
-            f-partial={buildPageUrl(totalPages)}
-            class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
-          >
-            <img
-              src="/img/datacontrol/CaretDoubleRight.svg"
-              alt="arrow double right"
-              className="w-[13px] h-[13px]"
-            />
-          </a>
-        </li>
+        {currentPage < totalPages && (
+          <li>
+            <a
+              href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
+              f-partial={buildPageUrl(Math.min(totalPages, currentPage + 1))}
+              class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
+            >
+              <img
+                src="/img/datacontrol/CaretRight.svg"
+                alt="arrow right"
+                className="w-[13px] h-[13px]"
+              />
+            </a>
+          </li>
+        )}
+        {includeGoToEnd && (
+          <li>
+            <a
+              href={buildPageUrl(totalPages)}
+              f-partial={buildPageUrl(totalPages)}
+              class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
+            >
+              <img
+                src="/img/datacontrol/CaretDoubleRight.svg"
+                alt="arrow double right"
+                className="w-[13px] h-[13px]"
+              />
+            </a>
+          </li>
+        )}
       </ul>
     </nav>
   );
