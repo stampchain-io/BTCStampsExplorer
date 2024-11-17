@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { Button } from "$components/Button.tsx";
 
 const middleLayoutClassName =
@@ -144,8 +144,8 @@ export function SRC20Card(
             </p>
             <p class={defaultTextClassName}>
               DEPLOY{" "}
-              <span class={boldTextClassName}>
-                {new Date(src20.block_time).toLocaleString("default", {
+              <span className={boldTextClassName}>
+                {formatDate(new Date(src20.block_time), {
                   month: "short",
                   year: "numeric",
                 })}
@@ -218,8 +218,8 @@ export function SRC20Card(
             </p>
             <p class={defaultTextClassName}>
               DEPLOY{" "}
-              <span class={boldTextClassName}>
-                {new Date(src20.block_time).toLocaleString("default", {
+              <span className={boldTextClassName}>
+                {formatDate(new Date(src20.block_time), {
                   month: "short",
                   year: "numeric",
                 })}

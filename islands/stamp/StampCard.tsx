@@ -1,24 +1,19 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
-import { StampRow } from "globals";
-import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
-import { BREAKPOINTS } from "$client/utils/constants.ts";
-import { useEffect, useState } from "preact/hooks";
+import {
+  abbreviateAddress,
+  formatSupplyValue,
+  stripTrailingZeros,
+} from "$lib/utils/formatUtils.ts";
 import {
   getStampImageUrl,
   handleImageError,
   isValidSVG,
 } from "$lib/utils/imageUtils.ts";
 
-import {
-  abbreviateAddress,
-  formatSupplyValue,
-  stripTrailingZeros,
-} from "$lib/utils/formatUtils.ts";
-
+import { StampRow } from "globals";
+import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
+import { BREAKPOINTS } from "$client/utils/constants.ts";
+import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-
-dayjs.extend(relativeTime);
 
 // Text style constants for different breakpoints
 

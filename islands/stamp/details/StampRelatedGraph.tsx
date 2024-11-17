@@ -1,9 +1,5 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
 import StampHolders from "$components/stampDetails/StampHolders.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-
-dayjs.extend(relativeTime);
 
 interface Holder {
   address: string | null;

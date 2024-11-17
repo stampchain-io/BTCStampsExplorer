@@ -1,5 +1,10 @@
 import { BigFloat } from "bigfloat/mod.ts";
 import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts";
+import dayjs from "$dayjs/";
+import relativeTime from "$dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
+
 // Helper constant for satoshi conversion
 
 export function abbreviateAddress(
@@ -47,9 +52,39 @@ export function formatNumber(value: number, decimals: number = 8): string {
   });
 }
 
-export function formatDate(date: Date): string {
+interface DateFormatOptions {
+  timeZone?: boolean;
+  month?: "short" | "long" | "numeric" | "2-digit";
+  year?: "numeric" | "2-digit";
+  day?: "numeric" | "2-digit";
+  includeRelative?: boolean;
+}
+
+export function formatDate(
+  date: Date,
+  options: DateFormatOptions = {},
+): string {
   const locale = navigator.language || "en-US";
-  return date.toLocaleDateString(locale);
+  const formatOptions: Intl.DateTimeFormatOptions = {};
+
+  // Add timeZone if requested (default: true)
+  if (options.timeZone !== false) {
+    formatOptions.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
+
+  // Add other format options if provided
+  if (options.month) formatOptions.month = options.month;
+  if (options.year) formatOptions.year = options.year;
+  if (options.day) formatOptions.day = options.day;
+
+  const formattedDate = date.toLocaleDateString(locale, formatOptions);
+
+  // Add relative time if requested
+  if (options.includeRelative) {
+    return `${formattedDate} (${dayjs(date).fromNow()})`;
+  }
+
+  return formattedDate;
 }
 
 export function stripTrailingZeros(num: number | string): string {

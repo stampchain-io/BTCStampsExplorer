@@ -1,11 +1,6 @@
 import type { Signal } from "@preact/signals";
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
-
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { BlockRow } from "globals";
-
-dayjs.extend(relativeTime);
 
 interface BlockProps {
   block: BlockRow;
@@ -34,7 +29,11 @@ export default function BlockSelector(props: BlockProps) {
     >
       <div class="flex items-center justify-between text-sm mobileLg:text-base">
         <h3 class="font-bold">Block {block.block_index}</h3>
-        <span>{dayjs(block.block_time).fromNow()}</span>
+        <span>
+          {formatDate(new Date(block.block_time), {
+            includeRelative: true,
+          })}
+        </span>
       </div>
       <div class="mt-1 mb-2">
         <p class="truncate">{displayAddress}</p>

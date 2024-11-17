@@ -1,12 +1,19 @@
 import { SRC20Row } from "globals";
 import { useEffect, useState } from "preact/hooks";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
 };
 
-const ImageModal = ({ imgSrc, isOpen, onClose }) => {
+interface ImageModalProps {
+  imgSrc: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const ImageModal = ({ imgSrc, isOpen, onClose }: ImageModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -122,13 +129,10 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                           {src20.deci}
                         </td>
                         <td class="px-6 py-4 text-sm">
-                          {new Date(src20.block_time).toLocaleString(
-                            "default",
-                            {
-                              month: "short",
-                              year: "numeric",
-                            },
-                          )}
+                          {formatDate(new Date(src20.block_time), {
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </td>
                       </tr>
                     );

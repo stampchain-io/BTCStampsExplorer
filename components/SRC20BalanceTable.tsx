@@ -1,8 +1,5 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
+import { formatDate } from "$lib/utils/formatUtils.ts";
 import { SRC20Balance } from "globals";
-
-dayjs.extend(relativeTime);
 
 type SRC20BalanceTableProps = {
   src20Balances: SRC20Balance[];
@@ -57,7 +54,9 @@ export const SRC20BalanceTable = (props: SRC20BalanceTableProps) => {
                   {Number(src20.amt).toLocaleString()}
                 </td>
                 <td className="px-6 py-4">
-                  {dayjs(Number(src20.block_time)).fromNow()}
+                  {formatDate(new Date(Number(src20.block_time)), {
+                    includeRelative: true,
+                  })}
                 </td>
               </tr>
             );

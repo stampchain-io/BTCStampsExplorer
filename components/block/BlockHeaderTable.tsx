@@ -1,9 +1,6 @@
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
-
+import { formatDate } from "$lib/utils/formatUtils.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-
-dayjs.extend(relativeTime);
+import { BlockInfo, SendRow, StampRow } from "globals";
 
 interface BlockHeaderTableProps {
   block: {
@@ -29,7 +26,9 @@ export default function BlockHeaderTable(props: BlockHeaderTableProps) {
             </td>
             <th scope="row" class="px-6 py-3">Time</th>
             <td class="whitespace-nowrap">
-              {dayjs(Number(block_info.block_time)).fromNow()}
+              {formatDate(new Date(Number(block_info.block_time)), {
+                includeRelative: true,
+              })}
             </td>
           </tr>
           <tr class="border-b">
