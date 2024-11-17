@@ -71,6 +71,7 @@ export function SRC20TickHeader({
 
   // Format BTC values to 8 decimal places
   const sum1dBTCFormatted = formatNumber(sum1dBTC, 4);
+  const sum7dBTCFormatted = formatNumber(sum1dBTC * 7, 4);
   const mcapBTCFormatted = formatNumber(mcapBTC, 4);
 
   // Format Satoshi value with commas (no decimals needed)
@@ -172,7 +173,7 @@ export function SRC20TickHeader({
         />
         <StatItem
           label="24H CHANGE"
-          value="N/A" // FIXME: not available from API mcap request
+          value="N/A" // FIXME: not available from API request
           currency="%"
           direction="col"
         />
@@ -197,7 +198,7 @@ export function SRC20TickHeader({
         {/* 7 DAY Volume in BTC */}
         <StatItem
           label="7 DAY VOLUME"
-          value={sum1dBTCFormatted * 7}
+          value={sum7dBTCFormatted}
           currency="BTC"
           direction="col"
         />

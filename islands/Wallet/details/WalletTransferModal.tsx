@@ -86,9 +86,10 @@ function WalletTransferModal({
         true, // Enable RBF
       );
 
-      if (signResult.signed) {
-        const txid = await walletContext.broadcastPSBT(signResult.psbt);
-        setSuccessMessage(`Transfer initiated successfully. TXID: ${txid}`);
+      if (signResult.signed && signResult.txid) {
+        setSuccessMessage(
+          `Transfer initiated successfully. TXID: ${signResult.txid}`,
+        );
         setTimeout(toggleModal, 5000);
       } else if (signResult.cancelled) {
         throw new Error("Transaction signing was cancelled.");

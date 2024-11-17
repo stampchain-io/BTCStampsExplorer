@@ -152,7 +152,7 @@ export function TransactionFeeDetails({
           </button>
         )}
         <button
-          className="bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold"
+          className="bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold disabled:bg-stamp-purple-darker disabled:text-black disabled:cursor-not-allowed"
           onClick={onSubmit}
           disabled={isSubmitting}
         >

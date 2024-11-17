@@ -17,7 +17,7 @@ export function CollectionListCard(
 ) {
   return (
     <a
-      href={`/collection/${collection.collection_name}`}
+      href={`/collection/details/${collection.collection_name}`}
       class={containerClassName}
     >
       <div

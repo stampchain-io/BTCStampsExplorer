@@ -4,6 +4,17 @@ import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
+const bodyCenterClassName =
+  "flex flex-col gap-3 mobileMd:gap-6 items-center w-full";
+const titleCenterClassName =
+  "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1 text-center mt-6 w-full";
+const inputFieldContainerClassName =
+  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
+const inputField2colClassName =
+  "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
+const feeSelectorContainerClassName =
+  "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" },
 ) {
@@ -38,12 +49,10 @@ export function TransferContent(
   };
 
   return (
-    <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
-        TRANSFER
-      </p>
+    <div className={bodyCenterClassName}>
+      <h1 className={titleCenterClassName}>TRANSFER</h1>
 
-      <div className="flex flex-col gap-3 tablet:gap-6 dark-gradient p-3 tablet:p-6 w-full">
+      <div className={inputFieldContainerClassName}>
         <InputField
           type="text"
           placeholder="Recipient address"
@@ -52,7 +61,7 @@ export function TransferContent(
           error={formState.toAddressError}
         />
 
-        <div className="w-full flex flex-col tablet:flex-row gap-3 tablet:gap-6">
+        <div className={inputField2colClassName}>
           <InputField
             type="text"
             placeholder="Token"
@@ -71,7 +80,7 @@ export function TransferContent(
         </div>
       </div>
 
-      <div className="dark-gradient p-3 tablet:p-6 w-full z-[10]">
+      <div className={feeSelectorContainerClassName}>
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
@@ -82,7 +91,7 @@ export function TransferContent(
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleTransferSubmit}
-          buttonName="Transfer"
+          buttonName="TRANSFER"
         />
 
         <StatusMessages

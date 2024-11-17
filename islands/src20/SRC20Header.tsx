@@ -27,8 +27,11 @@ export const SRC20Header = (
   return (
     <div className="tabs">
       <div class="flex flex-row justify-between items-center gap-3 w-full">
-        <h1 className="text-4xl mobileLg:text-6xl purple-gradient1 font-black">
+        <h1 className="hidden tablet:block text-5xl desktop:text-6xl purple-gradient1 font-black">
           SRC-20 TOKENS
+        </h1>
+        <h1 className="block tablet:hidden text-4xl mobileLg:text-5xl purple-gradient1 font-black">
+          TOKENS
         </h1>
         <div class="flex gap-3 justify-between h-[40px]">
           <Sort initSort={sortBy} />

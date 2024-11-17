@@ -20,6 +20,7 @@ import { Dispense, Dispenser } from "$types/index.d.ts";
 import { CollectionController } from "./collectionController.ts";
 import { Src20Controller } from "./src20Controller.ts";
 import { CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
+import { stripTrailingZeros } from "$lib/utils/util.ts";
 
 export class StampController {
   static async getStampDetailsById(id: string, stampType: STAMP_TYPES = "all") {
@@ -278,14 +279,14 @@ export class StampController {
         const dispenserMap = new Map();
         
         const batchDispensers = await Promise.all(
-          uniqueCpids.map(cpid => DispenserManager.getDispensersByCpid(cpid))
+          uniqueCpids.map(cpid => DispenserManager.getDispensersByCpid(cpid, "all"))
         );
         
         batchDispensers.forEach((dispensers, index) => {
           dispenserMap.set(uniqueCpids[index], dispensers);
         });
 
-        // Update stamps with floor prices
+        // Update stamps with floor prices and recent sale prices
         const updatedStamps = stampResult.stamps.map(stamp => {
           if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
             return stamp;
@@ -293,23 +294,36 @@ export class StampController {
 
           const dispensersForStamp = dispenserMap.get(stamp.cpid);
           let floorPrice: string | number = "priceless";
+          let recentSalePrice: string | number = "priceless";
 
           if (dispensersForStamp?.length > 0) {
+            // Find open dispensers for floor price
             const openDispensers = dispensersForStamp.filter(
               dispenser => dispenser.give_remaining > 0
             );
+            
             if (openDispensers.length > 0) {
               floorPrice = Math.min(
                 ...openDispensers.map(
-                  dispenser => dispenser.satoshirate / 100000000
+                  dispenser => Number(stripTrailingZeros((dispenser.satoshirate / 100000000).toFixed(8)))
                 )
               );
+            }
+
+            // Find most recent dispenser for recent sale price
+            const mostRecentDispenser = dispensersForStamp.reduce((prev, current) => 
+              (prev.block_index > current.block_index) ? prev : current
+            );
+
+            if (mostRecentDispenser) {
+              recentSalePrice = Number(stripTrailingZeros((mostRecentDispenser.satoshirate / 100000000).toFixed(8)));
             }
           }
 
           return {
             ...stamp,
             floorPrice,
+            recentSalePrice,
           };
         });
 

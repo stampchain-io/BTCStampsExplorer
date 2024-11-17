@@ -288,13 +288,13 @@ export function DeployContent(
           type="src20"
           fileType="application/json"
           fileSize={formState.jsonSize}
-          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
-          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleDeploySubmit}
-          buttonName="Deploy"
+          buttonName="DEPLOY"
+          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
+          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
         />
 
         <StatusMessages

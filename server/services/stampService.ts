@@ -210,7 +210,7 @@ export class StampService {
         return {
           ...stamp,
           sale_data: {
-            btc_amount: event.params.btc_amount,
+            btc_amount: event.params.btc_amount / 100000000,
             block_index: event.block_index,
             tx_hash: event.tx_hash,
           },

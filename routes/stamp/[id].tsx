@@ -51,11 +51,17 @@ export const handler: Handlers<StampData> = {
       const url = new URL(_req.url);
       const { id } = ctx.params;
       const stampData = await StampController.getStampDetailsById(id);
+
+      // Check for null/undefined stamp data
+      if (!stampData?.data?.stamp) {
+        return ctx.renderNotFound();
+      }
+
       const result = await StampController.getRecentSales(1, 6);
       console.log("result: ", result);
 
       if (!stampData) {
-        return new Response("Stamp not found", { status: 404 });
+        return ctx.renderNotFound();
       }
 
       const page = parseInt(url.searchParams.get("page") || "1");
@@ -112,6 +118,9 @@ export const handler: Handlers<StampData> = {
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
+      if (error.message?.includes("Stamp not found")) {
+        return ctx.renderNotFound();
+      }
       return new Response("Internal Server Error", { status: 500 });
     }
   },

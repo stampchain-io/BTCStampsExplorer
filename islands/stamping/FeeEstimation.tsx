@@ -34,6 +34,8 @@ interface FeeEstimationProps {
   confirmText?: string;
   showCoinToggle?: boolean;
   className?: string;
+  tosAgreed?: boolean;
+  onTosChange?: (agreed: boolean) => void;
 }
 
 export function FeeEstimation({
@@ -61,15 +63,16 @@ export function FeeEstimation({
   confirmText,
   showCoinToggle = true,
   className = "",
+  tosAgreed = false,
+  onTosChange = () => {},
 }: FeeEstimationProps) {
   const { fees, loading } = useFeePolling(300000);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [txfee, setTxfee] = useState(0.0);
   const [mintfee, setMintfee] = useState(0.0);
   const [dust, setDust] = useState(0.0);
   const [total, setTotal] = useState(0.0);
   const [coinType, setCoinType] = useState("BTC");
-  const [tosAgreed, setToSAgreed] = useState(false);
 
   // Update fee when recommended fee changes
   useEffect(() => {
@@ -238,25 +241,10 @@ export function FeeEstimation({
     // Original Content pages details view
     return (
       <div className={`${visible ? "visible" : "invisible"}`}>
-        {type === "src20" && (
-          <div className="flex justify-between border-b border-[#8A8989] py-4">
-            <p>Sats per byte</p>
-            <p>{fee}</p>
-          </div>
-        )}
         {type === "stamp" && (
           <>
             <p className="font-medium text-xs">
               <span className="text-[#666666] font-light">FILE</span> {fileType}
-            </p>
-            <p className="font-medium text-xs">
-              <span className="text-[#666666] font-light">BYTES</span>{" "}
-              {fileSize} bytes
-            </p>
-            <p className="font-medium text-xs">
-              <span className="text-[#666666] font-light">SATS PER BYTE</span>
-              {" "}
-              {fee}
             </p>
             <p className="font-medium text-xs">
               <span className="text-[#666666] font-light">EDITIONS:</span>{" "}
@@ -264,6 +252,15 @@ export function FeeEstimation({
             </p>
           </>
         )}
+        <p className="font-medium text-xs">
+          <span className="text-[#666666] font-light">BYTES</span> {fileSize}
+          {" "}
+          bytes
+        </p>
+        <p className="font-medium text-xs">
+          <span className="text-[#666666] font-light">SATS PER BYTE</span> {fee}
+        </p>
+
         <p className="flex gap-1 items-center text-xs font-medium">
           <span className="font-light text-[#666666]">MINER FEE</span>{" "}
           {txfee.toFixed(0)} sats
@@ -283,6 +280,52 @@ export function FeeEstimation({
       </div>
     );
   };
+
+  const renderModalActions = () => (
+    <div className="flex flex-col items-end gap-4 mt-4">
+      {!isModal && (
+        <div className="flex gap-2 items-center">
+          <input
+            type="checkbox"
+            id="tosAgreed"
+            checked={tosAgreed}
+            onChange={(e) =>
+              onTosChange((e.target as HTMLInputElement).checked)}
+            className="w-3 h-3 bg-[#262424] border border-[#7F7979]"
+          />
+          <label
+            htmlFor="tosAgreed"
+            className="text-[#999999] text-xs font-medium"
+          >
+            I AGREE TO THE <span className="text-[#8800CC]">ToS</span>
+          </label>
+        </div>
+      )}
+
+      <div className="flex justify-end gap-6">
+        {isModal && onCancel && (
+          <button
+            className="border-2 border-[#8800CC] text-[#8800CC] w-[108px] h-[48px] rounded-md font-extrabold"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            {cancelText}
+          </button>
+        )}
+        <button
+          className={`bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold ${
+            (disabled || isSubmitting || (!isModal && !tosAgreed))
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
+          onClick={onSubmit}
+          disabled={disabled || isSubmitting || (!isModal && !tosAgreed)}
+        >
+          {isSubmitting ? "Processing..." : confirmText || buttonName}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className={`text-[#999999] ${className}`}>
@@ -307,57 +350,43 @@ export function FeeEstimation({
         )}
       </div>
 
-      <p className="flex items-center uppercase">
-        Details
-        <span onClick={() => setVisible(!visible)} className="cursor-pointer">
-          {!visible
-            ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="1em"
-                height="1em"
-                viewBox="0 0 24 24"
-              >
-                <path fill="white" d="M12 8l6 6H6l6-6z" />
-              </svg>
-            )
-            : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="1em"
-                height="1em"
-                viewBox="0 0 24 24"
-              >
-                <path fill="white" d="M12 16l-6-6h12l-6 6z" />
-              </svg>
-            )}
+      <p className="flex font-bold mt-4 mobileSm:text-sm mobileLg:text-lg">
+        <span className="text-[#666666] font-light uppercase">
+          ESTIMATE:{" "}
         </span>
+        {coinType === "BTC"
+          ? `${total.toFixed(0)} sats`
+          : `${(total / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
       </p>
 
-      {renderDetails()}
-
-      <div className="flex justify-end gap-6 mt-4">
-        {isModal && onCancel && (
-          <button
-            className="border-2 border-[#8800CC] text-[#8800CC] w-[108px] h-[48px] rounded-md font-extrabold"
-            onClick={onCancel}
-            disabled={isSubmitting}
+      <div 
+        onClick={() => setVisible(!visible)} 
+        className="flex items-center gap-1 uppercase mt-2 text-xs cursor-pointer"
+      >
+        DETAILS
+        {!visible ? (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 24 24"
           >
-            {cancelText}
-          </button>
+            <path fill="white" d="M12 8l6 6H6l6-6z" />
+          </svg>
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 24 24"
+          >
+            <path fill="white" d="M12 16l-6-6h12l-6 6z" />
+          </svg>
         )}
-        <button
-          className={`bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold ${
-            (disabled || isSubmitting || (!isModal && !tosAgreed))
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-          onClick={onSubmit}
-          disabled={disabled || isSubmitting || (!isModal && !tosAgreed)}
-        >
-          {isSubmitting ? "Processing..." : confirmText || buttonName}
-        </button>
       </div>
+
+      {renderDetails()}
+      {renderModalActions()}
     </div>
   );
 }

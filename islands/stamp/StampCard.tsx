@@ -8,9 +8,9 @@ import { useEffect, useState } from "preact/hooks";
 
 import {
   abbreviateAddress,
-  // formatSatoshisToBTC,
   getFileSuffixFromMime,
   getSupply,
+  stripTrailingZeros,
 } from "$lib/utils/util.ts";
 
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
@@ -138,7 +138,7 @@ export function StampCard({
         // Show fallback if content is empty, invalid SVG, or contains deploy data
         if (
           !svgContent || !isValidSVG(svgContent) ||
-          svgContent.includes('"p":"deploy"')
+          svgContent.includes('"deploy"')
         ) {
           setValidatedContent(
             <img
@@ -227,11 +227,15 @@ export function StampCard({
 
   const renderPrice = () => {
     if (isRecentSale && stamp.sale_data) {
-      return `${stamp.sale_data.btc_amount.toLocaleString()} ₿`;
-    } else if (Number.isFinite(stamp.floorPrice)) {
-      return `${Number(stamp.floorPrice).toLocaleString()} ₿`;
+      return `${stripTrailingZeros(stamp.sale_data.btc_amount.toFixed(8))} BTC`;
+    } else if (stamp.floorPrice !== "priceless") {
+      return `${stripTrailingZeros(Number(stamp.floorPrice).toFixed(8))} BTC`;
+    } else if (stamp.recentSalePrice !== "priceless") {
+      return `${
+        stripTrailingZeros(Number(stamp.recentSalePrice).toFixed(8))
+      } BTC`;
     } else {
-      return "0 ₿";
+      return stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN";
     }
   };
 

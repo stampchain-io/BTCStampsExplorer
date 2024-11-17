@@ -195,7 +195,7 @@ export default function Collection(props: CollectionPageProps) {
             href="/collection/overview"
             f-partial="/collection/overview"
           >
-            <button className="bg-stamp-grey font-extrabold text-stamp-bg-darkest px-5 py-3 rounded-md float-right">
+            <button className="bg-stamp-grey font-extrabold text-stamp-bg-grey-darkest px-5 py-3 rounded-md float-right">
               STAMP
             </button>
           </a>

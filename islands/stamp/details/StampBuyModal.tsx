@@ -88,7 +88,7 @@ const StampBuyModal = ({
       console.log("Creating dispense transaction:", {
         address: wallet.address,
         dispenser: dispenser.source,
-        quantity: totalPrice,
+        quantity: quantity,
         feeRate: options.fee_per_kb,
       });
 
@@ -98,7 +98,7 @@ const StampBuyModal = ({
         body: JSON.stringify({
           address: wallet.address,
           dispenser: dispenser.source,
-          quantity: totalPrice,
+          quantity: quantity,
           options,
         }),
       });
@@ -125,10 +125,9 @@ const StampBuyModal = ({
         true, // Enable RBF
       );
 
-      if (signResult.signed) {
-        const txid = await walletContext.broadcastPSBT(signResult.psbt);
+      if (signResult.signed && signResult.txid) {
         setSuccessMessage(
-          `Transaction broadcasted successfully. TXID: ${txid}`,
+          `Transaction broadcasted successfully. TXID: ${signResult.txid}`,
         );
         setTimeout(toggleModal, 5000);
       } else if (signResult.cancelled) {
