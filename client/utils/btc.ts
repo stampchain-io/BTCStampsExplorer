@@ -1,4 +1,5 @@
-// TODO: this is for leather and phantom, perhaps balance can be pulled properly from the wallet
+import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+
 export const getBtcBalance = async (address: string): Promise<number> => {
   try {
     const response = await fetch(
@@ -8,11 +9,11 @@ export const getBtcBalance = async (address: string): Promise<number> => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const utxosJson = await response.json();
-    const balance = utxosJson.reduce(
+    const satoshis = utxosJson.reduce(
       (acc: number, utxo: { value: number }) => acc + utxo.value,
       0,
     );
-    return balance / 100000000;
+    return Number(formatSatoshisToBTC(satoshis, { includeSymbol: false }));
   } catch (error) {
     console.error("Error fetching BTC balance:", error);
     return 0;

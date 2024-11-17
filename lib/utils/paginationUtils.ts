@@ -13,3 +13,13 @@ export function getPaginationParams(url: URL): PaginationQueryParams {
   const page = Number(url.searchParams.get("page")) || 1;
   return { limit, page };
 }
+
+export function paginate(total: number, page = 1, limit = 10) {
+  const totalPages = Math.ceil(total / limit);
+  return {
+    page,
+    limit,
+    totalPages,
+    total,
+  };
+}

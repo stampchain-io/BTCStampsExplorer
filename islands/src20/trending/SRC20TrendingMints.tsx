@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
-import { convertToEmoji } from "$lib/utils/util.ts";
+import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
 import { SRC20Card } from "$islands/src20/SRC20Card.tsx";
 

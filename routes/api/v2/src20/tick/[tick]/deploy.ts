@@ -1,5 +1,5 @@
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { convertEmojiToTick } from "$lib/utils/util.ts";
+import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { TickHandlerContext } from "globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 

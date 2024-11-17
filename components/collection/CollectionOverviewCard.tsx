@@ -1,5 +1,5 @@
 import { Collection } from "globals";
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 export function CollectionOverviewCard(
   { collection }: { collection: Collection },
 ) {

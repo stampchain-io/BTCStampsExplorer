@@ -1,7 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { StampRow } from "globals";
-import { getFileSuffixFromMime } from "$lib/utils/util.ts";
+import { getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 
 interface CarouselProps {

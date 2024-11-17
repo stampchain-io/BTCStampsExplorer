@@ -1,4 +1,4 @@
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 export function StampVaults(
   { vaults }: {

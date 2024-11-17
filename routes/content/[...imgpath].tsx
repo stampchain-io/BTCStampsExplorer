@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { getMimeType } from "$lib/utils/util.ts";
+import { getMimeType } from "$lib/utils/imageUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
@@ -56,6 +56,7 @@ async function serveImage(imgpath: string): Promise<Response> {
 
   return await serveNotAvailableImage();
 }
+
 async function serveNotAvailableImage(): Promise<Response> {
   try {
     const notAvailablePath =

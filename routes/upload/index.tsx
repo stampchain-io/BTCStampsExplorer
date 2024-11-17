@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { paginate } from "$lib/utils/util.ts";
+import { paginate } from "$lib/utils/paginationUtils.ts";
 import { initialWallet, walletContext } from "$client/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
 import { Handlers } from "$fresh/server.ts";
