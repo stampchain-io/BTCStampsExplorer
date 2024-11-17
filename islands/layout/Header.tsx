@@ -70,7 +70,7 @@ const socialLinks = [
 ];
 
 const logoClassName =
-  "purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl mobileLg:text-4xl desktop:text-5xl font-black italic pr-2";
+  "purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black italic pr-2";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -201,8 +201,8 @@ export function Header() {
   };
 
   return (
-    <header className="px-3 mobileLg:px-6 desktop:px-12 my-[18px] mobileLg:my-[36px] tablet:my-[68px] max-w-desktop w-full mx-auto tablet:flex justify-between items-center">
-      <div className="w-full flex justify-between items-center">
+    <header className="px-3 mobileMd:px-6 desktop:px-12 my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12 max-w-desktop w-full mx-auto tablet:flex justify-between items-center">
+      <div className="flex justify-between items-center w-full ">
         <a
           href="/home"
           f-partial="/home"
