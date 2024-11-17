@@ -210,7 +210,8 @@ export default function createCarouselSlider(
   const swiperEl = el.querySelector(".swiper") as HTMLElement;
   if (!swiperEl) return undefined;
 
-  const isMobile = window.innerWidth < CAROUSEL_CONFIG.BREAKPOINTS.MOBILE_LG;
+  const isMobile =
+    globalThis.innerWidth < CAROUSEL_CONFIG.BREAKPOINTS.MOBILE_LG;
 
   const swiper = new Swiper(swiperEl, {
     modules: [Autoplay, Pagination],
