@@ -109,32 +109,32 @@ function WalletOverview(
           </p>
         </div>
         <div className="flex gap-3">
-          <img
-            src="/img/wallet/icon-copy.svg"
-            className="w-8 h-8 cursor-pointer"
-            alt="Copy"
+          <Button
+            variant="wallet"
+            icon="/img/wallet/icon-copy.svg"
+            iconAlt="Copy"
             onClick={copy}
           />
-          <img
-            src="/img/wallet/icon-arrow-square-out.svg"
-            className="w-8 h-8 cursor-pointer"
-            alt="Send"
+          <Button
+            variant="wallet"
+            icon="/img/wallet/icon-arrow-square-out.svg"
+            iconAlt="Send"
             onClick={onSend}
           />
-          <img
-            src="/img/wallet/icon-arrow-square-in.svg"
-            className="w-8 h-8 cursor-pointer"
-            alt="Receive"
+          <Button
+            variant="wallet"
+            icon="/img/wallet/icon-arrow-square-in.svg"
+            iconAlt="Receive"
             onClick={onReceive}
           />
           <a
             href={`https://mempool.space/address/${walletData.address}`}
             target="_blank"
           >
-            <img
-              src="/img/wallet/icon-history.svg"
-              className="w-8 h-8 cursor-pointer"
-              alt="History"
+            <Button
+              variant="wallet"
+              icon="/img/wallet/icon-history.svg"
+              iconAlt="History"
             />
           </a>
         </div>
