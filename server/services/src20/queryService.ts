@@ -9,7 +9,8 @@ import {
   SRC20SnapshotRequestParams,
 } from "globals";
 import { SRC20UtilityService } from "./utilityService.ts";
-import { paginate, stripTrailingZeros } from "$lib/utils/util.ts";
+import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
+import { paginate } from "$lib/utils/paginationUtils.ts"
 import { Big } from "$Big";
 
 // Change class name from Src20Service to SRC20QueryService

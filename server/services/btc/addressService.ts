@@ -1,4 +1,5 @@
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
+import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 
 interface BTCAddressInfo {
   address: string;
@@ -12,19 +13,15 @@ interface BTCAddressInfo {
 export class BTCAddressService {
   static async getAddressInfo(address: string): Promise<BTCAddressInfo | null> {
     try {
-      // Use getUTXOForAddress with mempool.space as first fallback
-      const txInfo = await getUTXOForAddress(address, undefined, undefined, true);
+      const txInfo = await getUTXOForAddress(address);
       if (!txInfo?.utxo) return null;
 
-      // Extract data from the mempool.space response (first endpoint)
-      const mempoolData = txInfo.utxo.status || {};
-      
       return {
         address,
-        balance: txInfo.utxo.value / 100000000, // Convert to BTC
-        txCount: mempoolData.tx_count || 0,
-        unconfirmedBalance: mempoolData.unconfirmed_balance || 0,
-        unconfirmedTxCount: mempoolData.unconfirmed_tx_count || 0,
+        balance: Number(formatSatoshisToBTC(txInfo.utxo.value, { includeSymbol: false })),
+        txCount: txInfo.utxo.status?.tx_count || 0,
+        unconfirmedBalance: txInfo.utxo.status?.unconfirmed_balance || 0,
+        unconfirmedTxCount: txInfo.utxo.status?.unconfirmed_tx_count || 0,
         fee_per_vbyte: txInfo.ancestor?.effectiveRate
       };
     } catch (error) {

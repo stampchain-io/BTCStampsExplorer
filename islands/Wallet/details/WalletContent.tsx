@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { Search } from "$islands/datacontrol/Search.tsx";
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";

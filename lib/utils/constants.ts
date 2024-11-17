@@ -13,7 +13,7 @@ export const DEFAULT_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
 export const SATS_PER_KB_MULTIPLIER = 1000; // Convert vB to kB
 export const BIG_LIMIT = 200;
 export const SMALL_LIMIT = 50;
-
+export const SATOSHIS_PER_BTC = 100000000;
 export const CAROUSEL_STAMP_IDS = [
   771859,
   746290,

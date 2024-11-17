@@ -97,7 +97,6 @@ components/:
 - Server-side rendered (SSR)
 - No client-side JavaScript
 - Rendered on the server and sent as HTML
-Example: StampBalanceCard.tsx - static layout component
 
 islands/:
 - Client-side interactive components

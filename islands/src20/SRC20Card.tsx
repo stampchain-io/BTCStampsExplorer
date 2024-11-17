@@ -1,14 +1,13 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
-import { abbreviateAddress, convertToEmoji } from "$lib/utils/util.ts";
+import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { Button } from "$components/Button.tsx";
 
 const middleLayoutClassName =
   "hidden tablet:flex text-center flex-col justify-center";
 const defaultTextClassName = "text-lg text-stamp-grey-darker font-light";
 const boldTextClassName = "font-bold text-stamp-grey";
-const mintButtonClassName =
-  `bg-stamp-purple text-center text-stamp-bg-grey-darkest text-sm font-black
-  w-[84px] h-[48px] rounded-md`;
 
 interface SRC20CardProps {
   src20: SRC20Row;
@@ -264,13 +263,13 @@ export function SRC20Card(
 
       {/* Mint Button */}
       {progress !== "100" && (
-        <button
+        <Button
+          variant="mint"
           onClick={handleMintClick}
-          class={mintButtonClassName +
-            (variant != "minting" ? " hidden mobileLg:block" : "")}
+          class={variant != "minting" ? "hidden mobileLg:block" : ""}
         >
           Mint
-        </button>
+        </Button>
       )}
     </div>
   );

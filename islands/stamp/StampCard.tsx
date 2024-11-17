@@ -3,16 +3,18 @@ import relativeTime from "$dayjs/plugin/relativeTime";
 import { StampRow } from "globals";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
-import { isValidSVG } from "$lib/utils/util.ts";
 import { useEffect, useState } from "preact/hooks";
-import { handleImageError } from "$lib/utils/imageUtils.ts";
+import {
+  getStampImageUrl,
+  handleImageError,
+  isValidSVG,
+} from "$lib/utils/imageUtils.ts";
 
 import {
   abbreviateAddress,
-  getFileSuffixFromMime,
-  getSupply,
+  formatSupplyValue,
   stripTrailingZeros,
-} from "$lib/utils/util.ts";
+} from "$lib/utils/formatUtils.ts";
 
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 
@@ -113,12 +115,7 @@ export function StampCard({
     return ABBREVIATION_LENGTHS.mobileSm;
   };
 
-  let src: string;
-  const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
-  src = `/content/${stamp.tx_hash}.${suffix}`;
-  if (suffix === "unknown") {
-    src = `/not-available.png`;
-  }
+  const src = getStampImageUrl(stamp);
 
   // Add state for validated content
   const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
@@ -158,9 +155,7 @@ export function StampCard({
             loading="lazy"
             alt={`Stamp No. ${stamp.stamp}`}
             className="h-full w-full object-contain pixelart"
-            onError={(e) => {
-              e.currentTarget.src = `/not-available.png`;
-            }}
+            onError={handleImageError}
           />,
         );
       } catch {
@@ -174,15 +169,15 @@ export function StampCard({
       }
     };
 
-    if (suffix === "svg") {
+    if (stamp.stamp_mimetype === "image/svg+xml") {
       validateSVG();
     }
-  }, [src, suffix, stamp.stamp]);
+  }, [src, stamp.stamp, stamp.stamp_mimetype]);
 
   const renderContent = () => {
-    if (stamp.stamp_mimetype === "text/plain" || suffix === "txt") {
+    if (stamp.stamp_mimetype === "text/plain") {
       return <TextContentIsland src={src} />;
-    } else if (suffix === "html") {
+    } else if (stamp.stamp_mimetype === "text/html") {
       return (
         <iframe
           scrolling="no"
@@ -210,7 +205,7 @@ export function StampCard({
           }}
         />
       );
-    } else if (suffix === "svg") {
+    } else if (stamp.stamp_mimetype === "image/svg+xml") {
       return validatedContent || (
         <img
           src="/not-available.png"
@@ -249,12 +244,12 @@ export function StampCard({
     (stamp.cpid && stamp.cpid.charAt(0) === "A");
 
   const supplyDisplay = stamp.ident !== "SRC-20" && stamp.balance
-    ? `${getSupply(Number(stamp.balance), stamp.divisible)}/${
+    ? `${formatSupplyValue(Number(stamp.balance), stamp.divisible)}/${
       stamp.supply < 100000 && !stamp.divisible
-        ? getSupply(stamp.supply, stamp.divisible)
+        ? formatSupplyValue(stamp.supply, stamp.divisible)
         : "+100000"
     }`
-    : `1/${getSupply(stamp.supply, stamp.divisible)}`;
+    : `1/${formatSupplyValue(stamp.supply, stamp.divisible)}`;
 
   // Use dynamic abbreviation length
   const creatorDisplay = stamp.creator_name

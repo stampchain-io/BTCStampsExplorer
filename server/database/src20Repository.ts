@@ -1,6 +1,6 @@
 import { serverConfig } from "$server/config/config.ts";
 import { BigFloat } from "bigfloat/mod.ts";
-import { bigFloatToString } from "$lib/utils/util.ts";
+import { bigFloatToString } from "$lib/utils/formatUtils.ts";
 import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$lib/utils/constants.ts";
 import {
   SRC20BalanceRequestParams,

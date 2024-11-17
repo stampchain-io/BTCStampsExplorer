@@ -1,10 +1,11 @@
 import dayjs from "$dayjs/";
 import relativeTime from "$dayjs/plugin/relativeTime";
 
-import { abbreviateAddress } from "$lib/utils/util.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { StampKind } from "$components/StampKind.tsx";
 import Stamp from "$islands/stamp/details/StampImage.tsx";
-import { BlockInfo, SendRow } from "globals";
+import { BlockInfo } from "globals";
+import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 dayjs.extend(relativeTime);
 
 interface BlockSendsTableProps {
@@ -93,8 +94,8 @@ export default function BlockSendsTable(props: BlockSendsTableProps) {
                 <td class="px-6 py-4 text-sm">{send.quantity}</td>
                 <td class="px-6 py-4 text-sm">
                   {send.satoshirate
-                    ? `${send.satoshirate / 100000000} BTC`
-                    : "0 BTC"}
+                    ? formatSatoshisToBTC(send.satoshirate)
+                    : formatSatoshisToBTC(0)}
                 </td>
                 <td class="px-6 py-4 text-sm">{send.memo}</td>
                 <td class="px-6 py-4 text-sm">

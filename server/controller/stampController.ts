@@ -4,7 +4,7 @@ import { HolderRow, SUBPROTOCOLS } from "globals";
 import { Src20Service } from "$server/services/src20/queryService.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import { paginate } from "$lib/utils/util.ts";
+import { paginate } from "$lib/utils/paginationUtils.ts";
 import {
   PaginatedStampBalanceResponseBody,
   ProcessedHolder,
@@ -20,7 +20,7 @@ import { Dispense, Dispenser } from "$types/index.d.ts";
 import { CollectionController } from "./collectionController.ts";
 import { Src20Controller } from "./src20Controller.ts";
 import { CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
-import { stripTrailingZeros } from "$lib/utils/util.ts";
+import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 
 export class StampController {
   static async getStampDetailsById(id: string, stampType: STAMP_TYPES = "all") {
@@ -114,7 +114,9 @@ export class StampController {
               JSON.stringify(dispenser, null, 2),
             );
             if (dispenser && dispenser.satoshirate !== undefined) {
-              return dispenser.satoshirate / 100000000;
+              return Number(formatSatoshisToBTC(dispenser.satoshirate, { 
+                includeSymbol: false 
+              }));
             } else {
               console.log("Warning: dispenser or satoshirate is undefined");
               return Infinity;
@@ -305,7 +307,9 @@ export class StampController {
             if (openDispensers.length > 0) {
               floorPrice = Math.min(
                 ...openDispensers.map(
-                  dispenser => Number(stripTrailingZeros((dispenser.satoshirate / 100000000).toFixed(8)))
+                  dispenser => Number(formatSatoshisToBTC(dispenser.satoshirate, { 
+                    includeSymbol: false 
+                  }))
                 )
               );
             }
@@ -316,7 +320,9 @@ export class StampController {
             );
 
             if (mostRecentDispenser) {
-              recentSalePrice = Number(stripTrailingZeros((mostRecentDispenser.satoshirate / 100000000).toFixed(8)));
+              recentSalePrice = Number(formatSatoshisToBTC(mostRecentDispenser.satoshirate, { 
+                includeSymbol: false 
+              }));
             }
           }
 
