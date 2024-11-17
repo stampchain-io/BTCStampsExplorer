@@ -9,6 +9,7 @@ import type {
   ScriptType,
   TransactionSizeOptions,
 } from "$types/index.d.ts";
+import { Button } from "$components/Button.tsx";
 
 interface TransactionFeeDetailsProps {
   fee: number;
@@ -143,21 +144,22 @@ export function TransactionFeeDetails({
 
       <div className="flex justify-end gap-6 mt-4">
         {onCancel && (
-          <button
-            className="border-2 border-[#8800CC] text-[#8800CC] w-[108px] h-[48px] rounded-md font-extrabold"
+          <Button
+            variant="cancel"
             onClick={onCancel}
             disabled={isSubmitting}
           >
             CANCEL
-          </button>
+          </Button>
         )}
-        <button
-          className="bg-[#8800CC] text-[#330033] w-[84px] h-[48px] rounded-md font-extrabold disabled:bg-stamp-purple-darker disabled:text-black disabled:cursor-not-allowed"
+        <Button
+          variant="submit"
           onClick={onSubmit}
           disabled={isSubmitting}
+          isSubmitting={isSubmitting}
         >
-          {isSubmitting ? "Processing..." : buttonName}
-        </button>
+          {buttonName}
+        </Button>
       </div>
     </div>
   );
