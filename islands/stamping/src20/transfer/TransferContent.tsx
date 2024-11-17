@@ -4,6 +4,17 @@ import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
+const bodyCenterClassName =
+  "flex flex-col gap-3 mobileMd:gap-6 items-center w-full";
+const titleCenterClassName =
+  "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1 text-center mt-6 w-full";
+const inputFieldContainerClassName =
+  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
+const inputField2colClassName =
+  "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
+const feeSelectorContainerClassName =
+  "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" },
 ) {
@@ -36,18 +47,6 @@ export function TransferContent(
       console.error("Transfer error:", error);
     }
   };
-
-  export default function TransferToken() {
-  const bodyCenterClassName =
-    "flex flex-col gap-3 mobileMd:gap-6 items-center w-full"; 
-  const titleCenterClassName =
-    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1 text-center mt-6 w-full";
-  const inputFieldContainerClassName =
-    "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
-  const inputField2colClassName =
-    "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-  const feeSelectorContainerClassName =
-    "p-3 mobileMd:p-6 dark-gradient z-[10] w-full ";  
 
   return (
     <div className={bodyCenterClassName}>
