@@ -5,20 +5,19 @@ info:
   version: 2.0.0
 externalDocs:
   description: Find out more about Stampchain
-  url: 'http://stampchain.io'
+  url: "http://stampchain.io"
 servers:
-  - url: 'https://stampchain.io'
-    description:  Production server (uses live data)
+  - url: "https://stampchain.io"
+    description: Production server (uses live data)
   - url: "https://bitcoinstamps.xyz"
     description: Production server (uses live data)
-  - url: 'http://localhost:8000'
+  - url: "http://localhost:8000"
 paths:
-
   /api/v2/health:
     get:
       summary: Health check endpoint
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -32,18 +31,18 @@ paths:
     get:
       summary: API documentation
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/APIDocs'
+                $ref: "#/components/schemas/APIDocs"
 
   /api/v2/version:
     get:
       summary: Get API version
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -57,12 +56,12 @@ paths:
     get:
       summary: Test error endpoint
       responses:
-        '400':
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/balance/{address}:
     get:
@@ -75,20 +74,19 @@ paths:
           schema:
             type: string
           description: The address of the wallet
-      responses: 
-        '200':
+      responses:
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedBalanceResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedBalanceResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/block/{block_index}:
     get:
@@ -102,18 +100,18 @@ paths:
             type: string
           description: The block index or block hash
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BlockInfoResponseBody'
-        '500':
+                $ref: "#/components/schemas/BlockInfoResponseBody"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/block/block_count/{number}:
     get:
@@ -127,7 +125,7 @@ paths:
             type: integer
           description: The number of last blocks
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -135,12 +133,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BlockRow"
-        '500':
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/collections:
     get:
@@ -150,30 +148,30 @@ paths:
           name: limit
           schema:
             type: integer
-          description: 'The maximum number of collections to retrieve (default: 50)'
+          description: "The maximum number of collections to retrieve (default: 50)"
         - in: query
           name: page
           schema:
             type: integer
-          description: 'The page number of the results (default: 1)'
+          description: "The page number of the results (default: 1)"
         - in: query
           name: creator
           schema:
             type: string
-          description: 'Filter collections by creator address'
+          description: "Filter collections by creator address"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedCollectionResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedCollectionResponseBody"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/cursed:
     get:
@@ -184,31 +182,31 @@ paths:
           example: 2
           schema:
             type: integer
-          description: 'The maximum number of stamps to retrieve (default: 50)'
+          description: "The maximum number of stamps to retrieve (default: 50)"
         - in: query
           name: page
           schema:
             type: integer
-          description: 'The page number of the results (default: 0)'
+          description: "The page number of the results (default: 0)"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedStampResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedStampResponseBody"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/cursed/{id}:
     get:
       summary: Get stamp by ID {tx_hash, stamp, cpid}
       description: |
-        Cursed stamps simply have a negative stamp number. This is equivalent to /api/v2/stamps/{id} 
+        Cursed stamps simply have a negative stamp number. This is equivalent to /api/v2/stamps/{id}
       parameters:
         - in: path
           name: id
@@ -218,18 +216,18 @@ paths:
             type: string
           description: Stamp number, cpid, or stamp_hash
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampResponseBody'
-        '500':
+                $ref: "#/components/schemas/StampResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/cursed/block/{block_index}:
     get:
@@ -243,18 +241,18 @@ paths:
             type: integer
           description: The block index
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampBlockResponseBody'
-        '500':
+                $ref: "#/components/schemas/StampBlockResponseBody"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20:
     get:
@@ -277,20 +275,18 @@ paths:
             default: 1
           description: The page number of transactions to retrieve
       responses:
-        '200':
+        "200":
           description: Successful response with paginated SRC-20 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/balance/{address}:
     get:
@@ -318,25 +314,24 @@ paths:
             default: 1
           description: The page number of transactions to retrieve
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20BalanceResponseBody'
-        '404':
+                $ref: "#/components/schemas/PaginatedSrc20BalanceResponseBody"
+        "404":
           description: Address Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
+                $ref: "#/components/schemas/ErrorResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/balance/{address}/{tick}:
     get:
@@ -357,28 +352,28 @@ paths:
             type: string
           description: The tick value
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20BalanceResponseBody'
-        '404':
+                $ref: "#/components/schemas/Src20BalanceResponseBody"
+        "404":
           description: Address/Tick Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
+                $ref: "#/components/schemas/ErrorResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/balance/snapshot/{tick}:
     get:
-      summary: | 
+      summary: |
         Get SRC-20 balance snapshot by tick, based upon current block height.
       description: |
         Retrieve a snapshot of all owners for the SRC-20 tick value based upon the current block height.
@@ -406,19 +401,18 @@ paths:
             default: 1
           description: The page number of transactions to retrieve
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20SnapshotResponseBody'
-        '500':
+                $ref: "#/components/schemas/Src20SnapshotResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/block/{block_index}:
     get:
@@ -458,23 +452,21 @@ paths:
           required: false
           schema:
             type: string
-            default: 'ASC'
+            default: "ASC"
           description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/block/{block_index}/{tick}:
     get:
@@ -525,21 +517,21 @@ paths:
           required: false
           schema:
             type: string
-            default: 'ASC'
+            default: "ASC"
           description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
       responses:
-        '200':
+        "200":
           description: Successful response with the list of valid SRC-20 transactions.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
+        "500":
           description: Internal server error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/tick:
     get:
@@ -576,19 +568,18 @@ paths:
             enum: [ASC, DESC]
           description: Sort order [ASC, DESC]
       responses:
-        '200':
+        "200":
           description: Successful response with paginated SRC-20 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc20ResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/tick/{tick}:
     get:
@@ -604,12 +595,12 @@ paths:
             type: string
         - in: query
           name: limit
-          description: 'Number of records per page (default: 50)'
+          description: "Number of records per page (default: 50)"
           schema:
             type: integer
         - in: query
           name: page
-          description: 'Page number (default: 1)'
+          description: "Page number (default: 1)"
           schema:
             type: integer
         - in: query
@@ -627,18 +618,18 @@ paths:
             enum: [ASC, DESC]
           description: Sort order [ASC, DESC]
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedTickResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedTickResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/tick/{tick}/deploy:
     get:
@@ -653,78 +644,78 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Successful response with deployment details.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TickResponseBody'
-        '500':
+                $ref: "#/components/schemas/TickResponseBody"
+        "500":
           description: Internal server error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
-  /api/v2/src101/{deploy_hash}/address/{address_btc}:
-    get:
-      summary: Get tokenid of SRC-101 by address_btc
-      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
-      parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            example: 2
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
-        - in: query
-          name: sort
-          schema:
-            type: string
-            default: DESC
-            enum: [ASC, DESC]
-          description: Sort order [ASC, DESC]
-        - in: query
-          name: prim
-          required: true
-          example: "true"
-          schema:
-            type: string
-        - in: path
-          name: deploy_hash
-          required: true
-          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
-          description: The hash of the deploy transaction.
-          schema:
-            type: string
-        - in: path
-          name: address_btc
-          required: true
-          example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
-          schema:
-            type: string
-        responses:
-        '200':
-          description: Successful response with deployment details.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenidSrc101ResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+  # /api/v2/src101/{deploy_hash}/address/{address_btc}:
+  #   get:
+  #     summary: Get tokenid of SRC-101 by address_btc
+  #     description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+  #     parameters:
+  #       - in: query
+  #         name: limit
+  #         example: 2
+  #         schema:
+  #           type: integer
+  #           minimum: 1
+  #           default: 50
+  #         description: The maximum number of transactions to retrieve per page
+  #       - in: query
+  #         name: page
+  #         schema:
+  #           type: integer
+  #           minimum: 1
+  #           default: 1
+  #         description: The page number of transactions to retrieve
+  #       - in: query
+  #         name: sort
+  #         schema:
+  #           type: string
+  #           default: DESC
+  #           enum: [ASC, DESC]
+  #         description: Sort order [ASC, DESC]
+  #       - in: query
+  #         name: prim
+  #         required: true
+  #         example: "true"
+  #         schema:
+  #           type: string
+  #       - in: path
+  #         name: deploy_hash
+  #         required: true
+  #         example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+  #         description: The hash of the deploy transaction.
+  #         schema:
+  #           type: string
+  #       - in: path
+  #         name: address_btc
+  #         required: true
+  #         example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
+  #         schema:
+  #           type: string
+  #       responses:
+  #       '200':
+  #         description: Successful response with deployment details.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/TokenidSrc101ResponseBody'
+  #       '500':
+  #         description: Internal server error.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/src20/tx/{tx_hash}:
     get:
@@ -738,19 +729,18 @@ paths:
             type: string
           description: The hash of the transaction.
       responses:
-        '200':
+        "200":
           description: Successful response with transaction information.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src20ResponseBody'
-        '500':
+                $ref: "#/components/schemas/Src20ResponseBody"
+        "500":
           description: Internal server error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src101/:
     get:
@@ -773,19 +763,19 @@ paths:
             default: 1
           description: The page number of transactions to retrieve
       responses:
-        '200':
+        "200":
           description: Successful response with paginated SRC-101 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-                
+                $ref: "#/components/schemas/ErrorResponseBody"
+
   /api/v2/src101/tx:
     get:
       summary: Get paginated SRC-101 transactions
@@ -826,18 +816,18 @@ paths:
             type: integer
           description: Valid is 1, inValid is 0
       responses:
-        '200':
+        "200":
           description: Successful response with paginated SRC-101 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src101/tx/{tx_hash}:
     get:
@@ -851,18 +841,18 @@ paths:
             type: string
           description: The hash of the transaction.
       responses:
-        '200':
+        "200":
           description: Successful response with paginated SRC-101 transactions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src101/{deploy_hash}/deploy:
     get:
@@ -877,18 +867,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Successful response with deployment details.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc101ResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "500":
           description: Internal server error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src101/{deploy_hash}/total:
     get:
@@ -903,78 +893,78 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Successful response with deployment details.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TotalSrc101ResponseBody'
-        '500':
+                $ref: "#/components/schemas/TotalSrc101ResponseBody"
+        "500":
           description: Internal server error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
-  /api/v2/src101/{deploy_hash}/address/{address_btc}:
-    get:
-      summary: Get tokenid of SRC-101 by address_btc
-      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
-      parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            example: 2
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
-        - in: query
-          name: sort
-          schema:
-            type: string
-            default: DESC
-            enum: [ASC, DESC]
-          description: Sort order [ASC, DESC]
-        - in: query
-          name: prim
-          required: true
-          example: "true"
-          schema:
-            type: string
-        - in: path
-          name: deploy_hash
-          required: true
-          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
-          description: The hash of the deploy transaction.
-          schema:
-            type: string
-        - in: path
-          name: address_btc
-          required: true
-          example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
-          schema:
-            type: string
-        responses:
-        '200':
-          description: Successful response with deployment details.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenidSrc101ResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+  # /api/v2/src101/{deploy_hash}/address/{address_btc}:
+  #   get:
+  #     summary: Get tokenid of SRC-101 by address_btc
+  #     description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+  #     parameters:
+  #       - in: query
+  #         name: limit
+  #         schema:
+  #           type: integer
+  #           example: 2
+  #           minimum: 1
+  #           default: 50
+  #         description: The maximum number of transactions to retrieve per page
+  #       - in: query
+  #         name: page
+  #         schema:
+  #           type: integer
+  #           minimum: 1
+  #           default: 1
+  #         description: The page number of transactions to retrieve
+  #       - in: query
+  #         name: sort
+  #         schema:
+  #           type: string
+  #           default: DESC
+  #           enum: [ASC, DESC]
+  #         description: Sort order [ASC, DESC]
+  #       - in: query
+  #         name: prim
+  #         required: true
+  #         example: "true"
+  #         schema:
+  #           type: string
+  #       - in: path
+  #         name: deploy_hash
+  #         required: true
+  #         example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+  #         description: The hash of the deploy transaction.
+  #         schema:
+  #           type: string
+  #       - in: path
+  #         name: address_btc
+  #         required: true
+  #         example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
+  #         schema:
+  #           type: string
+  #       responses:
+  #       '200':
+  #         description: Successful response with deployment details.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/TokenidSrc101ResponseBody'
+  #       '500':
+  #         description: Internal server error.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/src101/balance/{address}:
     get:
@@ -1002,24 +992,24 @@ paths:
             default: 1
           description: The page number of transactions to retrieve
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSrc101BalanceResponseBody'
-        '404':
+                $ref: "#/components/schemas/PaginatedSrc101BalanceResponseBody"
+        "404":
           description: Address Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
+                $ref: "#/components/schemas/ErrorResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src101/{deploy_hash}/{tokenid}:
     get:
@@ -1038,26 +1028,26 @@ paths:
           example: "c3VwZXJib3k="
           schema:
             type: string
-          description: 
+          description:
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src101BalanceResponseBody'
-        '404':
+                $ref: "#/components/schemas/Src101BalanceResponseBody"
+        "404":
           description: tokenid/deploy_hash Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
+                $ref: "#/components/schemas/ErrorResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src101/index/{deploy_hash}/{index}:
     get:
@@ -1077,24 +1067,24 @@ paths:
           schema:
             type: number
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Src101BalanceResponseBody'
-        '404':
+                $ref: "#/components/schemas/Src101BalanceResponseBody"
+        "404":
           description: tokenid/deploy_hash Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
+                $ref: "#/components/schemas/ErrorResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/stamps:
     get:
@@ -1114,25 +1104,24 @@ paths:
             type: integer
           description: The page number to retrieve. Defaults to 1.
         - in: query
-          name: sort
+          name: sort_order
           example: desc
           schema:
             type: string
           description: The order of stamps.
       responses:
-        '200':
+        "200":
           description: Successful response with paginated stamps.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedStampResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedStampResponseBody"
+        "500":
           description: Internal server error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/stamps/{id}:
     get:
@@ -1147,19 +1136,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampResponseBody'
-        '500':
+                $ref: "#/components/schemas/StampResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/stamps/balance/{address}:
     get:
@@ -1176,27 +1164,27 @@ paths:
         - in: query
           name: limit
           example: 2
-          description: 'The maximum number of stamp balances to retrieve. default: 50'
+          description: "The maximum number of stamp balances to retrieve. default: 50"
           schema:
             type: integer
         - in: query
           name: page
-          description: 'The page number of stamp balances to retrieve. default: 1'
+          description: "The page number of stamp balances to retrieve. default: 1"
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedStampBalanceResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedStampBalanceResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/stamps/block/{block_index}:
     get:
@@ -1210,20 +1198,18 @@ paths:
             type: string
           description: The index of the block
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StampBlockResponseBody'
-        '404':
+                $ref: "#/components/schemas/StampBlockResponseBody"
+        "404":
           description: Block not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-
-
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/stamps/ident/{ident}:
     get:
@@ -1240,37 +1226,37 @@ paths:
         - in: query
           name: limit
           example: 2
-          description: 'The maximum number of stamps to retrieve (default: 50)'
+          description: "The maximum number of stamps to retrieve (default: 50)"
           schema:
             type: integer
         - in: query
           name: page
-          description: 'The page number of stamps to retrieve (default: 1)'
+          description: "The page number of stamps to retrieve (default: 1)"
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Successful response with the paginated stamps
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedIdResponseBody'
-        '404':
+                $ref: "#/components/schemas/PaginatedIdResponseBody"
+        "404":
           description: Stamps with the provided ident not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
+                $ref: "#/components/schemas/ErrorResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/stamps/dispensers:
     get:
-      summary: Get all open dispensers 
+      summary: Get all open dispensers
       description: Retrieve all open counterparty dispensers
       parameters:
         - in: query
@@ -1289,18 +1275,18 @@ paths:
             default: 1
           description: The page number of transactions to retrieve
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedDispenserResponseBody'
-        '500':
+                $ref: "#/components/schemas/PaginatedDispenserResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/stamps/dispensers/{id}:
     get:
@@ -1315,18 +1301,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DispenserResponseBody'
-        '500':
+                $ref: "#/components/schemas/DispenserResponseBody"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/create:
     post:
@@ -1344,8 +1330,8 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/SRC20InputData'
-                - $ref: '#/components/schemas/SRC20TransferInputData'
+                - $ref: "#/components/schemas/SRC20InputData"
+                - $ref: "#/components/schemas/SRC20TransferInputData"
             examples:
               deploy:
                 value:
@@ -1374,7 +1360,7 @@ paths:
                   feeRate: 150
                   amt: 100000
       responses:
-        '200':
+        "200":
           description: Successful response with the hex value.
           content:
             application/json:
@@ -1390,7 +1376,7 @@ paths:
                   change:
                     type: integer
                     description: The change value
-        '400':
+        "400":
           description: Bad request error response.
           content:
             application/json:
@@ -1414,7 +1400,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MintStampInputData'
+              $ref: "#/components/schemas/MintStampInputData"
             examples:
               mint:
                 value:
@@ -1427,7 +1413,7 @@ paths:
                   service_fee: null
                   service_fee_address: null
       responses:
-        '200':
+        "200":
           description: Successful response with the psbt transaction
           content:
             application/json:
@@ -1458,7 +1444,7 @@ paths:
                   change_value:
                     type: integer
                     description: The change value
-        '400':
+        "400":
           description: Bad request error response.
           content:
             application/json:
@@ -1470,7 +1456,6 @@ paths:
                     description: The error message.
                 required:
                   - error
-  
 
 components:
   schemas:
@@ -1514,7 +1499,7 @@ components:
     SendsRow:
       type: object
       properties:
-        from: 
+        from:
           type: string
     DispenseRow:
       type: object
@@ -1559,7 +1544,7 @@ components:
         dispenses:
           type: array
           items:
-            $ref: '#/components/schemas/DispenseRow'
+            $ref: "#/components/schemas/DispenseRow"
       required:
         - tx_hash
         - block_index
@@ -1622,11 +1607,11 @@ components:
         cpid:
           oneOf:
             - type: string
-            
+
         tick:
           oneOf:
             - type: string
-            
+
         memo:
           type: string
         quantity:
@@ -1707,7 +1692,7 @@ components:
     Src20SnapShotDetail:
       type: object
       properties:
-        tick: 
+        tick:
           type: string
         address:
           type: string
@@ -1819,7 +1804,7 @@ components:
             - type: string
         imgf:
           oneOf:
-            - type: string    
+            - type: string
         deploy_hash:
           oneOf:
             - type: string
@@ -1957,7 +1942,7 @@ components:
     PaginatedStampResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -1969,7 +1954,7 @@ components:
     PaginatedStampBalanceResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -1981,7 +1966,7 @@ components:
     PaginatedSrc20ResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -2010,7 +1995,7 @@ components:
     PaginatedSrc101ResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -2022,7 +2007,7 @@ components:
     PaginatedTickResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -2052,7 +2037,7 @@ components:
     Src20SnapshotResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             snapshot_block:
@@ -2105,7 +2090,7 @@ components:
     PaginatedBalanceResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -2138,7 +2123,7 @@ components:
     PaginatedIdResponseBody:
       type: object
       allOf:
-        - $ref: '#/components/schemas/Pagination'
+        - $ref: "#/components/schemas/Pagination"
         - type: object
           properties:
             last_block:
@@ -2166,7 +2151,7 @@ components:
         dispensers:
           type: array
           items:
-            $ref: '#/components/schemas/DispenserRow'
+            $ref: "#/components/schemas/DispenserRow"
     DispenserResponseBody:
       type: object
       properties:
@@ -2400,7 +2385,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Collection'
+            $ref: "#/components/schemas/Collection"
 
     Collection:
       type: object
@@ -2416,7 +2401,7 @@ components:
         stamps:
           type: array
           items:
-            $ref: '#/components/schemas/StampRow'
+            $ref: "#/components/schemas/StampRow"
     APIDocs:
       type: object
       properties:

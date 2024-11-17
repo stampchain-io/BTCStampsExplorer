@@ -14,9 +14,9 @@ hooks.beforeEachValidation((transaction, done) => {
     const dataInProd = JSON.parse(fs.readFileSync("hooks/response.json"));
 
     const compareResult = compareAPIResp(dataInDev, dataInProd);
-    if (typeof compareResult !== "string")
+    if (typeof compareResult !== "string") {
       fs.writeFileSync("hooks/result.json", JSON.stringify(compareResult));
-    else hooks.log(compareResult);
+    } else hooks.log(compareResult);
   }
 
   if (transaction.name.includes("500")) {
@@ -44,23 +44,23 @@ hooks.beforeEachValidation((transaction, done) => {
   done();
 });
 
+let issues = [];
 const compareByKeys = (devObj, prodObj) => {
   const devKeys = Object.keys(devObj);
-  const prodKeys = Object.keys(prodObj);
-
-  if (devKeys.length !== prodKeys.length) return false;
 
   for (const key of devKeys) {
     if (devObj[key] !== prodObj[key]) {
       if (typeof devObj[key] === "object" && typeof prodObj[key] === "object") {
-        if (!deepCompare(devObj[key], prodObj[key])) return false;
+        if (!compareByKeys(devObj[key], prodObj[key])) {
+          issues.push(key);
+        }
       } else {
-        return false;
+        issues.push(key);
       }
     }
   }
 
-  return true;
+  return;
 };
 
 const compareAPIResp = (dev, prod) => {
@@ -68,14 +68,16 @@ const compareAPIResp = (dev, prod) => {
 
   // Assuming both arrays are of the same length and ordered
   dev.forEach((item, index) => {
-    const isEqual = compareByKeys(item, prod[index]);
-    if (!isEqual) {
+    compareByKeys(item, prod[index]);
+    if (issues.length !== 0) {
       diffs.push({
         index,
+        issues: issues,
         devData: item,
         prodData: prod[index],
       });
     }
+    issues = [];
   });
 
   return diffs.length ? diffs : "Differences not found";

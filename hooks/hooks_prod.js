@@ -14,7 +14,7 @@ hooks.beforeEachValidation((transaction, done) => {
     try {
       if (jsonString) {
         // Check if jsonString is not empty
-        fs.writeFileSync("hooks/response_dev.json", jsonString);
+        fs.writeFileSync("hooks/response.json", jsonString);
 
         hooks.log("File written successfully");
       } else {
