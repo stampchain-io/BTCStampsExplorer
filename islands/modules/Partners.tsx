@@ -6,6 +6,7 @@ interface Partner {
   largeImageHover: string;
   smallImage: string;
   smallImageHover: string;
+  url?: string;
 }
 
 const partners: Partner[] = [
@@ -29,15 +30,17 @@ const partners: Partner[] = [
     largeImageHover: "/img/home/partner/bitname-large-hover.svg",
     smallImage: "/img/home/partner/bitname-small.svg",
     smallImageHover: "/img/home/partner/bitname-small-hover.svg",
+    url: "https://bitname.pro",
   },
 ];
 
 function PartnerCard(
-  { name, largeImage, largeImageHover, smallImage, smallImageHover }: Partner,
+  { name, largeImage, largeImageHover, smallImage, smallImageHover, url }:
+    Partner,
 ) {
   const [isHovered, setIsHovered] = useState(false);
 
-  return (
+  const content = (
     <div className="relative w-full">
       {/* Add invisible copy of image to set correct height */}
       <img
@@ -71,6 +74,14 @@ function PartnerCard(
       />
     </div>
   );
+
+  return url
+    ? (
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        {content}
+      </a>
+    )
+    : content;
 }
 
 export function PartnersModule() {

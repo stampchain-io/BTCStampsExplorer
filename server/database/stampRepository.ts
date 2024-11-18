@@ -13,7 +13,6 @@ import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
-import { getStampSelectQuery, STAMP_URL_VALIDATION } from "./sharedQueries.ts";
 
 export class StampRepository {
   static sanitize(input: string): string {
@@ -315,21 +314,13 @@ export class StampRepository {
     identifier: string,
   ): Promise<string | null> {
     const sanitizedIdentifier = this.sanitize(identifier);
-    
-    const selectQuery = getStampSelectQuery({
-      tableAlias: "st",
-      includeCreator: false,
-      columnSet: 'filename'
-    });
-
-    const query = `
-      ${selectQuery}
+    const data = await dbManager.executeQueryWithCache(
+      `
+      SELECT tx_hash, stamp_hash, stamp_mimetype, cpid, stamp_base64
+      FROM ${STAMP_TABLE}
       WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?)
       AND stamp IS NOT NULL;
-    `;
-
-    const data = await dbManager.executeQueryWithCache(
-      query,
+      `,
       [sanitizedIdentifier, sanitizedIdentifier, sanitizedIdentifier],
       DEFAULT_CACHE_DURATION,
     );
@@ -408,13 +399,39 @@ export class StampRepository {
       suffixFilters,
     );
 
-    // Use the shared query builder with all options
-    const selectQuery = getStampSelectQuery({
-      tableAlias: "st",
-      includeCreator: true,
-      allColumns,
-      includeCollectionId: !!collectionId
-    });
+    // Build base columns for select clause
+    const baseColumns = `
+      st.stamp, 
+      st.block_index, 
+      st.cpid, 
+      st.creator, 
+      cr.creator AS creator_name, 
+      st.divisible, 
+      st.keyburn, 
+      st.locked, 
+      st.stamp_base64, 
+      st.stamp_mimetype, 
+      st.stamp_url, 
+      st.supply, 
+      st.block_time, 
+      st.tx_hash, 
+      st.tx_index, 
+      st.ident, 
+      st.stamp_hash, 
+      st.is_btc_stamp, 
+      st.file_hash
+    `;
+
+    // Initialize select clause
+    let selectClause = allColumns
+      ? "st.*, cr.creator AS creator_name"
+      : baseColumns;
+
+    // Only include collection_id in select clause if collectionId is provided
+    if (collectionId) {
+      selectClause += `,
+      HEX(cs1.collection_id) AS collection_id`;
+    }
 
     const whereClause = whereConditions.length > 0
       ? `WHERE ${whereConditions.join(" AND ")}`
@@ -461,9 +478,12 @@ export class StampRepository {
     let query = ''; // Declare query variable
 
     if (collectionId && groupBy === "collection_id") {
+      // Handle single collection case differently from multiple collections
       if (!Array.isArray(collectionId)) {
+        // Simple query for single collection with standard pagination
         query = `
-          ${selectQuery}
+          SELECT ${selectClause}
+          FROM ${STAMP_TABLE} AS st
           ${joinClause}
           ${whereClause}
           ${orderClause}
@@ -471,38 +491,47 @@ export class StampRepository {
           ${offsetClause}
         `;
       } else {
+        // Complex query for multiple collections with per-collection limits
         const subQuery = `
           WITH ValidStamps AS (
-            ${getStampSelectQuery({
-              tableAlias: "st",
-              includeCreator: true,
-              allColumns: false,
-              includeCollectionId: true,
-              includeRowNumber: true,
-              sortColumn,
-              sortOrder: order,
-              validateStampUrl: true
-            })}
+            SELECT 
+              ${baseColumns},
+              HEX(cs1.collection_id) as collection_id,
+              ROW_NUMBER() OVER (
+                PARTITION BY cs1.collection_id 
+                ORDER BY st.${sortColumn} ${order}
+              ) as rn
+            FROM ${STAMP_TABLE} st
             ${joinClause}
             WHERE cs1.collection_id IN (${collectionId.map(() => "UNHEX(?)").join(",")})
-              AND (${STAMP_URL_VALIDATION})
+              AND (
+                st.stamp_url IS NOT NULL
+                AND st.stamp_url != ''
+                AND st.stamp_url NOT LIKE '%undefined%'
+                AND st.stamp_url NOT LIKE '%null%'
+                AND st.stamp_mimetype IS NOT NULL
+              )
           )
         `;
-        
-        queryParams.push(...collectionId);
-        
+
+        // Main query with pagination
         query = `
           ${subQuery}
-          SELECT * FROM ValidStamps
+          SELECT *
+          FROM ValidStamps ranked_stamps
           WHERE rn <= ${collectionStampLimit}
           ORDER BY ${sortColumn} ${order}
           LIMIT ? OFFSET ?
         `;
+
+        // Add parameters for multiple collections
+        queryParams.push(...collectionId);
       }
     } else {
       // Standard query for non-collection cases
       query = `
-        ${selectQuery}
+        SELECT ${selectClause}
+        FROM ${STAMP_TABLE} AS st
         ${joinClause}
         ${whereClause}
         ${groupByClause}
@@ -568,15 +597,27 @@ export class StampRepository {
         return [];
       }
 
-      const selectQuery = getStampSelectQuery({
-        tableAlias: "st",
-        includeCreator: true,
-        columnSet: 'balance'
-      });
-
       const query = `
-        ${selectQuery}
-        WHERE st.cpid IN ( ${assets.map((asset: string) => `'${asset}'`).join(", ")} )
+        SELECT 
+          st.cpid, 
+          st.stamp, 
+          st.stamp_base64,
+          st.stamp_url, 
+          st.stamp_mimetype, 
+          st.tx_hash, 
+          st.divisible, 
+          st.supply, 
+          st.locked, 
+          st.creator, 
+          cr.creator AS creator_name
+        FROM 
+          ${STAMP_TABLE} st
+        LEFT JOIN 
+          creator cr ON st.creator = cr.address
+        WHERE 
+          st.cpid IN ( ${
+        assets.map((asset: string) => `'${asset}'`).join(", ")
+      } )
         ORDER BY st.stamp ${order}
         LIMIT ${limit}
         OFFSET ${offset};
