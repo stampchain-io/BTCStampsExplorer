@@ -19,7 +19,7 @@ const resourcesStampLinks: FooterLink[] = [
   },
 ];
 
-const stapmChainLinks: FooterLink[] = [
+const stampChainLinks: FooterLink[] = [
   { title: "ABOUT", href: "/about" },
   { title: "DONATE", href: "#" },
   { title: "CONTACT", href: "#" },
@@ -50,22 +50,22 @@ const socialLinks = [
 ];
 
 const titleClassName =
-  "purple-gradient2 text-[40px] leading-[47px] mobileLg:text-[54px] mobileLg:leading-[64px] tablet:text-[42px] tablet:leading-[50px] desktop:text-[56px] desktop:leading-[66px] italic font-black";
+  "purple-gradient2 text-4xl leading-[43.2px] mobileLg:text-5xl mobileLg:leading-[57.6px] tablet:text-5xl tablet:leading-[57.6px] desktop:text-6xl desktop:leading-8xl italic font-black";
 const subTitleClassName =
-  "text-stamp-purple-bright text-[15px] leading-[17.6px] mobileLg:text-lg mobileLg:leading-[21px] tablet:text-base tablet:leading-[18.77px] desktop:text-xl desktop:leading-[24px] font-light mb-2 mobileLg:mb-3 tablet:mb-2";
+  "text-stamp-purple-bright text-sm leading-[16.8px] mobileLg:text-lg mobileLg:leading-[21.6px] desktop:text-xl desktop:leading-6 font-light mb-2 mobileLg:mb-3 tablet:mb-2";
 const navTitleClassName =
   "text-stamp-primary-dark hidden tablet:block text-lg leading-[21.1px] desktop:text-xl desktop:leading-[23.4px] font-black";
 const navContentClassName =
-  "text-stamp-primary-dark text-xs leading-[14px] mobileLg:text-sm mobileLg:leading-[16.4px] desktop:text-base desktop:leading-[18.7px] font-medium hover:text-stamp-purple-bright";
+  "text-stamp-primary-dark text-xs leading-[14.4px] mobileLg:text-sm mobileLg:leading-[16.8px] desktop:text-base desktop:leading-[19.2px] font-medium hover:text-stamp-purple-bright";
 const copyrightClassName =
-  "text-xs leading-[14px] desktop:text-sm desktop:leading-[16.4px] font-medium text-[#440066]";
+  "text-xs leading-[14.4px] desktop:text-sm desktop:leading-[16.8px] font-medium text-[#440066]";
 
 export function Footer() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
     <footer className="
-      px-3 tablet:px-6 desktop:px-12 py-6 tablet:py-[72px]
+      px-3 tablet:px-6 desktop:px-12 py-6 tablet:py-18
       max-w-desktop w-full mx-auto flex flex-col tablet:flex-row justify-between gap-2 mobileLg:gap-3 tablet:gap-4
     ">
       <div className="w-full flex flex-col gap-1 items-center tablet:items-start">
@@ -77,7 +77,7 @@ export function Footer() {
           IMMORTALISED ART - STORED ON BITCOIN
         </p>
         <div className="flex flex-row tablet:hidden justify-center w-full gap-[18px] mobileLg:gap-6 leading-4 text-right mb-1 mobileLg:mb-2">
-          {stapmChainLinks.map((link, index) => (
+          {stampChainLinks.map((link, index) => (
             <a
               key={index}
               href={link.href}
@@ -142,7 +142,7 @@ export function Footer() {
 
         <div className="hidden tablet:flex flex-col justify-center w-full gap-1 text-right">
           <p className={navTitleClassName}>STAMPCHAIN</p>
-          {stapmChainLinks.map((link, index) => (
+          {stampChainLinks.map((link, index) => (
             <a
               key={index}
               href={link.href}
