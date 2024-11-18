@@ -1,4 +1,15 @@
 {
+  "name": "btcstampsexplorer",
+  "description": "This is the API for https://stampchain.io/ and the open source block explorer for Bitcoin Stamps.",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "validate:all": "npm run validate:schema && npm run validate:spectral",
+    "validate:schema": "npx swagger-cli validate ./schema.yml",
+    "validate:spectral": "npx spectral lint ./schema.yml",
+    "validate:ci": "npm run validate:schema",
+    "dredd": "dredd"
+  },
   "dependencies": {
     "bitcoinjs-lib": "6.1.6",
     "buffer": "6.0.3",
@@ -7,6 +18,19 @@
     "tiny-secp256k1": "2.2.3"
   },
   "devDependencies": {
+    "@apidevtools/swagger-cli": "^4.0.4",
+    "@stoplight/spectral-cli": "^6.11.0",
+    "dredd": "^14.1.0",
+    "hooks": "^0.3.2",
+    "js-yaml": "^4.1.0",
     "tailwindcss": "^3.4.14"
-  }
+  },
+  "main": "swagger.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
