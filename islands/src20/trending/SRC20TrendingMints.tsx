@@ -2,7 +2,8 @@ import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
-import { SRC20Card } from "$islands/src20/SRC20Card.tsx";
+import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
+import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 
 type SRC20TrendingMintsProps = {
   data: SRC20Row[];
@@ -56,11 +57,21 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
       />
       <div class="flex flex-col gap-6 p-2 mb-6">
         {data.map((src20) => (
-          <SRC20Card
-            src20={src20}
-            variant="trending"
-            onImageClick={handleImageClick}
-          />
+          src20.progress !== "100"
+            ? (
+              <SRC20TokenMintingCard
+                src20={src20}
+                variant="trending"
+                onImageClick={handleImageClick}
+              />
+            )
+            : (
+              <SRC20TokenOutmintedCard
+                src20={src20}
+                variant="trending"
+                onImageClick={handleImageClick}
+              />
+            )
         ))}
       </div>
       <div className="flex justify-end">

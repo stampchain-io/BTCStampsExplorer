@@ -1,7 +1,8 @@
 import { ViewAllButton } from "$components/ViewAllButton.tsx";
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
-import { SRC20Card } from "$islands/src20/SRC20Card.tsx";
+import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
+import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
@@ -49,11 +50,21 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
 
       <div class="flex flex-col gap-6">
         {data.map((src20) => (
-          <SRC20Card
-            src20={src20}
-            variant="deploy"
-            onImageClick={handleImageClick}
-          />
+          src20.progress !== "100"
+            ? (
+              <SRC20TokenMintingCard
+                src20={src20}
+                variant="deploy"
+                onImageClick={handleImageClick}
+              />
+            )
+            : (
+              <SRC20TokenOutmintedCard
+                src20={src20}
+                variant="deploy"
+                onImageClick={handleImageClick}
+              />
+            )
         ))}
       </div>
 

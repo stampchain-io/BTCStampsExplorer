@@ -1,4 +1,5 @@
-import { SRC20Card } from "$islands/src20/SRC20Card.tsx";
+import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
+import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 
 const PopularMinting = ({ transactions }) => {
   if (!transactions || transactions.length === 0) {
@@ -13,12 +14,23 @@ const PopularMinting = ({ transactions }) => {
       <p className="text-2xl tablet:text-5xl text-[#AA00FF]">POPULAR TOKENS</p>
       <div class="w-full flex flex-col gap-4">
         {transactions.map((src20) => (
-          <SRC20Card
-            key={src20.tick}
-            src20={src20}
-            variant="minting"
-            onImageClick={() => {}}
-          />
+          src20.progress !== "100"
+            ? (
+              <SRC20TokenMintingCard
+                key={src20.tick}
+                src20={src20}
+                variant="minting"
+                onImageClick={() => {}}
+              />
+            )
+            : (
+              <SRC20TokenOutmintedCard
+                key={src20.tick}
+                src20={src20}
+                variant="minting"
+                onImageClick={() => {}}
+              />
+            )
         ))}
       </div>
     </div>
