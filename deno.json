@@ -4,8 +4,9 @@
   "tasks": {
     "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
     "start": "deno task check_version && deno run -A main.ts",
-    "dev": "export ENV=development && deno run -A --watch=static/,routes/,components/,islands/ dev.ts --host",
+    "dev": "export DENO_ENV=development && deno run -A --watch=static/,routes/,components/,islands/ dev.ts --host",
     "build": "deno run -A main.ts build",
+    "dev:build": "export DENO_ENV=development && deno run -A dev.ts build",
     "docs": "deno run --allow-read --allow-write swagger.js",
     "fakebuild": "echo 'fake build'",
     "preview": "deno run -A main.ts",

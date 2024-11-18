@@ -22,7 +22,7 @@ interface DatabaseConfig {
   DB_NAME: string;
   DB_MAX_RETRIES: number;
   ELASTICACHE_ENDPOINT: string;
-  ENV: string;
+  DENO_ENV: string;
   CACHE?: string;
 }
 
@@ -126,7 +126,7 @@ class DatabaseManager {
     cacheDuration: number | "never",
   ): Promise<T> {
     if (
-      this.config.ENV === "development" ||
+      this.config.DENO_ENV === "development" ||
       this.config.CACHE?.toLowerCase() === "false"
     ) {
       return await this.executeQuery<T>(query, params);
@@ -359,7 +359,7 @@ const dbConfig: DatabaseConfig = {
   DB_NAME: Deno.env.get("DB_NAME") || "",
   DB_MAX_RETRIES: Number(Deno.env.get("DB_MAX_RETRIES")) || 5,
   ELASTICACHE_ENDPOINT: Deno.env.get("ELASTICACHE_ENDPOINT") || "",
-  ENV: Deno.env.get("ENV") || "development",
+  DENO_ENV: Deno.env.get("DENO_ENV") || "development",
   CACHE: Deno.env.get("CACHE") || "true",
 };
 
