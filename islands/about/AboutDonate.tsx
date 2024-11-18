@@ -82,6 +82,10 @@ export default function AboutDonate() {
   const handleOpen = () => {
     setIsOpen(!isOpen);
   };
+
+  const handleCloseModal = () => {
+    setIsOpen(false);
+  };
   return (
     <>
       <section className="mobileLg:mt-36 mt-24">
@@ -194,7 +198,7 @@ export default function AboutDonate() {
             handleFileChange={handleFileChange}
             handleFileUpload={handleFileUpload}
             handleChangeFee={handleChangeFee}
-            handleCloseModal={() => setIsOpen(false)}
+            handleCloseModal={handleCloseModal}
             handleDonate={handleDonate}
             handleOpen={() => setIsOpen(true)}
           />

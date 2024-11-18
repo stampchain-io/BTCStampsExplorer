@@ -119,7 +119,7 @@ export default function DonateModal(
           BTCPrice={0.005487}
           isSubmitting={false}
           onSubmit={handleDonate}
-          onCancel={handleOpen}
+          onCancel={handleCloseModal}
           buttonName="DONATE"
           className="pt-4"
           userAddress={"bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203"}
