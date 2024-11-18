@@ -11,15 +11,19 @@
         "run",
         "-A",
         "--inspect-wait",
-        "--watch=static/,routes/,components/,islands/",
-        "./main.ts"
+        "--watch=static/,routes/,components/,islands/,server/",
+        "./dev.ts"
       ],
       "outputCapture": "std",
       "attachSimplePort": 9229,
+      "restart": false,
+      "autoAttachChildProcesses": true,
+      "preLaunchTask": "pre-launch-tasks",
+      "postDebugTask": "restart-debug",
       "env": {
-        "PATH": "${env:HOME}/.deno/bin:${env:PATH}"
-      },
-      "preLaunchTask": "deno-build"
+        "PATH": "${env:HOME}/.deno/bin:${env:PATH}",
+        "DENO_ENV": "development"
+      }
     }
   ]
 }

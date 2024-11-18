@@ -4,11 +4,49 @@
     {
       "label": "deno-build",
       "type": "shell",
-      "command": "deno",
-      "args": ["task", "build"],
+      "command": "echo 'Starting development build...' && deno task dev:build",
       "group": {
         "kind": "build",
         "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "close": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "pre-launch-tasks",
+      "dependsOrder": "sequence",
+      "dependsOn": ["deno-build"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "close": false,
+        "focus": true
+      }
+    },
+    {
+      "label": "restart-debug",
+      "type": "shell",
+      "command": "echo 'Restarting debug session...' && pkill -f 'deno.*--inspect' || true && echo 'Starting new debug session...' && deno run -A --inspect-wait --watch=static/,routes/,components/,islands/,server/ ./dev.ts",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "close": true,
+        "focus": true
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^.*$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Watcher Process started",
+          "endsPattern": "Debugger session started"
+        }
       }
     }
   ]
