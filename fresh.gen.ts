@@ -154,10 +154,12 @@ import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
-import * as $src20_SRC20Card from "./islands/src20/SRC20Card.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
 import * as $src20_all_SRC20DeployTable from "./islands/src20/all/SRC20DeployTable.tsx";
+import * as $src20_cards_SRC20BaseCard from "./islands/src20/cards/SRC20BaseCard.tsx";
+import * as $src20_cards_SRC20TokenMintingCard from "./islands/src20/cards/SRC20TokenMintingCard.tsx";
+import * as $src20_cards_SRC20TokenOutmintedCard from "./islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import * as $src20_details_SRC20DetailsTab from "./islands/src20/details/SRC20DetailsTab.tsx";
 import * as $src20_details_SRC20TX from "./islands/src20/details/SRC20TX.tsx";
 import * as $src20_details_SRC20TickHeader from "./islands/src20/details/SRC20TickHeader.tsx";
@@ -381,10 +383,14 @@ const manifest = {
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
-    "./islands/src20/SRC20Card.tsx": $src20_SRC20Card,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
     "./islands/src20/all/SRC20DeployTable.tsx": $src20_all_SRC20DeployTable,
+    "./islands/src20/cards/SRC20BaseCard.tsx": $src20_cards_SRC20BaseCard,
+    "./islands/src20/cards/SRC20TokenMintingCard.tsx":
+      $src20_cards_SRC20TokenMintingCard,
+    "./islands/src20/cards/SRC20TokenOutmintedCard.tsx":
+      $src20_cards_SRC20TokenOutmintedCard,
     "./islands/src20/details/SRC20DetailsTab.tsx":
       $src20_details_SRC20DetailsTab,
     "./islands/src20/details/SRC20TX.tsx": $src20_details_SRC20TX,
