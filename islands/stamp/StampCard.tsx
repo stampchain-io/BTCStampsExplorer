@@ -174,49 +174,79 @@ export function StampCard({
       return <TextContentIsland src={src} />;
     } else if (stamp.stamp_mimetype === "text/html") {
       return (
-        <iframe
-          scrolling="no"
-          loading="lazy"
-          sandbox="allow-scripts allow-same-origin"
-          src={src}
-          className="h-full w-fit max-w-full object-contain items-center pointer-events-none"
-          onError={handleImageError}
-          onLoad={(e) => {
-            try {
-              const iframe = e.currentTarget;
-              const iframeDoc = iframe.contentDocument;
-              if (iframeDoc) {
-                // Ensure all scripts are loaded in order
-                const scripts = Array.from(
-                  iframeDoc.getElementsByTagName("script"),
-                );
-                scripts.forEach((script) => {
-                  script.setAttribute("defer", "");
-                });
+        <div className="relative w-full h-full">
+          <iframe
+            scrolling="no"
+            loading="lazy"
+            sandbox="allow-scripts allow-same-origin"
+            src={src}
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+            onError={(e) => {
+              const parent = e.currentTarget.parentElement;
+              if (parent) {
+                parent.innerHTML = `
+                  <img
+                    src="/not-available.png"
+                    alt="Content not available"
+                    class="absolute inset-0 w-full h-full object-contain pixelart"
+                  />
+                `;
               }
-            } catch (error) {
-              console.error("Error setting up iframe:", error);
-            }
-          }}
-        />
+            }}
+            onLoad={(e) => {
+              try {
+                const iframe = e.currentTarget;
+                const iframeDoc = iframe.contentDocument;
+                if (iframeDoc) {
+                  const scripts = Array.from(
+                    iframeDoc.getElementsByTagName("script"),
+                  );
+                  scripts.forEach((script) => script.setAttribute("defer", ""));
+                }
+              } catch (_error) {
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  parent.innerHTML = `
+                    <img
+                      src="/not-available.png"
+                      alt="Content not available"
+                      class="absolute inset-0 w-full h-full object-contain pixelart"
+                    />
+                  `;
+                }
+              }
+            }}
+          />
+        </div>
       );
     } else if (stamp.stamp_mimetype === "image/svg+xml") {
-      return validatedContent || (
-        <img
-          src="/not-available.png"
-          alt="Loading..."
-          className="h-full w-full object-contain pixelart"
-        />
+      return (
+        <div className="relative w-full h-full">
+          {validatedContent || (
+            <img
+              src="/not-available.png"
+              alt="Loading..."
+              className="absolute inset-0 w-full h-full object-contain pixelart"
+            />
+          )}
+        </div>
       );
     } else {
+      // Regular images (jpg, png, etc.)
       return (
-        <img
-          src={src}
-          loading="lazy"
-          onError={handleImageError}
-          alt={`Stamp No. ${stamp.stamp}`}
-          className="h-full w-full object-contain pixelart"
-        />
+        <div className="relative w-full h-full">
+          <img
+            src={src}
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = "/not-available.png";
+              e.currentTarget.className =
+                "absolute inset-0 w-full h-full object-contain pixelart";
+            }}
+            alt={`Stamp No. ${stamp.stamp}`}
+            className="absolute inset-0 w-full h-full object-contain pixelart"
+          />
+        </div>
       );
     }
   };
@@ -292,12 +322,9 @@ export function StampCard({
           bg-stamp-card-bg
         `}
       >
-        {/* Image Container - Made more flexible */}
         <div className="relative w-full h-full">
-          <div className="aspect-stamp w-full h-full overflow-hidden image-rendering-pixelated">
-            <div className="center relative w-full h-full">
-              {renderContent()}
-            </div>
+          <div className="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
+            {renderContent()}
           </div>
         </div>
 
