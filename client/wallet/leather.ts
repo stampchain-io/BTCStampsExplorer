@@ -2,6 +2,7 @@ import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { getBtcBalance } from "$client/utils/btc.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -29,6 +30,9 @@ export const connectLeather = async (addToast: AddToastFunction) => {
   try {
     const isInstalled = checkLeather();
     if (!isInstalled) {
+      logger.warn("ui", {
+        message: "Leather wallet not detected",
+      });
       addToast(
         "Leather wallet not detected. Please install the Leather extension.",
         "error",
@@ -36,12 +40,16 @@ export const connectLeather = async (addToast: AddToastFunction) => {
       return;
     }
 
+    logger.debug("ui", {
+      message: "Connecting to Leather wallet",
+    });
+
     const leatherProvider = (globalThis as any).LeatherProvider;
     const response = await leatherProvider.request("getAddresses");
 
     let addresses;
     if (
-      response && response.result && Array.isArray(response.result.addresses)
+      response?.result?.addresses && Array.isArray(response.result.addresses)
     ) {
       addresses = response.result.addresses;
     } else {
@@ -53,10 +61,22 @@ export const connectLeather = async (addToast: AddToastFunction) => {
     }
 
     await handleConnect(addresses);
+    logger.info("ui", {
+      message: "Successfully connected to Leather wallet",
+    });
     addToast("Successfully connected to Leather wallet", "success");
   } catch (error) {
-    console.error("Error in connectLeather:", error);
-    addToast(`Failed to connect to Leather wallet: ${error.message}`, "error");
+    logger.error("ui", {
+      message: "Error connecting to Leather wallet",
+      error: error instanceof Error ? error.message : String(error),
+      details: error,
+    });
+    addToast(
+      `Failed to connect to Leather wallet: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
+      "error",
+    );
   }
 };
 
@@ -129,13 +149,17 @@ export const signPSBT = async (
   sighashTypes?: number[],
   autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
-  console.log("Entering Leather signPSBT function");
-  console.log("PSBT hex length:", psbtHex.length);
-  console.log("Number of inputs to sign:", inputsToSign.length);
+  logger.debug("ui", {
+    message: "Entering Leather signPSBT function",
+    psbtHexLength: psbtHex.length,
+    inputsCount: inputsToSign.length,
+  });
 
   const leatherProvider = (globalThis as any).LeatherProvider;
   if (typeof leatherProvider === "undefined") {
-    console.error("Leather wallet not connected");
+    logger.error("ui", {
+      message: "Leather wallet not connected",
+    });
     return { signed: false, error: "Leather wallet not connected" };
   }
 
@@ -146,22 +170,25 @@ export const signPSBT = async (
       broadcast: autoBroadcast,
       inputsToSign: inputsToSign || undefined,
       rbf: enableRBF,
-      sighashTypes: sighashTypes || undefined, // Pass sighashTypes if provided
+      sighashTypes: sighashTypes || undefined,
     };
 
-    console.log("Calling Leather provider signPsbt method");
-    console.log("Input parameters:", requestParams);
+    logger.debug("ui", {
+      message: "Calling Leather provider signPsbt method",
+      requestParams,
+    });
 
     const result = await leatherProvider.request("signPsbt", requestParams);
 
-    console.log("Leather signPsbt result:", JSON.stringify(result, null, 2));
+    logger.debug("ui", {
+      message: "Leather signPsbt result received",
+      result: JSON.stringify(result, null, 2),
+    });
 
-    if (result && result.result) {
+    if (result?.result) {
       if (result.result.hex) {
-        // For PSBTs that are not fully signed
         return { signed: true, psbt: result.result.hex };
       } else if (result.result.txid) {
-        // For fully signed and broadcasted transactions
         return { signed: true, txid: result.result.txid };
       }
     }
@@ -171,12 +198,19 @@ export const signPSBT = async (
       error: "Unexpected result format from Leather wallet",
     };
   } catch (error) {
-    console.error("Error signing PSBT with Leather:", error);
-    console.log("Error details:", JSON.stringify(error, null, 2));
-    if (error.message && error.message.includes("User rejected")) {
+    logger.error("ui", {
+      message: "Error signing PSBT with Leather",
+      error: error instanceof Error ? error.message : String(error),
+      details: error,
+    });
+
+    if (error instanceof Error && error.message.includes("User rejected")) {
       return { signed: false, cancelled: true };
     }
-    return { signed: false, error: error.message || "Unknown error occurred" };
+    return {
+      signed: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
 };
 

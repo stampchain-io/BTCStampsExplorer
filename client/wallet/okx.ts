@@ -1,6 +1,7 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export const isOKXInstalled = signal<boolean>(false);
 
@@ -10,6 +11,10 @@ export const connectOKX = async (
   try {
     const okx = (globalThis as any).okxwallet;
     if (!okx) {
+      logger.error("ui", {
+        message: "OKX wallet not detected",
+        context: "connectOKX",
+      });
       addToast(
         "OKX wallet not detected. Please install the OKX extension.",
         "error",
@@ -18,9 +23,23 @@ export const connectOKX = async (
     }
     await okx.bitcoin.requestAccounts();
     await handleAccountsChanged();
+    logger.info("ui", {
+      message: "Successfully connected to OKX wallet",
+      context: "connectOKX",
+    });
     addToast("Successfully connected to OKX wallet", "success");
-  } catch (error) {
-    addToast(`Failed to connect to OKX wallet: ${error.message}`, "error");
+  } catch (error: unknown) {
+    logger.error("ui", {
+      message: "Failed to connect to OKX wallet",
+      context: "connectOKX",
+      error: error instanceof Error ? error.message : String(error),
+    });
+    addToast(
+      `Failed to connect to OKX wallet: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
+      "error",
+    );
   }
 };
 
@@ -38,25 +57,39 @@ export const checkOKX = () => {
 const handleAccountsChanged = async () => {
   const okx = (globalThis as any).okxwallet;
   if (!okx || !okx.bitcoin) {
-    console.error("OKX wallet not connected");
+    logger.error("ui", {
+      message: "OKX wallet not connected",
+      context: "handleAccountsChanged",
+    });
     return;
   }
 
   try {
     const accounts: string[] = await okx.bitcoin.getAccounts();
     if (!accounts || accounts.length === 0) {
-      console.error("No accounts found in OKX wallet");
+      logger.error("ui", {
+        message: "No accounts found in OKX wallet",
+        context: "handleAccountsChanged",
+      });
       walletContext.disconnect();
       return;
     }
 
     const address = accounts[0];
     const balanceInfo = await okx.bitcoin.getBalance();
+    const publicKey = await okx.bitcoin.getPublicKey();
+
+    logger.debug("ui", {
+      message: "Fetched OKX wallet information",
+      context: "handleAccountsChanged",
+      address,
+      balanceInfo,
+    });
 
     const _wallet: Wallet = {
       address,
       accounts,
-      publicKey: await okx.bitcoin.getPublicKey(),
+      publicKey,
       btcBalance: {
         confirmed: balanceInfo.confirmed,
         unconfirmed: balanceInfo.unconfirmed,
@@ -64,14 +97,25 @@ const handleAccountsChanged = async () => {
       },
       network: "mainnet",
       provider: "okx",
+      stampBalance: [],
     };
 
     const basicInfo = await walletContext.getBasicStampInfo(address);
     _wallet.stampBalance = basicInfo.stampBalance;
 
+    logger.info("ui", {
+      message: "Updated wallet information",
+      context: "handleAccountsChanged",
+      wallet: _wallet,
+    });
+
     walletContext.updateWallet(_wallet);
-  } catch (error) {
-    console.error("Error fetching account from OKX wallet:", error);
+  } catch (error: unknown) {
+    logger.error("ui", {
+      message: "Error fetching account from OKX wallet",
+      context: "handleAccountsChanged",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };
 
@@ -100,43 +144,61 @@ const signPSBT = async (
 ): Promise<SignPSBTResult> => {
   const okx = (globalThis as any).okxwallet;
   try {
+    logger.debug("ui", {
+      message: "Signing PSBT with OKX",
+      context: "signPSBT",
+      psbtHex,
+      inputsToSign,
+    });
+
     const options: any = {
-      autoFinalized: true, // Default is true
+      autoFinalized: true,
     };
 
     if (inputsToSign && inputsToSign.length > 0) {
       options.toSignInputs = inputsToSign.map((input, idx) => ({
         index: input.index,
-        // Assign sighashTypes per input if available
         sighashTypes: sighashTypes ? [sighashTypes[idx]] : undefined,
       }));
     }
 
     const signedPsbtHex = await okx.bitcoin.signPsbt(psbtHex, options);
 
-    console.log("OKX signPsbt result:", signedPsbtHex);
+    logger.debug("ui", {
+      message: "OKX signPsbt result",
+      context: "signPSBT",
+      signedPsbtHex,
+    });
 
     if (signedPsbtHex && typeof signedPsbtHex === "string") {
       if (autoBroadcast) {
-        // Broadcast the signed PSBT
         const txid = await okx.bitcoin.pushPsbt(signedPsbtHex);
+        logger.info("ui", {
+          message: "Successfully broadcast transaction",
+          context: "signPSBT",
+          txid,
+        });
         return { signed: true, txid };
       } else {
-        // Return the signed PSBT
         return { signed: true, psbt: signedPsbtHex };
       }
     } else {
-      return {
-        signed: false,
-        error: "Unexpected result format from OKX wallet",
-      };
+      throw new Error("Unexpected result format from OKX wallet");
     }
-  } catch (error) {
-    console.error("Error signing PSBT with OKX:", error);
-    if (error.message && error.message.includes("User rejected")) {
+  } catch (error: unknown) {
+    logger.error("ui", {
+      message: "Error signing PSBT with OKX",
+      context: "signPSBT",
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    if (error instanceof Error && error.message.includes("User rejected")) {
       return { signed: false, cancelled: true };
     }
-    return { signed: false, error: error.message };
+    return {
+      signed: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 };
 

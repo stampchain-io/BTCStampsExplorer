@@ -9,13 +9,19 @@ import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
 import { Config } from "globals";
+import { logger } from "$lib/utils/logger.ts";
 
 export function useSRC20Form(
   action: string,
   trxType: "olga" | "multisig" = "multisig",
   initialToken?: string,
 ) {
-  console.log("useSRC20Form initialized with:", { action, trxType });
+  logger.debug("ui", {
+    message: "useSRC20Form initialized",
+    action,
+    trxType,
+    initialToken,
+  });
 
   const { config, isLoading: configLoading } = useConfig<Config>();
   const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000); // 5 minutes
@@ -250,11 +256,17 @@ export function useSRC20Form(
   };
 
   const handleSubmit = async (additionalData = {}) => {
-    console.log("handleSubmit called with trxType:", trxType);
-    console.log("Entering handleSubmit in useSRC20Form");
+    logger.debug("ui", {
+      message: "handleSubmit called",
+      trxType,
+      action,
+      additionalData,
+    });
 
     if (!walletContext.isConnected) {
-      console.log("Wallet not connected. Showing connect modal.");
+      logger.info("ui", {
+        message: "Wallet not connected, showing connect modal",
+      });
       showConnectWalletModal.value = true;
       return;
     }
@@ -263,6 +275,9 @@ export function useSRC20Form(
     setApiError("");
 
     if (!validateForm()) {
+      logger.warn("ui", {
+        message: "Form validation failed",
+      });
       return;
     }
 
@@ -276,7 +291,11 @@ export function useSRC20Form(
 
       let endpoint, requestData;
 
-      console.log("Preparing request data for action:", action);
+      logger.debug("ui", {
+        message: "Preparing request data",
+        action,
+        trxType,
+      });
 
       if (trxType === "olga") {
         endpoint = "/api/v2/src20/v2create";
@@ -327,50 +346,53 @@ export function useSRC20Form(
         };
       }
 
-      console.log("Sending request to:", endpoint);
-      console.log("Request data:", JSON.stringify(requestData, null, 2));
+      logger.debug("ui", {
+        message: "Sending request",
+        endpoint,
+        requestData: JSON.stringify(requestData, null, 2),
+      });
+
       const response = await axiod.post(endpoint, requestData);
-      console.log("Full API response:", JSON.stringify(response.data, null, 2));
+
+      logger.debug("ui", {
+        message: "API response received",
+        responseData: JSON.stringify(response.data, null, 2),
+      });
 
       if (!response.data || !response.data.hex) {
-        console.log("Invalid response from server: missing transaction data");
         throw new Error(
           "Invalid response from server: missing transaction data",
         );
       }
 
-      console.log("Preparing to sign PSBT");
-      console.log("PSBT hex length:", response.data.hex.length);
-      console.log(
-        "Number of inputs to sign:",
-        response.data.inputsToSign?.length,
-      );
+      logger.debug("ui", {
+        message: "Preparing to sign PSBT",
+        hexLength: response.data.hex.length,
+        inputsToSignCount: response.data.inputsToSign?.length,
+      });
 
-      // Handle wallet interaction
-      console.log("Calling walletContext.signPSBT");
       const walletResult = await walletContext.signPSBT(
         wallet,
         response.data.hex,
         response.data.inputsToSign || [],
-        true, // Enable RBF
+        true,
       );
 
-      console.log("Wallet signing result:", walletResult);
+      logger.debug("ui", {
+        message: "Wallet signing completed",
+        result: walletResult,
+      });
 
       if (walletResult.signed) {
-        console.log("Transaction signed successfully");
-        // Include txid in the submissionMessage
         setSubmissionMessage({
           message: "Transaction broadcasted successfully.",
           txid: walletResult.txid,
         });
       } else if (walletResult.cancelled) {
-        console.log("Transaction signing cancelled by user");
         setSubmissionMessage({
           message: "Transaction signing cancelled by user.",
         });
       } else {
-        console.log("Transaction signing failed:", walletResult.error);
         setSubmissionMessage({
           message: `Transaction signing failed: ${walletResult.error}`,
         });
@@ -378,11 +400,17 @@ export function useSRC20Form(
 
       return response.data;
     } catch (error) {
-      console.error(`${action} error:`, error);
-      if (error.response && error.response.data && error.response.data.error) {
-        setApiError(error.response.data.error);
-      } else if (error.message) {
-        setApiError(error.message);
+      logger.error("ui", {
+        message: `${action} error occurred`,
+        error: error instanceof Error ? error.message : String(error),
+        details: error,
+      });
+
+      if (error instanceof Error) {
+        const apiError = (error as any).response?.data?.error;
+        setApiError(
+          apiError || error.message || "An unexpected error occurred",
+        );
       } else {
         setApiError("An unexpected error occurred");
       }

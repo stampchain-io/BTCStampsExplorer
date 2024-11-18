@@ -9,6 +9,7 @@ import axiod from "axiod";
 import { decodeBase64 } from "@std/encoding/base64";
 import { encodeHex } from "@std/encoding/hex";
 import { Config } from "globals";
+import { logger } from "$lib/utils/logger.ts";
 
 export function useFairmintForm(fairminters: any[]) {
   const { config, isLoading: configLoading } = useConfig<Config>();
@@ -74,11 +75,20 @@ export function useFairmintForm(fairminters: any[]) {
     }
 
     if (!config) {
+      logger.error("ui", {
+        message: "Configuration not loaded",
+        context: "useFairmintForm",
+      });
       setApiError("Configuration not loaded");
       return;
     }
 
     if (!formState.asset || !formState.quantity || formState.fee <= 0) {
+      logger.warn("ui", {
+        message: "Invalid form state",
+        context: "useFairmintForm",
+        formState,
+      });
       setApiError("Please fill in all required fields.");
       return;
     }
@@ -88,34 +98,50 @@ export function useFairmintForm(fairminters: any[]) {
     setApiError("");
 
     try {
+      logger.debug("ui", {
+        message: "Submitting fairmint request",
+        context: "useFairmintForm",
+        payload: {
+          address,
+          asset: formState.asset,
+          quantity: formState.quantity,
+          fee_per_kb: formState.fee * 1000,
+        },
+      });
+
       const response = await axiod.post("/api/v2/fairmint/compose", {
         address,
         asset: formState.asset,
         quantity: formState.quantity,
         options: {
-          fee_per_kb: formState.fee * 1000, // sat/byte to sat/kB
+          fee_per_kb: formState.fee * 1000,
         },
         service_fee: config?.MINTING_SERVICE_FEE,
         service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
       });
 
-      console.log("API response:", response.data);
+      logger.debug("ui", {
+        message: "Received API response",
+        context: "useFairmintForm",
+        response: response.data,
+      });
 
-      // Extract psbt from the response
       const psbtBase64 = response.data?.result?.psbt;
 
       if (!psbtBase64 || typeof psbtBase64 !== "string") {
         throw new Error("Invalid response from server: PSBT not found.");
       }
 
-      console.log("psbtBase64:", psbtBase64);
-
       // Convert the PSBT from Base64 to Hex
       const psbtUint8Array = decodeBase64(psbtBase64);
       const psbtHexArray = encodeHex(psbtUint8Array);
-      const psbtHex = new TextDecoder().decode(psbtHexArray);
+      const psbtHex = new TextDecoder().decode(new Uint8Array(psbtHexArray));
 
-      console.log("psbtHex:", psbtHex);
+      logger.debug("ui", {
+        message: "Processing PSBT",
+        context: "useFairmintForm",
+        psbtHex,
+      });
 
       const { signed, txid, error } = await walletContext.signPSBT(
         wallet,
@@ -125,13 +151,31 @@ export function useFairmintForm(fairminters: any[]) {
       );
 
       if (signed) {
+        logger.info("ui", {
+          message: "Transaction successfully broadcasted",
+          context: "useFairmintForm",
+          txid,
+        });
         setSubmissionMessage({ message: "Transaction broadcasted.", txid });
       } else {
+        logger.error("ui", {
+          message: "Transaction signing failed",
+          context: "useFairmintForm",
+          error,
+        });
         setSubmissionMessage({ message: `Transaction failed: ${error}` });
       }
-    } catch (error) {
-      console.error("Error during submission:", error);
-      setApiError(error.message || "An unexpected error occurred.");
+    } catch (error: unknown) {
+      logger.error("ui", {
+        message: "Error during submission",
+        context: "useFairmintForm",
+        error: error instanceof Error ? error.message : String(error),
+      });
+      setApiError(
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred.",
+      );
     } finally {
       setIsSubmitting(false);
     }
