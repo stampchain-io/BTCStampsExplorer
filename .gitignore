@@ -10,3 +10,6 @@ _fresh/
 node_modules/
 
 db.log
+reports/
+openapitools.json
+package-lock.json

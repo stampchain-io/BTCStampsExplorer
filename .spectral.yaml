@@ -1,0 +1,64 @@
+extends: ["spectral:oas"]
+rules:
+  oas3-unused-component: off
+  operation-success-response:
+    description: Operation must have at least one 2xx or 3xx response
+    severity: error
+    recommended: true
+    given: $.paths[*][*]
+    then:
+      field: responses
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          properties:
+            responses:
+              type: object
+              properties:
+                "200":
+                  type: object
+  operation-description:
+    description: Operation should have a description
+    severity: warn
+    recommended: true
+    given: $.paths[*][*]
+    then:
+      field: description
+      function: truthy
+  operation-tags:
+    description: Operation should have tags
+    severity: warn
+    recommended: true
+    given: $.paths[*][*]
+    then:
+      field: tags
+      function: truthy
+  # parameter-description:
+  #   description: Parameters should have descriptions
+  #   severity: warn
+  #   given: $.paths[*][*].parameters[*]
+  #   then:
+  #     field: description
+  #     function: truthy
+  # schema-properties-description:
+  #   description: Schema properties should have descriptions
+  #   severity: warn
+  #   given: $.components.schemas[*].properties[*]
+  #   then:
+  #     field: description
+  #     function: truthy
+  response-description:
+    description: Responses should have descriptions
+    severity: warn
+    given: $.paths[*][*].responses[*]
+    then:
+      field: description
+      function: truthy
+  security-defined:
+    description: Security schemes should be defined
+    severity: error
+    given: $.security[*]
+    then:
+      field: $ref
+      function: truthy

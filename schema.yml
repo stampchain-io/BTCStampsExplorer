@@ -3,6 +3,33 @@ info:
   title: Stampchain - OpenAPI 3.0
   description: Stampchain API UI
   version: 2.0.0
+  contact:
+    name: Stampchain Support
+    url: https://stampchain.io
+    email: support@stampchain.io
+tags:
+  - name: System
+    description: System-level endpoints for health and version checks
+  - name: Documentation
+    description: API documentation endpoints
+  - name: Balance
+    description: Balance-related endpoints
+  - name: Blocks
+    description: Block-related endpoints
+  - name: Collections
+    description: Collection management endpoints
+  - name: Cursed Stamps
+    description: Endpoints for managing cursed stamps
+  - name: SRC-20
+    description: SRC-20 token related endpoints
+  - name: SRC-101
+    description: SRC-101 token related endpoints
+  - name: Stamps
+    description: Stamp management endpoints
+  - name: Dispensers
+    description: Dispenser management endpoints
+  - name: Minting
+    description: Token and stamp minting endpoints
 externalDocs:
   description: Find out more about Stampchain
   url: "http://stampchain.io"
@@ -15,10 +42,14 @@ servers:
 paths:
   /api/v2/health:
     get:
+      operationId: getHealthStatus
+      tags:
+        - System
       summary: Health check endpoint
+      description: Checks if the API service is running and responding correctly. Returns a status indicating the health of the service.
       responses:
         "200":
-          description: OK
+          description: Successful response
           content:
             application/json:
               schema:
@@ -26,10 +57,17 @@ paths:
                 properties:
                   status:
                     type: string
+                    enum: ["OK"]
+                required:
+                  - status
 
   /api/v2/docs:
     get:
+      operationId: getApiDocs
+      tags:
+        - Documentation
       summary: API documentation
+      description: Returns the complete API documentation including all available endpoints, schemas, and examples.
       responses:
         "200":
           description: OK
@@ -40,7 +78,11 @@ paths:
 
   /api/v2/version:
     get:
+      operationId: getApiVersion
+      tags:
+        - System
       summary: Get API version
+      description: Returns the current version of the API being used. Useful for tracking API compatibility.
       responses:
         "200":
           description: OK
@@ -54,7 +96,11 @@ paths:
 
   /api/v2/error:
     get:
+      operationId: testErrorResponse
+      tags:
+        - System
       summary: Test error endpoint
+      description: Test endpoint that always returns an error response. Used for testing error handling and responses.
       responses:
         "400":
           description: Bad Request
@@ -65,7 +111,11 @@ paths:
 
   /api/v2/balance/{address}:
     get:
+      operationId: getAddressBalance
+      tags:
+        - Balance
       summary: Get balance by address
+      description: Retrieves the complete balance information for a given Bitcoin address, including stamps and SRC-20 tokens.
       parameters:
         - in: path
           name: address
@@ -90,7 +140,11 @@ paths:
 
   /api/v2/block/{block_index}:
     get:
+      operationId: getBlockInfo
+      tags:
+        - Blocks
       summary: Get block info by block index or block hash
+      description: Retrieves detailed information about a specific block, including transactions, stamps, and other block-related data.
       parameters:
         - in: path
           name: block_index
@@ -115,7 +169,11 @@ paths:
 
   /api/v2/block/block_count/{number}:
     get:
+      operationId: getLastBlocks
+      tags:
+        - Blocks
       summary: Get last x blocks
+      description: Returns information about the most recent blocks, with the number of blocks specified in the request.
       parameters:
         - in: path
           name: number
@@ -123,7 +181,7 @@ paths:
           example: 2
           schema:
             type: integer
-          description: The number of last blocks
+          description: The number of last blocks to retrieve
       responses:
         "200":
           description: Successful response
@@ -142,7 +200,11 @@ paths:
 
   /api/v2/collections:
     get:
+      operationId: getCollections
+      tags:
+        - Collections
       summary: Get paginated collections
+      description: Retrieves a paginated list of stamp collections. Can be filtered by creator address and includes collection metadata.
       parameters:
         - in: query
           name: limit
@@ -175,7 +237,11 @@ paths:
 
   /api/v2/cursed:
     get:
+      operationId: getCursedStamps
+      tags:
+        - Cursed Stamps
       summary: Get paginated cursed stamps
+      description: Retrieves a paginated list of cursed stamps. Cursed stamps are stamps with negative stamp numbers that have been identified as invalid or problematic.
       parameters:
         - in: query
           name: limit
@@ -204,9 +270,13 @@ paths:
 
   /api/v2/cursed/{id}:
     get:
+      operationId: getCursedStampById
+      tags:
+        - Cursed Stamps
       summary: Get stamp by ID {tx_hash, stamp, cpid}
       description: |
-        Cursed stamps simply have a negative stamp number. This is equivalent to /api/v2/stamps/{id}
+        Retrieves a specific cursed stamp by its identifier. Cursed stamps simply have a negative stamp number. 
+        This endpoint is equivalent to /api/v2/stamps/{id} but specifically for cursed stamps.
       parameters:
         - in: path
           name: id
@@ -231,7 +301,11 @@ paths:
 
   /api/v2/cursed/block/{block_index}:
     get:
+      operationId: getCursedStampsByBlock
+      tags:
+        - Cursed Stamps
       summary: Get cursed stamps by block index
+      description: Retrieves all cursed stamps that were created or identified in a specific block.
       parameters:
         - in: path
           name: block_index
@@ -256,8 +330,11 @@ paths:
 
   /api/v2/src20:
     get:
+      operationId: getSrc20Transactions
+      tags:
+        - SRC-20
       summary: Get paginated valid SRC-20 transactions
-      description: Retrieve paginated valid SRC-20 transactions with optional limit and page parameters
+      description: Retrieves a paginated list of valid SRC-20 transactions with optional limit and page parameters.
       parameters:
         - in: query
           name: limit
@@ -290,7 +367,11 @@ paths:
 
   /api/v2/src20/balance/{address}:
     get:
+      operationId: getSrc20AddressBalance
+      tags:
+        - SRC-20
       summary: Get SRC-20 balances by BTC wallet address
+      description: Retrieves all SRC-20 token balances for a specific Bitcoin address.
       parameters:
         - in: path
           name: address
@@ -335,7 +416,11 @@ paths:
 
   /api/v2/src20/balance/{address}/{tick}:
     get:
+      operationId: getSrc20AddressTickBalance
+      tags:
+        - SRC-20
       summary: Get SRC-20 balance by address and tick
+      description: Retrieves the balance of a specific SRC-20 token (identified by tick) for a given Bitcoin address.
       parameters:
         - in: path
           name: address
@@ -373,10 +458,13 @@ paths:
 
   /api/v2/src20/balance/snapshot/{tick}:
     get:
-      summary: |
-        Get SRC-20 balance snapshot by tick, based upon current block height.
+      operationId: getSrc20TickSnapshot
+      tags:
+        - SRC-20
+      summary: Get SRC-20 balance snapshot by tick
       description: |
-        Retrieve a snapshot of all owners for the SRC-20 tick value based upon the current block height.
+        Retrieves a snapshot of all owners for the SRC-20 tick value based upon the current block height.
+        This provides a complete overview of token distribution at the current point in time.
       parameters:
         - in: path
           name: tick
@@ -416,7 +504,11 @@ paths:
 
   /api/v2/src20/block/{block_index}:
     get:
+      operationId: getSrc20BlockTransactions
+      tags:
+        - SRC-20
       summary: Get paginated valid SRC-20 transactions from a specific block
+      description: Retrieves all SRC-20 transactions that occurred in a specific block. Results can be filtered and paginated.
       parameters:
         - in: path
           name: block_index
@@ -470,10 +562,11 @@ paths:
 
   /api/v2/src20/block/{block_index}/{tick}:
     get:
+      operationId: getSrc20BlockTickTransactions
+      tags:
+        - SRC-20
       summary: Fetches SRC20 transactions for a given block and tick
-      description: >
-        Retrieves SRC20 transactions filtered by block index and tick value,
-        with additional optional filtering and pagination parameters.
+      description: Retrieves SRC20 transactions filtered by block index and tick value, with additional optional filtering and pagination parameters.
       parameters:
         - in: path
           name: block_index
@@ -495,6 +588,7 @@ paths:
           required: false
           schema:
             type: string
+            enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type, if applicable.
         - in: query
           name: limit
@@ -502,6 +596,7 @@ paths:
           schema:
             type: integer
             format: int32
+            minimum: 1
             default: 1000
           description: The maximum number of items to return, default is 1000.
         - in: query
@@ -510,6 +605,7 @@ paths:
           schema:
             type: integer
             format: int32
+            minimum: 1
             default: 1
           description: The page number for pagination, default is 1.
         - in: query
@@ -517,6 +613,7 @@ paths:
           required: false
           schema:
             type: string
+            enum: [ASC, DESC]
             default: "ASC"
           description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
       responses:
@@ -535,6 +632,9 @@ paths:
 
   /api/v2/src20/tick:
     get:
+      operationId: getSrc20TickOperations
+      tags:
+        - SRC-20
       summary: Get paginated valid SRC-20 transactions by operation type
       description: Retrieve paginated valid SRC-20 transactions by operation type (DEPLOY, MINT, TRANSFER)
       parameters:
@@ -557,14 +657,14 @@ paths:
           name: op
           schema:
             type: string
-            default: DEPLOY
+            default: "DEPLOY"
             enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type [TRANSFER, MINT, DEPLOY(DEFAULT)]
         - in: query
           name: sort
           schema:
             type: string
-            default: DESC
+            default: "DESC"
             enum: [ASC, DESC]
           description: Sort order [ASC, DESC]
       responses:
@@ -583,6 +683,9 @@ paths:
 
   /api/v2/src20/tick/{tick}:
     get:
+      operationId: getSrc20TickData
+      tags:
+        - SRC-20
       summary: Get paginated tick data
       description: Retrieve paginated tick data for a specific tick
       parameters:
@@ -607,14 +710,14 @@ paths:
           name: op
           schema:
             type: string
-            default: null
+            default: "DEPLOY"
             enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type [TRANSFER, MINT, DEPLOY]
         - in: query
           name: sort
           schema:
             type: string
-            default: ASC
+            default: "ASC"
             enum: [ASC, DESC]
           description: Sort order [ASC, DESC]
       responses:
@@ -633,6 +736,9 @@ paths:
 
   /api/v2/src20/tick/{tick}/deploy:
     get:
+      operationId: getSrc20TickDeployInfo
+      tags:
+        - SRC-20
       summary: Get deployment details for a specific tick
       description: Retrieve deployment details for a specific tick in the tick API.
       parameters:
@@ -657,69 +763,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponseBody"
 
-  # /api/v2/src101/{deploy_hash}/address/{address_btc}:
-  #   get:
-  #     summary: Get tokenid of SRC-101 by address_btc
-  #     description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
-  #     parameters:
-  #       - in: query
-  #         name: limit
-  #         example: 2
-  #         schema:
-  #           type: integer
-  #           minimum: 1
-  #           default: 50
-  #         description: The maximum number of transactions to retrieve per page
-  #       - in: query
-  #         name: page
-  #         schema:
-  #           type: integer
-  #           minimum: 1
-  #           default: 1
-  #         description: The page number of transactions to retrieve
-  #       - in: query
-  #         name: sort
-  #         schema:
-  #           type: string
-  #           default: DESC
-  #           enum: [ASC, DESC]
-  #         description: Sort order [ASC, DESC]
-  #       - in: query
-  #         name: prim
-  #         required: true
-  #         example: "true"
-  #         schema:
-  #           type: string
-  #       - in: path
-  #         name: deploy_hash
-  #         required: true
-  #         example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
-  #         description: The hash of the deploy transaction.
-  #         schema:
-  #           type: string
-  #       - in: path
-  #         name: address_btc
-  #         required: true
-  #         example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
-  #         schema:
-  #           type: string
-  #       responses:
-  #       '200':
-  #         description: Successful response with deployment details.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/TokenidSrc101ResponseBody'
-  #       '500':
-  #         description: Internal server error.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ErrorResponseBody'
 
   /api/v2/src20/tx/{tx_hash}:
     get:
-      summary: Get information about a specific transaction.
+      operationId: getSrc20TransactionInfo
+      tags:
+        - SRC-20
+      summary: Get information about a specific transaction
+      description: Retrieves detailed information about a specific SRC-20 transaction by its transaction hash.
       parameters:
         - in: path
           name: tx_hash
@@ -742,8 +793,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponseBody"
 
-  /api/v2/src101/:
+  /api/v2/src101:
     get:
+      operationId: getSrc101Transactions
+      tags:
+        - SRC-101
       summary: Get paginated valid SRC-101 transactions
       description: Retrieve paginated valid SRC-101 transactions with optional limit and page parameters
       parameters:
@@ -778,8 +832,11 @@ paths:
 
   /api/v2/src101/tx:
     get:
+      operationId: getSrc101TransactionList
+      tags:
+        - SRC-101
       summary: Get paginated SRC-101 transactions
-      description: Retrieve paginated SRC-101 transactions with optional limit and page parameters
+      description: Retrieve paginated SRC-101 transactions with optional filtering by block index, operation type, and validation status.
       parameters:
         - in: query
           name: limit
@@ -800,21 +857,24 @@ paths:
           name: block_index
           schema:
             type: integer
-          description: Block index
+          description: Filter transactions by block index
         - in: query
           name: op
           schema:
             type: string
-          description: Opetarion, "mint" "transfer"
+            enum: [mint, transfer]
+          description: Filter by operation type, either "mint" or "transfer"
         - in: query
           name: deploy_hash
           schema:
             type: string
+          description: Filter by deployment transaction hash
         - in: query
           name: valid
           schema:
             type: integer
-          description: Valid is 1, inValid is 0
+            enum: [0, 1]
+          description: Filter by validation status (1 for valid, 0 for invalid)
       responses:
         "200":
           description: Successful response with paginated SRC-101 transactions
@@ -831,18 +891,22 @@ paths:
 
   /api/v2/src101/tx/{tx_hash}:
     get:
-      summary: Get paginated valid SRC-101 transactions
-      description: Retrieve paginated valid SRC-101 transactions with optional limit and page parameters
+      operationId: getSrc101TransactionByHash
+      tags:
+        - SRC-101
+      summary: Get SRC-101 transaction by hash
+      description: Retrieve detailed information about a specific SRC-101 transaction using its transaction hash.
       parameters:
         - in: path
           name: tx_hash
+          required: true
           example: "11e4b91d35040f3bc71c5c0f80be9f0ebc3c7073bdcee01651914062dde5733e"
           schema:
             type: string
-          description: The hash of the transaction.
+          description: The hash of the transaction
       responses:
         "200":
-          description: Successful response with paginated SRC-101 transactions
+          description: Successful response with transaction details
           content:
             application/json:
               schema:
@@ -856,25 +920,28 @@ paths:
 
   /api/v2/src101/{deploy_hash}/deploy:
     get:
-      summary: Get SRC-101 deploy detail
-      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+      operationId: getSrc101DeployInfo
+      tags:
+        - SRC-101
+      summary: Get SRC-101 deployment details
+      description: Retrieve comprehensive deployment information for a specific SRC-101 token using its deployment transaction hash.
       parameters:
         - in: path
           name: deploy_hash
           required: true
           example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
-          description: The hash of the deploy transaction.
           schema:
             type: string
+          description: The hash of the deploy transaction
       responses:
         "200":
-          description: Successful response with deployment details.
+          description: Successful response with deployment details
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
         "500":
-          description: Internal server error.
+          description: Internal server error
           content:
             application/json:
               schema:
@@ -882,108 +949,50 @@ paths:
 
   /api/v2/src101/{deploy_hash}/total:
     get:
-      summary: Get total of SRC-101
-      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
+      operationId: getSrc101TotalSupply
+      tags:
+        - SRC-101
+      summary: Get total supply for SRC-101 token
+      description: Retrieve the total supply and related statistics for a specific SRC-101 token using its deployment hash.
       parameters:
         - in: path
           name: deploy_hash
           required: true
           example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
-          description: The hash of the deploy transaction.
           schema:
             type: string
+          description: The hash of the deploy transaction
       responses:
         "200":
-          description: Successful response with deployment details.
+          description: Successful response with total supply information
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TotalSrc101ResponseBody"
         "500":
-          description: Internal server error.
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponseBody"
 
-  # /api/v2/src101/{deploy_hash}/address/{address_btc}:
-  #   get:
-  #     summary: Get tokenid of SRC-101 by address_btc
-  #     description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
-  #     parameters:
-  #       - in: query
-  #         name: limit
-  #         schema:
-  #           type: integer
-  #           example: 2
-  #           minimum: 1
-  #           default: 50
-  #         description: The maximum number of transactions to retrieve per page
-  #       - in: query
-  #         name: page
-  #         schema:
-  #           type: integer
-  #           minimum: 1
-  #           default: 1
-  #         description: The page number of transactions to retrieve
-  #       - in: query
-  #         name: sort
-  #         schema:
-  #           type: string
-  #           default: DESC
-  #           enum: [ASC, DESC]
-  #         description: Sort order [ASC, DESC]
-  #       - in: query
-  #         name: prim
-  #         required: true
-  #         example: "true"
-  #         schema:
-  #           type: string
-  #       - in: path
-  #         name: deploy_hash
-  #         required: true
-  #         example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
-  #         description: The hash of the deploy transaction.
-  #         schema:
-  #           type: string
-  #       - in: path
-  #         name: address_btc
-  #         required: true
-  #         example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
-  #         schema:
-  #           type: string
-  #       responses:
-  #       '200':
-  #         description: Successful response with deployment details.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/TokenidSrc101ResponseBody'
-  #       '500':
-  #         description: Internal server error.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ErrorResponseBody'
 
-  /api/v2/src101/balance/{address}:
+  /api/v2/src101/{deploy_hash}/address/{address_btc}:
     get:
-      summary: Get SRC-101 balances by BTC wallet address
+      operationId: getSrc101TokensByAddress
+      tags:
+        - SRC-101
+      summary: Get tokenid of SRC-101 by address_btc
+      description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
       parameters:
-        - in: path
-          name: address
-          required: true
-          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
-          schema:
-            type: string
-          description: The address of the wallet
         - in: query
           name: limit
-          example: 2
           schema:
             type: integer
+            example: 2
             minimum: 1
-            default: 200
+            default: 50
+          description: The maximum number of transactions to retrieve per page
         - in: query
           name: page
           schema:
@@ -991,19 +1000,82 @@ paths:
             minimum: 1
             default: 1
           description: The page number of transactions to retrieve
+        - in: query
+          name: sort
+          schema:
+            type: string
+            default: DESC
+            enum: [ASC, DESC]
+          description: Sort order [ASC, DESC]
+        - in: query
+          name: prim
+          required: true
+          example: "true"
+          schema:
+            type: string
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+          description: The hash of the deploy transaction.
+          schema:
+            type: string
+        - in: path
+          name: address_btc
+          required: true
+          example: "miuyV1UoMA25QE8heKjWX8A7RtAn26tLYu"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with deployment details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenidSrc101ResponseBody'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseBody'
+  /api/v2/src101/balance/{address}:
+    get:
+      operationId: getSrc101AddressBalance
+      tags:
+        - SRC-101
+      summary: Get SRC-101 balances by address
+      description: Retrieve all SRC-101 token balances for a specific Bitcoin address, including details about each token held.
+      parameters:
+        - in: path
+          name: address
+          required: true
+          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
+          schema:
+            type: string
+          description: The Bitcoin address to query
+        - in: query
+          name: limit
+          example: 2
+          schema:
+            type: integer
+            minimum: 1
+            default: 200
+          description: Number of records per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination
       responses:
         "200":
-          description: Successful response
+          description: Successful response with address balances
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101BalanceResponseBody"
-        "404":
-          description: Address Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1013,7 +1085,11 @@ paths:
 
   /api/v2/src101/{deploy_hash}/{tokenid}:
     get:
-      summary: Get SRC-101 bitname info by deploy_hash and tokenid
+      operationId: getSrc101TokenInfo
+      tags:
+        - SRC-101
+      summary: Get SRC-101 token information
+      description: Retrieve detailed information about a specific SRC-101 token using its deployment hash and token identifier.
       parameters:
         - in: path
           name: deploy_hash
@@ -1021,23 +1097,23 @@ paths:
           example: "9f4f8e7ba2eb8daf36f9d38b502315d23807aa7a55858acc1c73066b30506ab7"
           schema:
             type: string
-          description: Txid of the deploy transaction
+          description: The deployment transaction hash
         - in: path
           name: tokenid
           required: true
           example: "c3VwZXJib3k="
           schema:
             type: string
-          description:
+          description: The unique token identifier
       responses:
         "200":
-          description: Successful response
+          description: Successful response with token information
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Src101BalanceResponseBody"
         "404":
-          description: tokenid/deploy_hash Not Found
+          description: Token not found
           content:
             application/json:
               schema:
@@ -1051,7 +1127,11 @@ paths:
 
   /api/v2/src101/index/{deploy_hash}/{index}:
     get:
-      summary: Get SRC-101 bitname info by deploy_hash and index
+      operationId: getSrc101TokenByIndex
+      tags:
+        - SRC-101
+      summary: Get SRC-101 token by index
+      description: Retrieve token information using its deployment hash and numeric index. This endpoint provides an alternative way to access token data.
       parameters:
         - in: path
           name: deploy_hash
@@ -1059,22 +1139,23 @@ paths:
           example: "9f4f8e7ba2eb8daf36f9d38b502315d23807aa7a55858acc1c73066b30506ab7"
           schema:
             type: string
-          description: Txid of the deploy transaction
+          description: The deployment transaction hash
         - in: path
           name: index
           required: true
           example: 1
           schema:
             type: number
+          description: The numeric index of the token
       responses:
         "200":
-          description: Successful response
+          description: Successful response with token information
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Src101BalanceResponseBody"
         "404":
-          description: tokenid/deploy_hash Not Found
+          description: Token not found
           content:
             application/json:
               schema:
@@ -1088,12 +1169,15 @@ paths:
 
   /api/v2/stamps:
     get:
+      operationId: getStamps
+      tags:
+        - Stamps
       summary: Get paginated stamps
       description: Retrieve a paginated list of stamps.
       parameters:
         - in: query
           name: limit
-          example: 500
+          example: 2
           schema:
             type: integer
           description: The maximum number of stamps to return per page. Defaults to 50.
@@ -1125,14 +1209,17 @@ paths:
 
   /api/v2/stamps/{id}:
     get:
-      summary: Get stamp by ID {tx_hash, stamp, cpid}
-      description: Retrieve a stamp by its ID one of tx_hash, stamp number, or cpid
+      operationId: getStampById
+      tags:
+        - Stamps
+      summary: Get stamp by ID
+      description: Retrieve a specific stamp using its ID (tx_hash, stamp number, or cpid).
       parameters:
         - in: path
           name: id
           required: true
           example: "5faa1aa3012c89b598372153371f835a88739e5539c9c709924ce189fb9c7863"
-          description: ID {tx_hash, stamp, cpid} of the stamp
+          description: ID (tx_hash, stamp, cpid) of the stamp
           schema:
             type: string
       responses:
@@ -1151,8 +1238,11 @@ paths:
 
   /api/v2/stamps/balance/{address}:
     get:
+      operationId: getStampBalance
+      tags:
+        - Stamps
       summary: Get stamp balances by address
-      description: Retrieve stamp balances for a specific address
+      description: Retrieve all stamp balances for a specific Bitcoin address.
       parameters:
         - in: path
           name: address
@@ -1188,7 +1278,11 @@ paths:
 
   /api/v2/stamps/block/{block_index}:
     get:
+      operationId: getStampsByBlock
+      tags:
+        - Stamps
       summary: Get stamps by block index
+      description: Retrieve all stamps that were created in a specific block.
       parameters:
         - in: path
           name: block_index
@@ -1213,8 +1307,11 @@ paths:
 
   /api/v2/stamps/ident/{ident}:
     get:
+      operationId: getStampsByIdent
+      tags:
+        - Stamps
       summary: Get stamps by ident
-      description: Retrieve stamps based on the provided ident
+      description: Retrieve stamps based on their identifier type (SRC-721, STAMP).
       parameters:
         - in: path
           name: ident
@@ -1256,8 +1353,12 @@ paths:
 
   /api/v2/stamps/dispensers:
     get:
+      operationId: getStampDispensers
+      tags:
+        - Stamps
+        - Dispensers
       summary: Get all open dispensers
-      description: Retrieve all open counterparty dispensers
+      description: Retrieve all open counterparty dispensers for stamps.
       parameters:
         - in: query
           name: limit
@@ -1266,14 +1367,14 @@ paths:
             type: integer
             minimum: 1
             default: 50
-          description: The maximum number of transactions to retrieve per page
+          description: The maximum number of dispensers to retrieve per page
         - in: query
           name: page
           schema:
             type: integer
             minimum: 1
             default: 1
-          description: The page number of transactions to retrieve
+          description: The page number of dispensers to retrieve
       responses:
         "200":
           description: Successful response
@@ -1290,8 +1391,12 @@ paths:
 
   /api/v2/stamps/dispensers/{id}:
     get:
+      operationId: getStampDispenserById
+      tags:
+        - Stamps
+        - Dispensers
       summary: Get open dispensers by stamp number, cpid, or stamp_hash
-      description: Retrieve open dispensers by stamp number, cpid, or stamp_hash
+      description: Retrieve open dispensers for a specific stamp identified by its number, cpid, or stamp_hash.
       parameters:
         - in: path
           name: id
@@ -1316,49 +1421,29 @@ paths:
 
   /api/v2/src20/create:
     post:
+      operationId: createSrc20Token
+      tags:
+        - SRC-20
       summary: Deploy, Mint, Transfer SRC-20 Tokens
       description: |
         This returns a hex encoded serialized PSBT transaction ready for signing and broadcasting
-        via wallet or library. There is no validation that the input data provided
-        will conform to SRC-20 specifications or mint limit requirements. It is the 
-        users sole responsibility to confirm mint, deploy limits and confirm existing
-        balances prior to a transfer of tokens. The examples provided are for demonstration
-        purposes only.
+        via wallet or library.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               oneOf:
-                - $ref: "#/components/schemas/SRC20InputData"
-                - $ref: "#/components/schemas/SRC20TransferInputData"
+                - $ref: '#/components/schemas/SRC20DeployData'
+                - $ref: '#/components/schemas/SRC20MintData'
+                - $ref: '#/components/schemas/SRC20TransferData'
             examples:
               deploy:
-                value:
-                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  op: "deploy"
-                  tick: "APIV2"
-                  feeRate: 12
-                  max: 2100000000
-                  lim: 100000
-                  dec: 18
+                $ref: '#/components/examples/DeployExample'
               mint:
-                value:
-                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  op: "mint"
-                  tick: "DOGE"
-                  feeRate: 150
-                  amt: 1000
+                $ref: '#/components/examples/MintExample'
               transfer:
-                value:
-                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
-                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
-                  op: "transfer"
-                  tick: "STAMP"
-                  feeRate: 150
-                  amt: 100000
+                $ref: '#/components/examples/TransferExample'
       responses:
         "200":
           description: Successful response with the hex value.
@@ -1370,9 +1455,32 @@ paths:
                   hex:
                     type: string
                     description: The hex encoded serialized psbt trx
+                  base64:
+                    type: string
+                    description: The base64 encoded serialized psbt trx
+                  input_value:
+                    type: integer
+                    description: The input value in sats
+                  total_dust_value:
+                    type: integer
+                    description: The total dust value in sats
+                  est_miner_fee:
+                    type: integer
+                    description: The estimated miner fee in sats
+                  est_tx_size:
+                    type: integer
+                    description: The estimated transaction size
+                  inputsToSign:
+                    type: array
+                    items:
+                      type: string
+                      description: The inputs to sign
+                  changeAddress:
+                    type: string
+                    description: The change address
                   fee:
                     type: integer
-                    description: The estimated miner fee
+                    description: The estimated miner fee in sats
                   change:
                     type: integer
                     description: The change value
@@ -1381,14 +1489,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: The error message.
+                $ref: "#/components/schemas/ErrorResponseBody"
+
 
   /api/v2/olga/mint:
     post:
+      operationId: mintOlgaStamp
+      tags:
+        - Minting
       summary: Mint an OLGA STAMP.
       description: |
         This returns a hex encoded serialized PSBT transaction ready for signing and broadcasting
@@ -1449,15 +1557,44 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: The error message.
-                required:
-                  - error
+                $ref: "#/components/schemas/ErrorResponseBody"
+
 
 components:
+  examples:
+    DeployExample:
+      summary: Example deploy request
+      value:
+        toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        op: "deploy"
+        tick: "APIV2"
+        feeRate: 12
+        max: "2100000000"
+        lim: "100000"
+        dec: 18
+
+    MintExample:
+      summary: Example mint request
+      value:
+        toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        op: "mint"
+        tick: "DOGE"
+        feeRate: 150
+        amt: "1000"
+
+    TransferExample:
+      summary: Example transfer request
+      value:
+        fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+        toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+        changeAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+        op: "transfer"
+        tick: "STAMP"
+        feeRate: 150
+        amt: "100000"
+
   schemas:
     Pagination:
       type: object
@@ -1496,6 +1633,8 @@ components:
           type: string
         messages_hash:
           type: string
+        tx_count:
+          type: number
     SendsRow:
       type: object
       properties:
@@ -1647,6 +1786,10 @@ components:
         unconfirmedBalance:
           type: number
         unconfirmedTxCount:
+          type: number
+        btcPrice:
+          type: number
+        usdValue:
           type: number
     XCPParams:
       type: object
@@ -1886,7 +2029,6 @@ components:
         limit:
           oneOf:
             - type: number
-
     SRC20TrxRequestParams:
       type: object
       properties:
@@ -2098,9 +2240,16 @@ components:
             btc:
               $ref: "#/components/schemas/BtcInfo"
             data:
-              type: array
-              items:
-                $ref: "#/components/schemas/StampsAndSrc20"
+              type: object
+              properties:
+                stamps:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/StampRow"
+                src20:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/SRC20Balance"
     StampResponseBody:
       type: object
       properties:
@@ -2274,80 +2423,140 @@ components:
       properties:
         error:
           type: string
+    SRC20DeployData:
+      type: object
+      required:
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - feeRate
+        - max
+        - lim
+        - dec
+      properties:
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['deploy']
+        tick:
+          type: string
+        feeRate:
+          type: number
+        max:
+          type: string
+        lim:
+          type: string
+        dec:
+          type: number
+
+    SRC20MintData:
+      type: object
+      required:
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - feeRate
+        - amt
+      properties:
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['mint']
+        tick:
+          type: string
+        feeRate:
+          type: number
+        amt:
+          type: string
+
+    SRC20TransferData:
+      type: object
+      required:
+        - fromAddress
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - feeRate
+        - amt
+      properties:
+        fromAddress:
+          type: string
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['transfer']
+        tick:
+          type: string
+        feeRate:
+          type: number
+        amt:
+          type: string
+
+    SRC20BaseData:
+      type: object
+      required:
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - feeRate
+      properties:
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['deploy', 'mint', 'transfer']
+        tick:
+          type: string
+        feeRate:
+          type: number
+
     SRC20InputData:
       type: object
-      properties:
-        op:
-          type: string
-        toAddress:
-          type: string
-        changeAddress:
-          type: string
-        tick:
-          type: string
-        feeRate:
-          type: number
-        max:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-        lim:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-        dec:
-          type: number
-          nullable: true
-        amt:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
+      discriminator:
+        propertyName: op
+        mapping:
+          deploy: '#/components/schemas/SRC20DeployData'
+          mint: '#/components/schemas/SRC20MintData'
+      oneOf:
+        - $ref: '#/components/schemas/SRC20DeployData'
+        - $ref: '#/components/schemas/SRC20MintData'
+      required:
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - feeRate
+
     SRC20TransferInputData:
-      type: object
-      properties:
-        op:
-          type: string
-        toAddress:
-          type: string
-        changeAddress:
-          type: string
-        fromAddress:
-          oneOf:
-            - type: string
-              nullable: true
-        tick:
-          type: string
-        feeRate:
-          type: number
-        max:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-        lim:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
-        dec:
-          type: number
-          nullable: true
-        amt:
-          oneOf:
-            - type: number
-            - type: string
-              nullable: true
+      oneOf:
+        - $ref: '#/components/schemas/SRC20TransferData'
+      discriminator:
+        propertyName: op
+        mapping:
+          transfer: '#/components/schemas/SRC20TransferData'
+
     MintStampInputData:
       type: object
       properties:
         sourceWallet:
           type: string
         assetName:
-          oneOf:
-            - type: string
+          type: string
           nullable: true
         qty:
           type: number
@@ -2355,6 +2564,7 @@ components:
           type: boolean
         divisible:
           type: boolean
+          default: false
         filename:
           type: string
         file:
@@ -2362,13 +2572,16 @@ components:
         satsPerKB:
           type: number
         service_fee:
-          oneOf:
-            - type: number
+          type: number
           nullable: true
         service_fee_address:
-          oneOf:
-            - type: string
+          type: string
           nullable: true
+      required:
+        - sourceWallet
+        - qty
+        - file
+        - satsPerKB
     PaginatedCollectionResponseBody:
       type: object
       properties:
@@ -2416,3 +2629,15 @@ components:
                 type: string
               description:
                 type: string
+
+    SRC20CreateRequest:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/SRC20InputData'
+        - $ref: '#/components/schemas/SRC20TransferInputData'
+      discriminator:
+        propertyName: op
+        mapping:
+          deploy: '#/components/schemas/SRC20InputData'
+          mint: '#/components/schemas/SRC20InputData'
+          transfer: '#/components/schemas/SRC20TransferInputData'
