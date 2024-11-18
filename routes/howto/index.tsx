@@ -1,22 +1,22 @@
 import { Head } from "$fresh/runtime.ts";
 
 export default function HowTo() {
-  const titleClassName =
+  const bodyClassName = "flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36";
+  const titleGreyDLClassName =
     "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
-  const subTitleClassName =
-    "text-xl mobileMd:text-2xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light";
-  const defaultTextClassName =
-    "text-sm mobileMd:text-base mobileLg:text-lg desktop:text-xl font-medium text-stamp-grey-light";
-  const buttonClassName =
-    "border-2 border-stamp-grey rounded-md text-base leading-[18.77px] font-extrabold px-6 py-4 text-stamp-grey inline-flex items-center justify-center";
-  // const buttonClassName = "text-base font-extrabold border-2 border-[#999999] text-[#999999] w-[138px] h-[48px] flex justify-center items-center rounded-md";
+  const subTitleGreyClassName =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
+  const bodyTextLightClassName =
+    "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
+  const buttonGreyOutlineClassName =
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] leading-[42px] mobileLg:leading-[48px] px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
   return (
-    <div className="flex flex-col gap-12 mt-20 tablet:mt-5">
+    <div className={bodyClassName}>
       <section className="mb-6">
-        <h1 className={titleClassName}>HOW-TO</h1>
-        <h2 className={subTitleClassName}>OUR STEP-BY-STEP GUIDES</h2>
-        <p className={defaultTextClassName}>
+        <h1 className={titleGreyDLClassName}>HOW-TO</h1>
+        <h2 className={subTitleGreyClassName}>OUR STEP-BY-STEP GUIDES</h2>
+        <p className={bodyTextLightClassName}>
           <b>
             Explore our comprehensive How-To section, where you'll find
             step-by-step guides for the most popular features on our platform.
@@ -32,7 +32,7 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className={subTitleClassName}>DEPLOY YOUR OWN TOKEN</h2>
+        <h2 className={subTitleGreyClassName}>DEPLOY YOUR OWN TOKEN</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
           <img
             src="/img/how-tos/deploy/00.png"
@@ -40,7 +40,7 @@ export default function HowTo() {
             alt="Deploy a SRC-20 token on Bitcoin"
           />
           <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
-            <p className={defaultTextClassName}>
+            <p className={bodyTextLightClassName}>
               To deploy a SRC-20 token, stamp the transaction on Bitcoin with
               the token's supply and metadata. This makes the token immutable
               and secured by Bitcoin's blockchain.<br />
@@ -54,9 +54,9 @@ export default function HowTo() {
               <a
                 href="/howto/deploytoken"
                 f-partial="/howto/deploytoken"
-                className={buttonClassName}
+                className={buttonGreyOutlineClassName}
               >
-                READ MORE
+                READ
               </a>
             </div>
           </div>
@@ -64,10 +64,10 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className={subTitleClassName}>MINT YOUR TOKEN</h2>
+        <h2 className={subTitleGreyClassName}>MINT YOUR TOKEN</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
           <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
-            <p className={defaultTextClassName}>
+            <p className={bodyTextLightClassName}>
               After deployment, token holders can mint SRC-20 tokens based on
               the initial supply set in the contract.<br />
               <br />
@@ -77,31 +77,32 @@ export default function HowTo() {
               <a
                 href="/howto/mint"
                 f-partial="/howto/mint"
-                className={buttonClassName}
+                className={buttonGreyOutlineClassName}
               >
-                READ MORE
+                READ
               </a>
             </div>
           </div>
           <img
             src="/img/how-tos/mintsrc20/00.png"
-            width="432px"
+            width="100%"
             alt="How to mint a SRC-20 Bitcoin stamps token"
           />
         </div>
       </section>
 
       <section>
-        <h2 className={subTitleClassName}>STAMPING ART</h2>
+        <h2 className={subTitleGreyClassName}>STAMPING ART</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
           <img
             src="/img/how-tos/stamping/00.png"
-            width="432px"
+            width="100%"
             alt="Guide on how to create NFTs on Bitcoin using the stamps protocol"
           />
           <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
-            <p className={defaultTextClassName}>
-              Art is Art.<br />
+            <p className={bodyTextLightClassName}>
+              Store your art permanently on Bitcoin - the most resilient
+              blockchain in the world.<br />
               <br />
               <b>In this guide, you'll learn how to stamp art!</b>
             </p>
@@ -109,9 +110,9 @@ export default function HowTo() {
               <a
                 href="/howto/getstamping"
                 f-partial="/howto/getstamping"
-                className={buttonClassName}
+                className={buttonGreyOutlineClassName}
               >
-                READ MORE
+                READ
               </a>
             </div>
           </div>
@@ -119,11 +120,13 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className={subTitleClassName}>TRANSFER FUNCTIONALITY</h2>
+        <h2 className={subTitleGreyClassName}>TRANSFER FUNCTIONALITY</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
           <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
-            <p className={defaultTextClassName}>
-              Send an SOS <br />
+            <p className={bodyTextLightClassName}>
+              Send your assets swiftly and securely across the Bitcoin
+              blockchain
+              <br />
               <br />
               <b>
                 In this guide, you'll learn how to transfer SRC-20 tokens and
@@ -134,31 +137,33 @@ export default function HowTo() {
               <a
                 href="/howto/transfer"
                 f-partial="/howto/transfer"
-                className={buttonClassName}
+                className={buttonGreyOutlineClassName}
               >
-                READ MORE
+                READ
               </a>
             </div>
           </div>
           <img
             src="/img/how-tos/transfer/00.png"
-            width="432px"
+            width="100%"
             alt="Transfer SRC-20 tokens on the Bitcoin blockchain"
           />
         </div>
       </section>
 
       <section>
-        <h2 className={subTitleClassName}>CREATE A LEATHER WALLET</h2>
+        <h2 className={subTitleGreyClassName}>CREATE A LEATHER WALLET</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
           <img
             src="/img/how-tos/createleatherwallet/00.png"
-            width="432px"
+            width="100%"
             alt="Create, setup and install Bitcoin Leather wallet"
           />
           <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
-            <p className={defaultTextClassName}>
-              New to Bitcoin, Stamps, wallet and others? No worries! <br />
+            <p className={bodyTextLightClassName}>
+              New to Bitcoin, Stamps, wallet and all the other fancy lingo?{" "}
+              <br />
+              No worries! We've got you covered. <br />
               <br />
               <b>In this guide, you'll learn how to create a Leather wallet!</b>
             </p>
@@ -166,9 +171,9 @@ export default function HowTo() {
               <a
                 href="/howto/leathercreate"
                 f-partial="/howto/leathercreate"
-                className={buttonClassName}
+                className={buttonGreyOutlineClassName}
               >
-                READ MORE
+                READ
               </a>
             </div>
           </div>
@@ -176,10 +181,10 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className={subTitleClassName}>CONNECT YOUR LEATHER WALLET</h2>
+        <h2 className={subTitleGreyClassName}>CONNECT YOUR LEATHER WALLET</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
           <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
-            <p className={defaultTextClassName}>
+            <p className={bodyTextLightClassName}>
               <b>
                 In this guide, you'll learn how connect your Leather wallet to
                 stampchain.io
@@ -189,9 +194,9 @@ export default function HowTo() {
               <a
                 href="/howto/leatherconnect"
                 f-partial="/howto/leatherconnect"
-                className={buttonClassName}
+                className={buttonGreyOutlineClassName}
               >
-                READ MORE
+                READ
               </a>
             </div>
           </div>
