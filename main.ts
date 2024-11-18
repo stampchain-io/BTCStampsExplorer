@@ -9,18 +9,17 @@ import { start } from "$fresh/server.ts";
 import build from "$fresh/dev.ts";
 import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
-
-import "$server/database/databaseManager.ts";
+import "$server/database/index.ts";
 
 if (import.meta.main) {
   if (Deno.args.includes("build")) {
-    console.log("Running build...");
-    globalThis.SKIP_REDIS_CONNECTION = true;
     await build(import.meta.url, "./main.ts", config);
-    console.log("Build completed.");
     Deno.exit(0);
   } else {
-    console.log("Starting server...");
+    if (Deno.env.get("DENO_ENV") !== "development") {
+      (globalThis as any).SKIP_REDIS_CONNECTION = false;
+      await import("$server/database/databaseManager.ts");
+    }
     await start(manifest, config);
   }
 }
