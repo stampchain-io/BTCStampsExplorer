@@ -20,6 +20,17 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v3
 
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate OpenAPI Schema
+        run: npm run validate:ci
+
       - name: Install Deno
         uses: denoland/setup-deno@v2
         with:
