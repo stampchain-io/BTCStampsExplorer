@@ -10,6 +10,7 @@ interface InputFieldProps {
   pattern?: string;
   maxLength?: number;
   disabled?: boolean;
+  textAlign?: "left" | "center" | "right";
 }
 
 export function InputField({
@@ -22,12 +23,15 @@ export function InputField({
   pattern,
   maxLength,
   disabled = false,
+  textAlign = "left",
 }: InputFieldProps) {
   return (
     <div class="w-full">
       <input
         type={type}
-        class="h-12 px-3 rounded-md bg-[#999999] text-[#333333] placeholder:text-[#333333] placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC]"
+        class={`h-12 px-3 rounded-md bg-[#999999] text-[#333333] placeholder:text-[#333333] placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC] ${
+          textAlign === "center" ? "text-center" : ""
+        }`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
@@ -35,6 +39,7 @@ export function InputField({
         pattern={pattern}
         maxLength={maxLength}
         disabled={disabled}
+        style={{ textAlign }}
       />
       {error && <p class="text-red-500 mt-2">{error}</p>}
     </div>
