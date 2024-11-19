@@ -260,13 +260,13 @@ export function OlgaContent() {
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+          `<div class='w-5 h-5 rounded-full bg-stamp-purple-dark'></div>`;
       }, 150);
     } else {
       switchToggle.classList.remove("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+          `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
       }, 150);
     }
     setShowAdvancedOptions(!showAdvancedOptions);
@@ -279,13 +279,13 @@ export function OlgaContent() {
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+          `<div class='w-5 h-5 rounded-full bg-stamp-purple-dark'></div>`;
       }, 150);
     } else {
       switchToggle.classList.remove("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+          `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
       }, 150);
     }
     setIsPoshStamp(!isPoshStamp);
@@ -295,13 +295,13 @@ export function OlgaContent() {
     const advancedToggle = document.getElementById("switch-toggle-advanced");
     if (advancedToggle) {
       advancedToggle.innerHTML =
-        `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+        `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
     }
 
     const lockedToggle = document.getElementById("switch-toggle-locked");
     if (lockedToggle) {
       lockedToggle.innerHTML =
-        `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+        `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
     }
   }, []);
 
@@ -557,11 +557,12 @@ export function OlgaContent() {
     addressError,
   ]);
 
+  const titlePurpleDLCenterClassName =
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+
   return (
-    <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
-        STAMP
-      </p>
+    <div class="flex flex-col w-full items-center gap-3 mobileMd:gap-6">
+      <h1 class={titlePurpleDLCenterClassName}>STAMP</h1>
 
       {isConnected && addressError && (
         <div class="w-full text-red-500 text-center font-bold">
@@ -569,12 +570,12 @@ export function OlgaContent() {
         </div>
       )}
 
-      <div className="dark-gradient p-6 w-full">
-        <div className="flex gap-8">
-          <div className="flex gap-8">
+      <div className="dark-gradient p-3 mobileMd:p-6 w-full">
+        <div className="flex gap-3 mobileMd:gap-6">
+          <div className="flex gap-3 mobileMd:gap-6">
             <div
               id="image-preview"
-              class="relative rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#660099]"
+              class="relative rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-stamp-purple-dark"
             >
               <input
                 id="upload"
@@ -651,17 +652,17 @@ export function OlgaContent() {
 
           <div class="w-full flex flex-col justify-between items-end">
             <button
-              class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+              class="min-w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
               onClick={handleShowAdvancedOptions}
             >
               <div
                 id="switch-toggle-advanced"
-                class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center bg-[#440066]"
+                class="w-6 h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
               >
               </div>
             </button>
-            <div className="flex gap-6 items-center">
-              <p class="text-base tablet:text-2xl font-semibold text-[#999999] uppercase">
+            <div className="flex gap-3 mobileMd:gap-6 items-center">
+              <p className="text-xl mobileMd:text-2xl desktop:text-3xl font-semibold text-stamp-grey uppercase">
                 Editions
               </p>
               <div className="w-12">
@@ -670,6 +671,7 @@ export function OlgaContent() {
                   value={issuance}
                   onChange={(e) => handleIssuanceChange(e)}
                   error={issuanceError}
+                  textAlign="center"
                 />
               </div>
             </div>
@@ -677,18 +679,20 @@ export function OlgaContent() {
         </div>
 
         <div
-          className={`mt-6 transition-all duration-500 ${
-            showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
+          className={`overflow-hidden transition-all duration-500 ${
+            showAdvancedOptions
+              ? "max-h-[200px] opacity-100 mt-3 mobileMd:mt-6" // Adjust max-h value based on your content
+              : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <div className="flex gap-7 justify-between">
+          <div className="flex gap-3 mobileMd:gap-6 justify-between">
             <button
-              class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+              class="min-w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
               onClick={handleIsPoshStamp}
             >
               <div
                 id="switch-toggle-locked"
-                class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center"
+                class="w-6 h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
               >
               </div>
             </button>
@@ -696,13 +700,13 @@ export function OlgaContent() {
               src={isLocked
                 ? "/img/stamping/LockSimple.svg"
                 : "/img/stamping/LockSimpleOpen.svg"}
-              className="bg-[#999999] p-3 rounded-md cursor-pointer"
+              className="bg-stamp-grey p-3 rounded-md cursor-pointer"
               onClick={() => setIsLocked(!isLocked)}
             />
           </div>
-          <div className="flex items-end gap-3">
+          <div className="flex items-end gap-3 mobileMd:gap-6">
             <div className="w-full">
-              <p className="text-xs tablet:text-lg font-medium text-[#999999]">
+              <p className="text-base mobileLg:text-lg font-medium text-stamp-grey leading-[2px] mobileMd:leading-[8px] mobileLg:leading-[12px] pb-2 mobileMd:pb-3">
                 POSH
               </p>
               <InputField
@@ -718,7 +722,7 @@ export function OlgaContent() {
             <img
               src="/img/stamping/CornersOut.svg"
               className={`p-3 rounded-md cursor-pointer ${
-                file ? "bg-[#999999]" : "bg-[#333333]"
+                file ? "bg-[#999999]" : "bg-[#999999]"
               }`}
               onClick={toggleFullScreenModal}
             />
