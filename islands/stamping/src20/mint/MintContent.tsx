@@ -151,11 +151,16 @@ export function MintContent({
     }
   };
 
+  const bodyToolsClassName =
+    "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+  const titlePurpleLDCenterClassName =
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+  const feeSelectorContainerClassName =
+    "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+
   return (
-    <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
-        MINT SRC-20
-      </p>
+    <div className={bodyToolsClassName}>
+      <h1 className={titlePurpleLDCenterClassName}>MINT SRC-20</h1>
 
       {/* Display error if any */}
       {error && (
@@ -164,8 +169,8 @@ export function MintContent({
         </div>
       )}
 
-      <div className="dark-gradient p-3 tablet:p-6 flex flex-col gap-3 tablet:gap-6 w-full">
-        <div className="w-full flex gap-3 tablet:gap-6">
+      <div className="dark-gradient p-3 mobileMd:p-6 flex flex-col gap-3 mobileMd:gap-6 w-full">
+        <div className="w-full flex gap-3 mobileMd:gap-6">
           <div
             id="image-preview"
             class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[108px] tablet:min-w-[120px] w-[108px] tablet:w-[120px] h-[108px] tablet:h-[120px] content-center bg-[#660099] flex flex-col"
@@ -176,7 +181,7 @@ export function MintContent({
               alt=""
             />
           </div>
-          <div className="flex flex-col gap-3 tablet:gap-6 w-full">
+          <div className="flex flex-col gap-3 mobileMd:gap-6 w-full">
             <InputField
               type="text"
               placeholder="Token"
@@ -205,7 +210,7 @@ export function MintContent({
         />
       </div>
 
-      <div className="dark-gradient p-3 tablet:p-6 w-full z-[10]">
+      <div className={feeSelectorContainerClassName}>
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
