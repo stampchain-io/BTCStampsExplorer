@@ -3,8 +3,6 @@ import { getMimeType } from "$lib/utils/imageUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
-type SecurityHeaders = Record<string, string>;
-
 export const handler: Handlers = {
   async GET(_req, ctx) {
     const { imgpath } = ctx.params;
@@ -14,29 +12,6 @@ export const handler: Handlers = {
 
 async function serveImage(imgpath: string): Promise<Response> {
   const mimeType = getMimeType(imgpath.split(".").pop() as string);
-  const isHtml = mimeType === "text/html";
-
-  const headers: SecurityHeaders = {
-    "Content-Type": mimeType,
-    "Cache-Control": "public, max-age=3600",
-    "X-Content-Type-Options": "nosniff",
-  };
-
-  if (isHtml) {
-    headers["Content-Security-Policy"] = `default-src 'self'; ` +
-      `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com; ` +
-      `style-src 'self' 'unsafe-inline'; ` +
-      `img-src 'self' data: blob:; ` +
-      `connect-src 'self' blob: data: https://static.cloudflareinsights.com; ` +
-      `worker-src 'self' blob:; ` +
-      `frame-ancestors 'self'; ` +
-      `base-uri 'none'; ` +
-      `form-action 'none'; ` +
-      `media-src 'self' blob:; ` +
-      `font-src 'self' data:;`;
-
-    headers["CF-No-Cache"] = "1";
-  }
 
   if (serverConfig.IMAGES_SRC_PATH) {
     const remotePath = `${serverConfig.IMAGES_SRC_PATH}/${imgpath}`;
@@ -44,7 +19,9 @@ async function serveImage(imgpath: string): Promise<Response> {
       const response = await fetch(remotePath);
       if (response.ok) {
         const content = await response.arrayBuffer();
-        return ResponseUtil.custom(content, 200, headers);
+        return ResponseUtil.custom(content, 200, {
+          "Content-Type": mimeType,
+        });
       }
     } catch (error) {
       return ResponseUtil.handleError(
@@ -64,8 +41,6 @@ async function serveNotAvailableImage(): Promise<Response> {
     const file = await Deno.readFile(notAvailablePath);
     return ResponseUtil.custom(file, 200, {
       "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=3600",
-      "X-Content-Type-Options": "nosniff",
     });
   } catch (error) {
     return ResponseUtil.handleError(

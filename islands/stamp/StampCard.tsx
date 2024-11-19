@@ -178,7 +178,7 @@ export function StampCard({
           <iframe
             scrolling="no"
             loading="lazy"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts allow-same-origin allow-modals"
             src={src}
             className="absolute inset-0 w-full h-full object-contain pointer-events-none"
             onError={(e) => {
@@ -198,10 +198,19 @@ export function StampCard({
                 const iframe = e.currentTarget;
                 const iframeDoc = iframe.contentDocument;
                 if (iframeDoc) {
+                  // Add base target to prevent navigation
+                  const base = iframeDoc.createElement("base");
+                  base.target = "_blank";
+                  iframeDoc.head.appendChild(base);
+
+                  // Process scripts
                   const scripts = Array.from(
                     iframeDoc.getElementsByTagName("script"),
                   );
-                  scripts.forEach((script) => script.setAttribute("defer", ""));
+                  scripts.forEach((script) => {
+                    script.setAttribute("defer", "");
+                    if (!script.type) script.type = "text/javascript";
+                  });
                 }
               } catch (_error) {
                 const parent = e.currentTarget.parentElement;
