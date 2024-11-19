@@ -179,6 +179,7 @@ import * as $stamping_FeeEstimation from "./islands/stamping/FeeEstimation.tsx";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
+import * as $stamping_src101_MintContent from "./islands/stamping/src101/MintContent.tsx";
 import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/deploy/DeployContent.tsx";
 import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
 import * as $stamping_src20_mint_MintContent from "./islands/stamping/src20/mint/MintContent.tsx";
@@ -413,6 +414,7 @@ const manifest = {
     "./islands/stamping/InputField.tsx": $stamping_InputField,
     "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
+    "./islands/stamping/src101/MintContent.tsx": $stamping_src101_MintContent,
     "./islands/stamping/src20/deploy/DeployContent.tsx":
       $stamping_src20_deploy_DeployContent,
     "./islands/stamping/src20/deploy/RecentDeploy.tsx":
