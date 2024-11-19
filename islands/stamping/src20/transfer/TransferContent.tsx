@@ -4,10 +4,11 @@ import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
-const bodyCenterClassName =
-  "flex flex-col gap-3 mobileMd:gap-6 items-center w-full";
-const titleCenterClassName =
-  "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1 text-center mt-6 w-full";
+const titlePurpleLDCenterClassName =
+  "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+const bodyToolsClassName =
+  "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+
 const inputFieldContainerClassName =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
 const inputField2colClassName =
@@ -49,8 +50,8 @@ export function TransferContent(
   };
 
   return (
-    <div className={bodyCenterClassName}>
-      <h1 className={titleCenterClassName}>TRANSFER</h1>
+    <div className={bodyToolsClassName}>
+      <h1 className={titlePurpleLDCenterClassName}>TRANSFER</h1>
 
       <div className={inputFieldContainerClassName}>
         <InputField
