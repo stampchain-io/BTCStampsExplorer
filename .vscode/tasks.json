@@ -4,13 +4,27 @@
     {
       "label": "deno: cleanup-ports",
       "type": "shell",
-      "command": "lsof -ti:9229,8000 | xargs kill -9 || true",
+      "command": "bash",
+      "args": [
+        "-c",
+        "if lsof -ti:9229,8000 >/dev/null; then lsof -ti:9229,8000 | xargs kill -15 && sleep 2; fi"
+      ],
       "presentation": {
         "reveal": "never",
         "panel": "shared",
         "close": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "run-local-script",
+      "type": "shell",
+      "command": "bash",
+      "args": ["${workspaceFolder}/scripts/local.sh"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
     }
   ]
 }
