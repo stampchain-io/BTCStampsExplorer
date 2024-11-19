@@ -13,6 +13,8 @@ type ServerConfig = {
   readonly API_KEY?: string;
   readonly QUICKNODE_ENDPOINT?: string;
   readonly QUICKNODE_API_KEY?: string;
+  readonly DEBUG_NAMESPACES: string;
+  readonly IS_DEBUG_ENABLED: boolean;
   [key: string]: string | undefined;
 };
 
@@ -48,6 +50,12 @@ const serverConfig: ServerConfig = {
   get QUICKNODE_API_KEY() {
     return Deno.env.get("QUICKNODE_API_KEY");
   },
+  get DEBUG_NAMESPACES() {
+    return Deno.env.get("DEBUG") || "";
+  },
+  get IS_DEBUG_ENABLED() {
+    return !!Deno.env.get("DEBUG");
+  },
 };
 
 export { serverConfig };
@@ -57,6 +65,7 @@ export function getClientConfig() {
     API_BASE_URL: serverConfig.API_BASE_URL,
     MINTING_SERVICE_FEE: serverConfig.MINTING_SERVICE_FEE,
     MINTING_SERVICE_FEE_ADDRESS: serverConfig.MINTING_SERVICE_FEE_ADDRESS,
-    // Add other client-safe config variables here
+    DEBUG_NAMESPACES: serverConfig.DEBUG_NAMESPACES,
+    IS_DEBUG_ENABLED: serverConfig.IS_DEBUG_ENABLED,
   };
 }
