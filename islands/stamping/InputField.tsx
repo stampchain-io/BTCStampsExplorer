@@ -27,7 +27,7 @@ export function InputField({
     <div class="w-full">
       <input
         type={type}
-        class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+        class="h-12 px-3 rounded-md bg-[#999999] text-[#333333] placeholder:text-[#333333] placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC]"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
