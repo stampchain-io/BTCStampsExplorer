@@ -21,6 +21,7 @@ import { CollectionController } from "./collectionController.ts";
 import { Src20Controller } from "./src20Controller.ts";
 import { CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export class StampController {
   static async getStampDetailsById(id: string, stampType: STAMP_TYPES = "all") {
@@ -70,7 +71,10 @@ export class StampController {
         last_block,
       };
     } catch (error) {
-      console.error("Error in StampController.getStampDetailsById:", error);
+      logger.error("stamps", {
+        message: "Error in StampController.getStampDetailsById",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
@@ -89,73 +93,109 @@ export class StampController {
     dispenses: Dispense[],
     stamp: StampRow,
   ) {
-    console.log("Entering calculatePrices method");
-    console.log("Dispensers:", JSON.stringify(dispensers, null, 2));
-    console.log("Dispenses:", JSON.stringify(dispenses, null, 2));
-    console.log("Stamp:", JSON.stringify(stamp, null, 2));
+    logger.debug("stamps", {
+      message: "Entering calculatePrices method",
+      dispensers,
+      dispenses,
+      stamp
+    });
 
     let floorPrice: string | number = "priceless";
     let marketCap: string | number = "priceless";
 
     if (dispensers && dispensers.length > 0) {
-      console.log("Dispensers array is not empty");
+      logger.debug("stamps", {
+        message: "Processing dispensers array",
+        count: dispensers.length
+      });
+
       const openDispensers = dispensers.filter((dispenser) => {
-        console.log("Checking dispenser:", JSON.stringify(dispenser, null, 2));
+        logger.debug("stamps", {
+          message: "Checking dispenser status",
+          dispenser
+        });
         return dispenser && dispenser.give_remaining > 0;
       });
-      console.log("Open dispensers:", JSON.stringify(openDispensers, null, 2));
+
+      logger.debug("stamps", {
+        message: "Found open dispensers",
+        count: openDispensers.length
+      });
 
       if (openDispensers.length > 0) {
-        console.log("There are open dispensers");
         const lowestBtcRate = Math.min(
           ...openDispensers.map((dispenser) => {
-            console.log(
-              "Processing dispenser:",
-              JSON.stringify(dispenser, null, 2),
-            );
+            logger.debug("stamps", {
+              message: "Processing dispenser for BTC rate",
+              dispenser
+            });
+            
             if (dispenser && dispenser.satoshirate !== undefined) {
               return Number(formatSatoshisToBTC(dispenser.satoshirate, { 
                 includeSymbol: false 
               }));
             } else {
-              console.log("Warning: dispenser or satoshirate is undefined");
+              logger.warn("stamps", {
+                message: "Invalid dispenser data",
+                dispenser
+              });
               return Infinity;
             }
           }),
         );
-        console.log("Lowest BTC rate:", lowestBtcRate);
+        
+        logger.debug("stamps", {
+          message: "Calculated lowest BTC rate",
+          lowestBtcRate
+        });
+        
         floorPrice = lowestBtcRate !== Infinity ? lowestBtcRate : "priceless";
       }
     } else {
-      console.log("Dispensers array is empty or undefined");
+      logger.debug("stamps", {
+        message: "No dispensers available"
+      });
     }
 
     if (dispenses && dispenses.length > 0 && stamp.supply) {
-      console.log("Calculating market cap");
-      const mostRecentDispense = dispenses[0];
-      console.log(
-        "Most recent dispense:",
-        JSON.stringify(mostRecentDispense, null, 2),
-      );
+      logger.debug("stamps", {
+        message: "Calculating market cap",
+        dispenseCount: dispenses.length,
+        supply: stamp.supply
+      });
 
-      // Find the parent dispenser for the most recent dispense
+      const mostRecentDispense = dispenses[0];
+      logger.debug("stamps", {
+        message: "Processing most recent dispense",
+        dispense: mostRecentDispense
+      });
+
       const parentDispenser = dispensers.find((d) =>
         d.tx_hash === mostRecentDispense.dispenser_tx_hash
       );
 
       if (parentDispenser && parentDispenser.satoshirate !== undefined) {
-        const recentPrice = parentDispenser.satoshirate / 100000000; // Convert satoshis to BTC
+        const recentPrice = parentDispenser.satoshirate / 100000000;
         marketCap = recentPrice * stamp.supply;
-        console.log("Calculated market cap:", marketCap);
+        logger.debug("stamps", {
+          message: "Market cap calculated",
+          recentPrice,
+          marketCap
+        });
       } else {
-        console.log(
-          "Warning: Parent dispenser not found or satoshirate is missing for the most recent dispense",
-        );
+        logger.warn("stamps", {
+          message: "Unable to calculate market cap - missing dispenser data",
+          parentDispenser
+        });
       }
     }
 
-    console.log("Final floorPrice:", floorPrice);
-    console.log("Final marketCap:", marketCap);
+    logger.debug("stamps", {
+      message: "Price calculation complete",
+      floorPrice,
+      marketCap
+    });
+
     return { floorPrice, marketCap };
   }
 
@@ -248,7 +288,8 @@ export class StampController {
         BlockService.getLastBlock(),
       ]);
 
-      console.log("StampResult from service:", {
+      logger.debug("stamps", {
+        message: "Stamp result from service",
         totalStamps: stampResult?.stamps?.length,
         sampleStamp: stampResult?.stamps?.[0],
         page: stampResult?.page,
@@ -257,6 +298,9 @@ export class StampController {
       });
 
       if (!stampResult) {
+        logger.error("stamps", {
+          message: "No stamps found"
+        });
         throw new Error("No stamps found");
       }
 
@@ -352,7 +396,10 @@ export class StampController {
         data: stampResult.stamps,
       };
     } catch (error) {
-      console.error("Error in getStamps:", error);
+      logger.error("stamps", {
+        message: "Error in getStamps",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
@@ -375,7 +422,10 @@ export class StampController {
         data: recentSales,
       };
     } catch (error) {
-      console.error("Error in getRecentSales:", error);
+      logger.error("stamps", {
+        message: "Error in getRecentSales",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
@@ -396,7 +446,10 @@ export class StampController {
         totalStamps: result.total,
       };
     } catch (error) {
-      console.error("Error in getStamp:", error);
+      logger.error("stamps", {
+        message: "Error in getStamp",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
@@ -505,7 +558,9 @@ export class StampController {
 
         stamps_posh = poshStampsResult.data; // Extract the stamps array
       } else {
-        console.warn("Posh collection not found");
+        logger.warn("stamps", {
+          message: "Posh collection not found"
+        });
       }
 
       return {
@@ -519,7 +574,10 @@ export class StampController {
         carouselStamps: carouselStamps.data,
       };
     } catch (error) {
-      console.error("Error in getHomePageData:", error);
+      logger.error("stamps", {
+        message: "Error in getHomePageData",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
@@ -549,14 +607,19 @@ export class StampController {
         });
         stamps_posh = poshStampsResult.data; // Extract the stamps array
       } else {
-        console.warn("Posh collection not found");
+        logger.warn("stamps", {
+          message: "Posh collection not found"
+        });
       }
       return {
         stamps_src721: stampCategories[0].stamps,
         stamps_posh,
       };
     } catch (error) {
-      console.error("Error in getHomePageData:", error);
+      logger.error("stamps", {
+        message: "Error in getHomePageData",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
@@ -602,7 +665,10 @@ export class StampController {
           return this.redirectToNotAvailable();
       }
     } catch (error) {
-      console.error("Error in StampController.getStampFile:", error);
+      logger.error("stamps", {
+        message: "Error in StampController.getStampFile",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
@@ -623,7 +689,10 @@ export class StampController {
     try {
       return await StampService.getCreatorNameByAddress(address);
     } catch (error) {
-      console.error("Error in getCreatorNameByAddress:", error);
+      logger.error("stamps", {
+        message: "Error in getCreatorNameByAddress",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
@@ -635,7 +704,10 @@ export class StampController {
     try {
       return await StampService.updateCreatorName(address, newName);
     } catch (error) {
-      console.error("Error in updateCreatorName:", error);
+      logger.error("stamps", {
+        message: "Error in updateCreatorName",
+        error: error instanceof Error ? error.message : String(error)
+      });
       throw error;
     }
   }
