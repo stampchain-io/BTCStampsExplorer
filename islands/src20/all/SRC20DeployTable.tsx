@@ -1,4 +1,4 @@
-import { ViewAllButton } from "$components/ViewAllButton.tsx";
+import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
@@ -41,7 +41,7 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
   };
 
   return (
-    <div className="max-w-desktop w-full mx-auto px-3 tablet:px-6 desktop:px-12">
+    <div class="grid grid-cols-1 gap-3 mobileLg:gap-6 items-end max-w-desktop w-full mx-auto">
       <ImageModal
         imgSrc={modalImg}
         isOpen={isModalOpen}
@@ -68,7 +68,6 @@ export const SRC20DeployTable = (props: SRC20BalanceTableProps) => {
         ))}
       </div>
 
-      {/* ViewAllButton aligned right */}
       <div className="flex justify-end">
         <ViewAllButton href="/src20" />
       </div>

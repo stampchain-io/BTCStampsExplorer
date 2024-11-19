@@ -11,8 +11,6 @@ export class SRC20MarketService {
       this.fetchOpenStampMarketData().catch(() => []),
     ]);
 
-    console.log("openStampData: ", openStampData);
-
     const openStampDataMap = new Map<string, OpenStampMarketData>(
       Array.isArray(openStampData)
         ? openStampData.map((item) => [item.name.toUpperCase(), item])

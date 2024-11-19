@@ -1,35 +1,55 @@
 import { StampRow } from "globals";
 
-export const NOT_AVAILABLE_IMAGE = "/not-available.png";
-export const mimeTypes: { [key: string]: string } = {
+const NOT_AVAILABLE_IMAGE = "/not-available.png";
+const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",
   "png": "image/png",
   "gif": "image/gif",
   "svg": "image/svg+xml",
-  "tif": "image/tiff",
-  "jfif": "image/jpeg",
-  "jpe": "image/jpeg",
-  "pbm": "image/x-portable-bitmap",
-  "pgm": "image/x-portable-graymap",
-  "ppm": "image/x-portable-pixmap",
-  "pnm": "image/x-portable-anymap",
-  "apng": "image/apng",
-  "bmp": "image/bmp",
+  "svgz": "image/svg+xml",
   "webp": "image/webp",
-  "heif": "image/heif",
-  "heic": "image/heic",
   "avif": "image/avif",
   "ico": "image/x-icon",
+  "bmp": "image/bmp",
   "tiff": "image/tiff",
-  "svgz": "image/svg+xml",
-  "wmf": "image/wmf",
-  "emf": "image/emf",
-  "pcx": "image/pcx",
-  "djvu": "image/vnd.djvu",
-  "djv": "image/vnd.djvu",
+  "tif": "image/tiff",
   "html": "text/html",
+  "htm": "text/html",
   "txt": "text/plain",
+  "md": "text/markdown",
+  "csv": "text/csv",
+  "js": "application/javascript",
+  "mjs": "application/javascript",
+  "cjs": "application/javascript",
+  "json": "application/json",
+  "map": "application/json",
+  "jsonld": "application/ld+json",
+  "gz": "application/gzip",
+  "gzip": "application/gzip",
+  "zip": "application/zip",
+  "bz": "application/x-bzip",
+  "bz2": "application/x-bzip2",
+  "7z": "application/x-7z-compressed",
+  "css": "text/css",
+  "less": "text/less",
+  "sass": "text/sass",
+  "scss": "text/scss",
+  "xml": "application/xml",
+  "wasm": "application/wasm",
+  "woff": "font/woff",
+  "woff2": "font/woff2",
+  "ttf": "font/ttf",
+  "otf": "font/otf",
+  "eot": "application/vnd.ms-fontobject",
+  "mp3": "audio/mpeg",
+  "wav": "audio/wav",
+  "mp4": "video/mp4",
+  "webm": "video/webm",
+  "ogg": "audio/ogg",
+  "ogv": "video/ogg",
+  "mpeg": "video/mpeg",
+  "avi": "video/x-msvideo",
 };
 
 export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(
@@ -40,29 +60,18 @@ export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(
   {} as { [key: string]: string },
 );
 
-export const getMimeType = (extension: string): string => {
-  const normalizedExt = extension.toLowerCase();
+export const getStampImageSrc = (stamp: StampRow) => {
+  if (!stamp.stamp_url) {
+    return NOT_AVAILABLE_IMAGE;
+  }
+  const filename = stamp.stamp_url.split("/").pop();
+  return `/content/${filename}`;
+};
 
+export const getMimeType = (extension: string): string => {
+  const normalizedExt = extension.toLowerCase().trim();
   return mimeTypes[normalizedExt] || "application/octet-stream";
 };
-
-export const getFileSuffixFromMime = (mimetype: string): string => {
-  if (!mimetype) return "unknown";
-  return mimeTypeToSuffix[mimetype] || "unknown";
-};
-
-export function getStampImageUrl(stamp: StampRow): string {
-  if (!stamp?.tx_hash || !stamp?.stamp_mimetype) {
-    return NOT_AVAILABLE_IMAGE;
-  }
-
-  const suffix = getFileSuffixFromMime(stamp.stamp_mimetype);
-  if (suffix === "unknown") {
-    return NOT_AVAILABLE_IMAGE;
-  }
-
-  return `/content/${stamp.tx_hash}.${suffix}`;
-}
 
 export function showFallback(element: HTMLElement) {
   const fallback = document.createElement("img");
@@ -121,19 +130,24 @@ export function isValidSVG(svgContent: string): boolean {
   return true;
 }
 
-// function showFallback(element: HTMLElement) {
-//   const fallback = document.createElement("img");
-//   fallback.src = "/not-available.png";
-//   fallback.alt = "Content not available";
-//   fallback.className = "w-full h-full object-contain rounded-lg";
+// Keep validation logic without JSX
+export const validateStampContent = async (src: string): Promise<{
+  isValid: boolean;
+  error?: string;
+}> => {
+  try {
+    const response = await fetch(src);
+    if (!response.ok) {
+      return { isValid: false, error: "Failed to fetch content" };
+    }
 
-//   if (element instanceof HTMLIFrameElement) {
-//     element.style.display = "none";
-//     if (element.parentNode) {
-//       element.parentNode.appendChild(fallback);
-//     }
-//   } else {
-//     element.innerHTML = "";
-//     element.appendChild(fallback);
-//   }
-// }
+    const content = await response.text();
+    if (!content || content.includes('"deploy"')) {
+      return { isValid: false, error: "Invalid content" };
+    }
+
+    return { isValid: true };
+  } catch {
+    return { isValid: false, error: "Error validating content" };
+  }
+};

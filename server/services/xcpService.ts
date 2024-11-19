@@ -687,7 +687,7 @@ export class XcpManager {
 
       const validEvents = response.result.filter(
         (event): event is DispenseEvent => {
-          return (
+          const isValid = (
             typeof event === "object" &&
             event !== null &&
             typeof event.event_index === "number" &&
@@ -707,7 +707,17 @@ export class XcpManager {
             typeof event.tx_hash === "string" &&
             typeof event.block_index === "number"
           );
-        },
+
+          if (isValid) {
+            // Convert btc_amount to BTC if it's in satoshis
+            event.params.btc_amount = Number(formatSatoshisToBTC(event.params.btc_amount, {
+              includeSymbol: false,
+              stripZeros: false
+            }));
+          }
+
+          return isValid;
+        }
       );
 
       allEvents = allEvents.concat(validEvents);

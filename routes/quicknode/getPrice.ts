@@ -1,5 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { fetchQuicknode } from "$lib/utils/quicknode.ts";
+import { dbManager } from "$server/database/databaseManager.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -19,17 +20,28 @@ export const handler: Handlers = {
       );
     }
 
-    try {
-      const params = JSON.parse(paramsStr);
-      const btcPrice = await fetchQuicknode(name, params);
+    const CACHE_KEY = `btc_price_usd_${name}_${paramsStr}`;
+    const CACHE_DURATION = 300; // 5 minutes in seconds
 
-      const usdPrice = btcPrice.result?.bitcoin?.usd ??
-        btcPrice.result?.price ?? 0;
+    try {
+      // Use caching logic here
+      const price = await dbManager.handleCache<number>(
+        CACHE_KEY,
+        async () => {
+          const params = JSON.parse(paramsStr);
+          const btcPrice = await fetchQuicknode(name, params);
+
+          const usdPrice = btcPrice.result?.bitcoin?.usd ??
+            btcPrice.result?.price ?? 0;
+
+          return usdPrice;
+        },
+        CACHE_DURATION,
+      );
 
       return new Response(
         JSON.stringify({
-          price: usdPrice,
-          data: btcPrice.result,
+          price,
         }),
         {
           headers: { "Content-Type": "application/json" },

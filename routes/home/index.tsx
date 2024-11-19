@@ -1,5 +1,7 @@
 import { StampRow } from "globals";
 import { Handlers } from "$fresh/server.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { getRecommendedFees } from "$lib/utils/mempool.ts";
 
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
 import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
@@ -10,6 +12,7 @@ import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
 import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { StampController } from "$server/controller/stampController.ts";
+import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
 
 type HomePageProps = {
   data: {
@@ -21,6 +24,8 @@ type HomePageProps = {
     trendingSrc20s: any[];
     collectionData: CollectionRow[];
     carouselStamps: StampRow[];
+    btcPrice: number;
+    recommendedFee: number;
   };
 };
 
@@ -51,11 +56,35 @@ export const handler: Handlers = {
     }
 
     try {
-      const result = await StampController.getHomePageData();
-      return ctx.render(result);
+      const baseUrl = `${url.protocol}//${url.host}`;
+
+      const [pageData, btcPrice, fees] = await Promise.all([
+        StampController.getHomePageData(),
+        fetchBTCPriceInUSD(baseUrl),
+        getRecommendedFees(),
+      ]);
+
+      console.log("BTC Price received:", btcPrice); // Debug log
+
+      const data = {
+        ...pageData,
+        btcPrice: Number(btcPrice || 0),
+        recommendedFee: Number(fees?.fastestFee || 0),
+      };
+
+      console.log("Final data being sent to render:", {
+        btcPrice: data.btcPrice,
+        recommendedFee: data.recommendedFee,
+      });
+
+      return ctx.render(data);
     } catch (error) {
-      console.error(error);
-      return ctx.render({ error: `Error: Internal server error` });
+      console.error("Error in handler:", error);
+      return ctx.render({
+        error: `Error: Internal server error`,
+        btcPrice: 0,
+        recommendedFee: 6,
+      });
     }
   },
 };
@@ -70,6 +99,8 @@ export default function Home(props: HomePageProps) {
     src20s = [],
     trendingSrc20s = [],
     carouselStamps = [],
+    btcPrice = 0,
+    recommendedFee = 0,
   } = props.data || {};
 
   return (
@@ -87,6 +118,10 @@ export default function Home(props: HomePageProps) {
       <SRC20TrendingMints data={trendingSrc20s} />
       <StampChainModule />
       <PartnersModule />
+      <GetStampingModule
+        btcPrice={Number(btcPrice)}
+        recommendedFee={Number(recommendedFee)}
+      />
     </div>
   );
 }

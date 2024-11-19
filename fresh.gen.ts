@@ -68,8 +68,6 @@ import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
 import * as $api_v2_update_creator_name from "./routes/api/v2/update-creator-name.ts";
 import * as $api_v2_upload_src20_background from "./routes/api/v2/upload-src20-background.ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
-import * as $block_id_ from "./routes/block/[id].tsx";
-import * as $block_index from "./routes/block/index.tsx";
 import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
 import * as $collection_overview_overview_ from "./routes/collection/overview/[overview].tsx";
@@ -284,8 +282,6 @@ const manifest = {
     "./routes/api/v2/upload-src20-background.ts":
       $api_v2_upload_src20_background,
     "./routes/api/v2/version.ts": $api_v2_version,
-    "./routes/block/[id].tsx": $block_id_,
-    "./routes/block/index.tsx": $block_index,
     "./routes/collection/details/[id].tsx": $collection_details_id_,
     "./routes/collection/index.tsx": $collection_index,
     "./routes/collection/overview/[overview].tsx":

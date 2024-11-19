@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { StampRow, StampSectionProps } from "globals";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
-import { ViewAllButton } from "$components/ViewAllButton.tsx";
+import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
