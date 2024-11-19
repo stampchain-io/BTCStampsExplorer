@@ -458,9 +458,10 @@ export interface Src101BalanceParams {
 
 export interface Pagination {
   page: number;
-  limit: number;
+  pageSize: number;
   totalPages: number;
   total: number;
+  prefix?: string;
 }
 
 export interface PaginatedStampResponseBody extends Pagination {
@@ -751,7 +752,7 @@ export interface PaginationProps {
 }
 
 export interface WalletStampSectionProps extends StampSectionProps {
-  pagination?: PaginationProps;
+  pagination?: Pagination;
   customHeader?: boolean;
   customGridClass?: string;
 }

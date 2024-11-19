@@ -320,10 +320,6 @@ function WalletContent(
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
-  const [currentStampsPage, setCurrentStampsPage] = useState(
-    stamps.pagination.page,
-  );
-  const [currentSrc20Page, setCurrentSrc20Page] = useState(1);
 
   const handleOpenSettingModal = () => {
     setOpenSettingModal(!openSettingModal);
@@ -368,33 +364,6 @@ function WalletContent(
     }
   }, []);
 
-  const handleStampsPageChange = async (page: number) => {
-    try {
-      const response = await fetch(
-        `/api/v2/stamps/balance/${address}?page=${page}&limit=${stamps.pagination.limit}`, // FIXME: need to handle src20 pagination separately
-      );
-      const data = await response.json();
-      // Update stamps data in state
-      setCurrentStampsPage(page);
-      // You'll need to implement state management here to update the stamps data
-    } catch (error) {
-      console.error("Error fetching stamps page:", error);
-    }
-  };
-
-  const handleSrc20PageChange = async (page: number) => {
-    try {
-      // Use the src20-specific endpoint
-      const response = await fetch(
-        `/api/v2/src20/balance/${address}?page=${page}&limit=${src20.pagination.limit}`,
-      );
-      const data = await response.json();
-      // Update src20 data
-    } catch (error) {
-      console.error("Error fetching src20 page:", error);
-    }
-  };
-
   const stampSection = {
     title: "", // Empty title means no header
     type: "all",
@@ -416,10 +385,10 @@ function WalletContent(
       auto-rows-fr
     `,
     pagination: {
-      page: currentStampsPage,
+      page: stamps.pagination.page,
       pageSize: stamps.pagination.limit,
       total: stamps.pagination.total,
-      onPageChange: handleStampsPageChange,
+      prefix: "stamps",
     },
   };
 
@@ -427,12 +396,17 @@ function WalletContent(
     <>
       <div>
         <ItemHeader
+          title="STAMP"
           sortBy={sortBy}
           isOpen={openS}
           handleOpen={handleOpen}
+          sort={true}
+          search={true}
           filter={false}
           setting={true}
+          isOpenFilter={false}
           isOpenSetting={openSetting}
+          handleOpenFilter={() => {}}
           handleOpenSetting={handleOpenSetting}
         />
         <StampSection {...stampSection} />
@@ -443,8 +417,15 @@ function WalletContent(
           title="TOKENS"
           sortBy={sortBy}
           isOpen={openT}
+          sort={true}
+          search={true}
           filter={false}
+          setting={false}
+          isOpenFilter={false}
+          isOpenSetting={false}
           handleOpen={handleOpen}
+          handleOpenFilter={() => {}}
+          handleOpenSetting={() => {}}
         />
         <div className="mt-6">
           <SRC20DeployTable
@@ -456,12 +437,13 @@ function WalletContent(
       {/* Listening Pagination */}
       {src20.data.length && (
         <Pagination
-          page={1}
-          page_size={8}
+          page={src20.pagination.page}
+          page_size={src20.pagination.limit}
           key="Token"
           type="Token_id"
-          data_length={8}
-          pages={src20.data.length / 8}
+          data_length={src20.pagination.total}
+          pages={Math.ceil(src20.pagination.total / src20.pagination.limit)}
+          prefix="src20"
         />
       )}
 
@@ -474,8 +456,11 @@ function WalletContent(
           sort={true}
           filter={true}
           search={true}
+          setting={false}
           isOpenFilter={openFilter}
+          isOpenSetting={false}
           handleOpenFilter={handleOpenFilter}
+          handleOpenSetting={() => {}}
         />
         <div className="mt-6">
           <DispenserItem />
