@@ -104,6 +104,7 @@ import * as $stamping_src20 from "./routes/stamping/src20.tsx";
 import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
 import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
+import * as $test_test_image from "./routes/test/test-image.ts";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Accordion from "./islands/Accordion.tsx";
@@ -323,6 +324,7 @@ const manifest = {
     "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
     "./routes/stamping/stamp.tsx": $stamping_stamp,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
+    "./routes/test/test-image.ts": $test_test_image,
     "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,
   },
