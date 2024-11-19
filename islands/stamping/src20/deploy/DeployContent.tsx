@@ -135,15 +135,20 @@ export function DeployContent(
     }
   }, []);
 
-  return (
-    <div class="flex flex-col w-full items-center gap-8">
-      <p class="purple-gradient1 text-3xl tablet:text-6xl font-black mt-6 w-full text-center">
-        DEPLOY
-      </p>
+  const bodyToolsClassName =
+    "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+  const titlePurpleLDCenterClassName =
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+  const feeSelectorContainerClassName =
+    "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 
-      <div className="dark-gradient p-2 tablet:p-6 w-full flex flex-col gap-3 tablet:gap-6">
-        <div className="flex gap-3 tablet:gap-6">
-          <div className="flex flex-col gap-3 tablet:gap-6 !w-[108px] tablet:!w-[120px]">
+  return (
+    <div className={bodyToolsClassName}>
+      <h1 className={titlePurpleLDCenterClassName}>DEPLOY</h1>
+
+      <div className="dark-gradient p-2 mobileMd:p-6 w-full flex flex-col gap-3 mobileMd:gap-6">
+        <div className="flex gap-3 mobileMd:gap-6">
+          <div className="flex flex-col gap-3 mobileMd:gap-6 !w-[108px] mobileMd:!w-[120px]">
             <div
               id="image-preview"
               class="relative rounded-[3px] items-center text-center cursor-pointer min-w-[108px] tablet:min-w-[120px] h-[108px] tablet:h-[120px] content-center bg-[#660099]"
@@ -192,8 +197,8 @@ export function DeployContent(
             />
           </div>
 
-          <div className="flex flex-col gap-3 tablet:gap-6 w-full">
-            <div class="w-full flex gap-3 tablet:gap-6">
+          <div className="flex flex-col gap-3 mobileMd:gap-6 w-full">
+            <div class="w-full flex gap-3 mobileMd:gap-6">
               <InputField
                 type="text"
                 placeholder="Token ticker name"
@@ -237,19 +242,19 @@ export function DeployContent(
         </div>
 
         <div
-          className={`flex flex-col gap-3 tablet:gap-6 transition-all duration-300 ${
+          className={`flex flex-col gap-3 mobileMd:gap-6 transition-all duration-300 ${
             showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
           }`}
         >
           <textarea
             type="text"
-            class="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC]"
+            class="h-12 px-3 rounded-md bg-[#999999] text-[#333333] placeholder:text-[#333333] placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC]"
             placeholder="Description"
             rows={5}
             // value={formState.description}
             // onChange={(e) => handleInputChange(e, "description")}
           />
-          <div className="w-full flex gap-3 tablet:gap-6">
+          <div className="w-full flex gap-3 mobileMd:gap-6">
             <InputField
               type="text"
               placeholder="X"
@@ -263,7 +268,7 @@ export function DeployContent(
               onChange={(e) => handleInputChange(e, "web")}
             />
           </div>
-          <div className="w-full flex gap-3 tablet:gap-6">
+          <div className="w-full flex gap-3 mobileMd:gap-6">
             <InputField
               type="text"
               placeholder="Telegram"
@@ -281,7 +286,7 @@ export function DeployContent(
         </div>
       </div>
 
-      <div className="dark-gradient p-3 tablet:p-6 w-full z-[10]">
+      <div className={feeSelectorContainerClassName}>
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
