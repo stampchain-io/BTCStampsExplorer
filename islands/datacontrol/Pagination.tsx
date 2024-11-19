@@ -1,6 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 
+const MOBILE_MAX_PAGE_RANGE = 2;
+const DESKTOP_MAX_PAGE_RANGE = 4;
+
+const navArrowClassName = `
+  flex items-center justify-center
+  bg-stamp-purple-darker hover:bg-stamp-primary-hover rounded-md
+  w-7 h-7 mobileLg:h-9 mobileLg:w-9`;
+const navContentClassName = `
+  flex items-center justify-center
+  w-7 h-7 mobileLg:h-9 mobileLg:w-9 rounded-md hover:bg-stamp-primary-hover
+  text-sm leading-[16.5px] mobileLg:text-base mobileLg:leading-[19px]
+  font-medium font-work-sans text-stamp-bg-grey-darkest`;
+
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -17,17 +30,21 @@ const useIsMobile = () => {
   return isMobile;
 };
 
+interface PaginationProps {
+  page: number;
+  pages: number;
+  page_size: number;
+  type: string;
+  data_length: number;
+}
+
 export const Pagination = (
-  { page, pages, page_size, type = "stamp", data_length }: {
-    page: number;
-    pages: number;
-    page_size: number;
-    type: string;
-    data_length: number;
-  },
+  { page, pages, page_size, type = "stamp", data_length }: PaginationProps,
 ) => {
   const isMobile = useIsMobile();
-  const maxPagesToShow = isMobile ? 2 : 4;
+  const maxPagesToShow = isMobile
+    ? MOBILE_MAX_PAGE_RANGE
+    : DESKTOP_MAX_PAGE_RANGE;
   const [currentPage, setCurrentPage] = useState(page);
   const totalPages = pages;
   const { getSort, getFilter, getType } = useNavigator();
@@ -63,11 +80,25 @@ export const Pagination = (
     return url.toString();
   }, [isClient, type, page_size, getSort, getFilter, getType]);
 
-  const [pageItems, includeGoToStart, includeGoToEnd] = useMemo(() => {
+  const renderPageLink = (pageNum: number, icon: string) => (
+    <li key={icon}>
+      <a
+        href={buildPageUrl(pageNum)}
+        f-partial={buildPageUrl(pageNum)}
+        class={navArrowClassName}
+      >
+        <img
+          src={`/img/datacontrol/${icon}.svg`}
+          alt={`arrow ${icon.toLowerCase()}`}
+          class="w-[13px] h-[13px]"
+        />
+      </a>
+    </li>
+  );
+
+  const [pageItems] = useMemo(() => {
     const startPage = Math.max(1, currentPage - maxPagesToShow);
     const endPage = Math.min(totalPages, currentPage + maxPagesToShow);
-    const includeGoToEnd = endPage < totalPages;
-    const includeGoToStart = startPage > 1;
     const items = [];
 
     for (let p = startPage; p <= endPage; p++) {
@@ -77,15 +108,15 @@ export const Pagination = (
           <a
             href={pageUrl}
             f-partial={pageUrl}
-            class={`rounded-md flex items-center justify-center w-7 h-7 mobileLg:h-9 mobileLg:w-9 text-sm leading-[16.5px] mobileLg:text-base mobileLg:leading-[19px] font-medium font-work-sans text-[#080808] hover:bg-[#AA00FF] 
-              ${currentPage === p ? "bg-[#660099] " : "bg-[#440066]"}`}
+            class={navContentClassName + " " +
+              (currentPage === p ? "bg-[#660099] " : "bg-[#440066]")}
           >
             {p}
           </a>
         </li>,
       );
     }
-    return [items, includeGoToStart, includeGoToEnd];
+    return [items];
   }, [currentPage, totalPages, maxPagesToShow, buildPageUrl]);
 
   if (data_length === 0) return null;
@@ -93,69 +124,24 @@ export const Pagination = (
   return (
     <nav
       aria-label="Page navigation"
-      className="flex items-center justify-center"
+      class="flex items-center justify-center"
     >
       <ul class="inline-flex items-center -space-x-px text-sm gap-2">
-        {includeGoToStart && (
-          <li>
-            <a
-              href={buildPageUrl(1)}
-              f-partial={buildPageUrl(1)}
-              class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
-            >
-              <img
-                src="/img/datacontrol/CaretDoubleLeft.svg"
-                alt="arrow double left"
-                className="w-[13px] h-[13px]"
-              />
-            </a>
-          </li>
-        )}
         {currentPage !== 1 && (
-          <li>
-            <a
-              href={buildPageUrl(Math.max(1, currentPage - 1))}
-              f-partial={buildPageUrl(Math.max(1, currentPage - 1))}
-              class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
-            >
-              <img
-                src="/img/datacontrol/CaretLeft.svg"
-                alt="arrow left"
-                className="w-[13px] h-[13px]"
-              />
-            </a>
-          </li>
+          <>
+            {renderPageLink(1, "CaretDoubleLeft")}
+            {renderPageLink(Math.max(1, currentPage - 1), "CaretLeft")}
+          </>
         )}
         {pageItems}
         {currentPage < totalPages && (
-          <li>
-            <a
-              href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-              f-partial={buildPageUrl(Math.min(totalPages, currentPage + 1))}
-              class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
-            >
-              <img
-                src="/img/datacontrol/CaretRight.svg"
-                alt="arrow right"
-                className="w-[13px] h-[13px]"
-              />
-            </a>
-          </li>
-        )}
-        {includeGoToEnd && (
-          <li>
-            <a
-              href={buildPageUrl(totalPages)}
-              f-partial={buildPageUrl(totalPages)}
-              class="flex items-center justify-center bg-[#440066] hover:bg-[#AA00FF] rounded-md w-7 h-7 mobileLg:h-9 mobileLg:w-9"
-            >
-              <img
-                src="/img/datacontrol/CaretDoubleRight.svg"
-                alt="arrow double right"
-                className="w-[13px] h-[13px]"
-              />
-            </a>
-          </li>
+          <>
+            {renderPageLink(
+              Math.min(totalPages, currentPage + 1),
+              "CaretRight",
+            )}
+            {renderPageLink(totalPages, "CaretDoubleRight")}
+          </>
         )}
       </ul>
     </nav>
