@@ -802,7 +802,7 @@ export function OlgaContent() {
       </div> */
       }
 
-      <div className="dark-gradient p-6 w-full z-[10]">
+      <div className="p-3 mobileMd:p-6 dark-gradient z-[10] w-full">
         <FeeEstimation
           fee={fee}
           handleChangeFee={handleChangeFee}
