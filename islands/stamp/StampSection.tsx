@@ -131,7 +131,7 @@ export default function StampSection({
               type="stamp_card_id"
               data_length={pagination.total}
               pages={Math.ceil(pagination.total / pagination.pageSize)}
-              disabled={isLoading}
+              prefix={pagination.prefix}
             />
           </div>
         )

@@ -36,10 +36,12 @@ interface PaginationProps {
   page_size: number;
   type: string;
   data_length: number;
+  prefix?: string;
 }
 
 export const Pagination = (
-  { page, pages, page_size, type = "stamp", data_length }: PaginationProps,
+  { page, pages, page_size, type = "stamp", data_length, prefix }:
+    PaginationProps,
 ) => {
   const isMobile = useIsMobile();
   const maxPagesToShow = isMobile
@@ -49,6 +51,7 @@ export const Pagination = (
   const totalPages = pages;
   const { getSort, getFilter, getType } = useNavigator();
   const [isClient, setIsClient] = useState(false);
+  const _prefix = prefix ? `${prefix}_` : "";
 
   useEffect(() => {
     setCurrentPage(page);
@@ -61,8 +64,23 @@ export const Pagination = (
     }
 
     const url = new URL(globalThis.location.href);
-    url.searchParams.set("page", pageNum.toString());
-    url.searchParams.set("limit", page_size.toString());
+
+    const stampsPage = url.searchParams.get("stamps_page");
+    const stampsLimit = url.searchParams.get("stamps_limit");
+    const src20Page = url.searchParams.get("src20_page");
+    const src20Limit = url.searchParams.get("src20_limit");
+
+    if (stampsPage && stampsLimit) {
+      url.searchParams.set("stamps_page", stampsPage);
+      url.searchParams.set("stamps_limit", stampsLimit);
+    }
+    if (src20Page && src20Limit) {
+      url.searchParams.set("src20_page", src20Page);
+      url.searchParams.set("src20_limit", src20Limit);
+    }
+
+    url.searchParams.set(`${_prefix}page`, pageNum.toString());
+    url.searchParams.set(`${_prefix}limit`, page_size.toString());
 
     const currentType = url.searchParams.get("type") || getType();
     const currentSort = url.searchParams.get("sortBy") || getSort();

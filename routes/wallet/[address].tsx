@@ -15,7 +15,6 @@ type WalletPageProps = {
       stamps: any[];
       src20: any[];
     };
-    selectedTab: string;
     address: string;
     walletData: WalletData;
     stampsTotal: number;
@@ -33,7 +32,8 @@ export const handler: Handlers = {
   async GET(req, ctx) {
     const { address } = ctx.params;
     const url = new URL(req.url);
-    const { limit, page } = getPaginationParams(url);
+    const stampsParams = getPaginationParams(url, "stamps");
+    const src20Params = getPaginationParams(url, "src20");
 
     try {
       // Fetch all required data in parallel
@@ -41,11 +41,11 @@ export const handler: Handlers = {
         .all([
           // Stamps data with pagination
           fetch(
-            `${serverConfig.API_BASE_URL}/api/v2/stamps/balance/${address}?page=${page}&limit=${limit}`,
+            `${serverConfig.API_BASE_URL}/api/v2/stamps/balance/${address}?page=${stampsParams.page}&limit=${stampsParams.limit}`,
           ),
           // SRC20 data with pagination
           fetch(
-            `${serverConfig.API_BASE_URL}/api/v2/src20/balance/${address}?page=${page}&limit=${limit}`,
+            `${serverConfig.API_BASE_URL}/api/v2/src20/balance/${address}?page=${src20Params.page}&limit=${src20Params.limit}`,
           ),
           // BTC wallet info
           BTCAddressService.getAddressInfo(address),
@@ -88,7 +88,6 @@ export const handler: Handlers = {
         address,
         stampsTotal: stampsData.total || 0,
         src20Total: src20Data.total || 0,
-        selectedTab: "my_items",
       });
     } catch (error) {
       console.error("Error:", error);
@@ -96,11 +95,11 @@ export const handler: Handlers = {
       return ctx.render({
         stamps: {
           data: [],
-          pagination: { page: 1, limit, total: 0, totalPages: 0 },
+          pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
         },
         src20: {
           data: [],
-          pagination: { page: 1, limit, total: 0, totalPages: 0 },
+          pagination: { page: 1, limit: 8, total: 0, totalPages: 0 },
         },
         walletData: {
           balance: 0,
@@ -112,7 +111,6 @@ export const handler: Handlers = {
         address,
         stampsTotal: 0,
         src20Total: 0,
-        selectedTab: "my_items",
       });
     }
   },
@@ -126,9 +124,6 @@ export default function Wallet(props: WalletPageProps) {
       <WalletHeader
         filterBy={[]}
         sortBy="DESC"
-        selectedTab={data.selectedTab}
-        address={data.address}
-        type="all"
       />
       <WalletDetails
         walletData={data.walletData}
