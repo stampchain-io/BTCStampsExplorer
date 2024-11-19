@@ -1,7 +1,4 @@
 import { useEffect, useState } from "preact/hooks";
-import { StampRow } from "globals";
-import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import StampImage from "./StampImage.tsx";
 
 interface StampCodeModalProps {
   src: string;
@@ -9,9 +6,9 @@ interface StampCodeModalProps {
   handleCloseModal: () => void;
 }
 
-const StampCodeModal = (
+export default function StampCodeModal(
   { src, toggleModal, handleCloseModal }: StampCodeModalProps,
-) => {
+) {
   const [formattedSrc, setFormattedSrc] = useState("");
 
   useEffect(() => {
@@ -19,7 +16,7 @@ const StampCodeModal = (
   }, [src]);
 
   function formatHtmlSource(html: string): string {
-    let formatted = html.replace(/</g, "\n<").replace(/>/g, ">\n");
+    const formatted = html.replace(/</g, "\n<").replace(/>/g, ">\n");
     let indent = 0;
     let result = "";
 
@@ -69,13 +66,11 @@ const StampCodeModal = (
               <span class="sr-only">Close modal</span>
             </button>
             <pre class="text-sm text-gray-800 whitespace-pre-wrap break-words">
-              <code>{src}</code>
+              <code>{formattedSrc}</code>
             </pre>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default StampCodeModal;
+}

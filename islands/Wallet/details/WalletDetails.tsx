@@ -3,7 +3,7 @@ import { useState } from "preact/hooks";
 import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletData } from "$types/index.d.ts";
-import { Button } from "$components/Button.tsx";
+import { Button } from "$components/shared/Button.tsx";
 
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {

@@ -1,6 +1,5 @@
 import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
 import { SUBPROTOCOLS } from "globals";
-import { getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import { BIG_LIMIT } from "$lib/utils/constants.ts";
 import {
   STAMP_FILTER_TYPES,
@@ -316,7 +315,7 @@ export class StampRepository {
     const sanitizedIdentifier = this.sanitize(identifier);
     const data = await dbManager.executeQueryWithCache(
       `
-      SELECT tx_hash, stamp_hash, stamp_mimetype, cpid, stamp_base64
+      SELECT tx_hash, stamp_hash, stamp_mimetype, cpid, stamp_base64, stamp_url
       FROM ${STAMP_TABLE}
       WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?)
       AND stamp IS NOT NULL;
@@ -329,18 +328,17 @@ export class StampRepository {
       return null;
     }
 
-    const tx_hash = data.rows[0]?.tx_hash;
-    const stamp_mimetype = data.rows[0]?.stamp_mimetype;
+    const { tx_hash, stamp_mimetype, stamp_url, stamp_base64 } = data.rows[0];
 
-    if (!tx_hash || !stamp_mimetype) {
+    if (!tx_hash || !stamp_mimetype || !stamp_url) {
       return null;
     }
 
-    const ext = getFileSuffixFromMime(stamp_mimetype);
-    const fileName = `${tx_hash}.${ext}`;
-    const base64 = data.rows[0].stamp_base64;
+    // Get extension from stamp_url
+    const extension = stamp_url.split('.').pop() || '';
+    const fileName = `${tx_hash}.${extension}`;
 
-    return { fileName, base64, stamp_mimetype };
+    return { fileName, base64: stamp_base64, stamp_mimetype };
   }
 
   static async getStampsFromDb(

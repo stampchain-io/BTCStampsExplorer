@@ -307,9 +307,8 @@ export function FeeEstimation({
             type="checkbox"
             id="tosAgreed"
             checked={tosAgreed}
-            onChange={(e) =>
-              onTosChange((e.target as HTMLInputElement).checked)}
-            className="w-3 h-3 mobileLg:w-4 mobileLg:h-4 rounded-[3px] bg-stamp-grey checked:bg-stamp-grey-light appearance-none cursor-pointer relative checked:after:content-['✓'] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:text-[#660099] checked:after:p-[3px] checked:after:text-[10px] checked:after:font-bold"
+            onChange={(e) => onTosChange(e.target.checked)}
+            className="w-3 h-3 bg-[#262424] border border-[#7F7979]"
           />
           <label
             htmlFor="tosAgreed"
@@ -412,38 +411,28 @@ export function FeeEstimation({
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center gap-1 mt-2 text-sm mobileLg:text-base font-light text-stamp-grey-darker cursor-pointer"
+        className="flex items-center gap-1 uppercase mt-2 text-xs cursor-pointer"
       >
-        <span className="mr-[3px] mobileLg:mr-[6px]">DETAILS</span>
+        DETAILS
         {!visible
           ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="10"
-              height="5"
-              className="mobileLg:w-[12px] mobileLg:h-[6px]"
-              viewBox="0 0 10 5"
-              fill="none"
+              width="1em"
+              height="1em"
+              viewBox="0 0 24 24"
             >
-              <path
-                d="M9.01552 4.76561C8.98069 4.80047 8.93934 4.82813 8.89381 4.84701C8.84829 4.86588 8.79949 4.87559 8.75021 4.87559C8.70093 4.87559 8.65213 4.86588 8.60661 4.84701C8.56108 4.82813 8.51972 4.80047 8.4849 4.76561L5.00021 1.28045L1.51552 4.76561C1.44516 4.83597 1.34972 4.8755 1.25021 4.8755C1.1507 4.8755 1.05526 4.83597 0.984896 4.76561C0.914531 4.69524 0.875 4.59981 0.875 4.5003C0.875 4.40078 0.914531 4.30535 0.984896 4.23498L4.7349 0.484982C4.76972 0.450116 4.81108 0.422457 4.85661 0.403585C4.90213 0.384714 4.95093 0.375 5.00021 0.375C5.04949 0.375 5.09829 0.384714 5.14381 0.403585C5.18934 0.422457 5.23069 0.450116 5.26552 0.484982L9.01552 4.23498C9.05039 4.26981 9.07805 4.31117 9.09692 4.35669C9.11579 4.40222 9.1255 4.45101 9.1255 4.5003C9.1255 4.54958 9.11579 4.59837 9.09692 4.6439C9.07805 4.68942 9.05039 4.73078 9.01552 4.76561Z"
-                fill="#666666"
-              />
+              <path fill="white" d="M12 8l6 6H6l6-6z" />
             </svg>
           )
           : (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="10"
-              height="5"
-              className="mobileLg:w-[12px] mobileLg:h-[6px]"
-              viewBox="0 0 10 5"
-              fill="none"
+              width="1em"
+              height="1em"
+              viewBox="0 0 24 24"
             >
-              <path
-                d="M9.01552 0.765521L5.26552 4.51552C5.23069 4.55039 5.18934 4.57805 5.14381 4.59692C5.09829 4.61579 5.04949 4.6255 5.00021 4.6255C4.95093 4.6255 4.90213 4.61579 4.85661 4.59692C4.81108 4.57805 4.76972 4.55039 4.7349 4.51552L0.984896 0.765521C0.914531 0.695156 0.875 0.59972 0.875 0.500208C0.875 0.400697 0.914531 0.305261 0.984896 0.234896C1.05526 0.164531 1.1507 0.125 1.25021 0.125C1.34972 0.125 1.44516 0.164531 1.51552 0.234896L5.00021 3.72005L8.4849 0.234896C8.51974 0.200054 8.5611 0.172417 8.60662 0.153561C8.65215 0.134705 8.70094 0.125 8.75021 0.125C8.79948 0.125 8.84827 0.134705 8.8938 0.153561C8.93932 0.172417 8.98068 0.200054 9.01552 0.234896C9.05036 0.269737 9.078 0.3111 9.09686 0.356622C9.11571 0.402145 9.12542 0.450935 9.12542 0.500208C9.12542 0.549482 9.11571 0.598272 9.09686 0.643795C9.078 0.689317 9.05036 0.73068 9.01552 0.765521Z"
-                fill="#666666"
-              />
+              <path fill="white" d="M12 16l-6-6h12l-6 6z" />
             </svg>
           )}
       </div>

@@ -1,7 +1,7 @@
 import { StampRow, StampSectionProps } from "globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
-import { ViewAllButton } from "$components/ViewAllButton.tsx";
+import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { CollectionOverviewCard } from "$components/collection/CollectionOverviewCard.tsx";
 import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";

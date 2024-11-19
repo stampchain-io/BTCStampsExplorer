@@ -57,7 +57,14 @@ export function SRC20TickHeader({
   totalTransfers,
   marketInfo,
 }: SRC20TickHeaderProps) {
-  const tickValue = deployment.tick ? convertToEmoji(deployment.tick) : "N/A";
+  const tickValue = deployment.tick
+    ? (() => {
+      console.log("Original tick:", deployment.tick);
+      const converted = convertToEmoji(deployment.tick);
+      console.log("Converted tick:", converted);
+      return converted;
+    })()
+    : "N/A";
   const deployDate = formatDate(new Date(deployment.block_time), {
     month: "short",
     year: "numeric",

@@ -42,7 +42,11 @@ export function formatSatoshisToBTC(
     stripZeros?: boolean;
   } = {},
 ): string {
-  return formatBTCAmount(satoshis / SATOSHIS_PER_BTC, options);
+  // Check if the number already appears to be in BTC (has decimal places)
+  const isAlreadyBTC = satoshis.toString().includes(".");
+  const btcValue = isAlreadyBTC ? satoshis : satoshis / SATOSHIS_PER_BTC;
+
+  return formatBTCAmount(btcValue, options);
 }
 
 export function formatNumber(value: number, decimals: number = 8): string {
@@ -117,14 +121,12 @@ export function bigFloatToString(
 }
 
 export function formatSupplyValue(
-  supply: number | string | bigint,
+  supply: number | string | undefined,
   divisible: boolean,
 ): string {
-  if (typeof supply === "bigint") {
-    return divisible
-      ? (supply / 100000000n).toString()
-      : BigInt(supply).toString();
-  } else if (typeof supply === "string") {
+  if (supply === undefined) return "0";
+
+  if (typeof supply === "string") {
     supply = parseInt(supply);
   }
   return divisible ? (supply / 100000000).toFixed(2) : supply.toString();

@@ -8,7 +8,7 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
 export function DeployContent(
-  { trxType = "olga" }: { trxType?: "olga" | "multisig" },
+  { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
 ) {
   console.log("DeployContent trxType:", trxType);
   const {
@@ -27,6 +27,7 @@ export function DeployContent(
   } = useSRC20Form("deploy", trxType);
 
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
+  const [tosAgreed, setTosAgreed] = useState(false);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -300,6 +301,8 @@ export function DeployContent(
           buttonName="DEPLOY"
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
+          tosAgreed={tosAgreed}
+          onTosChange={setTosAgreed}
         />
 
         <StatusMessages
