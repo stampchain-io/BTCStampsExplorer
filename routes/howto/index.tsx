@@ -9,8 +9,7 @@ export default function HowTo() {
   const bodyTextLightClassName =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
   const buttonGreyOutlineClassName =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] leading-[42px] mobileLg:leading-[48px] px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
-
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
   return (
     <div className={bodyClassName}>
       <section className="mb-6">
@@ -33,13 +32,13 @@ export default function HowTo() {
 
       <section>
         <h2 className={subTitleGreyClassName}>DEPLOY YOUR OWN TOKEN</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
           <img
             src="/img/how-tos/deploy/00.png"
             width="100%"
             alt="Deploy a SRC-20 token on Bitcoin"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
+          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
             <p className={bodyTextLightClassName}>
               To deploy a SRC-20 token, stamp the transaction on Bitcoin with
               the token's supply and metadata. This makes the token immutable
@@ -65,8 +64,14 @@ export default function HowTo() {
 
       <section>
         <h2 className={subTitleGreyClassName}>MINT YOUR TOKEN</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
-          <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
+          <img
+            src="/img/how-tos/mintsrc20/00.png"
+            width="100%"
+            alt="How to mint a SRC-20 Bitcoin stamps token"
+            class="block mobileLg:order-last"
+          />
+          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
             <p className={bodyTextLightClassName}>
               After deployment, token holders can mint SRC-20 tokens based on
               the initial supply set in the contract.<br />
@@ -83,23 +88,18 @@ export default function HowTo() {
               </a>
             </div>
           </div>
-          <img
-            src="/img/how-tos/mintsrc20/00.png"
-            width="100%"
-            alt="How to mint a SRC-20 Bitcoin stamps token"
-          />
         </div>
       </section>
 
       <section>
         <h2 className={subTitleGreyClassName}>STAMPING ART</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
           <img
             src="/img/how-tos/stamping/00.png"
             width="100%"
             alt="Guide on how to create NFTs on Bitcoin using the stamps protocol"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
+          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
             <p className={bodyTextLightClassName}>
               Store your art permanently on Bitcoin - the most resilient
               blockchain in the world.<br />
@@ -121,8 +121,14 @@ export default function HowTo() {
 
       <section>
         <h2 className={subTitleGreyClassName}>TRANSFER FUNCTIONALITY</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
-          <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
+          <img
+            src="/img/how-tos/transfer/00.png"
+            width="100%"
+            alt="Transfer SRC-20 tokens on the Bitcoin blockchain"
+            class="block mobileLg:order-last"
+          />
+          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
             <p className={bodyTextLightClassName}>
               Send your assets swiftly and securely across the Bitcoin
               blockchain
@@ -143,23 +149,18 @@ export default function HowTo() {
               </a>
             </div>
           </div>
-          <img
-            src="/img/how-tos/transfer/00.png"
-            width="100%"
-            alt="Transfer SRC-20 tokens on the Bitcoin blockchain"
-          />
         </div>
       </section>
 
       <section>
         <h2 className={subTitleGreyClassName}>CREATE A LEATHER WALLET</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
           <img
             src="/img/how-tos/createleatherwallet/00.png"
             width="100%"
             alt="Create, setup and install Bitcoin Leather wallet"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
+          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
             <p className={bodyTextLightClassName}>
               New to Bitcoin, Stamps, wallet and all the other fancy lingo?{" "}
               <br />
@@ -182,8 +183,14 @@ export default function HowTo() {
 
       <section>
         <h2 className={subTitleGreyClassName}>CONNECT YOUR LEATHER WALLET</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6">
-          <div className="desktop:col-span-2 flex flex-col gap-6 justify-between">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
+          <img
+            src="/img/how-tos/connectleatherwallet/00.png"
+            width="100%"
+            alt="Connect your Bitcoin Leather wallet to the Stampchain website"
+            class="block mobileLg:order-last"
+          />
+          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
             <p className={bodyTextLightClassName}>
               <b>
                 In this guide, you'll learn how connect your Leather wallet to
@@ -200,11 +207,6 @@ export default function HowTo() {
               </a>
             </div>
           </div>
-          <img
-            src="/img/how-tos/connectleatherwallet/00.png"
-            width="100%"
-            alt="Connect your Bitcoin Leather wallet to the Stampchain website"
-          />
         </div>
       </section>
     </div>
