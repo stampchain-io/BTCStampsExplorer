@@ -14,13 +14,15 @@
       "attachSimplePort": 9229,
       "restart": true,
       "outputCapture": "std",
-      "postDebugTask": "deno: cleanup-ports",
+      "preLaunchTask": "run-local-script",
+      // "postDebugTask": "deno: cleanup-ports",
       "env": {
         "DENO_ENV": "development",
         "DENO_V8_FLAGS": "--max-old-space-size=8192"
       },
       "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart"
+      "internalConsoleOptions": "openOnSessionStart",
+      "autoAttachChildProcesses": true
     }
   ]
 }
