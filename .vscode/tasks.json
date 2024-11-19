@@ -2,52 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "deno-build",
+      "label": "deno: cleanup-ports",
       "type": "shell",
-      "command": "echo 'Starting development build...' && deno task dev:build",
-      "group": {
-        "kind": "build",
-        "isDefault": true
+      "command": "lsof -ti:9229,8000 | xargs kill -9 || true",
+      "presentation": {
+        "reveal": "never",
+        "panel": "shared",
+        "close": true
       },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "close": true,
-        "focus": true
-      }
-    },
-    {
-      "label": "pre-launch-tasks",
-      "dependsOrder": "sequence",
-      "dependsOn": ["deno-build"],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "close": false,
-        "focus": true
-      }
-    },
-    {
-      "label": "restart-debug",
-      "type": "shell",
-      "command": "echo 'Restarting debug session...' && pkill -f 'deno.*--inspect' || true && echo 'Starting new debug session...' && deno run -A --inspect-wait --watch=static/,routes/,components/,islands/,server/ ./dev.ts",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "close": true,
-        "focus": true
-      },
-      "isBackground": true,
-      "problemMatcher": {
-        "pattern": {
-          "regexp": "^.*$"
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "Watcher Process started",
-          "endsPattern": "Debugger session started"
-        }
-      }
+      "problemMatcher": []
     }
   ]
 }
