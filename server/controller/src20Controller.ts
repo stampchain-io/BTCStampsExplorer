@@ -134,15 +134,16 @@ export class Src20Controller {
   }
 
   static async handleSrc20MintProgressRequest(tick: string) {
+    if (!tick) {
+      return null;
+    }
+
     try {
       const responseBody = await SRC20Service.QueryService.getSrc20MintProgressByTick(tick);
-      if (responseBody === null) {
-        return null; // Return null instead of throwing an error
-      }
-      return responseBody;
+      return responseBody || null;
     } catch (error) {
       console.error("Error processing SRC20 mint progress request:", error);
-      return null; // Return null in case of any error
+      return null;
     }
   }
 

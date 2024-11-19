@@ -9,7 +9,6 @@ import {
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { BIG_LIMIT } from "$lib/utils/constants.ts";
-import { getMimeType, getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import { DispenserFilter } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 
@@ -142,8 +141,10 @@ export class StampService {
       return { type: "notFound" };
     }
 
-    const suffix = getFileSuffixFromMime(result.stamp_mimetype);
-    if (suffix === "unknown") {
+    // Get extension directly from stamp_url/fileName
+    const extension = result.fileName.split('.').pop();
+    
+    if (!extension) {
       if (result.base64) {
         return { 
           type: "base64", 

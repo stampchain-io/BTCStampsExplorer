@@ -5,7 +5,7 @@ import {
   PaginatedCollectionResponseBody,
 } from "globals";
 import { StampController } from "$server/controller/stampController.ts";
-import { getStampImageUrl } from "$lib/utils/imageUtils.ts";
+import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 
 export class CollectionController {
   static async getCollectionDetails(
@@ -95,7 +95,7 @@ export class CollectionController {
         }
 
         const stamps = stampsByCollection.get(collectionId)!;
-        const imageUrl = getStampImageUrl(stamp);
+        const imageUrl = getStampImageSrc(stamp);
         if (stamps.length < 12 && !stamps.includes(imageUrl)) {
           stamps.push(imageUrl);
         }

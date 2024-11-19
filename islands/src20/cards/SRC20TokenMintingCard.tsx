@@ -1,4 +1,4 @@
-import { Button } from "$components/Button.tsx";
+import { Button } from "$components/shared/Button.tsx";
 import {
   boldTextClassName,
   defaultTextClassName,

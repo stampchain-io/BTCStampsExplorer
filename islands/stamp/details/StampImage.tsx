@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "preact/hooks";
+import { VNode } from "preact";
 
 import { StampRow } from "globals";
 import {
-  getStampImageUrl,
+  getStampImageSrc,
   handleImageError,
-  NOT_AVAILABLE_IMAGE,
+  validateStampContent,
 } from "$lib/utils/imageUtils.ts";
 
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
@@ -105,7 +106,7 @@ export function StampImage(
   },
 ) {
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
-  const imgScopeRef = useRef(null);
+  const imgScopeRef = useRef<HTMLDivElement | null>(null);
   const [transform, setTransform] = useState("");
 
   const updateTransform = () => {
@@ -146,18 +147,14 @@ export function StampImage(
     setIsFullScreenModalOpen(!isFullScreenModalOpen);
   };
 
-  const getStampSrc = () => {
-    if (!stamp.tx_hash || !stamp.stamp_mimetype) {
-      return NOT_AVAILABLE_IMAGE;
-    }
-    return getStampImageUrl(stamp);
-  };
+  const src = getStampImageSrc(stamp);
+  const isHtml = stamp.stamp_mimetype === "text/html";
+  const isPlainText = stamp.stamp_mimetype === "text/plain";
 
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
-  const src = getStampSrc();
 
   useEffect(() => {
-    if (stamp.stamp_mimetype === "text/html") {
+    if (isHtml) {
       fetchHtmlContent();
     }
   }, [stamp]);
@@ -176,6 +173,31 @@ export function StampImage(
     }
   };
 
+  const [validatedContent, setValidatedContent] = useState<VNode | null>(null);
+
+  useEffect(() => {
+    const validateContent = async () => {
+      if (stamp.stamp_mimetype === "image/svg+xml") {
+        const { isValid } = await validateStampContent(src);
+        if (isValid) {
+          setValidatedContent(
+            <div className="stamp-container">
+              <img
+                src={src}
+                loading="lazy"
+                alt={`Stamp No. ${stamp.stamp}`}
+                className="max-w-none object-contain rounded-lg pixelart stamp-image"
+                onError={handleImageError}
+              />
+            </div>,
+          );
+        }
+      }
+    };
+
+    validateContent();
+  }, [src, stamp.stamp_mimetype]);
+
   return (
     <>
       {src === NOT_AVAILABLE_IMAGE && (
@@ -190,25 +212,24 @@ export function StampImage(
         </div>
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE &&
-        stamp.stamp_mimetype === "text/html" && (
+      {src !== NOT_AVAILABLE_IMAGE && isHtml && (
         <div className={`${className} flex flex-col gap-4`}>
-          <div
-            className="p-6 bg-[#1F002E] flex justify-center items-center relative w-full h-full pt-[56.25%]"
-            ref={imgScopeRef}
-          >
-            <iframe
-              width="100%"
-              height="100%"
-              scrolling="no"
-              className={`${className} aspect-square rounded-lg absolute top-0 left-0`}
-              sandbox="allow-scripts allow-same-origin"
-              src={src}
-              loading="lazy"
-              style={{ transform }}
-              onError={handleImageError}
-              title="Stamp"
-            />
+          <div className="relative">
+            <div className="absolute inset-0 bg-[#1F002E] z-0" />
+            <div className="relative z-10 p-6 flex justify-center items-center w-full h-full pt-[56.25%]">
+              <iframe
+                width="100%"
+                height="100%"
+                scrolling="no"
+                className={`${className} aspect-square rounded-lg absolute top-0 left-0`}
+                sandbox="allow-scripts allow-same-origin"
+                src={src}
+                loading="lazy"
+                style={{ transform }}
+                onError={handleImageError}
+                title="Stamp"
+              />
+            </div>
           </div>
           {flag && (
             <RightPanel
@@ -221,27 +242,26 @@ export function StampImage(
         </div>
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE &&
-        stamp.stamp_mimetype === "text/plain" && (
-        <TextContentIsland
-          src={src}
-        />
+      {src !== NOT_AVAILABLE_IMAGE && isPlainText && (
+        <TextContentIsland src={src} />
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE &&
-        stamp.stamp_mimetype !== "text/html" &&
-        stamp.stamp_mimetype !== "text/plain" && (
+      {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && (
         <div className="flex flex-col gap-4">
-          <div className={`${className} p-6 bg-[#1F002E]`}>
+          <div className="relative p-6 bg-[#1F002E]">
             <div className="stamp-container">
-              <img
-                width="100%"
-                loading="lazy"
-                className="max-w-none object-contain rounded-lg pixelart stamp-image"
-                src={src}
-                onError={handleImageError}
-                alt="Stamp"
-              />
+              <div className="relative z-10">
+                {validatedContent || (
+                  <img
+                    width="100%"
+                    loading="lazy"
+                    className="max-w-none object-contain rounded-lg pixelart stamp-image"
+                    src={src}
+                    onError={handleImageError}
+                    alt="Stamp"
+                  />
+                )}
+              </div>
             </div>
           </div>
           {flag && (
@@ -281,5 +301,4 @@ export function StampImage(
     </>
   );
 }
-
 export default StampImage;

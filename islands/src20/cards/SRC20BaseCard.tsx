@@ -41,7 +41,7 @@ export function SRC20BaseCard(
           src={imageUrl}
           class="w-[86px] h-[86px]"
           onClick={() => onImageClick?.(imageUrl)}
-          alt={src20.tick}
+          alt={convertToEmoji(src20.tick)}
         />
         <div class="flex flex-col justify-between">
           <a

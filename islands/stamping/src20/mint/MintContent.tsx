@@ -60,7 +60,7 @@ export function MintContent({
   tick,
   mintStatus: initialMintStatus,
   holders: initialHolders,
-}: MintContentProps) {
+}: MintContentProps = { trxType: "olga" }) {
   const {
     formState,
     handleChangeFee,
@@ -74,11 +74,12 @@ export function MintContent({
     walletError,
     apiError,
     setFormState,
-  } = useSRC20Form("mint", trxType, tick);
+  } = useSRC20Form("mint", trxType, tick ?? undefined);
 
   const [mintStatus, setMintStatus] = useState<any>(initialMintStatus || null);
   const [holders, setHolders] = useState<number>(initialHolders || 0);
   const [error, setError] = useState<string | null>(null);
+  const [tosAgreed, setTosAgreed] = useState(false);
 
   // Adjusted useEffect hook to always fetch data when token changes
   useEffect(() => {
@@ -222,6 +223,8 @@ export function MintContent({
           isSubmitting={isSubmitting}
           onSubmit={handleMintSubmit}
           buttonName="MINT"
+          tosAgreed={tosAgreed}
+          onTosChange={setTosAgreed}
         />
 
         <StatusMessages

@@ -1,7 +1,5 @@
 import { Collection, StampRow, StampSectionProps } from "globals";
 import StampSection from "$islands/stamp/StampSection.tsx";
-import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
-import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";
 import CollectionSection from "$islands/collection/CollectionSection.tsx";
 
 export function HomeStampPreview({
@@ -36,14 +34,14 @@ export function HomeStampPreview({
         mobileSm:grid-cols-2
         mobileLg:grid-cols-3
         tablet:grid-cols-3
-        desktop:grid-cols-4
+        desktop:grid-cols-5
         auto-rows-fr
       `,
       displayCounts: {
         "mobileSm": 8, // 2 columns x 4 rows
         "mobileLg": 12, // 3 columns x 4 rows
         "tablet": 12, // 3 columns x 4 rows
-        "desktop": 16, // 4 columns x 4 rows
+        "desktop": 20, // 5 columns x 4 rows
       },
     },
   ];
@@ -137,16 +135,6 @@ export function HomeStampPreview({
       },
     },
   ];
-
-  // const SectionSRC20: StampSectionProps[] = [
-  //   {
-  //     title: "ALL TOKENS",
-  //     type: "src20",
-  //     stamps: stamps_src20,
-  //     layout: "row",
-  //     showDetails: false,
-  //   },
-  // ];
 
   return (
     <div className="
@@ -281,8 +269,6 @@ export function HomeStampPreview({
           ))}
         </div>
       </div>
-
-      <GetStampingModule />
     </div>
   );
 }

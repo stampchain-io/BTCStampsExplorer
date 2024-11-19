@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "globals";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
-import { ViewAllButton } from "$components/ViewAllButton.tsx";
+import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 
@@ -45,17 +45,14 @@ export const SRC20TrendingMints = (props: SRC20TrendingMintsProps) => {
     setModalOpen(!isModalOpen);
   };
 
-  // Define the desired trxType, e.g., 'olga' or 'multisig'
-  const trxType = "olga"; // or use a state/context variable if dynamic
-
   return (
-    <div className="max-w-desktop w-full mx-auto px-3 tablet:px-6 desktop:px-12">
+    <div class="grid grid-cols-1 gap-3 mobileLg:gap-6 items-end max-w-desktop w-full mx-auto">
       <ImageModal
         imgSrc={modalImg}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-      <div class="flex flex-col gap-6 p-2 mb-6">
+      <div class="flex flex-col gap-6">
         {data.map((src20) => (
           src20.progress !== "100"
             ? (

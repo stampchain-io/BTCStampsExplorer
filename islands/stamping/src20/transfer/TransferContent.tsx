@@ -1,4 +1,5 @@
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
+import { useState } from "preact/hooks";
 
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
@@ -17,7 +18,7 @@ const feeSelectorContainerClassName =
   "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 
 export function TransferContent(
-  { trxType = "olga" }: { trxType?: "olga" | "multisig" },
+  { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
 ) {
   const {
     formState,
@@ -32,6 +33,8 @@ export function TransferContent(
     walletError,
     apiError,
   } = useSRC20Form("transfer", trxType);
+
+  const [tosAgreed, setTosAgreed] = useState(false);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -93,6 +96,8 @@ export function TransferContent(
           isSubmitting={isSubmitting}
           onSubmit={handleTransferSubmit}
           buttonName="TRANSFER"
+          tosAgreed={tosAgreed}
+          onTosChange={setTosAgreed}
         />
 
         <StatusMessages

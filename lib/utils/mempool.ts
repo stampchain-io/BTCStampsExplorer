@@ -1,5 +1,3 @@
-//import { handleCache } from 'utils/cache.ts';
-
 const base_endpoint = "https://mempool.space/";
 const MAX_RETRIES = 3;
 

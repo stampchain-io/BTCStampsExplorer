@@ -14,9 +14,9 @@ interface StampRelatedInfoProps {
 type TabType = "dispensers" | "sales" | "transfers";
 
 const tabs: Array<{ id: TabType; label: string }> = [
-  { id: "dispensers", label: "Dispensers" },
-  { id: "sales", label: "Sales" },
-  { id: "transfers", label: "Transfers" },
+  { id: "dispensers", label: "DISPENSERS" },
+  { id: "sales", label: "SALES" },
+  { id: "transfers", label: "TRANSFERS" },
 ];
 
 export function StampRelatedInfo(

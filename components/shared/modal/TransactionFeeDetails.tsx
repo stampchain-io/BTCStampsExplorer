@@ -9,7 +9,7 @@ import type {
   ScriptType,
   TransactionSizeOptions,
 } from "$types/index.d.ts";
-import { Button } from "$components/Button.tsx";
+import { Button } from "$components/shared/Button.tsx";
 
 interface TransactionFeeDetailsProps {
   fee: number;

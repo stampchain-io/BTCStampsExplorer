@@ -4,9 +4,9 @@ import {
   stripTrailingZeros,
 } from "$lib/utils/formatUtils.ts";
 import {
-  getStampImageUrl,
+  getStampImageSrc,
   handleImageError,
-  isValidSVG,
+  validateStampContent,
 } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "globals";
@@ -110,7 +110,7 @@ export function StampCard({
     return ABBREVIATION_LENGTHS.mobileSm;
   };
 
-  const src = getStampImageUrl(stamp);
+  const src = getStampImageSrc(stamp);
 
   // Add state for validated content
   const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
@@ -118,61 +118,34 @@ export function StampCard({
   );
 
   useEffect(() => {
-    const validateSVG = async () => {
-      try {
-        const response = await fetch(src);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch SVG");
-        }
-
-        const svgContent = await response.text();
-
-        // Show fallback if content is empty, invalid SVG, or contains deploy data
-        if (
-          !svgContent || !isValidSVG(svgContent) ||
-          svgContent.includes('"deploy"')
-        ) {
+    const validateContent = async () => {
+      if (stamp.stamp_mimetype === "image/svg+xml") {
+        const { isValid } = await validateStampContent(src);
+        if (isValid) {
           setValidatedContent(
-            <img
-              src="/not-available.png"
-              alt="Content not available"
-              className="h-full w-full object-contain pixelart"
-            />,
+            <div className="stamp-container">
+              <img
+                src={src}
+                loading="lazy"
+                alt={`Stamp No. ${stamp.stamp}`}
+                className="absolute inset-0 w-full h-full object-contain pixelart stamp-image"
+                onError={handleImageError}
+              />
+            </div>,
           );
-          return;
         }
-
-        // Set valid SVG content
-        setValidatedContent(
-          <img
-            src={src}
-            loading="lazy"
-            alt={`Stamp No. ${stamp.stamp}`}
-            className="h-full w-full object-contain pixelart"
-            onError={handleImageError}
-          />,
-        );
-      } catch {
-        setValidatedContent(
-          <img
-            src="/not-available.png"
-            alt="Content not available"
-            className="h-full w-full object-contain pixelart"
-          />,
-        );
       }
     };
 
-    if (stamp.stamp_mimetype === "image/svg+xml") {
-      validateSVG();
-    }
-  }, [src, stamp.stamp, stamp.stamp_mimetype]);
+    validateContent();
+  }, [src, stamp.stamp_mimetype]);
 
   const renderContent = () => {
     if (stamp.stamp_mimetype === "text/plain") {
       return <TextContentIsland src={src} />;
-    } else if (stamp.stamp_mimetype === "text/html") {
+    }
+
+    if (stamp.stamp_mimetype === "text/html") {
       return (
         <div className="relative w-full h-full">
           <iframe
@@ -181,83 +154,32 @@ export function StampCard({
             sandbox="allow-scripts allow-same-origin allow-modals"
             src={src}
             className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            onError={(e) => {
-              const parent = e.currentTarget.parentElement;
-              if (parent) {
-                parent.innerHTML = `
-                  <img
-                    src="/not-available.png"
-                    alt="Content not available"
-                    class="absolute inset-0 w-full h-full object-contain pixelart"
-                  />
-                `;
-              }
-            }}
-            onLoad={(e) => {
-              try {
-                const iframe = e.currentTarget;
-                const iframeDoc = iframe.contentDocument;
-                if (iframeDoc) {
-                  // Add base target to prevent navigation
-                  const base = iframeDoc.createElement("base");
-                  base.target = "_blank";
-                  iframeDoc.head.appendChild(base);
-
-                  // Process scripts
-                  const scripts = Array.from(
-                    iframeDoc.getElementsByTagName("script"),
-                  );
-                  scripts.forEach((script) => {
-                    script.setAttribute("defer", "");
-                    if (!script.type) script.type = "text/javascript";
-                  });
-                }
-              } catch (_error) {
-                const parent = e.currentTarget.parentElement;
-                if (parent) {
-                  parent.innerHTML = `
-                    <img
-                      src="/not-available.png"
-                      alt="Content not available"
-                      class="absolute inset-0 w-full h-full object-contain pixelart"
-                    />
-                  `;
-                }
-              }
-            }}
-          />
-        </div>
-      );
-    } else if (stamp.stamp_mimetype === "image/svg+xml") {
-      return (
-        <div className="relative w-full h-full">
-          {validatedContent || (
-            <img
-              src="/not-available.png"
-              alt="Loading..."
-              className="absolute inset-0 w-full h-full object-contain pixelart"
-            />
-          )}
-        </div>
-      );
-    } else {
-      // Regular images (jpg, png, etc.)
-      return (
-        <div className="relative w-full h-full">
-          <img
-            src={src}
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.src = "/not-available.png";
-              e.currentTarget.className =
-                "absolute inset-0 w-full h-full object-contain pixelart";
-            }}
-            alt={`Stamp No. ${stamp.stamp}`}
-            className="absolute inset-0 w-full h-full object-contain pixelart"
+            onError={handleImageError}
           />
         </div>
       );
     }
+
+    if (stamp.stamp_mimetype === "image/svg+xml") {
+      return validatedContent || (
+        <img
+          src="/not-available.png"
+          alt="Loading..."
+          className="absolute inset-0 w-full h-full object-contain pixelart"
+        />
+      );
+    }
+
+    // Regular images
+    return (
+      <img
+        src={src}
+        loading="lazy"
+        alt={`Stamp No. ${stamp.stamp}`}
+        className="absolute inset-0 w-full h-full object-contain pixelart"
+        onError={handleImageError}
+      />
+    );
   };
 
   const renderPrice = () => {
@@ -280,10 +202,10 @@ export function StampCard({
   const supplyDisplay = stamp.ident !== "SRC-20" && stamp.balance
     ? `${formatSupplyValue(Number(stamp.balance), stamp.divisible)}/${
       stamp.supply < 100000 && !stamp.divisible
-        ? formatSupplyValue(stamp.supply, stamp.divisible)
+        ? formatSupplyValue(stamp.supply ?? 0, stamp.divisible)
         : "+100000"
     }`
-    : `1/${formatSupplyValue(stamp.supply, stamp.divisible)}`;
+    : `1/${formatSupplyValue(stamp.supply ?? 0, stamp.divisible)}`;
 
   // Use dynamic abbreviation length
   const creatorDisplay = stamp.creator_name

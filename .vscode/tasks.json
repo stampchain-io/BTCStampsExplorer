@@ -7,11 +7,12 @@
       "command": "bash",
       "args": [
         "-c",
-        "if lsof -ti:9229,8000 >/dev/null; then lsof -ti:9229,8000 | xargs kill -15 && sleep 2; fi"
+        "pids=$(lsof -ti:9229,8000 -sTCP:LISTEN -c deno) && if [ ! -z \"$pids\" ]; then echo \"Terminating Deno processes: $pids\" && kill -15 $pids && sleep 2 && kill -0 $pids || true; fi"
       ],
       "presentation": {
         "reveal": "never",
         "panel": "shared",
+        "echo": false,
         "close": true
       },
       "problemMatcher": []
@@ -23,7 +24,9 @@
       "args": ["${workspaceFolder}/scripts/local.sh"],
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
+        "panel": "shared",
+        "echo": false,
+        "close": true
       }
     }
   ]

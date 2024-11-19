@@ -22,9 +22,27 @@ export const handler: Handlers = {
 };
 
 async function serveImage(imgpath: string): Promise<Response> {
-  const mimeType = getMimeType(imgpath.split(".").pop() as string);
-  const isHtml = mimeType === "text/html";
+  const extension = imgpath.split(".").pop()?.toLowerCase() || "";
+
+  // Direct extension checks for specific handling
+  const isHtml = extension === "html" || extension === "htm";
+  const isJs = extension === "js" || extension === "mjs" || extension === "cjs";
+  const isGzip = extension === "gz" || extension === "gzip";
+  const isSvg = extension === "svg" || extension === "svgz";
   const isDev = Deno.env.get("DENO_ENV") === "development";
+
+  // Basic MIME type mapping for Content-Type header
+  const mimeType = {
+    html: "text/html",
+    htm: "text/html",
+    js: "application/javascript",
+    mjs: "application/javascript",
+    cjs: "application/javascript",
+    gz: "application/gzip",
+    gzip: "application/gzip",
+    svg: "image/svg+xml",
+    svgz: "image/svg+xml",
+  }[extension] || getMimeType(extension); // Fallback to full mapping for other types
 
   if (serverConfig.IMAGES_SRC_PATH) {
     const remotePath = `${serverConfig.IMAGES_SRC_PATH}/${imgpath}`;
@@ -38,6 +56,60 @@ async function serveImage(imgpath: string): Promise<Response> {
             "Content-Type": "text/html; charset=utf-8",
             "Cache-Control": "no-store, must-revalidate",
             "CF-Features": "rocketLoader=off",
+            "X-XSS-Protection": "1; mode=block",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Permissions-Policy": isDev
+              ? "" // No restrictions in dev
+              : "camera=(), geolocation=(), microphone=(), payment=(), usb=(), interest-cohort=()",
+            "Content-Security-Policy": isDev
+              ? "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *;" +
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: *;" +
+                "style-src 'self' 'unsafe-inline' *;" +
+                "frame-src 'self' 'unsafe-inline' data: blob: *;" +
+                "child-src 'self' blob: data: *;" +
+                "worker-src 'self' blob: *;"
+              : "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;" +
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data:;" +
+                "style-src 'self' 'unsafe-inline';" +
+                "frame-src 'self' data: blob:;" +
+                "child-src 'self' blob: data:;" +
+                "worker-src 'self' blob:;",
+            "Vary": "Accept-Encoding",
+          });
+        }
+
+        if (isJs) {
+          return ResponseUtil.custom(content, 200, {
+            "Content-Type": "application/javascript; charset=utf-8",
+            "Cache-Control": isDev
+              ? "no-store, must-revalidate"
+              : "public, max-age=3600",
+            "Vary": "Accept-Encoding",
+          });
+        }
+
+        if (isGzip) {
+          return ResponseUtil.custom(content, 200, {
+            "Content-Type": "application/gzip",
+            "Content-Encoding": "gzip",
+            "Cache-Control": isDev
+              ? "no-store, must-revalidate"
+              : "public, max-age=3600",
+            "Accept-Ranges": "bytes",
+            "Vary": "Accept-Encoding",
+          });
+        }
+
+        if (isSvg) {
+          return ResponseUtil.custom(content, 200, {
+            "Content-Type": "image/svg+xml",
+            "Cache-Control": isDev
+              ? "no-store, must-revalidate"
+              : "public, max-age=3600",
+            "Content-Security-Policy": isDev
+              ? "default-src 'self' data: blob: *; img-src 'self' data: blob: *;"
+              : "default-src 'self' data: blob:; img-src 'self' data: blob:;",
+            "Vary": "Accept-Encoding",
           });
         }
 
@@ -45,7 +117,8 @@ async function serveImage(imgpath: string): Promise<Response> {
           "Content-Type": mimeType,
           "Cache-Control": isDev
             ? "no-store, must-revalidate"
-            : "public, max-age=36000",
+            : "public, max-age=3600",
+          "Vary": "Accept-Encoding",
         });
       }
     } catch (error) {
@@ -71,6 +144,9 @@ async function serveNotAvailableImage(): Promise<Response> {
       "Cache-Control": isDev
         ? "no-store, must-revalidate"
         : "public, max-age=3600",
+      "Cross-Origin-Resource-Policy": "cross-origin",
+      "Access-Control-Allow-Origin": "*",
+      "Vary": "Accept-Encoding",
     });
   } catch (error) {
     return ResponseUtil.handleError(

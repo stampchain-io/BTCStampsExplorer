@@ -1,7 +1,6 @@
 import { useEffect } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { StampRow } from "globals";
-import { getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 
 interface CarouselProps {
@@ -33,22 +32,23 @@ export default function Carousel(props: CarouselProps) {
     >
       <div class="swiper h-full">
         <div class="swiper-wrapper">
-          {duplicatedStamps.map((stamp, index) => (
-            <div
-              class="swiper-slide"
-              key={`${stamp.tx_hash}-${index}`}
-              data-hash={stamp.tx_hash}
-            >
-              <img
-                src={`/content/${stamp.tx_hash}.${
-                  getFileSuffixFromMime(stamp.stamp_mimetype)
-                }`}
-                alt={`Stamp #${stamp.stamp}`}
-                loading="lazy"
-                class="rounded-xl object-contain"
-              />
-            </div>
-          ))}
+          {duplicatedStamps.map((stamp, index) => {
+            const extension = stamp.stamp_url?.split('.')?.pop() || '';
+            return (
+              <div
+                class="swiper-slide"
+                key={`${stamp.tx_hash}-${index}`}
+                data-hash={stamp.tx_hash}
+              >
+                <img
+                  src={`/content/${stamp.tx_hash}.${extension}`}
+                  alt={`Stamp #${stamp.stamp}`}
+                  loading="lazy"
+                  class="rounded-xl object-contain"
+                />
+              </div>
+            );
+          })}
         </div>
         <div
           class="swiper-pagination"

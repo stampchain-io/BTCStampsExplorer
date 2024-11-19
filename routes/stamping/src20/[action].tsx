@@ -38,7 +38,7 @@ export const handler: Handlers<StampingSrc20PageProps> = {
 
       const trxType =
         (url.searchParams.get("trxType") as "multisig" | "olga") ||
-        "multisig";
+        "olga";
       const tick = url.searchParams.get("tick") || null;
 
       let mintStatus = null;
@@ -64,7 +64,7 @@ export const handler: Handlers<StampingSrc20PageProps> = {
           if (error.message?.includes("not found")) {
             return ctx.renderNotFound();
           }
-          throw error; // Re-throw other errors to be caught by outer try-catch
+          throw error;
         }
       }
 

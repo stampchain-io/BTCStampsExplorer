@@ -15,7 +15,7 @@
       "restart": true,
       "outputCapture": "std",
       "preLaunchTask": "run-local-script",
-      // "postDebugTask": "deno: cleanup-ports",
+      "postDebugTask": "deno: cleanup-ports",
       "env": {
         "DENO_ENV": "development",
         "DENO_V8_FLAGS": "--max-old-space-size=8192"

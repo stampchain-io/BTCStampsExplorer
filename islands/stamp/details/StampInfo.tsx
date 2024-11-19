@@ -5,7 +5,6 @@ import {
   formatBTCAmount,
   formatDate,
 } from "$lib/utils/formatUtils.ts";
-import { getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "globals";
 
@@ -30,12 +29,12 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     setIsModalOpen(!isModalOpen);
   };
 
-  const timestamp = new Date(stamp.block_time);
-  const _type = stamp.is_btc_stamp
-    ? "stamp"
-    : stamp.cpid.startsWith("A")
-    ? "cursed"
-    : "posh";
+  const createdDate = formatDate(new Date(stamp.block_time), {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+    includeRelative: true,
+  });
 
   const editionCount = stamp.divisible
     ? (stamp.supply / 100000000).toFixed(2)
@@ -49,7 +48,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   >(null);
   const [imageSize, setImageSize] = useState<number | null>(null);
 
-  const fileExtension = getFileSuffixFromMime(stamp.stamp_mimetype);
+  const fileExtension = stamp.stamp_url?.split(".")?.pop()?.toUpperCase() ||
+    "UNKNOWN";
 
   const creatorDisplay = stamp.creator_name
     ? stamp.creator_name
@@ -216,12 +216,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               Created
             </p>
             <p className="text-[#999999] font-medium">
-              {formatDate(new Date(stamp.block_time), {
-                month: "numeric",
-                day: "numeric",
-                year: "numeric",
-                includeRelative: true,
-              })}
+              {createdDate}
             </p>
           </div>
           <div className="flex justify-between items-center flex-col tablet:items-center gap-1">
