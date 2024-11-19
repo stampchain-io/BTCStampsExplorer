@@ -6,14 +6,16 @@
     "start": "deno task check_version && deno run -A main.ts",
     "dev": "export DENO_ENV=development && deno run --allow-all --inspect=127.0.0.1:9229 --watch --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/ --no-clear-screen dev.ts --host",
     "build": "deno run -A main.ts build",
-    "dev:build": "export DENO_ENV=development && deno run -A dev.ts build",
+    "dev:build": "deno task build && deno task dev",
     "docs": "deno run --allow-read --allow-write swagger.js",
     "fakebuild": "echo 'fake build'",
     "preview": "deno run -A main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "decode": "deno run -A utils/decodeSrc20MsigTx.ts",
     "decode_olga": "deno run -A utils/decodeSrc20OlgaTx.ts",
-    "check_version": "deno run --allow-run --allow-env utils/check_deno_version.ts"
+    "check_version": "deno run --allow-run --allow-env utils/check_deno_version.ts",
+    "cleanup": "deno run --allow-run scripts/cleanup.ts",
+    "dev:safe": "deno task cleanup && deno task dev"
   },
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
