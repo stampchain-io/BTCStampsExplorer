@@ -268,7 +268,7 @@ export function SRC20Card(
           onClick={handleMintClick}
           class={variant != "minting" ? "hidden mobileLg:block" : ""}
         >
-          Mint
+          MINT
         </Button>
       )}
     </div>
