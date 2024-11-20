@@ -1,13 +1,25 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
-
+import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
+import { handleWalletError } from "./walletHelper.ts";
 export const isUnisatInstalled = signal<boolean>(false);
+
+export const checkUnisat = () => {
+  const isAvailable = checkWalletAvailability("unisat");
+  isUnisatInstalled.value = isAvailable;
+  return isAvailable;
+};
+
+const getProvider = () => {
+  const wallets = getGlobalWallets();
+  return wallets.unisat;
+};
 
 export const connectUnisat = async (
   addToast: (message: string, type: "error" | "success") => void,
 ) => {
-  const unisat = (globalThis as any).unisat;
+  const unisat = getProvider();
   if (!unisat) {
     addToast("Unisat not installed", "error");
     return;
@@ -27,7 +39,7 @@ const handleAccountsChanged = async (_accounts: string[]) => {
     return;
   }
   const _wallet = {} as Wallet;
-  const unisat = (globalThis as any).unisat;
+  const unisat = getProvider();
   _wallet.accounts = _accounts;
   const address = _accounts[0];
   _wallet.address = address;
@@ -42,7 +54,7 @@ const handleAccountsChanged = async (_accounts: string[]) => {
   walletContext.updateWallet(_wallet);
 };
 
-const unisat = (globalThis as any).unisat;
+const unisat = getProvider();
 unisat?.on("accountsChanged", handleAccountsChanged);
 
 export const signPSBT = async (
@@ -53,7 +65,7 @@ export const signPSBT = async (
   autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
   try {
-    const unisat = (globalThis as any).unisat;
+    const unisat = getProvider();
     if (!unisat) {
       throw new Error("Unisat wallet not connected");
     }
@@ -99,15 +111,8 @@ export const signPSBT = async (
         error: "Unexpected result format from Unisat wallet",
       };
     }
-  } catch (error) {
-    console.error("Error signing PSBT with Unisat:", error);
-    if (error.message && error.message.includes("User rejected")) {
-      return { signed: false, cancelled: true };
-    }
-    return {
-      signed: false,
-      error: error.message || "Unknown error occurred",
-    };
+  } catch (error: unknown) {
+    return handleWalletError(error, "Unisat");
   }
 };
 
