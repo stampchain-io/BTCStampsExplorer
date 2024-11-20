@@ -67,18 +67,6 @@ export default function StampingStampPage({ data }: PageProps<StampPageData>) {
         </div>
         <div class="w-full tablet:w-1/2 flex flex-col gap-4 items-start tablet:items-end">
           <StampSection {...latestStampsSection} />
-          <div class="w-full flex justify-end items-end">
-            <a
-              href="/stamps"
-              class="text-stamp-purple-dark hover:text-stamp-primary-hover 
-                     text-sm tablet:text-base font-extrabold border-2 
-                     border-stamp-purple-dark hover:border-stamp-primary-hover 
-                     py-1 text-center min-w-[120px] rounded-md cursor-pointer 
-                     transition-colors duration-200"
-            >
-              View All
-            </a>
-          </div>
         </div>
       </div>
     </div>
