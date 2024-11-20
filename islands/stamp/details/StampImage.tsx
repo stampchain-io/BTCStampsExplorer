@@ -5,6 +5,7 @@ import { StampRow } from "globals";
 import {
   getStampImageSrc,
   handleImageError,
+  NOT_AVAILABLE_IMAGE,
   validateStampContent,
 } from "$lib/utils/imageUtils.ts";
 

@@ -1,6 +1,6 @@
 import { StampRow } from "globals";
 
-const NOT_AVAILABLE_IMAGE = "/not-available.png";
+export const NOT_AVAILABLE_IMAGE = "/not-available.png";
 const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",
