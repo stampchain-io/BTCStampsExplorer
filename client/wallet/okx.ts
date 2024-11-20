@@ -2,6 +2,8 @@ import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
+import { handleWalletError } from "./walletHelper.ts";
 
 export const isOKXInstalled = signal<boolean>(false);
 
@@ -44,14 +46,14 @@ export const connectOKX = async (
 };
 
 export const checkOKX = () => {
-  const okx = (globalThis as any).okxwallet;
-  if (okx && okx.bitcoin) {
-    isOKXInstalled.value = true;
-    okx.bitcoin.on("accountsChanged", handleAccountsChanged);
-    return true;
-  }
-  isOKXInstalled.value = false;
-  return false;
+  const isAvailable = checkWalletAvailability("okx");
+  isOKXInstalled.value = isAvailable;
+  return isAvailable;
+};
+
+const getProvider = () => {
+  const wallets = getGlobalWallets();
+  return wallets.okxwallet;
 };
 
 const handleAccountsChanged = async () => {
@@ -186,19 +188,7 @@ const signPSBT = async (
       throw new Error("Unexpected result format from OKX wallet");
     }
   } catch (error: unknown) {
-    logger.error("ui", {
-      message: "Error signing PSBT with OKX",
-      context: "signPSBT",
-      error: error instanceof Error ? error.message : String(error),
-    });
-
-    if (error instanceof Error && error.message.includes("User rejected")) {
-      return { signed: false, cancelled: true };
-    }
-    return {
-      signed: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
+    return handleWalletError(error, "OKX");
   }
 };
 

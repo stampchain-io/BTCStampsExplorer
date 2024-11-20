@@ -1,4 +1,5 @@
-import { Signal, signal } from "@preact/signals";
+import { signal } from "@preact/signals";
+import { logger } from "$lib/utils/logger.ts";
 
 import { Wallet } from "$types/index.d.ts";
 import {
@@ -7,6 +8,32 @@ import {
   signMessage,
   signPSBT,
 } from "./walletHelper.ts";
+
+// Add this at the very top of the file, before any imports
+declare global {
+  interface Window {
+    __DEBUG?: {
+      namespaces: string;
+      enabled: boolean;
+    };
+  }
+}
+
+interface GlobalWithDebug {
+  __DEBUG?: {
+    namespaces: string;
+    enabled: boolean;
+  };
+}
+
+// Move interfaces and variables to the top
+interface WalletProviders {
+  LeatherProvider?: any;
+  okxwallet?: any;
+  unisat?: any;
+  tapwallet?: any;
+  phantom?: any;
+}
 
 interface WalletContext {
   readonly wallet: Wallet;
@@ -28,6 +55,7 @@ interface WalletContext {
   showConnectModal: () => void;
 }
 
+// Initialize wallet state
 export const initialWallet: Wallet = {
   address: undefined,
   publicKey: undefined,
@@ -57,6 +85,7 @@ try {
 
 export const walletSignal = signal<Wallet>(initialWalletState);
 export const isConnectedSignal = signal<boolean>(initialConnected);
+export const showConnectWalletModal = signal<boolean>(false);
 
 export const updateWallet = (_wallet: Wallet) => {
   walletSignal.value = _wallet;
@@ -80,8 +109,7 @@ export const getBasicStampInfo = async (address: string) => {
   return { stampBalance };
 };
 
-export const showConnectWalletModal = signal<boolean>(false);
-
+// Wallet context with all functionality
 export const walletContext: WalletContext = {
   get wallet() {
     return walletSignal.value;
@@ -103,11 +131,6 @@ export const walletContext: WalletContext = {
     sighashTypes?: number[],
     autoBroadcast = true,
   ) => {
-    console.log("Entering signPSBT in walletContext");
-    console.log("Wallet provider:", wallet.provider);
-    console.log("PSBT length:", psbt.length);
-    console.log("Number of inputs to sign:", inputsToSign.length);
-    console.log("Enable RBF:", enableRBF);
     return await signPSBT(
       wallet,
       psbt,
@@ -127,3 +150,65 @@ export const walletContext: WalletContext = {
     showConnectWalletModal.value = true;
   },
 };
+
+// Provider checking functions
+export function getGlobalWallets(): WalletProviders {
+  // Skip provider checks if we're not in a browser context
+  if (typeof globalThis === "undefined" || !("document" in globalThis)) {
+    return {};
+  }
+
+  // Only log wallet availability on client-side
+  const global = globalThis as unknown as {
+    LeatherProvider?: unknown;
+    okxwallet?: { bitcoin?: unknown };
+    unisat?: unknown;
+    tapwallet?: unknown;
+    phantom?: { bitcoin?: { isPhantom?: boolean } };
+  };
+
+  logger.debug("ui", {
+    message: "Checking wallet providers (client-side)",
+    data: {
+      hasLeather: Boolean(global.LeatherProvider),
+      hasOKX: Boolean(global.okxwallet?.bitcoin),
+      hasUnisat: Boolean(global.unisat),
+      hasTapWallet: Boolean(global.tapwallet),
+      hasPhantom: Boolean(global.phantom?.bitcoin?.isPhantom),
+      timestamp: new Date().toISOString(),
+    },
+  });
+
+  return {
+    LeatherProvider: global.LeatherProvider,
+    okxwallet: global.okxwallet,
+    unisat: global.unisat,
+    tapwallet: global.tapwallet,
+    phantom: global.phantom,
+  };
+}
+
+// Update wallet availability checks
+export function checkWalletAvailability(provider: string): boolean {
+  // Skip checks if we're not in a browser context
+  if (typeof globalThis === "undefined" || !("document" in globalThis)) {
+    return false;
+  }
+
+  const wallets = getGlobalWallets();
+
+  switch (provider) {
+    case "leather":
+      return !!wallets.LeatherProvider;
+    case "okx":
+      return !!wallets.okxwallet?.bitcoin;
+    case "unisat":
+      return !!wallets.unisat;
+    case "tapwallet":
+      return !!wallets.tapwallet;
+    case "phantom":
+      return !!wallets.phantom?.bitcoin?.isPhantom;
+    default:
+      return false;
+  }
+}

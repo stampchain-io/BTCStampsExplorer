@@ -61,19 +61,13 @@ async function serveImage(imgpath: string): Promise<Response> {
             "Permissions-Policy": isDev
               ? "" // No restrictions in dev
               : "camera=(), geolocation=(), microphone=(), payment=(), usb=(), interest-cohort=()",
-            "Content-Security-Policy": isDev
-              ? "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *;" +
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: *;" +
-                "style-src 'self' 'unsafe-inline' *;" +
-                "frame-src 'self' 'unsafe-inline' data: blob: *;" +
-                "child-src 'self' blob: data: *;" +
-                "worker-src 'self' blob: *;"
-              : "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;" +
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data:;" +
-                "style-src 'self' 'unsafe-inline';" +
-                "frame-src 'self' data: blob:;" +
-                "child-src 'self' blob: data:;" +
-                "worker-src 'self' blob:;",
+            "Content-Security-Policy":
+              "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://dev.bitcoinstamps.xyz;" +
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https://dev.bitcoinstamps.xyz https://dev.bitcoinstamps.xyz/cdn-cgi/speculation;" +
+              "style-src 'self' 'unsafe-inline' https://dev.bitcoinstamps.xyz;" +
+              "frame-src 'self' data: blob: https://dev.bitcoinstamps.xyz;" +
+              "child-src 'self' blob: data:;" +
+              "worker-src 'self' blob:;",
             "Vary": "Accept-Encoding",
           });
         }

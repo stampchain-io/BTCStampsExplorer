@@ -1,6 +1,8 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
+import { handleWalletError } from "./walletHelper.ts";
 
 export const isTapWalletInstalled = signal<boolean>(false);
 
@@ -23,14 +25,14 @@ export const connectTapWallet = async (addToast) => {
 };
 
 export const checkTapWallet = () => {
-  const tapwallet = (globalThis as any).tapwallet;
-  if (tapwallet) {
-    isTapWalletInstalled.value = true;
-    tapwallet.on("accountsChanged", handleAccountsChanged);
-    return true;
-  }
-  isTapWalletInstalled.value = false;
-  return false;
+  const isAvailable = checkWalletAvailability("tapwallet");
+  isTapWalletInstalled.value = isAvailable;
+  return isAvailable;
+};
+
+const getProvider = () => {
+  const wallets = getGlobalWallets();
+  return wallets.tapwallet;
 };
 
 const handleAccountsChanged = async (accounts: string[]) => {
@@ -117,12 +119,8 @@ const signPSBT = async (
       // Return the signed PSBT for further handling
       return { signed: true, psbt: signedPsbtHex };
     }
-  } catch (error) {
-    console.error("Error signing PSBT with TapWallet:", error);
-    if (error.message && error.message.includes("User rejected")) {
-      return { signed: false, cancelled: true };
-    }
-    return { signed: false, error: error.message || "Unknown error occurred" };
+  } catch (error: unknown) {
+    return handleWalletError(error, "TapWallet");
   }
 };
 
