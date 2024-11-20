@@ -11,6 +11,7 @@ interface InputFieldProps {
   maxLength?: number;
   disabled?: boolean;
   textAlign?: "left" | "center" | "right";
+  isUppercase?: boolean;
 }
 
 export function InputField({
@@ -24,6 +25,7 @@ export function InputField({
   maxLength,
   disabled = false,
   textAlign = "left",
+  isUppercase = false,
 }: InputFieldProps) {
   return (
     <div class="w-full">
@@ -31,9 +33,9 @@ export function InputField({
         type={type}
         class={`h-12 px-3 rounded-md bg-[#999999] text-[#333333] placeholder:text-[#333333] placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC] ${
           textAlign === "center" ? "text-center" : ""
-        }`}
+        } ${isUppercase ? "uppercase" : ""}`}
         placeholder={placeholder}
-        value={value}
+        value={isUppercase ? value?.toUpperCase() : value}
         onChange={onChange}
         inputMode={inputMode}
         pattern={pattern}
