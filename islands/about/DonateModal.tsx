@@ -1,5 +1,5 @@
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
-import { DonateEstimation } from "./DonateEstimation.tsx";
+import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 
 export default function DonateModal(
   {
@@ -27,7 +27,9 @@ export default function DonateModal(
       <ModalLayout onClose={handleCloseModal} title="DONATE">
         <div className="w-full justify-center items-center">
           <p className="text-stamp-grey text-4xl text-center font-work-sans">
-            <span className="text-stamp-grey-light">0.00069420</span>
+            <span className="text-stamp-grey-light">
+              0.00069420
+            </span>{" "}
             BTC
           </p>
         </div>
@@ -111,11 +113,11 @@ export default function DonateModal(
           </div>
         </div>
 
-        <DonateEstimation
+        <FeeEstimation
           fee={fee}
           handleChangeFee={handleChangeFee}
-          type="buy"
           amount={0.005}
+          type="donate"
           BTCPrice={0.005487}
           isSubmitting={false}
           onSubmit={handleDonate}

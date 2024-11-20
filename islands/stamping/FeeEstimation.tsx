@@ -115,7 +115,12 @@ export function FeeEstimation({
         console.log("FeeEstimation: Using frontend estimation");
         const { minerFee, dustValue, detectedInputType } =
           calculateTransactionFees({
-            type: type as "stamp" | "src20" | "fairmint" | "transfer",
+            type: type as
+              | "stamp"
+              | "src20"
+              | "fairmint"
+              | "transfer"
+              | "donate",
             fileSize,
             userAddress,
             outputTypes,
@@ -230,12 +235,17 @@ export function FeeEstimation({
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINER FEE</span> {txfee}
             {" "}
-            <span className="font-light">SATS</span>
+            <span className="font-light">
+              {type === "donate" ? "₿" : "SATS"}
+            </span>
           </p>
           {mintfee > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>SERVICE FEE</span>{" "}
-              {mintfee} <span className="font-light">SATS</span>
+              {mintfee}{" "}
+              <span className="font-light">
+                {type === "donate" ? "₿" : "SATS"}
+              </span>
             </p>
           )}
           {dust > 0 && (
@@ -276,7 +286,8 @@ export function FeeEstimation({
 
         <p className={detailsTextClassName}>
           <span className={detailsTitleClassName}>MINER FEE</span>{" "}
-          {txfee.toFixed(0)} <span className="font-light">SATS</span>
+          {txfee.toFixed(0)}{" "}
+          <span className="font-light">{type === "donate" ? "₿" : "SATS"}</span>
         </p>
         {mintfee > 0 && (
           <p className={detailsTextClassName}>
@@ -396,7 +407,8 @@ export function FeeEstimation({
         {coinType === "BTC"
           ? (
             <>
-              <span className="font-bold">{total.toFixed(0)}</span> SATS
+              <span className="font-bold">{total.toFixed(0)}</span>{" "}
+              {type === "donate" ? "₿" : "SATS"}
             </>
           )
           : (
