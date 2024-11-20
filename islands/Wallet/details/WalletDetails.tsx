@@ -4,6 +4,7 @@ import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletData } from "$types/index.d.ts";
 import { Button } from "$components/shared/Button.tsx";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
@@ -20,7 +21,7 @@ function WalletDetails(
 
   return (
     <div>
-      <div className="flex flex-col gap-6 items-stretch">
+      <div class="flex flex-col gap-6 items-stretch">
         <WalletOverview
           walletData={{ ...walletData, fee }}
           onSend={() => setIsSendModalOpen(true)}
@@ -68,63 +69,69 @@ function WalletOverview(
   };
 
   return (
-    <div className="w-full dark-gradient flex flex-col justify-between p-6">
-      <div className="flex justify-between">
-        <div className={`${hideBalance ? "blur-sm" : ""}`}>
-          <p className="text-[#999999] text-5xl select-none">
-            <span className="font-light">
+    <div class="w-full dark-gradient flex flex-col justify-between p-6">
+      <div class="flex justify-between">
+        <div class={`${hideBalance ? "blur-sm" : ""}`}>
+          <p class="text-stamp-grey font-extralight text-3xl mobileLg:text-4xl desktop:text-5xl select-none">
+            <span class="font-medium">
               {hideBalance ? "***" : walletData.balance}
-            </span>
-            &nbsp;
-            <span className="font-extralight">BTC</span>
+            </span>{" "}
+            BTC
           </p>
-          <p className="text-[#666666] text-2xl  select-none">
-            {hideBalance ? "******" : walletData.usdValue.toLocaleString()} USD
+          <p class="text-stamp-grey-darker font-extralight text-lg mobileLg:text-xl desktop:text-2xl select-none">
+            <span class="font-medium">
+              {hideBalance ? "******" : walletData.usdValue.toLocaleString()}
+            </span>{" "}
+            USD
           </p>
         </div>
-        <div>
-          <button class="" onClick={() => setHideBalance(!hideBalance)}>
-            {hideBalance
-              ? (
-                <img
-                  src="/img/wallet/icon-unhide-balance.svg"
-                  className="w-8 h-8"
-                  alt="Hide balance"
-                />
-              )
-              : (
-                <img
-                  src="/img/wallet/icon-hide-balance.svg"
-                  className="w-8 h-8"
-                  alt="Hide balance"
-                />
-              )}
-          </button>
-        </div>
+        <button class="" onClick={() => setHideBalance(!hideBalance)}>
+          {hideBalance
+            ? (
+              <img
+                src="/img/wallet/icon-unhide-balance.svg"
+                class="w-8 h-8"
+                alt="Hide balance"
+              />
+            )
+            : (
+              <img
+                src="/img/wallet/icon-hide-balance.svg"
+                class="w-8 h-8"
+                alt="Hide balance"
+              />
+            )}
+        </button>
       </div>
-      <div className="flex justify-between">
-        <div className="flex items-center">
-          <p className="text-[#8800CC] font-medium select-none mobileLg:block tablet:text-sm text-xs hidden">
+      <div class="flex justify-between">
+        <div class="flex items-center">
+          <p class="text-stamp-primary font-medium select-none text-xs mobileLg:text-sm desktop:text-base hidden mobileLg:block">
             {walletData.address}
           </p>
+          <p class="text-stamp-primary font-medium select-none text-xs mobileLg:text-sm desktop:text-base block mobileLg:hidden">
+            {abbreviateAddress(walletData.address)}
+          </p>
         </div>
-        <div className="flex gap-3">
+        <div class="flex gap-2 mobileLg:gap-3">
           <Button
             variant="wallet"
             icon="/img/wallet/icon-copy.svg"
             iconAlt="Copy"
+            class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px]"
             onClick={copy}
           />
           <Button
             variant="wallet"
             icon="/img/wallet/icon-arrow-square-out.svg"
             iconAlt="Send"
+            class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px]"
             onClick={onSend}
           />
           <Button
             variant="wallet"
             icon="/img/wallet/icon-arrow-square-in.svg"
             iconAlt="Receive"
+            class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px]"
             onClick={onReceive}
           />
           <a
@@ -135,6 +142,7 @@ function WalletOverview(
               variant="wallet"
               icon="/img/wallet/icon-history.svg"
               iconAlt="History"
+              class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px]"
             />
           </a>
         </div>
@@ -156,7 +164,7 @@ function WalletStats(
   };
 
   return (
-    <div className="w-full flex flex-col tablet:flex-row gap-6 ">
+    <div class="w-full flex flex-col desktop:flex-row gap-3 mobileLg:gap-6">
       <StampStats
         stampsTotal={stampsTotal}
         stampsCreated={stampsCreated}
@@ -177,10 +185,10 @@ function StampStats(
 ) {
   return (
     <div
-      className="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      class="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
       onClick={() => handleType("stamp")}
     >
-      <div className="flex justify-between">
+      <div class="flex justify-between">
         <StatItem label="STAMPS" value={stampsTotal.toString()} />
         <StatItem label="BY ME" value={stampsCreated.toString()} />
       </div>
@@ -193,11 +201,14 @@ function DispenserStats(
 ) {
   return (
     <div
-      className="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      class="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
       onClick={() => handleType("dispenser")}
     >
-      <div className="flex justify-between">
-        <StatItem label="DISPENSERS" value="N/A" align="left" />
+      <div class="flex justify-between">
+        <StatItem label="LISTINGS" value="N/A" align="left" />
+        <div class="hidden mobileLg:block desktop:hidden">
+          <StatItem label="ATOMIC" value="N/A" align="left" />
+        </div>
         <StatItem label="SOLD" value="N/A" align="right" />
       </div>
     </div>
@@ -212,7 +223,7 @@ function TokenStats(
 ) {
   return (
     <div
-      className="w-full dark-gradient flex justify-between p-6 hover:border-[#9900EE] hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      class="w-full dark-gradient flex justify-between p-6 hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
       onClick={() => handleType("token")}
     >
       <StatItem label="TOKENS" value={src20Total.toString()} />
@@ -220,9 +231,9 @@ function TokenStats(
         label="VALUE"
         value={
           <>
-            <span className="font-light">
+            <span class="font-light">
               N/A
-            </span>&nbsp;<span className="font-extralight">BTC</span>
+            </span>&nbsp;<span class="font-extralight">BTC</span>
           </>
         }
         align="right"
@@ -246,8 +257,14 @@ function StatItem({ label, value, align = "left" }: StatItemProps) {
 
   return (
     <div>
-      <p className={`text-[#666666] ${alignmentClass}`}>{label}</p>
-      <p className={`text-4xl font-black text-[#999999] ${alignmentClass}`}>
+      <p
+        class={`text-base mobileLg:text-lg font-light text-stamp-grey-darker ${alignmentClass}`}
+      >
+        {label}
+      </p>
+      <p
+        class={`text-2xl mobileLg:text-3xl desktop:text-4xl font-black text-stamp-grey ${alignmentClass}`}
+      >
         {value}
       </p>
     </div>

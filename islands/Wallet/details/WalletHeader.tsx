@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { Filter } from "../../datacontrol/Filter.tsx";
+import { Filter } from "$islands/datacontrol/Filter.tsx";
 
 import { WALLET_FILTER_TYPES } from "globals";
 
@@ -27,8 +27,8 @@ const WalletHeader = ({
   };
 
   return (
-    <div class="flex flex-col-reverse tablet:flex-row justify-between items-center gap-3 w-full">
-      <h1 className="text-5xl text-[#660099] font-black">WALLET</h1>
+    <div class="flex justify-between items-center gap-3 w-full">
+      <h1 className="text-5xl text-stamp-primary-dark font-black">WALLET</h1>
       <div class="flex gap-3 justify-between h-[40px]">
         <Filter
           initFilter={filterBy}
