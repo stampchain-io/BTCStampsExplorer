@@ -160,7 +160,7 @@ export function DonateEstimation({
           Estimated:{" "}
         </span>
         {coinType === "BTC"
-          ? `${totalFee.toFixed(0)} sats`
+          ? `${totalFee.toFixed(0)} ₿`
           : `${(totalFee / 1e8 * BTCPrice).toFixed(2)} ${coinType}`}
       </p>
 
@@ -178,15 +178,15 @@ export function DonateEstimation({
             BYTES <span className="font-medium">{txSize}</span>
           </p>
           <p className="text-xs font-light text-[#999999]">
-            MINER FEE <span className="font-medium">{minerFee}</span> SATS
+            MINER FEE <span className="font-medium">{minerFee}</span> ₿
           </p>
           {dustValue > 0 && (
             <p className="text-xs font-light text-[#999999]">
-              DUST <span className="font-medium">{dustValue}</span> SATS
+              DUST <span className="font-medium">{dustValue}</span> ₿
             </p>
           )}
           <p className="text-xs font-light text-[#999999]">
-            TOTAL FEE <span className="font-medium">{totalFee}</span> SATS
+            TOTAL FEE <span className="font-medium">{totalFee}</span> ₿
           </p>
         </div>
       )}
