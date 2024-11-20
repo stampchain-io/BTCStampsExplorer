@@ -6,7 +6,6 @@ export const FAQModule = () => {
       <div className="flex flex-col">
         <h1 className={ModulesStyles.titleGreyDL}>HOW-TO</h1>
         <h2 className={ModulesStyles.subTitleGrey}>MINT A TOKEN</h2>
-
         <p className={ModulesStyles.bodyTextLight}>
           <ul className="list-disc pl-5 space-y-2">
             <li>
