@@ -287,16 +287,8 @@ export function StampImage(
       {isFullScreenModalOpen && (
         <StampImageFullScreen
           src={src}
-          toggleModal={handleCloseFullScreenModal}
           handleCloseModal={handleCloseFullScreenModal}
-          typeFlag={src !== NOT_AVAILABLE_IMAGE &&
-              stamp.stamp_mimetype === "text/html"
-            ? 1
-            : src !== NOT_AVAILABLE_IMAGE &&
-                stamp.stamp_mimetype !== "text/html" &&
-                stamp.stamp_mimetype !== "text/plain"
-            ? 2
-            : 0}
+          contentType={stamp.stamp_mimetype === "text/html" ? "html" : "image"}
         />
       )}
     </>

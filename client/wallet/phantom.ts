@@ -1,6 +1,8 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
+import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
+import { handleWalletError } from "./walletHelper.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -23,24 +25,14 @@ export const connectPhantom = async (addToast) => {
 };
 
 const getProvider = () => {
-  if ("phantom" in globalThis) {
-    const provider = globalThis.phantom?.bitcoin;
-    if (provider?.isPhantom) {
-      return provider;
-    }
-  }
-  return null;
+  const wallets = getGlobalWallets();
+  return wallets.phantom?.bitcoin;
 };
 
 export const checkPhantom = () => {
-  const provider = getProvider();
-  if (provider) {
-    isPhantomInstalled.value = true;
-    provider.on("accountsChanged", handleAccountsChanged);
-    return true;
-  }
-  isPhantomInstalled.value = false;
-  return false;
+  const isAvailable = checkWalletAvailability("phantom");
+  isPhantomInstalled.value = isAvailable;
+  return isAvailable;
 };
 
 const handleAccountsChanged = async (accounts: any[]) => {
@@ -150,12 +142,8 @@ const signPSBT = async (
         error: "Unexpected result format from Phantom wallet",
       };
     }
-  } catch (error) {
-    console.error("Error signing PSBT with Phantom:", error);
-    if (error.message && error.message.includes("User rejected")) {
-      return { signed: false, cancelled: true };
-    }
-    return { signed: false, error: error.message };
+  } catch (error: unknown) {
+    return handleWalletError(error, "Phantom");
   }
 };
 
