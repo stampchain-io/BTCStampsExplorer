@@ -18,30 +18,33 @@ const MintProgress = (
   { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
 ) => {
   return (
-    <div className="flex justify-between text-[#999999] items-end">
-      <div className="flex flex-col gap-1">
-        <p className="text-base tablet:text-2xl font-light">
-          PROGRESS{" "}
+    <div className="flex justify-between text-stamp-grey items-end">
+      <div className="min-w-[420px] flex flex-col gap-[6px]">
+        <p className="text-xl mobileLg:text-2xl font-light text-stamp-grey-light">
+          <span className="text-stamp-grey-darker">PROGRESS</span>{" "}
           <span className="font-bold">
-            {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0] || "0"}%
+            {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0]}
           </span>
+          %
         </p>
-        <div className="min-w-[260px] h-1 bg-[#999999] relative rounded-full">
+        <div className="w-full max-w-[420px] h-[6px] bg-stamp-grey relative rounded-full">
           <div
-            className="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
+            className="absolute left-0 top-0 h-[6px] bg-[#660099] rounded-full"
             style={{ width: progressWidth }}
           />
         </div>
       </div>
-      <div className="text-right text-xs tablet:text-base font-light">
+      <div className="text-sm mobileLg:text-base font-light text-stamp-grey-darker text-right">
         <p>
-          SUPPLY <span className="font-bold">{maxSupply}</span>
+          SUPPLY{" "}
+          <span className="text-stamp-grey-light font-bold">{maxSupply}</span>
         </p>
         <p>
-          LIMIT <span className="font-bold">{limit}</span>
+          LIMIT <span className="text-stamp-grey-light font-bold">{limit}</span>
         </p>
-        <p>
-          MINTERS <span className="font-bold">{minters}</span>
+        <p className="-mb-[5px] mobileLg:-mb-[7px]">
+          MINTERS{" "}
+          <span className="text-stamp-grey-light font-bold">{minters}</span>
         </p>
       </div>
     </div>
@@ -158,6 +161,8 @@ export function MintContent({
     "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
   const feeSelectorContainerClassName =
     "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+  const inputFieldContainerClassName =
+    "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
 
   return (
     <div className={bodyToolsClassName}>
@@ -170,11 +175,11 @@ export function MintContent({
         </div>
       )}
 
-      <div className="dark-gradient p-3 mobileMd:p-6 flex flex-col gap-3 mobileMd:gap-6 w-full">
+      <div className={inputFieldContainerClassName}>
         <div className="w-full flex gap-3 mobileMd:gap-6">
           <div
             id="image-preview"
-            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[108px] tablet:min-w-[120px] w-[108px] tablet:w-[120px] h-[108px] tablet:h-[120px] content-center bg-[#660099] flex flex-col"
+            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[108px] mobileMd:min-w-[120px] w-[108px] mobileMd:w-[120px] h-[108px] mobileMd:h-[120px] content-center bg-[#660099] flex flex-col"
           >
             <img
               src="/img/stamping/image-upload.svg"
@@ -189,6 +194,7 @@ export function MintContent({
               value={formState.token}
               onChange={(e) => handleInputChange(e, "token")}
               error={formState.tokenError}
+              isUppercase
             />
 
             <InputField
