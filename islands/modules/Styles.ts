@@ -1,12 +1,21 @@
 export const ModulesStyles = {
-  title:
-    "font-black text-4xl mobileLg:text-5xl tablet:text-6xl gray-gradient3 mb-1",
-  subTitle:
-    "font-extralight text-2xl mobileLg:text-4xl tablet:text-5xl text-stamp-grey-light mb-3",
-  content:
-    "font-medium text-base mobileLg:text-lg desktop:text-xl text-stamp-grey",
-  buttonType1:
-    "bg-transparent border-2 border-stamp-grey text-stamp-grey w-[96px] h-[48px] flex justify-center items-center rounded-md",
-  buttonType2:
-    "bg-stamp-grey text-black w-[96px] h-[48px] flex justify-center items-center rounded-md",
+  titleGreyDL:
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3",
+  titleGreyLD:
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1",
+  titlePurpleDL:
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1",
+  titlePurpleLD:
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3",
+  subTitleGrey:
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3",
+  subTitlePurple:
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3",
+  bodyTextDark: "text-base mobileLg:text-lg font-medium text-stamp-grey-darker",
+  bodyText: "text-base mobileLg:text-lg font-medium text-stamp-grey",
+  bodyTextLight: "text-base mobileLg:text-lg font-medium text-stamp-grey-light",
+  buttonGreyFlat:
+    "inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:bg-stamp-grey-light transition-colors",
+  buttonGreyOutline:
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors",
 } as const;
