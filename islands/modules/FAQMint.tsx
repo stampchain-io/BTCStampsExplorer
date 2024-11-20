@@ -1,3 +1,5 @@
+import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
+
 export const FAQModule = () => {
   return (
     <div className="flex flex-col gap-4">
@@ -48,15 +50,7 @@ export const FAQModule = () => {
         All related costs are listed in the <b>details</b> section.<br />
       </p>
 
-      <div className="flex justify-end tablet:justify-start">
-        <a
-          href="/faq"
-          f-partial="/faq"
-          className="border tablet:border-2 border-[#999999] rounded-md bg-transparent text-[#999999] font-extrabold text-sm tablet:text-base w-[63px] tablet:w-[84px] h-[36px] tablet:h-[48px] flex justify-center items-center"
-        >
-          READ ALL
-        </a>
-      </div>
+      <ReadAllButton />
     </div>
   );
 };
