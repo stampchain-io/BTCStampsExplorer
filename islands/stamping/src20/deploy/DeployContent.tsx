@@ -116,13 +116,13 @@ export function DeployContent(
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+          `<div class='w-5 h-5 rounded-full bg-stamp-purple-dark'></div>`;
       }, 150);
     } else {
       switchToggle.classList.remove("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+          `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
       }, 150);
     }
     setShowAdvancedOptions(!showAdvancedOptions);
@@ -132,7 +132,7 @@ export function DeployContent(
     const advancedToggle = document.getElementById("switch-toggle-advanced");
     if (advancedToggle) {
       advancedToggle.innerHTML =
-        `<div class='w-5 h-5 rounded-full bg-[#440066]'></div>`;
+        `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
     }
   }, []);
 
@@ -147,12 +147,12 @@ export function DeployContent(
     <div className={bodyToolsClassName}>
       <h1 className={titlePurpleLDCenterClassName}>DEPLOY</h1>
 
-      <div className="dark-gradient p-2 mobileMd:p-6 w-full flex flex-col gap-3 mobileMd:gap-6">
+      <div className="dark-gradient p-2 mobileMd:p-6 w-full">
         <div className="flex gap-3 mobileMd:gap-6">
           <div className="flex flex-col gap-3 mobileMd:gap-6 !w-[108px] mobileMd:!w-[120px]">
             <div
               id="image-preview"
-              class="relative rounded-[3px] items-center text-center cursor-pointer min-w-[108px] tablet:min-w-[120px] h-[108px] tablet:h-[120px] content-center bg-[#660099]"
+              class="relative rounded-[3px] items-center text-center cursor-pointer min-w-[108px] mobileMd:min-w-[120px] h-[108px] mobileMd:h-[120px] content-center bg-stamp-purple-darker"
             >
               <input
                 id="upload"
@@ -207,14 +207,15 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "token")}
                 error={formState.tokenError}
                 maxLength={5}
+                isUppercase
               />
               <button
-                class="min-w-12 h-6 rounded-full bg-gray-700 flex items-center transition duration-300 focus:outline-none shadow"
+                class="min-w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
                 onClick={handleShowAdvancedOptions}
               >
                 <div
                   id="switch-toggle-advanced"
-                  class="w-6 h-6 relative rounded-full transition duration-500 transform text-white flex justify-center items-center"
+                  class="w-6 h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
                 >
                 </div>
               </button>
@@ -243,46 +244,47 @@ export function DeployContent(
         </div>
 
         <div
-          className={`flex flex-col gap-3 mobileMd:gap-6 transition-all duration-300 ${
-            showAdvancedOptions ? "h-full opacity-100" : "h-0 opacity-0"
+          className={`overflow-hidden transition-all duration-500 ${
+            showAdvancedOptions
+              ? "max-h-[400px] opacity-100 mt-3 mobileMd:mt-6"
+              : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <textarea
-            type="text"
-            class="h-12 px-3 rounded-md bg-[#999999] text-[#333333] placeholder:text-[#333333] placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC]"
-            placeholder="Description"
-            rows={5}
-            // value={formState.description}
-            // onChange={(e) => handleInputChange(e, "description")}
-          />
-          <div className="w-full flex gap-3 mobileMd:gap-6">
-            <InputField
+          <div className="flex flex-col gap-3 mobileMd:gap-6">
+            <textarea
               type="text"
-              placeholder="X"
-              value={formState.x}
-              onChange={(e) => handleInputChange(e, "x")}
+              class="h-[108px] mobileMd:h-[120px] p-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC]"
+              placeholder="Description"
+              rows={5}
             />
-            <InputField
-              type="text"
-              placeholder="Website"
-              value={formState.web}
-              onChange={(e) => handleInputChange(e, "web")}
-            />
-          </div>
-          <div className="w-full flex gap-3 mobileMd:gap-6">
-            <InputField
-              type="text"
-              placeholder="Telegram"
-              value=""
-              // value={formState.telegram}
-              onChange={(e) => handleInputChange(e, "telegram")}
-            />
-            <InputField
-              type="email"
-              placeholder="Email"
-              value={formState.email}
-              onChange={(e) => handleInputChange(e, "email")}
-            />
+            <div className="w-full flex gap-3 mobileMd:gap-6">
+              <InputField
+                type="text"
+                placeholder="X"
+                value={formState.x}
+                onChange={(e) => handleInputChange(e, "x")}
+              />
+              <InputField
+                type="text"
+                placeholder="Website"
+                value={formState.web}
+                onChange={(e) => handleInputChange(e, "web")}
+              />
+            </div>
+            <div className="w-full flex gap-3 mobileMd:gap-6">
+              <InputField
+                type="text"
+                placeholder="Telegram"
+                value={formState.tg || ""}
+                onChange={(e) => handleInputChange(e, "telegram")}
+              />
+              <InputField
+                type="email"
+                placeholder="Email"
+                value={formState.email || ""}
+                onChange={(e) => handleInputChange(e, "email")}
+              />
+            </div>
           </div>
         </div>
       </div>
