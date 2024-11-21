@@ -6,6 +6,14 @@ import { WalletData } from "$types/index.d.ts";
 import { Button } from "$components/shared/Button.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
+interface WalletStatsProps {
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  dispensers: WalletData["dispensers"];
+  setShowItem: (type: string) => void;
+}
+
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
     walletData: WalletData;
@@ -32,6 +40,7 @@ function WalletDetails(
           stampsTotal={stampsTotal}
           src20Total={src20Total}
           stampsCreated={stampsCreated}
+          dispensers={walletData.dispensers}
         />
       </div>
 
@@ -152,12 +161,13 @@ function WalletOverview(
 }
 
 function WalletStats(
-  { stampsTotal, src20Total, stampsCreated, setShowItem = () => {} }: {
-    stampsTotal: number;
-    src20Total: number;
-    stampsCreated: number;
-    setShowItem: (type: string) => void;
-  },
+  {
+    stampsTotal,
+    src20Total,
+    stampsCreated,
+    dispensers,
+    setShowItem = () => {},
+  }: WalletStatsProps,
 ) {
   const handleType = (type: string) => {
     setShowItem(type);
@@ -170,7 +180,7 @@ function WalletStats(
         stampsCreated={stampsCreated}
         handleType={handleType}
       />
-      <DispenserStats handleType={handleType} />
+      <DispenserStats dispensers={dispensers} handleType={handleType} />
       <TokenStats src20Total={src20Total} handleType={handleType} />
     </div>
   );
@@ -197,7 +207,10 @@ function StampStats(
 }
 
 function DispenserStats(
-  { handleType }: { handleType: (type: string) => void },
+  { handleType, dispensers = { open: 0, closed: 0, total: 0 } }: {
+    handleType: (type: string) => void;
+    dispensers?: { open: number; closed: number; total: number };
+  },
 ) {
   return (
     <div
@@ -205,11 +218,19 @@ function DispenserStats(
       onClick={() => handleType("dispenser")}
     >
       <div class="flex justify-between">
-        <StatItem label="LISTINGS" value="N/A" align="left" />
+        <StatItem
+          label="LISTINGS"
+          value={dispensers.open.toString()}
+          align="left"
+        />
         <div class="hidden mobileLg:block desktop:hidden">
           <StatItem label="ATOMIC" value="N/A" align="left" />
         </div>
-        <StatItem label="SOLD" value="N/A" align="right" />
+        <StatItem
+          label="SOLD"
+          value={dispensers.closed.toString()}
+          align="right"
+        />
       </div>
     </div>
   );
