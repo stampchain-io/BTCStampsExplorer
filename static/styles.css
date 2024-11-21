@@ -149,23 +149,23 @@ html, body {
 }
 
 .bgGradientTop {
-  @apply fixed top-0 left-0 right-0;
-  height: 140vh;
+  @apply absolute top-0 left-0 right-0;
+  height: 2000px;
   z-index: 1;
   background:
     radial-gradient(
       ellipse 50% 50% at 5% 5%,
-      rgba(120, 80, 0, 0.1),
+      rgba(120, 80, 0, 0.15),
       transparent 90%
     ),
     radial-gradient(
       ellipse 75% 150% at 20% 0,
       rgba(1, 0, 1, 0.9) 10%,
-      transparent 70%
+      transparent 50%
     ),
     radial-gradient(
       ellipse 50% 50% at 100% 10%,
-      rgba(120, 80, 0, 0.2),
+      rgba(120, 80, 0, 0.15),
       transparent 80%
     ),
     radial-gradient(
@@ -174,12 +174,12 @@ html, body {
       transparent 80%
     ),
     radial-gradient(
-      ellipse 60% 50% at 120% 70%,
-      rgba(0, 120, 80, 0.2),
+      ellipse 100% 60% at 120% 70%,
+      var(--gradient-cyan),
       transparent 90%
     ),
     linear-gradient(
-      rgba(80, 0, 120, 0.3),
+      rgba(80, 0, 120, 0.4),
       rgba(0, 0, 0, 0.8) 70%,
       rgba(0, 0, 0, 1) 100%
     );
@@ -195,7 +195,10 @@ html, body {
     black 60%,
     transparent 100%
   );
+  animation:
+    fadeInOutCyan 4s linear infinite alternate;
 }
+
 @layer base {
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
@@ -205,13 +208,13 @@ html, body {
 }
 
 .bgGradientBottom {
-  @apply fixed bottom-0 left-0 right-0;
-  height: 100vh;
+  @apply absolute bottom-0 left-0 right-0;
+  height: 1000px;
   z-index: 1;
   background:
     radial-gradient(
       ellipse 75% 100% at 20% 100%,
-      rgba(1, 0, 1, 0.8) 10%,
+      rgba(1, 0, 1, 0.6) 10%,
       transparent 70%
     ),
     radial-gradient(
@@ -221,7 +224,7 @@ html, body {
     ),
     radial-gradient(
       ellipse 20% 60% at 0% 90%,
-      rgba(120, 80, 0, 0.2),
+      rgba(120, 80, 0, 0.3),
       transparent
     ),
     radial-gradient(
@@ -236,7 +239,7 @@ html, body {
     ),
     linear-gradient(
       rgba(0, 0, 0, 1),
-      rgba(0, 120, 80, 0.2)
+      rgba(0, 120, 80, 0.1)
     );
   mask-image: linear-gradient(
     to top,
@@ -255,31 +258,125 @@ html, body {
     fadeInOutPurple 2s linear infinite alternate;
 }
 
+@media (max-width: 768px) {
+  .bgGradientTop {
+    height: 1000px;
+  }
+  .bgGradientBottom {
+    height: 500px;
+  }
+}
+
 :root {
   --gradient-orange: rgba(120, 80, 0, 0.1);
-  --gradient-purple: rgba(80, 0, 120, 0.15);
+  --gradient-purple: rgba(80, 0, 120, 0.2);
+  --gradient-cyan: rgba(0, 120, 80, 0.3);
 }
 
 @keyframes fadeInOutOrange {
   0% {
     --gradient-orange: rgba(120, 80, 0, 0.1);
   }
+  10% {
+    --gradient-orange: rgba(120, 80, 0, 0.105);
+  }
+  20% {
+    --gradient-orange: rgba(120, 80, 0, 0.11);
+  }
+  30% {
+    --gradient-orange: rgba(120, 80, 0, 0.115);
+  }
+  40% {
+    --gradient-orange: rgba(120, 80, 0, 0.12);
+  }
   50% {
-    --gradient-orange: rgba(120, 80, 0, 0.15);
+    --gradient-orange: rgba(120, 80, 0, 0.125);
+  }
+  60% {
+    --gradient-orange: rgba(120, 80, 0, 0.13);
+  }
+  70% {
+      --gradient-orange: rgba(120, 80, 0, 0.135);
+  }
+  80% {
+    --gradient-orange: rgba(120, 80, 0, 0.14);
+  }
+  90% {
+    --gradient-orange: rgba(120, 80, 0, 0.145);
   }
   100% {
-    --gradient-orange: rgba(120, 80, 0, 0.2);
+    --gradient-orange: rgba(120, 80, 0, 0.15);
   }
 }
 
 @keyframes fadeInOutPurple {
   0% {
-    --gradient-purple: rgba(80, 0, 120, 0.15);
-  }
-  50% {
     --gradient-purple: rgba(80, 0, 120, 0.2);
   }
-  100% {
+  10% {
+    --gradient-purple: rgba(80, 0, 120, 0.21);
+  }
+  20% {
+    --gradient-purple: rgba(80, 0, 120, 0.22);
+  }
+  30% {
+    --gradient-purple: rgba(80, 0, 120, 0.23);
+  }
+  40% {
+    --gradient-purple: rgba(80, 0, 120, 0.24);
+  }
+  50% {
     --gradient-purple: rgba(80, 0, 120, 0.25);
+  }
+  60% {
+    --gradient-purple: rgba(80, 0, 120, 0.26);
+  }
+  70% {
+    --gradient-purple: rgba(80, 0, 120, 0.27);
+  }
+  80% {
+    --gradient-purple: rgba(80, 0, 120, 0.28);
+  }
+  90% {
+    --gradient-purple: rgba(80, 0, 120, 0.29);
+  }
+  100% {
+    --gradient-purple: rgba(80, 0, 120, 0.3);
+  }
+}
+
+@keyframes fadeInOutCyan {
+  0% {
+    --gradient-cyan: rgba(0, 120, 80, 0.3);
+  }
+  10% {
+    --gradient-cyan: rgba(0, 120, 80, 0.305);
+  }
+  20% {
+    --gradient-cyan: rgba(0, 120, 80, 0.31);
+  }
+  30% {
+    --gradient-cyan: rgba(0, 120, 80, 0.315);
+  }
+  40% {
+    --gradient-cyan: rgba(0, 120, 80, 0.32);
+  }
+  50% {
+    --gradient-cyan: rgba(0, 120, 80, 0.325);
+  }
+  60% {
+    --gradient-cyan: rgba(0, 120, 80, 0.33);
+  }
+  70% {
+    --gradient-cyan: rgba(0, 120, 80, 0.335);
+  }
+  80% {
+    --gradient-cyan: rgba(0, 120, 80, 0.34);
+  }
+  90% {
+    --gradient-cyan: rgba(0, 120, 80, 0.345);
+  }
+  100% {
+    --gradient-cyan: rgba(0, 120, 80, 0.35);
   }
 }
