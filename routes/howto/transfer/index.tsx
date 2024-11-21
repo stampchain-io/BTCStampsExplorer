@@ -24,11 +24,12 @@ interface ArticleLink {
 }
 
 const ARTICLE_LINKS: ArticleLink[] = [
-  { title: "DEPLOY TOKENS", href: "/howto/deploytoken" },
-  { title: "TRANSFER", href: "/howto/transfer" },
-  { title: "MINT", href: "/howto/mint" },
-  { title: "GET STAMPING", href: "/howto/getstamping" },
-  { title: "ANOTHER ARTICLE", href: "/howto/#" },
+  { title: "DEPLOY YOUR OWN TOKEN", href: "/howto/deploytoken" },
+  { title: "MINT YOUR OWN TOKEN", href: "/howto/mint" },
+  { title: "STAMPING ART", href: "/howto/getstamping" },
+  { title: "TRANSFER FUNCTIONALITY", href: "/howto/transfer" },
+  { title: "CREATE A WALLET", href: "/howto/leathercreate" },
+  { title: "CONNECT YOUR LEATHER WALLET", href: "/howto/leatherconnect" },
 ];
 
 export default function HowTo() {

@@ -1,142 +1,112 @@
-export default function HowTo() {
+import { HowToLayout } from "$components/howto/HowToLayout.tsx";
+import { Step } from "$components/howto/Step.tsx";
+import type { StepProps } from "$components/howto/Step.tsx";
+
+interface ConnectStep extends StepProps {
+  number: number;
+}
+
+const CONNECT_STEPS: ConnectStep[] = [
+  {
+    number: 1,
+    title: "CONNECT BUTTON",
+    image: "/img/how-tos/connectleatherwallet/01.png",
+    description:
+      `Go to Stampchain.io and click on "CONNECT" button.\nA pop up will be displayed with all supported wallets.`,
+  },
+  {
+    number: 2,
+    title: "SELECTING LEATHER WALLET",
+    image: "/img/how-tos/connectleatherwallet/02.png",
+    description:
+      `Click on "Leather wallet" option.\nA Leather wallet extension pop up will appear.`,
+  },
+  {
+    number: 3,
+    title: "ENTER YOUR PASSWORD IF PROMPTED",
+    image: "/img/how-tos/connectleatherwallet/03.png",
+    description:
+      `In some situations, if you didn't open your Leather wallet, you will requested to enter your password.`,
+  },
+  {
+    number: 4,
+    title: "CONNECT APP",
+    image: "/img/how-tos/connectleatherwallet/04.png",
+    description:
+      `Your wallet will show a pop up and you have to sign in order to connect to stampchain.io.`,
+  },
+  {
+    number: 5,
+    title: "YOUR ADDRESS IS DISPLAYED",
+    image: "/img/how-tos/connectleatherwallet/05.png",
+    description: `Congratulations! Your wallet is linked to Stampchain.io!`,
+  },
+];
+
+const SUPPORTED_WALLETS = [
+  "Leather",
+  "Unisat",
+  "OKX",
+  "TapWallet",
+  "Phantom",
+];
+
+const IMPORTANT_NOTES = [
+  "Never share your seed words nor your private keys.",
+  "Always verify the website URL before connecting your wallet.",
+  "Ensure your wallet has sufficient funds before proceeding with transactions.",
+];
+
+function IntroSection() {
   return (
-    <div className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-      <div className="max-w-[1080px] w-full mx-auto flex flex-col gap-12">
-        <section>
-          <h1 className="gray-gradient3 text-6xl font-black">HOW-TO</h1>
-          <h2 className="text-2xl md:text-5xl font-extralight mb-3">
-            CONNECT YOUR LEATHER WALLET
-          </h2>
-          <img
-            src="/img/how-tos/connectleatherwallet/00.png"
-            width="1020px"
-            alt="Screenshot"
-          />
-          <p className="mb-12">
-            Connect wallet!
-            <br /> <br />
-            To start creating, sending, and storing Bitcoin Stamps, SRC-20s
-            you'll need a compatible wallet.<br />
-            Some options include:
-            <ul className="list-disc pl-5 space-y-2">
-              <li>
-                Leather
-              </li>
-              <li>
-                Unisat
-              </li>
-              <li>
-                OKX
-              </li>
-              <li>
-                TapWallet
-              </li>
-              <li>
-                Phantom
-              </li>
-            </ul>
-            <br />
-            In this example we will make use of Leather.io wallet.<br />
-            Note: There is a How-TO to create a Leather wallet.
-          </p>
-          <br />
-          <h2 className="text-2xl md:text-5xl font-extralight">
-            <ul className="list-decimal pl-5 space-y-2">
-              <li>
-                <section className="flex flex-col gap-3">
-                  Connect button at the top right. <br />
-
-                  <img
-                    src="/img/how-tos/connectleatherwallet/01.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Go to Stampchain.io and click on "CONNECT" button.<br />
-                    A pop up will be displayed with all supported wallets.<br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  SELECTING LEATHER WALLET<br />
-
-                  <img
-                    src="/img/how-tos/connectleatherwallet/02.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-1">
-                    Click on "Leather wallet" option.<br />
-                    A Leather wallet extension pop up will appear.
-
-                    <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  ENTER YOUR PASSWORD IF PROMPTED <br />
-
-                  <img
-                    src="/img/how-tos/connectleatherwallet/03.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    In some situations, if you didn't open your Leather wallet,
-                    you will requested to enter your password.<br /> <br />
-
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  CONNECT APP <br />
-
-                  <img
-                    src="/img/how-tos/connectleatherwallet/04.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Your wallet will show a pop up and you have to sign in order
-                    to connect to stampchain.io.<br /> <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  YOUR ADDRESS IS DISPLAYED <br />
-
-                  <img
-                    src="/img/how-tos/connectleatherwallet/05.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Congratulations! Your wallet is linked to
-                    Stampchain.io!<br /> <br />
-                  </p>
-                </section>
-              </li>
-            </ul>
-          </h2>
-          <br />
-          <b>IMPORTANT:</b>
-          <br />
-          Never share your seed words nor private key.<br />
-          <br /> <br />
-        </section>
-      </div>
+    <div class="mb-12">
+      <p class="mb-6">
+        Connect wallet!
+      </p>
+      <p class="mb-6">
+        To start creating, sending, and storing Bitcoin Stamps, SRC-20s you'll
+        need a compatible wallet.<br />
+        Some options include:
+      </p>
+      <ul class="list-disc pl-5 space-y-2">
+        {SUPPORTED_WALLETS.map((wallet) => <li key={wallet}>{wallet}</li>)}
+      </ul>
+      <p class="mt-6">
+        In this example we will make use of Leather.io wallet.<br />
+        Note: There is a How-TO to create a Leather wallet.
+      </p>
     </div>
+  );
+}
+
+function ConnectSteps() {
+  return (
+    <h2 class="text-2xl md:text-5xl font-extralight">
+      <ul class="list-decimal pl-5 space-y-16">
+        {CONNECT_STEPS.map((step) => (
+          <Step
+            key={step.number}
+            title={step.title}
+            image={step.image}
+            description={step.description}
+          />
+        ))}
+      </ul>
+    </h2>
+  );
+}
+
+export default function LeatherConnect() {
+  return (
+    <HowToLayout
+      title="HOW-TO"
+      subtitle="CONNECT YOUR LEATHER WALLET"
+      headerImage="/img/how-tos/connectleatherwallet/00.png"
+      importantNotes={IMPORTANT_NOTES}
+    >
+      <IntroSection />
+      <br />
+      <ConnectSteps />
+    </HowToLayout>
   );
 }
