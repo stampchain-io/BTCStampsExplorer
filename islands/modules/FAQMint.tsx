@@ -1,4 +1,5 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
 export const FAQModule = () => {
   return (
@@ -50,15 +51,8 @@ export const FAQModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
-      <div className="flex justify-end tablet:justify-start">
-        <a
-          href="/howto/mint"
-          f-partial="/howto/mint"
-          className={ModulesStyles.buttonGreyOutline}
-        >
-          READ MORE
-        </a>
-      </div>
+
+      <ReadAllButton />
     </div>
   );
 };

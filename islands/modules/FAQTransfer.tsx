@@ -1,4 +1,6 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
+
 export const FAQModule = () => {
   return (
     <div className="flex flex-col gap-3 mobileMd:gap-6">
@@ -45,15 +47,7 @@ export const FAQModule = () => {
         </p>
       </div>
 
-      <div className="flex justify-end tablet:justify-start">
-        <a
-          href="/howto/transfer"
-          f-partial="/howto/transfer"
-          className={ModulesStyles.buttonGreyOutline}
-        >
-          READ MORE
-        </a>
-      </div>
+      <ReadAllButton />
     </div>
   );
 };
