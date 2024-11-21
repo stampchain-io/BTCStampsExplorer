@@ -7,10 +7,11 @@ import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import ImageFullScreen from "./ImageFullScreen.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { Config } from "globals";
+import { logger } from "$lib/utils/logger.ts";
+import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 
 const log = (message: string, data?: any) => {
   console.log(`[OlgaContent] ${message}`, data ? data : "");
@@ -49,7 +50,9 @@ function isValidForMinting(params: {
     isConnected,
   } = params;
 
-  console.log("Validating minting conditions:", {
+  // Create a validation results object for detailed logging
+  const validationResults = {
+    isConnected,
     hasFile: !!file,
     fileError,
     issuanceError,
@@ -57,42 +60,68 @@ function isValidForMinting(params: {
     isPoshStamp,
     hasStampName: !!stampName,
     addressError,
-    isConnected,
+  };
+
+  logger.debug("stamps", {
+    message: "Checking form validation state",
+    validationResults,
   });
 
   // Check wallet connection first
   if (!isConnected) {
-    console.log("Validation failed: Wallet not connected");
+    logger.debug("stamps", {
+      message: "Validation failed: Wallet not connected",
+    });
     return false;
   }
 
   // Check for file
   if (!file) {
-    console.log("Validation failed: No file selected");
+    logger.debug("stamps", {
+      message: "Validation failed: No file selected",
+    });
     return false;
   }
 
   // Check for errors
   if (fileError) {
-    console.log("Validation failed: File error present:", fileError);
+    logger.debug("stamps", {
+      message: "Validation failed: File error present",
+      error: fileError,
+    });
     return false;
   }
+
   if (issuanceError) {
-    console.log("Validation failed: Issuance error present:", issuanceError);
+    logger.debug("stamps", {
+      message: "Validation failed: Issuance error present",
+      error: issuanceError,
+    });
     return false;
   }
+
   if (addressError) {
-    console.log("Validation failed: Address error present:", addressError);
+    logger.debug("stamps", {
+      message: "Validation failed: Address error present",
+      error: addressError,
+    });
     return false;
   }
 
   // Check POSH stamp requirements
   if (isPoshStamp && (!stampName || stampNameError)) {
-    console.log("Validation failed: POSH stamp requirements not met");
+    logger.debug("stamps", {
+      message: "Validation failed: POSH stamp requirements not met",
+      isPoshStamp,
+      stampName,
+      stampNameError,
+    });
     return false;
   }
 
-  console.log("Validation passed: All conditions met");
+  logger.debug("stamps", {
+    message: "Validation passed: All conditions met",
+  });
   return true;
 }
 
@@ -113,6 +142,89 @@ interface MintRequest {
   service_fee: string | null;
   service_fee_address: string | null;
   assetName?: string;
+}
+
+// Update the extractErrorMessage function
+function extractErrorMessage(error: unknown): string {
+  logger.debug("stamps", {
+    message: "Extracting error message from",
+    error,
+  });
+
+  // Handle string errors first
+  if (typeof error === "string") {
+    return error;
+  }
+
+  // Handle Error instances
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  // Handle error objects
+  if (error && typeof error === "object") {
+    const err = error as {
+      error?: {
+        message?: string;
+        code?: number;
+      };
+      details?: {
+        error?: {
+          message?: string;
+        };
+      };
+      message?: string;
+    };
+
+    // Check for direct error message
+    if (err.error?.message) {
+      logger.debug("stamps", {
+        message: "Found direct error message",
+        path: "error.message",
+        value: err.error.message,
+      });
+      return err.error.message;
+    }
+
+    // Check for nested error message
+    if (err.details?.error?.message) {
+      logger.debug("stamps", {
+        message: "Found nested error message",
+        path: "details.error.message",
+        value: err.details.error.message,
+      });
+      return err.details.error.message;
+    }
+
+    // Check for simple message
+    if (err.message) {
+      logger.debug("stamps", {
+        message: "Found simple message",
+        path: "message",
+        value: err.message,
+      });
+      return err.message;
+    }
+  }
+
+  // Default error message
+  logger.debug("stamps", {
+    message: "No valid error message found, using default",
+  });
+  return "An unexpected error occurred";
+}
+
+// Add interface for the wallet error structure
+interface WalletError {
+  details?: {
+    jsonrpc?: string;
+    id?: string;
+    error?: {
+      code?: number;
+      message?: string;
+    };
+  };
+  message?: string;
 }
 
 export function OlgaContent() {
@@ -195,9 +307,13 @@ export function OlgaContent() {
     }
   }, [address, isConnected]);
 
+  // Add state to track if we have a valid transaction to estimate
+  const [hasValidTransaction, setHasValidTransaction] = useState(false);
+
   // When file is uploaded
   useEffect(() => {
     if (isConnected && wallet.address && file) {
+      setHasValidTransaction(true); // Only set to true when we have all required components
       const prepareTx = async () => {
         try {
           const data = await toBase64(file);
@@ -225,12 +341,18 @@ export function OlgaContent() {
         }
       };
       prepareTx();
+    } else {
+      // Reset transaction state when requirements aren't met
+      setHasValidTransaction(false);
+      setTxDetails(null);
+      setFeeDetails({ hasExactFees: false });
     }
-  }, [isConnected, wallet.address, file]); // Only recalculate when these change
+  }, [isConnected, wallet.address, file]); // Only recalculate when these essential components change
 
   // Handle fee rate changes without rebuilding transaction
   useEffect(() => {
-    if (txDetails && fee) {
+    if (hasValidTransaction && txDetails && fee) {
+      // Only recalculate fees if we have a valid transaction
       const newFee = Math.ceil(txDetails.txDetails.estimatedSize * fee);
       setFeeDetails({
         minerFee: newFee,
@@ -239,7 +361,7 @@ export function OlgaContent() {
         hasExactFees: true,
       });
     }
-  }, [fee, txDetails]);
+  }, [fee, txDetails, hasValidTransaction]);
 
   const validateWalletAddress = (address: string) => {
     const { isValid, error } = validateWalletAddressForMinting(address);
@@ -275,18 +397,21 @@ export function OlgaContent() {
   const handleIsPoshStamp = () => {
     const switchToggle = document.querySelector("#switch-toggle-locked");
     if (!switchToggle) return;
+
     if (!isPoshStamp) {
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
           `<div class='w-5 h-5 rounded-full bg-stamp-purple-dark'></div>`;
       }, 150);
+      setStampName(""); // Clear the input when switching to POSH
     } else {
       switchToggle.classList.remove("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
           `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
       }, 150);
+      setStampName(""); // Clear the input when switching to CUSTOM CPID
     }
     setIsPoshStamp(!isPoshStamp);
   };
@@ -375,13 +500,49 @@ export function OlgaContent() {
 
   const handleStampNameChange = (e: Event) => {
     const value = (e.target as HTMLInputElement).value;
-    if (/^[B-Zb-z][A-Za-z]{0,12}$/.test(value)) {
-      setStampName(value);
-      setStampNameError("");
+
+    if (isPoshStamp) {
+      // POSH validation: Must start with B-Z and be 1-13 characters long
+      if (/^[B-Zb-z][A-Za-z]{0,12}$/.test(value)) {
+        setStampName(value);
+        setStampNameError("");
+      } else {
+        setStampNameError(
+          "Invalid POSH name. Must start with B-Z and be 1-13 characters long.",
+        );
+      }
     } else {
-      setStampNameError(
-        "Invalid stamp name. Must start with B-Z and be 1-13 characters long.",
-      );
+      // CUSTOM CPID validation: Must start with 'A' followed by a number between 26^12 + 1 and 2^64 - 1
+      if (value === "" || value === "A") {
+        setStampName(value);
+        setStampNameError("");
+        return;
+      }
+
+      if (!value.startsWith("A")) {
+        setStampNameError("Custom CPID must start with 'A'");
+        return;
+      }
+
+      const numStr = value.slice(1); // Remove the 'A' prefix
+
+      try {
+        // Parse the number after 'A'
+        const num = BigInt(numStr);
+        const min = BigInt(Math.pow(26, 12)) + BigInt(1); // 26^12 + 1
+        const max = BigInt("18446744073709551615"); // 2^64 - 1
+
+        if (num >= min && num <= max) {
+          setStampName(value);
+          setStampNameError("");
+        } else {
+          setStampNameError(
+            `Number must be between ${min.toString()} and ${max.toString()}`,
+          );
+        }
+      } catch (error) {
+        setStampNameError("Invalid number format after 'A'");
+      }
     }
   };
 
@@ -466,12 +627,39 @@ export function OlgaContent() {
         console.log("Constructed inputsToSign:", inputsToSign);
 
         const result = await walletProvider.signPSBT(hex, inputsToSign);
-        console.log("Result from walletProvider.signPSBT:", result);
+
+        logger.debug("stamps", {
+          message: "Raw wallet provider response",
+          data: {
+            result,
+            resultType: typeof result,
+            error: result?.error,
+          },
+        });
 
         if (!result || !result.signed) {
-          const errorMsg = result?.error || "Unknown error signing transaction";
-          setApiError(`Transaction signing failed: ${errorMsg}`);
-          console.error("Transaction signing failed:", errorMsg);
+          // If result contains an error message, use it directly
+          if (result?.error) {
+            logger.debug("stamps", {
+              message: "Using error from result",
+              error: result.error,
+            });
+            setApiError(result.error);
+            setSubmissionMessage(null);
+            return;
+          }
+
+          if (result?.cancelled) {
+            logger.debug("stamps", {
+              message: "Transaction was cancelled",
+            });
+            setApiError("Transaction was cancelled");
+            setSubmissionMessage(null);
+            return;
+          }
+
+          setApiError("Failed to sign PSBT");
+          setSubmissionMessage(null);
           return;
         }
 
@@ -497,24 +685,23 @@ export function OlgaContent() {
           });
           setApiError("");
         }
-      } catch (error: unknown) {
-        console.error("Minting error:", error);
-
-        const errorMessage = error instanceof Error
-          ? error.message
-          : typeof error === "object" && error && "data" in error
-          ? (error.data as any)?.message || "Unknown error"
-          : "An unexpected error occurred during minting";
-
-        // Set the error message for display
-        setApiError(errorMessage);
+      } catch (error) {
+        const errorMsg = extractErrorMessage(error);
+        logger.error("stamps", {
+          message: "Minting error",
+          error,
+          extractedMessage: errorMsg,
+        });
+        setApiError(errorMsg);
         setSubmissionMessage(null);
       }
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : "An unexpected error occurred during minting";
-      setApiError(errorMessage);
+    } catch (error) {
+      // This catch block should only handle unexpected errors
+      logger.error("stamps", {
+        message: "Unexpected minting error",
+        error,
+      });
+      setApiError("An unexpected error occurred");
       setSubmissionMessage(null);
     }
   };
@@ -534,20 +721,21 @@ export function OlgaContent() {
 
   const [tosAgreed, setTosAgreed] = useState(false);
 
-  // Add a useEffect to monitor state changes
+  // Update the useEffect to monitor validation state
   useEffect(() => {
-    console.log("State changed:", {
-      isConnected,
-      hasFile: !!file,
+    const validationState = isValidForMinting({
+      file,
       fileError,
       issuanceError,
       stampNameError,
       isPoshStamp,
       stampName,
       addressError,
+      isConnected,
     });
+
+    console.log("Validation state updated:", validationState);
   }, [
-    isConnected,
     file,
     fileError,
     issuanceError,
@@ -555,12 +743,52 @@ export function OlgaContent() {
     isPoshStamp,
     stampName,
     addressError,
+    isConnected,
   ]);
 
   const bodyToolsClassName =
     "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
   const titlePurpleLDCenterClassName =
     "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+
+  const isFormValid = isValidForMinting({
+    file,
+    fileError,
+    issuanceError,
+    stampNameError,
+    isPoshStamp,
+    stampName,
+    addressError,
+    isConnected,
+  });
+
+  // Add initialization tracking
+  useEffect(() => {
+    logger.debug("stamps", {
+      message: "OlgaContent mounted",
+      data: {
+        isConnected,
+        hasWallet: !!wallet,
+        provider: wallet?.provider,
+      },
+    });
+
+    return () => {
+      logger.debug("stamps", {
+        message: "OlgaContent unmounted",
+      });
+    };
+  }, []);
+
+  // Add cleanup for blob URLs
+  useEffect(() => {
+    return () => {
+      // Cleanup any existing blob URLs when component unmounts
+      if (file) {
+        URL.revokeObjectURL(URL.createObjectURL(file));
+      }
+    };
+  }, [file]);
 
   return (
     <div class={bodyToolsClassName}>
@@ -603,6 +831,12 @@ export function OlgaContent() {
                       }}
                       src={URL.createObjectURL(file)}
                       alt="Preview"
+                      onError={(e) => {
+                        logger.error("stamps", {
+                          message: "Image preview failed to load",
+                          error: e,
+                        });
+                      }}
                     />
                     <div class="absolute inset-0 hover:bg-black hover:bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                       <img
@@ -709,15 +943,16 @@ export function OlgaContent() {
           <div className="flex items-end gap-3 mobileMd:gap-6">
             <div className="w-full">
               <p className="text-base mobileLg:text-lg font-medium text-stamp-grey leading-[2px] mobileMd:leading-[8px] mobileLg:leading-[12px] pb-2 mobileMd:pb-3">
-                POSH
+                {isPoshStamp ? "POSH" : "CUSTOM CPID"}
               </p>
               <InputField
                 type="text"
                 value={stampName}
                 onChange={(e) => handleStampNameChange(e)}
-                placeholder="Named Stamp"
+                placeholder={isPoshStamp
+                  ? "Named Stamp (Requires XCP)"
+                  : "Custom CPID"}
                 maxLength={13}
-                disabled={!isPoshStamp}
                 error={stampNameError}
               />
             </div>
@@ -819,16 +1054,7 @@ export function OlgaContent() {
           feeDetails={feeDetails}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          disabled={!isValidForMinting({
-            file,
-            fileError,
-            issuanceError,
-            stampNameError,
-            isPoshStamp,
-            stampName,
-            addressError,
-            isConnected,
-          })}
+          disabled={!isFormValid || !hasValidTransaction}
         />
 
         <StatusMessages
@@ -838,10 +1064,10 @@ export function OlgaContent() {
       </div>
 
       {isFullScreenModalOpen && (
-        <ImageFullScreen
-          file={file}
-          toggleModal={handleCloseFullScreenModal}
+        <StampImageFullScreen
+          src={file}
           handleCloseModal={handleCloseFullScreenModal}
+          contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
         />
       )}
     </div>

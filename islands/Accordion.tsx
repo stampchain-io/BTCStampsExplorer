@@ -11,7 +11,7 @@ const Accordion = (
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full text-stamp-grey-light">
       <div
         className="flex justify-between items-center cursor-pointer text-xl tablet:text-4xl"
         onClick={toggleAccordion}

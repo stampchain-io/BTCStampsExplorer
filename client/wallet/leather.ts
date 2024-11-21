@@ -3,6 +3,8 @@ import { walletContext } from "./wallet.ts";
 import { getBtcBalance } from "$client/utils/btc.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
+import { handleWalletError } from "./walletHelper.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -18,12 +20,9 @@ type AddToastFunction = (message: string, type: string) => void;
 export const isLeatherInstalled = signal<boolean>(false);
 
 export const checkLeather = () => {
-  if (typeof globalThis !== "undefined" && "LeatherProvider" in globalThis) {
-    isLeatherInstalled.value = true;
-    return true;
-  }
-  isLeatherInstalled.value = false;
-  return false;
+  const isAvailable = checkWalletAvailability("leather");
+  isLeatherInstalled.value = isAvailable;
+  return isAvailable;
 };
 
 export const connectLeather = async (addToast: AddToastFunction) => {
@@ -44,7 +43,7 @@ export const connectLeather = async (addToast: AddToastFunction) => {
       message: "Connecting to Leather wallet",
     });
 
-    const leatherProvider = (globalThis as any).LeatherProvider;
+    const leatherProvider = getProvider();
     const response = await leatherProvider.request("getAddresses");
 
     let addresses;
@@ -120,7 +119,7 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
 };
 
 const signMessage = async (message: string) => {
-  const leatherProvider = (globalThis as any).LeatherProvider;
+  const leatherProvider = getProvider();
   if (typeof leatherProvider === "undefined") {
     throw new Error("Leather wallet not connected");
   }
@@ -155,7 +154,7 @@ export const signPSBT = async (
     inputsCount: inputsToSign.length,
   });
 
-  const leatherProvider = (globalThis as any).LeatherProvider;
+  const leatherProvider = getProvider();
   if (typeof leatherProvider === "undefined") {
     logger.error("ui", {
       message: "Leather wallet not connected",
@@ -197,20 +196,8 @@ export const signPSBT = async (
       signed: false,
       error: "Unexpected result format from Leather wallet",
     };
-  } catch (error) {
-    logger.error("ui", {
-      message: "Error signing PSBT with Leather",
-      error: error instanceof Error ? error.message : String(error),
-      details: error,
-    });
-
-    if (error instanceof Error && error.message.includes("User rejected")) {
-      return { signed: false, cancelled: true };
-    }
-    return {
-      signed: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
-    };
+  } catch (error: unknown) {
+    return handleWalletError(error, "Leather");
   }
 };
 
@@ -219,4 +206,9 @@ export const leatherProvider = {
   connectLeather,
   signMessage,
   signPSBT,
+};
+
+const getProvider = () => {
+  const wallets = getGlobalWallets();
+  return wallets.LeatherProvider;
 };
