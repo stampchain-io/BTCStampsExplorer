@@ -234,7 +234,7 @@ export function Header() {
       </div>
 
       {/* Desktop Navbar */}
-      <div className="hidden tablet:flex justify-between items-center gap-6 desktop:gap-12 font-black text-stamp-primary">
+      <div className="hidden tablet:flex justify-between items-center gap-9 desktop:gap-12 font-black text-stamp-primary">
         {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>
