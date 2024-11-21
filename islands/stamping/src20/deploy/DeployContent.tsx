@@ -207,6 +207,7 @@ export function DeployContent(
                 onChange={(e) => handleInputChange(e, "token")}
                 error={formState.tokenError}
                 maxLength={5}
+                isUppercase
               />
               <button
                 class="min-w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
