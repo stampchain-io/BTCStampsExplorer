@@ -13,6 +13,10 @@ export interface Dispenser {
   origin: string;
   confirmed: boolean;
   close_block_index: number | null;
+  status: "open" | "closed" | "unknown";
+  asset_info?: any;
+  dispenser_info?: any;
+  stamp?: StampRow | null;
 }
 
 export interface Dispense {
@@ -85,4 +89,20 @@ export interface XcpBalance {
   utxo: string;
   utxo_address: string;
   divisible: boolean;
+}
+
+export interface DispenserStats {
+  open: number;
+  closed: number;
+  total: number;
+  items: Dispenser[];
+}
+
+export interface WalletData {
+  balance: number;
+  usdValue: number;
+  address: string;
+  fee: number;
+  btcPrice: number;
+  dispensers: DispenserStats;
 }
