@@ -113,17 +113,18 @@ export class DispenserManager {
           tx_hash: dispenser.tx_hash,
           block_index: dispenser.block_index,
           source: dispenser.source,
-          cpid: cpid,
+          cpid: dispenser.asset,
           give_quantity: dispenser.give_quantity,
           give_remaining: dispenser.give_remaining,
           escrow_quantity: dispenser.escrow_quantity,
           satoshirate: dispenser.satoshirate,
-          btcrate: Number(formatSatoshisToBTC(dispenser.satoshirate, { 
-            includeSymbol: false 
-          })),
+          btcrate: Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false })),
           origin: dispenser.origin,
           confirmed: dispenser.confirmed,
           close_block_index: dispenser.close_block_index,
+          status: dispenser.give_remaining > 0 ? "open" : "closed",
+          asset_info: dispenser.asset_info,
+          dispenser_info: dispenser.dispenser_info
         }));
 
         allDispensers = allDispensers.concat(dispensers);
@@ -1386,6 +1387,64 @@ export class XcpManager {
     } catch (error) {
       console.error(`Error fetching asset info for ${asset}:`, error);
       throw error; // Throw non-404 errors
+    }
+  }
+
+  static async getDispensersByAddress(
+    address: string,
+    options: DispensersByAddressOptions = {}
+  ): Promise<{ dispensers: Dispenser[]; total: number }> {
+    const endpoint = `/addresses/${address}/dispensers`;
+    const queryParams = new URLSearchParams();
+
+    // Add optional parameters if they exist
+    if (options.status) queryParams.append('status', options.status);
+    if (options.cursor) queryParams.append('cursor', options.cursor);
+    if (options.limit) queryParams.append('limit', options.limit.toString());
+    if (options.offset) queryParams.append('offset', options.offset.toString());
+    if (options.sort) queryParams.append('sort', options.sort);
+    if (options.verbose) queryParams.append('verbose', 'true');
+    if (options.show_unconfirmed) queryParams.append('show_unconfirmed', 'true');
+
+    try {
+      const response = await this.fetchXcpV2WithCache<any>(endpoint, queryParams);
+      
+      if (!response || !Array.isArray(response.result)) {
+        console.log(`No dispensers found for address: ${address}`);
+        return {
+          dispensers: [],
+          total: 0
+        };
+      }
+
+      const dispensers = response.result.map((dispenser: any) => ({
+        tx_hash: dispenser.tx_hash,
+        block_index: dispenser.block_index,
+        source: dispenser.source,
+        cpid: dispenser.asset,
+        give_quantity: dispenser.give_quantity,
+        give_remaining: dispenser.give_remaining,
+        escrow_quantity: dispenser.escrow_quantity,
+        satoshirate: dispenser.satoshirate,
+        btcrate: Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false })),
+        origin: dispenser.origin,
+        confirmed: dispenser.confirmed,
+        close_block_index: dispenser.close_block_index,
+        status: String(dispenser.status || "unknown").toLowerCase() as 'open' | 'closed' | 'unknown',
+        asset_info: dispenser.asset_info,
+        dispenser_info: dispenser.dispenser_info
+      }));
+
+      return {
+        dispensers,
+        total: dispensers.length
+      };
+    } catch (error) {
+      console.error(`Error fetching dispensers for address ${address}:`, error);
+      return {
+        dispensers: [],
+        total: 0
+      };
     }
   }
 }
