@@ -1,7 +1,7 @@
-const hooks = require("hooks");
-const { readFileSync, writeFileSync } = require("node:fs");
-const { resolve } = require("node:path");
-const yaml = require("js-yaml");
+import hooks from "hooks";
+import { readFileSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+import yaml from "js-yaml";
 
 // Load schema once
 const schema = yaml.load(readFileSync("./schema.yml", "utf8"));
