@@ -1,6 +1,6 @@
 color: true
 dry-run: null
-hookfiles: ./hooks/hooks.cjs
+hookfiles: ./hooks/hooks.js
 language: nodejs
 require: null
 server: npm start
