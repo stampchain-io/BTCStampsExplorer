@@ -2,10 +2,13 @@ import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
 
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
+
+import { logger } from "$lib/utils/logger.ts";
 
 export function DeployContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
@@ -28,6 +31,8 @@ export function DeployContent(
 
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
   const [tosAgreed, setTosAgreed] = useState(false);
+
+  const { wallet, isConnected } = walletContext;
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -87,6 +92,14 @@ export function DeployContent(
   };
 
   const handleDeploySubmit = async () => {
+    if (!isConnected) {
+      logger.debug("stamps", {
+        message: "Showing wallet connect modal - user not connected",
+      });
+      walletContext.showConnectModal();
+      return;
+    }
+
     let fileUploaded = false;
     if (formState.file) {
       try {
@@ -300,7 +313,7 @@ export function DeployContent(
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleDeploySubmit}
-          buttonName="DEPLOY"
+          buttonName={isConnected ? "DEPLOY" : "CONNECT WALLET"}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           tosAgreed={tosAgreed}
