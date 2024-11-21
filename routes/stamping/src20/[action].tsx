@@ -132,8 +132,8 @@ export default function StampingSrc20Page(
   } = data;
 
   const isMint = selectedTab === "mint";
-  const flexDirection = isMint ? "lg:flex-row" : "md:flex-row";
-  const columnWidth = isMint ? "lg:w-1/2" : "md:w-1/2";
+  const flexDirection = isMint ? "tablet:flex-row" : "tablet:flex-row";
+  const columnWidth = isMint ? "tablet:w-1/2" : "tablet:w-1/2";
 
   const renderContent = () => {
     switch (selectedTab) {
@@ -169,12 +169,14 @@ export default function StampingSrc20Page(
   };
 
   return (
-    <div className="flex flex-col gap-16">
+    <div className="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
       <div className="self-center max-w-[680px] w-full mx-auto">
         {renderContent()}
       </div>
 
-      <div className={`flex flex-col gap-6 w-full ${flexDirection}`}>
+      <div
+        className={`flex flex-col gap-3 mobileMd:gap-6 w-full desktop:gap-9 ${flexDirection}`}
+      >
         <div className={`w-full ${columnWidth}`}>
           <FAQModule />
           {isMint && <RecentDeploy transactions={recentTransactions.deploy} />}
