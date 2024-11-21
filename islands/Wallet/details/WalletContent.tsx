@@ -235,7 +235,7 @@ function DispenserRow(
               href="#"
               class="text-3xl text-[#666666] font-bold hover:text-stamp-primary-hover uppercase flex gap-4"
             >
-              {`#${dispenser.block_index}`}
+              {`#${dispenser.stamp.stamp}`}
             </a>
           </div>
 
