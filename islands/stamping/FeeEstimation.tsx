@@ -308,21 +308,21 @@ export function FeeEstimation({
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINER FEE</span>{" "}
             {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
-            <span className="font-light">₿</span>
+            <span className="font-light">BTC</span>
           </p>
           {mintfee > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>SERVICE FEE</span>{" "}
               {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}
               {" "}
-              <span className="font-light">₿</span>
+              <span className="font-light">BTC</span>
             </p>
           )}
           {dust > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>DUST</span>{" "}
               {formatSatoshisToBTC(dust, { includeSymbol: false })}{" "}
-              <span className="font-light">₿</span>
+              <span className="font-light">BTC</span>
             </p>
           )}
         </div>
@@ -358,20 +358,20 @@ export function FeeEstimation({
         <p className={detailsTextClassName}>
           <span className={detailsTitleClassName}>MINER FEE</span>{" "}
           {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
-          <span className="font-light">₿</span>
+          <span className="font-light">BTC</span>
         </p>
         {mintfee > 0 && (
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINTING FEE</span>{" "}
             {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}{" "}
-            <span className="font-light">₿</span>
+            <span className="font-light">BTC</span>
           </p>
         )}
         {dust > 0 && (
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>DUST</span>{" "}
             {formatSatoshisToBTC(dust, { includeSymbol: false })}{" "}
-            <span className="font-light">₿</span>
+            <span className="font-light">BTC</span>
           </p>
         )}
       </div>
@@ -502,7 +502,7 @@ export function FeeEstimation({
               <span className="font-bold">
                 {formatSatoshisToBTC(total, { includeSymbol: false })}
               </span>{" "}
-              ₿
+              BTC
             </>
           )
           : (
