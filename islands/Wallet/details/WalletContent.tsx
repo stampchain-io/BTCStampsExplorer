@@ -210,14 +210,18 @@ function DispenserRow(
   return (
     <div class="bg-gradient-to-br from-transparent from-0% via-[#14001F] to-[#1F002E] text-sm flex justify-between rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE]">
       <div class="p-3 uppercase cursor-pointer flex gap-6 w-full">
-        <a href={`/stamp/${dispenser.stamp.stamp}`} class={imageSize}>
-          <div class="relative p-2 bg-[#1F002E] rounded-lg">
-            <div class="stamp-container">
-              <div class="relative z-10">
+        <a
+          href={`/stamp/${dispenser.stamp.stamp}`}
+          class={`${imageSize} relative`}
+        >
+          <div class="relative p-2 bg-[#1F002E] rounded-lg h-full">
+            <div class="stamp-container h-full flex items-center justify-center">
+              <div class="relative z-10 w-full h-full">
                 <img
                   width="100%"
+                  height="100%"
                   loading="lazy"
-                  class="max-w-none object-contain rounded-lg pixelart stamp-image"
+                  class="max-w-none w-full h-full object-contain rounded-lg pixelart stamp-image"
                   src={getStampImageSrc(dispenser.stamp)}
                   alt={`Stamp ${dispenser.stamp.stamp}`}
                   onError={(e) => {
@@ -246,9 +250,9 @@ function DispenserRow(
               }`}
             >
               <span class="font-bold text-stamp-primary text-base normal-case">
-                {dispenser.origin
-                  ? dispenser.origin
-                  : abbreviateAddress(dispenser.origin)}
+                {view === "mobile"
+                  ? abbreviateAddress(dispenser.origin)
+                  : dispenser.origin || abbreviateAddress(dispenser.origin)}
               </span>
             </p>
             <div class="flex flex-row gap-1">
