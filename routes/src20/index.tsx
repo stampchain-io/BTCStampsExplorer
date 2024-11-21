@@ -98,7 +98,7 @@ export default function SRC20Page(props: any) {
   }
 
   return (
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-6">
       <SRC20Header
         filterBy={filterBy}
         sortBy={sortBy}

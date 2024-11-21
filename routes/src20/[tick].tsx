@@ -70,7 +70,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
   const tick = deployment.tick;
 
   return (
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-6">
       <SRC20TickHeader
         deployment={deployment}
         mintStatus={mint_status}
