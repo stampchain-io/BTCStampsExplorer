@@ -37,7 +37,6 @@ function isValidForMinting(params: {
   isPoshStamp: boolean;
   stampName: string;
   addressError?: string;
-  isConnected: boolean;
 }) {
   const {
     file,
@@ -47,12 +46,10 @@ function isValidForMinting(params: {
     isPoshStamp,
     stampName,
     addressError,
-    isConnected,
   } = params;
 
   // Create a validation results object for detailed logging
   const validationResults = {
-    isConnected,
     hasFile: !!file,
     fileError,
     issuanceError,
@@ -60,6 +57,8 @@ function isValidForMinting(params: {
     isPoshStamp,
     hasStampName: !!stampName,
     addressError,
+    fileType: file?.type,
+    fileSize: file?.size,
   };
 
   logger.debug("stamps", {
@@ -67,60 +66,54 @@ function isValidForMinting(params: {
     validationResults,
   });
 
-  // Check wallet connection first
-  if (!isConnected) {
-    logger.debug("stamps", {
-      message: "Validation failed: Wallet not connected",
-    });
-    return false;
-  }
-
-  // Check for file
   if (!file) {
     logger.debug("stamps", {
-      message: "Validation failed: No file selected",
+      message: "Form invalid: No file",
+      validationResults,
     });
     return false;
   }
 
-  // Check for errors
   if (fileError) {
     logger.debug("stamps", {
-      message: "Validation failed: File error present",
+      message: "Form invalid: File error",
       error: fileError,
+      validationResults,
     });
     return false;
   }
 
   if (issuanceError) {
     logger.debug("stamps", {
-      message: "Validation failed: Issuance error present",
+      message: "Form invalid: Issuance error",
       error: issuanceError,
+      validationResults,
     });
     return false;
   }
 
   if (addressError) {
     logger.debug("stamps", {
-      message: "Validation failed: Address error present",
+      message: "Form invalid: Address error",
       error: addressError,
+      validationResults,
     });
     return false;
   }
 
-  // Check POSH stamp requirements
   if (isPoshStamp && (!stampName || stampNameError)) {
     logger.debug("stamps", {
-      message: "Validation failed: POSH stamp requirements not met",
-      isPoshStamp,
+      message: "Form invalid: POSH requirements not met",
       stampName,
       stampNameError,
+      validationResults,
     });
     return false;
   }
 
   logger.debug("stamps", {
-    message: "Validation passed: All conditions met",
+    message: "Form validation passed",
+    validationResults,
   });
   return true;
 }
@@ -312,8 +305,19 @@ export function OlgaContent() {
 
   // When file is uploaded
   useEffect(() => {
+    logger.debug("stamps", {
+      message: "Checking transaction requirements",
+      data: {
+        isConnected,
+        hasWalletAddress: !!wallet.address,
+        hasFile: !!file,
+        fileType: file?.type,
+        fileSize: file?.size,
+      },
+    });
+
     if (isConnected && wallet.address && file) {
-      setHasValidTransaction(true); // Only set to true when we have all required components
+      setHasValidTransaction(true);
       const prepareTx = async () => {
         try {
           const data = await toBase64(file);
@@ -547,12 +551,16 @@ export function OlgaContent() {
   };
 
   const handleMint = async () => {
+    if (!isConnected) {
+      logger.debug("stamps", {
+        message: "Showing wallet connect modal - user not connected",
+      });
+      walletContext.showConnectModal();
+      return;
+    }
+
     try {
       log("Starting minting process");
-
-      if (!isConnected) {
-        throw new Error("Connect your wallet");
-      }
 
       if (address && !validateWalletAddress(address)) {
         throw new Error(addressError || "Invalid wallet address type");
@@ -731,7 +739,6 @@ export function OlgaContent() {
       isPoshStamp,
       stampName,
       addressError,
-      isConnected,
     });
 
     console.log("Validation state updated:", validationState);
@@ -743,7 +750,6 @@ export function OlgaContent() {
     isPoshStamp,
     stampName,
     addressError,
-    isConnected,
   ]);
 
   const bodyToolsClassName =
@@ -759,7 +765,6 @@ export function OlgaContent() {
     isPoshStamp,
     stampName,
     addressError,
-    isConnected,
   });
 
   // Add initialization tracking
@@ -1049,12 +1054,12 @@ export function OlgaContent() {
           onRefresh={fetchFees}
           isSubmitting={false}
           onSubmit={handleMint}
-          buttonName="STAMP"
+          buttonName={isConnected ? "STAMP" : "CONNECT WALLET"}
           userAddress={address}
           feeDetails={feeDetails}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          disabled={!isFormValid || !hasValidTransaction}
+          disabled={!isFormValid}
         />
 
         <StatusMessages
