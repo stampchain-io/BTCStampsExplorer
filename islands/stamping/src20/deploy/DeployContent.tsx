@@ -275,7 +275,7 @@ export function DeployContent(
               <InputField
                 type="text"
                 placeholder="Telegram"
-                value={formState.telegram || ""}
+                value={formState.tg || ""}
                 onChange={(e) => handleInputChange(e, "telegram")}
               />
               <InputField
