@@ -1,4 +1,5 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 
 interface GetStampingModuleProps {
   btcPrice: number;
@@ -12,7 +13,10 @@ export const GetStampingModule = ({
   console.log("GetStampingModule received:", { btcPrice, recommendedFee });
 
   const displayPrice = typeof btcPrice === "number"
-    ? btcPrice.toLocaleString()
+    ? btcPrice.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
     : "0";
   const displayFee = typeof recommendedFee === "number" ? recommendedFee : "0";
 
