@@ -1,251 +1,132 @@
-export default function HowTo() {
+import { HowToLayout } from "$components/howto/HowToLayout.tsx";
+import { Step } from "$components/howto/Step.tsx";
+import type { StepProps } from "$components/howto/Step.tsx";
+
+interface WalletStep extends StepProps {
+  number: number;
+}
+
+const WALLET_STEPS: WalletStep[] = [
+  {
+    number: 1,
+    title: "DOWNLOAD CHROME EXTENSION",
+    image: "/img/how-tos/createleatherwallet/01.png",
+    description:
+      "Open you Chrome or Brave browser\nDownload the Leather.io extension for chrome from the Chrome web store.",
+  },
+  {
+    number: 2,
+    title: 'CLICK ON "Add to Chrome"',
+    image: "/img/how-tos/createleatherwallet/02.png",
+    description: "This will install the extension",
+  },
+  {
+    number: 3,
+    title: 'Click on "Add extension" button in the popup.',
+    image: "/img/how-tos/createleatherwallet/03.png",
+    description: 'Click on "Add extension" button in the popup.',
+  },
+  {
+    number: 4,
+    title: "LEATHER WALLET INSTALLED",
+    image: "/img/how-tos/createleatherwallet/04.png",
+    description:
+      `This screen is the confirmation that the extension has been dowloaded and installed.\nThe next step is to create your LEather wallet`,
+  },
+  {
+    number: 5,
+    title: "CREATE LEATHER WALLET",
+    image: "/img/how-tos/createleatherwallet/05.png",
+    description: 'Click on "Create new wallet" button.',
+  },
+  {
+    number: 6,
+    title: "BACK UP YOUR SECRET KEY",
+    image: "/img/how-tos/createleatherwallet/06.png",
+    description: `Back up your secret key.\n
+      Critical Reminder!\n
+      Make sure to back up your secret key in a secure location.\nIf you lose your secret key, you won't be able to restore or import it.\nAdditionally, if someone gains access to your secret key, they will have full control of your wallet.`,
+  },
+  {
+    number: 7,
+    title: "BACKUP YOUR SECRET KEY",
+    image: "/img/how-tos/createleatherwallet/07.png",
+    description: 'Click on "I\'ve backed it up" button.',
+  },
+  {
+    number: 8,
+    title: "SET A PASSWORD",
+    image: "/img/how-tos/createleatherwallet/08.png",
+    description: 'Click on "Set a password.',
+  },
+  {
+    number: 9,
+    title: "SET A STRONG PASSWORD",
+    image: "/img/how-tos/createleatherwallet/09.png",
+    description:
+      'Make sure that you have a strong password and click on "Continue".',
+  },
+  {
+    number: 10,
+    title: "CONGRATULATIONS WITH YOUR LEATHER WALLET!",
+    image: "/img/how-tos/createleatherwallet/10.png",
+    description: "Now you are ready to interact with stampachain.io.",
+  },
+];
+
+const SETUP_STEPS = [
+  "Download extension in your browser",
+  "Create you Leather wallet",
+];
+
+const IMPORTANT_NOTES = [
+  "Never share your seed words nor your private keys.",
+];
+
+function IntroSection() {
   return (
-    <div className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 tablet:mt-5">
-      <div className="max-w-[1080px] w-full mx-auto flex flex-col gap-12">
-        <section>
-          <h1 className="gray-gradient3 text-6xl font-black">HOW-TO</h1>
-          <h2 className="text-2xl tablet:text-5xl font-extralight mb-3">
-            CREATE A LEATHER WALLET
-          </h2>
-          <img
-            src="/img/how-tos/createleatherwallet/00.png"
-            width="1020px"
-            alt="Screenshot"
+    <p class="mb-12">
+      In this article the focus will be on create a Leather wallet which
+      basically will have 2 steps:
+      <ul class="list-decimal pl-5 space-y-2">
+        {SETUP_STEPS.map((step, index) => (
+          <li key={index}>
+            {step}
+          </li>
+        ))}
+      </ul>
+    </p>
+  );
+}
+
+function WalletSteps() {
+  return (
+    <h2 class="text-2xl md:text-5xl font-extralight">
+      <ul class="list-decimal pl-5 space-y-16">
+        {WALLET_STEPS.map((step) => (
+          <Step
+            key={step.number}
+            title={step.title}
+            image={step.image}
+            description={step.description}
           />
-          <p className="mb-12">
-            In this article the focus will be on create a Leather wallet which
-            basically will have 2 steps:
-            <ul className="list-decimal pl-5 space-y-2">
-              <li>
-                Download extension in your browser
-              </li>
-              <li>
-                Create you Leather wallet
-              </li>
-            </ul>
-          </p>
-          <br />
-          <h2 className="text-2xl md:text-5xl font-extralight">
-            <ul className="list-decimal pl-5 space-y-2">
-              <li>
-                <section className="flex flex-col gap-3">
-                  DOWNLOAD CHROME EXTENSION <br />
+        ))}
+      </ul>
+    </h2>
+  );
+}
 
-                  <img
-                    src="/img/how-tos/createleatherwallet/01.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Open you Chrome or Brave browser <br />
-                    Download the Leather.io extension for chrome from the Chrome
-                    web store.<br /> <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  CLICK ON "Add to Chrome" <br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/02.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-1">
-                    This will install the extension <br />
-
-                    <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  Click on "Add extension" button in the popup.<br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/03.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Click on "Add extension" button in the popup.<br /> <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  LEATHER WALLET INSTALLED <br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/04.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    This screen is the confirmation that the extension has been
-                    dowloaded and installed.<br />
-                    The next step is to create your LEather wallet <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  CREATE LEATHER WALLET <br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/05.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Click on "Create new wallet" button. <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  BACK UP YOUR SECRET KEY. <br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/06.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Back up your secret key. <br />
-                    <b>Critical Reminder!</b>{" "}
-                    Make sure to back up your secret key in a secure
-                    location.<br />
-                    If you lose your secret key, you won't be able to restore or
-                    import it.<br />
-                    Additionally, if someone gains access to your secret key,
-                    they will have full control of your wallet.
-                    <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  BACKUP YOUR SECRET KEY<br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/07.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Click on "I've backed it up" button. <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  SET A PASSWORD <br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/08.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Click on "Set a password. <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  SET A STRONG PASSWORD<br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/09.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Make sure that you have a strong password and click on
-                    "Continue". <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-              <li>
-                <section className="flex flex-col gap-3">
-                  CONGRATULATIONS WITH YOUR LEATHER WALLET!<br />
-
-                  <img
-                    src="/img/how-tos/createleatherwallet/10.png"
-                    width="1020px"
-                    alt="Screenshot"
-                  />
-
-                  <p className="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
-                    Now you are ready to interact with stampachain.io. <br />
-                    <br />
-                  </p>
-                </section>
-              </li>
-            </ul>
-          </h2>
-          <br />
-          <b>IMPORTANT:</b>
-          <br />
-          Never share your seed words nor your private keys.<br />
-          <br /> <br />
-        </section>
-      </div>
-      <section className="mt-24">
-        <h1 className="gray-gradient3 text-4xl tablet:text-5xl desktop:text-6xl font-black">
-          KEEP READING
-        </h1>
-        <div className="grid grid-cols-1 tablet:grid-cols-2 gap-6">
-          <div>
-            <h2 className="text-2xl tablet:text-5xl font-extralight">HOW-TO</h2>
-            {ARTICLE_LINKS.map(({ title, href }) => (
-              <a
-                key={`${title}-${href}`}
-                href={href}
-                f-partial={href}
-                className="block gray-gradient3 text-xl tablet:text-2xl font-bold"
-              >
-                {title}
-              </a>
-            ))}
-          </div>
-          <div className="flex flex-col tablet:items-end tablet:text-right">
-            <h2 className="text-2xl tablet:text-5xl font-extralight">FAQ</h2>
-            <p>
-              All you ever wanted to know about the Bitcoin Stamps protocol and
-              stuff you never thought you needed to know.
-            </p>
-            <div className="w-full flex justify-end">
-              <a
-                href="/faq"
-                f-partial="/faq"
-                className="float-right border-2 border-[#999999] text-[#999999] w-[78px] h-[48px] flex justify-center items-center rounded-md"
-              >
-                FAQ
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+export default function LeatherCreate() {
+  return (
+    <HowToLayout
+      title="HOW-TO"
+      subtitle="CREATE A LEATHER WALLET"
+      headerImage="/img/how-tos/createleatherwallet/00.png"
+      importantNotes={IMPORTANT_NOTES}
+    >
+      <IntroSection />
+      <br />
+      <WalletSteps />
+    </HowToLayout>
   );
 }
