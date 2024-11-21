@@ -1,4 +1,5 @@
 import { useState } from "preact/hooks";
+import { ModulesStyles } from "$islands/modules/Styles.ts";
 
 interface Partner {
   name: string;
@@ -16,6 +17,7 @@ const partners: Partner[] = [
     largeImageHover: "/img/home/partner/bitfinity-large-hover.svg",
     smallImage: "/img/home/partner/bitfinity-small.svg",
     smallImageHover: "/img/home/partner/bitfinity-small-hover.svg",
+    url: "https://bitfinity.network/",
   },
   {
     name: "R8",
@@ -23,6 +25,7 @@ const partners: Partner[] = [
     largeImageHover: "/img/home/partner/r8-large-hover.svg",
     smallImage: "/img/home/partner/r8-small.svg",
     smallImageHover: "/img/home/partner/r8-small-hover.svg",
+    url: "https://www.revolvedex.com/",
   },
   {
     name: "Bitname",
@@ -46,12 +49,12 @@ function PartnerCard(
       <img
         src={largeImage}
         alt=""
-        class="hidden mobileLg:block w-full invisible p-[6px]"
+        class="hidden mobileMd:block w-full invisible p-[6px]"
       />
       <img
         src={smallImage}
         alt=""
-        class="block mobileLg:hidden w-full invisible p-[6px]"
+        class="block mobileMd:hidden w-full invisible p-[6px]"
       />
 
       {/* Overlay elements */}
@@ -60,7 +63,7 @@ function PartnerCard(
         src={isHovered ? largeImageHover : largeImage}
         alt={`${name} banner`}
         loading="lazy"
-        class="hidden mobileLg:block absolute inset-0 cursor-pointer transition-all duration-300 w-full p-[6px]"
+        class="hidden mobileMd:block absolute inset-0 cursor-pointer transition-all duration-300 w-full p-[6px]"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       />
@@ -68,7 +71,7 @@ function PartnerCard(
         src={isHovered ? smallImageHover : smallImage}
         alt={`${name} banner`}
         loading="lazy"
-        class="block mobileLg:hidden absolute inset-0 cursor-pointer transition-all duration-300 w-full p-[6px]"
+        class="block mobileMd:hidden absolute inset-0 cursor-pointer transition-all duration-300 w-full p-[6px]"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       />
@@ -86,14 +89,9 @@ function PartnerCard(
 
 export function PartnersModule() {
   return (
-    <div class="
-      flex flex-col gap-3 mobileLg:gap-6
-      max-w-desktop w-full mx-auto
-    ">
-      <h2 class="font-extralight text-2xl mobileLg:text-4xl desktop:text-5xl text-stamp-grey-light">
-        PARTNERS
-      </h2>
-      <div className="grid grid-cols-3 mobileLg:gap-3">
+    <div class="flex flex-col max-w-desktop w-full mx-auto">
+      <h2 className={ModulesStyles.subTitleGrey}>PARTNERS</h2>
+      <div class="grid grid-cols-3 -m-[6px] gap-[6px] mobileMd:gap-[18px] desktop:gap-[30px]">
         {partners.map((partner) => (
           <PartnerCard key={partner.name} {...partner} />
         ))}
