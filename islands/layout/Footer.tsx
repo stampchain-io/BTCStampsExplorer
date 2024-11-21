@@ -21,8 +21,8 @@ const resourcesStampLinks: FooterLink[] = [
 
 const stampChainLinks: FooterLink[] = [
   { title: "ABOUT", href: "/about" },
-  { title: "DONATE", href: "/donate" },
-  { title: "CONTACT", href: "#" },
+  { title: "DONATE", href: "/about#donate" },
+  { title: "CONTACT", href: "/about#contact" },
   { title: "TERMS OF SERVICE", href: "/termsofservice", hiddenOnMobile: true },
 ];
 

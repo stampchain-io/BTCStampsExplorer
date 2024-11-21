@@ -297,7 +297,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
               type="button"
               ref={buttonRef}
               // onClick={toggleModal}
-              class="hidden tablet:block text-stamp-primary px-5 py-4 bg-black font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px] border-2 border-stamp-primary rounded-md opacity-100 group-hover:opacity-0"
+              class="hidden tablet:block text-stamp-primary bg-black font-extrabold border-2 border-stamp-primary rounded-md opacity-100 group-hover:opacity-0 text-sm mobileLg:text-base tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5"
             >
               {abbreviateAddress(address)}
             </button>
@@ -315,7 +315,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
                 type="button"
                 ref={buttonRef}
                 // onClick={toggleModal}
-                class="hidden tablet:block text-stamp-primary px-5 py-4 bg-black font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px]"
+                class="hidden tablet:block text-stamp-primary px-5 py-4 bg-black font-extrabold text-sm mobileLg:text-base"
               >
                 {abbreviateAddress(address)}
               </button>
@@ -346,7 +346,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             type="button"
             ref={buttonRef}
             onClick={toggleModal}
-            class="bg-stamp-purple hover:bg-[#9911DD] text-[#080808] px-5 py-4 rounded font-extrabold text-sm leading-[16px] mobileLg:text-base mobileLg:leading-[19px] mt-6 mobileLg:mt-9 tablet:mt-0"
+            class="bg-stamp-purple border-2 border-stamp-purple rounded-md  hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 mt-6 mobileLg:mt-9 tablet:mt-0 "
           >
             CONNECT
           </button>
