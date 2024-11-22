@@ -515,9 +515,9 @@ export class StampController {
         carouselStamps,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["STAMP", "SRC-721"], limit: 16 },
+          { idents: ["STAMP", "SRC-721"], limit: 20 },
           { idents: ["SRC-721"], limit: 12 },
-          { idents: ["STAMP"], limit: 16 },
+          { idents: ["STAMP"], limit: 20 },
         ]),
         Src20Controller.fetchSrc20DetailsWithHolders(null, {
           op: "DEPLOY",
