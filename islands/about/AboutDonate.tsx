@@ -82,13 +82,11 @@ export default function AboutDonate() {
   const handleOpen = () => {
     setIsOpen(!isOpen);
   };
-<<<<<<< HEAD
 
   const handleCloseModal = () => {
     setIsOpen(false);
   };
-=======
->>>>>>> 898c3cc (update donate)
+
   return (
     <>
       <section className="mobileLg:mt-36 mt-24">
