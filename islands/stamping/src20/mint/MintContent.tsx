@@ -2,10 +2,13 @@ import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
 
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
+
+import { logger } from "$lib/utils/logger.ts";
 
 interface MintProgressProps {
   progress: string;
@@ -84,6 +87,8 @@ export function MintContent({
   const [error, setError] = useState<string | null>(null);
   const [tosAgreed, setTosAgreed] = useState(false);
 
+  const { wallet, isConnected } = walletContext;
+
   // Adjusted useEffect hook to always fetch data when token changes
   useEffect(() => {
     const fetchData = async () => {
@@ -148,6 +153,14 @@ export function MintContent({
   }
 
   const handleMintSubmit = async () => {
+    if (!isConnected) {
+      logger.debug("stamps", {
+        message: "Showing wallet connect modal - user not connected",
+      });
+      walletContext.showConnectModal();
+      return;
+    }
+
     try {
       await handleSubmit();
     } catch (error) {
@@ -228,7 +241,7 @@ export function MintContent({
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleMintSubmit}
-          buttonName="MINT"
+          buttonName={isConnected ? "MINT" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
         />
