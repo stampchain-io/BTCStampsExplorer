@@ -1,10 +1,10 @@
 import { signal } from "@preact/signals";
 import { walletContext } from "./wallet.ts";
-import { getBtcBalance } from "$client/utils/btc.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
+import { getAddressBalance } from "$lib/utils/balanceUtils.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -103,11 +103,15 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
   _wallet.publicKey = btcAddress.publicKey;
   _wallet.addressType = btcAddress.type; // Store the address type for future reference
 
-  const btcBalance = await getBtcBalance(btcAddress.address);
+  const confirmedBalance = await getAddressBalance(btcAddress.address, {
+    format: "BTC",
+    fallbackValue: 0,
+  });
+
   _wallet.btcBalance = {
-    confirmed: btcBalance,
+    confirmed: confirmedBalance ?? 0,
     unconfirmed: 0,
-    total: btcBalance,
+    total: confirmedBalance ?? 0,
   };
 
   const basicInfo = await walletContext.getBasicStampInfo(btcAddress.address);

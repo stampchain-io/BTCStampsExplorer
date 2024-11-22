@@ -173,3 +173,8 @@ export function bigIntSerializer(_key: string, value: unknown): unknown {
 export function jsonStringifyWithBigInt(obj: object): string {
   return JSON.stringify(obj, bigIntSerializer);
 }
+
+export function formatUSDValue(value: number): number {
+  // Round to 2 decimal places and ensure it's a number
+  return Number(value.toFixed(2));
+}

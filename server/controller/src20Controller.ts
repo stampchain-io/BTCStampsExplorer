@@ -6,13 +6,14 @@ import {
   SRC20TrxRequestParams,
 } from "globals";
 import { StampService } from "$server/services/stampService.ts";
-import { BTCAddressService } from "$server/services/btc/addressService.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { MarketListingSummary } from "$types/index.d.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
+import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
+import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 
 export class Src20Controller {
   static async getTotalCountValidSrc20Tx(
@@ -169,9 +170,11 @@ export class Src20Controller {
         stampsResponse,
         src20Response,
         lastBlock,
-        btcPrice,
       ] = await Promise.allSettled([
-        BTCAddressService.getAddressInfo(address),
+        getAddressInfo(address, { 
+          includeUSD: true,
+          apiBaseUrl: serverConfig.API_BASE_URL 
+        }),
         StampService.getStampBalancesByAddress(address, subLimit, page),
         this.handleSrc20BalanceRequest({
           address,
@@ -180,7 +183,6 @@ export class Src20Controller {
           sortBy: "ASC",
         }),
         BlockService.getLastBlock(),
-        fetchBTCPriceInUSD(serverConfig.API_BASE_URL),
       ]);
 
       const btcData = btcInfo.status === "fulfilled" ? btcInfo.value : null;
@@ -193,7 +195,6 @@ export class Src20Controller {
       const lastBlockData = lastBlock.status === "fulfilled"
         ? lastBlock.value
         : null;
-      const usdPrice = btcPrice.status === "fulfilled" ? btcPrice.value : 0;
 
       const stampsTotal = stampsData.total || 0;
       const src20Total = Array.isArray(src20Data.data)
@@ -204,10 +205,12 @@ export class Src20Controller {
 
       const walletData = {
         balance: btcData?.balance ?? 0,
-        usdValue: (btcData?.balance ?? 0) * usdPrice,
+        usdValue: btcData?.usdValue ?? 0,
         address,
-        fee: btcData?.fee_per_vbyte ?? 0, // FIXME: Update to fetch next block fee
-        btcPrice: usdPrice,
+        btcPrice: btcData?.btcPrice ?? 0,
+        txCount: btcData?.txCount ?? 0,
+        unconfirmedBalance: btcData?.unconfirmedBalance ?? 0,
+        unconfirmedTxCount: btcData?.unconfirmedTxCount ?? 0
       };
 
       return {

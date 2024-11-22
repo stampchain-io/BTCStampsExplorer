@@ -6,7 +6,7 @@ import {
 import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { calculateJsonSize } from "$lib/utils/jsonUtils.ts";
 import { Config } from "globals";
 import { logger } from "$lib/utils/logger.ts";

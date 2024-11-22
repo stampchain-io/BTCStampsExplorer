@@ -234,10 +234,10 @@ function constructScriptFromAddress(address: string): string | null {
 async function tryAPIs<T>(
   endpoints: Array<{
     name: string;
-    fn: () => Promise<T | T[] | null>;
+    fn: () => Promise<T[] | null>;
   }>,
   maxRetries = 3,
-): Promise<T | T[] | null> {
+): Promise<T[] | null> {
   console.log(`\n>>> tryAPIs called with ${endpoints.length} endpoints`);
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {

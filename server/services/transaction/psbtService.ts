@@ -2,7 +2,6 @@ import { Psbt, Transaction, payments, networks } from "bitcoinjs-lib";
 import { UTXOService } from "./utxoService.ts";
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import { BTCAddressService } from "$server/services/btc/addressService.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
