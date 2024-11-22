@@ -86,6 +86,17 @@ export default function AboutDonate() {
   const handleCloseModal = () => {
     setIsOpen(false);
   };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(
+        "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203",
+      );
+      alert("Text copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
   return (
     <>
       <section className="mobileLg:mt-36 mt-24">
@@ -152,6 +163,7 @@ export default function AboutDonate() {
                 <img
                   src="/img/wallet/icon-copy.svg"
                   className="w-6 h-6 cursor-pointer"
+                  onClick={handleCopy}
                   alt="Copy"
                 />
               </div>
@@ -183,6 +195,7 @@ export default function AboutDonate() {
                   bc1qe5sz3mt4a3e5...74qe0xdrkzew203
                 </p>
                 <img
+                  onClick={handleCopy}
                   src="/img/wallet/icon-copy.svg"
                   className="w-6 h-6 cursor-pointer"
                   alt="Copy"
