@@ -5,6 +5,7 @@ import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
+import { ModulesStyles } from "$islands/modules/Styles.ts";
 
 export default function StampSection({
   title,
@@ -26,11 +27,6 @@ export default function StampSection({
   const [displayCount, setDisplayCount] = useState(stampArray.length);
   const [isLoading, setIsLoading] = useState(false);
   const { width } = useWindowSize();
-
-  const titlePurpleDLClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3";
-  const subTitlePurpleClassName =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
 
   // Build the "See All"  link parameters
   const params = new URLSearchParams();
@@ -87,13 +83,6 @@ export default function StampSection({
     }
   }, [pagination?.page]);
 
-  const titlePurpleDLClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
-  const titlePurpleLDClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3";
-  const subTitlePurpleClassName =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
-
   return (
     <div
       class={`
@@ -102,12 +91,12 @@ export default function StampSection({
       `}
     >
       {title && (
-        <h1 className={titlePurpleDLClassName}>
+        <h1 className={ModulesStyles.titlePurpleDLClassName}>
           {title}
         </h1>
       )}
       {subtitle && (
-        <h2 className={subTitlePurpleClassName}>
+        <h2 className={ModulesStyles.subTitlePurple}>
           {subtitle}
         </h2>
       )}

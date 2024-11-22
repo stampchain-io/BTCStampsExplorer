@@ -1,31 +1,25 @@
+import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
+import type { StampTransaction, TransferProps } from "$lib/types/stamping.ts";
+import type { JSX } from "preact";
 
-// FIXME: transition this to stampsection
-
-const LatestTransfer = ({ transactions }) => {
-  // Map transactions to match the expected shape by StampCard
-  const stamps = transactions.map((tx) => ({
+export default function LatestTransfer(
+  { transactions }: TransferProps,
+): JSX.Element {
+  const stamps = transactions.map((tx: StampTransaction) => ({
     ...tx,
-    // Ensure all required properties for StampCard are included
   }));
-
-  const titlePurpleDLClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
-  const titlePurpleLDClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3";
-  const subTitlePurpleClassName =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
 
   return (
     <div className="flex flex-col items-start tablet:items-end">
-      <h1 class={`${titlePurpleDLClassName} tablet:hidden`}>
+      <h1 class={`${ModulesStyles.titlePurpleDLClassName} tablet:hidden`}>
         RECENT TRANSFERS
       </h1>
-      <h1 class={`hidden tablet:block ${titlePurpleLDClassName}`}>
+      <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLDClassName}`}>
         RECENT TRANSFERS
       </h1>
       {stamps.length > 0 && (
-        <h2 className={subTitlePurpleClassName}>
+        <h2 className={ModulesStyles.subTitlePurple}>
           BLOCK #{stamps[0].block_index}
         </h2>
       )}
@@ -41,6 +35,4 @@ const LatestTransfer = ({ transactions }) => {
       </div>
     </div>
   );
-};
-
-export default LatestTransfer;
+}
