@@ -27,11 +27,6 @@ export default function StampSection({
   const [isLoading, setIsLoading] = useState(false);
   const { width } = useWindowSize();
 
-  const titlePurpleDLClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3";
-  const subTitlePurpleClassName =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
-
   // Build the "See All"  link parameters
   const params = new URLSearchParams();
   if (isRecentSales) {
@@ -88,9 +83,9 @@ export default function StampSection({
   }, [pagination?.page]);
 
   const titlePurpleDLClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
-  const titlePurpleLDClassName =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3";
+  const titlePurpleLDClassName =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
   const subTitlePurpleClassName =
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
 
