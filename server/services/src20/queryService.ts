@@ -12,6 +12,7 @@ import { SRC20UtilityService } from "./utilityService.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts"
 import { Big } from "$Big";
+import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 
 // Change class name from Src20Service to SRC20QueryService
 export class SRC20QueryService {
@@ -215,10 +216,10 @@ export class SRC20QueryService {
 
   static async checkMintedOut(tick: string, amount: string) {
     const mint_status = await SRC20Repository.getSrc20MintProgressByTickFromDb(
-      tick,
+      convertEmojiToTick(tick),
     );
     if (!mint_status) {
-      throw new Error("Tick not found");
+      throw new Error(`Tick ${tick} not found`);
     }
     const { max_supply, total_minted } = mint_status;
     const isMintedOut = new Big(total_minted).plus(amount).gt(max_supply);

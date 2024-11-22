@@ -25,6 +25,7 @@ export function useSRC20Form(
 
   const { config, isLoading: configLoading } = useConfig<Config>();
   const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000); // 5 minutes
+  const [apiError, setApiError] = useState<string>("");
 
   const [formState, setFormState] = useState({
     toAddress: "",
@@ -289,70 +290,54 @@ export function useSRC20Form(
         throw new Error("Configuration not loaded");
       }
 
-      let endpoint, requestData;
+      const endpoint = "/api/v2/src20/create";
+      let requestData;
 
       logger.debug("ui", {
         message: "Preparing request data",
         action,
         trxType,
+        endpoint,
       });
 
-      if (trxType === "olga") {
-        endpoint = "/api/v2/src20/v2create";
-        requestData = {
-          sourceWallet: address,
-          toAddress: action === "transfer" ? formState.toAddress : address,
-          src20Action: {
-            p: "SRC-20",
-            op: action,
-            tick: formState.token,
-            amt: formState.amt,
-            ...(action === "deploy" && {
-              max: formState.max,
-              lim: formState.lim,
-              dec: formState.dec,
-              x: formState.x,
-              tg: formState.tg,
-              web: formState.web,
-              email: formState.email,
-            }),
-          },
-          satsPerKB: formState.fee,
-          service_fee: config?.MINTING_SERVICE_FEE,
-          service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
-        };
-      } else {
-        endpoint = "/api/v2/src20/create";
-        requestData = {
-          toAddress: action === "transfer" ? formState.toAddress : address,
-          fromAddress: action === "transfer" ? address : undefined,
-          changeAddress: address,
-          op: action,
-          tick: formState.token,
-          feeRate: formState.fee,
-          amt: formState.amt,
-          service_fee: config?.MINTING_SERVICE_FEE,
-          service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
-          ...(action === "deploy" && {
-            max: formState.max,
-            lim: formState.lim,
-            dec: formState.dec,
-            x: formState.x,
-            tg: formState.tg,
-            web: formState.web,
-            email: formState.email,
-          }),
-          ...additionalData,
-        };
-      }
+      requestData = {
+        trxType,
+        toAddress: action === "transfer" ? formState.toAddress : address,
+        fromAddress: action === "transfer" ? address : undefined,
+        changeAddress: address,
+        op: action,
+        tick: formState.token,
+        feeRate: formState.fee,
+        amt: formState.amt,
+        service_fee: config?.MINTING_SERVICE_FEE,
+        service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
+        ...(action === "deploy" && {
+          max: formState.max,
+          lim: formState.lim,
+          dec: formState.dec,
+          x: formState.x,
+          tg: formState.tg,
+          web: formState.web,
+          email: formState.email,
+        }),
+        ...additionalData,
+      };
 
       logger.debug("ui", {
         message: "Sending request",
         endpoint,
         requestData: JSON.stringify(requestData, null, 2),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      const response = await axiod.post(endpoint, requestData);
+      const response = await axiod.post(endpoint, requestData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       logger.debug("ui", {
         message: "API response received",
@@ -418,8 +403,6 @@ export function useSRC20Form(
       setIsSubmitting(false);
     }
   };
-
-  const [apiError, setApiError] = useState<string>("");
 
   return {
     formState,

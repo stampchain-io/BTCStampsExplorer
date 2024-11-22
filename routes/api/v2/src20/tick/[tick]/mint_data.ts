@@ -1,6 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { emojiToUnicode } from "$lib/utils/emojiUtils.ts";
+import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {
@@ -10,14 +11,40 @@ export const handler: Handlers = {
         throw new Error("Tick parameter is required");
       }
 
-      // Decode and normalize the tick
+      // Debug logging with structured logger
+      logger.debug("stamps", {
+        message: "Processing tick request",
+        data: {
+          originalTick: tick,
+        }
+      });
+
       const decodedTick = decodeURIComponent(tick);
-      const normalizedTick = emojiToUnicode(decodedTick);
+      logger.debug("stamps", {
+        message: "Decoded tick",
+        data: {
+          decodedTick,
+        }
+      });
+
+      const normalizedTick = convertEmojiToTick(decodedTick);
+      logger.debug("stamps", {
+        message: "Normalized tick",
+        data: {
+          normalizedTick,
+        }
+      });
 
       // Fetch mint progress data with normalized tick
       const mintStatus = await Src20Controller.handleSrc20MintProgressRequest(
         normalizedTick,
       );
+      logger.debug("stamps", {
+        message: "Mint status retrieved",
+        data: {
+          mintStatus,
+        }
+      });
 
       // Fetch holders count with normalized tick
       const balanceData = await Src20Controller.handleSrc20BalanceRequest({
@@ -39,7 +66,13 @@ export const handler: Handlers = {
         },
       );
     } catch (error) {
-      console.error("Error in /api/v2/src20/tick/[tick]/mint_data:", error);
+      logger.error("stamps", {
+        message: "Error in /api/v2/src20/tick/[tick]/mint_data",
+        data: {
+          error: error instanceof Error ? error.message : String(error),
+        }
+      });
+
       return new Response(
         JSON.stringify({ error: "Error fetching mint data" }),
         { status: 500, headers: { "Content-Type": "application/json" } },

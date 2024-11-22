@@ -2,7 +2,7 @@ import "$/server/config/env.ts";
 
 import { Client } from "$mysql/mod.ts";
 import { connect, Redis } from "redis";
-import * as crypto from "crypto";
+import { crypto } from "@std/crypto";
 import {
   ConsoleHandler,
   FileHandler,
@@ -221,7 +221,11 @@ class DatabaseManager {
 
   private generateCacheKey(query: string, params: unknown[]): string {
     const input = `${query}:${JSON.stringify(params)}`;
-    return crypto.createHash("sha256").update(input).digest("hex").toString();
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = crypto.subtle.digestSync("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   public async handleCache<T>(

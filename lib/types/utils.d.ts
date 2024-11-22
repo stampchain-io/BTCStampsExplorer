@@ -48,7 +48,6 @@ type Output = {
   value: number;
 };
 
-// Define BufferLike interface to match Node's Buffer API that we're using
 export interface BufferLike {
   readonly length: number;
   readonly buffer: ArrayBuffer;

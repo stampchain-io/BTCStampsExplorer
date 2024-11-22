@@ -1,4 +1,4 @@
-import { Buffer } from "buffer";
+import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import * as msgpack from "msgpack";
@@ -20,9 +20,11 @@ async function decodeSRC20OLGATransaction(txHash: string): Promise<string> {
 
     let encodedData = "";
     for (const output of dataOutputs) {
-      const script = Buffer.from(output.scriptPubKey.hex, "hex");
+      const script = new Uint8Array(hex2bin(output.scriptPubKey.hex));
       // Remove the first two bytes (OP_0 and push 32 bytes) and convert to hex
-      encodedData += script.slice(2).toString("hex");
+      encodedData += Array.from(script.slice(2))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
     }
 
     console.log("Encoded data:", encodedData);
@@ -34,16 +36,16 @@ async function decodeSRC20OLGATransaction(txHash: string): Promise<string> {
     const lengthPrefix = parseInt(encodedData.slice(0, 4), 16);
     console.log("Length prefix:", lengthPrefix);
 
-    // Decode the hex data to a buffer, excluding the length prefix
-    const decodedBuffer = Buffer.from(encodedData.slice(4), "hex").slice(
-      0,
-      lengthPrefix,
-    );
+    // Decode the hex data to a Uint8Array, excluding the length prefix
+    const decodedBuffer = new Uint8Array(hex2bin(encodedData.slice(4)))
+      .slice(0, lengthPrefix);
 
     console.log("Decoded buffer length:", decodedBuffer.length);
 
     // Check for STAMP prefix
-    const prefix = decodedBuffer.slice(0, STAMP_PREFIX.length).toString("utf8");
+    const prefix = new TextDecoder().decode(
+      decodedBuffer.slice(0, STAMP_PREFIX.length),
+    );
     if (prefix !== STAMP_PREFIX) {
       throw new Error("Invalid data format: missing STAMP prefix");
     }
@@ -66,7 +68,7 @@ async function decodeSRC20OLGATransaction(txHash: string): Promise<string> {
         "Failed to decompress or decode with msgpack, attempting JSON parse",
       );
       // If decompression or msgpack decoding fails, try parsing as JSON
-      const jsonString = data.toString("utf8");
+      const jsonString = new TextDecoder().decode(data);
       const parsedData = JSON.parse(jsonString);
       console.log("Decoded data (JSON):", parsedData);
       return JSON.stringify(parsedData);

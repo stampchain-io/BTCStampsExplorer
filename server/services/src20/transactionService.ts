@@ -3,12 +3,19 @@ import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { deploySRC20, mintSRC20, transferSRC20 } from "./index.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$types/index.d.ts";
 import { InputData } from "$types/index.d.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export class SRC20TransactionService {
   static async handleOperation(
     operation: "deploy" | "mint" | "transfer",
     body: InputData,
   ): Promise<TX | TXError> {
+    logger.debug("stamps", {
+      message: "Starting handleOperation",
+      operation,
+      body: JSON.stringify(body, null, 2)
+    });
+
     let result;
 
     const commonParams = {
@@ -18,8 +25,17 @@ export class SRC20TransactionService {
       feeRate: body.feeRate,
     };
 
+    logger.debug("stamps", {
+      message: "Common params prepared",
+      params: commonParams
+    });
+
     switch (operation) {
       case "deploy":
+        logger.debug("stamps", {
+          message: "Handling deploy operation",
+          deployParams: this.prepareDeploy(body)
+        });
         result = await deploySRC20({
           ...commonParams,
           ...this.prepareDeploy(body),
@@ -32,6 +48,10 @@ export class SRC20TransactionService {
             400,
           );
         }
+        logger.debug("stamps", {
+          message: "Handling mint operation",
+          mintParams: this.prepareMint(body)
+        });
         result = await mintSRC20({
           ...commonParams,
           ...this.prepareMint(body),
@@ -50,6 +70,10 @@ export class SRC20TransactionService {
             400,
           );
         }
+        logger.debug("stamps", {
+          message: "Handling transfer operation",
+          transferParams: this.prepareTransfer(body)
+        });
         result = await transferSRC20({
           ...commonParams,
           ...this.prepareTransfer(body),
@@ -59,14 +83,20 @@ export class SRC20TransactionService {
         return ResponseUtil.error("Invalid operation", 400);
     }
 
+    logger.debug("stamps", {
+      message: "Operation result received",
+      result: JSON.stringify(result, null, 2)
+    });
+
     if ("error" in result) {
+      logger.error("stamps", {
+        message: "Operation error",
+        error: result.error
+      });
       return ResponseUtil.error(result.error, 400);
     }
 
-    return ResponseUtil.success({
-      hex: result.psbtHex,
-      inputsToSign: result.inputsToSign,
-    });
+    return result;
   }
 
   private static prepareDeploy(body: InputData): IDeploySRC20 {

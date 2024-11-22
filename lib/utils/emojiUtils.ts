@@ -51,13 +51,15 @@ export function convertToEmoji(tick: string): string {
   return result;
 }
 
-// Utility function to convert emoji to Unicode escape sequence
-export function emojiToUnicode(input: string): string {
-  if (!input) return input;
+/**
+ * Converts an emoji to its tick representation using supported unicode points
+ */
+export function convertEmojiToTick(emoji: string): string {
+  if (!emoji) return emoji;
 
   try {
     // Split the string into an array of characters/emojis
-    const chars = Array.from(input);
+    const chars = Array.from(emoji);
 
     // Map through each character, only convert if it's an emoji
     const converted = chars.map((char) => {
@@ -74,50 +76,6 @@ export function emojiToUnicode(input: string): string {
     // Join the characters back together
     return converted.join("");
   } catch {
-    return input;
+    return emoji;
   }
 }
-/**
- * Converts an emoji to its tick representation using supported unicode points
- */
-export function convertEmojiToTick(str: string): string {
-  str = decodeURIComponent(str);
-  let result = "";
-
-  for (const char of str) {
-    if (char.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]/)) {
-      const codePoint = char.codePointAt(0);
-      if (codePoint && SUPPORTED_UNICODE.has(codePoint)) {
-        result += "\\\\u" + codePoint.toString(16).padStart(8, "0");
-      } else {
-        result += char;
-      }
-    } else {
-      result += char;
-    }
-  }
-  return result;
-}
-
-// Test cases
-/*
-// You can uncomment and run these tests:
-const testCases = [
-  "\\U0001f525",  // Fire emoji uppercase
-  "\\u0001f525",  // Fire emoji lowercase
-  "\\u1f525",     // Fire emoji shortened
-  "\\U0001f600",  // Grinning face
-  "\\u1f600",     // Grinning face shortened
-  "invalid",      // Invalid input
-];
-
-testCases.forEach(test => {
-  console.log(`Input: ${test}`);
-  console.log(`Output: ${convertToEmoji(test)}`);
-  console.log('---');
-});
-*/
-
-// Test directly
-// console.log("Test conversion:");
-// console.log("\\U0001f525 ->", convertToEmoji("\\U0001f525")); // Should show 🔥

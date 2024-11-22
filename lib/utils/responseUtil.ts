@@ -31,7 +31,7 @@ export class ResponseUtil {
       : defaultHeaders;
 
     return new Response(
-      // Only stringify if the body isn't already a Buffer/ArrayBuffer
+      // Only stringify if the body isn't already BufferLike
       body instanceof ArrayBuffer || body instanceof Uint8Array
         ? body
         : JSON.stringify(body),

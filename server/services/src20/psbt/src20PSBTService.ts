@@ -1,5 +1,4 @@
 import * as bitcoin from "bitcoinjs-lib";
-import { Buffer } from "buffer";
 import { UTXO } from "$types/index.d.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
 import { PSBTInput } from "$types/index.d.ts";
@@ -11,10 +10,12 @@ import {
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import * as msgpack from "msgpack";
 import { TransactionService } from "$server/services/transaction/index.ts";
+import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { UTXOService } from "$server/services/transaction/utxoService.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export class SRC20PSBTService {
   private static readonly DUST_SIZE = 420; // Min is 330
@@ -39,14 +40,17 @@ export class SRC20PSBTService {
   }) {
     const effectiveChangeAddress = changeAddress || sourceAddress;
 
-    console.log("Entering preparePSBT with params:", {
-      sourceAddress,
-      toAddress,
-      src20Action,
-      satsPerVB,
-      service_fee,
-      service_fee_address,  
-      changeAddress: effectiveChangeAddress,
+    logger.debug("stamps", {
+      message: "Entering preparePSBT",
+      data: {
+        sourceAddress,
+        toAddress,
+        src20Action,
+        satsPerVB,
+        service_fee,
+        service_fee_address,
+        changeAddress: effectiveChangeAddress,
+      }
     });
 
     const network = bitcoin.networks.bitcoin;
@@ -70,7 +74,11 @@ export class SRC20PSBTService {
         address: toAddress,
       });
     } catch (error) {
-      console.error(`Error creating output for address ${toAddress}:`, error);
+      logger.error("stamps", {
+        message: "Error creating output for address",
+        error: error instanceof Error ? error.message : String(error),
+        data: { toAddress }
+      });
       throw new Error(`Invalid toAddress: ${error.message}`);
     }
 
@@ -102,25 +110,38 @@ export class SRC20PSBTService {
       { filterStampUTXOs: true, includeAncestors: true }
     );
 
-    // Calculate total input value
-    const totalInputValue = inputs.reduce((sum, input) => sum + input.value, 0);
-    const totalOutputValue = vouts.reduce((sum, vout) => sum + vout.value, 0);
+    // Calculate total values using BigInt
+    const totalInputValue = inputs.reduce((sum, input) => 
+      BigInt(sum) + BigInt(input.value), BigInt(0));
+    const totalOutputValue = vouts.reduce((sum, vout) => 
+      BigInt(sum) + BigInt(vout.value), BigInt(0));
     const totalDustValue = vouts.reduce((sum, vout) => 
-        vout.value <= this.DUST_SIZE ? sum + vout.value : sum, 0);
+      vout.value <= this.DUST_SIZE ? BigInt(sum) + BigInt(vout.value) : BigInt(sum), BigInt(0));
+
+    logger.debug("stamps", {
+      message: "Transaction values calculated",
+      data: {
+        totalInputValue: totalInputValue.toString(),
+        totalOutputValue: totalOutputValue.toString(),
+        totalDustValue: totalDustValue.toString(),
+        change: change.toString(),
+        fee: fee.toString()
+      }
+    });
 
     // Add inputs
     for (const input of inputs) {
       const txDetails = await getTransaction(input.txid);
       const psbtInput = SRC20PSBTService.createPsbtInput(input, txDetails);
       
-      // Ensure witness data is properly handled
+      // Be explicit with Uint8Array
       if (this.isWitnessInput(input.script)) {
         psbtInput.witnessUtxo = {
-          script: Buffer.from(input.script, 'hex'),
-          value: input.value,
+          script: new Uint8Array(hex2bin(input.script)), // Be explicit
+          value: BigInt(input.value),
         };
       } else {
-        psbtInput.nonWitnessUtxo = Buffer.from(txDetails.hex, 'hex');
+        psbtInput.nonWitnessUtxo = new Uint8Array(hex2bin(txDetails.hex)); // Be explicit
       }
       
       psbt.addInput(psbtInput);
@@ -138,8 +159,8 @@ export class SRC20PSBTService {
         network,
       );
       const changeOutput = {
-        script: changePayment.output,
-        value: change,
+        script: new Uint8Array(hex2bin(changePayment.output.toString('hex'))), // Be explicit
+        value: BigInt(change),
       };
       vouts.push(changeOutput);
     }
@@ -148,11 +169,16 @@ export class SRC20PSBTService {
     for (const out of vouts) {
       if ("script" in out) {
         psbt.addOutput({
-          script: out.script,
-          value: out.value,
+          script: new Uint8Array(hex2bin(out.script.toString('hex'))), // Be explicit
+          value: BigInt(out.value),
         });
       } else {
-        psbt.addOutput(out);
+        // Handle address-based output
+        const script = bitcoin.address.toOutputScript(out.address, network);
+        psbt.addOutput({
+          script: new Uint8Array(hex2bin(script.toString('hex'))), // Be explicit
+          value: BigInt(out.value),
+        });
       }
     }
 
@@ -185,28 +211,37 @@ export class SRC20PSBTService {
       }
     );
 
-    console.log("Final PSBT data:", {
-      hex: psbt.toHex(),
-      base64: psbt.toBase64(),
-      estimatedTxSize: estimatedSize,
-      totalInputValue: inputs.reduce((sum, input) => sum + input.value, 0),
-      totalOutputValue: vouts.reduce((sum, vout) => sum + vout.value, 0),
-      totalChangeOutput: change,
-      totalDustValue: vouts.reduce((sum, vout) => 
-          vout.value <= this.DUST_SIZE ? sum + vout.value : sum, 0),
-      estMinerFee,
+    logger.debug("stamps", {
+      message: "Final PSBT data prepared",
+      data: {
+        hex: psbt.toHex(),
+        base64: psbt.toBase64(),
+        estimatedTxSize: estimatedSize,
+        totalInputValue: inputs.reduce((sum, input) => 
+          BigInt(sum) + BigInt(input.value), BigInt(0)).toString(),
+        totalOutputValue: vouts.reduce((sum, vout) => 
+          BigInt(sum) + BigInt(vout.value), BigInt(0)).toString(),
+        totalChangeOutput: change.toString(),
+        totalDustValue: vouts.reduce((sum, vout) => 
+          vout.value <= this.DUST_SIZE ? BigInt(sum) + BigInt(vout.value) : BigInt(sum), 
+          BigInt(0)).toString(),
+        estMinerFee: estMinerFee.toString(),
+      }
     });
 
     return {
       psbt,
       feePerKb: satsPerVB,
       estimatedTxSize: estimatedSize,
-      totalInputValue: inputs.reduce((sum, input) => sum + input.value, 0),
-      totalOutputValue: vouts.reduce((sum, vout) => sum + vout.value, 0),
-      totalChangeOutput: change,
+      totalInputValue: inputs.reduce((sum, input) => 
+        BigInt(sum) + BigInt(input.value), BigInt(0)).toString(),
+      totalOutputValue: vouts.reduce((sum, vout) => 
+        BigInt(sum) + BigInt(vout.value), BigInt(0)).toString(),
+      totalChangeOutput: change.toString(),
       totalDustValue: vouts.reduce((sum, vout) => 
-          vout.value <= this.DUST_SIZE ? sum + vout.value : sum, 0),
-      estMinerFee,
+        vout.value <= this.DUST_SIZE ? BigInt(sum) + BigInt(vout.value) : BigInt(sum), 
+        BigInt(0)).toString(),
+      estMinerFee: estMinerFee.toString(),
       changeAddress: changeAddress,
     };
   }
@@ -233,7 +268,10 @@ export class SRC20PSBTService {
     const lengthPrefix = new Uint8Array(2);
     new DataView(lengthPrefix.buffer).setUint16(0, dataLength, false);
     const finalData = new Uint8Array([...lengthPrefix, ...fullData]);
-    const hex_data = Buffer.from(finalData).toString("hex");
+    
+    const hex_data = Array.from(finalData)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
 
     return { actionData, finalData, hex_data };
   }
@@ -243,14 +281,7 @@ export class SRC20PSBTService {
   }
 
   private static getInputType(inputDetails: any): string {
-    if (
-      !inputDetails || !inputDetails.scriptPubKey ||
-      !inputDetails.scriptPubKey.type
-    ) {
-      console.error(
-        "Invalid inputDetails:",
-        JSON.stringify(inputDetails, null, 2),
-      );
+    if (!inputDetails?.scriptPubKey?.type) {
       throw new Error("Invalid input details: missing scriptPubKey or type");
     }
 
@@ -271,8 +302,16 @@ export class SRC20PSBTService {
   }
 
   private static createPsbtInput(input: UTXO, txDetails: any): PSBTInput {
-    console.log("Creating PSBT input:", JSON.stringify(input, null, 2));
-    // console.log("Input Transaction details:", JSON.stringify(txDetails, null, 2));
+    logger.debug("stamps", {
+      message: "Creating PSBT input",
+      data: {
+        txid: input.txid,
+        vout: input.vout,
+        value: Number(input.value),
+        address: input.address,
+        script: input.script,
+      }
+    });
 
     const inputDetails = txDetails.vout[input.vout];
     if (!inputDetails) {
@@ -288,14 +327,12 @@ export class SRC20PSBTService {
     const scriptType = getScriptTypeInfo(input.script);
     
     if (scriptType.isWitness) {
-      // Witness input (segwit)
       psbtInput.witnessUtxo = {
-        script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
-        value: input.value,
+        script: new Uint8Array(hex2bin(inputDetails.scriptPubKey.hex)),
+        value: BigInt(input.value),
       };
     } else {
-      // Non-witness input
-      psbtInput.nonWitnessUtxo = Buffer.from(txDetails.hex, "hex");
+      psbtInput.nonWitnessUtxo = new Uint8Array(hex2bin(txDetails.hex));
     }
 
     return psbtInput;
@@ -306,19 +343,30 @@ export class SRC20PSBTService {
     inputType: string,
     network: bitcoin.Network,
   ) {
-    switch (inputType) {
-      case "p2pkh":
-        return bitcoin.payments.p2pkh({ address, network });
-      case "p2sh":
-        return bitcoin.payments.p2sh({ address, network });
-      case "p2wpkh":
-        return bitcoin.payments.p2wpkh({ address, network });
-      case "p2wsh":
-        return bitcoin.payments.p2wsh({ address, network });
-      default:
-        // Default to P2WPKH if input type is unknown
-        return bitcoin.payments.p2wpkh({ address, network });
+    const payment = (() => {
+      switch (inputType) {
+        case "p2pkh":
+          return bitcoin.payments.p2pkh({ address, network });
+        case "p2sh":
+          return bitcoin.payments.p2sh({ address, network });
+        case "p2wpkh":
+          return bitcoin.payments.p2wpkh({ address, network });
+        case "p2wsh":
+          return bitcoin.payments.p2wsh({ address, network });
+        default:
+          // Default to P2WPKH if input type is unknown
+          return bitcoin.payments.p2wpkh({ address, network });
+      }
+    })();
+
+    if (!payment.output) {
+      throw new Error(`Failed to create output script for ${inputType}`);
     }
+
+    return {
+      output: new Uint8Array(payment.output),
+      network
+    };
   }
 
   private static createP2WSHOutput(
@@ -331,10 +379,17 @@ export class SRC20PSBTService {
     }
     try {
       const script = bitcoin.address.toOutputScript(address, network);
+      const p2wshOutput = bitcoin.payments.p2wsh({ 
+        redeem: { 
+          output: new Uint8Array(script),
+          network 
+        },
+        network 
+      });
+
       return {
-        script:
-          bitcoin.payments.p2wsh({ redeem: { output: script }, network }).output,
-        value: value,
+        script: new Uint8Array(p2wshOutput.output || []),
+        value: BigInt(value),
       };
     } catch (error) {
       console.error(`Error creating P2WSH output for address ${address}:`, error);
