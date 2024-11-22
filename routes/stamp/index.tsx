@@ -100,29 +100,26 @@ export function StampPage(props: StampPageProps) {
     selectedTab,
   } = props.data;
 
-  // Ensure stamps is an array
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
 
   return (
-    <div class="w-full flex flex-col items-center" f-client-nav>
-      <div data-partial="/stamp">
-        <StampHeader
-          filterBy={filterBy as STAMP_FILTER_TYPES[]}
-          sortBy={sortBy}
-        />
-        <StampContent
-          stamps={stampsArray}
-          isRecentSales={isRecentSales}
-        />
-        <Pagination
-          page={page}
-          pages={totalPages}
-          page_size={limit}
-          type={selectedTab}
-          data_length={stampsArray.length}
-        />
-      </div>
+    <div class="w-full" f-client-nav data-partial="/stamp">
+      <StampHeader
+        filterBy={filterBy as STAMP_FILTER_TYPES[]}
+        sortBy={sortBy}
+      />
+      <StampContent
+        stamps={stampsArray}
+        isRecentSales={isRecentSales}
+      />
+      <Pagination
+        page={page}
+        pages={totalPages}
+        page_size={limit}
+        type={selectedTab}
+        data_length={stampsArray.length}
+      />
     </div>
   );
 }
