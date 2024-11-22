@@ -47,7 +47,7 @@ export function Filter({
 
   return (
     <div
-      class={`border-2 border-[#660099] bg-[#0B0B0B] rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
+      class={`border-2 border-[#8800CC] bg-transparent rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
         open ? "px-6 py-4" : "p-[10px]"
       }`}
     >
@@ -67,7 +67,7 @@ export function Filter({
                 class={`cursor-pointer text-xs tablet:text-sm font-black ${
                   localFilters.includes(filter)
                     ? "text-[#AA00FF]"
-                    : "text-[#660099] hover:text-[#AA00FF]"
+                    : "text-[#8800CC] hover:text-[#AA00FF]"
                 }`}
                 onClick={() => handleFilterChange(filter)}
               >

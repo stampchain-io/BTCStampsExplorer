@@ -49,7 +49,7 @@ export function StampSearchClient(
         <img
           src="/img/stamp/search-glass.png"
           alt="Search icon"
-          className="bg-stamp-purple-dark rounded-stamp p-search-icon cursor-pointer"
+          className="bg-stamp-purple rounded-stamp p-search-icon cursor-pointer"
           onClick={() => handleOpen2(true)}
         />
       )}
