@@ -6,7 +6,7 @@ import {
   StampValidationService,
 } from "$server/services/stamp/index.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { Buffer } from "buffer";
+import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, _ctx: FreshContext) {
@@ -80,8 +80,13 @@ export const handler: Handlers<TX | TXError> = {
         let vout = 0;
 
         if (input.hash && typeof input.index === "number") {
-          const hashBuffer = Buffer.from(input.hash);
-          txid = hashBuffer.reverse().toString("hex");
+          // Convert hash to Uint8Array, then to hex string
+          const hashBytes = new Uint8Array(hex2bin(input.hash.toString("hex")));
+          // Reverse bytes and convert to hex string
+          txid = Array.from(hashBytes)
+            .reverse()
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
           vout = input.index;
         } else {
           throw new Error(

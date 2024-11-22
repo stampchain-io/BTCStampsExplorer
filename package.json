@@ -5,20 +5,18 @@
   "type": "module",
   "scripts": {
     "validate:all": "npm run validate:schema && npm run validate:spectral",
-    "validate:schema": "npx swagger-cli validate ./schema.yml",
+    "validate:schema": "npx @redocly/cli lint ./schema.yml",
     "validate:spectral": "npx spectral lint ./schema.yml",
     "validate:ci": "npm run validate:schema",
     "dredd": "dredd"
   },
   "dependencies": {
-    "bitcoinjs-lib": "6.1.6",
-    "buffer": "6.0.3",
-    "crypto-browserify": "3.12.0",
+    "bitcoinjs-lib": "7.0.0-rc.0",
     "readable-stream": "4.3.0",
     "tiny-secp256k1": "2.2.3"
   },
   "devDependencies": {
-    "@apidevtools/swagger-cli": "^4.0.4",
+    "@redocly/cli": "^1.10.0",
     "@stoplight/spectral-cli": "^6.11.0",
     "dredd": "^14.1.0",
     "hooks": "^0.3.2",

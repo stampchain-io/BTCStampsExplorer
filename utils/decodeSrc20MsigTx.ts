@@ -1,7 +1,6 @@
 import * as bitcoin from "bitcoinjs-lib";
-import { Buffer } from "buffer";
-import { arc4 } from "../lib/utils/minting/transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { arc4 } from "../lib/utils/minting/transactionUtils.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
 import * as msgpack from "msgpack";
 import { SRC20Service } from "$server/services/src20/index.ts";
@@ -24,15 +23,22 @@ async function decodeSRC20Transaction(txHash: string): Promise<string> {
 
     let encryptedData = "";
     for (const output of multisigOutputs) {
-      const script = Buffer.from(output.scriptPubKey.hex, "hex");
-      const pubkeys = bitcoin.script.decompile(script)?.slice(
-        1,
-        -2,
-      ) as Buffer[];
+      const script = new Uint8Array(hex2bin(output.scriptPubKey.hex));
+      const pubkeys = bitcoin.script.decompile(script)?.slice(1, -2);
       if (!pubkeys || pubkeys.length !== 3) continue;
 
-      const chunk1 = pubkeys[0].toString("hex").slice(2, -2);
-      const chunk2 = pubkeys[1].toString("hex").slice(2, -2);
+      // Convert pubkeys to hex strings
+      const pubkeyHexes = pubkeys.map((pubkey) => {
+        if (pubkey instanceof Uint8Array) {
+          return Array.from(pubkey)
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+        }
+        return "";
+      });
+
+      const chunk1 = pubkeyHexes[0].slice(2, -2);
+      const chunk2 = pubkeyHexes[1].slice(2, -2);
       encryptedData += chunk1 + chunk2;
     }
 
@@ -43,10 +49,16 @@ async function decodeSRC20Transaction(txHash: string): Promise<string> {
     console.log("Decryption key:", decryptionKey);
     const decryptedData = arc4(hex2bin(decryptionKey), hex2bin(encryptedData));
 
-    console.log("Decrypted data (hex):", bin2hex(decryptedData));
+    console.log(
+      "Decrypted data (hex):",
+      Array.from(decryptedData)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join(""),
+    );
 
     // Extract the length and actual data
-    const chunkLength = parseInt(bin2hex(decryptedData.slice(0, 2)), 16);
+    const lengthBytes = decryptedData.slice(0, 2);
+    const chunkLength = (lengthBytes[0] << 8) | lengthBytes[1];
     console.log("Chunk length:", chunkLength);
     const chunk = decryptedData.slice(2, 2 + chunkLength);
 
@@ -63,23 +75,27 @@ async function decodeSRC20Transaction(txHash: string): Promise<string> {
     }
 
     const data = chunk.slice(STAMP_PREFIX.length);
-    console.log("Data without prefix (hex):", bin2hex(data));
-
-    // Validate data length
-    const dataLength = chunk.length - STAMP_PREFIX.length;
-    if (dataLength !== chunkLength - STAMP_PREFIX.length) {
-      throw new Error("Invalid data length");
-    }
+    console.log(
+      "Data without prefix (hex):",
+      Array.from(data)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join(""),
+    );
 
     // Try to decompress and decode the data
     try {
       const uncompressedData = await SRC20Service.CompressionService
         .zLibUncompress(data);
-      console.log("Uncompressed data (hex):", bin2hex(uncompressedData));
+      console.log(
+        "Uncompressed data (hex):",
+        Array.from(uncompressedData)
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join(""),
+      );
 
       // Decode using MessagePack
       const decodedData = msgpack.decode(uncompressedData);
-      return decodedData;
+      return JSON.stringify(decodedData);
     } catch (error) {
       console.warn("Failed to decompress data, raw text output");
       // If decompression fails, return the data as a string without parsing
@@ -88,7 +104,7 @@ async function decodeSRC20Transaction(txHash: string): Promise<string> {
   } catch (error) {
     console.error("Error decoding data:", error);
     // If all decoding attempts fail, return the data as a string
-    return new TextDecoder().decode(data).trim();
+    return new TextDecoder().decode(chunk).trim();
   }
 }
 

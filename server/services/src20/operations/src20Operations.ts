@@ -1,5 +1,6 @@
 import { SRC20Service } from "$server/services/src20/index.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20, IPrepareSRC20TX } from "$types/index.d.ts";
+import { SRC20MultisigPSBTService } from "$server/services/src20/psbt/src20MultisigPSBTService.ts";
 
 interface SRC20Operation {
   op: string;
@@ -11,12 +12,16 @@ interface SRC20Operation {
 export class SRC20OperationService {
   private static async executeSRC20Operation<T extends IPrepareSRC20TX>(
     params: T,
-    checkParams: (params: T) => void,
+    validateParams: (params: T) => Promise<void | TXError>,
     createOperationObject: (params: T) => SRC20Operation,
     additionalChecks: (params: T) => Promise<void>,
   ) {
     try {
-      checkParams(params);
+      const validationError = await validateParams(params);
+      if (validationError) {
+        throw new Error(validationError.error);
+      }
+      
       await additionalChecks(params);
 
       const operationObject = createOperationObject(params);
@@ -27,8 +32,16 @@ export class SRC20OperationService {
         transferString,
       };
 
-      const { psbtHex, inputsToSign } = await SRC20Service.PSBTService.preparePSBT(prepare);
-      return { psbtHex, inputsToSign };
+      const result = await SRC20MultisigPSBTService.preparePSBT(prepare);
+      
+      return {
+        hex: result.psbtHex,
+        base64: result.psbtBase64,
+        inputsToSign: result.inputsToSign,
+        est_tx_size: result.estimatedTxSize || 0,
+        est_miner_fee: result.fee,
+        change_value: result.change,
+      };
     } catch (error) {
       console.error(error);
       return { error: error.message };
@@ -38,7 +51,7 @@ export class SRC20OperationService {
   static mintSRC20(params: IMintSRC20) {
     return this.executeSRC20Operation(
       params,
-      SRC20Service.UtilityService.checkMintParams,
+      SRC20Service.UtilityService.validateMint,
       ({ tick, amt }) => ({ op: "MINT", p: "SRC-20", tick, amt }),
       async ({ tick, amt }) => {
         const mintInfo = await SRC20Service.UtilityService.checkMintedOut(tick, amt);
@@ -52,7 +65,7 @@ export class SRC20OperationService {
   static deploySRC20(params: IDeploySRC20) {
     return this.executeSRC20Operation(
       params,
-      SRC20Service.UtilityService.checkDeployParams,
+      SRC20Service.UtilityService.validateDeploy,
       ({ tick, max, lim, dec, x, web, email, tg, description }) => ({
         op: "DEPLOY",
         p: "SRC-20",
@@ -78,7 +91,7 @@ export class SRC20OperationService {
   static transferSRC20(params: ITransferSRC20) {
     return this.executeSRC20Operation(
       params,
-      SRC20Service.UtilityService.checkTransferParams,
+      SRC20Service.UtilityService.validateTransfer,
       ({ tick, amt }) => ({ op: "TRANSFER", p: "SRC-20", tick, amt }),
       async ({ fromAddress, tick, amt }) => {
         const hasEnoughBalance = await SRC20Service.UtilityService.checkEnoughBalance(fromAddress, tick, amt);

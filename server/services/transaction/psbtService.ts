@@ -1,5 +1,4 @@
 import { Psbt, Transaction, payments, networks } from "bitcoinjs-lib";
-import { Buffer } from "buffer";
 import { UTXOService } from "./utxoService.ts";
 import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
@@ -7,6 +6,7 @@ import { BTCAddressService } from "$server/services/btc/addressService.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 
 export class PSBTService {
   static async createPSBT(
@@ -39,8 +39,8 @@ export class PSBTService {
       index: vout,
       sequence: 0xfffffffd, // Enable RBF
       witnessUtxo: {
-        script: Buffer.from(utxoDetails.script, 'hex'),
-        value: inputAmount,
+        script: new Uint8Array(hex2bin(utxoDetails.script)), // Use hex2bin and be explicit with Uint8Array
+        value: BigInt(inputAmount), // Use BigInt for values
       },
       sighashType: Transaction.SIGHASH_SINGLE | Transaction.SIGHASH_ANYONECANPAY,
     };
@@ -49,7 +49,7 @@ export class PSBTService {
     psbt.addInput(input);
 
     // Add output for sale price
-    const salePriceSats = Math.round(salePrice * 1e8);
+    const salePriceSats = BigInt(Math.round(salePrice * 1e8)); // Use BigInt
     psbt.addOutput({
       address: sellerAddress,
       value: salePriceSats,
@@ -60,15 +60,18 @@ export class PSBTService {
     if (addressType === 'p2sh-p2wpkh') {
       const p2wpkh = payments.p2wpkh({ address: sellerAddress, network });
       const p2sh = payments.p2sh({ redeem: p2wpkh, network });
-      psbt.updateInput(0, { redeemScript: p2sh.redeem!.output });
+      if (p2sh.redeem?.output) {
+        psbt.updateInput(0, { 
+          redeemScript: new Uint8Array(p2sh.redeem.output) // Be explicit with Uint8Array
+        });
+      }
     }
 
     // Return the PSBT as a hex string
     return psbt.toHex();
   }
-
   // Change from standalone function to static class method
-  private static getPubkeyFromAddress(address: string): Buffer {
+  private static getPubkeyFromAddress(address: string): Uint8Array {
     // Implementation depends on how you're managing keys
     throw new Error('Not implemented');
   }
@@ -76,7 +79,7 @@ export class PSBTService {
   // Make sure all helper functions are static class methods
   private static getAddressType(address: string, network: networks.Network): string {
     try {
-      btcAddress.toOutputScript(address, network);
+      bitcoin.address.toOutputScript(address, network);
       return 'p2pkh';
     } catch (error) {
       try {
@@ -110,7 +113,7 @@ export class PSBTService {
     }
   }
 
-  private static getAddressFromScript(script: Buffer, network: networks.Network): string {
+  private static getAddressFromScript(script: Uint8Array, network: networks.Network): string {
     const payment = payments.p2wpkh({ output: script, network });
     if (!payment.address) {
       throw new Error("Failed to derive address from script");
@@ -136,10 +139,9 @@ export class PSBTService {
         throw new Error("Missing scriptPubKey in transaction output");
       }
 
-      // Convert scriptPubKey to address
+      // Convert scriptPubKey to address using Uint8Array
       const network = this.getAddressNetwork(address);
-      const scriptPubKeyBuffer = Buffer.from(scriptPubKeyHex, "hex");
-      const scriptPubKey = scriptPubKeyBuffer;
+      const scriptPubKey = new Uint8Array(hex2bin(scriptPubKeyHex));
 
       let derivedAddress: string;
       try {
@@ -184,7 +186,10 @@ export class PSBTService {
     }
 
     // Extract seller's input details
-    const sellerInputTxid = Buffer.from(sellerTxInput.hash).reverse().toString("hex");
+    const sellerInputTxid = Array.from(sellerTxInput.hash)
+      .reverse()
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
     const sellerInputVout = sellerTxInput.index;
 
     // Get seller's address from witnessUtxo
@@ -193,7 +198,10 @@ export class PSBTService {
       throw new Error("Seller's witnessUtxo not found");
     }
 
-    const sellerAddress = getAddressFromScript(sellerWitnessUtxo.script, network);
+    const sellerAddress = getAddressFromScript(
+      new Uint8Array(sellerWitnessUtxo.script), // Be explicit with Uint8Array
+      network
+    );
 
     // Validate seller's UTXO
     const sellerUtxoInfo = await getUTXOForAddress(
@@ -232,20 +240,20 @@ export class PSBTService {
       hash: buyerTxid,
       index: buyerVout,
       witnessUtxo: {
-        script: Buffer.from(buyerUtxo.script, "hex"),
-        value: buyerUtxo.value,
+        script: new Uint8Array(hex2bin(buyerUtxo.script)), // Use hex2bin and be explicit
+        value: BigInt(buyerUtxo.value), // Use BigInt
       },
     });
 
     // **Calculate Total Input and Output Values**
     const totalInputValue = psbt.data.inputs.reduce(
-      (sum, input) => sum + (input.witnessUtxo?.value || 0),
-      0,
+      (sum, input) => sum + BigInt(input.witnessUtxo?.value || 0),
+      BigInt(0)
     );
 
     const totalOutputValue = psbt.txOutputs.reduce(
-      (sum, output) => sum + output.value,
-      0,
+      (sum, output) => sum + BigInt(output.value),
+      BigInt(0)
     );
 
     // **Prepare Outputs Array for Fee Estimation**
@@ -265,7 +273,7 @@ export class PSBTService {
     );
 
     // **Calculate Change**
-    const changeValue = totalInputValue - totalOutputValue - estimatedFee;
+    const changeValue = totalInputValue - totalOutputValue - BigInt(estimatedFee);
 
     if (changeValue < 0) {
       throw new Error("Insufficient funds to cover outputs and fees.");
@@ -318,7 +326,10 @@ export class PSBTService {
       // Add UTXO details for each input
       const ancestorInfos = [];
       for (const [index, input] of tx.ins.entries()) {
-        const inputTxid = Buffer.from(input.hash).reverse().toString("hex");
+        const inputTxid = Array.from(input.hash)
+          .reverse()
+          .map(b => b.toString(16).padStart(2, "0"))
+          .join("");
         const inputVout = input.index;
         console.log(
           `Processing input ${index}: txid=${inputTxid}, vout=${inputVout}`,
@@ -350,11 +361,11 @@ export class PSBTService {
           throw new Error(`Missing script for input ${index}`);
         }
 
-        // Update input with witness UTXO
+        // Update input with witness UTXO using Uint8Array
         psbt.updateInput(index, {
           witnessUtxo: {
-            script: Buffer.from(utxoDetails.script, "hex"),
-            value: utxoDetails.value,
+            script: new Uint8Array(hex2bin(utxoDetails.script)),
+            value: BigInt(utxoDetails.value),
           },
         });
 
@@ -373,15 +384,15 @@ export class PSBTService {
         }
       });
 
-      // Calculate and validate fees
+      // Calculate and validate fees using BigInt
       const totalIn = tx.ins.reduce((sum, _, index) => {
         const witnessUtxo = psbt.data.inputs[index]?.witnessUtxo;
-        return sum + (witnessUtxo?.value || 0);
-      }, 0);
+        return sum + BigInt(witnessUtxo?.value || 0);
+      }, BigInt(0));
 
       const vsize = tx.virtualSize();
       const requestedFeeRateVB = feeRateKB / SATS_PER_KB_MULTIPLIER;
-      const targetFee = Math.ceil(vsize * requestedFeeRateVB);
+      const targetFee = BigInt(Math.ceil(vsize * requestedFeeRateVB));
 
       // Find the change output (usually the last non-OP_RETURN output)
       const changeOutputIndex = tx.outs.findIndex((output, index, arr) => {
@@ -395,21 +406,21 @@ export class PSBTService {
         throw new Error("No change output found to adjust fee");
       }
 
-      // Calculate the required change value to achieve target fee
+      // Calculate the required change value to achieve target fee using BigInt
       const nonChangeOutputsTotal = tx.outs.reduce((sum, output, index) => 
-        index !== changeOutputIndex ? sum + output.value : sum, 0);
+        index !== changeOutputIndex ? sum + BigInt(output.value) : sum, BigInt(0));
       
       const newChangeValue = totalIn - nonChangeOutputsTotal - targetFee;
 
-      if (newChangeValue < 546) { // Dust limit
+      if (newChangeValue < BigInt(546)) { // Dust limit
         throw new Error(`Cannot achieve target fee rate: change would be dust (${newChangeValue} sats)`);
       }
 
       // Update the change output with the new value
-      tx.outs[changeOutputIndex].value = newChangeValue;
+      tx.outs[changeOutputIndex].value = Number(newChangeValue);
 
       // Recalculate actual fee after adjustment
-      const totalOut = tx.outs.reduce((sum, output) => sum + output.value, 0);
+      const totalOut = tx.outs.reduce((sum, output) => sum + BigInt(output.value), BigInt(0));
       const actualFee = totalIn - totalOut;
 
       console.log(`
