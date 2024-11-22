@@ -28,7 +28,6 @@ export const handler: Handlers<IdentHandlerContext> = {
         sortBy,
         type: "stamps",
         ident: [ident.toUpperCase() as SUBPROTOCOLS],
-        allColumns: true,
       });
 
       const body: PaginatedStampResponseBody = {

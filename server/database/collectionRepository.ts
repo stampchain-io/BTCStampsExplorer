@@ -18,6 +18,7 @@ export class CollectionRepository {
         c.collection_name,
         c.collection_description,
         GROUP_CONCAT(DISTINCT cc.creator_address) as creators,
+        GROUP_CONCAT(DISTINCT cs.stamp) as stamp_numbers,
         COUNT(DISTINCT cs.stamp) as stamp_count,
         SUM(
           CASE 
@@ -47,11 +48,20 @@ export class CollectionRepository {
 
     queryParams.push(limit, offset);
 
-    return await dbManager.executeQueryWithCache(
+    const results = await dbManager.executeQueryWithCache(
       query,
       queryParams,
       1000 * 60 * 5, // 5 minutes cache
     );
+
+    return {
+      ...results,
+      rows: results.rows.map((row: any) => ({
+        ...row,
+        creators: row.creators ? row.creators.split(',') : [],
+        stamp_numbers: row.stamp_numbers ? row.stamp_numbers.split(',').map(Number) : [],
+      })),
+    };
   }
 
   static async getTotalCollectionsByCreatorFromDb(
