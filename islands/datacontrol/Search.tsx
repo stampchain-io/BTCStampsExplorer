@@ -82,7 +82,7 @@ export function Search({
         <img
           src="/img/stamp/search-glass.png"
           alt="Search icon"
-          class="bg-[#660099] rounded-md p-[12px] cursor-pointer"
+          class="bg-[#8800CC] rounded-md p-[12px] cursor-pointer"
           onClick={() => handleOpen(true)}
         />
       )}
