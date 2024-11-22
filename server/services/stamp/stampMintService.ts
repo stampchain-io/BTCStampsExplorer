@@ -3,7 +3,6 @@
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
-import { Buffer } from "buffer";
 import * as bitcoin from "bitcoinjs-lib";
 import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
 import type { stampMintData, stampMintCIP33, PSBTInput } from "$types/index.d.ts";
@@ -15,6 +14,7 @@ import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { calculateDust, calculateMiningFee, calculateP2WSHMiningFee } from "$lib/utils/minting/feeCalculations.ts";
 import { TX_CONSTANTS} from "$lib/utils/minting/constants.ts";
+import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 
 export class StampMintService {
 
@@ -295,11 +295,23 @@ export class StampMintService {
         });
       }
 
+      // Before adding outputs
+      console.log("Preparing to add outputs:", {
+        outputCount: vouts.length,
+        outputs: vouts.map(out => ({
+          hasScript: "script" in out,
+          hasAddress: "address" in out,
+          value: out.value,
+          scriptType: "script" in out ? 
+            `Uint8Array: ${out.script instanceof Uint8Array}` : 
+            'N/A'
+        }))
+      });
+
       // Add inputs to PSBT
       for (const input of inputs) {
         const txDetails = await getTransaction(input.txid);
 
-        // Ensure txDetails are available
         if (!txDetails) {
           throw new Error(`Failed to fetch transaction details for ${input.txid}`);
         }
@@ -321,21 +333,45 @@ export class StampMintService {
         };
 
         if (isWitnessUtxo) {
-          psbtInput["witnessUtxo"] = {
-            script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
-            value: input.value,
+          psbtInput.witnessUtxo = {
+            script: new Uint8Array(hex2bin(inputDetails.scriptPubKey.hex)),
+            value: BigInt(input.value),
           };
         } else {
-          // For non-witness inputs, we need the full transaction hex
-          psbtInput["nonWitnessUtxo"] = Buffer.from(txDetails.hex, "hex");
+          psbtInput.nonWitnessUtxo = new Uint8Array(hex2bin(txDetails.hex));
         }
 
         psbt.addInput(psbtInput);
       }
 
-      // Add outputs to PSBT
+      // Add outputs
       for (const out of vouts) {
-        psbt.addOutput(out);
+        try {
+          if ("script" in out) {
+            // For script-based outputs, ensure script is Uint8Array
+            psbt.addOutput({
+              script: out.script instanceof Uint8Array ? 
+                out.script : 
+                new Uint8Array(out.script),
+              value: BigInt(out.value),
+            });
+          } else if ("address" in out && out.address) {
+            // For address-based outputs
+            psbt.addOutput({
+              address: out.address,
+              value: BigInt(out.value),
+            });
+          } else {
+            console.error("Invalid output:", out);
+            throw new Error("Invalid output format");
+          }
+        } catch (error) {
+          console.error("Error adding output:", {
+            output: out,
+            error: error instanceof Error ? error.message : String(error)
+          });
+          throw error;
+        }
       }
 
       // Final transaction summary

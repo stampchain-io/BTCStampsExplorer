@@ -2,8 +2,7 @@
 
 import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
-import * as crypto from "crypto";
-import { Buffer } from "buffer";
+import { crypto } from "@std/crypto";
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { arc4 } from "$lib/utils/minting/transactionUtils.ts";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
@@ -12,11 +11,12 @@ import { serverConfig } from "$server/config/config.ts";
 import { IPrepareSRC20TX, PSBTInput, VOUT } from "$types/index.d.ts";
 import { getTransaction } from "$lib/utils/quicknode.ts";
 import * as msgpack from "msgpack";
+import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 
 export class SRC20MultisigPSBTService {
-  private static readonly RECIPIENT_DUST = 789;
-  private static readonly MULTISIG_DUST = 809;
-  private static readonly CHANGE_DUST = 1000;
+  private static readonly RECIPIENT_DUST = BigInt(789);
+  private static readonly MULTISIG_DUST = BigInt(809);
+  private static readonly CHANGE_DUST = BigInt(1000);
   private static readonly THIRD_PUBKEY = "020202020202020202020202020202020202020202020202020202020202020202";
 
   static async preparePSBT({
@@ -42,21 +42,20 @@ export class SRC20MultisigPSBTService {
       ];
 
       // Select UTXOs first to get txid for encryption
-      const {
-        inputs: selectedUtxos,
-        change,
-        fee: estimatedFee,
-      } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+      const { inputs, change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
         changeAddress,
         vouts,
         feeRate,
+        0,
+        1.5,
+        { filterStampUTXOs: true, includeAncestors: true }
       );
 
-      if (selectedUtxos.length === 0) {
+      if (inputs.length === 0) {
         throw new Error("Unable to select suitable UTXOs for the transaction");
       }
 
-      // Prepare and encrypt data
+      // Prepare and encrypt data using first input's txid
       let transferDataBytes: Uint8Array;
       const stampPrefixBytes = new TextEncoder().encode("stamp:");
 
@@ -81,8 +80,8 @@ export class SRC20MultisigPSBTService {
         payloadBytes = new Uint8Array([...payloadBytes, ...new Uint8Array(padLength)]);
       }
 
-      // Encrypt data using first UTXO's txid
-      const txidBytes = hex2bin(selectedUtxos[0].txid);
+      // Encrypt data using first input's txid
+      const txidBytes = hex2bin(inputs[0].txid);
       const encryptedDataBytes = arc4(txidBytes, payloadBytes);
 
       // Create multisig outputs
@@ -98,20 +97,24 @@ export class SRC20MultisigPSBTService {
         let pubkey1: string, pubkey2: string;
 
         do {
-          const first_byte = crypto.randomBytes(1)[0] & 1 ? "02" : "03";
-          const second_byte = crypto.randomBytes(1)[0].toString(16).padStart(2, "0");
+          const randomBytes = new Uint8Array(1);
+          crypto.getRandomValues(randomBytes);
+          const first_byte = randomBytes[0] & 1 ? "02" : "03";
+          const second_byte = randomBytes[0].toString(16).padStart(2, "0");
           pubkey1 = first_byte + pubkey_seg1 + second_byte;
         } while (!this.isValidPubkey(pubkey1));
 
         do {
-          const first_byte = crypto.randomBytes(1)[0] & 1 ? "02" : "03";
-          const second_byte = crypto.randomBytes(1)[0].toString(16).padStart(2, "0");
+          const randomBytes = new Uint8Array(1);
+          crypto.getRandomValues(randomBytes);
+          const first_byte = randomBytes[0] & 1 ? "02" : "03";
+          const second_byte = randomBytes[0].toString(16).padStart(2, "0");
           pubkey2 = first_byte + pubkey_seg2 + second_byte;
         } while (!this.isValidPubkey(pubkey2));
 
         const script = `5121${pubkey1}21${pubkey2}21${this.THIRD_PUBKEY}53ae`;
         vouts.push({
-          script: Buffer.from(script, "hex"),
+          script: hex2bin(script),
           value: this.MULTISIG_DUST,
         });
       }
@@ -124,7 +127,7 @@ export class SRC20MultisigPSBTService {
       }
 
       // Add inputs to PSBT
-      for (const input of selectedUtxos) {
+      for (const input of inputs) {
         const txDetails = await getTransaction(input.txid);
         if (!txDetails?.vout) throw new Error(`Transaction details not found for txid: ${input.txid}`);
 
@@ -144,41 +147,79 @@ export class SRC20MultisigPSBTService {
 
         if (isWitnessUtxo) {
           psbtInput.witnessUtxo = {
-            script: Buffer.from(inputDetails.scriptPubKey.hex, "hex"),
-            value: input.value,
+            script: hex2bin(inputDetails.scriptPubKey.hex),
+            value: BigInt(input.value),
           };
         } else {
-          psbtInput.nonWitnessUtxo = Buffer.from(txDetails.hex, "hex");
+          psbtInput.nonWitnessUtxo = hex2bin(txDetails.hex);
         }
 
         psbt.addInput(psbtInput);
       }
 
+      // Calculate total input and output values
+      const totalInputValue = inputs.reduce((sum, input) => 
+        BigInt(sum) + BigInt(input.value), BigInt(0));
+
+      // Calculate total output value before change
+      const outputsBeforeChange = vouts.reduce((sum, vout) => 
+        BigInt(sum) + BigInt(vout.value), BigInt(0));
+
+      // Calculate fee
+      const estimatedFee = BigInt(fee);
+
+      // Calculate change correctly
+      const changeAmount = totalInputValue - outputsBeforeChange - estimatedFee;
+
       // Add all outputs to PSBT
       vouts.forEach((vout) => {
         if ("address" in vout && vout.address) {
-          psbt.addOutput({ address: vout.address, value: vout.value });
+          psbt.addOutput({ 
+            address: vout.address, 
+            value: BigInt(vout.value) 
+          });
         } else if ("script" in vout && vout.script) {
-          psbt.addOutput({ script: vout.script, value: vout.value });
+          psbt.addOutput({ 
+            script: new Uint8Array(vout.script), 
+            value: BigInt(vout.value) 
+          });
         }
       });
 
-      // Add change output if needed
-      if (change > this.CHANGE_DUST) {
-        psbt.addOutput({ address: changeAddress, value: change });
+      // Add change output if it's above dust
+      if (changeAmount > this.CHANGE_DUST) {
+        psbt.addOutput({ 
+          address: changeAddress, 
+          value: changeAmount 
+        });
       }
 
-      console.log("Final transaction details:");
-      console.log("Inputs:", selectedUtxos);
-      console.log("Outputs:", vouts);
-      console.log("Change:", change);
-      console.log("Fee:", estimatedFee);
+      // Convert values to strings for logging
+      console.log("Final transaction details:", {
+        inputs: inputs.map(utxo => ({
+          ...utxo,
+          value: BigInt(utxo.value).toString()
+        })),
+        outputs: vouts.map(vout => ({
+          ...vout,
+          value: BigInt(vout.value).toString()
+        })),
+        change: changeAmount.toString(),
+        fee: BigInt(fee).toString()
+      });
 
       return {
         psbtHex: psbt.toHex(),
-        fee: estimatedFee,
-        change,
-        inputsToSign: selectedUtxos.map((_, index) => ({ index })),
+        psbtBase64: psbt.toBase64(),
+        fee: fee.toString(),
+        change: changeAmount.toString(),
+        inputsToSign: inputs.map((_, index) => ({ index })),
+        estimatedTxSize: estimateTransactionSize({
+          inputs,
+          outputs: vouts,
+          includeChangeOutput: true,
+          changeOutputType: "P2WPKH"
+        }),
       };
     } catch (error) {
       console.error("Error in prepareSrc20TX:", error);
@@ -188,8 +229,8 @@ export class SRC20MultisigPSBTService {
 
   private static isValidPubkey(pubkey: string): boolean {
     try {
-      const pubkeyBuffer = Buffer.from(pubkey, "hex");
-      return ecc.isPoint(pubkeyBuffer);
+      const pubkeyBytes = hex2bin(pubkey);
+      return ecc.isPoint(pubkeyBytes);
     } catch {
       return false;
     }

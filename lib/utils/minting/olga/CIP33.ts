@@ -4,16 +4,22 @@
  */
 export class CIP33 {
   static base64_to_hex(str: string) {
-    return atob(str).split("")
-      .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
+    const binaryString = atob(str);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
   }
 
   static hex_to_base64(str: string) {
-    const hex = str.match(/.{1,2}/g)!.map((byte) =>
-      String.fromCharCode(parseInt(byte, 16))
-    ).join("");
-    return btoa(hex);
+    const bytes = new Uint8Array(
+      str.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)),
+    );
+    const binaryString = String.fromCharCode(...bytes);
+    return btoa(binaryString);
   }
 
   static file_to_addresses(file_hex: string, network = "bitcoin"): string[] {

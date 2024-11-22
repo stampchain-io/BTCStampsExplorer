@@ -3,6 +3,8 @@ import { TX, TXError } from "globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { InputData } from "$types/index.d.ts";
+import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 type TrxType = "multisig" | "olga";
 
@@ -12,7 +14,20 @@ export const handler: Handlers<TX | TXError> = {
       const rawBody = await req.text();
       console.log("SRC-20 request body:", rawBody);
 
-      const body: InputData & { trxType?: TrxType } = JSON.parse(rawBody);
+      if (!rawBody) {
+        return ResponseUtil.error("Empty request body", 400);
+      }
+
+      let body: InputData & { trxType?: TrxType };
+      try {
+        body = JSON.parse(rawBody);
+      } catch (e) {
+        console.error("JSON parse error:", e);
+        return ResponseUtil.error("Invalid JSON in request body", 400);
+      }
+
+      console.log("Parsed request body:", body);
+
       const trxType = body.trxType || "olga";
 
       // Handle backward compatibility for fromAddress
@@ -29,6 +44,14 @@ export const handler: Handlers<TX | TXError> = {
         );
       }
 
+      logger.debug("stamps", {
+        message: "Processing request",
+        trxType,
+        operation: body.op.toLowerCase(),
+        effectiveChangeAddress,
+        effectiveSourceAddress,
+      });
+
       // Validate operation for both transaction types
       const validationError = await SRC20Service.UtilityService
         .validateOperation(
@@ -41,19 +64,39 @@ export const handler: Handlers<TX | TXError> = {
         );
 
       if (validationError) {
+        logger.debug("stamps", {
+          message: "Validation error",
+          error: validationError,
+        });
         return validationError;
       }
 
       if (trxType === "multisig") {
-        return ResponseUtil.success(
-          await SRC20Service.TransactionService.handleOperation(
-            body.op.toLowerCase() as "deploy" | "mint" | "transfer",
-            {
-              ...body,
-              changeAddress: effectiveChangeAddress,
-            },
-          ),
+        logger.debug("stamps", {
+          message: "Starting multisig transaction handling",
+          operation: body.op.toLowerCase(),
+        });
+
+        const result = await SRC20Service.TransactionService.handleOperation(
+          body.op.toLowerCase() as "deploy" | "mint" | "transfer",
+          {
+            ...body,
+            changeAddress: effectiveChangeAddress,
+          },
         );
+
+        logger.debug("stamps", {
+          message: "Multisig transaction result",
+          result: JSON.stringify(result, null, 2),
+        });
+
+        const response = ResponseUtil.success(result);
+        logger.debug("stamps", {
+          message: "Final multisig response",
+          response: JSON.stringify(response, null, 2),
+        });
+
+        return response;
       } else {
         // Handle Olga/p2wsh transaction
         const src20Action = {
@@ -95,7 +138,12 @@ export const handler: Handlers<TX | TXError> = {
         });
       }
     } catch (error: unknown) {
-      console.error("Error processing request:", error);
+      logger.error("stamps", {
+        message: "Error processing request",
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
       if (error instanceof SyntaxError) {
         return ResponseUtil.error("Invalid JSON in request body", 400);
       }

@@ -1,6 +1,6 @@
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Src20Detail, InputData } from "globals";
-import * as crypto from "crypto";
+import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC20QueryService } from "./queryService.ts";
 import { BigFloat } from "bigfloat/mod.ts";
@@ -22,9 +22,9 @@ export class SRC20UtilityService {
   static calculateTickHash(tick: string): string {
     const encoder = new TextEncoder();
     const data = encoder.encode(tick.toLowerCase());
-    const hashBuffer = crypto.createHash("sha3-256").update(data).digest();
+    const hashBuffer = crypto.subtle.digestSync("SHA3-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   static async checkDeployedTick(tick: string) {
@@ -72,11 +72,11 @@ export class SRC20UtilityService {
     body: InputData,
   ): Promise<void | TXError> {
     // Common validations for all operations
-    if (!body.toAddress || !isValidBitcoinAddress(body.toAddress)) {
-      return ResponseUtil.error("Invalid or missing toAddress", 400);
-    }
     if (!body.tick || typeof body.tick !== "string") {
       return ResponseUtil.error("Invalid or missing tick", 400);
+    }
+    if (!body.toAddress || !isValidBitcoinAddress(body.toAddress)) {
+      return ResponseUtil.error("Invalid or missing toAddress", 400);
     }
     if (!body.feeRate || isNaN(Number(body.feeRate))) {
       return ResponseUtil.error("Invalid or missing feeRate", 400);
@@ -139,7 +139,7 @@ export class SRC20UtilityService {
       return ResponseUtil.error("amt is required for mint operation", 400);
     }
 
-    const mintInfo = await this.checkMintedOut(body.tick, body.amt.toString());
+    const mintInfo = await SRC20UtilityService.checkMintedOut(body.tick, body.amt.toString());
     if (mintInfo.minted_out) {
       return ResponseUtil.error(`Token ${body.tick} already minted out`, 400);
     }
