@@ -25,18 +25,16 @@ export const StampHeader = (
     setIsOpen2(open);
   };
 
+  const titlePurpleDLClassName =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
+
   return (
     <div
-      class="flex flex-row justify-between items-center gap-3 w-full"
+      className="flex flex-row justify-between items-center gap-3 w-full"
       f-partial="/stamp"
     >
-      <p className="bg-text-purple bg-clip-text text-transparent text-3xl mobileLg:text-6xl font-black hidden mobileLg:block">
-        ART STAMPS
-      </p>
-      <p className="bg-text-purple bg-clip-text text-transparent text-3xl mobileLg:text-6xl font-black block mobileLg:hidden">
-        STAMPS
-      </p>
-      <div class="flex gap-3 justify-between h-[40px]">
+      <h1 className={titlePurpleDLClassName}>ART STAMPS</h1>
+      <div className="flex gap-3 justify-between h-[40px]">
         <Sort initSort={sortBy} />
         <Filter
           initFilter={filterBy}
