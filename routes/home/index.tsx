@@ -1,6 +1,6 @@
 import { StampRow } from "globals";
 import { Handlers } from "$fresh/server.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { getRecommendedFees } from "$lib/utils/mempool.ts";
 
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";

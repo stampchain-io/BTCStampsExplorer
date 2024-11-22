@@ -102,7 +102,7 @@ export interface WalletData {
   balance: number;
   usdValue: number;
   address: string;
-  fee: number;
+  fee?: number;
   btcPrice: number;
   dispensers: DispenserStats;
 }

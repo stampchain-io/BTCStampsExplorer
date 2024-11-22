@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "preact/hooks";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 

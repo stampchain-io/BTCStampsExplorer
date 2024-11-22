@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import {
   showConnectWalletModal,
   walletContext,

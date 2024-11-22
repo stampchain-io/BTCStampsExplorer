@@ -3,7 +3,7 @@ import { useConfig } from "$client/hooks/useConfig.ts";
 import axiod from "axiod";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";

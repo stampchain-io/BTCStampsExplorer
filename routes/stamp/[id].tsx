@@ -13,7 +13,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
-import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
 
 interface StampDetailPageProps {

@@ -4,13 +4,11 @@ import { Handlers } from "$fresh/server.ts";
 import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
 import WalletDetails from "$islands/Wallet/details/WalletDetails.tsx";
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
-import { BTCAddressService } from "$server/services/btc/addressService.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/btc.ts";
 import { Dispenser, WalletData } from "$types/index.d.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
 import { StampRow } from "globals";
 import { StampController } from "$server/controller/stampController.ts";
+import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
 
 type WalletPageProps = {
   data: {
@@ -42,6 +40,11 @@ type WalletPageProps = {
   };
 };
 
+// Add type for dispenser
+interface DispenserWithRemaining extends Dispenser {
+  give_remaining: number;
+}
+
 export const handler: Handlers = {
   async GET(req, ctx) {
     const { address } = ctx.params;
@@ -51,45 +54,39 @@ export const handler: Handlers = {
 
     try {
       // Fetch all required data in parallel
-      const [stampsResponse, src20Response, btcInfo, btcPrice, dispensersData] =
-        await Promise
-          .all([
-            // Stamps data with pagination
-            fetch(
-              `${serverConfig.API_BASE_URL}/api/v2/stamps/balance/${address}?page=${stampsParams.page}&limit=${stampsParams.limit}`,
-            ),
-            // SRC20 data with pagination
-            fetch(
-              `${serverConfig.API_BASE_URL}/api/v2/src20/balance/${address}?page=${src20Params.page}&limit=${src20Params.limit}`,
-            ),
-            // BTC wallet info
-            BTCAddressService.getAddressInfo(address),
-            // BTC price
-            fetchBTCPriceInUSD(serverConfig.API_BASE_URL),
-            // Fetch dispensers
-            // FIXME Need to add proper pagination to this
-            StampController.getDispensersWithStampsByAddress(address, {
-              limit: 1000,
-            }),
-          ]);
+      const [stampsResponse, src20Response, btcInfo, dispensersData] =
+        await Promise.all([
+          // Stamps data with pagination
+          fetch(
+            `${serverConfig.API_BASE_URL}/api/v2/stamps/balance/${address}?page=${stampsParams.page}&limit=${stampsParams.limit}`,
+          ),
+          // SRC20 data with pagination
+          fetch(
+            `${serverConfig.API_BASE_URL}/api/v2/src20/balance/${address}?page=${src20Params.page}&limit=${src20Params.limit}`,
+          ),
+          // Get BTC info with USD value included
+          getAddressInfo(address, {
+            includeUSD: true,
+            apiBaseUrl: serverConfig.API_BASE_URL,
+          }),
+          // Fetch dispensers
+          StampController.getDispensersWithStampsByAddress(address, {
+            limit: 1000,
+          }),
+        ]);
 
       const stampsData = await stampsResponse.json();
       const src20Data = await src20Response.json();
-      const dispensers: Dispenser[] = dispensersData.dispensers;
+      const dispensers = dispensersData.dispensers as DispenserWithRemaining[];
 
       const walletData: WalletData = {
         balance: btcInfo?.balance ?? 0,
-        usdValue: (btcInfo?.balance ?? 0) * btcPrice,
+        usdValue: (btcInfo?.balance ?? 0) * (btcInfo?.btcPrice ?? 0),
         address,
-        fee: btcInfo?.fee_per_vbyte ?? 0,
-        btcPrice: btcPrice,
+        btcPrice: btcInfo?.btcPrice ?? 0,
         dispensers: {
-          open: dispensersData.dispensers.filter((d) =>
-            d.give_remaining > 0
-          ).length,
-          closed: dispensersData.dispensers.filter((d) =>
-            d.give_remaining === 0
-          ).length,
+          open: dispensers.filter((d) => d.give_remaining > 0).length,
+          closed: dispensers.filter((d) => d.give_remaining === 0).length,
           total: dispensersData.total,
           items: dispensersData.dispensers,
         },
@@ -142,7 +139,6 @@ export const handler: Handlers = {
           balance: 0,
           usdValue: 0,
           address,
-          fee: 0,
           btcPrice: 0,
           dispensers: {
             open: 0,
