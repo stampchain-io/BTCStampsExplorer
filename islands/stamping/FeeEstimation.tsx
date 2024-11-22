@@ -170,12 +170,7 @@ export function FeeEstimation({
 
         const { minerFee, dustValue, detectedInputType } =
           calculateTransactionFees({
-            type: type as
-              | "stamp"
-              | "src20"
-              | "fairmint"
-              | "transfer"
-              | "donate",
+            type: type as "stamp" | "src20" | "fairmint" | "transfer",
             fileSize,
             userAddress,
             outputTypes,
@@ -311,26 +306,23 @@ export function FeeEstimation({
           )}
 
           <p className={detailsTextClassName}>
-            <span className={detailsTitleClassName}>MINER FEE</span> {txfee}
-            {" "}
-            <span className="font-light">
-              {type === "donate" ? "₿" : "SATS"}
-            </span>
+            <span className={detailsTitleClassName}>MINER FEE</span>{" "}
+            {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
+            <span className="font-light">BTC</span>
           </p>
           {mintfee > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>SERVICE FEE</span>{" "}
-              {mintfee}{" "}
-              <span className="font-light">
-                {type === "donate" ? "₿" : "SATS"}
-              </span>
+              {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}
+              {" "}
+              <span className="font-light">BTC</span>
             </p>
           )}
           {dust > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>DUST</span>{" "}
               {formatSatoshisToBTC(dust, { includeSymbol: false })}{" "}
-              <span className="font-light">₿</span>
+              <span className="font-light">BTC</span>
             </p>
           )}
         </div>
@@ -365,21 +357,21 @@ export function FeeEstimation({
 
         <p className={detailsTextClassName}>
           <span className={detailsTitleClassName}>MINER FEE</span>{" "}
-          {txfee.toFixed(0)}{" "}
-          <span className="font-light">{type === "donate" ? "₿" : "SATS"}</span>
+          {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
+          <span className="font-light">BTC</span>
         </p>
         {mintfee > 0 && (
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINTING FEE</span>{" "}
             {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}{" "}
-            <span className="font-light">₿</span>
+            <span className="font-light">BTC</span>
           </p>
         )}
         {dust > 0 && (
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>DUST</span>{" "}
             {formatSatoshisToBTC(dust, { includeSymbol: false })}{" "}
-            <span className="font-light">₿</span>
+            <span className="font-light">BTC</span>
           </p>
         )}
       </div>
@@ -507,8 +499,10 @@ export function FeeEstimation({
         {coinType === "BTC"
           ? (
             <>
-              <span className="font-bold">{total.toFixed(0)}</span>{" "}
-              {type === "donate" ? "₿" : "SATS"}
+              <span className="font-bold">
+                {formatSatoshisToBTC(total, { includeSymbol: false })}
+              </span>{" "}
+              BTC
             </>
           )
           : (
