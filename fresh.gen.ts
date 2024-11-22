@@ -353,10 +353,6 @@ const manifest = {
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
     "./islands/about/AboutHeader.tsx": $about_AboutHeader,
     "./islands/about/AboutTeam.tsx": $about_AboutTeam,
-    "./islands/about/DonateModal.tsx": $about_DonateModal,
-    "./islands/block/BlockHeader.tsx": $block_BlockHeader,
-    "./islands/block/BlockSelector.tsx": $block_BlockSelector,
-    "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
     "./islands/collection/ArtistCollection.tsx": $collection_ArtistCollection,
     "./islands/collection/CollectionCreateButton.tsx":
       $collection_CollectionCreateButton,
