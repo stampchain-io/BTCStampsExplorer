@@ -7,7 +7,7 @@
       "command": "bash",
       "args": [
         "-c",
-        "pids=$(lsof -ti:9229,8000 -sTCP:LISTEN -c deno) && if [ ! -z \"$pids\" ]; then echo \"Terminating Deno processes: $pids\" && kill -15 $pids && sleep 2 && kill -0 $pids || true; fi"
+        "pids=$(lsof -ti:9229,8000 -sTCP:LISTEN -c deno 2>/dev/null) && if [ ! -z \"$pids\" ]; then echo \"Terminating Deno processes: $pids\" && kill -15 $pids && sleep 2 && kill -0 $pids 2>/dev/null || true; fi || true"
       ],
       "presentation": {
         "reveal": "never",
