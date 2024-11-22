@@ -1,6 +1,6 @@
 color: true
 dry-run: null
-hookfiles: ./hooks/hooks.js
+hookfiles: ./hooks/hooks.cjs
 language: nodejs
 require: null
 server: npm start
@@ -36,10 +36,10 @@ reporters:
   - dot
   - markdown
 output:
-  - reports/dredd-report.html
-  - reports/comparison-report.html
-  - reports/apiary-report.txt
-  - reports/report.md
+  - ./reports/dredd-report.html
+  - ./reports/comparison-report.html
+  - ./reports/apiary-report.txt
+  - ./reports/report.md
 reporter: apiary
 full-validation: true
 validate-swagger: true

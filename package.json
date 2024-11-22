@@ -4,9 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "validate:all": "npm run validate:schema && npm run validate:spectral",
-    "validate:schema": "npx @redocly/cli lint ./schema.yml",
-    "validate:spectral": "npx spectral lint ./schema.yml",
+    "validate:all": "npm run validate:schema",
+    "validate:schema": "npx @redocly/cli lint --config .redocly.yaml --format stylish ./schema.yml",
     "validate:ci": "npm run validate:schema",
     "dredd": "dredd"
   },
@@ -17,7 +16,6 @@
   },
   "devDependencies": {
     "@redocly/cli": "^1.10.0",
-    "@stoplight/spectral-cli": "^6.11.0",
     "dredd": "^14.1.0",
     "hooks": "^0.3.2",
     "js-yaml": "^4.1.0",
