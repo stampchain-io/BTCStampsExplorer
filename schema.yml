@@ -3,9 +3,6 @@ info:
   title: Stampchain - OpenAPI 3.0
   description: Stampchain API UI
   version: 2.0.0
-  license:
-    name: GNU Affero General Public License v3.0
-    url: https://www.gnu.org/licenses/agpl-3.0.html
   contact:
     name: Stampchain Support
     url: https://stampchain.io
@@ -41,10 +38,7 @@ servers:
     description: Production server (uses live data)
   - url: "https://bitcoinstamps.xyz"
     description: Production server (uses live data)
-
-security:
-  - ApiKeyAuth: []
-
+  - url: "http://localhost:8000"
 paths:
   /api/v2/health:
     get:
@@ -66,18 +60,6 @@ paths:
                     enum: ["OK"]
                 required:
                   - status
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/docs:
     get:
@@ -93,18 +75,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/APIDocs"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Documentation not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/version:
     get:
@@ -123,18 +93,6 @@ paths:
                 properties:
                   version:
                     type: string
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Version information not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/error:
     get:
@@ -146,12 +104,6 @@ paths:
       responses:
         "400":
           description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "500":
-          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -179,18 +131,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedBalanceResponseBody"
-        "400":
-          description: Bad Request - Invalid address format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Address not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -220,20 +160,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BlockInfoResponseBody"
-        "400":
-          description: Bad Request - Invalid block index format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Block not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
-          description: Internal server error
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -263,18 +191,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BlockRow"
-        "400":
-          description: Bad Request - Invalid number format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No blocks found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -312,20 +228,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedCollectionResponseBody"
-        "400":
-          description: Bad Request - Invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No collections found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
-          description: Internal server error
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -357,20 +261,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedStampResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No cursed stamps found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
-          description: Internal server error
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -400,18 +292,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StampResponseBody"
-        "400":
-          description: Bad Request - Invalid ID format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Cursed stamp not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -441,18 +321,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StampBlockResponseBody"
-        "400":
-          description: Bad Request - Invalid block index format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Block not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal Server Error
           content:
@@ -490,18 +358,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No transactions found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -639,18 +495,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Src20SnapshotResponseBody"
-        "400":
-          description: Bad Request - Invalid tick format or pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Tick not found or no balances exist
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -709,18 +553,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
-        "400":
-          description: Bad Request - Invalid block index or query parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Block not found or no transactions in block
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal Server Error
           content:
@@ -791,20 +623,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
-        "400":
-          description: Bad Request - Invalid block index, tick format, or query parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Block or tick not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
-          description: Internal Server Error
+          description: Internal server error.
           content:
             application/json:
               schema:
@@ -854,18 +674,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
-        "400":
-          description: Bad Request - Invalid query parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No transactions found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -919,18 +727,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedTickResponseBody"
-        "400":
-          description: Bad Request - Invalid tick format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Tick not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -960,20 +756,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TickResponseBody"
-        "400":
-          description: Bad Request - Invalid tick format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Deployment not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
-          description: Internal server error
+          description: Internal server error.
           content:
             application/json:
               schema:
@@ -1002,18 +786,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Src20ResponseBody"
-        "400":
-          description: Bad Request - Invalid transaction hash format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Transaction not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error.
           content:
@@ -1051,18 +823,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No SRC-101 transactions found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1122,18 +882,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
-        "400":
-          description: Bad Request - Invalid query parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No matching transactions found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1163,18 +911,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
-        "400":
-          description: Bad Request - Invalid transaction hash format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Transaction not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1204,18 +940,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
-        "400":
-          description: Bad Request - Invalid deploy hash format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Deployment not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1245,18 +969,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TotalSrc101ResponseBody"
-        "400":
-          description: Bad Request - Invalid deploy hash format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Deploy hash not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1321,18 +1033,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenidSrc101ResponseBody'
-        '400':
-          description: Bad Request - Invalid deploy hash or address format
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '404':
-          description: No tokens found for this address
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
         '500':
           description: Internal server error.
           content:
@@ -1376,18 +1076,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101BalanceResponseBody"
-        "400":
-          description: Bad Request - Invalid address format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Address not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1512,20 +1200,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedStampResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No stamps found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
-          description: Internal server error
+          description: Internal server error.
           content:
             application/json:
               schema:
@@ -1553,18 +1229,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StampResponseBody"
-        "400":
-          description: Bad Request - Invalid ID format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Stamp not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1605,18 +1269,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedStampBalanceResponseBody"
-        "400":
-          description: Bad Request - Invalid address format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Address not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1648,12 +1300,6 @@ paths:
                 $ref: "#/components/schemas/StampBlockResponseBody"
         "404":
           description: Block not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "500":
-          description: Internal server error
           content:
             application/json:
               schema:
@@ -1736,18 +1382,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedDispenserResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: No dispensers found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1778,18 +1412,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DispenserResponseBody"
-        "400":
-          description: Bad Request - Invalid ID format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Dispenser not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "500":
           description: Internal server error
           content:
@@ -1939,13 +1561,6 @@ paths:
 
 
 components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-API-Key
-      description: API key for authentication
-
   examples:
     DeployExample:
       summary: Example deploy request
@@ -2020,6 +1635,11 @@ components:
           type: string
         tx_count:
           type: number
+    SendsRow:
+      type: object
+      properties:
+        from:
+          type: string
     DispenseRow:
       type: object
       properties:
@@ -2104,7 +1724,7 @@ components:
           oneOf:
             - type: number
             - type: string
-            - type: "null"
+          nullable: true
         tx_hash:
           type: string
         ident:
@@ -2116,7 +1736,44 @@ components:
           type: string
         file_hash:
           type: string
+    SendRow:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        cpid:
+          oneOf:
+            - type: string
 
+        tick:
+          oneOf:
+            - type: string
+
+        memo:
+          type: string
+        quantity:
+          type: string
+          format: int64
+        tx_hash:
+          type: string
+        block_index:
+          type: number
+    HolderRow:
+      type: object
+      properties:
+        address:
+          type: string
+        quantity:
+          type: number
+        divisible:
+          type: number
+    BlockInfo:
+      type: object
+      properties:
+        block_info:
+          $ref: "#/components/schemas/BlockRow"
     BtcInfo:
       type: object
       properties:
@@ -2134,6 +1791,24 @@ components:
           type: number
         usdValue:
           type: number
+    XCPParams:
+      type: object
+      properties:
+        filters:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              op:
+                type: string
+              value:
+                type: string
+        address:
+          type: string
+        asset:
+          type: string
     SRC20Balance:
       type: object
       properties:
@@ -2157,7 +1832,15 @@ components:
         deploy_img:
           type: string
           description: "The image associated with the deploy token"
-
+    Src20SnapShotDetail:
+      type: object
+      properties:
+        tick:
+          type: string
+        address:
+          type: string
+        balance:
+          type: string
     Src20Detail:
       type: object
       properties:
@@ -2346,6 +2029,57 @@ components:
         limit:
           oneOf:
             - type: number
+    SRC20TrxRequestParams:
+      type: object
+      properties:
+        block_index:
+          type: integer
+          format: int32
+          nullable: true
+          description: The index of the block.
+        tick:
+          type: string
+          nullable: true
+          description: The tick value, possibly represented as an emoji.
+        op:
+          type: string
+          nullable: true
+          description: The operation type, if applicable.
+        limit:
+          type: integer
+          format: int32
+          default: 1000
+          description: The maximum number of items to return.
+        page:
+          type: integer
+          format: int32
+          default: 1
+          description: The page number for pagination.
+        sort:
+          type: string
+          default: "ASC"
+          description: The sorting order, ASC or DESC.
+        tx_hash:
+          type: string
+          nullable: true
+          description: The transaction hash, if filtering by transaction.
+        address:
+          type: string
+          nullable: true
+          description: The address involved in the transactions.
+
+    PaginationQueryParams:
+      type: object
+      properties:
+        limit:
+          type: number
+        page:
+          type: number
+    PaginatedRequest:
+      type: object
+      properties:
+        query:
+          $ref: "#/components/schemas/PaginationQueryParams"
 
     PaginatedStampResponseBody:
       type: object
@@ -2452,6 +2186,17 @@ components:
               type: number
             data:
               $ref: "#/components/schemas/Src20SnapshotDetail"
+    StampsAndSrc20:
+      type: object
+      properties:
+        stamps:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
+        src20:
+          type: array
+          items:
+            $ref: "#/components/schemas/SRC20Balance"
     PaginatedSrc20BalanceResponseBody:
       type: object
       properties:
@@ -2515,6 +2260,15 @@ components:
               $ref: "#/components/schemas/StampRow"
         last_block:
           type: number
+    StampsResponseBody:
+      type: object
+      properties:
+        last_block:
+          type: number
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StampRow"
     PaginatedIdResponseBody:
       type: object
       allOf:
@@ -2561,7 +2315,10 @@ components:
       properties:
         error:
           type: string
-
+    PaginatedResponseBody:
+      oneOf:
+        - $ref: "#/components/schemas/PaginatedStampResponseBody"
+        - $ref: "#/components/schemas/ErrorResponseBody"
     BlockInfoResponseBody:
       type: object
       properties:
@@ -2584,6 +2341,88 @@ components:
             $ref: "#/components/schemas/StampRow"
         last_block:
           type: number
+    IdHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            id:
+              oneOf:
+                - type: string
+                - type: number
+    IdentHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            ident:
+              type: string
+    BlockHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            block_index:
+              oneOf:
+                - type: number
+                - type: string
+    AddressHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            address:
+              type: string
+    TickHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            tick:
+              oneOf:
+                - type: string
+                - type: number
+    BlockTickHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            block_index:
+              oneOf:
+                - type: number
+                - type: string
+            tick:
+              oneOf:
+                - type: string
+                - type: number
+    AddressTickHandlerContext:
+      type: object
+      properties:
+        params:
+          type: object
+          properties:
+            address:
+              type: string
+            tick:
+              oneOf:
+                - type: string
+                - type: number
+    TX:
+      type: object
+      properties:
+        hex:
+          type: string
+    TXError:
+      type: object
+      properties:
+        error:
+          type: string
     SRC20DeployData:
       type: object
       required:
@@ -2665,6 +2504,52 @@ components:
         amt:
           type: string
 
+    SRC20BaseData:
+      type: object
+      required:
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - feeRate
+      properties:
+        toAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['deploy', 'mint', 'transfer']
+        tick:
+          type: string
+        feeRate:
+          type: number
+
+    SRC20InputData:
+      type: object
+      discriminator:
+        propertyName: op
+        mapping:
+          deploy: '#/components/schemas/SRC20DeployData'
+          mint: '#/components/schemas/SRC20MintData'
+      oneOf:
+        - $ref: '#/components/schemas/SRC20DeployData'
+        - $ref: '#/components/schemas/SRC20MintData'
+      required:
+        - toAddress
+        - changeAddress
+        - op
+        - tick
+        - feeRate
+
+    SRC20TransferInputData:
+      oneOf:
+        - $ref: '#/components/schemas/SRC20TransferData'
+      discriminator:
+        propertyName: op
+        mapping:
+          transfer: '#/components/schemas/SRC20TransferData'
+
     MintStampInputData:
       type: object
       properties:
@@ -2744,3 +2629,15 @@ components:
                 type: string
               description:
                 type: string
+
+    SRC20CreateRequest:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/SRC20InputData'
+        - $ref: '#/components/schemas/SRC20TransferInputData'
+      discriminator:
+        propertyName: op
+        mapping:
+          deploy: '#/components/schemas/SRC20InputData'
+          mint: '#/components/schemas/SRC20InputData'
+          transfer: '#/components/schemas/SRC20TransferInputData'

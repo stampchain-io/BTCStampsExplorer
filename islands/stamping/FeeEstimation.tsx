@@ -1,10 +1,11 @@
 import { useEffect, useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import type { AncestorInfo, Output, ScriptType } from "$types/index.d.ts";
 import { calculateTransactionFees } from "$lib/utils/minting/feeEstimator.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import type { AncestorInfo, Output, ScriptType } from "$types/index.d.ts";
 
 interface FeeEstimationProps {
   fee: number;
@@ -75,6 +76,8 @@ export function FeeEstimation({
   const [dust, setDust] = useState(0.0);
   const [total, setTotal] = useState(0.0);
   const [coinType, setCoinType] = useState("BTC");
+
+  const { wallet, isConnected } = walletContext;
 
   // Update fee when recommended fee changes
   useEffect(() => {
@@ -170,12 +173,7 @@ export function FeeEstimation({
 
         const { minerFee, dustValue, detectedInputType } =
           calculateTransactionFees({
-            type: type as
-              | "stamp"
-              | "src20"
-              | "fairmint"
-              | "transfer"
-              | "donate",
+            type: type as "stamp" | "src20" | "fairmint" | "transfer",
             fileSize,
             userAddress,
             outputTypes,
@@ -264,7 +262,7 @@ export function FeeEstimation({
     };
 
     return (
-      <div className={`flex flex-col w-full ${isModal ? "w-full" : "w-1/2"}`}>
+      <div className={`flex flex-col ${isModal ? "w-full" : "w-1/2"}`}>
         <p className="text-base mobileLg:text-lg text-stamp-grey-light font-light">
           <span className="text-stamp-grey-darker">FEE</span>{" "}
           <span className="font-bold">{fee}</span> SAT/vB
@@ -313,18 +311,14 @@ export function FeeEstimation({
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINER FEE</span>{" "}
             {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
-            <span className="font-light">
-              BTC
-            </span>
+            <span className="font-light">BTC</span>
           </p>
           {mintfee > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>SERVICE FEE</span>{" "}
               {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}
               {" "}
-              <span className="font-light">
-                BTC
-              </span>
+              <span className="font-light">BTC</span>
             </p>
           )}
           {dust > 0 && (
@@ -394,7 +388,7 @@ export function FeeEstimation({
   const renderModalActions = () => (
     <div className="flex flex-col items-end gap-4 mt-4">
       {!isModal && (
-        <div className="flex gap-2 items-center">
+        <div class="relative flex items-center">
           <input
             type="checkbox"
             id="tosAgreed"
@@ -403,31 +397,50 @@ export function FeeEstimation({
               const target = e.target as HTMLInputElement;
               onTosChange(target.checked);
             }}
-            className="w-3 h-3 bg-[#262424] border border-[#7F7979]"
+            className="absolute w-0 h-0 opacity-0" // Hide the default checkbox
           />
           <label
             htmlFor="tosAgreed"
-            className={`text-xs mobileLg:text-sm font-medium ${
-              tosAgreed ? "text-stamp-grey-light" : "text-stamp-grey"
-            }`}
+            className="flex items-center cursor-pointer"
           >
-            I AGREE TO THE{" "}
-            <span className="text-stamp-purple">
-              <span className="mobileLg:hidden">
-                <a
-                  href="/termsofservice"
-                  className="hover:text-stamp-purple-highlight"
+            <div
+              className={`w-3 h-3 border border-[#7F7979] mr-2 flex items-center justify-center bg-[#999999] rounded-[2px]`}
+            >
+              {tosAgreed && (
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-2 h-2 text-[#333333]"
                 >
-                  ToS
-                </a>
-              </span>
-              <span className="hidden mobileLg:inline">
-                <a
-                  href="/termsofservice"
-                  class="hover:text-stamp-purple-highlight"
-                >
-                  TERMS OF SERVICE
-                </a>
+                  <path
+                    fill="currentColor"
+                    d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"
+                  />
+                </svg>
+              )}
+            </div>
+            <span
+              className={`text-xs mobileLg:text-sm font-medium ${
+                tosAgreed ? "text-stamp-grey-light" : "text-stamp-grey"
+              }`}
+            >
+              I AGREE TO THE{" "}
+              <span className="text-stamp-purple">
+                <span className="mobileLg:hidden">
+                  <a
+                    href="/termsofservice"
+                    className="hover:text-stamp-purple-highlight"
+                  >
+                    ToS
+                  </a>
+                </span>
+                <span className="hidden mobileLg:inline">
+                  <a
+                    href="/termsofservice"
+                    className="hover:text-stamp-purple-highlight"
+                  >
+                    TERMS OF SERVICE
+                  </a>
+                </span>
               </span>
             </span>
           </label>
@@ -449,7 +462,11 @@ export function FeeEstimation({
           </button>
         )}
         <button
-          className={`${buttonPurpleFlatClassName} ${
+          className={`${
+            isConnected
+              ? buttonPurpleFlatClassName
+              : buttonPurpleOutlineClassName
+          } ${
             (disabled || isSubmitting || (!isModal && !tosAgreed))
               ? "opacity-50 cursor-not-allowed"
               : ""
@@ -527,30 +544,12 @@ export function FeeEstimation({
 
       <div
         onClick={handleDetailsToggle}
-        className="flex items-center gap-1 uppercase mt-2 text-xs cursor-pointer"
+        className="flex items-center gap-1 uppercase mt-2 text-xs cursor-pointer text-[#666666]"
       >
         DETAILS
         {!visible
-          ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 24 24"
-            >
-              <path fill="white" d="M12 8l6 6H6l6-6z" />
-            </svg>
-          )
-          : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="1em"
-              height="1em"
-              viewBox="0 0 24 24"
-            >
-              <path fill="white" d="M12 16l-6-6h12l-6 6z" />
-            </svg>
-          )}
+          ? <img src="/img/stamping/CaretDown.svg" />
+          : <img src="/img/stamping/CaretDown.svg" class="rotate-180" />}
       </div>
 
       {renderDetails()}

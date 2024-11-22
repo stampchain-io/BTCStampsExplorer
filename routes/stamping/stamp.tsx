@@ -34,15 +34,13 @@ export const handler: Handlers<StampPageData> = {
 export default function StampingStampPage({ data }: PageProps<StampPageData>) {
   const latestStampsSection = {
     title: "LATEST STAMPS",
-    subTitle: "ON-CHAIN MARVELS",
     type: "classic",
     stamps: data.latestStamps,
     layout: "grid" as const,
     showDetails: false,
     gridClass: `
       grid w-full
-      gap-3
-      mobileMd:gap-6
+      gap-[12px]
       grid-cols-2
       mobileSm:grid-cols-3
       mobileLg:grid-cols-4
@@ -53,21 +51,21 @@ export default function StampingStampPage({ data }: PageProps<StampPageData>) {
     displayCounts: {
       "mobileSm": 6, // 3 columns x 2 rows
       "mobileLg": 8, // 4 columns x 2 rows
-      "tablet": 9, // 3 columns x 3 rows
-      "desktop": 12, // 4 columns x 3 rows
+      "tablet": 6, // 3 columns x 2 rows
+      "desktop": 8, // 4 columns x 2 rows
     },
   };
 
   return (
-    <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
+    <div class="flex flex-col gap-16">
       <div class="self-center max-w-[680px] w-full mx-auto">
         <OlgaContent />
       </div>
-      <div class="flex flex-col tablet:flex-row gap-3 mobileMd:gap-6 desktop:gap-9 w-full">
+      <div class="flex flex-col tablet:flex-row gap-6 w-full px-2 tablet:px-0">
         <div class="w-full tablet:w-1/2">
           <FAQModule />
         </div>
-        <div class="w-full tablet:w-1/2 flex flex-col gap-3 mobileMd:gap-6 items-start tablet:items-end">
+        <div class="w-full tablet:w-1/2 flex flex-col gap-4 items-start tablet:items-end">
           <StampSection {...latestStampsSection} />
         </div>
       </div>

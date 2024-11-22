@@ -33,7 +33,7 @@ export default function Carousel(props: CarouselProps) {
       <div class="swiper h-full">
         <div class="swiper-wrapper">
           {duplicatedStamps.map((stamp, index) => {
-            const extension = stamp.stamp_url?.split(".")?.pop() || "";
+            const extension = stamp.stamp_url?.split('.')?.pop() || '';
             return (
               <div
                 class="swiper-slide"
@@ -44,7 +44,7 @@ export default function Carousel(props: CarouselProps) {
                   src={`/content/${stamp.tx_hash}.${extension}`}
                   alt={`Stamp #${stamp.stamp}`}
                   loading="lazy"
-                  class="rounded-xl object-contain cursor-pointer border-2 border-transparent hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid"
+                  class="rounded-xl object-contain"
                 />
               </div>
             );

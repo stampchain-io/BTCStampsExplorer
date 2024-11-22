@@ -1,16 +1,10 @@
-const hooks = require("hooks");
-const fs = require("node:fs");
-const path = require("node:path");
-const yaml = require("js-yaml");
-
-// At the start of the file, add this to ensure reports directory exists
-const reportsDir = path.resolve(process.cwd(), "reports");
-if (!fs.existsSync(reportsDir)) {
-  fs.mkdirSync(reportsDir, { recursive: true });
-}
+import hooks from "hooks";
+import { readFileSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+import yaml from "js-yaml";
 
 // Load schema once
-const schema = yaml.load(fs.readFileSync("./schema.yml", "utf8"));
+const schema = yaml.load(readFileSync("./schema.yml", "utf8"));
 
 // Store API responses
 const comparisonResults = {};
@@ -58,11 +52,17 @@ async function fetchBothEndpoints(path, transaction) {
   let sanitizedPath = path;
   const pathParams = path.match(/{([^}]+)}/g);
   if (pathParams) {
+    console.log("Path parameters found:", pathParams);
+
     pathParams.forEach((param) => {
       const paramName = param.slice(1, -1);
       const paramValue = params[paramName];
+
       if (paramValue) {
         sanitizedPath = sanitizedPath.replace(param, paramValue);
+        console.log(`Replaced ${param} with ${paramValue}`);
+      } else {
+        console.log(`Warning: No value found for parameter ${param}`);
       }
     });
   }
@@ -73,28 +73,17 @@ async function fetchBothEndpoints(path, transaction) {
         schemaParams.toString() ? "?" + schemaParams.toString() : ""
       }`;
       console.log(`\nFetching ${env} endpoint:`, url);
+      console.log("Full query parameters:", schemaParams.toString() || "none");
 
       const response = await fetch(url);
-      let responseData;
-
-      try {
-        // Try to parse as JSON first
-        responseData = await response.json();
-      } catch (e) {
-        // If JSON parsing fails, use text
-        responseData = await response.text();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      results[env] = {
-        status: response.status,
-        data: responseData,
-      };
+      const jsonResponse = await response.json();
+      results[env] = JSON.stringify(jsonResponse);
     } catch (error) {
       console.error(`Error fetching from ${env}:`, error);
-      results[env] = {
-        status: error.status || 500,
-        error: error.message,
-      };
+      results[env] = { error: error.message };
     }
   }
 
@@ -152,6 +141,7 @@ function buildExpectedResponse(schemaComponent, schemas) {
   }
 }
 
+// Update the comparison function to handle null values
 function compareResponses(prod, dev) {
   const differences = [];
 
@@ -172,6 +162,7 @@ function compareResponses(prod, dev) {
       return;
     }
 
+    // Rest of the comparison logic remains the same...
     if (typeof prodObj !== typeof devObj) {
       differences.push({
         path,
@@ -249,28 +240,6 @@ function compareResponses(prod, dev) {
   return differences;
 }
 
-// Add this near the top, after your imports and initial configs
-const dreddConfig = yaml.load(fs.readFileSync("./dredd.yml", "utf8"));
-
-// Add this single new hook
-hooks.beforeEach((transaction, done) => {
-  try {
-    // Set the hostname for Dredd reporting
-    const endpointUrl = new URL(dreddConfig.endpoint);
-    // Modify both host and hostname properties
-    transaction.host = endpointUrl.host;
-    transaction.hostname = endpointUrl.hostname;
-    // Also set it in the request if it exists
-    if (transaction.request) {
-      transaction.request.host = endpointUrl.host;
-      transaction.request.hostname = endpointUrl.hostname;
-    }
-  } catch (error) {
-    console.error("Error in beforeEach:", error);
-  }
-  done();
-});
-
 // Before validation hook
 hooks.beforeEachValidation(async (transaction, done) => {
   try {
@@ -341,47 +310,36 @@ hooks.beforeEachValidation(async (transaction, done) => {
     if (transaction.request.method === "GET") {
       const results = await fetchBothEndpoints(path, transaction);
 
-      // Check if we have valid responses to compare
-      if (results.production?.data && results.development?.data) {
-        const differences = compareResponses(
-          results.production.data,
-          results.development.data,
-        );
+      // Parse the stringified responses for comparison
+      const differences = compareResponses(
+        JSON.parse(results.production),
+        JSON.parse(results.development),
+      );
 
-        if (differences.length > 0) {
-          comparisonResults[path] = differences;
+      if (differences.length > 0) {
+        comparisonResults[path] = differences;
 
-          const comparisonMessage = [
-            "\n## Endpoint Comparison",
-            "\n### Production Response:",
-            "```json",
-            JSON.stringify(results.production.data, null, 2),
-            "```",
-            "\n### Development Response:",
-            "```json",
-            JSON.stringify(results.development.data, null, 2),
-            "```",
-            "\n### Differences:",
-            ...differences.map((diff) =>
-              `- ${diff.issue} at ${diff.path}\n  ` +
-              `Prod: ${JSON.stringify(diff.production)}\n  ` +
-              `Dev: ${JSON.stringify(diff.development)}`
-            ),
-          ].join("\n");
+        // Enhanced Apiary reporting
+        const comparisonMessage = [
+          "\n## Endpoint Comparison",
+          "\n### Production Response:",
+          "```json",
+          JSON.stringify(results.production, null, 2),
+          "```",
+          "\n### Development Response:",
+          "```json",
+          JSON.stringify(results.development, null, 2),
+          "```",
+          "\n### Differences:",
+          ...differences.map((diff) =>
+            `- ${diff.issue} at ${diff.path}\n  ` +
+            `Prod: ${JSON.stringify(diff.production)}\n  ` +
+            `Dev: ${JSON.stringify(diff.development)}`
+          ),
+        ].join("\n");
 
-          if (!transaction.test) transaction.test = "";
-          transaction.test += comparisonMessage;
-        }
-      } else {
-        // Log error responses
-        console.log("Response status codes:", {
-          production: results.production?.status,
-          development: results.development?.status,
-        });
-        console.log("Response data:", {
-          production: results.production?.data || results.production?.error,
-          development: results.development?.data || results.development?.error,
-        });
+        if (!transaction.test) transaction.test = "";
+        transaction.test += comparisonMessage;
       }
     }
   } catch (error) {
@@ -394,10 +352,6 @@ hooks.beforeEachValidation(async (transaction, done) => {
 // After all tests hook
 hooks.afterAll((transactions, done) => {
   try {
-    // Add debug logging
-    console.log("Writing reports to:", reportsDir);
-    console.log("Current working directory:", process.cwd());
-
     // Add test run statistics with correct failure counting
     let summaryReport = "# API Endpoint Comparison Summary\n\n";
 
@@ -435,7 +389,7 @@ hooks.afterAll((transactions, done) => {
     summaryReport += `## Endpoint Differences\n\n`;
 
     if (Object.keys(comparisonResults).length > 0) {
-      const reportsDir = path.resolve(__dirname, "../reports");
+      const reportsDir = resolve(__dirname, "../reports");
 
       // Generate summary report
       Object.entries(comparisonResults).forEach(([path, differences]) => {
@@ -467,26 +421,16 @@ hooks.afterAll((transactions, done) => {
       });
 
       // Write summary report
-      try {
-        fs.writeFileSync(
-          path.resolve(reportsDir, "endpoint-summary.md"),
-          summaryReport,
-        );
-        console.log("Successfully wrote endpoint-summary.md");
-      } catch (error) {
-        console.error("Error writing endpoint-summary.md:", error);
-      }
+      writeFileSync(
+        resolve(reportsDir, "endpoint-summary.md"),
+        summaryReport,
+      );
 
       // Write JSON comparison
-      try {
-        fs.writeFileSync(
-          path.resolve(reportsDir, "endpoint-comparison.json"),
-          JSON.stringify(comparisonResults, null, 2),
-        );
-        console.log("Successfully wrote endpoint-comparison.json");
-      } catch (error) {
-        console.error("Error writing endpoint-comparison.json:", error);
-      }
+      writeFileSync(
+        resolve(reportsDir, "endpoint-comparison.json"),
+        JSON.stringify(comparisonResults, null, 2),
+      );
 
       // Generate detailed markdown report
       let markdownReport = "# API Endpoint Comparison Report\n\n";
@@ -510,15 +454,10 @@ hooks.afterAll((transactions, done) => {
       });
 
       // Write detailed markdown report
-      try {
-        fs.writeFileSync(
-          path.resolve(reportsDir, "endpoint-comparison.md"),
-          markdownReport,
-        );
-        console.log("Successfully wrote endpoint-comparison.md");
-      } catch (error) {
-        console.error("Error writing endpoint-comparison.md:", error);
-      }
+      writeFileSync(
+        resolve(reportsDir, "endpoint-comparison.md"),
+        markdownReport,
+      );
     }
   } catch (error) {
     console.error("Error in afterAll hook:", error);

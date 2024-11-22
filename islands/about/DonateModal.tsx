@@ -28,7 +28,7 @@ export default function DonateModal(
         <div className="w-full justify-center items-center">
           <p className="text-stamp-grey text-4xl text-center font-work-sans">
             <span className="text-stamp-grey-light">
-              0.00011218
+              0.00069420
             </span>{" "}
             BTC
           </p>
