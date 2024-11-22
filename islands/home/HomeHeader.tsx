@@ -22,13 +22,14 @@ function TitleText(
 
 export function HomeHeader() {
   return (
-    <div class="flex flex-col items-center justify-center gap-4 px-4 w-full">
+    <div class="flex flex-col items-center justify-center gap-3 mobileMd:gap-6 w-full">
       <div class="
-        w-[295px] h-[50px]
-        mobileSm:w-[295px] mobileSm:h-[50px]
-        mobileLg:w-[590px] mobileLg:h-[96px]
-        tablet:w-[737px] tablet:h-[124px]
-        desktop:w-[885px] desktop:h-[152px]
+        w-[336px]
+        min-[420px]:w-[376px]
+        mobileMd:w-[520px]
+        mobileLg:w-[720px]
+        tablet:w-[976px]
+        desktop:w-[1368px]
         flex flex-col justify-center
       ">
         <p class="text-center">
@@ -36,7 +37,8 @@ export function HomeHeader() {
             font-black
             bg-text-gray-1
             text-2xl
-            mobileSm:text-2xl
+            min-[420px]:text-3xl
+            mobileMd:text-4xl
             mobileLg:text-5xl
             tablet:text-6xl
             desktop:text-7xl
@@ -52,11 +54,13 @@ export function HomeHeader() {
             bg-text-gray-1
             uppercase
             text-xl
-            mobileSm:text-xl
+            min-[420px]:text-2xl
+            mobileMd:text-3xl
             mobileLg:text-4xl
             tablet:text-5xl
             desktop:text-6xl
-            mt-1
+            -mt-1
+            tablet:mt-0
           ">
             BECAUSE SATS DON’T EXIST
           </TitleText>
@@ -68,8 +72,9 @@ export function HomeHeader() {
         w-full
         text-center
         font-medium 
-        text-stamp-grey
-        mobileSm:max-w-[310px] mobileSm:text-base
+        text-stamp-grey-light
+        mobileSm:max-w-[336px] mobileSm:text-base
+        mobileMd:max-w-[380px] mobileMd:text-lg
         mobileLg:max-w-[515px] mobileLg:text-xl
         tablet:max-w-[618px] tablet:text-2xl
         desktop:max-w-[772px] desktop:text-3xl

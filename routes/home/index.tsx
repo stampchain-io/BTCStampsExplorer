@@ -104,7 +104,7 @@ export default function Home(props: HomePageProps) {
   } = props.data || {};
 
   return (
-    <div class="layout-container flex flex-col gap-10 mt-10 text-white">
+    <div class="layout-container flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36 text-white">
       <HomeHeader />
       <HomeCarousel carouselStamps={carouselStamps} />
       <HomeStampPreview
@@ -114,14 +114,16 @@ export default function Home(props: HomePageProps) {
         stamps_recent={stamps_recent}
         collectionData={collectionData}
       />
-      <SRC20DeployTable data={src20s} />
-      <SRC20TrendingMints data={trendingSrc20s} />
-      <StampChainModule />
-      <PartnersModule />
       <GetStampingModule
         btcPrice={Number(btcPrice)}
         recommendedFee={Number(recommendedFee)}
       />
+      <SRC20DeployTable data={src20s} />
+      <SRC20TrendingMints data={trendingSrc20s} />
+      <div class="flex flex-col gap-3 mobileMd:gap-6 desktop:gap-9">
+        <StampChainModule />
+        <PartnersModule />
+      </div>
     </div>
   );
 }

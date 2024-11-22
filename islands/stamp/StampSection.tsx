@@ -8,9 +8,10 @@ import { BREAKPOINTS } from "$client/utils/constants.ts";
 
 export default function StampSection({
   title,
-  subTitle,
+  subtitle,
   type,
   stamps,
+  layout,
   isRecentSales,
   filterBy,
   showDetails = false,
@@ -26,7 +27,12 @@ export default function StampSection({
   const [isLoading, setIsLoading] = useState(false);
   const { width } = useWindowSize();
 
-  // Build the "See All" link parameters
+  const titlePurpleDLClassName =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3";
+  const subTitlePurpleClassName =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
+
+  // Build the "See All"  link parameters
   const params = new URLSearchParams();
   if (isRecentSales) {
     params.append("recentSales", "true");
@@ -92,36 +98,18 @@ export default function StampSection({
     <div
       class={`
         w-full
-        pt-[2px] pb-[18px]
-        mobileSm:pt-[2px] mobileSm:pb-[18px]
-        mobileLg:pt-[2px] mobileLg:pb-[36px]
-        tablet:pt-[2px] tablet:pb-[72px]
-        desktop:pt-[2px] desktop:pb-[72px]
+        
       `}
     >
       {title && (
-        <>
-          <h1 class={`${titlePurpleDLClassName} tablet:hidden`}>
-            {title}
-          </h1>
-          <h1
-            class={`${titlePurpleLDClassName} hidden tablet:block text-right`}
-          >
-            {title}
-          </h1>
-        </>
+        <h1 className={titlePurpleDLClassName}>
+          {title}
+        </h1>
       )}
-      {subTitle && (
-        <>
-          <h2 class={`${subTitlePurpleClassName} tablet:hidden`}>
-            {subTitle}
-          </h2>
-          <h2
-            class={`${subTitlePurpleClassName} hidden tablet:block text-right`}
-          >
-            {subTitle}
-          </h2>
-        </>
+      {subtitle && (
+        <h2 className={subTitlePurpleClassName}>
+          {subtitle}
+        </h2>
       )}
 
       <div class={gridClass}>
