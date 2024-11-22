@@ -26,9 +26,14 @@ export class BlockService {
       throw new Error(`Block: ${blockIdentifier} not found`);
     }
 
+    const blockData = {
+      ...block_info.rows[0],
+      tx_count: data.stamps.length,
+    };
+
     return {
       last_block,
-      block_info: block_info.rows[0],
+      block_info: blockData,
       data: data.stamps,
     };
   }

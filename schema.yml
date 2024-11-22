@@ -2081,6 +2081,7 @@ components:
         stamp:
           oneOf:
             - type: number
+            - type: "null"
         block_index:
           type: number
         cpid:
@@ -2092,6 +2093,7 @@ components:
         keyburn:
           oneOf:
             - type: number
+            - type: "null"
         locked:
           type: number
         stamp_base64:
@@ -2107,15 +2109,32 @@ components:
             - type: "null"
         tx_hash:
           type: string
+        tx_index:
+          type: number
         ident:
           $ref: "#/components/schemas/SUBPROTOCOLS"
         creator_name:
           oneOf:
             - type: string
+            - type: "null"
         stamp_hash:
           type: string
+        is_btc_stamp:
+          type: number
         file_hash:
           type: string
+        floorPrice:
+          oneOf:
+            - type: number
+            - type: string
+            - type: "null"
+          description: "Current floor price in BTC, or 'priceless' if no open dispensers"
+        recentSalePrice:
+          oneOf:
+            - type: number
+            - type: string
+            - type: "null"
+          description: "Most recent sale price in BTC, or 'priceless' if no sales"
 
     BtcInfo:
       type: object
@@ -2451,7 +2470,9 @@ components:
             snapshot_block:
               type: number
             data:
-              $ref: "#/components/schemas/Src20SnapshotDetail"
+              type: array
+              items:
+                $ref: "#/components/schemas/Src20SnapshotDetail"
     PaginatedSrc20BalanceResponseBody:
       type: object
       properties:
@@ -2722,14 +2743,21 @@ components:
           type: string
         collection_name:
           type: string
+        collection_description:
+          type: string
         creators:
           type: array
           items:
             type: string
-        stamps:
+        stamp_count:
+          type: integer
+        total_editions:
+          type: number
+        stamp_numbers:
           type: array
           items:
-            $ref: "#/components/schemas/StampRow"
+            type: integer
+            description: Array of stamp numbers in this collection
     APIDocs:
       type: object
       properties:
