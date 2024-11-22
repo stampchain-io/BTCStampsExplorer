@@ -22,7 +22,7 @@ const MintProgress = (
 ) => {
   return (
     <div className="flex justify-between text-stamp-grey items-end">
-      <div className="min-w-[420px] flex flex-col gap-[6px]">
+      <div className="w-1/2 flex flex-col gap-[6px]">
         <p className="text-xl mobileLg:text-2xl font-light text-stamp-grey-light">
           <span className="text-stamp-grey-darker">PROGRESS</span>{" "}
           <span className="font-bold">
@@ -37,7 +37,7 @@ const MintProgress = (
           />
         </div>
       </div>
-      <div className="text-sm mobileLg:text-base font-light text-stamp-grey-darker text-right">
+      <div className="w-1/2 text-sm mobileLg:text-base font-light text-stamp-grey-darker text-right">
         <p>
           SUPPLY{" "}
           <span className="text-stamp-grey-light font-bold">{maxSupply}</span>
@@ -192,7 +192,7 @@ export function MintContent({
         <div className="w-full flex gap-3 mobileMd:gap-6">
           <div
             id="image-preview"
-            class="relative rounded-md items-center justify-center mx-auto text-center cursor-pointer min-w-[108px] mobileMd:min-w-[120px] w-[108px] mobileMd:w-[120px] h-[108px] mobileMd:h-[120px] content-center bg-[#660099] flex flex-col"
+            class="relative rounded-md items-center justify-center mx-auto text-center min-w-[108px] mobileMd:min-w-[120px] w-[108px] mobileMd:w-[120px] h-[108px] mobileMd:h-[120px] content-center bg-[#660099] flex flex-col"
           >
             <img
               src="/img/stamping/image-upload.svg"
