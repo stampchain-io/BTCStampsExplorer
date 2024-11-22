@@ -8,6 +8,7 @@ import { BREAKPOINTS } from "$client/utils/constants.ts";
 
 export default function StampSection({
   title,
+  subTitle,
   type,
   stamps,
   isRecentSales,
@@ -80,6 +81,13 @@ export default function StampSection({
     }
   }, [pagination?.page]);
 
+  const titlePurpleDLClassName =
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
+  const titlePurpleLDClassName =
+    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3";
+  const subTitlePurpleClassName =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
+
   return (
     <div
       class={`
@@ -92,18 +100,28 @@ export default function StampSection({
       `}
     >
       {title && (
-        <div class="mb-2">
-          <h2 class="
-            text-2xl
-            mobileSm:text-2xl
-            mobileLg:text-4xl
-            tablet:text-4xl
-            desktop:text-5xl
-            font-extralight bg-text-purple-2 bg-clip-text text-transparent
-          ">
+        <>
+          <h1 class={`${titlePurpleDLClassName} tablet:hidden`}>
             {title}
+          </h1>
+          <h1
+            class={`${titlePurpleLDClassName} hidden tablet:block text-right`}
+          >
+            {title}
+          </h1>
+        </>
+      )}
+      {subTitle && (
+        <>
+          <h2 class={`${subTitlePurpleClassName} tablet:hidden`}>
+            {subTitle}
           </h2>
-        </div>
+          <h2
+            class={`${subTitlePurpleClassName} hidden tablet:block text-right`}
+          >
+            {subTitle}
+          </h2>
+        </>
       )}
 
       <div class={gridClass}>
