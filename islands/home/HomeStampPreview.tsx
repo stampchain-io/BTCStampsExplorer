@@ -17,30 +17,25 @@ export function HomeStampPreview({
 }) {
   const SectionsLatestArtStamps: StampSectionProps[] = [
     {
-      title: "ON-CHAIN MARVELS",
+      subtitle: "ON-CHAIN MARVELS",
       type: "classic",
       stamps: stamps_art,
       layout: "grid",
       showDetails: false,
       gridClass: `
         grid w-full
-        gap-[12px]
-        gap-[12px]
-        mobileSm:gap-[12px]
-        mobileLg:gap-[24px]
-        tablet:gap-[24px]
-        desktop:gap-[24px]
+        gap-3
+        mobileMd:gap-6
         grid-cols-2
-        mobileSm:grid-cols-2
         mobileLg:grid-cols-3
-        tablet:grid-cols-3
+        tablet:grid-cols-4
         desktop:grid-cols-5
         auto-rows-fr
       `,
       displayCounts: {
         "mobileSm": 8, // 2 columns x 4 rows
         "mobileLg": 12, // 3 columns x 4 rows
-        "tablet": 12, // 3 columns x 4 rows
+        "tablet": 16, // 4 columns x 4 rows
         "desktop": 20, // 5 columns x 4 rows
       },
     },
@@ -48,56 +43,48 @@ export function HomeStampPreview({
 
   const SectionsCollections: StampSectionProps[] = [
     {
-      title: "FRESH POSH STAMPS",
+      subtitle: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
       layout: "grid",
       showDetails: false,
       gridClass: `
         grid w-full
-        gap-[12px]
-        mobileSm:gap-[12px]
-        mobileLg:gap-[24px]
-        tablet:gap-[24px]
-        desktop:gap-[24px]
+        gap-3
+        mobileMd:gap-6
         grid-cols-2
-        mobileSm:grid-cols-2
-        mobileLg:grid-cols-4
-        tablet:grid-cols-3
-        desktop:grid-cols-4
+        mobileLg:grid-cols-3
+        tablet:grid-cols-4
+        desktop:grid-cols-5
         auto-rows-fr
       `,
       displayCounts: {
         "mobileSm": 4, // 2 columns x 2 rows
-        "mobileLg": 8, // 4 columns x 2 rows
-        "tablet": 6, // 3 columns x 2 rows
-        "desktop": 8, // 4 columns x 2 rows
+        "mobileLg": 6, // 3 columns x 2 rows
+        "tablet": 8, // 4 columns x 2 rows
+        "desktop": 10, // 5 columns x 2 rows
       },
     },
     {
-      title: "RECENT RECURSIVE",
+      subtitle: "RECENT RECURSIVE",
       filterBy: "recursive",
       stamps: stamps_src721,
       layout: "grid",
       showDetails: false,
       gridClass: `
         grid w-full
-        gap-[12px]
-        mobileSm:gap-[12px]
-        mobileLg:gap-[24px]
-        tablet:gap-[24px]
-        desktop:gap-[24px]
-        grid-cols-2
-        mobileSm:grid-cols-3
-        mobileLg:grid-cols-4
-        tablet:grid-cols-4
+        gap-3
+        mobileMd:gap-6
+        grid-cols-4
+        mobileLg:grid-cols-5
+        tablet:grid-cols-6
         desktop:grid-cols-6
         auto-rows-fr
       `,
       displayCounts: {
-        "mobileSm": 6, // 3 columns x 2 rows
-        "mobileLg": 8, // 4 columns x 2 rows
-        "tablet": 8, // 4 columns x 2 rows
+        "mobileSm": 8, // 4 columns x 2 rows
+        "mobileLg": 10, // 5 columns x 2 rows
+        "tablet": 12, // 6 columns x 2 rows
         "desktop": 12, // 6 columns x 2 rows
       },
     },
@@ -105,7 +92,7 @@ export function HomeStampPreview({
 
   const SectionsRecentSales: StampSectionProps[] = [
     {
-      title: "HOT STAMPS",
+      subtitle: "HOT STAMPS",
       type: "recent",
       stamps: stamps_recent,
       layout: "grid",
@@ -115,60 +102,47 @@ export function HomeStampPreview({
       variant: "grey",
       gridClass: `
         grid w-full
-        gap-[12px]
-        mobileSm:gap-[12px]
-        mobileLg:gap-[24px]
-        tablet:gap-[24px]
-        desktop:gap-[24px]
-        grid-cols-2
-        mobileSm:grid-cols-3
-        mobileLg:grid-cols-4
-        tablet:grid-cols-4
+        gap-3
+        mobileMd:gap-6
+        grid-cols-4
+        mobileMd:grid-cols-5
+        mobileLg:grid-cols-5
+        tablet:grid-cols-6
         desktop:grid-cols-6
         auto-rows-fr
       `,
       displayCounts: {
-        "mobileSm": 3, // 3 columns x 1 row
-        "mobileLg": 4, // 4 columns x 1 row
-        "tablet": 4, // 4 columns x 1 row
+        "mobileSm": 4, // 4 columns x 1 row
+        "mobileMd": 5, // 5 columns x 1 row
+        "mobileLg": 5, // 5 columns x 1 row
+        "tablet": 6, // 6 columns x 1 row
         "desktop": 6, // 6 columns x 1 row
       },
     },
   ];
 
+  const titlePurpleDLClassName =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
+  const titleGreyDLClassName =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+
   return (
     <div className="
-      flex flex-col gap-8 mobileLg:gap-16
+      flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36
       max-w-desktop w-full mx-auto
     ">
       {/* LATEST ART STAMPS */}
-      <div className="flex flex-col gap-2">
-        <div
-          class={`
-            w-full
-            pb-0 pt-[18px]
-            mobileSm:pb-0 mobileSm:pt-[18px]
-            mobileLg:pb-0 mobileLg:pt-[36px]
-            tablet:pb-0 tablet:pt-[72px]
-            desktop:pb-0 desktop:pt-[72px]
-          `}
-        >
-          <h1 className="
-            text-4xl
-            mobileSm:text-4xl
-            mobileLg:text-5xl
-            tablet:text-5xl
-            desktop:text-6xl
-            font-black bg-text-purple-2 bg-clip-text text-transparent
-          ">
+      <div className="flex flex-col">
+        <div className="w-full">
+          <h1 className={titlePurpleDLClassName}>
             <span className="mobileSm:hidden">LATEST ART STAMPS</span>
             <span className="hidden mobileSm:block mobileLg:hidden">
-              LATEST ART
+              LATEST STAMPS
             </span>
             <span className="hidden mobileLg:block">LATEST ART STAMPS</span>
           </h1>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 mobileMd:gap-6">
           {SectionsLatestArtStamps.map((section) => (
             <StampSection key={section.title} {...section} />
           ))}
@@ -176,29 +150,13 @@ export function HomeStampPreview({
       </div>
 
       {/* COLLECTIONS */}
-      <div className="flex flex-col gap-2">
-        <div
-          class={`
-            w-full
-            pb-0 pt-[18px]
-            mobileSm:pb-0 mobileSm:pt-[18px]
-            mobileLg:pb-0 mobileLg:pt-[36px]
-            tablet:pb-0 tablet:pt-[72px]
-            desktop:pb-0 desktop:pt-[72px]
-          `}
-        >
-          <h1 className="
-            text-4xl
-            mobileSm:text-4xl
-            mobileLg:text-5xl
-            tablet:text-5xl
-            desktop:text-6xl
-            font-black bg-text-purple-2 bg-clip-text text-transparent
-          ">
+      <div className="flex flex-col">
+        <div className="w-full">
+          <h1 className={titlePurpleDLClassName}>
             COLLECTIONS
           </h1>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 mobileMd:gap-69">
           {SectionsCollections.map((section) => (
             <StampSection key={section.title} {...section} />
           ))}
@@ -206,26 +164,10 @@ export function HomeStampPreview({
       </div>
 
       {/* FEATURED COLLECTIONS */}
-      <div className="flex flex-col gap-2">
-        <div
-          class={`
-            w-full
-            pb-0 pt-[18px]
-            mobileSm:pb-0 mobileSm:pt-[18px]
-            mobileLg:pb-0 mobileLg:pt-[36px]
-            tablet:pb-0 tablet:pt-[72px]
-            desktop:pb-0 desktop:pt-[72px]
-          `}
-        >
-          <h1 className="
-            text-4xl
-            mobileSm:text-4xl
-            mobileLg:text-5xl
-            tablet:text-5xl
-            desktop:text-6xl
-            font-black bg-text-gray-1 bg-clip-text text-transparent
-          ">
-            FEATURED COLLECTIONS
+      <div className="flex flex-col">
+        <div className="w-full">
+          <h1 className={titleGreyDLClassName}>
+            CUTTING EDGE
           </h1>
         </div>
         <CollectionSection
@@ -241,29 +183,13 @@ export function HomeStampPreview({
       </div>
 
       {/* RECENT SALES */}
-      <div className="flex flex-col gap-2">
-        <div
-          class={`
-            w-full
-            pb-0 pt-[18px]
-            mobileSm:pb-0 mobileSm:pt-[18px]
-            mobileLg:pb-0 mobileLg:pt-[36px]
-            tablet:pb-0 tablet:pt-[72px]
-            desktop:pb-0 desktop:pt-[72px]
-          `}
-        >
-          <h1 className="
-            text-4xl
-            mobileSm:text-4xl
-            mobileLg:text-5xl
-            tablet:text-5xl
-            desktop:text-6xl
-            font-black bg-text-purple-2 bg-clip-text text-transparent
-          ">
+      <div className="flex flex-col">
+        <div className="w-full">
+          <h1 className={titlePurpleDLClassName}>
             RECENT SALES
           </h1>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 mobileMd:gap-6">
           {SectionsRecentSales.map((section) => (
             <StampSection key={section.title} {...section} />
           ))}
