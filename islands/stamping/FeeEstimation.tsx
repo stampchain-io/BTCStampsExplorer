@@ -170,7 +170,12 @@ export function FeeEstimation({
 
         const { minerFee, dustValue, detectedInputType } =
           calculateTransactionFees({
-            type: type as "stamp" | "src20" | "fairmint" | "transfer",
+            type: type as
+              | "stamp"
+              | "src20"
+              | "fairmint"
+              | "transfer"
+              | "donate",
             fileSize,
             userAddress,
             outputTypes,
@@ -308,14 +313,18 @@ export function FeeEstimation({
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINER FEE</span>{" "}
             {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
-            <span className="font-light">BTC</span>
+            <span className="font-light">
+              BTC
+            </span>
           </p>
           {mintfee > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>SERVICE FEE</span>{" "}
               {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}
               {" "}
-              <span className="font-light">BTC</span>
+              <span className="font-light">
+                BTC
+              </span>
             </p>
           )}
           {dust > 0 && (
