@@ -171,7 +171,7 @@ export function MintContent({
   const bodyToolsClassName =
     "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
   const titlePurpleLDCenterClassName =
-    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
   const feeSelectorContainerClassName =
     "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
   const inputFieldContainerClassName =

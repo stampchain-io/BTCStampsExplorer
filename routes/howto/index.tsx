@@ -3,7 +3,7 @@ import { Head } from "$fresh/runtime.ts";
 export default function HowTo() {
   const bodyClassName = "flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36";
   const titleGreyDLClassName =
-    "text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
   const subTitleGreyClassName =
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const bodyTextLightClassName =
