@@ -5,7 +5,7 @@ export default function Media() {
   const subTitleGreyClassName =
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const articleLinkClassName =
-    "text-lg mobileMd:text-xl mobileLg:text-3xl desktop:text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[#cccccc] to-[#666666] hover:bg-none hover:text-[#cccccc] transition-colors";
+    "inline-block text-lg mobileMd:text-xl mobileLg:text-3xl desktop:text-4xl font-bold relative bg-clip-text text-transparent bg-gradient-to-r from-[#cccccc] to-[#666666] hover:bg-none hover:text-[#cccccc] transition-colors";
   const bodyTextLightClassName =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
   const buttonGreyOutlineClassName =

@@ -9,7 +9,7 @@ import { ModulesStyles } from "$islands/modules/Styles.ts";
 
 export default function StampSection({
   title,
-  subtitle,
+  subTitle,
   type,
   stamps,
   layout,
@@ -86,17 +86,21 @@ export default function StampSection({
   return (
     <div class="w-full">
       {title && (
-        <h1 class={ModulesStyles.titlePurpleDLClassName}>
-          {title}
-        </h1>
+        <div class="flex flex-col items-start tablet:items-end">
+          <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
+            {title}
+          </h1>
+          <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}>
+            {title}
+          </h1>
+        </div>
       )}
-      {subtitle && (
-        <h2
-          class={ModulesStyles.subTitlePurple +
-            " mb-3 mobileMd:mb-6 desktop:mb-9"}
-        >
-          {subtitle}
-        </h2>
+      {subTitle && (
+        <div class="flex flex-col items-start tablet:items-end">
+          <h2 className={ModulesStyles.subTitlePurple}>
+            {subTitle}
+          </h2>
+        </div>
       )}
 
       <div class={gridClass}>
