@@ -1,6 +1,6 @@
-import { TransactionService } from "$server/services/transaction/index.ts";
 import { UTXO } from "$types/index.d.ts";
 import { decodeBase58 } from "@std/encoding/base58";
+import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
@@ -30,6 +30,11 @@ function reverseEndian(hexString: string): string {
     result += hexString.substring(i - 2, i);
   }
   return result;
+}
+
+function estimateInputSize(script: string): number {
+  const scriptType = getScriptTypeInfo(script);
+  return scriptType.size;
 }
 
 function formatUTXOs(data: any[], address: string): UTXO[] | null {
@@ -91,18 +96,17 @@ function formatUTXOs(data: any[], address: string): UTXO[] | null {
         return null;
       }
 
-      const formattedUtxo = {
+      const formattedUtxo: UTXO = {
         txid,
         vout,
         value,
         address: address,
         script,
-        size: tx.size ??
-          TransactionService.UTXOService.estimateInputSize(script),
+        size: tx.size ?? estimateInputSize(script),
         status: {
           confirmed: tx.status?.confirmed ?? tx.confirmations > 0,
-          block_height: tx.status?.block_height ?? tx.block_height,
-          block_hash: tx.status?.block_hash ?? tx.block_hash,
+          block_height: tx.status?.block_height ?? tx.block_height ?? undefined,
+          block_hash: tx.status?.block_hash ?? tx.block_hash ?? undefined,
           block_time: tx.status?.block_time ??
             (tx.confirmed ? new Date(tx.confirmed).getTime() : undefined),
         },
@@ -112,9 +116,8 @@ function formatUTXOs(data: any[], address: string): UTXO[] | null {
       console.log("Formatted UTXO:", formattedUtxo);
       return formattedUtxo;
     }).filter((utxo): utxo is UTXO => {
-      if (!utxo) {
-        return false;
-      }
+      if (!utxo) return false;
+
       // Additional validation for script
       if (!utxo.script) {
         console.warn(
@@ -231,13 +234,13 @@ function constructScriptFromAddress(address: string): string | null {
 }
 
 // Generic API request handler with failover
-async function tryAPIs<T>(
+async function tryAPIs<T extends UTXO[] | TxInfo>(
   endpoints: Array<{
     name: string;
-    fn: () => Promise<T[] | null>;
+    fn: () => Promise<T | null>;
   }>,
   maxRetries = 3,
-): Promise<T[] | null> {
+): Promise<T | null> {
   console.log(`\n>>> tryAPIs called with ${endpoints.length} endpoints`);
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -335,7 +338,7 @@ export async function getUTXOForAddress(
   specificVout?: number,
   includeAncestors = false,
   retries = 3,
-): Promise<UTXO[] | null> {
+): Promise<UTXO[] | TxInfo | null> {
   console.log(`
 >>> getUTXOForAddress called with:
 Address: ${address}
@@ -377,17 +380,16 @@ Retries: ${retries}
             };
 
             const formattedUtxos = formatUTXOs([utxoData], address);
-            const result: TxInfo = { utxo: formattedUtxos?.[0] };
-
-            if (includeAncestors) {
-              result.ancestor = {
-                fees: tx.ancestor_fees || 0,
-                vsize: tx.ancestor_size || 0,
-                effectiveRate: tx.effective_fee_rate || 0,
-              };
-            }
-
-            return result;
+            return {
+              utxo: formattedUtxos?.[0],
+              ancestor: includeAncestors
+                ? {
+                  fees: tx.ancestor_fees || 0,
+                  vsize: tx.ancestor_size || 0,
+                  effectiveRate: tx.effective_fee_rate || 0,
+                }
+                : undefined,
+            } as TxInfo;
           } else {
             // Bulk UTXO fetch - return all UTXOs
             const response = await fetch(

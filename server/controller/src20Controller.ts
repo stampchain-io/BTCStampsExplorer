@@ -14,6 +14,7 @@ import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
+import { WalletData } from "$lib/types/index.d.ts";
 
 export class Src20Controller {
   static async getTotalCountValidSrc20Tx(
@@ -203,7 +204,7 @@ export class Src20Controller {
       const totalItems = stampsTotal + src20Total;
       const totalPages = Math.ceil(totalItems / limit);
 
-      const walletData = {
+      const walletData: WalletData = {
         balance: btcData?.balance ?? 0,
         usdValue: btcData?.usdValue ?? 0,
         address,

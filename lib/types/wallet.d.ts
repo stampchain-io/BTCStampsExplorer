@@ -1,4 +1,5 @@
 import { WalletProviderKey } from "$lib/utils/constants.ts";
+import { DispenserStats } from "./services.d.ts";
 
 export interface StampBalance {
   cpid?: string;
@@ -29,10 +30,28 @@ export interface Wallet {
   addressType?: "p2wpkh" | "p2tr";
 }
 
-interface WalletData {
+// Base interface for Bitcoin address information
+export interface BTCAddressInfo {
   address: string;
   balance: number;
-  fee: number;
+  txCount: number;
+  unconfirmedBalance: number;
+  unconfirmedTxCount: number;
   usdValue: number;
   btcPrice: number;
+}
+
+// Extended interface for wallet data that includes dispenser stats
+export interface WalletData extends BTCAddressInfo {
+  fee: number;
+  dispensers?: DispenserStats;
+}
+
+// Add the WalletStats interface
+export interface WalletStatsProps {
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  dispensers: WalletData["dispensers"];
+  setShowItem: (type: string) => void;
 }
