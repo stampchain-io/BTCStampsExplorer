@@ -1,11 +1,11 @@
 export const ModulesStyles = {
-  titleGreyDLClassName:
+  titleGreyDL:
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3",
-  titleGreyLDClassName:
+  titleGreyLD:
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1",
-  titlePurpleDLClassName:
+  titlePurpleDL:
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1",
-  titlePurpleLDClassName:
+  titlePurpleLD:
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3",
   subTitleGrey:
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3",

@@ -13,11 +13,11 @@ export default function RecentDeploy(
   return (
     <div className="flex flex-col items-start tablet:items-end">
       <div>
-        <h1 class={`${ModulesStyles.titlePurpleDLClassName} tablet:hidden`}>
+        <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
           RECENT DEPLOYS
         </h1>
         <h1
-          class={`hidden tablet:block ${ModulesStyles.titlePurpleLDClassName}`}
+          class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}
         >
           RECENT DEPLOYS
         </h1>
