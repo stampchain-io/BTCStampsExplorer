@@ -3,7 +3,11 @@ import { Collection, CollectionSectionProps } from "globals";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
 import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";
+import { ModulesStyles } from "$islands/modules/Styles.ts";
+
 export default function CollectionSection({
+  title,
+  subTitle,
   collections,
   gridClass,
   displayCounts,
@@ -44,17 +48,28 @@ export default function CollectionSection({
     updateDisplayCount();
   }, [width, displayCounts, collectionArray.length]);
   return (
-    <div class={gridClass}>
-      {collectionArray.slice(0, displayCount).map((
-        collection: Collection,
-        key: number,
-      ) => (
-        <CollectionListCard
-          key={collection.collection_id}
-          collection={collection}
-          isDarkMode={key % 2 ? false : true}
-        />
-      ))}
+    <div>
+      {title && <h1 class={ModulesStyles.titleGreyDLClassName}>{title}</h1>}
+      {subTitle && (
+        <h2
+          class={ModulesStyles.subTitleGrey +
+            " mb-3 mobileMd:mb-6 desktop:mb-9"}
+        >
+          {subTitle}
+        </h2>
+      )}
+      <div class={gridClass}>
+        {collectionArray.slice(0, displayCount).map((
+          collection: Collection,
+          key: number,
+        ) => (
+          <CollectionListCard
+            key={collection.collection_id}
+            collection={collection}
+            isDarkMode={key % 2 ? false : true}
+          />
+        ))}
+      </div>
     </div>
   );
 }

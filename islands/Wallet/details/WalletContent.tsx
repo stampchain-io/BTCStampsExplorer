@@ -6,7 +6,7 @@ import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import WalletTransferModal from "$islands/Wallet/details/WalletTransferModal.tsx";
-import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
+import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { StampRow } from "globals";
 import { Dispenser } from "$types/index.d.ts";
@@ -447,7 +447,8 @@ export default function WalletContent(
           handleOpenSetting={() => {}}
         />
         <div class="mt-3 mobileLg:mt-6">
-          <SRC20DeployTable
+          <SRC20Section
+            type="all"
             data={src20.data}
           />
         </div>

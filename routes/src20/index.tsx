@@ -1,8 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TrxRequestParams } from "globals";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
-import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
-import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.tsx";
+import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -104,8 +103,10 @@ export default function SRC20Page(props: any) {
         sortBy={sortBy}
         selectedTab={selectedTab}
       />
-      {selectedTab === "all" && <SRC20DeployTable data={data.src20s} />}
-      {selectedTab === "trending" && <SRC20TrendingMints data={data.src20s} />}
+      {selectedTab === "all" && <SRC20Section type="all" data={data.src20s} />}
+      {selectedTab === "trending" && (
+        <SRC20Section type="trending" data={data.src20s} />
+      )}
       <Pagination
         page={page}
         pages={totalPages}
