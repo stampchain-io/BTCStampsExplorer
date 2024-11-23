@@ -2,7 +2,11 @@ import { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
 import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
-import { WalletData, WalletStatsProps } from "$lib/types/index.d.ts";
+import {
+  WalletData,
+  WalletOverviewInfo,
+  WalletStatsProps,
+} from "$lib/types/index.d.ts";
 import { Button } from "$components/shared/Button.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
@@ -56,7 +60,7 @@ function WalletDetails(
 
 function WalletOverview(
   { walletData, onSend, onReceive }: {
-    walletData: WalletData;
+    walletData: WalletOverviewInfo;
     onSend: () => void;
     onReceive: () => void;
   },
