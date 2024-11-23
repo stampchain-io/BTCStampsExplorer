@@ -1,18 +1,19 @@
 import { StampRow } from "globals";
 import { Handlers } from "$fresh/server.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import { getRecommendedFees } from "$lib/utils/mempool.ts";
 
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
 import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
 // import { HomeStampChainSelected } from "$islands/home/HomeStampChainSelected.tsx";
+import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
-import { SRC20DeployTable } from "$islands/src20/all/SRC20DeployTable.tsx";
-import { SRC20TrendingMints } from "$islands/src20/trending/SRC20TrendingMints.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
-import { StampController } from "$server/controller/stampController.ts";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
+
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
+import { getRecommendedFees } from "$lib/utils/mempool.ts";
+
+import { StampController } from "$server/controller/stampController.ts";
 
 type HomePageProps = {
   data: {
@@ -104,7 +105,7 @@ export default function Home(props: HomePageProps) {
   } = props.data || {};
 
   return (
-    <div class="layout-container flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36 text-white">
+    <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 text-white">
       <HomeHeader />
       <HomeCarousel carouselStamps={carouselStamps} />
       <HomeStampPreview
@@ -118,9 +119,20 @@ export default function Home(props: HomePageProps) {
         btcPrice={Number(btcPrice)}
         recommendedFee={Number(recommendedFee)}
       />
-      <SRC20DeployTable data={src20s} />
-      <SRC20TrendingMints data={trendingSrc20s} />
-      <div class="flex flex-col gap-3 mobileMd:gap-6 desktop:gap-9">
+      <div class="flex flex-col gap-12 mobileLg:gap-[72px]">
+        <SRC20Section
+          title="SRC-20 TOKENS"
+          subTitle="TOP TICKERS"
+          type="all"
+          data={src20s}
+        />
+        <SRC20Section
+          subTitle="TRENDING MINTS"
+          type="trending"
+          data={trendingSrc20s}
+        />
+      </div>
+      <div class="flex flex-col gap-6 mobileLg:gap-12">
         <StampChainModule />
         <PartnersModule />
       </div>

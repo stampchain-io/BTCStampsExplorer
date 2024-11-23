@@ -1,6 +1,13 @@
-import { Collection, StampRow, StampSectionProps } from "globals";
+import {
+  Collection,
+  CollectionSectionProps,
+  StampRow,
+  StampSectionProps,
+} from "globals";
+
 import StampSection from "$islands/stamp/StampSection.tsx";
 import CollectionSection from "$islands/collection/CollectionSection.tsx";
+import { ModulesStyles } from "$islands/modules/Styles.ts";
 
 export function HomeStampPreview({
   stamps_recent = [],
@@ -15,7 +22,7 @@ export function HomeStampPreview({
   stamps_recent: StampRow[];
   collectionData: Collection[];
 }) {
-  const SectionsLatestArtStamps: StampSectionProps[] = [
+  const LatestArtStampsSection: StampSectionProps[] = [
     {
       subtitle: "ON-CHAIN MARVELS",
       type: "classic",
@@ -23,13 +30,8 @@ export function HomeStampPreview({
       layout: "grid",
       showDetails: false,
       gridClass: `
-        grid w-full
-        gap-3
-        mobileMd:gap-6
-        grid-cols-2
-        mobileLg:grid-cols-3
-        tablet:grid-cols-4
-        desktop:grid-cols-5
+        grid w-full gap-3 mobileMd:gap-6
+        grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
         auto-rows-fr
       `,
       displayCounts: {
@@ -41,21 +43,33 @@ export function HomeStampPreview({
     },
   ];
 
-  const SectionsCollections: StampSectionProps[] = [
+  const FeaturedArtistsSection: CollectionSectionProps = {
+    title: "FEATURED ARTISTS",
+    subTitle: "POPULAR COLLECTIONS",
+    collections: collectionData,
+    gridClass: `
+      grid
+      grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6
+    `,
+    displayCounts: {
+      "mobileSm": 2, // 2 columns x 1 rows
+      "mobileLg": 2, // 2 columns x 1 rows
+      "tablet": 3, // 3 columns x 1 rows
+      "desktop": 3, // 3 columns x 1 rows
+    },
+  };
+
+  const CollectionsSection: StampSectionProps[] = [
     {
+      title: "COLLECTIONS",
       subtitle: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
       layout: "grid",
       showDetails: false,
       gridClass: `
-        grid w-full
-        gap-3
-        mobileMd:gap-6
-        grid-cols-2
-        mobileLg:grid-cols-3
-        tablet:grid-cols-4
-        desktop:grid-cols-5
+        grid w-full gap-3 mobileMd:gap-6
+        grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
         auto-rows-fr
       `,
       displayCounts: {
@@ -72,13 +86,8 @@ export function HomeStampPreview({
       layout: "grid",
       showDetails: false,
       gridClass: `
-        grid w-full
-        gap-3
-        mobileMd:gap-6
-        grid-cols-4
-        mobileLg:grid-cols-5
-        tablet:grid-cols-6
-        desktop:grid-cols-6
+        grid w-full gap-3 mobileMd:gap-6
+        grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-6
         auto-rows-fr
       `,
       displayCounts: {
@@ -90,8 +99,25 @@ export function HomeStampPreview({
     },
   ];
 
-  const SectionsRecentSales: StampSectionProps[] = [
+  const CuttingEdgeSection: CollectionSectionProps = {
+    title: "CUTTING EDGE",
+    subTitle: "RECURSIVE COLLECTIONS",
+    collections: collectionData,
+    gridClass: `
+      grid
+      grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6
+    `,
+    displayCounts: {
+      "mobileSm": 2, // 2 columns x 1 rows
+      "mobileLg": 2, // 2 columns x 1 rows
+      "tablet": 3, // 3 columns x 1 rows
+      "desktop": 3, // 3 columns x 1 rows
+    },
+  };
+
+  const RecentSalesSection: StampSectionProps[] = [
     {
+      title: "RECENT SALES",
       subtitle: "HOT STAMPS",
       type: "recent",
       stamps: stamps_recent,
@@ -101,14 +127,8 @@ export function HomeStampPreview({
       showMinDetails: true,
       variant: "grey",
       gridClass: `
-        grid w-full
-        gap-3
-        mobileMd:gap-6
-        grid-cols-4
-        mobileMd:grid-cols-5
-        mobileLg:grid-cols-5
-        tablet:grid-cols-6
-        desktop:grid-cols-6
+        grid w-full gap-3 mobileMd:gap-6
+        grid-cols-4 mobileMd:grid-cols-5 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-6
         auto-rows-fr
       `,
       displayCounts: {
@@ -121,11 +141,6 @@ export function HomeStampPreview({
     },
   ];
 
-  const titlePurpleDLClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
-  const titleGreyDLClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
-
   return (
     <div className="
       flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36
@@ -134,67 +149,33 @@ export function HomeStampPreview({
       {/* LATEST ART STAMPS */}
       <div className="flex flex-col">
         <div className="w-full">
-          <h1 className={titlePurpleDLClassName}>
-            <span className="mobileSm:hidden">LATEST ART STAMPS</span>
-            <span className="hidden mobileSm:block mobileLg:hidden">
-              LATEST STAMPS
-            </span>
+          <h1 className={ModulesStyles.titlePurpleDLClassName}>
+            <span className="block mobileLg:hidden">LATEST STAMPS</span>
             <span className="hidden mobileLg:block">LATEST ART STAMPS</span>
           </h1>
         </div>
         <div className="flex flex-col gap-3 mobileMd:gap-6">
-          {SectionsLatestArtStamps.map((section) => (
+          {LatestArtStampsSection.map((section) => (
             <StampSection key={section.title} {...section} />
           ))}
         </div>
       </div>
+
+      {/* FEATURED ARTISTS */}
+      <CollectionSection {...FeaturedArtistsSection} />
 
       {/* COLLECTIONS */}
-      <div className="flex flex-col">
-        <div className="w-full">
-          <h1 className={titlePurpleDLClassName}>
-            COLLECTIONS
-          </h1>
-        </div>
-        <div className="flex flex-col gap-3 mobileMd:gap-69">
-          {SectionsCollections.map((section) => (
-            <StampSection key={section.title} {...section} />
-          ))}
-        </div>
-      </div>
+      {CollectionsSection.map((section) => (
+        <StampSection key={section.title} {...section} />
+      ))}
 
-      {/* FEATURED COLLECTIONS */}
-      <div className="flex flex-col">
-        <div className="w-full">
-          <h1 className={titleGreyDLClassName}>
-            CUTTING EDGE
-          </h1>
-        </div>
-        <CollectionSection
-          collections={collectionData}
-          gridClass="grid grid-cols-2 tablet:grid-cols-3 gap-3 mobileLg:gap-6"
-          displayCounts={{
-            "mobileSm": 2, // 2 columns x 1 rows
-            "mobileLg": 2, // 2 columns x 1 rows
-            "tablet": 3, // 3 columns x 1 rows
-            "desktop": 3, // 3 columns x 1 rows
-          }}
-        />
-      </div>
+      {/* CUTTING EDGE */}
+      <CollectionSection {...CuttingEdgeSection} />
 
       {/* RECENT SALES */}
-      <div className="flex flex-col">
-        <div className="w-full">
-          <h1 className={titlePurpleDLClassName}>
-            RECENT SALES
-          </h1>
-        </div>
-        <div className="flex flex-col gap-3 mobileMd:gap-6">
-          {SectionsRecentSales.map((section) => (
-            <StampSection key={section.title} {...section} />
-          ))}
-        </div>
-      </div>
+      {RecentSalesSection.map((section) => (
+        <StampSection key={section.title} {...section} />
+      ))}
     </div>
   );
 }

@@ -7,7 +7,7 @@ export const StampChainModule = () => {
       max-w-desktop w-full mx-auto
     ">
       <div className="col-span1 desktop:col-span-2">
-        <h1 className={ModulesStyles.titleGreyDL}>STAMPCHAIN</h1>
+        <h1 className={ModulesStyles.titleGreyDLClassName}>STAMPCHAIN</h1>
         <h2 className={ModulesStyles.subTitleGrey}>
           THE CREATORS OF BITCOIN STAMPS
         </h2>
