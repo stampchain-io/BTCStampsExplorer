@@ -1,3 +1,5 @@
+import { StampRow } from "globals";
+
 export type DispenserFilter = "open" | "closed" | "all";
 
 export interface Dispenser {

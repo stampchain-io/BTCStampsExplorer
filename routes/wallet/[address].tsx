@@ -5,45 +5,9 @@ import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
 import WalletDetails from "$islands/Wallet/details/WalletDetails.tsx";
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
 import { serverConfig } from "$server/config/config.ts";
-import { Dispenser, WalletData } from "$types/index.d.ts";
-import { StampRow } from "globals";
+import { Dispenser, WalletData, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
-
-type WalletPageProps = {
-  data: {
-    data: {
-      stamps: {
-        data: StampRow[];
-        pagination: {
-          page: number;
-          limit: number;
-          total: number;
-          totalPages: number;
-        };
-      };
-      src20: {
-        data: any[];
-        pagination: {
-          page: number;
-          limit: number;
-          total: number;
-          totalPages: number;
-        };
-      };
-      dispensers: Dispenser[];
-    };
-    address: string;
-    walletData: WalletData;
-    stampsTotal: number;
-    src20Total: number;
-  };
-};
-
-// Add type for dispenser
-interface DispenserWithRemaining extends Dispenser {
-  give_remaining: number;
-}
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -77,13 +41,17 @@ export const handler: Handlers = {
 
       const stampsData = await stampsResponse.json();
       const src20Data = await src20Response.json();
-      const dispensers = dispensersData.dispensers as DispenserWithRemaining[];
+      const dispensers = dispensersData.dispensers as Dispenser[];
 
       const walletData: WalletData = {
         balance: btcInfo?.balance ?? 0,
         usdValue: (btcInfo?.balance ?? 0) * (btcInfo?.btcPrice ?? 0),
         address,
         btcPrice: btcInfo?.btcPrice ?? 0,
+        fee: 0,
+        txCount: btcInfo?.txCount ?? 0,
+        unconfirmedBalance: btcInfo?.unconfirmedBalance ?? 0,
+        unconfirmedTxCount: btcInfo?.unconfirmedTxCount ?? 0,
         dispensers: {
           open: dispensers.filter((d) => d.give_remaining > 0).length,
           closed: dispensers.filter((d) => d.give_remaining === 0).length,
@@ -140,6 +108,10 @@ export const handler: Handlers = {
           usdValue: 0,
           address,
           btcPrice: 0,
+          fee: 0,
+          txCount: 0,
+          unconfirmedBalance: 0,
+          unconfirmedTxCount: 0,
           dispensers: {
             open: 0,
             closed: 0,

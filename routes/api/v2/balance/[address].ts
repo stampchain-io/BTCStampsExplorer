@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { WalletController } from "$server/controller/walletController.ts";
 import { AddressHandlerContext, PaginatedBalanceResponseBody } from "globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
@@ -10,7 +10,7 @@ export const handler: Handlers<AddressHandlerContext> = {
       const { address } = ctx.params;
       const url = new URL(req.url);
       const { limit, page } = getPaginationParams(url);
-      const result = await Src20Controller.handleWalletBalanceRequest(
+      const result = await WalletController.handleWalletBalanceRequest(
         address,
         limit,
         page,
