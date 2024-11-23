@@ -34,10 +34,15 @@ const TEXT_STYLES = {
   creator: {
     base: "font-bold text-stamp-grey break-words text-center",
     sizes:
-      "text-base mobileSm:text-base mobileLg:text-lg tablet:text-lg desktop:text-lg", // deviation from design
+      "text-base mobileSm:text-base mobileLg:text-base tablet:text-lg desktop:text-lg", // deviation from design
   },
   price: {
-    base: "font-medium text-stamp-grey  text-nowrap",
+    base: "font-medium text-stamp-grey-light text-nowrap",
+    sizes:
+      "text-xs mobileSm:text-xs mobileLg:text-sm tablet:text-sm desktop:text-base",
+  },
+  mimeType: {
+    base: "font-medium text-stamp-grey text-nowrap",
     sizes:
       "text-xs mobileSm:text-xs mobileLg:text-sm tablet:text-sm desktop:text-base",
   },
@@ -65,23 +70,26 @@ const TEXT_STYLES = {
   },
   greyGradient: {
     hashSymbol: {
-      base: "font-light text-stamp-grey-darker",
+      base:
+        "font-light text-stamp-grey group-hover:text-stamp-purple-highlight",
       sizes:
-        "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-3xl",
+        "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl",
     },
     stampNumber: {
-      base: "font-black text-stamp-grey-darker truncate max-w-full",
+      base:
+        "font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF] truncate max-w-full transition-colors duration-200",
       sizes:
-        "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl", // deviation from design
+        "text-lg mobileSm:text-lg mobileLg:text-xl tablet:text-2xl desktop:text-2xl",
     },
   },
 } as const;
 
 const ABBREVIATION_LENGTHS = {
-  desktop: 8,
-  tablet: 6,
-  mobileLg: 6,
-  mobileSm: 4,
+  desktop: 6,
+  tablet: 5,
+  mobileLg: 5,
+  mobileMd: 5,
+  mobileSm: 5,
 } as const;
 
 export function StampCard({
@@ -107,6 +115,7 @@ export function StampCard({
     if (width >= BREAKPOINTS.desktop) return ABBREVIATION_LENGTHS.desktop;
     if (width >= BREAKPOINTS.tablet) return ABBREVIATION_LENGTHS.tablet;
     if (width >= BREAKPOINTS.mobileLg) return ABBREVIATION_LENGTHS.mobileLg;
+    if (width >= BREAKPOINTS.mobileMd) return ABBREVIATION_LENGTHS.mobileMd;
     return ABBREVIATION_LENGTHS.mobileSm;
   };
 
@@ -184,15 +193,29 @@ export function StampCard({
 
   const renderPrice = () => {
     if (isRecentSale && stamp.sale_data) {
-      return `${stripTrailingZeros(stamp.sale_data.btc_amount.toFixed(8))} BTC`;
+      return {
+        text: `${
+          stripTrailingZeros(stamp.sale_data.btc_amount.toFixed(8))
+        } BTC`,
+        style: TEXT_STYLES.price,
+      };
     } else if (stamp.floorPrice !== "priceless") {
-      return `${stripTrailingZeros(Number(stamp.floorPrice).toFixed(8))} BTC`;
+      return {
+        text: `${stripTrailingZeros(Number(stamp.floorPrice).toFixed(8))} BTC`,
+        style: TEXT_STYLES.price,
+      };
     } else if (stamp.recentSalePrice !== "priceless") {
-      return `${
-        stripTrailingZeros(Number(stamp.recentSalePrice).toFixed(8))
-      } BTC`;
+      return {
+        text: `${
+          stripTrailingZeros(Number(stamp.recentSalePrice).toFixed(8))
+        } BTC`,
+        style: TEXT_STYLES.price,
+      };
     } else {
-      return stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN";
+      return {
+        text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
+        style: TEXT_STYLES.mimeType,
+      };
     }
   };
 
@@ -261,7 +284,7 @@ export function StampCard({
 
         {/* Full Details Section with variant support */}
         {showDetails && !showMinDetails && (
-          <div class="flex flex-col items-center px-2 tablet:px-3 py-2">
+          <div class="flex flex-col items-center px-[6px] pt-[18px] pb-0">
             {/* Stamp Number with container */}
             <div class="flex items-center justify-center max-w-[90%]">
               {shouldDisplayHash && (
@@ -284,19 +307,19 @@ export function StampCard({
 
             {/* Creator Name or Abbreviated Address */}
             <div
-              class={`${TEXT_STYLES.creator.base} ${TEXT_STYLES.creator.sizes}`}
+              class={`${TEXT_STYLES.creator.base} ${TEXT_STYLES.creator.sizes} mt-[3px]`}
             >
               {creatorDisplay}
             </div>
 
             {/* Price and Supply */}
-            <div class="flex justify-between w-full mt-2">
+            <div class="flex justify-between w-full mt-[6px]">
               {/* Render Price on the Left */}
-              <div class="flex-1 text-left">
+              <div class="flex-1 text-left -mt-[2px] mobileLg:-mt-[0px] desktop:mt-[3px]">
                 <span
-                  class={`${TEXT_STYLES.price.base} ${TEXT_STYLES.price.sizes}`}
+                  class={`${renderPrice().style.base} ${renderPrice().style.sizes}`}
                 >
-                  {renderPrice()}
+                  {renderPrice().text}
                 </span>
               </div>
               <div
@@ -329,7 +352,7 @@ export function StampCard({
               <span
                 class={`${TEXT_STYLES.minimal.price.base} ${TEXT_STYLES.minimal.price.sizes}`}
               >
-                {renderPrice()}
+                {renderPrice().text}
               </span>
             </div>
           </div>
