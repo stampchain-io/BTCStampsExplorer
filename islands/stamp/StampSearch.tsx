@@ -38,7 +38,7 @@ export function StampSearchClient(
             onKeyPress={handleKeyPress}
           />
           <img
-            src="/img/stamp/search-glass.png"
+            src="/img/stamp/search-glass.svg"
             alt="Search icon"
             className="absolute top-3 right-3 cursor-pointer"
             onClick={() => handleOpen2(false)}
@@ -47,7 +47,7 @@ export function StampSearchClient(
       )}
       {!open2 && (
         <img
-          src="/img/stamp/search-glass.png"
+          src="/img/stamp/search-glass.svg"
           alt="Search icon"
           className="bg-stamp-purple rounded-stamp p-search-icon cursor-pointer"
           onClick={() => handleOpen2(true)}
