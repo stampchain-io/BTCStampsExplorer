@@ -126,6 +126,8 @@ export interface StampSectionProps {
   viewAllLink?: string;
 }
 export interface CollectionSectionProps {
+  title?: string;
+  subTitle?: string;
   collections: Collection[];
   gridClass?: string;
   displayCounts?: DisplayCountBreakpoints;

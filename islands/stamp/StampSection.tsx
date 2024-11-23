@@ -84,19 +84,17 @@ export default function StampSection({
   }, [pagination?.page]);
 
   return (
-    <div
-      class={`
-        w-full
-        
-      `}
-    >
+    <div class="w-full">
       {title && (
-        <h1 className={ModulesStyles.titlePurpleDLClassName}>
+        <h1 class={ModulesStyles.titlePurpleDLClassName}>
           {title}
         </h1>
       )}
       {subtitle && (
-        <h2 className={ModulesStyles.subTitlePurple}>
+        <h2
+          class={ModulesStyles.subTitlePurple +
+            " mb-3 mobileMd:mb-6 desktop:mb-9"}
+        >
           {subtitle}
         </h2>
       )}
