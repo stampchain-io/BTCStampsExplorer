@@ -13,10 +13,10 @@ export default function PopularMinting(
 
   return (
     <div className="flex flex-col items-start tablet:items-end">
-      <h1 class={`${ModulesStyles.titlePurpleDLClassName} tablet:hidden`}>
+      <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
         TRENDING
       </h1>
-      <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLDClassName}`}>
+      <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}>
         TRENDING
       </h1>
       <h2 className={ModulesStyles.subTitlePurple}>POPULAR TOKENS</h2>
