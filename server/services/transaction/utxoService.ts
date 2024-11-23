@@ -3,7 +3,7 @@ import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { calculateMiningFee } from "$lib/utils/minting/feeCalculations.ts";
-import { PSBTService } from "./psbtService.ts";
+import { PSBTService } from "$server/services/transaction/psbtService.ts";
 import { 
   isP2PKH, 
   isP2SH, 
@@ -17,11 +17,6 @@ import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 
 export class UTXOService {
   private static readonly CHANGE_DUST = 1000;
-
-  static estimateInputSize(script: string): number {
-    const scriptType = getScriptTypeInfo(script);
-    return scriptType.size;
-  }
 
   static estimateVoutSize(output: Output): number {
     let scriptSize = 0;

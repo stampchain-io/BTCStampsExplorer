@@ -56,5 +56,14 @@ export interface BufferLike {
   toString(encoding?: string): string;
 }
 
-// Type alias for when we might accept either Buffer or Uint8Array
 export type BinaryData = BufferLike | Uint8Array;
+
+export interface BalanceOptions {
+  format?: "BTC" | "satoshis";
+  fallbackValue?: number | null;
+}
+
+export interface AddressInfoOptions {
+  includeUSD?: boolean;
+  apiBaseUrl?: string;
+}

@@ -1,26 +1,11 @@
-import { getUTXOForAddress } from "./utxoUtils.ts";
-import { formatSatoshisToBTC, formatUSDValue } from "./formatUtils.ts";
-import { UTXO } from "$lib/types/utils.d.ts";
-
-interface BalanceOptions {
-  format?: "BTC" | "satoshis";
-  fallbackValue?: number | null;
-}
-
-interface AddressInfoOptions {
-  includeUSD?: boolean;
-  apiBaseUrl?: string;
-}
-
-interface BTCAddressInfo {
-  address: string;
-  balance: number;
-  txCount: number;
-  unconfirmedBalance: number;
-  unconfirmedTxCount: number;
-  usdValue?: number;
-  btcPrice?: number;
-}
+import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
+import { formatSatoshisToBTC, formatUSDValue } from "$lib/utils/formatUtils.ts";
+import {
+  AddressInfoOptions,
+  BalanceOptions,
+  BTCAddressInfo,
+  UTXO,
+} from "$lib/types/index.d.ts";
 
 export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
   const base = apiBaseUrl || "";
@@ -54,10 +39,20 @@ export async function getAddressBalance(
   } = options;
 
   try {
-    const utxos = await getUTXOForAddress(address);
-    if (!utxos) return fallbackValue;
+    const utxoResponse = await getUTXOForAddress(address);
+    if (!utxoResponse) return fallbackValue;
 
-    const balanceInSats = utxos.reduce((sum, utxo) => sum + utxo.value, 0);
+    // Handle both UTXO[] and TxInfo types
+    const utxos = Array.isArray(utxoResponse)
+      ? utxoResponse
+      : utxoResponse.utxo
+      ? [utxoResponse.utxo]
+      : [];
+
+    const balanceInSats = utxos.reduce(
+      (sum: number, utxo: UTXO) => sum + utxo.value,
+      0,
+    );
 
     if (format === "BTC") {
       return Number(formatSatoshisToBTC(balanceInSats, {
@@ -78,8 +73,17 @@ export async function getAddressInfo(
   options: AddressInfoOptions = {},
 ): Promise<BTCAddressInfo | null> {
   try {
-    const utxos = await getUTXOForAddress(address);
-    if (!utxos || utxos.length === 0) return null;
+    const utxoResponse = await getUTXOForAddress(address);
+    if (!utxoResponse) return null;
+
+    // Handle both UTXO[] and TxInfo types
+    const utxos = Array.isArray(utxoResponse)
+      ? utxoResponse
+      : utxoResponse.utxo
+      ? [utxoResponse.utxo]
+      : [];
+
+    if (utxos.length === 0) return null;
 
     const balance = await getAddressBalance(address, {
       format: "BTC",
@@ -87,12 +91,14 @@ export async function getAddressInfo(
     });
 
     // Count confirmed and unconfirmed transactions
-    const confirmedUtxos = utxos.filter((utxo) => utxo.status.confirmed);
-    const unconfirmedUtxos = utxos.filter((utxo) => !utxo.status.confirmed);
+    const confirmedUtxos = utxos.filter((utxo: UTXO) => utxo.status.confirmed);
+    const unconfirmedUtxos = utxos.filter((utxo: UTXO) =>
+      !utxo.status.confirmed
+    );
 
     // Calculate unconfirmed balance
     const unconfirmedBalance = unconfirmedUtxos.reduce(
-      (sum, utxo) => sum + utxo.value,
+      (sum: number, utxo: UTXO) => sum + utxo.value,
       0,
     );
 

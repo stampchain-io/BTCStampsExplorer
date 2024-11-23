@@ -97,12 +97,3 @@ export interface DispenserStats {
   total: number;
   items: Dispenser[];
 }
-
-export interface WalletData {
-  balance: number;
-  usdValue: number;
-  address: string;
-  fee?: number;
-  btcPrice: number;
-  dispensers: DispenserStats;
-}

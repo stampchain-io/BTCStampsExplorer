@@ -2,17 +2,9 @@ import { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
 import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
-import { WalletData } from "$types/index.d.ts";
+import { WalletData, WalletStatsProps } from "$lib/types/index.d.ts";
 import { Button } from "$components/shared/Button.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-
-interface WalletStatsProps {
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  dispensers: WalletData["dispensers"];
-  setShowItem: (type: string) => void;
-}
 
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
@@ -23,7 +15,7 @@ function WalletDetails(
     setShowItem: (type: string) => void;
   },
 ) {
-  const [fee, setFee] = useState<number>(walletData.fee);
+  const [fee, setFee] = useState<number>(walletData.fee || 0);
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
 
