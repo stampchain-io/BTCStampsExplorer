@@ -9,7 +9,7 @@ dayjs.extend(relativeTime);
 
 export function abbreviateAddress(
   address?: string,
-  sliceLength: number = 6,
+  sliceLength: number = 4,
 ): string {
   if (!address) return "";
   return `${address.slice(0, sliceLength)}...${address.slice(-sliceLength)}`;
