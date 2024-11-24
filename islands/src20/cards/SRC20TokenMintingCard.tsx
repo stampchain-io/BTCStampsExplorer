@@ -39,7 +39,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
                 {formatDate(new Date(src20.block_time), {
                   month: "short",
                   year: "numeric",
-                })}
+                }).toUpperCase()}
               </span>
             </p>
           </div>
@@ -48,15 +48,13 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
           <div class={middleLayoutClassName}>
             {/* TODO: not available from API request */}
             <p class={defaultTextClassName}>
-              TOP MINTS{" "}
-              <span class={boldTextClassName}>
-                0
-              </span>{" "}
-              %
+              TOP MINTS <span class={boldTextClassName}>0</span>
+              <span class="text-stamp-grey-light">%</span>
             </p>
             <div class="flex flex-col gap-1">
               <p class={defaultTextClassName}>
-                PROGRESS <span class={boldTextClassName}>{progress}%</span>
+                PROGRESS <span class={boldTextClassName}>{progress}</span>
+                <span class="text-stamp-grey-light">%</span>
               </p>
               <div class="hidden mobileLg:block min-w-[260px] h-1 bg-[#999999] relative rounded-full">
                 <div
@@ -98,9 +96,9 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
       <Button
         variant="mint"
         onClick={handleMintClick}
-        class={variant != "minting" ? "hidden mobileLg:block" : ""}
+        class={variant != "minting" ? "hidden min-[480px]:block" : ""}
       >
-        Mint
+        MINT
       </Button>
     </SRC20BaseCard>
   );
