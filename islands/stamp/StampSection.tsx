@@ -142,7 +142,7 @@ export default function StampSection({
 
       {pagination
         ? (
-          <div class="mt-4">
+          <div class="mt-9 mobileLg:mt-[72px]">
             <Pagination
               page={pagination.page}
               page_size={pagination.pageSize}
