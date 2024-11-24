@@ -99,7 +99,7 @@ export function MintContent({
 
           // Fetch combined mint data
           const response = await axiod.get(
-            `/api/v2/src20/tick/${currentTick}/mint_data`,
+            `/api/v2/src20/tick/${currentTick}/mintData`,
           );
           const data = response.data;
 
