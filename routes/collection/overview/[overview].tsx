@@ -188,7 +188,7 @@ export default function CollectionOverview(
   };
 
   return (
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-3 mobileMd:gap-6">
       <CollectionOverviewHeader />
       {renderContent()}
     </div>
