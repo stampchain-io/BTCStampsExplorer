@@ -5,7 +5,7 @@ import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 export const middleLayoutClassName =
   "hidden tablet:flex text-center flex-col justify-center";
 export const defaultTextClassName = "text-lg text-stamp-grey-darker font-light";
-export const boldTextClassName = "font-bold text-stamp-grey";
+export const boldTextClassName = "font-bold text-stamp-grey-light";
 
 export interface SRC20BaseCardProps {
   src20: SRC20Row;
@@ -46,8 +46,8 @@ export function SRC20BaseCard(
         <div class="flex flex-col justify-between">
           <a
             href={href}
-            class={`text-2xl font-bold ${
-              isHovered ? "text-stamp-primary-hover" : "text-stamp-grey-darker"
+            class={`text-2xl font-black ${
+              isHovered ? "text-stamp-primary-hover" : "purple-gradient3"
             } flex gap-4`}
           >
             {convertToEmoji(src20.tick)}
@@ -102,7 +102,7 @@ export function SRC20BaseCard(
               <p class={defaultTextClassName}>
                 PROGRESS <span class={boldTextClassName}>{progress}%</span>
               </p>
-              <div class="hidden mobileLg:block min-w-[260px] h-1 bg-[#999999] relative rounded-full">
+              <div class="hidden mobileMd:block min-w-[260px] h-1 bg-[#999999] relative rounded-full">
                 <div
                   class="absolute left-0 top-0 h-1 bg-[#660099] rounded-full"
                   style={{ width: progressWidth }}

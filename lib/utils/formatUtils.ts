@@ -7,12 +7,9 @@ dayjs.extend(relativeTime);
 
 // Helper constant for satoshi conversion
 
-export function abbreviateAddress(
-  address?: string,
-  sliceLength: number = 4,
-): string {
+export function abbreviateAddress(address: string, length = 4): string {
   if (!address) return "";
-  return `${address.slice(0, sliceLength)}...${address.slice(-sliceLength)}`;
+  return `${address.slice(0, length)}...${address.slice(-length)}`;
 }
 
 export function formatBTCAmount(
