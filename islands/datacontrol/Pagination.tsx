@@ -6,7 +6,7 @@ const DESKTOP_MAX_PAGE_RANGE = 4;
 
 const navArrowClassName = `
   flex items-center justify-center
-  bg-stamp-purple-darker hover:bg-stamp-primary-hover rounded-md
+  bg-stamp-purple-dark hover:bg-stamp-primary-hover rounded-md
   w-7 h-7 mobileLg:h-9 mobileLg:w-9`;
 const navContentClassName = `
   flex items-center justify-center
@@ -127,7 +127,9 @@ export const Pagination = (
             href={pageUrl}
             f-partial={pageUrl}
             class={navContentClassName + " " +
-              (currentPage === p ? "bg-[#660099] " : "bg-[#440066]")}
+              (currentPage === p
+                ? " bg-stamp-purple "
+                : " bg-stamp-purple-dark")}
           >
             {p}
           </a>
