@@ -12,9 +12,24 @@ export const StampChainModule = () => {
           THE CREATORS OF BITCOIN STAMPS
         </h2>
         <p className={ModulesStyles.bodyTextLight}>
-          Your premier destination for all things Bitcoin Stamps. As the OG
-          resource, we offer unparalleled expertise and tools for the Stamps
-          ecosystem.
+          <b>
+            As the architects of the Bitcoin Stamps protocol, we've been at the
+            forefront of the ecosystem since its inception. Our platform
+            combines deep technical expertise with user-friendly tools to help
+            you create, collect, and trade Bitcoin Stamps with confidence.
+          </b>
+          <br />
+          <br />
+          <b>We empower creators and collectors by:</b>
+          <li>
+            Providing battle-tested tools developed by the original Bitcoin
+            Stamps team
+          </li>
+          <li>
+            Maintaining the most comprehensive knowledge base for Stamps
+            technology
+          </li>
+          {/* <li>Offering expert guidance on stamp creation, trading, and collection management</li> */}
         </p>
       </div>
 
