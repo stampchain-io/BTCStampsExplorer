@@ -22,6 +22,7 @@ export default function StampSection({
   showMinDetails = false,
   variant = "default",
   viewAllLink,
+  alignRight = false,
 }: StampSectionProps) {
   const stampArray = Array.isArray(stamps) ? stamps : [];
   const [displayCount, setDisplayCount] = useState(stampArray.length);
@@ -86,17 +87,37 @@ export default function StampSection({
   return (
     <div class="w-full">
       {title && (
-        <div class="flex flex-col items-start tablet:items-end">
-          <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
+        <div
+          class={`flex flex-col items-start ${
+            alignRight && "tablet:items-end"
+          }`}
+        >
+          <h1
+            class={`${
+              alignRight
+                ? ModulesStyles.titlePurpleDL
+                : ModulesStyles.titlePurpleDL
+            } tablet:hidden`}
+          >
             {title}
           </h1>
-          <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}>
+          <h1
+            class={`hidden tablet:block ${
+              alignRight
+                ? ModulesStyles.titlePurpleLD
+                : ModulesStyles.titlePurpleDL
+            }`}
+          >
             {title}
           </h1>
         </div>
       )}
       {subTitle && (
-        <div class="flex flex-col items-start tablet:items-end">
+        <div
+          class={`flex flex-col items-start ${
+            alignRight && "tablet:items-end"
+          }`}
+        >
           <h2 className={ModulesStyles.subTitlePurple}>
             {subTitle}
           </h2>

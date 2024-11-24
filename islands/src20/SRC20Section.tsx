@@ -49,7 +49,7 @@ export const SRC20Section = (props: SRC20SectionProps) => {
   return (
     <div>
       {props.title && (
-        <h1 class={ModulesStyles.titlePurpleDLClassName}>
+        <h1 class={ModulesStyles.titlePurpleDL}>
           {props.title}
         </h1>
       )}
