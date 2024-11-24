@@ -96,7 +96,7 @@ export default function CollectionDetails(props: CollectionDetailsPageProps) {
   } = props.data;
 
   return (
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-3 mobileMd:gap-6">
       <CollectionDetailsHeader collection={collection} stamps={stamps} />
       <CollectionDetailsContent stamps={stamps} />
       <Pagination
