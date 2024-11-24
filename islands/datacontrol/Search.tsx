@@ -52,7 +52,7 @@ export function Search({
         <>
           <input
             type="text"
-            class="min-w-[260px] tablet:min-w-[360px] h-[40px] purple-bg-gradient px-4 py-2 rounded text-[13px] text-[#8D9199]"
+            class="min-w-[260px] tablet:min-w-[360px] h-[40px] bg-stamp-purple px-4 py-2 rounded-md text-[13px] text-black placeholder:text-black placeholder:uppercase"
             placeholder={placeholder}
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
@@ -63,7 +63,7 @@ export function Search({
                 <li
                   key={result.tick || JSON.stringify(result)}
                   onClick={() => onResultClick(result)}
-                  class="cursor-pointer p-2 hover:bg-gray-200"
+                  className="cursor-pointer p-2 hover:bg-gray-200"
                 >
                   {resultDisplay(result)}
                 </li>
@@ -73,7 +73,7 @@ export function Search({
           <img
             src="/img/stamp/search-glass.png"
             alt="Search icon"
-            class="absolute top-3 right-3 cursor-pointer"
+            className="absolute top-3 right-3 cursor-pointer"
             onClick={() => handleOpen(false)}
           />
         </>
@@ -82,7 +82,7 @@ export function Search({
         <img
           src="/img/stamp/search-glass.png"
           alt="Search icon"
-          class="bg-[#8800CC] rounded-md p-[12px] cursor-pointer"
+          className="bg-stamp-purple rounded-stamp p-search-icon cursor-pointer"
           onClick={() => handleOpen(true)}
         />
       )}

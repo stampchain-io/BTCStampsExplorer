@@ -67,8 +67,8 @@ const ItemHeader = (
 ) => {
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full">
-      <div class="flex gap-6 tablet:gap-8 items-end">
-        <p class="cursor-pointer pb-1 tablet:pb-3 text-2xl tablet:text-4xl desktop:text-5xl uppercase text-stamp-primary font-extralight">
+      <div class="flex items-end">
+        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight">
           {title}
         </p>
       </div>
@@ -117,8 +117,8 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
   // If no dispensers, show empty state
   if (!dispensers?.length) {
     return (
-      <div class="text-center text-stamp-grey-darker p-6">
-        No listings found
+      <div class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+        NO LISTINGS FOUND
       </div>
     );
   }
@@ -135,23 +135,27 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
   // If no dispensers with stamps, show empty state
   if (!dispensersWithStamps.length) {
     return (
-      <div class="text-center text-stamp-grey-darker p-6">
-        No Listings Found
+      <div>
+        <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
+          NO LISTINGS FOUND
+        </h3>
       </div>
     );
   }
 
   return (
     <div class="relative shadow-md">
-      {/* Desktop View */}
-      <div class="hidden desktop:flex flex-col gap-6 p-2">
+      {/* MobileMd/Tablet/Desktop View */}
+      <div class="hidden mobileLg:flex flex-col gap-6 -mt-6">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
-          <div class="mb-8">
-            <h3 class="text-xl text-stamp-grey-darker mb-4">OPEN LISTINGS</h3>
+          <div>
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+              OPEN LISTINGS
+            </h3>
             <div class="flex flex-col gap-6">
               {openDispensers.map((dispenser) => (
-                <DispenserRow dispenser={dispenser} view="desktop" />
+                <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
             </div>
           </div>
@@ -160,22 +164,26 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div>
-            <h3 class="text-xl text-stamp-grey-darker mb-4">CLOSED LISTINGS</h3>
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+              CLOSED LISTINGS
+            </h3>
             <div class="flex flex-col gap-6">
               {closedDispensers.map((dispenser) => (
-                <DispenserRow dispenser={dispenser} view="desktop" />
+                <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
             </div>
           </div>
         )}
       </div>
 
-      {/* Mobile View */}
-      <div class="flex desktop:hidden flex-col gap-3 p-2">
+      {/* MobileSm/MobileMd View */}
+      <div class="flex mobileLg:hidden flex-col gap-3">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
           <div class="mb-8">
-            <h3 class="text-xl text-stamp-grey-darker mb-4">OPEN LISTINGS</h3>
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+              OPEN LISTINGS
+            </h3>
             <div class="flex flex-col gap-6">
               {openDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="mobile" />
@@ -187,7 +195,9 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
           <div>
-            <h3 class="text-xl text-stamp-grey-darker mb-4">CLOSED LISTINGS</h3>
+            <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
+              CLOSED LISTINGS
+            </h3>
             <div class="flex flex-col gap-6">
               {closedDispensers.map((dispenser) => (
                 <DispenserRow dispenser={dispenser} view="mobile" />
@@ -201,21 +211,22 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
 }
 
 function DispenserRow(
-  { dispenser, view }: { dispenser: Dispenser; view: "mobile" | "desktop" },
+  /* mobile = mobileSm/Md // tablet = mobileLg/tablet/desktop */
+  { dispenser, view }: { dispenser: Dispenser; view: "mobile" | "tablet" },
 ) {
-  const imageSize = view === "desktop"
-    ? "w-[134px] h-[134px]"
-    : "w-[117px] h-[117px]";
+  const imageSize = view === "mobile"
+    ? "w-[146px] h-[146px]"
+    : "w-[172px] h-[172px]";
 
   return (
-    <div class="bg-gradient-to-br from-transparent from-0% via-[#14001F] to-[#1F002E] text-sm flex justify-between rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE]">
-      <div class="p-3 uppercase cursor-pointer flex gap-6 w-full">
+    <div class="flex justify-between dark-gradient rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
+      <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
-          class={`${imageSize} relative`}
+          class={`${imageSize} relative flex-shrink-0`}
         >
-          <div class="relative p-2 bg-[#1F002E] rounded-lg h-full">
-            <div class="stamp-container h-full flex items-center justify-center">
+          <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-lg aspect-square">
+            <div class="stamp-container absolute inset-0 flex items-center justify-center">
               <div class="relative z-10 w-full h-full">
                 <img
                   width="100%"
@@ -234,44 +245,55 @@ function DispenserRow(
           </div>
         </a>
         <div class="flex flex-col w-full">
-          <div class="flex flex-col justify-between w-full">
-            <a
-              href="#"
-              class="text-3xl text-[#666666] font-bold hover:text-stamp-primary-hover uppercase flex gap-4"
-            >
-              {`#${dispenser.stamp.stamp}`}
-            </a>
+          <div class="flex flex-col justify-between w-full mt-[6px]">
+            <div class="relative">
+              <a
+                href={`/stamp/${dispenser.stamp.stamp}`}
+                class="!inline-block text-2xl mobileLg:text-4xl font-black purple-gradient3 group-hover:[-webkit-text-fill-color:#AA00FF]"
+              >
+                {`#${dispenser.stamp.stamp}`}
+              </a>
+            </div>
           </div>
 
           <div class="flex justify-between flex-row w-full">
             <p
               class={`text-base text-stamp-primary font-light text-ellipsis overflow-hidden ${
-                view === "mobile" ? "tablet:w-full max-w-48" : ""
+                view === "mobile" ? "tablet:w-full" : ""
               }`}
             >
-              <span class="font-bold text-stamp-primary text-base normal-case">
-                {view === "mobile"
-                  ? abbreviateAddress(dispenser.origin)
-                  : dispenser.origin || abbreviateAddress(dispenser.origin)}
+              <span class="font-bold text-stamp-primary text-base mobileLg:text-xl normal-case">
+                <span class="mobileMd:hidden">
+                  {abbreviateAddress(dispenser.origin, 4)}
+                </span>
+                <span class="hidden mobileMd:inline mobileLg:hidden">
+                  {abbreviateAddress(dispenser.origin, 7)}
+                </span>
+                <span class="hidden mobileLg:inline tablet:hidden">
+                  {abbreviateAddress(dispenser.origin, 10)}
+                </span>
+                <span class="hidden tablet:inline">
+                  {dispenser.origin}
+                </span>
               </span>
             </p>
-            <div class="flex flex-row gap-1">
+            <div class="flex flex-row gap-[9px] mobileLg:gap-3">
               <img
                 src="/img/wallet/icon-copy.svg"
-                class="w-6 h-6 cursor-pointer"
+                class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] cursor-pointer"
                 alt="Copy"
               />
               <img
                 src="/img/wallet/icon-history.svg"
-                class="w-6 h-6 cursor-pointer"
+                class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] cursor-pointer"
                 alt="History"
               />
             </div>
           </div>
-          <div class="text-center flex justify-between">
+          <div class="text-center flex justify-between mt-[6px]">
             <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
               GIVE{" "}
-              <span class="font-bold text-stamp-grey">
+              <span class="font-bold text-stamp-grey-light">
                 {Number(dispenser.give_quantity).toLocaleString()}
               </span>
             </p>
@@ -279,7 +301,7 @@ function DispenserRow(
           <div class="flex flex-row justify-between w-full">
             <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
               QUANTITY{" "}
-              <span class="font-bold text-stamp-grey">
+              <span class="font-bold text-stamp-grey-light">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
                   : `${Number(dispenser.give_remaining).toLocaleString()}/${
@@ -288,7 +310,7 @@ function DispenserRow(
               </span>
             </p>
             <p
-              class={`text-stamp-grey-darker text-lg ${
+              class={`text-stamp-grey-darker text-lg font-light -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
@@ -296,23 +318,24 @@ function DispenserRow(
             </p>
           </div>
           <div class="flex flex-row justify-between w-full">
-            <p class="text-base text-stamp-grey-darker font-light">
+            <p class="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
               PRICE{" "}
-              <span class="font-bold text-stamp-grey">
+              <span class="font-bold text-stamp-grey-light">
                 {formatBTCAmount(Number(dispenser.btcrate), {
-                  includeSymbol: true,
+                  includeSymbol: false,
                 })}
-              </span>
+              </span>{" "}
+              <span className="text-stamp-grey-light">BTC</span>
             </p>
             <p
-              class={`text-base text-stamp-grey-darker font-light ${
+              class={`text-xl mobileMd:text-2xl text-stamp-grey-light font-bold -mt-1 ${
                 view === "mobile" ? "hidden mobileLg:block" : ""
               }`}
             >
               {formatBTCAmount(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
-                { includeSymbol: true },
-              )}
+                { includeSymbol: false },
+              )} <span class="text-stamp-grey-light font-light">BTC</span>
             </p>
           </div>
         </div>
@@ -384,11 +407,8 @@ export default function WalletContent(
     showDetails: false,
     gridClass: `
       grid w-full
-      gap-[12px]
-      mobileSm:gap-[12px]
-      mobileLg:gap-[24px]
-      tablet:gap-[24px]
-      desktop:gap-[12px]
+      gap-3
+      mobileMd:gap-6
       grid-cols-4
       mobileLg:grid-cols-6
       tablet:grid-cols-6
@@ -411,7 +431,7 @@ export default function WalletContent(
 
   return (
     <>
-      <div>
+      <div class="mt-6 mobileLg:mt-12 desktop:mt-24">
         <ItemHeader
           title="STAMPS"
           sortBy={sortBy}
@@ -431,7 +451,7 @@ export default function WalletContent(
         </div>
       </div>
 
-      <div class="mt-48">
+      <div class="mt-12 mobileLg:mt-24 desktop:mt-36">
         <ItemHeader
           title="TOKENS"
           sortBy={sortBy}
@@ -456,15 +476,17 @@ export default function WalletContent(
 
       {/* Listening Pagination */}
       {src20.data.length && (
-        <Pagination
-          page={src20.pagination.page}
-          page_size={src20.pagination.limit}
-          key="Token"
-          type="Token_id"
-          data_length={src20.pagination.total}
-          pages={Math.ceil(src20.pagination.total / src20.pagination.limit)}
-          prefix="src20"
-        />
+        <div class="mt-9 mobileLg:mt-[72px]">
+          <Pagination
+            page={src20.pagination.page}
+            page_size={src20.pagination.limit}
+            key="Token"
+            type="Token_id"
+            data_length={src20.pagination.total}
+            pages={Math.ceil(src20.pagination.total / src20.pagination.limit)}
+            prefix="src20"
+          />
+        </div>
       )}
 
       <div class="mt-48">
@@ -482,7 +504,7 @@ export default function WalletContent(
           handleOpenFilter={handleOpenFilter}
           handleOpenSetting={() => {}}
         />
-        <div class="mt-3 mobileLg:mt-6">
+        <div class="mt-3 mobileMd:mt-6">
           <DispenserItem dispensers={dispensers || []} />
         </div>
       </div>

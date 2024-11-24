@@ -28,7 +28,9 @@ const WalletHeader = ({
 
   return (
     <div class="flex justify-between items-center gap-3 w-full">
-      <h1 className="text-5xl text-stamp-primary-dark font-black">WALLET</h1>
+      <h1 className="inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1">
+        WALLET
+      </h1>
       <div class="flex gap-3 justify-between h-[40px]">
         <Filter
           initFilter={filterBy}

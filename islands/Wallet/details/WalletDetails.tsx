@@ -25,7 +25,7 @@ function WalletDetails(
 
   return (
     <div>
-      <div class="flex flex-col gap-6 items-stretch">
+      <div class="flex flex-col gap-3 mobileMd:gap-6 items-stretch">
         <WalletOverview
           walletData={{ ...walletData, fee }}
           onSend={() => setIsSendModalOpen(true)}
@@ -77,15 +77,15 @@ function WalletOverview(
     <div class="w-full dark-gradient flex flex-col justify-between p-6">
       <div class="flex justify-between">
         <div class={`${hideBalance ? "blur-sm" : ""}`}>
-          <p class="text-stamp-grey font-extralight text-3xl mobileLg:text-4xl desktop:text-5xl select-none">
-            <span class="font-medium">
-              {hideBalance ? "***" : walletData.balance}
+          <p class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl select-none">
+            <span class="font-bold">
+              {hideBalance ? "*********" : walletData.balance}
             </span>{" "}
             BTC
           </p>
-          <p class="text-stamp-grey-darker font-extralight text-lg mobileLg:text-xl desktop:text-2xl select-none">
+          <p class="text-stamp-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl desktop:text-2xl select-none pt-[3px]">
             <span class="font-medium">
-              {hideBalance ? "******" : walletData.usdValue.toLocaleString()}
+              {hideBalance ? "*****" : walletData.usdValue.toLocaleString()}
             </span>{" "}
             USD
           </p>
@@ -95,29 +95,29 @@ function WalletOverview(
             ? (
               <img
                 src="/img/wallet/icon-unhide-balance.svg"
-                class="w-8 h-8"
-                alt="Hide balance"
+                class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px]"
+                alt="Show balance"
               />
             )
             : (
               <img
                 src="/img/wallet/icon-hide-balance.svg"
-                class="w-8 h-8"
+                class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px]"
                 alt="Hide balance"
               />
             )}
         </button>
       </div>
-      <div class="flex justify-between">
+      <div class="flex justify-between pt-3">
         <div class="flex items-center">
-          <p class="text-stamp-primary font-medium select-none text-xs mobileLg:text-sm desktop:text-base hidden mobileLg:block">
+          <p class="text-stamp-primary font-medium select-none text-base mobileLg:text-lg desktop:text-xl hidden mobileLg:block">
             {walletData.address}
           </p>
-          <p class="text-stamp-primary font-medium select-none text-xs mobileLg:text-sm desktop:text-base block mobileLg:hidden">
-            {abbreviateAddress(walletData.address)}
+          <p class="text-stamp-primary font-medium select-none text-base mobileLg:text-lg desktop:text-xl block mobileLg:hidden">
+            {abbreviateAddress(walletData.address, 8)}
           </p>
         </div>
-        <div class="flex gap-2 mobileLg:gap-3">
+        <div class="flex gap-[9px] mobileLg:gap-3">
           <Button
             variant="wallet"
             icon="/img/wallet/icon-copy.svg"
@@ -170,7 +170,7 @@ function WalletStats(
   };
 
   return (
-    <div class="w-full flex flex-col desktop:flex-row gap-3 mobileLg:gap-6">
+    <div class="w-full flex flex-col tablet:flex-row gap-3 mobileMd:gap-6">
       <StampStats
         stampsTotal={stampsTotal}
         stampsCreated={stampsCreated}
@@ -191,12 +191,16 @@ function StampStats(
 ) {
   return (
     <div
-      class="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      class="w-full dark-gradient p-6 flex flex-col gap-6 rounded-md"
       onClick={() => handleType("stamp")}
     >
       <div class="flex justify-between">
         <StatItem label="STAMPS" value={stampsTotal.toString()} />
-        <StatItem label="BY ME" value={stampsCreated.toString()} />
+        <StatItem
+          label="BY ME"
+          value={stampsCreated.toString()}
+          align="right"
+        />
       </div>
     </div>
   );
@@ -210,7 +214,7 @@ function DispenserStats(
 ) {
   return (
     <div
-      class="w-full dark-gradient p-6 flex flex-col gap-6 hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      class="flex flex-col w-full dark-gradient p-6 gap-6 rounded-md"
       onClick={() => handleType("dispenser")}
     >
       <div class="flex justify-between">
@@ -219,8 +223,8 @@ function DispenserStats(
           value={dispensers.open.toString()}
           align="left"
         />
-        <div class="hidden mobileLg:block desktop:hidden">
-          <StatItem label="ATOMIC" value="N/A" align="left" />
+        <div class="hidden mobileMd:block">
+          <StatItem label="ATOMIC" value="N/A" align="center" />
         </div>
         <StatItem
           label="SOLD"
@@ -240,7 +244,7 @@ function TokenStats(
 ) {
   return (
     <div
-      class="w-full dark-gradient flex justify-between p-6 hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] cursor-pointer"
+      class="flex justify-between w-full dark-gradient p-6 gap-6 rounded-md"
       onClick={() => handleType("token")}
     >
       <StatItem label="TOKENS" value={src20Total.toString()} />
@@ -275,12 +279,12 @@ function StatItem({ label, value, align = "left" }: StatItemProps) {
   return (
     <div>
       <p
-        class={`text-base mobileLg:text-lg font-light text-stamp-grey-darker ${alignmentClass}`}
+        class={`text-base mobileLg:text-lg desktop:text-xl font-light text-stamp-grey-darker ${alignmentClass}`}
       >
         {label}
       </p>
       <p
-        class={`text-2xl mobileLg:text-3xl desktop:text-4xl font-black text-stamp-grey ${alignmentClass}`}
+        class={`text-2xl mobileLg:text-3xl desktop:text-4xl font-black text-stamp-grey-light ${alignmentClass}`}
       >
         {value}
       </p>
