@@ -49,7 +49,7 @@ export default function CollectionSection({
   }, [width, displayCounts, collectionArray.length]);
   return (
     <div>
-      {title && <h1 class={ModulesStyles.titleGreyDLClassName}>{title}</h1>}
+      {title && <h1 class={ModulesStyles.titleGreyDL}>{title}</h1>}
       {subTitle && (
         <h2
           class={ModulesStyles.subTitleGrey +

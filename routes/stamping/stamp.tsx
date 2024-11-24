@@ -39,6 +39,7 @@ export default function StampingStampPage({ data }: PageProps<StampPageData>) {
     stamps: data.latestStamps,
     layout: "grid" as const,
     showDetails: false,
+    alignRight: true,
     gridClass: `
       grid w-full
       gap-3

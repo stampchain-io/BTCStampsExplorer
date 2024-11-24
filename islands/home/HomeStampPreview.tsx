@@ -24,7 +24,7 @@ export function HomeStampPreview({
 }) {
   const LatestArtStampsSection: StampSectionProps[] = [
     {
-      subtitle: "ON-CHAIN MARVELS",
+      subTitle: "ON-CHAIN MARVELS",
       type: "classic",
       stamps: stamps_art,
       layout: "grid",
@@ -62,7 +62,7 @@ export function HomeStampPreview({
   const CollectionsSection: StampSectionProps[] = [
     {
       title: "COLLECTIONS",
-      subtitle: "FRESH POSH STAMPS",
+      subTitle: "FRESH POSH STAMPS",
       type: "posh",
       stamps: stamps_posh,
       layout: "grid",
@@ -80,7 +80,7 @@ export function HomeStampPreview({
       },
     },
     {
-      subtitle: "RECENT RECURSIVE",
+      subTitle: "RECENT RECURSIVE",
       filterBy: "recursive",
       stamps: stamps_src721,
       layout: "grid",
@@ -118,7 +118,7 @@ export function HomeStampPreview({
   const RecentSalesSection: StampSectionProps[] = [
     {
       title: "RECENT SALES",
-      subtitle: "HOT STAMPS",
+      subTitle: "HOT STAMPS",
       type: "recent",
       stamps: stamps_recent,
       layout: "grid",
@@ -149,7 +149,7 @@ export function HomeStampPreview({
       {/* LATEST ART STAMPS */}
       <div className="flex flex-col">
         <div className="w-full">
-          <h1 className={ModulesStyles.titlePurpleDLClassName}>
+          <h1 className={ModulesStyles.titlePurpleDL}>
             <span className="block mobileLg:hidden">LATEST STAMPS</span>
             <span className="hidden mobileLg:block">LATEST ART STAMPS</span>
           </h1>

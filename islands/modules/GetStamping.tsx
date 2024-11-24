@@ -18,7 +18,7 @@ export const GetStampingModule = ({
   return (
     <div class="grid grid-cols-1 desktop:grid-cols-3 gap-3 mobileMd:gap-6 items-end max-w-desktop w-full mx-auto">
       <div className="col-span1 desktop:col-span-2">
-        <h1 className={ModulesStyles.titleGreyDLClassName}>GET STAMPING</h1>
+        <h1 className={ModulesStyles.titleGreyDL}>GET STAMPING</h1>
         <h2 className={ModulesStyles.subTitleGrey}>IMMORTALISE YOUR ART</h2>
         <p className={ModulesStyles.bodyTextLight}>
           <b>
