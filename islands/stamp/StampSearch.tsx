@@ -26,19 +26,14 @@ export function StampSearchClient(
         <>
           <input
             type="text"
-            className="min-w-[260px] mobileLg:min-w-[360px] h-[40px] 
-              bg-purple-bg-gradient 
-              px-4 py-2 
-              rounded-stamp 
-              text-[13px] 
-              text-stamp-table-placeholder"
-            placeholder="stamp #, CPID, wallet address, tx_hash"
+            className="min-w-[260px] tablet:min-w-[360px] h-[40px] bg-stamp-purple px-4 py-2 rounded-md text-[13px] text-black placeholder:text-black placeholder:uppercase"
+            placeholder="stamp #, CPID, wallet address or tx_hash"
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
             onKeyPress={handleKeyPress}
           />
           <img
-            src="/img/stamp/search-glass.svg"
+            src="/img/stamp/search-glass.png"
             alt="Search icon"
             className="absolute top-3 right-3 cursor-pointer"
             onClick={() => handleOpen2(false)}
@@ -47,7 +42,7 @@ export function StampSearchClient(
       )}
       {!open2 && (
         <img
-          src="/img/stamp/search-glass.svg"
+          src="/img/stamp/search-glass.png"
           alt="Search icon"
           className="bg-stamp-purple rounded-stamp p-search-icon cursor-pointer"
           onClick={() => handleOpen2(true)}
