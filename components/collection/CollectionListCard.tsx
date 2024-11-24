@@ -28,8 +28,8 @@ export function CollectionListCard(
       <div
         class={gradientContentClassName + " " +
           (isDarkMode
-            ? "from-[#666666] via-[#999999BD] to-[#CCCCCC7F]"
-            : "from-[#CCCCCC] via-[#999999BD] to-[#6666667F]")}
+            ? "from-[#666666] via-[#999999] to-[#CCCCCC]"
+            : "from-[#CCCCCC] via-[#999999] to-[#666666]")}
       />
       <h3
         class={nameClassName + " " +
