@@ -49,7 +49,7 @@ export function Setting({
   return (
     <div
       class={`rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
-        open ? "px-6 py-4 border-2 border-[#8800CC] bg-[#0B0B0B]" : ""
+        open ? "px-6 py-4 border-2 border-stamp-purple bg-[#0B0B0B]" : ""
       }`}
     >
       {open
@@ -67,8 +67,8 @@ export function Setting({
                 key={filter}
                 class={`cursor-pointer text-xs tablet:text-sm font-black ${
                   localFilters.includes(filter)
-                    ? "text-[#AA00FF]"
-                    : "text-[#8800CC] hover:text-[#AA00FF]"
+                    ? "text-stamp-purple-bright "
+                    : "text-stamp-purple hover:text-stamp-purple-bright"
                 }`}
                 onClick={() => handleFilterChange(filter)}
               >
@@ -81,7 +81,7 @@ export function Setting({
           <img
             src="/img/wallet/icon_setting.svg"
             alt="Tools icon"
-            class="bg-[#8800CC] rounded-md p-[12px] cursor-pointer"
+            class="bg-stamp-purple rounded-md p-[12px] cursor-pointer"
             onClick={() => handleOpen(true)}
           />
         )}
