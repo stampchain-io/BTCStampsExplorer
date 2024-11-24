@@ -16,7 +16,7 @@ export const handler: Handlers = {
         message: "Processing tick request",
         data: {
           originalTick: tick,
-        }
+        },
       });
 
       const decodedTick = decodeURIComponent(tick);
@@ -24,7 +24,7 @@ export const handler: Handlers = {
         message: "Decoded tick",
         data: {
           decodedTick,
-        }
+        },
       });
 
       const normalizedTick = convertEmojiToTick(decodedTick);
@@ -32,7 +32,7 @@ export const handler: Handlers = {
         message: "Normalized tick",
         data: {
           normalizedTick,
-        }
+        },
       });
 
       // Fetch mint progress data with normalized tick
@@ -43,7 +43,7 @@ export const handler: Handlers = {
         message: "Mint status retrieved",
         data: {
           mintStatus,
-        }
+        },
       });
 
       // Fetch holders count with normalized tick
@@ -67,10 +67,10 @@ export const handler: Handlers = {
       );
     } catch (error) {
       logger.error("stamps", {
-        message: "Error in /api/v2/src20/tick/[tick]/mint_data",
+        message: "Error in /api/v2/src20/tick/[tick]/mintData",
         data: {
           error: error instanceof Error ? error.message : String(error),
-        }
+        },
       });
 
       return new Response(
