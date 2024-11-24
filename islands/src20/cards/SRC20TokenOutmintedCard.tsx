@@ -23,23 +23,17 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
                 {Math.round((src20.floor_unit_price ?? 0) * 1e8)
                   .toLocaleString()}
               </span>{" "}
-              SATS
+              <span class="text-stamp-grey-light">SATS</span>
             </p>
             {/* TODO: not available from API request */}
             <p class={defaultTextClassName}>
-              CHANGE{" "}
-              <span class={boldTextClassName}>
-                N/A
-              </span>{" "}
-              %
+              CHANGE <span class={boldTextClassName}>N/A</span>
+              <span class="text-stamp-grey-light">%</span>
             </p>
             {/* TODO: not available from API request */}
             <p class={defaultTextClassName}>
-              VOLUME{" "}
-              <span class={boldTextClassName}>
-                0.00
-              </span>{" "}
-              BTC
+              VOLUME <span class={boldTextClassName}>0.00</span>{" "}
+              <span class="text-stamp-grey-light">BTC</span>
             </p>
           </div>
 
@@ -57,7 +51,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
                 {formatDate(new Date(src20.block_time), {
                   month: "short",
                   year: "numeric",
-                })}
+                }).toUpperCase()}
               </span>
             </p>
             <p class={defaultTextClassName}>
@@ -72,7 +66,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
       )}
 
       {variant === "minting" && (
-        <div class={middleLayoutClassName + " desktop:hidden"}>
+        <div class={middleLayoutClassName + " mobileMd:hidden"}>
           <p class={defaultTextClassName}>
             SUPPLY{" "}
             <span class={boldTextClassName}>
