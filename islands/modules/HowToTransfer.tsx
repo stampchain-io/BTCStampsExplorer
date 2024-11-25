@@ -1,7 +1,7 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
-export const FAQTransferModule = () => {
+export const HowToTransferModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
