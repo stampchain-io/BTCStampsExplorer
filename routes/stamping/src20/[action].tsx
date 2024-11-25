@@ -7,7 +7,9 @@ import RecentDeploy from "$islands/stamping/src20/deploy/RecentDeploy.tsx";
 import { TransferContent } from "$islands/stamping/src20/transfer/TransferContent.tsx";
 import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx";
 
-import { FAQModule } from "$islands/modules/FAQMint.tsx";
+import { FAQDeployModule } from "$islands/modules/FAQDeploy.tsx";
+import { FAQMintModule } from "$islands/modules/FAQMint.tsx";
+import { FAQTransferModule } from "$islands/modules/FAQTransfer.tsx";
 
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
@@ -155,7 +157,20 @@ export default function StampingSrc20Page(
     }
   };
 
-  const renderSidebar = () => {
+  const renderLeftSidebar = () => {
+    switch (selectedTab) {
+      case "mint":
+        return <FAQMintModule />;
+      case "deploy":
+        return <FAQDeployModule />;
+      case "transfer":
+        return <FAQTransferModule />;
+      default:
+        return null;
+    }
+  };
+
+  const renderRightSidebar = () => {
     switch (selectedTab) {
       case "mint":
         return <PopularMinting transactions={trendingTokens} />;
@@ -178,11 +193,11 @@ export default function StampingSrc20Page(
         className={`flex flex-col gap-3 mobileMd:gap-6 w-full desktop:gap-9 ${flexDirection}`}
       >
         <div className={`w-full ${columnWidth}`}>
-          <FAQModule />
+          {renderLeftSidebar()}
           {isMint && <RecentDeploy transactions={recentTransactions.deploy} />}
         </div>
         <div className={`w-full ${columnWidth}`}>
-          {renderSidebar()}
+          {renderRightSidebar()}
         </div>
       </div>
     </div>

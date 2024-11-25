@@ -114,8 +114,7 @@ export default function SRC20Page(props: any) {
         type={"src20"}
         data_length={src20s.length}
       />
-      {selectedTab === "all" && <DeployMintModule />}
-      {selectedTab === "trending" && <DeployMintModule />}
+      <DeployMintModule />
     </div>
   );
 }

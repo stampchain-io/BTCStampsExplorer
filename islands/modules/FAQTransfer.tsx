@@ -1,14 +1,14 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
-export const FAQModule = () => {
+export const FAQTransferModule = () => {
   return (
-    <div className="flex flex-col gap-3 mobileMd:gap-6">
-      <div className="flex flex-col">
-        <h1 className={ModulesStyles.titleGreyDL}>HOW-TO</h1>
-        <h2 className={ModulesStyles.subTitleGrey}>TRANSFER A TOKEN</h2>
-        <p className={ModulesStyles.bodyTextLight}>
-          <ul className="list-disc pl-5 space-y-2">
+    <div class="flex flex-col gap-3 mobileMd:gap-6">
+      <div class="flex flex-col">
+        <h1 class={ModulesStyles.titleGreyDL}>HOW-TO</h1>
+        <h2 class={ModulesStyles.subTitleGrey}>TRANSFER A TOKEN</h2>
+        <p class={ModulesStyles.bodyTextLight}>
+          <ul class="list-disc pl-5 space-y-2">
             <li>
               The Bitcoin <b>recepient address</b>{" "}
               must start with 1 if classic, or with bc1q if SegWit.

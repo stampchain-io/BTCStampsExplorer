@@ -6,29 +6,29 @@ export const DeployMintModule = () => {
       grid grid-cols-1 tablet:grid-cols-3 gap-3 mobileLg:gap-6 items-end
       max-w-desktop w-full mx-auto
     ">
-      <div className="col-span1 tablet:col-span-2">
-        <h1 className={ModulesStyles.title}>
+      <div class="col-span1 tablet:col-span-2">
+        <h1 class={ModulesStyles.titleGreyDL}>
           DEPLOY
         </h1>
-        <h2 className={ModulesStyles.subTitle}>YOUR OWN TOKEN</h2>
-        <p className={ModulesStyles.content}>
+        <h2 class={ModulesStyles.subTitleGrey}>YOUR OWN TOKEN</h2>
+        <p class={ModulesStyles.bodyTextLight}>
           Create or mint the most immutable fungible token with SRC-20. Built on
           top of the stamps meta-protocol SRC-20 tokens are built with Bitcoin.
         </p>
       </div>
 
-      <div className="flex gap-3 mobileLg:gap-6 font-extrabold justify-end">
+      <div class="flex gap-3 mobileLg:gap-6 font-extrabold justify-end">
         <a
           href="/howto"
           f-partial="/howto"
-          className={ModulesStyles.buttonType1 + " !w-[114px]"}
+          class={ModulesStyles.buttonGreyOutline + " !w-[114px]"}
         >
           HOW-TO
         </a>
         <a
           href="/stamping/src20/deploy"
           f-partial="/stamping/src20/deploy"
-          className={ModulesStyles.buttonType2 + " !w-[102px]"}
+          class={ModulesStyles.buttonGreyFlat + " !w-[102px]"}
         >
           DEPLOY
         </a>
