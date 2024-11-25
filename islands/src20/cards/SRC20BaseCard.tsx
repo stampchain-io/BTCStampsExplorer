@@ -103,9 +103,9 @@ export function SRC20BaseCard(
               <p class={defaultTextClassName}>
                 PROGRESS <span class={boldTextClassName}>{progress}%</span>
               </p>
-              <div class="hidden mobileMd:block min-w-[260px] h-1 bg-stamp-grey relative rounded-full">
+              <div class="hidden mobileMd:block min-w-[260px] h-1.5 bg-stamp-grey relative rounded-full">
                 <div
-                  class="absolute left-0 top-0 h-1 bg-stamp-purple-dark rounded-full"
+                  class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
                   style={{ width: progressWidth }}
                 />
               </div>
