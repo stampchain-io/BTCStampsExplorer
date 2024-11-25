@@ -2,15 +2,15 @@ import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
 export const FAQModule = () => {
   return (
-    <div className="flex flex-col gap-4">
-      <p className="font-black text-4xl tablet:text-7xl flex flex-col gray-gradient3 text-left">
+    <div class="flex flex-col gap-4">
+      <p class="font-black text-4xl tablet:text-7xl flex flex-col gray-gradient3 text-left">
         FAQ
       </p>
-      <p className="flex flex-col gray-gradient4 text-left text-3xl tablet:text-6xl font-extralight text-[#CCCCCC]">
+      <p class="flex flex-col gray-gradient4 text-left text-3xl tablet:text-6xl font-extralight text-[#CCCCCC]">
         Let's Stamp!
       </p>
 
-      <p className="text-[#999999] text-base tablet:text-2xl font-medium">
+      <p class="text-[#999999] text-base tablet:text-2xl font-medium">
         Click the icon to upload your artwork in a supported format. Use the
         TOGGLE to switch between CLASSIC and POSH Art, and add a STAMP NAME.
         EDITIONS sets the number of copies you want to create. The LOCK icon is

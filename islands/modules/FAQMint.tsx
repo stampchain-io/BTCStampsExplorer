@@ -1,14 +1,14 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
-export const FAQModule = () => {
+export const FAQMintModule = () => {
   return (
-    <div className="flex flex-col gap-3 mobileMd:gap-6">
-      <div className="flex flex-col">
-        <h1 className={ModulesStyles.titleGreyDL}>HOW-TO</h1>
-        <h2 className={ModulesStyles.subTitleGrey}>MINT A TOKEN</h2>
-        <p className={ModulesStyles.bodyTextLight}>
-          <ul className="list-disc pl-5 space-y-2">
+    <div class="flex flex-col gap-3 mobileMd:gap-6">
+      <div class="flex flex-col">
+        <h1 class={ModulesStyles.titleGreyDL}>HOW-TO</h1>
+        <h2 class={ModulesStyles.subTitleGrey}>MINT A TOKEN</h2>
+        <p class={ModulesStyles.bodyTextLight}>
+          <ul class="list-disc pl-5 space-y-2">
             <li>
               Start typing a <b>token name</b>{" "}
               to filter and select the correct ticker.
