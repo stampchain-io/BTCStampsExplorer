@@ -111,7 +111,7 @@ export interface DisplayCountBreakpoints {
 
 export interface StampSectionProps {
   title?: string;
-  subtitle?: string;
+  subTitle?: string;
   type?: string;
   stamps: StampRow[];
   layout: "grid" | "row";
@@ -125,7 +125,16 @@ export interface StampSectionProps {
   variant?: "default" | "grey";
   viewAllLink?: string;
 }
+
 export interface CollectionSectionProps {
+  title?: string;
+  subTitle?: string;
+  collections: Collection[];
+  gridClass?: string;
+  displayCounts?: DisplayCountBreakpoints;
+}
+
+export interface CollectionOverviewSectionProps {
   title?: string;
   subTitle?: string;
   collections: Collection[];

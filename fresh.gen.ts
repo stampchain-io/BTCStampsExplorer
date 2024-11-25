@@ -133,6 +133,7 @@ import * as $collection_CollectionDetailsContent from "./islands/collection/Coll
 import * as $collection_CollectionDetailsHeader from "./islands/collection/CollectionDetailsHeader.tsx";
 import * as $collection_CollectionOverviewArtistContent from "./islands/collection/CollectionOverviewArtistContent.tsx";
 import * as $collection_CollectionOverviewHeader from "./islands/collection/CollectionOverviewHeader.tsx";
+import * as $collection_CollectionOverviewSection from "./islands/collection/CollectionOverviewSection.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
@@ -153,7 +154,9 @@ import * as $modules_FAQMint from "./islands/modules/FAQMint.tsx";
 import * as $modules_FAQStamping from "./islands/modules/FAQStamping.tsx";
 import * as $modules_FAQTransfer from "./islands/modules/FAQTransfer.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
+import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
+import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
@@ -362,6 +365,8 @@ const manifest = {
       $collection_CollectionOverviewArtistContent,
     "./islands/collection/CollectionOverviewHeader.tsx":
       $collection_CollectionOverviewHeader,
+    "./islands/collection/CollectionOverviewSection.tsx":
+      $collection_CollectionOverviewSection,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
@@ -382,7 +387,9 @@ const manifest = {
     "./islands/modules/FAQStamping.tsx": $modules_FAQStamping,
     "./islands/modules/FAQTransfer.tsx": $modules_FAQTransfer,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
+    "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/Partners.tsx": $modules_Partners,
+    "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
