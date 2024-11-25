@@ -56,19 +56,10 @@ export const handler: Handlers = {
       if (content) {
         switch (mimeType) {
           case "text/html": {
-            const html = new TextDecoder().decode(content);
-            const modifiedHtml = html.replace(
-              /<head>/i,
-              `<head><base href="${url.origin}/">`,
-            );
-            return ResponseUtil.custom(
-              new TextEncoder().encode(modifiedHtml),
-              200,
-              {
-                "Content-Type": `${mimeType}; charset=utf-8`,
-                "Cache-Control": STATIC_CACHE_CONTROL,
-              },
-            );
+            return ResponseUtil.custom(content, 200, {
+              "Content-Type": `${mimeType}; charset=utf-8`,
+              "Cache-Control": STATIC_CACHE_CONTROL,
+            });
           }
 
           case "application/javascript": {
