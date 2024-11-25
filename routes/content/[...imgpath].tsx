@@ -67,11 +67,6 @@ export const handler: Handlers = {
               {
                 "Content-Type": `${mimeType}; charset=utf-8`,
                 "Cache-Control": STATIC_CACHE_CONTROL,
-                "X-XSS-Protection": "1; mode=block",
-                "X-Frame-Options": "SAMEORIGIN",
-                "Permissions-Policy": isDev
-                  ? ""
-                  : "camera=(), geolocation=(), microphone=(), payment=(), usb=(), interest-cohort=()",
               },
             );
           }
@@ -98,9 +93,6 @@ export const handler: Handlers = {
             return ResponseUtil.custom(content, 200, {
               "Content-Type": mimeType,
               "Cache-Control": STATIC_CACHE_CONTROL,
-              "Content-Security-Policy": isDev
-                ? "default-src 'self' data: blob: *; img-src 'self' data: blob: *;"
-                : "default-src 'self' data: blob:; img-src 'self' data: blob:;",
               "Vary": "Accept-Encoding",
             });
           }
@@ -122,8 +114,6 @@ export const handler: Handlers = {
       return ResponseUtil.custom(fallbackContent, 200, {
         "Content-Type": "image/png",
         "Cache-Control": STATIC_CACHE_CONTROL,
-        "Cross-Origin-Resource-Policy": "cross-origin",
-        "Access-Control-Allow-Origin": "*",
         "Vary": "Accept-Encoding",
       });
     } catch (error) {
