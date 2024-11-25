@@ -2,6 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
+import { getMimeType, NOT_AVAILABLE_IMAGE } from "$lib/utils/imageUtils.ts";
 
 const isDev = Deno.env.get("DENO_ENV") === "development";
 
@@ -16,82 +17,114 @@ export const handler: Handlers = {
     try {
       const { imgpath } = ctx.params;
 
-      // Development-only features
-      if (imgpath.startsWith("test/") && !isDev) {
+      if (imgpath.startsWith("test/")) {
         return ResponseUtil.notFound(
           "Test endpoints only available in development",
         );
       }
 
       const url = new URL(req.url);
+      let content: ArrayBuffer | null = null;
+      const mimeType = getMimeType(
+        imgpath.split(".").pop()?.toLowerCase() || "",
+      );
 
-      // Determine file type
-      const isHtml = imgpath.endsWith(".html");
-      const isJs = imgpath.endsWith(".js");
-      const isGzip = imgpath.endsWith(".gz");
-      const isSvg = imgpath.endsWith(".svg");
-
-      // Get file path
-      const filePath = `${serverConfig.APP_ROOT}/static/${imgpath}`;
-
-      try {
-        const content = await Deno.readFile(filePath);
-        const mimeType = getMimeType(imgpath);
-
-        if (isHtml) {
-          const html = new TextDecoder().decode(content);
-          const modifiedHtml = html.replace(
-            /<head>/i,
-            `<head><base href="${url.origin}/">`,
-          );
-
-          return ResponseUtil.custom(
-            new TextEncoder().encode(modifiedHtml),
-            200,
-            {
-              "Content-Type": "text/html; charset=utf-8",
-              "Cache-Control": STATIC_CACHE_CONTROL,
-            },
-          );
+      // Try remote IMAGES_SRC_PATH first
+      if (serverConfig.IMAGES_SRC_PATH) {
+        try {
+          const remotePath = `${serverConfig.IMAGES_SRC_PATH}/${imgpath}`;
+          const response = await fetch(remotePath);
+          if (response.ok) {
+            content = await response.arrayBuffer();
+          }
+        } catch (error) {
+          console.debug(`Remote fetch failed: ${error}`);
         }
-
-        if (isJs) {
-          return ResponseUtil.custom(content, 200, {
-            "Content-Type": "application/javascript; charset=utf-8",
-            "Cache-Control": STATIC_CACHE_CONTROL,
-          });
-        }
-
-        if (isGzip) {
-          return ResponseUtil.custom(content, 200, {
-            "Content-Type": "application/gzip",
-            "Content-Encoding": "gzip",
-            "Cache-Control": STATIC_CACHE_CONTROL,
-          });
-        }
-
-        if (isSvg) {
-          return ResponseUtil.custom(content, 200, {
-            "Content-Type": "image/svg+xml",
-            "Cache-Control": STATIC_CACHE_CONTROL,
-          });
-        }
-
-        return ResponseUtil.custom(content, 200, {
-          "Content-Type": mimeType,
-          "Cache-Control": STATIC_CACHE_CONTROL,
-        });
-      } catch (error) {
-        console.error(`Error reading file ${filePath}:`, error);
       }
 
-      // If file not found or error, return not-available.png
+      // If remote fetch failed, try local static directory
+      if (!content) {
+        try {
+          const filePath = `${serverConfig.APP_ROOT}/static/${imgpath}`;
+          content = await Deno.readFile(filePath);
+        } catch (error) {
+          console.debug(`Local file read failed: ${error}`);
+        }
+      }
+
+      // If content was found, serve it with appropriate headers
+      if (content) {
+        switch (mimeType) {
+          case "text/html": {
+            const html = new TextDecoder().decode(content);
+            const modifiedHtml = html.replace(
+              /<head>/i,
+              `<head><base href="${url.origin}/">`,
+            );
+            return ResponseUtil.custom(
+              new TextEncoder().encode(modifiedHtml),
+              200,
+              {
+                "Content-Type": `${mimeType}; charset=utf-8`,
+                "Cache-Control": STATIC_CACHE_CONTROL,
+                "X-XSS-Protection": "1; mode=block",
+                "X-Frame-Options": "SAMEORIGIN",
+                "Permissions-Policy": isDev
+                  ? ""
+                  : "camera=(), geolocation=(), microphone=(), payment=(), usb=(), interest-cohort=()",
+              },
+            );
+          }
+
+          case "application/javascript": {
+            return ResponseUtil.custom(content, 200, {
+              "Content-Type": `${mimeType}; charset=utf-8`,
+              "Cache-Control": STATIC_CACHE_CONTROL,
+              "Vary": "Accept-Encoding",
+            });
+          }
+
+          case "application/gzip": {
+            return ResponseUtil.custom(content, 200, {
+              "Content-Type": mimeType,
+              "Content-Encoding": "gzip",
+              "Cache-Control": STATIC_CACHE_CONTROL,
+              "Accept-Ranges": "bytes",
+              "Vary": "Accept-Encoding",
+            });
+          }
+
+          case "image/svg+xml": {
+            return ResponseUtil.custom(content, 200, {
+              "Content-Type": mimeType,
+              "Cache-Control": STATIC_CACHE_CONTROL,
+              "Content-Security-Policy": isDev
+                ? "default-src 'self' data: blob: *; img-src 'self' data: blob: *;"
+                : "default-src 'self' data: blob:; img-src 'self' data: blob:;",
+              "Vary": "Accept-Encoding",
+            });
+          }
+
+          default: {
+            return ResponseUtil.custom(content, 200, {
+              "Content-Type": mimeType,
+              "Cache-Control": STATIC_CACHE_CONTROL,
+              "Vary": "Accept-Encoding",
+            });
+          }
+        }
+      }
+
+      // Fallback to not-available.png
       const notAvailablePath =
-        `${serverConfig.APP_ROOT}/static/not-available.png`;
-      const file = await Deno.readFile(notAvailablePath);
-      return ResponseUtil.custom(file, 200, {
+        `${serverConfig.APP_ROOT}/static${NOT_AVAILABLE_IMAGE}`;
+      const fallbackContent = await Deno.readFile(notAvailablePath);
+      return ResponseUtil.custom(fallbackContent, 200, {
         "Content-Type": "image/png",
         "Cache-Control": STATIC_CACHE_CONTROL,
+        "Cross-Origin-Resource-Policy": "cross-origin",
+        "Access-Control-Allow-Origin": "*",
+        "Vary": "Accept-Encoding",
       });
     } catch (error) {
       console.error("Error in [...imgpath] handler:", error);
@@ -99,22 +132,3 @@ export const handler: Handlers = {
     }
   },
 };
-
-function getMimeType(filename: string): string {
-  const ext = filename.split(".").pop()?.toLowerCase();
-  const mimeTypes: Record<string, string> = {
-    html: "text/html",
-    js: "application/javascript",
-    css: "text/css",
-    png: "image/png",
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    gif: "image/gif",
-    svg: "image/svg+xml",
-    ico: "image/x-icon",
-    json: "application/json",
-    gz: "application/gzip",
-  };
-
-  return mimeTypes[ext || ""] || "application/octet-stream";
-}
