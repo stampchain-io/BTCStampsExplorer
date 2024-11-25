@@ -26,12 +26,12 @@ export const handler: Handlers = {
 
       // Validate inputs
       if (!utxo || !salePrice || !sellerAddress) {
-        return ResponseUtil.error("Missing parameters", 400);
+        return ResponseUtil.badRequest("Missing parameters");
       }
 
       // Additional validation can be added here
       if (isNaN(salePrice) || salePrice <= 0) {
-        return ResponseUtil.error("Invalid salePrice value", 400);
+        return ResponseUtil.badRequest("Invalid salePrice value");
       }
 
       // const isOwner = await validateUTXOOwnership(utxo, sellerAddress);
@@ -66,9 +66,9 @@ export const handler: Handlers = {
         error,
       );
       if (error instanceof SyntaxError) {
-        return ResponseUtil.error("Invalid JSON in request body", 400);
+        return ResponseUtil.badRequest("Invalid JSON in request body");
       }
-      return ResponseUtil.error(error.message || "Internal Server Error", 500);
+      return ResponseUtil.internalError(error, "Internal Server Error");
     }
   },
 };

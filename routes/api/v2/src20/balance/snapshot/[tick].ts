@@ -4,36 +4,62 @@ import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import {
+  checkEmptyResult,
+  DEFAULT_PAGINATION,
+  validateRequiredParams,
+  validateSortParam,
+} from "$server/services/routeValidationService.ts";
 
 export const handler: Handlers<AddressTickHandlerContext> = {
   async GET(req, ctx) {
     try {
       const { tick } = ctx.params;
+
+      // Validate required parameters
+      const paramsValidation = validateRequiredParams({ tick });
+      if (!paramsValidation.isValid) {
+        return paramsValidation.error!;
+      }
+
       const url = new URL(req.url);
-      const params = url.searchParams;
-      const { limit, page } = getPaginationParams(url);
+      const pagination = getPaginationParams(url);
+
+      // Check if pagination validation failed
+      if (pagination instanceof Response) {
+        return pagination;
+      }
+
+      const { limit, page } = pagination;
+
+      // Validate sort parameter
+      const sortValidation = validateSortParam(url);
+      if (!sortValidation.isValid) {
+        return sortValidation.error!;
+      }
 
       const snapshotParams = {
         tick: convertEmojiToTick(String(tick)),
-        limit,
-        page,
-        amt: Number(params.get("amt")) || 0,
-        sortBy: params.get("sort") || "DESC",
+        limit: limit || DEFAULT_PAGINATION.limit,
+        page: page || DEFAULT_PAGINATION.page,
+        amt: Number(url.searchParams.get("amt")) || 0,
+        sortBy: sortValidation.data,
       };
 
       const result = await Src20Controller.handleSrc20SnapshotRequest(
         snapshotParams,
       );
 
-      if (!result || Object.keys(result).length === 0) {
-        console.log("Empty result received:", result);
-        return ResponseUtil.error("No data found", 404);
+      // Check for empty result
+      const emptyCheck = checkEmptyResult(result, "snapshot data");
+      if (emptyCheck) {
+        return emptyCheck;
       }
 
       return ResponseUtil.success(result);
     } catch (error) {
       console.error("Error in GET handler:", error);
-      return ResponseUtil.handleError(
+      return ResponseUtil.internalError(
         error,
         "Error processing SRC20 snapshot request",
       );

@@ -9,7 +9,7 @@ export const handler: Handlers = {
       return ResponseUtil.success(fairminters);
     } catch (error) {
       console.error("Error fetching fairminters:", error);
-      return ResponseUtil.handleError(error, "Failed to fetch fairminters");
+      return ResponseUtil.internalError(error, "Failed to fetch fairminters");
     }
   },
 };

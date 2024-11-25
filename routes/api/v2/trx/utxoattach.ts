@@ -26,7 +26,7 @@ export const handler: Handlers = {
 
       // Validate fee rate
       if (typeof options?.fee_per_kb !== "number" || options.fee_per_kb <= 0) {
-        return ResponseUtil.error("Invalid fee rate", 400);
+        return ResponseUtil.badRequest("Invalid fee rate");
       }
 
       const feeRateKB = options.fee_per_kb;
@@ -47,7 +47,7 @@ export const handler: Handlers = {
 
         if (!response?.result?.psbt) {
           if (response?.error) {
-            return ResponseUtil.error(response.error, 400);
+            return ResponseUtil.badRequest(response.error);
           }
           throw new Error("Failed to compose attach transaction.");
         }
@@ -69,13 +69,13 @@ export const handler: Handlers = {
         if (
           error instanceof Error && error.message.includes("Insufficient BTC")
         ) {
-          return ResponseUtil.error(error.message, 400);
+          return ResponseUtil.badRequest(error.message);
         }
         throw error;
       }
     } catch (error) {
       console.error("Error processing utxo attach request:", error);
-      return ResponseUtil.handleError(
+      return ResponseUtil.internalError(
         error,
         "Failed to process utxo attach request",
       );

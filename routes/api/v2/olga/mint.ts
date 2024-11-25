@@ -14,7 +14,7 @@ export const handler: Handlers<TX | TXError> = {
     try {
       body = await req.json();
     } catch (_error) {
-      return ResponseUtil.error("Invalid JSON format in request body", 400);
+      return ResponseUtil.badRequest("Invalid JSON format in request body");
     }
 
     const isDryRun = body.dryRun === true;
@@ -25,10 +25,9 @@ export const handler: Handlers<TX | TXError> = {
         body.assetName,
       );
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        return ResponseUtil.error(error.message, 400);
-      }
-      return ResponseUtil.error("Invalid asset name", 400);
+      return ResponseUtil.badRequest(
+        error instanceof Error ? error.message : "Invalid asset name",
+      );
     }
 
     const prepare = {
@@ -65,9 +64,8 @@ export const handler: Handlers<TX | TXError> = {
 
       if (!mint_tx || !mint_tx.psbt) {
         console.error("Invalid mint_tx structure:", mint_tx);
-        return ResponseUtil.error(
+        return ResponseUtil.badRequest(
           "Error generating mint transaction: Invalid response structure",
-          400,
         );
       }
 
@@ -115,24 +113,21 @@ export const handler: Handlers<TX | TXError> = {
       });
     } catch (error: unknown) {
       console.error("Minting error:", error);
-
       const errorMessage = error instanceof Error
         ? error.message
         : "An unexpected error occurred during minting";
 
-      let statusCode = 400;
-
-      if (errorMessage.includes("insufficient funds")) {
-        statusCode = 400;
-      } else if (errorMessage.includes("UTXO selection failed")) {
-        statusCode = 400;
-      } else if (errorMessage.includes("Invalid satsPerKB parameter")) {
-        statusCode = 400;
-      } else {
-        statusCode = 500;
+      // Client errors (400)
+      if (
+        errorMessage.includes("insufficient funds") ||
+        errorMessage.includes("UTXO selection failed") ||
+        errorMessage.includes("Invalid satsPerKB parameter")
+      ) {
+        return ResponseUtil.badRequest(errorMessage);
       }
 
-      return ResponseUtil.error(errorMessage, statusCode);
+      // Server errors (500)
+      return ResponseUtil.internalError(error, errorMessage);
     }
   },
 };

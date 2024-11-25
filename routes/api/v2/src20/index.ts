@@ -3,17 +3,34 @@ import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC20TrxRequestParams } from "globals";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import {
+  DEFAULT_PAGINATION,
+  validateSortParam,
+} from "$server/services/routeValidationService.ts";
 
 export const handler: Handlers = {
   async GET(req) {
     const url = new URL(req.url);
-    const { limit, page } = getPaginationParams(url);
+    const pagination = getPaginationParams(url);
+
+    // Check if pagination validation failed
+    if (pagination instanceof Response) {
+      return pagination;
+    }
+
+    const { limit, page } = pagination;
+
+    // Validate sort parameter
+    const sortValidation = validateSortParam(url);
+    if (!sortValidation.isValid) {
+      return sortValidation.error!;
+    }
 
     const params: SRC20TrxRequestParams = {
       op: url.searchParams.get("op") ?? undefined,
-      sortBy: url.searchParams.get("sort") ?? "ASC",
-      page,
-      limit,
+      sortBy: sortValidation.data,
+      page: page || DEFAULT_PAGINATION.page,
+      limit: limit || DEFAULT_PAGINATION.limit,
     };
 
     try {
@@ -23,7 +40,7 @@ export const handler: Handlers = {
       );
       return ResponseUtil.success(result);
     } catch (error) {
-      return ResponseUtil.handleError(error, "Error processing request");
+      return ResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

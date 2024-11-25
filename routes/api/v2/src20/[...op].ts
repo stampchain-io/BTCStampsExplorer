@@ -16,7 +16,7 @@ export const handler: Handlers = {
       const splitOps = ops.flatMap((op) => op.split("/"));
 
       if (!splitOps.every((op) => validOps.includes(op))) {
-        return ResponseUtil.error("Invalid operation", 400);
+        return ResponseUtil.badRequest("Invalid operation");
       }
 
       const result = await Src20Controller.handleSrc20TransactionsRequest(req, {
@@ -25,7 +25,10 @@ export const handler: Handlers = {
       return ResponseUtil.success(result);
     } catch (error) {
       console.error("Error in src20/[...op] handler:", error);
-      return ResponseUtil.handleError(error, "Error processing SRC-20 request");
+      return ResponseUtil.internalError(
+        error,
+        "Error processing SRC-20 request",
+      );
     }
   },
 };

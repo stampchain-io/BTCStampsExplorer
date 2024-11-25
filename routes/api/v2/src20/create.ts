@@ -15,7 +15,7 @@ export const handler: Handlers<TX | TXError> = {
       console.log("SRC-20 request body:", rawBody);
 
       if (!rawBody) {
-        return ResponseUtil.error("Empty request body", 400);
+        return ResponseUtil.badRequest("Empty request body");
       }
 
       let body: InputData & { trxType?: TrxType };
@@ -23,7 +23,7 @@ export const handler: Handlers<TX | TXError> = {
         body = JSON.parse(rawBody);
       } catch (e) {
         console.error("JSON parse error:", e);
-        return ResponseUtil.error("Invalid JSON in request body", 400);
+        return ResponseUtil.badRequest("Invalid JSON in request body");
       }
 
       console.log("Parsed request body:", body);
@@ -38,7 +38,7 @@ export const handler: Handlers<TX | TXError> = {
 
       // Ensure at least one address exists
       if (!effectiveSourceAddress) {
-        return ResponseUtil.error(
+        return ResponseUtil.badRequest(
           "Either sourceAddress/fromAddress or changeAddress is required",
           400,
         );
@@ -145,12 +145,9 @@ export const handler: Handlers<TX | TXError> = {
       });
 
       if (error instanceof SyntaxError) {
-        return ResponseUtil.error("Invalid JSON in request body", 400);
+        return ResponseUtil.badRequest("Invalid JSON in request body");
       }
-      return ResponseUtil.error(
-        error instanceof Error ? error.message : "Unknown error occurred",
-        400,
-      );
+      return ResponseUtil.internalError(error, "Unknown error occurred");
     }
   },
 };

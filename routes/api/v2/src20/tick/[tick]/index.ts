@@ -5,22 +5,47 @@ import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { BigFloat } from "bigfloat/mod.ts";
+import {
+  DEFAULT_PAGINATION,
+  validateRequiredParams,
+  validateSortParam,
+} from "$server/services/routeValidationService.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
     try {
       const { tick } = ctx.params;
+
+      // Validate required parameters
+      const paramsValidation = validateRequiredParams({ tick });
+      if (!paramsValidation.isValid) {
+        return paramsValidation.error!;
+      }
+
       const url = new URL(req.url);
-      const { limit, page } = getPaginationParams(url);
+      const pagination = getPaginationParams(url);
+
+      // Check if pagination validation failed
+      if (pagination instanceof Response) {
+        return pagination;
+      }
+
+      const { limit, page } = pagination;
       const opParam = url.searchParams.get("op") || undefined;
 
+      // Validate sort parameter
+      const sortValidation = validateSortParam(url, "sortBy");
+      if (!sortValidation.isValid) {
+        return sortValidation.error!;
+      }
+
+      // Ensure required pagination values
       const params = {
         tick: convertEmojiToTick(String(tick)),
-        limit,
-        page,
+        limit: limit || DEFAULT_PAGINATION.limit,
+        page: page || DEFAULT_PAGINATION.page,
         op: opParam,
-        sortBy: url.searchParams.get("sortBy") ||
-          url.searchParams.get("sort") || "DESC",
+        sortBy: sortValidation.data,
       };
 
       // Fetch data using controller
@@ -28,7 +53,7 @@ export const handler: Handlers = {
         .getTickData(params);
 
       // Prepare pagination variables
-      const totalPages = Math.ceil(total / limit);
+      const totalPages = Math.ceil(total / (limit || DEFAULT_PAGINATION.limit));
 
       // Map data, ensuring all necessary fields are included
       const data = src20_txs.rows.map((tx: any) => ({
@@ -41,8 +66,8 @@ export const handler: Handlers = {
 
       // Construct response body
       const body: PaginatedTickResponseBody = {
-        page,
-        limit,
+        page: page || DEFAULT_PAGINATION.page,
+        limit: limit || DEFAULT_PAGINATION.limit,
         total,
         totalPages,
         last_block: lastBlock,
@@ -60,7 +85,7 @@ export const handler: Handlers = {
       return ResponseUtil.success(body);
     } catch (error) {
       console.error(error);
-      return ResponseUtil.handleError(error, "Error processing request");
+      return ResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

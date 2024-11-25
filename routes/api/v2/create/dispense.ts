@@ -24,7 +24,7 @@ export const handler: Handlers = {
 
       // Validate fee rate
       if (typeof options?.fee_per_kb !== "number" || options.fee_per_kb <= 0) {
-        return ResponseUtil.error("Invalid fee rate", 400);
+        return ResponseUtil.badRequest("Invalid fee rate");
       }
 
       // Add dust size to options
@@ -46,7 +46,7 @@ export const handler: Handlers = {
 
         if (!response?.result?.psbt) {
           if (response?.error) {
-            return ResponseUtil.error(response.error, 400);
+            return ResponseUtil.badRequest(response.error);
           }
           throw new Error("Failed to create dispense transaction.");
         }
@@ -69,14 +69,14 @@ export const handler: Handlers = {
         const errorMessage = error instanceof Error
           ? error.message
           : "Unknown error";
-        return ResponseUtil.error(errorMessage, 400);
+        return ResponseUtil.badRequest(errorMessage);
       }
     } catch (error: unknown) {
       console.error("Error processing dispense request:", error);
       const errorMessage = error instanceof Error
         ? error.message
         : "Failed to process dispense request";
-      return ResponseUtil.error(errorMessage, 400);
+      return ResponseUtil.badRequest(errorMessage);
     }
   },
 };

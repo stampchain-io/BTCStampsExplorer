@@ -81,27 +81,37 @@ export class DispenserManager {
 
   static async getDispensersByCpid(
     cpid: string,
-    filter: DispenserFilter = "open",
-  ): Promise<any[]> {
+    page: number = 1,
+    limit: number = 50,
+    cacheTimeout?: number,
+    filter: DispenserFilter = "all"
+  ): Promise<{ dispensers: any[], total: number }> {
     const endpoint = `/assets/${cpid}/dispensers`;
     let allDispensers: any[] = [];
     let cursor: string | null = null;
-    const limit = 1000;
+    const apiLimit = 1000;
 
-    console.log(`Fetching dispensers for CPID: ${cpid}, Filter: ${filter}`);
+    // Calculate how many items to skip based on page and limit
+    const skipCount = (page - 1) * limit;
+    let processedCount = 0;
+
+    console.log(`Fetching dispensers for CPID: ${cpid}, Filter: ${filter}, Page: ${page}, Limit: ${limit}`);
+
+    // Apply filter to API query if possible
+    const queryParams = new URLSearchParams({
+      limit: apiLimit.toString(),
+      status: filter === "all" ? undefined : filter
+    });
 
     while (true) {
-      const queryParams = new URLSearchParams({
-        limit: limit.toString(),
-      });
       if (cursor) {
-        queryParams.append("cursor", cursor);
+        queryParams.set("cursor", cursor);
       }
 
       try {
-        const response = await this.fetchXcpV2WithCache<any>(
+        const response = await fetchXcpV2WithCache(
           endpoint,
-          queryParams,
+          queryParams
         );
 
         if (!response || !Array.isArray(response.result)) {
@@ -127,155 +137,77 @@ export class DispenserManager {
           dispenser_info: dispenser.dispenser_info
         }));
 
-        allDispensers = allDispensers.concat(dispensers);
+        // If API doesn't support status filter, apply it client-side
+        const filteredDispensers = filter === "all"
+          ? dispensers
+          : dispensers.filter((dispenser) =>
+            filter === "open"
+              ? dispenser.give_remaining > 0
+              : dispenser.give_remaining === 0
+          );
 
-        if (response.next_cursor && response.next_cursor !== cursor) {
-          cursor = response.next_cursor;
-          console.log(`New cursor for CPID ${cpid}: ${cursor}`);
-        } else {
-          console.log(`No more pages for CPID ${cpid}`);
+        allDispensers = allDispensers.concat(filteredDispensers);
+        processedCount += filteredDispensers.length;
+
+        // If we have enough items for the requested page, break
+        if (allDispensers.length >= skipCount + limit) {
           break;
         }
+
+        if (!response.next_cursor || response.next_cursor === cursor) {
+          break;
+        }
+        cursor = response.next_cursor;
       } catch (error) {
         console.error(`Error fetching dispensers for cpid ${cpid}:`, error);
         break;
       }
     }
 
-    // Apply filtering
-    const filteredDispensers = filter === "all"
-      ? allDispensers
-      : allDispensers.filter((dispenser) =>
-        filter === "open"
-          ? dispenser.give_remaining > 0
-          : dispenser.give_remaining === 0
-      );
+    // Apply pagination to the collected results
+    const paginatedDispensers = allDispensers.slice(skipCount, skipCount + limit);
+    const total = allDispensers.length;
 
     console.log(
-      `Fetched dispensers for CPID: ${cpid}, Count: ${filteredDispensers.length}`,
+      `Fetched dispensers for CPID: ${cpid}, Count: ${total}`,
     );
 
-    return filteredDispensers;
+    return {
+      dispensers: paginatedDispensers,
+      total
+    };
   }
 
-  static async getAllOpenStampDispensers(page: number = 1, limit: number = 10) {
-    // FIXME: this is only returning the event for when they are opened, not all open dispensers
-    const endpoint = "/events/OPEN_DISPENSER";
-    let allDispensers: any[] = [];
+  static async getDispensesByCpid(
+    cpid: string,
+    page: number = 1,
+    limit: number = 50,
+    cacheTimeout?: number
+  ): Promise<{ dispenses: any[], total: number }> {
+    const endpoint = `/assets/${cpid}/dispenses`;
+    let allDispenses: any[] = [];
     let cursor: string | null = null;
     const apiLimit = 1000;
+
+    // Calculate how many items to skip based on page and limit
+    const skipCount = (page - 1) * limit;
+    let processedCount = 0;
+
+    console.log(`Fetching dispenses for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`);
 
     while (true) {
       const queryParams = new URLSearchParams({
         limit: apiLimit.toString(),
-      });
-      if (cursor) {
-        queryParams.append("cursor", cursor);
-      }
-
-      try {
-        const response = await this.fetchXcpV2WithCache<any>(
-          endpoint,
-          queryParams,
-        );
-
-        if (!response || !Array.isArray(response.result)) {
-          break;
-        }
-
-        const dispensers = response.result.map((event: any) => ({
-          tx_hash: event.tx_hash,
-          block_index: event.block_index,
-          source: event.params.source,
-          cpid: event.params.asset,
-          give_quantity: event.params.give_quantity,
-          give_remaining: event.params.give_remaining,
-          escrow_quantity: event.params.escrow_quantity,
-          satoshirate: event.params.satoshirate,
-          btcrate: Number(formatSatoshisToBTC(event.params.satoshirate, { 
-            includeSymbol: false 
-          })),
-          origin: event.params.origin,
-        }));
-
-        allDispensers = allDispensers.concat(dispensers);
-
-        cursor = response.next_cursor || null;
-        if (!cursor) {
-          break;
-        }
-      } catch (error) {
-        console.error("Error fetching open dispensers:", error);
-        break;
-      }
-    }
-
-    const assetIds = [
-      ...new Set(allDispensers.map((dispenser) => dispenser.cpid)),
-    ];
-
-    const stamps = await StampService.getStamps({
-      identifier: assetIds,
-      allColumns: true,
-      noPagination: true,
-    });
-
-    // Handle the possibility of `stamps` being `null`
-    if (!stamps || !stamps.stamps) {
-      throw new Error("Failed to fetch stamps");
-    }
-
-    // Explicitly type the `stamp` parameter
-    const stampMap = new Map(
-      stamps.stamps.map((stamp: { cpid: string }) => [stamp.cpid, stamp]),
-    );
-
-    const filteredDispensers = allDispensers.filter((dispenser) =>
-      stampMap.has(dispenser.cpid)
-    );
-
-    const mappedDispensersPromises = filteredDispensers.map(
-      async (dispenser) => {
-        const dispenses = await this.getDispensesByCpid(dispenser.cpid);
-        return {
-          ...dispenser,
-          dispenses,
-          stamp: stampMap.get(dispenser.cpid),
-        };
-      },
-    );
-
-    const mappedDispensers = await Promise.all(mappedDispensersPromises);
-
-    const total = mappedDispensers.length;
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedDispensers = mappedDispensers.slice(startIndex, endIndex);
-
-    return { total, dispensers: paginatedDispensers };
-  }
-
-  static async getDispensesByCpid(cpid: string) {
-    const endpoint = `/assets/${cpid}/dispenses`;
-    let allDispenses: any[] = [];
-    let cursor: string | null = null;
-    const limit = 1000;
-
-    console.log(`Fetching dispenses for CPID: ${cpid}`);
-
-    while (true) {
-      const queryParams = new URLSearchParams({
-        limit: limit.toString(),
         verbose: "true",
       });
       if (cursor) {
-        queryParams.append("cursor", cursor);
+        queryParams.set("cursor", cursor);
       }
 
       try {
-        const response = await this.fetchXcpV2WithCache<any>(
+        const response = await fetchXcpV2WithCache(
           endpoint,
-          queryParams,
+          queryParams
         );
 
         if (!response || !Array.isArray(response.result)) {
@@ -298,14 +230,18 @@ export class DispenserManager {
         }));
 
         allDispenses = allDispenses.concat(dispenses);
+        processedCount += dispenses.length;
 
-        if (response.next_cursor && response.next_cursor !== cursor) {
-          cursor = response.next_cursor;
-          console.log(`New cursor for CPID ${cpid}: ${cursor}`);
-        } else {
-          console.log(`No more pages for CPID ${cpid}`);
+        // If we have enough items for the requested page, break
+        if (allDispenses.length >= skipCount + limit) {
           break;
         }
+
+        // Break if no next cursor or if it's the same as current
+        if (!response.next_cursor || response.next_cursor === cursor) {
+          break;
+        }
+        cursor = response.next_cursor;
       } catch (error) {
         console.error(
           `Error fetching dispenses for cpid ${cpid}:`,
@@ -315,11 +251,18 @@ export class DispenserManager {
       }
     }
 
+    // Apply pagination to the collected results
+    const paginatedDispenses = allDispenses.slice(skipCount, skipCount + limit);
+    const total = allDispenses.length;
+
     console.log(
-      `Fetched dispenses for CPID: ${cpid}, Count: ${allDispenses.length}`,
+      `Fetched dispenses for CPID: ${cpid}, Count: ${total}`,
     );
 
-    return allDispenses;
+    return {
+      dispenses: paginatedDispenses,
+      total
+    };
   }
 }
 
@@ -416,30 +359,38 @@ export class XcpManager {
     return allAssets.slice(0, maxRecords);
   }
 
-  static async getXcpHoldersByCpid(cpid: string): Promise<any[]> {
+  static async getXcpHoldersByCpid(
+    cpid: string,
+    page: number = 1,
+    limit: number = 50,
+    cacheTimeout?: number
+  ): Promise<{ holders: any[], total: number }> {
     const endpoint = `/assets/${cpid}/balances`;
     let allHolders: any[] = [];
     let cursor: string | null = null;
-    const limit = 1000;
+    const apiLimit = 1000;
 
-    console.log(`Fetching XCP holders for CPID: ${cpid}`);
+    // Calculate how many items to skip based on page and limit
+    const skipCount = (page - 1) * limit;
+    let processedCount = 0;
+
+    console.log(`Fetching XCP holders for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`);
 
     while (true) {
       const queryParams = new URLSearchParams({
-        limit: limit.toString(),
+        limit: apiLimit.toString(),
       });
       if (cursor) {
-        queryParams.append("cursor", cursor);
+        queryParams.set("cursor", cursor);
       }
 
       try {
-        const response = await this.fetchXcpV2WithCache<any>(
+        const response = await fetchXcpV2WithCache(
           endpoint,
-          queryParams,
+          queryParams
         );
 
         if (!response || !Array.isArray(response.result)) {
-          console.log(`No more results for CPID: ${cpid}`);
           break;
         }
 
@@ -451,25 +402,32 @@ export class XcpManager {
           }));
 
         allHolders = allHolders.concat(holders);
+        processedCount += holders.length;
 
-        if (response.next_cursor && response.next_cursor !== cursor) {
-          cursor = response.next_cursor;
-          console.log(`New cursor for CPID ${cpid}: ${cursor}`);
-        } else {
-          console.log(`No more pages for CPID ${cpid}`);
+        // If we have enough items for the requested page, break
+        if (allHolders.length >= skipCount + limit) {
           break;
         }
+
+        // Break if no next cursor or if it's the same as current
+        if (!response.next_cursor || response.next_cursor === cursor) {
+          break;
+        }
+        cursor = response.next_cursor;
       } catch (error) {
         console.error(`Error fetching holders for cpid ${cpid}:`, error);
         break;
       }
     }
 
-    console.log(
-      `Fetched XCP holders for CPID: ${cpid}, Count: ${allHolders.length}`,
-    );
+    // Apply pagination to the collected results
+    const paginatedHolders = allHolders.slice(skipCount, skipCount + limit);
+    const total = allHolders.length;
 
-    return allHolders;
+    return {
+      holders: paginatedHolders,
+      total
+    };
   }
 
   static getXcpBalancesByAddress = async (
@@ -590,24 +548,35 @@ export class XcpManager {
     return allBalances;
   };
 
-  static async getXcpSendsByCPID(cpid: string): Promise<any[]> {
+  static async getXcpSendsByCPID(
+    cpid: string,
+    page: number = 1,
+    limit: number = 50,
+    cacheTimeout?: number
+  ): Promise<{ sends: any[], total: number }> {
     const endpoint = `/assets/${cpid}/sends`;
     let allSends: any[] = [];
     let cursor: string | null = null;
-    const limit = 1000;
+    const apiLimit = 1000;
 
-    console.log(`Fetching XCP sends for CPID: ${cpid}`);
+    // Calculate how many items to skip based on page and limit
+    const skipCount = (page - 1) * limit;
+    let processedCount = 0;
+
+    console.log(`Fetching XCP sends for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`);
 
     while (true) {
-      const queryParams = new URLSearchParams({ limit: limit.toString() });
+      const queryParams = new URLSearchParams({
+        limit: apiLimit.toString(),
+      });
       if (cursor) {
-        queryParams.append("cursor", cursor);
+        queryParams.set("cursor", cursor);
       }
 
       try {
-        const response = await this.fetchXcpV2WithCache<any>(
+        const response = await fetchXcpV2WithCache(
           endpoint,
-          queryParams,
+          queryParams
         );
 
         if (!response || !Array.isArray(response.result)) {
@@ -626,25 +595,36 @@ export class XcpManager {
         }));
 
         allSends = allSends.concat(sends);
+        processedCount += sends.length;
 
-        if (response.next_cursor && response.next_cursor !== cursor) {
-          cursor = response.next_cursor;
-          console.log(`New cursor for CPID ${cpid}: ${cursor}`);
-        } else {
-          console.log(`No more pages for CPID ${cpid}`);
+        // If we have enough items for the requested page, break
+        if (allSends.length >= skipCount + limit) {
           break;
         }
+
+        // Break if no next cursor or if it's the same as current
+        if (!response.next_cursor || response.next_cursor === cursor) {
+          break;
+        }
+        cursor = response.next_cursor;
       } catch (error) {
         console.error(`Error fetching sends for cpid ${cpid}:`, error);
         break;
       }
     }
 
+    // Apply pagination to the collected results
+    const paginatedSends = allSends.slice(skipCount, skipCount + limit);
+    const total = allSends.length;
+
     console.log(
-      `Fetched XCP sends for CPID: ${cpid}, Count: ${allSends.length}`,
+      `Fetched XCP sends for CPID: ${cpid}, Count: ${total}`,
     );
 
-    return allSends;
+    return {
+      sends: paginatedSends,
+      total
+    };
   }
 
   private static getDispenseEvents(
@@ -1199,7 +1179,7 @@ export class XcpManager {
         limit: limit.toString(),
       });
       if (cursor) {
-        queryParams.append("cursor", cursor);
+        queryParams.set("cursor", cursor);
       }
 
       try {
@@ -1244,13 +1224,12 @@ export class XcpManager {
 
         allFairminters = allFairminters.concat(fairminters);
 
-        if (response.next_cursor && response.next_cursor !== cursor) {
-          cursor = response.next_cursor;
-          console.log(`New cursor for fairminters: ${cursor}`);
-        } else {
+        // Break if no next cursor or if it's the same as current
+        if (!response.next_cursor || response.next_cursor === cursor) {
           console.log("No more pages for fairminters");
           break;
         }
+        cursor = response.next_cursor;
       } catch (error) {
         console.error("Error fetching fairminters:", error);
         break;
@@ -1392,7 +1371,16 @@ export class XcpManager {
 
   static async getDispensersByAddress(
     address: string,
-    options: DispensersByAddressOptions = {}
+    options: {
+      status?: string;
+      cursor?: string;
+      limit?: number;
+      page?: number;
+      offset?: number;
+      sort?: string;
+      verbose?: boolean;
+      show_unconfirmed?: boolean;
+    } = {}
   ): Promise<{ dispensers: Dispenser[]; total: number }> {
     const endpoint = `/addresses/${address}/dispensers`;
     const queryParams = new URLSearchParams();
@@ -1406,11 +1394,15 @@ export class XcpManager {
     if (options.verbose) queryParams.append('verbose', 'true');
     if (options.show_unconfirmed) queryParams.append('show_unconfirmed', 'true');
 
+    // Handle pagination
+    const page = options.page || 1;
+    const limit = options.limit || 50;
+    const skipCount = (page - 1) * limit;
+
     try {
       const response = await this.fetchXcpV2WithCache<any>(endpoint, queryParams);
       
       if (!response || !Array.isArray(response.result)) {
-        console.log(`No dispensers found for address: ${address}`);
         return {
           dispensers: [],
           total: 0
@@ -1430,13 +1422,16 @@ export class XcpManager {
         origin: dispenser.origin,
         confirmed: dispenser.confirmed,
         close_block_index: dispenser.close_block_index,
-        status: String(dispenser.status || "unknown").toLowerCase() as 'open' | 'closed' | 'unknown',
+        status: String(dispenser.status || "unknown").toLowerCase(),
         asset_info: dispenser.asset_info,
         dispenser_info: dispenser.dispenser_info
       }));
 
+      // Apply pagination
+      const paginatedDispensers = dispensers.slice(skipCount, skipCount + limit);
+
       return {
-        dispensers,
+        dispensers: paginatedDispensers,
         total: dispensers.length
       };
     } catch (error) {

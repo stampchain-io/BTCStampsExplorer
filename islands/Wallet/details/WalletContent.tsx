@@ -113,7 +113,29 @@ const ItemHeader = (
   );
 };
 
-function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
+function DispenserItem({
+  dispensers = [],
+  openPagination,
+  closedPagination,
+  onOpenPageChange,
+  onClosedPageChange,
+}: {
+  dispensers?: Dispenser[];
+  openPagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  closedPagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  onOpenPageChange?: (page: number) => void;
+  onClosedPageChange?: (page: number) => void;
+}) {
   // If no dispensers, show empty state
   if (!dispensers?.length) {
     return (
@@ -158,6 +180,16 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
                 <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
             </div>
+            {/* Open Listings Pagination */}
+            {openPagination && openPagination.totalPages > 1 && (
+              <div class="mt-6">
+                <Pagination
+                  page={openPagination.page}
+                  totalPages={openPagination.totalPages}
+                  onChange={onOpenPageChange}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -172,6 +204,16 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
                 <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
             </div>
+            {/* Closed Listings Pagination */}
+            {closedPagination && closedPagination.totalPages > 1 && (
+              <div class="mt-6">
+                <Pagination
+                  page={closedPagination.page}
+                  totalPages={closedPagination.totalPages}
+                  onChange={onClosedPageChange}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -189,6 +231,16 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
                 <DispenserRow dispenser={dispenser} view="mobile" />
               ))}
             </div>
+            {/* Open Listings Pagination (Mobile) */}
+            {openPagination && openPagination.totalPages > 1 && (
+              <div class="mt-6">
+                <Pagination
+                  page={openPagination.page}
+                  totalPages={openPagination.totalPages}
+                  onChange={onOpenPageChange}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -203,6 +255,16 @@ function DispenserItem({ dispensers = [] }: { dispensers?: Dispenser[] }) {
                 <DispenserRow dispenser={dispenser} view="mobile" />
               ))}
             </div>
+            {/* Closed Listings Pagination (Mobile) */}
+            {closedPagination && closedPagination.totalPages > 1 && (
+              <div class="mt-6">
+                <Pagination
+                  page={closedPagination.page}
+                  totalPages={closedPagination.totalPages}
+                  onChange={onClosedPageChange}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -474,7 +536,7 @@ export default function WalletContent(
         </div>
       </div>
 
-      {/* Listening Pagination */}
+      {/* Listing Pagination */}
       {src20.data.length && (
         <div class="mt-9 mobileLg:mt-[72px]">
           <Pagination

@@ -283,6 +283,7 @@ hooks.beforeEachValidation(async (transaction, done) => {
       transaction.real.body = JSON.stringify({
         error: "Internal Server Error",
         message: "Simulated server error for testing purposes",
+        status: 500,
       });
       return done();
     } else if (transaction.name.includes("404")) {
@@ -291,6 +292,7 @@ hooks.beforeEachValidation(async (transaction, done) => {
       transaction.real.body = JSON.stringify({
         error: "Not Found",
         message: "Simulated not found error for testing purposes",
+        status: 404,
       });
       return done();
     } else if (transaction.name.includes("400")) {
@@ -299,6 +301,7 @@ hooks.beforeEachValidation(async (transaction, done) => {
       transaction.real.body = JSON.stringify({
         error: "Bad Request",
         message: "Simulated bad request error for testing purposes",
+        status: 400,
       });
       return done();
     }

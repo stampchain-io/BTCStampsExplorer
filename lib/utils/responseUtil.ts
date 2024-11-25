@@ -1,22 +1,65 @@
+import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
+
+// Update this when making breaking changes to response format
+const API_RESPONSE_VERSION = "v2";
+
+interface ResponseOptions {
+  forceNoCache?: boolean;
+  routeType?: RouteType;
+}
+
 export class ResponseUtil {
-  static success<T>(data: T, status: number = 200): Response {
+  static success(data: unknown, options: ResponseOptions = {}) {
+    if (options.routeType) {
+      return this.successWithCache(data, options);
+    }
+
     return new Response(JSON.stringify(data), {
-      status,
-      headers: { "Content-Type": "application/json" },
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Version": API_RESPONSE_VERSION,
+      },
     });
   }
 
-  static successArray<T>(data: T[], status: number = 200): Response {
-    return new Response(JSON.stringify(data), {
-      status,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+  static successWithCache(data: unknown, options: ResponseOptions) {
+    const { duration, staleWhileRevalidate, staleIfError } = getCacheConfig(
+      options.routeType || RouteType.DYNAMIC,
+    );
 
-  static error(message: string, status: number = 400): Response {
-    return new Response(JSON.stringify({ error: message }), {
-      status,
-      headers: { "Content-Type": "application/json" },
+    // Force no-cache if specified or duration is 0
+    if (options.forceNoCache || duration === 0) {
+      return new Response(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store, must-revalidate",
+          "X-API-Version": API_RESPONSE_VERSION,
+        },
+      });
+    }
+
+    const cacheControl = [
+      "public",
+      `max-age=${duration}`,
+      staleWhileRevalidate
+        ? `stale-while-revalidate=${staleWhileRevalidate}`
+        : "",
+      staleIfError ? `stale-if-error=${staleIfError}` : "",
+    ].filter(Boolean).join(", ");
+
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": cacheControl,
+        "CDN-Cache-Control": cacheControl,
+        "Cloudflare-CDN-Cache-Control": cacheControl,
+        "Surrogate-Control": `max-age=${duration}`,
+        "Vary": "Accept-Encoding, X-API-Version",
+        "X-API-Version": API_RESPONSE_VERSION,
+      },
     });
   }
 
@@ -25,13 +68,15 @@ export class ResponseUtil {
     status: number,
     headers?: HeadersInit,
   ): Response {
-    const defaultHeaders = { "Content-Type": "application/json" };
+    const defaultHeaders = {
+      "Content-Type": "application/json",
+      "X-API-Version": API_RESPONSE_VERSION,
+    };
     const responseHeaders = headers
       ? { ...defaultHeaders, ...headers }
       : defaultHeaders;
 
     return new Response(
-      // Only stringify if the body isn't already BufferLike
       body instanceof ArrayBuffer || body instanceof Uint8Array
         ? body
         : JSON.stringify(body),
@@ -42,19 +87,48 @@ export class ResponseUtil {
     );
   }
 
-  static notFound(message: string = "Resource not found"): Response {
+  static badRequest(message: string) {
     return new Response(
       JSON.stringify({ error: message }),
       {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          "X-API-Version": API_RESPONSE_VERSION,
+        },
       },
     );
   }
 
-  static handleError(error: unknown, defaultMessage: string): Response {
+  static notFound(message: string) {
+    return new Response(
+      JSON.stringify({ error: message }),
+      {
+        status: 404,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          "X-API-Version": API_RESPONSE_VERSION,
+        },
+      },
+    );
+  }
+
+  static internalError(error: unknown, message?: string) {
     console.error(error);
-    const message = error instanceof Error ? error.message : defaultMessage;
-    return this.error(message, 500);
+    return new Response(
+      JSON.stringify({
+        error: message || "Internal server error",
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          "X-API-Version": API_RESPONSE_VERSION,
+        },
+      },
+    );
   }
 }

@@ -2,24 +2,43 @@ import { Handlers } from "$fresh/server.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import {
+  checkEmptyResult,
+  DEFAULT_PAGINATION,
+} from "$server/services/routeValidationService.ts";
+import { RouteType } from "$server/services/cacheService.ts";
 
 export const handler: Handlers = {
   async GET(req) {
     try {
       const url = new URL(req.url);
-      const { limit, page } = getPaginationParams(url);
+      const pagination = getPaginationParams(url);
+
+      // Check if pagination validation failed
+      if (pagination instanceof Response) {
+        return pagination;
+      }
+
+      const { limit, page } = pagination;
       const creator = url.searchParams.get("creator") ?? undefined;
 
       const result = await CollectionController.getCollectionDetails({
-        limit,
-        page,
+        limit: limit || DEFAULT_PAGINATION.limit,
+        page: page || DEFAULT_PAGINATION.page,
         creator,
       });
 
-      return ResponseUtil.success(result);
+      // Check for empty result
+      const emptyCheck = checkEmptyResult(result, "collection data");
+      if (emptyCheck) {
+        return emptyCheck;
+      }
+
+      // Return with long cache duration for collections
+      return ResponseUtil.success(result, { routeType: RouteType.COLLECTION });
     } catch (error) {
       console.error("Error in GET handler:", error);
-      return ResponseUtil.handleError(
+      return ResponseUtil.internalError(
         error,
         "Error processing collections request",
       );

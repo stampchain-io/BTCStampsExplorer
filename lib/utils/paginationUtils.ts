@@ -1,9 +1,10 @@
 import { PaginationQueryParams } from "globals";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 export function getPaginationParams(
   url: URL,
   type?: string,
-): PaginationQueryParams {
+): PaginationQueryParams | Response {
   let defaultLimit = 50;
 
   if (url.pathname.includes("/wallet/")) {
@@ -16,6 +17,15 @@ export function getPaginationParams(
   const prefix = type ? `${type}_` : "";
   const limit = Number(url.searchParams.get(`${prefix}limit`)) || defaultLimit;
   const page = Number(url.searchParams.get(`${prefix}page`)) || 1;
+
+  // Validate numeric parameters
+  if (isNaN(limit) || limit < 1) {
+    return ResponseUtil.badRequest("Invalid limit parameter");
+  }
+  if (isNaN(page) || page < 1) {
+    return ResponseUtil.badRequest("Invalid page parameter");
+  }
+
   return { limit, page };
 }
 

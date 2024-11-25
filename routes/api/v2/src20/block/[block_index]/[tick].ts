@@ -20,7 +20,7 @@ export const handler: Handlers = {
       return ResponseUtil.success(result);
     } catch (error) {
       console.error("Error in block/tick handler:", error);
-      return ResponseUtil.handleError(
+      return ResponseUtil.internalError(
         error,
         "Error processing block/tick request",
       );

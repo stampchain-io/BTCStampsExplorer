@@ -66,18 +66,10 @@ paths:
                     enum: ["OK"]
                 required:
                   - status
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
 
   /api/v2/docs:
     get:
@@ -93,19 +85,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/APIDocs"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: Documentation not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  
   /api/v2/version:
     get:
       operationId: getApiVersion
@@ -123,18 +107,10 @@ paths:
                 properties:
                   version:
                     type: string
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: Version information not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
 
   /api/v2/error:
     get:
@@ -151,11 +127,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponseBody"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/balance/{address}:
     get:
@@ -180,23 +152,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedBalanceResponseBody"
         "400":
-          description: Bad Request - Invalid address format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Address not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/block/{block_index}:
     get:
@@ -221,23 +181,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/BlockInfoResponseBody"
         "400":
-          description: Bad Request - Invalid block index format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Block not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/block/block_count/{number}:
     get:
@@ -250,7 +198,7 @@ paths:
         - in: path
           name: number
           required: true
-          example: 2
+          example: 1
           schema:
             type: integer
           description: The number of last blocks to retrieve
@@ -264,23 +212,11 @@ paths:
                 items:
                   $ref: "#/components/schemas/BlockRow"
         "400":
-          description: Bad Request - Invalid number format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: No blocks found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/collections:
     get:
@@ -312,24 +248,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedCollectionResponseBody"
-        "400":
-          description: Bad Request - Invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: No collections found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalError"
 
   /api/v2/cursed:
     get:
@@ -341,7 +263,7 @@ paths:
       parameters:
         - in: query
           name: limit
-          example: 2
+          example: 1
           schema:
             type: integer
           description: "The maximum number of stamps to retrieve (default: 50)"
@@ -357,24 +279,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedStampResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: No cursed stamps found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalError"
 
   /api/v2/cursed/{id}:
     get:
@@ -401,23 +309,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/StampResponseBody"
         "400":
-          description: Bad Request - Invalid ID format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Cursed stamp not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/cursed/block/{block_index}:
     get:
@@ -442,23 +339,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/StampBlockResponseBody"
         "400":
-          description: Bad Request - Invalid block index format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Block not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/src20:
     get:
@@ -470,7 +356,7 @@ paths:
       parameters:
         - in: query
           name: limit
-          example: 2
+          example: 1
           schema:
             type: integer
             minimum: 1
@@ -490,24 +376,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: No transactions found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalError"
 
   /api/v2/src20/balance/{address}:
     get:
@@ -526,7 +398,7 @@ paths:
           description: The address of the wallet
         - in: query
           name: limit
-          example: 2
+          example: 1
           schema:
             type: integer
             minimum: 1
@@ -545,18 +417,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Address Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/src20/balance/{address}/{tick}:
     get:
@@ -587,18 +454,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Src20BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Address/Tick Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/src20/balance/snapshot/{tick}:
     get:
@@ -619,7 +481,7 @@ paths:
           description: The SRC20 tick value
         - in: query
           name: limit
-          example: 2
+          example: 1
           schema:
             type: integer
             minimum: 1
@@ -640,23 +502,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Src20SnapshotResponseBody"
         "400":
-          description: Bad Request - Invalid tick format or pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Tick not found or no balances exist
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/src20/block/{block_index}:
     get:
@@ -710,24 +561,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
         "400":
-          description: Bad Request - Invalid block index or query parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Block not found or no transactions in block
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
+        
   /api/v2/src20/block/{block_index}/{tick}:
     get:
       operationId: getSrc20BlockTickTransactions
@@ -792,23 +632,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
         "400":
-          description: Bad Request - Invalid block index, tick format, or query parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Block or tick not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/src20/tick:
     get:
@@ -822,7 +651,7 @@ paths:
           name: limit
           schema:
             type: integer
-            example: 2
+            example: 1
             minimum: 1
             default: 50
           description: The maximum number of transactions to retrieve per page
@@ -854,24 +683,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc20ResponseBody"
-        "400":
-          description: Bad Request - Invalid query parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: No transactions found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalError"
 
   /api/v2/src20/tick/{tick}:
     get:
@@ -920,24 +735,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedTickResponseBody"
         "400":
-          description: Bad Request - Invalid tick format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Tick not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
+  
   /api/v2/src20/tick/{tick}/deploy:
     get:
       operationId: getSrc20TickDeployInfo
@@ -961,23 +765,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/TickResponseBody"
         "400":
-          description: Bad Request - Invalid tick format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Deployment not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
 
   /api/v2/src20/tx/{tx_hash}:
@@ -1003,23 +795,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Src20ResponseBody"
         "400":
-          description: Bad Request - Invalid transaction hash format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Transaction not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/src101:
     get:
@@ -1031,7 +812,7 @@ paths:
       parameters:
         - in: query
           name: limit
-          example: 2
+          example: 1
           schema:
             type: integer
             minimum: 1
@@ -1051,24 +832,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: No SRC-101 transactions found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalError"
 
   /api/v2/src101/tx:
     get:
@@ -1080,7 +847,7 @@ paths:
       parameters:
         - in: query
           name: limit
-          example: 2
+          example: 1
           schema:
             type: integer
             minimum: 1
@@ -1122,25 +889,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
-        "400":
-          description: Bad Request - Invalid query parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: No matching transactions found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-
+          $ref: "#/components/responses/InternalError"
+  
   /api/v2/src101/tx/{tx_hash}:
     get:
       operationId: getSrc101TransactionByHash
@@ -1152,7 +905,7 @@ paths:
         - in: path
           name: tx_hash
           required: true
-          example: "11e4b91d35040f3bc71c5c0f80be9f0ebc3c7073bdcee01651914062dde5733e"
+          example: "ffd10ada1715fd53d427442613ceb9e910ddceea61e26fc4ab87e870468a3c61"
           schema:
             type: string
           description: The hash of the transaction
@@ -1164,23 +917,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
         "400":
-          description: Bad Request - Invalid transaction hash format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Transaction not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src101/{deploy_hash}/deploy:
     get:
@@ -1205,23 +946,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
         "400":
-          description: Bad Request - Invalid deploy hash format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Deployment not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/src101/{deploy_hash}/total:
     get:
@@ -1246,23 +976,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/TotalSrc101ResponseBody"
         "400":
-          description: Bad Request - Invalid deploy hash format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Deploy hash not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
 
   /api/v2/src101/{deploy_hash}/address/{address_btc}:
@@ -1277,7 +996,7 @@ paths:
           name: limit
           schema:
             type: integer
-            example: 2
+            example: 1
             minimum: 1
             default: 50
           description: The maximum number of transactions to retrieve per page
@@ -1321,24 +1040,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenidSrc101ResponseBody'
-        '400':
-          description: Bad Request - Invalid deploy hash or address format
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '404':
-          description: No tokens found for this address
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
-        '500':
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponseBody'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
   /api/v2/src101/balance/{address}:
     get:
       operationId: getSrc101AddressBalance
@@ -1356,7 +1065,7 @@ paths:
           description: The Bitcoin address to query
         - in: query
           name: limit
-          example: 2
+          example: 1
           schema:
             type: integer
             minimum: 1
@@ -1377,23 +1086,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedSrc101BalanceResponseBody"
         "400":
-          description: Bad Request - Invalid address format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Address not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src101/{deploy_hash}/{tokenid}:
     get:
@@ -1424,18 +1121,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Src101BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Token not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/src101/index/{deploy_hash}/{index}:
     get:
@@ -1466,18 +1157,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Src101BalanceResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Token not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/stamps:
     get:
@@ -1489,7 +1174,7 @@ paths:
       parameters:
         - in: query
           name: limit
-          example: 2
+          example: 1
           schema:
             type: integer
           description: The maximum number of stamps to return per page. Defaults to 50.
@@ -1512,24 +1197,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedStampResponseBody"
-        "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
         "404":
-          description: No stamps found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalError"
 
   /api/v2/stamps/{id}:
     get:
@@ -1554,23 +1225,229 @@ paths:
               schema:
                 $ref: "#/components/schemas/StampResponseBody"
         "400":
-          description: Bad Request - Invalid ID format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Stamp not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
+          $ref: "#/components/responses/InternalServerError"
+
+
+  /api/v2/stamps/{id}/holders:
+    get:
+      operationId: getStampHolders
+      tags:
+        - Stamps
+      summary: Get holders for a specific stamp
+      description: Retrieve all current holders of a specific stamp.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "5"
+          schema:
+            type: string
+          description: Stamp number, cpid, or stamp_hash
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+          description: Number of records per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+      responses:
+        "200":
+          description: Successful response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+                allOf:
+                  - $ref: "#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                            quantity:
+                              type: number
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+  /api/v2/stamps/{id}/dispensers:
+    get:
+      operationId: getStampDispensersById
+      tags:
+        - Stamps
+        - Dispensers
+      summary: Get all dispensers for a specific stamp
+      description: Retrieve all dispensers (open and closed) for a specific stamp.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "5"
+          schema:
+            type: string
+          description: Stamp number, cpid, or stamp_hash
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+          description: Number of records per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/DispenserRow"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+  /api/v2/stamps/{id}/sends:
+    get:
+      operationId: getStampSends
+      tags:
+        - Stamps
+      summary: Get send history for a specific stamp
+      description: Retrieve the complete transfer history for a specific stamp.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "5"
+          schema:
+            type: string
+          description: Stamp number, cpid, or stamp_hash
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+          description: Number of records per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            tx_hash:
+                              type: string
+                            block_index:
+                              type: number
+                            source:
+                              type: string
+                            destination:
+                              type: string
+                            quantity:
+                              type: number
+                            block_time:
+                              type: string
+                              format: date-time
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+  /api/v2/stamps/{id}/dispenses:
+    get:
+      operationId: getStampDispenses
+      tags:
+        - Stamps
+        - Dispensers
+      summary: Get dispense history for a specific stamp
+      description: Retrieve the complete dispense history for a specific stamp.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          example: "5"
+          schema:
+            type: string
+          description: Stamp number, cpid, or stamp_hash
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+          description: Number of records per page
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/DispenseRow"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/stamps/balance/{address}:
     get:
@@ -1589,7 +1466,7 @@ paths:
             type: string
         - in: query
           name: limit
-          example: 2
+          example: 1
           description: "The maximum number of stamp balances to retrieve. default: 50"
           schema:
             type: integer
@@ -1606,23 +1483,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedStampBalanceResponseBody"
         "400":
-          description: Bad Request - Invalid address format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Address not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
 
   /api/v2/stamps/block/{block_index}:
     get:
@@ -1646,18 +1512,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StampBlockResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: Block not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
+
+
 
   /api/v2/stamps/ident/{ident}:
     get:
@@ -1676,7 +1538,7 @@ paths:
             type: string
         - in: query
           name: limit
-          example: 2
+          example: 1
           description: "The maximum number of stamps to retrieve (default: 50)"
           schema:
             type: integer
@@ -1692,110 +1554,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedIdResponseBody"
-        "404":
-          description: Stamps with the provided ident not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-
-  /api/v2/stamps/dispensers:
-    get:
-      operationId: getStampDispensers
-      tags:
-        - Stamps
-        - Dispensers
-      summary: Get all open dispensers
-      description: Retrieve all open counterparty dispensers for stamps.
-      parameters:
-        - in: query
-          name: limit
-          example: 2
-          schema:
-            type: integer
-            minimum: 1
-            default: 50
-          description: The maximum number of dispensers to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of dispensers to retrieve
-      responses:
-        "200":
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PaginatedDispenserResponseBody"
         "400":
-          description: Bad Request - Invalid pagination parameters
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
         "404":
-          description: No dispensers found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/NotFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/InternalServerError"
 
-  /api/v2/stamps/dispensers/{id}:
-    get:
-      operationId: getStampDispenserById
-      tags:
-        - Stamps
-        - Dispensers
-      summary: Get open dispensers by stamp number, cpid, or stamp_hash
-      description: Retrieve open dispensers for a specific stamp identified by its number, cpid, or stamp_hash.
-      parameters:
-        - in: path
-          name: id
-          required: true
-          example: "A666240355190303432"
-          description: Stamp number, cpid, or stamp_hash
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DispenserResponseBody"
-        "400":
-          description: Bad Request - Invalid ID format
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "404":
-          description: Dispenser not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
-        "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/src20/create:
     post:
@@ -1863,11 +1628,12 @@ paths:
                     type: integer
                     description: The change value
         "400":
-          description: Bad request error response.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 
 
   /api/v2/olga/mint:
@@ -1931,11 +1697,12 @@ paths:
                     type: integer
                     description: The change value
         "400":
-          description: Bad request error response.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseBody"
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 
 
 components:
@@ -1948,7 +1715,6 @@ components:
 
   examples:
     DeployExample:
-      summary: Example deploy request
       value:
         toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
         changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
@@ -1960,7 +1726,6 @@ components:
         dec: 18
 
     MintExample:
-      summary: Example mint request
       value:
         toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
         changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
@@ -1970,7 +1735,6 @@ components:
         amt: "1000"
 
     TransferExample:
-      summary: Example transfer request
       value:
         fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
         toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
@@ -2006,10 +1770,8 @@ components:
         block_hash:
           type: string
         block_time:
-          oneOf:
-            - type: number
-            - type: string
-              format: date-time
+          type: string
+          format: date-time
         previous_block_hash:
           type: string
         ledger_hash:
@@ -2079,9 +1841,110 @@ components:
       type: object
       properties:
         stamp:
-          oneOf:
-            - type: number
-            - type: "null"
+          type: number
+          nullable: true
+        block_index:
+          type: number
+        cpid:
+          type: string
+        creator:
+          type: string
+        divisible:
+          type: number
+        keyburn:
+          type: number
+          nullable: true
+        locked:
+          type: number
+        stamp_base64:
+          type: string
+        stamp_mimetype:
+          type: string
+        stamp_url:
+          type: string
+        supply:
+          type: number
+          nullable: true
+        tx_hash:
+          type: string
+        tx_index:
+          type: number
+        ident:
+          $ref: "#/components/schemas/SUBPROTOCOLS"
+        creator_name:
+          type: string
+          nullable: true
+        stamp_hash:
+          type: string
+        is_btc_stamp:
+          type: number
+        file_hash:
+          type: string
+        floorPrice:
+          type: number
+          nullable: true
+          description: "Current floor price in BTC, or 'priceless' if no open dispensers"
+        recentSalePrice:
+          type: number
+          nullable: true
+          description: "Most recent sale price in BTC, or 'priceless' if no sales"
+        marketCap:
+          type: number
+          nullable: true
+          description: "Marketcap in BTC, or 'priceless' if no sales"
+    StampRowSummary:
+      type: object
+      properties:
+        stamp:
+          type: number
+          nullable: true
+        block_index:
+          type: number
+        cpid:
+          type: string
+        creator:
+          type: string
+        divisible:
+          type: number
+        keyburn:
+          type: number
+          nullable: true
+        locked:
+          type: number
+        stamp_base64:
+          type: string
+        stamp_mimetype:
+          type: string
+        stamp_url:
+          type: string
+        supply:
+          type: number
+          nullable: true
+        tx_hash:
+          type: string
+        tx_index:
+          type: number
+        ident:
+          $ref: "#/components/schemas/SUBPROTOCOLS"
+        creator_name:
+          type: string
+          nullable: true
+        stamp_hash:
+          type: string
+        is_btc_stamp:
+          type: number
+        file_hash:
+          type: string
+        floorPrice:
+          type: number
+          nullable: true
+          description: "Current floor price in BTC, or 'priceless' if no open dispensers"
+    BlockStampRow:
+      type: object
+      properties:
+        stamp:
+          type: number
+          nullable: true
         block_index:
           type: number
         cpid:
@@ -2107,6 +1970,9 @@ components:
             - type: number
             - type: string
             - type: "null"
+        block_time:
+          type: string
+          format: date-time
         tx_hash:
           type: string
         tx_index:
@@ -2123,18 +1989,6 @@ components:
           type: number
         file_hash:
           type: string
-        floorPrice:
-          oneOf:
-            - type: number
-            - type: string
-            - type: "null"
-          description: "Current floor price in BTC, or 'priceless' if no open dispensers"
-        recentSalePrice:
-          oneOf:
-            - type: number
-            - type: string
-            - type: "null"
-          description: "Most recent sale price in BTC, or 'priceless' if no sales"
 
     BtcInfo:
       type: object
@@ -2205,6 +2059,7 @@ components:
           type: string
         block_time:
           type: string
+          format: date-time
         creator_name:
           oneOf:
             - type: string
@@ -2315,6 +2170,7 @@ components:
           type: string
         block_time:
           type: string
+          format: date-time
     StampBalance:
       type: object
       properties:
@@ -2377,7 +2233,7 @@ components:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/StampRow"
+                $ref: "#/components/schemas/StampRowSummary"
     PaginatedStampBalanceResponseBody:
       type: object
       allOf:
@@ -2551,38 +2407,6 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StampRow"
-    PaginatedDispenserResponseBody:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        totalPages:
-          type: integer
-        total:
-          type: integer
-        last_block:
-          type: integer
-        dispensers:
-          type: array
-          items:
-            $ref: "#/components/schemas/DispenserRow"
-    DispenserResponseBody:
-      type: object
-      properties:
-        dispensers:
-          type: array
-          items:
-            $ref: "#/components/schemas/DispenserRow"
-        last_block:
-          type: number
-    ErrorResponseBody:
-      type: object
-      properties:
-        error:
-          type: string
-
     BlockInfoResponseBody:
       type: object
       properties:
@@ -2591,7 +2415,7 @@ components:
         issuances:
           type: array
           items:
-            $ref: "#/components/schemas/StampRow"
+            $ref: "#/components/schemas/BlockStampRow"
         last_block:
           type: number
     StampBlockResponseBody:
@@ -2602,7 +2426,7 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/StampRow"
+            $ref: "#/components/schemas/BlockStampRow"
         last_block:
           type: number
     SRC20DeployData:
@@ -2772,3 +2596,63 @@ components:
                 type: string
               description:
                 type: string
+    ErrorResponseBody:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+        status:  # Changed from code to status
+          type: integer
+          description: HTTP status code
+      required:
+        - error
+        - status
+      example:
+        error: "Resource not found"
+        status: 404
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+      required:
+        - error
+      example:
+        error: "Invalid fee rate"
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "Resource not found"
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "Internal server error"
+    BadRequest:
+      description: Bad Request - Invalid input parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "Invalid request parameters"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "Internal server error"

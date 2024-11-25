@@ -21,7 +21,10 @@ export const handler: Handlers<BlockHandlerContext> = {
       return ResponseUtil.success(response);
     } catch (error) {
       console.error(`Error in block handler:`, error);
-      return ResponseUtil.handleError(error, "Error processing block request");
+      return ResponseUtil.internalError(
+        error,
+        "Error processing block request",
+      );
     }
   },
 };

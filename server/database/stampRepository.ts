@@ -360,6 +360,8 @@ export class StampRepository {
       groupBy?: string;
       groupBySubquery?: boolean;
       collectionStampLimit?: number;
+      skipTotalCount?: boolean;
+      selectColumns?: string[];
     },
   ) {
     const {
@@ -380,6 +382,8 @@ export class StampRepository {
       groupBy,
       groupBySubquery = false,
       collectionStampLimit = 12,
+      skipTotalCount = false,
+      selectColumns,
     } = options;
 
     const whereConditions: string[] = [];
@@ -420,10 +424,12 @@ export class StampRepository {
       st.file_hash
     `;
 
-    // Initialize select clause
-    let selectClause = allColumns
-      ? "st.*, cr.creator AS creator_name"
-      : baseColumns;
+    // Modify select clause to use custom columns if provided
+    let selectClause = selectColumns 
+      ? `st.${selectColumns.join(', st.')}`
+      : allColumns
+        ? "st.*, cr.creator AS creator_name"
+        : baseColumns;
 
     // Only include collection_id in select clause if collectionId is provided
     if (collectionId) {
@@ -546,19 +552,23 @@ export class StampRepository {
       cacheDuration,
     );
 
-    // Get total count
-    const totalResult = await this.getTotalStampCountFromDb({
-      type,
-      ident,
-      identifier,
-      blockIdentifier,
-      collectionId,
-      filterBy,
-      suffixFilters,
-    });
+    // Get total count only if needed
+    let total = 0;
+    let totalPages = 1;
 
-    const total = totalResult.rows[0]?.total || 0;
-    const totalPages = noPagination ? 1 : Math.ceil(total / limit);
+    if (!skipTotalCount) {
+      const totalResult = await this.getTotalStampCountFromDb({
+        type,
+        ident,
+        identifier,
+        blockIdentifier,
+        collectionId,
+        filterBy,
+        suffixFilters,
+      });
+      total = totalResult.rows[0]?.total || 0;
+      totalPages = noPagination ? 1 : Math.ceil(total / limit);
+    }
 
     return {
       stamps: dataResult.rows,

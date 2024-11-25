@@ -426,6 +426,8 @@ export interface SRC101ValidTxTotalCountParams {
   deploy_hash?: string;
   tx_hash?: string;
   address?: string;
+  limit?: number;
+  page?: number;
 }
 
 export interface SRC101OwnerParams {
@@ -477,6 +479,9 @@ export interface Pagination {
 
 export interface PaginatedStampResponseBody extends Pagination {
   last_block: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   data: StampRow[];
 }
 

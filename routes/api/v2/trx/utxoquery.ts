@@ -12,7 +12,7 @@ export const handler: Handlers = {
       const excludeAssets = url.searchParams.get("excludeAssets") === "true";
 
       if (!address) {
-        return ResponseUtil.error("Address parameter is required", 400);
+        return ResponseUtil.badRequest("Address parameter is required");
       }
 
       console.log("Fetching UTXOs for address:", address, {
@@ -42,7 +42,7 @@ export const handler: Handlers = {
           );
         } catch (error) {
           console.error("Error selecting UTXOs:", error);
-          return ResponseUtil.error("Failed to select UTXOs", 500);
+          return ResponseUtil.internalError(error, "Failed to select UTXOs");
         }
       } else {
         // Original behavior for getting all UTXOs
@@ -51,7 +51,7 @@ export const handler: Handlers = {
 
         if (!result) {
           console.log("No UTXOs found");
-          return ResponseUtil.error("No UTXOs found for address", 404);
+          return ResponseUtil.notFound("No UTXOs found for address");
         }
 
         const utxos: UTXO[] = Array.isArray(result) ? result : [result];
@@ -68,10 +68,7 @@ export const handler: Handlers = {
       }
     } catch (error) {
       console.error("Error in UTXO query handler:", error);
-      return ResponseUtil.error(
-        error instanceof Error ? error.message : "Internal Server Error",
-        500,
-      );
+      return ResponseUtil.internalError(error, "Internal Server Error");
     }
   },
 };

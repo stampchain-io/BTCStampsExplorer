@@ -23,183 +23,13 @@ import { CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
+import { RouteType } from "$server/services/cacheService.ts";
+
+interface StampControllerOptions {
+  cacheType: RouteType;
+}
 
 export class StampController {
-  static async getStampDetailsById(id: string, stampType: STAMP_TYPES = "all") {
-    try {
-      const res = await StampService.getStampDetailsById(id, "all", stampType);
-      if (!res) {
-        return null;
-      }
-
-      const {
-        asset,
-        stamp,
-        holders,
-        sends,
-        dispensers,
-        dispenses,
-        total,
-        last_block,
-      } = res;
-
-      if (asset) {
-        stamp.divisible = asset.divisible ?? stamp.divisible;
-        stamp.locked = asset.locked ?? stamp.locked;
-        stamp.supply = asset.supply ?? stamp.supply;
-      }
-
-      const processedHolders = this.processHolders(holders);
-      const { floorPrice, marketCap } = this.calculatePrices(
-        dispensers,
-        dispenses,
-        stamp,
-      );
-
-      return {
-        data: {
-          stamp: {
-            ...stamp,
-            floorPrice,
-            marketCap,
-          },
-          holders: processedHolders,
-          sends,
-          dispensers,
-          dispenses,
-          total,
-        },
-        last_block,
-      };
-    } catch (error) {
-      logger.error("stamps", {
-        message: "Error in StampController.getStampDetailsById",
-        error: error instanceof Error ? error.message : String(error)
-      });
-      throw error;
-    }
-  }
-
-  private static processHolders(holders: HolderRow[]): ProcessedHolder[] {
-    return holders.map((holder: HolderRow) => ({
-      address: holder.address,
-      quantity: holder.divisible
-        ? holder.quantity / 100000000
-        : holder.quantity,
-    }));
-  }
-
-  private static calculatePrices(
-    dispensers: Dispenser[],
-    dispenses: Dispense[],
-    stamp: StampRow,
-  ) {
-    logger.debug("stamps", {
-      message: "Entering calculatePrices method",
-      dispensers,
-      dispenses,
-      stamp
-    });
-
-    let floorPrice: string | number = "priceless";
-    let marketCap: string | number = "priceless";
-
-    if (dispensers && dispensers.length > 0) {
-      logger.debug("stamps", {
-        message: "Processing dispensers array",
-        count: dispensers.length
-      });
-
-      const openDispensers = dispensers.filter((dispenser) => {
-        logger.debug("stamps", {
-          message: "Checking dispenser status",
-          dispenser
-        });
-        return dispenser && dispenser.give_remaining > 0;
-      });
-
-      logger.debug("stamps", {
-        message: "Found open dispensers",
-        count: openDispensers.length
-      });
-
-      if (openDispensers.length > 0) {
-        const lowestBtcRate = Math.min(
-          ...openDispensers.map((dispenser) => {
-            logger.debug("stamps", {
-              message: "Processing dispenser for BTC rate",
-              dispenser
-            });
-            
-            if (dispenser && dispenser.satoshirate !== undefined) {
-              return Number(formatSatoshisToBTC(dispenser.satoshirate, { 
-                includeSymbol: false 
-              }));
-            } else {
-              logger.warn("stamps", {
-                message: "Invalid dispenser data",
-                dispenser
-              });
-              return Infinity;
-            }
-          }),
-        );
-        
-        logger.debug("stamps", {
-          message: "Calculated lowest BTC rate",
-          lowestBtcRate
-        });
-        
-        floorPrice = lowestBtcRate !== Infinity ? lowestBtcRate : "priceless";
-      }
-    } else {
-      logger.debug("stamps", {
-        message: "No dispensers available"
-      });
-    }
-
-    if (dispenses && dispenses.length > 0 && stamp.supply) {
-      logger.debug("stamps", {
-        message: "Calculating market cap",
-        dispenseCount: dispenses.length,
-        supply: stamp.supply
-      });
-
-      const mostRecentDispense = dispenses[0];
-      logger.debug("stamps", {
-        message: "Processing most recent dispense",
-        dispense: mostRecentDispense
-      });
-
-      const parentDispenser = dispensers.find((d) =>
-        d.tx_hash === mostRecentDispense.dispenser_tx_hash
-      );
-
-      if (parentDispenser && parentDispenser.satoshirate !== undefined) {
-        const recentPrice = parentDispenser.satoshirate / 100000000;
-        marketCap = recentPrice * stamp.supply;
-        logger.debug("stamps", {
-          message: "Market cap calculated",
-          recentPrice,
-          marketCap
-        });
-      } else {
-        logger.warn("stamps", {
-          message: "Unable to calculate market cap - missing dispenser data",
-          parentDispenser
-        });
-      }
-    }
-
-    logger.debug("stamps", {
-      message: "Price calculation complete",
-      floorPrice,
-      marketCap
-    });
-
-    return { floorPrice, marketCap };
-  }
-
   static async getStamps({
     page = 1,
     limit = BIG_LIMIT,
@@ -218,10 +48,11 @@ export class StampController {
     collectionStampLimit = 12,
     groupBy,
     groupBySubquery,
+    skipTotalCount = false,
+    cacheType = RouteType.STAMP_LIST,
+    enrichWithAssetInfo = false
   } = {}) {
     try {
-
-
       const filterByArray = typeof filterBy === "string"
         ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
         : filterBy;
@@ -266,143 +97,173 @@ export class StampController {
         suffixFilters = []; // No suffix filter applied
       }
 
-      const [stampResult, lastBlock] = await Promise.all([
-        StampService.getStamps({
-          page,
-          limit,
-          sortBy,
-          type,
-          ident: finalIdent,
-          suffixFilters,
-          allColumns,
-          collectionId,
-          identifier,
-          blockIdentifier,
-          cacheDuration,
-          noPagination,
-          filterBy: filterByArray,
-          sortColumn,
-          collectionStampLimit,
-          groupBy,
-          groupBySubquery
-        }),
-        BlockService.getLastBlock(),
-      ]);
-
-      logger.debug("stamps", {
-        message: "Stamp result from service",
-        totalStamps: stampResult?.stamps?.length,
-        sampleStamp: stampResult?.stamps?.[0],
-        page: stampResult?.page,
-        pageSize: stampResult?.page_size,
-        total: stampResult?.total
+      const stampResult = await StampService.getStamps({
+        page,
+        limit,
+        sortBy,
+        type,
+        ident: finalIdent,
+        suffixFilters,
+        allColumns,
+        collectionId,
+        identifier,
+        blockIdentifier,
+        cacheDuration,
+        noPagination,
+        filterBy: filterByArray,
+        sortColumn,
+        collectionStampLimit,
+        groupBy,
+        groupBySubquery,
+        skipTotalCount,
+        cacheType,
       });
 
-      if (!stampResult) {
-        logger.error("stamps", {
-          message: "No stamps found"
-        });
-        throw new Error("No stamps found");
+      // If we're getting details for a single stamp and enrichment is requested
+      if (identifier && !Array.isArray(identifier) && enrichWithAssetInfo) {
+        const stamp = stampResult.stamps[0];
+        if (stamp && (stamp.ident === "STAMP" || stamp.ident === "SRC-721")) {
+          // Get asset details from XCP with same cache parameters
+          const asset = await XcpManager.getAssetInfo(stamp.cpid);  // TODO: pass cacheDuration or cacheType
+          const enrichedStamp = this.enrichStampWithAssetData(stamp, asset);
+          
+          return {
+            data: {
+              stamp: enrichedStamp,
+            },
+            last_block: stampResult.last_block,
+          };
+        }
       }
 
-      // Return data without dispenser processing for collection queries
-      if (collectionId) {
-        return {
-          page: stampResult.page,
-          limit: stampResult.page_size,
-          totalPages: stampResult.pages,
-          total: stampResult.total,
-          last_block: lastBlock,
-          data: stampResult.stamps,  // Return stamps directly without dispenser processing
-        };
-      }
-
-      // Existing dispenser processing for non-collection queries
-      if (stampResult.stamps.length > 0 && 
-          (stampResult.stamps[0].ident === "STAMP" || 
-           stampResult.stamps[0].ident === "SRC-721")) {
-        // Batch dispenser requests for efficiency
-        const uniqueCpids = [...new Set(stampResult.stamps.map(stamp => stamp.cpid))];
-        const dispenserMap = new Map();
-        
-        const batchDispensers = await Promise.all(
-          uniqueCpids.map(cpid => DispenserManager.getDispensersByCpid(cpid, "all"))
-        );
-        
-        batchDispensers.forEach((dispensers, index) => {
-          dispenserMap.set(uniqueCpids[index], dispensers);
-        });
-
-        // Update stamps with floor prices and recent sale prices
-        const updatedStamps = stampResult.stamps.map(stamp => {
+      // Process stamps with just open dispensers for floor price
+      const processedStamps = await Promise.all(
+        stampResult.stamps.map(async (stamp) => {
           if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
             return stamp;
           }
-
-          const dispensersForStamp = dispenserMap.get(stamp.cpid);
-          let floorPrice: string | number = "priceless";
-          let recentSalePrice: string | number = "priceless";
-
-          if (dispensersForStamp?.length > 0) {
-            // Find open dispensers for floor price
-            const openDispensers = dispensersForStamp.filter(
-              dispenser => dispenser.give_remaining > 0
-            );
-            
-            if (openDispensers.length > 0) {
-              floorPrice = Math.min(
-                ...openDispensers.map(
-                  dispenser => Number(formatSatoshisToBTC(dispenser.satoshirate, { 
-                    includeSymbol: false 
-                  }))
-                )
-              );
-            }
-
-            // Find most recent dispenser for recent sale price
-            const mostRecentDispenser = dispensersForStamp.reduce((prev, current) => 
-              (prev.block_index > current.block_index) ? prev : current
-            );
-
-            if (mostRecentDispenser) {
-              recentSalePrice = Number(formatSatoshisToBTC(mostRecentDispenser.satoshirate, { 
-                includeSymbol: false 
-              }));
-            }
-          }
-
+          
+          // Only fetch open dispensers
+          const openDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid, "open");
+          
+          // Calculate floor price from open dispensers
+          const floorPrice = openDispensers.length > 0 
+            ? this.calculateFloorPrice(openDispensers)
+            : "priceless";
+          
           return {
             ...stamp,
             floorPrice,
-            recentSalePrice,
           };
-        });
+        })
+      );
 
+      // Build response based on query type
+      const baseResponse = {
+        data: processedStamps,
+        last_block: stampResult.last_block,
+      };
+
+      // Add pagination data for index/collection routes
+      if (!identifier || Array.isArray(identifier)) {
         return {
+          ...baseResponse,
           page: stampResult.page,
           limit: stampResult.page_size,
           totalPages: stampResult.pages,
-          total: stampResult.total,
-          last_block: lastBlock,
-          data: updatedStamps,
+          total: skipTotalCount ? undefined : stampResult.total,
         };
       }
 
-      return {
-        page: stampResult.page,
-        limit: stampResult.page_size,
-        totalPages: stampResult.pages,
-        total: stampResult.total,
-        last_block: lastBlock,
-        data: stampResult.stamps,
-      };
+      return baseResponse;
     } catch (error) {
       logger.error("stamps", {
-        message: "Error in getStamps",
+        message: "Error in StampController.getStamps",
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
     }
+  }
+
+  // This becomes a wrapper around getStamps for backward compatibility
+  static async getStampDetailsById(
+    id: string, 
+    stampType: STAMP_TYPES = "all",
+    cacheType: RouteType = RouteType.STAMP_DETAIL,
+    cacheDuration?: number | "never"
+  ) {
+    return this.getStamps({
+      identifier: id,
+      type: stampType,
+      cacheType,
+      cacheDuration,
+      allColumns: true,
+      noPagination: true,
+      skipTotalCount: true,
+      enrichWithAssetInfo: true // Enable asset info enrichment
+    });
+  }
+
+  private static enrichStampWithAssetData(stamp: StampRow, asset: any) {
+    return {
+      ...stamp,
+      divisible: asset?.divisible ?? stamp.divisible,
+      locked: asset?.locked ?? stamp.locked,
+      supply: asset?.supply ?? stamp.supply,
+    };
+  }
+
+  private static processHolders(holders: HolderRow[]): ProcessedHolder[] {
+    return holders.map((holder: HolderRow) => ({
+      address: holder.address,
+      quantity: holder.divisible
+        ? holder.quantity / 100000000
+        : holder.quantity,
+    }));
+  }
+
+  private static calculateFloorPrice(openDispensers: Dispenser[]): number | "priceless" {
+    if (openDispensers.length === 0) return "priceless";
+    
+    const lowestBtcRate = Math.min(
+      ...openDispensers.map(dispenser => 
+        Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false }))
+      )
+    );
+    
+    return lowestBtcRate !== Infinity ? lowestBtcRate : "priceless";
+  }
+
+  private static calculateRecentSalePrice(dispensers: Dispenser[]): number | "priceless" {
+    if (dispensers.length === 0) return "priceless";
+
+    // Look at both open and closed dispensers to find the most recent
+    const closedDispensers = dispensers.filter(d => d.give_remaining === 0);
+    const openDispensers = dispensers.filter(d => d.give_remaining > 0);
+
+    // Get most recent from each category
+    const mostRecentClosed = closedDispensers.length > 0 
+      ? closedDispensers.reduce((prev, current) => 
+          (prev.block_index > current.block_index) ? prev : current
+        )
+      : null;
+
+    const mostRecentOpen = openDispensers.length > 0
+      ? openDispensers.reduce((prev, current) => 
+          (prev.block_index > current.block_index) ? prev : current
+        )
+      : null;
+
+    // Compare block indices to find the most recent overall
+    const mostRecent = !mostRecentClosed ? mostRecentOpen :
+                      !mostRecentOpen ? mostRecentClosed :
+                      mostRecentClosed.block_index > mostRecentOpen.block_index 
+                        ? mostRecentClosed 
+                        : mostRecentOpen;
+
+    return mostRecent ? 
+      Number(formatSatoshisToBTC(mostRecent.satoshirate, { includeSymbol: false })) 
+      : "priceless";
   }
 
   static async getRecentSales(page?: number, limit?: number) {
@@ -431,29 +292,7 @@ export class StampController {
     }
   }
 
-  static async getStamp(id: string) {
-    try {
-      const result = await StampService.getStamps({
-        identifier: id,
-      });
 
-      if (!result) {
-        return null;
-      }
-
-      return {
-        id: result.stamp.id,
-        name: result.stamp.name,
-        totalStamps: result.total,
-      };
-    } catch (error) {
-      logger.error("stamps", {
-        message: "Error in getStamp",
-        error: error instanceof Error ? error.message : String(error)
-      });
-      throw error;
-    }
-  }
 
   static async getStampBalancesByAddress(
     address: string,
@@ -713,11 +552,18 @@ export class StampController {
     }
   }
 
-  static async getDispensersWithStampsByAddress(address: string, options = {}) {
+  static async getDispensersWithStampsByAddress(
+    address: string, 
+    page: number = 1,
+    limit: number = 50,
+    options = {}
+  ) {
     try {
-      // First get dispensers
+      // First get dispensers with pagination
       const dispensersData = await XcpManager.getDispensersByAddress(address, {
         verbose: true,
+        page,
+        limit,
         ...options
       });
 
@@ -758,6 +604,114 @@ export class StampController {
         message: "Error fetching dispensers with stamps",
         error: error instanceof Error ? error.message : String(error),
         address
+      });
+      throw error;
+    }
+  }
+
+  private static async resolveToCpid(id: string): Promise<string> {
+    const result = await StampService.resolveToCpid(id);
+    if (!result?.cpid) {
+      throw new Error(`Could not resolve identifier ${id} to a cpid`);
+    }
+    return result.cpid;
+  }
+
+  static async getStampHolders(
+    id: string, 
+    page: number = 1, 
+    limit: number = 50,
+    cacheType: RouteType
+  ) {
+    try {
+      const cpid = await this.resolveToCpid(id);
+      const { holders, total } = await StampService.getStampHolders(cpid, page, limit, { cacheType });
+      return {
+        data: this.processHolders(holders),
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      };
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error fetching stamp holders",
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
+    }
+  }
+
+  static async getStampSends(
+    id: string, 
+    page: number = 1, 
+    limit: number = 50,
+    cacheType: RouteType
+  ) {
+    try {
+      const cpid = await this.resolveToCpid(id);
+      const { sends, total } = await StampService.getStampSends(cpid, page, limit, { cacheType });
+      return {
+        data: sends,
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      };
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error fetching stamp sends",
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
+    }
+  }
+
+  static async getStampDispensers(
+    id: string, 
+    page: number = 1, 
+    limit: number = 50,
+    cacheType: RouteType
+  ) {
+    try {
+      const cpid = await this.resolveToCpid(id);
+      const { dispensers, total } = await StampService.getStampDispensers(cpid, page, limit, { cacheType });
+      return {
+        data: dispensers,
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      };
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error fetching stamp dispensers",
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
+    }
+  }
+
+  static async getStampDispenses(
+    id: string, 
+    page: number = 1, 
+    limit: number = 50,
+    cacheType: RouteType
+  ) {
+    try {
+      const cpid = await this.resolveToCpid(id);
+      const { dispenses, total } = await StampService.getStampDispenses(cpid, page, limit, { cacheType });
+      return {
+        data: dispenses,
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      };
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error fetching stamp dispenses",
+        error: error instanceof Error ? error.message : String(error)
       });
       throw error;
     }

@@ -82,16 +82,16 @@ export default function App({ Component }: AppProps) {
           content="/img/stamp.jpg"
         />
 
-        <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+      {/* <meta http-equiv="X-Content-Type-Options" content="nosniff" /> */}
         <meta
           http-equiv="Referrer-Policy"
           content="strict-origin-when-cross-origin"
         />
-        <meta
+        {/* <meta
           http-equiv="Content-Security-Policy"
           content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https:;"
         />
-      </Head>
+      </Head> */}
       <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden">
         {/* <div class="bgGradientTop" aria-hidden="true" /> */}
         {/* <div class="bgGradientBottom" aria-hidden="true" /> */}

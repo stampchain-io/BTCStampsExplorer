@@ -43,9 +43,8 @@ export class SRC20TransactionService {
         break;
       case "mint":
         if (!body.amt) {
-          return ResponseUtil.error(
+          return ResponseUtil.badRequest(
             "Error: amt is required for mint operation",
-            400,
           );
         }
         logger.debug("stamps", {
@@ -59,15 +58,13 @@ export class SRC20TransactionService {
         break;
       case "transfer":
         if (!body.fromAddress) {
-          return ResponseUtil.error(
+          return ResponseUtil.badRequest(
             "Error: fromAddress is required for transfer operation",
-            400,
           );
         }
         if (!body.amt) {
-          return ResponseUtil.error(
+          return ResponseUtil.badRequest(
             "Error: amt is required for transfer operation",
-            400,
           );
         }
         logger.debug("stamps", {
@@ -80,7 +77,7 @@ export class SRC20TransactionService {
         } as ITransferSRC20);
         break;
       default:
-        return ResponseUtil.error("Invalid operation", 400);
+        return ResponseUtil.badRequest("Invalid operation");
     }
 
     logger.debug("stamps", {
@@ -93,7 +90,7 @@ export class SRC20TransactionService {
         message: "Operation error",
         error: result.error
       });
-      return ResponseUtil.error(result.error, 400);
+      return ResponseUtil.badRequest(result.error);
     }
 
     return result;
