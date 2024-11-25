@@ -5,6 +5,7 @@ import {
   formatBTCAmount,
   formatDate,
 } from "$lib/utils/formatUtils.ts";
+import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "globals";
 
@@ -14,7 +15,11 @@ interface StampInfoProps {
 }
 
 export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
-  console.log("stamp: ", stamp);
+  console.log("StampInfo received stamp:", {
+    stamp_mimetype: stamp.stamp_mimetype,
+    stamp_url: stamp.stamp_url,
+    full_stamp: stamp,
+  });
 
   const [fee, setFee] = useState<number>(0);
   const handleChangeFee = (newFee: number) => {
@@ -56,30 +61,46 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     : abbreviateAddress(stamp.creator, 8);
 
   useEffect(() => {
-    if (stamp.stamp_mimetype.startsWith("image/") && stamp.stamp_url) {
+    if (!stamp?.stamp_mimetype) {
+      console.log("Missing stamp_mimetype:", stamp?.stamp_mimetype);
+      return;
+    }
+
+    if (stamp.stamp_mimetype.startsWith("image/")) {
+      const src = getStampImageSrc(stamp);
+      console.log("Attempting to load image from:", src);
+
       const img = new Image();
       img.onload = () => {
+        console.log("Image loaded with dimensions:", {
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+        });
         setImageDimensions({
           width: img.naturalWidth,
           height: img.naturalHeight,
         });
       };
-      img.onerror = () => {
-        console.error("Failed to load image for dimensions.");
+      img.onerror = (error) => {
+        console.error("Failed to load image for dimensions:", error);
       };
-      img.src = stamp.stamp_url;
+      img.src = src;
 
       // Fetch the image to get file size
-      fetch(stamp.stamp_url)
-        .then((response) => response.blob())
+      fetch(src)
+        .then((response) => {
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.blob();
+        })
         .then((blob) => {
+          console.log("Image size fetched:", blob.size);
           setImageSize(blob.size);
         })
         .catch((error) => {
           console.error("Failed to fetch image size:", error);
         });
     }
-  }, [stamp.stamp_mimetype, stamp.stamp_url]);
+  }, [stamp?.stamp_mimetype]);
   return (
     <div>
       <div className={"flex flex-col gap-4"}>

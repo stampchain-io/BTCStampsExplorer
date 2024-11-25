@@ -46,17 +46,32 @@ interface StampData {
   lowestPriceDispenser: any;
 }
 
+// Update CollectionRow interface to be simpler since we only need basic info
+interface CollectionRow {
+  collection_id: string;
+  name: string;
+}
+
 export const handler: Handlers<StampData> = {
   async GET(_req: Request, ctx) {
     try {
-      const url = new URL(_req.url);
       const { id } = ctx.params;
-      const stampData = await StampController.getStampDetailsById(id);
+
+      // Fetch stamp details and collections in parallel
+      const [stampData, collectionsData] = await Promise.all([
+        StampController.getStampDetailsById(id),
+        CollectionController.getCollectionNames({
+          limit: 50,
+          page: 1,
+        }),
+      ]);
 
       // Check for null/undefined stamp data
       if (!stampData?.data?.stamp) {
         return ctx.renderNotFound();
       }
+
+      const collections = collectionsData?.data || [];
 
       // Only fetch dispensers for STAMP or SRC-721
       let dispensers = [];
@@ -108,20 +123,18 @@ export const handler: Handlers<StampData> = {
       };
 
       // Don't wait for recent sales - let it load independently
-      StampController.getRecentSales(1, 6).then(result => {
+      StampController.getRecentSales(1, 6).then((result) => {
         console.log("Recent sales loaded: ", result);
-      }).catch(error => {
+      }).catch((error) => {
         console.error("Error loading recent sales:", error);
       });
 
       return ctx.render({
         ...stampData.data,
         stamp: stampWithPrices,
-        stamps_recent: { data: [] }, // Initialize empty, will be populated by island
+        stamps_recent: { data: [] },
         collections,
         last_block: stampData.last_block,
-        lowestPriceDispenser,
-        dispensers,
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
@@ -139,20 +152,15 @@ export default function StampPage(props: StampDetailPageProps) {
     stamp,
     holders,
     sends,
-    dispensers,
-    dispenses,
     stamps_recent,
-    lowestPriceDispenser,
+    dispensers = [],
+    dispenses = [],
+    lowestPriceDispenser = null,
   } = props.data;
 
   const title = stamp.name
     ? `${stamp.name}`
     : `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
-
-  const dispensesWithRates = StampService.mapDispensesWithRates(
-    dispenses,
-    dispensers,
-  );
 
   return (
     <>
@@ -181,13 +189,12 @@ export default function StampPage(props: StampDetailPageProps) {
         </div>
 
         <StampRelatedGraph
-          holders={holders}
+          stampId={stamp.stamp?.toString() || ""}
+          initialHolders={holders || []}
         />
 
         <StampRelatedInfo
-          sends={sends}
-          dispensers={dispensers}
-          dispensesWithRates={dispensesWithRates}
+          stampId={stamp.stamp?.toString() || ""}
         />
 
         <RecentSales initialData={stamps_recent.data} />

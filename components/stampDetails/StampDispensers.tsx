@@ -1,4 +1,8 @@
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+import {
+  abbreviateAddress,
+  formatNumber,
+  formatSatoshisToBTC,
+} from "$lib/utils/formatUtils.ts";
 
 interface Dispenser {
   source: string;
@@ -27,15 +31,20 @@ const tableHeaders = [
 function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
   return (
     <tr>
-      <td className="pr-3 tablet:pr-6 py-2 tablet:py-4">{dispenser.source}</td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
-        {dispenser.escrow_quantity}
+      <td className="pr-3 tablet:pr-6 py-2 tablet:py-4">
+        <span className="hidden tablet:inline">{dispenser.source}</span>
+        <span className="inline tablet:hidden">
+          {abbreviateAddress(dispenser.source)}
+        </span>
       </td>
       <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
-        {dispenser.give_quantity}
+        {formatNumber(dispenser.escrow_quantity, 0)}
       </td>
       <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
-        {dispenser.give_remaining}
+        {formatNumber(dispenser.give_quantity, 0)}
+      </td>
+      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
+        {formatNumber(dispenser.give_remaining, 0)}
       </td>
       <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
         {formatSatoshisToBTC(dispenser.satoshirate)}
