@@ -8,7 +8,14 @@ export const handler: Handlers = {
   async GET(req) {
     try {
       const url = new URL(req.url);
-      const { limit, page } = getPaginationParams(url);
+      const pagination = getPaginationParams(url);
+
+      // Check if pagination validation failed
+      if (pagination instanceof Response) {
+        return pagination;
+      }
+
+      const { limit, page } = pagination;
 
       const params: SRC20TrxRequestParams = {
         sortBy: url.searchParams.get("sort") || "ASC",
@@ -27,7 +34,7 @@ export const handler: Handlers = {
       );
       return ResponseUtil.success(result);
     } catch (error) {
-      return ResponseUtil.handleError(error, "Error processing request");
+      return ResponseUtil.internalError(error, "Error processing request");
     }
   },
 };

@@ -16,7 +16,7 @@ export const sharedBlockWithStampsHandler: Handlers<BlockHandlerContext> = {
       return ResponseUtil.success(response);
     } catch (error) {
       console.error(`Error in ${type}/block handler:`, error);
-      return ResponseUtil.handleError(
+      return ResponseUtil.internalError(
         error,
         `Block: ${block_index} not found`,
         404,

@@ -1,59 +1,186 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { jsonStringifyWithBigInt } from "$lib/utils/formatUtils.ts";
+import { validateSortDirection } from "$server/services/validationService.ts";
 
-export const sharedStampIndexHandler = (
-  stampType: "stamps" | "cursed",
+type StampHandlerConfig = {
+  type: "stamps" | "cursed";
+  isIndex: boolean;
+};
+
+/**
+ * Determines the appropriate cache RouteType based on the path and options
+ */
+function getCacheType(path: string, isIndex: boolean): RouteType {
+  // Index route gets long cache
+  if (isIndex) {
+    return RouteType.STAMP_LIST;
+  }
+
+  // Check path for specific routes
+  if (path.includes("/dispenses")) {
+    return RouteType.STAMP_DISPENSE;
+  }
+  if (path.includes("/dispensers")) {
+    return RouteType.STAMP_DISPENSER;
+  }
+  if (path.includes("/sends")) {
+    return RouteType.STAMP_SEND;
+  }
+  if (path.includes("/holders")) {
+    return RouteType.BALANCE; // Holders are like balances
+  }
+
+  // Individual stamp details get short cache
+  return RouteType.STAMP_DETAIL;
+}
+
+export const createStampHandler = (
+  routeConfig: StampHandlerConfig,
 ): Handlers => ({
-  async GET(req: Request, _ctx) {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-      const { limit, page } = getPaginationParams(url);
-      const maxLimit = 500;
-      const effectiveLimit = Math.min(limit ?? maxLimit, maxLimit);
-      const sortBy =
-        (url.searchParams.get("sort")?.toUpperCase() as "ASC" | "DESC") ||
-        "ASC";
+      const cacheType = getCacheType(url.pathname, routeConfig.isIndex);
 
-      const result = await StampController.getStamps({
-        page,
-        limit: effectiveLimit,
-        sortBy,
-        type: stampType,
-        allColumns: true,
-      });
+      if (routeConfig.isIndex) {
+        const pagination = getPaginationParams(url);
 
-      return ResponseUtil.success(
-        JSON.parse(jsonStringifyWithBigInt(result)),
-      );
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error(
-          `Error fetching paginated ${stampType}: ${error.message}`,
+        // Check if pagination validation failed
+        if (pagination instanceof Response) {
+          return pagination;
+        }
+
+        const { limit, page } = pagination;
+        const maxLimit = 100;
+        const effectiveLimit = Math.min(limit ?? maxLimit, maxLimit);
+
+        // Validate sort parameter
+        const sortParam = url.searchParams.get("sort");
+        const sortValidation = validateSortDirection(sortParam);
+        if (sortValidation instanceof Response) {
+          return sortValidation;
+        }
+
+        const result = await StampController.getStamps({
+          page,
+          limit: effectiveLimit,
+          sortBy: sortValidation,
+          type: routeConfig.type,
+          allColumns: true,
+          skipTotalCount: false,
+          cacheType, // Pass cache type to controller
+        });
+
+        return ResponseUtil.success(result, { routeType: cacheType });
+      } else {
+        const { id } = ctx.params;
+        const path = new URL(req.url).pathname;
+
+        if (path.includes("/holders")) {
+          const url = new URL(req.url);
+          const pagination = getPaginationParams(url);
+
+          // Check if pagination validation failed
+          if (pagination instanceof Response) {
+            return pagination;
+          }
+
+          const { limit, page } = pagination;
+
+          // Validate sort parameter
+          const sortParam = url.searchParams.get("sort");
+          const sortValidation = validateSortDirection(sortParam);
+          if (sortValidation instanceof Response) {
+            return sortValidation;
+          }
+
+          const holders = await StampController.getStampHolders(
+            id,
+            page || 1,
+            limit || 50,
+            cacheType,
+          );
+          return ResponseUtil.success(holders, { routeType: cacheType });
+        }
+
+        if (path.includes("/dispensers")) {
+          const url = new URL(req.url);
+          const pagination = getPaginationParams(url);
+
+          // Check if pagination validation failed
+          if (pagination instanceof Response) {
+            return pagination;
+          }
+
+          const { limit, page } = pagination;
+          const dispensers = await StampController.getStampDispensers(
+            id,
+            page,
+            limit,
+            cacheType,
+          );
+          return ResponseUtil.success(dispensers, { routeType: cacheType });
+        }
+
+        if (path.includes("/sends")) {
+          const url = new URL(req.url);
+          const pagination = getPaginationParams(url);
+
+          // Check if pagination validation failed
+          if (pagination instanceof Response) {
+            return pagination;
+          }
+
+          const { limit, page } = pagination;
+          const sends = await StampController.getStampSends(
+            id,
+            page,
+            limit,
+            cacheType,
+          );
+          return ResponseUtil.success(sends, { routeType: cacheType });
+        }
+
+        if (path.includes("/dispenses")) {
+          const url = new URL(req.url);
+          const pagination = getPaginationParams(url);
+
+          // Check if pagination validation failed
+          if (pagination instanceof Response) {
+            return pagination;
+          }
+
+          const { limit, page } = pagination;
+          const dispenses = await StampController.getStampDispenses(
+            id,
+            page,
+            limit,
+            cacheType, // Pass cache type to controller
+          );
+          return ResponseUtil.success(dispenses, { routeType: cacheType });
+        }
+
+        const stampData = await StampController.getStampDetailsById(
+          id,
+          routeConfig.type,
+          cacheType, // Pass cache type to controller
         );
+        if (!stampData) {
+          return ResponseUtil.notFound("Stamp not found");
+        }
+        return ResponseUtil.success({
+          last_block: stampData.last_block,
+          data: stampData.data,
+        }, { routeType: cacheType });
       }
-      return ResponseUtil.error(`Error: Internal server error`, 500);
+    } catch (error) {
+      const errorMessage = routeConfig.isIndex
+        ? `Error fetching paginated ${routeConfig.type}`
+        : "Error fetching stamp data";
+      return ResponseUtil.internalError(error, errorMessage);
     }
   },
 });
-
-export const sharedStampIdHandler: Handlers = {
-  async GET(_req: Request, ctx) {
-    try {
-      const { id } = ctx.params;
-      const stampData = await StampController.getStampDetailsById(id, "all");
-      if (!stampData) {
-        return ResponseUtil.error("Stamp not found", 404);
-      }
-      return ResponseUtil.success({
-        last_block: stampData.last_block,
-        data: stampData.data,
-      });
-    } catch (error) {
-      console.error("Error fetching stamp data:", error);
-      return ResponseUtil.error("Internal server error", 500);
-    }
-  },
-};

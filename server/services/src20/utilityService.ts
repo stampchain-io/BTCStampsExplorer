@@ -73,13 +73,13 @@ export class SRC20UtilityService {
   ): Promise<void | TXError> {
     // Common validations for all operations
     if (!body.tick || typeof body.tick !== "string") {
-      return ResponseUtil.error("Invalid or missing tick", 400);
+      return ResponseUtil.badRequest("Invalid or missing tick", 400);
     }
     if (!body.toAddress || !isValidBitcoinAddress(body.toAddress)) {
-      return ResponseUtil.error("Invalid or missing toAddress", 400);
+      return ResponseUtil.badRequest("Invalid or missing toAddress", 400);
     }
     if (!body.feeRate || isNaN(Number(body.feeRate))) {
-      return ResponseUtil.error("Invalid or missing feeRate", 400);
+      return ResponseUtil.badRequest("Invalid or missing feeRate", 400);
     }
 
     // Operation-specific validations
@@ -100,7 +100,7 @@ export class SRC20UtilityService {
         break;
 
       default:
-        return ResponseUtil.error("Invalid operation", 400);
+        return ResponseUtil.badRequest("Invalid operation", 400);
     }
   }
 
@@ -108,49 +108,49 @@ export class SRC20UtilityService {
     // Check if already deployed
     const { deployed } = await this.checkDeployedTick(body.tick);
     if (deployed) {
-      return ResponseUtil.error(`Token ${body.tick} already deployed`, 400);
+      return ResponseUtil.badRequest(`Token ${body.tick} already deployed`, 400);
     }
 
     // Validate deploy-specific parameters
     if (body.max && isNaN(Number(body.max))) {
-      return ResponseUtil.error("max must be a number", 400);
+      return ResponseUtil.badRequest("max must be a number", 400);
     }
     if (body.lim && isNaN(Number(body.lim))) {
-      return ResponseUtil.error("lim must be a number", 400);
+      return ResponseUtil.badRequest("lim must be a number", 400);
     }
     if (body.dec !== undefined && isNaN(Number(body.dec))) {
-      return ResponseUtil.error("dec must be a number", 400);
+      return ResponseUtil.badRequest("dec must be a number", 400);
     }
 
     // Optional field validations
     if (body.x && !/^[a-zA-Z0-9_]{1,15}$/.test(body.x)) {
-      return ResponseUtil.error("Invalid x username", 400);
+      return ResponseUtil.badRequest("Invalid x username", 400);
     }
     if (body.web && !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(body.web)) {
-      return ResponseUtil.error("Invalid website URL", 400);
+      return ResponseUtil.badRequest("Invalid website URL", 400);
     }
     if (body.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
-      return ResponseUtil.error("Invalid email address", 400);
+      return ResponseUtil.badRequest("Invalid email address", 400);
     }
   }
 
   private static async validateMint(body: InputData): Promise<void | TXError> {
     if (!body.amt || isNaN(Number(body.amt))) {
-      return ResponseUtil.error("amt is required for mint operation", 400);
+      return ResponseUtil.badRequest("amt is required for mint operation", 400);
     }
 
     const mintInfo = await SRC20UtilityService.checkMintedOut(body.tick, body.amt.toString());
     if (mintInfo.minted_out) {
-      return ResponseUtil.error(`Token ${body.tick} already minted out`, 400);
+      return ResponseUtil.badRequest(`Token ${body.tick} already minted out`);
     }
   }
 
   private static async validateTransfer(body: InputData): Promise<void | TXError> {
     if (!body.fromAddress || !isValidBitcoinAddress(body.fromAddress)) {
-      return ResponseUtil.error("Invalid or missing fromAddress", 400);
+      return ResponseUtil.badRequest("Invalid or missing fromAddress", 400);
     }
     if (!body.amt || isNaN(Number(body.amt))) {
-      return ResponseUtil.error("amt is required for transfer operation", 400);
+      return ResponseUtil.badRequest("amt is required for transfer operation", 400);
     }
 
     const hasBalance = await this.checkEnoughBalance(
@@ -159,7 +159,7 @@ export class SRC20UtilityService {
       body.amt.toString(),
     );
     if (!hasBalance) {
-      return ResponseUtil.error("Insufficient balance", 400);
+      return ResponseUtil.badRequest("Insufficient balance");
     }
   }
 }

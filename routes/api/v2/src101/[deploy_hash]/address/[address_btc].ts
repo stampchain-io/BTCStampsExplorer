@@ -2,34 +2,70 @@ import { Handlers } from "$fresh/server.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
 import { AddressHandlerContext } from "globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import {
+  checkEmptyResult,
+  DEFAULT_PAGINATION,
+  validateRequiredParams,
+  validateSortParam,
+} from "$server/services/routeValidationService.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req, ctx) {
     try {
       const { deploy_hash, address_btc } = ctx.params;
+
+      // Validate required parameters
+      const paramsValidation = validateRequiredParams({
+        deploy_hash,
+        address_btc,
+      });
+      if (!paramsValidation.isValid) {
+        return paramsValidation.error!;
+      }
+
       const url = new URL(req.url);
-      const params = url.searchParams;
+      const pagination = getPaginationParams(url);
+
+      // Check if pagination validation failed
+      if (pagination instanceof Response) {
+        return pagination;
+      }
+
+      const { limit, page } = pagination;
+
+      // Validate sort parameter
+      const sortValidation = validateSortParam(url);
+      if (!sortValidation.isValid) {
+        return sortValidation.error!;
+      }
+
       const queryParams = {
         deploy_hash,
         address_btc,
-        prim: params.get("prim") === "true",
-        limit: Number(params.get("limit")) || 1000,
-        page: Number(params.get("page")) || 1,
-        sort: params.get("sort") || "ASC",
+        prim: url.searchParams.get("prim") === "true",
+        limit: limit || DEFAULT_PAGINATION.limit,
+        page: page || DEFAULT_PAGINATION.page,
+        sort: sortValidation.data,
       };
+
       const result = await Src101Controller.handleSrc101TokenidsRequest(
-        queryParams
+        queryParams,
       );
 
-      if (!result || Object.keys(result).length === 0) {
-        console.log("Empty result received:", result);
-        return ResponseUtil.error("No data found", 404);
+      // Check for empty result
+      const emptyCheck = checkEmptyResult(result, "tokenids data");
+      if (emptyCheck) {
+        return emptyCheck;
       }
 
       return ResponseUtil.success(result);
     } catch (error) {
-      console.error("Error in [deploy_hash]/address/[address_btc] handler:", error);
-      return ResponseUtil.handleError(
+      console.error(
+        "Error in [deploy_hash]/address/[address_btc] handler:",
+        error,
+      );
+      return ResponseUtil.internalError(
         error,
         "Error processing src101 tokenids request",
       );

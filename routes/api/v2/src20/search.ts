@@ -13,7 +13,10 @@ export const handler: Handlers = {
       return ResponseUtil.success({ data: results });
     } catch (error) {
       console.error("Error in search handler:", error);
-      return ResponseUtil.handleError(error, "Error processing search request");
+      return ResponseUtil.internalError(
+        error,
+        "Error processing search request",
+      );
     }
   },
 };

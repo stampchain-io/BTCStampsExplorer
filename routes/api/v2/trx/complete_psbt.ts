@@ -11,7 +11,7 @@ export const handler: Handlers = {
       if (
         !sellerPsbtHex || !buyerUtxo || !buyerAddress || feeRate === undefined
       ) {
-        return ResponseUtil.error("Missing parameters", 400);
+        return ResponseUtil.badRequest("Missing parameters");
       }
 
       console.log(`Completing PSBT with fee rate: ${feeRate} sat/vB`);
@@ -29,7 +29,7 @@ export const handler: Handlers = {
       });
     } catch (error) {
       console.error("Error completing PSBT:", error);
-      return ResponseUtil.error(error.message || "Internal Server Error", 500);
+      return ResponseUtil.internalError(error, "Internal Server Error");
     }
   },
 };

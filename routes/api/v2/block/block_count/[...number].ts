@@ -11,9 +11,8 @@ export const handler: Handlers = {
       if (
         Number.isNaN(parsedNumber) || parsedNumber < 1 || parsedNumber > 100
       ) {
-        return ResponseUtil.error(
+        return ResponseUtil.badRequest(
           "Invalid number provided. Must be a number between 1 and 100.",
-          400,
         );
       }
 
@@ -21,7 +20,7 @@ export const handler: Handlers = {
       return ResponseUtil.success(lastBlocks);
     } catch (error) {
       console.error("Failed to get last blocks:", error);
-      return ResponseUtil.handleError(
+      return ResponseUtil.internalError(
         error,
         "Error processing block count request",
       );

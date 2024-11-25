@@ -17,7 +17,7 @@ export const handler: Handlers<BlockHandlerContext> = {
       return ResponseUtil.success(response);
     } catch (error) {
       console.error(`Error in ${type}/block handler:`, error);
-      return ResponseUtil.handleError(
+      return ResponseUtil.internalError(
         error,
         `Block: ${blockIdentifier} not found`,
         404,

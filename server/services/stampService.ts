@@ -11,49 +11,58 @@ import { XcpManager } from "$server/services/xcpService.ts";
 import { BIG_LIMIT } from "$lib/utils/constants.ts";
 import { DispenserFilter } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
+
+interface StampServiceOptions {
+  cacheType: RouteType;
+}
 
 export class StampService {
   static async getStampDetailsById(
-    id: string,
-    dispenserFilter: DispenserFilter = "all",
+    id: string | number,
     stampType: STAMP_TYPES = "all",
+    cacheType?: RouteType,
+    cacheDuration?: number | "never"
   ) {
-    console.log(`Fetching stamp details for ID: ${id}, Type: ${stampType}`);
-    const stampResult = await this.getStamps({
-      identifier: id,
-      allColumns: true,
-      noPagination: true,
-      cacheDuration: "never",
-      type: stampType,
-    });
+    try {
+      // Get stamp details using getStamps with proper caching
+      const stampResult = await this.getStamps({
+        identifier: id,
+        allColumns: true,
+        noPagination: true,
+        type: stampType,
+        skipTotalCount: true,
+        cacheType,
+        cacheDuration
+      });
 
-    console.log("Stamp result:", JSON.stringify(stampResult, null, 2));
+      if (!stampResult) {
+        throw new Error(`Error: Stamp ${id} not found`);
+      }
 
-    if (!stampResult) {
-      console.error(`Stamp ${id} not found in getStamps result`);
-      throw new Error(`Error: Stamp ${id} not found`);
+      const stamp = this.extractStamp(stampResult);
+
+      // For non-STAMP/SRC-721, return basic info
+      if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
+        return {
+          stamp,
+          last_block: stampResult.last_block,
+        };
+      }
+
+      // Get asset details from XCP with same cache parameters
+      const { duration } = getCacheConfig(cacheType || RouteType.STAMP_DETAIL);
+      const asset = await XcpManager.getAssetInfo(stamp.cpid, duration);
+
+      return {
+        stamp,
+        asset,
+        last_block: stampResult.last_block,
+      };
+    } catch (error) {
+      console.error("Error in getStampDetailsById:", error);
+      return null;
     }
-
-    const stamp = this.extractStamp(stampResult);
-    console.log("Extracted stamp:", JSON.stringify(stamp, null, 2));
-
-    const cpid = stamp.cpid;
-
-    const [asset, holders, dispensers, sends, dispenses, total, lastBlock] =
-      await this.fetchRelatedData(stamp, cpid, dispenserFilter);
-
-    console.log("Related data fetched successfully");
-
-    return {
-      last_block: lastBlock,
-      asset: asset ? asset.result : null,
-      stamp,
-      holders,
-      sends,
-      dispensers,
-      dispenses,
-      total: total.rows[0]?.total,
-    };
   }
 
   private static extractStamp(stampResult: any) {
@@ -69,54 +78,38 @@ export class StampService {
         throw new Error(`Error: Stamp not found`);
       }
       return stampResult.stamps[0];
-    } else if (stampResult.stamp) {
+    } 
+    // Handle single stamp result
+    else if (stampResult.stamp) {
       return stampResult.stamp;
-    } else {
+    } 
+    // Handle direct result
+    else {
       return stampResult;
     }
   }
 
-  private static async fetchRelatedData(
-    stamp: any,
-    cpid: string,
-    filter: DispenserFilter,
-  ) {
-    const isStampOrSrc721 = stamp.ident === "STAMP" ||
-      stamp.ident === "SRC-721";
-
-    console.log(
-      `Fetching related data for CPID: ${cpid}, Filter: ${filter}, IsStampOrSrc721: ${isStampOrSrc721}`,
-    );
-
-    const results = await Promise.all([
-      isStampOrSrc721 ? XcpManager.getXcpAsset(cpid) : Promise.resolve(null),
-      isStampOrSrc721
-        ? XcpManager.getXcpHoldersByCpid(cpid)
-        : Promise.resolve([]),
-      isStampOrSrc721
-        ? DispenserManager.getDispensersByCpid(cpid, filter)
-        : Promise.resolve([]),
-      isStampOrSrc721
-        ? XcpManager.getXcpSendsByCPID(cpid)
-        : Promise.resolve([]),
-      isStampOrSrc721
-        ? DispenserManager.getDispensesByCpid(cpid)
-        : Promise.resolve([]),
-      StampRepository.getTotalStampCountFromDb({ type: "stamps" }),
-      BlockService.getLastBlock(),
-    ]);
-
-    console.log(
-      `Fetched related data for CPID: ${cpid}, Results: ${
-        JSON.stringify(results)
-      }`,
-    );
-
-    return results;
-  }
-
-  static async getStamps(options) {
-
+  static async getStamps(options: {
+    page?: number;
+    limit?: number;
+    sortBy?: "ASC" | "DESC";
+    type?: STAMP_TYPES;
+    ident?: SUBPROTOCOLS | SUBPROTOCOLS[];
+    identifier?: string | number | (string | number)[];
+    blockIdentifier?: number | string;
+    allColumns?: boolean;
+    noPagination?: boolean;
+    cacheDuration?: number | "never";
+    collectionId?: string | string[];
+    sortColumn?: string;
+    filterBy?: STAMP_FILTER_TYPES[];
+    suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    groupBy?: string;
+    groupBySubquery?: boolean;
+    skipTotalCount?: boolean;
+    cacheType?: RouteType;
+  }) {
+    // Ensure collection queries have proper grouping configuration
     if (options.collectionId && (!options.groupBy || !options.groupBySubquery)) {
       options = {
         ...options,
@@ -125,14 +118,37 @@ export class StampService {
       };
     }
 
-    const result = await StampRepository.getStampsFromDb(options);
-
+    const [result, lastBlock] = await Promise.all([
+      StampRepository.getStampsFromDb({
+        ...options,
+        cacheType: options.cacheType,
+        cacheDuration: options.cacheDuration
+      }),
+      BlockService.getLastBlock(),
+    ]);
 
     if (!result) {
       throw new Error("No stamps found");
     }
 
-    return result;
+    // Build base response
+    const response = {
+      stamps: result.stamps,
+      last_block: lastBlock,
+    };
+
+    // Add pagination info for collection queries and index routes
+    if ((options.collectionId && options.groupBy === "collection_id") || !options.skipTotalCount) {
+      return {
+        ...response,
+        page: result.page,
+        page_size: result.page_size,
+        pages: result.pages,
+        total: result.total,
+      };
+    }
+
+    return response;
   }
 
   static async getStampFile(id: string) {
@@ -249,5 +265,63 @@ export class StampService {
     newName: string,
   ): Promise<boolean> {
     return await StampRepository.updateCreatorName(address, newName);
+  }
+
+  static async getStampHolders(
+    cpid: string, 
+    page: number, 
+    limit: number,
+    options: StampServiceOptions
+  ) {
+    const { duration } = getCacheConfig(options.cacheType);
+    return await XcpManager.getXcpHoldersByCpid(cpid, page, limit, duration);
+  }
+
+  static async getStampSends(
+    cpid: string, 
+    page: number, 
+    limit: number,
+    options: StampServiceOptions
+  ) {
+    const { duration } = getCacheConfig(options.cacheType);
+    return await XcpManager.getXcpSendsByCPID(cpid, page, limit, duration);
+  }
+
+  static async getStampDispensers(
+    cpid: string, 
+    page: number, 
+    limit: number,
+    options: StampServiceOptions
+  ) {
+    const { duration } = getCacheConfig(options.cacheType);
+    return await DispenserManager.getDispensersByCpid(cpid, page, limit, duration);
+  }
+
+  static async getStampDispenses(
+    cpid: string, 
+    page: number, 
+    limit: number,
+    options: StampServiceOptions
+  ) {
+    const { duration } = getCacheConfig(options.cacheType);
+    return await DispenserManager.getDispensesByCpid(cpid, page, limit, duration);
+  }
+
+  // New lightweight method to just get cpid
+  static async resolveToCpid(id: string) {
+    const result = await StampRepository.getStampsFromDb({
+      identifier: id,
+      allColumns: false,
+      noPagination: true,
+      skipTotalCount: true,
+      // Only select minimal required fields
+      selectColumns: ['cpid', 'ident']
+    });
+
+    if (!result?.stamps?.[0]) {
+      throw new Error(`Error: Stamp ${id} not found`);
+    }
+
+    return result.stamps[0];
   }
 }

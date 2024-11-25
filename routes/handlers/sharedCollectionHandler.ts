@@ -9,7 +9,7 @@ export const collectionHandler: Handlers = {
       const collectionName = url.searchParams.get("name");
 
       if (!collectionName) {
-        return ResponseUtil.error("Collection name is required", 400);
+        return ResponseUtil.badRequest("Collection name is required", 400);
       }
 
       const collection = await CollectionService.getCollectionByName(
@@ -17,13 +17,12 @@ export const collectionHandler: Handlers = {
       );
 
       if (!collection) {
-        return ResponseUtil.error("Collection not found", 404);
+        return ResponseUtil.notFound("Collection not found");
       }
 
       return ResponseUtil.success({ data: collection });
     } catch (error) {
-      console.error(`Error fetching collection: ${error.message}`);
-      return ResponseUtil.error("Internal server error", 500);
+      return ResponseUtil.internalError(error, "Error fetching collection");
     }
   },
 };

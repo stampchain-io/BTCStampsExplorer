@@ -1,3 +1,3 @@
-import { sharedStampIdHandler } from "$handlers/sharedStampHandler.ts";
+import { createStampHandler } from "$handlers/sharedStampHandler.ts";
 
-export const handler = sharedStampIdHandler;
+export const handler = createStampHandler({ type: "cursed", isIndex: false });

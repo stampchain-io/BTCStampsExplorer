@@ -3,18 +3,19 @@ import { StampRow, StampSectionProps } from "globals";
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 
-import StampSection from "$islands/stamp/StampSection.tsx";
-
 import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
+import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
+import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
 
 import { StampController } from "$server/controller/stampController.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
-import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
+import { DispenserManager } from "$server/services/xcpService.ts";
+import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 
 interface StampDetailPageProps {
   data: {
@@ -57,64 +58,70 @@ export const handler: Handlers<StampData> = {
         return ctx.renderNotFound();
       }
 
-      const result = await StampController.getRecentSales(1, 6);
-      console.log("result: ", result);
+      // Only fetch dispensers for STAMP or SRC-721
+      let dispensers = [];
+      let lowestPriceDispenser = null;
+      let floorPrice = null;
 
-      if (!stampData) {
-        return ctx.renderNotFound();
+      if (
+        stampData.data.stamp.ident === "STAMP" ||
+        stampData.data.stamp.ident === "SRC-721"
+      ) {
+        // Fetch dispensers separately
+        const dispensersData = await DispenserManager.getDispensersByCpid(
+          stampData.data.stamp.cpid,
+        );
+        dispensers = dispensersData?.dispensers || [];
+
+        // Find the lowest price open dispenser
+        const openDispensers = dispensers.filter((d) => d.give_remaining > 0);
+        lowestPriceDispenser = openDispensers.reduce(
+          (lowest, dispenser) => {
+            if (!lowest || dispenser.satoshirate < lowest.satoshirate) {
+              return dispenser;
+            }
+            return lowest;
+          },
+          null,
+        );
+
+        // Calculate floor price from lowest price dispenser
+        floorPrice = lowestPriceDispenser
+          ? Number(
+            formatSatoshisToBTC(lowestPriceDispenser.satoshirate, {
+              includeSymbol: false,
+            }),
+          )
+          : null;
       }
-
-      const page = parseInt(url.searchParams.get("page") || "1");
-      const page_size = parseInt(
-        url.searchParams.get("limit") || "20",
-      );
-      const collectionsData = await CollectionController.getCollectionStamps({
-        limit: page_size,
-        page: page,
-        creator: "",
-      });
-
-      const { collections, pages, pag, limit } = {
-        collections: collectionsData.data,
-        pages: collectionsData.totalPages,
-        pag: collectionsData.page,
-        limit: collectionsData.limit,
-      };
-
-      // Find the lowest price open dispenser
-      const openDispensers = stampData.data.dispensers.filter((d) =>
-        d.give_remaining > 0
-      );
-      const lowestPriceDispenser = openDispensers.reduce(
-        (lowest, dispenser) => {
-          if (!lowest || dispenser.satoshirate < lowest.satoshirate) {
-            return dispenser;
-          }
-          return lowest;
-        },
-        null,
-      );
 
       const btcPrice = await fetchBTCPriceInUSD(serverConfig.API_BASE_URL);
 
       // Calculate USD values
       const stampWithPrices = {
         ...stampData.data.stamp,
-        floorPriceUSD: typeof stampData.data.stamp.floorPrice === "number"
-          ? stampData.data.stamp.floorPrice * btcPrice
-          : null,
+        floorPrice,
+        floorPriceUSD: floorPrice !== null ? floorPrice * btcPrice : null,
         marketCapUSD: typeof stampData.data.stamp.marketCap === "number"
           ? stampData.data.stamp.marketCap * btcPrice
           : null,
       };
 
+      // Don't wait for recent sales - let it load independently
+      StampController.getRecentSales(1, 6).then(result => {
+        console.log("Recent sales loaded: ", result);
+      }).catch(error => {
+        console.error("Error loading recent sales:", error);
+      });
+
       return ctx.render({
         ...stampData.data,
         stamp: stampWithPrices,
-        stamps_recent: result,
+        stamps_recent: { data: [] }, // Initialize empty, will be populated by island
         collections,
         last_block: stampData.last_block,
         lowestPriceDispenser,
+        dispensers,
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
@@ -146,29 +153,6 @@ export default function StampPage(props: StampDetailPageProps) {
     dispenses,
     dispensers,
   );
-
-  const sections: StampSectionProps[] = [
-    {
-      title: "RECENT SALES",
-      type: "stamps",
-      isRecentSales: true,
-      stamps: stamps_recent.data,
-      layout: "row",
-      showDetails: false,
-      gridClass: ` 
-        grid w-full gap-3 mobileLg:gap-4
-        grid-cols-4 desktop:grid-cols-6
-      `,
-      displayCounts: {
-        "mobileSm": 4, // 4 columns x 1 rows
-        "mobileLg": 4, // 4 columns x 1 rows
-        "tablet": 4, // 4 columns x 1 rows
-        "desktop": 6, // 6 columns x 1 rows
-      },
-    },
-  ];
-
-  console.log("stamp====>", stamp);
 
   return (
     <>
@@ -206,16 +190,7 @@ export default function StampPage(props: StampDetailPageProps) {
           dispensesWithRates={dispensesWithRates}
         />
 
-        <div>
-          <h1 class="text-3xl tablet:text-7xl text-left mb-2 bg-clip-text text-transparent purple-gradient1 font-black">
-            LATEST STAMPS
-          </h1>
-          <div class="flex flex-col gap-12">
-            {sections.map((section) => (
-              <StampSection key={section.type} {...section} />
-            ))}
-          </div>
-        </div>
+        <RecentSales initialData={stamps_recent.data} />
       </div>
     </>
   );

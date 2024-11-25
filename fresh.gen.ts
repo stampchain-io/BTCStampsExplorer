@@ -54,9 +54,14 @@ import * as $api_v2_src20_tick_tick_mintData from "./routes/api/v2/src20/tick/[t
 import * as $api_v2_src20_tick_index from "./routes/api/v2/src20/tick/index.ts";
 import * as $api_v2_src20_tx_tx_hash_ from "./routes/api/v2/src20/tx/[tx_hash].ts";
 import * as $api_v2_stamps_id_ from "./routes/api/v2/stamps/[id].ts";
+import * as $api_v2_stamps_id_dispensers from "./routes/api/v2/stamps/[id]/dispensers.ts";
+import * as $api_v2_stamps_id_dispenses from "./routes/api/v2/stamps/[id]/dispenses.ts";
+import * as $api_v2_stamps_id_holders from "./routes/api/v2/stamps/[id]/holders.ts";
+import * as $api_v2_stamps_id_sends from "./routes/api/v2/stamps/[id]/sends.ts";
 import * as $api_v2_stamps_balance_address_ from "./routes/api/v2/stamps/balance/[address].tsx";
 import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
 import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block/[block_index].ts";
+import * as $api_v2_stamps_dispense from "./routes/api/v2/stamps/dispense.ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
 import * as $api_v2_trx_complete_psbt from "./routes/api/v2/trx/complete_psbt.ts";
@@ -173,6 +178,7 @@ import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
+import * as $stamp_details_RecentSales from "./islands/stamp/details/RecentSales.tsx";
 import * as $stamp_details_StampBuyModal from "./islands/stamp/details/StampBuyModal.tsx";
 import * as $stamp_details_StampCodeModal from "./islands/stamp/details/StampCodeModal.tsx";
 import * as $stamp_details_StampImage from "./islands/stamp/details/StampImage.tsx";
@@ -269,11 +275,16 @@ const manifest = {
     "./routes/api/v2/src20/tick/index.ts": $api_v2_src20_tick_index,
     "./routes/api/v2/src20/tx/[tx_hash].ts": $api_v2_src20_tx_tx_hash_,
     "./routes/api/v2/stamps/[id].ts": $api_v2_stamps_id_,
+    "./routes/api/v2/stamps/[id]/dispensers.ts": $api_v2_stamps_id_dispensers,
+    "./routes/api/v2/stamps/[id]/dispenses.ts": $api_v2_stamps_id_dispenses,
+    "./routes/api/v2/stamps/[id]/holders.ts": $api_v2_stamps_id_holders,
+    "./routes/api/v2/stamps/[id]/sends.ts": $api_v2_stamps_id_sends,
     "./routes/api/v2/stamps/balance/[address].tsx":
       $api_v2_stamps_balance_address_,
     "./routes/api/v2/stamps/block.ts": $api_v2_stamps_block,
     "./routes/api/v2/stamps/block/[block_index].ts":
       $api_v2_stamps_block_block_index_,
+    "./routes/api/v2/stamps/dispense.ts": $api_v2_stamps_dispense,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
     "./routes/api/v2/trx/complete_psbt.ts": $api_v2_trx_complete_psbt,
@@ -410,6 +421,7 @@ const manifest = {
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/stamp/StampSection.tsx": $stamp_StampSection,
+    "./islands/stamp/details/RecentSales.tsx": $stamp_details_RecentSales,
     "./islands/stamp/details/StampBuyModal.tsx": $stamp_details_StampBuyModal,
     "./islands/stamp/details/StampCodeModal.tsx": $stamp_details_StampCodeModal,
     "./islands/stamp/details/StampImage.tsx": $stamp_details_StampImage,

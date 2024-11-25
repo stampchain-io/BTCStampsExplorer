@@ -13,6 +13,6 @@ export const handler = async (
     return ResponseUtil.success(body);
   } catch (error) {
     console.error("Error in deploy handler:", error);
-    return ResponseUtil.handleError(error, "Internal server error");
+    return ResponseUtil.internalError(error, "Internal server error");
   }
 };
