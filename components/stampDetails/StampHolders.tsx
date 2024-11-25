@@ -8,6 +8,10 @@ interface StampHoldersProps {
 }
 
 const StampHolders = ({ holders }: StampHoldersProps) => {
+  if (!holders?.length) {
+    return <div class="text-center py-4">No holder data available</div>;
+  }
+
   // Calculate total quantity for percentages
   const totalQuantity = holders.reduce(
     (sum, holder) => sum + holder.quantity,
@@ -35,43 +39,53 @@ const StampHolders = ({ holders }: StampHoldersProps) => {
     });
   };
 
-  const DoughnutConfig = {
-    type: "doughnut",
-    svgClass: "w-full h-1/2",
-    options: {
-      responsive: false,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: (context: any) => {
-              const holder = holders[context.dataIndex];
-              const percent = ((holder.quantity / totalQuantity) * 100).toFixed(
-                2,
-              );
-              return [
-                `Address: ${holder.address || "Unknown"}`,
-                `Amount: ${holder.quantity}`,
-                `Percent: ${percent}%`,
-              ];
+  try {
+    const DoughnutConfig = {
+      type: "doughnut" as const,
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: (context: any) => {
+                const holder = holders[context.dataIndex];
+                const percent = ((holder.quantity / totalQuantity) * 100)
+                  .toFixed(2);
+                return [
+                  `Address: ${holder.address || "Unknown"}`,
+                  `Amount: ${holder.quantity}`,
+                  `Percent: ${percent}%`,
+                ];
+              },
             },
           },
         },
       },
-    },
-    data: {
-      labels: false,
-      datasets: [{
-        borderColor: [...Array(holders.length)].fill("#666666"),
-        label: "Graph Holder",
-        data: holders.map((holder) => holder.quantity),
-        backgroundColor: generateColors(holders.length),
-        hoverOffset: 4,
-      }],
-    },
-  };
+      data: {
+        labels: holders.map((h) => h.address || "Unknown"),
+        datasets: [{
+          borderColor: [...Array(holders.length)].fill("#666666"),
+          label: "Graph Holder",
+          data: holders.map((holder) => holder.quantity),
+          backgroundColor: generateColors(holders.length),
+          hoverOffset: 4,
+        }],
+      },
+    };
 
-  return <Chart {...DoughnutConfig} />;
+    return (
+      <div class="w-[300px] h-[300px] tablet:w-[400px] tablet:h-[400px]">
+        <Chart {...DoughnutConfig} />
+      </div>
+    );
+  } catch (error) {
+    console.error("Error rendering chart:", error);
+    return <div class="text-center py-4">Error rendering chart</div>;
+  }
 };
 
 export default StampHolders;

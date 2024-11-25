@@ -1,3 +1,4 @@
+import { useEffect, useState } from "preact/hooks";
 import StampHolders from "$components/stampDetails/StampHolders.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
@@ -7,7 +8,8 @@ interface Holder {
 }
 
 interface StampRelatedGraphProps {
-  holders: Holder[];
+  stampId: string;
+  initialHolders?: Holder[];
 }
 
 const tableHeaders = [
@@ -23,22 +25,81 @@ function HolderRow(
 
   return (
     <tr>
-      <td className="pr-3 tablet:pr-6 py-2 tablet:py-4">
+      <td class="pr-3 tablet:pr-6 py-2 tablet:py-4">
         <a href={`/wallet/${holder.address}`}>
           {holder.address ? abbreviateAddress(holder.address) : "Unknown"}
         </a>
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
+      <td class="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
         {holder.quantity}
       </td>
-      <td className="pl-3 tablet:pl-6 py-2 tablet:py-4 text-sm">
+      <td class="pl-3 tablet:pl-6 py-2 tablet:py-4 text-sm">
         {holderPercent}%
       </td>
     </tr>
   );
 }
 
-export function StampRelatedGraph({ holders }: StampRelatedGraphProps) {
+export function StampRelatedGraph(
+  { stampId, initialHolders = [] }: StampRelatedGraphProps,
+) {
+  const [holders, setHolders] = useState<Holder[]>(initialHolders);
+  const [isLoading, setIsLoading] = useState(!initialHolders.length);
+
+  useEffect(() => {
+    const fetchHolders = async () => {
+      if (holders.length > 0) return;
+
+      setIsLoading(true);
+      try {
+        console.log("Fetching holders for stamp:", stampId);
+        const response = await fetch(`/api/v2/stamps/${stampId}/holders`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Holders data received:", data);
+        if (data.data) {
+          setHolders(data.data);
+        } else {
+          console.warn("No holders data in response:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching holders:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (stampId) {
+      console.log("Starting holders fetch for stampId:", stampId);
+      fetchHolders();
+    } else {
+      console.warn("No stampId provided for holders fetch");
+    }
+  }, [stampId]);
+
+  useEffect(() => {
+    console.log("Current holders:", holders);
+    console.log("Is loading:", isLoading);
+  }, [holders, isLoading]);
+
+  if (isLoading) {
+    return (
+      <div class="flex flex-col bg-gradient-to-br primary-gradient p-6 relative">
+        <div class="text-center py-10">Loading holders data...</div>
+      </div>
+    );
+  }
+
+  if (!holders.length) {
+    return (
+      <div class="flex flex-col bg-gradient-to-br primary-gradient p-6 relative">
+        <div class="text-center py-10">No holder data available</div>
+      </div>
+    );
+  }
+
   const totalHolders = holders.length;
   const totalQuantity = holders.reduce(
     (sum, holder) => sum + holder.quantity,
@@ -46,29 +107,29 @@ export function StampRelatedGraph({ holders }: StampRelatedGraphProps) {
   );
 
   return (
-    <div className="flex flex-col bg-gradient-to-br primary-gradient p-6 relative">
-      <div className="absolute top-6 right-6 text-center">
-        <p className="text-stamp-text-secondary font-light uppercase">
+    <div class="flex flex-col bg-gradient-to-br primary-gradient p-6 relative">
+      <div class="absolute top-6 right-6 text-center">
+        <p class="text-stamp-text-secondary font-light uppercase">
           HOLDERS
         </p>
-        <p className="text-stamp-text-primary font-light uppercase tablet:text-[32px]">
+        <p class="text-stamp-text-primary font-light uppercase tablet:text-[32px]">
           {totalHolders}
         </p>
       </div>
-      <div className="flex flex-col items-center tablet:flex-row w-full gap-6">
-        <div className="mt-5 tablet:mt-0">
+      <div class="flex flex-col items-center tablet:flex-row w-full gap-6">
+        <div class="mt-5 tablet:mt-0">
           <StampHolders holders={holders} />
         </div>
-        <div className="relative shadow-md w-full max-w-full mt-6 tablet:mt-20">
-          <div className="max-h-96 overflow-x-auto">
-            <table className="w-full text-sm text-left rtl:text-right text-stamp-text-secondary mobileLg:rounded-lg">
-              <thead className="text-lg uppercase">
+        <div class="relative shadow-md w-full max-w-full mt-6 tablet:mt-20">
+          <div class="max-h-96 overflow-x-auto">
+            <table class="w-full text-sm text-left rtl:text-right text-stamp-text-secondary mobileLg:rounded-lg">
+              <thead class="text-lg uppercase">
                 <tr>
                   {tableHeaders.map(({ key, label }) => (
                     <th
                       key={key}
                       scope="col"
-                      className={`${
+                      class={`${
                         key === "address"
                           ? "pr-3 tablet:pr-6"
                           : key === "percent"
