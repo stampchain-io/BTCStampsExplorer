@@ -99,7 +99,7 @@ export function SRC20BaseCard(
           )}
 
           {variant === "minting" && (
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-1 pt-3">
               <p class={defaultTextClassName}>
                 PROGRESS <span class={boldTextClassName}>{progress}%</span>
               </p>
