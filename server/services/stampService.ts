@@ -207,7 +207,7 @@ export class StampService {
     }));
   }
 
-  static async getRecentSales(page?: number, limit?: number) {
+  static async getRecentSales(page?: number, limit?: number) { // FIXME: this is temoprorary until we add recent sales in db
     // Fetch dispense events and extract unique asset values
     const dispenseEvents = await XcpManager.fetchDispenseEvents(500); // Fetch recent dispense events
     const uniqueAssets = [
@@ -216,7 +216,7 @@ export class StampService {
 
     const stampDetails = await this.getStamps({
       identifier: uniqueAssets,
-      allColumns: true,
+      allColumns: false,
       noPagination: true,
     });
 
@@ -289,12 +289,15 @@ export class StampService {
 
   static async getStampDispensers(
     cpid: string, 
-    page: number, 
-    limit: number,
+    page?: number, 
+    limit?: number,
     options: StampServiceOptions
   ) {
     const { duration } = getCacheConfig(options.cacheType);
-    return await DispenserManager.getDispensersByCpid(cpid, page, limit, duration);
+    if (page !== undefined && limit !== undefined) {
+      return await DispenserManager.getDispensersByCpid(cpid, page, limit, duration);
+    }
+    return await DispenserManager.getDispensersByCpid(cpid);
   }
 
   static async getStampDispenses(

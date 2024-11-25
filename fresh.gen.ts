@@ -64,6 +64,7 @@ import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block
 import * as $api_v2_stamps_dispense from "./routes/api/v2/stamps/dispense.ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
+import * as $api_v2_stamps_recentSales from "./routes/api/v2/stamps/recentSales.ts";
 import * as $api_v2_trx_complete_psbt from "./routes/api/v2/trx/complete_psbt.ts";
 import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_utxoattach from "./routes/api/v2/trx/utxoattach.ts";
@@ -287,6 +288,7 @@ const manifest = {
     "./routes/api/v2/stamps/dispense.ts": $api_v2_stamps_dispense,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
+    "./routes/api/v2/stamps/recentSales.ts": $api_v2_stamps_recentSales,
     "./routes/api/v2/trx/complete_psbt.ts": $api_v2_trx_complete_psbt,
     "./routes/api/v2/trx/create_psbt.ts": $api_v2_trx_create_psbt,
     "./routes/api/v2/trx/utxoattach.ts": $api_v2_trx_utxoattach,

@@ -10,7 +10,6 @@ import CollectionSection from "$islands/collection/CollectionSection.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 
 export function HomeStampPreview({
-  stamps_recent = [],
   stamps_src721 = [],
   stamps_art = [],
   stamps_posh = [],
@@ -19,7 +18,6 @@ export function HomeStampPreview({
   stamps_art: StampRow[];
   stamps_posh: StampRow[];
   stamps_src721: StampRow[];
-  stamps_recent: StampRow[];
   collectionData: Collection[];
 }) {
   const LatestArtStampsSection: StampSectionProps[] = [
@@ -115,32 +113,6 @@ export function HomeStampPreview({
     },
   };
 
-  const RecentSalesSection: StampSectionProps[] = [
-    {
-      title: "RECENT SALES",
-      subTitle: "HOT STAMPS",
-      type: "recent",
-      stamps: stamps_recent,
-      layout: "grid",
-      isRecentSales: true,
-      showDetails: false,
-      showMinDetails: true,
-      variant: "grey",
-      gridClass: `
-        grid w-full gap-3 mobileMd:gap-6
-        grid-cols-4 mobileMd:grid-cols-5 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-6
-        auto-rows-fr
-      `,
-      displayCounts: {
-        "mobileSm": 4, // 4 columns x 1 row
-        "mobileMd": 5, // 5 columns x 1 row
-        "mobileLg": 5, // 5 columns x 1 row
-        "tablet": 6, // 6 columns x 1 row
-        "desktop": 6, // 6 columns x 1 row
-      },
-    },
-  ];
-
   return (
     <div className="
       flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36
@@ -171,11 +143,6 @@ export function HomeStampPreview({
 
       {/* CUTTING EDGE */}
       <CollectionSection {...CuttingEdgeSection} />
-
-      {/* RECENT SALES */}
-      {RecentSalesSection.map((section) => (
-        <StampSection key={section.title} {...section} />
-      ))}
     </div>
   );
 }
