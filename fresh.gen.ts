@@ -154,12 +154,11 @@ import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
-import * as $modules_FAQ from "./islands/modules/FAQ.tsx";
-import * as $modules_FAQDeploy from "./islands/modules/FAQDeploy.tsx";
-import * as $modules_FAQMint from "./islands/modules/FAQMint.tsx";
-import * as $modules_FAQStamping from "./islands/modules/FAQStamping.tsx";
-import * as $modules_FAQTransfer from "./islands/modules/FAQTransfer.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
+import * as $modules_HowToDeploy from "./islands/modules/HowToDeploy.tsx";
+import * as $modules_HowToMint from "./islands/modules/HowToMint.tsx";
+import * as $modules_HowToStamp from "./islands/modules/HowToStamp.tsx";
+import * as $modules_HowToTransfer from "./islands/modules/HowToTransfer.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
@@ -394,12 +393,11 @@ const manifest = {
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,
-    "./islands/modules/FAQ.tsx": $modules_FAQ,
-    "./islands/modules/FAQDeploy.tsx": $modules_FAQDeploy,
-    "./islands/modules/FAQMint.tsx": $modules_FAQMint,
-    "./islands/modules/FAQStamping.tsx": $modules_FAQStamping,
-    "./islands/modules/FAQTransfer.tsx": $modules_FAQTransfer,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
+    "./islands/modules/HowToDeploy.tsx": $modules_HowToDeploy,
+    "./islands/modules/HowToMint.tsx": $modules_HowToMint,
+    "./islands/modules/HowToStamp.tsx": $modules_HowToStamp,
+    "./islands/modules/HowToTransfer.tsx": $modules_HowToTransfer,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,

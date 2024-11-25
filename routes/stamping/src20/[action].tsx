@@ -7,9 +7,9 @@ import RecentDeploy from "$islands/stamping/src20/deploy/RecentDeploy.tsx";
 import { TransferContent } from "$islands/stamping/src20/transfer/TransferContent.tsx";
 import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx";
 
-import { FAQDeployModule } from "$islands/modules/FAQDeploy.tsx";
-import { FAQMintModule } from "$islands/modules/FAQMint.tsx";
-import { FAQTransferModule } from "$islands/modules/FAQTransfer.tsx";
+import { HowToDeployModule } from "$islands/modules/HowToDeploy.tsx";
+import { HowToMintModule } from "$islands/modules/HowToMint.tsx";
+import { HowToTransferModule } from "$islands/modules/HowToTransfer.tsx";
 
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
@@ -160,11 +160,11 @@ export default function StampingSrc20Page(
   const renderLeftSidebar = () => {
     switch (selectedTab) {
       case "mint":
-        return <FAQMintModule />;
+        return <HowToMintModule />;
       case "deploy":
-        return <FAQDeployModule />;
+        return <HowToDeployModule />;
       case "transfer":
-        return <FAQTransferModule />;
+        return <HowToTransferModule />;
       default:
         return null;
     }

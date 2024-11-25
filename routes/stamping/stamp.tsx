@@ -3,7 +3,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 
 import { OlgaContent } from "$islands/stamping/stamp/OlgaContent.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
-import { FAQStampingModule } from "$islands/modules/FAQStamping.tsx";
+import { HowToStampModule } from "$islands/modules/HowToStamp.tsx";
 
 import { StampController } from "$server/controller/stampController.ts";
 
@@ -68,7 +68,7 @@ export default function StampingStampPage({ data }: PageProps<StampPageData>) {
       </div>
       <div class="flex flex-col tablet:flex-row gap-3 mobileMd:gap-6 desktop:gap-9 w-full">
         <div class="w-full tablet:w-1/2">
-          <FAQStampingModule />
+          <HowToStampModule />
         </div>
         <div class="w-full tablet:w-1/2 flex flex-col gap-3 mobileMd:gap-6 items-start tablet:items-end">
           <StampSection {...latestStampsSection} />
