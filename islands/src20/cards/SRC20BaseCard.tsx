@@ -40,7 +40,7 @@ export function SRC20BaseCard(
       <div class="uppercase cursor-pointer flex gap-6">
         <img
           src={imageUrl}
-          class="w-[86px] h-[86px] mobileLg:w-[103px] mobileLg:h-[103px]"
+          class="w-[86px] h-[86px] mobileLg:w-[102px] mobileLg:h-[102px]"
           onClick={() => onImageClick?.(imageUrl)}
           alt={convertToEmoji(src20.tick)}
         />
