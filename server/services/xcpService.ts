@@ -81,101 +81,76 @@ export class DispenserManager {
 
   static async getDispensersByCpid(
     cpid: string,
-    page: number = 1,
-    limit: number = 50,
+    page?: number,
+    limit?: number,
     cacheTimeout?: number,
     filter: DispenserFilter = "all"
   ): Promise<{ dispensers: any[], total: number }> {
     const endpoint = `/assets/${cpid}/dispensers`;
-    let allDispensers: any[] = [];
-    let cursor: string | null = null;
-    const apiLimit = 1000;
-
-    // Calculate how many items to skip based on page and limit
-    const skipCount = (page - 1) * limit;
-    let processedCount = 0;
-
-    console.log(`Fetching dispensers for CPID: ${cpid}, Filter: ${filter}, Page: ${page}, Limit: ${limit}`);
 
     // Apply filter to API query if possible
     const queryParams = new URLSearchParams({
-      limit: apiLimit.toString(),
+      limit: limit?.toString() || "50",
       status: filter === "all" ? undefined : filter
     });
 
-    while (true) {
-      if (cursor) {
-        queryParams.set("cursor", cursor);
+    try {
+      const response = await fetchXcpV2WithCache(
+        endpoint,
+        queryParams
+      );
+
+      if (!response || !Array.isArray(response.result)) {
+        return { dispensers: [], total: 0 };
       }
 
-      try {
-        const response = await fetchXcpV2WithCache(
-          endpoint,
-          queryParams
+      const dispensers = response.result.map((dispenser: any) => ({
+        tx_hash: dispenser.tx_hash,
+        block_index: dispenser.block_index,
+        source: dispenser.source,
+        cpid: dispenser.asset,
+        give_quantity: dispenser.give_quantity,
+        give_remaining: dispenser.give_remaining,
+        escrow_quantity: dispenser.escrow_quantity,
+        satoshirate: dispenser.satoshirate,
+        btcrate: Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false })),
+        origin: dispenser.origin,
+        confirmed: dispenser.confirmed,
+        close_block_index: dispenser.close_block_index,
+        status: dispenser.give_remaining > 0 ? "open" : "closed",
+        asset_info: dispenser.asset_info,
+        dispenser_info: dispenser.dispenser_info
+      }));
+
+      // If API doesn't support status filter, apply it client-side
+      const filteredDispensers = filter === "all"
+        ? dispensers
+        : dispensers.filter((dispenser) =>
+          filter === "open"
+            ? dispenser.give_remaining > 0
+            : dispenser.give_remaining === 0
         );
 
-        if (!response || !Array.isArray(response.result)) {
-          console.log(`No more results for CPID: ${cpid}`);
-          break;
-        }
-
-        const dispensers = response.result.map((dispenser: any) => ({
-          tx_hash: dispenser.tx_hash,
-          block_index: dispenser.block_index,
-          source: dispenser.source,
-          cpid: dispenser.asset,
-          give_quantity: dispenser.give_quantity,
-          give_remaining: dispenser.give_remaining,
-          escrow_quantity: dispenser.escrow_quantity,
-          satoshirate: dispenser.satoshirate,
-          btcrate: Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false })),
-          origin: dispenser.origin,
-          confirmed: dispenser.confirmed,
-          close_block_index: dispenser.close_block_index,
-          status: dispenser.give_remaining > 0 ? "open" : "closed",
-          asset_info: dispenser.asset_info,
-          dispenser_info: dispenser.dispenser_info
-        }));
-
-        // If API doesn't support status filter, apply it client-side
-        const filteredDispensers = filter === "all"
-          ? dispensers
-          : dispensers.filter((dispenser) =>
-            filter === "open"
-              ? dispenser.give_remaining > 0
-              : dispenser.give_remaining === 0
-          );
-
-        allDispensers = allDispensers.concat(filteredDispensers);
-        processedCount += filteredDispensers.length;
-
-        // If we have enough items for the requested page, break
-        if (allDispensers.length >= skipCount + limit) {
-          break;
-        }
-
-        if (!response.next_cursor || response.next_cursor === cursor) {
-          break;
-        }
-        cursor = response.next_cursor;
-      } catch (error) {
-        console.error(`Error fetching dispensers for cpid ${cpid}:`, error);
-        break;
+      // If pagination is requested, apply it
+      if (page !== undefined && limit !== undefined) {
+        const skipCount = (page - 1) * limit;
+        const paginatedDispensers = filteredDispensers.slice(skipCount, skipCount + limit);
+        return {
+          dispensers: paginatedDispensers,
+          total: filteredDispensers.length
+        };
       }
+
+      // Otherwise return all dispensers
+      return {
+        dispensers: filteredDispensers,
+        total: filteredDispensers.length
+      };
+
+    } catch (error) {
+      console.error(`Error fetching dispensers for cpid ${cpid}:`, error);
+      return { dispensers: [], total: 0 };
     }
-
-    // Apply pagination to the collected results
-    const paginatedDispensers = allDispensers.slice(skipCount, skipCount + limit);
-    const total = allDispensers.length;
-
-    console.log(
-      `Fetched dispensers for CPID: ${cpid}, Count: ${total}`,
-    );
-
-    return {
-      dispensers: paginatedDispensers,
-      total
-    };
   }
 
   static async getDispensesByCpid(
@@ -187,7 +162,6 @@ export class DispenserManager {
     const endpoint = `/assets/${cpid}/dispenses`;
     let allDispenses: any[] = [];
     let cursor: string | null = null;
-    const apiLimit = 1000;
 
     // Calculate how many items to skip based on page and limit
     const skipCount = (page - 1) * limit;

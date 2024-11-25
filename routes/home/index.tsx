@@ -4,11 +4,11 @@ import { Handlers } from "$fresh/server.ts";
 import { HomeHeader } from "$islands/home/HomeHeader.tsx";
 import { HomeCarousel } from "$islands/home/HomeCarousel.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
-// import { HomeStampChainSelected } from "$islands/home/HomeStampChainSelected.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
 import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
+import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
 
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { getRecommendedFees } from "$lib/utils/mempool.ts";
@@ -92,7 +92,6 @@ export const handler: Handlers = {
 
 export default function Home(props: HomePageProps) {
   const {
-    stamps_recent = [],
     stamps_src721 = [],
     stamps_art = [],
     stamps_posh = [],
@@ -108,16 +107,27 @@ export default function Home(props: HomePageProps) {
     <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 text-white">
       <HomeHeader />
       <HomeCarousel carouselStamps={carouselStamps} />
+
       <HomeStampPreview
         stamps_art={stamps_art}
         stamps_posh={stamps_posh}
         stamps_src721={stamps_src721}
-        stamps_recent={stamps_recent}
         collectionData={collectionData}
       />
       <GetStampingModule
         btcPrice={Number(btcPrice)}
         recommendedFee={Number(recommendedFee)}
+      />
+      <RecentSales
+        title="RECENT SALES"
+        subTitle="HOT STAMPS"
+        variant="home"
+        displayCounts={{
+          mobileSm: 4,
+          mobileLg: 5,
+          tablet: 6,
+          desktop: 6,
+        }}
       />
       <div class="flex flex-col gap-12 mobileLg:gap-[72px]">
         <SRC20Section

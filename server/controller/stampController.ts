@@ -349,7 +349,6 @@ export class StampController {
         stampCategories,
         src20Result,
         trendingSrc20s,
-        recentSales,
         collectionData,
         carouselStamps,
       ] = await Promise.all([
@@ -365,7 +364,6 @@ export class StampController {
           sortBy: "ASC",
         }),
         Src20Controller.fetchTrendingTokens(null, 5, 1, 1000),
-        this.getRecentSales(1, 6),
         CollectionController.getCollectionStamps({
           limit: 4,
           page: 1,
@@ -404,7 +402,6 @@ export class StampController {
       }
 
       return {
-        stamps_recent: recentSales.data,
         stamps_src721: stampCategories[1].stamps,
         stamps_art: stampCategories[2].stamps,
         stamps_posh,
@@ -669,8 +666,8 @@ export class StampController {
 
   static async getStampDispensers(
     id: string, 
-    page: number = 1, 
-    limit: number = 50,
+    page: number, 
+    limit: number,
     cacheType: RouteType
   ) {
     try {
@@ -686,6 +683,26 @@ export class StampController {
     } catch (error) {
       logger.error("stamps", {
         message: "Error fetching stamp dispensers",
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
+    }
+  }
+
+  static async getAllStampDispensers(
+    id: string,
+    cacheType: RouteType
+  ) {
+    try {
+      const cpid = await this.resolveToCpid(id);
+      const { dispensers, total } = await StampService.getAllStampDispensers(cpid, { cacheType });
+      return {
+        data: dispensers,
+        total
+      };
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error fetching all stamp dispensers",
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;

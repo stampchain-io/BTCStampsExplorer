@@ -1,4 +1,4 @@
-import { StampRow, StampSectionProps } from "globals";
+import { StampRow } from "globals";
 
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
@@ -10,7 +10,6 @@ import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx"
 import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
 
 import { StampController } from "$server/controller/stampController.ts";
-import { StampService } from "$server/services/stampService.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
@@ -122,17 +121,9 @@ export const handler: Handlers<StampData> = {
           : null,
       };
 
-      // Don't wait for recent sales - let it load independently
-      StampController.getRecentSales(1, 6).then((result) => {
-        console.log("Recent sales loaded: ", result);
-      }).catch((error) => {
-        console.error("Error loading recent sales:", error);
-      });
-
       return ctx.render({
         ...stampData.data,
         stamp: stampWithPrices,
-        stamps_recent: { data: [] },
         collections,
         last_block: stampData.last_block,
       });
@@ -197,7 +188,17 @@ export default function StampPage(props: StampDetailPageProps) {
           stampId={stamp.stamp?.toString() || ""}
         />
 
-        <RecentSales initialData={stamps_recent.data} />
+        <RecentSales
+          title="LATEST STAMPS"
+          subTitle="LATEST TRANSACTIONS"
+          variant="detail"
+          displayCounts={{
+            mobileSm: 3,
+            mobileLg: 4,
+            tablet: 4,
+            desktop: 6,
+          }}
+        />
       </div>
     </>
   );

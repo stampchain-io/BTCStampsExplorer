@@ -12,7 +12,9 @@ export function StampContent({ stamps, isRecentSales = false }: {
       <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
         {stamps.map((stamp) => (
           <StampCard
-            key={stamp.tx_hash}
+            key={isRecentSales && stamp.sale_data
+              ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
+              : stamp.tx_hash}
             stamp={stamp}
             isRecentSale={isRecentSales}
             showDetails={true}

@@ -127,7 +127,11 @@ export default function StampSection({
       <div class={gridClass}>
         {isLoading ? <div>Loading...</div> : (
           stampArray.slice(0, displayCount).map((stamp: StampRow) => (
-            <div key={stamp.tx_hash}>
+            <div
+              key={isRecentSales && stamp.sale_data
+                ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
+                : stamp.tx_hash}
+            >
               <StampCard
                 stamp={stamp}
                 isRecentSale={isRecentSales}
