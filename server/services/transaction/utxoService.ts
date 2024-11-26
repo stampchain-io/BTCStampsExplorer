@@ -73,7 +73,7 @@ export class UTXOService {
         );
 
         const utxosToExclude = new Set<string>();
-        for (const balance of stampBalances) {
+        for (const balance of stampBalances.balances) {
           if (balance.utxo) {
             utxosToExclude.add(balance.utxo);
           }

@@ -7,7 +7,6 @@ interface SendRow {
   memo: string;
   tx_hash: string;
   block_time: number;
-  is_btc_stamp: boolean;
   cpid?: string;
 }
 

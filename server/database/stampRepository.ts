@@ -268,44 +268,31 @@ export class StampRepository {
    */
   static async getCountStampBalancesByAddressFromDb(
     address: string,
+    xcpBalances: XcpBalance[]
   ) {
     try {
-      const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
-      const assets = xcp_balances.map((balance: XcpBalance) => balance.cpid);
+      const assets = xcpBalances.map(balance => balance.cpid);
       if (assets.length === 0) {
         return {
-          rows: [
-            {
-              total: 0,
-            },
-          ],
+          rows: [{ total: 0 }]
         };
       }
+
       const query = `
-          SELECT 
-            COUNT(*) AS total
-          FROM 
-            ${STAMP_TABLE} st
-          LEFT JOIN 
-            creator cr ON st.creator = cr.address
-          WHERE 
-            st.cpid IN (${assets.map(() => "?").join(",")})
-        `;
-      const balances = await dbManager.executeQueryWithCache(
+        SELECT COUNT(*) AS total
+        FROM ${STAMP_TABLE} st
+        LEFT JOIN creator cr ON st.creator = cr.address
+        WHERE st.cpid IN (${assets.map(() => "?").join(",")})
+      `;
+
+      return await dbManager.executeQueryWithCache(
         query,
         assets,
-        DEFAULT_CACHE_DURATION,
+        DEFAULT_CACHE_DURATION
       );
-      return balances;
     } catch (error) {
-      console.error("Error getting balances: ", error);
-      return {
-        rows: [
-          {
-            total: 0,
-          },
-        ],
-      };
+      console.error("Error getting balance count:", error);
+      return { rows: [{ total: 0 }] };
     }
   }
 
@@ -401,8 +388,8 @@ export class StampRepository {
       suffixFilters,
     );
 
-    // Build base columns for select clause
-    const baseColumns = `
+    // Core stamp fields that are always needed
+    const coreColumns = `
       st.stamp, 
       st.block_index, 
       st.cpid, 
@@ -420,16 +407,23 @@ export class StampRepository {
       st.tx_index, 
       st.ident, 
       st.stamp_hash, 
-      st.is_btc_stamp, 
       st.file_hash
     `;
 
-    // Modify select clause to use custom columns if provided
-    let selectClause = selectColumns 
-      ? `st.${selectColumns.join(', st.')}`
-      : allColumns
-        ? "st.*, cr.creator AS creator_name"
-        : baseColumns;
+    // Extended fields for full stamp details
+    const extendedColumns = `
+      st.asset_longname,
+      st.message_index,
+      st.src_data,
+      st.is_btc_stamp,
+      st.is_reissue,
+      st.is_valid_base64
+    `;
+
+    // Select either custom columns, or core+extended columns, or just core columns
+    const selectClause = selectColumns 
+      ? `st.${selectColumns.join(', st.')}` // Custom columns
+      : `${coreColumns}${extendedColumns ? `, ${extendedColumns}` : ''}`; // Core + optional extended
 
     // Only include collection_id in select clause if collectionId is provided
     if (collectionId) {
@@ -499,7 +493,7 @@ export class StampRepository {
         const subQuery = `
           WITH ValidStamps AS (
             SELECT 
-              ${baseColumns},
+              ${coreColumns},
               HEX(cs1.collection_id) as collection_id,
               ROW_NUMBER() OVER (
                 PARTITION BY cs1.collection_id 
@@ -588,18 +582,16 @@ export class StampRepository {
    * @param order - The order in which to retrieve the stamp balances. Default is "DESC".
    * @returns An array of summarized stamp balances for the given address.
    */
-  static async getStampBalancesByAddressFromDb(
+  static async getStampBalancesByAddress(
     address: string,
     limit = BIG_LIMIT,
     page = 1,
-    order = "DESC",
+    xcpBalances: XcpBalance[],
+    order = "DESC"
   ): Promise<StampBalance[]> {
     const offset = (page - 1) * limit;
     try {
-      // FIXME: this is likely a bit redundant since we are fetching updated balances on the indexer every 20 blocks now - may want to increase that polling interval
-      // However this will be needed to fetch realtime UTXO attaches if needed here.
-      const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
-      const assets = xcp_balances.map((balance: XcpBalance) => balance.cpid);
+      const assets = xcpBalances.map(balance => balance.cpid);
 
       if (assets.length === 0) {
         return [];
@@ -607,63 +599,55 @@ export class StampRepository {
 
       const query = `
         SELECT 
-          st.cpid, 
           st.stamp, 
-          st.stamp_base64,
+          st.tx_hash,
+          st.cpid, 
           st.stamp_url, 
           st.stamp_mimetype, 
-          st.tx_hash, 
           st.divisible, 
           st.supply, 
           st.locked, 
           st.creator, 
           cr.creator AS creator_name
-        FROM 
-          ${STAMP_TABLE} st
-        LEFT JOIN 
-          creator cr ON st.creator = cr.address
-        WHERE 
-          st.cpid IN ( ${
-        assets.map((asset: string) => `'${asset}'`).join(", ")
-      } )
+        FROM ${STAMP_TABLE} st
+        LEFT JOIN creator cr ON st.creator = cr.address
+        WHERE st.cpid IN (${assets.map(() => "?").join(",")})
         ORDER BY st.stamp ${order}
         LIMIT ${limit}
-        OFFSET ${offset};
+        OFFSET ${offset}
       `;
 
       const balances = await dbManager.executeQueryWithCache(
         query,
         assets,
-        DEFAULT_CACHE_DURATION,
+        DEFAULT_CACHE_DURATION
       );
 
       const grouped = balances.rows.reduce(
         (acc: Record<string, StampBalance[]>, cur: StampBalance) => {
           acc[cur.cpid] = acc[cur.cpid] || [];
-          acc[cur.cpid].push({
-            ...cur,
-            is_btc_stamp: cur.is_btc_stamp ?? 0,
-          });
+          acc[cur.cpid].push({ ...cur });
           return acc;
         },
-        {},
+        {}
       );
 
-      const summarized = Object.keys(grouped).map((key) =>
+      const summarized = Object.keys(grouped).map(key => 
         summarize_issuances(grouped[key])
       );
 
+      // Use the passed xcpBalances for quantity info
       return summarized.map((summary: StampBalance) => {
-        const xcp_balance = xcp_balances.find((
-          balance: { cpid: string; quantity: number },
-        ) => balance.cpid === summary.cpid);
+        const xcp_balance = xcpBalances.find(
+          balance => balance.cpid === summary.cpid
+        );
         return {
           ...summary,
-          balance: xcp_balance ? xcp_balance.quantity : 0,
+          balance: xcp_balance ? xcp_balance.quantity : 0
         };
       });
     } catch (error) {
-      console.error("Error getting balances: ", error);
+      console.error("Error getting balances:", error);
       return [];
     }
   }

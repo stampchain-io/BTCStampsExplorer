@@ -55,13 +55,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         last_block: result.last_block,
         btc: result.btc,
         data: {
-          stamps: result.data.stamps.map((stamp: StampBalance) => ({
-            ...stamp,
-            block_index: stamp.block_index || 0,
-            keyburn: stamp.keyburn || 0,
-            block_time: stamp.block_time || 0,
-            ident: stamp.ident || "STAMP",
-          })),
+          stamps: result.data.stamps,
           src20: result.data.src20 || [],
         },
       };

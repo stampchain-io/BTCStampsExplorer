@@ -28,7 +28,7 @@ export class StampService {
       // Get stamp details using getStamps with proper caching
       const stampResult = await this.getStamps({
         identifier: id,
-        allColumns: true,
+        allColumns: false,
         noPagination: true,
         type: stampType,
         skipTotalCount: true,
@@ -182,15 +182,22 @@ export class StampService {
     address: string,
     limit: number,
     page: number,
+    xcpBalances: XcpBalance[]
   ) {
-    const [totalResult, stamps] = await Promise.all([
-      StampRepository.getCountStampBalancesByAddressFromDb(address),
-      StampRepository.getStampBalancesByAddressFromDb(address, limit, page),
-    ]);
+    try {
+      // Get stamps and total count in parallel using the passed XCP balances
+      const [stamps, totalResult] = await Promise.all([
+        StampRepository.getStampBalancesByAddress(address, limit, page, xcpBalances),
+        StampRepository.getCountStampBalancesByAddressFromDb(address, xcpBalances)
+      ]);
 
-    const total = totalResult.rows[0]?.total || 0;
+      const total = totalResult.rows[0]?.total || 0;
 
-    return { stamps, total };
+      return { stamps, total };
+    } catch (error) {
+      console.error("Error in getStampBalancesByAddress:", error);
+      return { stamps: [], total: 0 };
+    }
   }
 
   static async getAllCPIDs() {

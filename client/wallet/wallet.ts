@@ -100,11 +100,10 @@ export const disconnect = () => {
 };
 
 export const getBasicStampInfo = async (address: string) => {
-  const response = await fetch("/api/v2/balance/getStampsBalance", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ address }),
-  });
+  const response = await fetch(
+    `/api/v2/balance/getStampsBalance?address=${encodeURIComponent(address)}`,
+    { method: "GET" },
+  );
   const { stampBalance } = await response.json();
   return { stampBalance };
 };

@@ -69,7 +69,7 @@ export const createStampHandler = (
           limit: effectiveLimit,
           sortBy: sortValidation,
           type: routeConfig.type,
-          allColumns: true,
+          allColumns: false,
           skipTotalCount: false,
           cacheType, // Pass cache type to controller
         });
@@ -156,9 +156,9 @@ export const createStampHandler = (
           const { limit, page } = pagination;
           const dispenses = await StampController.getStampDispenses(
             id,
-            page,
-            limit,
-            cacheType, // Pass cache type to controller
+            page || 1,
+            limit || 50,
+            cacheType,
           );
           return ResponseUtil.success(dispenses, { routeType: cacheType });
         }

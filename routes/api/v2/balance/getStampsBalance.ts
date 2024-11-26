@@ -1,34 +1,32 @@
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
+import { RouteType } from "$server/services/cacheService.ts";
+import { validateRequiredParams } from "$server/services/routeValidationService.ts";
 
-// FIXME: This is a temporary endpoint to get the stamps balance for a given address
 export async function handler(req: Request): Promise<Response> {
   try {
-    const { address, utxoOnly } = await req.json();
+    const url = new URL(req.url);
+    const address = url.searchParams.get("address");
+    const utxoOnly = url.searchParams.get("utxoOnly") === "true";
 
-    if (!address) {
-      return new Response(
-        JSON.stringify({ error: "Address is required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      );
+    // Validate required parameters
+    const paramsValidation = validateRequiredParams({ address });
+    if (!paramsValidation.isValid) {
+      return paramsValidation.error!;
     }
 
-    // Parse utxoOnly as boolean
-    const utxoOnlyBool = utxoOnly === true || utxoOnly === "true";
-
-    const stampBalance = await XcpManager.getXcpBalancesByAddress(
+    const { balances: stampBalance } = await XcpManager.getXcpBalancesByAddress(
       address,
       undefined, // cpid
-      utxoOnlyBool,
+      utxoOnly,
+      { type: "all" },
     );
 
-    return new Response(JSON.stringify({ stampBalance }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Error in getStampsBalance:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } },
+    return ResponseUtil.success(
+      { stampBalance },
+      { routeType: RouteType.DYNAMIC },
     );
+  } catch (error) {
+    return ResponseUtil.internalError(error, "Error retrieving stamps balance");
   }
 }

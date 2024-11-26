@@ -22,6 +22,15 @@ export const xcp_v2_nodes = [
 ];
 
 
+interface XcpBalanceOptions {
+  limit?: number;
+  page?: number;
+  type?: string;
+  verbose?: boolean;
+  showUnconfirmed?: boolean;
+  sort?: string;
+}
+
 
 export async function fetchXcpV2WithCache<T>(
   endpoint: string,
@@ -91,7 +100,7 @@ export class DispenserManager {
     // Apply filter to API query if possible
     const queryParams = new URLSearchParams({
       limit: limit?.toString() || "50",
-      status: filter === "all" ? undefined : filter
+      status: filter || 'all'
     });
 
     try {
@@ -171,7 +180,7 @@ export class DispenserManager {
 
     while (true) {
       const queryParams = new URLSearchParams({
-        limit: apiLimit.toString(),
+        limit: limit.toString(),
         verbose: "true",
       });
       if (cursor) {
@@ -404,123 +413,147 @@ export class XcpManager {
     };
   }
 
-  static getXcpBalancesByAddress = async (
+
+  static async getXcpBalancesByAddress(
     address: string,
     cpid?: string,
     utxoOnly: boolean = false,
-    maxIterations = 100,
-  ): Promise<XcpBalance[]> => {
+    options: XcpBalanceOptions = {}
+  ): Promise<{ balances: XcpBalance[]; total: number }> {
     const baseEndpoint = `/addresses/${address}/balances`;
     const endpoint = cpid ? `${baseEndpoint}/${cpid}` : baseEndpoint;
+    
+    const defaultParams = new URLSearchParams();
+    
+    // Add type=all by default unless specified
+    defaultParams.append("type", options.type || "all");
+    
+    // Handle pagination
+    const limit = options.limit || 50;
+    const page = options.page || 1;
+    const offset = (page - 1) * limit;
+    
+    defaultParams.append("limit", limit.toString());
+    defaultParams.append("offset", offset.toString());
+    
+    // Add optional parameters
+    if (options.verbose) {
+      defaultParams.append("verbose", "true");
+    }
+    if (options.showUnconfirmed) {
+      defaultParams.append("show_unconfirmed", "true");
+    }
+    if (options.sort) {
+      defaultParams.append("sort", options.sort);
+    }
+
     let allBalances: XcpBalance[] = [];
-    let cursor: string | null = null;
-    const limit = 1000;
-    let iterations = 0;
+    let total = 0;
 
-    console.log(
-      `Fetching XCP balances for address: ${address}${
-        cpid ? `, CPID: ${cpid}` : ""
-      }${utxoOnly ? ", UTXO only" : ""}`,
-    );
+    try {
+      const response = await this.fetchXcpV2WithCache<any>(endpoint, defaultParams);
 
-    while (iterations < maxIterations) {
-      iterations++;
-      const queryParams = new URLSearchParams({ limit: limit.toString() });
-      if (cursor) {
-        queryParams.append("cursor", cursor);
+      if (!response) {
+        console.warn(`Unexpected response structure for address ${address}`);
+        return { balances: [], total: 0 };
       }
 
-      try {
-        const response = await this.fetchXcpV2WithCache<any>(
-          endpoint,
-          queryParams,
-        );
+      let balances: XcpBalance[];
 
-        if (!response) {
-          console.warn(`Unexpected response structure for address ${address}`);
-          break;
-        }
-
-        let balances: XcpBalance[];
-
-        if (cpid) {
-          // Handle single balance response for specific CPID
-          if (response.result && response.result.quantity > 0) {
-            balances = [{
-              address: response.result.address || null,
-              cpid: response.result.asset,
-              quantity: response.result.quantity,
-              utxo: response.result.utxo || "",
-              utxo_address: response.result.utxo_address || "",
-              divisible: response.result.divisible || false,
-            }];
-          } else {
-            balances = [];
-          }
+      if (cpid) {
+        // Handle single balance response for specific CPID
+        if (response.result && response.result.quantity > 0) {
+          balances = [{
+            address: response.result.address || null,
+            cpid: response.result.asset,
+            quantity: response.result.quantity,
+            utxo: response.result.utxo || "",
+            utxo_address: response.result.utxo_address || "",
+            divisible: response.result.divisible || false,
+          }];
         } else {
-          // Handle multiple balances response
-          if (!Array.isArray(response.result)) {
-            console.warn(`Unexpected result structure for address ${address}`);
-            break;
-          }
-          balances = response.result
-            .filter((balance: any) => balance.quantity > 0)
-            .map((balance: any) => ({
-              address: balance.address || null,
-              cpid: balance.asset,
-              quantity: balance.quantity,
-              utxo: balance.utxo || "",
-              utxo_address: balance.utxo_address || "",
-              divisible: balance.divisible || false,
-            }));
+          balances = [];
         }
-
-        // Apply UTXO-only filter after fetching the balances
-        if (utxoOnly) {
-          balances = balances.filter((balance) => balance.utxo !== "");
+      } else {
+        // Handle multiple balances response
+        if (!Array.isArray(response.result)) {
+          console.warn(`Unexpected result structure for address ${address}`);
+          return { balances: [], total: 0 };
         }
-
-        allBalances = allBalances.concat(balances);
-
-        console.log(
-          `Iteration ${iterations}: Fetched ${balances.length} balances. Total: ${allBalances.length}`,
-        );
-
-        if (cpid || !response.next_cursor) {
-          console.log("No more pages to fetch");
-          break; // No pagination for specific CPID or no more pages
-        }
-
-        cursor = response.next_cursor;
-        console.log(`New cursor: ${cursor}`);
-
-        if (
-          response.result_count && allBalances.length >= response.result_count
-        ) {
-          console.log(`Fetched all ${response.result_count} balances`);
-          break;
-        }
-      } catch (error) {
-        console.error(
-          `Error fetching balances for address ${address} (iteration ${iterations}):`,
-          error,
-        );
-        break;
+        balances = response.result
+          .filter((balance: any) => balance.quantity > 0)
+          .map((balance: any) => ({
+            address: balance.address || null,
+            cpid: balance.asset,
+            quantity: balance.quantity,
+            utxo: balance.utxo || "",
+            utxo_address: balance.utxo_address || "",
+            divisible: balance.divisible || false,
+          }));
       }
-    }
 
-    if (iterations >= maxIterations) {
-      console.warn(
-        `Reached maximum iterations (${maxIterations}) for address ${address}. Fetched ${allBalances.length} balances.`,
-      );
-    } else {
+      // Apply UTXO-only filter if requested
+      if (utxoOnly) {
+        balances = balances.filter((balance) => balance.utxo !== "");
+      }
+
+      total = response.result_count || balances.length;
+      allBalances = balances;
+
       console.log(
-        `Completed fetching balances for address ${address}. Total balances: ${allBalances.length}`,
+        `Fetched ${allBalances.length} balances for address ${address}`,
       );
-    }
 
-    return allBalances;
-  };
+      return { 
+        balances: allBalances,
+        total 
+      };
+    } catch (error) {
+      console.error(
+        `Error fetching balances for address ${address}:`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  static async getAllXcpBalancesByAddress(
+    address: string,
+    utxoOnly: boolean = false
+  ): Promise<{ balances: XcpBalance[]; total: number }> {
+    try {
+      // First request to get total count
+      const { total } = await this.getXcpBalancesByAddress(
+        address,
+        undefined,
+        utxoOnly,
+        { 
+          type: "all",
+          limit: 1 
+        }
+      );
+
+      if (total === 0) {
+        return { balances: [], total: 0 };
+      }
+
+      // Get all balances in one request
+      const result = await this.getXcpBalancesByAddress(
+        address,
+        undefined,
+        utxoOnly,
+        { 
+          type: "all",
+          limit: total // Request all balances at once
+        }
+      );
+
+      return result;
+    } catch (error) {
+      console.error(`Error fetching all balances for address ${address}:`, error);
+      throw error;
+    }
+  }
 
   static async getXcpSendsByCPID(
     cpid: string,

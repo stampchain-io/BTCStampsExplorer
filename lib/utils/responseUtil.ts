@@ -1,7 +1,7 @@
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
 
 // Update this when making breaking changes to response format
-const API_RESPONSE_VERSION = "v2";
+const API_RESPONSE_VERSION = "v2.2";
 
 interface ResponseOptions {
   forceNoCache?: boolean;

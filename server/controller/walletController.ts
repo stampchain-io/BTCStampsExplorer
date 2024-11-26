@@ -1,4 +1,4 @@
-import { StampService } from "$server/services/stampService.ts";
+import { StampController } from "./stampController.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
@@ -24,7 +24,7 @@ export class WalletController {
           includeUSD: true,
           apiBaseUrl: serverConfig.API_BASE_URL 
         }),
-        StampService.getStampBalancesByAddress(address, subLimit, page),
+        StampController.getStampBalancesByAddress(address, subLimit, page),
         Src20Controller.handleSrc20BalanceRequest({
           address,
           limit: subLimit,
@@ -37,7 +37,7 @@ export class WalletController {
       const btcData = btcInfo.status === "fulfilled" ? btcInfo.value : null;
       const stampsData = stampsResponse.status === "fulfilled"
         ? stampsResponse.value
-        : { stamps: [], total: 0 };
+        : { data: [], total: 0 };
       const src20Data = src20Response.status === "fulfilled"
         ? src20Response.value
         : { data: [], last_block: 0 };
@@ -65,7 +65,7 @@ export class WalletController {
       return {
         btc: walletData,
         data: {
-          stamps: stampsData.stamps,
+          stamps: stampsData.data,
           src20: Array.isArray(src20Data.data) ? src20Data.data : [],
         },
         pagination: {
@@ -74,7 +74,7 @@ export class WalletController {
           total: totalItems,
           totalPages,
         },
-        last_block: src20Data.last_block || lastBlockData?.last_block || 0,
+        last_block: stampsData.last_block || src20Data.last_block || lastBlockData?.last_block || 0,
       };
     } catch (error) {
       console.error("Error processing wallet balance request:", error);

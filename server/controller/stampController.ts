@@ -119,37 +119,28 @@ export class StampController {
         cacheType,
       });
 
-      // If we're getting details for a single stamp and enrichment is requested
-      if (identifier && !Array.isArray(identifier) && enrichWithAssetInfo) {
-        const stamp = stampResult.stamps[0];
-        if (stamp && (stamp.ident === "STAMP" || stamp.ident === "SRC-721")) {
-          // Get asset details from XCP with same cache parameters
-          const asset = await XcpManager.getAssetInfo(stamp.cpid);  // TODO: pass cacheDuration or cacheType
-          const enrichedStamp = this.enrichStampWithAssetData(stamp, asset);
-          
-          return {
-            data: {
-              stamp: enrichedStamp,
-            },
-            last_block: stampResult.last_block,
-          };
-        }
-      }
-
-      // Process stamps with just open dispensers for floor price
+      // Process stamps with floor prices and asset info if needed
       const processedStamps = await Promise.all(
         stampResult.stamps.map(async (stamp) => {
           if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
             return stamp;
           }
           
-          // Only fetch open dispensers
+          // Always fetch open dispensers for floor price
           const openDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid, "open");
-          
-          // Calculate floor price from open dispensers
           const floorPrice = openDispensers.length > 0 
             ? this.calculateFloorPrice(openDispensers)
             : "priceless";
+
+          // If enrichment is requested and it's a single stamp query
+          if (enrichWithAssetInfo && identifier && !Array.isArray(identifier)) {
+            const asset = await XcpManager.getAssetInfo(stamp.cpid);
+            const enrichedStamp = this.enrichStampWithAssetData(stamp, asset);
+            return {
+              ...enrichedStamp,
+              floorPrice,
+            };
+          }
           
           return {
             ...stamp,
@@ -160,7 +151,9 @@ export class StampController {
 
       // Build response based on query type
       const baseResponse = {
-        data: processedStamps,
+        data: identifier && !Array.isArray(identifier) 
+          ? { stamp: processedStamps[0] }  // Single stamp response
+          : processedStamps,               // Multiple stamps response
         last_block: stampResult.last_block,
       };
 
@@ -197,7 +190,7 @@ export class StampController {
       type: stampType,
       cacheType,
       cacheDuration,
-      allColumns: true,
+      allColumns: false,
       noPagination: true,
       skipTotalCount: true,
       enrichWithAssetInfo: true // Enable asset info enrichment
@@ -299,18 +292,30 @@ export class StampController {
     limit: number,
     page: number,
   ): Promise<PaginatedStampBalanceResponseBody> {
-    const [{ stamps, total }, lastBlock] = await Promise.all([
-      StampService.getStampBalancesByAddress(address, limit, page),
-      BlockService.getLastBlock(),
-    ]);
+    try {
+      // Get all XCP balances at once
+      const { balances: xcpBalances } = await XcpManager.getAllXcpBalancesByAddress(
+        address,
+        false
+      );
 
-    const pagination = paginate(total, page, limit);
+      // Pass XCP balances to service layer
+      const [{ stamps, total }, lastBlock] = await Promise.all([
+        StampService.getStampBalancesByAddress(address, limit, page, xcpBalances),
+        BlockService.getLastBlock(),
+      ]);
 
-    return {
-      ...pagination,
-      last_block: lastBlock,
-      data: stamps,
-    };
+      const pagination = paginate(total, page, limit);
+
+      return {
+        ...pagination,
+        last_block: lastBlock,
+        data: stamps,
+      };
+    } catch (error) {
+      console.error("Error in getStampBalancesByAddress:", error);
+      throw error;
+    }
   }
 
   static async getMultipleStampCategories(
@@ -577,7 +582,7 @@ export class StampController {
       // Fetch stamps data for all CPIDs
       const stampsData = await this.getStamps({
         identifier: uniqueCpids,
-        allColumns: true,
+        allColumns: false,
         noPagination: true
       });
 
