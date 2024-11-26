@@ -129,20 +129,20 @@ const WalletPopup = (
   return (
     <div
       ref={popupRef}
-      className="flex flex-col gap-[10px] absolute top-[50px] right-0 z-[100] bg-[#3E2F4C] text-white p-[14px] min-w-[370px]"
+      class="flex flex-col gap-[10px] absolute top-[50px] right-0 z-[100] bg-[#3E2F4C] text-white p-[14px] min-w-[370px]"
     >
       <div class="flex justify-between items-end">
-        <p className="text-[24px] font-normal">Wallet</p>
+        <p class="text-[24px] font-normal">Wallet</p>
         <a
           href={`/wallet/${wallet.address}`}
-          className="underline cursor-pointer font-normal"
+          class="underline cursor-pointer font-normal"
         >
           View Wallet
         </a>
       </div>
       <hr />
       <div class="flex justify-between items-center">
-        <p className="font-normal">Currency</p>
+        <p class="font-normal">Currency</p>
         <select
           name="currency"
           id="currency"
@@ -156,7 +156,7 @@ const WalletPopup = (
         </select>
       </div>
       <hr />
-      <p className="font-normal">Display name</p>
+      <p class="font-normal">Display name</p>
       <div class="flex justify-between">
         <input
           type="text"
@@ -175,7 +175,7 @@ const WalletPopup = (
         /* <hr />
         // TODO: Need to add Twitter column to the DB
       <p>X (Twitter)</p>
-      <div className={"flex justify-between"}>
+      <div class={"flex justify-between"}>
         <input
           type="text"
           class="bg-[#4F3666] border border-[#8A8989] rounded-[4px] py-1 px-2"
@@ -195,7 +195,7 @@ const WalletPopup = (
       </div>
       <hr /> */
       }
-      <p className="font-normal">My address</p>
+      <p class="font-normal">My address</p>
       <p class="text-[14px] break-all font-normal">{wallet.address}</p>
       {
         /* <p
@@ -287,7 +287,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
 
   return (
     <div
-      className="relative "
+      class="relative "
       ref={modalRef}
     >
       {isConnected && address && (
@@ -315,17 +315,17 @@ export const WalletModal = ({ connectors = [] }: Props) => {
                 type="button"
                 ref={buttonRef}
                 // onClick={toggleModal}
-                class="hidden tablet:block text-stamp-primary px-5 py-4 bg-black font-extrabold text-sm mobileLg:text-base"
+                class="hidden tablet:block text-stamp-primary px-5 py-3 bg-black font-extrabold text-sm mobileLg:text-base"
               >
                 {abbreviateAddress(address)}
               </button>
 
-              <p className="block tablet:hidden px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer">
+              <p class="block tablet:hidden px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer">
                 {abbreviateAddress(address)}
               </p>
               <a
                 href={isConnected && address ? `/wallet/${address}` : "#"}
-                class="px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer"
+                class="px-4 py-2 !pt-1 text-center hover:text-stamp-primary-hover cursor-pointer"
               >
                 DASHBOARD
               </a>
