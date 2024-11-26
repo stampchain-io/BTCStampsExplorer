@@ -934,7 +934,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
-          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+          example: "ffd10ada1715fd53d427442613ceb9e910ddceea61e26fc4ab87e870468a3c61"
           schema:
             type: string
           description: The hash of the deploy transaction
@@ -1023,7 +1023,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
-          example: "8d40a2b97c0fa638fa18daf564f916260a22e7f2eca9a786763f2eeaab57541d"
+          example: "ffd10ada1715fd53d427442613ceb9e910ddceea61e26fc4ab87e870468a3c61"
           description: The hash of the deploy transaction.
           schema:
             type: string
@@ -1059,7 +1059,7 @@ paths:
         - in: path
           name: address
           required: true
-          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
+          example: "bc1q5jh7yjer6ruftaagctzs2vcm6qz5qr0k6hxvzx"
           schema:
             type: string
           description: The Bitcoin address to query
@@ -1139,7 +1139,7 @@ paths:
         - in: path
           name: deploy_hash
           required: true
-          example: "9f4f8e7ba2eb8daf36f9d38b502315d23807aa7a55858acc1c73066b30506ab7"
+          example: "5d18994d0981c421c115bf18a1ec0047cf63c06a4c94384a560ab74d6d0552f9"
           schema:
             type: string
           description: The deployment transaction hash
@@ -1876,22 +1876,12 @@ components:
           nullable: true
         stamp_hash:
           type: string
-        is_btc_stamp:
-          type: number
         file_hash:
           type: string
         floorPrice:
           type: number
           nullable: true
           description: "Current floor price in BTC, or 'priceless' if no open dispensers"
-        recentSalePrice:
-          type: number
-          nullable: true
-          description: "Most recent sale price in BTC, or 'priceless' if no sales"
-        marketCap:
-          type: number
-          nullable: true
-          description: "Marketcap in BTC, or 'priceless' if no sales"
     StampRowSummary:
       type: object
       properties:
@@ -1931,8 +1921,6 @@ components:
           nullable: true
         stamp_hash:
           type: string
-        is_btc_stamp:
-          type: number
         file_hash:
           type: string
         floorPrice:
@@ -1985,8 +1973,6 @@ components:
             - type: "null"
         stamp_hash:
           type: string
-        is_btc_stamp:
-          type: number
         file_hash:
           type: string
 
@@ -2104,6 +2090,8 @@ components:
     Src101Detail:
       type: object
       properties:
+        row_num:
+          type: number
         tx_hash:
           type: string
         block_index:
@@ -2112,15 +2100,17 @@ components:
           type: string
         op:
           type: string
+        root:
+          type: string
         tick:
-          oneOf:
-            - type: string
+          type: string
         tick_hash:
-          oneOf:
-            - type: string
+          type: string
         name:
           oneOf:
             - type: string
+        tokenid_origin:
+          type: string
         tokenid:
           oneOf:
             - type: string
@@ -2154,6 +2144,8 @@ components:
         lim:
           oneOf:
             - type: number
+        coef:
+          type: number
         mintstart:
           oneOf:
             - type: number
@@ -2168,9 +2160,13 @@ components:
             - type: string
         destination:
           type: string
+        destination_nvalue:
+          type: string
         block_time:
           type: string
           format: date-time
+        status:
+          type: string
     StampBalance:
       type: object
       properties:

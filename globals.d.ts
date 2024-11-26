@@ -91,7 +91,6 @@ export interface StampRow {
   ident: SUBPROTOCOLS;
   creator_name: string | null;
   stamp_hash: string;
-  is_btc_stamp: number;
   file_hash: string;
   floorPrice?: number | "priceless";
   marketCap?: number | "priceless";
@@ -180,7 +179,6 @@ interface SendRow {
   tx_hash: string;
   block_index: number;
   satoshirate: number | null;
-  is_btc_stamp: number;
   block_time: Date;
 }
 
@@ -294,7 +292,6 @@ export interface StampBalance {
   stamp_url: string;
   stamp_mimetype: string;
   tx_hash: string;
-  is_btc_stamp: 0 | 1 | boolean | null;
   divisible: 0 | 1;
   supply: number | string;
   locked: 0 | 1 | boolean;

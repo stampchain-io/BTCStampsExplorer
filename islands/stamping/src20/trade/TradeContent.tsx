@@ -434,14 +434,12 @@ export function TradeContent() {
 
     try {
       console.log("Querying assets for address:", address);
-      const response = await fetch("/api/v2/balance/getStampsBalance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          address,
-          utxoOnly: false, // Set to true if you only want assets in UTXOs
-        }),
-      });
+      const response = await fetch(
+        `/api/v2/balance/getStampsBalance?address=${
+          encodeURIComponent(address)
+        }`,
+        { method: "GET" },
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

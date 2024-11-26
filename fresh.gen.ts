@@ -61,7 +61,6 @@ import * as $api_v2_stamps_id_sends from "./routes/api/v2/stamps/[id]/sends.ts";
 import * as $api_v2_stamps_balance_address_ from "./routes/api/v2/stamps/balance/[address].tsx";
 import * as $api_v2_stamps_block from "./routes/api/v2/stamps/block.ts";
 import * as $api_v2_stamps_block_block_index_ from "./routes/api/v2/stamps/block/[block_index].ts";
-import * as $api_v2_stamps_dispense from "./routes/api/v2/stamps/dispense.ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
 import * as $api_v2_stamps_recentSales from "./routes/api/v2/stamps/recentSales.ts";
@@ -284,7 +283,6 @@ const manifest = {
     "./routes/api/v2/stamps/block.ts": $api_v2_stamps_block,
     "./routes/api/v2/stamps/block/[block_index].ts":
       $api_v2_stamps_block_block_index_,
-    "./routes/api/v2/stamps/dispense.ts": $api_v2_stamps_dispense,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
     "./routes/api/v2/stamps/recentSales.ts": $api_v2_stamps_recentSales,

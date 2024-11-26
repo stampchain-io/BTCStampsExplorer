@@ -118,6 +118,7 @@ export class SRC101Repository {
         src101.tokenid_origin,
         src101.tokenid,
         src101.tokenid_utf8,
+        src101.tick_hash,
         src101.description,
         src101.tick,
         src101.wla,
