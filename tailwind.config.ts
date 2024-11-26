@@ -171,6 +171,7 @@ export default {
       boxShadow: {
         "stamp": "0px 0px 30px #aa00ff",
         "stamp-hover": "0px 0px 40px #aa00ff",
+        "collection": "0px 0px 30px #FFFFFF7F",
       },
       aspectRatio: {
         "stamp": "1",

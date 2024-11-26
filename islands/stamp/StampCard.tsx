@@ -132,12 +132,12 @@ export function StampCard({
         const { isValid } = await validateStampContent(src);
         if (isValid) {
           setValidatedContent(
-            <div className="stamp-container">
+            <div class="stamp-container">
               <img
                 src={src}
                 loading="lazy"
                 alt={`Stamp No. ${stamp.stamp}`}
-                className="absolute inset-0 w-full h-full object-contain pixelart stamp-image"
+                class="absolute inset-0 w-full h-full object-contain pixelart stamp-image"
                 onError={handleImageError}
               />
             </div>,
@@ -156,13 +156,13 @@ export function StampCard({
 
     if (stamp.stamp_mimetype === "text/html") {
       return (
-        <div className="relative w-full h-full">
+        <div class="relative w-full h-full">
           <iframe
             scrolling="no"
             loading="lazy"
             sandbox="allow-scripts allow-same-origin allow-modals"
             src={src}
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+            class="absolute inset-0 w-full h-full object-contain pointer-events-none"
             onError={handleImageError}
           />
         </div>
@@ -174,7 +174,7 @@ export function StampCard({
         <img
           src="/not-available.png"
           alt="Loading..."
-          className="absolute inset-0 w-full h-full object-contain pixelart"
+          class="absolute inset-0 w-full h-full object-contain pixelart"
         />
       );
     }
@@ -185,7 +185,7 @@ export function StampCard({
         src={src}
         loading="lazy"
         alt={`Stamp No. ${stamp.stamp}`}
-        className="absolute inset-0 w-full h-full object-contain pixelart"
+        class="absolute inset-0 w-full h-full object-contain pixelart"
         onError={handleImageError}
       />
     );
@@ -269,15 +269,15 @@ export function StampCard({
         data-long-number={isLongNumber(stampValue)}
         class={`
           text-white group relative z-0 flex flex-col
-          p-stamp-card-lg mobileLg:p-3
+          p-stamp-card mobileLg:p-3
           rounded-stamp transition-all
           w-full h-full
           hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent
           bg-stamp-card-bg
         `}
       >
-        <div className="relative w-full h-full">
-          <div className="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
+        <div class="relative w-full h-full">
+          <div class="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
             {renderContent()}
           </div>
         </div>
