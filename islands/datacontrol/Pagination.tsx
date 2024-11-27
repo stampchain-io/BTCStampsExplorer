@@ -139,6 +139,8 @@ export const Pagination = (
     return [items];
   }, [currentPage, totalPages, maxPagesToShow, buildPageUrl]);
 
+  if (totalPages === 1) return null;
+
   if (data_length === 0) return null;
 
   return (
