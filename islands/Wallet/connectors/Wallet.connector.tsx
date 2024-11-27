@@ -60,8 +60,8 @@ export function WalletConnector(
       onMouseLeave={() => setIsHovered(false)}
     >
       <p
-        className={` text-2xl uppercase font-black ${
-          isHovered ? "text-[#AA00FF]" : "gray-gradient4"
+        className={`text-xl mobileLg:text-2xl uppercase font-black ${
+          isHovered ? "text-[#AA00FF]" : "purple-gradient3"
         }`}
       >
         {providerInfo.name}
@@ -69,7 +69,7 @@ export function WalletConnector(
       <img
         src={providerInfo.logo.small}
         alt={providerInfo.name}
-        className="w-8 h-8"
+        className="w-8 h-8 mobileLg:w-10 mobileLg:h-10"
       />
     </div>
   );
