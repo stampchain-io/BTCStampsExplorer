@@ -1,5 +1,6 @@
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
+import { set_precision } from "bigfloat/mod.ts";
 
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
@@ -9,6 +10,10 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
+import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
+
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 interface MintProgressProps {
   progress: string;
@@ -89,13 +94,66 @@ export function MintContent({
 
   const { wallet, isConnected } = walletContext;
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedToken, setSelectedToken] = useState(null);
+
+  // Fetch search results based on searchTerm
+  useEffect(() => {
+    if (isSelecting) {
+      setIsSelecting(false); // Reset flag after selection
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      if (searchTerm.trim()) {
+        const response = await fetch(
+          `/api/v2/src20/search?q=${encodeURIComponent(searchTerm.trim())}`,
+        );
+        const data = await response.json();
+        setSearchResults(data.data);
+      } else {
+        setSearchResults([]);
+      }
+    }, 300); // Debounce the search input by 300ms
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm]);
+
+  const handleResultClick = async (tick: string) => {
+    setIsSelecting(true); // Set flag to true to prevent search
+    setFormState((prevState) => ({
+      ...prevState,
+      token: tick,
+    }));
+    setSearchTerm(tick);
+    setSearchResults([]);
+
+    // TODO: This one occurs error atm
+    // try {
+    //   if (!tick) return;
+
+    //   tick = convertEmojiToTick(tick);
+    //   set_precision(-4);
+    //   const body = await Src20Controller.handleTickPageRequest(tick);
+
+    //   if (!body || body.error) return;
+
+    //   setSelectedToken(body.deployment);
+    // } catch (error) {
+    //   console.error("Error in SRC20 tick page:", error);
+    //   return;
+    // }
+  };
+
   // Adjusted useEffect hook to always fetch data when token changes
   useEffect(() => {
     const fetchData = async () => {
-      if (formState.token) {
+      if (searchTerm) {
         try {
           setError(null);
-          const currentTick = formState.token;
+          const currentTick = searchTerm;
 
           // Fetch combined mint data
           const response = await axiod.get(
@@ -133,7 +191,7 @@ export function MintContent({
     };
 
     fetchData();
-  }, [formState.token, setFormState]);
+  }, [searchTerm, setFormState]);
 
   // Calculate progress and other values
   const progress = mintStatus ? mintStatus.progress : "0";
@@ -195,20 +253,38 @@ export function MintContent({
             class="relative rounded-md items-center justify-center mx-auto text-center min-w-[108px] mobileMd:min-w-[120px] w-[108px] mobileMd:w-[120px] h-[108px] mobileMd:h-[120px] content-center bg-[#660099] flex flex-col"
           >
             <img
-              src="/img/stamping/image-upload.svg"
+              src={selectedToken
+                ? `/content/${selectedToken.tx_hash}.svg`
+                : `/img/stamping/image-upload.svg`}
               class="w-12 h-12"
               alt=""
+              loading="lazy"
             />
           </div>
-          <div className="flex flex-col gap-3 mobileMd:gap-6 w-full">
+          <div className="flex flex-col gap-3 mobileMd:gap-6 w-full relative">
             <InputField
               type="text"
               placeholder="Token"
-              value={formState.token}
-              onChange={(e) => handleInputChange(e, "token")}
+              value={searchTerm}
+              // onChange={(e) => handleInputChange(e, "token")}
+              onInput={(e) =>
+                setSearchTerm((e.target as HTMLInputElement).value)}
               error={formState.tokenError}
               isUppercase
             />
+            {searchResults.length > 0 && (
+              <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[20] max-h-60 overflow-y-auto">
+                {searchResults.map((result) => (
+                  <li
+                    key={result.tick}
+                    onClick={() => handleResultClick(result.tick)}
+                    class="cursor-pointer p-2 hover:bg-gray-600"
+                  >
+                    {result.tick}
+                  </li>
+                ))}
+              </ul>
+            )}
 
             <InputField
               type="text"
