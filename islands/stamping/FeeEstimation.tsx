@@ -299,12 +299,13 @@ export function FeeEstimation({
   // Estimate details component
   const renderDetails = () => {
     if (isModal) {
-      const detailsTitleClassName = "text-stamp-grey-darker font-light";
+      const detailsTitleClassName =
+        "text-xs mobileLg:text-sm font-light text-stamp-grey-darker";
       const detailsTextClassName =
         "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
 
       return (
-        <div className="flex flex-col gap-2 mt-2">
+        <div className="flex flex-col gap-1 mt-1.5">
           {fileSize && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>SIZE</span> {fileSize}
@@ -315,22 +316,55 @@ export function FeeEstimation({
 
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINER FEE</span>{" "}
-            {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
-            <span className="font-light">BTC</span>
+            {coinType === "BTC"
+              ? (
+                <>
+                  {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
+                  <span className="font-light">BTC</span>
+                </>
+              )
+              : (
+                <>
+                  {((txfee / 1e8) * BTCPrice).toFixed(2)}{" "}
+                  <span className="font-light">USDT</span>
+                </>
+              )}
           </p>
           {mintfee > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>SERVICE FEE</span>{" "}
-              {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}
-              {" "}
-              <span className="font-light">BTC</span>
+              {coinType === "BTC"
+                ? (
+                  <>
+                    {formatSatoshisToBTC(mintfee * 1e8, {
+                      includeSymbol: false,
+                    })} <span className="font-light">BTC</span>
+                  </>
+                )
+                : (
+                  <>
+                    {(mintfee * BTCPrice).toFixed(2)}{" "}
+                    <span className="font-light">USDT</span>
+                  </>
+                )}
             </p>
           )}
           {dust > 0 && (
             <p className={detailsTextClassName}>
               <span className={detailsTitleClassName}>DUST</span>{" "}
-              {formatSatoshisToBTC(dust, { includeSymbol: false })}{" "}
-              <span className="font-light">BTC</span>
+              {coinType === "BTC"
+                ? (
+                  <>
+                    {formatSatoshisToBTC(dust, { includeSymbol: false })}{" "}
+                    <span className="font-light">BTC</span>
+                  </>
+                )
+                : (
+                  <>
+                    {((dust / 1e8) * BTCPrice).toFixed(2)}{" "}
+                    <span className="font-light">USDT</span>
+                  </>
+                )}
             </p>
           )}
         </div>
@@ -343,7 +377,7 @@ export function FeeEstimation({
       "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
 
     return (
-      <div className={`${visible ? "visible" : "invisible"}`}>
+      <div className={`${visible ? "visible" : "invisible"} gap-1 mt-1.5`}>
         {type === "stamp" && (
           <>
             <p className={detailsTextClassName}>
@@ -365,21 +399,55 @@ export function FeeEstimation({
 
         <p className={detailsTextClassName}>
           <span className={detailsTitleClassName}>MINER FEE</span>{" "}
-          {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
-          <span className="font-light">BTC</span>
+          {coinType === "BTC"
+            ? (
+              <>
+                {formatSatoshisToBTC(txfee, { includeSymbol: false })}{" "}
+                <span className="font-light">BTC</span>
+              </>
+            )
+            : (
+              <>
+                {((txfee / 1e8) * BTCPrice).toFixed(2)}{" "}
+                <span className="font-light">USDT</span>
+              </>
+            )}
         </p>
         {mintfee > 0 && (
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINTING FEE</span>{" "}
-            {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}{" "}
-            <span className="font-light">BTC</span>
+            {coinType === "BTC"
+              ? (
+                <>
+                  {formatSatoshisToBTC(mintfee * 1e8, { includeSymbol: false })}
+                  {" "}
+                  <span className="font-light">BTC</span>
+                </>
+              )
+              : (
+                <>
+                  {(mintfee * BTCPrice).toFixed(2)}{" "}
+                  <span className="font-light">USDT</span>
+                </>
+              )}
           </p>
         )}
         {dust > 0 && (
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>DUST</span>{" "}
-            {formatSatoshisToBTC(dust, { includeSymbol: false })}{" "}
-            <span className="font-light">BTC</span>
+            {coinType === "BTC"
+              ? (
+                <>
+                  {formatSatoshisToBTC(dust, { includeSymbol: false })}{" "}
+                  <span className="font-light">BTC</span>
+                </>
+              )
+              : (
+                <>
+                  {((dust / 1e8) * BTCPrice).toFixed(2)}{" "}
+                  <span className="font-light">USDT</span>
+                </>
+              )}
           </p>
         )}
       </div>
@@ -507,7 +575,7 @@ export function FeeEstimation({
       <div className="flex">
         {renderFeeSelector()}
         {showCoinToggle && (
-          <div className="flex gap-1 items-center justify-end w-1/2">
+          <div className="flex gap-1 items-start justify-end w-1/2">
             <button
               className="w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
               onClick={handleChangeCoin}
@@ -533,7 +601,7 @@ export function FeeEstimation({
               <span className="font-bold">
                 {formatSatoshisToBTC(total, { includeSymbol: false })}
               </span>{" "}
-              BTC
+              <span className="font-light">BTC</span>
             </>
           )
           : (
@@ -542,14 +610,14 @@ export function FeeEstimation({
                 {(Number(formatSatoshisToBTC(total, { includeSymbol: false })) *
                   BTCPrice).toFixed(2)}
               </span>{" "}
-              {coinType}
+              <span className="font-light">{coinType}</span>
             </>
           )}
       </p>
 
       <div
         onClick={handleDetailsToggle}
-        className="flex items-center gap-1 uppercase mt-2 text-xs cursor-pointer text-[#666666]"
+        className="flex items-center gap-1 uppercase mt-2 text-xs mobileLg:text-sm cursor-pointer text-stamp-grey-darker"
       >
         DETAILS
         {!visible
