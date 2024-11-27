@@ -52,9 +52,10 @@ interface CollectionRow {
 }
 
 export const handler: Handlers<StampData> = {
-  async GET(_req: Request, ctx) {
+  async GET(req: Request, ctx) {
     try {
       const { id } = ctx.params;
+      const url = new URL(req.url);
 
       // Fetch stamp details and collections in parallel
       const [stampData, collectionsData] = await Promise.all([
@@ -109,7 +110,7 @@ export const handler: Handlers<StampData> = {
           : null;
       }
 
-      const btcPrice = await fetchBTCPriceInUSD(serverConfig.API_BASE_URL);
+      const btcPrice = await fetchBTCPriceInUSD(url.origin);
 
       // Calculate USD values
       const stampWithPrices = {

@@ -102,6 +102,10 @@ paths:
                 oneOf:
                   - description: Full API documentation (no filters)
                     type: object
+                    required:
+                      - openapi
+                      - info
+                      - paths
                     properties:
                       openapi:
                         type: string
@@ -110,6 +114,9 @@ paths:
                       info:
                         type: object
                         description: API information
+                        required:
+                          - title
+                          - version
                         properties:
                           title:
                             type: string
@@ -140,11 +147,16 @@ paths:
                               type: string
                   - description: Filtered documentation response
                     type: object
+                    required:
+                      - documentation
                     properties:
                       documentation:
                         type: array
                         items:
                           type: object
+                          required:
+                            - path
+                            - method
                           properties:
                             path:
                               type: string
@@ -188,28 +200,6 @@ paths:
                                   content:
                                     type: object
                                     description: Response content schema
-                required:
-                  - documentation
-              examples:
-                fullDocs:
-                  summary: Complete API documentation
-                  value:
-                    openapi: "3.0.3"
-                    info:
-                      title: "Stampchain API"
-                      version: "2.2.0"
-                    # ... other full documentation fields
-                filteredDocs:
-                  summary: Filtered endpoint documentation
-                  value:
-                    documentation:
-                      - path: "/api/v2/olga/mint"
-                        method: "POST"
-                        summary: "Mint a new stamp"
-                        tags: ["Minting"]
-                        responses:
-                          - code: "200"
-                            description: "Successful mint transaction"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -256,26 +246,76 @@ paths:
 
   /api/v2/balance/{address}:
     get:
-      operationId: getAddressBalance
+      operationId: getCombinedBalance
       tags:
         - Balance
-      summary: Get SRC-20 and STAMP balances by address
-      description: Retrieves the complete balance information for a given Bitcoin address, including stamps and SRC-20 tokens.
+      summary: Get combined stamp and SRC-20 balances
+      description: |
+        Convenience endpoint that combines stamp and SRC-20 balance data in a single request.
+        For better performance, consider using the dedicated endpoints:
+        - /api/v2/stamps/balance/{address}
+        - /api/v2/src20/balance/{address}
       parameters:
         - in: path
           name: address
           required: true
-          example: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+          example: "1GotRejB6XsGgMsM79TvcypeanDJRJbMtg"
           schema:
             type: string
-          description: The address of the wallet
+          description: The Bitcoin address to query
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+          description: Number of records per page for each balance type
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: redirect
+          schema:
+            type: boolean
+            default: false
+          description: If true, redirects to stamps balance endpoint
       responses:
         "200":
-          description: Successful response
+          description: Successful response with combined balances
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedBalanceResponseBody"
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      stamps:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/StampBalance"
+                      src20:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Src20Detail"
+                  pagination:
+                    type: object
+                    properties:
+                      stamps:
+                        $ref: "#/components/schemas/Pagination"
+                      src20:
+                        $ref: "#/components/schemas/Pagination"
+                  _info:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      stampEndpoint:
+                        type: string
+                      src20Endpoint:
+                        type: string
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":

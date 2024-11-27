@@ -63,7 +63,7 @@ export interface BalanceOptions {
   fallbackValue?: number | null;
 }
 
-export interface AddressInfoOptions {
+export interface BTCBalanceInfoOptions {
   includeUSD?: boolean;
   apiBaseUrl?: string;
 }

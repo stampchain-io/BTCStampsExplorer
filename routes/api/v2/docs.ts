@@ -98,6 +98,19 @@ export const handler: Handlers = {
     const tag = url.searchParams.get("tag");
 
     const paths = openApiSchema.paths as Record<string, unknown>;
+
+    // If no filters, return full OpenAPI documentation
+    if (!path && !tag) {
+      return ResponseUtil.success({
+        openapi: openApiSchema.openapi,
+        info: openApiSchema.info,
+        paths: openApiSchema.paths,
+        tags: openApiSchema.tags,
+        servers: openApiSchema.servers,
+      });
+    }
+
+    // For filtered responses (by path or tag)
     let filteredDocs: unknown[] = [];
 
     if (path) {
@@ -120,25 +133,24 @@ export const handler: Handlers = {
           ...endpointDocs.filter((doc) => (doc.tags as string[]).includes(tag)),
         );
       });
-    } else {
-      // Return full API documentation with better structure
-      return ResponseUtil.success({
-        openapi: openApiSchema.openapi,
-        info: openApiSchema.info,
-        paths: Object.entries(paths).reduce((acc, [path, pathData]) => {
-          acc[path] = formatEndpointDocs(
-            path,
-            pathData as Record<string, unknown>,
-          );
-          return acc;
-        }, {} as Record<string, unknown>),
-        tags: openApiSchema.tags,
-        servers: openApiSchema.servers,
-      });
     }
 
+    // Return filtered documentation in the correct format
     return ResponseUtil.success({
-      documentation: filteredDocs,
+      documentation: filteredDocs.map((doc) => ({
+        path: doc.path,
+        method: doc.method,
+        summary: doc.summary,
+        description: doc.description,
+        tags: doc.tags,
+        parameters: doc.parameters || [],
+        requestBody: doc.requestBody,
+        responses: doc.responses.map((response) => ({
+          code: response.code,
+          description: response.description,
+          content: response.content,
+        })),
+      })),
     });
   },
 };

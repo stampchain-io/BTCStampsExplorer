@@ -7,7 +7,7 @@ import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
 import { serverConfig } from "$server/config/config.ts";
 import { Dispenser, WalletData, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
+import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -39,14 +39,14 @@ export const handler: Handlers = {
         closedDispensersResponse,
       ] = await Promise.allSettled([
         fetch(
-          `${serverConfig.API_BASE_URL}/api/v2/stamps/balance/${address}?page=${stampsParams.page}&limit=${stampsParams.limit}`,
+          `${url.origin}/api/v2/stamps/balance/${address}?page=${stampsParams.page}&limit=${stampsParams.limit}`,
         ).then((res) => res.json()),
         fetch(
-          `${serverConfig.API_BASE_URL}/api/v2/src20/balance/${address}?page=${src20Params.page}&limit=${src20Params.limit}`,
+          `${url.origin}/api/v2/src20/balance/${address}?page=${src20Params.page}&limit=${src20Params.limit}`,
         ).then((res) => res.json()),
-        getAddressInfo(address, {
+        getBTCBalanceInfo(address, {
           includeUSD: true,
-          apiBaseUrl: serverConfig.API_BASE_URL,
+          apiBaseUrl: url.origin,
         }),
         StampController.getDispensersWithStampsByAddress(
           address,

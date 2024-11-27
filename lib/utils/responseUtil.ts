@@ -6,6 +6,7 @@ const API_RESPONSE_VERSION = "v2.2";
 interface ResponseOptions {
   forceNoCache?: boolean;
   routeType?: RouteType;
+  headers?: HeadersInit;
 }
 
 export class ResponseUtil {
@@ -19,6 +20,7 @@ export class ResponseUtil {
       headers: {
         "Content-Type": "application/json",
         "X-API-Version": API_RESPONSE_VERSION,
+        ...(options.headers || {}),
       },
     });
   }
@@ -36,6 +38,7 @@ export class ResponseUtil {
           "Content-Type": "application/json",
           "Cache-Control": "no-store, must-revalidate",
           "X-API-Version": API_RESPONSE_VERSION,
+          ...(options.headers || {}),
         },
       });
     }
@@ -59,6 +62,7 @@ export class ResponseUtil {
         "Surrogate-Control": `max-age=${duration}`,
         "Vary": "Accept-Encoding, X-API-Version",
         "X-API-Version": API_RESPONSE_VERSION,
+        ...(options.headers || {}),
       },
     });
   }
@@ -66,15 +70,13 @@ export class ResponseUtil {
   static custom<T>(
     body: T,
     status: number,
-    headers?: HeadersInit,
+    options: ResponseOptions = {},
   ): Response {
     const defaultHeaders = {
       "Content-Type": "application/json",
       "X-API-Version": API_RESPONSE_VERSION,
+      ...(options.headers || {}),
     };
-    const responseHeaders = headers
-      ? { ...defaultHeaders, ...headers }
-      : defaultHeaders;
 
     return new Response(
       body instanceof ArrayBuffer || body instanceof Uint8Array
@@ -82,12 +84,12 @@ export class ResponseUtil {
         : JSON.stringify(body),
       {
         status,
-        headers: responseHeaders,
+        headers: defaultHeaders,
       },
     );
   }
 
-  static badRequest(message: string) {
+  static badRequest(message: string, options: ResponseOptions = {}) {
     return new Response(
       JSON.stringify({ error: message }),
       {
@@ -96,12 +98,13 @@ export class ResponseUtil {
           "Content-Type": "application/json",
           "Cache-Control": "no-store",
           "X-API-Version": API_RESPONSE_VERSION,
+          ...(options.headers || {}),
         },
       },
     );
   }
 
-  static notFound(message: string) {
+  static notFound(message: string, options: ResponseOptions = {}) {
     return new Response(
       JSON.stringify({ error: message }),
       {
@@ -110,12 +113,17 @@ export class ResponseUtil {
           "Content-Type": "application/json",
           "Cache-Control": "no-store",
           "X-API-Version": API_RESPONSE_VERSION,
+          ...(options.headers || {}),
         },
       },
     );
   }
 
-  static internalError(error: unknown, message?: string) {
+  static internalError(
+    error: unknown,
+    message?: string,
+    options: ResponseOptions = {},
+  ) {
     console.error(error);
     return new Response(
       JSON.stringify({
@@ -127,6 +135,7 @@ export class ResponseUtil {
           "Content-Type": "application/json",
           "Cache-Control": "no-store",
           "X-API-Version": API_RESPONSE_VERSION,
+          ...(options.headers || {}),
         },
       },
     );

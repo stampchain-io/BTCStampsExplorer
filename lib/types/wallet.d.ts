@@ -13,17 +13,63 @@ export interface StampBalance {
   info?: any;
 }
 
-export interface BtcBalance {
+// Base interface for chain and mempool stats from Mempool API
+interface BTCStatsDetail {
+  funded_txo_count: number;
+  funded_txo_sum: number;
+  spent_txo_count: number;
+  spent_txo_sum: number;
+  tx_count: number;
+}
+
+// Full Mempool API response type
+export interface MempoolAddressResponse {
+  address: string;
+  chain_stats: BTCStatsDetail;
+  mempool_stats: BTCStatsDetail;
+}
+
+interface BlockCypherAddressBalanceResponse {
+  address: string;
+  total_received: number;
+  total_sent: number;
+  balance: number;
+  unconfirmed_balance: number;
+  final_balance: number;
+  n_tx: number;
+  unconfirmed_n_tx: number;
+  final_n_tx: number;
+}
+
+// Basic balance interface used across the application
+export interface BTCBalance {
   confirmed: number;
   unconfirmed: number;
-  total: number;
+  txCount?: number;
+  unconfirmedTxCount?: number;
+}
+
+// Extended balance info with USD values and additional data
+export interface BTCBalanceInfo {
+  address: string;
+  balance: number;
+  txCount: number;
+  unconfirmedBalance: number;
+  unconfirmedTxCount: number;
+  btcPrice?: number;
+  usdValue?: number;
+}
+
+export interface BTCBalanceInfoOptions {
+  includeUSD?: boolean;
+  apiBaseUrl?: string;
 }
 
 export interface Wallet {
   address?: string;
   publicKey?: string;
   accounts: any[];
-  btcBalance: BtcBalance;
+  btcBalance: BTCBalance;
   stampBalance: StampBalance[];
   type?: "legacy" | "segwit";
   provider?: WalletProviderKey;
@@ -31,21 +77,10 @@ export interface Wallet {
   addressType?: "p2wpkh" | "p2tr";
 }
 
-// Base interface for Bitcoin address information (flexible)
-export interface BTCAddressInfo {
-  address: string;
-  balance: number;
-  txCount: number;
-  unconfirmedBalance: number;
-  unconfirmedTxCount: number;
-  usdValue?: number; // Optional in base interface
-  btcPrice?: number; // Optional in base interface
-}
-
 // Interface for wallet overview display that requires all fields
-export interface WalletOverviewInfo extends BTCAddressInfo {
-  usdValue: number; // Required in UI
-  btcPrice: number; // Required in UI
+export interface WalletOverviewInfo extends BTCBalanceInfo {
+  usdValue: number; // Required in UI (override optional)
+  btcPrice: number; // Required in UI (override optional)
   fee: number; // Required for overview
 }
 

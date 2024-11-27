@@ -1,76 +1,67 @@
 import { formatSatoshisToBTC, formatUSDValue } from "$lib/utils/formatUtils.ts";
-import { AddressInfoOptions, BTCAddressInfo } from "$lib/types/index.d.ts";
 import {
-  BLOCKCYPHER_API_BASE_URL,
-  MEMPOOL_API_BASE_URL,
-} from "$lib/utils/constants.ts";
+  BlockCypherAddressBalanceResponse,
+  BTCBalance,
+  BTCBalanceInfo,
+  BTCBalanceInfoOptions,
+} from "$lib/types/index.d.ts";
+import { BLOCKCYPHER_API_BASE_URL } from "$lib/utils/constants.ts";
+import { getBTCBalanceFromMempool } from "$lib/utils/mempool.ts";
 
 export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
+  const requestId = `btc-price-${Date.now()}-${
+    Math.random().toString(36).substr(2, 9)
+  }`;
+  console.log(
+    `[${requestId}] Fetching BTC price, apiBaseUrl: ${apiBaseUrl || "none"}`,
+  );
+
   try {
-    // For production, use full URL if apiBaseUrl is provided
-    // For local development, use relative path
     const url = apiBaseUrl
       ? new URL("/api/internal/btcPrice", apiBaseUrl).toString()
       : "/api/internal/btcPrice";
 
+    console.log(`[${requestId}] Constructed URL: ${url}`);
+
+    console.log(`[${requestId}] Making fetch request...`);
     const response = await fetch(url);
+    console.log(
+      `[${requestId}] Response status: ${response.status} ${response.statusText}`,
+    );
+
     if (!response.ok) {
       console.warn(
-        `BTC price endpoint returned ${response.status}: ${response.statusText}`,
+        `[${requestId}] BTC price endpoint returned ${response.status}: ${response.statusText}`,
       );
       return 0;
     }
 
-    const data = await response.json();
-    return formatUSDValue(data.data?.price || 0);
+    const text = await response.text();
+    console.log(`[${requestId}] Raw response:`, text);
+
+    const data = JSON.parse(text);
+    console.log(`[${requestId}] Parsed data:`, data);
+
+    const price = formatUSDValue(data.data?.price || 0);
+    console.log(`[${requestId}] Formatted price: ${price}`);
+
+    return price;
   } catch (error) {
-    console.error("Error fetching BTC price:", error);
+    console.error(`[${requestId}] Error fetching BTC price:`, error);
     return 0;
   }
 }
 
-interface AddressBalance {
-  confirmed: number;
-  unconfirmed: number;
-  txCount?: number;
-  unconfirmedTxCount?: number;
-}
-
-interface TxCounts {
-  txCount: number;
-  unconfirmedTxCount: number;
-}
-
-async function getAddressFromMempool(
+async function getBTCBalanceFromBlockCypher(
   address: string,
-): Promise<AddressBalance | null> {
-  try {
-    const response = await fetch(`${MEMPOOL_API_BASE_URL}/address/${address}`);
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    return {
-      confirmed: data.chain_stats.funded_txo_sum -
-        data.chain_stats.spent_txo_sum,
-      unconfirmed: data.mempool_stats.funded_txo_sum -
-        data.mempool_stats.spent_txo_sum,
-    };
-  } catch (error) {
-    console.error("Mempool balance fetch error:", error);
-    return null;
-  }
-}
-
-async function getAddressFromBlockCypher(
-  address: string,
-): Promise<AddressBalance | null> {
+): Promise<BTCBalance | null> {
   try {
     const response = await fetch(
-      `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/addrs/${address}`,
+      `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/addrs/${address}/balance`,
     );
     if (!response.ok) return null;
 
-    const data = await response.json();
+    const data = await response.json() as BlockCypherAddressBalanceResponse;
     return {
       confirmed: data.balance || 0,
       unconfirmed: data.unconfirmed_balance || 0,
@@ -83,26 +74,20 @@ async function getAddressFromBlockCypher(
   }
 }
 
-export async function getAddressInfo(
+export async function getBTCBalanceInfo(
   address: string,
-  options: AddressInfoOptions = {},
-): Promise<BTCAddressInfo | null> {
+  options: BTCBalanceInfoOptions = {},
+): Promise<BTCBalanceInfo | null> {
   try {
-    const providers = [getAddressFromMempool, getAddressFromBlockCypher];
+    const providers = [getBTCBalanceFromMempool, getBTCBalanceFromBlockCypher];
     let balance = null;
-    let txData: TxCounts | null = null;
 
     for (const provider of providers) {
       try {
         const result = await provider(address);
         if (result) {
           balance = result;
-          if ("txCount" in result) {
-            txData = {
-              txCount: result.txCount,
-              unconfirmedTxCount: result.unconfirmedTxCount || 0,
-            };
-          }
+          console.log(`Using balance data from ${provider.name}`);
           break;
         }
       } catch (error) {
@@ -121,12 +106,12 @@ export async function getAddressInfo(
       stripZeros: true,
     }));
 
-    const info: BTCAddressInfo = {
+    const info: BTCBalanceInfo = {
       address,
       balance: confirmedBTC,
-      txCount: txData?.txCount ?? 0,
+      txCount: balance.txCount ?? 0,
       unconfirmedBalance: unconfirmedBTC,
-      unconfirmedTxCount: txData?.unconfirmedTxCount ?? 0,
+      unconfirmedTxCount: balance.unconfirmedTxCount ?? 0,
     };
 
     if (options.includeUSD) {
@@ -138,7 +123,7 @@ export async function getAddressInfo(
     console.log("Address Info:", info);
     return info;
   } catch (error) {
-    console.error("Error in getAddressInfo:", error);
+    console.error("Error in getBTCBalanceInfo:", error);
     return null;
   }
 }

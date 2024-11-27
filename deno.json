@@ -15,7 +15,9 @@
     "decode_olga": "deno run -A utils/decodeSrc20OlgaTx.ts",
     "check_version": "deno run --allow-run --allow-env utils/check_deno_version.ts",
     "cleanup": "deno run --allow-run scripts/cleanup.ts",
-    "dev:safe": "deno task cleanup && deno task dev"
+    "dev:safe": "deno task cleanup && deno task dev",
+    "validate:schema": "npx @redocly/cli lint --config .redocly.yaml --format stylish ./schema.yml",
+    "dredd": "deno task validate:schema && npx dredd"
   },
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
