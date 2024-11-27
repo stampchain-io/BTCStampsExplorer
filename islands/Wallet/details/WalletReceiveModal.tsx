@@ -1,6 +1,6 @@
-import { ComponentChildren } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import QRCode from "qrcode";
+import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 
 interface Props {
   onClose: () => void;
@@ -8,10 +8,6 @@ interface Props {
 }
 
 function WalletReceiveModal({ onClose, address }: Props) {
-  const handleModalClick = (e: MouseEvent) => {
-    e.stopPropagation();
-  };
-
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
   useEffect(() => {
@@ -29,68 +25,45 @@ function WalletReceiveModal({ onClose, address }: Props) {
   }, [address]);
 
   return (
-    <div
-      class="fixed inset-0 z-50 flex items-center justify-center bg-[#100019] bg-opacity-75 backdrop-filter backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div class="relative w-[360px] h-[600px] p-3 mobileMd:p-6 bg-[#080808] rounded-lg shadow overflow-hidden">
-        <div
-          class="relative"
-          onClick={handleModalClick}
-        >
-          <div class="space-y-4 p-4">
-            <CloseButton onClick={onClose} />
-            <ModalTitle>RECEIVE</ModalTitle>
-            {qrCodeDataUrl && (
-              <div class="flex justify-center items-center">
-                <img
-                  src={qrCodeDataUrl}
-                  alt="QR Code"
-                  class="w-48 h-48"
-                />
-              </div>
-            )}
-            <p class="text-base break-words text-center text-stamp-grey-light">
-              {formatAddress(address)}
-            </p>
-            <img
-              src="/img/wallet/icon-copy.svg"
-              alt="Copy Bitcoin address"
-              class="mx-auto cursor-pointer fill-stamp-grey"
-            />
-          </div>
-        </div>
+    <ModalLayout onClose={onClose} title="RECEIVE">
+      <div class="flex flex-col gap-6 items-center">
+        {qrCodeDataUrl && (
+          <img
+            src={qrCodeDataUrl}
+            alt="QR Code"
+            class="w-36 h-36 mobileLg:w-48 mobileLg:h-48"
+          />
+        )}
+        <p class="break-all text-center text-base mobileLg:text-xl leading-relaxed text-stamp-grey-light max-w-full pt-3">
+          {formatAddress(address)}
+        </p>
+        <img
+          src="/img/wallet/icon-copy.svg"
+          alt="Copy Bitcoin address"
+          class="cursor-pointer fill-stamp-grey"
+        />
       </div>
-    </div>
-  );
-}
-
-function CloseButton({ onClick }: { onClick: () => void }) {
-  return (
-    <img
-      onClick={onClick}
-      class="w-6 h-6 ms-auto cursor-pointer"
-      alt="Close modal"
-      src="/img/wallet/icon-close.svg"
-    />
-  );
-}
-
-function ModalTitle({ children }: { children: ComponentChildren }) {
-  return (
-    <p class="font-black text-4xl text-center purple-gradient3">
-      {children}
-    </p>
+    </ModalLayout>
   );
 }
 
 function formatAddress(address: string): JSX.Element[] {
   const groups = address.match(/.{1,4}/g) ?? [address];
   return groups.map((group, index) => [
-    index % 2 === 0
-      ? <span key={index}>{group}</span>
-      : <span key={index} class="font-bold text-stamp-grey">{group}</span>,
-    index < groups.length - 1 && <span key={`space-${index}`}>&nbsp;</span>,
+    index % 2 === 0 ? <span key={index}>{group}</span> : (
+      <span
+        key={index}
+        class="font-bold text-stamp-grey text-base mobileLg:text-xl"
+      >
+        {group}
+      </span>
+    ),
+    // Add line break after every 4th group (16 characters)
+    index < groups.length - 1 && (
+      (index + 1) % 4 === 0
+        ? <br key={`break-${index}`} />
+        : <span key={`space-${index}`}>&nbsp;</span>
+    ),
   ]).flat();
 }
 
