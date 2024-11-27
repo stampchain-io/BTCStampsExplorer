@@ -320,19 +320,26 @@ export class StampService {
 
   // New lightweight method to just get cpid
   static async resolveToCpid(id: string) {
-    const result = await StampRepository.getStamps({
-      identifier: id,
-      allColumns: false,
-      noPagination: true,
-      skipTotalCount: true,
-      // Only select minimal required fields
-      selectColumns: ['cpid', 'ident']
-    });
+    try {
+      const result = await StampRepository.getStamps({
+        identifier: id,
+        allColumns: false,
+        noPagination: true,
+        skipTotalCount: true,
+        // Only select minimal required fields
+        selectColumns: ['cpid', 'ident'],
+        // Important: Don't filter by type to allow cursed stamps
+        type: "all"  
+      });
 
-    if (!result?.stamps?.[0]) {
-      throw new Error(`Error: Stamp ${id} not found`);
+      if (!result?.stamps?.[0]) {
+        throw new Error(`Error: Stamp ${id} not found`);
+      }
+
+      return result.stamps[0];
+    } catch (error) {
+      console.error(`Error resolving CPID for ${id}:`, error);
+      throw error;
     }
-
-    return result.stamps[0];
   }
 }

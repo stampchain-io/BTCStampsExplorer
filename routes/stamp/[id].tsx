@@ -12,7 +12,6 @@ import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import { serverConfig } from "$server/config/config.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 
@@ -182,11 +181,13 @@ export default function StampPage(props: StampDetailPageProps) {
 
         <StampRelatedGraph
           stampId={stamp.stamp?.toString() || ""}
+          cpid={stamp.cpid}
           initialHolders={holders || []}
         />
 
         <StampRelatedInfo
           stampId={stamp.stamp?.toString() || ""}
+          cpid={stamp.cpid}
         />
 
         <RecentSales

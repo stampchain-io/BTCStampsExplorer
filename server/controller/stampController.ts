@@ -25,6 +25,7 @@ import { logger } from "$lib/utils/logger.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { StampRepository } from "$server/database/stampRepository.ts";
+import { isCpid } from "$lib/utils/identifierUtils.ts";
 
 interface StampControllerOptions {
   cacheType: RouteType;
@@ -621,6 +622,9 @@ export class StampController {
   }
 
   static async resolveToCpid(id: string): Promise<string> {
+    if (isCpid(id)) {
+      return id;
+    }
     const result = await StampService.resolveToCpid(id);
     if (!result?.cpid) {
       throw new Error(`Could not resolve identifier ${id} to a cpid`);

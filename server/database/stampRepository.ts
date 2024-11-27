@@ -12,6 +12,7 @@ import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
+import { isStampNumber, isTxHash, isStampHash, isCpid } from "$lib/utils/identifierUtils.ts";
 
 export class StampRepository {
   static sanitize(input: string): string {
@@ -31,47 +32,58 @@ export class StampRepository {
   ) {
     if (identifier !== undefined) {
       if (Array.isArray(identifier)) {
-        const numericIds = identifier.filter((id): id is number =>
-          typeof id === "number"
+        const validIdentifiers = identifier.filter(id => 
+          isStampNumber(id) || isTxHash(id) || isStampHash(id) || isCpid(id)
         );
-        const stringIds = identifier.filter((id): id is string =>
-          typeof id === "string"
-        );
+
+        if (validIdentifiers.length === 0) {
+          whereConditions.push("1 = 0");
+          return;
+        }
+
+        const numericIds = validIdentifiers.filter((id): id is number => isStampNumber(id));
+        const txHashes = validIdentifiers.filter((id): id is string => isTxHash(id));
+        const stampHashes = validIdentifiers.filter((id): id is string => isStampHash(id));
+        const cpids = validIdentifiers.filter((id): id is string => isCpid(id));
+
+        const conditions: string[] = [];
 
         if (numericIds.length > 0) {
-          whereConditions.push(
-            `st.stamp IN (${numericIds.map(() => "?").join(",")})`,
-          );
-          queryParams.push(...numericIds);
+          conditions.push(`st.stamp IN (${numericIds.map(() => "?").join(",")})`);
+          queryParams.push(...numericIds.map(Number));
         }
 
-        if (stringIds.length > 0) {
-          whereConditions.push(
-            `st.cpid IN (${stringIds.map(() => "?").join(",")})`,
-          );
-          queryParams.push(...stringIds);
+        if (txHashes.length > 0) {
+          conditions.push(`st.tx_hash IN (${txHashes.map(() => "?").join(",")})`);
+          queryParams.push(...txHashes);
         }
+
+        if (stampHashes.length > 0) {
+          conditions.push(`st.stamp_hash IN (${stampHashes.map(() => "?").join(",")})`);
+          queryParams.push(...stampHashes);
+        }
+
+        if (cpids.length > 0) {
+          conditions.push(`st.cpid IN (${cpids.map(() => "?").join(",")})`);
+          queryParams.push(...cpids);
+        }
+
+        whereConditions.push(`(${conditions.join(" OR ")})`);
       } else {
-        const isNumber = typeof identifier === "number" ||
-          !isNaN(Number(identifier));
-        const isTxHash = typeof identifier === "string" &&
-          identifier.length === 64 && /^[a-fA-F0-9]+$/.test(identifier);
-        const isStampHash = typeof identifier === "string" &&
-          /^[a-zA-Z0-9]{12,20}$/.test(identifier) && /[a-z]/.test(identifier) &&
-          /[A-Z]/.test(identifier);
-
-        if (isNumber) {
+        if (isStampNumber(identifier)) {
           whereConditions.push("st.stamp = ?");
           queryParams.push(Number(identifier));
-        } else if (isTxHash) {
+        } else if (isTxHash(identifier)) {
           whereConditions.push("st.tx_hash = ?");
           queryParams.push(identifier);
-        } else if (isStampHash) {
+        } else if (isStampHash(identifier)) {
           whereConditions.push("st.stamp_hash = ?");
           queryParams.push(identifier);
-        } else {
+        } else if (isCpid(identifier)) {
           whereConditions.push("st.cpid = ?");
           queryParams.push(identifier);
+        } else {
+          whereConditions.push("1 = 0");
         }
       }
     }
@@ -79,10 +91,10 @@ export class StampRepository {
     // Type-based stamp condition
     let stampCondition = "";
     if (type !== "all") {
-      if (type === "stamps") {
-        stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
-      } else if (type === "cursed") {
+      if (type === "cursed") {
         stampCondition = "st.stamp < 0";
+      } else if (type === "stamps") {
+        stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
       } else if (type === "posh") {
         stampCondition =
           "st.stamp < 0 AND st.cpid NOT LIKE 'A%' AND st.ident != 'SRC-20'";
