@@ -7,8 +7,8 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
-
 import { logger } from "$lib/utils/logger.ts";
+import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 
 export function DeployContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
@@ -62,7 +62,7 @@ export function DeployContent(
     }
   };
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
     if (!file) return;
 
     const reader = new FileReader();
@@ -70,16 +70,25 @@ export function DeployContent(
       const base64String = reader.result as string;
 
       try {
-        const response = await axiod.post(`/api/v2/upload-src20-background`, {
-          fileData: base64String,
-          tick: formState.token,
+        const csrfToken = await getCSRFToken();
+
+        const response = await axiod.post("/api/internal/src20Background", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken,
+          },
+          body: JSON.stringify({
+            fileData: base64String,
+            tick: formState.token,
+            csrfToken,
+          }),
         });
 
-        if (response.data.success) {
-          console.log("File uploaded successfully");
-        } else {
+        if (!response.data.success) {
           throw new Error(response.data.message || "Upload failed");
         }
+        console.log("File uploaded successfully");
       } catch (error) {
         console.error("Error uploading file:", error);
         setFileUploadError(

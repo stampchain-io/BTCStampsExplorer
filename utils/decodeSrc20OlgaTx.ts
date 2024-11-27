@@ -1,13 +1,12 @@
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-import { getTransaction } from "$lib/utils/quicknode.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import * as msgpack from "msgpack";
-
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 const STAMP_PREFIX = "stamp:";
 
 async function decodeSRC20OLGATransaction(txHash: string): Promise<string> {
   try {
-    const txDetails = await getTransaction(txHash);
+    const txDetails = await QuicknodeService.getTransaction(txHash);
 
     // Find P2WSH outputs (starting from the second output)
     const dataOutputs = txDetails.vout.slice(1).filter(

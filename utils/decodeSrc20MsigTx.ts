@@ -1,16 +1,15 @@
 import * as bitcoin from "bitcoinjs-lib";
 import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { arc4 } from "../lib/utils/minting/transactionUtils.ts";
-import { getTransaction } from "$lib/utils/quicknode.ts";
 import * as msgpack from "msgpack";
 import { SRC20Service } from "$server/services/src20/index.ts";
-
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 const STAMP_PREFIX = "stamp:";
 
 async function decodeSRC20Transaction(txHash: string): Promise<string> {
   try {
     // Fetch the transaction details
-    const txDetails = await getTransaction(txHash);
+    const txDetails = await QuicknodeService.getTransaction(txHash);
 
     // Reconstruct the encrypted data from multisig outputs
     const multisigOutputs = txDetails.vout.filter(

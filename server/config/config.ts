@@ -15,6 +15,8 @@ type ServerConfig = {
   readonly QUICKNODE_API_KEY?: string;
   readonly DEBUG_NAMESPACES: string;
   readonly IS_DEBUG_ENABLED: boolean;
+  readonly APP_DOMAIN: string;
+  readonly ALLOWED_DOMAINS: string;
   [key: string]: string | undefined;
 };
 
@@ -55,6 +57,12 @@ const serverConfig: ServerConfig = {
   },
   get IS_DEBUG_ENABLED() {
     return !!Deno.env.get("DEBUG");
+  },
+  get APP_DOMAIN() {
+    return Deno.env.get("APP_DOMAIN");
+  },
+  get ALLOWED_DOMAINS() {
+    return Deno.env.get("ALLOWED_DOMAINS");
   },
 };
 

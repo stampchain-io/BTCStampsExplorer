@@ -9,9 +9,9 @@ import { bin2hex, hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { serverConfig } from "$server/config/config.ts";
 import { IPrepareSRC20TX, PSBTInput, VOUT } from "$types/index.d.ts";
-import { getTransaction } from "$lib/utils/quicknode.ts";
 import * as msgpack from "msgpack";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 
 export class SRC20MultisigPSBTService {
   private static readonly RECIPIENT_DUST = BigInt(789);
@@ -128,7 +128,7 @@ export class SRC20MultisigPSBTService {
 
       // Add inputs to PSBT
       for (const input of inputs) {
-        const txDetails = await getTransaction(input.txid);
+        const txDetails = await QuicknodeService.getTransaction(input.txid);
         if (!txDetails?.vout) throw new Error(`Transaction details not found for txid: ${input.txid}`);
 
         const inputDetails = txDetails.vout[input.vout];

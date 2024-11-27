@@ -8,7 +8,6 @@ import {
 } from "$client/wallet/wallet.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { ConnectorsModal } from "./ConnectorsModal.tsx";
-import { ConnectedModal } from "./ConnectedModal.tsx";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 
 const WalletPopup = (
@@ -26,19 +25,21 @@ const WalletPopup = (
       if (wallet.address) {
         try {
           const response = await fetch(
-            `/api/v2/creator-name?address=${wallet.address}`,
+            `/api/internal/creatorName?address=${
+              encodeURIComponent(wallet.address)
+            }`,
           );
-          if (response.ok) {
-            const data = await response.json();
-            const displayValue = data.creatorName ||
-              abbreviateAddress(wallet.address);
-            setDisplayName(displayValue);
-            if (displayNameRef.current) {
-              displayNameRef.current.value = displayValue;
-            }
-          } else {
-            console.error("Failed to fetch creator name");
-            setDisplayName(abbreviateAddress(wallet.address));
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          const displayValue = data.creatorName ||
+            abbreviateAddress(wallet.address);
+          setDisplayName(displayValue);
+          if (displayNameRef.current) {
+            displayNameRef.current.value = displayValue;
           }
         } catch (error) {
           console.error("Error fetching creator name:", error);
@@ -53,74 +54,61 @@ const WalletPopup = (
   // TODO: This will need to move to the new dashboard /wallet page
 
   const handleUpdateDisplayName = async () => {
-    if (displayNameRef.current) {
-      const newDisplayName = displayNameRef.current.value.trim();
-      if (
-        newDisplayName &&
-        newDisplayName !== abbreviateAddress(wallet.address)
-      ) {
-        try {
-          const timestamp = Date.now().toString();
-          const message =
-            `Update creator name to ${newDisplayName} at ${timestamp}`;
-          console.log("Preparing to sign message:", message);
+    if (!displayNameRef.current) return;
 
-          // Use the walletContext's signMessage function
-          const signature = await walletContext.signMessage(message);
+    const newDisplayName = displayNameRef.current.value.trim();
+    if (
+      !newDisplayName || newDisplayName === abbreviateAddress(wallet.address)
+    ) {
+      displayNameRef.current.value = displayName;
+      return;
+    }
 
-          console.log(
-            "Signature received in handleUpdateDisplayName:",
-            signature,
-          );
+    try {
+      // Get CSRF token using utility function
+      const csrfToken = await getCSRFToken();
 
-          if (!signature) {
-            console.error("Signature is undefined or null");
-            return;
-          }
+      // Sign the message
+      const timestamp = Date.now().toString();
+      const message =
+        `Update creator name to ${newDisplayName} at ${timestamp}`;
+      const signature = await walletContext.signMessage(message);
 
-          const csrfToken = await getCSRFToken();
-          console.log("CSRF Token received:", csrfToken);
+      if (!signature) {
+        throw new Error("Failed to sign message");
+      }
 
-          const requestBody = {
-            address: wallet.address,
-            newName: newDisplayName,
-            signature,
-            timestamp,
-            csrfToken,
-          };
-          console.log("Sending request with body:", requestBody);
+      // Update with CSRF token in header
+      const response = await fetch("/api/internal/creatorName", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken,
+        },
+        body: JSON.stringify({
+          address: wallet.address,
+          newName: newDisplayName,
+          signature,
+          timestamp,
+          csrfToken,
+        }),
+      });
 
-          const response = await fetch("/api/v2/update-creator-name", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestBody),
-          });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update display name");
+      }
 
-          console.log("Request body sent:", JSON.stringify(requestBody));
-
-          console.log("Response status:", response.status);
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          console.log("Response data:", data);
-
-          if (data.success) {
-            setDisplayName(data.creatorName);
-            console.log("Display name updated successfully");
-          } else {
-            console.error("Failed to update display name:", data.message);
-          }
-        } catch (error) {
-          console.error("Error updating display name:", error);
-          // You might want to show an error message to the user here
-        }
+      const data = await response.json();
+      if (data.success) {
+        setDisplayName(data.creatorName);
+        console.log("Display name updated successfully");
       } else {
-        // Reset to the current display name if empty or unchanged
+        throw new Error(data.message || "Failed to update display name");
+      }
+    } catch (error) {
+      console.error("Error updating display name:", error);
+      if (displayNameRef.current) {
         displayNameRef.current.value = displayName;
       }
     }
