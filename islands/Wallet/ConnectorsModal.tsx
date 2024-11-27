@@ -21,12 +21,12 @@ export const ConnectorsModal = (
 
   return (
     <div
-      class={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm ${
+      class={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#100019] bg-opacity-75 backdrop-filter backdrop-blur-sm ${
         showConnectWalletModal.value ? "" : "hidden"
       }`}
       onClick={handleCloseModal}
     >
-      <div class="relative w-full max-w-2xl h-auto bg-[#0B0B0B] rounded-lg shadow overflow-hidden p-3 mobileMd:p-6 flex flex-col gap-3 mobileMd:gap-6">
+      <div class="relative w-full max-w-2xl h-auto bg-[#080808] rounded-lg shadow overflow-hidden p-3 mobileMd:p-6 flex flex-col">
         <img
           onClick={closeModal}
           src="/img/wallet/icon-close.svg"
@@ -34,14 +34,14 @@ export const ConnectorsModal = (
           alt="Close modal"
         />
 
-        <h3 class="text-5xl font-black purple-gradient1">
-          CONNECT<br />
-          <span className="text-4xl font-extralight text-[#AA00FF]">
-            YOUR WALLET
-          </span>
+        <h3 class="text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center mobileLg:text-left">
+          CONNECT
         </h3>
+        <h4 class="text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-highlight text-center mobileLg:text-left pb-1.5 mobileLg:pb-3 mobileMd:pb-6">
+          YOUR WALLLET
+        </h4>
 
-        <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-2 tablet:gap-4 items-center">
+        <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-3 mobileMd:gap-6 items-center">
           {Object.keys(WALLET_PROVIDERS).map((providerKey) => (
             <WalletConnector
               key={providerKey}
