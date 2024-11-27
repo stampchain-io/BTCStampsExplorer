@@ -84,10 +84,14 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
       }
     });
   };
+  const inputField1colClassName =
+    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
+  const inputField2colClassName =
+    "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
 
   return (
     <ModalLayout onClose={onClose} title="SEND">
-      <div class="space-y-4">
+      <div class="flex flex-col gap-3 mobileMd:gap-6">
         <input
           type="text"
           value={formState.amount}
@@ -97,7 +101,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
               amount: (e.target as HTMLInputElement).value,
             })}
           placeholder="Enter amount"
-          class="bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium rounded-md px-6 py-3 w-full outline-none"
+          class={inputField1colClassName}
         />
 
         <input
@@ -108,7 +112,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
               recipientAddress: (e.target as HTMLInputElement).value,
             })}
           placeholder="Recipient address"
-          class="bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium rounded-md px-6 py-3 w-full outline-none"
+          class={inputField1colClassName}
         />
       </div>
 
