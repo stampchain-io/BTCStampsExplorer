@@ -14,6 +14,7 @@ import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { getRecommendedFees } from "$lib/utils/mempool.ts";
 
 import { StampController } from "$server/controller/stampController.ts";
+import { serverConfig } from "$server/config/config.ts";
 
 type HomePageProps = {
   data: {
@@ -31,9 +32,9 @@ type HomePageProps = {
 };
 
 export const handler: Handlers = {
-  async GET(_req: Request, ctx) {
-    const headers = Object.fromEntries(_req.headers);
-    const url = new URL(_req.url);
+  async GET(req: Request, ctx) {
+    const headers = Object.fromEntries(req.headers);
+    const url = new URL(req.url);
 
     // Only handle CSS requests for carousel when on home route
     if (
@@ -57,11 +58,9 @@ export const handler: Handlers = {
     }
 
     try {
-      const baseUrl = `${url.protocol}//${url.host}`;
-
       const [pageData, btcPrice, fees] = await Promise.all([
         StampController.getHomePageData(),
-        fetchBTCPriceInUSD(baseUrl),
+        fetchBTCPriceInUSD(url.origin),
         getRecommendedFees(),
       ]);
 

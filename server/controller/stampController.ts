@@ -24,6 +24,7 @@ import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
+import { StampRepository } from "$server/database/stampRepository.ts";
 
 interface StampControllerOptions {
   cacheType: RouteType;
@@ -293,24 +294,32 @@ export class StampController {
     page: number,
   ): Promise<PaginatedStampBalanceResponseBody> {
     try {
-      // Get all XCP balances at once
-      const { balances: xcpBalances } = await XcpManager.getAllXcpBalancesByAddress(
+      const { balances: xcpBalances, total: xcpTotal } = await XcpManager.getAllXcpBalancesByAddress(
         address,
         false
       );
+      
+      console.log(`[StampController] Got ${xcpBalances.length} XCP balances out of ${xcpTotal} total`);
 
-      // Pass XCP balances to service layer
-      const [{ stamps, total }, lastBlock] = await Promise.all([
-        StampService.getStampBalancesByAddress(address, limit, page, xcpBalances),
+      // Get all stamps first
+      const [{ stamps }, lastBlock] = await Promise.all([
+        StampService.getStampBalancesByAddress(address, xcpTotal, 1, xcpBalances),
         BlockService.getLastBlock(),
       ]);
 
-      const pagination = paginate(total, page, limit);
+      // Apply standard pagination
+      const startIndex = (page - 1) * limit;
+      const endIndex = Math.min(startIndex + limit, stamps.length);
+      const paginatedStamps = stamps.slice(startIndex, endIndex);
+
+      console.log(`[StampController] Got ${stamps.length} total stamps, showing ${paginatedStamps.length} for page ${page}`);
+
+      const pagination = paginate(stamps.length, page, limit);
 
       return {
         ...pagination,
         last_block: lastBlock,
-        data: stamps,
+        data: paginatedStamps,
       };
     } catch (error) {
       console.error("Error in getStampBalancesByAddress:", error);

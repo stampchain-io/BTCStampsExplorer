@@ -10,9 +10,6 @@ import { BlockService } from "$server/services/blockService.ts";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { MarketListingSummary } from "$types/index.d.ts";
-import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import { serverConfig } from "$server/config/config.ts";
-import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { WalletData } from "$lib/types/index.d.ts";
 
 export class Src20Controller {

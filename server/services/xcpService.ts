@@ -23,12 +23,13 @@ export const xcp_v2_nodes = [
 
 
 interface XcpBalanceOptions {
-  limit?: number;
-  page?: number;
-  type?: string;
-  verbose?: boolean;
-  showUnconfirmed?: boolean;
-  sort?: string;
+  type?: 'all' | 'send' | 'dispenser' | 'issuance';  // Types of balances
+  cursor?: string;      // Last index for cursor-based pagination
+  limit?: number;       // Max results per request
+  offset?: number;      // Skip count (overrides cursor)
+  sort?: string;        // Sort order (overrides cursor)
+  verbose?: boolean;    // Include additional info
+  showUnconfirmed?: boolean;  // Include mempool results
 }
 
 
@@ -485,36 +486,34 @@ export class XcpManager {
     cpid?: string,
     utxoOnly: boolean = false,
     options: XcpBalanceOptions = {}
-  ): Promise<{ balances: XcpBalance[]; total: number }> {
+  ): Promise<{ balances: XcpBalance[]; total: number; next_cursor?: string }> {
     const baseEndpoint = `/addresses/${address}/balances`;
     const endpoint = cpid ? `${baseEndpoint}/${cpid}` : baseEndpoint;
     
     const defaultParams = new URLSearchParams();
-    
-    // Add type=all by default unless specified
     defaultParams.append("type", options.type || "all");
-    
-    // Handle pagination
-    const limit = options.limit || 50;
-    const page = options.page || 1;
-    const offset = (page - 1) * limit;
-    
-    defaultParams.append("limit", limit.toString());
-    defaultParams.append("offset", offset.toString());
-    
-    // Add optional parameters
+    defaultParams.append("limit", (options.limit || 50).toString());
+
+    // Handle pagination - offset takes precedence over cursor
+    if (options.offset !== undefined) {
+      defaultParams.append("offset", options.offset.toString());
+    } else if (options.cursor) {
+      defaultParams.append("cursor", options.cursor);
+    }
+
+    // Sort overrides cursor if provided
+    if (options.sort) {
+      defaultParams.append("sort", options.sort);
+    }
+
     if (options.verbose) {
       defaultParams.append("verbose", "true");
     }
     if (options.showUnconfirmed) {
       defaultParams.append("show_unconfirmed", "true");
     }
-    if (options.sort) {
-      defaultParams.append("sort", options.sort);
-    }
 
-    let allBalances: XcpBalance[] = [];
-    let total = 0;
+    console.log(`[XcpManager] Fetching balances with params:`, Object.fromEntries(defaultParams));
 
     try {
       const response = await this.fetchXcpV2WithCache<any>(endpoint, defaultParams);
@@ -563,22 +562,13 @@ export class XcpManager {
         balances = balances.filter((balance) => balance.utxo !== "");
       }
 
-      total = response.result_count || balances.length;
-      allBalances = balances;
-
-      console.log(
-        `Fetched ${allBalances.length} balances for address ${address}`,
-      );
-
       return { 
-        balances: allBalances,
-        total 
+        balances,
+        total: response.result_count || balances.length,
+        next_cursor: response.next_cursor
       };
     } catch (error) {
-      console.error(
-        `Error fetching balances for address ${address}:`,
-        error,
-      );
+      console.error(`Error fetching balances for address ${address}:`, error);
       throw error;
     }
   }
@@ -588,33 +578,89 @@ export class XcpManager {
     utxoOnly: boolean = false
   ): Promise<{ balances: XcpBalance[]; total: number }> {
     try {
-      // First request to get total count
-      const { total } = await this.getXcpBalancesByAddress(
-        address,
-        undefined,
-        utxoOnly,
-        { 
-          type: "all",
-          limit: 1 
-        }
-      );
+      const MAX_RETRIES = 3;
+      let attempt = 0;
+      
+      while (attempt < MAX_RETRIES) {
+        // First request to get total count and initial data
+        const result = await this.getXcpBalancesByAddress(
+          address,
+          undefined,
+          utxoOnly,
+          { 
+            type: "all",
+            limit: 500,
+            verbose: true
+          }
+        );
 
-      if (total === 0) {
-        return { balances: [], total: 0 };
+        console.log(`[XcpManager] Initial fetch - Total expected: ${result.total}, Got: ${result.balances.length}`);
+
+        if (result.total === 0) {
+          return { balances: [], total: 0 };
+        }
+
+        // Start with initial balances
+        let allBalances = [...result.balances];
+        let nextCursor = result.next_cursor;
+        let lastLength = allBalances.length;
+        let noProgressCount = 0;
+
+        while (nextCursor && allBalances.length < result.total) {
+          console.log(`[XcpManager] Fetching next page with cursor: ${nextCursor}, current count: ${allBalances.length}`);
+          
+          const pageResult = await this.getXcpBalancesByAddress(
+            address,
+            undefined,
+            utxoOnly,
+            { 
+              type: "all",
+              limit: 500,
+              cursor: nextCursor,
+              verbose: true
+            }
+          );
+
+          if (!pageResult.balances.length) {
+            console.log(`[XcpManager] No more balances returned`);
+            break;
+          }
+
+          allBalances = [...allBalances, ...pageResult.balances];
+          nextCursor = pageResult.next_cursor;
+
+          // Check if we're making progress
+          if (allBalances.length === lastLength) {
+            noProgressCount++;
+            if (noProgressCount > 3) {
+              console.warn(`[XcpManager] No progress after 3 attempts, breaking pagination`);
+              break;
+            }
+          } else {
+            noProgressCount = 0;
+            lastLength = allBalances.length;
+          }
+
+          console.log(`[XcpManager] Progress: ${allBalances.length}/${result.total}`);
+        }
+
+        // Verify we got expected number of results
+        if (allBalances.length >= result.total * 0.9) { // Allow 10% margin
+          console.log(`[XcpManager] Successfully fetched ${allBalances.length} balances`);
+          return { balances: allBalances, total: result.total };
+        }
+
+        console.warn(
+          `[XcpManager] Got ${allBalances.length} balances but expected ${result.total}, retrying...`
+        );
+        attempt++;
+        
+        if (attempt < MAX_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
       }
 
-      // Get all balances in one request
-      const result = await this.getXcpBalancesByAddress(
-        address,
-        undefined,
-        utxoOnly,
-        { 
-          type: "all",
-          limit: total // Request all balances at once
-        }
-      );
-
-      return result;
+      throw new Error(`Failed to fetch complete balance set after ${MAX_RETRIES} attempts`);
     } catch (error) {
       console.error(`Error fetching all balances for address ${address}:`, error);
       throw error;

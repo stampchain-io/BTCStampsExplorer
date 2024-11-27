@@ -3,7 +3,7 @@ import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
-import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
+import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -55,7 +55,7 @@ const handleAccountsChanged = async (accounts: any[]) => {
   _wallet.publicKey = accounts[0]?.publicKey;
 
   if (_wallet.address) {
-    const addressInfo = await getAddressInfo(_wallet.address);
+    const addressInfo = await getBTCBalanceInfo(_wallet.address);
 
     _wallet.btcBalance = {
       confirmed: addressInfo?.balance ?? 0,

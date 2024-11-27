@@ -278,6 +278,8 @@ export class StampRepository {
         };
       }
 
+      console.log(`[StampRepository] Counting total stamps for ${assets.length} assets`);
+
       const query = `
         SELECT COUNT(*) AS total
         FROM ${STAMP_TABLE} st
@@ -285,11 +287,14 @@ export class StampRepository {
         WHERE st.cpid IN (${assets.map(() => "?").join(",")})
       `;
 
-      return await dbManager.executeQueryWithCache(
+      const result = await dbManager.executeQueryWithCache(
         query,
         assets,
         DEFAULT_CACHE_DURATION
       );
+
+      console.log(`[StampRepository] Total count query returned: ${result.rows[0]?.total}`);
+      return result;
     } catch (error) {
       console.error("Error getting balance count:", error);
       return { rows: [{ total: 0 }] };
@@ -598,18 +603,17 @@ export class StampRepository {
    */
   static async getStampBalancesByAddress(
     address: string,
-    limit = BIG_LIMIT,
-    page = 1,
+    limit: number,
+    page: number,
     xcpBalances: XcpBalance[],
     order = "DESC"
   ): Promise<StampBalance[]> {
-    const offset = (page - 1) * limit;
     try {
       const assets = xcpBalances.map(balance => balance.cpid);
+      if (assets.length === 0) return [];
 
-      if (assets.length === 0) {
-        return [];
-      }
+      const offset = (page - 1) * limit;
+      console.log(`[StampRepository] Fetching stamps with limit: ${limit}, offset: ${offset}`);
 
       const query = `
         SELECT 
@@ -636,6 +640,8 @@ export class StampRepository {
         assets,
         DEFAULT_CACHE_DURATION
       );
+
+      console.log(`[StampRepository] Query returned ${balances.rows.length} rows of ${assets.length} total stamps`);
 
       const grouped = balances.rows.reduce(
         (acc: Record<string, StampBalance[]>, cur: StampBalance) => {

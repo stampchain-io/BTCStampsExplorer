@@ -1,4 +1,3 @@
-import { serverConfig } from "$server/config/config.ts";
 import { bigFloatToString } from "$lib/utils/formatUtils.ts";
 import {
   BIG_LIMIT,

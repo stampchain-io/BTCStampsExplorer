@@ -1,10 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { WalletController } from "$server/controller/walletController.ts";
-import {
-  AddressHandlerContext,
-  PaginatedBalanceResponseBody,
-  StampBalance,
-} from "globals";
+import { AddressHandlerContext } from "globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
@@ -15,61 +10,87 @@ import {
 import { RouteType } from "$server/services/cacheService.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
-  async GET(req: Request, ctx) {
+  async GET(req: Request, ctx): Promise<Response> {
     try {
       const { address } = ctx.params;
+      const url = new URL(req.url);
 
-      // Validate required parameters
       const paramsValidation = validateRequiredParams({ address });
       if (!paramsValidation.isValid) {
-        return paramsValidation.error!;
+        return paramsValidation.error ??
+          new Response("Invalid parameters", { status: 400 });
       }
 
-      const url = new URL(req.url);
+      // Get pagination params
       const pagination = getPaginationParams(url);
-
-      // Check if pagination validation failed
       if (pagination instanceof Response) {
         return pagination;
       }
 
-      const { limit, page } = pagination;
+      const {
+        limit = DEFAULT_PAGINATION.limit,
+        page = DEFAULT_PAGINATION.page,
+      } = pagination;
 
-      const result = await WalletController.handleWalletBalanceRequest(
-        address,
-        limit || DEFAULT_PAGINATION.limit,
-        page || DEFAULT_PAGINATION.page,
-      );
+      const [stampsRes, src20Res] = await Promise.all([
+        fetch(
+          `${url.origin}/api/v2/stamps/balance/${address}?limit=${limit}&page=${page}`,
+        ),
+        fetch(
+          `${url.origin}/api/v2/src20/balance/${address}?limit=${limit}&page=${page}`,
+        ),
+      ]);
 
-      // Check for empty result
-      const emptyCheck = checkEmptyResult(result, "wallet balance data");
-      if (emptyCheck) {
-        return emptyCheck;
+      const [stamps, src20] = await Promise.all([
+        stampsRes.json(),
+        src20Res.json(),
+      ]);
+
+      // Check for empty results
+      if (!stamps.data?.length && !src20.data?.length) {
+        return checkEmptyResult(null, "balance data") ??
+          new Response("No data found", { status: 404 });
       }
 
-      const responseBody: PaginatedBalanceResponseBody = {
-        page: result.pagination.page,
-        limit: result.pagination.limit,
-        totalPages: result.pagination.totalPages,
-        total: result.pagination.total,
-        last_block: result.last_block,
-        btc: result.btc,
+      const response = {
         data: {
-          stamps: result.data.stamps,
-          src20: result.data.src20 || [],
+          stamps: stamps.data,
+          src20: src20.data,
+        },
+        pagination: {
+          stamps: {
+            page: stamps.page,
+            limit: stamps.limit,
+            total: stamps.total,
+            totalPages: stamps.totalPages,
+          },
+          src20: {
+            page: src20.page,
+            limit: src20.limit,
+            total: src20.total,
+            totalPages: src20.totalPages,
+          },
+        },
+        _info: {
+          message: "Consider using dedicated endpoints for better performance",
+          stampEndpoint: `/api/v2/stamps/balance/${address}`,
+          src20Endpoint: `/api/v2/src20/balance/${address}`,
         },
       };
 
-      // Return with short cache duration for balances
-      return ResponseUtil.success(responseBody, {
+      // Return with proper caching and informational headers
+      return ResponseUtil.success(response, {
         routeType: RouteType.BALANCE,
+        headers: {
+          "X-Preferred-Endpoints":
+            "/api/v2/stamps/balance/[address], /api/v2/src20/balance/[address]",
+          "X-Info": "Consider using dedicated endpoints for better performance",
+        },
       });
     } catch (error) {
       console.error("Error in balance/[address] handler:", error);
-      return ResponseUtil.internalError(
-        error,
-        "Error processing balance request",
-      );
+      return ResponseUtil.internalError(error) ??
+        new Response("Internal server error", { status: 500 });
     }
   },
 };
