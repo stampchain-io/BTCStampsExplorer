@@ -2,7 +2,6 @@
 
 import { TransactionService } from "$server/services/transaction/index.ts";
 import { extractOutputs } from "$lib/utils/minting/transactionUtils.ts";
-import { getTransaction } from "$lib/utils/quicknode.ts";
 import * as bitcoin from "bitcoinjs-lib";
 import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
 import type { stampMintData, stampMintCIP33, PSBTInput } from "$types/index.d.ts";
@@ -15,7 +14,7 @@ import { XcpManager } from "$server/services/xcpService.ts";
 import { calculateDust, calculateMiningFee, calculateP2WSHMiningFee } from "$lib/utils/minting/feeCalculations.ts";
 import { TX_CONSTANTS} from "$lib/utils/minting/constants.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 export class StampMintService {
 
 
@@ -310,7 +309,7 @@ export class StampMintService {
 
       // Add inputs to PSBT
       for (const input of inputs) {
-        const txDetails = await getTransaction(input.txid);
+        const txDetails = await QuicknodeService.getTransaction(input.txid);
 
         if (!txDetails) {
           throw new Error(`Failed to fetch transaction details for ${input.txid}`);

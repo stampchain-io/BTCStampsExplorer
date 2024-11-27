@@ -1,70 +1,85 @@
-import { getUTXOForAddress } from "$lib/utils/utxoUtils.ts";
 import { formatSatoshisToBTC, formatUSDValue } from "$lib/utils/formatUtils.ts";
+import { AddressInfoOptions, BTCAddressInfo } from "$lib/types/index.d.ts";
 import {
-  AddressInfoOptions,
-  BalanceOptions,
-  BTCAddressInfo,
-  UTXO,
-} from "$lib/types/index.d.ts";
+  BLOCKCYPHER_API_BASE_URL,
+  MEMPOOL_API_BASE_URL,
+} from "$lib/utils/constants.ts";
 
 export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
-  const base = apiBaseUrl || "";
-  const params = encodeURIComponent(
-    JSON.stringify(["bitcoin", "usd", true, true, true]),
-  );
-  const url = `${base}/quicknode/getPrice?name=cg_simplePrice&params=${params}`;
-
   try {
+    // For production, use full URL if apiBaseUrl is provided
+    // For local development, use relative path
+    const url = apiBaseUrl
+      ? new URL("/api/internal/btcPrice", apiBaseUrl).toString()
+      : "/api/internal/btcPrice";
+
     const response = await fetch(url);
     if (!response.ok) {
-      console.error("Error fetching BTC price:", response.statusText);
+      console.warn(
+        `BTC price endpoint returned ${response.status}: ${response.statusText}`,
+      );
       return 0;
     }
 
     const data = await response.json();
-    return formatUSDValue(data.price || 0);
+    return formatUSDValue(data.data?.price || 0);
   } catch (error) {
     console.error("Error fetching BTC price:", error);
     return 0;
   }
 }
 
-export async function getAddressBalance(
+interface AddressBalance {
+  confirmed: number;
+  unconfirmed: number;
+  txCount?: number;
+  unconfirmedTxCount?: number;
+}
+
+interface TxCounts {
+  txCount: number;
+  unconfirmedTxCount: number;
+}
+
+async function getAddressFromMempool(
   address: string,
-  options: BalanceOptions = {},
-): Promise<number | null> {
-  const {
-    format = "satoshis",
-    fallbackValue = null,
-  } = options;
-
+): Promise<AddressBalance | null> {
   try {
-    const utxoResponse = await getUTXOForAddress(address);
-    if (!utxoResponse) return fallbackValue;
+    const response = await fetch(`${MEMPOOL_API_BASE_URL}/address/${address}`);
+    if (!response.ok) return null;
 
-    // Handle both UTXO[] and TxInfo types
-    const utxos = Array.isArray(utxoResponse)
-      ? utxoResponse
-      : utxoResponse.utxo
-      ? [utxoResponse.utxo]
-      : [];
-
-    const balanceInSats = utxos.reduce(
-      (sum: number, utxo: UTXO) => sum + utxo.value,
-      0,
-    );
-
-    if (format === "BTC") {
-      return Number(formatSatoshisToBTC(balanceInSats, {
-        includeSymbol: false,
-        stripZeros: true,
-      }));
-    }
-
-    return balanceInSats;
+    const data = await response.json();
+    return {
+      confirmed: data.chain_stats.funded_txo_sum -
+        data.chain_stats.spent_txo_sum,
+      unconfirmed: data.mempool_stats.funded_txo_sum -
+        data.mempool_stats.spent_txo_sum,
+    };
   } catch (error) {
-    console.error("Error fetching balance:", error);
-    return fallbackValue;
+    console.error("Mempool balance fetch error:", error);
+    return null;
+  }
+}
+
+async function getAddressFromBlockCypher(
+  address: string,
+): Promise<AddressBalance | null> {
+  try {
+    const response = await fetch(
+      `${BLOCKCYPHER_API_BASE_URL}/v1/btc/main/addrs/${address}`,
+    );
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return {
+      confirmed: data.balance || 0,
+      unconfirmed: data.unconfirmed_balance || 0,
+      txCount: data.n_tx || 0,
+      unconfirmedTxCount: data.unconfirmed_n_tx || 0,
+    };
+  } catch (error) {
+    console.error("BlockCypher balance fetch error:", error);
+    return null;
   }
 }
 
@@ -73,56 +88,57 @@ export async function getAddressInfo(
   options: AddressInfoOptions = {},
 ): Promise<BTCAddressInfo | null> {
   try {
-    const utxoResponse = await getUTXOForAddress(address);
-    if (!utxoResponse) return null;
+    const providers = [getAddressFromMempool, getAddressFromBlockCypher];
+    let balance = null;
+    let txData: TxCounts | null = null;
 
-    // Handle both UTXO[] and TxInfo types
-    const utxos = Array.isArray(utxoResponse)
-      ? utxoResponse
-      : utxoResponse.utxo
-      ? [utxoResponse.utxo]
-      : [];
+    for (const provider of providers) {
+      try {
+        const result = await provider(address);
+        if (result) {
+          balance = result;
+          if ("txCount" in result) {
+            txData = {
+              txCount: result.txCount,
+              unconfirmedTxCount: result.unconfirmedTxCount || 0,
+            };
+          }
+          break;
+        }
+      } catch (error) {
+        console.error(`${provider.name} failed:`, error);
+      }
+    }
 
-    if (utxos.length === 0) return null;
+    if (!balance) return null;
 
-    const balance = await getAddressBalance(address, {
-      format: "BTC",
-      fallbackValue: 0,
-    });
-
-    // Count confirmed and unconfirmed transactions
-    const confirmedUtxos = utxos.filter((utxo: UTXO) => utxo.status.confirmed);
-    const unconfirmedUtxos = utxos.filter((utxo: UTXO) =>
-      !utxo.status.confirmed
-    );
-
-    // Calculate unconfirmed balance
-    const unconfirmedBalance = unconfirmedUtxos.reduce(
-      (sum: number, utxo: UTXO) => sum + utxo.value,
-      0,
-    );
+    const confirmedBTC = Number(formatSatoshisToBTC(balance.confirmed, {
+      includeSymbol: false,
+      stripZeros: true,
+    }));
+    const unconfirmedBTC = Number(formatSatoshisToBTC(balance.unconfirmed, {
+      includeSymbol: false,
+      stripZeros: true,
+    }));
 
     const info: BTCAddressInfo = {
       address,
-      balance: balance ?? 0,
-      txCount: confirmedUtxos.length,
-      unconfirmedBalance: Number(formatSatoshisToBTC(unconfirmedBalance, {
-        includeSymbol: false,
-        stripZeros: true,
-      })),
-      unconfirmedTxCount: unconfirmedUtxos.length,
+      balance: confirmedBTC,
+      txCount: txData?.txCount ?? 0,
+      unconfirmedBalance: unconfirmedBTC,
+      unconfirmedTxCount: txData?.unconfirmedTxCount ?? 0,
     };
 
-    // Optionally fetch and include USD value
     if (options.includeUSD) {
       const btcPrice = await fetchBTCPriceInUSD(options.apiBaseUrl);
       info.btcPrice = btcPrice;
-      info.usdValue = formatUSDValue((info.balance ?? 0) * btcPrice);
+      info.usdValue = formatUSDValue(confirmedBTC * btcPrice);
     }
 
+    console.log("Address Info:", info);
     return info;
   } catch (error) {
-    console.error("Error fetching address info:", error);
+    console.error("Error in getAddressInfo:", error);
     return null;
   }
 }

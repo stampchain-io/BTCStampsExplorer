@@ -22,6 +22,12 @@ export const CAROUSEL_STAMP_IDS = [
   757268,
 ];
 
+export const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
+export const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
+export const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
+export const BLOCKSTREAM_API_BASE_URL = "https://blockstream.info/api";
+export const COINGECKO_API_BASE_URL = "https://api.coingecko.com/api/v3";
+
 export type WalletProviderKey =
   | "unisat"
   | "leather"

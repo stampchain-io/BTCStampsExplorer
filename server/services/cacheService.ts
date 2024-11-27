@@ -21,6 +21,7 @@ export enum RouteType {
   HISTORICAL = 'historical',
   PROTOCOL = 'protocol',
   STATIC = 'static',
+  PRICE = 'price',
 }
 
 export interface CacheConfig {
@@ -93,6 +94,14 @@ export function getCacheConfig(routeType: RouteType): CacheConfig {
         duration: 86400,         // 24 hours
         staleWhileRevalidate: 3600,
         staleIfError: 7200,
+      };
+
+    // Price data - short cache
+    case RouteType.PRICE:
+      return {
+        duration: 60,            // 1 minute
+        staleWhileRevalidate: 300,
+        staleIfError: 600,
       };
   }
 } 
