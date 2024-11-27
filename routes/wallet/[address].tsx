@@ -13,29 +13,37 @@ export const handler: Handlers = {
   async GET(req, ctx) {
     const { address } = ctx.params;
     const url = new URL(req.url);
-    const stampsParams = getPaginationParams(url, "stamps");
-    const src20Params = getPaginationParams(url, "src20");
-    const openListingsParams = getPaginationParams(url, "open_listings");
-    const closedListingsParams = getPaginationParams(url, "closed_listings");
+    const stampsParams = getPaginationParams(url, "stamps") as {
+      page: number;
+      limit: number;
+    };
+    const src20Params = getPaginationParams(url, "src20") as {
+      page: number;
+      limit: number;
+    };
+    const openListingsParams = getPaginationParams(url, "open_listings") as {
+      page: number;
+      limit: number;
+    };
+    const closedListingsParams = getPaginationParams(
+      url,
+      "closed_listings",
+    ) as { page: number; limit: number };
 
     try {
-      // Fetch all required data in parallel
       const [
         stampsResponse,
         src20Response,
-        btcInfo,
+        btcInfoResponse,
         openDispensersResponse,
         closedDispensersResponse,
       ] = await Promise.allSettled([
-        // Stamps data with pagination
         fetch(
           `${serverConfig.API_BASE_URL}/api/v2/stamps/balance/${address}?page=${stampsParams.page}&limit=${stampsParams.limit}`,
-        ),
-        // SRC20 data with pagination
+        ).then((res) => res.json()),
         fetch(
           `${serverConfig.API_BASE_URL}/api/v2/src20/balance/${address}?page=${src20Params.page}&limit=${src20Params.limit}`,
-        ),
-        // Get BTC info with USD value included
+        ).then((res) => res.json()),
         getAddressInfo(address, {
           includeUSD: true,
           apiBaseUrl: serverConfig.API_BASE_URL,
@@ -54,8 +62,17 @@ export const handler: Handlers = {
         ),
       ]);
 
-      const stampsData = await stampsResponse.json();
-      const src20Data = await src20Response.json();
+      const stampsData = stampsResponse.status === "fulfilled"
+        ? stampsResponse.value
+        : { data: [], total: 0 };
+
+      const src20Data = src20Response.status === "fulfilled"
+        ? src20Response.value
+        : { data: [], total: 0 };
+
+      const btcInfo = btcInfoResponse.status === "fulfilled"
+        ? btcInfoResponse.value
+        : null;
 
       const openDispensersData = openDispensersResponse.status === "fulfilled"
         ? openDispensersResponse.value
@@ -133,7 +150,7 @@ export const handler: Handlers = {
               ),
             },
           },
-          dispensers: dispenserSection,
+          dispenser: dispenserSection,
         },
         address,
         walletData,

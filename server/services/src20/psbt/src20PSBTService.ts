@@ -1,6 +1,5 @@
 import * as bitcoin from "bitcoinjs-lib";
 import { UTXO } from "$types/index.d.ts";
-import { getTransaction } from "$lib/utils/quicknode.ts";
 import { PSBTInput } from "$types/index.d.ts";
 import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
 import {
@@ -16,7 +15,7 @@ import { UTXOService } from "$server/services/transaction/utxoService.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
-
+import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 export class SRC20PSBTService {
   private static readonly DUST_SIZE = 420; // Min is 330
   private static readonly STAMP_PREFIX = "stamp:";
@@ -131,7 +130,7 @@ export class SRC20PSBTService {
 
     // Add inputs
     for (const input of inputs) {
-      const txDetails = await getTransaction(input.txid);
+      const txDetails = await QuicknodeService.getTransaction(input.txid);
       const psbtInput = SRC20PSBTService.createPsbtInput(input, txDetails);
       
       // Be explicit with Uint8Array
@@ -148,7 +147,7 @@ export class SRC20PSBTService {
     }
 
     // Determine the input type for the change output
-    const firstInputDetails = await getTransaction(inputs[0].txid);
+    const firstInputDetails = await QuicknodeService.getTransaction(inputs[0].txid);
     const inputType = this.getInputType(firstInputDetails.vout[inputs[0].vout]);
 
     // Add change output using the same type as the input

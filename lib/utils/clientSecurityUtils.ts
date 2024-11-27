@@ -1,6 +1,6 @@
 export async function getCSRFToken(): Promise<string> {
   try {
-    const response = await fetch("/api/v2/csrf-token");
+    const response = await fetch("/api/internal/csrfToken");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

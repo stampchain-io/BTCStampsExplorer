@@ -7,8 +7,12 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
-import * as $api_bitcoin_notification from "./routes/api/bitcoin-notification.ts";
-import * as $api_getBTCPrice from "./routes/api/getBTCPrice.ts";
+import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
+import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
+import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts";
+import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
+import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
+import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
@@ -17,8 +21,6 @@ import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_
 import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
 import * as $api_v2_create_dispense from "./routes/api/v2/create/dispense.ts";
-import * as $api_v2_creator_name from "./routes/api/v2/creator-name.ts";
-import * as $api_v2_csrf_token from "./routes/api/v2/csrf-token.ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
 import * as $api_v2_cursed_block from "./routes/api/v2/cursed/block.ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
@@ -69,7 +71,6 @@ import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_stampattach from "./routes/api/v2/trx/stampattach.ts";
 import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
 import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
-import * as $api_v2_update_creator_name from "./routes/api/v2/update-creator-name.ts";
 import * as $api_v2_upload_src20_background from "./routes/api/v2/upload-src20-background.ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
@@ -77,7 +78,6 @@ import * as $collection_index from "./routes/collection/index.tsx";
 import * as $collection_overview_overview_ from "./routes/collection/overview/[overview].tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
-import * as $design_system from "./routes/design-system.tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
@@ -93,9 +93,9 @@ import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.
 import * as $howto_mint_index from "./routes/howto/mint/index.tsx";
 import * as $howto_transfer_index from "./routes/howto/transfer/index.tsx";
 import * as $index from "./routes/index.tsx";
+import * as $internal_btcPrice from "./routes/internal/btcPrice.ts";
 import * as $media_index from "./routes/media/index.tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
-import * as $quicknode_getPrice from "./routes/quicknode/getPrice.ts";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
@@ -106,6 +106,7 @@ import * as $stamping_src20 from "./routes/stamping/src20.tsx";
 import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
 import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
+import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_test_image from "./routes/test/test-image.ts";
 import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
@@ -211,8 +212,13 @@ const manifest = {
     "./routes/_app.tsx": $_app,
     "./routes/about/index.tsx": $about_index,
     "./routes/api/[...path].ts": $api_path_,
-    "./routes/api/bitcoin-notification.ts": $api_bitcoin_notification,
-    "./routes/api/getBTCPrice.ts": $api_getBTCPrice,
+    "./routes/api/internal/bitcoinNotifications.ts":
+      $api_internal_bitcoinNotifications,
+    "./routes/api/internal/btcPrice.ts": $api_internal_btcPrice,
+    "./routes/api/internal/creatorName.ts": $api_internal_creatorName,
+    "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
+    "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
+    "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
@@ -224,8 +230,6 @@ const manifest = {
       $api_v2_block_related_block_index_,
     "./routes/api/v2/collections/index.ts": $api_v2_collections_index,
     "./routes/api/v2/create/dispense.ts": $api_v2_create_dispense,
-    "./routes/api/v2/creator-name.ts": $api_v2_creator_name,
-    "./routes/api/v2/csrf-token.ts": $api_v2_csrf_token,
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,
     "./routes/api/v2/cursed/block.ts": $api_v2_cursed_block,
     "./routes/api/v2/cursed/block/[block_index].ts":
@@ -292,7 +296,6 @@ const manifest = {
     "./routes/api/v2/trx/stampattach.ts": $api_v2_trx_stampattach,
     "./routes/api/v2/trx/stampdetach.ts": $api_v2_trx_stampdetach,
     "./routes/api/v2/trx/utxoquery.ts": $api_v2_trx_utxoquery,
-    "./routes/api/v2/update-creator-name.ts": $api_v2_update_creator_name,
     "./routes/api/v2/upload-src20-background.ts":
       $api_v2_upload_src20_background,
     "./routes/api/v2/version.ts": $api_v2_version,
@@ -302,7 +305,6 @@ const manifest = {
       $collection_overview_overview_,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
-    "./routes/design-system.tsx": $design_system,
     "./routes/docs/index.tsx": $docs_index,
     "./routes/fairmint.tsx": $fairmint,
     "./routes/faq/index.tsx": $faq_index,
@@ -320,9 +322,9 @@ const manifest = {
     "./routes/howto/mint/index.tsx": $howto_mint_index,
     "./routes/howto/transfer/index.tsx": $howto_transfer_index,
     "./routes/index.tsx": $index,
+    "./routes/internal/btcPrice.ts": $internal_btcPrice,
     "./routes/media/index.tsx": $media_index,
     "./routes/presskit/index.tsx": $presskit_index,
-    "./routes/quicknode/getPrice.ts": $quicknode_getPrice,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
@@ -333,6 +335,7 @@ const manifest = {
     "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
     "./routes/stamping/stamp.tsx": $stamping_stamp,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
+    "./routes/test/design-system.tsx": $test_design_system,
     "./routes/test/test-image.ts": $test_test_image,
     "./routes/upload/index.tsx": $upload_index,
     "./routes/wallet/[address].tsx": $wallet_address_,

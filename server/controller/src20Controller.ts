@@ -12,7 +12,6 @@ import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 import { MarketListingSummary } from "$types/index.d.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { serverConfig } from "$server/config/config.ts";
-import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 import { WalletData } from "$lib/types/index.d.ts";
 
