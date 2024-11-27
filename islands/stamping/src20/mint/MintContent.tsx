@@ -1,4 +1,5 @@
 import axiod from "axiod";
+import { SRC20Row } from "globals";
 import { useEffect, useState } from "preact/hooks";
 
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
@@ -91,7 +92,7 @@ export function MintContent({
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [selectedToken, setSelectedToken] = useState(null);
+  const [selectedTokenImage, setSelectedTokenImage] = useState(null);
   const [isImageLoading, setIsImageLoading] = useState(false);
 
   // Fetch search results based on searchTerm
@@ -120,13 +121,22 @@ export function MintContent({
     setIsImageLoading(true);
 
     try {
-      const response = await fetch(`/api/v2/src20/tick/${tick}/info`);
+      const response = await fetch(`/api/v2/src20/tick/${tick}/deploy`);
       if (!response.ok) {
         throw new Error("Failed to fetch recent sales");
       }
       const data = await response.json();
-      setSelectedToken(data.deployment);
-      console.log("data", data);
+      const src20: SRC20Row = data.data;
+      console.log("src20: ", src20);
+      if (!src20 || (Array.isArray(src20) && src20.length === 0)) {
+        setSelectedTokenImage(null);
+      } else {
+        const imageUrl = src20.stamp_url ||
+          src20.deploy_img ||
+          `/content/${src20.tx_hash}.svg` ||
+          `/content/${src20.deploy_tx}`;
+        setSelectedTokenImage(imageUrl);
+      }
     } catch (error) {
       console.error("Error fetching recent sales:", error);
     } finally {
@@ -157,6 +167,7 @@ export function MintContent({
             `/api/v2/src20/tick/${currentTick}/mintData`,
           );
           const data = response.data;
+          console.log("data: ", data);
 
           if (!data || data.error || !data.mintStatus) {
             setError("Token not deployed");
@@ -256,10 +267,10 @@ export function MintContent({
               )
               : (
                 <img
-                  src={selectedToken
-                    ? `/content/${selectedToken.tx_hash}.svg`
+                  src={selectedTokenImage
+                    ? selectedTokenImage
                     : `/img/stamping/image-upload.svg`}
-                  class={selectedToken ? "w-full h-full" : "w-12 h-12"}
+                  class={selectedTokenImage ? "w-full h-full" : "w-12 h-12"}
                   alt=""
                   loading="lazy"
                   onLoad={() => setIsImageLoading(false)}
