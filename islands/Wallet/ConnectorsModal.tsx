@@ -26,7 +26,7 @@ export const ConnectorsModal = (
       }`}
       onClick={handleCloseModal}
     >
-      <div class="relative w-full max-w-2xl h-auto bg-[#080808] rounded-lg shadow overflow-hidden p-3 mobileMd:p-6 flex flex-col">
+      <div class="relative flex flex-col w-full max-w-2xl h-auto p-3 mobileMd:p-6 bg-[#080808] rounded-lg shadow overflow-hidden">
         <img
           onClick={closeModal}
           src="/img/wallet/icon-close.svg"
