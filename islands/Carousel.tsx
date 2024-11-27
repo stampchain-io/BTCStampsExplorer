@@ -54,7 +54,7 @@ export default function Carousel(props: CarouselProps) {
                   key={`${stamp.tx_hash}-${index}`}
                   data-hash={stamp.tx_hash}
                 >
-                  <a target="_target" href={`/stamp/${stamp.tx_hash}`}>
+                  <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
                     <div className="hover-gradient hover:bg-stamp-purple-bright hover:shadow-stamp p-0.5 rounded-xl">
                       <div className="mobileLg:p-[12px] p-[6px] rounded-xl bg-stamp-card-bg hover:bg-black relative  desktop:min-h-[408px] tablet:min-h-[269px] mobileLg:min-h-[200px] mobileMd:min-h-[242px] min-h-[150px]">
                         <img
@@ -79,13 +79,13 @@ export default function Carousel(props: CarouselProps) {
                                     </span>
                                   </h3>
                                 </div>
-                                <div className="px-4 py-1 flex justify-between items-center">
-                                  <h4 className="desktop:text-2xl mobileLg:text-lg text-base text-stamp-grey font-bold">
+                                <div className="w-full px-4 py-1 flex justify-between items-center">
+                                  <h4 className="desktop:text-2xl mobileLg:text-lg text-base text-stamp-grey font-bold mobileMd:text-start text-center w-full">
                                     {stamp.creator_name
                                       ? stamp.creator_name
                                       : abbreviateAddress(stamp.creator, 4)}
                                   </h4>
-                                  <h5 className="desktop:text-xl mobileLg:text-base text-sm text-stamp-grey-darker font-bold mobileMd:block hidden">
+                                  <h5 className="desktop:text-xl mobileLg:text-base text-sm text-stamp-grey-darker font-bold mobileMd:block text-end w-full hidden">
                                     {stamp.divisible
                                       ? (stamp.supply / 100000000).toFixed(2)
                                       : stamp.supply > 100000
