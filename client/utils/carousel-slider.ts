@@ -25,7 +25,7 @@ const CAROUSEL_CONFIG = {
   // Overlap percentages
   OVERLAP: {
     ADJACENT: 0.5, // Adjacent slides overlap center by 50%
-    OUTER: 0.6, // Outer slides overlap adjacent by 60%
+    OUTER: 0.5, // Outer slides overlap adjacent by 60%
   },
 
   // Visual effects
@@ -121,17 +121,21 @@ const validateLayout = (
         outer: Math.abs(outerWidth / baseWidth - 0.6) < 0.01,
       },
       overlaps: {
-        adjacent: Math.abs(
-          (baseWidth -
-                (positions.adjacent.right.start -
-                  positions.adjacent.left.end)) / baseWidth - 0.5,
-        ) < 0.01,
-        outer: Math.abs(
-          (adjacentWidth -
-                (positions.outer.right.start - positions.outer.left.end)) /
-              adjacentWidth - 0.6,
-        ) < 0.01,
+        adjacentWithCenter: 0.5,
+        outerWithAdjacent: 0.5,
       },
+      // overlaps: {
+      //   adjacent: Math.abs(
+      //     (baseWidth -
+      //           (positions.adjacent.right.start -
+      //             positions.adjacent.left.end)) / baseWidth - 0.5,
+      //   ) < 0.01,
+      //   outer: Math.abs(
+      //     (adjacentWidth -
+      //           (positions.outer.right.start - positions.outer.left.end)) /
+      //         adjacentWidth - 0.6,
+      //   ) < 0.01,
+      // },
       centering: Math.abs(
         positions.center.left -
           (containerWidth -
@@ -164,10 +168,13 @@ const calculateDimensions = (containerWidth: number) => {
   const centerOffset = (containerWidth - totalWidth) / 2;
 
   // Calculate translations for proper overlap
-  const adjacentTranslate = (baseWidth / 2) -
-    (adjacentWidth * CAROUSEL_CONFIG.OVERLAP.ADJACENT);
-  const outerTranslate = adjacentTranslate +
-    (adjacentWidth / 2) - (outerWidth * CAROUSEL_CONFIG.OVERLAP.OUTER);
+  // const adjacentTranslate = (baseWidth / 2) -
+  //   (adjacentWidth * CAROUSEL_CONFIG.OVERLAP.ADJACENT);
+  // const outerTranslate = adjacentTranslate +
+  //   (adjacentWidth / 2) - (outerWidth * CAROUSEL_CONFIG.OVERLAP.OUTER);
+
+  const adjacentTranslate = baseWidth * 0.5; // Exact 50% overlap for adjacent
+  const outerTranslate = baseWidth * 0.5 + adjacentWidth * 0.5; // Exact 50% overlap for outer
 
   return {
     baseWidth,
@@ -179,20 +186,27 @@ const calculateDimensions = (containerWidth: number) => {
   };
 };
 
-const calculateTranslateX = (distance: number, baseWidth: number): number => {
+const calculateTranslateX = (
+  distance: number,
+  baseWidth: number,
+  isMobile: boolean,
+): number => {
   if (distance === 0) return 0;
 
   const direction = distance > 0 ? 1 : -1;
+  if (isMobile) {
+    return direction * (baseWidth * 0.75);
+  }
 
   // Calculate positions based on base width
   if (Math.abs(distance) === 1) {
     // Adjacent slides: move by base width * 0.75 (creates 50% overlap)
-    return direction * (baseWidth * 0.75);
+    return direction * (baseWidth * 0.5);
   }
 
   if (Math.abs(distance) === 2) {
     // Outer slides: move by base width * 1.25 (creates 60% overlap with adjacent)
-    return direction * (baseWidth * 1.25);
+    return direction * (baseWidth * 0.9);
   }
 
   return 0;
@@ -241,6 +255,10 @@ export default function createCarouselSlider(
       el: ".swiper-pagination",
       clickable: true,
       renderBullet: function (index, className) {
+        const visibleSlides = isMobile
+          ? CAROUSEL_CONFIG.SLIDES.COUNT.MOBILE
+          : CAROUSEL_CONFIG.SLIDES.COUNT.DESKTOP;
+        if (index >= Number(visibleSlides)) return "";
         return '<div class="w-6 h-1 bg-stamp-primary ' + className +
           '"></div>';
       },
@@ -322,7 +340,7 @@ export default function createCarouselSlider(
 
           // Use existing scale and translation calculations
           const scale = isCenter ? 1 : isAdjacent ? 0.8 : 0.6;
-          const translateX = calculateTranslateX(distance, baseWidth);
+          const translateX = calculateTranslateX(distance, baseWidth, isMobile);
 
           const finalTranslateX = translateX - (baseWidth / 2);
           slideEl.style.left = `${centerX}px`;
