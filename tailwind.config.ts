@@ -164,6 +164,8 @@ export default {
         "padding-mobile": "12px", // 12px
         "padding-tablet": "24px", // 24px
         "padding-desktop": "48px", // 48px
+        "calc-24": "calc(100% - 24px)",
+        "calc-12": "calc(100% - 12px)",
       },
       borderRadius: {
         "stamp": "6px",
@@ -211,11 +213,13 @@ export default {
           "-webkit-text-fill-color": "transparent",
           "text-fill-color": "transparent",
         },
+        ".hover-dark-gradient": {
+          background:
+            "linear-gradient(191.03deg, rgba(10, 0, 15, 0) 41.63%, rgba(20, 0, 31, 0.5) 58.37%, #1F002E 75.11%)",
+        },
         ".hover-gradient": {
-          "background-image": "var(--tw-gradient-hover-default)",
-          "&:hover": {
-            "background-image": "var(--tw-gradient-hover-active)",
-          },
+          background:
+            "linear-gradient(146.07deg, rgba(102, 0, 153, 0) 0%, #8800CC 49.98%, #AA00FF 99.95%)",
         },
         ".scrollbar-stamp": {
           "&::-webkit-scrollbar": {
