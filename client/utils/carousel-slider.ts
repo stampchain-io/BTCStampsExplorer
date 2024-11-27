@@ -251,19 +251,6 @@ export default function createCarouselSlider(
     // Custom slide transition effect
     effect: "custom",
 
-    pagination: {
-      el: ".swiper-pagination",
-      clickable: true,
-      renderBullet: function (index, className) {
-        const visibleSlides = isMobile
-          ? CAROUSEL_CONFIG.SLIDES.COUNT.MOBILE
-          : CAROUSEL_CONFIG.SLIDES.COUNT.DESKTOP;
-        if (index >= (visibleSlides * 2)) return "";
-        return '<div class="w-6 h-1 bg-stamp-primary ' + className +
-          '"></div>';
-      },
-    },
-
     on: {
       beforeInit: function (swiper: SwiperType) {
         swiper.params.cssMode = false;
