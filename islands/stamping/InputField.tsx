@@ -33,7 +33,7 @@ export function InputField({
     <div class="w-full">
       <input
         type={type}
-        class={`h-12 px-3 rounded-md bg-[#999999] text-[#333333] placeholder:text-[#333333] placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC] ${
+        class={`h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light ${
           textAlign === "center" ? "text-center" : ""
         } ${isUppercase ? "uppercase" : ""}`}
         placeholder={placeholder}
