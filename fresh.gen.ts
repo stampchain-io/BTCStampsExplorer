@@ -93,7 +93,6 @@ import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.
 import * as $howto_mint_index from "./routes/howto/mint/index.tsx";
 import * as $howto_transfer_index from "./routes/howto/transfer/index.tsx";
 import * as $index from "./routes/index.tsx";
-import * as $internal_btcPrice from "./routes/internal/btcPrice.ts";
 import * as $media_index from "./routes/media/index.tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
@@ -322,7 +321,6 @@ const manifest = {
     "./routes/howto/mint/index.tsx": $howto_mint_index,
     "./routes/howto/transfer/index.tsx": $howto_transfer_index,
     "./routes/index.tsx": $index,
-    "./routes/internal/btcPrice.ts": $internal_btcPrice,
     "./routes/media/index.tsx": $media_index,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/s/[...id].tsx": $s_id_,
