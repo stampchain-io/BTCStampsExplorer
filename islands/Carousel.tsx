@@ -54,7 +54,7 @@ export default function Carousel(props: CarouselProps) {
                   key={`${stamp.tx_hash}-${index}`}
                   data-hash={stamp.tx_hash}
                 >
-                  <a href={`/stamp/${stamp.tx_hash}`}>
+                  <a target="_target" href={`/stamp/${stamp.tx_hash}`}>
                     <div className="hover-gradient hover:bg-stamp-purple-bright hover:shadow-stamp p-0.5 rounded-xl">
                       <div className="mobileLg:p-[12px] p-[6px] rounded-xl bg-stamp-card-bg hover:bg-black relative  desktop:min-h-[408px] tablet:min-h-[269px] mobileLg:min-h-[200px] mobileMd:min-h-[242px] min-h-[150px]">
                         <img
