@@ -388,6 +388,7 @@ export class SRC20Repository {
     const total_mints = parseInt(row["total_mints"] ?? 0);
     const total_minted = new BigFloat(row["total_minted"] ?? 0);
     const progress = bigFloatToString(total_minted.div(max_supply).mul(100), 3);
+    const tx_hash = row["tx_hash"];
 
     const response = {
       max_supply: max_supply.toString(),
@@ -396,6 +397,7 @@ export class SRC20Repository {
       total_mints: total_mints,
       progress,
       decimals,
+      tx_hash,
     };
 
     return response;

@@ -4,7 +4,8 @@ interface InputFieldProps {
   type: string;
   placeholder?: string;
   value: string;
-  onChange: (e: JSX.TargetedEvent<HTMLInputElement, Event>) => void;
+  onChange?: (e: JSX.TargetedEvent<HTMLInputElement, Event>) => void;
+  onInput?: (e: JSX.TargetedEvent<HTMLInputElement, Event>) => void;
   error?: string;
   inputMode?: "text" | "numeric";
   pattern?: string;
@@ -19,6 +20,7 @@ export function InputField({
   placeholder,
   value,
   onChange,
+  onInput,
   error,
   inputMode,
   pattern,
@@ -37,6 +39,7 @@ export function InputField({
         placeholder={placeholder}
         value={isUppercase ? value?.toUpperCase() : value}
         onChange={onChange}
+        onInput={onInput}
         inputMode={inputMode}
         pattern={pattern}
         maxLength={maxLength}
