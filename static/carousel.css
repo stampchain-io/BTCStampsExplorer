@@ -47,8 +47,13 @@
   flex-shrink: 0;
 }
 
+.carousel-slider .swiper-slide:hover {
+  z-index: 10 !important;
+  filter: blur(0) !important;
+  opacity: 1 !important;
+}
+
 .carousel-slider .swiper-slide img {
-  width: 100%;
   height: auto;
   object-fit: contain;
   border-radius: 12px;

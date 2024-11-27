@@ -11,7 +11,7 @@ const CAROUSEL_CONFIG = {
       MOBILE: 3, // Show 3 slides on mobile
       DESKTOP: 5, // Show 5 slides on desktop
     },
-    MAX_WIDTH: 408, // Maximum width of center slide
+    MAX_WIDTH: 432, // Maximum width of center slide
     CONTAINER_WIDTH_RATIO: 0.35,
   },
 
@@ -224,7 +224,7 @@ export default function createCarouselSlider(
     watchSlidesProgress: true,
     allowTouchMove: true,
     virtualTranslate: true,
-
+    initialSlide: 1,
     // Enhanced autoplay configuration
     autoplay: {
       delay: CAROUSEL_CONFIG.ANIMATION.AUTOPLAY,
@@ -236,6 +236,15 @@ export default function createCarouselSlider(
 
     // Custom slide transition effect
     effect: "custom",
+
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+      renderBullet: function (index, className) {
+        return '<div class="w-6 h-1 bg-stamp-primary ' + className +
+          '"></div>';
+      },
+    },
 
     on: {
       beforeInit: function (swiper: SwiperType) {
@@ -363,6 +372,17 @@ export default function createCarouselSlider(
           realIndex: swiper.realIndex,
           autoplayRunning: swiper.autoplay.running,
           time: Date.now(),
+        });
+        const paginationBullets = document.querySelectorAll(
+          ".swiper-pagination .swiper-pagination-bullet",
+        );
+        // Hide extra pagination bullets when the slide changes
+        paginationBullets.forEach((bullet, index) => {
+          if (index >= 5) {
+            bullet.style.display = "none";
+          } else {
+            bullet.style.display = "block";
+          }
         });
 
         // Ensure autoplay continues
