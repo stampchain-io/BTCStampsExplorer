@@ -1,6 +1,5 @@
 import axiod from "axiod";
 import { useEffect, useState } from "preact/hooks";
-import { set_precision } from "bigfloat/mod.ts";
 
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
@@ -10,10 +9,6 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
-
-import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 interface MintProgressProps {
   progress: string;
@@ -26,33 +21,32 @@ const MintProgress = (
   { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
 ) => {
   return (
-    <div className="flex justify-between text-stamp-grey items-end">
-      <div className="w-1/2 flex flex-col gap-[6px]">
-        <p className="text-xl mobileLg:text-2xl font-light text-stamp-grey-light">
-          <span className="text-stamp-grey-darker">PROGRESS</span>{" "}
-          <span className="font-bold">
+    <div class="flex justify-between text-stamp-grey items-end">
+      <div class="w-1/2 flex flex-col gap-[6px]">
+        <p class="text-xl mobileLg:text-2xl font-light text-stamp-grey-light">
+          <span class="text-stamp-grey-darker">PROGRESS</span>{" "}
+          <span class="font-bold">
             {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0]}
           </span>
           %
         </p>
-        <div className="w-full max-w-[420px] h-[6px] bg-stamp-grey relative rounded-full">
+        <div class="w-full max-w-[420px] h-[6px] bg-stamp-grey relative rounded-full">
           <div
-            className="absolute left-0 top-0 h-[6px] bg-[#660099] rounded-full"
+            class="absolute left-0 top-0 h-[6px] bg-[#660099] rounded-full"
             style={{ width: progressWidth }}
           />
         </div>
       </div>
-      <div className="w-1/2 text-sm mobileLg:text-base font-light text-stamp-grey-darker text-right">
+      <div class="w-1/2 text-sm mobileLg:text-base font-light text-stamp-grey-darker text-right">
         <p>
           SUPPLY{" "}
-          <span className="text-stamp-grey-light font-bold">{maxSupply}</span>
+          <span class="text-stamp-grey-light font-bold">{maxSupply}</span>
         </p>
         <p>
-          LIMIT <span className="text-stamp-grey-light font-bold">{limit}</span>
+          LIMIT <span class="text-stamp-grey-light font-bold">{limit}</span>
         </p>
-        <p className="-mb-[5px] mobileLg:-mb-[7px]">
-          MINTERS{" "}
-          <span className="text-stamp-grey-light font-bold">{minters}</span>
+        <p class="-mb-[5px] mobileLg:-mb-[7px]">
+          MINTERS <span class="text-stamp-grey-light font-bold">{minters}</span>
         </p>
       </div>
     </div>
@@ -98,6 +92,7 @@ export function MintContent({
   const [searchResults, setSearchResults] = useState([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectedToken, setSelectedToken] = useState(null);
+  const [isImageLoading, setIsImageLoading] = useState(false);
 
   // Fetch search results based on searchTerm
   useEffect(() => {
@@ -121,6 +116,24 @@ export function MintContent({
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
+  const fetchTickDeployment = async (tick: string) => {
+    setIsImageLoading(true);
+
+    try {
+      const response = await fetch(`/api/v2/src20/tick/${tick}/info`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch recent sales");
+      }
+      const data = await response.json();
+      setSelectedToken(data.deployment);
+      console.log("data", data);
+    } catch (error) {
+      console.error("Error fetching recent sales:", error);
+    } finally {
+      setIsImageLoading(false);
+    }
+  };
+
   const handleResultClick = async (tick: string) => {
     setIsSelecting(true); // Set flag to true to prevent search
     setFormState((prevState) => ({
@@ -129,22 +142,6 @@ export function MintContent({
     }));
     setSearchTerm(tick);
     setSearchResults([]);
-
-    // TODO: This one occurs error atm
-    // try {
-    //   if (!tick) return;
-
-    //   tick = convertEmojiToTick(tick);
-    //   set_precision(-4);
-    //   const body = await Src20Controller.handleTickPageRequest(tick);
-
-    //   if (!body || body.error) return;
-
-    //   setSelectedToken(body.deployment);
-    // } catch (error) {
-    //   console.error("Error in SRC20 tick page:", error);
-    //   return;
-    // }
   };
 
   // Adjusted useEffect hook to always fetch data when token changes
@@ -191,6 +188,7 @@ export function MintContent({
     };
 
     fetchData();
+    fetchTickDeployment(searchTerm);
   }, [searchTerm, setFormState]);
 
   // Calculate progress and other values
@@ -236,32 +234,40 @@ export function MintContent({
     "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
 
   return (
-    <div className={bodyToolsClassName}>
-      <h1 className={titlePurpleLDCenterClassName}>MINT SRC-20</h1>
+    <div class={bodyToolsClassName}>
+      <h1 class={titlePurpleLDCenterClassName}>MINT SRC-20</h1>
 
       {/* Display error if any */}
       {error && (
-        <div className="w-full text-red-500 text-center font-bold">
+        <div class="w-full text-red-500 text-center font-bold">
           {error}
         </div>
       )}
 
-      <div className={inputFieldContainerClassName}>
-        <div className="w-full flex gap-3 mobileMd:gap-6">
+      <div class={inputFieldContainerClassName}>
+        <div class="w-full flex gap-3 mobileMd:gap-6">
           <div
             id="image-preview"
             class="relative rounded-md items-center justify-center mx-auto text-center min-w-[108px] mobileMd:min-w-[120px] w-[108px] mobileMd:w-[120px] h-[108px] mobileMd:h-[120px] content-center bg-[#660099] flex flex-col"
           >
-            <img
-              src={selectedToken
-                ? `/content/${selectedToken.tx_hash}.svg`
-                : `/img/stamping/image-upload.svg`}
-              class="w-12 h-12"
-              alt=""
-              loading="lazy"
-            />
+            {isImageLoading
+              ? (
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+              )
+              : (
+                <img
+                  src={selectedToken
+                    ? `/content/${selectedToken.tx_hash}.svg`
+                    : `/img/stamping/image-upload.svg`}
+                  class={selectedToken ? "w-full h-full" : "w-12 h-12"}
+                  alt=""
+                  loading="lazy"
+                  onLoad={() => setIsImageLoading(false)}
+                  onError={() => setIsImageLoading(false)}
+                />
+              )}
           </div>
-          <div className="flex flex-col gap-3 mobileMd:gap-6 w-full relative">
+          <div class="flex flex-col gap-3 mobileMd:gap-6 w-full relative">
             <InputField
               type="text"
               placeholder="Token"
@@ -306,7 +312,7 @@ export function MintContent({
         />
       </div>
 
-      <div className={feeSelectorContainerClassName}>
+      <div class={feeSelectorContainerClassName}>
         <FeeEstimation
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
