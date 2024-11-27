@@ -79,129 +79,137 @@ paths:
       tags:
         - Documentation
       summary: API documentation
-      description: Returns the complete OpenAPI documentation including all available endpoints, schemas, and examples.
+      description: Returns the OpenAPI documentation. Can be filtered by path or tag.
+      parameters:
+        - in: query
+          name: path
+          schema:
+            type: string
+          description: Optional path to filter documentation for a specific endpoint
+          example: "/api/v2/olga/mint"
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Optional tag to filter documentation by category
+          example: "Minting"
       responses:
         "200":
-          description: Successful response with complete API documentation
+          description: Successful response with API documentation
           content:
             application/json:
               schema:
-                description: Complete API documentation
-                type: object
-                required:
-                  - openapi
-                  - info
-                  - paths
-                properties:
-                  openapi:
-                    type: string
-                    description: OpenAPI version
-                    example: "3.0.3"
-                  info:
+                oneOf:
+                  - description: Full API documentation (no filters)
                     type: object
-                    description: API information
                     properties:
-                      title:
+                      openapi:
                         type: string
-                        description: API title
-                      description:
-                        type: string
-                        description: API description
-                      version:
-                        type: string
-                        description: API version
-                      license:
+                        description: OpenAPI version
+                        example: "3.0.3"
+                      info:
                         type: object
-                        description: License information
+                        description: API information
                         properties:
-                          name:
+                          title:
                             type: string
-                            description: License name
-                          url:
+                          description:
                             type: string
-                            description: License URL
-                      contact:
+                          version:
+                            type: string
+                      paths:
                         type: object
-                        description: Contact information
-                        properties:
-                          name:
-                            type: string
-                            description: Contact name
-                          url:
-                            type: string
-                            description: Contact URL
-                          email:
-                            type: string
-                            description: Contact email
-                  paths:
+                        description: Formatted endpoint documentation
+                      tags:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            description:
+                              type: string
+                      servers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                            description:
+                              type: string
+                  - description: Filtered documentation response
                     type: object
-                    description: Available API paths
-                    additionalProperties:
-                      type: object
-                      description: Path item
-                      properties:
-                        get:
+                    properties:
+                      documentation:
+                        type: array
+                        items:
                           type: object
-                          description: GET operation
                           properties:
-                            tags:
-                              type: array
-                              description: Operation tags
-                              items:
-                                type: string
+                            path:
+                              type: string
+                              description: Endpoint path
+                            method:
+                              type: string
+                              description: HTTP method
+                              enum: [GET, POST, PUT, DELETE, PATCH]
                             summary:
                               type: string
-                              description: Operation summary
+                              description: Brief description of the endpoint
                             description:
                               type: string
-                              description: Operation description
-                            responses:
-                              type: object
-                              description: Operation responses
-                        post:
-                          type: object
-                          description: POST operation
-                          properties:
+                              description: Detailed endpoint description
                             tags:
                               type: array
-                              description: Operation tags
                               items:
                                 type: string
-                            summary:
-                              type: string
-                              description: Operation summary
-                            description:
-                              type: string
-                              description: Operation description
-                            responses:
+                              description: Associated tags
+                            parameters:
+                              type: array
+                              description: Endpoint parameters
+                              items:
+                                type: object
+                            requestBody:
                               type: object
-                              description: Operation responses
-                  tags:
-                    type: array
-                    description: API tags
-                    items:
-                      type: object
-                      description: Tag item
-                      properties:
-                        name:
-                          type: string
-                          description: Tag name
-                        description:
-                          type: string
-                          description: Tag description
-                  servers:
-                    type: array
-                    description: API servers
-                    items:
-                      type: object
-                      description: Server item
-                      properties:
-                        url:
-                          type: string
-                          description: Server URL
-                        description:
-                          type: string
-                          description: Server description
+                              nullable: true
+                              description: Request body schema if applicable
+                            responses:
+                              type: array
+                              description: Possible responses
+                              items:
+                                type: object
+                                properties:
+                                  code:
+                                    type: string
+                                    description: HTTP status code
+                                  description:
+                                    type: string
+                                    description: Response description
+                                  content:
+                                    type: object
+                                    description: Response content schema
+                required:
+                  - documentation
+              examples:
+                fullDocs:
+                  summary: Complete API documentation
+                  value:
+                    openapi: "3.0.3"
+                    info:
+                      title: "Stampchain API"
+                      version: "2.2.0"
+                    # ... other full documentation fields
+                filteredDocs:
+                  summary: Filtered endpoint documentation
+                  value:
+                    documentation:
+                      - path: "/api/v2/olga/mint"
+                        method: "POST"
+                        summary: "Mint a new stamp"
+                        tags: ["Minting"]
+                        responses:
+                          - code: "200"
+                            description: "Successful mint transaction"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
