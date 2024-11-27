@@ -84,13 +84,13 @@ export default function Carousel(props: CarouselProps) {
                                     </span>
                                   </h3>
                                 </div>
-                                <div className="w-full px-4 py-1 flex justify-between items-center">
-                                  <h4 className="desktop:text-2xl mobileLg:text-lg text-base text-stamp-grey font-bold mobileMd:text-start text-center w-full">
+                                <div className="px-4 py-1 flex justify-between items-center">
+                                  <h4 className="desktop:text-2xl mobileLg:text-lg text-base text-stamp-grey font-bold">
                                     {stamp.creator_name
                                       ? stamp.creator_name
                                       : abbreviateAddress(stamp.creator, 4)}
                                   </h4>
-                                  <h5 className="desktop:text-xl mobileLg:text-base text-sm text-stamp-grey-darker font-bold mobileMd:block text-end w-full hidden">
+                                  <h5 className="desktop:text-xl mobileLg:text-base text-sm text-stamp-grey-darker font-bold mobileMd:block hidden">
                                     {stamp.divisible
                                       ? (stamp.supply / 100000000).toFixed(2)
                                       : stamp.supply > 100000
