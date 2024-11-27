@@ -80,7 +80,7 @@ export const handler: Handlers<StampingSrc20PageProps> = {
 
       if (action === "mint") {
         // Fetch trending tokens for PopularMinting
-        const limit = 8;
+        const limit = 5;
         const page = 1;
         const transactionCount = 1000;
 
@@ -92,11 +92,6 @@ export const handler: Handlers<StampingSrc20PageProps> = {
         );
 
         trendingTokens.push(...trendingData.data);
-
-        // Fetch recent deploys for RecentDeploy
-        const recentDeploysData = await Src20Controller
-          .fetchRecentTransactions();
-        recentTransactions.deploy = recentDeploysData.deploy;
       } else {
         recentTransactions = await Src20Controller.fetchRecentTransactions();
       }
@@ -132,10 +127,6 @@ export default function StampingSrc20Page(
     recentTransactions,
     trendingTokens,
   } = data;
-
-  const isMint = selectedTab === "mint";
-  const flexDirection = isMint ? "tablet:flex-row" : "tablet:flex-row";
-  const columnWidth = isMint ? "tablet:w-1/2" : "tablet:w-1/2";
 
   const renderContent = () => {
     switch (selectedTab) {
@@ -184,19 +175,16 @@ export default function StampingSrc20Page(
   };
 
   return (
-    <div className="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
-      <div className="self-center max-w-[680px] w-full mx-auto">
+    <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
+      <div class="self-center max-w-[680px] w-full mx-auto">
         {renderContent()}
       </div>
 
-      <div
-        className={`flex flex-col gap-3 mobileMd:gap-6 w-full desktop:gap-9 ${flexDirection}`}
-      >
-        <div className={`w-full ${columnWidth}`}>
+      <div class="flex flex-col gap-3 mobileMd:gap-6 w-full desktop:gap-9 tablet:flex-row">
+        <div class="w-full tablet:w-1/2">
           {renderLeftSidebar()}
-          {isMint && <RecentDeploy transactions={recentTransactions.deploy} />}
         </div>
-        <div className={`w-full ${columnWidth}`}>
+        <div class="w-full tablet:w-1/2">
           {renderRightSidebar()}
         </div>
       </div>
