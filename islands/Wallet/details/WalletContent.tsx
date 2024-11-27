@@ -528,12 +528,14 @@ export default function WalletContent(
           handleOpenFilter={() => {}}
           handleOpenSetting={() => {}}
         />
-        <div class="mt-3 mobileLg:mt-6">
-          <SRC20Section
-            type="all"
-            data={src20.data}
-          />
-        </div>
+        {Math.ceil(src20.pagination.total / src20.pagination.limit) > 1 && (
+          <div class="mt-3 mobileLg:mt-6">
+            <SRC20Section
+              type="all"
+              data={src20.data}
+            />
+          </div>
+        )}
       </div>
 
       {/* Listing Pagination */}
