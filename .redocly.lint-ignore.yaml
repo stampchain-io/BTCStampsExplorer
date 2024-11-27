@@ -6,7 +6,8 @@ schema.yml:
     - '#/paths/~1api~1v2~1src101~1{deploy_hash}~1total'
     - '#/paths/~1api~1v2~1src101~1balance~1{address}'
     - '#/paths/~1api~1v2~1src101~1index~1{deploy_hash}~1{index}'
+    - '#/paths/~1api~1v2~1stamps~1balance~1{address}'
+    - '#/paths/~1api~1v2~1stamps~1block~1{block_index}'
+    - '#/paths/~1api~1v2~1stamps~1ident~1{ident}'
   operation-2xx-response:
     - '#/paths/~1api~1v2~1error/get/responses'
-  paths-kebab-case:
-    - '#/paths/~1api~1v2~1block~1block_count~1{number}'

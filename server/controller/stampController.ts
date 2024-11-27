@@ -611,7 +611,7 @@ export class StampController {
     }
   }
 
-  private static async resolveToCpid(id: string): Promise<string> {
+  static async resolveToCpid(id: string): Promise<string> {
     const result = await StampService.resolveToCpid(id);
     if (!result?.cpid) {
       throw new Error(`Could not resolve identifier ${id} to a cpid`);

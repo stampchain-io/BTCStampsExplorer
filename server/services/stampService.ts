@@ -109,18 +109,19 @@ export class StampService {
     skipTotalCount?: boolean;
     cacheType?: RouteType;
   }) {
-    // Ensure collection queries have proper grouping configuration
-    if (options.collectionId && (!options.groupBy || !options.groupBySubquery)) {
-      options = {
-        ...options,
+    // Create a new options object instead of modifying the input
+    const queryOptions = {
+      ...options,
+      // Add collection query defaults if needed
+      ...(options.collectionId && (!options.groupBy || !options.groupBySubquery) ? {
         groupBy: "collection_id",
         groupBySubquery: true
-      };
-    }
+      } : {})
+    };
 
     const [result, lastBlock] = await Promise.all([
-      StampRepository.getStampsFromDb({
-        ...options,
+      StampRepository.getStamps({
+        ...queryOptions,
         cacheType: options.cacheType,
         cacheDuration: options.cacheDuration
       }),
@@ -319,7 +320,7 @@ export class StampService {
 
   // New lightweight method to just get cpid
   static async resolveToCpid(id: string) {
-    const result = await StampRepository.getStampsFromDb({
+    const result = await StampRepository.getStamps({
       identifier: id,
       allColumns: false,
       noPagination: true,

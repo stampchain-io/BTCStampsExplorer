@@ -74,27 +74,28 @@ export const handler: Handlers<TX | TXError> = {
       // Update the txDetails mapping without changing the API response format
       const txInputs = mint_tx.psbt.txInputs;
       const txDetails = txInputs.map((input: any, index: number) => {
-        let txid = "";
+        let inputTxid = ""; // Renamed to clarify this is the input transaction ID
         let vout = 0;
 
         if (input.hash && typeof input.index === "number") {
           // Convert hash to Uint8Array, then to hex string
+          // This is the txid of the previous transaction being spent by this input
           const hashBytes = new Uint8Array(hex2bin(input.hash.toString("hex")));
           // Reverse bytes and convert to hex string
-          txid = Array.from(hashBytes)
+          inputTxid = Array.from(hashBytes)
             .reverse()
             .map((b) => b.toString(16).padStart(2, "0"))
             .join("");
-          vout = input.index;
+          vout = input.index; // The output index in the previous transaction
         } else {
           throw new Error(
-            `Unable to extract txid and vout for input at index ${index}`,
+            `Unable to extract input txid and vout for input at index ${index}`,
           );
         }
 
         return {
-          txid,
-          vout,
+          txid: inputTxid, // The transaction ID of the input being spent
+          vout, // The output index in the input transaction
           signingIndex: index,
         };
       });
@@ -104,12 +105,25 @@ export const handler: Handlers<TX | TXError> = {
         hex: mint_tx.psbt.toHex(),
         base64: mint_tx.psbt.toBase64(),
         cpid: assetName,
-        est_tx_size: mint_tx.estimatedTxSize,
-        input_value: mint_tx.totalInputValue,
-        total_dust_value: mint_tx.totalDustValue,
-        est_miner_fee: mint_tx.estMinerFee,
-        change_value: mint_tx.totalChangeOutput,
-        txDetails: txDetails,
+        transactionDetails: {
+          estimatedSize: mint_tx.estimatedTxSize,
+          totalInputValue: mint_tx.totalInputValue,
+          totalDustValue: mint_tx.totalDustValue,
+          minerFee: mint_tx.estMinerFee,
+          changeOutput: mint_tx.totalChangeOutput,
+          inputs: txDetails.map((input) => ({
+            txid: input.txid,
+            vout: input.vout,
+            signingIndex: input.signingIndex,
+            value: input.value, // Add if available
+            address: input.address, // Add if available
+          })),
+          outputs: mint_tx.outputs?.map((output) => ({
+            address: output.address,
+            value: output.value,
+            type: output.type, // e.g., 'change', 'stamp', 'fee'
+          })) || [],
+        },
       });
     } catch (error: unknown) {
       console.error("Minting error:", error);

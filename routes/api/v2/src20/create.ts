@@ -131,6 +131,7 @@ export const handler: Handlers<TX | TXError> = {
           input_value: psbtData.totalInputValue,
           total_dust_value: psbtData.totalDustValue,
           est_miner_fee: psbtData.estMinerFee,
+          fee: psbtData.totalDustValue + psbtData.estMinerFee,
           change_value: psbtData.totalChangeOutput,
           inputsToSign: psbtData.psbt.data.inputs.map((_, index) => index),
           sourceAddress: body.sourceAddress,
