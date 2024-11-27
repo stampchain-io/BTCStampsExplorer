@@ -57,42 +57,52 @@ export const handler: Handlers = {
         switch (mimeType) {
           case "text/html": {
             return ResponseUtil.custom(content, 200, {
-              "Content-Type": `${mimeType}; charset=utf-8`,
-              "Cache-Control": STATIC_CACHE_CONTROL,
+              headers: {
+                "Content-Type": `${mimeType}; charset=utf-8`,
+                "Cache-Control": STATIC_CACHE_CONTROL,
+              },
             });
           }
 
           case "application/javascript": {
             return ResponseUtil.custom(content, 200, {
-              "Content-Type": `${mimeType}; charset=utf-8`,
-              "Cache-Control": STATIC_CACHE_CONTROL,
-              "Vary": "Accept-Encoding",
+              headers: {
+                "Content-Type": `${mimeType}; charset=utf-8`,
+                "Cache-Control": STATIC_CACHE_CONTROL,
+                "Vary": "Accept-Encoding",
+              },
             });
           }
 
           case "application/gzip": {
             return ResponseUtil.custom(content, 200, {
-              "Content-Type": mimeType,
-              "Content-Encoding": "gzip",
-              "Cache-Control": STATIC_CACHE_CONTROL,
-              "Accept-Ranges": "bytes",
-              "Vary": "Accept-Encoding",
+              headers: {
+                "Content-Type": mimeType,
+                "Content-Encoding": "gzip",
+                "Cache-Control": STATIC_CACHE_CONTROL,
+                "Accept-Ranges": "bytes",
+                "Vary": "Accept-Encoding",
+              },
             });
           }
 
           case "image/svg+xml": {
             return ResponseUtil.custom(content, 200, {
-              "Content-Type": mimeType,
-              "Cache-Control": STATIC_CACHE_CONTROL,
-              "Vary": "Accept-Encoding",
+              headers: {
+                "Content-Type": mimeType,
+                "Cache-Control": STATIC_CACHE_CONTROL,
+                "Vary": "Accept-Encoding",
+              },
             });
           }
 
           default: {
             return ResponseUtil.custom(content, 200, {
-              "Content-Type": mimeType,
-              "Cache-Control": STATIC_CACHE_CONTROL,
-              "Vary": "Accept-Encoding",
+              headers: {
+                "Content-Type": mimeType,
+                "Cache-Control": STATIC_CACHE_CONTROL,
+                "Vary": "Accept-Encoding",
+              },
             });
           }
         }
@@ -103,9 +113,11 @@ export const handler: Handlers = {
         `${serverConfig.APP_ROOT}/static${NOT_AVAILABLE_IMAGE}`;
       const fallbackContent = await Deno.readFile(notAvailablePath);
       return ResponseUtil.custom(fallbackContent, 200, {
-        "Content-Type": "image/png",
-        "Cache-Control": STATIC_CACHE_CONTROL,
-        "Vary": "Accept-Encoding",
+        headers: {
+          "Content-Type": "image/png",
+          "Cache-Control": STATIC_CACHE_CONTROL,
+          "Vary": "Accept-Encoding",
+        },
       });
     } catch (error) {
       console.error("Error in [...imgpath] handler:", error);
