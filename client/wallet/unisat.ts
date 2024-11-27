@@ -47,8 +47,6 @@ const handleAccountsChanged = async (_accounts: string[]) => {
   _wallet.publicKey = publicKey;
   const balance = await unisat.getBalance();
   _wallet.btcBalance = balance;
-  const basicInfo = await walletContext.getBasicStampInfo(address);
-  _wallet.stampBalance = basicInfo.stampBalance;
   _wallet.network = "mainnet";
   _wallet.provider = "unisat";
   walletContext.updateWallet(_wallet);

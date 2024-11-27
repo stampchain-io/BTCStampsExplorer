@@ -4,7 +4,7 @@ import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
-import { getAddressBalance } from "$lib/utils/balanceUtils.ts";
+import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
 
 interface LeatherAddress {
   symbol: "BTC" | "STX";
@@ -103,19 +103,14 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
   _wallet.publicKey = btcAddress.publicKey;
   _wallet.addressType = btcAddress.type; // Store the address type for future reference
 
-  const confirmedBalance = await getAddressBalance(btcAddress.address, {
-    format: "BTC",
-    fallbackValue: 0,
-  });
+  const addressInfo = await getAddressInfo(btcAddress.address);
 
   _wallet.btcBalance = {
-    confirmed: confirmedBalance ?? 0,
-    unconfirmed: 0,
-    total: confirmedBalance ?? 0,
+    confirmed: addressInfo?.balance ?? 0,
+    unconfirmed: addressInfo?.unconfirmedBalance ?? 0,
+    total: (addressInfo?.balance ?? 0) + (addressInfo?.unconfirmedBalance ?? 0),
   };
 
-  const basicInfo = await walletContext.getBasicStampInfo(btcAddress.address);
-  _wallet.stampBalance = basicInfo.stampBalance;
   _wallet.network = "mainnet";
   _wallet.provider = "leather";
 
