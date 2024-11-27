@@ -361,6 +361,7 @@ export class SRC20Repository {
             dep.max,
             dep.deci,
             dep.lim,
+            dep.tx_hash,
             (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
             (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted
         FROM ${SRC20_TABLE} AS dep
