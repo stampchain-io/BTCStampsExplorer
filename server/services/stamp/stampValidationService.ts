@@ -1,5 +1,6 @@
 import { XcpManager } from "$server/services/xcpService.ts";
 import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
+import { isCpid } from "$lib/utils/identifierUtils.ts";
 
 export class StampValidationService {
   static async checkAssetAvailability(assetName: string): Promise<boolean> {
@@ -15,14 +16,18 @@ export class StampValidationService {
   }
 
   static async generateAvailableAssetName(): Promise<string> {
-    const max_asset_id = 2 ** 64 - 1;
-    const min_asset_id = 26 ** 12 + 1;
+    const max_asset_id = 2n ** 64n - 1n;
+    const min_asset_id = 26n ** 12n + 1n;
     let asset_name: string;
     let nameAvailable = false;
     const maxIterations = 100;
     
     for (let i = 0; i < maxIterations; i++) {
-      asset_name = "A" + generateRandomNumber(min_asset_id - 8008, max_asset_id - 8008);
+      // Convert to string after subtracting BigInts
+      asset_name = "A" + (generateRandomNumber(
+        Number(min_asset_id - 8008n), 
+        Number(max_asset_id - 8008n)
+      ));
       nameAvailable = await this.checkAssetAvailability(asset_name);
       if (nameAvailable) break;
     }
@@ -34,24 +39,16 @@ export class StampValidationService {
     if (!assetName) {
       return this.generateAvailableAssetName();
     }
-  // FIXME: We need to check and validate the users address has XCP in the wallet for a cleaner error than 'insufficient funds'
-  // FIXME: this should also likely check the qty on the issuance value
+
+    // FIXME: We need to check and validate the users address has XCP in the wallet for a cleaner error than 'insufficient funds'
+    // FIXME: this should also likely check the qty on the issuance value
 
     const upperCaseAssetName = assetName.toUpperCase();
 
-    if (upperCaseAssetName.startsWith("A")) {
-      const numericPart = BigInt(upperCaseAssetName.slice(1));
-      const min = BigInt(26n ** 12n + 1n);
-      const max = BigInt(2n ** 64n - 1n);
-      
-      if (numericPart < min || numericPart > max) {
-    throw new Error(`Numeric assets must be between ${min} and ${max}.`);
-      }
-    }
-
-    if (!/^[B-Z][A-Z]{0,12}$/.test(upperCaseAssetName) && !upperCaseAssetName.startsWith("A")) {
+    // Use the centralized CPID validation
+    if (!isCpid(upperCaseAssetName)) {
       throw new Error(
-        "Name must start with letters (B-Z), contain only uppercase letters (A-Z), and must not exceed 13 characters.",
+        "Invalid asset name format. Must be either an A-prefixed numeric ID or a B-Z alphabetic name up to 13 characters."
       );
     }
 

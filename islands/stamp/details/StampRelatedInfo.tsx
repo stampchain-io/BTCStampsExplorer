@@ -6,6 +6,7 @@ import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
 
 interface StampRelatedInfoProps {
   stampId: string;
+  cpid: string;
 }
 
 type TabType = "dispensers" | "sales" | "transfers";
@@ -32,7 +33,7 @@ function mapDispensesWithRates(dispenses: any[], dispensers: any[]) {
   }));
 }
 
-export function StampRelatedInfo({ stampId }: StampRelatedInfoProps) {
+export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
   const [selectedTab, setSelectedTab] = useState<TabType>("dispensers");
   const [dispensers, setDispensers] = useState<any[]>([]);
   const [dispenses, setDispenses] = useState<any[]>([]);
@@ -59,7 +60,7 @@ export function StampRelatedInfo({ stampId }: StampRelatedInfoProps) {
       switch (selectedTab) {
         case "dispensers": {
           response = await fetch(
-            `/api/v2/stamps/${stampId}/dispensers?${params}`,
+            `/api/v2/stamps/${cpid}/dispensers?${params}`,
           );
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -76,9 +77,9 @@ export function StampRelatedInfo({ stampId }: StampRelatedInfoProps) {
         }
         case "sales": {
           const [dispenseResponse, dispensersResponse] = await Promise.all([
-            fetch(`/api/v2/stamps/${stampId}/dispenses?${params}`),
+            fetch(`/api/v2/stamps/${cpid}/dispenses?${params}`),
             fetch(
-              `/api/v2/stamps/${stampId}/dispensers?${new URLSearchParams({
+              `/api/v2/stamps/${cpid}/dispensers?${new URLSearchParams({
                 limit: "1000",
                 sort: "DESC",
               })}`,
@@ -116,7 +117,7 @@ export function StampRelatedInfo({ stampId }: StampRelatedInfoProps) {
           break;
         }
         case "transfers": {
-          response = await fetch(`/api/v2/stamps/${stampId}/sends?${params}`);
+          response = await fetch(`/api/v2/stamps/${cpid}/sends?${params}`);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }

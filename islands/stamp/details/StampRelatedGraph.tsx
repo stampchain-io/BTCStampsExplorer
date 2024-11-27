@@ -9,6 +9,7 @@ interface Holder {
 
 interface StampRelatedGraphProps {
   stampId: string;
+  cpid: string;
   initialHolders?: Holder[];
 }
 
@@ -41,7 +42,7 @@ function HolderRow(
 }
 
 export function StampRelatedGraph(
-  { stampId, initialHolders = [] }: StampRelatedGraphProps,
+  { stampId, cpid, initialHolders = [] }: StampRelatedGraphProps,
 ) {
   const [holders, setHolders] = useState<Holder[]>(initialHolders);
   const [isLoading, setIsLoading] = useState(!initialHolders.length);
@@ -52,8 +53,8 @@ export function StampRelatedGraph(
 
       setIsLoading(true);
       try {
-        console.log("Fetching holders for stamp:", stampId);
-        const response = await fetch(`/api/v2/stamps/${stampId}/holders`);
+        console.log("Fetching holders for stamp:", cpid);
+        const response = await fetch(`/api/v2/stamps/${cpid}/holders`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -71,13 +72,13 @@ export function StampRelatedGraph(
       }
     };
 
-    if (stampId) {
-      console.log("Starting holders fetch for stampId:", stampId);
+    if (cpid) {
+      console.log("Starting holders fetch for cpid:", cpid);
       fetchHolders();
     } else {
-      console.warn("No stampId provided for holders fetch");
+      console.warn("No cpid provided for holders fetch");
     }
-  }, [stampId]);
+  }, [cpid]);
 
   useEffect(() => {
     console.log("Current holders:", holders);
