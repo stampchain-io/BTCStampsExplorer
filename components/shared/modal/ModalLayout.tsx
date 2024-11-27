@@ -17,22 +17,22 @@ export function ModalLayout({
 }: ModalLayoutProps) {
   return (
     <div
-      class={`fixed inset-0 z-50 flex items-center justify-center bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm ${className}`}
+      class={`fixed inset-0 z-50 flex items-center justify-center bg-[#100019] bg-opacity-75 backdrop-filter backdrop-blur-sm ${className}`}
       onClick={preventPropagation ? onClose : undefined}
     >
-      <div class="relative w-full max-w-[360px] h-auto">
+      <div class="relative w-[360px] h-[600px] p-3 mobileMd:p-6 bg-[#080808] rounded-lg overflow-hidden">
         <div
-          class={`relative bg-[#0B0B0B] rounded-lg shadow overflow-hidden p-4 space-y-4 ${contentClassName}`}
+          class={`relative ${contentClassName}`}
           onClick={preventPropagation ? (e) => e.stopPropagation() : undefined}
         >
           <img
             onClick={onClose}
-            class="w-6 h-6 ms-auto cursor-pointer"
+            class="w-6 h-6 ms-auto cursor-pointer absolute top-0 right-0"
             alt="Close modal"
             src="/img/wallet/icon-close.svg"
           />
 
-          <p class="font-black text-5xl text-center purple-gradient1">
+          <p class="font-black text-4xl mobileLg:text-5xl text-center purple-gradient3 pt-3 mobileLg:pt-6 pb-6 mobileLg:pb-9">
             {title}
           </p>
 
