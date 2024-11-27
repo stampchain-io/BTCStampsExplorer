@@ -102,9 +102,6 @@ const handleAccountsChanged = async () => {
       stampBalance: [],
     };
 
-    const basicInfo = await walletContext.getBasicStampInfo(address);
-    _wallet.stampBalance = basicInfo.stampBalance;
-
     logger.info("ui", {
       message: "Updated wallet information",
       context: "handleAccountsChanged",

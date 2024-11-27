@@ -56,8 +56,6 @@ const handleAccountsChanged = async (accounts: string[]) => {
     total: balance.total,
   };
 
-  const basicInfo = await walletContext.getBasicStampInfo(accounts[0]);
-  _wallet.stampBalance = basicInfo.stampBalance;
   _wallet.network = await tapwallet.getNetwork();
   _wallet.provider = "tapwallet";
 

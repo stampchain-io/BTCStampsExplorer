@@ -3,7 +3,7 @@ import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
-import { getAddressBalance } from "$lib/utils/balanceUtils.ts";
+import { getAddressInfo } from "$lib/utils/balanceUtils.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -54,22 +54,17 @@ const handleAccountsChanged = async (accounts: any[]) => {
   _wallet.accounts = accounts.map((acc) => acc.address);
   _wallet.publicKey = accounts[0]?.publicKey;
 
-  // Phantom doesn't provide a direct method to get balance
   if (_wallet.address) {
-    const confirmedBalance = await getAddressBalance(_wallet.address, {
-      format: "BTC",
-      fallbackValue: 0,
-    });
+    const addressInfo = await getAddressInfo(_wallet.address);
 
     _wallet.btcBalance = {
-      confirmed: confirmedBalance ?? 0,
-      unconfirmed: 0,
-      total: confirmedBalance ?? 0,
+      confirmed: addressInfo?.balance ?? 0,
+      unconfirmed: addressInfo?.unconfirmedBalance ?? 0,
+      total: (addressInfo?.balance ?? 0) +
+        (addressInfo?.unconfirmedBalance ?? 0),
     };
   }
 
-  const basicInfo = await walletContext.getBasicStampInfo(_wallet.address);
-  _wallet.stampBalance = basicInfo.stampBalance;
   _wallet.network = "mainnet";
   _wallet.provider = "phantom";
 
