@@ -17,15 +17,35 @@ const log = (message: string, data?: any) => {
   console.log(`[OlgaContent] ${message}`, data ? data : "");
 };
 
-interface TxDetails {
-  fee: number;
-  dust: number;
-  total: number;
-  txDetails: {
-    estimatedSize: number;
-    totalInputValue: number;
-    changeOutput: number;
-  };
+interface TransactionInput {
+  txid: string;
+  vout: number;
+  signingIndex: number;
+  value?: number;
+  address?: string;
+}
+
+interface TransactionOutput {
+  address: string;
+  value: number;
+  type: "change" | "stamp" | "fee";
+}
+
+interface TransactionDetails {
+  estimatedSize: number;
+  totalInputValue: number;
+  totalDustValue: number;
+  minerFee: number;
+  changeOutput: number;
+  inputs: TransactionInput[];
+  outputs: TransactionOutput[];
+}
+
+interface TxResponse {
+  hex: string;
+  base64: string;
+  cpid: string;
+  transactionDetails: TransactionDetails;
 }
 
 // Add this helper function near the top of the file
@@ -612,26 +632,23 @@ export function OlgaContent() {
           throw new Error("Invalid response structure: missing hex field");
         }
 
-        const { hex, base64, txDetails, cpid } = response.data;
-        log("Extracted data from response", { hex, base64, txDetails, cpid });
+        const { hex, base64, transactionDetails, cpid } = response.data;
+        log("Extracted data from response", {
+          hex,
+          base64,
+          cpid,
+          inputCount: transactionDetails.inputs.length,
+          outputCount: transactionDetails.outputs.length,
+        });
 
         const walletProvider = getWalletProvider(
           wallet.provider,
         );
 
-        // Correctly construct inputsToSign with index
-        const inputsToSign = txDetails.map(
-          (input: { signingIndex: number }) => {
-            if (typeof input.signingIndex !== "number") {
-              throw new Error(
-                "signingIndex is missing or invalid in txDetails",
-              );
-            }
-            return {
-              index: input.signingIndex,
-            };
-          },
-        );
+        // Update the inputsToSign construction to handle multiple inputs
+        const inputsToSign = transactionDetails.inputs.map((input) => ({
+          index: input.signingIndex,
+        }));
         console.log("Constructed inputsToSign:", inputsToSign);
 
         const result = await walletProvider.signPSBT(hex, inputsToSign);

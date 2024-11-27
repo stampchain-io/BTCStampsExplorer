@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
-import { IdentHandlerContext, PaginatedStampResponseBody } from "globals";
+import { IdentHandlerContext, PaginatedIdResponseBody } from "globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
@@ -60,12 +60,13 @@ export const handler: Handlers<IdentHandlerContext> = {
         return emptyCheck;
       }
 
-      const body: PaginatedStampResponseBody = {
+      const body: PaginatedIdResponseBody = {
         page: result.page || DEFAULT_PAGINATION.page,
         limit: result.limit || DEFAULT_PAGINATION.limit,
         totalPages: result.totalPages,
         total: result.total,
         last_block: result.last_block,
+        ident: ident.toUpperCase(),
         data: result.data,
       };
 

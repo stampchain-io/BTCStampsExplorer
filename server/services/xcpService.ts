@@ -249,6 +249,72 @@ export class DispenserManager {
   }
 }
 
+// Update only the ComposeAttachOptions interface
+export interface ComposeAttachOptions {
+  // Required parameters
+  fee_per_kb: number;  // Changed from optional to required
+
+  // Optional parameters
+  destination_vout?: number;
+  inputs_set?: string;  // txid:vout format for specifying UTXO
+  encoding?: string;    // default: 'auto'
+  regular_dust_size?: number;    // default: 546
+  multisig_dust_size?: number;   // default: 1000
+  pubkeys?: string;
+  allow_unconfirmed_inputs?: boolean;  // default: false
+  exact_fee?: number;
+  fee_provided?: number;         // default: 0
+  unspent_tx_hash?: string;
+  dust_return_pubkey?: string | false;
+  disable_utxo_locks?: boolean;  // default: false
+  p2sh_pretx_txid?: string;
+  segwit?: boolean;             // default: false
+  confirmation_target?: number;  // default: 3
+  exclude_utxos?: string;
+  return_psbt?: boolean;        // default: false (API v2 only)
+  return_only_data?: boolean;   // default: false (API v2 only)
+  extended_tx_info?: boolean;   // default: false (API v1 only)
+  old_style_api?: boolean;      // default: false (API v1 only)
+  use_utxos_with_balances?: boolean;    // default: false
+  exclude_utxos_with_balances?: boolean; // default: false
+  validate?: boolean;           // default: true
+  verbose?: boolean;            // default: false
+  show_unconfirmed?: boolean;   // default: false
+}
+
+// Also add ComposeDetachOptions since it's used in stampdetach.ts
+export interface ComposeDetachOptions {
+  // Required parameters
+  fee_per_kb: number;
+
+  // Optional parameters
+  destination?: string;
+  encoding?: string;
+  regular_dust_size?: number;
+  multisig_dust_size?: number;
+  pubkeys?: string;
+  allow_unconfirmed_inputs?: boolean;
+  exact_fee?: number;
+  fee_provided?: number;
+  unspent_tx_hash?: string;
+  dust_return_pubkey?: string | false;
+  disable_utxo_locks?: boolean;
+  p2sh_pretx_txid?: string;
+  segwit?: boolean;
+  confirmation_target?: number;
+  exclude_utxos?: string;
+  inputs_set?: string;
+  return_psbt?: boolean;
+  return_only_data?: boolean;
+  extended_tx_info?: boolean;
+  old_style_api?: boolean;
+  use_utxos_with_balances?: boolean;
+  exclude_utxos_with_balances?: boolean;
+  validate?: boolean;
+  verbose?: boolean;
+  show_unconfirmed?: boolean;
+}
+
 export class XcpManager {
   private static fetchXcpV2WithCache = fetchXcpV2WithCache;
 
@@ -822,37 +888,17 @@ export class XcpManager {
     address: string,
     asset: string,
     quantity: number,
-    options: {
-      destination?: string;
-      fee_per_kb?: number;
-      regular_dust_size?: number;
-      multisig_dust_size?: number;
-      pubkeys?: string;
-      allow_unconfirmed_inputs?: boolean;
-      exact_fee?: number;
-      fee_provided?: number;
-      unspent_tx_hash?: string;
-      dust_return_pubkey?: string;
-      disable_utxo_locks?: boolean;
-      p2sh_pretx_txid?: string;
-      segwit?: boolean;
-      confirmation_target?: number; // pass a value for block target
-      exclude_utxos?: string;
-      inputs_set?: string;
-      return_psbt?: boolean;
-      return_only_data?: boolean;
-      extended_tx_info?: boolean;
-      old_style_api?: boolean;
-      verbose?: boolean;
-      show_unconfirmed?: boolean;
-    } = {},
+    options: ComposeAttachOptions = {},
   ): Promise<any> {
     const endpoint = `/addresses/${address}/compose/attach`;
     const queryParams = new URLSearchParams();
 
-    queryParams.append("multisig_dust_size", "788");
+    // Required parameters
     queryParams.append("asset", asset);
     queryParams.append("quantity", quantity.toString());
+
+    // Default values
+    queryParams.append("multisig_dust_size", "788");
     queryParams.append("return_psbt", "true");
     queryParams.append("verbose", "true");
 
@@ -865,18 +911,14 @@ export class XcpManager {
       );
     }
 
-    // if address is a segwit address, set segwit to true
+    // Handle segwit addresses
     if (address.startsWith("bc1")) {
       queryParams.append("segwit", "true");
     }
 
-    // Append optional parameters if provided
-    if (options.destination) {
-      queryParams.append("inputs_set", options.destination);
-    }
-
+    // Append all provided options to query parameters, except fee_per_kb which we handled above
     for (const [key, value] of Object.entries(options)) {
-      if (value !== undefined && value !== null && key !== "destination") {
+      if (value !== undefined && value !== null && key !== 'fee_per_kb') {
         queryParams.append(key, value.toString());
       }
     }
@@ -947,46 +989,37 @@ export class XcpManager {
   static async composeDetach(
     utxo: string,
     destination: string,
-    asset: string,
-    quantity: number,
-    options: {
-      encoding?: string;
-      fee_per_kb?: number;
-      regular_dust_size?: number;
-      multisig_dust_size?: number;
-      pubkeys?: string;
-      allow_unconfirmed_inputs?: boolean;
-      exact_fee?: number;
-      fee_provided?: number;
-      unspent_tx_hash?: string;
-      dust_return_pubkey?: string;
-      disable_utxo_locks?: boolean;
-      p2sh_pretx_txid?: string;
-      segwit?: boolean;
-      confirmation_target?: number;
-      exclude_utxos?: string;
-      inputs_set?: string;
-      return_psbt?: boolean;
-      return_only_data?: boolean;
-      extended_tx_info?: boolean;
-      old_style_api?: boolean;
-      verbose?: boolean;
-      show_unconfirmed?: boolean;
-    } = {},
+    options: ComposeDetachOptions = {},
   ): Promise<any> {
     const endpoint = `/utxos/${utxo}/compose/detach`;
     const queryParams = new URLSearchParams();
 
-    queryParams.append("destination", destination);
-    queryParams.append("asset", asset);
-    queryParams.append("quantity", quantity.toString());
+    // Required parameters
+    if (destination) {
+      queryParams.append("destination", destination);
+    }
 
-    // Append optional parameters if provided
+    // Default values
+    queryParams.append("return_psbt", "true");
+    queryParams.append("verbose", "true");
+
+    // The API expects sat/kB
+    if (options.fee_per_kb) {
+      console.log(`Setting fee rate to ${options.fee_per_kb} sat/kB`);
+      queryParams.append(
+        "fee_per_kb",
+        Math.floor(options.fee_per_kb).toString(),
+      );
+    }
+
+    // Append all provided options to query parameters, except fee_per_kb which we handled above
     for (const [key, value] of Object.entries(options)) {
-      if (value !== undefined && value !== null) {
+      if (value !== undefined && value !== null && key !== 'fee_per_kb') {
         queryParams.append(key, value.toString());
       }
     }
+
+    let lastError: string | null = null;
 
     for (const node of xcp_v2_nodes) {
       const url = `${node.url}${endpoint}?${queryParams.toString()}`;
@@ -999,7 +1032,15 @@ export class XcpManager {
         if (!response.ok) {
           const errorBody = await response.text();
           console.error(`Error response body from ${node.name}: ${errorBody}`);
-          continue; // Try the next node
+          try {
+            const errorJson = JSON.parse(errorBody);
+            if (errorJson.error) {
+              lastError = errorJson.error;
+            }
+          } catch (e) {
+            lastError = errorBody;
+          }
+          continue;
         }
 
         const data = await response.json();
@@ -1007,11 +1048,11 @@ export class XcpManager {
         return data;
       } catch (error) {
         console.error(`Fetch error for ${url}:`, error);
-        // Continue to the next node
+        lastError = error.message;
       }
     }
 
-    throw new Error("All nodes failed to compose detach transaction.");
+    throw new Error(lastError || "All nodes failed to compose detach transaction.");
   }
 
   static async composeDispenser(
@@ -1450,3 +1491,4 @@ export class XcpManager {
     }
   }
 }
+

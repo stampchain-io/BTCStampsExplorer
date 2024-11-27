@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Stampchain - OpenAPI 3.0
   description: Stampchain API UI
-  version: 2.0.0
+  version: 2.2.0
   license:
     name: GNU Affero General Public License v3.0
     url: https://www.gnu.org/licenses/agpl-3.0.html
@@ -16,7 +16,7 @@ tags:
   - name: Documentation
     description: API documentation endpoints
   - name: Balance
-    description: Balance-related endpoints
+    description: STAMPS, SRC-101, and SRC-20 balance-related endpoints
   - name: Blocks
     description: Block-related endpoints
   - name: Collections
@@ -33,6 +33,8 @@ tags:
     description: Dispenser management endpoints
   - name: Minting
     description: Token and stamp minting endpoints
+  - name: UTXO
+    description: UTXO management endpoints
 externalDocs:
   description: Find out more about Stampchain
   url: "http://stampchain.io"
@@ -77,14 +79,129 @@ paths:
       tags:
         - Documentation
       summary: API documentation
-      description: Returns the complete API documentation including all available endpoints, schemas, and examples.
+      description: Returns the complete OpenAPI documentation including all available endpoints, schemas, and examples.
       responses:
         "200":
-          description: OK
+          description: Successful response with complete API documentation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/APIDocs"
+                description: Complete API documentation
+                type: object
+                required:
+                  - openapi
+                  - info
+                  - paths
+                properties:
+                  openapi:
+                    type: string
+                    description: OpenAPI version
+                    example: "3.0.3"
+                  info:
+                    type: object
+                    description: API information
+                    properties:
+                      title:
+                        type: string
+                        description: API title
+                      description:
+                        type: string
+                        description: API description
+                      version:
+                        type: string
+                        description: API version
+                      license:
+                        type: object
+                        description: License information
+                        properties:
+                          name:
+                            type: string
+                            description: License name
+                          url:
+                            type: string
+                            description: License URL
+                      contact:
+                        type: object
+                        description: Contact information
+                        properties:
+                          name:
+                            type: string
+                            description: Contact name
+                          url:
+                            type: string
+                            description: Contact URL
+                          email:
+                            type: string
+                            description: Contact email
+                  paths:
+                    type: object
+                    description: Available API paths
+                    additionalProperties:
+                      type: object
+                      description: Path item
+                      properties:
+                        get:
+                          type: object
+                          description: GET operation
+                          properties:
+                            tags:
+                              type: array
+                              description: Operation tags
+                              items:
+                                type: string
+                            summary:
+                              type: string
+                              description: Operation summary
+                            description:
+                              type: string
+                              description: Operation description
+                            responses:
+                              type: object
+                              description: Operation responses
+                        post:
+                          type: object
+                          description: POST operation
+                          properties:
+                            tags:
+                              type: array
+                              description: Operation tags
+                              items:
+                                type: string
+                            summary:
+                              type: string
+                              description: Operation summary
+                            description:
+                              type: string
+                              description: Operation description
+                            responses:
+                              type: object
+                              description: Operation responses
+                  tags:
+                    type: array
+                    description: API tags
+                    items:
+                      type: object
+                      description: Tag item
+                      properties:
+                        name:
+                          type: string
+                          description: Tag name
+                        description:
+                          type: string
+                          description: Tag description
+                  servers:
+                    type: array
+                    description: API servers
+                    items:
+                      type: object
+                      description: Server item
+                      properties:
+                        url:
+                          type: string
+                          description: Server URL
+                        description:
+                          type: string
+                          description: Server description
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -134,7 +251,7 @@ paths:
       operationId: getAddressBalance
       tags:
         - Balance
-      summary: Get balance by address
+      summary: Get SRC-20 and STAMP balances by address
       description: Retrieves the complete balance information for a given Bitcoin address, including stamps and SRC-20 tokens.
       parameters:
         - in: path
@@ -386,6 +503,7 @@ paths:
       operationId: getSrc20AddressBalance
       tags:
         - SRC-20
+        - Balance
       summary: Get SRC-20 balances by BTC wallet address
       description: Retrieves all SRC-20 token balances for a specific Bitcoin address.
       parameters:
@@ -430,6 +548,7 @@ paths:
       operationId: getSrc20AddressTickBalance
       tags:
         - SRC-20
+        - Balance
       summary: Get SRC-20 balance by address and tick
       description: Retrieves the balance of a specific SRC-20 token (identified by tick) for a given Bitcoin address.
       parameters:
@@ -467,7 +586,8 @@ paths:
       operationId: getSrc20TickSnapshot
       tags:
         - SRC-20
-      summary: Get SRC-20 balance snapshot by tick
+        - Balance
+      summary: Get SRC-20 balance snapshot by tick on current block height
       description: |
         Retrieves a snapshot of all owners for the SRC-20 tick value based upon the current block height.
         This provides a complete overview of token distribution at the current point in time.
@@ -1053,6 +1173,7 @@ paths:
       operationId: getSrc101AddressBalance
       tags:
         - SRC-101
+        - Balance
       summary: Get SRC-101 balances by address
       description: Retrieve all SRC-101 token balances for a specific Bitcoin address, including details about each token held.
       parameters:
@@ -1454,6 +1575,7 @@ paths:
       operationId: getStampBalance
       tags:
         - Stamps
+        - Balance
       summary: Get stamp balances by address
       description: Retrieve all stamp balances for a specific Bitcoin address.
       parameters:
@@ -1566,6 +1688,7 @@ paths:
     post:
       operationId: createSrc20Token
       tags:
+        - Minting
         - SRC-20
       summary: Deploy, Mint, Transfer SRC-20 Tokens
       description: |
@@ -1618,15 +1741,20 @@ paths:
                     items:
                       type: string
                       description: The inputs to sign
+                  fee:
+                    type: integer
+                    description: The estimated miner fee + dust value
+                  change_value:
+                    type: integer
+                    description: The change value
+                  inputs_to_sign:
+                    type: array
+                    items:
+                      type: string
+                    description: The inputs to sign
                   changeAddress:
                     type: string
                     description: The change address
-                  fee:
-                    type: integer
-                    description: The estimated miner fee in sats
-                  change:
-                    type: integer
-                    description: The change value
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -1634,19 +1762,86 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-
+  /api/v2/trx/stampattach:
+    post:
+      operationId: attachStampById
+      tags:
+        - Stamps
+      summary: Attach stamp by ID
+      description: |
+        Creates a PSBT transaction to attach a stamp using its identifier (cpid, stamp number, or tx_hash).
+        The stamp will be attached to the specified address. Optionally, a specific UTXO can be specified using inputs_set.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+                - identifier
+                - quantity
+                - options
+              properties:
+                address:
+                  type: string
+                  description: The Bitcoin address to attach the stamp to
+                  example: "bc1qx6tg7nls0u949wy8eudwcaw0rcq0vl7ehh6p9l"
+                identifier:
+                  type: string
+                  description: The stamp identifier (cpid, stamp number, or tx_hash)
+                  example: "11"
+                quantity:
+                  type: number
+                  description: The quantity of stamps to attach
+                  example: 1
+                inputs_set:
+                  type: string
+                  description:  Specific UTXO to attach to (txid:vout format)
+                  example: "abc123def456...789:0"
+                options:
+                  type: object
+                  required:
+                    - fee_per_kb
+                  properties:
+                    fee_per_kb:
+                      type: number
+                      description: Fee rate in satoshis per kilobyte
+                      example: 20
+                    regular_dust_size:
+                      type: number
+                      description: Override the dust amount for regular outputs (in satoshis)
+                      default: 546
+                    return_psbt:
+                      type: boolean
+                      description: Return a PSBT instead of raw transaction
+                      default: true
+                    verbose:
+                      type: boolean
+                      description: Include additional transaction details
+                      default: true
+      responses:
+        "200":
+          description: Successful response with PSBT transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MintResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/olga/mint:
     post:
-      operationId: mintOlgaStamp
+      operationId: mintStamp
       tags:
         - Minting
-      summary: Mint an OLGA STAMP.
-      description: |
-        This returns a hex encoded serialized PSBT transaction ready for signing and broadcasting
-        via wallet or library. There is no validation that the input data provided
-        will conform to all STAMP specifications. It is the users sole responsibility 
-        The examples provided are for demonstration purposes only.
+        - Stamps
+      summary: Mint a new stamp
+      description: Creates a new stamp minting transaction that needs to be signed by the wallet
       requestBody:
         required: true
         content:
@@ -1666,36 +1861,11 @@ paths:
                   service_fee_address: null
       responses:
         "200":
-          description: Successful response with the psbt transaction
+          description: Successful response with the psbt transaction details
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  hex:
-                    type: string
-                    description: The hex string of the psbt transaction
-                  cpid:
-                    type: string
-                    description: The asset name
-                  base64:
-                    type: string
-                    description: The base64 string of the psbt transaction
-                  est_tx_size:
-                    type: integer
-                    description: The estimated transaction size
-                  input_value:
-                    type: integer
-                    description: The total input value
-                  total_dust_value:
-                    type: integer
-                    description: The total dust value
-                  est_miner_fee:
-                    type: integer
-                    description: The estimated miner fee
-                  change_value:
-                    type: integer
-                    description: The change value
+                $ref: "#/components/schemas/MintResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -1703,6 +1873,67 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v2/trx/stampdetach:
+    post:
+      operationId: detachStampFromUtxo
+      tags:
+        - Stamps
+        - UTXO
+      summary: Detach stamp from UTXO
+      description: |
+        Creates a PSBT transaction to detach a stamp from a specific UTXO.
+        If no destination is provided, the stamp will be detached to the address corresponding to the UTXO.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - utxo
+              properties:
+                utxo:
+                  type: string
+                  description: The UTXO from which to detach the stamp
+                  example: "abc123:0"
+                destination:
+                  type: string
+                  description: The address to detach the stamp to (optional)
+                  example: "bc1qx6tg7nls0u949wy8eudwcaw0rcq0vl7ehh6p9l"
+                options:
+                  type: object
+                  properties:
+                    fee_per_kb:
+                      type: number
+                      description: Fee rate in satoshis per kilobyte
+                      example: 20
+                    regular_dust_size:
+                      type: number
+                      description: Override the dust amount for regular outputs (in satoshis)
+                    multisig_dust_size:
+                      type: number
+                      description: Override the dust amount for multisig outputs (in satoshis)
+                    return_psbt:
+                      type: boolean
+                      description: Return a PSBT instead of raw transaction
+                      default: true
+                    verbose:
+                      type: boolean
+                      description: Include additional transaction details
+                      default: true
+      responses:
+        "200":
+          description: Successful response with PSBT transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MintResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
 
 components:
@@ -2170,17 +2401,15 @@ components:
     StampBalance:
       type: object
       properties:
-        cpid:
-          type: string
         stamp:
           type: number
-        stamp_base64:
+        tx_hash:
+          type: string
+        cpid:
           type: string
         stamp_url:
           type: string
         stamp_mimetype:
-          type: string
-        tx_hash:
           type: string
         divisible:
           type: number
@@ -2578,20 +2807,7 @@ components:
           items:
             type: integer
             description: Array of stamp numbers in this collection
-    APIDocs:
-      type: object
-      properties:
-        version:
-          type: string
-        endpoints:
-          type: array
-          items:
-            type: object
-            properties:
-              path:
-                type: string
-              description:
-                type: string
+
     ErrorResponseBody:
       type: object
       properties:
@@ -2618,6 +2834,95 @@ components:
         - error
       example:
         error: "Invalid fee rate"
+
+    MintResponse:
+      type: object
+      properties:
+        hex:
+          type: string
+          description: The hex encoded serialized psbt transaction
+        base64:
+          type: string
+          description: The base64 encoded serialized psbt transaction
+        cpid:
+          type: string
+          description: The asset name or identifier
+        transactionDetails:
+          type: object
+          properties:
+            estimatedSize:
+              type: integer
+              description: Estimated size of the transaction in bytes
+            totalInputValue:
+              type: integer
+              description: Total value of all inputs in satoshis
+            totalDustValue:
+              type: integer
+              description: Total dust value in satoshis
+            minerFee:
+              type: integer
+              description: Estimated miner fee in satoshis
+            changeOutput:
+              type: integer
+              description: Value returned to change address in satoshis
+            inputs:
+              type: array
+              description: Array of transaction inputs
+              items:
+                type: object
+                properties:
+                  txid:
+                    type: string
+                    description: Transaction ID of the input
+                  vout:
+                    type: integer
+                    description: Output index in the previous transaction
+                  signingIndex:
+                    type: integer
+                    description: Index for signing this input
+                  value:
+                    type: integer
+                    description: Value of this input in satoshis
+                  address:
+                    type: string
+                    description: Address associated with this input
+                required:
+                  - txid
+                  - vout
+                  - signingIndex
+            outputs:
+              type: array
+              description: Array of transaction outputs
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: Recipient address
+                  value:
+                    type: integer
+                    description: Output amount in satoshis
+                  type:
+                    type: string
+                    enum: [change, stamp, fee]
+                    description: Type of output
+                required:
+                  - address
+                  - value
+                  - type
+          required:
+            - estimatedSize
+            - totalInputValue
+            - totalDustValue
+            - minerFee
+            - changeOutput
+            - inputs
+            - outputs
+      required:
+        - hex
+        - base64
+        - cpid
+        - transactionDetails
 
   responses:
     NotFound:

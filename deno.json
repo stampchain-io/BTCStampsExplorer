@@ -39,6 +39,8 @@
     "@std/encoding": "jsr:/@std/encoding@^1.0.5",
     "@std/encoding/": "jsr:/@std/encoding@^1.0.5/",
     "@std/crypto": "jsr:@std/crypto@^1.0.3",
+    "@std/yaml": "jsr:/@std/yaml@^0.219.1",
+    "@std/path": "jsr:/@std/path@^0.219.1",
     "bigfloat/": "https://deno.land/x/bigfloat@v3.0.2/",
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:tailwindcss@3.4.1/",
@@ -55,7 +57,7 @@
     "swiper/": "https://esm.sh/swiper@11.1.14/",
     "swiper": "https://esm.sh/swiper@11.1.14",
 
-    "constants": "./lib/utils/constants.ts",
+    "$constants": "./lib/utils/constants.ts",
     "globals": "./globals.d.ts",
     "$/": "./",
     "$lib/": "./lib/",

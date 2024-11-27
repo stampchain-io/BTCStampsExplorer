@@ -482,6 +482,10 @@ export interface PaginatedStampResponseBody extends Pagination {
   data: StampRow[];
 }
 
+export interface PaginatedIdResponseBody extends PaginatedStampResponseBody {
+  ident: SUBPROTOCOLS;
+}
+
 export interface PaginatedStampBalanceResponseBody extends Pagination {
   last_block: number;
   data: StampBalance[];

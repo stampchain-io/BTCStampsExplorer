@@ -5,6 +5,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { ComposeAttachOptions } from "$server/services/xcpService.ts";
 
 const SIGHASH_SINGLE = 0x03;
 const SIGHASH_ANYONECANPAY = 0x80;
@@ -168,7 +169,7 @@ export function TradeContent() {
     }
 
     setIsSubmitting(true);
-    setSubmissionMessage("Please wait...");
+    setSubmissionMessage({ message: "Please wait..." });
     setApiError(null);
 
     try {
@@ -191,28 +192,34 @@ export function TradeContent() {
         return;
       }
 
-      // Convert fee rate from sat/vB to sat/kB (multiply by 1000)
+      // Convert fee rate from sat/vB to sat/kB
       const feeRateKB = parsedFeeRate * SATS_PER_KB_MULTIPLIER;
       console.log(
         `Converting fee rate: ${parsedFeeRate} sat/vB = ${feeRateKB} sat/kB`,
       );
 
-      // Prepare the request body
-      const requestBody = {
+      // Prepare the request body for new endpoint
+      const requestBody: {
+        address: string;
+        identifier: string;
+        quantity: number;
+        inputs_set: string;
+        options: Partial<ComposeAttachOptions>;
+      } = {
         address,
-        asset: cpid,
+        identifier: cpid,
         quantity: parseInt(quantity, 10),
-        utxo,
+        inputs_set: utxo,
         options: {
+          fee_per_kb: feeRateKB,
           return_psbt: true,
           extended_tx_info: true,
           regular_dust_size: 588,
-          fee_per_kb: feeRateKB, // This should now be 15000 for 15 sat/vB
         },
       };
 
-      // Call the backend API
-      const response = await fetch("/api/v2/trx/utxoattach", {
+      // Call the new endpoint
+      const response = await fetch("/api/v2/trx/stampattach", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -246,12 +253,18 @@ export function TradeContent() {
       );
 
       if (walletResult.signed) {
-        setSubmissionMessage("Transaction signed and broadcast successfully!");
+        setSubmissionMessage({
+          message: "Transaction signed and broadcast successfully!",
+        });
         setAttachFormState((prev) => ({ ...prev, psbtHex: walletResult.psbt }));
       } else if (walletResult.cancelled) {
-        setSubmissionMessage("PSBT signing cancelled by user.");
+        setSubmissionMessage({
+          message: "PSBT signing cancelled by user.",
+        });
       } else {
-        setSubmissionMessage(`PSBT signing failed: ${walletResult.error}`);
+        setSubmissionMessage({
+          message: `PSBT signing failed: ${walletResult.error}`,
+        });
       }
     } catch (error: unknown) {
       console.error("Error creating or signing PSBT:", error);

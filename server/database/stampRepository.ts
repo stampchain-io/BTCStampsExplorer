@@ -1,4 +1,4 @@
-import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "constants";
+import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "$constants";
 import { SUBPROTOCOLS } from "globals";
 import { BIG_LIMIT } from "$lib/utils/constants.ts";
 import {
@@ -328,7 +328,7 @@ export class StampRepository {
     return { fileName, base64: stamp_base64, stamp_mimetype };
   }
 
-  static async getStampsFromDb(
+  static async getStamps(
     options: {
       limit?: number;
       page?: number;
@@ -351,11 +351,23 @@ export class StampRepository {
       selectColumns?: string[];
     },
   ) {
+    const queryOptions = {
+      limit: SMALL_LIMIT,
+      page: 1,
+      sortBy: "ASC",
+      type: "stamps",
+      ...options,
+      ...(options.collectionId && (!options.groupBy || !options.groupBySubquery) ? {
+        groupBy: "collection_id",
+        groupBySubquery: true
+      } : {})
+    };
+
     const {
-      limit = SMALL_LIMIT,
-      page = 1,
-      sortBy = "ASC",
-      type = "stamps",
+      limit,
+      page,
+      sortBy,
+      type,
       ident,
       identifier,
       blockIdentifier,
@@ -371,7 +383,7 @@ export class StampRepository {
       collectionStampLimit = 12,
       skipTotalCount = false,
       selectColumns,
-    } = options;
+    } = queryOptions;
 
     const whereConditions: string[] = [];
     const queryParams: (string | number)[] = [];
@@ -421,9 +433,11 @@ export class StampRepository {
     `;
 
     // Select either custom columns, or core+extended columns, or just core columns
-    const selectClause = selectColumns 
-      ? `st.${selectColumns.join(', st.')}` // Custom columns
-      : `${coreColumns}${extendedColumns ? `, ${extendedColumns}` : ''}`; // Core + optional extended
+    let selectClause = selectColumns 
+      ? `st.${selectColumns.join(', st.')}` // Only selected columns if specified
+      : allColumns 
+        ? `${coreColumns}, ${extendedColumns}` // All columns if allColumns is true
+        : coreColumns; // Just core columns by default
 
     // Only include collection_id in select clause if collectionId is provided
     if (collectionId) {

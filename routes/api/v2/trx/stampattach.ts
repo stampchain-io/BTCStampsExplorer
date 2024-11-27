@@ -1,47 +1,57 @@
 import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { XcpManager } from "$server/services/xcpService.ts";
+import {
+  ComposeAttachOptions,
+  XcpManager,
+} from "$server/services/xcpService.ts";
 import { PSBTService } from "$server/services/transaction/psbtService.ts";
+import { StampController } from "$server/controller/stampController.ts";
 
-interface UtxoAttachInput {
+// Define interface extending ComposeAttachOptions for stamp-specific fields
+interface StampAttachInput {
   address: string;
-  asset: string;
+  identifier: string; // cpid, stamp number, or tx_hash
   quantity: number;
-  utxo: string;
-  options: {
-    return_psbt: boolean;
-    extended_tx_info: boolean;
-    regular_dust_size: number;
-    fee_per_kb: number;
+  options: Omit<ComposeAttachOptions, "inputs_set"> & {
+    fee_per_kb: number; // Make explicitly required
   };
+  inputs_set?: string; // txid:vout format - moved to top level for clarity
 }
 
 export const handler: Handlers = {
   async POST(req: Request) {
     try {
-      const input: UtxoAttachInput = await req.json();
-      console.log("Received input:", input);
+      const input: StampAttachInput = await req.json();
+      console.log("Received stamp attach input:", input);
 
-      const { address, asset, quantity, utxo, options } = input;
+      const { address, identifier, quantity, inputs_set, options } = input;
 
       // Validate fee rate
       if (typeof options?.fee_per_kb !== "number" || options.fee_per_kb <= 0) {
         return ResponseUtil.badRequest("Invalid fee rate");
       }
 
-      const feeRateKB = options.fee_per_kb;
-      console.log(`Fee rate (sat/kB): ${feeRateKB}`);
+      // Validate inputs_set format if provided
+      if (inputs_set && !inputs_set.match(/^[a-fA-F0-9]{64}:\d+$/)) {
+        return ResponseUtil.badRequest(
+          "Invalid inputs_set format. Expected txid:vout",
+        );
+      }
 
       try {
-        // Call composeAttach with fee rate in sat/kB
+        // Resolve identifier to CPID
+        const cpid = await StampController.resolveToCpid(identifier);
+
+        // Call composeAttach with resolved CPID
         const response = await XcpManager.composeAttach(
           address,
-          asset,
+          cpid,
           quantity,
           {
             ...options,
-            destination: utxo,
-            fee_per_kb: feeRateKB,
+            inputs_set, // Add inputs_set to options
+            return_psbt: true,
+            verbose: true,
           },
         );
 
@@ -52,13 +62,11 @@ export const handler: Handlers = {
           throw new Error("Failed to compose attach transaction.");
         }
 
-        console.log("PSBT Base64 from XCP:", response.result.psbt);
-
         // Process PSBT using shared service
         const processedPSBT = await PSBTService.processCounterpartyPSBT(
           response.result.psbt,
           address,
-          feeRateKB,
+          options.fee_per_kb,
           { validateInputs: true, validateFees: true },
         );
 
@@ -74,10 +82,10 @@ export const handler: Handlers = {
         throw error;
       }
     } catch (error) {
-      console.error("Error processing utxo attach request:", error);
+      console.error("Error processing stamp attach request:", error);
       return ResponseUtil.internalError(
         error,
-        "Failed to process utxo attach request",
+        "Failed to process stamp attach request",
       );
     }
   },
