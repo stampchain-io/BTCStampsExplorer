@@ -54,7 +54,8 @@ export function StampRelatedGraph(
       setIsLoading(true);
       try {
         console.log("Fetching holders for stamp:", cpid);
-        const response = await fetch(`/api/v2/stamps/${cpid}/holders`);
+        const encodedCpid = encodeURIComponent(cpid);
+        const response = await fetch(`/api/v2/stamps/${encodedCpid}/holders`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

@@ -56,11 +56,13 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
         sort: "DESC",
       });
 
+      const encodedCpid = encodeURIComponent(cpid);
       let response;
+
       switch (selectedTab) {
         case "dispensers": {
           response = await fetch(
-            `/api/v2/stamps/${cpid}/dispensers?${params}`,
+            `/api/v2/stamps/${encodedCpid}/dispensers?${params}`,
           );
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -77,9 +79,9 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
         }
         case "sales": {
           const [dispenseResponse, dispensersResponse] = await Promise.all([
-            fetch(`/api/v2/stamps/${cpid}/dispenses?${params}`),
+            fetch(`/api/v2/stamps/${encodedCpid}/dispenses?${params}`),
             fetch(
-              `/api/v2/stamps/${cpid}/dispensers?${new URLSearchParams({
+              `/api/v2/stamps/${encodedCpid}/dispensers?${new URLSearchParams({
                 limit: "1000",
                 sort: "DESC",
               })}`,
@@ -117,7 +119,9 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
           break;
         }
         case "transfers": {
-          response = await fetch(`/api/v2/stamps/${cpid}/sends?${params}`);
+          response = await fetch(
+            `/api/v2/stamps/${encodedCpid}/sends?${params}`,
+          );
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
