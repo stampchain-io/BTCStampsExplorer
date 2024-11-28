@@ -97,6 +97,16 @@ export function MintContent({
   );
   const [isImageLoading, setIsImageLoading] = useState(false);
 
+  const resetTokenData = () => {
+    setMintStatus(null);
+    setHolders(0);
+    setSelectedTokenImage(null);
+    setFormState((prevState) => ({
+      ...prevState,
+      amt: "",
+    }));
+  };
+
   // Fetch search results based on searchTerm
   useEffect(() => {
     if (isSelecting) {
@@ -127,62 +137,57 @@ export function MintContent({
     }));
     setSearchTerm(tick);
     setSearchResults([]);
+
+    const fetchData = async (tick: string) => {
+      setIsImageLoading(true);
+      try {
+        setError(null);
+        const currentTick = tick;
+
+        // Fetch combined mint data
+        const response = await axiod.get(
+          `/api/v2/src20/tick/${currentTick}/mintData`,
+        );
+        const data = response.data;
+        console.log("data: ", data);
+
+        if (!data || data.error || !data.mintStatus) {
+          setError("Token not deployed");
+          resetTokenData();
+        } else {
+          setMintStatus(data.mintStatus);
+          setHolders(data.holders || 0);
+
+          // Pre-populate amt with limit value
+          if (data.mintStatus.limit) {
+            setFormState((prevState) => ({
+              ...prevState,
+              amt: data.mintStatus.limit.toString(),
+            }));
+          }
+
+          const imageUrl = `/content/${data.mintStatus.tx_hash}.svg`;
+          setSelectedTokenImage(imageUrl);
+        }
+      } catch (err) {
+        console.error("Error fetching mint data:", err);
+        setError("Error fetching token data");
+        resetTokenData();
+      } finally {
+        setIsImageLoading(false);
+      }
+    };
+
+    fetchData(tick);
   };
 
   // Adjusted useEffect hook to always fetch data when token changes
   useEffect(() => {
-    const fetchData = async () => {
-      setIsImageLoading(true);
-      if (searchTerm) {
-        try {
-          setError(null);
-          const currentTick = searchTerm;
-
-          // Fetch combined mint data
-          const response = await axiod.get(
-            `/api/v2/src20/tick/${currentTick}/mintData`,
-          );
-          const data = response.data;
-          console.log("data: ", data);
-
-          if (!data || data.error || !data.mintStatus) {
-            setError("Token not deployed");
-            setMintStatus(null);
-            setHolders(0);
-            setSelectedTokenImage(null);
-          } else {
-            setMintStatus(data.mintStatus);
-            setHolders(data.holders || 0);
-
-            // Pre-populate amt with limit value
-            if (data.mintStatus.limit) {
-              setFormState((prevState) => ({
-                ...prevState,
-                amt: data.mintStatus.limit.toString(),
-              }));
-            }
-
-            const imageUrl = `/content/${data.mintStatus.tx_hash}.svg`;
-            setSelectedTokenImage(imageUrl);
-          }
-        } catch (err) {
-          console.error("Error fetching mint data:", err);
-          setError("Error fetching token data");
-          setMintStatus(null);
-          setHolders(0);
-          setSelectedTokenImage(null);
-        }
-      } else {
-        setMintStatus(null);
-        setHolders(0);
-        setError(null);
-        setSelectedTokenImage(null);
-      }
-      setIsImageLoading(false);
-    };
-
-    fetchData();
-  }, [searchTerm, setFormState]);
+    if (!searchTerm) {
+      setError(null);
+      resetTokenData();
+    }
+  }, [searchTerm]);
 
   // Calculate progress and other values
   const progress = mintStatus ? mintStatus.progress : "0";
@@ -277,7 +282,7 @@ export function MintContent({
                   <li
                     key={result.tick}
                     onClick={() => handleResultClick(result.tick)}
-                    class="cursor-pointer p-2 hover:bg-gray-600"
+                    class="cursor-pointer p-2 hover:bg-gray-600 uppercase"
                   >
                     {result.tick}
                   </li>
