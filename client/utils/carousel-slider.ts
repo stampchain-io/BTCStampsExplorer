@@ -53,7 +53,7 @@ const CAROUSEL_CONFIG = {
   },
 
   BREAKPOINTS: {
-    MOBILE_LG: 568, // Match mobileLg breakpoint
+    MOBILE_LG: 768, // Match mobileLg breakpoint
   },
 } as const;
 
@@ -213,7 +213,7 @@ const calculateTranslateX = (
 };
 
 const debug = (message: string, data?: unknown) => {
-  console.log(`Carousel Debug: ${message}`, data);
+  // console.log(`Carousel Debug: ${message}`, data);
 };
 
 export default function createCarouselSlider(
@@ -258,7 +258,7 @@ export default function createCarouselSlider(
         const visibleSlides = isMobile
           ? CAROUSEL_CONFIG.SLIDES.COUNT.MOBILE
           : CAROUSEL_CONFIG.SLIDES.COUNT.DESKTOP;
-        if (index >= Number(visibleSlides)) return "";
+        if (index >= (visibleSlides * 2)) return "";
         return '<div class="w-6 h-1 bg-stamp-primary ' + className +
           '"></div>';
       },
@@ -394,12 +394,27 @@ export default function createCarouselSlider(
         const paginationBullets = document.querySelectorAll(
           ".swiper-pagination .swiper-pagination-bullet",
         );
+
         // Hide extra pagination bullets when the slide changes
+        const visibleSlides = isMobile
+          ? CAROUSEL_CONFIG.SLIDES.COUNT.MOBILE
+          : CAROUSEL_CONFIG.SLIDES.COUNT.DESKTOP;
+
         paginationBullets.forEach((bullet, index) => {
-          if (index >= 5) {
-            bullet.style.display = "none";
+          if (swiper.realIndex >= visibleSlides) {
+            if (
+              index >= visibleSlides
+            ) {
+              bullet.style.display = "block";
+            } else {
+              bullet.style.display = "none";
+            }
           } else {
-            bullet.style.display = "block";
+            if (index >= visibleSlides) {
+              bullet.style.display = "none";
+            } else {
+              bullet.style.display = "block";
+            }
           }
         });
 

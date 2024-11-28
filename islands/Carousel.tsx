@@ -12,7 +12,12 @@ interface CarouselProps {
 }
 
 export default function Carousel(props: CarouselProps) {
-  const duplicatedStamps = [...props.stamps];
+  const { stamps } = props;
+  const isMobile = globalThis.innerWidth < 768;
+  const duplicatedStamps = isMobile
+    ? [...stamps, ...[stamps[2]]]
+    : [...stamps, ...stamps];
+  // const duplicatedStamps = [...props.stamps, ...props.stamps];
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
 
