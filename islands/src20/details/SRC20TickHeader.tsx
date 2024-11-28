@@ -42,7 +42,7 @@ function StatItem(
   return (
     <div
       class={`flex ${
-        direction === "col" ? "flex-col" : "gap-2 items-center justify-end"
+        direction === "col" ? "flex-col" : "gap-1.5 items-center justify-end"
       } ${alignmentClass}`}
     >
       <p class="text-base mobileLg:text-lg font-light text-stamp-grey-darker ">
@@ -51,7 +51,7 @@ function StatItem(
       <p
         class={`font-bold text-stamp-grey-light ${
           direction === "col"
-            ? "text-2xl mobileLg:text-3xl"
+            ? "text-2xl mobileLg:text-3xl -mt-1"
             : "text-base mobileLg:text-lg"
         }`}
       >
@@ -109,15 +109,15 @@ export function SRC20TickHeader({
     <div class="flex w-full flex-col gap-6">
       <div class="w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient">
         <div class="flex flex-row w-full">
-          <div className="flex gap-3">
+          <div className="flex gap-[18px] mobileMd:gap-[30px]">
             <img
               src={`/content/${deployment.tx_hash}.svg`}
-              class="max-w-[99px] mobileMd:max-w-[105px] mobileLg:max-w-[111px] desktop:max-w-[125px] rounded-sm"
+              class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] desktop:max-w-[116px] rounded-sm"
               alt={`${deployment.tick} token image`}
               loading="lazy"
             />
             <div>
-              <div class="flex gap-6 items-center">
+              <div class="flex">
                 <p class="inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1 uppercase">
                   {tickValue}
                 </p>
@@ -144,18 +144,22 @@ export function SRC20TickHeader({
                   )}
                 </div>
               </div>
-              <p className="text-[#666666] text-base mobileLg:text-lg font-light">
+              <p className="text-[#666666] text-base mobileLg:text-lg font-light pt-1.5">
                 CREATOR
               </p>
-              <p className="text-stamp-grey-light text-xl mobileLg:text-2xl font-bold">
+              <p className="text-stamp-grey-light text-xl mobileLg:text-2xl font-bold -mt-1">
                 {deployment.creator_name ||
                   abbreviateAddress(deployment.destination)}
               </p>
             </div>
           </div>
-          <div class="flex flex-col gap-2 justify-end items-start ml-auto">
-            <div>
-              <StatItem label="DEPLOY" value={deployDate} direction="row" />
+          <div class="flex flex-col gap-0 justify-end items-end ml-auto">
+            <div class="flex flex-col -space-y-0.5">
+              <StatItem
+                label="DEPLOY"
+                value={deployDate.toUpperCase()}
+                direction="row"
+              />
               <StatItem
                 label="BLOCK #"
                 value={deployment.block_index}
