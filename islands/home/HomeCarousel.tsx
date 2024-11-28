@@ -10,7 +10,7 @@ export function HomeCarousel({ carouselStamps }: HomeCarouselProps) {
     <div class="max-w-desktop w-full mx-auto px-3 tablet:px-6 desktop:px-12">
       <div class="
         w-full
-        max-w-[500px] h-[186px]
+        max-w-[500px] h-[200px]
         mobileMd:max-w-[500px] mobileMd:h-[302px]
         mobileLg:max-w-[640px] mobileLg:h-[260px]
         tablet:max-w-[840px] tablet:h-[341px]

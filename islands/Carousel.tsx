@@ -40,7 +40,7 @@ export default function Carousel(props: CarouselProps) {
   return (
     <>
       <div
-        class={`carousel-slider relative  mobileSm:h-[186px] mobileMd:h-[302px] mobileLg:h-[260px] tablet:h-[341px] desktop:h-[480px] w-full ${
+        class={`carousel-slider relative h-[200px] mobileMd:h-[302px] mobileLg:h-[260px] tablet:h-[341px] desktop:h-[480px] w-full ${
           props.class ?? ""
         }`}
       >
@@ -61,7 +61,7 @@ export default function Carousel(props: CarouselProps) {
                           src={`/content/${stamp.tx_hash}.${extension}`}
                           alt={`Stamp #${stamp.stamp}`}
                           loading="lazy"
-                          class="rounded-xl object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px]"
+                          class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-none"
                           onLoad={handleLoad}
                         />
                         {activeSlideIndex - 1 == index &&
