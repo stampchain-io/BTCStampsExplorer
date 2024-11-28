@@ -2,6 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import {
   ComposeDetachOptions,
+  normalizeFeeRate,
   XcpManager,
 } from "$server/services/xcpService.ts";
 import { PSBTService } from "$server/services/transaction/psbtService.ts";
@@ -9,8 +10,9 @@ import { PSBTService } from "$server/services/transaction/psbtService.ts";
 interface StampDetachInput {
   utxo: string;
   destination?: string;
-  options: {
-    fee_per_kb: number;
+  options: Omit<ComposeDetachOptions, "fee_per_kb"> & {
+    fee_per_kb?: number;
+    satsPerVB?: number;
     regular_dust_size?: number;
     return_psbt?: boolean;
     verbose?: boolean;
@@ -26,9 +28,17 @@ export const handler: Handlers = {
 
       const { utxo, destination, options } = input;
 
-      // Validate fee rate
-      if (typeof options?.fee_per_kb !== "number" || options.fee_per_kb <= 0) {
-        return ResponseUtil.badRequest("Invalid fee rate");
+      // Normalize fee rate from either input type
+      let normalizedFees;
+      try {
+        normalizedFees = normalizeFeeRate({
+          satsPerKB: options.fee_per_kb,
+          satsPerVB: options.satsPerVB,
+        });
+      } catch (error) {
+        return ResponseUtil.badRequest(
+          error instanceof Error ? error.message : "Invalid fee rate",
+        );
       }
 
       try {
@@ -37,6 +47,7 @@ export const handler: Handlers = {
           destination || "",
           {
             ...options,
+            fee_per_kb: normalizedFees.normalizedSatsPerKB, // Use normalized fee rate
             return_psbt: true,
             verbose: true,
           },
@@ -53,7 +64,7 @@ export const handler: Handlers = {
         const processedPSBT = await PSBTService.processCounterpartyPSBT(
           response.result.psbt,
           destination || "",
-          options.fee_per_kb,
+          normalizedFees.normalizedSatsPerKB, // Use normalized fee rate
           { validateInputs: true, validateFees: true },
         );
 

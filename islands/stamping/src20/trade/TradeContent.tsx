@@ -4,21 +4,17 @@ import { InputField } from "$islands/stamping/InputField.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import type { UTXO, XcpBalance } from "$lib/types/index.d.ts";
-import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { ComposeAttachOptions } from "$server/services/xcpService.ts";
+import { normalizeFeeRate } from "$server/services/xcpService.ts";
 
 const SIGHASH_SINGLE = 0x03;
 const SIGHASH_ANYONECANPAY = 0x80;
 const SIGHASH_SINGLE_ANYONECANPAY = SIGHASH_SINGLE | SIGHASH_ANYONECANPAY; // 131
 
-const MIN_FEE_RATE_VB = 1; // minimum sat/vB
 const MAX_FEE_RATE_VB = 500; // maximum sat/vB
 
 // Add this constant at the top with other constants
 const MIN_UTXO_VALUE = 546; // Minimum UTXO value in satoshis
-
-// Remove the local UTXO interface and import it from types
-import type { UTXO } from "$lib/types/index.d.ts";
 
 // Add these interfaces at the top with other types
 interface InputToSign {
@@ -175,28 +171,33 @@ export function TradeContent() {
     try {
       const { cpid, quantity, feeRateVB, utxo } = attachFormState;
 
-      // Validate inputs
+      // Validate required inputs first
       if (!cpid || !quantity || !feeRateVB || !utxo) {
         setApiError("Please fill in all fields with valid values.");
         setIsSubmitting(false);
         return;
       }
 
-      // Parse and validate fee rate
-      const parsedFeeRate = parseInt(feeRateVB, 10);
-      if (parsedFeeRate < MIN_FEE_RATE_VB || parsedFeeRate > MAX_FEE_RATE_VB) {
+      // Normalize fee rate first - this includes validation
+      let normalizedFees;
+      try {
+        normalizedFees = normalizeFeeRate({
+          satsPerVB: Number(feeRateVB),
+        });
+      } catch (error) {
         setApiError(
-          `Fee rate must be between ${MIN_FEE_RATE_VB} and ${MAX_FEE_RATE_VB} sat/vB`,
+          error instanceof Error ? error.message : "Invalid fee rate",
         );
         setIsSubmitting(false);
         return;
       }
 
-      // Convert fee rate from sat/vB to sat/kB
-      const feeRateKB = parsedFeeRate * SATS_PER_KB_MULTIPLIER;
-      console.log(
-        `Converting fee rate: ${parsedFeeRate} sat/vB = ${feeRateKB} sat/kB`,
-      );
+      // Additional fee rate bounds checking if needed
+      if (normalizedFees.normalizedSatsPerVB > MAX_FEE_RATE_VB) {
+        setApiError(`Fee rate should not exceed ${MAX_FEE_RATE_VB} sat/vB`);
+        setIsSubmitting(false);
+        return;
+      }
 
       // Prepare the request body for new endpoint
       const requestBody: {
@@ -211,7 +212,7 @@ export function TradeContent() {
         quantity: parseInt(quantity, 10),
         inputs_set: utxo,
         options: {
-          fee_per_kb: feeRateKB,
+          fee_per_kb: normalizedFees.normalizedSatsPerKB,
           return_psbt: true,
           extended_tx_info: true,
           regular_dust_size: 588,

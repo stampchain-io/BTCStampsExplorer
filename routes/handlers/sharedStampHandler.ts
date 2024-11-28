@@ -83,14 +83,11 @@ export const createStampHandler = (
           const url = new URL(req.url);
           const pagination = getPaginationParams(url);
 
-          // Check if pagination validation failed
           if (pagination instanceof Response) {
             return pagination;
           }
 
           const { limit, page } = pagination;
-
-          // Validate sort parameter
           const sortParam = url.searchParams.get("sort");
           const sortValidation = validateSortDirection(sortParam);
           if (sortValidation instanceof Response) {
@@ -103,6 +100,10 @@ export const createStampHandler = (
             limit || 50,
             cacheType,
           );
+
+          if (!holders || !holders.data?.length) {
+            return ResponseUtil.notFound("No holders found for this stamp");
+          }
           return ResponseUtil.success(holders, { routeType: cacheType });
         }
 
@@ -110,7 +111,6 @@ export const createStampHandler = (
           const url = new URL(req.url);
           const pagination = getPaginationParams(url);
 
-          // Check if pagination validation failed
           if (pagination instanceof Response) {
             return pagination;
           }
@@ -122,6 +122,10 @@ export const createStampHandler = (
             limit,
             cacheType,
           );
+
+          if (!dispensers || !dispensers.data?.length) {
+            return ResponseUtil.notFound("No dispensers found for this stamp");
+          }
           return ResponseUtil.success(dispensers, { routeType: cacheType });
         }
 
@@ -129,7 +133,6 @@ export const createStampHandler = (
           const url = new URL(req.url);
           const pagination = getPaginationParams(url);
 
-          // Check if pagination validation failed
           if (pagination instanceof Response) {
             return pagination;
           }
@@ -141,6 +144,10 @@ export const createStampHandler = (
             limit,
             cacheType,
           );
+
+          if (!sends || !sends.data?.length) {
+            return ResponseUtil.notFound("No sends found for this stamp");
+          }
           return ResponseUtil.success(sends, { routeType: cacheType });
         }
 
@@ -148,7 +155,6 @@ export const createStampHandler = (
           const url = new URL(req.url);
           const pagination = getPaginationParams(url);
 
-          // Check if pagination validation failed
           if (pagination instanceof Response) {
             return pagination;
           }
@@ -160,6 +166,10 @@ export const createStampHandler = (
             limit || 50,
             cacheType,
           );
+
+          if (!dispenses || !dispenses.data?.length) {
+            return ResponseUtil.notFound("No dispenses found for this stamp");
+          }
           return ResponseUtil.success(dispenses, { routeType: cacheType });
         }
 

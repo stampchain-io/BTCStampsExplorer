@@ -5,8 +5,16 @@ import { SRC20Service } from "$server/services/src20/index.ts";
 import { InputData } from "$types/index.d.ts";
 import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { normalizeFeeRate } from "$server/services/xcpService.ts";
 
 type TrxType = "multisig" | "olga";
+
+// Extend InputData to include all possible fee rate inputs
+interface ExtendedInputData extends Omit<InputData, "feeRate"> {
+  feeRate?: number; // legacy support
+  satsPerVB?: number;
+  satsPerKB?: number; // included for completeness but shouldn't be used
+}
 
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request) {
@@ -18,12 +26,36 @@ export const handler: Handlers<TX | TXError> = {
         return ResponseUtil.badRequest("Empty request body");
       }
 
-      let body: InputData & { trxType?: TrxType };
+      let body: ExtendedInputData & { trxType?: TrxType };
       try {
         body = JSON.parse(rawBody);
       } catch (e) {
         console.error("JSON parse error:", e);
         return ResponseUtil.badRequest("Invalid JSON in request body");
+      }
+
+      // Normalize fee rate from any of the possible inputs
+      let normalizedFees;
+      try {
+        const feeInput = {
+          satsPerKB: body.satsPerKB,
+          satsPerVB: body.satsPerVB,
+        };
+
+        // If neither is provided but legacy feeRate exists, use that as satsPerVB
+        if (
+          body.feeRate !== undefined && !feeInput.satsPerKB &&
+          !feeInput.satsPerVB
+        ) {
+          console.log("Using legacy feeRate as satsPerVB:", body.feeRate);
+          feeInput.satsPerVB = body.feeRate;
+        }
+
+        normalizedFees = normalizeFeeRate(feeInput);
+      } catch (error) {
+        return ResponseUtil.badRequest(
+          error instanceof Error ? error.message : "Invalid fee rate",
+        );
       }
 
       console.log("Parsed request body:", body);
@@ -40,7 +72,6 @@ export const handler: Handlers<TX | TXError> = {
       if (!effectiveSourceAddress) {
         return ResponseUtil.badRequest(
           "Either sourceAddress/fromAddress or changeAddress is required",
-          400,
         );
       }
 
@@ -77,12 +108,23 @@ export const handler: Handlers<TX | TXError> = {
           operation: body.op.toLowerCase(),
         });
 
+        // Destructure and reconstruct with required properties
+        const {
+          satsPerVB: _satsPerVB, // Omit these optional properties
+          satsPerKB: _satsPerKB,
+          feeRate: _feeRate,
+          ...restBody
+        } = body;
+
+        const operationData: InputData = {
+          ...restBody,
+          changeAddress: effectiveChangeAddress || effectiveSourceAddress,
+          feeRate: normalizedFees.normalizedSatsPerVB,
+        };
+
         const result = await SRC20Service.TransactionService.handleOperation(
           body.op.toLowerCase() as "deploy" | "mint" | "transfer",
-          {
-            ...body,
-            changeAddress: effectiveChangeAddress,
-          },
+          operationData,
         );
 
         logger.debug("stamps", {
@@ -118,10 +160,10 @@ export const handler: Handlers<TX | TXError> = {
           sourceAddress: effectiveSourceAddress,
           toAddress: body.toAddress,
           src20Action,
-          satsPerVB: Number(body.feeRate),
+          satsPerVB: normalizedFees.normalizedSatsPerVB,
           service_fee: 0,
           service_fee_address: "",
-          changeAddress: effectiveChangeAddress,
+          changeAddress: effectiveChangeAddress || effectiveSourceAddress,
         });
 
         return ResponseUtil.success({

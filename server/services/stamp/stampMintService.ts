@@ -6,7 +6,7 @@ import * as bitcoin from "bitcoinjs-lib";
 import { generateRandomNumber } from "$lib/utils/numberUtils.ts";
 import type { stampMintData, stampMintCIP33, PSBTInput } from "$types/index.d.ts";
 import CIP33 from "$lib/utils/minting/olga/CIP33.ts";
-import { PSBTService } from "$server/services/transaction/psbtService.ts";
+import { PSBTService, formatPsbtForLogging } from "$server/services/transaction/psbtService.ts";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
@@ -15,6 +15,8 @@ import { calculateDust, calculateMiningFee, calculateP2WSHMiningFee } from "$lib
 import { TX_CONSTANTS} from "$lib/utils/minting/constants.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
+import { normalizeFeeRate } from "$server/services/xcpService.ts";
+
 export class StampMintService {
 
 
@@ -27,6 +29,7 @@ export class StampMintService {
     filename,
     file,
     satsPerKB,
+    satsPerVB,
     service_fee,
     service_fee_address,
     prefix,
@@ -38,11 +41,18 @@ export class StampMintService {
     divisible: boolean;
     filename: string;
     file: string;
-    satsPerKB: number;
+    satsPerKB?: number;
+    satsPerVB?: number;
     service_fee: number;
     service_fee_address: string;
     prefix: "stamp" | "file" | "glyph";
   }) {
+    // Validate and normalize fee rate
+    const { normalizedSatsPerVB, normalizedSatsPerKB } = normalizeFeeRate({
+      satsPerKB,
+      satsPerVB
+    });
+
     console.log("Starting createStampIssuance with params:", {
       sourceWallet,
       assetName,
@@ -51,8 +61,9 @@ export class StampMintService {
       divisible,
       filename,
       fileSize: Math.ceil((file.length * 3) / 4),
-      satsPerKB,
-      satsPerVB: satsPerKB / 1000,
+      providedSatsPerKB: satsPerKB,
+      providedSatsPerVB: satsPerVB,
+      normalizedSatsPerVB,
       service_fee,
       service_fee_address,
       prefix
@@ -82,7 +93,7 @@ export class StampMintService {
         locked,
         divisible,
         description: `${prefix}:${filename}`,
-        satsPerKB,
+        satsPerKB: normalizedSatsPerKB,
       });
 
       if (!result.tx_hex) {
@@ -103,7 +114,7 @@ export class StampMintService {
       const psbt = await this.generatePSBT(
         hex,
         sourceWallet,
-        satsPerKB / 1000, // Convert to sat/vB
+        normalizedSatsPerVB,
         service_fee,
         service_fee_address,
         cip33Addresses as string[],
@@ -134,12 +145,13 @@ export class StampMintService {
     let psbt;
     let vouts = [];
     let estMinerFee = 0;
+    let totalDustValue = 0;
+    
 
     try {
       console.log("Starting PSBT generation with params:", {
         address,
         satsPerVB,
-        satsPerKB: satsPerVB * 1000,
         service_fee,
         recipient_fee,
         cip33AddressCount: cip33Addresses.length,
@@ -209,10 +221,12 @@ export class StampMintService {
           address: cip33Addresses[i],
         });
         totalOutputValue += dustValue;
+        totalDustValue += dustValue;
       }
 
       console.log("After adding data outputs:", {
         totalOutputValue,
+        totalDustValue,
         outputCount: vouts.length,
         dustValues: vouts.map(v => v.value)
       });
@@ -266,7 +280,7 @@ export class StampMintService {
       });
 
       // Verify final fee rate
-      const finalTotalOutputValue = totalOutputValue + adjustedChange;
+      const finalTotalOutputValue = totalOutputValue + (adjustedChange > 0 ? adjustedChange : 0);
       const actualFee = totalInputValue - finalTotalOutputValue;
       const actualFeeRate = actualFee / estimatedSize;
 
@@ -280,19 +294,6 @@ export class StampMintService {
         estimatedSize,
         effectiveFeePerVbyte: actualFee / estimatedSize
       });
-
-      // Add change output
-      if (adjustedChange > 0) {
-        vouts.push({
-          value: adjustedChange,
-          address: address,
-        });
-        console.log("Added change output:", {
-          adjustedChange,
-          finalVoutCount: vouts.length,
-          allVoutValues: vouts.map(v => v.value)
-        });
-      }
 
       // Before adding outputs
       console.log("Preparing to add outputs:", {
@@ -373,6 +374,19 @@ export class StampMintService {
         }
       }
 
+      // Add change output last (after all other outputs)
+      if (adjustedChange > 0) {
+        vouts.push({
+          value: adjustedChange,
+          address: address,
+        });
+        console.log("Added change output:", {
+          adjustedChange,
+          finalVoutCount: vouts.length,
+          allVoutValues: vouts.map(v => v.value)
+        });
+      }
+
       // Final transaction summary
       console.log("Final transaction structure:", {
         inputCount: inputs.length,
@@ -385,18 +399,20 @@ export class StampMintService {
         outputs: vouts.map((v, i) => ({
           index: i,
           value: v.value,
-          type: v.address === address ? 'change' : 'data'
-        }))
+          type: v.address === address ? 'change' : 'data',
+          address: v.address
+        })),
+        psbtDetails: formatPsbtForLogging(psbt)
       });
 
       return {
         psbt,
-        feePerKb: satsPerVB,
+        satsPerVB,
         estimatedTxSize: estimatedSize,
         totalInputValue,
         totalOutputValue: finalTotalOutputValue,
         totalChangeOutput: adjustedChange,
-        totalDustValue: 0,
+        totalDustValue,
         estMinerFee: exactFeeNeeded,
         changeAddress: address,
       };

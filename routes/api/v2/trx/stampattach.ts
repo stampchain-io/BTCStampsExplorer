@@ -2,18 +2,20 @@ import { Handlers } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import {
   ComposeAttachOptions,
+  normalizeFeeRate,
   XcpManager,
 } from "$server/services/xcpService.ts";
 import { PSBTService } from "$server/services/transaction/psbtService.ts";
 import { StampController } from "$server/controller/stampController.ts";
 
-// Define interface extending ComposeAttachOptions for stamp-specific fields
+// Update interface to accept either fee rate type
 interface StampAttachInput {
   address: string;
   identifier: string; // cpid, stamp number, or tx_hash
   quantity: number;
-  options: Omit<ComposeAttachOptions, "inputs_set"> & {
-    fee_per_kb: number; // Make explicitly required
+  options: Omit<ComposeAttachOptions, "inputs_set" | "fee_per_kb"> & {
+    fee_per_kb?: number;
+    satsPerVB?: number;
   };
   inputs_set?: string; // txid:vout format - moved to top level for clarity
 }
@@ -26,9 +28,17 @@ export const handler: Handlers = {
 
       const { address, identifier, quantity, inputs_set, options } = input;
 
-      // Validate fee rate
-      if (typeof options?.fee_per_kb !== "number" || options.fee_per_kb <= 0) {
-        return ResponseUtil.badRequest("Invalid fee rate");
+      // Normalize fee rate from either input type
+      let normalizedFees;
+      try {
+        normalizedFees = normalizeFeeRate({
+          satsPerKB: options.fee_per_kb,
+          satsPerVB: options.satsPerVB,
+        });
+      } catch (error) {
+        return ResponseUtil.badRequest(
+          error instanceof Error ? error.message : "Invalid fee rate",
+        );
       }
 
       // Validate inputs_set format if provided
@@ -42,14 +52,15 @@ export const handler: Handlers = {
         // Resolve identifier to CPID
         const cpid = await StampController.resolveToCpid(identifier);
 
-        // Call composeAttach with resolved CPID
+        // Call composeAttach with resolved CPID and normalized fee rate
         const response = await XcpManager.composeAttach(
           address,
           cpid,
           quantity,
           {
             ...options,
-            inputs_set, // Add inputs_set to options
+            fee_per_kb: normalizedFees.normalizedSatsPerKB, // Use normalized fee rate
+            inputs_set,
             return_psbt: true,
             verbose: true,
           },
@@ -66,7 +77,7 @@ export const handler: Handlers = {
         const processedPSBT = await PSBTService.processCounterpartyPSBT(
           response.result.psbt,
           address,
-          options.fee_per_kb,
+          normalizedFees.normalizedSatsPerKB, // Use normalized fee rate
           { validateInputs: true, validateFees: true },
         );
 
