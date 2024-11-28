@@ -21,12 +21,12 @@ export const ConnectorsModal = (
 
   return (
     <div
-      class={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#100019] bg-opacity-75 backdrop-filter backdrop-blur-sm ${
+      class={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#0b0b0b] bg-opacity-95 backdrop-filter backdrop-blur-sm ${
         showConnectWalletModal.value ? "" : "hidden"
       }`}
       onClick={handleCloseModal}
     >
-      <div class="relative flex flex-col w-full max-w-2xl h-auto p-3 mobileMd:p-6 bg-[#080808] rounded-lg shadow overflow-hidden">
+      <div class="relative flex flex-col w-full max-w-2xl h-auto p-3 mobileMd:p-6 dark-gradient rounded-lg shadow overflow-hidden">
         <img
           onClick={closeModal}
           src="/img/wallet/icon-close.svg"
