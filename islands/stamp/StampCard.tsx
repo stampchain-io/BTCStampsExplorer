@@ -34,7 +34,7 @@ const TEXT_STYLES = {
   creator: {
     base: "font-bold text-stamp-grey break-words text-center",
     sizes:
-      "text-base mobileSm:text-base mobileLg:text-base tablet:text-lg desktop:text-lg", // deviation from design
+      "text-sm mobileSm:text-sm mobileLg:text-sm tablet:text-base desktop:text-base", // deviation from design
   },
   price: {
     base: "font-medium text-stamp-grey-light text-nowrap",
@@ -86,10 +86,10 @@ const TEXT_STYLES = {
 
 const ABBREVIATION_LENGTHS = {
   desktop: 6,
-  tablet: 5,
-  mobileLg: 5,
-  mobileMd: 5,
-  mobileSm: 5,
+  tablet: 6,
+  mobileLg: 6,
+  mobileMd: 6,
+  mobileSm: 6,
 } as const;
 
 export function StampCard({
