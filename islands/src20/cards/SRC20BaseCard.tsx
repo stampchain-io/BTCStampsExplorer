@@ -48,7 +48,7 @@ export function SRC20BaseCard(
           <a
             href={href}
             class={`text-2xl mobileLg:text-4xl font-black ${
-              isHovered ? "text-stamp-primary-hover" : "purple-gradient3"
+              isHovered ? "text-stamp-primary-hover" : "gray-gradient1"
             } flex gap-4`}
           >
             {convertToEmoji(src20.tick)}
