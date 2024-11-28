@@ -249,7 +249,6 @@ export function TransactionFeeDetails({
             variant="cancel"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             CANCEL
           </Button>
@@ -259,7 +258,6 @@ export function TransactionFeeDetails({
           onClick={onSubmit}
           disabled={isSubmitting}
           isSubmitting={isSubmitting}
-          className="bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {buttonName}
         </Button>
