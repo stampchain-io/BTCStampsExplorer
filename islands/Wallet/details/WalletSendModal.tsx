@@ -91,7 +91,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
 
   return (
     <ModalLayout onClose={onClose} title="SEND">
-      <div class="flex flex-col gap-3 mobileMd:gap-6">
+      <div class="flex flex-col gap-6">
         <input
           type="text"
           value={formState.amount}
@@ -126,7 +126,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
         onSubmit={handleSendSubmit}
         onCancel={onClose}
         buttonName="SEND"
-        className="border-t border-[#333333] pt-4"
+        className="pt-12"
         userAddress={wallet?.address}
         recipientAddress={formState.recipientAddress}
         inputType="P2WPKH"

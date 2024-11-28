@@ -26,15 +26,15 @@ function WalletReceiveModal({ onClose, address }: Props) {
 
   return (
     <ModalLayout onClose={onClose} title="RECEIVE">
-      <div class="flex flex-col gap-6 items-center">
+      <div class="flex flex-col -mt-3 mobileLg:-mt-4 items-center">
         {qrCodeDataUrl && (
           <img
             src={qrCodeDataUrl}
             alt="QR Code"
-            class="w-36 h-36 mobileLg:w-48 mobileLg:h-48"
+            class="w-60 h-60 mobileLg:w-72 mobileLg:h-72"
           />
         )}
-        <p class="break-all text-center text-base mobileLg:text-xl leading-relaxed text-stamp-grey-light max-w-full pt-3">
+        <p class="break-all text-center text-base mobileLg:text-xl leading-relaxed text-stamp-grey-light max-w-full pt-5 mobileLg:pt-7">
           {formatAddress(address)}
         </p>
         <img
@@ -53,7 +53,7 @@ function formatAddress(address: string): JSX.Element[] {
     index % 2 === 0 ? <span key={index}>{group}</span> : (
       <span
         key={index}
-        class="font-bold text-stamp-grey text-base mobileLg:text-xl"
+        class="text-stamp-purple-dark text-base mobileLg:text-xl"
       >
         {group}
       </span>
