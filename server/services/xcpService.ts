@@ -4,7 +4,7 @@ import { StampService } from "$server/services/stampService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { DispenserFilter, DispenseEvent, XcpBalance } from "$types/index.d.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
-
+import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 export const xcp_v2_nodes = [
   {
     name: "stampchain.io",
@@ -32,6 +32,35 @@ interface XcpBalanceOptions {
   showUnconfirmed?: boolean;  // Include mempool results
 }
 
+export function normalizeFeeRate(params: {
+  satsPerKB?: number;
+  satsPerVB?: number;
+}): {
+  normalizedSatsPerVB: number;
+  normalizedSatsPerKB: number;
+} {
+  let normalizedSatsPerVB: number;
+  
+  if (params.satsPerVB !== undefined) {
+    normalizedSatsPerVB = params.satsPerVB;
+  } else if (params.satsPerKB !== undefined) {
+    // If satsPerKB/1000 < 1, assume it was intended as sats/vB
+    normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER 
+      ? params.satsPerKB 
+      : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
+  } else {
+    throw new Error("Either satsPerKB or satsPerVB must be provided");
+  }
+
+  if (normalizedSatsPerVB <= 2) {
+    throw new Error("Fee rate must be greater than 2 sat/vB");
+  }
+
+  return {
+    normalizedSatsPerVB,
+    normalizedSatsPerKB: normalizedSatsPerVB * SATS_PER_KB_MULTIPLIER
+  };
+}
 
 export async function fetchXcpV2WithCache<T>(
   endpoint: string,

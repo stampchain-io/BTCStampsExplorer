@@ -632,10 +632,9 @@ export function OlgaContent() {
           throw new Error("Invalid response structure: missing hex field");
         }
 
-        const { hex, base64, transactionDetails, cpid } = response.data;
+        const { hex, transactionDetails, cpid } = response.data;
         log("Extracted data from response", {
           hex,
-          base64,
           cpid,
           inputCount: transactionDetails.inputs.length,
           outputCount: transactionDetails.outputs.length,

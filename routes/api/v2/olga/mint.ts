@@ -7,14 +7,50 @@ import {
 } from "$server/services/stamp/index.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
+import { formatPsbtForLogging } from "$server/services/transaction/psbtService.ts";
+import { normalizeFeeRate } from "$server/services/xcpService.ts";
+
+// Then create the extended interface by omitting the fee field from the base interface
+interface ExtendedMintStampInputData
+  extends Omit<MintStampInputData, "satsPerKB"> {
+  dryRun?: boolean;
+  // Make all fee-related fields optional but mutually exclusive
+  satsPerKB?: number;
+  satsPerVB?: number;
+  feeRate?: number; // legacy support
+}
 
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request, _ctx: FreshContext) {
-    let body: MintStampInputData;
+    let body: ExtendedMintStampInputData;
     try {
       body = await req.json();
     } catch (_error) {
       return ResponseUtil.badRequest("Invalid JSON format in request body");
+    }
+
+    // Normalize fee rate from any of the possible inputs
+    let normalizedFees;
+    try {
+      // Handle legacy feeRate first
+      const feeInput = {
+        satsPerKB: body.satsPerKB,
+        satsPerVB: body.satsPerVB,
+      };
+
+      // If neither is provided but legacy feeRate exists, use that as satsPerKB
+      if (
+        body.feeRate !== undefined && !feeInput.satsPerKB && !feeInput.satsPerVB
+      ) {
+        console.log("Using legacy feeRate as satsPerKB:", body.feeRate);
+        feeInput.satsPerKB = body.feeRate;
+      }
+
+      normalizedFees = normalizeFeeRate(feeInput);
+    } catch (error) {
+      return ResponseUtil.badRequest(
+        error instanceof Error ? error.message : "Invalid fee rate",
+      );
     }
 
     const isDryRun = body.dryRun === true;
@@ -34,7 +70,8 @@ export const handler: Handlers<TX | TXError> = {
       ...body,
       prefix: "stamp" as const,
       assetName: assetName,
-      satsPerKB: Number(body.satsPerKB),
+      satsPerKB: normalizedFees.normalizedSatsPerKB,
+      satsPerVB: normalizedFees.normalizedSatsPerVB,
       ...(body.service_fee && {
         service_fee: body.service_fee ||
           parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS),
@@ -69,7 +106,17 @@ export const handler: Handlers<TX | TXError> = {
         );
       }
 
-      console.log("Successful mint_tx:", mint_tx);
+      console.log("Successful mint_tx:", {
+        psbt: formatPsbtForLogging(mint_tx.psbt),
+        satsPerVB: mint_tx.satsPerVB,
+        estimatedTxSize: mint_tx.estimatedTxSize,
+        totalInputValue: mint_tx.totalInputValue,
+        totalOutputValue: mint_tx.totalOutputValue,
+        totalChangeOutput: mint_tx.totalChangeOutput,
+        totalDustValue: mint_tx.totalDustValue,
+        estMinerFee: mint_tx.estMinerFee,
+        changeAddress: mint_tx.changeAddress,
+      });
 
       // Update the txDetails mapping without changing the API response format
       const txInputs = mint_tx.psbt.txInputs;
@@ -114,14 +161,7 @@ export const handler: Handlers<TX | TXError> = {
             txid: input.txid,
             vout: input.vout,
             signingIndex: input.signingIndex,
-            value: input.value, // Add if available
-            address: input.address, // Add if available
           })),
-          outputs: mint_tx.outputs?.map((output) => ({
-            address: output.address,
-            value: output.value,
-            type: output.type, // e.g., 'change', 'stamp', 'fee'
-          })) || [],
         },
       });
     } catch (error: unknown) {

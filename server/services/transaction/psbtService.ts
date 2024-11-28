@@ -7,6 +7,22 @@ import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
 
+
+export function formatPsbtForLogging(psbt: bitcoin.Psbt) {
+  return {
+      inputs: psbt.data.inputs.map(input => ({
+          witnessUtxo: input.witnessUtxo ? {
+              value: Number(input.witnessUtxo.value),
+              script: input.witnessUtxo.script.toString('hex')
+          } : undefined,
+      })),
+      outputs: psbt.txOutputs.map(output => ({
+          address: output.address,
+          value: Number(output.value)
+      })),
+  };
+}
+
 export class PSBTService {
   static async createPSBT(
     utxo: string,
