@@ -21,30 +21,48 @@ export interface SRC20TickHeaderProps {
   totalMints: number;
   totalTransfers: number;
   marketInfo?: MarketListingSummary;
+  align?: "left" | "center" | "right";
 }
 
 function StatItem(
-  { label, value, direction, currency }: {
+  { label, value, direction, currency, align = "left" }: {
     label: string;
     value: string | number;
     currency?: string;
     direction: string;
+    align?: "left" | "center" | "right";
   },
 ) {
+  const alignmentClass = {
+    left: "text-left",
+    center: "text-center",
+    right: "text-right",
+  }[align];
+
   return (
     <div
       class={`flex ${
-        direction === "col" ? "flex-col" : "gap-2 items-center justify-end"
-      }`}
+        direction === "col" ? "flex-col" : "gap-1.5 items-center justify-end"
+      } ${alignmentClass}`}
     >
-      <p class="text-lg font-light text-[#666666]">{label}</p>
+      <p class="text-base mobileLg:text-lg font-light text-stamp-grey-darker ">
+        {label}
+      </p>
       <p
-        class={`font-bold text-[#999999] ${
-          direction === "col" ? "text-3xl" : "text-lg"
+        class={`font-bold text-stamp-grey-light ${
+          direction === "col"
+            ? "text-2xl mobileLg:text-3xl -mt-1"
+            : "text-base mobileLg:text-lg"
         }`}
       >
         {value}
-        {currency ? <span class="font-extralight">&nbsp;{currency}</span> : ""}
+        {currency
+          ? (
+            <span class="font-light">
+              &nbsp;{currency}
+            </span>
+          )
+          : ""}
       </p>
     </div>
   );
@@ -56,6 +74,7 @@ export function SRC20TickHeader({
   totalMints,
   totalTransfers,
   marketInfo,
+  align,
 }: SRC20TickHeaderProps) {
   const tickValue = deployment.tick
     ? (() => {
@@ -88,21 +107,21 @@ export function SRC20TickHeader({
 
   return (
     <div class="flex w-full flex-col gap-6">
-      <div class="w-full flex flex-wrap gap-3 tablet:gap-6 p-3 tablet:p-6 dark-gradient">
-        <div class="flex flex-col tablet:flex-row justify-between gap-3 w-full">
-          <div className="flex gap-3">
+      <div class="w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient">
+        <div class="flex flex-row w-full">
+          <div className="flex gap-[18px] mobileMd:gap-[30px]">
             <img
               src={`/content/${deployment.tx_hash}.svg`}
-              class="max-w-[135px] rounded-lg"
+              class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] desktop:max-w-[116px] rounded-sm"
               alt={`${deployment.tick} token image`}
               loading="lazy"
             />
             <div>
-              <div class="flex gap-6 items-center">
-                <p class="text-3xl tablet:text-6xl uppercase font-black text-[#660099]">
+              <div class="flex">
+                <p class="inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1 uppercase">
                   {tickValue}
                 </p>
-                <div class="flex gap-2 items-center">
+                <div class="flex gap-3 items-center">
                   {deployment.email && (
                     <a href={deployment.email} target="_blank">
                       <img src="/img/src20/details/EnvelopeSimple.svg" />
@@ -125,18 +144,24 @@ export function SRC20TickHeader({
                   )}
                 </div>
               </div>
-              <p className="text-[#666666] text-2xl font-light">CREATOR</p>
-              <p className="text-[#999999] text-2xl font-bold">
+              <p className="text-[#666666] text-base mobileLg:text-lg font-light pt-1.5">
+                CREATOR
+              </p>
+              <p className="text-stamp-grey-light text-xl mobileLg:text-2xl font-bold -mt-1">
                 {deployment.creator_name ||
                   abbreviateAddress(deployment.destination)}
               </p>
             </div>
           </div>
-          <div class="flex flex-col gap-2 justify-end items-start ml-auto">
-            <div>
-              <StatItem label="Deploy" value={deployDate} direction="row" />
+          <div class="flex flex-col gap-0 justify-end items-end ml-auto">
+            <div class="flex flex-col -space-y-0.5">
               <StatItem
-                label="Block #"
+                label="DEPLOY"
+                value={deployDate.toUpperCase()}
+                direction="row"
+              />
+              <StatItem
+                label="BLOCK #"
                 value={deployment.block_index}
                 direction="row"
               />
@@ -148,19 +173,22 @@ export function SRC20TickHeader({
             </div>
           </div>
         </div>
-
+        {
+          /*
         <p class="text-sm text-[#CCCCCC] font-medium">
           This is an SRC-20 token, there are many like it, but this one is{" "}
           {deployment.tick.toUpperCase()}. This was deployed on block{" "}
           {deployment.block_index}{" "}
           without a description on the deploy. We hope you enjoy.
         </p>
+        */
+        }
       </div>
 
       {/* Token Information */}
-      <div class="flex flex-wrap gap-3 tablet:gap-6 p-3 tablet:p-6 justify-between dark-gradient">
+      <div class="flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 justify-between dark-gradient">
         <StatItem
-          label="Supply"
+          label="SUPPLY"
           value={formatNumber(deployment.max, 0)}
           direction="col"
         />
@@ -168,11 +196,19 @@ export function SRC20TickHeader({
           label="LIMIT"
           value={formatNumber(deployment.lim, 0)}
           direction="col"
+          align="center"
         />
-        <StatItem label="DECIMALS" value={deployment.deci} direction="col" />
+        <div class="hidden mobileMd:block">
+          <StatItem
+            label="DECIMALS"
+            value={deployment.deci}
+            direction="col"
+            align="right"
+          />
+        </div>
       </div>
 
-      <div class="flex flex-wrap gap-3 tablet:gap-6 p-3 tablet:p-6 justify-between dark-gradient">
+      <div class="flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 justify-between dark-gradient">
         {/* Price in Satoshis */}
         <StatItem
           label="PRICE"
@@ -185,11 +221,12 @@ export function SRC20TickHeader({
           value="N/A" // FIXME: not available from API request
           currency="%"
           direction="col"
+          align="right"
         />
       </div>
 
       {/* Market Information */}
-      <div class="flex flex-wrap gap-3 tablet:gap-6 p-3 tablet:p-6 justify-between dark-gradient">
+      <div class="flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 justify-between dark-gradient">
         {/* Market Cap in BTC */}
         <StatItem
           label="MARKET CAP"
@@ -198,18 +235,22 @@ export function SRC20TickHeader({
           direction="col"
         />
         {/* 24H Volume in BTC */}
-        <StatItem
-          label="24H VOLUME"
-          value={sum1dBTCFormatted}
-          currency="BTC"
-          direction="col"
-        />
+        <div class="hidden mobileMd:block">
+          <StatItem
+            label="24H VOLUME"
+            value={sum1dBTCFormatted}
+            currency="BTC"
+            direction="col"
+            align="center"
+          />
+        </div>
         {/* 7 DAY Volume in BTC */}
         <StatItem
           label="7 DAY VOLUME"
           value={sum7dBTCFormatted}
           currency="BTC"
           direction="col"
+          align="right"
         />
       </div>
     </div>

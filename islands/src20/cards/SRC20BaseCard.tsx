@@ -38,10 +38,10 @@ export function SRC20BaseCard(
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Left Section - Image and Title */}
-      <div class="uppercase cursor-pointer flex gap-6">
+      <div class="uppercase cursor-pointer flex gap-[18px] mobileMd:gap-[30px]">
         <img
           src={imageUrl}
-          class="w-[86px] h-[86px] mobileLg:w-[102px] mobileLg:h-[102px]"
+          class="w-[86px] h-[86px] mobileLg:w-[102px] mobileLg:h-[102px] rounded-sm"
           onClick={() => onImageClick?.(imageUrl)}
           alt={convertToEmoji(src20.tick)}
         />
