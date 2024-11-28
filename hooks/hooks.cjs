@@ -1,3 +1,5 @@
+// @ts-nocheck
+// deno-lint-ignore-file
 const hooks = require("hooks");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -74,28 +76,57 @@ async function fetchBothEndpoints(path, transaction) {
       }`;
       console.log(`\nFetching ${env} endpoint:`, url);
 
+      // More precise timing measurement
+      const startTime = process.hrtime();
       const response = await fetch(url);
-      let responseData;
+      const endTime = process.hrtime(startTime);
+      const responseTime = (endTime[0] * 1e9 + endTime[1]) / 1e6; // Convert to milliseconds
 
+      let responseData;
       try {
-        // Try to parse as JSON first
         responseData = await response.json();
       } catch (e) {
-        // If JSON parsing fails, use text
         responseData = await response.text();
       }
 
       results[env] = {
         status: response.status,
         data: responseData,
+        responseTime,
       };
+
+      console.log(`${env} response time:`, responseTime, "ms");
     } catch (error) {
       console.error(`Error fetching from ${env}:`, error);
       results[env] = {
         status: error.status || 500,
         error: error.message,
+        responseTime: 0,
       };
     }
+  }
+
+  // Calculate timing differences if both calls succeeded
+  if (results.production?.responseTime && results.development?.responseTime) {
+    const prodTime = results.production.responseTime;
+    const devTime = results.development.responseTime;
+    const difference = Math.abs(prodTime - devTime);
+    const percentageDiff = (difference / Math.min(prodTime, devTime)) * 100;
+
+    results.timingAnalysis = {
+      productionTime: prodTime,
+      developmentTime: devTime,
+      difference,
+      percentageDiff,
+      isSignificant: percentageDiff > 10,
+    };
+
+    console.log(`Timing analysis for ${path}:`, results.timingAnalysis);
+  } else {
+    console.log(`Missing timing data for ${path}:`, {
+      productionTime: results.production?.responseTime,
+      developmentTime: results.development?.responseTime,
+    });
   }
 
   return results;
@@ -111,6 +142,12 @@ function buildExpectedResponse(schemaComponent, schemas) {
     return buildExpectedResponse(schemas[refName], schemas);
   }
 
+  // Handle oneOf
+  if (schemaComponent.oneOf) {
+    // Use the first schema in oneOf for example response
+    return buildExpectedResponse(schemaComponent.oneOf[0], schemas);
+  }
+
   // Handle arrays
   if (schemaComponent.type === "array" && schemaComponent.items) {
     return [buildExpectedResponse(schemaComponent.items, schemas)];
@@ -122,16 +159,12 @@ function buildExpectedResponse(schemaComponent, schemas) {
     const properties = schemaComponent.properties || {};
 
     Object.entries(properties).forEach(([key, prop]) => {
-      result[key] = buildExpectedResponse(prop, schemas);
+      // Check if property is required
+      const isRequired = (schemaComponent.required || []).includes(key);
+      if (isRequired || Math.random() > 0.5) { // Include required fields and randomly include optional fields
+        result[key] = buildExpectedResponse(prop, schemas);
+      }
     });
-
-    // Handle allOf
-    if (schemaComponent.allOf) {
-      schemaComponent.allOf.forEach((subSchema) => {
-        const subResult = buildExpectedResponse(subSchema, schemas);
-        Object.assign(result, subResult);
-      });
-    }
 
     return result;
   }
@@ -139,7 +172,7 @@ function buildExpectedResponse(schemaComponent, schemas) {
   // Handle primitive types with example values
   switch (schemaComponent.type) {
     case "string":
-      return schemaComponent.example || "";
+      return schemaComponent.example || "example_string";
     case "number":
     case "integer":
       return schemaComponent.example || 0;
@@ -148,7 +181,7 @@ function buildExpectedResponse(schemaComponent, schemas) {
     case "null":
       return null;
     default:
-      return null;
+      return schemaComponent.example || null;
   }
 }
 
@@ -276,7 +309,7 @@ hooks.beforeEachValidation(async (transaction, done) => {
   try {
     const [path] = transaction.name.split(" > ");
 
-    // Check for error scenarios first
+    // Check for error scenarios first, regardless of method
     if (transaction.name.includes("500")) {
       console.log(`Simulating 500 response for: ${transaction.name}`);
       transaction.real.statusCode = "500";
@@ -304,6 +337,34 @@ hooks.beforeEachValidation(async (transaction, done) => {
         status: 400,
       });
       return done();
+    }
+
+    // Special handling for POST endpoints with examples (only for successful cases)
+    if (transaction.request.method === "POST") {
+      // Get the response schema from the path definition
+      const pathSchema = schema.paths[path];
+      const responseSchema = pathSchema?.post?.responses?.["200"]?.content
+        ?.["application/json"]?.schema;
+
+      if (responseSchema) {
+        // Build expected response from the response schema
+        const expectedResponse = buildExpectedResponse(
+          responseSchema,
+          schema.components.schemas,
+        );
+
+        // Set the expected response body
+        transaction.expected.body = JSON.stringify(expectedResponse);
+
+        // Debug log
+        console.log(
+          `Expected response for ${path}:`,
+          JSON.stringify(expectedResponse, null, 2),
+        );
+
+        // Don't continue with the comparison if we're handling a POST request
+        return done();
+      }
     }
 
     // For successful responses, resolve schema references
@@ -344,6 +405,15 @@ hooks.beforeEachValidation(async (transaction, done) => {
     if (transaction.request.method === "GET") {
       const results = await fetchBothEndpoints(path, transaction);
 
+      // Store timing data directly on the transaction object
+      if (results.timingAnalysis) {
+        transaction.timingAnalysis = results.timingAnalysis;
+        console.log(
+          `Stored timing data for ${path}:`,
+          transaction.timingAnalysis,
+        );
+      }
+
       // Check if we have valid responses to compare
       if (results.production?.data && results.development?.data) {
         const differences = compareResponses(
@@ -352,10 +422,29 @@ hooks.beforeEachValidation(async (transaction, done) => {
         );
 
         if (differences.length > 0) {
-          comparisonResults[path] = differences;
+          comparisonResults[path] = {
+            differences,
+            timingAnalysis: results.timingAnalysis, // Store timing analysis with differences
+          };
 
           const comparisonMessage = [
             "\n## Endpoint Comparison",
+            results.timingAnalysis ? "\n### Response Times:" : "",
+            results.timingAnalysis
+              ? `Production: ${
+                results.timingAnalysis.productionTime.toFixed(2)
+              }ms`
+              : "",
+            results.timingAnalysis
+              ? `Development: ${
+                results.timingAnalysis.developmentTime.toFixed(2)
+              }ms`
+              : "",
+            results.timingAnalysis?.isSignificant
+              ? `⚠️ Response time difference: ${
+                results.timingAnalysis.percentageDiff.toFixed(2)
+              }%`
+              : "",
             "\n### Production Response:",
             "```json",
             JSON.stringify(results.production.data, null, 2),
@@ -370,7 +459,7 @@ hooks.beforeEachValidation(async (transaction, done) => {
               `Prod: ${JSON.stringify(diff.production)}\n  ` +
               `Dev: ${JSON.stringify(diff.development)}`
             ),
-          ].join("\n");
+          ].filter(Boolean).join("\n");
 
           if (!transaction.test) transaction.test = "";
           transaction.test += comparisonMessage;
@@ -435,39 +524,158 @@ hooks.afterAll((transactions, done) => {
       summaryReport += "\n";
     }
 
+    // Debug logging
+    console.log(
+      "Number of transactions with timing data:",
+      transactions.filter((t) => t.timingAnalysis).length,
+    );
+
+    // Add timing analysis section with more detailed logging
+    console.log("\nGenerating Response Time Analysis...");
+    summaryReport += `\n## Response Time Analysis\n\n`;
+
+    const timingData = transactions
+      .filter((t) => t.timingAnalysis)
+      .map((t) => ({
+        path: t.request.uri.replace(ENDPOINTS.development, ""),
+        timing: t.timingAnalysis,
+      }));
+
+    console.log(`Found ${timingData.length} endpoints with timing data`);
+
+    if (timingData.length > 0) {
+      // Add summary statistics
+      const avgProdTime = timingData.reduce((acc, { timing }) =>
+        acc + timing.productionTime, 0) / timingData.length;
+      const avgDevTime = timingData.reduce((acc, { timing }) =>
+        acc + timing.developmentTime, 0) / timingData.length;
+
+      summaryReport += `### Summary Statistics\n`;
+      summaryReport += `- Average Production Response Time: ${
+        avgProdTime.toFixed(2)
+      }ms\n`;
+      summaryReport += `- Average Development Response Time: ${
+        avgDevTime.toFixed(2)
+      }ms\n\n`;
+
+      // Add detailed timing table
+      summaryReport += `### Detailed Timing Analysis\n\n`;
+      summaryReport +=
+        `| Endpoint | Production (ms) | Development (ms) | Difference | % Difference |\n`;
+      summaryReport +=
+        `|----------|----------------|-----------------|------------|-------------|\n`;
+
+      const significantDelays = [];
+
+      timingData.forEach(({ path, timing }) => {
+        // Log each timing entry for debugging
+        console.log(`Timing for ${path}:`, timing);
+
+        const row = `| ${path} | ${timing.productionTime.toFixed(2)} | ${
+          timing.developmentTime.toFixed(2)
+        } | ${timing.difference.toFixed(2)} | ${
+          timing.percentageDiff.toFixed(2)
+        }% |`;
+
+        // Add warning emoji for significant differences
+        summaryReport += timing.isSignificant ? `${row} ⚠️\n` : `${row}\n`;
+
+        if (timing.isSignificant) {
+          significantDelays.push({
+            endpoint: path,
+            ...timing,
+          });
+        }
+      });
+
+      // Add significant delays section with more context
+      if (significantDelays.length > 0) {
+        summaryReport += `\n### ⚠️ Performance Concerns (>10% difference)\n\n`;
+        summaryReport +=
+          `${significantDelays.length} endpoints showed significant performance differences:\n\n`;
+
+        significantDelays.forEach((delay) => {
+          summaryReport += `#### ${delay.endpoint}\n`;
+          summaryReport += `- Production: ${
+            delay.productionTime.toFixed(2)
+          }ms\n`;
+          summaryReport += `- Development: ${
+            delay.developmentTime.toFixed(2)
+          }ms\n`;
+          summaryReport += `- Absolute Difference: ${
+            delay.difference.toFixed(2)
+          }ms\n`;
+          summaryReport += `- Percentage Difference: ${
+            delay.percentageDiff.toFixed(2)
+          }%\n`;
+          summaryReport += `- Environment Comparison: ${
+            delay.productionTime > delay.developmentTime
+              ? "Development is faster"
+              : "Production is faster"
+          }\n\n`;
+        });
+      }
+
+      summaryReport += `\n### Performance Overview\n`;
+      summaryReport += `- Total Endpoints Analyzed: ${timingData.length}\n`;
+      summaryReport +=
+        `- Endpoints with Significant Delays: ${significantDelays.length}\n`;
+      summaryReport += `- Performance Threshold: 10% difference\n\n`;
+    } else {
+      summaryReport +=
+        `No response time data available. Please check if timing analysis is properly configured.\n\n`;
+      console.warn("Warning: No timing data found in transactions");
+    }
+
     summaryReport += `## Endpoint Differences\n\n`;
 
     if (Object.keys(comparisonResults).length > 0) {
       const reportsDir = path.resolve(__dirname, "../reports");
 
       // Generate summary report
-      Object.entries(comparisonResults).forEach(([path, differences]) => {
-        summaryReport += `# ${path}\n\n`;
+      Object.entries(comparisonResults).forEach(
+        ([path, { differences, timingAnalysis }]) => {
+          summaryReport += `# ${path}\n`;
 
-        // Group differences by issue type and consolidate similar paths
-        const issueGroups = differences.reduce((acc, diff) => {
-          if (!acc[diff.issue]) {
-            acc[diff.issue] = new Set();
+          // Add both development and production example queries if they exist
+          if (transactions.find((t) => t.name.startsWith(path))) {
+            const example = transactions.find((t) => t.name.startsWith(path));
+            const devUri = example.request.uri;
+            const prodUri = devUri.replace(
+              ENDPOINTS.development,
+              ENDPOINTS.production,
+            );
+            summaryReport += `## Examples:\n`;
+            summaryReport += `### Development: ${devUri}\n`;
+            summaryReport += `### Production: ${prodUri}\n`;
           }
-
-          // Normalize array paths to show pattern
-          const normalizedPath = diff.path.replace(/\[\d+\]/g, "[]");
-          acc[diff.issue].add(normalizedPath);
-
-          return acc;
-        }, {});
-
-        // Output consolidated differences
-        Object.entries(issueGroups).forEach(([issue, paths]) => {
-          summaryReport += `## ${issue}\n`;
-          paths.forEach((path) => {
-            summaryReport += `- \`${path}\`\n`;
-          });
           summaryReport += "\n";
-        });
 
-        summaryReport += "---\n\n";
-      });
+          // Group differences by issue type and consolidate similar paths
+          const issueGroups = differences.reduce((acc, diff) => {
+            if (!acc[diff.issue]) {
+              acc[diff.issue] = new Set();
+            }
+
+            // Normalize array paths to show pattern
+            const normalizedPath = diff.path.replace(/\[\d+\]/g, "[]");
+            acc[diff.issue].add(normalizedPath);
+
+            return acc;
+          }, {});
+
+          // Output consolidated differences
+          Object.entries(issueGroups).forEach(([issue, paths]) => {
+            summaryReport += `## ${issue}\n`;
+            paths.forEach((path) => {
+              summaryReport += `- \`${path}\`\n`;
+            });
+            summaryReport += "\n";
+          });
+
+          summaryReport += "---\n\n";
+        },
+      );
 
       // Write summary report
       try {
@@ -493,24 +701,26 @@ hooks.afterAll((transactions, done) => {
 
       // Generate detailed markdown report
       let markdownReport = "# API Endpoint Comparison Report\n\n";
-      Object.entries(comparisonResults).forEach(([path, differences]) => {
-        markdownReport += `## ${path}\n\n`;
-        differences.forEach((diff) => {
-          markdownReport += `### ${diff.issue}\n`;
-          markdownReport += `**Path:** \`${diff.path}\`\n\n`;
-          if (diff.production !== undefined) {
-            markdownReport += `**Production:**\n\`\`\`json\n${
-              JSON.stringify(diff.production, null, 2)
-            }\n\`\`\`\n\n`;
-          }
-          if (diff.development !== undefined) {
-            markdownReport += `**Development:**\n\`\`\`json\n${
-              JSON.stringify(diff.development, null, 2)
-            }\n\`\`\`\n\n`;
-          }
-        });
-        markdownReport += "---\n\n";
-      });
+      Object.entries(comparisonResults).forEach(
+        ([path, { differences, timingAnalysis }]) => {
+          markdownReport += `## ${path}\n\n`;
+          differences.forEach((diff) => {
+            markdownReport += `### ${diff.issue}\n`;
+            markdownReport += `**Path:** \`${diff.path}\`\n\n`;
+            if (diff.production !== undefined) {
+              markdownReport += `**Production:**\n\`\`\`json\n${
+                JSON.stringify(diff.production, null, 2)
+              }\n\`\`\`\n\n`;
+            }
+            if (diff.development !== undefined) {
+              markdownReport += `**Development:**\n\`\`\`json\n${
+                JSON.stringify(diff.development, null, 2)
+              }\n\`\`\`\n\n`;
+            }
+          });
+          markdownReport += "---\n\n";
+        },
+      );
 
       // Write detailed markdown report
       try {
