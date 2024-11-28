@@ -68,7 +68,35 @@ export class InternalRouteGuard {
     return null;
   }
 
-  // For origin checking
+  private static getRequestInfo(headers: Headers) {
+    return {
+      // Cloudflare specific
+      cfRay: headers.get("CF-Ray"),
+      cfConnectingIp: headers.get("CF-Connecting-IP"),
+      cfIpCountry: headers.get("CF-IPCountry"),
+      cfVisitor: headers.get("CF-Visitor"),
+      // AWS CloudFront
+      cloudFrontId: headers.get("X-Amz-Cf-Id"),
+      awsRegion: headers.get("X-Amz-Cf-Pop"),
+      awsTraceId: headers.get("x-amzn-trace-id"),
+      // Common CDN/forwarded info
+      xForwardedFor: headers.get("x-forwarded-for"),
+      xForwardedPort: headers.get("x-forwarded-port"),
+      xForwardedProto: headers.get("x-forwarded-proto"),
+      xForwardedHost: headers.get("x-forwarded-host"),
+      // CDN info
+      cdnLoop: headers.get("cdn-loop"),
+    };
+  }
+
+  private static isCloudflareRequest(headers: Headers): boolean {
+    return !!(headers.get("CF-Ray") || headers.get("cdn-loop")?.includes("cloudflare"));
+  }
+
+  private static isCloudFrontRequest(headers: Headers): boolean {
+    return !!(headers.get("X-Amz-Cf-Id"));
+  }
+
   static async requireTrustedOrigin(req: Request) {
     const requestId = `origin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     console.log(`[${requestId}] Checking trusted origin...`);
@@ -79,13 +107,27 @@ export class InternalRouteGuard {
       return null;
     }
 
+    // Get standard headers
     const origin = req.headers.get("Origin");
     const referer = req.headers.get("Referer");
-    console.log(`[${requestId}] Headers - Origin: ${origin}, Referer: ${referer}`);
+    const host = req.headers.get("host");
+    const scheme = req.headers.get("x-forwarded-proto") || "https";
+
+    // Get detailed request information
+    const requestInfo = this.getRequestInfo(req.headers);
+    
+    // Log detailed request information
+    console.log(`[${requestId}] Request details:`, {
+      standard: { origin, referer, host, scheme },
+      cloud: requestInfo,
+      isCloudflare: this.isCloudflareRequest(req.headers),
+      isCloudFront: this.isCloudFrontRequest(req.headers)
+    });
     
     // Get allowed domains from config
-    const allowedDomains = serverConfig.ALLOWED_DOMAINS?.split(',') || [];
+    const allowedDomains = serverConfig.ALLOWED_DOMAINS?.split(',').map(d => d.trim()) || [];
     const mainDomain = serverConfig.APP_DOMAIN;
+    
     console.log(`[${requestId}] Config - Main domain: ${mainDomain}, Allowed domains:`, allowedDomains);
 
     if (!mainDomain && allowedDomains.length === 0) {
@@ -96,25 +138,80 @@ export class InternalRouteGuard {
       );
     }
 
-    // Check if request origin matches any allowed domain
-    const isTrustedOrigin = (origin || referer) && (
+    // Function to check if a domain matches the pattern
+    const isDomainMatch = (domain: string, pattern: string) => {
+      if (!domain || !pattern) return false;
+      
+      domain = domain.toLowerCase();
+      pattern = pattern.toLowerCase();
+      
+      if (pattern.startsWith('*.')) {
+        const patternBase = pattern.slice(2); // Remove *. from start
+        return domain === patternBase || domain.endsWith('.' + patternBase);
+      }
+      return domain === pattern;
+    };
+
+    // Build list of domains to check against
+    const requestDomains = new Set([
+      host,
+      requestInfo.xForwardedHost,
+      origin && new URL(origin).hostname,
+      referer && new URL(referer).hostname,
+    ].filter(Boolean) as string[]);
+
+    // Add CDN domains if needed
+    if (this.isCloudflareRequest(req.headers)) {
+      allowedDomains.push(
+        '*.cloudflare.com',
+        'cloudflare.com'
+      );
+    }
+    if (this.isCloudFrontRequest(req.headers)) {
+      allowedDomains.push(
+        '*.cloudfront.net',
+        'cloudfront.net'
+      );
+    }
+
+    // Check if any request domain matches allowed domains
+    const isTrustedOrigin = Array.from(requestDomains).some(domain => {
       // Check main domain
-      (mainDomain && (
-        origin?.includes(mainDomain) ||
-        referer?.includes(mainDomain)
-      )) ||
+      if (mainDomain && isDomainMatch(domain, mainDomain)) {
+        console.log(`[${requestId}] Matched main domain: ${domain}`);
+        return true;
+      }
+      
       // Check additional allowed domains
-      allowedDomains.some(domain => {
-        const matches = origin?.includes(domain) || referer?.includes(domain);
-        if (matches) {
-          console.log(`[${requestId}] Matched allowed domain: ${domain}`);
+      return allowedDomains.some(allowed => {
+        if (isDomainMatch(domain, allowed)) {
+          console.log(`[${requestId}] Matched allowed domain: ${domain} with ${allowed}`);
+          return true;
         }
-        return matches;
-      })
-    );
-                       
+        return false;
+      });
+    });
+
+    // Special case: If no origin/referer, but host matches allowed domains
+    if (!origin && !referer && host) {
+      const isValidHost = isDomainMatch(host, mainDomain) || 
+        allowedDomains.some(allowed => isDomainMatch(host, allowed));
+      
+      if (isValidHost) {
+        console.log(`[${requestId}] Direct request with valid host: ${host}`);
+        return null;
+      }
+    }
+
     if (!isTrustedOrigin) {
-      console.warn(`[${requestId}] Rejected untrusted request - Origin: ${origin}, Referer: ${referer}`);
+      console.warn(`[${requestId}] Rejected untrusted request - Domains:`, 
+        Array.from(requestDomains), 
+        `Host: ${host}`,
+        `CDN Info: ${JSON.stringify({
+          cloudflare: this.isCloudflareRequest(req.headers),
+          cloudfront: this.isCloudFrontRequest(req.headers)
+        })}`
+      );
       return ResponseUtil.badRequest("Invalid origin");
     }
 

@@ -71,7 +71,6 @@ import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_stampattach from "./routes/api/v2/trx/stampattach.ts";
 import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
 import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
-import * as $api_v2_upload_src20_background from "./routes/api/v2/upload-src20-background.ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
@@ -295,8 +294,6 @@ const manifest = {
     "./routes/api/v2/trx/stampattach.ts": $api_v2_trx_stampattach,
     "./routes/api/v2/trx/stampdetach.ts": $api_v2_trx_stampdetach,
     "./routes/api/v2/trx/utxoquery.ts": $api_v2_trx_utxoquery,
-    "./routes/api/v2/upload-src20-background.ts":
-      $api_v2_upload_src20_background,
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/collection/details/[id].tsx": $collection_details_id_,
     "./routes/collection/index.tsx": $collection_index,

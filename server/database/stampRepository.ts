@@ -747,4 +747,28 @@ export class StampRepository {
       return false;
     }
   }
+
+  static async countTotalStamps(): Promise<{ isValid: boolean; count: number }> {
+    try {
+      const result = await this.getTotalStampCountFromDb({
+        type: "all",
+        skipTotalCount: false
+      });
+      // If we can't get a count or it's 0, that indicates a database problem
+      if (!result?.rows?.[0]?.total) {
+        throw new Error("No stamps found in database");
+      }
+      const total = result.rows[0].total;
+      return {
+        isValid: true,
+        count: total
+      };
+    } catch (error) {
+      console.error("Database connection check failed:", error);
+      return {
+        isValid: false,
+        count: 0
+      };
+    }
+  }
 }

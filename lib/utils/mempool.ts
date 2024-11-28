@@ -2,7 +2,17 @@ const MAX_RETRIES = 3;
 import { MEMPOOL_API_BASE_URL } from "$lib/utils/constants.ts";
 import { BTCBalance, MempoolAddressResponse } from "$lib/types/index.d.ts";
 
-export const getRecommendedFees = async (retries = 0) => {
+interface RecommendedFees {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+  minimumFee: number;
+}
+
+export const getRecommendedFees = async (
+  retries = 0,
+): Promise<RecommendedFees | null> => {
   try {
     const endpoint = `${MEMPOOL_API_BASE_URL}/v1/fees/recommended`;
     const response = await fetch(endpoint);
@@ -24,7 +34,7 @@ export const getRecommendedFees = async (retries = 0) => {
   }
 };
 
-export const getCurrentBlock = async (retries = 0) => {
+export const getCurrentBlock = async (retries = 0): Promise<number | null> => {
   try {
     const endpoint = `${MEMPOOL_API_BASE_URL}/v1/blocks/tip/height`;
     const response = await fetch(endpoint);
@@ -46,7 +56,10 @@ export const getCurrentBlock = async (retries = 0) => {
   }
 };
 
-export const getTransactionInfo = async (txid: string, retries = 0) => {
+export const getTransactionInfo = async (
+  txid: string,
+  retries = 0,
+): Promise<string | null> => {
   try {
     const endpoint = `${MEMPOOL_API_BASE_URL}/tx/${txid}/hex`;
     const response = await fetch(endpoint);

@@ -126,7 +126,6 @@ export const handler: Handlers<TX | TXError> = {
 
         return ResponseUtil.success({
           hex: psbtData.psbt.toHex(),
-          base64: psbtData.psbt.toBase64(),
           est_tx_size: psbtData.estimatedTxSize,
           input_value: psbtData.totalInputValue,
           total_dust_value: psbtData.totalDustValue,

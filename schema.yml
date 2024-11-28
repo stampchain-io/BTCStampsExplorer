@@ -54,10 +54,13 @@ paths:
       tags:
         - System
       summary: Health check endpoint
-      description: Checks if the API service is running and responding correctly. Returns a status indicating the health of the service.
+      description: |
+        Checks if the API service is running and responding correctly. 
+        Validates the status of core services including the API, indexer, and mempool connectivity.
+        Also provides block synchronization status between the indexer and network.
       responses:
         "200":
-          description: Successful response
+          description: Detailed health status of the system and its services
           content:
             application/json:
               schema:
@@ -65,13 +68,73 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum: ["OK"]
-                required:
-                  - status
-        "404":
-          $ref: "#/components/responses/NotFound"
+                    enum: ["OK", "ERROR"]
+                    description: Overall system health status
+                  services:
+                    type: object
+                    properties:
+                      api:
+                        type: boolean
+                        description: API service status
+                      indexer:
+                        type: boolean
+                        description: Indexer service status
+                      mempool:
+                        type: boolean
+                        description: Mempool API connectivity status
+                      database:
+                        type: boolean
+                        description: Database connectivity status
+                      blockSync:
+                        type: object
+                        description: Block synchronization information
+                        properties:
+                          indexed:
+                            type: integer
+                            description: Last indexed block height
+                          network:
+                            type: integer
+                            description: Current network block height
+                          isSynced:
+                            type: boolean
+                            description: Whether the indexer is in sync with the network (allowing 1 block lag)
+                      stats:  # Changed from tokens to stats
+                        type: object
+                        description: System-wide statistics
+                        properties:
+                          src20Deployments:
+                            type: integer
+                            description: Total number of SRC-20 tokens deployed
+                          totalStamps:
+                            type: integer
+                            description: Total number of stamps in the system
+                          xcp:
+                            type: boolean
+                            description: Counterparty API connectivity status
+                        required:
+                          - src20Deployments
+                          - totalStamps
+                          - xcp
+                  required:
+                    - status
+                    - services
+              example:
+                status: "OK"
+                services:
+                  api: true
+                  indexer: true
+                  mempool: true
+                  database: true
+                  blockSync:
+                    indexed: 800000
+                    network: 800001
+                    isSynced: true
+                  stats:
+                    src20Deployments: 100000
+                    totalStamps: 1000000
+                    xcp: true
         "500":
-          $ref: "#/components/responses/InternalError"
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v2/docs:
     get:
@@ -1769,9 +1832,6 @@ paths:
                   hex:
                     type: string
                     description: The hex encoded serialized psbt trx
-                  base64:
-                    type: string
-                    description: The base64 encoded serialized psbt trx
                   input_value:
                     type: integer
                     description: The input value in sats
@@ -2889,9 +2949,6 @@ components:
         hex:
           type: string
           description: The hex encoded serialized psbt transaction
-        base64:
-          type: string
-          description: The base64 encoded serialized psbt transaction
         cpid:
           type: string
           description: The asset name or identifier

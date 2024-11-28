@@ -103,7 +103,6 @@ export const handler: Handlers<TX | TXError> = {
       // Return the API response with the same format
       return ResponseUtil.success({
         hex: mint_tx.psbt.toHex(),
-        base64: mint_tx.psbt.toBase64(),
         cpid: assetName,
         transactionDetails: {
           estimatedSize: mint_tx.estimatedTxSize,
