@@ -342,4 +342,8 @@ export class StampService {
       throw error;
     }
   }
+
+  static async countTotalStamps(): Promise<boolean> {
+    return await StampRepository.countTotalStamps();
+  }
 }

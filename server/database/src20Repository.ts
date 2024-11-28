@@ -620,4 +620,28 @@ export class SRC20Repository {
     // Map the results to an array of tick names
     return result.rows.map((row: { tick: string }) => ({ tick: row.tick }));
   }
+
+  static async checkSrc20Deployments(): Promise<{ isValid: boolean; count: number }> {
+    try {
+      const result = await this.getTotalCountValidSrc20TxFromDb({
+        op: "DEPLOY"
+      });
+      
+      // If we can't get a count or it's 0, that indicates a database problem
+      if (!result?.rows?.[0]?.total) {
+        throw new Error("No SRC-20 deployments found in database");
+      }
+      const count = result.rows[0].total;
+      return {
+        isValid: true,
+        count
+      };
+    } catch (error) {
+      console.error("SRC20 deployment check failed:", error);
+      return {
+        isValid: false,
+        count: 0
+      };
+    }
+  }
 }

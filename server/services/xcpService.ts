@@ -83,8 +83,6 @@ export async function fetchXcpV2WithCache<T>(
     cacheTimeout,
   );
 }
-// curl -X GET 'https://api.counterparty.io:4000/v2/healthz'
-// {"result": {"status": "Healthy"}}%
 
 export class DispenserManager {
   private static fetchXcpV2WithCache = fetchXcpV2WithCache;
@@ -1534,6 +1532,23 @@ export class XcpManager {
         dispensers: [],
         total: 0
       };
+    }
+  }
+
+  static async checkHealth(): Promise<boolean> {
+    const endpoint = "/healthz";
+    const queryParams = new URLSearchParams();
+
+    try {
+      const response = await fetchXcpV2WithCache<{ result: { status: string } }>(
+        endpoint,
+        queryParams
+      );
+
+      return response?.result?.status === "Healthy";
+    } catch (error) {
+      console.error("XCP health check failed:", error);
+      return false;
     }
   }
 }
