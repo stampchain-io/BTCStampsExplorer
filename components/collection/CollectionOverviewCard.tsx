@@ -26,7 +26,7 @@ export function CollectionOverviewCard(
         </div>
         <div className="text-stamp-grey-darker text-base mobileLg:text-xl font-light w-full">
           <p>
-            <p className="inline-block text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-black purple-gradient3 group-hover:[-webkit-text-fill-color:#AA00FF]">
+            <p className="inline-block text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF]">
               <span className="min-[420px]:hidden">
                 {abbreviateCollectionName(collection.collection_name)
                   .toUpperCase()}

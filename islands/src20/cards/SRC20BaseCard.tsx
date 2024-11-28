@@ -31,7 +31,8 @@ export function SRC20BaseCard(
     `/content/${src20.deploy_tx}`;
 
   return (
-    <div
+    <a
+      href={href}
       class="flex text-sm justify-between items-center border-2 border-transparent rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] w-full bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] p-3 mobileMd:p-6"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -45,10 +46,9 @@ export function SRC20BaseCard(
           alt={convertToEmoji(src20.tick)}
         />
         <div class="flex flex-col">
-          <a
-            href={href}
+          <p
             class={`text-2xl mobileLg:text-4xl font-black ${
-              isHovered ? "text-stamp-primary-hover" : "purple-gradient3"
+              isHovered ? "text-stamp-primary-hover" : "gray-gradient1"
             } flex gap-4`}
           >
             {convertToEmoji(src20.tick)}
@@ -78,7 +78,7 @@ export function SRC20BaseCard(
                 </a>
               )}
             </div>
-          </a>
+          </p>
 
           {variant !== "minting" && (
             <div class="flex flex-col pt-1.5">
@@ -115,6 +115,6 @@ export function SRC20BaseCard(
       </div>
 
       {children}
-    </div>
+    </a>
   );
 }
