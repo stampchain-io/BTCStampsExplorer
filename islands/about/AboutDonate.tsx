@@ -1,82 +1,14 @@
 import { useState } from "preact/hooks";
-import DonateModal from "./DonateModal.tsx";
+import WalletDonateModal from "$islands/Wallet/details/WalletDonateModal.tsx";
+
+const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
 
 export default function AboutDonate() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [fee, setFee] = useState<number>(0);
-  const [formState, setFormState] = useState({
-    toAddress: "",
-    token: "",
-    amt: "",
-    fee: 0,
-    feeError: "",
-    BTCPrice: 0,
-    jsonSize: 0,
-    apiError: "",
-    toAddressError: "",
-    tokenError: "",
-    amtError: "",
-    // Deploy-specific fields
-    max: "",
-    maxError: "",
-    lim: "",
-    limError: "",
-    dec: "18",
-    x: "",
-    tg: "",
-    web: "",
-    email: "",
-    file: null as File | null,
-  });
-
-  const [fileUploadError, setFileUploadError] = useState<string | null>(null);
-
-  const handleFileChange = (e: Event) => {
-    const file = (e.target as HTMLInputElement).files?.[0] || null;
-    if (file) {
-      const img = new Image();
-      img.onload = () => {
-        if (img.width === 420 && img.height === 420) {
-          setFormState((prev) => ({ ...prev, file }));
-        } else {
-          setFileUploadError("Image must be exactly 420x420 pixels.");
-        }
-      };
-      img.onerror = () => {
-        setFileUploadError("Invalid image file.");
-      };
-      img.src = URL.createObjectURL(file);
-    } else {
-      setFormState((prev) => ({ ...prev, file: null }));
-    }
-  };
-
-  const handleFileUpload = (file: File) => {
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64String = reader.result as string;
-
-      try {
-        console.log("File uploaded successfully");
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        setFileUploadError(
-          "File upload failed. The deployment will continue without the background image.",
-        );
-      }
-    };
-
-    reader.readAsDataURL(file);
-  };
 
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
-  };
-
-  const handleDonate = () => {
-    console.log("donate");
   };
 
   const handleOpen = () => {
@@ -89,14 +21,13 @@ export default function AboutDonate() {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(
-        "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203",
-      );
+      await navigator.clipboard.writeText(DONATE_ADDRESS);
       alert("Text copied to clipboard!");
     } catch (err) {
       console.error("Failed to copy: ", err);
     }
   };
+
   return (
     <>
       <section className="mobileLg:mt-36 mt-24">
@@ -143,7 +74,7 @@ export default function AboutDonate() {
               </div>
             </div>
             <p className="text-stamp-grey text-lg mt-6">
-              Use the Donate button and you’ll receive a unique stamp by Viva la
+              Use the Donate button and you'll receive a unique stamp by Viva la
               Vandal as thanks for your support.
             </p>
             <br />
@@ -155,9 +86,9 @@ export default function AboutDonate() {
             <div className="w-full justify-start items-center mobileMd:flex hidden">
               <div className="flex gap-2 justify-center items-center">
                 <p className="text-stamp-primary mobileLg:block hidden desktop:text-xl mobileMd:text-lg text-sm">
-                  bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203
+                  {DONATE_ADDRESS}
                 </p>
-                <p className="text-stamp-primary mobileLg:hidden block  desktop:text-xl mobileMd:text-lg text-sm">
+                <p className="text-stamp-primary mobileLg:hidden block desktop:text-xl mobileMd:text-lg text-sm">
                   bc1qe5sz3mt4a3e5...74qe0xdrkzew203
                 </p>
                 <img
@@ -189,9 +120,9 @@ export default function AboutDonate() {
             <div className="w-full justify-start items-center">
               <div className="flex gap-2 justify-center items-center">
                 <p className="text-stamp-primary mobileLg:block hidden desktop:text-xl mobileMd:text-lg text-sm">
-                  bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203
+                  {DONATE_ADDRESS}
                 </p>
-                <p className="text-stamp-primary mobileLg:hidden block  desktop:text-xl mobileMd:text-lg text-sm">
+                <p className="text-stamp-primary mobileLg:hidden block desktop:text-xl mobileMd:text-lg text-sm">
                   bc1qe5sz3mt4a3e5...74qe0xdrkzew203
                 </p>
                 <img
@@ -205,15 +136,12 @@ export default function AboutDonate() {
           </div>
         </div>
         {isOpen && (
-          <DonateModal
+          <WalletDonateModal
             fee={fee}
-            formState={formState}
-            handleFileChange={handleFileChange}
-            handleFileUpload={handleFileUpload}
             handleChangeFee={handleChangeFee}
+            toggleModal={handleOpen}
             handleCloseModal={handleCloseModal}
-            handleDonate={handleDonate}
-            handleOpen={() => setIsOpen(true)}
+            donateAddress={DONATE_ADDRESS}
           />
         )}
       </section>

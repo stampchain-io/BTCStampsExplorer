@@ -14,9 +14,73 @@ import {
 } from "$lib/utils/scriptTypeUtils.ts";
 import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 
-
 export class UTXOService {
   private static readonly CHANGE_DUST = 1000;
+  private static utxoCache = new Map<string, {
+    utxos: UTXO[];
+    timestamp: number;
+  }>();
+  private static CACHE_DURATION = 60000; // 1 minute cache
+
+  static async getAddressUTXOs(
+    address: string,
+    options: { 
+      includeAncestors?: boolean;
+      filterStampUTXOs?: boolean;
+    } = {}
+  ): Promise<UTXO[]> {
+    const now = Date.now();
+    const cached = this.utxoCache.get(address);
+
+    // Return cached result if valid
+    if (cached && now - cached.timestamp < this.CACHE_DURATION) {
+      return cached.utxos;
+    }
+
+    // Use existing getUTXOForAddress with ancestor support
+    const utxos = await getUTXOForAddress(
+      address,
+      undefined,
+      undefined,
+      options.includeAncestors
+    );
+
+    if (options.filterStampUTXOs) {
+      try {
+        const stampBalances = await XcpManager.getXcpBalancesByAddress(
+          address,
+          undefined,
+          true,
+        );
+
+        const utxosToExclude = new Set<string>();
+        for (const balance of stampBalances.balances) {
+          if (balance.utxo) {
+            utxosToExclude.add(balance.utxo);
+          }
+        }
+
+        const filteredUtxos = utxos.filter(
+          (utxo) => !utxosToExclude.has(`${utxo.txid}:${utxo.vout}`),
+        );
+
+        // Cache filtered results
+        this.utxoCache.set(address, {
+          utxos: filteredUtxos,
+          timestamp: now,
+        });
+
+        return filteredUtxos;
+      } catch (error) {
+        console.error("Error fetching stamps balance:", error);
+        throw new Error("Failed to fetch stamps balance for UTXO exclusion");
+      }
+    }
+
+    // Cache and return unfiltered UTXOs
+    this.utxoCache.set(address, { utxos, timestamp: now });
+    return utxos;
+  }
 
   static estimateVoutSize(output: Output): number {
     let scriptSize = 0;
@@ -95,6 +159,12 @@ export class UTXOService {
         "No UTXOs available for transaction after filtering",
       );
     }
+
+    // Cache the filtered UTXOs for future use
+    this.utxoCache.set(address, {
+      utxos,
+      timestamp: Date.now()
+    });
 
     return this.selectUTXOs(utxos, vouts, feeRate, sigops_rate, rbfBuffer);
   }

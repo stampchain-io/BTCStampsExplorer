@@ -3,7 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import type { StampRow } from "globals";
 import StampImage from "$islands/stamp/details/StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { TransactionFeeDetails } from "$components/shared/modal/TransactionFeeDetails.tsx";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 
@@ -167,7 +167,7 @@ const StampBuyModal = ({
         </div>
       </div>
 
-      <TransactionFeeDetails
+      <BasicFeeCalculator
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="buy"

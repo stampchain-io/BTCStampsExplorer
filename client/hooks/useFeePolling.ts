@@ -51,5 +51,11 @@ export const useFeePolling = (intervalDuration = 300000) => {
     return () => clearInterval(intervalId);
   }, [fetchFees, intervalDuration]);
 
-  return { fees, loading, fetchFees };
+  return {
+    fees,
+    loading,
+    fetchFees,
+    satsPerVB: fees?.recommendedFee,
+    satsPerKB: fees?.recommendedFee * 1000,
+  };
 };
