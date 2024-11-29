@@ -12,13 +12,23 @@ interface Props {
   handleChangeFee: (fee: number) => void;
   toggleModal: () => void;
   handleCloseModal: () => void;
+  stamps: {
+    data: StampRow[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
 }
 
 function WalletTransferModal({
   fee: initialFee,
-  handleChangeFee,
+  handleChangeFee = () => {},
   toggleModal,
   handleCloseModal,
+  stamps,
 }: Props) {
   const { wallet } = walletContext;
   const [quantity, setQuantity] = useState(1);
@@ -99,19 +109,15 @@ function WalletTransferModal({
     });
   };
 
-  const handleStampSelect = (value: string) => {
-    // Implement stamp selection logic
-    // This would typically fetch the stamp details and update selectedStamp
-  };
-
   return (
     <ModalLayout onClose={handleCloseModal} title="TRANSFER">
-      <div className="flex justify-between items-center">
-        <div className="w-[144px] h-[144px] bg-[#660099] rounded-md flex items-center justify-center">
+      <div className="flex justify-between items-center gap-2">
+        <div className="min-w-[144px] h-[144px] bg-[#660099] rounded-md flex items-center justify-center">
           {selectedStamp
             ? (
               <img
-                src={`/api/v2/stamp/${selectedStamp.stamp}/content`}
+                // src={`/api/v2/stamp/${selectedStamp.stamp}/content`}
+                src={selectedStamp.stamp_url}
                 alt={`Stamp #${selectedStamp.stamp}`}
                 className="w-full h-full object-contain"
               />
@@ -119,13 +125,18 @@ function WalletTransferModal({
             : <span className="text-white">Select Stamp</span>}
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex  w-1/2 flex-col gap-4">
           <SelectField
+            options={stamps.data}
             value={selectedStamp?.stamp?.toString() || ""}
             onChange={(e) => {
-              // Handle stamp selection
-              const value = (e.target as HTMLInputElement).value;
-              handleStampSelect(value);
+              const selectedItem = stamps.data.find(
+                (item) => item.tx_hash === e.currentTarget.value,
+              );
+
+              if (selectedItem) {
+                setSelectedStamp(selectedItem);
+              }
             }}
           />
 
@@ -135,7 +146,7 @@ function WalletTransferModal({
             value={quantity}
             onChange={(e) =>
               setQuantity(parseInt((e.target as HTMLInputElement).value, 10))}
-            className="bg-[#999999] text-[#666666] font-bold text-xl rounded-md p-3"
+            className="bg-[#999999] text-[#666666] font-bold text-xl rounded-md p-3 w-full"
           />
         </div>
       </div>
