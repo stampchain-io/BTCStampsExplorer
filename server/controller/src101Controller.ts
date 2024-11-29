@@ -1,4 +1,4 @@
-import { Src101Service } from "$server/services/src101Service.ts";
+import { SRC101Service } from "$server/services/src101/index.ts";
 import { SRC101Repository } from "$server/database/src101Repository.ts";
 import {
   SRC101TokenidsParams,
@@ -8,6 +8,7 @@ import {
   SRC101BalanceParams,
 } from "globals";
 import { StampService } from "$server/services/stampService.ts";
+// import { getBtcAddressInfo } from "$lib/utils/btc.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts"
@@ -19,8 +20,8 @@ export class Src101Controller{
     try{
       const [lastBlock, txs, totalCount] = await Promise.all([
         BlockService.getLastBlock(),
-        Src101Service.getSrc101TXFromSRC101Table(params),
-        Src101Service.getTotalSrc101TXFromSRC101TableCount(params),
+        SRC101Service.QueryService.getSrc101TXFromSRC101Table(params),
+        SRC101Service.QueryService.getTotalSrc101TXFromSRC101TableCount(params),
       ]);
       let restructuredResult: any = {
         last_block: lastBlock,
@@ -51,8 +52,8 @@ export class Src101Controller{
     try{
       const [lastBlock, txs, totalCount] = await Promise.all([
         BlockService.getLastBlock(),
-        Src101Service.getValidSrc101Tx(params),
-        Src101Service.getTotalValidSrc101TxCount(params),
+        SRC101Service.QueryService.getValidSrc101Tx(params),
+        SRC101Service.QueryService.getTotalValidSrc101TxCount(params),
       ]);
       let restructuredResult: any = {
         last_block: lastBlock,
@@ -83,7 +84,7 @@ export class Src101Controller{
     try{
       const [lastBlock, details] = await Promise.all([
         BlockService.getLastBlock(),
-        Src101Service.getDepoyDetails(deploy_hash),
+        SRC101Service.QueryService.getDepoyDetails(deploy_hash),
       ]);
   
       let restructuredResult: any = {
@@ -108,7 +109,7 @@ export class Src101Controller{
     try{
       const [lastBlock, totalCount] = await Promise.all([
         BlockService.getLastBlock(),
-        Src101Service.getTotalCount(deploy_hash),
+        SRC101Service.QueryService.getTotalCount(deploy_hash),
       ]);
   
       let restructuredResult: any = {
@@ -133,8 +134,8 @@ export class Src101Controller{
     try{
       const [lastBlock, balance, totalCount] = await Promise.all([
         BlockService.getLastBlock(),
-        Src101Service.getSrc101Balance(params),
-        Src101Service.getSrc101BalanceTotalCount(params),
+        SRC101Service.QueryService.getSrc101Balance(params),
+        SRC101Service.QueryService.getSrc101BalanceTotalCount(params),
       ]);
   
       let restructuredResult: any = {
@@ -168,7 +169,7 @@ export class Src101Controller{
     try{
       const [lastBlock, owner] = await Promise.all([
         BlockService.getLastBlock(),
-        Src101Service.getSrc101Owner(params),
+        SRC101Service.QueryService.getSrc101Owner(params),
       ]);
   
       let restructuredResult: any = {
@@ -194,8 +195,8 @@ export class Src101Controller{
     try{
       const [lastBlock, tokenids, totalCount] = await Promise.all([
         BlockService.getLastBlock(),
-        Src101Service.getSrc101Tokenids(params),
-        Src101Service.getTotalSrc101TokenidsCount(params),
+        SRC101Service.QueryService.getSrc101Tokenids(params),
+        SRC101Service.QueryService.getTotalSrc101TokenidsCount(params),
       ]);
   
       let restructuredResult: any = {
