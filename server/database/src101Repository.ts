@@ -5,6 +5,7 @@ import {
   SRC101_TABLE,
   SRC101_ALL_TABLE,
   SRC101_RECIPIENTS_TABLE,
+  SRC101_PRICE_TABLE,
 } from "$lib/utils/constants.ts";
 
 import {
@@ -19,6 +20,29 @@ import {
 import { dbManager } from "$server/database/databaseManager.ts";
 
 export class SRC101Repository {
+  static async getSrc101Price(
+    deploy_hash: String,
+  ){
+    let sqlQuery = `
+    SELECT 
+      len, price
+    FROM
+      ${SRC101_PRICE_TABLE}
+    WHERE deploy_hash = ?;
+    `;
+    const rows = (await dbManager.executeQueryWithCache(
+      sqlQuery,
+      [deploy_hash],
+      1000 * 60 * 2, // Cache duration
+    )).rows;
+    const result = {};
+    rows.forEach(row => {
+      result[row.len] = row.price;
+    });
+    console.log("getSrc101Price.result", result);
+    return result;
+  }
+
   static async getTotalSrc101TXFromSRC101TableCount(
     params:SRC101TxParams
   ){
@@ -228,7 +252,7 @@ export class SRC101Repository {
       1000 * 60 * 2, // Cache duration
     )).rows.map((result) => (
       result["address"],
-    ));;
+    ));
 
     const queryParams = [];
     let whereClause = "";
