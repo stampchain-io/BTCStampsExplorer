@@ -153,6 +153,8 @@ export default function StampPage(props: StampDetailPageProps) {
     ? `${stamp.name}`
     : `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
 
+  const bodyClassName = "flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36";
+
   return (
     <>
       <Head>
@@ -167,16 +169,20 @@ export default function StampPage(props: StampDetailPageProps) {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <div className="flex flex-col gap-10 tablet:gap-20 desktop:gap-50">
-        <div className="grid grid-cols-1 tablet:grid-cols-2 gap-12">
-          <StampImage
-            stamp={stamp}
-            flag={true}
-          />
-          <StampInfo
-            stamp={stamp}
-            lowestPriceDispenser={lowestPriceDispenser}
-          />
+      <div class={bodyClassName}>
+        <div class="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6">
+          <div class="desktop:col-span-1">
+            <StampImage
+              stamp={stamp}
+              flag={true}
+            />
+          </div>
+          <div class="desktop:col-span-2">
+            <StampInfo
+              stamp={stamp}
+              lowestPriceDispenser={lowestPriceDispenser}
+            />
+          </div>
         </div>
 
         <StampRelatedGraph
