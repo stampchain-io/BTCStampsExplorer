@@ -43,6 +43,8 @@ servers:
     description: Production server (uses live data)
   - url: "https://bitcoinstamps.xyz"
     description: Production server (uses live data)
+  - url: "http://localhost:8000"
+    description: Production server (uses live data)
 
 security:
   - ApiKeyAuth: []
@@ -1249,7 +1251,7 @@ paths:
         - in: query
           name: prim
           required: true
-          example: "true"
+          example: "false"
           schema:
             type: string
         - in: path
@@ -1396,6 +1398,84 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/src101/create:
+    post:
+      operationId: createSrc101
+      tags:
+        - SRC-101
+      summary: Deploy, Mint, Transfer SRC-101, SetRecord, Renew
+      description: |
+        This returns a hex encoded serialized PSBT transaction ready for signing and broadcasting
+        via wallet or library.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/SRC101DeployData'
+                - $ref: '#/components/schemas/SRC101MintData'
+                - $ref: '#/components/schemas/SRC101TransferData'
+                - $ref: '#/components/schemas/SRC101SetRecordData'
+                - $ref: '#/components/schemas/SRC101RenewData'
+            examples:
+              deploy:
+                $ref: '#/components/examples/SRC101DeployExample'
+              mint:
+                $ref: '#/components/examples/SRC101MintExample'
+              transfer:
+                $ref: '#/components/examples/SRC101TransferExample'
+              setrecord:
+                $ref: '#/components/examples/SRC101SetRecordExample'
+              renew:
+                $ref: '#/components/examples/SRC101RenewExample'
+      responses:
+        "200":
+          description: Successful response with the hex value.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hex:
+                    type: string
+                    description: The hex encoded serialized psbt trx
+                  base64:
+                    type: string
+                    description: The base64 encoded serialized psbt trx
+                  input_value:
+                    type: integer
+                    description: The input value in sats
+                  total_dust_value:
+                    type: integer
+                    description: The total dust value in sats
+                  est_miner_fee:
+                    type: integer
+                    description: The estimated miner fee in sats
+                  est_tx_size:
+                    type: integer
+                    description: The estimated transaction size
+                  inputsToSign:
+                    type: array
+                    items:
+                      type: string
+                      description: The inputs to sign
+                  changeAddress:
+                    type: string
+                    description: The change address
+                  fee:
+                    type: integer
+                    description: The estimated miner fee in sats
+                  change:
+                    type: integer
+                    description: The change value
+        "400":
+          description: Bad request error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseBody"
 
   /api/v2/stamps:
     get:
@@ -2083,6 +2163,79 @@ components:
         tick: "STAMP"
         satsPerVB: 20
         amt: "100000"
+
+    SRC101DeployExample:
+      summary: Example deploy request
+      value:
+        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        op: "deploy"
+        root: "btc"
+        name: "BitNameService"
+        lim: "10"
+        owner: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        rec: ["bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"]
+        tick: "btc"
+        pri: {0: 45000, 1: -1, 2: -1, 3: 900000, 4: 225000}
+        desc: "Bitname Service powered by BTC stamp."
+        mintstart: "0"
+        mintend: "18446744073709551615"
+        wla: "0317ac27154373716ab3bce4f170211446e7598c69ae3a90f058c831c56308323c"
+        imglp: "https://img.bitname.pro/img/"
+        imgf: "png"
+        idua: "999"
+        feeRate: 12
+
+    SRC101MintExample:
+      summary: Example mint request
+      value:
+        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        op: "mint"
+        hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+        toaddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        tokenid: ["YWJjZGVm"]
+        dua: "999"
+        prim: "true"
+        coef: "1000"
+        sig: ""
+        img: ["https://img.bitname.pro/img/abcdef.png"]
+        feeRate: 12
+
+    SRC101TransferExample:
+      summary: Example transfer request
+      value:
+        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        op: "transfer"
+        hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+        toaddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        tokenid: "YWJjZGVm"
+        feeRate: 12
+
+    SRC101SetRecordExample:
+      summary: Example setrecord request
+      value:
+        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        op: "setrecord"
+        hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+        tokenid: "YWJjZGVm"
+        type: "address"
+        data: {btc: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"}
+        prim: "false"
+        feeRate: 12
+
+    SRC101RenewExample:
+      summary: Example renew request
+      value:
+        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+        op: "renew"
+        hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+        tokenid: "YWJjZGVm"
+        dua: "2"
+        feeRate: 12
 
   schemas:
     Pagination:
@@ -3044,6 +3197,194 @@ components:
         - cpid
         - transactionDetails
 
+    SRC101DeployData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - root
+        - name
+        - lim
+        - owner
+        - rec
+        - tick
+        - pri
+        - desc
+        - mintstart
+        - mintend
+        - wla
+        - imglp
+        - imgf
+        - idua
+        - feeRate
+      properties:
+        sourceAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['deploy']
+        name:
+          type: string
+        root:
+          type: string
+        lim:
+          type: number
+        owner:
+          type: string
+        rec:
+          type: []
+        tick:
+          type: string
+        pri:
+          type: {}
+        desc:
+          type: string
+        mintstart:
+          type: number
+        mintend:
+          type: number
+        wla:
+          type: string
+        imglp:
+          type: string
+        imgf:
+          type: string
+        idua:
+          type: number
+        feeRate:
+          type: number
+
+    SRC101MintData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - hash
+        - toaddress
+        - tokenid
+        - dua
+        - prim
+        - coef
+        - sig
+        - img
+        - feeRate
+      properties:
+        sourceAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['deploy']
+        hash:
+          type: string
+        toaddress:
+          type: string
+        tokenid:
+          type: []
+        dua:
+          type: number
+        prim:
+          type: string
+        coef:
+          type: number
+        sig:
+          type: string
+        img:
+          type: []
+        feeRate:
+          type: number
+
+    SRC101TransferData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - hash
+        - toaddress
+        - tokenid
+        - feeRate
+      properties:
+        sourceAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['transfer']
+        hash:
+          type: string
+        toaddress:
+          type: string
+        tokenid:
+          type: string
+        feeRate:
+          type: number
+
+    SRC101SetRecordData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - hash
+        - tokenid
+        - type
+        - data
+        - prim
+      properties:
+        sourceAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['setrecord']
+        hash:
+          type: string
+        tokenid:
+          type: string
+        type:
+          type: string
+        prim:
+          type: string
+        data:
+          type: {}
+        feeRate:
+          type: number
+
+    SRC101RenewData:
+      type: object
+      required:
+        - sourceAddress
+        - changeAddress
+        - op
+        - hash
+        - tokenid
+        - dua
+        - feeRate
+      properties:
+        sourceAddress:
+          type: string
+        changeAddress:
+          type: string
+        op:
+          type: string
+          enum: ['renew']
+        hash:
+          type: string
+        tokenid:
+          type: string
+        dua:
+          type: number
+        feeRate:
+          type: number
+
   responses:
     NotFound:
       description: Resource not found
@@ -3069,3 +3410,4 @@ components:
             $ref: "#/components/schemas/ErrorResponse"
           example:
             error: "Internal server error"
+

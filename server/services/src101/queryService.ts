@@ -1,7 +1,7 @@
 import { SRC101Repository } from "$server/database/src101Repository.ts";
 import { SRC101TokenidsParams, SRC101OwnerParams, SRC101TxParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams } from "globals";
 
-export class Src101Service {
+export class SRC101QueryService {
   static async getTotalSrc101TXFromSRC101TableCount(
     params: SRC101TxParams,
   ){
@@ -77,6 +77,16 @@ export class Src101Service {
       return await SRC101Repository.getDepoyDetails(deploy_hash);
     } catch (error) {
       console.error("Error getting SRC101 owner:", error);
+      throw error;
+    }
+  }
+
+  static async getSrc101Price(
+    deploy_hash: string,
+  ){
+    try{
+      return await SRC101Repository.getSrc101Price(deploy_hash);
+    } catch (error){
       throw error;
     }
   }
