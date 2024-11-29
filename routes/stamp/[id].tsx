@@ -170,7 +170,7 @@ export default function StampPage(props: StampDetailPageProps) {
       </Head>
 
       <div class={bodyClassName}>
-        <div class="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6">
+        <div class="grid grid-cols-1 min-[880px]:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6">
           <div class="desktop:col-span-1">
             <StampImage
               stamp={stamp}
