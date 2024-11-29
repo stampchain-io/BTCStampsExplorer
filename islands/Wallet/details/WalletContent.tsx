@@ -593,7 +593,6 @@ export default function WalletContent(
         (
           <WalletTransferModal
             stamps={stamps}
-            src20={src20}
             toggleModal={handleOpenSettingModal}
             handleCloseModal={handleCloseSettingModal}
           />
