@@ -7,7 +7,7 @@ import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
-import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
+import StampSection from "$islands/stamp/StampSection.tsx";
 
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionController } from "$server/controller/collectionController.ts";
@@ -57,10 +57,14 @@ export const handler: Handlers<StampData> = {
       const url = new URL(req.url);
 
       // Fetch stamp details and collections in parallel
-      const [stampData, collectionsData] = await Promise.all([
+      const [stampData, collectionsData, recentStamps] = await Promise.all([
         StampController.getStampDetailsById(id),
         CollectionController.getCollectionNames({
           limit: 50,
+          page: 1,
+        }),
+        StampController.getStamps({
+          limit: 12,
           page: 1,
         }),
       ]);
@@ -126,6 +130,7 @@ export const handler: Handlers<StampData> = {
         stamp: stampWithPrices,
         collections,
         last_block: stampData.last_block,
+        stamps_recent: recentStamps?.data || [],
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
@@ -153,7 +158,36 @@ export default function StampPage(props: StampDetailPageProps) {
     ? `${stamp.name}`
     : `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
 
-  const bodyClassName = "flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36";
+  const bodyClassName = "flex flex-col gap-6";
+
+  const latestStampsSection = {
+    title: "LATEST STAMPS",
+    subTitle: "ON-CHAIN MARVELS",
+    type: "classic",
+    stamps: stamps_recent,
+    layout: "grid" as const,
+    showDetails: false,
+    alignRight: false,
+    gridClass: `
+      grid w-full
+      gap-3
+      mobileMd:gap-6
+      grid-cols-3
+      mobileSm:grid-cols-3
+      mobileMd:grid-cols-4
+      mobileLg:grid-cols-5
+      tablet:grid-cols-6
+      desktop:grid-cols-8
+      auto-rows-fr
+    `,
+    displayCounts: {
+      "mobileSm": 3,
+      "mobileMd": 4,
+      "mobileLg": 5,
+      "tablet": 6,
+      "desktop": 8,
+    },
+  };
 
   return (
     <>
@@ -196,17 +230,9 @@ export default function StampPage(props: StampDetailPageProps) {
           cpid={stamp.cpid}
         />
 
-        <RecentSales
-          title="LATEST STAMPS"
-          subTitle="LATEST TRANSACTIONS"
-          variant="detail"
-          displayCounts={{
-            mobileSm: 3,
-            mobileLg: 4,
-            tablet: 4,
-            desktop: 6,
-          }}
-        />
+        <div class="pt-12 mobileLg:pt-24 desktop:pt-36">
+          <StampSection {...latestStampsSection} />
+        </div>
       </div>
     </>
   );
