@@ -74,7 +74,7 @@ const PieChart = ({ holders }: PieChartProps) => {
     };
 
     return (
-      <div class="w-[300px] h-[300px] tablet:w-[400px] tablet:h-[400px]">
+      <div class="flex items-center justify-center w-[300px] h-[300px] tablet:w-[400px] tablet:h-[400px] p-6">
         <Chart {...DoughnutConfig} />
       </div>
     );
