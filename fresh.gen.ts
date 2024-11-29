@@ -12,9 +12,9 @@ import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
 import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts";
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
 import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
+import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_internal_src20_recentTransactions from "./routes/api/internal/src20/recentTransactions.ts";
 import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
-import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
@@ -221,10 +221,10 @@ const manifest = {
     "./routes/api/internal/creatorName.ts": $api_internal_creatorName,
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
+    "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/internal/src20/recentTransactions.ts":
       $api_internal_src20_recentTransactions,
     "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
-    "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
