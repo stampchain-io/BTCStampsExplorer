@@ -188,7 +188,6 @@ import * as $stamp_details_StampCodeModal from "./islands/stamp/details/StampCod
 import * as $stamp_details_StampImage from "./islands/stamp/details/StampImage.tsx";
 import * as $stamp_details_StampImageFullScreen from "./islands/stamp/details/StampImageFullScreen.tsx";
 import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
-import * as $stamp_details_StampRelatedGraph from "./islands/stamp/details/StampRelatedGraph.tsx";
 import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
@@ -439,8 +438,6 @@ const manifest = {
     "./islands/stamp/details/StampImageFullScreen.tsx":
       $stamp_details_StampImageFullScreen,
     "./islands/stamp/details/StampInfo.tsx": $stamp_details_StampInfo,
-    "./islands/stamp/details/StampRelatedGraph.tsx":
-      $stamp_details_StampRelatedGraph,
     "./islands/stamp/details/StampRelatedInfo.tsx":
       $stamp_details_StampRelatedInfo,
     "./islands/stamp/details/StampTextContent.tsx":
