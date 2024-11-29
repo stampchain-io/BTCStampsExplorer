@@ -1,22 +1,17 @@
-import { Chart } from "$fresh_charts/island.tsx";
+import { Chart } from "$fresh_charts/mod.ts";
 
-interface StampHoldersProps {
+interface PieChartProps {
   holders: Array<{
     address: string | null;
-    quantity: number;
+    amt: number | string;
+    percentage: number | string;
   }>;
 }
 
-const StampHolders = ({ holders }: StampHoldersProps) => {
+const PieChart = ({ holders }: PieChartProps) => {
   if (!holders?.length) {
     return <div class="text-center py-4">No holder data available</div>;
   }
-
-  // Calculate total quantity for percentages
-  const totalQuantity = holders.reduce(
-    (sum, holder) => sum + holder.quantity,
-    0,
-  );
 
   const generateColors = (count: number) => {
     // Convert hex to RGB for easier interpolation
@@ -42,6 +37,8 @@ const StampHolders = ({ holders }: StampHoldersProps) => {
   try {
     const DoughnutConfig = {
       type: "doughnut" as const,
+      width: 300,
+      height: 300,
       options: {
         responsive: false,
         maintainAspectRatio: false,
@@ -50,15 +47,14 @@ const StampHolders = ({ holders }: StampHoldersProps) => {
             display: false,
           },
           tooltip: {
+            enabled: true,
             callbacks: {
               label: (context: any) => {
                 const holder = holders[context.dataIndex];
-                const percent = ((holder.quantity / totalQuantity) * 100)
-                  .toFixed(2);
                 return [
                   `Address: ${holder.address || "Unknown"}`,
-                  `Amount: ${holder.quantity}`,
-                  `Percent: ${percent}%`,
+                  `Amount: ${Number(holder.amt)}`,
+                  `Percent: ${Number(holder.percentage)}%`,
                 ];
               },
             },
@@ -70,7 +66,7 @@ const StampHolders = ({ holders }: StampHoldersProps) => {
         datasets: [{
           borderColor: [...Array(holders.length)].fill("#666666"),
           label: "Graph Holder",
-          data: holders.map((holder) => holder.quantity),
+          data: holders.map((holder) => Number(holder.amt)),
           backgroundColor: generateColors(holders.length),
           hoverOffset: 4,
         }],
@@ -88,4 +84,4 @@ const StampHolders = ({ holders }: StampHoldersProps) => {
   }
 };
 
-export default StampHolders;
+export default PieChart;

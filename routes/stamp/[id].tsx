@@ -3,17 +3,26 @@ import { StampRow } from "globals";
 import { Handlers } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 
+import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
+
 import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
 import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
-import { StampRelatedGraph } from "$islands/stamp/details/StampRelatedGraph.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
 
-import { StampController } from "$server/controller/stampController.ts";
-import { CollectionController } from "$server/controller/collectionController.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import { DispenserManager } from "$server/services/xcpService.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+
+import { StampController } from "$server/controller/stampController.ts";
+import { DispenserManager } from "$server/services/xcpService.ts";
+import { RouteType } from "$server/services/cacheService.ts";
+
+interface Holder {
+  address: string | null;
+  quantity: number;
+  amt: number;
+  percentage: number;
+}
 
 interface StampDetailPageProps {
   data: {
@@ -26,7 +35,6 @@ interface StampDetailPageProps {
     vaults: any;
     last_block: number;
     stamps_recent: any;
-    collections: CollectionRow[];
     lowestPriceDispenser: any; // Add this property
   };
 }
@@ -40,7 +48,6 @@ interface StampData {
   holders: any;
   last_block: number;
   stamps_recent: any;
-  collections: CollectionRow[];
   lowestPriceDispenser: any;
 }
 
@@ -57,12 +64,14 @@ export const handler: Handlers<StampData> = {
       const url = new URL(req.url);
 
       // Fetch stamp details and collections in parallel
-      const [stampData, collectionsData, recentStamps] = await Promise.all([
+      const [stampData, holders, recentStamps] = await Promise.all([
         StampController.getStampDetailsById(id),
-        CollectionController.getCollectionNames({
-          limit: 50,
-          page: 1,
-        }),
+        StampController.getStampHolders(
+          id,
+          1,
+          1000000,
+          RouteType.BALANCE,
+        ),
         StampController.getStamps({
           limit: 12,
           page: 1,
@@ -73,8 +82,6 @@ export const handler: Handlers<StampData> = {
       if (!stampData?.data?.stamp) {
         return ctx.renderNotFound();
       }
-
-      const collections = collectionsData?.data || [];
 
       // Only fetch dispensers for STAMP or SRC-721
       let dispensers = [];
@@ -125,12 +132,26 @@ export const handler: Handlers<StampData> = {
           : null,
       };
 
+      const calculateHoldersWithPercentage = (rawHolders: Holder[]) => {
+        const totalQuantity = rawHolders.reduce(
+          (sum, holder) => sum + holder.quantity,
+          0,
+        );
+        return rawHolders.map((holder) => ({
+          ...holder,
+          amt: holder.quantity, // Add amt for compatibility
+          percentage: Number(
+            ((holder.quantity / totalQuantity) * 100).toFixed(2),
+          ),
+        }));
+      };
+
       return ctx.render({
         ...stampData.data,
         stamp: stampWithPrices,
-        collections,
         last_block: stampData.last_block,
         stamps_recent: recentStamps?.data || [],
+        holders: calculateHoldersWithPercentage(holders.data),
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
@@ -144,7 +165,6 @@ export const handler: Handlers<StampData> = {
 
 export default function StampPage(props: StampDetailPageProps) {
   const {
-    collections,
     stamp,
     holders,
     sends,
@@ -219,11 +239,7 @@ export default function StampPage(props: StampDetailPageProps) {
           </div>
         </div>
 
-        <StampRelatedGraph
-          stampId={stamp.stamp?.toString() || ""}
-          cpid={stamp.cpid}
-          initialHolders={holders || []}
-        />
+        <HoldersGraph holders={holders || []} />
 
         <StampRelatedInfo
           stampId={stamp.stamp?.toString() || ""}
