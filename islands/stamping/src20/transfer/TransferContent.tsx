@@ -3,9 +3,9 @@ import { useState } from "preact/hooks";
 
 import { walletContext } from "$client/wallet/wallet.ts";
 
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { InputField } from "$islands/stamping/InputField.tsx";
+import { SRC20InputField } from "../SRC20InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
 
@@ -36,6 +36,7 @@ export function TransferContent(
     submissionMessage,
     walletError,
     apiError,
+    handleInputBlur,
   } = useSRC20Form("transfer", trxType);
 
   const [tosAgreed, setTosAgreed] = useState(false);
@@ -71,40 +72,44 @@ export function TransferContent(
       <h1 className={titlePurpleLDCenterClassName}>TRANSFER</h1>
 
       <div className={inputFieldContainerClassName}>
-        <InputField
+        <SRC20InputField
           type="text"
           placeholder="Recipient address"
           value={formState.toAddress}
           onChange={(e) => handleInputChange(e, "toAddress")}
+          onBlur={() => handleInputBlur("toAddress")}
           error={formState.toAddressError}
         />
 
         <div className={inputField2colClassName}>
-          <InputField
+          <SRC20InputField
             type="text"
             placeholder="Token"
             value={formState.token}
             onChange={(e) => handleInputChange(e, "token")}
+            onBlur={() => handleInputBlur("token")}
+            isUppercase
           />
 
-          <InputField
+          <SRC20InputField
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
             placeholder="Amount"
             value={formState.amt}
             onChange={(e) => handleInputChange(e, "amt")}
+            onBlur={() => handleInputBlur("amt")}
+            error={formState.amtError}
           />
         </div>
       </div>
 
       <div className={feeSelectorContainerClassName}>
-        <FeeEstimation
+        <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20-transfer"
           fileType="application/json"
-          fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
@@ -112,6 +117,15 @@ export function TransferContent(
           buttonName={isConnected ? "TRANSFER" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
+          userAddress={wallet?.address}
+          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
+          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
+          utxoAncestors={formState.utxoAncestors}
+          feeDetails={{
+            minerFee: formState.psbtFees?.estMinerFee || 0,
+            dustValue: formState.psbtFees?.totalDustValue || 0,
+            hasExactFees: !!formState.psbtFees?.hasExactFees,
+          }}
         />
 
         <StatusMessages

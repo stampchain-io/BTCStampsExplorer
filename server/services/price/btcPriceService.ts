@@ -1,4 +1,4 @@
-import { CachedRPCService } from "../quicknode/cachedRpcService.ts";
+import { CachedQuicknodeRPCService } from "$server/services/quicknode/cachedQuicknodeRpcService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { COINGECKO_API_BASE_URL } from "$lib/utils/constants.ts";
 
@@ -70,7 +70,7 @@ export class BTCPriceService {
   private static async getQuicknodePrice(): Promise<QuickNodePrice> {
     try {
       const params = ["bitcoin", "usd", true, true, true];
-      const response = await CachedRPCService.executeRPC<QuickNodePrice>(
+      const response = await CachedQuicknodeRPCService.executeRPC<QuickNodePrice>(
         "cg_simplePrice",
         params
       );

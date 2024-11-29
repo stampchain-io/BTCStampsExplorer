@@ -1,7 +1,7 @@
 import { QuicknodeService } from "./quicknodeService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 
-export class CachedRPCService {
+export class CachedQuicknodeRPCService {
   private static readonly CACHE_DURATION = 300;  // 5 minutes
 
   static async executeRPC<T>(

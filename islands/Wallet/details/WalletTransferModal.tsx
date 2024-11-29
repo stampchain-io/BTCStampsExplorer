@@ -1,7 +1,7 @@
 // islands/stamp/details/WalletTransferModal.tsx
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-import { TransactionFeeDetails } from "$components/shared/modal/TransactionFeeDetails.tsx";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { SelectField } from "$islands/stamping/SelectField.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
@@ -140,7 +140,7 @@ function WalletTransferModal({
         </div>
       </div>
 
-      <TransactionFeeDetails
+      <BasicFeeCalculator
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="transfer"
@@ -153,6 +153,7 @@ function WalletTransferModal({
         userAddress={wallet?.address}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
+        tosAgreed={true}
       />
 
       {error && <div className="text-red-500 mt-2">{error}</div>}

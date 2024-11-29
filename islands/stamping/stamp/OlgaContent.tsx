@@ -5,7 +5,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { getWalletProvider } from "$client/wallet/walletHelper.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
@@ -377,11 +377,11 @@ export function OlgaContent() {
   useEffect(() => {
     if (hasValidTransaction && txDetails && fee) {
       // Only recalculate fees if we have a valid transaction
-      const newFee = Math.ceil(txDetails.txDetails.estimatedSize * fee);
+      const newFee = Math.ceil((txDetails.txDetails?.estimatedSize || 0) * fee);
       setFeeDetails({
         minerFee: newFee,
-        dustValue: txDetails.dust,
-        totalValue: txDetails.total - txDetails.fee + newFee,
+        dustValue: txDetails.dust || 0,
+        totalValue: (txDetails.total || 0) - (txDetails.fee || 0) + newFee,
         hasExactFees: true,
       });
     }
@@ -637,7 +637,9 @@ export function OlgaContent() {
           hex,
           cpid,
           inputCount: transactionDetails.inputs.length,
-          outputCount: transactionDetails.outputs.length,
+          outputCount: transactionDetails.outputs
+            ? transactionDetails.outputs.length
+            : 0,
         });
 
         const walletProvider = getWalletProvider(
@@ -740,6 +742,9 @@ export function OlgaContent() {
   };
 
   const [feeDetails, setFeeDetails] = useState<FeeDetails>({
+    minerFee: 0,
+    dustValue: 0,
+    totalValue: 0,
     hasExactFees: false,
   });
 
@@ -1059,7 +1064,7 @@ export function OlgaContent() {
       }
 
       <div className="p-3 mobileMd:p-6 dark-gradient z-[10] w-full">
-        <FeeEstimation
+        <ComplexFeeCalculator
           fee={fee}
           handleChangeFee={handleChangeFee}
           type="stamp"
@@ -1076,6 +1081,7 @@ export function OlgaContent() {
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           disabled={!isFormValid}
+          utxoAncestors={[]}
         />
 
         <StatusMessages

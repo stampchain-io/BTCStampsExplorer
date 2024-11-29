@@ -19,12 +19,6 @@ interface StampingSrc20PageProps {
   tick?: string | null;
   mintStatus?: any;
   holders?: number;
-  recentTransactions: {
-    deploy: any[];
-    mint: any[];
-    transfer: any[];
-  };
-  trendingTokens: any[];
 }
 
 export const handler: Handlers<StampingSrc20PageProps> = {
@@ -70,40 +64,12 @@ export const handler: Handlers<StampingSrc20PageProps> = {
         }
       }
 
-      // Initialize variables
-      let recentTransactions = {
-        deploy: [],
-        mint: [],
-        transfer: [],
-      };
-      const trendingTokens: any[] = [];
-
-      if (action === "mint") {
-        // Fetch trending tokens for PopularMinting
-        const limit = 5;
-        const page = 1;
-        const transactionCount = 1000;
-
-        const trendingData = await Src20Controller.fetchTrendingTokens(
-          req,
-          limit,
-          page,
-          transactionCount,
-        );
-
-        trendingTokens.push(...trendingData.data);
-      } else {
-        recentTransactions = await Src20Controller.fetchRecentTransactions();
-      }
-
       return ctx.render({
         selectedTab: action,
         trxType,
         tick,
         mintStatus,
         holders,
-        recentTransactions,
-        trendingTokens,
       });
     } catch (error) {
       console.error("Error in stamping SRC20:", error);
@@ -124,8 +90,6 @@ export default function StampingSrc20Page(
     tick,
     mintStatus,
     holders,
-    recentTransactions,
-    trendingTokens,
   } = data;
 
   const renderContent = () => {
@@ -164,11 +128,11 @@ export default function StampingSrc20Page(
   const renderRightSidebar = () => {
     switch (selectedTab) {
       case "mint":
-        return <PopularMinting transactions={trendingTokens} />;
+        return <PopularMinting />;
       case "deploy":
-        return <RecentDeploy transactions={recentTransactions.deploy} />;
+        return <RecentDeploy />;
       case "transfer":
-        return <LatestTransfer transactions={recentTransactions.transfer} />;
+        return <LatestTransfer />;
       default:
         return null;
     }

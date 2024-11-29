@@ -12,6 +12,8 @@ import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
 import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts";
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
 import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
+import * as $api_internal_src20_recentTransactions from "./routes/api/internal/src20/recentTransactions.ts";
+import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
@@ -72,6 +74,7 @@ import * as $api_v2_trx_create_psbt from "./routes/api/v2/trx/create_psbt.ts";
 import * as $api_v2_trx_stampattach from "./routes/api/v2/trx/stampattach.ts";
 import * as $api_v2_trx_stampdetach from "./routes/api/v2/trx/stampdetach.ts";
 import * as $api_v2_trx_utxoquery from "./routes/api/v2/trx/utxoquery.ts";
+import * as $api_v2_utxo_ancestors_address_ from "./routes/api/v2/utxo/ancestors/[address].ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $collection_details_id_ from "./routes/collection/details/[id].tsx";
 import * as $collection_index from "./routes/collection/index.tsx";
@@ -121,6 +124,7 @@ import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
 import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
 import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
+import * as $Wallet_details_WalletDonateModal from "./islands/Wallet/details/WalletDonateModal.tsx";
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
 import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
 import * as $Wallet_details_WalletSendModal from "./islands/Wallet/details/WalletSendModal.tsx";
@@ -129,7 +133,6 @@ import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
 import * as $about_AboutHeader from "./islands/about/AboutHeader.tsx";
 import * as $about_AboutTeam from "./islands/about/AboutTeam.tsx";
-import * as $about_DonateModal from "./islands/about/DonateModal.tsx";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
@@ -147,6 +150,7 @@ import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
+import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
 import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
@@ -187,11 +191,11 @@ import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx
 import * as $stamp_details_StampRelatedGraph from "./islands/stamp/details/StampRelatedGraph.tsx";
 import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
-import * as $stamping_FeeEstimation from "./islands/stamping/FeeEstimation.tsx";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
 import * as $stamping_src101_mint_MintContent from "./islands/stamping/src101/mint/MintContent.tsx";
+import * as $stamping_src20_SRC20InputField from "./islands/stamping/src20/SRC20InputField.tsx";
 import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/deploy/DeployContent.tsx";
 import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
 import * as $stamping_src20_mint_MintContent from "./islands/stamping/src20/mint/MintContent.tsx";
@@ -217,6 +221,9 @@ const manifest = {
     "./routes/api/internal/creatorName.ts": $api_internal_creatorName,
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
+    "./routes/api/internal/src20/recentTransactions.ts":
+      $api_internal_src20_recentTransactions,
+    "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
     "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
@@ -296,6 +303,8 @@ const manifest = {
     "./routes/api/v2/trx/stampattach.ts": $api_v2_trx_stampattach,
     "./routes/api/v2/trx/stampdetach.ts": $api_v2_trx_stampdetach,
     "./routes/api/v2/trx/utxoquery.ts": $api_v2_trx_utxoquery,
+    "./routes/api/v2/utxo/ancestors/[address].ts":
+      $api_v2_utxo_ancestors_address_,
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/collection/details/[id].tsx": $collection_details_id_,
     "./routes/collection/index.tsx": $collection_index,
@@ -351,6 +360,8 @@ const manifest = {
       $Wallet_connectors_Wallet_connector,
     "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
     "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
+    "./islands/Wallet/details/WalletDonateModal.tsx":
+      $Wallet_details_WalletDonateModal,
     "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
     "./islands/Wallet/details/WalletReceiveModal.tsx":
       $Wallet_details_WalletReceiveModal,
@@ -362,7 +373,6 @@ const manifest = {
     "./islands/about/AboutDonate.tsx": $about_AboutDonate,
     "./islands/about/AboutHeader.tsx": $about_AboutHeader,
     "./islands/about/AboutTeam.tsx": $about_AboutTeam,
-    "./islands/about/DonateModal.tsx": $about_DonateModal,
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
@@ -386,6 +396,7 @@ const manifest = {
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
+    "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
     "./islands/home/HomeHeader.tsx": $home_HomeHeader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
@@ -434,12 +445,13 @@ const manifest = {
       $stamp_details_StampRelatedInfo,
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
-    "./islands/stamping/FeeEstimation.tsx": $stamping_FeeEstimation,
     "./islands/stamping/InputField.tsx": $stamping_InputField,
     "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
     "./islands/stamping/src101/mint/MintContent.tsx":
       $stamping_src101_mint_MintContent,
+    "./islands/stamping/src20/SRC20InputField.tsx":
+      $stamping_src20_SRC20InputField,
     "./islands/stamping/src20/deploy/DeployContent.tsx":
       $stamping_src20_deploy_DeployContent,
     "./islands/stamping/src20/deploy/RecentDeploy.tsx":

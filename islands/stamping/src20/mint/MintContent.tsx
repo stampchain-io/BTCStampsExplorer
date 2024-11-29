@@ -1,13 +1,12 @@
 import axiod from "axiod";
-import { SRC20Row } from "globals";
 import { useEffect, useState } from "preact/hooks";
 
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { InputField } from "$islands/stamping/InputField.tsx";
+import { SRC20InputField } from "../SRC20InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
 
@@ -61,6 +60,24 @@ interface MintContentProps {
   holders?: number;
 }
 
+// Add interface for search results
+interface SearchResult {
+  tick: string;
+  // Add other fields that might be in the search results
+  status?: string;
+  progress?: number;
+}
+
+// Add consistent class names at the top
+const bodyToolsClassName =
+  "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+const titlePurpleLDCenterClassName =
+  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+const feeSelectorContainerClassName =
+  "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+const inputFieldContainerClassName =
+  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
+
 export function MintContent({
   trxType = "olga",
   tick,
@@ -73,13 +90,14 @@ export function MintContent({
     handleInputChange,
     handleSubmit,
     fetchFees,
-    isLoading,
     config,
     isSubmitting,
     submissionMessage,
     walletError,
     apiError,
     setFormState,
+    handleInputBlur,
+    setIsSearching,
   } = useSRC20Form("mint", trxType, tick ?? undefined);
 
   const [mintStatus, setMintStatus] = useState<any>(initialMintStatus || null);
@@ -87,10 +105,10 @@ export function MintContent({
   const [error, setError] = useState<string | null>(null);
   const [tosAgreed, setTosAgreed] = useState(false);
 
-  const { isConnected } = walletContext;
+  const { isConnected, wallet } = walletContext;
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectedTokenImage, setSelectedTokenImage] = useState<string | null>(
     null,
@@ -107,78 +125,93 @@ export function MintContent({
     }));
   };
 
-  // Fetch search results based on searchTerm
+  // Update useEffect to handle search results with better debouncing
   useEffect(() => {
     if (isSelecting) {
-      setIsSelecting(false); // Reset flag after selection
+      setIsSelecting(false);
       return;
     }
 
+    setIsSearching(true);
     const delayDebounceFn = setTimeout(async () => {
       if (searchTerm.trim()) {
-        const response = await fetch(
-          `/api/v2/src20/search?q=${encodeURIComponent(searchTerm.trim())}`,
-        );
-        const data = await response.json();
-        setSearchResults(data.data);
+        try {
+          const response = await fetch(
+            `/api/v2/src20/search?q=${encodeURIComponent(searchTerm.trim())}`,
+          );
+          const data = await response.json();
+
+          logger.debug("stamps", {
+            message: "Search results received",
+            searchTerm,
+            resultsCount: data.data?.length || 0,
+          });
+
+          if (data.data && Array.isArray(data.data)) {
+            setSearchResults(data.data);
+          }
+        } catch (error) {
+          logger.error("stamps", {
+            message: "Search error",
+            error,
+            searchTerm,
+          });
+          setSearchResults([]);
+        }
       } else {
         setSearchResults([]);
-      }
-    }, 300); // Debounce the search input by 300ms
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
-
-  const handleResultClick = (tick: string) => {
-    setIsSelecting(true); // Set flag to true to prevent search
-    setFormState((prevState) => ({
-      ...prevState,
-      token: tick,
-    }));
-    setSearchTerm(tick);
-    setSearchResults([]);
-
-    const fetchData = async (tick: string) => {
-      setIsImageLoading(true);
-      try {
-        setError(null);
-        const currentTick = tick;
-
-        // Fetch combined mint data
-        const response = await axiod.get(
-          `/api/v2/src20/tick/${currentTick}/mintData`,
-        );
-        const data = response.data;
-        console.log("data: ", data);
-
-        if (!data || data.error || !data.mintStatus) {
-          setError("Token not deployed");
-          resetTokenData();
-        } else {
-          setMintStatus(data.mintStatus);
-          setHolders(data.holders || 0);
-
-          // Pre-populate amt with limit value
-          if (data.mintStatus.limit) {
-            setFormState((prevState) => ({
-              ...prevState,
-              amt: data.mintStatus.limit.toString(),
-            }));
-          }
-
-          const imageUrl = `/content/${data.mintStatus.tx_hash}.svg`;
-          setSelectedTokenImage(imageUrl);
-        }
-      } catch (err) {
-        console.error("Error fetching mint data:", err);
-        setError("Error fetching token data");
         resetTokenData();
-      } finally {
-        setIsImageLoading(false);
       }
-    };
+      setIsSearching(false);
+    }, 300);
 
-    fetchData(tick);
+    return () => {
+      clearTimeout(delayDebounceFn);
+      setIsSearching(false);
+    };
+  }, [searchTerm, isSelecting]);
+
+  // Update handleResultClick to be more efficient
+  const handleResultClick = async (tick: string) => {
+    setIsSelecting(true);
+    setSearchResults([]); // Clear results immediately
+    setSearchTerm(tick);
+
+    // Update form state after getting token data
+    try {
+      setIsImageLoading(true);
+      setError(null);
+
+      const response = await axiod.get(`/api/v2/src20/tick/${tick}/mintData`);
+      const data = response.data;
+
+      if (!data || data.error || !data.mintStatus) {
+        setError("Token not deployed");
+        resetTokenData();
+      } else {
+        // Set all token-related state at once
+        setMintStatus(data.mintStatus);
+        setHolders(data.holders || 0);
+        setSelectedTokenImage(`/content/${data.mintStatus.tx_hash}.svg`);
+
+        // Update form state last to minimize re-renders
+        setFormState((prevState) => ({
+          ...prevState,
+          token: tick,
+          amt: data.mintStatus.limit?.toString() || prevState.amt,
+        }));
+      }
+    } catch (err) {
+      logger.error("stamps", {
+        message: "Error fetching token data",
+        error: err,
+        tick,
+      });
+      setError("Error fetching token data");
+      resetTokenData();
+    } finally {
+      setIsImageLoading(false);
+    }
   };
 
   // Adjusted useEffect hook to always fetch data when token changes
@@ -197,10 +230,6 @@ export function MintContent({
     : "0";
   const limit = mintStatus ? Number(mintStatus.limit).toLocaleString() : "0";
   const minters = holders ? holders.toString() : "0";
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
@@ -222,20 +251,10 @@ export function MintContent({
     }
   };
 
-  const bodyToolsClassName =
-    "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-  const titlePurpleLDCenterClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
-  const feeSelectorContainerClassName =
-    "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
-  const inputFieldContainerClassName =
-    "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
-
   return (
     <div class={bodyToolsClassName}>
       <h1 class={titlePurpleLDCenterClassName}>MINT SRC-20</h1>
 
-      {/* Display error if any */}
       {error && (
         <div class="w-full text-red-500 text-center font-bold">
           {error}
@@ -254,9 +273,7 @@ export function MintContent({
               )
               : (
                 <img
-                  src={selectedTokenImage
-                    ? selectedTokenImage
-                    : `/img/stamping/image-upload.svg`}
+                  src={selectedTokenImage || `/img/stamping/image-upload.svg`}
                   class={selectedTokenImage ? "w-full h-full" : "w-12 h-12"}
                   alt=""
                   loading="lazy"
@@ -266,19 +283,18 @@ export function MintContent({
               )}
           </div>
           <div class="flex flex-col gap-3 mobileMd:gap-6 w-full relative">
-            <InputField
+            <SRC20InputField
               type="text"
               placeholder="Token"
               value={searchTerm}
-              // onChange={(e) => handleInputChange(e, "token")}
-              onInput={(e) =>
+              onChange={(e) =>
                 setSearchTerm((e.target as HTMLInputElement).value)}
               error={formState.tokenError}
               isUppercase
             />
             {searchResults.length > 0 && (
               <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[20] max-h-60 overflow-y-auto">
-                {searchResults.map((result) => (
+                {searchResults.map((result: SearchResult) => (
                   <li
                     key={result.tick}
                     onClick={() => handleResultClick(result.tick)}
@@ -290,13 +306,14 @@ export function MintContent({
               </ul>
             )}
 
-            <InputField
+            <SRC20InputField
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               placeholder="Amount"
               value={formState.amt}
               onChange={(e) => handleInputChange(e, "amt")}
+              onBlur={() => handleInputBlur("amt")}
               error={formState.amtError}
             />
           </div>
@@ -311,12 +328,11 @@ export function MintContent({
       </div>
 
       <div class={feeSelectorContainerClassName}>
-        <FeeEstimation
+        <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
-          type="src20-mint"
+          type="src20"
           fileType="application/json"
-          fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
@@ -324,6 +340,15 @@ export function MintContent({
           buttonName={isConnected ? "MINT" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
+          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
+          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
+          userAddress={wallet?.address}
+          utxoAncestors={formState.utxoAncestors}
+          feeDetails={{
+            minerFee: formState.psbtFees?.estMinerFee || 0,
+            dustValue: formState.psbtFees?.totalDustValue || 0,
+            hasExactFees: !!formState.psbtFees?.hasExactFees,
+          }}
         />
 
         <StatusMessages
