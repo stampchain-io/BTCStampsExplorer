@@ -182,13 +182,13 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
   };
 
   return (
-    <div class="dark-gradient p-2 tablet:p-6">
-      <div class="flex justify-between w-full overflow-y-auto text-[#666666] text-sm tablet:text-[19px]">
+    <div class="dark-gradient p-3 mobileMd:p-6">
+      <div class="flex justify-between w-full overflow-y-auto text-base mobileLg:text-lg text-stamp-grey-darker font-light">
         {tabs.map(({ id, label }) => (
           <p
             key={id}
-            class={`cursor-pointer pb-4 hover:text-[#8800CC] ${
-              selectedTab === id ? "text-[#8800CC] font-bold" : ""
+            class={`cursor-pointer pb-4 hover:text-stamp-purple-highlight ${
+              selectedTab === id ? "text-stamp-grey font-bold" : ""
             }`}
             onClick={() => setSelectedTab(id)}
           >
