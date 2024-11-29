@@ -38,11 +38,11 @@ import * as $api_v2_src101_deploy_hash_address_address_btc_ from "./routes/api/v
 import * as $api_v2_src101_deploy_hash_deploy from "./routes/api/v2/src101/[deploy_hash]/deploy.ts";
 import * as $api_v2_src101_deploy_hash_total from "./routes/api/v2/src101/[deploy_hash]/total.ts";
 import * as $api_v2_src101_balance_address_ from "./routes/api/v2/src101/balance/[address].ts";
+import * as $api_v2_src101_create from "./routes/api/v2/src101/create.ts";
 import * as $api_v2_src101_index from "./routes/api/v2/src101/index.ts";
 import * as $api_v2_src101_index_deploy_hash_index_ from "./routes/api/v2/src101/index/[deploy_hash]/[index].ts";
 import * as $api_v2_src101_tx_tx_hash_ from "./routes/api/v2/src101/tx/[tx_hash].ts";
 import * as $api_v2_src101_tx_index from "./routes/api/v2/src101/tx/index.ts";
-import * as $api_v2_src101_create from "./routes/api/v2/src101/create.ts";
 import * as $api_v2_src20_op_ from "./routes/api/v2/src20/[...op].ts";
 import * as $api_v2_src20_operation_ from "./routes/api/v2/src20/[operation].ts";
 import * as $api_v2_src20_balance_address_ from "./routes/api/v2/src20/balance/[address].ts";
@@ -257,12 +257,12 @@ const manifest = {
       $api_v2_src101_deploy_hash_total,
     "./routes/api/v2/src101/balance/[address].ts":
       $api_v2_src101_balance_address_,
+    "./routes/api/v2/src101/create.ts": $api_v2_src101_create,
     "./routes/api/v2/src101/index.ts": $api_v2_src101_index,
     "./routes/api/v2/src101/index/[deploy_hash]/[index].ts":
       $api_v2_src101_index_deploy_hash_index_,
     "./routes/api/v2/src101/tx/[tx_hash].ts": $api_v2_src101_tx_tx_hash_,
     "./routes/api/v2/src101/tx/index.ts": $api_v2_src101_tx_index,
-    "./routes/api/v2/src101/create.ts": $api_v2_src101_create,
     "./routes/api/v2/src20/[...op].ts": $api_v2_src20_op_,
     "./routes/api/v2/src20/[operation].ts": $api_v2_src20_operation_,
     "./routes/api/v2/src20/balance/[address].ts":
