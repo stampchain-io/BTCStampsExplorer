@@ -54,12 +54,12 @@ export default function AboutHeader() {
             innovations.
           </p>
           <p class="text-sm desktop:text-xl mobileLg:text-lg mobileSm:text-base font-medium w-full">
-            As the project evolved from concept to creation, Kevin joined the
-            fellowship, bringing technical precision and focused determination
-            to the team during what he called his "extended sabbatical." This
-            trinity of builders didn't just create a protocol—they forged a new
-            standard for digital permanence that would make ancient stone
-            tablets look like temporary Post-it notes.
+            As the project evolved from concept to creation, Reinamora joined
+            the fellowship, bringing technical precision and focused
+            determination to the team during what he called his "extended
+            sabbatical." This trinity of builders didn't just create a
+            protocol—they forged a new standard for digital permanence that
+            would make ancient stone tablets look like temporary Post-it notes.
           </p>
           <p class="text-sm desktop:text-xl mobileLg:text-lg mobileSm:text-base font-medium w-full">
             The introduction of{" "}
