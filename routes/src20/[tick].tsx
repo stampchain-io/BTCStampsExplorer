@@ -4,8 +4,8 @@ import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
 import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
-import { SRC20RelatedGraph } from "$components/src20/SRC20RelatedGraph.tsx";
 import { MarketListingSummary } from "$types/index.d.ts";
+import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 
 export const handler: Handlers = {
   async GET(_req: Request, ctx) {
@@ -78,7 +78,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
         totalTransfers={total_transfers}
         marketInfo={marketInfo} // Now contains data for current tick
       />
-      <SRC20RelatedGraph holders={holders} />
+      <HoldersGraph holders={holders} />
       <SRC20DetailsTab tick={tick} />
     </div>
   );
