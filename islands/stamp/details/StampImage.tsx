@@ -58,7 +58,7 @@ function RightPanel(
   };
 
   return (
-    <div className="flex justify-between p-5 bg-[#1F002E]">
+    <div className="flex justify-between p-5 dark-gradient">
       <div className="flex gap-4">
         <img
           src="/img/stamp/Copy.png"
@@ -187,7 +187,7 @@ export function StampImage(
                 src={src}
                 loading="lazy"
                 alt={`Stamp No. ${stamp.stamp}`}
-                className="max-w-none object-contain rounded-lg pixelart stamp-image"
+                className="max-w-none object-contain rounded-sm pixelart stamp-image h-full w-full"
                 onError={handleImageError}
               />
             </div>,
@@ -206,7 +206,7 @@ export function StampImage(
           <img
             width="100%"
             loading="lazy"
-            className={`max-w-none object-contain rounded-lg ${className} pixelart stamp-image`}
+            className={`max-w-none object-contain rounded-sm ${className} pixelart stamp-image`}
             src={src}
             alt="Not Available"
           />
@@ -214,22 +214,23 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && isHtml && (
-        <div className={`${className} flex flex-col gap-4`}>
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#1F002E] z-0" />
-            <div className="relative z-10 p-6 flex justify-center items-center w-full h-full pt-[56.25%]">
-              <iframe
-                width="100%"
-                height="100%"
-                scrolling="no"
-                className={`${className} aspect-square rounded-lg absolute top-0 left-0`}
-                sandbox="allow-scripts allow-same-origin"
-                src={src}
-                loading="lazy"
-                style={{ transform }}
-                onError={handleImageError}
-                title="Stamp"
-              />
+        <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
+          <div className="relative dark-gradient p-3 mobileMd:p-6">
+            <div className="stamp-container">
+              <div className="relative pt-[100%]">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  scrolling="no"
+                  className={`${className} rounded-sm absolute top-0 left-0`}
+                  sandbox="allow-scripts allow-same-origin"
+                  src={src}
+                  loading="lazy"
+                  style={{ transform }}
+                  onError={handleImageError}
+                  title="Stamp"
+                />
+              </div>
             </div>
           </div>
           {flag && (
@@ -248,15 +249,15 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && (
-        <div className="flex flex-col gap-4">
-          <div className="relative p-6 bg-[#1F002E]">
+        <div className="flex flex-col gap-3 mobileMd:gap-6">
+          <div className="relative p-3 mobileMd:p-6 dark-gradient">
             <div className="stamp-container">
-              <div className="relative z-10">
+              <div className="relative z-10 aspect-square">
                 {validatedContent || (
                   <img
                     width="100%"
                     loading="lazy"
-                    className="max-w-none object-contain rounded-lg pixelart stamp-image"
+                    className="max-w-none object-contain rounded-sm pixelart stamp-image h-full w-full"
                     src={src}
                     onError={handleImageError}
                     alt="Stamp"

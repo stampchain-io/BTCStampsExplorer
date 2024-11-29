@@ -21,19 +21,19 @@ const StampImageFullScreen = ({
 
   return (
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#0b0b0b] bg-opacity-95 backdrop-filter backdrop-blur-sm"
       onClick={handleCloseModal}
     >
-      <div class="relative p-4 w-full max-w-[800px] h-auto">
-        <div class="relative bg-white rounded-lg shadow overflow-hidden">
-          <div class="flex flex-col gap-4 items-center justify-between p-4 tablet:p-5 rounded-t">
+      <div class="relative w-full max-w-[800px] max-h-[800px] p-6 mobileLg:p-12">
+        <div class="flex flex-col p-3 mobileMd:p-6 dark-gradient rounded-md overflow-hidden">
+          <div class="flex flex-col stamp-container">
             {contentType === "html"
               ? (
                 <iframe
                   width="100%"
                   height="100%"
                   scrolling="no"
-                  className="aspect-square rounded-lg"
+                  className="aspect-square rounded-sm"
                   sandbox="allow-scripts allow-same-origin"
                   src={imageUrl}
                   loading="lazy"
@@ -42,12 +42,10 @@ const StampImageFullScreen = ({
               )
               : (
                 <img
-                  className="w-[300px] tablet:w-[640px] max-w-none object-contain rounded-lg pixelart stamp-image"
+                  className="max-w-full rounded-sm pixelart stamp-image aspect-square"
                   style={{
-                    height: "100%",
                     objectFit: "contain",
                     imageRendering: "pixelated",
-                    backgroundColor: "rgb(0,0,0)",
                   }}
                   src={imageUrl}
                   onError={handleImageError}
