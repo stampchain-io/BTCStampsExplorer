@@ -10,10 +10,89 @@ import { normalizeFeeRate } from "$server/services/xcpService.ts";
 type TrxType = "multisig" | "olga";
 
 // Extend InputData to include all possible fee rate inputs
+interface AncestorInfo {
+  txid: string;
+  vout: number;
+  weight?: number;
+}
+
 interface ExtendedInputData extends Omit<InputData, "feeRate"> {
   feeRate?: number; // legacy support
   satsPerVB?: number;
   satsPerKB?: number; // included for completeness but shouldn't be used
+  utxoAncestors?: AncestorInfo[];
+}
+
+// Update the PSBTService.preparePSBT interface by extending its parameters
+interface PSBTParams {
+  sourceAddress: string;
+  toAddress: string;
+  src20Action: Record<string, unknown>;
+  satsPerVB: number;
+  service_fee: number;
+  service_fee_address: string;
+  changeAddress: string;
+  utxoAncestors?: AncestorInfo[];
+  dryRun?: boolean;
+}
+
+// Add basic size estimation without UTXO fetching
+function estimateBasicSize(data: ExtendedInputData): number {
+  // Base transaction size
+  let size = 10; // Version + locktime
+
+  // Estimate input size (assume one P2WPKH input for estimation)
+  size += 68; // Basic input size
+
+  // Calculate outputs based on operation
+  switch (data.op.toLowerCase()) {
+    case "deploy":
+      // P2WSH output for deploy data + change output
+      size += Math.ceil((data.max?.length || 0) / 62) * 43; // Each data chunk in P2WSH
+      size += 31; // Change output
+      break;
+    case "mint":
+      // Basic mint outputs + change
+      size += 43; // Recipient output
+      size += Math.ceil((data.amt?.length || 0) / 62) * 43; // Data outputs
+      size += 31; // Change output
+      break;
+    case "transfer":
+      // Transfer outputs + change
+      size += 43; // Recipient output
+      size += 43; // Data output
+      size += 31; // Change output
+      break;
+  }
+
+  return size;
+}
+
+function calculateBasicDustValue(operation: string): number {
+  const DUST_AMOUNT = 546;
+  switch (operation) {
+    case "deploy":
+      return DUST_AMOUNT; // One recipient output
+    case "mint":
+      return DUST_AMOUNT * 2; // Recipient + data output
+    case "transfer":
+      return DUST_AMOUNT * 2; // Recipient + data output
+    default:
+      return DUST_AMOUNT;
+  }
+}
+
+function estimateOutputCount(data: ExtendedInputData): number {
+  switch (data.op.toLowerCase()) {
+    case "deploy":
+      return Math.ceil((data.max?.length || 0) / 62) + 2; // Data chunks + recipient + change
+    case "mint":
+      return Math.ceil((data.amt?.length || 0) / 62) + 2; // Data chunks + recipient + change
+    case "transfer":
+      return 3; // Recipient + data + change
+    default:
+      return 2;
+  }
 }
 
 export const handler: Handlers<TX | TXError> = {
@@ -26,7 +105,10 @@ export const handler: Handlers<TX | TXError> = {
         return ResponseUtil.badRequest("Empty request body");
       }
 
-      let body: ExtendedInputData & { trxType?: TrxType };
+      let body: ExtendedInputData & {
+        trxType?: TrxType;
+        dryRun?: boolean;
+      };
       try {
         body = JSON.parse(rawBody);
       } catch (e) {
@@ -84,24 +166,78 @@ export const handler: Handlers<TX | TXError> = {
       });
 
       // Validate operation for both transaction types
-      const validationError = await SRC20Service.UtilityService
-        .validateOperation(
-          body.op.toLowerCase() as "deploy" | "mint" | "transfer",
-          {
-            ...body,
-            sourceAddress: effectiveSourceAddress,
-            changeAddress: effectiveChangeAddress,
-          },
-        );
+      let validationError;
+      if (body.dryRun) {
+        validationError = await SRC20Service.UtilityService
+          .validateOperation(
+            body.op.toLowerCase() as "deploy" | "mint" | "transfer",
+            {
+              sourceAddress: effectiveSourceAddress,
+              changeAddress: effectiveChangeAddress,
+              tick: body.tick || "TEST",
+              max: body.max || "1000",
+              lim: body.lim || "1000",
+              dec: body.dec || "18",
+              amt: body.amt || "1",
+              toAddress: body.toAddress || effectiveSourceAddress,
+              isEstimate: true,
+            },
+          );
+      } else {
+        validationError = await SRC20Service.UtilityService
+          .validateOperation(
+            body.op.toLowerCase() as "deploy" | "mint" | "transfer",
+            {
+              sourceAddress: effectiveSourceAddress,
+              changeAddress: effectiveChangeAddress,
+              tick: body.tick,
+              max: body.max?.toString(),
+              lim: body.lim?.toString(),
+              dec: body.dec?.toString(),
+              amt: body.amt?.toString(),
+              toAddress: body.toAddress,
+              x: body.x,
+              web: body.web,
+              email: body.email,
+              isEstimate: false,
+            },
+          );
+      }
 
       if (validationError) {
         logger.debug("stamps", {
           message: "Validation error",
           error: validationError,
+          requestData: {
+            operation: body.op.toLowerCase(),
+            sourceAddress: effectiveSourceAddress,
+            changeAddress: effectiveChangeAddress,
+            tick: body.tick,
+            max: body.max,
+            lim: body.lim,
+            dec: body.dec,
+          },
         });
         return validationError;
       }
 
+      // If it's a dry run, use quick estimation without UTXO fetching
+      if (body.dryRun) {
+        const estimatedSize = estimateBasicSize(body);
+        const minerFee = Math.ceil(
+          estimatedSize * normalizedFees.normalizedSatsPerVB,
+        );
+        const dustValue = calculateBasicDustValue(body.op.toLowerCase());
+
+        return ResponseUtil.success({
+          minerFee,
+          dustValue,
+          estimatedSize,
+          outputCount: estimateOutputCount(body),
+        });
+      }
+
+      // Only do full UTXO fetching and PSBT construction for actual transactions
       if (trxType === "multisig") {
         logger.debug("stamps", {
           message: "Starting multisig transaction handling",
@@ -161,10 +297,12 @@ export const handler: Handlers<TX | TXError> = {
           toAddress: body.toAddress,
           src20Action,
           satsPerVB: normalizedFees.normalizedSatsPerVB,
-          service_fee: 0,
-          service_fee_address: "",
+          service_fee: body.service_fee || 0,
+          service_fee_address: body.service_fee_address || "",
           changeAddress: effectiveChangeAddress || effectiveSourceAddress,
-        });
+          utxoAncestors: body.utxoAncestors,
+          dryRun: body.dryRun,
+        } as PSBTParams);
 
         return ResponseUtil.success({
           hex: psbtData.psbt.toHex(),

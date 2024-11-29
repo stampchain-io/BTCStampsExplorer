@@ -1,7 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
+import { walletContext } from "$client/wallet/wallet.ts";
 
 interface FairmintContentProps {
   fairminters: any[];
@@ -19,8 +20,10 @@ export function FairmintContent({ fairminters }: FairmintContentProps) {
     isSubmitting,
     submissionMessage,
     apiError,
-    feeEstimationParams,
   } = useFairmintForm(fairminters);
+
+  const [tosAgreed, setTosAgreed] = useState(false);
+  const { wallet } = walletContext;
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -83,14 +86,26 @@ export function FairmintContent({ fairminters }: FairmintContentProps) {
           />
         </label>
 
-        <FeeEstimation
+        <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
+          type="fairmint"
+          fileType="application/json"
+          fileSize={formState.jsonSize}
+          BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           buttonName="FAIRMINT"
-          {...feeEstimationParams}
+          tosAgreed={tosAgreed}
+          onTosChange={setTosAgreed}
+          userAddress={wallet?.address}
+          utxoAncestors={formState.utxoAncestors}
+          feeDetails={{
+            minerFee: formState.psbtFees?.estMinerFee || 0,
+            dustValue: formState.psbtFees?.totalDustValue || 0,
+            hasExactFees: !!formState.psbtFees?.hasExactFees,
+          }}
         />
 
         <StatusMessages

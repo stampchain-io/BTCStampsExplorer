@@ -10,16 +10,29 @@ import { decodeBase64 } from "@std/encoding/base64";
 import { encodeHex } from "@std/encoding/hex";
 import { Config } from "globals";
 import { logger } from "$lib/utils/logger.ts";
+import type { AncestorInfo } from "$types/index.d.ts";
+
+interface FairmintFormState {
+  asset: string;
+  quantity: string;
+  fee: number;
+  BTCPrice: number;
+  jsonSize: number;
+  utxoAncestors?: AncestorInfo[];
+}
 
 export function useFairmintForm(fairminters: any[]) {
   const { config, isLoading: configLoading } = useConfig<Config>();
   const { fees, loading: feeLoading, fetchFees } = useFeePolling(300000);
   const [isLoading, setIsLoading] = useState(configLoading || feeLoading);
 
-  const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState<FairmintFormState>({
     asset: "",
     quantity: "",
     fee: 0,
+    BTCPrice: 0,
+    jsonSize: 0,
+    utxoAncestors: [],
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);

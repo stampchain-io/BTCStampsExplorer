@@ -7,7 +7,7 @@ import { BigFloat } from "bigfloat/mod.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import type { IDeploySRC20, IMintSRC20, ITransferSRC20 } from "$types/index.d.ts";
 import { InputData } from "$server/types/index.d.ts";
-
+import { logger } from "$lib/utils/logger.ts";
 export class SRC20UtilityService {
   static formatSRC20Row(row: Src20Detail) {
     return {
@@ -69,97 +69,133 @@ export class SRC20UtilityService {
 
   static async validateOperation(
     operation: "deploy" | "mint" | "transfer",
-    body: InputData,
-  ): Promise<void | TXError> {
-    // Common validations for all operations
-    if (!body.tick || typeof body.tick !== "string") {
-      return ResponseUtil.badRequest("Invalid or missing tick", 400);
-    }
-    if (!body.toAddress || !isValidBitcoinAddress(body.toAddress)) {
-      return ResponseUtil.badRequest("Invalid or missing toAddress", 400);
-    }
-    if (!body.feeRate || isNaN(Number(body.feeRate))) {
-      return ResponseUtil.badRequest("Invalid or missing feeRate", 400);
+    data: InputData,
+  ): Promise<Response | null> {
+    logger.debug("stamps", {
+      message: "Validating operation",
+      data: {
+        operation,
+        ...data,
+        isEstimate: data.isEstimate,
+      },
+    });
+
+    // Basic validation for all operations
+    if (!data.sourceAddress) {
+      return ResponseUtil.badRequest("Source address is required");
     }
 
-    // Operation-specific validations
+    if (!data.tick) {
+      return ResponseUtil.badRequest("Tick is required");
+    }
+
+    // Operation-specific validation
     switch (operation) {
       case "deploy":
-        const deployResult = await this.validateDeploy(body);
-        if (deployResult) return deployResult;
-        break;
-
+        return await this.validateDeploy(data);
       case "mint":
-        const mintResult = await this.validateMint(body);
-        if (mintResult) return mintResult;
-        break;
-
+        return await this.validateMint(data);
       case "transfer":
-        const transferResult = await this.validateTransfer(body);
-        if (transferResult) return transferResult;
-        break;
-
+        return await this.validateTransfer(data);
       default:
-        return ResponseUtil.badRequest("Invalid operation", 400);
+        return ResponseUtil.badRequest("Invalid operation");
     }
   }
 
-  private static async validateDeploy(body: InputData): Promise<void | TXError> {
-    // Check if already deployed
-    const { deployed } = await this.checkDeployedTick(body.tick);
-    if (deployed) {
-      return ResponseUtil.badRequest(`Token ${body.tick} already deployed`, 400);
+  private static async validateDeploy(data: InputData): Promise<Response | null> {
+    // Skip deployed check for estimation
+    if (!data.isEstimate) {
+      const { deployed } = await this.checkDeployedTick(data.tick);
+      if (deployed) {
+        return ResponseUtil.badRequest(`Token ${data.tick} already deployed`);
+      }
     }
 
-    // Validate deploy-specific parameters
-    if (body.max && isNaN(Number(body.max))) {
-      return ResponseUtil.badRequest("max must be a number", 400);
+    // Required field validations
+    if (!data.max) {
+      return ResponseUtil.badRequest("Max supply is required for deploy");
     }
-    if (body.lim && isNaN(Number(body.lim))) {
-      return ResponseUtil.badRequest("lim must be a number", 400);
+    if (!data.lim) {
+      return ResponseUtil.badRequest("Limit per mint is required for deploy");
     }
-    if (body.dec !== undefined && isNaN(Number(body.dec))) {
-      return ResponseUtil.badRequest("dec must be a number", 400);
+    if (data.dec === undefined) {
+      return ResponseUtil.badRequest("Decimals is required for deploy");
     }
 
-    // Optional field validations
-    if (body.x && !/^[a-zA-Z0-9_]{1,15}$/.test(body.x)) {
-      return ResponseUtil.badRequest("Invalid x username", 400);
+    // Validate numeric values
+    try {
+      const maxValue = BigInt(data.max);
+      const limValue = BigInt(data.lim);
+      const decValue = parseInt(data.dec);
+
+      if (maxValue <= 0n) {
+        return ResponseUtil.badRequest("Max supply must be greater than 0");
+      }
+      if (limValue <= 0n) {
+        return ResponseUtil.badRequest("Limit per mint must be greater than 0");
+      }
+      if (limValue > maxValue) {
+        return ResponseUtil.badRequest("Limit per mint cannot exceed max supply");
+      }
+      if (decValue < 0 || decValue > 18) {
+        return ResponseUtil.badRequest("Decimals must be between 0 and 18");
+      }
+    } catch (error) {
+      return ResponseUtil.badRequest("Invalid numeric values provided");
     }
-    if (body.web && !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(body.web)) {
-      return ResponseUtil.badRequest("Invalid website URL", 400);
+
+    // Optional field validations - skip for estimation
+    if (!data.isEstimate) {
+      if (data.x && !/^[a-zA-Z0-9_]{1,15}$/.test(data.x)) {
+        return ResponseUtil.badRequest("Invalid x username");
+      }
+      if (data.web && !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(data.web)) {
+        return ResponseUtil.badRequest("Invalid website URL");
+      }
+      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        return ResponseUtil.badRequest("Invalid email address");
+      }
     }
-    if (body.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
-      return ResponseUtil.badRequest("Invalid email address", 400);
-    }
+
+    return null;
   }
 
-  private static async validateMint(body: InputData): Promise<void | TXError> {
-    if (!body.amt || isNaN(Number(body.amt))) {
-      return ResponseUtil.badRequest("amt is required for mint operation", 400);
+  private static async validateMint(data: InputData): Promise<Response | null> {
+    if (!data.amt) {
+      return ResponseUtil.badRequest("Amount is required for mint");
     }
 
-    const mintInfo = await SRC20UtilityService.checkMintedOut(body.tick, body.amt.toString());
-    if (mintInfo.minted_out) {
-      return ResponseUtil.badRequest(`Token ${body.tick} already minted out`);
+    // Skip minted out check for estimation
+    if (!data.isEstimate) {
+      const mintInfo = await this.checkMintedOut(data.tick, data.amt);
+      if (mintInfo.minted_out) {
+        return ResponseUtil.badRequest(`Token ${data.tick} already minted out`);
+      }
     }
+
+    return null;
   }
 
-  private static async validateTransfer(body: InputData): Promise<void | TXError> {
-    if (!body.fromAddress || !isValidBitcoinAddress(body.fromAddress)) {
-      return ResponseUtil.badRequest("Invalid or missing fromAddress", 400);
+  private static async validateTransfer(data: InputData): Promise<Response | null> {
+    if (!data.toAddress || !isValidBitcoinAddress(data.toAddress)) {
+      return ResponseUtil.badRequest("Invalid or missing recipient address");
     }
-    if (!body.amt || isNaN(Number(body.amt))) {
-      return ResponseUtil.badRequest("amt is required for transfer operation", 400);
+    if (!data.amt) {
+      return ResponseUtil.badRequest("Amount is required for transfer");
     }
 
-    const hasBalance = await this.checkEnoughBalance(
-      body.fromAddress,
-      body.tick,
-      body.amt.toString(),
-    );
-    if (!hasBalance) {
-      return ResponseUtil.badRequest("Insufficient balance");
+    // Skip balance check for estimation
+    if (!data.isEstimate) {
+      const hasBalance = await this.checkEnoughBalance(
+        data.sourceAddress,
+        data.tick,
+        data.amt,
+      );
+      if (!hasBalance) {
+        return ResponseUtil.badRequest("Insufficient balance");
+      }
     }
+
+    return null;
   }
 }

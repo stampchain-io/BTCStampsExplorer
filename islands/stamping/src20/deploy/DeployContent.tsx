@@ -4,9 +4,9 @@ import { useEffect, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { InputField } from "$islands/stamping/InputField.tsx";
+import { SRC20InputField } from "../SRC20InputField.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 
@@ -27,6 +27,8 @@ export function DeployContent(
     submissionMessage,
     walletError,
     apiError,
+    setApiError,
+    handleInputBlur,
   } = useSRC20Form("deploy", trxType);
 
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
@@ -123,10 +125,24 @@ export function DeployContent(
     }
 
     try {
-      // Proceed with the main deploy process regardless of file upload result
-      await handleSubmit({ fileUploaded });
+      const result = await handleSubmit({
+        fileUploaded,
+        trxType: trxType || "multisig",
+      });
+
+      if (!result?.hex) {
+        throw new Error("No transaction hex received from server");
+      }
+
+      logger.debug("stamps", {
+        message: "PSBT received from server",
+        hex: result.hex.substring(0, 100) + "...",
+      });
     } catch (error) {
       console.error("Deployment error:", error);
+      setApiError(
+        error instanceof Error ? error.message : "Unknown error occurred",
+      );
     }
   };
 
@@ -210,7 +226,7 @@ export function DeployContent(
               )}
             </div>
 
-            <InputField
+            <SRC20InputField
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
@@ -222,11 +238,12 @@ export function DeployContent(
 
           <div className="flex flex-col gap-3 mobileMd:gap-6 w-full">
             <div class="w-full flex gap-3 mobileMd:gap-6">
-              <InputField
+              <SRC20InputField
                 type="text"
                 placeholder="Token ticker name"
                 value={formState.token}
                 onChange={(e) => handleInputChange(e, "token")}
+                onBlur={() => handleInputBlur("token")}
                 error={formState.tokenError}
                 maxLength={5}
                 isUppercase
@@ -243,23 +260,25 @@ export function DeployContent(
               </button>
             </div>
 
-            <InputField
+            <SRC20InputField
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               placeholder="Limit pr. mint"
               value={formState.lim}
               onChange={(e) => handleInputChange(e, "lim")}
+              onBlur={() => handleInputBlur("lim")}
               error={formState.limError}
             />
 
-            <InputField
+            <SRC20InputField
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               placeholder="Supply"
               value={formState.max}
               onChange={(e) => handleInputChange(e, "max")}
+              onBlur={() => handleInputBlur("max")}
               error={formState.maxError}
             />
           </div>
@@ -280,13 +299,13 @@ export function DeployContent(
               rows={5}
             />
             <div className="w-full flex gap-3 mobileMd:gap-6">
-              <InputField
+              <SRC20InputField
                 type="text"
                 placeholder="X"
                 value={formState.x}
                 onChange={(e) => handleInputChange(e, "x")}
               />
-              <InputField
+              <SRC20InputField
                 type="text"
                 placeholder="Website"
                 value={formState.web}
@@ -294,13 +313,13 @@ export function DeployContent(
               />
             </div>
             <div className="w-full flex gap-3 mobileMd:gap-6">
-              <InputField
+              <SRC20InputField
                 type="text"
                 placeholder="Telegram"
                 value={formState.tg || ""}
                 onChange={(e) => handleInputChange(e, "telegram")}
               />
-              <InputField
+              <SRC20InputField
                 type="email"
                 placeholder="Email"
                 value={formState.email || ""}
@@ -312,21 +331,27 @@ export function DeployContent(
       </div>
 
       <div className={feeSelectorContainerClassName}>
-        <FeeEstimation
+        <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
           fileType="application/json"
-          fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleDeploySubmit}
           buttonName={isConnected ? "DEPLOY" : "CONNECT WALLET"}
-          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
-          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
+          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
+          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
+          userAddress={wallet?.address}
+          utxoAncestors={formState.utxoAncestors}
+          feeDetails={{
+            minerFee: formState.psbtFees?.estMinerFee || 0,
+            dustValue: formState.psbtFees?.totalDustValue || 0,
+            hasExactFees: !!formState.psbtFees?.hasExactFees,
+          }}
         />
 
         <StatusMessages

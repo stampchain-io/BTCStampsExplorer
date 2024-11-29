@@ -1,7 +1,8 @@
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { useState } from "preact/hooks";
+import { walletContext } from "$client/wallet/wallet.ts";
 
-import { FeeEstimation } from "$islands/stamping/FeeEstimation.tsx";
+import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
@@ -32,6 +33,7 @@ export function Mint101Content(
   } = useSRC20Form("transfer", trxType);
 
   const [tosAgreed, setTosAgreed] = useState(false);
+  const { wallet } = walletContext;
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -64,10 +66,10 @@ export function Mint101Content(
       </div>
 
       <div className={feeSelectorContainerClassName}>
-        <FeeEstimation
+        <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
-          type="src101-mint"
+          type="src20"
           fileType="application/json"
           fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
@@ -77,6 +79,10 @@ export function Mint101Content(
           buttonName="MINT"
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
+          userAddress={wallet?.address}
+          utxoAncestors={formState.utxoAncestors}
+          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
+          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
         />
 
         <StatusMessages

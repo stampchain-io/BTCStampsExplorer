@@ -279,23 +279,25 @@ export class StampMintService {
         difference: totalInputValue - (totalOutputValue + adjustedChange + exactFeeNeeded)
       });
 
-      // Verify final fee rate
-      const finalTotalOutputValue = totalOutputValue + (adjustedChange > 0 ? adjustedChange : 0);
-      const actualFee = totalInputValue - finalTotalOutputValue;
-      const actualFeeRate = actualFee / estimatedSize;
+      // Ensure adjustedChange is not negative
+      if (adjustedChange < 0) {
+        console.error("Adjusted change is negative, indicating insufficient funds.");
+        throw new Error("Insufficient funds to cover outputs and fees.");
+      }
 
-      console.log("Final fee verification:", {
-        requestedFeeRate: satsPerVB,
-        actualFeeRate,
-        difference: Math.abs(actualFeeRate - satsPerVB),
-        totalInputValue,
-        finalTotalOutputValue,
-        actualFee,
-        estimatedSize,
-        effectiveFeePerVbyte: actualFee / estimatedSize
-      });
+      // Add change output if adjustedChange is positive
+      if (adjustedChange > 0) {
+        vouts.push({
+          value: adjustedChange,
+          address: address,
+        });
+        console.log("Added change output:", {
+          adjustedChange,
+          finalVoutCount: vouts.length,
+          allVoutValues: vouts.map(v => v.value)
+        });
+      }
 
-      // Before adding outputs
       console.log("Preparing to add outputs:", {
         outputCount: vouts.length,
         outputs: vouts.map(out => ({
@@ -307,6 +309,36 @@ export class StampMintService {
             'N/A'
         }))
       });
+
+      // Add outputs to PSBT
+      for (const out of vouts) {
+        try {
+          if ("script" in out) {
+            // For script-based outputs
+            psbt.addOutput({
+              script: out.script instanceof Uint8Array ? 
+                out.script : 
+                new Uint8Array(out.script),
+              value: BigInt(out.value),
+            });
+          } else if ("address" in out && out.address) {
+            // For address-based outputs
+            psbt.addOutput({
+              address: out.address,
+              value: BigInt(out.value),
+            });
+          } else {
+            console.error("Invalid output:", out);
+            throw new Error("Invalid output format");
+          }
+        } catch (error) {
+          console.error("Error adding output:", {
+            output: out,
+            error: error instanceof Error ? error.message : String(error)
+          });
+          throw error;
+        }
+      }
 
       // Add inputs to PSBT
       for (const input of inputs) {
@@ -344,48 +376,23 @@ export class StampMintService {
         psbt.addInput(psbtInput);
       }
 
-      // Add outputs
-      for (const out of vouts) {
-        try {
-          if ("script" in out) {
-            // For script-based outputs, ensure script is Uint8Array
-            psbt.addOutput({
-              script: out.script instanceof Uint8Array ? 
-                out.script : 
-                new Uint8Array(out.script),
-              value: BigInt(out.value),
-            });
-          } else if ("address" in out && out.address) {
-            // For address-based outputs
-            psbt.addOutput({
-              address: out.address,
-              value: BigInt(out.value),
-            });
-          } else {
-            console.error("Invalid output:", out);
-            throw new Error("Invalid output format");
-          }
-        } catch (error) {
-          console.error("Error adding output:", {
-            output: out,
-            error: error instanceof Error ? error.message : String(error)
-          });
-          throw error;
-        }
-      }
+      // Recalculate finalTotalOutputValue to include change output
+      const finalTotalOutputValue = totalOutputValue + (adjustedChange > 0 ? adjustedChange : 0);
 
-      // Add change output last (after all other outputs)
-      if (adjustedChange > 0) {
-        vouts.push({
-          value: adjustedChange,
-          address: address,
-        });
-        console.log("Added change output:", {
-          adjustedChange,
-          finalVoutCount: vouts.length,
-          allVoutValues: vouts.map(v => v.value)
-        });
-      }
+      // Verify final fee rate (after including change output)
+      const actualFee = totalInputValue - finalTotalOutputValue;
+      const actualFeeRate = actualFee / estimatedSize;
+
+      console.log("Final fee verification:", {
+        requestedFeeRate: satsPerVB,
+        actualFeeRate,
+        difference: Math.abs(actualFeeRate - satsPerVB),
+        totalInputValue,
+        finalTotalOutputValue,
+        actualFee,
+        estimatedSize,
+        effectiveFeePerVbyte: actualFee / estimatedSize
+      });
 
       // Final transaction summary
       console.log("Final transaction structure:", {

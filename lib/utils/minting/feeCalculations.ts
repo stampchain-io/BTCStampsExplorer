@@ -6,7 +6,7 @@ import type {
   ScriptType,
   TransactionInput,
   TransactionOutput,
-} from "$types/index.d.ts";
+} from "$lib/types/index.d.ts";
 import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
 
 // Frontend-specific calculations
@@ -30,18 +30,14 @@ export function estimateFee(
   outputs: Output[],
   feeRate: number,
   inputCount = 1,
-  inputType: ScriptType = "P2WPKH",
+  utxoAncestors?: AncestorInfo[],
 ): number {
-  const txSize = estimateTransactionSize({
-    inputs: Array(inputCount).fill({ type: inputType }),
-    outputs: outputs.map((output) => ({
-      type: determineOutputType(output),
-    })),
-    includeChangeOutput: true,
-    changeOutputType: inputType, // Match change type to input type
-  });
+  // Consider ancestors in fee calculation
+  const ancestorFees =
+    utxoAncestors?.reduce((sum, info) => sum + (info.fees || 0), 0) || 0;
+  const baseEstimate = calculateBaseFee(outputs, feeRate, inputCount);
 
-  return Math.ceil(txSize * feeRate);
+  return baseEstimate + ancestorFees;
 }
 
 // Calculate actual fee rate considering ancestors
@@ -133,4 +129,23 @@ export function calculateP2WSHMiningFee(
       changeOutputType: "P2WPKH",
     },
   );
+}
+
+// Add this function for basic fee calculation
+function calculateBaseFee(
+  outputs: Output[],
+  feeRate: number,
+  inputCount = 1,
+  inputType: ScriptType = "P2WPKH",
+): number {
+  const txSize = estimateTransactionSize({
+    inputs: Array(inputCount).fill({ type: inputType }),
+    outputs: outputs.map((output) => ({
+      type: determineOutputType(output),
+    })),
+    includeChangeOutput: true,
+    changeOutputType: inputType,
+  });
+
+  return Math.ceil(txSize * feeRate);
 }

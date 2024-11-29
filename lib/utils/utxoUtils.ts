@@ -113,7 +113,7 @@ function formatUTXOs(data: any[], address: string): UTXO[] | null {
         index: tx.tx_index ?? vout,
       };
 
-      console.log("Formatted UTXO:", formattedUtxo);
+      console.debug("Formatted UTXO:", formattedUtxo);
       return formattedUtxo;
     }).filter((utxo): utxo is UTXO => {
       if (!utxo) return false;
@@ -135,7 +135,7 @@ function formatUTXOs(data: any[], address: string): UTXO[] | null {
       return true;
     });
 
-    console.log(
+    console.debug(
       `Final formatted UTXOs (${formattedUtxos.length}):`,
       formattedUtxos,
     );
@@ -432,7 +432,7 @@ Retries: ${retries}
             };
 
             const formattedUtxos = formatUTXOs([utxoData], address);
-            console.log(">>> BLOCKSTREAM: Formatted UTXOs:", formattedUtxos);
+            console.debug(">>> BLOCKSTREAM: Formatted UTXOs:", formattedUtxos);
 
             const result: TxInfo = {
               utxo: formattedUtxos?.[0],
@@ -490,7 +490,7 @@ Retries: ${retries}
             };
 
             const formattedUtxos = formatUTXOs([utxoData], address);
-            console.log(">>> BLOCKCHAIN: Formatted UTXOs:", formattedUtxos);
+            console.debug(">>> BLOCKCHAIN: Formatted UTXOs:", formattedUtxos);
 
             return { utxo: formattedUtxos?.[0] };
           } else {
@@ -544,7 +544,7 @@ Retries: ${retries}
             };
 
             const formattedUtxos = formatUTXOs([utxoData], address);
-            console.log(">>> BLOCKCYPHER: Formatted UTXOs:", formattedUtxos);
+            console.debug(">>> BLOCKCYPHER: Formatted UTXOs:", formattedUtxos);
 
             return { utxo: formattedUtxos?.[0] };
           } else {
