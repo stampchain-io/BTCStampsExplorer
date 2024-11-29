@@ -187,7 +187,7 @@ export function StampImage(
                 src={src}
                 loading="lazy"
                 alt={`Stamp No. ${stamp.stamp}`}
-                className="max-w-none object-contain rounded-sm pixelart stamp-image"
+                className="max-w-none object-contain rounded-sm pixelart stamp-image h-full w-full"
                 onError={handleImageError}
               />
             </div>,
