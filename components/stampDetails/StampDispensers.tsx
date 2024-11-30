@@ -28,39 +28,41 @@ const tableHeaders = [
   { key: "closeBlock", label: "Closed" },
 ];
 
-const tableTextClassName =
-  "w-full text-sm mobileLg:text-base text-stamp-grey-light font-light";
-const dataLabelClassName =
-  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+const tableLabelClassName =
+  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+const tableValueClassName =
+  "w-full text-xs mobileLg:text-sm text-stamp-grey-light font-normal";
 
 function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
   const isClosedDispenser = dispenser.close_block_index > 0;
-  const rowClassName = isClosedDispenser ? "text-[#666666]" : "";
+  const rowClassName = isClosedDispenser ? "text-stamp-grey-darker" : "";
 
   return (
     <tr class={rowClassName}>
-      <td className="text-left w-full">
+      <td className="text-left py-0">
         {formatSatoshisToBTC(dispenser.satoshirate)}
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         {formatNumber(dispenser.escrow_quantity, 0)}
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         {formatNumber(dispenser.give_quantity, 0)}
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         {formatNumber(dispenser.give_remaining, 0)}
       </td>
-      <td className="text-center">
-        <span className="hidden tablet:inline">{dispenser.source}</span>
-        <span className="inline tablet:hidden">
-          {abbreviateAddress(dispenser.source)}
+      <td className="text-center py-0">
+        <span className="tablet:hidden">
+          {abbreviateAddress(dispenser.source, 4)}
+        </span>
+        <span className="hidden tablet:inline">
+          {abbreviateAddress(dispenser.source, 8)}
         </span>
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         {dispenser.confirmed ? "YES" : "NO"}
       </td>
-      <td className="text-right">
+      <td className="text-right py-0">
         {!dispenser.close_block_index || dispenser.close_block_index <= 0
           ? "OPEN"
           : dispenser.close_block_index}
@@ -78,15 +80,15 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
   return (
     <div className="relative max-w-full">
       <div className="max-h-96 overflow-x-auto">
-        <table class={`${tableTextClassName} w-full table-fixed`}>
+        <table class={`${tableValueClassName} w-full table-fixed`}>
           <colgroup>
-            <col class="w-[16%] tablet:w-[12%]" /> {/* Price */}
-            <col class="w-[12%] tablet:w-[8%]" /> {/* Escrow */}
-            <col class="w-[12%] tablet:w-[8%]" /> {/* Give */}
-            <col class="w-[12%] tablet:w-[8%]" /> {/* Remain */}
-            <col class="w-[18%] tablet:w-[42%]" /> {/* Address column */}
-            <col class="w-[16%] tablet:w-[12%]" /> {/* Confirmed */}
-            <col class="w-[14%] tablet:w-[10%]" /> {/* Closed */}
+            <col class="w-[16%] tablet:w-[14%]" /> {/* Price */}
+            <col class="w-[12%] tablet:w-[10%]" /> {/* Escrow */}
+            <col class="w-[12%] tablet:w-[10%]" /> {/* Give */}
+            <col class="w-[12%] tablet:w-[10%]" /> {/* Remain */}
+            <col class="w-[20%] tablet:w-[28%]" /> {/* Address column */}
+            <col class="w-[14%] tablet:w-[14%]" /> {/* Confirmed */}
+            <col class="w-[14%] tablet:w-[14%]" /> {/* Closed */}
           </colgroup>
           <thead>
             <tr>
@@ -94,7 +96,7 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
                 <th
                   key={key}
                   scope="col"
-                  class={`${dataLabelClassName} ${
+                  class={`${tableLabelClassName} pb-1.5 ${
                     key === "price"
                       ? "text-left"
                       : key === "closeBlock"

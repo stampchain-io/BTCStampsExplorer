@@ -50,6 +50,10 @@ export function HoldersGraph(
     );
   }
 
+  const tableLabelClassName =
+    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+  const tableValueClassName =
+    "w-full text-xs mobileLg:text-sm text-stamp-grey-light font-normal";
   const totalHolders = holders.length;
 
   return (
@@ -69,14 +73,14 @@ export function HoldersGraph(
 
         <div className="relative w-full max-w-full">
           <div className="max-h-64 overflow-x-auto p-6">
-            <table className="w-full text-sm mobileLg:text-base text-left text-stamp-grey-light">
-              <thead className="text-base mobileLg:text-lg text-stamp-grey-darker font-light uppercase">
+            <table className={tableValueClassName}>
+              <thead className={tableLabelClassName}>
                 <tr>
                   {tableHeaders.map(({ key, label }) => (
                     <th
                       key={key}
                       scope="col"
-                      class={`py-0 mobileLg:py-1 font-light ${
+                      class={`${tableLabelClassName} pb-1.5 ${
                         key === "address"
                           ? "text-left"
                           : key === "percent"

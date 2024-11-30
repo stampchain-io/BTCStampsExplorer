@@ -23,30 +23,52 @@ const tableHeaders = [
   { key: "created", label: "Created" },
 ];
 
-const tableTextClassName =
-  "w-full text-sm mobileLg:text-base text-stamp-grey-light font-light";
-const dataLabelClassName =
-  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+const tableLabelClassName =
+  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+const tableValueClassName =
+  "w-full text-xs mobileLg:text-sm text-stamp-grey-light font-normal";
 
 function TransferRow({ send }: { send: SendRow }) {
   return (
     <tr key={send.tx_hash}>
-      <td className="text-left w-full">
-        {send.source ? abbreviateAddress(send.source) : "NULL"}
+      <td className="text-left py-0">
+        {send.source
+          ? (
+            <>
+              <span className="tablet:hidden">
+                {abbreviateAddress(send.source, 4)}
+              </span>
+              <span className="hidden tablet:inline">
+                {abbreviateAddress(send.source, 6)}
+              </span>
+            </>
+          )
+          : "NULL"}
       </td>
-      <td className="text-center">
-        {send.destination ? abbreviateAddress(send.destination) : "NULL"}
+      <td className="text-center py-0">
+        {send.destination
+          ? (
+            <>
+              <span className="tablet:hidden">
+                {abbreviateAddress(send.destination, 4)}
+              </span>
+              <span className="hidden tablet:inline">
+                {abbreviateAddress(send.destination, 6)}
+              </span>
+            </>
+          )
+          : "NULL"}
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         {send.quantity}
       </td>
-      <td className="text-center uppercase">
+      <td className="text-center uppercase py-0">
         {send.memo || "transfer"}
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         {abbreviateAddress(send.tx_hash)}
       </td>
-      <td className="text-right uppercase">
+      <td className="text-right uppercase py-0">
         {formatDate(new Date(send.block_time), {
           includeRelative: false,
         })}
@@ -59,7 +81,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
   return (
     <div className="relative max-w-full">
       <div className="max-h-96 overflow-x-auto">
-        <table className={`${tableTextClassName} w-full table-fixed`}>
+        <table className={`${tableValueClassName} w-full table-fixed`}>
           <colgroup>
             <col className="w-[20%]" /> {/* From column */}
             <col className="w-[20%]" /> {/* To */}
@@ -74,7 +96,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                 <th
                   key={key}
                   scope="col"
-                  className={`${dataLabelClassName} ${
+                  className={`${tableLabelClassName} ${
                     key === "from"
                       ? "text-left"
                       : key === "created"
