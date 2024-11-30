@@ -220,6 +220,10 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
       }
     }
   };
+  const dataLabelClassName =
+    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+  const dataValueXLlinkClassName =
+    "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
 
   // Update getTabsWithCounts to use totalCounts
   function getTabsWithCounts() {
@@ -230,7 +234,7 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
           <div class="flex flex-col text-left">
             DISPENSERS
             <div
-              class={`text-2xl mobileLg:text-3xl font-black -mt-1 ${
+              class={`${dataValueXLlinkClassName} ${
                 selectedTab === "dispensers"
                   ? "text-stamp-grey-light"
                   : "text-stamp-grey-darker"
@@ -247,7 +251,7 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
           <div class="flex flex-col text-center">
             SALES
             <div
-              class={`text-2xl mobileLg:text-3xl font-black -mt-1 ${
+              class={`${dataValueXLlinkClassName} ${
                 selectedTab === "sales"
                   ? "text-stamp-grey-light"
                   : "text-stamp-grey-darker"
@@ -264,7 +268,7 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
           <div class="flex flex-col text-right">
             TRANSFERS
             <div
-              class={`text-2xl mobileLg:text-3xl font-black -mt-1 ${
+              class={`${dataValueXLlinkClassName} ${
                 selectedTab === "transfers"
                   ? "text-stamp-grey-light"
                   : "text-stamp-grey-darker"

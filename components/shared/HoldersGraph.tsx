@@ -50,19 +50,23 @@ export function HoldersGraph(
     );
   }
 
+  const dataLabelClassName =
+    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+  const dataValueXLClassName =
+    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
   const tableLabelClassName =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
   const tableValueClassName =
-    "w-full text-xs mobileLg:text-sm text-stamp-grey-light font-normal";
+    "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
   const totalHolders = holders.length;
 
   return (
-    <div className="flex flex-col bg-gradient-to-br primary-gradient p-0 pt-24 relative">
+    <div className="flex flex-col dark-gradient p-0 pt-24 relative">
       <div className="absolute top-6 right-6 text-right">
-        <p className="text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+        <p className={dataLabelClassName}>
           HOLDERS
         </p>
-        <p className="text-2xl mobileLg:text-3xl text-stamp-grey-light font-black -mt-1">
+        <p className={dataValueXLClassName}>
           {totalHolders}
         </p>
       </div>

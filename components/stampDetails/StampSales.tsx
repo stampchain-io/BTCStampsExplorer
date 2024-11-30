@@ -27,7 +27,7 @@ const tableHeaders = [
 const tableLabelClassName =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
 const tableValueClassName =
-  "w-full text-xs mobileLg:text-sm text-stamp-grey-light font-normal";
+  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 
 function DispenseRow({ dispense }: { dispense: Dispense }) {
   return (
