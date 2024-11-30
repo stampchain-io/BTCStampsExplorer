@@ -19,8 +19,8 @@ const tableHeaders = [
   { key: "to", label: "To" },
   { key: "quantity", label: "Quantity" },
   { key: "memo", label: "Memo" },
-  { key: "txHash", label: "Tx hash" },
-  { key: "created", label: "Created" },
+  { key: "txHash", label: "Tx Hash" },
+  { key: "created", label: "Date" },
 ];
 
 const tableLabelClassName =
@@ -83,12 +83,12 @@ export function StampTransfers({ sends }: StampTransfersProps) {
       <div className="max-h-96 overflow-x-auto">
         <table className={`${tableValueClassName} w-full table-fixed`}>
           <colgroup>
-            <col className="w-[20%]" /> {/* From column */}
-            <col className="w-[20%]" /> {/* To */}
-            <col className="w-[20%]" /> {/* Quantity */}
-            <col className="w-[20%]" /> {/* Memo */}
-            <col className="w-[20%]" /> {/* Tx hash */}
-            <col className="w-[20%]" /> {/* Created */}
+            <col className="w-[18%]" /> {/* From column */}
+            <col className="w-[18%]" /> {/* To */}
+            <col className="w-[10%]" /> {/* Quantity */}
+            <col className="w-[18%]" /> {/* Memo */}
+            <col className="w-[18%]" /> {/* Tx hash */}
+            <col className="w-[18%]" /> {/* Created */}
           </colgroup>
           <thead>
             <tr>
