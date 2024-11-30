@@ -20,35 +20,36 @@ const tableHeaders = [
   { key: "from", label: "From" },
   { key: "to", label: "To" },
   { key: "quantity", label: "Quantity" },
-  { key: "price", label: "Price (BTC)" },
+  { key: "price", label: "Price" },
   { key: "confirmed", label: "Confirmed" },
-  { key: "closeBlock", label: "Close Block" },
 ];
+
+const tableTextClassName =
+  "w-full text-sm mobileLg:text-base text-stamp-grey-light font-light";
+const dataLabelClassName =
+  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
 
 function DispenseRow({ dispense }: { dispense: Dispense }) {
   return (
     <tr>
-      <td className="pr-3 tablet:pr-6 py-2 tablet:py-4">
+      <td className="text-left w-full">
         <a href={`/wallet/${dispense.source}`}>
           {abbreviateAddress(dispense.source)}
         </a>
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4">
+      <td className="text-center">
         <a href={`/wallet/${dispense.destination}`}>
           {abbreviateAddress(dispense.destination)}
         </a>
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
+      <td className="text-center">
         {dispense.dispense_quantity}
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
+      <td className="text-center">
         {formatSatoshisToBTC(dispense.satoshirate)}
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
-        {dispense.confirmed ? "Yes" : "No"}
-      </td>
-      <td className="pl-3 tablet:pl-6 py-2 tablet:py-4 text-sm">
-        {dispense.close_block_index}
+      <td className="text-right">
+        {dispense.confirmed ? "YES" : "NO"}
       </td>
     </tr>
   );
@@ -58,20 +59,27 @@ export function StampSales({ dispenses }: StampSalesProps) {
   return (
     <div className="relative shadow-md max-w-full">
       <div className="max-h-96 overflow-x-auto">
-        <table className="w-full text-sm text-left rtl:text-right text-[#666666] mobileLg:rounded-lg">
-          <thead className="text-lg uppercase">
+        <table className={`${tableTextClassName} w-full table-fixed`}>
+          <colgroup>
+            <col className="w-[20%]" /> {/* From column */}
+            <col className="w-[20%]" /> {/* To */}
+            <col className="w-[20%]" /> {/* Quantity */}
+            <col className="w-[20%]" /> {/* Price */}
+            <col className="w-[20%]" /> {/* Confirmed */}
+          </colgroup>
+          <thead>
             <tr>
               {tableHeaders.map(({ key, label }) => (
                 <th
                   key={key}
                   scope="col"
-                  className={`${
+                  className={`${dataLabelClassName} ${
                     key === "from"
-                      ? "pr-3 tablet:pr-6"
-                      : key === "closeBlock"
-                      ? "pl-3 tablet:pl-6"
-                      : "px-3 tablet:px-6"
-                  } py-1 tablet:py-3 font-light`}
+                      ? "text-left"
+                      : key === "confirmed"
+                      ? "text-right"
+                      : "text-center"
+                  }`}
                 >
                   {label}
                 </th>

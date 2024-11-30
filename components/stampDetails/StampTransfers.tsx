@@ -23,27 +23,32 @@ const tableHeaders = [
   { key: "created", label: "Created" },
 ];
 
+const tableTextClassName =
+  "w-full text-sm mobileLg:text-base text-stamp-grey-light font-light";
+const dataLabelClassName =
+  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+
 function TransferRow({ send }: { send: SendRow }) {
   return (
     <tr key={send.tx_hash}>
-      <td className="pr-3 tablet:pr-6 py-2 tablet:py-4">
+      <td className="text-left w-full">
         {send.source ? abbreviateAddress(send.source) : "NULL"}
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4">
+      <td className="text-center">
         {send.destination ? abbreviateAddress(send.destination) : "NULL"}
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
+      <td className="text-center">
         {send.quantity}
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
+      <td className="text-center uppercase">
         {send.memo || "transfer"}
       </td>
-      <td className="px-3 tablet:px-6 py-2 tablet:py-4 text-sm">
+      <td className="text-center">
         {abbreviateAddress(send.tx_hash)}
       </td>
-      <td className="pl-3 tablet:pl-6 py-2 tablet:py-4 text-sm">
+      <td className="text-right uppercase">
         {formatDate(new Date(send.block_time), {
-          includeRelative: true,
+          includeRelative: false,
         })}
       </td>
     </tr>
@@ -52,22 +57,30 @@ function TransferRow({ send }: { send: SendRow }) {
 
 export function StampTransfers({ sends }: StampTransfersProps) {
   return (
-    <div className="relative shadow-md max-w-full">
+    <div className="relative max-w-full">
       <div className="max-h-96 overflow-x-auto">
-        <table className="w-full text-sm text-left rtl:text-right text-[#666666] mobileLg:rounded-lg">
-          <thead className="text-lg uppercase">
+        <table className={`${tableTextClassName} w-full table-fixed`}>
+          <colgroup>
+            <col className="w-[20%]" /> {/* From column */}
+            <col className="w-[20%]" /> {/* To */}
+            <col className="w-[20%]" /> {/* Quantity */}
+            <col className="w-[20%]" /> {/* Memo */}
+            <col className="w-[20%]" /> {/* Tx hash */}
+            <col className="w-[20%]" /> {/* Created */}
+          </colgroup>
+          <thead>
             <tr>
               {tableHeaders.map(({ key, label }) => (
                 <th
                   key={key}
                   scope="col"
-                  className={`${
+                  className={`${dataLabelClassName} ${
                     key === "from"
-                      ? "pr-6"
+                      ? "text-left"
                       : key === "created"
-                      ? "pl-6"
-                      : "px-6"
-                  } py-3 font-light`}
+                      ? "text-right"
+                      : "text-center"
+                  }`}
                 >
                   {label}
                 </th>
