@@ -52,18 +52,21 @@ export function SRC20TX(props: SRC20TXProps) {
     if (type === "TRANSFER") {
       return (
         <tr class="w-full table table-fixed">
-          <th scope="col" class="px-6 py-3">from</th>
-          <th scope="col" class="px-6 py-3">to</th>
-          <th scope="col" class="px-6 py-3">amount</th>
-          <th scope="col" class="px-6 py-3">date</th>
+          <th scope="col" class="px-6 py-3">From</th>
+          <th scope="col" class="px-6 py-3">To</th>
+          <th scope="col" class="px-6 py-3">Amount</th>
+          <th scope="col" class="px-6 py-3">Tx Hash</th>
+          <th scope="col" class="px-6 py-3">Date</th>
         </tr>
       );
     } else if (type === "MINT") {
       return (
         <tr class="w-full table table-fixed">
-          <th scope="col" class="px-6 py-3">block</th>
-          <th scope="col" class="px-6 py-3">address</th>
-          <th scope="col" class="px-6 py-3">amount</th>
+          <th scope="col" class="px-6 py-3">Block</th>
+          <th scope="col" class="px-6 py-3">Address</th>
+          <th scope="col" class="px-6 py-3">Amount</th>
+          <th scope="col" class="px-6 py-3">Tx Hash</th>
+          <th scope="col" class="px-6 py-3">Date</th>
         </tr>
       );
     }
@@ -84,7 +87,10 @@ export function SRC20TX(props: SRC20TXProps) {
 
       if (type === "TRANSFER") {
         return (
-          <tr key={tx.tx_hash} class="w-full table table-fixed text-xs">
+          <tr
+            key={tx.tx_hash}
+            class="w-full table table-fixed text-xs mobileLg:text-sm font-normal text-stamp-grey-light"
+          >
             <td class="px-3 py-2">{abbreviateAddress(tx.creator)}</td>
             <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
             <td class="px-3 py-2">{formattedAmt}</td>
