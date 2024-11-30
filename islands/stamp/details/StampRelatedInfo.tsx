@@ -11,14 +11,6 @@ interface StampRelatedInfoProps {
 
 type TabType = "dispensers" | "sales" | "transfers";
 
-const tabs: Array<{ id: TabType; label: string }> = [
-  { id: "dispensers", label: "DISPENSERS" },
-  { id: "sales", label: "SALES" },
-  { id: "transfers", label: "TRANSFERS" },
-];
-
-const PAGE_SIZE = 20;
-
 // Move rate calculation to frontend
 function mapDispensesWithRates(dispenses: any[], dispensers: any[]) {
   if (!dispenses || !dispensers) return [];
@@ -33,6 +25,17 @@ function mapDispensesWithRates(dispenses: any[], dispensers: any[]) {
   }));
 }
 
+// Remove the static tabs array and create a function to get tabs with counts
+function getTabsWithCounts(dispensers: any[], dispenses: any[], sends: any[]) {
+  return [
+    { id: "dispensers", label: `DISPENSERS (${dispensers.length})` },
+    { id: "sales", label: `SALES (${dispenses.length})` },
+    { id: "transfers", label: `TRANSFERS (${sends.length})` },
+  ] as const;
+}
+
+const PAGE_SIZE = 20;
+
 export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
   const [selectedTab, setSelectedTab] = useState<TabType>("dispensers");
   const [dispensers, setDispensers] = useState<any[]>([]);
@@ -44,11 +47,49 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
+  // Add new state for total counts
+  const [totalCounts, setTotalCounts] = useState({
+    dispensers: 0,
+    sales: 0,
+    transfers: 0,
+  });
+
   const fetchData = async (pageNum: number) => {
     if (isLoading || !hasMore) return;
 
     setIsLoading(true);
     try {
+      const encodedCpid = encodeURIComponent(cpid);
+
+      // Fetch total counts if it's the first page
+      if (pageNum === 1) {
+        const countParams = new URLSearchParams({
+          limit: "1",
+          sort: "DESC",
+        });
+
+        // Fetch counts for all tabs
+        const [dispensersCount, salesCount, transfersCount] = await Promise.all(
+          [
+            fetch(`/api/v2/stamps/${encodedCpid}/dispensers?${countParams}`),
+            fetch(`/api/v2/stamps/${encodedCpid}/dispenses?${countParams}`),
+            fetch(`/api/v2/stamps/${encodedCpid}/sends?${countParams}`),
+          ],
+        );
+
+        const [dispensersData, salesData, transfersData] = await Promise.all([
+          dispensersCount.json(),
+          salesCount.json(),
+          transfersCount.json(),
+        ]);
+
+        setTotalCounts({
+          dispensers: dispensersData.total || 0,
+          sales: salesData.total || 0,
+          transfers: transfersData.total || 0,
+        });
+      }
+
       console.log(`Fetching ${selectedTab} data for page ${pageNum}`);
       const params = new URLSearchParams({
         page: pageNum.toString(),
@@ -56,7 +97,6 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
         sort: "DESC",
       });
 
-      const encodedCpid = encodeURIComponent(cpid);
       let response;
 
       switch (selectedTab) {
@@ -181,14 +221,71 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
     }
   };
 
+  // Update getTabsWithCounts to use totalCounts
+  function getTabsWithCounts() {
+    return [
+      {
+        id: "dispensers",
+        label: (
+          <div class="flex flex-col text-left">
+            DISPENSERS
+            <div
+              class={`text-2xl mobileLg:text-3xl font-black -mt-1 ${
+                selectedTab === "dispensers"
+                  ? "text-stamp-grey-light"
+                  : "text-stamp-grey-darker"
+              } group-hover:text-stamp-grey-light`}
+            >
+              {totalCounts.dispensers}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "sales",
+        label: (
+          <div class="flex flex-col text-center">
+            SALES
+            <div
+              class={`text-2xl mobileLg:text-3xl font-black -mt-1 ${
+                selectedTab === "sales"
+                  ? "text-stamp-grey-light"
+                  : "text-stamp-grey-darker"
+              } group-hover:text-stamp-grey-light`}
+            >
+              {totalCounts.sales}
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "transfers",
+        label: (
+          <div class="flex flex-col text-right">
+            TRANSFERS
+            <div
+              class={`text-2xl mobileLg:text-3xl font-black -mt-1 ${
+                selectedTab === "transfers"
+                  ? "text-stamp-grey-light"
+                  : "text-stamp-grey-darker"
+              } group-hover:text-stamp-grey-light`}
+            >
+              {totalCounts.transfers}
+            </div>
+          </div>
+        ),
+      },
+    ] as const;
+  }
+
   return (
     <div class="dark-gradient p-3 mobileMd:p-6">
-      <div class="flex justify-between w-full overflow-y-auto text-base mobileLg:text-lg text-stamp-grey-darker font-light">
-        {tabs.map(({ id, label }) => (
+      <div class="flex justify-between w-full overflow-y-auto text-base mobileLg:text-lg text-stamp-grey-darker font-light pb-6">
+        {getTabsWithCounts().map(({ id, label }) => (
           <p
             key={id}
-            class={`cursor-pointer pb-4 hover:text-stamp-purple-highlight ${
-              selectedTab === id ? "text-stamp-grey font-bold" : ""
+            class={`cursor-pointer pb-4 hover:text-stamp-grey-light group ${
+              selectedTab === id ? "text-stamp-grey-darker" : ""
             }`}
             onClick={() => setSelectedTab(id)}
           >
@@ -196,9 +293,9 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
           </p>
         ))}
       </div>
-      <div onScroll={handleScroll} class="overflow-y-auto max-h-[600px]">
+      <div onScroll={handleScroll} class="overflow-y-auto max-h-48">
         {renderTabContent()}
-        {isLoading && <div class="text-center p-4">Loading...</div>}
+        {isLoading && <div class="text-center p-6">Loading...</div>}
       </div>
     </div>
   );
