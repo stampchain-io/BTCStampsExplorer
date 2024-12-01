@@ -1,5 +1,4 @@
-import PieChart from "$components/shared/PieChart.tsx";
-
+import { HoldersPieChart } from "../../islands/charts/HoldersPieChart.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 interface Holder {
@@ -72,7 +71,7 @@ export function HoldersGraph(
       </div>
       <div className="flex flex-col tablet:flex-row w-full gap-6">
         <div className="mt-6 tablet:-mt-24 flex justify-center tablet:justify-start">
-          <PieChart holders={holders} />
+          <HoldersPieChart holders={holders} />
         </div>
 
         <div className="relative w-full max-w-full">
