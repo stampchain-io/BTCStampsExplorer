@@ -122,7 +122,13 @@ function WalletTransferModal({
                 className="w-full h-full object-contain"
               />
             )
-            : <span className="text-white">Select Stamp</span>}
+            : (
+              <img
+                src="/img/stamping/image-upload.svg"
+                class="w-12 h-12"
+                alt=""
+              />
+            )}
         </div>
 
         <div className="flex  w-1/2 flex-col gap-4">
