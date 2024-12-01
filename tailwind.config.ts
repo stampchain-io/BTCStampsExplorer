@@ -136,6 +136,8 @@ export default {
         "slide-content":
           "linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))",
         "gradient-top": "var(--gradient-top)",
+        "gradient-filters":
+          "linear-gradient(to bottom, #080808 100%, #080808 80%",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",

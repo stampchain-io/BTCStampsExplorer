@@ -31,10 +31,6 @@ export function Filter({
   const [localFilters, setLocalFilters] = useState<FilterTypes[]>(initFilter);
   const { updateURL } = useURLUpdate();
 
-  const toggle = () => {
-    handleOpen(!open);
-  };
-
   useEffect(() => {
     setLocalFilters(initFilter);
   }, [initFilter]);
@@ -53,7 +49,7 @@ export function Filter({
     <div
       class={`${
         open ? "" : "cursor-pointer"
-      } border-2 border-[#8800CC] bg-transparent rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
+      } border-2 border-[#8800CC] bg-gradient-filters rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
         open ? "px-6 py-4" : "p-[10px]"
       }`}
       onClick={() => {
