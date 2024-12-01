@@ -59,7 +59,7 @@ export class CollectionRepository {
       rows: results.rows.map((row: any) => ({
         ...row,
         creators: row.creators ? row.creators.split(',') : [],
-        stamp_numbers: row.stamp_numbers ? row.stamp_numbers.split(',').map(Number) : [],
+        stamps: row.stamp_numbers ? row.stamp_numbers.split(',').map(Number) : [],
       })),
     };
   }

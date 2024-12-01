@@ -2899,7 +2899,7 @@ components:
       properties:
         block_info:
           $ref: "#/components/schemas/BlockRow"
-        issuances:
+        data:
           type: array
           items:
             $ref: "#/components/schemas/BlockStampRow"
@@ -3079,7 +3079,7 @@ components:
           type: integer
         total_editions:
           type: number
-        stamp_numbers:
+        stamps:
           type: array
           items:
             type: integer
