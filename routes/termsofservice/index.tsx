@@ -698,7 +698,7 @@ export default function TermsOfService() {
           Stampchain<br />
           __________<br />
           United States<br />
-          mail@stampchain.io
+          contact@stampchain.io
         </section>
 
         These terms of use were created using Termly's Terms and Conditions

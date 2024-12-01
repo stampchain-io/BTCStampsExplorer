@@ -9,7 +9,7 @@ info:
   contact:
     name: Stampchain Support
     url: https://stampchain.io
-    email: support@stampchain.io
+    email: api@stampchain.io
 tags:
   - name: System
     description: System-level endpoints for health and version checks
@@ -312,13 +312,13 @@ paths:
 
   /api/v2/balance/{address}:
     get:
-      operationId: getCombinedBalance
+      operationId: getAddressBalance
       tags:
         - Balance
       summary: Get combined stamp and SRC-20 balances
       description: |
         Convenience endpoint that combines stamp and SRC-20 balance data in a single request.
-        For better performance, consider using the dedicated endpoints:
+        For better performance and pagination control, consider using the dedicated endpoints:
         - /api/v2/stamps/balance/{address}
         - /api/v2/src20/balance/{address}
       parameters:
@@ -334,54 +334,20 @@ paths:
           schema:
             type: integer
             default: 50
-          description: Number of records per page for each balance type
+          description: Number of records per page 
         - in: query
           name: page
           schema:
             type: integer
             default: 1
           description: Page number for pagination
-        - in: query
-          name: redirect
-          schema:
-            type: boolean
-            default: false
-          description: If true, redirects to stamps balance endpoint
       responses:
         "200":
           description: Successful response with combined balances
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      stamps:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/StampBalance"
-                      src20:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/Src20Detail"
-                  pagination:
-                    type: object
-                    properties:
-                      stamps:
-                        $ref: "#/components/schemas/Pagination"
-                      src20:
-                        $ref: "#/components/schemas/Pagination"
-                  _info:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                      stampEndpoint:
-                        type: string
-                      src20Endpoint:
-                        type: string
+                $ref: "#/components/schemas/PaginatedBalanceResponseBody"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -2856,8 +2822,6 @@ components:
           properties:
             last_block:
               type: number
-            btc:
-              $ref: "#/components/schemas/BtcInfo"
             data:
               type: object
               properties:

@@ -32,6 +32,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         page = DEFAULT_PAGINATION.page,
       } = pagination;
 
+      // Use full limit for both endpoints to ensure we get all available data
       const [stampsRes, src20Res] = await Promise.all([
         fetch(
           `${url.origin}/api/v2/stamps/balance/${address}?limit=${limit}&page=${page}`,
@@ -52,30 +53,21 @@ export const handler: Handlers<AddressHandlerContext> = {
           new Response("No data found", { status: 404 });
       }
 
+      // Calculate combined totals
+      const totalItems = (stamps.total || 0) + (src20.total || 0);
+      const totalPages = Math.ceil(totalItems / limit);
+
+      // Format response to match old schema
       const response = {
-        data: {
-          stamps: stamps.data,
-          src20: src20.data,
-        },
-        pagination: {
-          stamps: {
-            page: stamps.page,
-            limit: stamps.limit,
-            total: stamps.total,
-            totalPages: stamps.totalPages,
-          },
-          src20: {
-            page: src20.page,
-            limit: src20.limit,
-            total: src20.total,
-            totalPages: src20.totalPages,
-          },
-        },
-        _info: {
-          message: "Consider using dedicated endpoints for better performance",
-          stampEndpoint: `/api/v2/stamps/balance/${address}`,
-          src20Endpoint: `/api/v2/src20/balance/${address}`,
-        },
+        page: page,
+        limit: limit,
+        totalPages: totalPages,
+        total: totalItems,
+        last_block: Math.max(stamps.last_block || 0, src20.last_block || 0),
+        data: [{
+          stamps: stamps.data || [],
+          src20: src20.data || [],
+        }],
       };
 
       // Return with proper caching and informational headers
@@ -84,7 +76,8 @@ export const handler: Handlers<AddressHandlerContext> = {
         headers: {
           "X-Preferred-Endpoints":
             "/api/v2/stamps/balance/[address], /api/v2/src20/balance/[address]",
-          "X-Info": "Consider using dedicated endpoints for better performance",
+          "X-Info":
+            "Consider using dedicated endpoints for better performance and pagination control",
         },
       });
     } catch (error) {
