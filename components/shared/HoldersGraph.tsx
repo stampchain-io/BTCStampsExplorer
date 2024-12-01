@@ -62,7 +62,7 @@ export function HoldersGraph(
 
   return (
     <div className="flex flex-col dark-gradient p-0 pt-24 relative">
-      <div className="absolute top-6 right-6 text-right">
+      <div className="mt-6 pr-6 text-right">
         <p className={dataLabelClassName}>
           HOLDERS
         </p>
