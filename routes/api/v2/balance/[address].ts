@@ -64,6 +64,9 @@ export const handler: Handlers<AddressHandlerContext> = {
         totalPages: totalPages,
         total: totalItems,
         last_block: Math.max(stamps.last_block || 0, src20.last_block || 0),
+        btc: {
+          address: address,
+        },
         data: [{
           stamps: stamps.data || [],
           src20: src20.data || [],
