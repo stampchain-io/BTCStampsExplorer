@@ -137,6 +137,7 @@ import * as $about_AboutTeam from "./islands/about/AboutTeam.tsx";
 import * as $block_BlockHeader from "./islands/block/BlockHeader.tsx";
 import * as $block_BlockSelector from "./islands/block/BlockSelector.tsx";
 import * as $block_BlockTransactions from "./islands/block/BlockTransactions.tsx";
+import * as $charts_HoldersPieChart from "./islands/charts/HoldersPieChart.tsx";
 import * as $collection_ArtistCollection from "./islands/collection/ArtistCollection.tsx";
 import * as $collection_CollectionCreateButton from "./islands/collection/CollectionCreateButton.tsx";
 import * as $collection_CollectionDetailsContent from "./islands/collection/CollectionDetailsContent.tsx";
@@ -378,6 +379,7 @@ const manifest = {
     "./islands/block/BlockHeader.tsx": $block_BlockHeader,
     "./islands/block/BlockSelector.tsx": $block_BlockSelector,
     "./islands/block/BlockTransactions.tsx": $block_BlockTransactions,
+    "./islands/charts/HoldersPieChart.tsx": $charts_HoldersPieChart,
     "./islands/collection/ArtistCollection.tsx": $collection_ArtistCollection,
     "./islands/collection/CollectionCreateButton.tsx":
       $collection_CollectionCreateButton,
