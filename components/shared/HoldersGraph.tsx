@@ -1,5 +1,4 @@
 import { HoldersPieChart } from "../../islands/charts/HoldersPieChart.tsx";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 interface Holder {
   address: string | null;
@@ -24,8 +23,12 @@ function HolderRow(
   return (
     <tr>
       <td className="text-left py-0">
-        <a href={`/wallet/${holder.address}`}>
-          {holder.address ? abbreviateAddress(holder.address) : "Unknown"}
+        <a
+          href={`/wallet/${holder.address}`}
+          data-tooltip-target={holder.address || "Unknown"}
+          title={holder.address || "Unknown"}
+        >
+          {holder.address ? holder.address : "Unknown"}
         </a>
       </td>
       <td className="text-center py-0">
