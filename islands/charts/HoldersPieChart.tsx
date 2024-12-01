@@ -1,4 +1,4 @@
-import { Chart } from "$fresh_charts/mod.ts";
+import { Chart } from "$fresh_charts/island.tsx";
 
 interface PieChartProps {
   holders: Array<{
@@ -8,7 +8,7 @@ interface PieChartProps {
   }>;
 }
 
-const PieChart = ({ holders }: PieChartProps) => {
+export const HoldersPieChart = ({ holders }: PieChartProps) => {
   if (!holders?.length) {
     return <div class="text-center py-4">No holder data available</div>;
   }
@@ -83,5 +83,3 @@ const PieChart = ({ holders }: PieChartProps) => {
     return <div class="text-center py-6">Error rendering chart</div>;
   }
 };
-
-export default PieChart;
