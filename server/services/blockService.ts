@@ -44,7 +44,7 @@ export class BlockService {
     return {
       last_block: stampBlockResponse.last_block,
       block_info: stampBlockResponse.block_info,
-      issuances: stampBlockResponse.data,
+      data: stampBlockResponse.data,
       sends: [], // Assuming sends is always an empty array as per the original function
     };
   }

@@ -29,7 +29,7 @@ export class SRC101OperationService {
       };
       console.log("prepare",prepare);
       const { psbtHex, inputsToSign } = await SRC101Service.MultisigPSBTService.preparePSBT(prepare);
-      return { psbtHex, inputsToSign };
+      return { hex: psbtHex, inputsToSign };
     } catch (error) {
       console.error(error);
       return { error: error.message };

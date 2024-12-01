@@ -5,7 +5,7 @@ interface CollectionRow {
   creators: string[];
   stamp_count: number;
   total_editions: number;
-  stamp_numbers: number[];
+  stamps: number[];
 }
 
 interface CollectionQueryParams {
