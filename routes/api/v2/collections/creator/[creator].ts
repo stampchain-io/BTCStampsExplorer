@@ -9,10 +9,11 @@ import {
 import { RouteType } from "$server/services/cacheService.ts";
 
 export const handler: Handlers = {
-  async GET(req) {
+  async GET(req, ctx) {
     try {
       const url = new URL(req.url);
       const pagination = getPaginationParams(url);
+      const { creator } = ctx.params;
 
       // Check if pagination validation failed
       if (pagination instanceof Response) {
@@ -24,6 +25,7 @@ export const handler: Handlers = {
       const result = await CollectionController.getCollectionDetails({
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
+        creator,
       });
 
       // Check for empty result

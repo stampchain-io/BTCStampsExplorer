@@ -21,6 +21,7 @@ import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getSt
 import * as $api_v2_block_block_index_ from "./routes/api/v2/block/[block_index].ts";
 import * as $api_v2_block_block_count_number_ from "./routes/api/v2/block/block_count/[...number].ts";
 import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/related/[block_index].ts";
+import * as $api_v2_collections_creator_creator_ from "./routes/api/v2/collections/creator/[creator].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
 import * as $api_v2_create_dispense from "./routes/api/v2/create/dispense.ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
@@ -233,6 +234,8 @@ const manifest = {
       $api_v2_block_block_count_number_,
     "./routes/api/v2/block/related/[block_index].ts":
       $api_v2_block_related_block_index_,
+    "./routes/api/v2/collections/creator/[creator].ts":
+      $api_v2_collections_creator_creator_,
     "./routes/api/v2/collections/index.ts": $api_v2_collections_index,
     "./routes/api/v2/create/dispense.ts": $api_v2_create_dispense,
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,

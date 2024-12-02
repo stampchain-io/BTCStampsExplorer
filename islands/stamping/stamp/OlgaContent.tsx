@@ -21,8 +21,6 @@ interface TransactionInput {
   txid: string;
   vout: number;
   signingIndex: number;
-  value?: number;
-  address?: string;
 }
 
 interface TransactionOutput {
@@ -140,9 +138,9 @@ function isValidForMinting(params: {
 
 interface FeeDetails {
   hasExactFees: boolean;
-  minerFee?: number;
-  dustValue?: number;
-  totalValue?: number;
+  minerFee: number;
+  dustValue: number;
+  totalValue: number;
 }
 
 interface MintRequest {
@@ -240,6 +238,18 @@ interface WalletError {
   message?: string;
 }
 
+// Replace TxDetails interface with MintResponse
+interface MintResponse {
+  hex: string;
+  cpid: string;
+  est_tx_size: number;
+  input_value: number;
+  total_dust_value: number;
+  est_miner_fee: number;
+  change_value: number;
+  txDetails: TransactionInput[];
+}
+
 export function OlgaContent() {
   const { config, isLoading } = useConfig<Config>();
 
@@ -285,7 +295,7 @@ export function OlgaContent() {
     undefined,
   );
 
-  const [txDetails, setTxDetails] = useState<TxDetails | null>(null);
+  const [txDetails, setTxDetails] = useState<MintResponse | null>(null);
 
   useEffect(() => {
     if (fees && !loading) {
@@ -349,39 +359,48 @@ export function OlgaContent() {
             qty: issuance,
             filename: file.name,
             ...(isPoshStamp && stampName ? { assetName: stampName } : {}),
-            dryRun: true, // Flag for fee estimation
+            dryRun: true,
           });
 
           setTxDetails(response.data);
           setFeeDetails({
-            minerFee: response.data.fee,
-            dustValue: response.data.dust,
-            totalValue: response.data.total,
+            minerFee: response.data.est_miner_fee,
+            dustValue: response.data.total_dust_value,
+            totalValue: response.data.input_value,
             hasExactFees: true,
           });
         } catch (error) {
           console.error("Transaction preparation error:", error);
-          setFeeDetails({ hasExactFees: false });
+          setFeeDetails({
+            hasExactFees: false,
+            minerFee: 0,
+            dustValue: 0,
+            totalValue: 0,
+          });
         }
       };
       prepareTx();
     } else {
-      // Reset transaction state when requirements aren't met
       setHasValidTransaction(false);
       setTxDetails(null);
-      setFeeDetails({ hasExactFees: false });
+      setFeeDetails({
+        hasExactFees: false,
+        minerFee: 0,
+        dustValue: 0,
+        totalValue: 0,
+      });
     }
-  }, [isConnected, wallet.address, file]); // Only recalculate when these essential components change
+  }, [isConnected, wallet.address, file]);
 
-  // Handle fee rate changes without rebuilding transaction
+  // Update the fee recalculation effect
   useEffect(() => {
     if (hasValidTransaction && txDetails && fee) {
-      // Only recalculate fees if we have a valid transaction
-      const newFee = Math.ceil((txDetails.txDetails?.estimatedSize || 0) * fee);
+      const newFee = Math.ceil((txDetails.est_tx_size || 0) * fee);
       setFeeDetails({
         minerFee: newFee,
-        dustValue: txDetails.dust || 0,
-        totalValue: (txDetails.total || 0) - (txDetails.fee || 0) + newFee,
+        dustValue: txDetails.total_dust_value || 0,
+        totalValue: (txDetails.input_value || 0) -
+          (txDetails.est_miner_fee || 0) + newFee,
         hasExactFees: true,
       });
     }
@@ -632,22 +651,20 @@ export function OlgaContent() {
           throw new Error("Invalid response structure: missing hex field");
         }
 
-        const { hex, transactionDetails, cpid } = response.data;
+        const { hex, cpid, txDetails } = response.data;
         log("Extracted data from response", {
           hex,
           cpid,
-          inputCount: transactionDetails.inputs.length,
-          outputCount: transactionDetails.outputs
-            ? transactionDetails.outputs.length
-            : 0,
+          inputCount: txDetails.length,
+          outputCount: 0,
         });
 
         const walletProvider = getWalletProvider(
           wallet.provider,
         );
 
-        // Update the inputsToSign construction to handle multiple inputs
-        const inputsToSign = transactionDetails.inputs.map((input) => ({
+        // Update the inputsToSign construction to use the new format
+        const inputsToSign = txDetails.map((input: TransactionInput) => ({
           index: input.signingIndex,
         }));
         console.log("Constructed inputsToSign:", inputsToSign);

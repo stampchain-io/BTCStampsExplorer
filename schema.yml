@@ -43,8 +43,6 @@ servers:
     description: Production server (uses live data)
   - url: "https://bitcoinstamps.xyz"
     description: Production server (uses live data)
-  - url: "http://localhost:8000"
-    description: Production server (uses live data)
 
 security:
   - ApiKeyAuth: []
@@ -77,19 +75,19 @@ paths:
                     properties:
                       api:
                         type: boolean
-                        description: API service status
+                        description: API service connectivity
                       indexer:
                         type: boolean
-                        description: Indexer service status
+                        description: Indexer service connectivity
                       mempool:
                         type: boolean
-                        description: Mempool API connectivity status
+                        description: Mempool API connectivity 
                       database:
                         type: boolean
-                        description: Database connectivity status
+                        description: Database connectivity 
                       xcp:
                         type: boolean
-                        description: Counterparty node status
+                        description: Counterparty node connectivity
                       blockSync:
                         type: object
                         description: Block synchronization information
@@ -113,13 +111,6 @@ paths:
                           totalStamps:
                             type: integer
                             description: Total number of stamps in the system
-                          xcp:
-                            type: boolean
-                            description: Counterparty API connectivity status
-                        required:
-                          - src20Deployments
-                          - totalStamps
-                          - xcp
               example:
                 status: "OK"
                 services:
@@ -134,7 +125,6 @@ paths:
                   stats:
                     src20Deployments: 100000
                     totalStamps: 1000000
-                    xcp: true
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -277,7 +267,7 @@ paths:
       tags:
         - System
       summary: Get API version
-      description: Returns the current version of the API being used. Useful for tracking API compatibility.
+      description: Returns the current version of the API being used.
       responses:
         "200":
           description: OK
@@ -329,18 +319,8 @@ paths:
           schema:
             type: string
           description: The Bitcoin address to query
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-          description: Number of records per page 
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-          description: Page number for pagination
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response with combined balances
@@ -421,23 +401,39 @@ paths:
       tags:
         - Collections
       summary: Get paginated collections
-      description: Retrieves a paginated list of stamp collections. Can be filtered by creator address and includes collection metadata.
+      description: Retrieves a paginated list of all stamp collections.
       parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          description: "The maximum number of collections to retrieve (default: 50)"
-        - in: query
-          name: page
-          schema:
-            type: integer
-          description: "The page number of the results (default: 1)"
-        - in: query
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedCollectionResponseBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/v2/collections/creator/{creator}:
+    get:
+      operationId: getCollectionsByCreator
+      tags:
+        - Collections
+      summary: Get collections by creator
+      description: Retrieves a paginated list of stamp collections for a specific creator.
+      parameters:
+        - in: path
           name: creator
+          required: true
+          example: "bc1qefhvcqwuz6g6qy6nck5dq2el2r37pky73tqxkc"
           schema:
             type: string
-          description: "Filter collections by creator address"
+          description: "Creator address to filter collections by"
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: OK
@@ -458,17 +454,9 @@ paths:
       summary: Get paginated cursed stamps
       description: Retrieves a paginated list of cursed stamps. Cursed stamps are stamps with negative stamp numbers that have been identified as invalid or problematic.
       parameters:
-        - in: query
-          name: limit
-          example: 1
-          schema:
-            type: integer
-          description: "The maximum number of stamps to retrieve (default: 50)"
-        - in: query
-          name: page
-          schema:
-            type: integer
-          description: "The page number of the results (default: 0)"
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Sort'
       responses:
         "200":
           description: OK
@@ -551,21 +539,9 @@ paths:
       summary: Get paginated valid SRC-20 transactions
       description: Retrieves a paginated list of valid SRC-20 transactions with optional limit and page parameters.
       parameters:
-        - in: query
-          name: limit
-          example: 1
-          schema:
-            type: integer
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Sort'
       responses:
         "200":
           description: Successful response with paginated SRC-20 transactions
@@ -594,20 +570,8 @@ paths:
           schema:
             type: string
           description: The address of the wallet
-        - in: query
-          name: limit
-          example: 1
-          schema:
-            type: integer
-            minimum: 1
-            default: 200
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response
@@ -679,21 +643,8 @@ paths:
           schema:
             type: string
           description: The SRC20 tick value
-        - in: query
-          name: limit
-          example: 1
-          schema:
-            type: integer
-            minimum: 1
-            default: 200
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response
@@ -730,29 +681,9 @@ paths:
           schema:
             type: string
           description: The operation type, if applicable.
-        - in: query
-          name: limit
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 1000
-          description: The maximum number of items to return, default is 1000.
-        - in: query
-          name: page
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 1
-          description: The page number for pagination, default is 1.
-        - in: query
-          name: sort
-          required: false
-          schema:
-            type: string
-            default: "ASC"
-          description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Sort'
       responses:
         "200":
           description: OK
@@ -798,32 +729,8 @@ paths:
             type: string
             enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type, if applicable.
-        - in: query
-          name: limit
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            default: 1000
-          description: The maximum number of items to return, default is 1000.
-        - in: query
-          name: page
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            default: 1
-          description: The page number for pagination, default is 1.
-        - in: query
-          name: sort
-          required: false
-          schema:
-            type: string
-            enum: [ASC, DESC]
-            default: "ASC"
-          description: The sorting order, can be 'ASC' or 'DESC', default is 'ASC'.
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response with the list of valid SRC-20 transactions.
@@ -848,34 +755,15 @@ paths:
       description: Retrieve paginated valid SRC-20 transactions by operation type (DEPLOY, MINT, TRANSFER)
       parameters:
         - in: query
-          name: limit
-          schema:
-            type: integer
-            example: 1
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
-        - in: query
           name: op
           schema:
             type: string
             default: "DEPLOY"
             enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type [TRANSFER, MINT, DEPLOY(DEFAULT)]
-        - in: query
-          name: sort
-          schema:
-            type: string
-            default: "DESC"
-            enum: [ASC, DESC]
-          description: Sort order [ASC, DESC]
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Sort'
       responses:
         "200":
           description: Successful response with paginated SRC-20 transactions
@@ -904,29 +792,14 @@ paths:
           schema:
             type: string
         - in: query
-          name: limit
-          description: "Number of records per page (default: 50)"
-          schema:
-            type: integer
-        - in: query
-          name: page
-          description: "Page number (default: 1)"
-          schema:
-            type: integer
-        - in: query
           name: op
           schema:
             type: string
             default: "DEPLOY"
             enum: [TRANSFER, MINT, DEPLOY]
           description: The operation type [TRANSFER, MINT, DEPLOY]
-        - in: query
-          name: sort
-          schema:
-            type: string
-            default: "ASC"
-            enum: [ASC, DESC]
-          description: Sort order [ASC, DESC]
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response
@@ -1010,21 +883,8 @@ paths:
       summary: Get paginated valid SRC-101 transactions
       description: Retrieve paginated valid SRC-101 transactions with optional limit and page parameters
       parameters:
-        - in: query
-          name: limit
-          example: 1
-          schema:
-            type: integer
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response with paginated SRC-101 transactions
@@ -1045,21 +905,8 @@ paths:
       summary: Get paginated SRC-101 transactions
       description: Retrieve paginated SRC-101 transactions with optional filtering by block index, operation type, and validation status.
       parameters:
-        - in: query
-          name: limit
-          example: 1
-          schema:
-            type: integer
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
         - in: query
           name: block_index
           schema:
@@ -1192,28 +1039,8 @@ paths:
       summary: Get tokenid of SRC-101 by address_btc
       description: Retrieve deployment details for a specific deploy_hash in the deploy_hash API.
       parameters:
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            example: 1
-            minimum: 1
-            default: 50
-          description: The maximum number of transactions to retrieve per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: The page number of transactions to retrieve
-        - in: query
-          name: sort
-          schema:
-            type: string
-            default: DESC
-            enum: [ASC, DESC]
-          description: Sort order [ASC, DESC]
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
         - in: query
           name: prim
           required: true
@@ -1264,21 +1091,8 @@ paths:
           schema:
             type: string
           description: The Bitcoin address to query
-        - in: query
-          name: limit
-          example: 1
-          schema:
-            type: integer
-            minimum: 1
-            default: 200
-          description: Number of records per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: Page number for pagination
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response with address balances
@@ -1379,23 +1193,83 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/SRC101DeployData'
-                - $ref: '#/components/schemas/SRC101MintData'
-                - $ref: '#/components/schemas/SRC101TransferData'
-                - $ref: '#/components/schemas/SRC101SetRecordData'
-                - $ref: '#/components/schemas/SRC101RenewData'
+              discriminator:
+                propertyName: op
+                mapping:
+                  deploy: '#/components/schemas/SRC101DeployData'
+                  mint: '#/components/schemas/SRC101MintData'
+                  transfer: '#/components/schemas/SRC101TransferData'
+                  setrecord: '#/components/schemas/SRC101SetRecordData'
+                  renew: '#/components/schemas/SRC101RenewData'
             examples:
               deploy:
-                $ref: '#/components/examples/SRC101DeployExample'
+                summary: Deploy example
+                value:
+                  sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  op: "deploy"
+                  root: "btc"
+                  name: "BitNameService"
+                  lim: "10"
+                  owner: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  rec: ["bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"]
+                  tick: "btc"
+                  pri: {0: 45000, 1: -1, 2: -1, 3: 900000, 4: 225000}
+                  desc: "Bitname Service powered by BTC stamp."
+                  mintstart: "0"
+                  mintend: "18446744073709551615"
+                  wla: "0317ac27154373716ab3bce4f170211446e7598c69ae3a90f058c831c56308323c"
+                  imglp: "https://img.bitname.pro/img/"
+                  imgf: "png"
+                  idua: "999"
+                  feeRate: 12
               mint:
-                $ref: '#/components/examples/SRC101MintExample'
+                summary: Mint example
+                value:
+                  sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  op: "mint"
+                  hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+                  toaddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  tokenid: ["YWJjZGVm"]
+                  dua: "999"
+                  prim: "true"
+                  coef: "1000"
+                  sig: ""
+                  img: ["https://img.bitname.pro/img/abcdef.png"]
+                  feeRate: 12
               transfer:
-                $ref: '#/components/examples/SRC101TransferExample'
+                summary: Transfer example
+                value:
+                  sourceAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  changeAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  op: "transfer"
+                  tick: "STAMP"
+                  satsPerVB: 20
+                  amt: "100000"
               setrecord:
-                $ref: '#/components/examples/SRC101SetRecordExample'
+                summary: Set record example
+                value:
+                  sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  op: "setrecord"
+                  hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+                  tokenid: "YWJjZGVm"
+                  type: "address"
+                  data: {btc: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"}
+                  prim: "false"
+                  feeRate: 12
               renew:
-                $ref: '#/components/examples/SRC101RenewExample'
+                summary: Renew example
+                value:
+                  sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  op: "renew"
+                  hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+                  tokenid: "YWJjZGVm"
+                  dua: "2"
+                  feeRate: 12
       responses:
         "200":
           description: Successful response with the hex value.
@@ -1451,24 +1325,9 @@ paths:
       summary: Get paginated stamps
       description: Retrieve a paginated list of stamps.
       parameters:
-        - in: query
-          name: limit
-          example: 1
-          schema:
-            type: integer
-          description: The maximum number of stamps to return per page. Defaults to 50.
-        - in: query
-          name: page
-          example: 1
-          schema:
-            type: integer
-          description: The page number to retrieve. Defaults to 1.
-        - in: query
-          name: sort_order
-          example: desc
-          schema:
-            type: string
-          description: The order of stamps.
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Sort'
       responses:
         "200":
           description: Successful response with paginated stamps.
@@ -1526,18 +1385,8 @@ paths:
           schema:
             type: string
           description: Stamp number, cpid, or stamp_hash
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-          description: Number of records per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-          description: Page number
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response
@@ -1581,18 +1430,8 @@ paths:
           schema:
             type: string
           description: Stamp number, cpid, or stamp_hash
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-          description: Number of records per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-          description: Page number
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response
@@ -1630,18 +1469,8 @@ paths:
           schema:
             type: string
           description: Stamp number, cpid, or stamp_hash
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-          description: Number of records per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-          description: Page number
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response
@@ -1694,18 +1523,8 @@ paths:
           schema:
             type: string
           description: Stamp number, cpid, or stamp_hash
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-          description: Number of records per page
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-          description: Page number
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response
@@ -1744,17 +1563,8 @@ paths:
           description: The address to retrieve stamp balances for
           schema:
             type: string
-        - in: query
-          name: limit
-          example: 1
-          description: "The maximum number of stamp balances to retrieve. default: 50"
-          schema:
-            type: integer
-        - in: query
-          name: page
-          description: "The page number of stamp balances to retrieve. default: 1"
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response
@@ -1816,17 +1626,8 @@ paths:
           description: The ident value (SRC-721, STAMP)
           schema:
             type: string
-        - in: query
-          name: limit
-          example: 1
-          description: "The maximum number of stamps to retrieve (default: 50)"
-          schema:
-            type: integer
-        - in: query
-          name: page
-          description: "The page number of stamps to retrieve (default: 1)"
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Page'
       responses:
         "200":
           description: Successful response with the paginated stamps
@@ -1857,17 +1658,43 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/SRC20DeployData'
-                - $ref: '#/components/schemas/SRC20MintData'
-                - $ref: '#/components/schemas/SRC20TransferData'
+              discriminator:
+                propertyName: op
+                mapping:
+                  deploy: '#/components/schemas/SRC20DeployData'
+                  mint: '#/components/schemas/SRC20MintData'
+                  transfer: '#/components/schemas/SRC20TransferData'
             examples:
               deploy:
-                $ref: '#/components/examples/DeployExample'
+                summary: Deploy example
+                value:
+                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  op: "deploy"
+                  tick: "APIV2"
+                  satsPerVB: 12
+                  max: "2100000000"
+                  lim: "100000"
+                  dec: 18
               mint:
-                $ref: '#/components/examples/MintExample'
+                summary: Mint example
+                value:
+                  toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  op: "mint"
+                  tick: "DOGE"
+                  satsPerVB: 20
+                  amt: "1000"
               transfer:
-                $ref: '#/components/examples/TransferExample'
+                summary: Transfer example
+                value:
+                  fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
+                  changeAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  op: "transfer"
+                  tick: "STAMP"
+                  satsPerVB: 20
+                  amt: "100000"
       responses:
         "200":
           description: Successful response with the hex value.
@@ -1896,20 +1723,15 @@ paths:
                     items:
                       type: string
                       description: The inputs to sign
-                  fee:
-                    type: integer
-                    description: The estimated miner fee + dust value
-                  change_value:
-                    type: integer
-                    description: The change value
-                  inputs_to_sign:
-                    type: array
-                    items:
-                      type: string
-                    description: The inputs to sign
                   changeAddress:
                     type: string
                     description: The change address
+                  fee:
+                    type: integer
+                    description: The estimated miner fee in sats
+                  change:
+                    type: integer
+                    description: The change value
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -2011,9 +1833,7 @@ paths:
                   locked: true
                   filename: test.png
                   file: "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAG1BMVEUAAAALOzcKBiAJTzz/1lqZoxgIaSyfQuJmIslgvM+QAAAAAXRSTlMAQObYZgAAAMlJREFUeNp9kNVhAzEMQFVtYE+ge8HfxhsUFkjuFih4gPJ3Jz9mMPuJJVvjzkR0CBJf7CFQB05GKs75EVCwEbAa+3Wg9XmZ5rOz7gljoE9ZmSydzT67lqcdaWrhUCo8m8baKDEt7Qqz4wtVKTVHRI8R2N1bW7wqMb4GLya0KQOYVOUrXfIaHKWY1lsCTfKXyih0msQXeA1td/RoHGOk++8figPKo67o+dqappTnx8FakD2Vxf11QA78F+cZ6cC5BCrd0F+T8UDmIwdjIhoVAu1hnQAAAABJRU5ErkJggg=="
-                  satsPerKB: 20
-                  service_fee: null
-                  service_fee_address: null
+                  satsPerVB: 20
       responses:
         "200":
           description: Successful response with PSBT transaction
@@ -2099,109 +1919,33 @@ components:
       name: X-API-Key
       description: API key for authentication
 
-  examples:
-    DeployExample:
-      value:
-        toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        op: "deploy"
-        tick: "APIV2"
-        satsPerVB: 12
-        max: "2100000000"
-        lim: "100000"
-        dec: 18
-
-    MintExample:
-      value:
-        toAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        op: "mint"
-        tick: "DOGE"
-        satsPerVB: 20
-        amt: "1000"
-
-    TransferExample:
-      value:
-        fromAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
-        toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
-        changeAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
-        op: "transfer"
-        tick: "STAMP"
-        satsPerVB: 20
-        amt: "100000"
-
-    SRC101DeployExample:
-      summary: Example deploy request
-      value:
-        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        op: "deploy"
-        root: "btc"
-        name: "BitNameService"
-        lim: "10"
-        owner: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        rec: ["bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"]
-        tick: "btc"
-        pri: {0: 45000, 1: -1, 2: -1, 3: 900000, 4: 225000}
-        desc: "Bitname Service powered by BTC stamp."
-        mintstart: "0"
-        mintend: "18446744073709551615"
-        wla: "0317ac27154373716ab3bce4f170211446e7598c69ae3a90f058c831c56308323c"
-        imglp: "https://img.bitname.pro/img/"
-        imgf: "png"
-        idua: "999"
-        feeRate: 12
-
-    SRC101MintExample:
-      summary: Example mint request
-      value:
-        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        op: "mint"
-        hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
-        toaddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        tokenid: ["YWJjZGVm"]
-        dua: "999"
-        prim: "true"
-        coef: "1000"
-        sig: ""
-        img: ["https://img.bitname.pro/img/abcdef.png"]
-        feeRate: 12
-
-    SRC101TransferExample:
-      summary: Example transfer request
-      value:
-        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        op: "transfer"
-        hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
-        toaddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        tokenid: "YWJjZGVm"
-        feeRate: 12
-
-    SRC101SetRecordExample:
-      summary: Example setrecord request
-      value:
-        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        op: "setrecord"
-        hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
-        tokenid: "YWJjZGVm"
-        type: "address"
-        data: {btc: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"}
-        prim: "false"
-        feeRate: 12
-
-    SRC101RenewExample:
-      summary: Example renew request
-      value:
-        sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-        op: "renew"
-        hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
-        tokenid: "YWJjZGVm"
-        dua: "2"
-        feeRate: 12
+  parameters:
+    Limit:
+      in: query
+      name: limit
+      example: 1
+      schema:
+        type: integer
+        minimum: 1
+      description: The maximum number of items to return per page.
+    
+    Page:
+      in: query
+      name: page
+      example: 1
+      schema:
+        type: integer
+        minimum: 1
+      description: The page number to retrieve. Defaults to 1.
+    
+    Sort:
+      in: query
+      name: sort
+      example: DESC
+      schema:
+        type: string
+        enum: [ASC, DESC]
+      description: The sort order for results. Accepts 'ASC' or 'DESC'.
 
   schemas:
     Pagination:
@@ -2401,9 +2145,8 @@ components:
         divisible:
           type: number
         keyburn:
-          oneOf:
-            - type: number
-            - type: "null"
+          type: number
+          nullable: true
         locked:
           type: number
         stamp_base64:
@@ -2413,10 +2156,8 @@ components:
         stamp_url:
           type: string
         supply:
-          oneOf:
-            - type: number
-            - type: string
-            - type: "null"
+          type: number
+          nullable: true
         block_time:
           type: string
           format: date-time
@@ -2427,31 +2168,13 @@ components:
         ident:
           $ref: "#/components/schemas/SUBPROTOCOLS"
         creator_name:
-          oneOf:
-            - type: string
-            - type: "null"
+          type: string
+          nullable: true
         stamp_hash:
           type: string
         file_hash:
           type: string
 
-    BtcInfo:
-      type: object
-      properties:
-        address:
-          type: string
-        balance:
-          type: number
-        txCount:
-          type: number
-        unconfirmedBalance:
-          type: number
-        unconfirmedTxCount:
-          type: number
-        btcPrice:
-          type: number
-        usdValue:
-          type: number
     SRC20Balance:
       type: object
       properties:
@@ -2492,8 +2215,8 @@ components:
         creator:
           type: string
         amt:
-          oneOf:
-            - type: number
+          type: number
+          nullable: true
         deci:
           type: number
         lim:
@@ -2506,8 +2229,8 @@ components:
           type: string
           format: date-time
         creator_name:
-          oneOf:
-            - type: string
+          type: string
+          nullable: true
         destination_name:
           type: string
     Src20SnapshotDetail:
@@ -2566,57 +2289,45 @@ components:
         tick_hash:
           type: string
         name:
-          oneOf:
-            - type: string
+          type: string
         tokenid_origin:
           type: string
         tokenid:
-          oneOf:
-            - type: string
+          type: string
         tokenid_utf8:
-          oneOf:
-            - type: string
+          type: string
         description:
-          oneOf:
-            - type: string
+          type: string
         wla:
-          oneOf:
-            - type: string
+          type: string
         imglp:
-          oneOf:
-            - type: string
+          type: string
         imgf:
-          oneOf:
-            - type: string
+          type: string
         deploy_hash:
-          oneOf:
-            - type: string
+          type: string
         creator:
-          oneOf:
-            - type: string
+          type: string
         pri:
-          oneOf:
-            - type: number
+          type: number
         dua:
-          oneOf:
-            - type: number
+          type: number
         lim:
-          oneOf:
-            - type: number
+          type: number
         coef:
           type: number
         mintstart:
-          oneOf:
-            - type: number
+          type: number
+          nullable: true
         mintend:
-          oneOf:
-            - type: number
+          type: number
+          nullable: true
         owner:
-          oneOf:
-            - type: string
+          type: string
+          nullable: true
         toaddress:
-          oneOf:
-            - type: string
+          type: string
+          nullable: true
         destination:
           type: string
         destination_nvalue:
@@ -2642,22 +2353,25 @@ components:
         divisible:
           type: number
         supply:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
+          nullable: true
         locked:
           oneOf:
             - type: number
+              nullable: true
             - type: boolean
+              nullable: true
         creator:
           type: string
         creator_name:
-          oneOf:
-            - type: string
+          type: string
+          nullable: true
         balance:
           oneOf:
             - type: number
+              nullable: true
             - type: string
+              nullable: true
     MintStatus:
       type: object
       properties:
@@ -2822,6 +2536,11 @@ components:
           properties:
             last_block:
               type: number
+            btc:
+              type: object
+              properties:
+                address:
+                  type: string
             data:
               type: object
               properties:
@@ -2887,12 +2606,12 @@ components:
         - changeAddress
         - op
         - tick
-        - oneOf:
-          - feeRate
-          - satsPerVB
         - max
         - lim
         - dec
+      oneOf:
+        - required: ['feeRate']
+        - required: ['satsPerVB']
       properties:
         toAddress:
           type: string
@@ -2904,9 +2623,13 @@ components:
         tick:
           type: string
         feeRate:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
         satsPerVB:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
         max:
           type: string
         lim:
@@ -2921,10 +2644,10 @@ components:
         - changeAddress
         - op
         - tick
-        - oneOf:
-          - feeRate
-          - satsPerVB
         - amt
+      oneOf:
+        - required: ['feeRate']
+        - required: ['satsPerVB']
       properties:
         toAddress:
           type: string
@@ -2936,11 +2659,17 @@ components:
         tick:
           type: string
         feeRate:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
         satsPerVB:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
         amt:
-          type: string
+          oneOf:
+            - type: number
+            - type: string
 
     SRC20TransferData:
       type: object
@@ -2950,10 +2679,10 @@ components:
         - changeAddress
         - op
         - tick
-        - oneOf:
-          - feeRate
-          - satsPerVB
         - amt
+      oneOf:
+        - required: ['feeRate']
+        - required: ['satsPerVB']
       properties:
         fromAddress:
           type: string
@@ -2967,12 +2696,28 @@ components:
         tick:
           type: string
         feeRate:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
+        satsPerVB:
+          oneOf:
+            - type: number
+            - type: string
         amt:
-          type: string
+          oneOf:
+            - type: number
+            - type: string
 
     MintStampInputData:
       type: object
+      required:
+        - sourceWallet
+        - qty
+        - file
+      oneOf:
+        - required: ['feeRate']
+        - required: ['satsPerVB']
+        - required: ['satsPerKB']
       properties:
         sourceWallet:
           type: string
@@ -2994,20 +2739,23 @@ components:
           type: number
           description: Fee rate in satoshis per virtual byte / backward compatible
         satsPerVB:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
+        satsPerKB:
+          oneOf:
+            - type: number
+            - type: string
         service_fee:
-          type: number
-          nullable: true
+          oneOf:
+            - type: number
+              nullable: true
+            - type: string
+              nullable: true
         service_fee_address:
           type: string
           nullable: true
-      required:
-        - sourceWallet
-        - qty
-        - file
-        - oneOf:
-          - feeRate
-          - satsPerVB
+
     PaginatedCollectionResponseBody:
       type: object
       properties:
@@ -3085,81 +2833,49 @@ components:
         cpid:
           type: string
           description: The asset name or identifier
-        transactionDetails:
-          type: object
-          properties:
-            estimatedSize:
-              type: integer
-              description: Estimated size of the transaction in bytes
-            totalInputValue:
-              type: integer
-              description: Total value of all inputs in satoshis
-            totalDustValue:
-              type: integer
-              description: Total dust value in satoshis
-            minerFee:
-              type: integer
-              description: Estimated miner fee in satoshis
-            changeOutput:
-              type: integer
-              description: Value returned to change address in satoshis
-            inputs:
-              type: array
-              description: Array of transaction inputs
-              items:
-                type: object
-                properties:
-                  txid:
-                    type: string
-                    description: Transaction ID of the input
-                  vout:
-                    type: integer
-                    description: Output index in the previous transaction
-                  signingIndex:
-                    type: integer
-                    description: Index for signing this input
-                  value:
-                    type: integer
-                    description: Value of this input in satoshis
-                  address:
-                    type: string
-                    description: Address associated with this input
-                required:
-                  - txid
-                  - vout
-                  - signingIndex
-            outputs:
-              type: array
-              description: Array of transaction outputs
-              items:
-                type: object
-                properties:
-                  address:
-                    type: string
-                    description: Recipient address
-                  value:
-                    type: integer
-                    description: Output amount in satoshis
-                  type:
-                    type: string
-                    enum: [change, stamp, fee]
-                    description: Type of output
-                required:
-                  - address
-                  - value
-                  - type
-          required:
-            - estimatedSize
-            - totalInputValue
-            - totalDustValue
-            - minerFee
-            - changeOutput
-            - inputs
-            - outputs
+        est_tx_size:
+          type: integer
+          description: Estimated size of the transaction in bytes
+        input_value:
+          type: integer
+          description: Total value of all inputs in satoshis
+        total_dust_value:
+          type: integer
+          description: Total dust value in satoshis
+        est_miner_fee:
+          type: integer
+          description: Estimated miner fee in satoshis
+        change_value:
+          type: integer
+          description: Value returned to change address in satoshis
+        txDetails:
+          type: array
+          description: Array of transaction inputs to sign
+          items:
+            type: object
+            properties:
+              txid:
+                type: string
+                description: Transaction ID of the input
+              vout:
+                type: integer
+                description: Output index in the previous transaction
+              signingIndex:
+                type: integer
+                description: Index for signing this input
+            required:
+              - txid
+              - vout
+              - signingIndex
       required:
         - hex
         - cpid
-        - transactionDetails
+        - est_tx_size
+        - input_value
+        - total_dust_value
+        - est_miner_fee
+        - change_value
+        - txDetails
 
     SRC101DeployData:
       type: object
@@ -3199,17 +2915,21 @@ components:
         owner:
           type: string
         rec:
-          type: []
+          type: array
         tick:
           type: string
         pri:
-          type: {}
+          type: object
         desc:
           type: string
         mintstart:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
         mintend:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
         wla:
           type: string
         imglp:
@@ -3217,7 +2937,9 @@ components:
         imgf:
           type: string
         idua:
-          type: number
+          oneOf:
+            - type: number
+            - type: string
         feeRate:
           type: number
 
@@ -3243,13 +2965,13 @@ components:
           type: string
         op:
           type: string
-          enum: ['deploy']
+          enum: ['mint']
         hash:
           type: string
         toaddress:
           type: string
         tokenid:
-          type: []
+          type: array
         dua:
           type: number
         prim:
@@ -3259,7 +2981,7 @@ components:
         sig:
           type: string
         img:
-          type: []
+          type: array
         feeRate:
           type: number
 
@@ -3318,7 +3040,7 @@ components:
         prim:
           type: string
         data:
-          type: {}
+          type: object
         feeRate:
           type: number
 

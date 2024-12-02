@@ -110,15 +110,23 @@ async function fetchBothEndpoints(path, transaction) {
   if (results.production?.responseTime && results.development?.responseTime) {
     const prodTime = results.production.responseTime;
     const devTime = results.development.responseTime;
-    const difference = Math.abs(prodTime - devTime);
-    const percentageDiff = (difference / Math.min(prodTime, devTime)) * 100;
+    const difference = prodTime - devTime; // Reversed: prod minus dev
+    const percentageDiff = ((prodTime - devTime) / prodTime) * 100; // Reversed calculation
+
+    // Add performance indicator
+    const performanceIndicator = percentageDiff > 0
+      ? "🟢" // Up arrow + green heart for improvement
+      : percentageDiff < 0
+      ? "🔴" // Down arrow + red heart for degradation
+      : "➡️"; // Right arrow when equal
 
     results.timingAnalysis = {
       productionTime: prodTime,
       developmentTime: devTime,
       difference,
       percentageDiff,
-      isSignificant: percentageDiff > 10,
+      performanceIndicator,
+      isSignificant: Math.abs(percentageDiff) > 10,
     };
 
     console.log(`Timing analysis for ${path}:`, results.timingAnalysis);
@@ -339,10 +347,69 @@ hooks.beforeEachValidation(async (transaction, done) => {
       return done();
     }
 
-    // Special handling for POST endpoints with examples (only for successful cases)
+    // For POST endpoints with examples
     if (transaction.request.method === "POST") {
-      // Get the response schema from the path definition
       const pathSchema = schema.paths[path];
+      const examples = pathSchema?.post?.requestBody?.content
+        ?.["application/json"]?.examples;
+
+      if (examples) {
+        console.log(`Testing examples for ${path}`);
+
+        // Store results for each example
+        transaction.exampleResults = [];
+
+        // Test each example
+        for (const [exampleName, example] of Object.entries(examples)) {
+          console.log(`Testing example: ${exampleName}`);
+
+          // Test against both environments
+          const results = await Promise.all([
+            fetch(`${ENDPOINTS.production}${path}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(example.value),
+            }),
+            fetch(`${ENDPOINTS.development}${path}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(example.value),
+            }),
+          ]);
+
+          // Store results
+          const prodResponse = await results[0].json();
+          const devResponse = await results[1].json();
+
+          transaction.exampleResults.push({
+            example: exampleName,
+            production: prodResponse,
+            development: devResponse,
+            differences: compareResponses(prodResponse, devResponse),
+          });
+        }
+
+        // Add example test results to transaction
+        if (!transaction.test) transaction.test = "";
+        transaction.test += "\n## Example Tests\n";
+
+        transaction.exampleResults.forEach((result) => {
+          transaction.test += `\n### Example: ${result.example}\n`;
+          transaction.test += "Production Response:\n```json\n" +
+            JSON.stringify(result.production, null, 2) + "\n```\n";
+          transaction.test += "Development Response:\n```json\n" +
+            JSON.stringify(result.development, null, 2) + "\n```\n";
+
+          if (result.differences.length > 0) {
+            transaction.test += "\nDifferences:\n";
+            result.differences.forEach((diff) => {
+              transaction.test += `- ${diff.issue} at ${diff.path}\n`;
+            });
+          }
+        });
+      }
+
+      // Get the response schema from the path definition
       const responseSchema = pathSchema?.post?.responses?.["200"]?.content
         ?.["application/json"]?.schema;
 
@@ -575,7 +642,7 @@ hooks.afterAll((transactions, done) => {
           timing.developmentTime.toFixed(2)
         } | ${timing.difference.toFixed(2)} | ${
           timing.percentageDiff.toFixed(2)
-        }% |`;
+        }% ${timing.performanceIndicator} |`;
 
         // Add warning emoji for significant differences
         summaryReport += timing.isSignificant ? `${row} ⚠️\n` : `${row}\n`;
@@ -640,7 +707,11 @@ hooks.afterAll((transactions, done) => {
           // Add both development and production example queries if they exist
           if (transactions.find((t) => t.name.startsWith(path))) {
             const example = transactions.find((t) => t.name.startsWith(path));
-            const devUri = example.request.uri;
+            // Get the full development URL from the example
+            const devUri = example.request.uri.startsWith("http")
+              ? example.request.uri
+              : `${ENDPOINTS.development}${example.request.uri}`;
+            // Create the production URL by replacing the development domain
             const prodUri = devUri.replace(
               ENDPOINTS.development,
               ENDPOINTS.production,
@@ -732,6 +803,28 @@ hooks.afterAll((transactions, done) => {
       } catch (error) {
         console.error("Error writing endpoint-comparison.md:", error);
       }
+    }
+
+    // Add example test results to summary
+    const exampleTests = transactions.filter((t) =>
+      t.exampleResults?.length > 0
+    );
+    if (exampleTests.length > 0) {
+      summaryReport += "\n## Example Test Results\n";
+      exampleTests.forEach((t) => {
+        summaryReport += `\n### ${t.request.method} ${t.request.uri}\n`;
+        t.exampleResults.forEach((result) => {
+          summaryReport += `- Example "${result.example}": ${
+            result.differences.length === 0 ? "✅" : "❌"
+          }\n`;
+          if (result.differences.length > 0) {
+            summaryReport += "  Differences found:\n";
+            result.differences.forEach((diff) => {
+              summaryReport += `  - ${diff.issue} at ${diff.path}\n`;
+            });
+          }
+        });
+      });
     }
   } catch (error) {
     console.error("Error in afterAll hook:", error);

@@ -147,22 +147,20 @@ export const handler: Handlers<TX | TXError> = {
         };
       });
 
-      // Return the API response with the same format
+      // Return the API response with the modified format
       return ResponseUtil.success({
         hex: mint_tx.psbt.toHex(),
         cpid: assetName,
-        transactionDetails: {
-          estimatedSize: mint_tx.estimatedTxSize,
-          totalInputValue: mint_tx.totalInputValue,
-          totalDustValue: mint_tx.totalDustValue,
-          minerFee: mint_tx.estMinerFee,
-          changeOutput: mint_tx.totalChangeOutput,
-          inputs: txDetails.map((input) => ({
-            txid: input.txid,
-            vout: input.vout,
-            signingIndex: input.signingIndex,
-          })),
-        },
+        est_tx_size: mint_tx.estimatedTxSize,
+        input_value: mint_tx.totalInputValue,
+        total_dust_value: mint_tx.totalDustValue,
+        est_miner_fee: mint_tx.estMinerFee,
+        change_value: mint_tx.totalChangeOutput,
+        txDetails: txDetails.map((input) => ({
+          txid: input.txid,
+          vout: input.vout,
+          signingIndex: input.signingIndex,
+        })),
       });
     } catch (error: unknown) {
       console.error("Minting error:", error);
