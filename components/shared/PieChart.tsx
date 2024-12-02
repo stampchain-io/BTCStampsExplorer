@@ -80,7 +80,7 @@ const PieChart = ({ holders }: PieChartProps) => {
     );
   } catch (error) {
     console.error("Error rendering chart:", error);
-    return <div class="text-center py-4">Error rendering chart</div>;
+    return <div class="text-center py-6">Error rendering chart</div>;
   }
 };
 
