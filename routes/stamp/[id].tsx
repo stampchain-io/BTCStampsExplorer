@@ -155,10 +155,13 @@ export const handler: Handlers<StampData> = {
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
-      if (error.message?.includes("Stamp not found")) {
-        return ctx.renderNotFound();
-      }
-      return new Response("Internal Server Error", { status: 500 });
+      return new Response("", {
+        status: 302,
+        headers: {
+          Location: "/404",
+          "Cache-Control": "no-store",
+        },
+      });
     }
   },
 };

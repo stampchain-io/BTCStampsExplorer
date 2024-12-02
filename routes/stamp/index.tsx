@@ -84,7 +84,13 @@ export const handler: Handlers = {
       });
     } catch (error) {
       console.error(error);
-      return new Response("Internal Server Error", { status: 500 });
+      return new Response("", {
+        status: 302,
+        headers: {
+          Location: "/404",
+          "Cache-Control": "no-store",
+        },
+      });
     }
   },
 };

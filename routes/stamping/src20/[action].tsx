@@ -73,10 +73,13 @@ export const handler: Handlers<StampingSrc20PageProps> = {
       });
     } catch (error) {
       console.error("Error in stamping SRC20:", error);
-      if ((error as Error).message?.includes("not found")) {
-        return ctx.renderNotFound();
-      }
-      return new Response("Internal Server Error", { status: 500 });
+      return new Response("", {
+        status: 302,
+        headers: {
+          Location: "/404",
+          "Cache-Control": "no-store",
+        },
+      });
     }
   },
 };

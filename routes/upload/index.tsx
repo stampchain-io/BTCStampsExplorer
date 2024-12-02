@@ -36,8 +36,13 @@ export const handler: Handlers = {
       return await ctx.render(body);
     } catch (error) {
       console.error(error);
-      const body = { error: `Error: Internal server error` };
-      return ctx.render(body);
+      return new Response("", {
+        status: 302,
+        headers: {
+          Location: "/404",
+          "Cache-Control": "no-store",
+        },
+      });
     }
   },
 };

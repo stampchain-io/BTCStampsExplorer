@@ -137,19 +137,37 @@ export class ResponseUtil {
     message?: string,
     options: ResponseOptions = {},
   ) {
-    console.error("ResponseUtil error:", error);
-    return new Response(
-      JSON.stringify({ error: message || "Internal server error" }),
-      {
-        status: 500,
-        headers: {
-          ...getSecurityHeaders({ forceNoCache: true }),
-          "Content-Type": "application/json",
-          "X-API-Version": API_RESPONSE_VERSION,
-          ...(options.headers || {}),
+    console.error(error);
+
+    // For API routes
+    if (
+      options.routeType ||
+      options.headers?.["Content-Type"] === "application/json"
+    ) {
+      return new Response(
+        JSON.stringify({
+          error: message || "Internal server error",
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store",
+            "X-API-Version": API_RESPONSE_VERSION,
+            ...(options.headers || {}),
+          },
         },
+      );
+    }
+
+    // For web pages
+    return new Response("", {
+      status: 302,
+      headers: {
+        Location: "/404",
+        "Cache-Control": "no-store",
       },
-    );
+    });
   }
 
   // Stamp-specific response methods

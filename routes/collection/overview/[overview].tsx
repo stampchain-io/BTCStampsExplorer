@@ -127,10 +127,13 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
       }
     } catch (error) {
       console.error("Error in collection overview:", error);
-      if (error.message?.includes("not found")) {
-        return ctx.renderNotFound();
-      }
-      return new Response("Internal Server Error", { status: 500 });
+      return new Response("", {
+        status: 302,
+        headers: {
+          Location: "/404",
+          "Cache-Control": "no-store",
+        },
+      });
     }
   },
 };

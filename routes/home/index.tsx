@@ -79,10 +79,12 @@ export const handler: Handlers = {
       return ctx.render(data);
     } catch (error) {
       console.error("Error in handler:", error);
-      return ctx.render({
-        error: `Error: Internal server error`,
-        btcPrice: 0,
-        recommendedFee: 6,
+      return new Response("", {
+        status: 302,
+        headers: {
+          Location: "/404",
+          "Cache-Control": "no-store",
+        },
       });
     }
   },

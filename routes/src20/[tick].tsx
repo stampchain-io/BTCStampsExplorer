@@ -26,10 +26,13 @@ export const handler: Handlers = {
       return await ctx.render(body);
     } catch (error) {
       console.error("Error in SRC20 tick page:", error);
-      if (error.message?.includes("not found")) {
-        return ctx.renderNotFound();
-      }
-      return new Response("Internal Server Error", { status: 500 });
+      return new Response("", {
+        status: 302,
+        headers: {
+          Location: "/404",
+          "Cache-Control": "no-store",
+        },
+      });
     }
   },
 };
