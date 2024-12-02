@@ -157,14 +157,18 @@ export function StampCard({
     if (stamp.stamp_mimetype === "text/html") {
       return (
         <div class="relative w-full h-full">
-          <iframe
-            scrolling="no"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin allow-modals"
-            src={src}
-            class="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            onError={handleImageError}
-          />
+          <div class="relative pt-[100%]">
+            <iframe
+              width="100%"
+              height="100%"
+              scrolling="no"
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin"
+              src={src}
+              class="absolute top-0 left-0 w-full h-full object-contain"
+              onError={handleImageError}
+            />
+          </div>
         </div>
       );
     }

@@ -431,6 +431,7 @@ export class StampRepository {
       st.keyburn, 
       st.locked, 
       st.stamp_url, 
+      st.stamp_mimetype,
       st.supply, 
       st.block_time, 
       st.tx_hash, 
@@ -441,8 +442,8 @@ export class StampRepository {
     `;
 
     const secondaryColumns = `
-      st.stamp_base64,
-      st.stamp_mimetype
+      st.stamp_base64
+
     `;
     // Extended fields for full stamp details
     const extendedColumns = `
