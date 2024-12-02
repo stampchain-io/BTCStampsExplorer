@@ -59,7 +59,7 @@ export function HoldersGraph(
   const tableLabelClassName =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
   const tableValueClassName =
-    "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
+    "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full table-auto";
   const totalHolders = holders.length;
 
   return (
