@@ -286,7 +286,7 @@ export class StampService {
     options: StampServiceOptions
   ) {
     const { duration } = getCacheConfig(options.cacheType);
-    return await XcpManager.getXcpHoldersByCpid(cpid, page, limit, duration);
+    return await XcpManager.getAllXcpHoldersByCpid(cpid, page, limit, duration);
   }
 
   static async getStampSends(
