@@ -292,8 +292,8 @@ export function MintContent({
               error={formState.tokenError}
               isUppercase
             />
-            {searchResults.length > 0 && (
-              <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[20] max-h-60 overflow-y-auto">
+            {searchResults.length > 1 && (
+              <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[11] max-h-60 overflow-y-auto">
                 {searchResults.map((result: SearchResult) => (
                   <li
                     key={result.tick}

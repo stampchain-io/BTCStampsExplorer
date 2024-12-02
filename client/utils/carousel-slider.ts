@@ -255,10 +255,6 @@ export default function createCarouselSlider(
       el: ".swiper-pagination",
       clickable: true,
       renderBullet: function (index, className) {
-        const visibleSlides = isMobile
-          ? CAROUSEL_CONFIG.SLIDES.COUNT.MOBILE
-          : CAROUSEL_CONFIG.SLIDES.COUNT.DESKTOP;
-        if (index >= Number(visibleSlides * 2)) return "";
         return '<div class="w-6 h-1 bg-stamp-primary ' + className +
           '"></div>';
       },
