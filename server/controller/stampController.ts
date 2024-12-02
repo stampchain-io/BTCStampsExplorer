@@ -336,6 +336,7 @@ export class StampController {
     categories: {
       idents: SUBPROTOCOLS[];
       limit: number;
+      type: STAMP_TYPES;
     }[],
   ) {
     const results = await Promise.all(
@@ -344,7 +345,7 @@ export class StampController {
           page: 1,
           limit: category.limit,
           sortBy: "DESC",
-          type: "all",
+          type: category.type,
           ident: category.idents,
           noPagination: false,
         });
@@ -372,9 +373,9 @@ export class StampController {
         carouselStamps,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["STAMP", "SRC-721"], limit: 20 },
-          { idents: ["SRC-721"], limit: 12 },
-          { idents: ["STAMP"], limit: 20 },
+          { idents: ["STAMP", "SRC-721"], limit: 20, type: "stamps" },
+          { idents: ["SRC-721"], limit: 12, type: "stamps" },
+          { idents: ["STAMP"], limit: 20, type: "stamps" },
         ]),
         Src20Controller.fetchSrc20DetailsWithHolders(null, {
           op: "DEPLOY",
