@@ -201,7 +201,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 : stamp.floorPrice}
               {(typeof stamp.floorPrice === "number" ||
                 (stamp.marketCap && typeof stamp.marketCap === "number")) && (
-                <span className="font-light">{" "}BTC</span>
+                <span className="font-extralight">{" "}BTC</span>
               )}
             </p>
           </div>
@@ -218,7 +218,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       </div>
 
       <div className="flex flex-col dark-gradient p-3 mobileLg:p-6">
-        <div className="flex flex-col min-[880px]:items-end min-[880px]:text-right">
+        <div className="flex flex-col">
           <p className={dataLabel}>{editionLabel}</p>
           <p className={dataValueXl}>{editionCount}{" "}</p>
         </div>
@@ -239,26 +239,28 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </p>
           </div>
           <div className={`${dataColumn} flex-1 items-end`}>
-            <p className={dataLabelSm}>SIZE</p>
+            <p className={dataLabelSm}>BURN</p>
             <p className={dataValueSm}>
-              {imageSize ? `${(imageSize / 1024).toFixed(2)} KB` : "N/A"}
+              LOCKED
             </p>
           </div>
         </div>
 
         <div className="flex flex-row pt-3">
           <div className={`${dataColumn} flex-1 items-start`}>
-            <p className={dataLabelSm}>
-              CREATED
+            <p className={dataLabelSm}>SIZE</p>
+            <p className={dataValueSm}>
+              {imageSize ? `${(imageSize / 1024).toFixed(2)} KB` : "N/A"}
             </p>
+          </div>
+          <div className={`${dataColumn} flex-1 items-center`}>
+            <p className={dataLabelSm}>CREATED</p>
             <p className={dataValueSm}>
               {createdDate}
             </p>
           </div>
           <div className={`${dataColumn} flex-1 items-end`}>
-            <p className={dataLabelSm}>
-              TX HASH
-            </p>
+            <p className={dataLabelSm}>TX HASH</p>
             <a
               href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
               target="_blank"
