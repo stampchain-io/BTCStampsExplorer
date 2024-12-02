@@ -79,11 +79,21 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const dataContainerClassName =
     "flex justify-between items-center dark-gradient p-3 mobileMd:p-6";
-  const dataColumnClassName = "flex flex-col -space-y-1";
-  const dataLabelClassName =
+  const dataContainer =
+    "flex justify-between items-center dark-gradient p-3 mobileLg:p-6";
+  const dataColumn = "flex flex-col -space-y-1";
+  const dataLabelSm =
+    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+  const dataLabel =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-  const dataValueClassName =
+  const dataValueXs =
+    "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
+  const dataValueSm =
+    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
+  const dataValue =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
+  const dataValueXl =
+    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
   const buttonPurpleFlatClassName =
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
 
@@ -130,8 +140,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   }, [stamp?.stamp_mimetype]);
   return (
     <div>
-      <div className={"flex flex-col gap-3 mobileMd:gap-6"}>
-        <div className="dark-gradient p-3 mobileMd:p-6">
+      <div
+        className={"flex flex-col dark-gradient p-3 mobileMd:p-6 gap-3 mobileMd:gap-6"}
+      >
+        <div className="">
           <p className={titleGreyLDClassName}>
             <span className="font-light">#</span>
             <span className="font-black">{stamp.stamp}</span>
@@ -140,155 +152,120 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             href={`https://explorer.unspendablelabs.com/assets/${stamp.cpid}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-base mobileLg:text-lg desktop:text-xl font-bold text-stamp-grey-darker block"
+            className="text-base mobileLg:text-lg font-bold text-stamp-grey-darker hover-stamp-grey-light block"
           >
             {stamp.cpid}
           </a>
-          <p className="text-lg mobileLg:text-2xl desktop:text-3xl font-extralight text-stamp-grey-light mt-1.5 mobileLg:mt-3">
-            <span className="text-stamp-grey-darker font-extralight">
-              BY{" "}
-            </span>
+
+          <div className={"flex flex-col items-start pt-3"}>
+            <p className={dataLabel}>BY</p>
             <a
-              className="font-bold"
+              className="text-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1"
               href={`/wallet/${stamp.creator}`}
               target="_parent"
             >
               {creatorDisplay}
             </a>
-          </p>
-
-          <p className="text-stamp-grey-light text-base mobileLg:text-lg desktop:text-2xl mt-3 mobileLg:mt-6">
-            <span className="font-bold">{editionCount}{" "}</span>
-            <span className="text-stamp-grey-darker font-light uppercase">
-              {editionLabel}
-            </span>
-          </p>
-
-          <div className="flex flex-col gap-4 items-end">
-            <div className="flex flex-col gap-1.5 w-full text-right">
-              <p className="text-stamp-grey-darker font-bold text-sm mobileMd:text-base tablet:text-2xl desktop:text-3xl">
-                {(!stamp.floorPrice || stamp.floorPrice === "priceless") &&
-                    stamp.marketCap && typeof stamp.marketCap === "number"
-                  ? formatBTCAmount(stamp.marketCap)
-                  : typeof stamp.floorPrice === "number"
-                  ? formatBTCAmount(stamp.floorPrice)
-                  : stamp.floorPrice}
-                {(typeof stamp.floorPrice === "number" ||
-                  (stamp.marketCap && typeof stamp.marketCap === "number")) &&
-                  (
-                    <span className="text-sm mobileLg:text-base tablet:text-2xl desktop:text-3xl font-medium">
-                      {" "}BTC
-                    </span>
-                  )}
-              </p>
-              {(stamp.floorPriceUSD || stamp.marketCapUSD) && (
-                <p className="text-[#999999] font-bold text-xs mobileLg:text-sm desktop:text-base">
-                  {stamp.floorPriceUSD
-                    ? `${
-                      stamp.floorPriceUSD.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })
-                    }`
-                    : stamp.marketCapUSD
-                    ? `${
-                      stamp.marketCapUSD.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })
-                    }`
-                    : null}
-                  <span className="text-xs mobileLg:text-sm desktop:text-base font-light">
-                    {" "}USD
-                  </span>
-                </p>
-              )}
-            </div>
-
-            {lowestPriceDispenser && (
-              <button
-                className={`${buttonPurpleFlatClassName} float-right`}
-                onClick={toggleModal}
-              >
-                BUY
-              </button>
-            )}
           </div>
         </div>
 
-        <div className={dataContainerClassName}>
-          <div className={dataColumnClassName}>
-            <p className={dataLabelClassName}>TYPE</p>
-            <p className={dataValueClassName}>
+        <div className="flex flex-col items-end">
+          <div className="flex flex-col w-full text-right">
+            {(stamp.floorPriceUSD || stamp.marketCapUSD) && (
+              <p className={dataLabel}>
+                {stamp.floorPriceUSD
+                  ? `${
+                    stamp.floorPriceUSD.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })
+                  }`
+                  : stamp.marketCapUSD
+                  ? `${
+                    stamp.marketCapUSD.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })
+                  }`
+                  : null}
+                <span className="font-light">
+                  {" "}USD
+                </span>
+              </p>
+            )}
+
+            <p className={dataValueXl}>
+              {(!stamp.floorPrice || stamp.floorPrice === "NOT LISTED") &&
+                  stamp.marketCap && typeof stamp.marketCap === "number"
+                ? formatBTCAmount(stamp.marketCap, { excludeSuffix: true })
+                : typeof stamp.floorPrice === "number"
+                ? formatBTCAmount(stamp.floorPrice, { excludeSuffix: true })
+                : stamp.floorPrice}
+              {(typeof stamp.floorPrice === "number" ||
+                (stamp.marketCap && typeof stamp.marketCap === "number")) && (
+                <span className="font-light">{" "}BTC</span>
+              )}
+            </p>
+          </div>
+
+          {lowestPriceDispenser && (
+            <button
+              className={`${buttonPurpleFlatClassName} float-right`}
+              onClick={toggleModal}
+            >
+              BUY
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col dark-gradient p-3 mobileLg:p-6">
+        <div className="flex flex-col min-[880px]:items-end min-[880px]:text-right">
+          <p className={dataLabel}>{editionLabel}</p>
+          <p className={dataValueXl}>{editionCount}{" "}</p>
+        </div>
+
+        <div className="flex flex-row pt-3">
+          <div className={`${dataColumn} flex-1 items-start`}>
+            <p className={dataLabelSm}>TYPE</p>
+            <p className={dataValueSm}>
               {fileExtension}
             </p>
           </div>
-          <div className={`${dataColumnClassName} items-center`}>
-            <p className={dataLabelClassName}>DIMENSIONS</p>
-            <p className={dataValueClassName}>
+          <div className={`${dataColumn} flex-1 items-center`}>
+            <p className={dataLabelSm}>DIMENSIONS</p>
+            <p className={`${dataValueSm}`}>
               {imageDimensions
-                ? `${imageDimensions.width} x ${imageDimensions.height}px`
+                ? `${imageDimensions.width} x ${imageDimensions.height} PX`
                 : "N/A"}
             </p>
           </div>
-          <div className={`${dataColumnClassName} items-end`}>
-            <p className={dataLabelClassName}>SIZE</p>
-            <p className={dataValueClassName}>
+          <div className={`${dataColumn} flex-1 items-end`}>
+            <p className={dataLabelSm}>SIZE</p>
+            <p className={dataValueSm}>
               {imageSize ? `${(imageSize / 1024).toFixed(2)} KB` : "N/A"}
             </p>
           </div>
         </div>
 
-        <div className={dataContainerClassName}>
-          <div className={dataColumnClassName}>
-            <p className={dataLabelClassName}>Locked</p>
-            <p className={dataValueClassName}>
-              {stamp.locked ?? false ? "Yes" : "No"}
+        <div className="flex flex-row pt-3">
+          <div className={`${dataColumn} flex-1 items-start`}>
+            <p className={dataLabelSm}>
+              CREATED
             </p>
-          </div>
-          <div className={`${dataColumnClassName} items-center`}>
-            <p className={dataLabelClassName}>Divisible</p>
-            <p className={dataValueClassName}>
-              {stamp.divisible ? "Yes" : "No"}
-            </p>
-          </div>
-          <div className={`${dataColumnClassName} items-end`}>
-            <p className={dataLabelClassName}>Keyburned</p>
-            <p className={dataValueClassName}>
-              {stamp.keyburn ?? false ? "Yes" : "No"}
-            </p>
-          </div>
-        </div>
-
-        <div className={dataContainerClassName}>
-          <div className={dataColumnClassName}>
-            <p className={dataLabelClassName}>
-              Created
-            </p>
-            <p className={dataValueClassName}>
+            <p className={dataValueSm}>
               {createdDate}
             </p>
           </div>
-          <div className={`${dataColumnClassName} items-center`}>
-            <p className={dataLabelClassName}>
-              TX hash
+          <div className={`${dataColumn} flex-1 items-end`}>
+            <p className={dataLabelSm}>
+              TX HASH
             </p>
             <a
               href={`https://www.blockchain.com/explorer/transactions/btc/${stamp.tx_hash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className={dataValueClassName}
+              className={dataValueSm}
             >
               {abbreviateAddress(stamp.tx_hash, 4)}
-            </a>
-          </div>
-          <div className={`${dataColumnClassName} items-end`}>
-            <p className={dataLabelClassName}>
-              Block #
-            </p>
-            <a
-              href={`/block/${stamp.block_index}`}
-              className={dataValueClassName}
-            >
-              {stamp.block_index}
             </a>
           </div>
         </div>
