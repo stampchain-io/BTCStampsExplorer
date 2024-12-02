@@ -24,31 +24,41 @@ const tableHeaders = [
   { key: "confirmed", label: "Confirmed" },
 ];
 
-const tableTextClassName =
-  "w-full text-sm mobileLg:text-base text-stamp-grey-light font-light";
-const dataLabelClassName =
-  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+const tableLabelClassName =
+  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+const tableValueClassName =
+  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 
 function DispenseRow({ dispense }: { dispense: Dispense }) {
   return (
     <tr>
-      <td className="text-left w-full">
+      <td className="text-left py-0">
         <a href={`/wallet/${dispense.source}`}>
-          {abbreviateAddress(dispense.source)}
+          <span className="tablet:hidden">
+            {abbreviateAddress(dispense.source, 4)}
+          </span>
+          <span className="hidden tablet:inline">
+            {abbreviateAddress(dispense.source, 6)}
+          </span>
         </a>
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         <a href={`/wallet/${dispense.destination}`}>
-          {abbreviateAddress(dispense.destination)}
+          <span className="tablet:hidden">
+            {abbreviateAddress(dispense.destination, 4)}
+          </span>
+          <span className="hidden tablet:inline">
+            {abbreviateAddress(dispense.destination, 6)}
+          </span>
         </a>
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         {dispense.dispense_quantity}
       </td>
-      <td className="text-center">
+      <td className="text-center py-0">
         {formatSatoshisToBTC(dispense.satoshirate)}
       </td>
-      <td className="text-right">
+      <td className="text-right py-0">
         {dispense.confirmed ? "YES" : "NO"}
       </td>
     </tr>
@@ -59,7 +69,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
   return (
     <div className="relative shadow-md max-w-full">
       <div className="max-h-96 overflow-x-auto">
-        <table className={`${tableTextClassName} w-full table-fixed`}>
+        <table className={`${tableValueClassName} w-full table-fixed`}>
           <colgroup>
             <col className="w-[20%]" /> {/* From column */}
             <col className="w-[20%]" /> {/* To */}
@@ -73,7 +83,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
                 <th
                   key={key}
                   scope="col"
-                  className={`${dataLabelClassName} ${
+                  className={`${tableLabelClassName} ${
                     key === "from"
                       ? "text-left"
                       : key === "confirmed"
