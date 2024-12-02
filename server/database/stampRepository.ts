@@ -442,7 +442,7 @@ export class StampRepository {
 
     const secondaryColumns = `
       st.stamp_base64,
-      st.stamp_mimetype,
+      st.stamp_mimetype
     `;
     // Extended fields for full stamp details
     const extendedColumns = `
