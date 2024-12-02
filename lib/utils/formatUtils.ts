@@ -18,17 +18,19 @@ export function formatBTCAmount(
     includeSymbol?: boolean;
     decimals?: number;
     stripZeros?: boolean;
+    excludeSuffix?: boolean;
   } = {},
 ): string {
   const {
     includeSymbol = true,
     decimals = 8,
     stripZeros = true,
+    excludeSuffix = false,
   } = options;
 
   const formatted = btc.toFixed(decimals);
   const result = stripZeros ? stripTrailingZeros(formatted) : formatted;
-  return includeSymbol ? `${result} BTC` : result;
+  return includeSymbol && !excludeSuffix ? `${result} BTC` : result;
 }
 
 export function formatSatoshisToBTC(
