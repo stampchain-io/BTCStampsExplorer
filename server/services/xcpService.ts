@@ -5,6 +5,8 @@ import { dbManager } from "$server/database/databaseManager.ts";
 import { DispenserFilter, DispenseEvent, XcpBalance } from "$types/index.d.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
+import { logger } from "$lib/utils/logger.ts";
+
 export const xcp_v2_nodes = [
   {
     name: "stampchain.io",
@@ -159,7 +161,6 @@ export class DispenserManager {
         dispenser_info: dispenser.dispenser_info
       }));
 
-      // If API doesn't support status filter, apply it client-side
       const filteredDispensers = filter === "all"
         ? dispensers
         : dispensers.filter((dispenser) =>
@@ -204,7 +205,7 @@ export class DispenserManager {
     const skipCount = (page - 1) * limit;
     let processedCount = 0;
 
-    console.log(`Fetching dispenses for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`);
+    logger.debug(`Fetching dispenses for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`);
 
     while (true) {
       const queryParams = new URLSearchParams({
@@ -375,83 +376,26 @@ export class XcpManager {
     }
   }
 
-  static async getAllXcpAssets(maxRecords = 1000): Promise<any[]> {
-    let allAssets: any[] = [];
-    let cursor: string | null = null;
-    const endpoint = "/assets";
 
-    console.log(`Starting to fetch XCP assets, max records: ${maxRecords}`);
 
-    do {
-      const remainingRecords = maxRecords - allAssets.length;
-      const queryLimit = Math.min(remainingRecords, 1000);
-
-      console.log(
-        `Fetching batch of assets. Cursor: ${cursor}, Limit: ${queryLimit}`,
-      );
-
-      const queryParams = new URLSearchParams({ limit: queryLimit.toString() });
-      if (cursor) {
-        queryParams.append("cursor", cursor);
-      }
-
-      try {
-        const response = await this.fetchXcpV2WithCache<any>(
-          endpoint,
-          queryParams,
-        );
-
-        console.log(
-          `Received response. Result count: ${response.result?.length}`,
-        );
-
-        if (!response || !Array.isArray(response.result)) {
-          console.warn("Unexpected response structure:", response);
-          break;
-        }
-
-        allAssets = allAssets.concat(response.result);
-        cursor = response.next_cursor || null;
-
-        console.log(
-          `Total assets fetched: ${allAssets.length}, Next cursor: ${cursor}`,
-        );
-
-        if (allAssets.length >= maxRecords) {
-          console.log(
-            `Reached or exceeded maxRecords (${maxRecords}). Stopping.`,
-          );
-          break;
-        }
-      } catch (error) {
-        console.error("Error fetching assets batch:", error);
-        break;
-      }
-    } while (cursor);
-
-    console.log(
-      `Finished fetching XCP assets. Total fetched: ${allAssets.length}`,
-    );
-
-    return allAssets.slice(0, maxRecords);
-  }
-
-  static async getXcpHoldersByCpid(
+  static async getAllXcpHoldersByCpid(
     cpid: string,
     page: number = 1,
     limit: number = 50,
     cacheTimeout?: number
   ): Promise<{ holders: any[], total: number }> {
     const endpoint = `/assets/${cpid}/balances`;
-    let allHolders: any[] = [];
     let cursor: string | null = null;
-    const apiLimit = 1000;
+    const apiLimit = 1000;  // FIXME: need to handle this more gracefully getAllXcpBalancesByAddress is a better example for fetching all
+
+    // Use a Map to aggregate quantities by address
+    const holderMap = new Map<string, number>();
 
     // Calculate how many items to skip based on page and limit
     const skipCount = (page - 1) * limit;
     let processedCount = 0;
 
-    console.log(`Fetching XCP holders for CPID: ${cpid}, Page: ${page}, Limit: ${limit}`);
+    logger.info(`Fetching ALL XCP holders for CPID: ${cpid} up to api limit: ${apiLimit}`);
 
     while (true) {
       const queryParams = new URLSearchParams({
@@ -471,20 +415,21 @@ export class XcpManager {
           break;
         }
 
-        const holders = response.result
+        // Process each holder and aggregate quantities
+        response.result
           .filter((holder: any) => holder.quantity > 0)
-          .map((holder: any) => ({
-            address: holder.address,
-            quantity: holder.quantity,
-          }));
+          .forEach((holder: any) => {
+            // Use utxo_address if address is null, otherwise use address
+            const effectiveAddress = holder.address || holder.utxo_address;
+            
+            if (effectiveAddress) {
+              // Add to existing quantity or create new entry
+              const currentQuantity = holderMap.get(effectiveAddress) || 0;
+              holderMap.set(effectiveAddress, currentQuantity + holder.quantity);
+            }
+          });
 
-        allHolders = allHolders.concat(holders);
-        processedCount += holders.length;
-
-        // If we have enough items for the requested page, break
-        if (allHolders.length >= skipCount + limit) {
-          break;
-        }
+        processedCount += response.result.length;
 
         // Break if no next cursor or if it's the same as current
         if (!response.next_cursor || response.next_cursor === cursor) {
@@ -496,6 +441,14 @@ export class XcpManager {
         break;
       }
     }
+
+    // Convert map to array and sort by quantity (descending)
+    const allHolders = Array.from(holderMap.entries())
+      .map(([address, quantity]) => ({
+        address,
+        quantity
+      }))
+      .sort((a, b) => b.quantity - a.quantity);
 
     // Apply pagination to the collected results
     const paginatedHolders = allHolders.slice(skipCount, skipCount + limit);
@@ -556,7 +509,7 @@ export class XcpManager {
         // Handle single balance response for specific CPID
         if (response.result && response.result.quantity > 0) {
           balances = [{
-            address: response.result.address || null,
+            address: response.result.address || response.result.utxo_address || null,
             cpid: response.result.asset,
             quantity: response.result.quantity,
             utxo: response.result.utxo || "",
@@ -572,16 +525,37 @@ export class XcpManager {
           console.warn(`Unexpected result structure for address ${address}`);
           return { balances: [], total: 0 };
         }
-        balances = response.result
+
+        // Create a map to aggregate quantities by address
+        const balanceMap = new Map<string, XcpBalance>();
+
+        response.result
           .filter((balance: any) => balance.quantity > 0)
-          .map((balance: any) => ({
-            address: balance.address || null,
-            cpid: balance.asset,
-            quantity: balance.quantity,
-            utxo: balance.utxo || "",
-            utxo_address: balance.utxo_address || "",
-            divisible: balance.divisible || false,
-          }));
+          .forEach((balance: any) => {
+            // Use utxo_address if address is null, otherwise use address
+            const effectiveAddress = balance.address || balance.utxo_address;
+            
+            if (effectiveAddress) {
+              const existing = balanceMap.get(effectiveAddress);
+              
+              if (existing && existing.cpid === balance.asset) {
+                // Sum quantities for same address and asset
+                existing.quantity += balance.quantity;
+              } else {
+                // Create new balance entry
+                balanceMap.set(effectiveAddress, {
+                  address: effectiveAddress,
+                  cpid: balance.asset,
+                  quantity: balance.quantity,
+                  utxo: balance.utxo || "",
+                  utxo_address: balance.utxo_address || "",
+                  divisible: balance.divisible || false,
+                });
+              }
+            }
+          });
+
+        balances = Array.from(balanceMap.values());
       }
 
       // Apply UTXO-only filter if requested
