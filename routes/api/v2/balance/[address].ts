@@ -67,10 +67,10 @@ export const handler: Handlers<AddressHandlerContext> = {
         btc: {
           address: address,
         },
-        data: [{
+        data: {
           stamps: stamps.data || [],
           src20: src20.data || [],
-        }],
+        },
       };
 
       // Return with proper caching and informational headers

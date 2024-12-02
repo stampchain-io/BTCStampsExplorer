@@ -37,6 +37,15 @@ function getCacheType(path: string, isIndex: boolean): RouteType {
   return RouteType.STAMP_DETAIL;
 }
 
+function getSortParameter(url: URL): string | null {
+  // Check for both sort and sort_order parameters
+  const sort = url.searchParams.get("sort");
+  const sortOrder = url.searchParams.get("sort_order");
+
+  // Prefer 'sort' if both are present, otherwise use whichever exists
+  return sort ?? sortOrder ?? null;
+}
+
 export const createStampHandler = (
   routeConfig: StampHandlerConfig,
 ): Handlers => ({
@@ -57,13 +66,14 @@ export const createStampHandler = (
         const maxLimit = 100;
         const effectiveLimit = Math.min(limit ?? maxLimit, maxLimit);
 
-        // Validate sort parameter
-        const sortParam = url.searchParams.get("sort");
+        // Get and validate sort parameter using new helper
+        const sortParam = getSortParameter(url);
         const sortValidation = validateSortDirection(sortParam);
         if (sortValidation instanceof Response) {
           return sortValidation;
         }
 
+        // For index routes, we only need core columns for better performance
         const result = await StampController.getStamps({
           page,
           limit: effectiveLimit,
@@ -71,7 +81,8 @@ export const createStampHandler = (
           type: routeConfig.type,
           allColumns: false,
           skipTotalCount: false,
-          cacheType, // Pass cache type to controller
+          includeSecondary: false, // Explicitly exclude secondary columns for listings
+          cacheType,
         });
 
         return ResponseUtil.success(result, { routeType: cacheType });
@@ -88,7 +99,7 @@ export const createStampHandler = (
           }
 
           const { limit, page } = pagination;
-          const sortParam = url.searchParams.get("sort");
+          const sortParam = getSortParameter(url);
           const sortValidation = validateSortDirection(sortParam);
           if (sortValidation instanceof Response) {
             return sortValidation;
@@ -118,8 +129,8 @@ export const createStampHandler = (
           const { limit, page } = pagination;
           const dispensers = await StampController.getStampDispensers(
             id,
-            page,
-            limit,
+            page || 1,
+            limit || 50,
             cacheType,
           );
 
@@ -173,14 +184,19 @@ export const createStampHandler = (
           return ResponseUtil.success(dispenses, { routeType: cacheType });
         }
 
+        // For individual stamp details, we want both core and secondary columns
         const stampData = await StampController.getStampDetailsById(
           id,
           routeConfig.type,
-          cacheType, // Pass cache type to controller
+          cacheType,
+          undefined, // Use default cache duration
+          true, // Explicitly include secondary columns for details
         );
+
         if (!stampData) {
           return ResponseUtil.notFound("Stamp not found");
         }
+
         return ResponseUtil.success({
           last_block: stampData.last_block,
           data: stampData.data,

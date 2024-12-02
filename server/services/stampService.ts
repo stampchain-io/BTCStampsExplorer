@@ -22,7 +22,8 @@ export class StampService {
     id: string | number,
     stampType: STAMP_TYPES = "all",
     cacheType?: RouteType,
-    cacheDuration?: number | "never"
+    cacheDuration?: number | "never",
+    includeSecondary: boolean = true
   ) {
     try {
       // Get stamp details using getStamps with proper caching
@@ -33,7 +34,8 @@ export class StampService {
         type: stampType,
         skipTotalCount: true,
         cacheType,
-        cacheDuration
+        cacheDuration,
+        includeSecondary
       });
 
       if (!stampResult) {
@@ -98,6 +100,7 @@ export class StampService {
     identifier?: string | number | (string | number)[];
     blockIdentifier?: number | string;
     allColumns?: boolean;
+    includeSecondary?: boolean;
     noPagination?: boolean;
     cacheDuration?: number | "never";
     collectionId?: string | string[];
@@ -122,6 +125,7 @@ export class StampService {
     const [result, lastBlock] = await Promise.all([
       StampRepository.getStamps({
         ...queryOptions,
+        includeSecondary: options.includeSecondary,
         cacheType: options.cacheType,
         cacheDuration: options.cacheDuration
       }),

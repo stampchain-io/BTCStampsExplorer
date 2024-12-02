@@ -45,6 +45,7 @@ export class StampController {
     cacheDuration,
     noPagination = false,
     allColumns = false,
+    includeSecondary = false,
     sortColumn = "tx_index",
     suffixFilters,
     collectionStampLimit = 12,
@@ -107,6 +108,7 @@ export class StampController {
         ident: finalIdent,
         suffixFilters,
         allColumns,
+        includeSecondary,
         collectionId,
         identifier,
         blockIdentifier,
@@ -185,7 +187,8 @@ export class StampController {
     id: string, 
     stampType: STAMP_TYPES = "all",
     cacheType: RouteType = RouteType.STAMP_DETAIL,
-    cacheDuration?: number | "never"
+    cacheDuration?: number | "never",
+    includeSecondary: boolean = true
   ) {
     return this.getStamps({
       identifier: id,
@@ -195,7 +198,8 @@ export class StampController {
       allColumns: false,
       noPagination: true,
       skipTotalCount: true,
-      enrichWithAssetInfo: true // Enable asset info enrichment
+      enrichWithAssetInfo: true,
+      includeSecondary
     });
   }
 

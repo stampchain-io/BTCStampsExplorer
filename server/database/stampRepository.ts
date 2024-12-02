@@ -366,6 +366,7 @@ export class StampRepository {
       collectionStampLimit?: number;
       skipTotalCount?: boolean;
       selectColumns?: string[];
+      includeSecondary?: boolean;
     },
   ) {
     const queryOptions = {
@@ -373,6 +374,7 @@ export class StampRepository {
       page: 1,
       sortBy: "ASC",
       type: "stamps",
+      includeSecondary: false,
       ...options,
       ...(options.collectionId && (!options.groupBy || !options.groupBySubquery) ? {
         groupBy: "collection_id",
@@ -400,6 +402,7 @@ export class StampRepository {
       collectionStampLimit = 12,
       skipTotalCount = false,
       selectColumns,
+      includeSecondary = false,
     } = queryOptions;
 
     const whereConditions: string[] = [];
@@ -427,8 +430,6 @@ export class StampRepository {
       st.divisible, 
       st.keyburn, 
       st.locked, 
-      st.stamp_base64, 
-      st.stamp_mimetype, 
       st.stamp_url, 
       st.supply, 
       st.block_time, 
@@ -439,6 +440,10 @@ export class StampRepository {
       st.file_hash
     `;
 
+    const secondaryColumns = `
+      st.stamp_base64,
+      st.stamp_mimetype,
+    `;
     // Extended fields for full stamp details
     const extendedColumns = `
       st.asset_longname,
@@ -453,8 +458,10 @@ export class StampRepository {
     let selectClause = selectColumns 
       ? `st.${selectColumns.join(', st.')}` // Only selected columns if specified
       : allColumns 
-        ? `${coreColumns}, ${extendedColumns}` // All columns if allColumns is true
-        : coreColumns; // Just core columns by default
+        ? `${coreColumns}, ${secondaryColumns}, ${extendedColumns}` // All columns including secondary
+        : includeSecondary
+          ? `${coreColumns}, ${secondaryColumns}` // Core + secondary columns
+          : coreColumns; // Just core columns by default
 
     // Only include collection_id in select clause if collectionId is provided
     if (collectionId) {

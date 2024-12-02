@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "validate:all": "npm run validate:schema",
     "validate:schema": "npx @redocly/cli lint --config .redocly.yaml --format stylish ./schema.yml",
     "validate:ci": "npm run validate:schema",
     "dredd": "dredd"
@@ -15,7 +14,7 @@
     "tiny-secp256k1": "2.2.3"
   },
   "devDependencies": {
-    "@redocly/cli": "^1.10.0",
+    "@redocly/cli": "^1.25.15",
     "dredd": "^14.1.0",
     "hooks": "^0.3.2",
     "js-yaml": "^4.1.0",
