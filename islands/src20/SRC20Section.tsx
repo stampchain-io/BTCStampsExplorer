@@ -45,7 +45,7 @@ export const SRC20Section = (props: SRC20SectionProps) => {
     setModalImg(imgSrc);
     setModalOpen(!isModalOpen);
   };
-
+  console.log("src20====>", data);
   return (
     <div>
       {props.title && (

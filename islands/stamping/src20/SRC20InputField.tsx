@@ -32,7 +32,7 @@ export function SRC20InputField({
         }`}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onInput={onChange}
         onBlur={onBlur}
         maxLength={maxLength}
         inputMode={inputMode}
