@@ -225,7 +225,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           <p className={dataValueXl}>{editionCount}{" "}</p>
         </div>
 
-        <div className="flex flex-row pt-3">
+        <div className="flex flex-row pt-3 mobileLg:pt-6">
           <div className={`${dataColumn} flex-1 items-start`}>
             <p className={dataLabelSm}>TYPE</p>
             <p className={dataValueSm}>
@@ -300,7 +300,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           </div>
         </div>
 
-        <div className="flex flex-row pt-3">
+        <div className="flex flex-row pt-1.5 mobileLg:pt-3">
           <div className={`${dataColumn} flex-1 items-start`}>
             <p className={dataLabelSm}>SIZE</p>
             <p className={dataValueSm}>
