@@ -25,12 +25,12 @@ const WalletHeader = ({
     setIsOpen1(false);
     setIsOpen2(open);
   };
+  const titlePurpleDL =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
 
   return (
     <div class="flex justify-between items-center gap-3 w-full">
-      <h1 className="inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1">
-        WALLET
-      </h1>
+      <h1 className={titlePurpleDL}>WALLET</h1>
       <div class="flex gap-3 justify-between h-[40px]">
         <Filter
           initFilter={filterBy}
