@@ -27,43 +27,61 @@ export default function AboutHeader() {
     fetchData();
   }, []);
 
+  const titlePurpleDL =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
+  const subTitlePurple =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
+  const bodyTextLight =
+    "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
+  const dataLabelPurple =
+    "text-base mobileLg:text-lg font-light text-stamp-purple-highlight";
+  const dataValuePurpleSm =
+    "text-2xl mobileLg:text-3xl font-black text-black text-stroke-glow";
+  const dataValuePurple =
+    "text-4xl mobileLg:text-5xl desktop:text-6xl font-black text-black text-stroke-glow";
+  const dataValuePurpleXl =
+    "text-6xl mobileLg:text-7xl desktop:text-8xl font-black text-black text-stroke-glow";
+
   return (
-    <div class="text-[#CCCCCC]">
-      <h1 class="text-3xl desktop:text-6xl tablet:text-5xl mobileMd:text-4xl font-black purple-gradient1 mb-2">
+    <div>
+      <h1 className={titlePurpleDL}>
         ABOUT
       </h1>
-      <h2 class="text-xl desktop:text-5xl mobileLg:text-4xl mobileMd:text-2xl font-extralight text-stamp-primary mb-3">
+      <h2 className={subTitlePurple}>
         STAMPCHAIN
       </h2>
-      <p class="text-sm desktop:text-xl mobileLg:text-lg mobileSm:text-base font-medium w-full desktop:max-w-[888px]">
-        The <span class="text-stamp-primary">Bitcoin Stamps meta-protocol</span>
-        {" "}
-        was conceived by Mike In Space, a maverick figure in the Bitcoin and
-        Counterparty community with deep roots in underground memetic culture.
-        While others saw Bitcoin's UTXO model as just a ledger, Mike glimpsed
-        something more profound: the foundation for humanity's most permanent
-        digital canvas.
-      </p>
+      <div className="w-full space-y-3 mobileMd:space-y-6">
+        <p className={bodyTextLight}>
+          The{" "}
+          <span className="text-stamp-primary">
+            Bitcoin Stamps meta-protocol
+          </span>{" "}
+          was conceived by Mike In Space, a maverick figure in the Bitcoin and
+          Counterparty community with deep roots in underground memetic culture.
+          While others saw Bitcoin's UTXO model as just a ledger, Mike glimpsed
+          something more profound: the foundation for humanity's most permanent
+          digital canvas.
+        </p>
+        <p className={bodyTextLight}>
+          Enter Arwyn, a long-time peer and fellow digital conspirator, who may
+          or may not have slightly oversold his dev credentials when Mike came
+          calling. Together, they began experimenting with various methods, some
+          so forward-thinking they accidentally predicted future innovations.
+        </p>
+        <p className={bodyTextLight}>
+          As the project evolved from concept to creation, Reinamora joined the
+          fellowship, bringing technical precision and focused determination to
+          the team during what he called his "extended sabbatical." This trinity
+          of builders didn't just create a protocol—they forged a new standard
+          for digital permanence that would make ancient stone tablets look like
+          temporary Post-it notes.
+        </p>
+      </div>
       <div class="grid grid-cols-12 mt-6">
-        <div class="desktop:col-span-8 mobileLg:col-span-6 col-span-12 flex flex-col gap-4 w-full">
-          <p class="text-sm desktop:text-xl mobileLg:text-lg mobileSm:text-base font-medium w-full">
-            Enter Arwyn, a long-time peer and fellow digital conspirator, who
-            may or may not have slightly oversold his dev credentials when Mike
-            came calling. Together, they began experimenting with various
-            methods, some so forward-thinking they accidentally predicted future
-            innovations.
-          </p>
-          <p class="text-sm desktop:text-xl mobileLg:text-lg mobileSm:text-base font-medium w-full">
-            As the project evolved from concept to creation, Reinamora joined
-            the fellowship, bringing technical precision and focused
-            determination to the team during what he called his "extended
-            sabbatical." This trinity of builders didn't just create a
-            protocol—they forged a new standard for digital permanence that
-            would make ancient stone tablets look like temporary Post-it notes.
-          </p>
-          <p class="text-sm desktop:text-xl mobileLg:text-lg mobileSm:text-base font-medium w-full">
+        <div class="desktop:col-span-8 mobileLg:col-span-6 col-span-12 flex flex-col gap-3 mobileMd:gap-6 w-full">
+          <p className={bodyTextLight}>
             The introduction of{" "}
-            <span class="text-stamp-primary">SRC-20 tokens</span>{" "}
+            <span className="text-stamp-primary">SRC-20 tokens</span>{" "}
             marked a watershed moment, proving that Bitcoin Stamps could do more
             than just store data—it could breathe new life into the entire
             ecosystem. In a delightful twist of fate, the success of this
@@ -71,9 +89,9 @@ export default function AboutHeader() {
             community after years away, reigniting their passion for building on
             Bitcoin.
           </p>
-          <p class="text-sm desktop:text-xl mobileLg:text-lg mobileSm:text-base font-medium w-full">
+          <p className={bodyTextLight}>
             Today,{" "}
-            <span class="text-stamp-primary">
+            <span className="text-stamp-primary">
               Bitcoin Stamps stands as an immutable testament to human ingenuity
             </span>, combining Bitcoin's unshakeable security with
             groundbreaking on-chain capabilities. Every stamp is a story, every
@@ -82,41 +100,41 @@ export default function AboutHeader() {
             devised.
           </p>
         </div>
-        <div class="col-span-12 desktop:col-span-4 mobileLg:col-span-6 h-full flex flex-col justify-center mobileLg:items-center items-end w-full mobileLg:mt-auto mobileLg:mr-auto mt-12 mobileMd:mr-14 mr-">
-          <p class="text-stamp-primary text-base desktop:text-2xl mobileLg:text-xl mobileMd:text-lg">
+        <div class="flex flex-col col-span-12 mobileLg:col-span-6 desktop:col-span-4 w-full h-full justify-center items-center pl-24 mobileLg:pl-0 mt-12 mobileLg:mt-auto">
+          <p class={dataLabelPurple}>
             GENESIS STAMP
           </p>
-          <div class="flex flex-col items-end">
-            <h1 class="leading-normal font-work-sans font-black text-3xl desktop:text-6xl tablet:text-5xl mobileMd:text-4xl text-stamp-bg-grey-darkest text-stroke">
+          <div class="flex flex-col items-center">
+            <h6 class={dataValuePurple}>
               {new Date("2023-03-07T01:19:09Z").toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "numeric",
                 day: "numeric",
               })}
-            </h1>
-            <h1 class="leading-normal font-work-sans font-black text-3xl desktop:text-6xl tablet:text-5xl mobileMd:text-4xl text-stamp-bg-grey-darkest text-stroke">
+            </h6>
+            <h6 class={dataValuePurpleSm}>
               {new Date("2023-03-07T01:19:09Z").toLocaleTimeString("en-US", {
                 hour: "numeric",
                 minute: "2-digit",
                 hour12: true,
               })}
-            </h1>
+            </h6>
           </div>
         </div>
       </div>
       <div class="grid grid-cols-12 mt-24">
-        <div class="col-span-8 flex flex-col justify-center tablet:items-center items-start">
-          <p class="text-stamp-primary text-base desktop:text-2xl mobileLg:text-xl mobileMd:text-lg">
+        <div class="col-span-8 flex flex-col justify-center items-center">
+          <p class={dataLabelPurple}>
             STAMPS STAMPED
           </p>
           {isLoading
             ? (
-              <div class="animate-spin rounded-full mt-6 h-10 w-10 border-b-2 border-white" />
+              <div class="animate-spin rounded-full mt-6 h-10 w-10 border-b-2 border-stamp-purple-highlight" />
             )
             : (
-              <h1 class="leading-normal font-work-sans font-black	text-5xl desktop:text-[84px] mobileLg:text-7xl mobileMd:text-6xl text-stamp-bg-grey-darkest text-stroke">
+              <h6 class={dataValuePurpleXl}>
                 {totalStampsCount.toLocaleString("en-US")}
-              </h1>
+              </h6>
             )}
         </div>
         <div class="col-span-4"></div>
@@ -125,28 +143,28 @@ export default function AboutHeader() {
       <div class="grid grid-cols-12 mt-24">
         <div class="col-span-6"></div>
         <div class="col-span-6 flex flex-col justify-center items-center">
-          <p class="text-stamp-primary text-base desktop:text-2xl mobileLg:text-xl mobileMd:text-lg">
+          <p class={dataLabelPurple}>
             TOKENS DEPLOYED
           </p>
           {isLoading
             ? (
-              <div class="animate-spin rounded-full mt-6 h-10 w-10 border-b-2 border-white" />
+              <div class="animate-spin rounded-full mt-6 h-10 w-10 border-b-2 border-stamp-purple-highlight" />
             )
             : (
-              <h1 class="leading-normal font-work-sans font-black	text-5xl desktop:text-[84px] mobileLg:text-7xl mobileMd:text-6xl text-stamp-bg-grey-darkest text-stroke">
+              <h6 class={dataValuePurpleXl}>
                 {totalTokensCount.toLocaleString("en-US")}
-              </h1>
+              </h6>
             )}
         </div>
       </div>
 
       <div class="flex flex-col justify-center items-center mobileLg:mt-36 mt-24">
-        <p class="text-stamp-primary text-base desktop:text-2xl mobileLg:text-xl mobileMd:text-lg">
+        <p class={dataLabelPurple}>
           OG TOKEN
         </p>
-        <h1 class="leading-normal font-work-sans font-black	text-3xl desktop:text-6xl tablet:text-5xl mobileMd:text-4xl text-stamp-bg-grey-darkest text-stroke">
+        <h6 class={dataValuePurple}>
           KEVIN
-        </h1>
+        </h6>
       </div>
     </div>
   );
