@@ -25,7 +25,11 @@ import { logger } from "$lib/utils/logger.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { StampRepository } from "$server/database/stampRepository.ts";
-import { isCpid } from "$lib/utils/identifierUtils.ts";
+import { isCpid, getIdentifierType } from "$lib/utils/identifierUtils.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { detectContentType } from "$lib/utils/imageUtils.ts";
+import { getRecursiveHeaders } from "$lib/utils/securityHeaders.ts";
+import { getMimeType } from "$lib/utils/imageUtils.ts";
 
 interface StampControllerOptions {
   cacheType: RouteType;
@@ -45,7 +49,7 @@ export class StampController {
     cacheDuration,
     noPagination = false,
     allColumns = false,
-    includeSecondary = false,
+    includeSecondary = true,
     sortColumn = "tx_index",
     suffixFilters,
     collectionStampLimit = 12,
@@ -494,78 +498,130 @@ export class StampController {
     }
   }
 
-  static async getStampFile(id: string, params: string): Promise<Response> {
+  private static async createStampRedirect(
+    identifier: string,
+    stamp_url: string,
+    baseUrl?: string,
+    contentType: string = 'application/octet-stream'
+  ) {
+    const redirectPath = baseUrl 
+      ? `${baseUrl}/stamps/${identifier.includes(".") ? identifier : stamp_url}`
+      : `/stamps/${identifier.includes(".") ? identifier : stamp_url}`;
+
     try {
-      const result = await StampService.getStampFile(id);
-
-      if (!result || result.type === "notFound") {
-        return this.redirectToNotAvailable();
+      const response = await fetch(redirectPath);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.statusText}`);
       }
 
-      switch (result.type) {
-        case "redirect":
-          return new Response("", {
-            status: 301,
-            headers: {
-              Location: `/content/${result.fileName}${
-                params ? `?${params}` : ""
-              }`,
-            },
-          });
-        case "base64":
-          return new Response(decodeBase64(result.base64), {
-            headers: {
-              "Content-Type": result.mimeType || "application/octet-stream",
-            },
-          });
-        default:
-          return this.redirectToNotAvailable();
-      }
-    } catch (error) {
-      logger.error("stamps", {
-        message: "Error in StampController.getStampFile",
-        error: error instanceof Error ? error.message : String(error)
+      const content = await response.arrayBuffer();
+      
+      return new Response(content, {
+        headers: {
+          "Content-Type": contentType,
+          "Content-Length": content.byteLength.toString(),
+        }
       });
-      throw error;
+    } catch (error) {
+      logger.error("content", {
+        message: "Error fetching from CDN",
+        error: error instanceof Error ? error.message : String(error),
+        path: redirectPath
+      });
+      return ResponseUtil.stampNotFound();
     }
   }
 
-  private static redirectToNotAvailable(): Response {
-    return new Response(null, {
-      status: 404,
-      headers: {
-        "Cache-Control": "no-store, must-revalidate",
-        "Content-Type": "text/html; charset=utf-8",
-      },
-    });
-  }
-
-  static async getCreatorNameByAddress(
-    address: string,
-  ): Promise<string | null> {
+  static async getStampFile(
+    identifier: string,
+    routeType: RouteType,
+    baseUrl?: string,
+    isFullPath?: boolean,
+  ) {
     try {
-      return await StampService.getCreatorNameByAddress(address);
-    } catch (error) {
-      logger.error("stamps", {
-        message: "Error in getCreatorNameByAddress",
-        error: error instanceof Error ? error.message : String(error)
+      // Case 1: Full path with extension - use CDN
+      if (isFullPath) {
+        const mimeType = getMimeType(identifier.split('.').pop() || '');
+        return this.createStampRedirect(
+          identifier,
+          identifier,
+          baseUrl,
+          mimeType
+        );
+      }
+
+      // Case 2: DB lookup
+      const result = await StampService.getStampFile(identifier);
+      if (!result) return ResponseUtil.stampNotFound();
+
+      const contentInfo = detectContentType(
+        result.body,
+        undefined,
+        result.headers["Content-Type"]
+      );
+
+      // Content types that need base64 decoding before serving
+      const needsDecoding = 
+        contentInfo.mimeType.includes('javascript') || 
+        contentInfo.mimeType.includes('text/') ||    // All text content (HTML, CSS, etc.)
+        contentInfo.mimeType.includes('application/json') ||
+        contentInfo.mimeType.includes('xml');
+
+      if (needsDecoding) {
+        try {
+          const decodedContent = atob(result.body);
+          return ResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
+            binary: false,
+            headers: {
+              "CF-No-Transform": contentInfo.mimeType.includes('javascript') || 
+                                contentInfo.mimeType.includes('text/html'),
+              ...(result.headers || {}),
+            }
+          });
+        } catch (error) {
+          logger.error("content", {
+            message: "Error decoding text content",
+            error: error instanceof Error ? error.message : String(error),
+            identifier,
+          });
+          return ResponseUtil.internalError(error);
+        }
+      }
+
+      // Binary content (images, audio, video, etc.) stays base64 encoded
+      return ResponseUtil.stampResponse(result.body, contentInfo.mimeType, {
+        binary: true,
+        headers: result.headers
       });
-      throw error;
+
+    } catch (error) {
+      await logger.error("content", {
+        message: "StampController error",
+        error: error instanceof Error ? error.message : String(error),
+        identifier,
+      });
+      return ResponseUtil.internalError(error);
     }
   }
 
-  static async updateCreatorName(
-    address: string,
-    newName: string,
-  ): Promise<boolean> {
+  static async getCreatorNameByAddress(address: string): Promise<Response> {
     try {
-      return await StampService.updateCreatorName(address, newName);
+      const name = await StampService.getCreatorNameByAddress(address);
+      return ResponseUtil.jsonResponse({ name });
     } catch (error) {
-      logger.error("stamps", {
-        message: "Error in updateCreatorName",
-        error: error instanceof Error ? error.message : String(error)
-      });
-      throw error;
+      console.error("Error in getCreatorNameByAddress:", error);
+      return ResponseUtil.internalError(error, "Error getting creator name");
+    }
+  }
+
+  static async updateCreatorName(address: string, newName: string): Promise<Response> {
+    try {
+      const success = await StampService.updateCreatorName(address, newName);
+      return ResponseUtil.jsonResponse({ success });
+    } catch (error) {
+      console.error("Error in updateCreatorName:", error);
+      return ResponseUtil.internalError(error, "Error updating creator name");
     }
   }
 
@@ -637,15 +693,18 @@ export class StampController {
     return result.cpid;
   }
 
-  static async getStampHolders(
-    id: string, 
-    page: number = 1, 
-    limit: number = 50,
-    cacheType: RouteType
-  ) {
+  static async getStampHolders(id: string, page: number = 1, limit: number = 50, cacheType: RouteType) {
     try {
-      const cpid = await this.resolveToCpid(id);
-      const { holders, total } = await StampService.getStampHolders(cpid, page, limit, { cacheType });
+      // If not a CPID, resolve it
+      const cpid = isCpid(id) ? id : await this.resolveToCpid(id);
+      
+      const { holders, total } = await StampService.getStampHolders(
+        cpid,
+        page, 
+        limit, 
+        { cacheType }
+      );
+
       return {
         data: this.processHolders(holders),
         page,

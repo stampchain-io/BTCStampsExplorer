@@ -40,7 +40,8 @@ export function isCpid(value: unknown): boolean {
       const numericPart = BigInt(value.slice(1));
       const min = BigInt(26n ** 12n + 1n);
       const max = BigInt(2n ** 64n - 1n);
-      return numericPart >= min && numericPart <= max;
+      const isValid = numericPart >= min && numericPart <= max;
+      return isValid;
     } catch {
       return false;
     }

@@ -12,9 +12,22 @@ import { BIG_LIMIT } from "$lib/utils/constants.ts";
 import { DispenserFilter } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
+import { getMimeType, detectContentType } from "$lib/utils/imageUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface StampServiceOptions {
   cacheType: RouteType;
+}
+
+interface StampFileResult {
+  status: number;
+  body: string;
+  stamp_url: string;
+  tx_hash: string;
+  headers: {
+    "Content-Type": string;
+    [key: string]: string;
+  };
 }
 
 export class StampService {
@@ -156,30 +169,25 @@ export class StampService {
     return response;
   }
 
-  static async getStampFile(id: string) {
-    const result = await StampRepository.getStampFilenameByIdFromDb(id);
-    if (!result?.fileName || !result?.stamp_mimetype) {
-      return { type: "notFound" };
-    }
+  static async getStampFile(id: string): Promise<StampFileResult | null> {
+    const result = await StampRepository.getStampFile(id);
+    if (!result) return null;
 
-    // Get extension directly from stamp_url/fileName
-    const extension = result.fileName.split('.').pop();
-    
-    if (!extension) {
-      if (result.base64) {
-        return { 
-          type: "base64", 
-          base64: result.base64, 
-          mimeType: result.stamp_mimetype 
-        };
+    await logger.debug("content" as LogNamespace, {
+      message: "StampService processing file",
+      id,
+      originalUrl: result.stamp_url,
+      mimeType: result.stamp_mimetype,
+    });
+
+    return {
+      status: 200,
+      body: result.stamp_base64,
+      stamp_url: result.stamp_url,
+      tx_hash: result.tx_hash,
+      headers: {
+        "Content-Type": result.stamp_mimetype
       }
-      return { type: "notFound" };
-    }
-
-    return { 
-      type: "redirect", 
-      fileName: result.fileName, 
-      base64: result.base64 
     };
   }
 

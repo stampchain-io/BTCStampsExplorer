@@ -1,22 +1,10 @@
-import { StampController } from "$server/controller/stampController.ts";
 import { Handlers } from "$fresh/server.ts";
-import { StampRow } from "globals";
+import { handleContentRequest } from "$routes/handlers/sharedContentHandler.ts";
 
-export const handler: Handlers<StampRow> = {
-  async GET(req: Request, ctx) {
-    const { id } = ctx.params;
-    const url = new URL(req.url);
-    const params = url.searchParams.toString();
-
-    try {
-      const result = await StampController.getStampFile(id as string, params);
-      return result;
-    } catch (error) {
-      console.error(`Error processing stamp file request for id ${id}:`, error);
-      return new Response(null, {
-        status: 500,
-        headers: { "X-Error": "Internal Server Error" },
-      });
-    }
+export const handler: Handlers = {
+  GET(_req: Request, ctx) {
+    const id = ctx.params.id.split("/").pop();
+    if (!id) return ctx.renderNotFound();
+    return handleContentRequest(id);
   },
 };

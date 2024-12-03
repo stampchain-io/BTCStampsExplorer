@@ -81,7 +81,7 @@ export const createStampHandler = (
           type: routeConfig.type,
           allColumns: false,
           skipTotalCount: false,
-          includeSecondary: false, // Explicitly exclude secondary columns for listings
+          includeSecondary: true, // Explicitly exclude secondary columns for listings
           cacheType,
         });
 

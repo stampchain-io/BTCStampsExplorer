@@ -1,6 +1,6 @@
 import "$/server/config/env.ts";
 
-import { create, Header, Payload, verify } from "$djwt/mod.ts";
+import { create, Header, Payload, verify } from "djwt/mod.ts";
 
 let SECRET_KEY: string | undefined;
 
