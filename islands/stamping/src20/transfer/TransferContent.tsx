@@ -1,5 +1,5 @@
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { walletContext } from "$client/wallet/wallet.ts";
 
@@ -8,6 +8,7 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "../SRC20InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
+import { SearchResult } from "$islands/datacontrol/Search.tsx";
 
 const bodyToolsClassName =
   "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
@@ -26,6 +27,7 @@ export function TransferContent(
 ) {
   const {
     formState,
+    setFormState,
     handleChangeFee,
     handleInputChange,
     handleSubmit,
@@ -40,6 +42,9 @@ export function TransferContent(
   } = useSRC20Form("transfer", trxType);
 
   const [tosAgreed, setTosAgreed] = useState(false);
+  const [balances, setBalances] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [openDrop, setOpenDrop] = useState<boolean>(false);
 
   const { wallet, isConnected } = walletContext;
 
@@ -67,6 +72,53 @@ export function TransferContent(
     }
   };
 
+  // Update useEffect to handle search results with better debouncing
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (formState.token?.trim()) {
+        try {
+          const data = balances.filter((item) => {
+            const regex = new RegExp(formState.token, "i"); // 'i' makes it case-insensitive
+            return regex.test(item.tick);
+          });
+
+          if (data && Array.isArray(data)) {
+            setSearchResults(data);
+          } else {
+            setSearchResults([]);
+          }
+        } catch (error) {
+          setSearchResults([]);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(delayDebounceFn);
+    };
+  }, [formState.token, balances]);
+
+  useEffect(() => {
+    const getBalances = async () => {
+      const response = await fetch(
+        `/api/v2/src20/balance/bc1qedz5mpvuc2ha8dahlthfe40psgpqeprfy569su`,
+      );
+      const data = await response.json();
+      setBalances(data.data);
+    };
+    getBalances();
+  }, []);
+
+  const handleDropDown = (ticket: string) => {
+    setOpenDrop(false);
+    setFormState((prev) => ({
+      ...prev,
+      token: ticket as string,
+    }));
+  };
+
   return (
     <div className={bodyToolsClassName}>
       <h1 className={titlePurpleLDCenterClassName}>TRANSFER</h1>
@@ -82,14 +134,34 @@ export function TransferContent(
         />
 
         <div className={inputField2colClassName}>
-          <SRC20InputField
-            type="text"
-            placeholder="Token"
-            value={formState.token}
-            onChange={(e) => handleInputChange(e, "token")}
-            onBlur={() => handleInputBlur("token")}
-            isUppercase
-          />
+          <div className="relative">
+            <SRC20InputField
+              type="text"
+              placeholder="Token"
+              value={formState.token}
+              onChange={(e) => {
+                if (e.currentTarget.value) {
+                  setOpenDrop(true);
+                }
+                handleInputChange(e, "token");
+              }}
+              onBlur={() => handleInputBlur("token")}
+              isUppercase
+            />
+            {(openDrop && searchResults.length > 0) && (
+              <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[11] max-h-60 overflow-y-auto">
+                {searchResults.map((result: SearchResult) => (
+                  <li
+                    key={result.tick}
+                    onClick={() => handleDropDown(result.tick)}
+                    class="cursor-pointer p-2 hover:bg-gray-600 uppercase"
+                  >
+                    {result.tick}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
           <SRC20InputField
             type="text"
