@@ -73,14 +73,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     ? stamp.creator_name
     : abbreviateAddress(stamp.creator, 8);
 
-  const titleGreyLDClassName =
+  const titleGreyLD =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
-  const subTitleGreyClassName =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
-  const dataContainerClassName =
-    "flex justify-between items-center dark-gradient p-3 mobileMd:p-6";
-  const dataContainer =
-    "flex justify-between items-center dark-gradient p-3 mobileLg:p-6";
   const dataColumn = "flex flex-col -space-y-1";
   const dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
@@ -95,8 +89,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const dataValueXl =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
   const tooltip =
-    "absolute bottom-full text-stamp-grey-light text-xs mb-2 hidden group-hover:block whitespace-nowrap";
-  const buttonPurpleFlatClassName =
+    "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-2 hidden group-hover:block whitespace-nowrap";
+  const buttonPurpleFlat =
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
 
   useEffect(() => {
@@ -146,7 +140,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         className={"flex flex-col dark-gradient p-3 mobileMd:p-6"}
       >
         <div>
-          <p className={titleGreyLDClassName}>
+          <p className={titleGreyLD}>
             <span className="font-light">#</span>
             <span className="font-black">{stamp.stamp}</span>
           </p>
@@ -210,7 +204,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
           {lowestPriceDispenser && (
             <button
-              className={`${buttonPurpleFlatClassName} float-right`}
+              className={`${buttonPurpleFlat} float-right`}
               onClick={toggleModal}
             >
               BUY
