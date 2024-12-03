@@ -7,34 +7,46 @@ const AboutContact = () => {
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
 
+  const titleGreyDL =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+  const subTitleGrey =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
+  const bodyTextLight =
+    "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
+  const inputField1col = "flex gap-3 mobileMd:gap-6 w-full";
+  const inputField2col =
+    "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
+  const buttonGreyOutline =
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+
   return (
     <>
-      <section className="mobileLg:mt-36 mt-24">
-        <form>
-          <div className="w-full flex flex-col justify-center items-start">
-            <h1 className="text-stamp-grey font-work-sans font-black desktop:text-5xl mobileMd:text-4xl text-3xl">
-              CONTACT
-            </h1>
-            <h3 className="text-stamp-grey font-work-sans font-extralight desktop:text-4xl mobileMd:text-2xl text-xl">
-              DROP US A MESSAGE
-            </h3>
+      <section className="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
+        <div className="flex flex-col">
+          <h1 className={titleGreyDL}>
+            CONTACT
+          </h1>
+          <h3 className={subTitleGrey}>
+            DROP US A MESSAGE
+          </h3>
+        </div>
+        <div className="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
+          <div className="w-full mobileLg:w-1/2 space-y-3 mobileMd:space-y-6">
+            <p className={bodyTextLight}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
+              vulputate, lacus at faucibus fringilla, urna urna pretium magna,
+              et porttitor odio massa sit amet arcu.
+            </p>
+            <p className={bodyTextLight}>
+              Curabitur dolor elit, ornare at dolor in, interdum laoreet dolor.
+              Pellentesque ut diam erat. Pellentesque id gravida tortor.
+              Praesent lacus diam, imperdiet at orci at, venenatis vulputate
+              velit.
+            </p>
           </div>
-          <div className="grid grid-cols-12 gap-4">
-            <div className="mobileMd:col-span-6 col-span-12">
-              <p className="text-stamp-grey text-lg">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                vulputate, lacus at faucibus fringilla, urna urna pretium magna,
-                et porttitor odio massa sit amet arcu.
-              </p>
-              <p className="text-stamp-grey text-lg">
-                Curabitur dolor elit, ornare at dolor in, interdum laoreet
-                dolor. Pellentesque ut diam erat. Pellentesque id gravida
-                tortor. Praesent lacus diam, imperdiet at orci at, venenatis
-                vulputate velit.
-              </p>
-            </div>
-            <div className="mobileMd:col-span-6 col-span-12">
-              <div className="flex flex-row justify-between items-center gap-2">
+          <div className="w-full mobileLg:w-1/2">
+            <form className="flex flex-col gap-3 mobileMd:gap-6">
+              <div className={inputField2col}>
                 <InputField
                   type="text"
                   value={name}
@@ -48,31 +60,33 @@ const AboutContact = () => {
                   placeholder="Email"
                 />
               </div>
-              <br />
-              <InputField
-                type="text"
-                value={subject}
-                onChange={(e) => setSubject(e.currentTarget.value)}
-                placeholder="Subject"
-              />
-              <br />
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.currentTarget.value)}
-                className="p-3 bg-[#999999] text-[#333333] placeholder:text-[#333333] font-medium w-full outline-none rounded-md focus:bg-[#CCCCCC] min-h-[120px] font-work-sans"
-                placeholder="Message"
-              />
-            </div>
+              <div className={inputField1col}>
+                <InputField
+                  type="text"
+                  value={subject}
+                  onChange={(e) => setSubject(e.currentTarget.value)}
+                  placeholder="Subject"
+                />
+              </div>
+              <div className={inputField1col}>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.currentTarget.value)}
+                  className="h-[108px] mobileMd:h-[120px] p-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
+                  placeholder="Message"
+                />
+              </div>
+              <div className="w-full flex justify-end">
+                <button
+                  type="submit"
+                  className={buttonGreyOutline}
+                >
+                  SEND
+                </button>
+              </div>
+            </form>
           </div>
-          <div className="w-full flex justify-end items-center">
-            <button
-              type="submit"
-              className="uppercase border tablet:border-2 border-[#999999] rounded-md bg-transparent text-[#999999] font-extrabold w-[63px] tablet:w-[84px] h-[36px] tablet:h-[48px] flex justify-center items-center"
-            >
-              Send
-            </button>
-          </div>
-        </form>
+        </div>
       </section>
     </>
   );
