@@ -55,17 +55,16 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
           <div class="flex flex-col -mb-3 mobileLg:-mb-[20px] -ml-24 tablet:ml-0 ">
             <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
               <p class={dataLabelSm}>
-                TOP MINTS <span class={dataValueSm}>0</span>
-                <span class="text-stamp-grey-light">%</span>
+                TOP MINTS <span class={dataValueSm}>N/A%</span>
               </p>
               <div class="flex flex-col gap-1">
                 <p class={dataLabelSm}>
                   PROGRESS <span class={dataValueSm}>{progress}</span>
                   <span class="text-stamp-grey-light">%</span>
                 </p>
-                <div class="relative min-w-[144px] mobileLg:min-w-[192px] h-1 mobileLg:h-1.5 bg-[#999999] rounded-full">
+                <div class="relative min-w-[144px] mobileLg:min-w-[192px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
                   <div
-                    class="absolute left-0 top-0 h-1 mobileLg:h-1.5 bg-[#660099] rounded-full"
+                    class="absolute left-0 top-0 h-1 mobileLg:h-1.5 bg-stamp-purple-dark rounded-full"
                     style={{ width: progressWidth }}
                   />
                 </div>
@@ -76,7 +75,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
       )}
 
       {variant === "minting" && (
-        <div class="flex flex-col gap-6 -mb-3 mobileLg:-mb-6 tablet:hidden">
+        <div class="flex-col gap-6 -mb-4 mobileLg:-mb-6 hidden mobileMd:flex tablet:hidden desktop:flex">
           <div class="flex flex-col justify-center text-center -space-y-0.5">
             <p class={dataLabelSm}>
               SUPPLY{" "}
@@ -93,9 +92,8 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             <p class={dataLabelSm}>
               TOP MINTS{" "}
               <span class={dataValueSm}>
-                0
-              </span>{" "}
-              %
+                N/A%
+              </span>
             </p>
           </div>
         </div>

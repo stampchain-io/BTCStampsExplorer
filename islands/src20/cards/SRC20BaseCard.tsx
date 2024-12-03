@@ -103,13 +103,13 @@ export function SRC20BaseCard(
           )}
 
           {variant === "minting" && (
-            <div class="flex flex-col gap-1 pt-3">
+            <div class="flex flex-col pt-1.5 mobileLg:pt-3 gap-1">
               <p class={dataLabelSm}>
                 PROGRESS <span class={dataValueSm}>{progress}%</span>
               </p>
-              <div class="hidden mobileMd:block min-w-[260px] h-1.5 bg-stamp-grey relative rounded-full">
+              <div class="relative min-w-[144px] mobileLg:min-w-[192px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
                 <div
-                  class="absolute left-0 top-0 h-1.5 bg-stamp-purple-dark rounded-full"
+                  class="absolute left-0 top-0 h-1 mobileLg:h-1.5 bg-stamp-purple-dark rounded-full"
                   style={{ width: progressWidth }}
                 />
               </div>
