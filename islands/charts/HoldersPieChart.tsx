@@ -1,4 +1,4 @@
-import { Chart } from "$fresh_charts/island.tsx";
+import { Chart } from "fresh_charts/island.tsx";
 
 interface PieChartProps {
   holders: Array<{

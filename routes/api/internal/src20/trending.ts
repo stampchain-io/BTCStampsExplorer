@@ -22,9 +22,6 @@ export const handler: Handlers = {
 
       return ResponseUtil.success(trendingData, {
         routeType: RouteType.DYNAMIC,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
       });
     } catch (error) {
       return ResponseUtil.internalError(

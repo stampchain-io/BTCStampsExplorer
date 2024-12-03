@@ -4,7 +4,14 @@ interface LogMessage {
 }
 
 type LogLevel = "debug" | "error" | "info" | "warn";
-type LogNamespace = "stamps" | "images" | "ui" | "db" | "all";
+export type LogNamespace =
+  | "stamps"
+  | "content"
+  | "api"
+  | "database"
+  | "cache"
+  | "auth"
+  | "system";
 
 declare global {
   interface Window {
@@ -22,21 +29,47 @@ interface GlobalWithDebug {
   };
 }
 
+function isServer(): boolean {
+  return typeof Deno !== "undefined";
+}
+
 function shouldLog(namespace: LogNamespace): boolean {
-  // Check if we're in browser context
-  if (typeof window !== "undefined") {
-    const global = (window as unknown) as GlobalWithDebug;
-    if (!global.__DEBUG?.enabled) return false;
-    const namespaces = global.__DEBUG.namespaces.split(",");
-    return namespaces.includes("all") || namespaces.includes(namespace);
+  // Client-side context
+  if (!isServer()) {
+    const globalWithDebug = globalThis as GlobalWithDebug;
+    if (!globalWithDebug.__DEBUG?.enabled) return false;
+
+    const namespaces = globalWithDebug.__DEBUG.namespaces.split(",")
+      .map((n) => n.trim().toLowerCase());
+
+    return namespaces.includes("all") ||
+      namespaces.includes(namespace.toLowerCase());
   }
 
   // Server-side context
   const debug = Deno.env.get("DEBUG") || "";
   if (!debug) return false;
 
-  const namespaces = debug.split(",");
-  return namespaces.includes("all") || namespaces.includes(namespace);
+  const namespaces = debug.split(",").map((n) => n.trim().toLowerCase());
+  return namespaces.includes("all") ||
+    namespaces.includes(namespace.toLowerCase());
+}
+
+const LOG_FILE = "app.log";
+
+async function writeToFile(data: string) {
+  if (!isServer()) return;
+
+  // Only write to file in development
+  if (Deno.env.get("DENO_ENV") !== "development") {
+    return;
+  }
+
+  try {
+    await Deno.writeTextFile(LOG_FILE, data + "\n", { append: true });
+  } catch (error) {
+    console.error("Failed to write to log file:", error);
+  }
 }
 
 function formatLog(level: LogLevel, namespace: LogNamespace, msg: LogMessage) {
@@ -48,26 +81,51 @@ function formatLog(level: LogLevel, namespace: LogNamespace, msg: LogMessage) {
   };
 }
 
+const isDevelopment = () =>
+  isServer() && Deno.env.get("DENO_ENV") === "development";
+
 export const logger = {
-  debug: (namespace: LogNamespace, msg: LogMessage) => {
+  debug: async (namespace: LogNamespace, msg: LogMessage) => {
+    const logData = formatLog("debug", namespace, msg);
+    const formatted = JSON.stringify(logData, null, 2);
+
+    // In development, always log to file regardless of DEBUG setting
+    if (isDevelopment()) {
+      await writeToFile(formatted);
+      // Also log to console for immediate feedback
+      console.debug(formatted);
+      return;
+    }
+
+    // In production, respect DEBUG setting
     if (shouldLog(namespace)) {
-      console.debug(
-        JSON.stringify(formatLog("debug", namespace, msg), null, 2),
-      );
+      console.debug(formatted);
     }
   },
 
-  error: (namespace: LogNamespace, msg: LogMessage) => {
-    console.error(JSON.stringify(formatLog("error", namespace, msg), null, 2));
+  error: async (namespace: LogNamespace, msg: LogMessage) => {
+    const logData = formatLog("error", namespace, msg);
+    const formatted = JSON.stringify(logData, null, 2);
+
+    console.error(formatted);
+    await writeToFile(formatted);
   },
 
-  info: (namespace: LogNamespace, msg: LogMessage) => {
+  info: async (namespace: LogNamespace, msg: LogMessage) => {
+    const logData = formatLog("info", namespace, msg);
+    const formatted = JSON.stringify(logData, null, 2);
+
     if (shouldLog(namespace)) {
-      console.info(JSON.stringify(formatLog("info", namespace, msg), null, 2));
+      console.info(formatted);
     }
+    await writeToFile(formatted);
   },
 
-  warn: (namespace: LogNamespace, msg: LogMessage) => {
-    console.warn(JSON.stringify(formatLog("warn", namespace, msg), null, 2));
+  warn: async (namespace: LogNamespace, msg: LogMessage) => {
+    const logData = formatLog("warn", namespace, msg);
+    const formatted = JSON.stringify(logData, null, 2);
+
+    console.warn(formatted);
+    await writeToFile(formatted);
   },
 };

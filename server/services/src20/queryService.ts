@@ -11,7 +11,7 @@ import {
 import { SRC20UtilityService } from "./utilityService.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts"
-import { Big } from "$Big";
+import { Big } from "big";
 import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 
 // Change class name from Src20Service to SRC20QueryService

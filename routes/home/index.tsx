@@ -14,7 +14,6 @@ import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { getRecommendedFees } from "$lib/utils/mempool.ts";
 
 import { StampController } from "$server/controller/stampController.ts";
-import { serverConfig } from "$server/config/config.ts";
 
 type HomePageProps = {
   data: {

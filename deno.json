@@ -19,45 +19,50 @@
     "validate:schema": "npx @redocly/cli lint --config .redocly.yaml --format stylish ./schema.yml",
     "dredd": "deno task validate:schema && npx dredd"
   },
-  "lint": { "rules": { "tags": ["fresh", "recommended"] } },
+  "lint": {
+    "rules": {
+      "tags": ["fresh", "recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-explicit-any"]
+    }
+  },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
   "nodeModulesDir": "auto",
   "imports": {
-    "axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
-    "redis": "https://deno.land/x/redis@v0.32.4/mod.ts",
-    "$Big": "https://esm.sh/big.js@6.2.1",
-    "$fresh/": "https://deno.land/x/fresh@1.7.3/",
-    "preact": "https://esm.sh/preact@10.22.0",
-    "preact/": "https://esm.sh/preact@10.22.0/",
-    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.1.0",
-    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
-    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
     "@std/dotenv": "jsr:/@std/dotenv@^0.225.2",
-    "@std/dotenv/": "jsr:/@std/dotenv@^0.225.2/",
     "@std/log": "jsr:/@std/log@0.224.0",
-    "@std/log/": "jsr:/@std/log@0.224.0/",
     "@std/async": "jsr:/@std/async@^1.0.5",
-    "@std/async/": "jsr:/@std/async@^1.0.5/",
     "@std/encoding": "jsr:/@std/encoding@^1.0.5",
-    "@std/encoding/": "jsr:/@std/encoding@^1.0.5/",
     "@std/crypto": "jsr:@std/crypto@^1.0.3",
     "@std/yaml": "jsr:/@std/yaml@^0.219.1",
     "@std/path": "jsr:/@std/path@^0.219.1",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
+
+    "axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
+    "bitcoinjs-lib": "npm:bitcoinjs-lib@7.0.0-rc.0",
+    "big": "https://esm.sh/big.js@6.2.1",
     "bigfloat/": "https://deno.land/x/bigfloat@v3.0.2/",
+    "compress": "https://deno.land/x/foras@v2.1.4/src/deno/mod.ts",
+    "dayjs": "https://esm.sh/dayjs@1.11.10",
+    "dayjs/": "https://esm.sh/dayjs@1.11.10/",
+    "djwt/": "https://deno.land/x/djwt@v3.0.2/",
+    "$fresh/": "https://deno.land/x/fresh@1.7.3/",
+    "fresh_charts/": "https://deno.land/x/fresh_charts@0.3.1/",
+    "fresh/tests/": "https://deno.land/x/fresh@1.7.6/tests/",
+    "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts",
+    "$mysql/": "https://deno.land/x/mysql@v2.12.1/",
+    "preact": "https://esm.sh/preact@10.19.3",
+    "preact/": "https://esm.sh/preact@10.19.3/",
+    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.3.1",
+    "qrcode": "https://esm.sh/qrcode@1.5.1",
+    "redis": "https://deno.land/x/redis@v0.32.4/mod.ts",
+    "swiper/": "https://esm.sh/swiper@11.1.14/",
+    "swiper": "https://esm.sh/swiper@11.1.14",
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:tailwindcss@3.4.1/plugin.js",
-    "$mysql/": "https://deno.land/x/mysql@v2.12.1/",
-    "$dayjs/": "https://esm.sh/dayjs@1.11.10/",
-    "$djwt/": "https://deno.land/x/djwt@v3.0.2/",
-    "$fresh_charts/": "https://deno.land/x/fresh_charts@0.3.1/",
-    "compress": "https://deno.land/x/foras@v2.1.4/src/deno/mod.ts",
-    "bitcoinjs-lib": "npm:bitcoinjs-lib@7.0.0-rc.0",
     "tiny-secp256k1": "npm:tiny-secp256k1@2.2.3",
-    "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts",
-    "qrcode": "https://esm.sh/qrcode@1.5.1",
-    "swiper/": "https://esm.sh/swiper@11.1.14/",
-    "swiper": "https://esm.sh/swiper@11.1.14",
 
     "$constants": "./lib/utils/constants.ts",
     "globals": "./globals.d.ts",
@@ -75,6 +80,23 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "strict": true,
-    "types": ["npm:@types/node"]
+    "types": ["npm:@types/node"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "fmt": {
+    "files": {
+      "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"]
+    },
+    "options": {
+      "useTabs": false,
+      "lineWidth": 80,
+      "indentWidth": 2,
+      "singleQuote": false,
+      "proseWrap": "preserve"
+    }
   }
 }

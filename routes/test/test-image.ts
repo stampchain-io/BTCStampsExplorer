@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { logger } from "$lib/utils/logger.ts";
+import { logger, LogNamespace } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";
 
 interface TestResult {
@@ -41,6 +41,15 @@ export const handler: Handlers = {
     // Use a known working stamp hash
     const testTxHash =
       "827374352ddea0191a7e597753aae1a7bec66318f94e9d8587ed9fa6f8cffe61";
+
+    // Get the DENO_ENV value
+    const denoEnv = Deno.env.get("DENO_ENV") || "unknown";
+
+    // Log the environment
+    logger.debug("environment", {
+      message: "Current DENO_ENV",
+      denoEnv,
+    });
 
     logger.debug("images", {
       message: "Testing image endpoints and configurations",
@@ -330,6 +339,9 @@ export const handler: Handlers = {
             .success { color: green; }
             .error { color: red; }
           </style>
+          <script>
+            window.DENO_ENV = "${denoEnv}";
+          </script>
         </head>
         <body>
           <h1>Image and CORS Test Results</h1>
@@ -341,6 +353,7 @@ export const handler: Handlers = {
         {
           BASE_URL: baseUrl,
           IMAGES_SRC_PATH: serverConfig.IMAGES_SRC_PATH,
+          DENO_ENV: denoEnv,
         },
         null,
         2,

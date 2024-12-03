@@ -1,7 +1,7 @@
 import { StampRow } from "globals";
 
 export const NOT_AVAILABLE_IMAGE = "/not-available.png";
-const mimeTypes: { [key: string]: string } = {
+export const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",
   "png": "image/png",
@@ -64,7 +64,12 @@ export const getStampImageSrc = (stamp: StampRow) => {
   if (!stamp.stamp_url) {
     return NOT_AVAILABLE_IMAGE;
   }
-  const filename = stamp.stamp_url.split("/").pop();
+
+  // Extract filename from full URL if present
+  const urlParts = stamp.stamp_url.split("/stamps/");
+  const filename = urlParts.length > 1 ? urlParts[1] : stamp.stamp_url;
+
+  // Use relative path
   return `/content/${filename}`;
 };
 
@@ -151,3 +156,79 @@ export const validateStampContent = async (src: string): Promise<{
     return { isValid: false, error: "Error validating content" };
   }
 };
+
+export interface ContentTypeResult {
+  mimeType: string;
+  isGzipped: boolean;
+  isJavaScript?: boolean;
+}
+
+export function detectContentType(
+  content: string,
+  fileName?: string,
+  providedMimeType?: string,
+): ContentTypeResult {
+  try {
+    // First check for gzip magic bytes
+    if (content.startsWith("\x1f\x8b\x08")) {
+      return {
+        mimeType: "application/javascript",
+        isGzipped: true,
+        isJavaScript: true,
+      };
+    }
+
+    // Decode base64 for content inspection
+    const decoded = atob(content);
+
+    // Special case: If database says text/html but content is clearly JavaScript
+    if (providedMimeType === "text/html") {
+      const jsPatterns = [
+        /^document\.head\.insertAdjacentHTML/,
+        /^!function/,
+        /^window\.onload\s*=/,
+      ];
+
+      if (jsPatterns.some((pattern) => pattern.test(decoded.trim()))) {
+        return {
+          mimeType: "application/javascript",
+          isGzipped: false,
+          isJavaScript: true,
+        };
+      }
+    }
+
+    // For all other cases, trust the database mime type
+    if (providedMimeType) {
+      return {
+        mimeType: providedMimeType,
+        isGzipped: false,
+        isJavaScript: providedMimeType.includes("javascript"),
+      };
+    }
+
+    // Only use filename detection if no mime type provided
+    if (fileName) {
+      const extension = fileName.split(".").pop()?.toLowerCase() || "";
+      return {
+        mimeType: getMimeType(extension),
+        isGzipped: false,
+        isJavaScript: extension === "js",
+      };
+    }
+
+    // Default fallback
+    return {
+      mimeType: "application/octet-stream",
+      isGzipped: false,
+      isJavaScript: false,
+    };
+  } catch (e) {
+    console.error("Error detecting content type:", e);
+    return {
+      mimeType: "application/octet-stream",
+      isGzipped: false,
+      isJavaScript: false,
+    };
+  }
+}

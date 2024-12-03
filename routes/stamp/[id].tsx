@@ -63,11 +63,16 @@ export const handler: Handlers<StampData> = {
       const { id } = ctx.params;
       const url = new URL(req.url);
 
-      // Fetch stamp details and collections in parallel
-      const [stampData, holders, recentStamps] = await Promise.all([
-        StampController.getStampDetailsById(id),
+      // Get stamp details first
+      const stampData = await StampController.getStampDetailsById(id);
+      if (!stampData?.data?.stamp) {
+        return ctx.renderNotFound();
+      }
+
+      // Use the CPID from stamp data for other queries
+      const [holders, recentStamps] = await Promise.all([
         StampController.getStampHolders(
-          id,
+          stampData.data.stamp.cpid, // Use CPID directly
           1,
           1000000,
           RouteType.BALANCE,
@@ -77,11 +82,6 @@ export const handler: Handlers<StampData> = {
           page: 1,
         }),
       ]);
-
-      // Check for null/undefined stamp data
-      if (!stampData?.data?.stamp) {
-        return ctx.renderNotFound();
-      }
 
       // Only fetch dispensers for STAMP or SRC-721
       let dispensers = [];
