@@ -53,7 +53,7 @@ export default function AboutHeader() {
       <div className="w-full space-y-3 mobileMd:space-y-6">
         <p className={bodyTextLight}>
           The{" "}
-          <span className="text-stamp-primary">
+          <span className="text-stamp-purple-highlight">
             Bitcoin Stamps meta-protocol
           </span>{" "}
           was conceived by Mike In Space, a maverick figure in the Bitcoin and
@@ -78,10 +78,11 @@ export default function AboutHeader() {
         </p>
       </div>
       <div class="grid grid-cols-12 mt-6">
-        <div class="desktop:col-span-8 mobileLg:col-span-6 col-span-12 flex flex-col gap-3 mobileMd:gap-6 w-full">
+        <div class=" flex flex-col col-span-12 mobileLg:col-span-6 desktop:col-span-8 gap-3 mobileMd:gap-6 w-full">
           <p className={bodyTextLight}>
             The introduction of{" "}
-            <span className="text-stamp-primary">SRC-20 tokens</span>{" "}
+            <span className="text-stamp-purple-highlight">SRC-20 tokens</span>
+            {" "}
             marked a watershed moment, proving that Bitcoin Stamps could do more
             than just store data—it could breathe new life into the entire
             ecosystem. In a delightful twist of fate, the success of this
@@ -91,7 +92,7 @@ export default function AboutHeader() {
           </p>
           <p className={bodyTextLight}>
             Today,{" "}
-            <span className="text-stamp-primary">
+            <span className="text-stamp-purple-highlight">
               Bitcoin Stamps stands as an immutable testament to human ingenuity
             </span>, combining Bitcoin's unshakeable security with
             groundbreaking on-chain capabilities. Every stamp is a story, every
