@@ -7,6 +7,10 @@ export const middleLayoutClassName =
 export const defaultTextClassName =
   "text-base mobileLg:text-lg text-stamp-grey-darker font-light";
 export const boldTextClassName = "font-bold text-stamp-grey-light";
+const dataLabelSm =
+  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+const dataValueSm =
+  "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
 
 export interface SRC20BaseCardProps {
   src20: SRC20Row;
@@ -33,21 +37,21 @@ export function SRC20BaseCard(
   return (
     <a
       href={href}
-      class="flex text-sm justify-between items-center border-2 border-transparent rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] w-full bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] p-3 mobileMd:p-6"
+      class="flex justify-between items-center border-2 border-transparent rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] w-full bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] p-3 mobileMd:p-6"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Left Section - Image and Title */}
-      <div class="uppercase cursor-pointer flex gap-[18px] mobileMd:gap-[30px]">
+      <div class="cursor-pointer flex gap-[18px] mobileMd:gap-[30px]">
         <img
           src={imageUrl}
-          class="w-[86px] h-[86px] mobileLg:w-[102px] mobileLg:h-[102px] rounded-sm"
+          class="w-[72px] h-[72px] mobileLg:w-[92px] mobileLg:h-[92px] rounded-sm"
           onClick={() => onImageClick?.(imageUrl)}
           alt={convertToEmoji(src20.tick)}
         />
         <div class="flex flex-col">
           <p
-            class={`text-2xl mobileLg:text-4xl font-black ${
+            class={`text-2xl mobileLg:text-4xl font-black uppercase  ${
               isHovered ? "text-stamp-primary-hover" : "gray-gradient1"
             } flex gap-4`}
           >
@@ -81,17 +85,17 @@ export function SRC20BaseCard(
           </p>
 
           {variant !== "minting" && (
-            <div class="flex flex-col pt-1.5">
-              <p class={defaultTextClassName}>
+            <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
+              <p class={dataLabelSm}>
                 SUPPLY{" "}
-                <span class={boldTextClassName}>
+                <span class={dataValueSm}>
                   {Number(src20.max).toLocaleString()}
                 </span>
               </p>
 
-              <p class={defaultTextClassName}>
+              <p class={dataLabelSm}>
                 LIMIT{" "}
-                <span class={boldTextClassName}>
+                <span class={dataValueSm}>
                   {Number(src20.lim).toLocaleString()}
                 </span>
               </p>
@@ -100,8 +104,8 @@ export function SRC20BaseCard(
 
           {variant === "minting" && (
             <div class="flex flex-col gap-1 pt-3">
-              <p class={defaultTextClassName}>
-                PROGRESS <span class={boldTextClassName}>{progress}%</span>
+              <p class={dataLabelSm}>
+                PROGRESS <span class={dataValueSm}>{progress}%</span>
               </p>
               <div class="hidden mobileMd:block min-w-[260px] h-1.5 bg-stamp-grey relative rounded-full">
                 <div

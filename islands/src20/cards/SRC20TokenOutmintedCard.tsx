@@ -1,7 +1,4 @@
 import {
-  boldTextClassName,
-  defaultTextClassName,
-  middleLayoutClassName,
   SRC20BaseCard,
   SRC20BaseCardProps,
 } from "$islands/src20/cards/SRC20BaseCard.tsx";
@@ -11,53 +8,59 @@ import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
   const { src20, variant } = props;
 
+  const dataLabelSm =
+    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+  const dataValueSm =
+    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
+
   return (
     <SRC20BaseCard {...props}>
       {variant !== "minting" && (
         <>
           {/* Price, Change, Volume group */}
-          <div class="flex flex-col gap-6 -mb-[16px]">
-            <div class={middleLayoutClassName}>
-              <p class={defaultTextClassName}>
+
+          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+            <div class="hidden min-[720px]:flex flex-col justify-center text-center -space-y-0.5 ">
+              <p class={dataLabelSm}>
                 PRICE{" "}
-                <span class={boldTextClassName}>
+                <span class={dataValueSm}>
                   {Math.round((src20.floor_unit_price ?? 0) * 1e8)
                     .toLocaleString()}
                 </span>{" "}
                 <span class="text-stamp-grey-light">SATS</span>
               </p>
-              <p class={defaultTextClassName}>
-                CHANGE <span class={boldTextClassName}>N/A</span>
+              <p class={dataLabelSm}>
+                CHANGE <span class={dataValueSm}>N/A</span>
                 <span class="text-stamp-grey-light">%</span>
               </p>
-              <p class={defaultTextClassName}>
-                VOLUME <span class={boldTextClassName}>0.00</span>{" "}
+              <p class={dataLabelSm}>
+                VOLUME <span class={dataValueSm}>0.00</span>{" "}
                 <span class="text-stamp-grey-light">BTC</span>
               </p>
             </div>
           </div>
 
           {/* Holders, Deploy, Creator group */}
-          <div class="flex flex-col gap-6 -mb-[16px]">
-            <div class={middleLayoutClassName + " text-right"}>
-              <p class={defaultTextClassName}>
+          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+            <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
+              <p class={dataLabelSm}>
                 HOLDERS{" "}
-                <span class={boldTextClassName}>
+                <span class={dataValueSm}>
                   {Number(src20.holders).toLocaleString()}
                 </span>
               </p>
-              <p class={defaultTextClassName}>
+              <p class={dataLabelSm}>
                 DEPLOY{" "}
-                <span class={boldTextClassName}>
+                <span class={dataValueSm}>
                   {formatDate(new Date(src20.block_time), {
                     month: "short",
                     year: "numeric",
                   }).toUpperCase()}
                 </span>
               </p>
-              <p class={defaultTextClassName}>
+              <p class={dataLabelSm}>
                 CREATOR{" "}
-                <span class={boldTextClassName}>
+                <span class={dataValueSm}>
                   {src20.creator_name ||
                     abbreviateAddress(src20.destination)}
                 </span>
@@ -68,24 +71,24 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
       )}
 
       {variant === "minting" && (
-        <div class="flex flex-col gap-6 -mb-[15px]">
-          <div class={middleLayoutClassName + " mobileMd:hidden"}>
-            <p class={defaultTextClassName}>
+        <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+          <div class="hidden min-[480px]:flex flex-col justify-center text-center -space-y-0.5 ">
+            <p class={dataLabelSm}>
               SUPPLY{" "}
-              <span class={boldTextClassName}>
+              <span class={dataValueSm}>
                 {Number(src20.max).toLocaleString()}
               </span>
             </p>
-            <p className={defaultTextClassName}>
-              HOLDERS{" "}
-              <span className={boldTextClassName}>
+            <p className={dataLabelSm}>
+              HOLDERS whereAmI{" "}
+              <span className={dataValueSm}>
                 {Number(src20.holders || 0).toLocaleString()}
               </span>
             </p>
             {/* Top Mints & Progress Bar */}
-            <p class={defaultTextClassName}>
+            <p class={dataLabelSm}>
               TOP MINTS{" "}
-              <span class={boldTextClassName}>
+              <span class={dataValueSm}>
                 0
               </span>{" "}
               %
