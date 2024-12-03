@@ -103,7 +103,7 @@ export function TransferContent(
   useEffect(() => {
     const getBalances = async () => {
       const response = await fetch(
-        `/api/v2/src20/balance/bc1qedz5mpvuc2ha8dahlthfe40psgpqeprfy569su`,
+        `/api/v2/src20/balance/${wallet.address}`,
       );
       const data = await response.json();
       setBalances(data.data);
