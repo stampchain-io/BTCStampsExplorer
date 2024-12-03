@@ -1,38 +1,56 @@
 export default function AboutTeam() {
+  const subTitlePurple =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
+  const aboutTitlePurpleLD =
+    "inline-block text-sm mobileMd:text-lg mobileLg:text-xl desktop:text-2xl font-black purple-gradient1 text-center mt-3 mobileLg:mt-[18px]";
+  const aboutSubTitlePurple =
+    "text-xs mobileMd:text-base mobileLg:text-lg desktop:text-xl font-medium text-stamp-purple text-center whitespace-nowrap";
+
   return (
     <>
-      <section className="tablet:mt-36 mt-24">
-        <div className="w-full flex justify-start items-center">
+      <section>
+        <div className="w-full flex justify-start items-start pt-6">
           <div className="w-full">
-            <h2 className="text-stamp-primary font-work-sans font-extralight leading-normal desktop:text-5xl mobileLg:text-4xl text-2xl">
+            <h2 className={subTitlePurple}>
               THE TEAM
             </h2>
-            <div className="flex justify-between items-center desktop:mx-28 mobileLg:mx-10 mobileMd:mx-4 mx-0 mobileMd:mt-6 mt-3">
-              <div className="flex flex-col gap-1">
+            <div className="flex justify-between items-start mx-0 mobileLg:mx-10 desktop:mx-28 gap-3 mobileMd:gap-6 mt-3">
+              <div className="flex flex-col items-center">
                 <img src="/img/about/code.png" />
-                <p className="text-center text-stamp-primary desktop:text-2xl mobileLg:text-xl mobileMd:text-lg text-sm font-black">
+                <p className={aboutTitlePurpleLD}>
                   MIKE IN SPACE
                 </p>
-                <p className="text-center text-stamp-primary desktop:text-xl mobileLg:text-lg mobileMd:text-base text-xs">
-                  CODE CONOISSEUR
+                <p className={aboutSubTitlePurple}>
+                  CODE{" "}
+                  <span className="mobileMd:hidden">
+                    <br />
+                  </span>
+                  CONOISSEUR
                 </p>
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col items-center">
                 <img src="/img/about/backend.png" />
-                <p className="text-center text-stamp-primary desktop:text-2xl mobileLg:text-xl mobileMd:text-lg text-sm font-black">
+                <p className={aboutTitlePurpleLD}>
                   REINAMORA
                 </p>
-                <p className="text-center text-stamp-primary desktop:text-xl mobileLg:text-lg mobileMd:text-base text-xs">
-                  BACKEND BIGBRAINS
+                <p className={aboutSubTitlePurple}>
+                  BACKEND{" "}
+                  <span className="mobileMd:hidden">
+                    <br />
+                  </span>
+                  BIGBRAINS
                 </p>
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col items-center">
                 <img src="/img/about/memetic.png" />
-                <p className="text-center text-stamp-primary desktop:text-2xl mobileLg:text-xl mobileMd:text-lg text-sm font-black">
+                <p className={aboutTitlePurpleLD}>
                   ARWYN
                 </p>
-                <p className="text-center text-stamp-primary desktop:text-xl mobileLg:text-lg mobileMd:text-base text-xs">
-                  MEMETIC MASTER
+                <p className={aboutSubTitlePurple}>
+                  MEMETIC{" "}
+                  <span className="mobileMd:hidden">
+                    <br />
+                  </span>MASTER
                 </p>
               </div>
             </div>
