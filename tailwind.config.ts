@@ -201,11 +201,28 @@ export default {
   plugins: [
     plugin(function ({ addUtilities, theme }) {
       addUtilities({
-        ".text-stroke": {
-          "-webkit-text-stroke-width": theme("spacing.stroke-width"),
-          "-webkit-text-stroke-color": theme(
-            "colors.stamp.text.custom-stroke-color",
-          ),
+        ".text-stroke-glow": {
+          "text-shadow": `
+            /* Glow effect */
+            -0.05em -0.05em 0.25em #A0F,    /* top-left */
+            0.05em -0.05em 0.25em #A0F,     /* top-right */
+            0.05em 0.05em 0.25em #A0F,      /* bottom-right */
+            -0.05em 0.05em 0.25em #A0F,     /* bottom-left */
+            -0.05em 0 0.25em #A0F,         /* left */
+            0.05em 0 0.25em #A0F,          /* right */
+            0 -0.05em 0.25em #A0F,         /* top */
+            0 0.05em 0.25em #A0F,          /* bottom */
+            
+            /* Stroke effect */
+            -3px -3px 0 #A0F,
+            3px -3px 0 #A0F,
+            -3px 3px 0 #A0F,
+            3px 3px 0 #A0F,
+            -3px 0 0 #A0F,
+            3px 0 0 #A0F,
+            0 -3px 0 #A0F,
+            0 3px 0 #A0F
+          `,
         },
         ".bg-clip-text": {
           "-webkit-background-clip": "text",
