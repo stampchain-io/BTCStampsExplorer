@@ -25,12 +25,13 @@ export interface SRC20TickHeaderProps {
 }
 
 function StatItem(
-  { label, value, direction, currency, align = "left" }: {
+  { label, value, direction, currency, align = "left", large = false }: {
     label: string;
     value: string | number;
     currency?: string;
     direction: string;
     align?: "left" | "center" | "right";
+    large?: boolean;
   },
 ) {
   const alignmentClass = {
@@ -42,17 +43,27 @@ function StatItem(
   return (
     <div
       class={`flex ${
-        direction === "col" ? "flex-col" : "gap-1.5 items-center justify-end"
+        direction === "col"
+          ? "flex-col -space-y-1"
+          : "gap-1.5 items-center justify-end"
       } ${alignmentClass}`}
     >
-      <p class="text-base mobileLg:text-lg font-light text-stamp-grey-darker ">
+      <p
+        class={`${
+          large ? "text-base mobileLg:text-lg" : "text-sm mobileLg:text-base"
+        } font-light text-stamp-grey-darker uppercase`}
+      >
         {label}
       </p>
       <p
-        class={`font-bold text-stamp-grey-light ${
+        class={`${
+          large
+            ? "text-3xl mobileLg:text-4xl font-black -mt-0.5"
+            : "text-sm mobileLg:text-base"
+        } ${
           direction === "col"
-            ? "text-2xl mobileLg:text-3xl -mt-1"
-            : "text-base mobileLg:text-lg"
+            ? "text-stamp-grey-light"
+            : "text-stamp-grey-light"
         }`}
       >
         {value}
@@ -105,6 +116,30 @@ export function SRC20TickHeader({
   // Format Satoshi value with commas (no decimals needed)
   const floorUnitPriceSatsFormatted = floorUnitPriceSats.toLocaleString();
 
+  const titleGreyLDClassName =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
+  const subTitleGreyClassName =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
+  const dataContainerClassName =
+    "flex justify-between items-center dark-gradient p-3 mobileMd:p-6";
+  const dataContainer =
+    "flex justify-between items-center dark-gradient p-3 mobileLg:p-6";
+  const dataColumn = "flex flex-col -space-y-1";
+  const dataLabelSm =
+    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+  const dataLabel =
+    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+  const dataValueXs =
+    "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
+  const dataValueSm =
+    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
+  const dataValue =
+    "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
+  const dataValueXl =
+    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
+  const tooltip =
+    "absolute bottom-full text-stamp-grey-light text-xs mb-2 hidden group-hover:block whitespace-nowrap";
+
   return (
     <div class="flex w-full flex-col gap-6">
       <div class="w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient">
@@ -144,32 +179,67 @@ export function SRC20TickHeader({
                   )}
                 </div>
               </div>
-              <p className="text-[#666666] text-base mobileLg:text-lg font-light pt-1.5">
+              <p class={`${dataLabel} pt-1.5`}>
                 CREATOR
               </p>
-              <p className="text-stamp-grey-light text-xl mobileLg:text-2xl font-bold -mt-1">
+              <p className="text-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1">
                 {deployment.creator_name ||
                   abbreviateAddress(deployment.destination)}
               </p>
             </div>
           </div>
-          <div class="flex flex-col gap-0 justify-end items-end ml-auto">
-            <div class="flex flex-col -space-y-0.5">
+          <div class="flex flex-col gap-0 justify-end ml-auto">
+            <div class="hidden mobileLg:flex flex-col ml-20 mb-0 -space-y-0.5 items-center">
               <StatItem
                 label="DEPLOY"
                 value={deployDate.toUpperCase()}
                 direction="row"
+                align="center"
               />
               <StatItem
                 label="BLOCK #"
                 value={deployment.block_index}
                 direction="row"
+                align="center"
               />
               <StatItem
                 label="TX ID"
                 value={abbreviateAddress(deployment.tx_hash)}
                 direction="row"
+                align="center"
               />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-0 justify-end items-end ml-auto">
+            <div class="flex flex-col -space-y-0.5 text-right">
+              <StatItem
+                label="DECIMALS"
+                value={deployment.deci}
+                direction="row"
+              />
+              <StatItem
+                label="LIMIT"
+                value={formatNumber(deployment.lim, 0)}
+                direction="row"
+              />
+              <div class="hidden">
+                <StatItem
+                  label="SUPPLY"
+                  value={formatNumber(deployment.max, 0)}
+                  direction="col"
+                  align="right"
+                  large
+                />
+              </div>
+              <div>
+                <StatItem
+                  label="SUPPLY"
+                  value={formatNumber(deployment.max, 0)}
+                  direction="row"
+                  align="right"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -185,73 +255,63 @@ export function SRC20TickHeader({
         }
       </div>
 
-      {/* Token Information */}
-      <div class="flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 justify-between dark-gradient">
-        <StatItem
-          label="SUPPLY"
-          value={formatNumber(deployment.max, 0)}
-          direction="col"
-        />
-        <StatItem
-          label="LIMIT"
-          value={formatNumber(deployment.lim, 0)}
-          direction="col"
-          align="center"
-        />
-        <div class="hidden mobileMd:block">
+      {/* Market Information */}
+      <div class="flex flex-col dark-gradient p-3 mobileMd:p-6">
+        <div className="flex flex-col">
           <StatItem
-            label="DECIMALS"
-            value={deployment.deci}
+            label="MARKET CAP"
+            value={mcapBTCFormatted}
+            currency="BTC"
             direction="col"
-            align="right"
+            large
           />
         </div>
-      </div>
-
-      <div class="flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 justify-between dark-gradient">
-        {/* Price in Satoshis */}
-        <StatItem
-          label="PRICE"
-          value={floorUnitPriceSatsFormatted}
-          currency="SATS"
-          direction="col"
-        />
-        <StatItem
-          label="24H CHANGE"
-          value="N/A" // FIXME: not available from API request
-          currency="%"
-          direction="col"
-          align="right"
-        />
-      </div>
-
-      {/* Market Information */}
-      <div class="flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 justify-between dark-gradient">
-        {/* Market Cap in BTC */}
-        <StatItem
-          label="MARKET CAP"
-          value={mcapBTCFormatted}
-          currency="BTC"
-          direction="col"
-        />
-        {/* 24H Volume in BTC */}
-        <div class="hidden mobileMd:block">
+        <div class="flex flex-wrap justify-between pt-3 mobileLg:pt-6">
           <StatItem
             label="24H VOLUME"
             value={sum1dBTCFormatted}
             currency="BTC"
             direction="col"
+            align="left"
+          />
+          <StatItem
+            label="3 DAY VOLUME"
+            value="N/A" // FIXME: not available from API request
+            currency="BTC"
+            direction="col"
             align="center"
           />
+          <StatItem
+            label="7 DAY VOLUME"
+            value={sum7dBTCFormatted}
+            currency="BTC"
+            direction="col"
+            align="right"
+          />
         </div>
-        {/* 7 DAY Volume in BTC */}
-        <StatItem
-          label="7 DAY VOLUME"
-          value={sum7dBTCFormatted}
-          currency="BTC"
-          direction="col"
-          align="right"
-        />
+
+        <div class="flex flex-wrap justify-between pt-1.5 mobileLg:pt-3">
+          <StatItem
+            label="PRICE"
+            value={floorUnitPriceSatsFormatted}
+            currency="SATS"
+            direction="col"
+          />
+          <StatItem
+            label="24H CHANGE"
+            value="N/A" // FIXME: not available from API request
+            currency="%"
+            direction="col"
+            align="center"
+          />
+          <StatItem
+            label="7 DAY CHANGE"
+            value="N/A" // FIXME: not available from API request
+            currency="%"
+            direction="col"
+            align="right"
+          />
+        </div>
       </div>
     </div>
   );
