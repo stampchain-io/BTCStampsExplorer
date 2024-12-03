@@ -28,57 +28,66 @@ export default function AboutDonate() {
     }
   };
 
+  const titlePurpleDL =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
+  const subTitlePurple =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
+  const bodyTextLight =
+    "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
+  const dataLabel =
+    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+  const dataValueXl =
+    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
+  const buttonPurpleOutline =
+    "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
+
   return (
     <>
-      <section className="mobileLg:mt-36 mt-24">
+      <section className="mt-24 mobileLg:mt-36">
         <div className="w-full flex flex-col justify-center items-start">
-          <h1 className="text-stamp-primary-dark font-work-sans font-black desktop:text-5xl mobileMd:text-4xl text-3xl">
+          <h1 className={titlePurpleDL}>
             DONATE
           </h1>
-          <h3 className="text-stamp-primary-dark font-work-sans font-black desktop:text-4xl mobileMd:text-2xl text-xl">
+          <h3 className={subTitlePurple}>
             TO THE DEV FUND
           </h3>
         </div>
-        <p className="text-stamp-grey text-lg tablet:hidden block">
+        <p className={`${bodyTextLight} tablet:hidden block`}>
           Support the ongoing development of Bitcoin Stamps and contribute to
           the monthly running costs of the backend infrastructure, to help
           ensure the stamping machine keeps running.
         </p>
         <div className="grid grid-cols-12">
           <div className="mobileMd:col-span-8 col-span-12">
-            <p className="text-stamp-grey text-lg tablet:block hidden">
+            <p className={`${bodyTextLight} tablet:block hidden`}>
               Support the ongoing development of Bitcoin Stamps and contribute
               to the monthly running costs of the backend infrastructure, to
               help ensure the stamping machine keeps running.
             </p>
             <div className="grid grid-cols-12 mt-6">
               <div className="col-span-6 flex flex-col justify-center items-center">
-                <p className="text-stamp-grey font-work-sans desktop:text-xl tablet:text-lg mobileLg:text-base text-sm font-extralight">
+                <p className={dataLabel}>
                   MONTHLY DONATIONS
                 </p>
-                <p className="text-stamp-grey desktop:text-4xl mobileLg:text-3xl mobileMd:text-2xl mobile-xl">
-                  <span className="text-stamp-grey-light font-black">434</span>
-                  USD
+                <p className={dataValueXl}>
+                  434 <span className="font-light">USD</span>
                 </p>
               </div>
               <div className="col-span-6 flex flex-col justify-center items-center">
-                <p className="text-stamp-grey font-work-sans desktop:text-xl tablet:text-lg mobileLg:text-base text-sm font-extralight">
+                <p className={dataLabel}>
                   EXPENSES
                 </p>
-                <p className="text-stamp-grey desktop:text-4xl mobileLg:text-3xl mobileMd:text-2xl mobile-xl">
-                  <span className="text-stamp-grey-light font-black">
-                    3,234
-                  </span>
-                  USD
+                <p className={dataValueXl}>
+                  3,234 <span className="font-light">USD</span>
                 </p>
               </div>
             </div>
-            <p className="text-stamp-grey text-lg mt-6">
+            <p className={bodyTextLight}>
               Use the Donate button and you'll receive a unique stamp by Viva la
               Vandal as thanks for your support.
             </p>
             <br />
-            <p className="text-stamp-grey text-lg mobileMd:block hidden">
+            <p className={`${bodyTextLight} mobileMd:block hidden`}>
               Or you may send BTC, SRC-20 Tokens or Art Stamps directly to the
               dev wallet.
             </p>
@@ -102,18 +111,18 @@ export default function AboutDonate() {
           </div>
           <div className="mobileMd:col-span-4 col-span-12 flex flex-col gap-5 justify-center items-center">
             <img
-              className="w-[104px] mobileMd:[127px] mobileLg:[162px] tablet:w-[204px]"
+              className="w-[134px] mobileLg:w-[174px] tablet:w-[204px]"
               src="/img/home/carousel1.png"
             />
             <button
               onClick={handleOpen}
-              className="text-[#660099] text-base font-extrabold border-2 border-[#660099] py-1 px-4 text-center min-w-[108px] rounded-md"
+              className={buttonPurpleOutline}
             >
               DONATE
             </button>
           </div>
           <div className="flex-col justify-center items-center mobileMd:hidden flex col-span-12 mt-5">
-            <p className="text-stamp-grey text-lg">
+            <p className={bodyTextLight}>
               Or you may send BTC, SRC-20 Tokens or Art Stamps directly to the
               dev wallet.
             </p>
