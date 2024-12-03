@@ -21,7 +21,7 @@ const AboutContact = () => {
 
   return (
     <>
-      <section className="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
+      <section>
         <div className="flex flex-col">
           <h1 className={titleGreyDL}>
             CONTACT

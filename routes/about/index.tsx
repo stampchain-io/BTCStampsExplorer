@@ -6,16 +6,14 @@ import AboutContact from "$islands/about/AboutContact.tsx";
 
 export default function About() {
   return (
-    <div className={"mobileLg:py-36 py-24 bg-stamp-bg-grey-darkest"}>
+    <div className="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
       <AboutHeader />
 
       {/* Team */}
       <AboutTeam />
 
-      {/* Partner */}
-      <section className="mobileLg:mt-36 mt-24">
-        <PartnersModule />
-      </section>
+      {/* Partners */}
+      <PartnersModule />
 
       {/* Donate */}
       <AboutDonate />

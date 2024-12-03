@@ -8,8 +8,8 @@ export default function AboutTeam() {
 
   return (
     <>
-      <section className="mt-24 mobileLg:mt-36 desktop:mt-48">
-        <div className="w-full flex justify-start items-start">
+      <section>
+        <div className="w-full flex justify-start items-start pt-6">
           <div className="w-full">
             <h2 className={subTitlePurple}>
               THE TEAM
