@@ -9,6 +9,19 @@ function abbreviateCollectionName(name: string): string {
 export function CollectionOverviewCard(
   { collection }: { collection: Collection },
 ) {
+  const dataColumn = "flex flex-col -space-y-1";
+  const dataLabelSm =
+    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+  const dataLabel =
+    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+  const dataValueXs =
+    "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
+  const dataValueSm =
+    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
+  const dataValue =
+    "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
+  const dataValueXl =
+    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
   return (
     <a
       href={`/collection/details/${collection.collection_name}`}
