@@ -37,7 +37,7 @@ export function CollectionOverviewCard(
             />
           </div>
         </div>
-        <div className="text-stamp-grey-darker text-base mobileLg:text-lg font-light w-full">
+        <div className="w-full">
           <p>
             <p className="inline-block text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-black gray-gradient1 group-hover:[-webkit-text-fill-color:#AA00FF]">
               <span className="min-[420px]:hidden">
@@ -49,9 +49,9 @@ export function CollectionOverviewCard(
               </span>
             </p>
           </p>
-          <p className="pt-[6px]">
+          <p className={`${dataLabelSm} pt-0.75 mobileLg:pt-1.5`}>
             BY{" "}
-            <span className="font-bold text-stamp-grey-light">
+            <span className={`${dataValueSm} normal-case`}>
               {collection.creators
                 ? (
                   <>
@@ -73,30 +73,29 @@ export function CollectionOverviewCard(
             </span>
           </p>
           <div className="flex flex-col mobileLg:flex-row justify-between w-full">
-            <p>
+            <p className={dataLabelSm}>
               STAMPS{" "}
-              <span className="font-bold text-stamp-grey-light">
+              <span className={dataValueSm}>
                 {collection.stamp_count}
               </span>
             </p>
-            <p className="hidden mobileLg:block">
-              VOLUME{" "}
-              <span className="font-bold text-stamp-grey-light">N/A</span>{"  "}
+            <p className={`${dataLabelSm} hidden mobileLg:block`}>
+              VOLUME <span className={dataValueSm}>N/A</span>{"  "}
               <span className="text-stamp-grey-light">BTC</span>
             </p>
           </div>
           <div className="flex flex-col mobileLg:flex-row justify-between w-full">
-            <p>
+            <p className={dataLabelSm}>
               <span className="min-[400px]:hidden">PRICE</span>
               <span className="hidden min-[400px]:inline">FLOOR PRICE</span>
               {" "}
-              <span className="font-bold text-stamp-grey-light">N/A</span>{" "}
+              <span className={dataValueSm}>N/A</span>{" "}
               <span className="text-stamp-grey-light">BTC</span>
             </p>
-            <p>
+            <p className={dataLabelSm}>
               <span className="min-[400px]:hidden">CAP</span>
               <span className="hidden min-[400px]:inline">MARKETCAP</span>{" "}
-              <span className="font-bold text-stamp-grey-light">N/A</span>{" "}
+              <span className={dataValueSm}>N/A</span>{" "}
               <span className="text-stamp-grey-light">BTC</span>
             </p>
           </div>
@@ -119,7 +118,7 @@ export function CollectionOverviewCard(
                     key={index}
                     src={imageUrl}
                     alt=""
-                    className={`min-w-[120px] min-h-[120px] mobileLg:min-w-[130px] mobileLg:min-h-[130px] desktop:min-w-[140px] desktop:min-h-[140px] object-contain pixelart`}
+                    className={`min-w-[100px] min-h-[100px] mobileLg:min-w-[110px] mobileLg:min-h-[110px] desktop:min-w-[120px] desktop:min-h-[120px] object-contain pixelart`}
                   />
                 </div>
               </div>
