@@ -1,7 +1,7 @@
 import { BigFloat } from "bigfloat/mod.ts";
 import { SATOSHIS_PER_BTC } from "$lib/utils/constants.ts";
-import dayjs from "$dayjs/";
-import relativeTime from "$dayjs/plugin/relativeTime";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 

@@ -11,9 +11,6 @@ export const handler: Handlers = {
 
       return ResponseUtil.success(recentTransactions, {
         routeType: RouteType.DYNAMIC,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
       });
     } catch (error) {
       return ResponseUtil.internalError(

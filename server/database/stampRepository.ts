@@ -12,7 +12,9 @@ import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
-import { isStampNumber, isTxHash, isStampHash, isCpid } from "$lib/utils/identifierUtils.ts";
+import { isStampNumber, isTxHash, isStampHash, isCpid, getIdentifierType } from "$lib/utils/identifierUtils.ts";
+import { getMimeType, getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
+import { logger, LogNamespace } from "$lib/utils/logger.ts";
 
 export class StampRepository {
   static sanitize(input: string): string {
@@ -313,36 +315,124 @@ export class StampRepository {
     }
   }
 
-  static async getStampFilenameByIdFromDb(
-    identifier: string,
-  ): Promise<string | null> {
+  static async getStampFile(identifier: string) {
     const sanitizedIdentifier = this.sanitize(identifier);
-    const data = await dbManager.executeQueryWithCache(
-      `
-      SELECT tx_hash, stamp_hash, stamp_mimetype, cpid, stamp_base64, stamp_url
+    const idType = getIdentifierType(sanitizedIdentifier);
+
+    await logger.debug("content" as LogNamespace, {
+      message: "StampRepository.getStampFile called",
+      identifier,
+      sanitizedIdentifier,
+      idType,
+    });
+
+    // Build query based on identifier type
+    let whereClause: string;
+    let params: string[];
+
+    switch (idType) {
+      case "cpid":
+        whereClause = "cpid = ?";
+        params = [sanitizedIdentifier];
+        break;
+
+      case "stamp_number":
+        whereClause = "stamp = ?";
+        params = [sanitizedIdentifier];
+        break;
+
+      case "tx_hash":
+        whereClause = "tx_hash = ?";
+        params = [sanitizedIdentifier];
+        break;
+
+      case "stamp_hash":
+        whereClause = "stamp_hash = ?";
+        params = [sanitizedIdentifier];
+        break;
+
+      default:
+        return null;
+    }
+
+    const query = `
+      SELECT 
+        tx_hash,
+        stamp_hash,
+        stamp_mimetype,
+        cpid,
+        stamp_base64,
+        stamp_url,
+        stamp
       FROM ${STAMP_TABLE}
-      WHERE (cpid = ? OR tx_hash = ? OR stamp_hash = ?)
-      AND stamp IS NOT NULL;
-      `,
-      [sanitizedIdentifier, sanitizedIdentifier, sanitizedIdentifier],
-      DEFAULT_CACHE_DURATION,
-    );
+      WHERE ${whereClause}
+      AND stamp IS NOT NULL
+      LIMIT 1;
+    `;
 
-    if (!data || data.rows.length === 0) {
-      return null;
+    try {
+      await logger.debug("content" as LogNamespace, {
+        message: "StampRepository executing query",
+        query,
+        params,
+        whereClause,
+      });
+
+      const data = await dbManager.executeQueryWithCache(
+        query,
+        params,
+        DEFAULT_CACHE_DURATION
+      );
+
+      await logger.debug("content" as LogNamespace, {
+        message: "StampRepository query result",
+        hasData: !!data?.rows?.length,
+        cpid: data?.rows?.[0]?.cpid,
+        mimetype: data?.rows?.[0]?.stamp_mimetype,
+        identifier,
+      });
+
+      if (!data?.rows?.length) {
+        return null;
+      }
+
+      const row = data.rows[0];
+
+      // Build filename from tx_hash and stamp_url if available
+      const suffix = row.stamp_url ? row.stamp_url.split('.').pop() : null;
+      const fileName = suffix ? `${row.tx_hash}.${suffix}` : row.tx_hash;
+
+      // Clean stamp_url to be relative path
+      const cleanStampUrl = row.stamp_url
+        ?.replace(/^https?:\/\/[^\/]+\/stamps\//, '')  // Remove domain and /stamps/
+        ?.replace(/^stamps\//, '');  // Also remove any standalone /stamps/ prefix
+
+      await logger.debug("content" as LogNamespace, {
+        message: "StampRepository processing URLs",
+        originalUrl: row.stamp_url,
+        cleanUrl: cleanStampUrl,
+        fileName,
+        suffix,
+      });
+
+      return {
+        fileName,
+        stamp_base64: row.stamp_base64,
+        stamp_url: cleanStampUrl,  // Store relative path
+        tx_hash: row.tx_hash,
+        stamp_mimetype: row.stamp_mimetype,
+        stamp_hash: row.stamp_hash,
+        cpid: row.cpid,
+        stamp: row.stamp
+      };
+    } catch (error) {
+      await logger.error("content" as LogNamespace, {
+        message: "StampRepository error",
+        error: error instanceof Error ? error.message : String(error),
+        identifier,
+      });
+      throw error;
     }
-
-    const { tx_hash, stamp_mimetype, stamp_url, stamp_base64 } = data.rows[0];
-
-    if (!tx_hash || !stamp_mimetype || !stamp_url) {
-      return null;
-    }
-
-    // Get extension from stamp_url
-    const extension = stamp_url.split('.').pop() || '';
-    const fileName = `${tx_hash}.${extension}`;
-
-    return { fileName, base64: stamp_base64, stamp_mimetype };
   }
 
   static async getStamps(
@@ -374,7 +464,7 @@ export class StampRepository {
       page: 1,
       sortBy: "ASC",
       type: "stamps",
-      includeSecondary: false,
+      includeSecondary: true,
       ...options,
       ...(options.collectionId && (!options.groupBy || !options.groupBySubquery) ? {
         groupBy: "collection_id",
@@ -402,7 +492,7 @@ export class StampRepository {
       collectionStampLimit = 12,
       skipTotalCount = false,
       selectColumns,
-      includeSecondary = false,
+      includeSecondary = true,
     } = queryOptions;
 
     const whereConditions: string[] = [];

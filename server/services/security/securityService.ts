@@ -1,4 +1,4 @@
-import { create, Header, verify } from "$djwt/mod.ts";
+import { create, Header, verify } from "djwt/mod.ts";
 import { serverConfig } from "$server/config/config.ts";
 
 interface CSRFPayload {

@@ -92,6 +92,15 @@ const ABBREVIATION_LENGTHS = {
   mobileSm: 6,
 } as const;
 
+interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
+  sale_data?: {
+    btc_amount: number;
+    block_index: number;
+    tx_hash: string;
+  };
+  stamp_base64?: string;
+}
+
 export function StampCard({
   stamp,
   isRecentSale = false,
@@ -99,9 +108,7 @@ export function StampCard({
   showMinDetails = false,
   variant = "default",
 }: {
-  stamp: StampRow & {
-    sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
-  };
+  stamp: StampWithSaleData;
   isRecentSale?: boolean;
   showDetails?: boolean;
   showMinDetails?: boolean;
@@ -119,7 +126,7 @@ export function StampCard({
     return ABBREVIATION_LENGTHS.mobileSm;
   };
 
-  const src = getStampImageSrc(stamp);
+  const src = getStampImageSrc(stamp as StampRow);
 
   // Add state for validated content
   const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
@@ -154,7 +161,17 @@ export function StampCard({
       return <TextContentIsland src={src} />;
     }
 
+    // Handle HTML content
     if (stamp.stamp_mimetype === "text/html") {
+      console.log("Rendering HTML content (detailed):", {
+        src,
+        mimetype: stamp.stamp_mimetype,
+        stamp: {
+          ...stamp,
+          base64: stamp.stamp_base64 ? atob(stamp.stamp_base64) : "missing",
+        },
+      });
+
       return (
         <div class="relative w-full h-full">
           <div class="relative pt-[100%]">
@@ -166,8 +183,56 @@ export function StampCard({
               sandbox="allow-scripts allow-same-origin"
               src={src}
               class="absolute top-0 left-0 w-full h-full object-contain"
-              onError={handleImageError}
+              onError={(e) => {
+                console.error("iframe error (detailed):", {
+                  error: e,
+                  target: e.target,
+                  src: (e.target as HTMLIFrameElement).src,
+                  contentWindow: (e.target as HTMLIFrameElement).contentWindow
+                    ? "present"
+                    : "missing",
+                });
+                handleImageError(e);
+              }}
             />
+          </div>
+        </div>
+      );
+    }
+
+    // Handle JavaScript content
+    if (stamp.stamp_mimetype === "application/javascript") {
+      console.log("Rendering JavaScript content (detailed):", {
+        src,
+        mimetype: stamp.stamp_mimetype,
+        stamp: {
+          ...stamp,
+          base64: stamp.stamp_base64 ? atob(stamp.stamp_base64) : "missing",
+        },
+      });
+
+      // Create a container for the script's output
+      return (
+        <div class="relative w-full h-full">
+          <div class="relative pt-[100%]">
+            <div
+              id={`js-output-${stamp.stamp}`}
+              class="absolute top-0 left-0 w-full h-full"
+            >
+              <script
+                src={src}
+                async
+                defer
+                onError={(e) => {
+                  console.error("Script error (detailed):", {
+                    error: e,
+                    target: e.target,
+                    src: (e.target as HTMLScriptElement).src,
+                  });
+                  handleImageError(e);
+                }}
+              />
+            </div>
           </div>
         </div>
       );

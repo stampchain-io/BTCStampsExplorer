@@ -1,4 +1,4 @@
-import { AppProps } from "$fresh/server.ts";
+import { type PageProps } from "$fresh/server.ts";
 import { Partial } from "$fresh/runtime.ts";
 import { Head } from "$fresh/runtime.ts";
 
@@ -7,7 +7,16 @@ import { Footer } from "$islands/layout/Footer.tsx";
 import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { NavigatorProvider } from "$islands/Navigator/NavigatorProvider.tsx";
 
-export default function App({ Component }: AppProps) {
+export default function App({ Component, state }: PageProps<unknown>) {
+  console.log("App state:", {
+    state,
+    path: state?.url ? new URL(state.url as string).pathname : null,
+  });
+
+  if (state?.skipAppLayout) {
+    return <Component />;
+  }
+
   const defaultTitle = "Bitcoin Stamps";
 
   return (
@@ -71,32 +80,14 @@ export default function App({ Component }: AppProps) {
 
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Stampchain.io" />
+        <meta name="twitter:title" content="stampchain.io" />
+        <meta name="twitter:image" content="/img/stamp.jpg" />
         <meta
           name="twitter:description"
           content="Unprunable UTXO Art, Because Sats Don't Exist"
         />
-        <meta
-          name="twitter:image"
-          content="/img/stamp.jpg"
-        />
-
-        {/* <meta http-equiv="X-Content-Type-Options" content="nosniff" /> */}
-        <meta
-          http-equiv="Referrer-Policy"
-          content="strict-origin-when-cross-origin"
-        />
-        {
-          /* <meta
-          http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https:;"
-        />*/
-        }
       </Head>
       <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden">
-        {/* <div class="bgGradientTop" aria-hidden="true" /> */}
-        {/* <div class="bgGradientBottom" aria-hidden="true" /> */}
-
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1]" />
 
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">

@@ -59,7 +59,7 @@ export type LISTING_FILTER_TYPES =
   | "psbt"
   | "dispensers";
 
-import Big from "$Big";
+import Big from "big";
 
 export interface BlockRow {
   block_index: number;

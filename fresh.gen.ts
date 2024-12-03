@@ -5,6 +5,7 @@
 import * as $_path_ from "./routes/[...path].ts";
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
+import * as $_middleware from "./routes/_middleware.ts";
 import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
@@ -87,6 +88,7 @@ import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
 import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/sharedBlockWithStampsHandler.ts";
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
+import * as $handlers_sharedContentHandler from "./routes/handlers/sharedContentHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
 import * as $home_index from "./routes/home/index.tsx";
 import * as $howto_deploytoken_index from "./routes/howto/deploytoken/index.tsx";
@@ -96,7 +98,6 @@ import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/inde
 import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.tsx";
 import * as $howto_mint_index from "./routes/howto/mint/index.tsx";
 import * as $howto_transfer_index from "./routes/howto/transfer/index.tsx";
-import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
@@ -214,6 +215,7 @@ const manifest = {
     "./routes/[...path].ts": $_path_,
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
+    "./routes/_middleware.ts": $_middleware,
     "./routes/about/index.tsx": $about_index,
     "./routes/api/[...path].ts": $api_path_,
     "./routes/api/internal/bitcoinNotifications.ts":
@@ -322,6 +324,7 @@ const manifest = {
       $handlers_sharedBlockWithStampsHandler,
     "./routes/handlers/sharedCollectionHandler.ts":
       $handlers_sharedCollectionHandler,
+    "./routes/handlers/sharedContentHandler.ts": $handlers_sharedContentHandler,
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
     "./routes/home/index.tsx": $home_index,
     "./routes/howto/deploytoken/index.tsx": $howto_deploytoken_index,
@@ -331,7 +334,6 @@ const manifest = {
     "./routes/howto/leathercreate/index.tsx": $howto_leathercreate_index,
     "./routes/howto/mint/index.tsx": $howto_mint_index,
     "./routes/howto/transfer/index.tsx": $howto_transfer_index,
-    "./routes/index.tsx": $index,
     "./routes/media/index.tsx": $media_index,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/s/[...id].tsx": $s_id_,
