@@ -5,7 +5,7 @@ const containerClassName =
   `border-2 border-stamp-grey-darker rounded-md relative overflow-hidden
   w-full h-[67px] mobileLg:h-[145px] tablet:h-[122px] desktop:h-[180px]`;
 const imageContentClassName =
-  "bg-center bg-no-repeat bg-[length:100%] w-full h-full";
+  "bg-center bg-no-repeat bg-[length:100%] w-full h-full grayscale transition-all duration-300";
 const gradientContentClassName =
   "w-full h-full bg-gradient-to-tr absolute left-0 top-0";
 const nameClassName = `hidden mobileLg:block
@@ -31,7 +31,7 @@ export function CollectionListCard(
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        class={imageContentClassName}
+        class={`${imageContentClassName} ${isHovered ? "grayscale-0" : ""}`}
         style={{ backgroundImage: `url('${collection.first_stamp_image}')` }}
       >
       </div>
