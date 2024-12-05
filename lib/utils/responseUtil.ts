@@ -139,12 +139,14 @@ export class ResponseUtil {
   ) {
     console.error("ResponseUtil error:", error);
     return new Response(
-      JSON.stringify({ error: message || "Internal server error" }),
+      JSON.stringify({
+        error: message || "Internal server error",
+      }),
       {
         status: 500,
         headers: {
-          ...getSecurityHeaders({ forceNoCache: true }),
           "Content-Type": "application/json",
+          "Cache-Control": "no-store",
           "X-API-Version": API_RESPONSE_VERSION,
           ...(options.headers || {}),
         },

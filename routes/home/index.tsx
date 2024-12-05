@@ -12,6 +12,7 @@ import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
 
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { getRecommendedFees } from "$lib/utils/mempool.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 import { StampController } from "$server/controller/stampController.ts";
 
@@ -79,11 +80,10 @@ export const handler: Handlers = {
       return ctx.render(data);
     } catch (error) {
       console.error("Error in handler:", error);
-      return ctx.render({
-        error: `Error: Internal server error`,
-        btcPrice: 0,
-        recommendedFee: 6,
-      });
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };

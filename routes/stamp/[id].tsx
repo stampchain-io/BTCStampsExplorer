@@ -12,6 +12,7 @@ import StampSection from "$islands/stamp/StampSection.tsx";
 
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 import { StampController } from "$server/controller/stampController.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
@@ -155,10 +156,13 @@ export const handler: Handlers<StampData> = {
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
-      if (error.message?.includes("Stamp not found")) {
+      if ((error as Error).message?.includes("Stamp not found")) {
         return ctx.renderNotFound();
       }
-      return new Response("Internal Server Error", { status: 500 });
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };

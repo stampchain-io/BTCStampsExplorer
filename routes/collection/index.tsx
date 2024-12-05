@@ -15,6 +15,8 @@ import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx"
 import { NamedAssetsModule } from "$islands/modules/NamedAssets.tsx";
 import CollectionOverviewSection from "$islands/collection/CollectionOverviewSection.tsx";
 
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+
 type CollectionPageProps = {
   data: {
     collections: CollectionRow[];
@@ -61,7 +63,10 @@ export const handler: Handlers = {
       return await ctx.render(data);
     } catch (error) {
       console.error(error);
-      return ctx.render({ error: `Error: Internal server error` });
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };

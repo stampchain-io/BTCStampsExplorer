@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { paginate } from "$lib/utils/paginationUtils.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { initialWallet, walletContext } from "$client/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
 import { Handlers } from "$fresh/server.ts";
@@ -36,8 +37,10 @@ export const handler: Handlers = {
       return await ctx.render(body);
     } catch (error) {
       console.error(error);
-      const body = { error: `Error: Internal server error` };
-      return ctx.render(body);
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };

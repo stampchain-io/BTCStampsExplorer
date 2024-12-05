@@ -8,6 +8,8 @@ import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, StampPageProps, SUBPROTOCOLS } from "globals";
 
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+
 const MAX_PAGE_SIZE = 120;
 
 interface CollectionOverviewPageProps {
@@ -127,10 +129,13 @@ export const handler: Handlers<CollectionOverviewPageProps> = {
       }
     } catch (error) {
       console.error("Error in collection overview:", error);
-      if (error.message?.includes("not found")) {
+      if ((error as Error).message?.includes("not found")) {
         return ctx.renderNotFound();
       }
-      return new Response("Internal Server Error", { status: 500 });
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };

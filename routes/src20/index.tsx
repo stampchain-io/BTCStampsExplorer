@@ -6,6 +6,8 @@ import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { DeployMintModule } from "$islands/modules/DeployMint.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
     try {
@@ -70,7 +72,10 @@ export const handler: Handlers = {
       return ctx.render({ data });
     } catch (error) {
       console.error(error);
-      return ctx.render({ error: `Error: Internal server error` });
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };
