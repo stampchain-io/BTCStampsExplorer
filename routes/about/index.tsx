@@ -16,9 +16,11 @@ export default function About() {
       <PartnersModule />
 
       {/* Donate */}
+      <div id="donate"></div>
       <AboutDonate />
 
       {/* Contact */}
+      <div id="contact"></div>
       <AboutContact />
     </div>
   );
