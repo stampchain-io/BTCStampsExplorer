@@ -594,32 +594,55 @@ export class SRC20Repository {
   }
 
   // Add the new method here
-  static async searchValidSrc20TxFromDb(query: string) {
-    const sanitizedQuery = query.replace(/[^\w-]/g, "");
+static async searchValidSrc20TxFromDb(query: string) {
+  const sanitizedQuery = query.replace(/[^\w-]/g, "");
 
-    const sqlQuery = `
-      SELECT DISTINCT tick
-      FROM ${SRC20_TABLE}
-      WHERE
-        tick LIKE ? OR
-        tx_hash LIKE ? OR
-        creator LIKE ? OR
-        destination LIKE ?
-      LIMIT 10;
-    `;
+  const sqlQuery = `
+    SELECT DISTINCT 
+      tick, 
+      (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+      (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted,
+      dep.max AS max_supply, 
+      dep.lim AS lim, 
+      dep.deci AS decimals
+    FROM ${SRC20_TABLE} dep
+    WHERE
+      (tick LIKE ? OR
+      tx_hash LIKE ? OR
+      creator LIKE ? OR
+      destination LIKE ?)
+      AND dep.max IS NOT NULL
+    LIMIT 10;
+  `;
 
-    const searchParam = `%${sanitizedQuery}%`;
-    const queryParams = [searchParam, searchParam, searchParam, searchParam];
+  const searchParam = `%${sanitizedQuery}%`;
+  const queryParams = [searchParam, searchParam, searchParam, searchParam];
 
+  try {
     const result = await dbManager.executeQueryWithCache(
       sqlQuery,
       queryParams,
-      1000 * 60 * 2, // Cache duration: 2 minutes
+      1000 * 60 * 2 // Cache duration: 2 minutes
     );
 
-    // Map the results to an array of tick names
-    return result.rows.map((row: { tick: string }) => ({ tick: row.tick }));
+    return result.rows.map((row: any) => {
+      const maxSupply = new BigFloat(row?.max_supply || "1"); // Avoid division by zero
+      const totalMinted = new BigFloat(row.total_minted || "0");
+      const progress = bigFloatToString(totalMinted.div(maxSupply).mul(100), 3);
+
+      return {
+        tick: row.tick,
+        progress: parseFloat(progress).toFixed(3), // Convert to number and format
+      };
+    }).filter(item => parseFloat(item.progress) !== 100)
+          .map(item => ({ tick: item.tick }))
+
+  } catch (error) {
+    console.error("Error executing query:", error);
+    return [];
   }
+}
+
 
   static async checkSrc20Deployments(): Promise<{ isValid: boolean; count: number }> {
     try {
