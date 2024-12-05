@@ -7,6 +7,8 @@ import { StampHeader } from "$islands/stamp/StampHeader.tsx";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "globals";
 
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+
 const MAX_PAGE_SIZE = 120;
 
 export const handler: Handlers = {
@@ -84,13 +86,10 @@ export const handler: Handlers = {
       });
     } catch (error) {
       console.error(error);
-      return new Response("", {
-        status: 302,
-        headers: {
-          Location: "/404",
-          "Cache-Control": "no-store",
-        },
-      });
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };

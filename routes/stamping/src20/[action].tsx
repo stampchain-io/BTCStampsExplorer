@@ -11,6 +11,8 @@ import { HowToDeployModule } from "$islands/modules/HowToDeploy.tsx";
 import { HowToMintModule } from "$islands/modules/HowToMint.tsx";
 import { HowToTransferModule } from "$islands/modules/HowToTransfer.tsx";
 
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 interface StampingSrc20PageProps {
@@ -57,7 +59,7 @@ export const handler: Handlers<StampingSrc20PageProps> = {
           holders = balanceData.total || 0;
         } catch (error) {
           console.error("Error fetching SRC20 data:", error);
-          if (error.message?.includes("not found")) {
+          if ((error as Error).message?.includes("not found")) {
             return ctx.renderNotFound();
           }
           throw error;
@@ -73,13 +75,13 @@ export const handler: Handlers<StampingSrc20PageProps> = {
       });
     } catch (error) {
       console.error("Error in stamping SRC20:", error);
-      return new Response("", {
-        status: 302,
-        headers: {
-          Location: "/404",
-          "Cache-Control": "no-store",
-        },
-      });
+      if ((error as Error).message?.includes("not found")) {
+        return ctx.renderNotFound();
+      }
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };

@@ -6,6 +6,8 @@ import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { CollectionDetailsHeader } from "$islands/collection/CollectionDetailsHeader.tsx";
 import { CollectionDetailsContent } from "$islands/collection/CollectionDetailsContent.tsx";
 
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 
@@ -77,13 +79,13 @@ export const handler: Handlers = {
       return await ctx.render(data);
     } catch (error) {
       console.error("Error in collection details:", error);
-      return new Response("", {
-        status: 302,
-        headers: {
-          Location: "/404",
-          "Cache-Control": "no-store",
-        },
-      });
+      if ((error as Error).message?.includes("Collection not found")) {
+        return ctx.renderNotFound();
+      }
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };
