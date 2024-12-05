@@ -22,7 +22,7 @@ export interface StampResponseOptions extends ResponseOptions {
 }
 
 export class ResponseUtil {
-  static success(data: unknown, options: ResponseOptions = {}) {
+  static success(data: unknown, options: ResponseOptions = {}): Response {
     if (options.routeType) {
       return this.successWithCache(data, options);
     }
@@ -38,22 +38,13 @@ export class ResponseUtil {
     });
   }
 
-  static successWithCache(data: unknown, options: ResponseOptions) {
+  static successWithCache(data: unknown, options: ResponseOptions): Response {
     const { duration, staleWhileRevalidate, staleIfError } = getCacheConfig(
       options.routeType || RouteType.DYNAMIC,
     );
 
-    // Force no-cache if specified or duration is 0
     if (options.forceNoCache || duration === 0) {
-      return new Response(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          ...getSecurityHeaders({ forceNoCache: true }),
-          "Content-Type": "application/json",
-          "X-API-Version": API_RESPONSE_VERSION,
-          ...(options.headers || {}),
-        },
-      });
+      return this.success(data, { ...options, forceNoCache: true });
     }
 
     const cacheControl = [
@@ -65,19 +56,22 @@ export class ResponseUtil {
       staleIfError ? `stale-if-error=${staleIfError}` : "",
     ].filter(Boolean).join(", ");
 
+    const headers = {
+      ...getSecurityHeaders(),
+      "Content-Type": "application/json",
+      "Cache-Control": cacheControl,
+      "CDN-Cache-Control": cacheControl,
+      "Cloudflare-CDN-Cache-Control": cacheControl,
+      "Surrogate-Control": `max-age=${duration}`,
+      "Edge-Control": `cache-maxage=${duration}`,
+      "Vary": "Accept-Encoding, X-API-Version",
+      "X-API-Version": API_RESPONSE_VERSION,
+      ...(options.headers || {}),
+    };
+
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        ...getSecurityHeaders(),
-        "Content-Type": "application/json",
-        "Cache-Control": cacheControl,
-        "CDN-Cache-Control": cacheControl,
-        "Cloudflare-CDN-Cache-Control": cacheControl,
-        "Surrogate-Control": `max-age=${duration}`,
-        "Vary": "Accept-Encoding, X-API-Version",
-        "X-API-Version": API_RESPONSE_VERSION,
-        ...(options.headers || {}),
-      },
+      headers,
     });
   }
 
@@ -102,9 +96,14 @@ export class ResponseUtil {
     );
   }
 
-  static badRequest(message: string, options: ResponseOptions = {}) {
+  static badRequest(message: string, options: ResponseOptions = {}): Response {
+    console.error("Bad Request:", message);
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({
+        error: message,
+        status: "error",
+        code: "BAD_REQUEST",
+      }),
       {
         status: 400,
         headers: {
@@ -134,12 +133,16 @@ export class ResponseUtil {
 
   static internalError(
     error: unknown,
-    message?: string,
+    message = "Internal server error",
     options: ResponseOptions = {},
-  ) {
-    console.error("ResponseUtil error:", error);
+  ): Response {
+    console.error("Internal Error:", error);
     return new Response(
-      JSON.stringify({ error: message || "Internal server error" }),
+      JSON.stringify({
+        error: message,
+        status: "error",
+        code: "INTERNAL_ERROR",
+      }),
       {
         status: 500,
         headers: {
