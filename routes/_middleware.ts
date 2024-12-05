@@ -1,12 +1,16 @@
 import { FreshContext } from "$fresh/server.ts";
-import { logger } from "$lib/utils/logger.ts";
 
 // Routes that should skip the app layout
 const DIRECT_ROUTES = [
   "/content/",
   "/s/",
   "/api/",
+  "/internal/",
+  "/test/",
 ];
+
+// Add response caching for static routes
+const CACHED_ROUTES = ["/"];
 
 function getBaseUrl(req: Request): string {
   if (Deno.env.get("DENO_ENV") === "development") {
@@ -19,26 +23,36 @@ export function handler(
   req: Request,
   ctx: FreshContext,
 ) {
+  const startTime = performance.now();
   const url = new URL(req.url);
   ctx.state.baseUrl = getBaseUrl(req);
 
-  logger.debug("stamps", {
-    message: "Setting base URL",
-    baseUrl: ctx.state.baseUrl,
-    env: Deno.env.get("DENO_ENV"),
-  });
-
-  // Check if route should skip app layout
-  const isDirectRoute = DIRECT_ROUTES.some((prefix) =>
-    url.pathname.startsWith(prefix)
-  );
-  if (isDirectRoute) {
-    ctx.state.skipAppLayout = true;
-    return ctx.next();
+  // Redirect /home to root with proper caching headers
+  if (url.pathname === "/home") {
+    return new Response("", {
+      status: 308, // Permanent redirect
+      headers: {
+        Location: "/",
+        "Cache-Control": "public, max-age=31536000", // Cache redirect for 1 year
+      },
+    });
   }
 
-  if (url.pathname === "/") {
-    return ctx.render();
+  // Add cache headers for static routes
+  if (CACHED_ROUTES.includes(url.pathname)) {
+    ctx.state.responseInit = {
+      headers: {
+        "Cache-Control": "public, max-age=3600",
+        "Timing-Allow-Origin": "*",
+        "Server-Timing": `route;dur=${performance.now() - startTime}`,
+      },
+    };
+  }
+
+  // Direct route check
+  if (DIRECT_ROUTES.some((prefix) => url.pathname.startsWith(prefix))) {
+    ctx.state.skipAppLayout = true;
+    return ctx.next();
   }
 
   return ctx.next();
