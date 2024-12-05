@@ -152,6 +152,7 @@ export const handler: Handlers<StampData> = {
         last_block: stampData.last_block,
         stamps_recent: recentStamps?.data || [],
         holders: calculateHoldersWithPercentage(holders.data),
+        lowestPriceDispenser: lowestPriceDispenser,
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
