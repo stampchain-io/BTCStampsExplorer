@@ -24,7 +24,48 @@ export interface StampResponseOptions extends ResponseOptions {
 export class ResponseUtil {
   static success(data: unknown, options: ResponseOptions = {}): Response {
     if (options.routeType) {
-      return this.successWithCache(data, options);
+      const { duration, staleWhileRevalidate, staleIfError } = getCacheConfig(
+        options.routeType,
+      );
+
+      if (options.forceNoCache || duration === 0) {
+        return new Response(JSON.stringify(data), {
+          status: 200,
+          headers: {
+            ...getSecurityHeaders({ forceNoCache: true }),
+            "Content-Type": "application/json",
+            "X-API-Version": API_RESPONSE_VERSION,
+            ...(options.headers || {}),
+          },
+        });
+      }
+
+      const cacheControl = [
+        "public",
+        `max-age=${duration}`,
+        staleWhileRevalidate
+          ? `stale-while-revalidate=${staleWhileRevalidate}`
+          : "",
+        staleIfError ? `stale-if-error=${staleIfError}` : "",
+      ].filter(Boolean).join(", ");
+
+      const headers = {
+        ...getSecurityHeaders(),
+        "Content-Type": "application/json",
+        "Cache-Control": cacheControl,
+        "CDN-Cache-Control": cacheControl,
+        "Cloudflare-CDN-Cache-Control": cacheControl,
+        "Surrogate-Control": `max-age=${duration}`,
+        "Edge-Control": `cache-maxage=${duration}`,
+        "Vary": "Accept-Encoding, X-API-Version",
+        "X-API-Version": API_RESPONSE_VERSION,
+        ...(options.headers || {}),
+      };
+
+      return new Response(JSON.stringify(data), {
+        status: 200,
+        headers,
+      });
     }
 
     return new Response(JSON.stringify(data), {
@@ -35,43 +76,6 @@ export class ResponseUtil {
         "X-API-Version": API_RESPONSE_VERSION,
         ...(options.headers || {}),
       },
-    });
-  }
-
-  static successWithCache(data: unknown, options: ResponseOptions): Response {
-    const { duration, staleWhileRevalidate, staleIfError } = getCacheConfig(
-      options.routeType || RouteType.DYNAMIC,
-    );
-
-    if (options.forceNoCache || duration === 0) {
-      return this.success(data, { ...options, forceNoCache: true });
-    }
-
-    const cacheControl = [
-      "public",
-      `max-age=${duration}`,
-      staleWhileRevalidate
-        ? `stale-while-revalidate=${staleWhileRevalidate}`
-        : "",
-      staleIfError ? `stale-if-error=${staleIfError}` : "",
-    ].filter(Boolean).join(", ");
-
-    const headers = {
-      ...getSecurityHeaders(),
-      "Content-Type": "application/json",
-      "Cache-Control": cacheControl,
-      "CDN-Cache-Control": cacheControl,
-      "Cloudflare-CDN-Cache-Control": cacheControl,
-      "Surrogate-Control": `max-age=${duration}`,
-      "Edge-Control": `cache-maxage=${duration}`,
-      "Vary": "Accept-Encoding, X-API-Version",
-      "X-API-Version": API_RESPONSE_VERSION,
-      ...(options.headers || {}),
-    };
-
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers,
     });
   }
 
