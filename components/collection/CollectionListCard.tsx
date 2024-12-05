@@ -3,7 +3,7 @@ import { useState } from "preact/hooks";
 
 const containerClassName =
   `border-2 border-stamp-grey-darker rounded-md relative overflow-hidden
-  w-full h-[67px] mobileLg:h-[145px] tablet:h-[122px] desktop:h-[180px]`;
+  w-full h-[92px] mobileMd:h-[116px] mobileLg:h-[130px] tablet:h-[148px] desktop:h-[160px]`;
 const imageContentClassName =
   "bg-center bg-no-repeat bg-[length:100%] w-full h-full grayscale transition-all duration-300";
 const gradientContentClassName =
@@ -38,8 +38,8 @@ export function CollectionListCard(
       <div
         class={`${gradientContentClassName} ${
           isDarkMode
-            ? "from-[#666666FF] via-[#999999BD] to-[#CCCCCC7F]"
-            : "from-[#CCCCCCFF] via-[#999999BD] to-[#6666667F]"
+            ? "from-[#666666FF] via-[#9999997F] to-[#CCCCCC00]"
+            : "from-[#CCCCCCFF] via-[#9999997F] to-[#66666600]"
         } ${isHovered ? "hidden" : ""}`}
       />
       <h3
