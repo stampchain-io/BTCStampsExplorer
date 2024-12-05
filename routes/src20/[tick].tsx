@@ -2,6 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
 import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
 import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { set_precision } from "bigfloat/mod.ts";
 import { MarketListingSummary } from "$types/index.d.ts";
@@ -26,10 +27,13 @@ export const handler: Handlers = {
       return await ctx.render(body);
     } catch (error) {
       console.error("Error in SRC20 tick page:", error);
-      if (error.message?.includes("not found")) {
+      if ((error as Error).message?.includes("not found")) {
         return ctx.renderNotFound();
       }
-      return new Response("Internal Server Error", { status: 500 });
+      return ResponseUtil.internalError(
+        error,
+        "Internal Server Error",
+      );
     }
   },
 };
