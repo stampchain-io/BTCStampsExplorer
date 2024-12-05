@@ -147,7 +147,6 @@ function WalletTransferModal({
                 setSelectedStamp(selectedItem);
               }
             }}
-            className={inputField}
           />
 
           <div className="flex w-full justify-between items-start">
