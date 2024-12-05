@@ -58,7 +58,7 @@ function RightPanel(
   };
 
   const tooltip =
-    "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-2 hidden group-hover:block whitespace-nowrap";
+    "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
 
   return (
     <div className="flex justify-between p-3 mobileMd:p-6 dark-gradient">

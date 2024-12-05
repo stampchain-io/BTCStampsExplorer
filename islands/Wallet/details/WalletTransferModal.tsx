@@ -109,10 +109,13 @@ function WalletTransferModal({
     });
   };
 
+  const inputField =
+    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
+
   return (
     <ModalLayout onClose={handleCloseModal} title="TRANSFER">
-      <div className="flex justify-between items-center gap-2">
-        <div className="min-w-[144px] h-[144px] bg-[#660099] rounded-md flex items-center justify-center">
+      <div className="flex w-full gap-3 mobileMd:gap-6">
+        <div className="min-w-[108px] h-[108px] mobileMd:min-w-[120px] mobileMd:h-[120px] bg-[#660099] rounded-md flex items-center justify-center">
           {selectedStamp
             ? (
               <img
@@ -131,7 +134,7 @@ function WalletTransferModal({
             )}
         </div>
 
-        <div className="flex  w-1/2 flex-col gap-4">
+        <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
           <SelectField
             options={stamps.data}
             value={selectedStamp?.stamp?.toString() || ""}
@@ -146,18 +149,42 @@ function WalletTransferModal({
             }}
           />
 
-          <input
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={(e) =>
-              setQuantity(parseInt((e.target as HTMLInputElement).value, 10))}
-            className="bg-[#999999] text-[#666666] font-bold text-xl rounded-md p-3 w-full"
-          />
+          <div className="flex w-full justify-between items-start">
+            <div className="flex flex-col justify-start -space-y-0.5">
+              <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey">
+                EDITIONS
+              </p>
+              <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+                MAX XX
+              </p>
+            </div>
+            <input
+              type="number"
+              min="1"
+              /* max={maxQuantity}*/
+              value={quantity}
+              /*onChange={handleQuantityChange}*/
+              className={`${inputField} !w-12 text-center`}
+            />
+          </div>
         </div>
       </div>
 
+      <div className="flex pt-3 mobileMd:pt-6">
+        <input
+          value={formState.recipientAddress}
+          onInput={(e) =>
+            setFormState({
+              ...formState,
+              recipientAddress: (e.target as HTMLInputElement).value,
+            })}
+          placeholder="Recipient address"
+          className={inputField}
+        />
+      </div>
+
       <BasicFeeCalculator
+        isModal={true}
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="transfer"
@@ -166,7 +193,7 @@ function WalletTransferModal({
         onSubmit={handleTransferSubmit}
         onCancel={toggleModal}
         buttonName="TRANSFER"
-        className="border-t border-[#333333] pt-4"
+        className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
