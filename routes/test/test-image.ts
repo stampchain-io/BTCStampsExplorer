@@ -215,11 +215,13 @@ export const handler: Handlers = {
       const testUrls = [
         {
           type: "html",
-          url: `${baseUrl}/content/some-html-stamp.html`,
+          url:
+            `${baseUrl}/content/63c47544559d61ffbf9991ee39d41745410366ddccbc6ea48661db33704c5c35.html`,
         },
         {
           type: "image",
-          url: `${baseUrl}/content/some-image.png`,
+          url:
+            `${baseUrl}/content/753ca8ce862b07998ff78c4f5cf186412e070b942f9e19f8e0ed787552b0a267.gif`,
         },
         {
           type: "stamp",
@@ -326,6 +328,58 @@ export const handler: Handlers = {
       recursiveStampHash,
     );
 
+    // Add this after the CORS tests but before the CSP tests
+    async function testRedirectBehavior(baseUrl: string, txHash: string) {
+      const testUrls = [
+        {
+          type: "content_png",
+          url: `${baseUrl}/content/${txHash}.png`,
+        },
+        {
+          type: "content_html",
+          url: `${baseUrl}/content/${txHash}.html`,
+        },
+        {
+          type: "s_endpoint",
+          url: `${baseUrl}/s/${txHash}`,
+        },
+      ];
+
+      const results = await Promise.all(testUrls.map(async ({ type, url }) => {
+        try {
+          const response = await fetch(url, {
+            redirect: "manual", // Don't automatically follow redirects
+          });
+
+          return {
+            type,
+            url,
+            status: response.status,
+            location: response.headers.get("location"),
+            contentType: response.headers.get("content-type"),
+            isRedirect: response.status === 301 || response.status === 302,
+            redirectTarget: response.headers.get("location"),
+            headers: Object.fromEntries(response.headers.entries()),
+          };
+        } catch (error) {
+          return {
+            type,
+            url,
+            error: error instanceof Error ? error.message : String(error),
+          };
+        }
+      }));
+
+      return {
+        contentPng: results.find((r) => r.type === "content_png"),
+        contentHtml: results.find((r) => r.type === "content_html"),
+        sEndpoint: results.find((r) => r.type === "s_endpoint"),
+      };
+    }
+
+    // Add the test execution
+    const redirectTests = await testRedirectBehavior(baseUrl, testTxHash);
+
     // Update the HTML template to include recursive stamp tests
     const htmlResponse = `
       <!DOCTYPE html>
@@ -413,8 +467,20 @@ export const handler: Handlers = {
           </div>
 
           <div class="test-section">
+            <h2>Redirect Tests</h2>
+            <h3>Content PNG Redirect</h3>
+            <pre>${JSON.stringify(redirectTests.contentPng, null, 2)}</pre>
+            
+            <h3>Content HTML Redirect</h3>
+            <pre>${JSON.stringify(redirectTests.contentHtml, null, 2)}</pre>
+            
+            <h3>S Endpoint</h3>
+            <pre>${JSON.stringify(redirectTests.sEndpoint, null, 2)}</pre>
+          </div>
+
+          <div class="test-section">
             <h2>Test Image</h2>
-            <img src="/content/${testTxHash}.png" 
+            <img src="/content/${testTxHash}" 
                  style="max-width: 200px;" 
                  onerror="this.parentElement.innerHTML='<p class=\'error\'>✗ Image failed to load</p>'"
             />

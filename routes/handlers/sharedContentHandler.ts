@@ -7,20 +7,21 @@ import {
   isTxHash,
 } from "$lib/utils/identifierUtils.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-
-function getStampBaseUrl(): string | undefined {
-  if (Deno.env.get("DENO_ENV") === "development") {
-    // In development, use the remote API URL
-    return Deno.env.get("API_BASE_URL");
-  }
-  // In production, use relative path (undefined baseUrl)
-  return undefined;
-}
+import { FreshContext } from "$fresh/server.ts";
 
 export async function handleContentRequest(
   identifier: string,
+  ctx: FreshContext,
 ) {
-  const isFullPath = identifier.includes(".");
+  logger.debug("content", {
+    message: "Content request received",
+    identifier,
+    path: ctx.url.pathname,
+    baseUrl: ctx.state.baseUrl,
+    env: Deno.env.get("DENO_ENV"),
+  });
+
+  const isFullPath = identifier.includes(".") || ctx.url.pathname.includes(".");
 
   try {
     // Validate identifier based on path type
@@ -46,13 +47,10 @@ export async function handleContentRequest(
       }
     }
 
-    // Get the appropriate base URL based on environment
-    const baseUrl = getStampBaseUrl();
-
     return await StampController.getStampFile(
       identifier,
       RouteType.STAMP_DETAIL,
-      baseUrl,
+      ctx.state.baseUrl,
       isFullPath,
     );
   } catch (error) {
@@ -60,6 +58,7 @@ export async function handleContentRequest(
       message: "Content handler error",
       identifier,
       error: error instanceof Error ? error.message : String(error),
+      path: ctx.url.pathname,
     });
     return ResponseUtil.stampNotFound();
   }
