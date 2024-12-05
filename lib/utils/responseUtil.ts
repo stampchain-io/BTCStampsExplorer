@@ -274,7 +274,7 @@ export class ResponseUtil {
     return new Response(JSON.stringify(data), {
       status: options.status || 200,
       headers: new Headers({
-        ...getSecurityHeaders({ forceNoCache: true }),
+        ...getSecurityHeaders({ forceNoCache: false }),
         "Content-Type": "application/json",
         ...(options.headers || {}),
       }),

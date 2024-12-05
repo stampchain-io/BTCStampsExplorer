@@ -71,40 +71,77 @@ export async function fetchXcpV2WithCache<T>(
   const cacheKey = `api:v2:${endpoint}:${queryParams.toString()}`;
   const cacheTimeout = 1000 * 60 * 5; // 5 minutes
 
-  console.log(
-    `Fetching XCP V2 with cache. Endpoint: ${endpoint}, QueryParams: ${queryParams.toString()}`,
-  );
+  await logger.info("api", {
+    message: "Fetching XCP V2 with cache",
+    endpoint,
+    queryParams: queryParams.toString(),
+    cacheKey,
+    cacheTimeout
+  });
 
   return await dbManager.handleCache(
     cacheKey,
     async () => {
       for (const node of xcp_v2_nodes) {
         const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-        console.log(`Attempting to fetch from URL: ${url}`);
+        
+        await logger.debug("api", {
+          message: "Attempting XCP node fetch",
+          node: node.name,
+          url,
+          endpoint,
+          queryParams: queryParams.toString()
+        });
 
         try {
           const response = await fetch(url);
-          console.log(`Response status from ${node.name}: ${response.status}`);
+          
+          await logger.debug("api", {
+            message: "XCP node response received",
+            node: node.name,
+            status: response.status,
+            ok: response.ok,
+            url
+          });
 
           if (!response.ok) {
             const errorBody = await response.text();
-            console.error(
-              `Error response body from ${node.name}: ${errorBody}`,
-            );
+            await logger.error("api", {
+              message: "XCP node error response",
+              node: node.name,
+              status: response.status,
+              errorBody,
+              url
+            });
             continue; // Try the next node
           }
 
           const data = await response.json();
-          console.log(`Successful response from ${node.name}`);
+          await logger.debug("api", {
+            message: "XCP node successful response",
+            node: node.name,
+            url
+          });
           return data;
         } catch (error) {
-          console.error(`Fetch error for ${url}:`, error);
+          await logger.error("api", {
+            message: "XCP node fetch error",
+            node: node.name,
+            error: error.message,
+            url,
+            stack: error.stack
+          });
           // Continue to the next node
         }
       }
 
       // If all nodes fail, return a minimal data structure
-      console.error("All nodes failed. Returning minimal data structure.");
+      await logger.warn("api", {
+        message: "All XCP nodes failed, returning minimal data structure",
+        endpoint,
+        queryParams: queryParams.toString()
+      });
+      
       return {
         result: [],
         next_cursor: null,
@@ -474,103 +511,105 @@ export class XcpManager {
     defaultParams.append("type", options.type || "all");
     defaultParams.append("limit", (options.limit || 50).toString());
 
-    // Handle pagination - offset takes precedence over cursor
-    if (options.offset !== undefined) {
-      defaultParams.append("offset", options.offset.toString());
-    } else if (options.cursor) {
-      defaultParams.append("cursor", options.cursor);
+    // Handle pagination options
+    if (options.cursor) {
+        defaultParams.append("cursor", options.cursor);
     }
-
-    // Sort overrides cursor if provided
-    if (options.sort) {
-      defaultParams.append("sort", options.sort);
-    }
-
     if (options.verbose) {
-      defaultParams.append("verbose", "true");
-    }
-    if (options.showUnconfirmed) {
-      defaultParams.append("show_unconfirmed", "true");
+        defaultParams.append("verbose", "true");
     }
 
-    console.log(`[XcpManager] Fetching balances with params:`, Object.fromEntries(defaultParams));
+    await logger.debug("api", {
+        message: "[XcpManager] Fetching balances",
+        endpoint,
+        params: Object.fromEntries(defaultParams),
+        address
+    });
 
     try {
-      const response = await this.fetchXcpV2WithCache<any>(endpoint, defaultParams);
+        const response = await fetchXcpV2WithCache<any>(endpoint, defaultParams);
 
-      if (!response) {
-        console.warn(`Unexpected response structure for address ${address}`);
-        return { balances: [], total: 0 };
-      }
-
-      let balances: XcpBalance[];
-
-      if (cpid) {
-        // Handle single balance response for specific CPID
-        if (response.result && response.result.quantity > 0) {
-          balances = [{
-            address: response.result.address || response.result.utxo_address || null,
-            cpid: response.result.asset,
-            quantity: response.result.quantity,
-            utxo: response.result.utxo || "",
-            utxo_address: response.result.utxo_address || "",
-            divisible: response.result.divisible || false,
-          }];
-        } else {
-          balances = [];
-        }
-      } else {
-        // Handle multiple balances response
-        if (!Array.isArray(response.result)) {
-          console.warn(`Unexpected result structure for address ${address}`);
-          return { balances: [], total: 0 };
+        if (!response || !response.result) {
+            await logger.warn("api", {
+                message: "Unexpected response structure",
+                address,
+                response
+            });
+            return { balances: [], total: 0 };
         }
 
-        // Create a map to aggregate quantities by address
-        const balanceMap = new Map<string, XcpBalance>();
+        // Handle the response based on whether it's a single balance or multiple balances
+        let balances: XcpBalance[] = [];
+        let total = 0;
 
-        response.result
-          .filter((balance: any) => balance.quantity > 0)
-          .forEach((balance: any) => {
-            // Use utxo_address if address is null, otherwise use address
-            const effectiveAddress = balance.address || balance.utxo_address;
-            
-            if (effectiveAddress) {
-              const existing = balanceMap.get(effectiveAddress);
-              
-              if (existing && existing.cpid === balance.asset) {
-                // Sum quantities for same address and asset
-                existing.quantity += balance.quantity;
-              } else {
-                // Create new balance entry
-                balanceMap.set(effectiveAddress, {
-                  address: effectiveAddress,
-                  cpid: balance.asset,
-                  quantity: balance.quantity,
-                  utxo: balance.utxo || "",
-                  utxo_address: balance.utxo_address || "",
-                  divisible: balance.divisible || false,
+        if (Array.isArray(response.result)) {
+            const balanceMap = new Map<string, XcpBalance>();
+
+            response.result
+                .filter((balance: any) => balance.quantity > 0)
+                .forEach((balance: any) => {
+                    const effectiveAddress = balance.address || balance.utxo_address;
+                    
+                    if (effectiveAddress) {
+                        const key = `${effectiveAddress}-${balance.asset}`;
+                        const existing = balanceMap.get(key);
+                        
+                        if (existing) {
+                            existing.quantity += balance.quantity;
+                        } else {
+                            balanceMap.set(key, {
+                                address: effectiveAddress,
+                                cpid: balance.asset,
+                                quantity: balance.quantity,
+                                utxo: balance.utxo || "",
+                                utxo_address: balance.utxo_address || "",
+                                divisible: balance.divisible || false,
+                            });
+                        }
+                    }
                 });
-              }
-            }
-          });
 
-        balances = Array.from(balanceMap.values());
-      }
+            balances = Array.from(balanceMap.values());
+            total = balances.length;
+        } else if (response.result.quantity > 0) {
+            // Single balance response
+            balances = [{
+                address: response.result.address || response.result.utxo_address,
+                cpid: response.result.asset,
+                quantity: response.result.quantity,
+                utxo: response.result.utxo || "",
+                utxo_address: response.result.utxo_address || "",
+                divisible: response.result.divisible || false,
+            }];
+            total = 1;
+        }
 
-      // Apply UTXO-only filter if requested
-      if (utxoOnly) {
-        balances = balances.filter((balance) => balance.utxo !== "");
-      }
+        // Apply UTXO-only filter if requested
+        if (utxoOnly) {
+            balances = balances.filter(balance => balance.utxo !== "");
+        }
 
-      return { 
-        balances,
-        total: response.result_count || balances.length,
-        next_cursor: response.next_cursor
-      };
+        await logger.debug("api", {
+            message: "[XcpManager] Balances fetched",
+            balancesCount: balances.length,
+            total,
+            nextCursor: response.next_cursor,
+            address
+        });
+
+        return {
+            balances,
+            total: response.total || total, // Use response.total if available
+            next_cursor: response.next_cursor
+        };
     } catch (error) {
-      console.error(`Error fetching balances for address ${address}:`, error);
-      throw error;
+        await logger.error("api", {
+            message: "Error fetching balances",
+            error: error.message,
+            address,
+            stack: error.stack
+        });
+        throw error;
     }
   }
 
@@ -583,77 +622,94 @@ export class XcpManager {
       let attempt = 0;
       
       while (attempt < MAX_RETRIES) {
-        // First request to get total count and initial data
-        const result = await this.getXcpBalancesByAddress(
+        await logger.info("api", {
+          message: "[XcpManager] Starting balance fetch attempt",
+          attempt: attempt + 1,
+          maxRetries: MAX_RETRIES,
           address,
-          undefined,
-          utxoOnly,
-          { 
+          utxoOnly
+        });
+
+        // Initialize collection for all balances
+        let allBalances: XcpBalance[] = [];
+        let cursor: string | null = null;
+        let expectedTotal: number | null = null;
+        
+        do {
+          // Prepare options for each request
+          const options: XcpBalanceOptions = {
             type: "all",
             limit: 500,
             verbose: true
-          }
-        );
-
-        console.log(`[XcpManager] Initial fetch - Total expected: ${result.total}, Got: ${result.balances.length}`);
-
-        if (result.total === 0) {
-          return { balances: [], total: 0 };
-        }
-
-        // Start with initial balances
-        let allBalances = [...result.balances];
-        let nextCursor = result.next_cursor;
-        let lastLength = allBalances.length;
-        let noProgressCount = 0;
-
-        while (nextCursor && allBalances.length < result.total) {
-          console.log(`[XcpManager] Fetching next page with cursor: ${nextCursor}, current count: ${allBalances.length}`);
+          };
           
-          const pageResult = await this.getXcpBalancesByAddress(
+          if (cursor) {
+            options.cursor = cursor;
+          }
+
+          const result = await this.getXcpBalancesByAddress(
             address,
             undefined,
             utxoOnly,
-            { 
-              type: "all",
-              limit: 500,
-              cursor: nextCursor,
-              verbose: true
-            }
+            options
           );
 
-          if (!pageResult.balances.length) {
-            console.log(`[XcpManager] No more balances returned`);
+          // Set expected total from first response's aggregated count
+          if (expectedTotal === null) {
+            expectedTotal = result.total;
+          }
+
+          // Add new balances to collection
+          if (result.balances?.length) {
+            allBalances = [...allBalances, ...result.balances];
+          }
+
+          await logger.debug("api", {
+            message: "[XcpManager] Pagination progress",
+            currentCount: allBalances.length,
+            expectedTotal,
+            cursor,
+            nextCursor: result.next_cursor,
+            address
+          });
+
+          cursor = result.next_cursor;
+
+          // Break if we have all expected results or more
+          // Note: We might get more than expected due to new transactions
+          if (allBalances.length >= expectedTotal) {
             break;
           }
 
-          allBalances = [...allBalances, ...pageResult.balances];
-          nextCursor = pageResult.next_cursor;
-
-          // Check if we're making progress
-          if (allBalances.length === lastLength) {
-            noProgressCount++;
-            if (noProgressCount > 3) {
-              console.warn(`[XcpManager] No progress after 3 attempts, breaking pagination`);
-              break;
-            }
-          } else {
-            noProgressCount = 0;
-            lastLength = allBalances.length;
+          if (!cursor) {
+            break;
           }
 
-          console.log(`[XcpManager] Progress: ${allBalances.length}/${result.total}`);
+        } while (cursor);
+
+        // Simplified success check - if we have balances, consider it successful
+        if (allBalances.length === 0) {
+          return { balances: [], total: 0 };
+        } else {
+          await logger.info("api", {
+            message: "[XcpManager] Successfully fetched balances",
+            finalCount: allBalances.length,
+            expectedTotal,
+            address
+          });
+          // Use actual aggregated count for total
+          return { balances: allBalances, total: allBalances.length };
         }
 
-        // Verify we got expected number of results
-        if (allBalances.length >= result.total * 0.9) { // Allow 10% margin
-          console.log(`[XcpManager] Successfully fetched ${allBalances.length} balances`);
-          return { balances: allBalances, total: result.total };
-        }
+        await logger.warn("api", {
+          message: "[XcpManager] Incomplete balance set",
+          currentCount: allBalances.length,
+          expectedTotal,
+          attempt: attempt + 1,
+          address,
+          retryDelay: 1000 * (attempt + 1)
+        });
 
-        console.warn(
-          `[XcpManager] Got ${allBalances.length} balances but expected ${result.total}, retrying...`
-        );
         attempt++;
         
         if (attempt < MAX_RETRIES) {
@@ -1555,4 +1611,3 @@ export class XcpManager {
     }
   }
 }
-

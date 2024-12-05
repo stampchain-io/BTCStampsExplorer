@@ -165,8 +165,8 @@ export interface ContentTypeResult {
 
 export function detectContentType(
   content: string,
-  fileName?: string,
-  providedMimeType?: string,
+  fileName?: string | undefined,
+  providedMimeType?: string | undefined,
 ): ContentTypeResult {
   try {
     // First check for gzip magic bytes

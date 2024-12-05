@@ -3,7 +3,6 @@ import "$/server/config/env.ts";
 type ServerConfig = {
   readonly APP_ROOT: string;
   readonly IMAGES_SRC_PATH?: string;
-  readonly API_BASE_URL?: string;
   readonly MINTING_SERVICE_FEE?: string;
   readonly MINTING_SERVICE_FEE_ADDRESS?: string;
   readonly CSRF_SECRET_KEY?: string;
@@ -27,9 +26,6 @@ const serverConfig: ServerConfig = {
 
   get IMAGES_SRC_PATH() {
     return Deno.env.get("IMAGES_SRC_PATH");
-  },
-  get API_BASE_URL() {
-    return Deno.env.get("API_BASE_URL");
   },
   get MINTING_SERVICE_FEE() {
     return Deno.env.get("MINTING_SERVICE_FEE");
@@ -70,7 +66,6 @@ export { serverConfig };
 
 export function getClientConfig() {
   return {
-    API_BASE_URL: serverConfig.API_BASE_URL,
     MINTING_SERVICE_FEE: serverConfig.MINTING_SERVICE_FEE,
     MINTING_SERVICE_FEE_ADDRESS: serverConfig.MINTING_SERVICE_FEE_ADDRESS,
     DEBUG_NAMESPACES: serverConfig.DEBUG_NAMESPACES,
