@@ -158,6 +158,7 @@ function WalletTransferModal({
       </div>
 
       <BasicFeeCalculator
+        isModal={true}
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="transfer"
@@ -166,7 +167,7 @@ function WalletTransferModal({
         onSubmit={handleTransferSubmit}
         onCancel={toggleModal}
         buttonName="TRANSFER"
-        className="border-t border-[#333333] pt-4"
+        className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}

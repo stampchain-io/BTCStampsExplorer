@@ -97,29 +97,37 @@ function WalletDonateModal({
     });
   };
 
-  const inputFieldClassName =
+  const dataColumn = "flex flex-col -space-y-1";
+  const dataLabelSm =
+    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+  const dataValueXs =
+    "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
+  const dataValueSm =
+    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
+  const inputField =
     "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
   return (
     <ModalLayout onClose={handleCloseModal} title="DONATE">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3 mobileLg:gap-6">
         <input
           type="text"
           value={amount}
           onInput={(e) => setAmount((e.target as HTMLInputElement).value)}
           placeholder="Enter amount"
-          className={inputFieldClassName}
+          className={inputField}
         />
 
         {donateAddress && (
-          <div className="text-sm text-stamp-grey-light break-all">
-            <span className="text-stamp-grey-darker">TO:</span>
-            {donateAddress}
+          <div className={dataColumn}>
+            <p className={dataLabelSm}>TO</p>
+            <p className={dataValueXs}>{donateAddress}</p>
           </div>
         )}
       </div>
 
       <BasicFeeCalculator
+        isModal={true}
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="send"
@@ -129,7 +137,7 @@ function WalletDonateModal({
         onSubmit={handleDonateSubmit}
         onCancel={toggleModal}
         buttonName="DONATE"
-        className="border-t border-[#333333] pt-4 mt-4"
+        className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}
         recipientAddress={donateAddress}
         inputType="P2WPKH"
