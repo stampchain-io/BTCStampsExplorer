@@ -41,7 +41,7 @@ export default function AboutDonate() {
   const buttonPurpleOutline =
     "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
   const tooltip =
-    "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-2 hidden group-hover:block whitespace-nowrap";
+    "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
 
   return (
     <>

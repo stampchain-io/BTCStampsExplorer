@@ -27,7 +27,7 @@ const dataValue =
 const dataValueXl =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
 const tooltip =
-  "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-2 hidden group-hover:block whitespace-nowrap";
+  "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
 
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
