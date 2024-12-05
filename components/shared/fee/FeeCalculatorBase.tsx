@@ -56,7 +56,7 @@ export function FeeCalculatorBase({
 
   // Fee selector component
   const renderFeeSelector = () => (
-    <div className={`flex flex-col ${isModal ? "w-full" : "w-1/2"}`}>
+    <div className={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
       <p className="text-base mobileLg:text-lg text-stamp-grey-light font-light">
         <span className="text-stamp-grey-darker">FEE</span>{" "}
         <span className="font-bold">{fee}</span> SAT/vB
@@ -196,7 +196,11 @@ export function FeeCalculatorBase({
       <div className="flex">
         {renderFeeSelector()}
         {showCoinToggle && (
-          <div className="flex gap-1 items-start justify-end w-1/2">
+          <div
+            className={`flex gap-1 items-start justify-end ${
+              isModal ? "w-1/3" : "w-1/2"
+            }`}
+          >
             <button
               className="w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
               onClick={handleCoinToggle}

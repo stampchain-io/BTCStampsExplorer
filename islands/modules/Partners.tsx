@@ -4,76 +4,79 @@ import { ModulesStyles } from "$islands/modules/Styles.ts";
 interface Partner {
   name: string;
   largeImage: string;
-  largeImageHover: string;
   smallImage: string;
-  smallImageHover: string;
   url?: string;
 }
 
 const partners: Partner[] = [
   {
     name: "Bitfinity",
-    largeImage: "/img/home/partner/bitfinity-large.svg",
-    largeImageHover: "/img/home/partner/bitfinity-large-hover.svg",
-    smallImage: "/img/home/partner/bitfinity-small.svg",
-    smallImageHover: "/img/home/partner/bitfinity-small-hover.svg",
+    largeImage: "/img/home/partner/bitfinity-partnercard-large.png",
+    smallImage: "/img/home/partner/bitfinity-partnercard-small.png",
     url: "https://bitfinity.network/",
   },
   {
     name: "R8",
-    largeImage: "/img/home/partner/r8-large.svg",
-    largeImageHover: "/img/home/partner/r8-large-hover.svg",
-    smallImage: "/img/home/partner/r8-small.svg",
-    smallImageHover: "/img/home/partner/r8-small-hover.svg",
+    largeImage: "/img/home/partner/r8-partnercard-large.png",
+    smallImage: "/img/home/partner/r8-partnercard-small.png",
     url: "https://www.revolvedex.com/",
   },
   {
     name: "Bitname",
-    largeImage: "/img/home/partner/bitname-large.svg",
-    largeImageHover: "/img/home/partner/bitname-large-hover.svg",
-    smallImage: "/img/home/partner/bitname-small.svg",
-    smallImageHover: "/img/home/partner/bitname-small-hover.svg",
+    largeImage: "/img/home/partner/bitname-partnercard-large.png",
+    smallImage: "/img/home/partner/bitname-partnercard-small.png",
     url: "https://bitname.pro",
   },
 ];
 
-function PartnerCard(
-  { name, largeImage, largeImageHover, smallImage, smallImageHover, url }:
-    Partner,
-) {
+function PartnerCard({ name, largeImage, smallImage, url }: Partner) {
   const [isHovered, setIsHovered] = useState(false);
 
   const content = (
-    <div className="relative w-full">
-      {/* Add invisible copy of image to set correct height */}
+    <div
+      class={`relative w-full border-2 ${
+        isHovered
+          ? "border-stamp-grey shadow-collection"
+          : "border-stamp-grey-darker"
+      } rounded-md`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Invisible images for sizing */}
       <img
         src={largeImage}
         alt=""
-        class="hidden mobileMd:block w-full invisible p-[6px]"
+        class="hidden mobileMd:block w-full invisible"
       />
       <img
         src={smallImage}
         alt=""
-        class="block mobileMd:hidden w-full invisible p-[6px]"
+        class="block mobileMd:hidden w-full invisible"
       />
 
-      {/* Overlay elements */}
-      {isHovered && <div className="blur bg-white/50 absolute inset-0" />}
+      {/* Actual display images */}
       <img
-        src={isHovered ? largeImageHover : largeImage}
+        src={largeImage}
         alt={`${name} banner`}
         loading="lazy"
-        class="hidden mobileMd:block absolute inset-0 cursor-pointer transition-all duration-300 w-full p-[6px]"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        class={`hidden mobileMd:block absolute inset-0 w-full cursor-pointer transition-all duration-300 ${
+          isHovered ? "grayscale-0" : "grayscale"
+        }`}
       />
       <img
-        src={isHovered ? smallImageHover : smallImage}
+        src={smallImage}
         alt={`${name} banner`}
         loading="lazy"
-        class="block mobileMd:hidden absolute inset-0 cursor-pointer transition-all duration-300 w-full p-[6px]"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        class={`block mobileMd:hidden absolute inset-0 w-full cursor-pointer transition-all duration-300 ${
+          isHovered ? "grayscale-0" : "grayscale"
+        }`}
+      />
+
+      {/* Gradient overlay */}
+      <div
+        class={`w-full h-full bg-gradient-to-tr from-[#666666FF] via-[#9999997F] to-[#CCCCCC00] absolute left-0 top-0 transition-opacity duration-300 ${
+          isHovered ? "!hidden" : ""
+        }`}
       />
     </div>
   );

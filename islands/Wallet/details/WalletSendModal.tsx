@@ -117,6 +117,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
       </div>
 
       <BasicFeeCalculator
+        isModal={true}
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="send"
@@ -126,7 +127,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
         onSubmit={handleSendSubmit}
         onCancel={onClose}
         buttonName="SEND"
-        className="pt-12"
+        className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}
         recipientAddress={formState.recipientAddress}
         inputType="P2WPKH"

@@ -138,6 +138,9 @@ const StampBuyModal = ({
     });
   };
 
+  const inputField =
+    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
+
   return (
     <ModalLayout onClose={handleCloseModal} title="BUY">
       <div className="flex justify-between">
@@ -150,10 +153,15 @@ const StampBuyModal = ({
           <p className="purple-gradient4 text-4xl font-black text-center">
             #{stamp.stamp}
           </p>
-          <div className="flex justify-between items-center w-full gap-3">
-            <div className="flex flex-col gap-1">
-              <p className="text-xl font-bold text-[#999999]">EDITIONS</p>
-              <span className="text-[#666666]">MAX {maxQuantity}</span>
+
+          <div className="flex w-full justify-between items-start">
+            <div className="flex flex-col justify-start -space-y-0.5">
+              <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey">
+                EDITIONS
+              </p>
+              <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+                MAX {maxQuantity}
+              </p>
             </div>
             <input
               type="number"
@@ -161,13 +169,14 @@ const StampBuyModal = ({
               max={maxQuantity}
               value={quantity}
               onChange={handleQuantityChange}
-              className="bg-[#999999] text-[#666666] font-bold text-xl rounded-md p-3"
+              className={`${inputField} !w-12 text-center`}
             />
           </div>
         </div>
       </div>
 
       <BasicFeeCalculator
+        isModal={true}
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="buy"
