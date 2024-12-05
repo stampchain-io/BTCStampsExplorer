@@ -155,9 +155,9 @@ function WalletTransferModal({
               <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey">
                 EDITIONS
               </p>
-              <span className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+              <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
                 MAX XX
-              </span>
+              </p>
             </div>
             <input
               type="number"
