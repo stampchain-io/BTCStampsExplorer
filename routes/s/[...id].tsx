@@ -5,6 +5,6 @@ export const handler: Handlers = {
   GET(_req: Request, ctx) {
     const id = ctx.params.id.split("/").pop();
     if (!id) return ctx.renderNotFound();
-    return handleContentRequest(id);
+    return handleContentRequest(id, ctx);
   },
 };

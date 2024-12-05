@@ -540,9 +540,11 @@ export class StampController {
     isFullPath?: boolean,
   ) {
     try {
-      // Case 1: Full path with extension - use CDN
+      // For full paths (file.suffix), redirect to /stamps/
       if (isFullPath) {
-        const mimeType = getMimeType(identifier.split('.').pop() || '');
+        const extension = identifier.split('.').pop() || '';
+        const mimeType = getMimeType(extension);
+        
         return this.createStampRedirect(
           identifier,
           identifier,
@@ -551,14 +553,14 @@ export class StampController {
         );
       }
 
-      // Case 2: DB lookup
+      // For non-full paths, proceed with DB lookup and content handling
       const result = await StampService.getStampFile(identifier);
       if (!result) return ResponseUtil.stampNotFound();
 
       const contentInfo = detectContentType(
         result.body,
         undefined,
-        result.headers["Content-Type"]
+        result.headers["Content-Type"] as string | undefined
       );
 
       // Content types that need base64 decoding before serving

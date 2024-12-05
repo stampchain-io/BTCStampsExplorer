@@ -56,13 +56,6 @@ export const handler: Handlers = {
       });
     }
 
-    if (url.pathname === "/" || url.pathname === "/home") {
-      return new Response("", {
-        status: 301,
-        headers: { Location: "/home" },
-      });
-    }
-
     // Render 404 for any unhandled routes
     return ctx.renderNotFound();
   },
