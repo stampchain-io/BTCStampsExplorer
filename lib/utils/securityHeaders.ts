@@ -3,32 +3,35 @@ export const getSecurityHeaders = (
 ) => {
   const cacheControl = options.forceNoCache
     ? "no-store, must-revalidate"
-    : "public, max-age=31536000, immutable"; // Cache for 1 year
+    : "public, max-age=31536000, immutable";
 
   return {
-    // CSP Header - using the permissive settings that work for recursive content
+    // Optimize CSP
     "Content-Security-Policy": [
-      "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:",
-      "script-src * 'unsafe-inline' 'unsafe-eval' data: blob:",
-      "style-src * 'unsafe-inline'",
-      "img-src * data: blob:",
-      "connect-src * data: blob:",
-      "frame-ancestors *",
-      "frame-src *",
-      "worker-src * blob:",
+      "default-src 'self' *.bitcoinstamps.xyz *.stampchain.io",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.bitcoinstamps.xyz *.stampchain.io",
+      "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
+      "img-src 'self' data: blob: *.bitcoinstamps.xyz *.stampchain.io",
+      "font-src 'self' fonts.gstatic.com",
+      "connect-src 'self' *.bitcoinstamps.xyz *.stampchain.io",
+      "frame-ancestors 'self' *.bitcoinstamps.xyz *.stampchain.io",
     ].join("; "),
 
-    // Cache Control
+    // Optimized cache headers
     "Cache-Control": cacheControl,
     "CDN-Cache-Control": cacheControl,
     "Cloudflare-CDN-Cache-Control": cacheControl,
-    "Surrogate-Control": "max-age=31536000",
+    "Surrogate-Control": options.forceNoCache ? "no-store" : "max-age=31536000",
+    "Edge-Control": options.forceNoCache ? "no-store" : "cache-maxage=31536000",
 
-    // CORS Headers - matching responseUtil.ts
-    "Cross-Origin-Resource-Policy": "cross-origin",
-    "Cross-Origin-Embedder-Policy": "unsafe-none",
-    "Cross-Origin-Opener-Policy": "same-origin",
-    "Vary": "Accept-Encoding",
+    // Security headers
+    // "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    // "X-Content-Type-Options": "nosniff",
+    // "X-Frame-Options": "SAMEORIGIN",
+    // "Referrer-Policy": "strict-origin-when-cross-origin",
+
+    // Vary header for proper cache keys
+    "Vary": "Accept-Encoding, Accept, Origin",
   };
 };
 

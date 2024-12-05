@@ -13,9 +13,9 @@ import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
 import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts";
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
 import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
-import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_internal_src20_recentTransactions from "./routes/api/internal/src20/recentTransactions.ts";
 import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
+import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
@@ -90,7 +90,6 @@ import * as $handlers_sharedBlockWithStampsHandler from "./routes/handlers/share
 import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedCollectionHandler.ts";
 import * as $handlers_sharedContentHandler from "./routes/handlers/sharedContentHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
-import * as $home_index from "./routes/home/index.tsx";
 import * as $howto_deploytoken_index from "./routes/howto/deploytoken/index.tsx";
 import * as $howto_getstamping_index from "./routes/howto/getstamping/index.tsx";
 import * as $howto_index from "./routes/howto/index.tsx";
@@ -98,6 +97,7 @@ import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/inde
 import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.tsx";
 import * as $howto_mint_index from "./routes/howto/mint/index.tsx";
 import * as $howto_transfer_index from "./routes/howto/transfer/index.tsx";
+import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
@@ -224,10 +224,10 @@ const manifest = {
     "./routes/api/internal/creatorName.ts": $api_internal_creatorName,
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
-    "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/internal/src20/recentTransactions.ts":
       $api_internal_src20_recentTransactions,
     "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
+    "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
@@ -326,7 +326,6 @@ const manifest = {
       $handlers_sharedCollectionHandler,
     "./routes/handlers/sharedContentHandler.ts": $handlers_sharedContentHandler,
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
-    "./routes/home/index.tsx": $home_index,
     "./routes/howto/deploytoken/index.tsx": $howto_deploytoken_index,
     "./routes/howto/getstamping/index.tsx": $howto_getstamping_index,
     "./routes/howto/index.tsx": $howto_index,
@@ -334,6 +333,7 @@ const manifest = {
     "./routes/howto/leathercreate/index.tsx": $howto_leathercreate_index,
     "./routes/howto/mint/index.tsx": $howto_mint_index,
     "./routes/howto/transfer/index.tsx": $howto_transfer_index,
+    "./routes/index.tsx": $index,
     "./routes/media/index.tsx": $media_index,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/s/[...id].tsx": $s_id_,
