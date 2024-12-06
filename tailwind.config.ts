@@ -1,9 +1,11 @@
 import { type Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
+import type { PluginAPI } from "tailwindcss/types/config";
 
 export default {
   content: [
-    "{routes,islands,components}/**/*.{ts,tsx}",
+    "{routes,islands,components,lib}/**/*.{ts,tsx}",
+    "./static/**/*.{html,js}",
   ],
 
   theme: {
@@ -137,7 +139,7 @@ export default {
           "linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))",
         "gradient-top": "var(--gradient-top)",
         "gradient-filters":
-          "linear-gradient(to bottom, #080808 100%, #080808 80%",
+          "linear-gradient(to bottom, #080808 100%, #080808 80%)",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",
@@ -199,7 +201,7 @@ export default {
     },
   },
   plugins: [
-    plugin(function ({ addUtilities, theme }) {
+    plugin(function ({ addUtilities }: PluginAPI) {
       addUtilities({
         ".text-stroke-glow": {
           "text-shadow": `
