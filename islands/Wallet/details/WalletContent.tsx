@@ -533,6 +533,7 @@ export default function WalletContent(
             <SRC20Section
               type="all"
               data={src20.data}
+              fromPage="wallet"
             />
           </div>
         )}

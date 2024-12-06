@@ -6,7 +6,7 @@ import {
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 
 export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
-  const { src20, variant } = props;
+  const { src20, fromPage } = props;
 
   const dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
@@ -15,7 +15,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
 
   return (
     <SRC20BaseCard {...props}>
-      {variant !== "minting" && (
+      {fromPage === "src20" && (
         <>
           {/* Price, Change, Volume group */}
 
@@ -70,7 +70,48 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
         </>
       )}
 
-      {variant === "minting" && (
+      {fromPage === "wallet" && (
+        <>
+          {/* Price, Change, Volume group */}
+          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+            <div class="hidden min-[720px]:flex flex-col justify-center text-center -space-y-0.5 ">
+              <p class={dataLabelSm}>
+                PRICE{" "}
+                <span class={dataValueSm}>
+                  {Math.round((src20.floor_unit_price ?? 0) * 1e8)
+                    .toLocaleString()}
+                </span>{" "}
+                <span class="text-stamp-grey-light">SATS</span>
+              </p>
+              {/* TODO: Get Change from Backend */}
+              <p class={dataLabelSm}>
+                CHANGE <span class={dataValueSm}>N/A</span>
+                <span class="text-stamp-grey-light">%</span>
+              </p>
+              {/* TODO: Get Volume from Backend */}
+              <p class={dataLabelSm}>
+                VOLUME <span class={dataValueSm}>0.00</span>{" "}
+                <span class="text-stamp-grey-light">BTC</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Holders, Deploy, Creator group */}
+          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+            {/* TODO: Get Value from Backend */}
+            <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
+              <p class={dataLabelSm}>
+                VALUE{" "}
+              </p>
+              <p class={dataValueSm}>
+                0.00 <span class="text-stamp-grey-light">BTC</span>
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {fromPage === "stamping/src20" && (
         <div class="flex flex-col -mb-3 mobileLg:-mb-6">
           <div class="hidden min-[480px]:flex flex-col justify-center text-center -space-y-0.5 ">
             <p class={dataLabelSm}>
