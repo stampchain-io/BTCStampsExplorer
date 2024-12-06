@@ -163,69 +163,108 @@ export class DispenserManager {
     filter: DispenserFilter = "all"
   ): Promise<{ dispensers: any[], total: number }> {
     const endpoint = `/assets/${cpid}/dispensers`;
+    let allDispensers: any[] = [];
+    let cursor: string | null = null;
+    const apiLimit = 1000; // Use a larger batch size for API requests
 
-    // Apply filter to API query if possible
-    const queryParams = new URLSearchParams({
-      limit: limit?.toString() || "50",
-      status: filter || 'all'
+    // Calculate how many items to skip based on page and limit
+    const skipCount = (page && limit) ? (page - 1) * limit : 0;
+    const effectiveLimit = limit || 50;
+
+    await logger.debug("api", {
+        message: "Fetching dispensers",
+        cpid,
+        page,
+        limit: effectiveLimit,
+        filter
     });
 
-    try {
-      const response = await fetchXcpV2WithCache(
-        endpoint,
-        queryParams
-      );
+    do {
+        const queryParams = new URLSearchParams({
+            limit: apiLimit.toString(),
+            status: filter
+        });
+        
+        if (cursor) {
+            queryParams.append("cursor", cursor);
+        }
 
-      if (!response || !Array.isArray(response.result)) {
-        return { dispensers: [], total: 0 };
-      }
+        try {
+            const response = await fetchXcpV2WithCache(endpoint, queryParams);
 
-      const dispensers = response.result.map((dispenser: any) => ({
-        tx_hash: dispenser.tx_hash,
-        block_index: dispenser.block_index,
-        source: dispenser.source,
-        cpid: dispenser.asset,
-        give_quantity: dispenser.give_quantity,
-        give_remaining: dispenser.give_remaining,
-        escrow_quantity: dispenser.escrow_quantity,
-        satoshirate: dispenser.satoshirate,
-        btcrate: Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false })),
-        origin: dispenser.origin,
-        confirmed: dispenser.confirmed,
-        close_block_index: dispenser.close_block_index,
-        status: dispenser.give_remaining > 0 ? "open" : "closed",
-        asset_info: dispenser.asset_info,
-        dispenser_info: dispenser.dispenser_info
-      }));
+            if (!response || !Array.isArray(response.result)) {
+                break;
+            }
 
-      const filteredDispensers = filter === "all"
-        ? dispensers
-        : dispensers.filter((dispenser) =>
-          filter === "open"
-            ? dispenser.give_remaining > 0
-            : dispenser.give_remaining === 0
+            const dispensers = response.result.map((dispenser: any) => ({
+                tx_hash: dispenser.tx_hash,
+                block_index: dispenser.block_index,
+                source: dispenser.source,
+                cpid: dispenser.asset,
+                give_quantity: dispenser.give_quantity,
+                give_remaining: dispenser.give_remaining,
+                escrow_quantity: dispenser.escrow_quantity,
+                satoshirate: dispenser.satoshirate,
+                btcrate: Number(formatSatoshisToBTC(dispenser.satoshirate, { includeSymbol: false })),
+                origin: dispenser.origin,
+                confirmed: dispenser.confirmed,
+                close_block_index: dispenser.close_block_index,
+                status: dispenser.give_remaining > 0 ? "open" : "closed",
+                asset_info: dispenser.asset_info,
+                dispenser_info: dispenser.dispenser_info
+            }));
+
+            allDispensers = allDispensers.concat(dispensers);
+
+            // Break if we have enough items for the requested page
+            if (limit && allDispensers.length >= skipCount + limit) {
+                break;
+            }
+
+            // Update cursor for next iteration
+            cursor = response.next_cursor;
+            
+            // Break if no more results
+            if (!cursor) {
+                break;
+            }
+
+        } catch (error) {
+            await logger.error("api", {
+                message: "Error fetching dispensers",
+                cpid,
+                error: error.message,
+                stack: error.stack
+            });
+            break;
+        }
+    } while (cursor);
+
+    // Filter results if needed
+    const filteredDispensers = filter === "all" 
+        ? allDispensers
+        : allDispensers.filter(dispenser => 
+            filter === "open" 
+                ? dispenser.give_remaining > 0 
+                : dispenser.give_remaining === 0
         );
 
-      // If pagination is requested, apply it
-      if (page !== undefined && limit !== undefined) {
-        const skipCount = (page - 1) * limit;
-        const paginatedDispensers = filteredDispensers.slice(skipCount, skipCount + limit);
-        return {
-          dispensers: paginatedDispensers,
-          total: filteredDispensers.length
-        };
-      }
+    // Apply pagination to the final results
+    const paginatedDispensers = limit 
+        ? filteredDispensers.slice(skipCount, skipCount + effectiveLimit)
+        : filteredDispensers;
 
-      // Otherwise return all dispensers
-      return {
-        dispensers: filteredDispensers,
+    await logger.debug("api", {
+        message: "Dispensers fetched",
+        cpid,
+        totalCount: filteredDispensers.length,
+        returnedCount: paginatedDispensers.length
+    });
+
+    return {
+        dispensers: paginatedDispensers,
         total: filteredDispensers.length
-      };
-
-    } catch (error) {
-      console.error(`Error fetching dispensers for cpid ${cpid}:`, error);
-      return { dispensers: [], total: 0 };
-    }
+    };
   }
 
   static async getDispensesByCpid(
