@@ -11,6 +11,7 @@ interface SRC20SectionProps {
   title?: string;
   subTitle?: string;
   type: "all" | "trending";
+  fromPage: "src20" | "wallet" | "stamping/src20";
 }
 
 const ImageModal = (
@@ -96,14 +97,14 @@ export function SRC20Section({ title, subTitle, type }: SRC20SectionProps) {
               ? (
                 <SRC20TokenMintingCard
                   src20={src20}
-                  variant="deploy"
+                  fromPage={props.fromPage}
                   onImageClick={handleImageClick}
                 />
               )
               : (
                 <SRC20TokenOutmintedCard
                   src20={src20}
-                  variant="deploy"
+                  fromPage={props.fromPage}
                   onImageClick={handleImageClick}
                 />
               )

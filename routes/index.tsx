@@ -117,10 +117,12 @@ export default function Home({ data }: PageProps<HomePageData>) {
               title="SRC-20 TOKENS"
               subTitle="TOP TICKERS"
               type="all"
+              fromPage="src20"
             />
             <SRC20Section
               subTitle="TRENDING MINTS"
               type="trending"
+              fromPage="src20"
             />
           </div>
         </div>

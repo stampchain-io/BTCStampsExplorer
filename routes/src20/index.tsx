@@ -103,8 +103,10 @@ export default function SRC20Page(props: any) {
         sortBy={sortBy}
         selectedTab={selectedTab}
       />
-      {selectedTab === "all" && <SRC20Section type="all" />}
-      {selectedTab === "trending" && <SRC20Section type="trending" />}
+      {selectedTab === "all" && <SRC20Section type="all" fromPage="src20" />}
+      {selectedTab === "trending" && (
+        <SRC20Section type="trending" fromPage="src20" />
+      )}
       <Pagination
         page={page}
         pages={totalPages}
