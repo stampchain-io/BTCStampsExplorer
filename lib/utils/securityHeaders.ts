@@ -25,6 +25,10 @@ export const getSecurityHeaders = (
     "Cloudflare-CDN-Cache-Control": cacheControl,
     "Surrogate-Control": options.forceNoCache ? "no-store" : "max-age=31536000",
     "Edge-Control": options.forceNoCache ? "no-store" : "cache-maxage=31536000",
+    // Recursive stamp headers
+    "Cross-Origin-Resource-Policy": "cross-origin",
+    "Cross-Origin-Embedder-Policy": "unsafe-none",
+    "Cross-Origin-Opener-Policy": "same-origin",
     "Vary": "Accept-Encoding, Accept, Origin",
   };
 };
