@@ -550,7 +550,10 @@ export default function WalletContent(
         />
         {Math.ceil(src20.pagination.total / src20.pagination.limit) > 1 && (
           <div class="mt-3 mobileLg:mt-6">
-            <SRC20Section type="all" />
+            <SRC20Section
+              type="all"
+              fromPage="wallet"
+            />
           </div>
         )}
       </div>
