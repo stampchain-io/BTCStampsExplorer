@@ -186,11 +186,13 @@ export default function Home({ data }: PageProps<HomePageData>) {
           subTitle="TOP TICKERS"
           type="all"
           data={src20s}
+          fromPage="src20"
         />
         <SRC20Section
           subTitle="TRENDING MINTS"
           type="trending"
           data={trendingSrc20s}
+          fromPage="src20"
         />
       </div>
       <div class="flex flex-col gap-6 mobileLg:gap-12">

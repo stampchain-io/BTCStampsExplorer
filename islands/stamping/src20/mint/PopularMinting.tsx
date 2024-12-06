@@ -53,7 +53,7 @@ export default function PopularMinting() {
               <SRC20TokenMintingCard
                 key={src20.tick}
                 src20={src20}
-                variant="minting"
+                fromPage="stamping/src20"
                 onImageClick={() => {}}
               />
             )
@@ -61,7 +61,7 @@ export default function PopularMinting() {
               <SRC20TokenOutmintedCard
                 key={src20.tick}
                 src20={src20}
-                variant="minting"
+                fromPage="stamping/src20"
                 onImageClick={() => {}}
               />
             )
