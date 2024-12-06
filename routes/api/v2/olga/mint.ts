@@ -1,5 +1,5 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
-import { MintStampInputData, TX, TXError } from "globals";
+import { MintStampInputData, TransactionInput, TX, TXError } from "globals";
 import { serverConfig } from "$server/config/config.ts";
 import {
   StampMintService,
@@ -18,6 +18,19 @@ interface ExtendedMintStampInputData
   satsPerKB?: number;
   satsPerVB?: number;
   feeRate?: number; // legacy support
+}
+
+// Add a common response interface
+interface NormalizedMintResponse {
+  hex: string;
+  cpid: string;
+  est_tx_size: number;
+  input_value: number;
+  total_dust_value: number;
+  est_miner_fee: number;
+  change_value: number;
+  total_output_value: number;
+  txDetails: TransactionInput[];
 }
 
 export const handler: Handlers<TX | TXError> = {
@@ -86,19 +99,21 @@ export const handler: Handlers<TX | TXError> = {
       const mint_tx = await StampMintService.createStampIssuance(prepare);
 
       if (isDryRun) {
-        // Return just the fee details for estimation
+        // Normalize dry run response to match full mint response
         return ResponseUtil.success({
-          fee: mint_tx.estMinerFee,
-          dust: mint_tx.totalDustValue,
-          total: mint_tx.totalOutputValue,
-          txDetails: {
-            estimatedSize: mint_tx.estimatedTxSize,
-            totalInputValue: mint_tx.totalInputValue,
-            changeOutput: mint_tx.totalChangeOutput,
-          },
-        });
+          hex: "", // Empty for dry run
+          cpid: assetName,
+          est_tx_size: Number(mint_tx.estimatedTxSize),
+          input_value: Number(mint_tx.totalInputValue),
+          total_dust_value: Number(mint_tx.totalDustValue),
+          est_miner_fee: Number(mint_tx.estMinerFee),
+          change_value: Number(mint_tx.totalChangeOutput),
+          total_output_value: Number(mint_tx.totalOutputValue),
+          txDetails: [], // Empty for dry run
+        } as NormalizedMintResponse);
       }
 
+      // Regular mint response - already in the correct format
       if (!mint_tx || !mint_tx.psbt) {
         console.error("Invalid mint_tx structure:", mint_tx);
         return ResponseUtil.badRequest(
@@ -147,21 +162,22 @@ export const handler: Handlers<TX | TXError> = {
         };
       });
 
-      // Return the API response with the modified format
+      // Return the normalized response
       return ResponseUtil.success({
         hex: mint_tx.psbt.toHex(),
         cpid: assetName,
-        est_tx_size: mint_tx.estimatedTxSize,
-        input_value: mint_tx.totalInputValue,
-        total_dust_value: mint_tx.totalDustValue,
-        est_miner_fee: mint_tx.estMinerFee,
-        change_value: mint_tx.totalChangeOutput,
+        est_tx_size: Number(mint_tx.estimatedTxSize),
+        input_value: Number(mint_tx.totalInputValue),
+        total_dust_value: Number(mint_tx.totalDustValue),
+        est_miner_fee: Number(mint_tx.estMinerFee),
+        change_value: Number(mint_tx.totalChangeOutput),
+        total_output_value: Number(mint_tx.totalOutputValue),
         txDetails: txDetails.map((input) => ({
           txid: input.txid,
           vout: input.vout,
           signingIndex: input.signingIndex,
         })),
-      });
+      } as NormalizedMintResponse);
     } catch (error: unknown) {
       console.error("Minting error:", error);
       const errorMessage = error instanceof Error

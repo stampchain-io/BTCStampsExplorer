@@ -60,6 +60,7 @@ export interface FeeEstimationResult {
   dustValue: number;
   outputs: TransactionOutput[];
   detectedInputType: ScriptType;
+  estimatedSize?: number;
 }
 
 export type ScriptType = "P2PKH" | "P2WPKH" | "P2WSH" | "P2SH" | "P2TR";
@@ -104,7 +105,7 @@ export interface ComplexFeeProps extends BaseFeeCalculatorProps {
   issuance?: number;
   serviceFee?: number;
   userAddress?: string;
-  outputTypes?: string[];
+  outputTypes?: ScriptType[];
   utxoAncestors?: AncestorInfo[];
   feeDetails?: FeeDetails;
   onRefresh?: () => Promise<void>;
@@ -114,4 +115,10 @@ export interface ComplexFeeProps extends BaseFeeCalculatorProps {
 
 interface PSBTFees extends FeeDetails {
   // Additional PSBT-specific fields if needed
+}
+
+export interface BTCBalance {
+  confirmed: number;
+  unconfirmed: number;
+  total?: number;
 }

@@ -11,7 +11,8 @@ export type LogNamespace =
   | "database"
   | "cache"
   | "auth"
-  | "system";
+  | "system"
+  | "ui";
 
 declare global {
   interface Window {
@@ -33,20 +34,29 @@ function isServer(): boolean {
   return typeof Deno !== "undefined";
 }
 
-function shouldLog(namespace: LogNamespace): boolean {
-  // Client-side context
+function initializeClientDebug() {
   if (!isServer()) {
-    const globalWithDebug = globalThis as GlobalWithDebug;
-    if (!globalWithDebug.__DEBUG?.enabled) return false;
+    const existingNamespaces = window.__DEBUG?.namespaces;
 
-    const namespaces = globalWithDebug.__DEBUG.namespaces.split(",")
+    globalThis.__DEBUG = {
+      namespaces: existingNamespaces || "stamps,ui,debug,all",
+      enabled: globalThis.__DEBUG?.enabled ?? true,
+    };
+  }
+}
+
+function shouldLog(namespace: LogNamespace): boolean {
+  if (!isServer()) {
+    if (!window.__DEBUG?.enabled) return false;
+
+    const namespaces = (window.__DEBUG.namespaces || "")
+      .split(",")
       .map((n) => n.trim().toLowerCase());
 
     return namespaces.includes("all") ||
       namespaces.includes(namespace.toLowerCase());
   }
 
-  // Server-side context
   const debug = Deno.env.get("DEBUG") || "";
   if (!debug) return false;
 
@@ -60,7 +70,6 @@ const LOG_FILE = "app.log";
 async function writeToFile(data: string) {
   if (!isServer()) return;
 
-  // Only write to file in development
   if (Deno.env.get("DENO_ENV") !== "development") {
     return;
   }
@@ -85,47 +94,72 @@ const isDevelopment = () =>
   isServer() && Deno.env.get("DENO_ENV") === "development";
 
 export const logger = {
-  debug: async (namespace: LogNamespace, msg: LogMessage) => {
+  debug: (namespace: LogNamespace, msg: LogMessage) => {
+    initializeClientDebug();
     const logData = formatLog("debug", namespace, msg);
-    const formatted = JSON.stringify(logData, null, 2);
 
-    // In development, always log to file regardless of DEBUG setting
+    if (!isServer()) {
+      if (isDevelopment() || shouldLog(namespace)) {
+        console.debug(logData);
+      }
+      return;
+    }
+
+    const formatted = JSON.stringify(logData, null, 2);
     if (isDevelopment()) {
-      await writeToFile(formatted);
-      // Also log to console for immediate feedback
+      writeToFile(formatted);
       console.debug(formatted);
       return;
     }
 
-    // In production, respect DEBUG setting
     if (shouldLog(namespace)) {
       console.debug(formatted);
     }
   },
 
-  error: async (namespace: LogNamespace, msg: LogMessage) => {
+  error: (namespace: LogNamespace, msg: LogMessage) => {
+    initializeClientDebug();
     const logData = formatLog("error", namespace, msg);
-    const formatted = JSON.stringify(logData, null, 2);
 
+    if (!isServer()) {
+      console.error(logData);
+      return;
+    }
+
+    const formatted = JSON.stringify(logData, null, 2);
     console.error(formatted);
-    await writeToFile(formatted);
+    writeToFile(formatted);
   },
 
-  info: async (namespace: LogNamespace, msg: LogMessage) => {
+  info: (namespace: LogNamespace, msg: LogMessage) => {
+    initializeClientDebug();
     const logData = formatLog("info", namespace, msg);
-    const formatted = JSON.stringify(logData, null, 2);
 
+    if (!isServer()) {
+      if (shouldLog(namespace)) {
+        console.info(logData);
+      }
+      return;
+    }
+
+    const formatted = JSON.stringify(logData, null, 2);
     if (shouldLog(namespace)) {
       console.info(formatted);
     }
-    await writeToFile(formatted);
+    writeToFile(formatted);
   },
 
-  warn: async (namespace: LogNamespace, msg: LogMessage) => {
+  warn: (namespace: LogNamespace, msg: LogMessage) => {
+    initializeClientDebug();
     const logData = formatLog("warn", namespace, msg);
-    const formatted = JSON.stringify(logData, null, 2);
 
+    if (!isServer()) {
+      console.warn(logData);
+      return;
+    }
+
+    const formatted = JSON.stringify(logData, null, 2);
     console.warn(formatted);
-    await writeToFile(formatted);
+    writeToFile(formatted);
   },
 };

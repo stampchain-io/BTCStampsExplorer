@@ -141,20 +141,27 @@ const signPSBT = async (
   sighashTypes?: number[],
   autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
-  const okx = (globalThis as any).okxwallet;
+  const okx = getProvider();
+  if (!okx) {
+    return { signed: false, error: "OKX wallet not connected" };
+  }
   try {
     logger.debug("ui", {
       message: "Signing PSBT with OKX",
-      context: "signPSBT",
-      psbtHex,
-      inputsToSign,
+      data: {
+        psbtHexLength: psbtHex.length,
+        inputsToSign,
+        enableRBF,
+        autoBroadcast,
+      },
     });
 
     const options: any = {
       autoFinalized: true,
+      enableRBF, // Add RBF support
     };
 
-    if (inputsToSign && inputsToSign.length > 0) {
+    if (inputsToSign?.length > 0) {
       options.toSignInputs = inputsToSign.map((input, idx) => ({
         index: input.index,
         sighashTypes: sighashTypes ? [sighashTypes[idx]] : undefined,
@@ -165,25 +172,31 @@ const signPSBT = async (
 
     logger.debug("ui", {
       message: "OKX signPsbt result",
-      context: "signPSBT",
-      signedPsbtHex,
+      data: { signedPsbtHex },
     });
 
-    if (signedPsbtHex && typeof signedPsbtHex === "string") {
-      if (autoBroadcast) {
+    if (!signedPsbtHex) {
+      return { signed: false, error: "No result from OKX wallet" };
+    }
+
+    if (autoBroadcast) {
+      try {
         const txid = await okx.bitcoin.pushPsbt(signedPsbtHex);
         logger.info("ui", {
           message: "Successfully broadcast transaction",
-          context: "signPSBT",
-          txid,
+          data: { txid },
         });
         return { signed: true, txid };
-      } else {
-        return { signed: true, psbt: signedPsbtHex };
+      } catch (broadcastError) {
+        return {
+          signed: true,
+          psbt: signedPsbtHex,
+          error: "Transaction signed but broadcast failed",
+        };
       }
-    } else {
-      throw new Error("Unexpected result format from OKX wallet");
     }
+
+    return { signed: true, psbt: signedPsbtHex };
   } catch (error: unknown) {
     return handleWalletError(error, "OKX");
   }

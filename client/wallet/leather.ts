@@ -101,7 +101,7 @@ export const handleConnect = async (addresses: LeatherAddress[]) => {
   _wallet.address = btcAddress.address;
   _wallet.accounts = [btcAddress.address];
   _wallet.publicKey = btcAddress.publicKey;
-  _wallet.addressType = btcAddress.type; // Store the address type for future reference
+  _wallet.addressType = btcAddress.type || "p2wpkh";
 
   const addressInfo = await getBTCBalanceInfo(btcAddress.address);
 
@@ -140,6 +140,15 @@ const signMessage = async (message: string) => {
   }
 };
 
+interface LeatherSignPSBTResponse {
+  error?: string;
+  result?: {
+    hex?: string; // Signed PSBT in hex format
+    txid?: string; // Transaction ID if broadcast
+    cancelled?: boolean;
+  };
+}
+
 export const signPSBT = async (
   psbtHex: string,
   inputsToSign: { index: number }[],
@@ -149,8 +158,12 @@ export const signPSBT = async (
 ): Promise<SignPSBTResult> => {
   logger.debug("ui", {
     message: "Entering Leather signPSBT function",
-    psbtHexLength: psbtHex.length,
-    inputsCount: inputsToSign.length,
+    data: {
+      psbtHexLength: psbtHex.length,
+      inputsCount: inputsToSign.length,
+      enableRBF,
+      autoBroadcast,
+    },
   });
 
   const leatherProvider = getProvider();
@@ -173,29 +186,64 @@ export const signPSBT = async (
 
     logger.debug("ui", {
       message: "Calling Leather provider signPsbt method",
-      requestParams,
+      data: requestParams,
     });
 
-    const result = await leatherProvider.request("signPsbt", requestParams);
+    const result = await leatherProvider.request(
+      "signPsbt",
+      requestParams,
+    ) as LeatherSignPSBTResponse;
 
     logger.debug("ui", {
       message: "Leather signPsbt result received",
-      result: JSON.stringify(result, null, 2),
+      data: result,
     });
 
-    if (result?.result) {
+    if (!result) {
+      return { signed: false, error: "No result from Leather wallet" };
+    }
+
+    // Check for user cancellation
+    if (result.result?.cancelled) {
+      return { signed: false, cancelled: true };
+    }
+
+    // Check for error
+    if (result.error) {
+      return { signed: false, error: result.error };
+    }
+
+    if (result.result) {
       if (result.result.hex) {
+        logger.info("ui", {
+          message: "PSBT signed successfully",
+          data: { hasHex: true, hasTxid: false },
+        });
         return { signed: true, psbt: result.result.hex };
-      } else if (result.result.txid) {
+      }
+      if (result.result.txid) {
+        logger.info("ui", {
+          message: "PSBT signed and broadcast successfully",
+          data: { hasHex: false, hasTxid: true, txid: result.result.txid },
+        });
         return { signed: true, txid: result.result.txid };
       }
     }
 
+    logger.error("ui", {
+      message: "Unexpected result format from Leather wallet",
+      data: result,
+    });
     return {
       signed: false,
       error: "Unexpected result format from Leather wallet",
     };
   } catch (error: unknown) {
+    logger.error("ui", {
+      message: "Error in Leather signPSBT",
+      error: error instanceof Error ? error.message : String(error),
+      details: error,
+    });
     return handleWalletError(error, "Leather");
   }
 };

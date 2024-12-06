@@ -3,6 +3,7 @@ import { walletContext } from "./wallet.ts";
 import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
+import { logger } from "$lib/utils/logger.ts";
 export const isUnisatInstalled = signal<boolean>(false);
 
 export const checkUnisat = () => {
@@ -46,7 +47,11 @@ const handleAccountsChanged = async (_accounts: string[]) => {
   const publicKey = await unisat.getPublicKey();
   _wallet.publicKey = publicKey;
   const balance = await unisat.getBalance();
-  _wallet.btcBalance = balance;
+  _wallet.btcBalance = {
+    confirmed: balance.confirmed,
+    unconfirmed: balance.unconfirmed,
+    total: balance.confirmed + balance.unconfirmed,
+  };
   _wallet.network = "mainnet";
   _wallet.provider = "unisat";
   walletContext.updateWallet(_wallet);
@@ -57,7 +62,7 @@ unisat?.on("accountsChanged", handleAccountsChanged);
 
 export const signPSBT = async (
   psbtHex: string,
-  inputsToSign?: { index: number; sighashTypes?: number[] }[],
+  inputsToSign: { index: number }[],
   enableRBF = true,
   sighashTypes?: number[],
   autoBroadcast = true,
@@ -65,50 +70,61 @@ export const signPSBT = async (
   try {
     const unisat = getProvider();
     if (!unisat) {
-      throw new Error("Unisat wallet not connected");
+      return { signed: false, error: "Unisat wallet not connected" };
     }
 
-    // Prepare options for signing
+    logger.debug("ui", {
+      message: "Signing PSBT with Unisat",
+      data: {
+        psbtHexLength: psbtHex.length,
+        inputsToSign,
+        enableRBF,
+        autoBroadcast,
+      },
+    });
+
     const unisatOptions: any = {
-      autoFinalized: true, // Default is true
+      autoFinalized: true,
+      enableRBF, // Note: Check if Unisat supports RBF in their options
     };
 
-    if (inputsToSign && inputsToSign.length > 0) {
-      unisatOptions.toSignInputs = inputsToSign.map((input, idx) => {
-        if (typeof input.index !== "number") {
-          throw new Error(
-            `Input at position ${idx} is missing 'index' property`,
-          );
-        }
-        return {
-          index: input.index,
-          address: walletContext.wallet.address,
-          sighashTypes: input.sighashTypes || sighashTypes,
-        };
-      });
+    if (inputsToSign?.length > 0) {
+      unisatOptions.toSignInputs = inputsToSign.map((input) => ({
+        index: input.index,
+        address: walletContext.wallet.address,
+        sighashTypes: sighashTypes,
+      }));
     }
 
-    // Sign the PSBT using Unisat's signPsbt method
     const signedPsbtHex = await unisat.signPsbt(psbtHex, unisatOptions);
 
-    console.log("Unisat signPsbt result (signedPsbtHex):", signedPsbtHex);
+    logger.debug("ui", {
+      message: "Unisat signPsbt result",
+      data: { signedPsbtHex },
+    });
 
-    if (signedPsbtHex && typeof signedPsbtHex === "string") {
-      if (autoBroadcast) {
-        // Broadcast the signed PSBT using Unisat's pushPsbt method
-        const txid = await unisat.pushPsbt(signedPsbtHex);
-        console.log("Transaction broadcasted with txid:", txid);
-        return { signed: true, txid };
-      } else {
-        // Return the signed PSBT for further handling
-        return { signed: true, psbt: signedPsbtHex };
-      }
-    } else {
-      return {
-        signed: false,
-        error: "Unexpected result format from Unisat wallet",
-      };
+    if (!signedPsbtHex) {
+      return { signed: false, error: "No result from Unisat wallet" };
     }
+
+    if (autoBroadcast) {
+      try {
+        const txid = await unisat.pushPsbt(signedPsbtHex);
+        logger.info("ui", {
+          message: "Successfully broadcast transaction",
+          data: { txid },
+        });
+        return { signed: true, txid };
+      } catch (broadcastError) {
+        return {
+          signed: true,
+          psbt: signedPsbtHex,
+          error: "Transaction signed but broadcast failed",
+        };
+      }
+    }
+
+    return { signed: true, psbt: signedPsbtHex };
   } catch (error: unknown) {
     return handleWalletError(error, "Unisat");
   }

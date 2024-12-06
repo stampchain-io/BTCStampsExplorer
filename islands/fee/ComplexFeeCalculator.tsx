@@ -1,10 +1,5 @@
 import { FeeCalculatorBase } from "$components/shared/fee/FeeCalculatorBase.tsx";
-import { calculateTransactionFees } from "$lib/utils/minting/feeEstimator.ts";
-import type {
-  BaseFeeCalculatorProps,
-  ComplexFeeProps,
-  ScriptType,
-} from "$lib/types/base.d.ts";
+import type { ComplexFeeProps } from "$lib/types/base.d.ts";
 import { useEffect } from "preact/hooks";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -28,21 +23,42 @@ export function ComplexFeeCalculator({
   onTosChange,
   ...baseProps
 }: ComplexFeeProps) {
-  const feeDetails = providedFeeDetails?.hasExactFees ? providedFeeDetails : {
-    minerFee: 0, // Will be updated after async calculation
-    dustValue: 0,
-    hasExactFees: false,
-  };
+  const feeDetails = providedFeeDetails?.hasExactFees
+    ? {
+      minerFee: Number(providedFeeDetails.minerFee) || 0,
+      dustValue: Number(providedFeeDetails.dustValue) || 0,
+      totalValue: Number(providedFeeDetails.totalValue) || 0,
+      hasExactFees: true,
+    }
+    : {
+      minerFee: 0,
+      dustValue: 0,
+      hasExactFees: false,
+      totalValue: 0,
+    };
 
   // Log fee details for debugging
-  console.log("Fee Details:", {
-    providedFees: providedFeeDetails,
-    finalFees: feeDetails,
-    inputs: {
-      type,
-      fileSize,
-      feeRate: fee,
-      utxoAncestors: utxoAncestors?.length,
+  logger.debug("stamps", {
+    message: "Fee calculator state",
+    data: {
+      providedFees: {
+        minerFee: providedFeeDetails?.minerFee,
+        dustValue: providedFeeDetails?.dustValue,
+        totalValue: providedFeeDetails?.totalValue,
+        hasExactFees: providedFeeDetails?.hasExactFees,
+      },
+      finalFees: {
+        minerFee: feeDetails.minerFee,
+        dustValue: feeDetails.dustValue,
+        totalValue: feeDetails.totalValue,
+        hasExactFees: feeDetails.hasExactFees,
+      },
+      inputs: {
+        type,
+        fileSize,
+        feeRate: fee,
+        utxoAncestors: utxoAncestors?.length,
+      },
     },
   });
 
@@ -50,16 +66,17 @@ export function ComplexFeeCalculator({
   useEffect(() => {
     if (providedFeeDetails?.hasExactFees) {
       logger.debug("stamps", {
-        message: "Fee details received",
+        message: "Fee details updated",
         data: {
           minerFee: providedFeeDetails.minerFee,
           dustValue: providedFeeDetails.dustValue,
+          totalValue: providedFeeDetails.totalValue,
           type,
           feeRate: fee,
         },
       });
     }
-  }, [providedFeeDetails]);
+  }, [providedFeeDetails, fee]);
 
   return (
     <FeeCalculatorBase
