@@ -6,7 +6,8 @@ import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { hex2bin } from "$lib/utils/binary/baseUtils.ts";
-
+import { logger } from "$lib/utils/logger.ts";
+import { bigIntSerializer } from "$lib/utils/formatUtils.ts";
 
 export function formatPsbtForLogging(psbt: bitcoin.Psbt) {
   return {
@@ -254,6 +255,7 @@ export class PSBTService {
     psbt.addInput({
       hash: buyerTxid,
       index: buyerVout,
+      sequence: 0xfffffffd, // Enable RBF
       witnessUtxo: {
         script: new Uint8Array(hex2bin(buyerUtxo.script)), // Use hex2bin and be explicit
         value: BigInt(buyerUtxo.value), // Use BigInt
@@ -318,21 +320,23 @@ export class PSBTService {
     psbt: string;
     inputsToSign: { index: number }[];
   }> {
-    console.log("Processing Counterparty PSBT:", {
-      psbtBase64,
-      address,
-      feeRateKB,
-      options
+    await logger.info("api", {
+      message: "Processing Counterparty PSBT",
+      data: { address, feeRateKB, options }
     });
 
     try {
-      // Parse PSBT from Base64
       const psbt = Psbt.fromBase64(psbtBase64);
-      console.log("Raw PSBT Data:", psbt.data);
+      await logger.debug("api", { 
+        message: "Raw PSBT Data", 
+        data: JSON.parse(JSON.stringify(psbt.data, bigIntSerializer))
+      });
 
-      // Access transaction data
       const tx = psbt.data.globalMap.unsignedTx.tx;
-      console.log("Transaction Data:", tx);
+      await logger.debug("api", { 
+        message: "Transaction Data", 
+        data: JSON.parse(JSON.stringify(tx, bigIntSerializer))
+      });
 
       if (!tx || !tx.ins || !tx.outs) {
         throw new Error("Invalid transaction structure in PSBT");
@@ -405,9 +409,9 @@ export class PSBTService {
         return sum + BigInt(witnessUtxo?.value || 0);
       }, BigInt(0));
 
-      const vsize = tx.virtualSize();
-      const requestedFeeRateVB = feeRateKB / SATS_PER_KB_MULTIPLIER;
-      const targetFee = BigInt(Math.ceil(vsize * requestedFeeRateVB));
+      const vsize = BigInt(tx.virtualSize());
+      const requestedFeeRateVB = BigInt(Math.ceil(feeRateKB / SATS_PER_KB_MULTIPLIER));
+      const targetFee = vsize * requestedFeeRateVB;
 
       // Find the change output (usually the last non-OP_RETURN output)
       const changeOutputIndex = tx.outs.findIndex((output, index, arr) => {
@@ -438,57 +442,65 @@ export class PSBTService {
       const totalOut = tx.outs.reduce((sum, output) => sum + BigInt(output.value), BigInt(0));
       const actualFee = totalIn - totalOut;
 
-      console.log(`
-Fee Adjustment:
-Original Change Value: ${tx.outs[changeOutputIndex].value}
-New Change Value: ${newChangeValue}
-Target Fee: ${targetFee} sats (${requestedFeeRateVB} sat/vB)
-Actual Fee: ${actualFee} sats (${(actualFee/vsize).toFixed(2)} sat/vB)
-      `);
+      await logger.info("api", {
+        message: "Fee Adjustment",
+        data: JSON.parse(JSON.stringify({
+          originalChangeValue: tx.outs[changeOutputIndex].value,
+          newChangeValue: newChangeValue,
+          targetFee: targetFee,
+          targetFeeRate: requestedFeeRateVB,
+          actualFee: actualFee,
+          actualFeeRate: Number(actualFee)/Number(vsize)
+        }, bigIntSerializer))
+      });
 
       // Validate fees if requested
       if (options?.validateFees) {
         // Check ancestor fee rates
         for (const [index, ancestorInfo] of ancestorInfos.entries()) {
           if (ancestorInfo) {
-            const effectiveFeeRate = (actualFee + ancestorInfo.fees) /
-              (vsize + ancestorInfo.vsize);
+            const ancestorFees = BigInt(ancestorInfo.fees);
+            const ancestorVsize = BigInt(ancestorInfo.vsize);
+            const effectiveFeeRate = Number(actualFee + ancestorFees) /
+              Number(vsize + ancestorVsize);
 
-            console.log(`
-Ancestor Fee Analysis for Input ${index}:
-Ancestor Fees: ${ancestorInfo.fees} satoshis
-Ancestor vSize: ${ancestorInfo.vsize} vBytes
-Current Tx:
-  Fee: ${actualFee} satoshis
-  vSize: ${vsize} vBytes
-Combined:
-  Total Fees: ${actualFee + ancestorInfo.fees} satoshis
-  Total vSize: ${vsize + ancestorInfo.vsize} vBytes
-  Effective Fee Rate: ${effectiveFeeRate.toFixed(2)} sat/vB
-Target Fee Rate: ${requestedFeeRateVB} sat/vB
-            `);
+            await logger.debug("api", {
+              message: `Ancestor Fee Analysis for Input ${index}`,
+              data: JSON.parse(JSON.stringify({
+                ancestorFees: ancestorFees,
+                ancestorVsize: ancestorVsize,
+                currentTxFee: actualFee,
+                currentTxVsize: vsize,
+                totalFees: actualFee + ancestorFees,
+                totalVsize: vsize + ancestorVsize,
+                effectiveFeeRate,
+                targetFeeRate: requestedFeeRateVB
+              }, bigIntSerializer))
+            });
 
             // If ancestors require higher fee rate, adjust the fee again
-            if (effectiveFeeRate < requestedFeeRateVB) {
-              const requiredFee = Math.ceil(
-                requestedFeeRateVB * (vsize + ancestorInfo.vsize) -
-                ancestorInfo.fees
-              );
+            if (effectiveFeeRate < Number(requestedFeeRateVB)) {
+              const requiredFee = BigInt(Math.ceil(
+                Number(requestedFeeRateVB) * Number(vsize + ancestorVsize) -
+                Number(ancestorFees)
+              ));
 
               const adjustedChangeValue = totalIn - nonChangeOutputsTotal - requiredFee;
-              if (adjustedChangeValue < 546) {
+              if (adjustedChangeValue < BigInt(546)) {
                 throw new Error(
                   `Cannot achieve target fee rate with ancestors: change would be dust (${adjustedChangeValue} sats)`
                 );
               }
 
               // Update change output with adjusted value
-              tx.outs[changeOutputIndex].value = adjustedChangeValue;
-              console.log(`
-Adjusted for ancestors:
-New Change Value: ${adjustedChangeValue}
-Required Fee: ${requiredFee} sats
-              `);
+              tx.outs[changeOutputIndex].value = Number(adjustedChangeValue);
+              await logger.info("api", {
+                message: "Adjusted for ancestors",
+                data: JSON.parse(JSON.stringify({
+                  newChangeValue: adjustedChangeValue,
+                  requiredFee: requiredFee
+                }, bigIntSerializer))
+              });
             }
           }
         }
@@ -496,18 +508,27 @@ Required Fee: ${requiredFee} sats
 
       // Identify inputs to sign
       const inputsToSign = tx.ins.map((_, index) => ({ index }));
-      console.log("Inputs to sign:", inputsToSign);
+      await logger.debug("api", {
+        message: "Inputs to sign",
+        data: inputsToSign
+      });
 
       // Convert updated PSBT to hex
       const updatedPsbtHex = psbt.toHex();
-      console.log("Updated PSBT Hex:", updatedPsbtHex);
+      await logger.debug("api", {
+        message: "Updated PSBT Hex",
+        data: updatedPsbtHex
+      });
 
       return {
         psbt: updatedPsbtHex,
         inputsToSign,
       };
     } catch (error) {
-      console.error("Error processing Counterparty PSBT:", error);
+      await logger.error("api", {
+        message: "Error processing Counterparty PSBT",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
       throw new Error(
         `Failed to process PSBT: ${
           error instanceof Error ? error.message : "Unknown error"

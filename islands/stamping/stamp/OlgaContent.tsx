@@ -13,8 +13,11 @@ import { Config } from "globals";
 import { logger } from "$lib/utils/logger.ts";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 
-const log = (message: string, data?: any) => {
-  console.log(`[OlgaContent] ${message}`, data ? data : "");
+const log = (message: string, data?: unknown) => {
+  logger.debug("stamps", {
+    message: `[OlgaContent] ${message}`,
+    data,
+  });
 };
 
 interface TransactionInput {
@@ -23,39 +26,29 @@ interface TransactionInput {
   signingIndex: number;
 }
 
-interface TransactionOutput {
-  address: string;
-  value: number;
-  type: "change" | "stamp" | "fee";
-}
-
-interface TransactionDetails {
-  estimatedSize: number;
-  totalInputValue: number;
-  totalDustValue: number;
-  minerFee: number;
-  changeOutput: number;
-  inputs: TransactionInput[];
-  outputs: TransactionOutput[];
-}
-
-interface TxResponse {
+interface MintResponse {
   hex: string;
-  base64: string;
   cpid: string;
-  transactionDetails: TransactionDetails;
+  est_tx_size: number;
+  input_value: number;
+  total_dust_value: number;
+  est_miner_fee: number;
+  change_value: number;
+  total_output_value: number;
+  txDetails: TransactionInput[];
 }
 
-// Add this helper function near the top of the file
-function isValidForMinting(params: {
+interface ValidationParams {
   file: File | null;
   fileError: string;
   issuanceError: string;
   stampNameError: string;
   isPoshStamp: boolean;
   stampName: string;
-  addressError?: string;
-}) {
+  addressError: string | undefined;
+}
+
+function isValidForMinting(params: ValidationParams) {
   const {
     file,
     fileError,
@@ -137,10 +130,10 @@ function isValidForMinting(params: {
 }
 
 interface FeeDetails {
-  hasExactFees: boolean;
   minerFee: number;
   dustValue: number;
   totalValue: number;
+  hasExactFees: boolean;
 }
 
 interface MintRequest {
@@ -225,29 +218,9 @@ function extractErrorMessage(error: unknown): string {
   return "An unexpected error occurred";
 }
 
-// Add interface for the wallet error structure
-interface WalletError {
-  details?: {
-    jsonrpc?: string;
-    id?: string;
-    error?: {
-      code?: number;
-      message?: string;
-    };
-  };
-  message?: string;
-}
-
-// Replace TxDetails interface with MintResponse
-interface MintResponse {
-  hex: string;
-  cpid: string;
-  est_tx_size: number;
-  input_value: number;
-  total_dust_value: number;
-  est_miner_fee: number;
-  change_value: number;
-  txDetails: TransactionInput[];
+interface SubmissionMessage {
+  message: string;
+  txid?: string | undefined;
 }
 
 export function OlgaContent() {
@@ -284,10 +257,7 @@ export function OlgaContent() {
 
   // Add the submissionMessage state
   const [submissionMessage, setSubmissionMessage] = useState<
-    {
-      message: string;
-      txid?: string;
-    } | null
+    SubmissionMessage | null
   >(null);
 
   // Initialize addressError as undefined
@@ -300,6 +270,14 @@ export function OlgaContent() {
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
+      logger.debug("stamps", {
+        message: "Setting initial fee",
+        data: {
+          recommendedFee,
+          currentFee: fee,
+          hasFile: !!file,
+        },
+      });
       setFee(recommendedFee);
     }
   }, [fees, loading]);
@@ -347,30 +325,62 @@ export function OlgaContent() {
     });
 
     if (isConnected && wallet.address && file) {
-      setHasValidTransaction(true);
+      log("Starting transaction preparation", {
+        address: wallet.address,
+        fileSize: file.size,
+        fileType: file.type,
+      });
+
       const prepareTx = async () => {
         try {
-          const data = await toBase64(file);
-          const response = await axiod.post("/api/v2/olga/mint", {
+          const fileData = await toBase64(file);
+          log("File converted to base64", {
+            dataLength: fileData.length,
+          });
+
+          const mintRequest = {
             sourceWallet: address,
-            file: data,
+            file: fileData,
             satsPerKB: fee * 1000,
             locked: isLocked,
             qty: issuance,
             filename: file.name,
             ...(isPoshStamp && stampName ? { assetName: stampName } : {}),
             dryRun: true,
+          };
+
+          log("Sending mint request", {
+            request: { ...mintRequest, file: "[REDACTED]" },
           });
 
-          setTxDetails(response.data);
+          const response = await axiod.post("/api/v2/olga/mint", mintRequest);
+          const data = response.data as MintResponse;
+
+          // Add debug logging here
+          logger.debug("stamps", {
+            message: "Mint API response",
+            data: {
+              raw: response.data,
+              est_miner_fee: data.est_miner_fee,
+              total_dust_value: data.total_dust_value,
+              input_value: data.input_value,
+              total_output_value: data.total_output_value,
+            },
+          });
+
+          setTxDetails(data);
           setFeeDetails({
-            minerFee: response.data.est_miner_fee,
-            dustValue: response.data.total_dust_value,
-            totalValue: response.data.input_value,
+            minerFee: Number(data.est_miner_fee) || 0,
+            dustValue: Number(data.total_dust_value) || 0,
+            totalValue: Number(data.total_output_value) || 0,
             hasExactFees: true,
           });
         } catch (error) {
-          console.error("Transaction preparation error:", error);
+          logger.error("stamps", {
+            message: "Transaction preparation failed",
+            error: error instanceof Error ? error.message : String(error),
+          });
+
           setFeeDetails({
             hasExactFees: false,
             minerFee: 0,
@@ -381,26 +391,22 @@ export function OlgaContent() {
       };
       prepareTx();
     } else {
-      setHasValidTransaction(false);
-      setTxDetails(null);
-      setFeeDetails({
-        hasExactFees: false,
-        minerFee: 0,
-        dustValue: 0,
-        totalValue: 0,
+      log("Missing requirements for tx preparation", {
+        isConnected,
+        hasAddress: !!wallet.address,
+        hasFile: !!file,
       });
     }
-  }, [isConnected, wallet.address, file]);
+  }, [isConnected, wallet.address, file, fee]);
 
   // Update the fee recalculation effect
   useEffect(() => {
     if (hasValidTransaction && txDetails && fee) {
-      const newFee = Math.ceil((txDetails.est_tx_size || 0) * fee);
+      const newFee = Math.ceil((txDetails.txDetails.estimatedSize || 0) * fee);
       setFeeDetails({
         minerFee: newFee,
-        dustValue: txDetails.total_dust_value || 0,
-        totalValue: (txDetails.input_value || 0) -
-          (txDetails.est_miner_fee || 0) + newFee,
+        dustValue: txDetails.dust || 0,
+        totalValue: (txDetails.total || 0) - (txDetails.fee || 0) + newFee,
         hasExactFees: true,
       });
     }
@@ -408,7 +414,10 @@ export function OlgaContent() {
 
   const validateWalletAddress = (address: string) => {
     const { isValid, error } = validateWalletAddressForMinting(address);
-    console.log("Validating wallet address:", { address, isValid, error });
+    logger.debug("stamps", {
+      message: "Validating wallet address",
+      data: { address, isValid, error },
+    });
     setAddressError(error);
     return isValid;
   };
@@ -497,14 +506,19 @@ export function OlgaContent() {
     const input = e.target as HTMLInputElement;
     const selectedFile = input.files?.[0];
 
-    console.log("Handle image called:", {
-      hasFile: !!selectedFile,
-      fileSize: selectedFile?.size,
-      fileType: selectedFile?.type,
+    logger.debug("stamps", {
+      message: "Handle image called",
+      data: {
+        hasFile: !!selectedFile,
+        fileSize: selectedFile?.size,
+        fileType: selectedFile?.type,
+      },
     });
 
     if (!selectedFile) {
-      console.log("No file selected");
+      logger.debug("stamps", {
+        message: "No file selected",
+      });
       setFileError("No file selected");
       setFile(null);
       setFileSize(undefined);
@@ -512,18 +526,23 @@ export function OlgaContent() {
     }
 
     if (selectedFile.size > 64 * 1024) {
-      console.log("File too large:", selectedFile.size);
+      logger.debug("stamps", {
+        message: "File too large",
+        size: selectedFile.size,
+      });
       setFileError("File size must be less than 64KB.");
       setFile(null);
       setFileSize(undefined);
       return;
     }
 
-    // Clear any previous errors and set the file
-    console.log("Setting valid file:", {
-      name: selectedFile.name,
-      size: selectedFile.size,
-      type: selectedFile.type,
+    logger.debug("stamps", {
+      message: "Setting valid file",
+      data: {
+        name: selectedFile.name,
+        size: selectedFile.size,
+        type: selectedFile.type,
+      },
     });
 
     setFileError("");
@@ -615,7 +634,10 @@ export function OlgaContent() {
         log("File converted to base64", { fileSize: data.length });
 
         // Do not convert fee rate; use it directly
-        console.log(`User-selected fee rate: ${fee} sat/vB`);
+        logger.debug("stamps", {
+          message: "User-selected fee rate",
+          data: { fee: `${fee} sat/vB` },
+        });
 
         log("Preparing mint request");
         const mintRequest: MintRequest = {
@@ -667,7 +689,10 @@ export function OlgaContent() {
         const inputsToSign = txDetails.map((input: TransactionInput) => ({
           index: input.signingIndex,
         }));
-        console.log("Constructed inputsToSign:", inputsToSign);
+        logger.debug("stamps", {
+          message: "Constructed inputsToSign",
+          data: { inputsToSign },
+        });
 
         const result = await walletProvider.signPSBT(hex, inputsToSign);
 
@@ -708,19 +733,19 @@ export function OlgaContent() {
 
         // Inside the try block after successful operations
         if (result.txid) {
-          log(
-            "Transaction signed and broadcast successfully. TXID:",
-            result.txid,
-          );
+          logger.debug("stamps", {
+            message: "Transaction signed and broadcast successfully",
+            data: { txid: result.txid },
+          });
           setSubmissionMessage({
             message: "Transaction broadcasted successfully.",
             txid: result.txid,
           });
           setApiError(""); // Clear any previous errors
         } else {
-          console.log(
-            "Transaction signed successfully, but txid not returned.",
-          );
+          logger.debug("stamps", {
+            message: "Transaction signed successfully, but txid not returned",
+          });
           setSubmissionMessage({
             message:
               "Transaction signed and broadcasted successfully. Please check your wallet or a block explorer for confirmation.",
@@ -779,7 +804,19 @@ export function OlgaContent() {
       addressError,
     });
 
-    console.log("Validation state updated:", validationState);
+    logger.debug("stamps", {
+      message: "Form validation state updated",
+      data: {
+        isValid: validationState,
+        file: !!file,
+        fileError,
+        issuanceError,
+        stampNameError,
+        isPoshStamp,
+        stampName,
+        addressError,
+      },
+    });
   }, [
     file,
     fileError,
@@ -832,6 +869,26 @@ export function OlgaContent() {
       }
     };
   }, [file]);
+
+  useEffect(() => {
+    logger.debug("stamps", {
+      message: "Fee calculation effect triggered",
+      data: {
+        isConnected,
+        hasWalletAddress: !!wallet.address,
+        hasFile: !!file,
+        currentFee: fee,
+        fileDetails: file
+          ? {
+            type: file.type,
+            size: file.size,
+          }
+          : null,
+      },
+    });
+
+    // ... rest of the effect
+  }, [isConnected, wallet.address, file, fee]);
 
   return (
     <div class={bodyToolsClassName}>

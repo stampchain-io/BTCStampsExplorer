@@ -71,4 +71,5 @@ export interface FeeEstimationResult {
   dustValue: number;
   outputs: TransactionOutput[];
   detectedInputType?: ScriptType;
+  estimatedSize?: number;
 }

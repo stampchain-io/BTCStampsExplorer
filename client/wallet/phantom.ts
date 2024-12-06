@@ -4,6 +4,7 @@ import { SignPSBTResult, Wallet } from "$types/index.d.ts";
 import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -109,20 +110,28 @@ const uint8ArrayToHex = (bytes: Uint8Array): string => {
 
 const signPSBT = async (
   psbtHex: string,
-  inputsToSign?: { index: number }[],
+  inputsToSign: { index: number }[],
   enableRBF = true,
   sighashTypes?: number[],
   autoBroadcast = true,
 ): Promise<SignPSBTResult> => {
   const provider = getProvider();
   if (!provider) {
-    throw new Error("Phantom wallet not connected");
+    return { signed: false, error: "Phantom wallet not connected" };
   }
-  try {
-    // Convert psbtHex to Uint8Array
-    const psbtBuffer = hexToUint8Array(psbtHex);
 
-    // Prepare inputsToSign
+  try {
+    logger.debug("ui", {
+      message: "Signing PSBT with Phantom",
+      data: {
+        psbtHexLength: psbtHex.length,
+        inputsToSign,
+        enableRBF,
+        autoBroadcast,
+      },
+    });
+
+    const psbtBuffer = hexToUint8Array(psbtHex);
     const inputsToSignArray = inputsToSign?.map((input) => ({
       address: walletContext.wallet.address,
       signingIndexes: [input.index],
@@ -131,31 +140,30 @@ const signPSBT = async (
 
     const result = await provider.signPSBT(psbtBuffer, {
       inputsToSign: inputsToSignArray,
+      enableRBF, // Note: Check if Phantom supports RBF in their options
     });
 
-    console.log("Phantom signPSBT result:", result);
+    logger.debug("ui", {
+      message: "Phantom signPSBT result",
+      data: { result },
+    });
 
-    if (result && result instanceof Uint8Array) {
-      // Convert the signed PSBT back to hex
-      const signedPsbtHex = uint8ArrayToHex(result);
+    if (!result) {
+      return { signed: false, error: "No result from Phantom wallet" };
+    }
 
-      if (autoBroadcast) {
-        // Phantom doesn't provide a direct method to broadcast
-        // You might need to use an external API to broadcast
-        // For now, we'll return an error
-        return {
-          signed: true,
-          error: "Auto-broadcasting is not supported with Phantom wallet",
-        };
-      } else {
-        return { signed: true, psbt: signedPsbtHex };
-      }
-    } else {
+    const signedPsbtHex = uint8ArrayToHex(result);
+
+    if (autoBroadcast) {
+      // Phantom doesn't support direct broadcasting
       return {
-        signed: false,
-        error: "Unexpected result format from Phantom wallet",
+        signed: true,
+        psbt: signedPsbtHex,
+        error: "Auto-broadcasting not supported with Phantom wallet",
       };
     }
+
+    return { signed: true, psbt: signedPsbtHex };
   } catch (error: unknown) {
     return handleWalletError(error, "Phantom");
   }
