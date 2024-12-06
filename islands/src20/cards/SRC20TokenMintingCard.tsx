@@ -1,15 +1,12 @@
 import { Button } from "$components/shared/Button.tsx";
 import {
-  boldTextClassName,
-  defaultTextClassName,
-  middleLayoutClassName,
   SRC20BaseCard,
   SRC20BaseCardProps,
 } from "$islands/src20/cards/SRC20BaseCard.tsx";
 import { formatDate } from "$lib/utils/formatUtils.ts";
 
 export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
-  const { src20, variant } = props;
+  const { src20, fromPage } = props;
 
   const mintHref = `/stamping/src20/mint?tick=${
     encodeURIComponent(src20.tick)
@@ -28,10 +25,10 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
 
   return (
     <SRC20BaseCard {...props}>
-      {variant !== "minting" && (
+      {fromPage === "src20" && (
         <>
           {/* Holders & Deploy */}
-          <div class="flex flex-col -mb-[44px]">
+          <div class="flex flex-col justify-end">
             <div class="hidden tablet:flex flex-col justify-center text-center -space-y-0.5 ">
               <p class={dataLabelSm}>
                 HOLDERS{" "}
@@ -74,7 +71,31 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
         </>
       )}
 
-      {variant === "minting" && (
+      {fromPage === "wallet" && (
+        // Holders & Deploy
+        <div class="flex flex-col justify-end">
+          <div class="hidden tablet:flex flex-col justify-center text-center -space-y-0.5 ">
+            <p class={dataLabelSm}>
+              HOLDERS{" "}
+              <span class={dataValueSm}>
+                {Number(src20.holders).toLocaleString()}
+              </span>
+            </p>
+            {/* TODO: Get Top Mints from Backend */}
+            <p class={dataLabelSm}>
+              TOP MINTS <span class={dataValueSm}>N/A%</span>
+            </p>
+            <div class="flex flex-col gap-1">
+              <p class={dataLabelSm}>
+                PROGRESS <span class={dataValueSm}>{progress}</span>
+                <span class="text-stamp-grey-light">%</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {fromPage === "stamping/src20" && (
         <div class="flex-col gap-6 -mb-4 mobileLg:-mb-6 hidden mobileMd:flex tablet:hidden desktop:flex">
           <div class="flex flex-col justify-center text-center -space-y-0.5">
             <p class={dataLabelSm}>
@@ -103,7 +124,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
       <Button
         variant="mint"
         onClick={handleMintClick}
-        class={variant != "minting" ? "hidden min-[480px]:block" : ""}
+        class={fromPage != "stamping/src20" ? "hidden min-[480px]:block" : ""}
       >
         MINT
       </Button>
