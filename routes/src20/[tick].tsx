@@ -26,10 +26,12 @@ export const handler: Handlers = {
       return await ctx.render(body);
     } catch (error) {
       console.error("Error in SRC20 tick page:", error);
-      if (error.message?.includes("not found")) {
+      if ((error as Error).message?.includes("not found")) {
         return ctx.renderNotFound();
       }
-      return new Response("Internal Server Error", { status: 500 });
+      return ctx.render({
+        error: error instanceof Error ? error.message : "Internal server error",
+      });
     }
   },
 };

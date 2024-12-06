@@ -84,7 +84,7 @@ export const handler: Handlers = {
       });
     } catch (error) {
       console.error(error);
-      return new Response("Internal Server Error", { status: 500 });
+      return ctx.render({ error: `Error: Internal server error` });
     }
   },
 };
