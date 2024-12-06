@@ -24,6 +24,9 @@ export default function App({ Component, state }: PageProps<unknown>) {
         <MetaTags />
       </Head>
       <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden">
+        <div class="bgGradientTop" />
+        <div class="bgGradientBottom" />
+
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1]" />
 
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
