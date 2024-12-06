@@ -13,8 +13,10 @@ export const getSecurityHeaders = (
       "style-src * 'unsafe-inline'",
       "img-src * data: blob:",
       "font-src * data: blob:",
-      "connect-src *",
+      "connect-src * data: blob:",
       "frame-ancestors *",
+      "frame-src *",
+      "worker-src * blob:",
     ].join("; "),
 
     // Rest of headers remain the same
