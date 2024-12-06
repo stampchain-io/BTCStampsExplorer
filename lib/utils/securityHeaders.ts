@@ -6,53 +6,33 @@ export const getSecurityHeaders = (
     : "public, max-age=31536000, immutable";
 
   return {
-    // Optimize CSP
+    // Less restrictive CSP
     "Content-Security-Policy": [
-      "default-src 'self' *.bitcoinstamps.xyz *.stampchain.io",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.bitcoinstamps.xyz *.stampchain.io",
-      "style-src 'self' 'unsafe-inline' fonts.googleapis.com",
-      "img-src 'self' data: blob: *.bitcoinstamps.xyz *.stampchain.io",
-      "font-src 'self' fonts.gstatic.com",
-      "connect-src 'self' *.bitcoinstamps.xyz *.stampchain.io",
-      "frame-ancestors 'self' *.bitcoinstamps.xyz *.stampchain.io",
+      "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:",
+      "script-src * 'unsafe-inline' 'unsafe-eval' data: blob:",
+      "style-src * 'unsafe-inline'",
+      "img-src * data: blob:",
+      "font-src * data: blob:",
+      "connect-src *",
+      "frame-ancestors *",
     ].join("; "),
 
-    // Optimized cache headers
+    // Rest of headers remain the same
     "Cache-Control": cacheControl,
     "CDN-Cache-Control": cacheControl,
     "Cloudflare-CDN-Cache-Control": cacheControl,
     "Surrogate-Control": options.forceNoCache ? "no-store" : "max-age=31536000",
     "Edge-Control": options.forceNoCache ? "no-store" : "cache-maxage=31536000",
-
-    // Security headers
-    // "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-    // "X-Content-Type-Options": "nosniff",
-    // "X-Frame-Options": "SAMEORIGIN",
-    // "Referrer-Policy": "strict-origin-when-cross-origin",
-
-    // Vary header for proper cache keys
     "Vary": "Accept-Encoding, Accept, Origin",
   };
 };
 
-// HTML content headers - using same permissive CSP
 export const getHtmlHeaders = (options?: { forceNoCache?: boolean }) => {
-  const baseHeaders = getSecurityHeaders(options); // Ensure baseHeaders is defined
-  const frameAncestors =
-    "frame-ancestors 'self' https://dev.bitcoinstamps.xyz https://bitcoinstamps.xyz https://stampchain.io";
-
-  // Combine the base CSP with frame-ancestors instead of overwriting
-  const combinedCsp = baseHeaders["Content-Security-Policy"].split(";")
-    .filter((directive) => !directive.trim().startsWith("frame-ancestors"))
-    .concat([frameAncestors])
-    .join("; ");
+  const baseHeaders = getSecurityHeaders(options);
 
   return {
     ...baseHeaders,
     "Content-Type": "text/html; charset=utf-8",
-    "X-Frame-Options":
-      "ALLOW-FROM https://dev.bitcoinstamps.xyz https://bitcoinstamps.xyz https://stampchain.io",
-    "Content-Security-Policy": combinedCsp,
     "Cross-Origin-Resource-Policy": "cross-origin",
     "Cross-Origin-Embedder-Policy": "unsafe-none",
   };
