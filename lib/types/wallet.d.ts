@@ -127,5 +127,6 @@ export interface WalletPageProps {
     walletData: WalletData;
     stampsTotal: number;
     src20Total: number;
+    anchor: string;
   };
 }
