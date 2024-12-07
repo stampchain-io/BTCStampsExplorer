@@ -4,8 +4,7 @@ import { Handlers } from "$fresh/server.ts";
 import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
 import WalletDetails from "$islands/Wallet/details/WalletDetails.tsx";
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
-import { serverConfig } from "$server/config/config.ts";
-import { Dispenser, WalletData, WalletPageProps } from "$lib/types/index.d.ts";
+import { WalletData, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 
@@ -30,7 +29,6 @@ export const handler: Handlers = {
       url,
       "closed_listings",
     ) as { page: number; limit: number };
-
     try {
       const [
         stampsResponse,
@@ -62,7 +60,6 @@ export const handler: Handlers = {
           "closed",
         ),
       ]);
-
       const stampsData = stampsResponse.status === "fulfilled"
         ? stampsResponse.value
         : { data: [], total: 0 };
