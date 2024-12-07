@@ -2,17 +2,15 @@ type ViewAllButtonProps = {
   href: string;
 };
 
-const buttonClassName =
-  `text-stamp-primary-dark hover:text-stamp-primary-hover text-sm tablet:text-base font-extrabold
-  border-2 border-stamp-primary-dark hover:border-stamp-primary-hover rounded-md
-  flex justify-center items-center w-[120px] h-[48px]`;
+const buttonPurpleOutline =
+  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
 
 export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (
-    <div className="flex justify-end w-full mt-6">
+    <div className="flex justify-end w-full mt-3 mobileMd:mt-6">
       <a
         href={href}
-        class={buttonClassName}
+        class={buttonPurpleOutline}
       >
         VIEW ALL
       </a>

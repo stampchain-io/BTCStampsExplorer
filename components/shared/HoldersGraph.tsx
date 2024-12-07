@@ -1,4 +1,5 @@
 import { HoldersPieChart } from "../../islands/charts/HoldersPieChart.tsx";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 interface Holder {
   address: string | null;
@@ -28,7 +29,20 @@ function HolderRow(
           data-tooltip-target={holder.address || "Unknown"}
           title={holder.address || "Unknown"}
         >
-          {holder.address ? holder.address : "Unknown"}
+          {holder.address
+            ? (
+              <>
+                <span className="mobileLg:hidden">
+                  {abbreviateAddress(holder.address, 8)}
+                </span>
+                <span className="hidden mobileLg:inline">
+                  {holder.address}
+                </span>
+              </>
+            )
+            : (
+              "Unknown"
+            )}
         </a>
       </td>
       <td className="text-center py-0">
@@ -63,8 +77,8 @@ export function HoldersGraph(
   const totalHolders = holders.length;
 
   return (
-    <div className="flex flex-col dark-gradient p-0 pt-24 relative">
-      <div className="mt-6 pr-6 text-right">
+    <div className="flex flex-col dark-gradient p-3 mobileMd:p-6 relative">
+      <div className="text-left tablet:text-right">
         <p className={dataLabelClassName}>
           HOLDERS
         </p>
@@ -73,12 +87,12 @@ export function HoldersGraph(
         </p>
       </div>
       <div className="flex flex-col tablet:flex-row w-full gap-6">
-        <div className="mt-6 tablet:-mt-24 flex justify-center tablet:justify-start">
+        <div className="flex justify-center tablet:justify-start">
           <HoldersPieChart holders={holders} />
         </div>
 
         <div className="relative w-full max-w-full">
-          <div className="max-h-64 overflow-x-auto p-6">
+          <div className="max-h-46 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
             <table className={tableValueClassName}>
               <thead className={tableLabelClassName}>
                 <tr>
