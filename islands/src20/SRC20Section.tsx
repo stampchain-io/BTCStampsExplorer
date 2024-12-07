@@ -110,7 +110,7 @@ export function SRC20Section({ title, subTitle, type }: SRC20SectionProps) {
           ))}
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end -mt-3 mobileMd:-mt-6">
           <ViewAllButton href={`/src20?type=${type}`} />
         </div>
       </div>

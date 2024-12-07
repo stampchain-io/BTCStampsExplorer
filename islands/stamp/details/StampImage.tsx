@@ -307,8 +307,34 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && (
-        <div className="flex flex-col gap-3 mobileMd:gap-6">
-          <div className="relative p-3 mobileMd:p-6 dark-gradient">
+        flag
+          ? (
+            <div className="flex flex-col gap-3 mobileMd:gap-6">
+              <div className="relative p-3 mobileMd:p-6 dark-gradient">
+                <div className="stamp-container">
+                  <div className="relative z-10 aspect-square">
+                    {validatedContent || (
+                      <img
+                        width="100%"
+                        loading="lazy"
+                        className="max-w-none object-contain rounded-sm pixelart stamp-image h-full w-full"
+                        src={src}
+                        onError={handleImageError}
+                        alt="Stamp"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+              <RightPanel
+                stamp={stamp}
+                toggleCodeModal={toggleCodeModal}
+                toggleFullScreenModal={toggleFullScreenModal}
+                showCodeButton={false}
+              />
+            </div>
+          )
+          : (
             <div className="stamp-container">
               <div className="relative z-10 aspect-square">
                 {validatedContent || (
@@ -323,16 +349,7 @@ export function StampImage(
                 )}
               </div>
             </div>
-          </div>
-          {flag && (
-            <RightPanel
-              stamp={stamp}
-              toggleCodeModal={toggleCodeModal}
-              toggleFullScreenModal={toggleFullScreenModal}
-              showCodeButton={false}
-            />
-          )}
-        </div>
+          )
       )}
 
       {isCodeModalOpen && (

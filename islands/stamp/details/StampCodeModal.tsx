@@ -23,11 +23,13 @@ export default function StampCodeModal(
     formatted.split("\n").forEach((line) => {
       line = line.trim();
       if (line.match(/^<\//) && indent > 0) {
-        indent -= 2;
+        indent -= 3; // Decrease indent for closing tags
       }
-      result += " ".repeat(indent) + line + "\n";
+      if (line) {
+        result += " ".repeat(indent) + line + "\n"; // Add line with current indent
+      }
       if (line.match(/^<[^/]/) && !line.match(/\/>/)) {
-        indent += 2;
+        indent += 2; // Increase indent for opening tags
       }
     });
 
@@ -36,38 +38,28 @@ export default function StampCodeModal(
 
   return (
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#0b0b0b] bg-opacity-95 backdrop-filter backdrop-blur-sm"
       onClick={handleCloseModal}
     >
-      <div class="relative p-4 w-4/5 h-auto">
-        <div class="relative bg-white rounded-lg shadow overflow-hidden">
-          <div class="flex flex-col gap-4 items-center justify-between p-4 tablet:p-5 rounded-t">
-            <button
+      <div class="relative max-w-[800px] max-h-[800px] h-[calc(100vh-24px)] p-6 mobileLg:p-12 overflow-hidden">
+        <div class="flex flex-col p-6 mobileMd:p-9 rounded-md bg-[#FAFAFA] h-full overflow-hidden">
+          <div class="relative top-0 right-0 -mr-3 mobileMd:-mr-[18px] mobileLg:-mr-1.5 -mt-1.5 mobileMd:-mt-3 mobileLg:-mt-1.5 w-6 h-6 ms-auto cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 32 32"
+              class="cursor-pointer w-[18px] h-[18px] mobileLg:w-6 mobileLg:h-6 hover:fill-stamp-grey-darker"
               onClick={toggleModal}
-              type="button"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-              data-modal-hide="default-modal"
+              role="button"
+              aria-label="Close Modal"
+              fill="#999999"
             >
-              <svg
-                class="w-3 h-3"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 14"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                />
-              </svg>
-              <span class="sr-only">Close modal</span>
-            </button>
-            <pre class="text-sm text-gray-800 whitespace-pre-wrap break-words">
-              <code>{formattedSrc}</code>
-            </pre>
+              <path d="M26.0612 23.9387C26.343 24.2205 26.5013 24.6027 26.5013 25.0012C26.5013 25.3997 26.343 25.7819 26.0612 26.0637C25.7794 26.3455 25.3972 26.5038 24.9987 26.5038C24.6002 26.5038 24.218 26.3455 23.9362 26.0637L15.9999 18.125L8.0612 26.0612C7.7794 26.343 7.39721 26.5013 6.9987 26.5013C6.60018 26.5013 6.21799 26.343 5.9362 26.0612C5.6544 25.7794 5.49609 25.3972 5.49609 24.9987C5.49609 24.6002 5.6544 24.218 5.9362 23.9362L13.8749 16L5.9387 8.06122C5.6569 7.77943 5.49859 7.39724 5.49859 6.99872C5.49859 6.60021 5.6569 6.21802 5.9387 5.93622C6.22049 5.65443 6.60268 5.49612 7.0012 5.49612C7.39971 5.49612 7.7819 5.65443 8.0637 5.93622L15.9999 13.875L23.9387 5.93497C24.2205 5.65318 24.6027 5.49487 25.0012 5.49487C25.3997 5.49487 25.7819 5.65318 26.0637 5.93497C26.3455 6.21677 26.5038 6.59896 26.5038 6.99747C26.5038 7.39599 26.3455 7.77818 26.0637 8.05998L18.1249 16L26.0612 23.9387Z" />
+            </svg>
+          </div>
+          <div class="flex flex-col max-w-full h-full text-xs text-stamp-grey-darkest leading-tight overflow-y-auto overflow-x-auto [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666]">
+            <code class="whitespace-pre-wrap">{formattedSrc}</code>
           </div>
         </div>
       </div>
