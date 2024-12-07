@@ -45,7 +45,7 @@ export default function Carousel(props: CarouselProps) {
   return (
     <>
       <div
-        class={`carousel-slider relative h-[200px] mobileMd:h-[302px] mobileLg:h-[260px] tablet:h-[341px] desktop:h-[480px] w-full ${
+        class={`carousel-slider relative h-[240px] mobileMd:h-[340px] mobileLg:h-[300px] tablet:h-[380px] desktop:h-[520px] w-full ${
           props.class ?? ""
         }`}
       >
@@ -60,37 +60,37 @@ export default function Carousel(props: CarouselProps) {
                   data-hash={stamp.tx_hash}
                 >
                   <a target="_top" href={`/stamp/${stamp.tx_hash}`}>
-                    <div className="hover-gradient hover:bg-stamp-purple-bright hover:shadow-stamp p-0.5 rounded-xl">
-                      <div className="mobileLg:p-[12px] p-[6px] rounded-xl bg-stamp-card-bg hover:bg-black relative  desktop:min-h-[408px] tablet:min-h-[269px] mobileLg:min-h-[200px] mobileMd:min-h-[242px] min-h-[150px]">
+                    <div className="hover-gradient hover:bg-stamp-purple-bright hover:shadow-stamp p-0.5 rounded-md">
+                      <div className="relative min-h-[150px] mobileMd:min-h-[242px] mobileLg:min-h-[200px] tablet:min-h-[269px] desktop:min-h-[408px] p-[6px] mobileMd:p-[12px] desktop:p-[18px] rounded-md bg-stamp-card-bg hover:bg-black">
                         <img
                           src={`/content/${stamp.tx_hash}.${extension}`}
                           alt={`Stamp #${stamp.stamp}`}
                           loading="lazy"
-                          class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-none"
+                          class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-sm"
                           onLoad={handleLoad}
                         />
                         {activeSlideIndex - 1 == index &&
                           (
                             <div
                               id="hover"
-                              className="mobileLg:w-calc-24 w-calc-12 h-[160px] hover-dark-gradient absolute bottom-[2%] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end"
+                              className="flex items-end mobileLg:w-calc-24 w-calc-12 h-[100%] hover-dark-gradient absolute bottom-[2%] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                             >
                               <div className="w-full mobileLg:pb-4 pb-1">
                                 <div className="w-full flex justify-center items-center">
-                                  <h3 className="desktop:text-4xl mobileLg:text-2xl text-xl text-stamp-primary font-extrabold">
-                                    <span className="font-light">#</span>
-                                    <span className="font-black">
-                                      {stamp.stamp}
+                                  <h3 className="desktop:text-4xl mobileLg:text-2xl text-xl purple-gradient3 font-black">
+                                    <span className="text-stamp-purple-bright font-light">
+                                      #
                                     </span>
+                                    {stamp.stamp}
                                   </h3>
                                 </div>
                                 <div className="w-full px-4 py-1 flex justify-between items-center">
-                                  <h4 className="desktop:text-2xl mobileLg:text-lg text-base text-stamp-grey font-bold mobileMd:text-start text-center w-full">
+                                  <h4 className="desktop:text-2xl mobileLg:text-lg text-base purple-gradient1 font-bold mobileMd:text-start text-center w-full">
                                     {stamp.creator_name
                                       ? stamp.creator_name
                                       : abbreviateAddress(stamp.creator, 4)}
                                   </h4>
-                                  <h5 className="desktop:text-xl mobileLg:text-base text-sm text-stamp-grey-darker font-bold mobileMd:block text-end w-full hidden">
+                                  <h5 className="desktop:text-2xl mobileLg:text-xl text-base text-stamp-purple-dark font-bold mobileMd:block text-end w-full hidden">
                                     {stamp.divisible
                                       ? (stamp.supply / 100000000).toFixed(2)
                                       : stamp.supply > 100000

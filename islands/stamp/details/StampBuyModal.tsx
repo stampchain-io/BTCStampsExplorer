@@ -143,34 +143,41 @@ const StampBuyModal = ({
 
   return (
     <ModalLayout onClose={handleCloseModal} title="BUY">
-      <div className="flex justify-between">
-        <StampImage
-          stamp={stamp}
-          className="w-[144px] !p-3 border-2 border-[#9900EE] rounded-md shadow-[0px_0px_20px_#9900EE]"
-          flag={false}
-        />
-        <div className="flex flex-col justify-between items-end">
-          <p className="purple-gradient4 text-4xl font-black text-center">
-            #{stamp.stamp}
+      <div className="flex flex-row gap-6">
+        <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
+          <StampImage
+            stamp={stamp}
+            className=""
+            flag={false}
+          />
+        </div>
+        <div className="flex flex-col w-full">
+          <p className="text-3xl mobileLg:text-4xl gray-gradient1 font-black">
+            <span className="text-stamp-grey-light font-light">
+              #
+            </span>
+            {stamp.stamp}
           </p>
 
-          <div className="flex w-full justify-between items-start">
-            <div className="flex flex-col justify-start -space-y-0.5">
-              <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey">
+          <div className="flex flex-row pt-3 w-full justify-between items-center">
+            <div className="flex flex-col items-start -space-y-0.5">
+              <p className="text-xl mobileLg:text-2xl font-bold text-stamp-grey">
                 EDITIONS
               </p>
               <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
                 MAX {maxQuantity}
               </p>
             </div>
-            <input
-              type="number"
-              min="1"
-              max={maxQuantity}
-              value={quantity}
-              onChange={handleQuantityChange}
-              className={`${inputField} !w-12 text-center`}
-            />
+            <div className="flex flex-col items-end">
+              <input
+                type="number"
+                min="1"
+                max={maxQuantity}
+                value={quantity}
+                onChange={handleQuantityChange}
+                className={`${inputField} !w-12 text-center`}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -186,7 +193,7 @@ const StampBuyModal = ({
         onSubmit={handleBuyClick}
         onCancel={toggleModal}
         buttonName="BUY"
-        className="border-t border-[#333333] pt-4"
+        className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}

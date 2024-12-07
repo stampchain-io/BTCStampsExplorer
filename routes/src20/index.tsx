@@ -97,7 +97,7 @@ export default function SRC20Page(props: any) {
   }
 
   return (
-    <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-9 mobileLg:gap-[72px]">
       <SRC20Header
         filterBy={filterBy}
         sortBy={sortBy}
@@ -112,7 +112,6 @@ export default function SRC20Page(props: any) {
         type={"src20"}
         data_length={src20s.length}
       />
-      <DeployMintModule />
     </div>
   );
 }

@@ -204,7 +204,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
           {lowestPriceDispenser && (
             <button
-              className={`${buttonPurpleFlat} float-right`}
+              className={`${buttonPurpleFlat} float-right mt-3 mobileMd:mt-6`}
               onClick={toggleModal}
             >
               BUY

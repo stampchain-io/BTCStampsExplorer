@@ -42,19 +42,23 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
       options: {
         responsive: false,
         maintainAspectRatio: false,
+        layout: {
+          padding: 9,
+        },
         plugins: {
           legend: {
             display: false,
           },
           tooltip: {
             enabled: true,
+            titleColor: "#CCCCCC",
+            bodyColor: "#CCCCCC",
             callbacks: {
               label: (context: any) => {
                 const holder = holders[context.dataIndex];
                 return [
-                  `Address: ${holder.address || "Unknown"}`,
-                  `Amount: ${Number(holder.amt)}`,
-                  `Percent: ${Number(holder.percentage)}%`,
+                  `AMOUNT: ${Number(holder.amt)}`,
+                  `PERCENT: ${Number(holder.percentage)}%`,
                 ];
               },
             },
@@ -64,17 +68,17 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
       data: {
         labels: holders.map((h) => h.address || "Unknown"),
         datasets: [{
-          borderColor: [...Array(holders.length)].fill("#666666"),
+          borderColor: [...Array(holders.length)].fill("#220033"),
           label: "Graph Holder",
           data: holders.map((holder) => Number(holder.amt)),
           backgroundColor: generateColors(holders.length),
-          hoverOffset: 4,
+          hoverOffset: 9,
         }],
       },
     };
 
     return (
-      <div class="flex items-center justify-center w-[300px] h-[300px] tablet:w-[400px] tablet:h-[400px] p-6">
+      <div class="flex items-center justify-center w-[300px] h-[300px] p-6">
         <Chart {...DoughnutConfig} />
       </div>
     );
