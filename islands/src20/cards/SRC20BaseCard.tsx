@@ -14,12 +14,12 @@ const dataValueSm =
 
 export interface SRC20BaseCardProps {
   src20: SRC20Row;
-  fromPage?: "src20" | "wallet" | "stamping/src20";
+  variant?: "deploy" | "trending" | "minting";
   onImageClick?: (imgSrc: string) => void;
 }
 
 export function SRC20BaseCard(
-  { src20, fromPage = "src20", onImageClick, children }: SRC20BaseCardProps & {
+  { src20, variant = "deploy", onImageClick, children }: SRC20BaseCardProps & {
     children: preact.ComponentChildren;
   },
 ) {
@@ -84,7 +84,7 @@ export function SRC20BaseCard(
             </div>
           </p>
 
-          {fromPage === "src20" && (
+          {variant !== "minting" && (
             <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
               <p class={dataLabelSm}>
                 SUPPLY{" "}
@@ -102,18 +102,7 @@ export function SRC20BaseCard(
             </div>
           )}
 
-          {fromPage === "wallet" && (
-            <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
-              <p class={dataLabelSm}>
-                AMOUNT
-              </p>
-              <p class={dataValueSm}>
-                {Number(src20.amt).toFixed(2).toLocaleString()}
-              </p>
-            </div>
-          )}
-
-          {fromPage === "stamping/src20" && (
+          {variant === "minting" && (
             <div class="flex flex-col pt-1.5 mobileLg:pt-3 gap-1">
               <p class={dataLabelSm}>
                 PROGRESS <span class={dataValueSm}>{progress}%</span>

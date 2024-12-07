@@ -12,7 +12,6 @@ type SRC20SectionProps = {
   subTitle?: string;
   type: "all" | "trending";
   data: SRC20Row[];
-  fromPage: "src20" | "wallet" | "stamping/src20";
 };
 
 const ImageModal = (
@@ -76,14 +75,14 @@ export const SRC20Section = (props: SRC20SectionProps) => {
               ? (
                 <SRC20TokenMintingCard
                   src20={src20}
-                  fromPage={props.fromPage}
+                  variant="deploy"
                   onImageClick={handleImageClick}
                 />
               )
               : (
                 <SRC20TokenOutmintedCard
                   src20={src20}
-                  fromPage={props.fromPage}
+                  variant="deploy"
                   onImageClick={handleImageClick}
                 />
               )

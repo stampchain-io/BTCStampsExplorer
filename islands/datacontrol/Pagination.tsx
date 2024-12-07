@@ -79,6 +79,8 @@ export const Pagination = (
       url.searchParams.set("src20_limit", src20Limit);
     }
 
+    url.searchParams.set("anchor", prefix ? prefix : "");
+
     url.searchParams.set(`${_prefix}page`, pageNum.toString());
     url.searchParams.set(`${_prefix}limit`, page_size.toString());
 
