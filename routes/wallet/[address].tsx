@@ -13,6 +13,7 @@ export const handler: Handlers = {
   async GET(req, ctx) {
     const { address } = ctx.params;
     const url = new URL(req.url);
+    const anchor = url.searchParams.get("anchor");
     const stampsParams = getPaginationParams(url, "stamps") as {
       page: number;
       limit: number;
@@ -156,6 +157,7 @@ export const handler: Handlers = {
         walletData,
         stampsTotal: stampsData.total || 0,
         src20Total: src20Data.total || 0,
+        anchor: anchor,
       });
     } catch (error) {
       console.error("Error:", error);
@@ -221,6 +223,7 @@ export default function Wallet(props: WalletPageProps) {
         dispenser={data.data.dispenser}
         address={data.address}
         showItem="stamp"
+        anchor={data.anchor}
       />
     </div>
   );

@@ -34,6 +34,7 @@ interface WalletContentProps {
   dispensers?: Dispenser[];
   showItem: string;
   address: string;
+  anchor: string;
 }
 
 const ItemHeader = (
@@ -171,7 +172,7 @@ function DispenserItem({
       <div class="hidden mobileLg:flex flex-col gap-6 -mt-6">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
-          <div>
+          <div id="open-listings-section">
             <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
               OPEN LISTINGS
             </h3>
@@ -195,7 +196,7 @@ function DispenserItem({
 
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
-          <div>
+          <div id="closed-listings-section">
             <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
               CLOSED LISTINGS
             </h3>
@@ -222,7 +223,7 @@ function DispenserItem({
       <div class="flex mobileLg:hidden flex-col gap-3">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
-          <div class="mb-8">
+          <div class="mb-8" id="open-listings-section">
             <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
               OPEN LISTINGS
             </h3>
@@ -246,7 +247,7 @@ function DispenserItem({
 
         {/* Closed Dispensers Section */}
         {closedDispensers.length > 0 && (
-          <div>
+          <div id="closed-listings-section">
             <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text mb-6">
               CLOSED LISTINGS
             </h3>
@@ -407,7 +408,7 @@ function DispenserRow(
 }
 
 export default function WalletContent(
-  { stamps, src20, dispensers, address, showItem }: WalletContentProps,
+  { stamps, src20, dispensers, address, showItem, anchor }: WalletContentProps,
 ) {
   const [filterBy, setFilterBy] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("ASC");
@@ -417,6 +418,25 @@ export default function WalletContent(
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (anchor) {
+      const sectionMap = {
+        stamp: "stamps-section",
+        src20: "src20-section",
+        open_listings: "open-listings-section",
+        closed_listings: "closed-listings-section",
+      };
+
+      const sectionId = sectionMap[anchor as keyof typeof sectionMap];
+      if (sectionId) {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
+  }, [anchor, stamps, src20, dispensers]);
 
   const handleOpenSettingModal = () => {
     setOpenSettingModal(!openSettingModal);
@@ -493,7 +513,7 @@ export default function WalletContent(
 
   return (
     <>
-      <div class="mt-6 mobileLg:mt-12 desktop:mt-24">
+      <div class="mt-6 mobileLg:mt-12 desktop:mt-24" id="stamps-section">
         <ItemHeader
           title="STAMPS"
           sortBy={sortBy}
@@ -513,7 +533,7 @@ export default function WalletContent(
         </div>
       </div>
 
-      <div class="mt-12 mobileLg:mt-24 desktop:mt-36">
+      <div class="mt-12 mobileLg:mt-24 desktop:mt-36" id="src20-section">
         <ItemHeader
           title="TOKENS"
           sortBy={sortBy}
