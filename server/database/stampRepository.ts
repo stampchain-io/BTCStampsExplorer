@@ -765,19 +765,15 @@ export class StampRepository {
       const summarized = Object.keys(grouped).map(key => 
         summarize_issuances(grouped[key])
       );
+
       // Use the passed xcpBalances for quantity info
       return summarized.map((summary: StampBalance) => {
-        const xcp_balance = xcpBalances.filter(
+        const xcp_balance = xcpBalances.find(
           balance => balance.cpid === summary.cpid
-        ).reduce((acc,balance)=>acc+balance.quantity,0);
-        const utxos = xcpBalances.filter(balance => balance.cpid === summary.cpid && balance.utxo_address).map(balance => ({ quantity: balance.quantity, utxo_address: balance.utxo_address}))
-        const unbound_quantity = xcpBalances.filter(balance =>  balance.cpid === summary.cpid && !balance.utxo_address).length
+        );
         return {
           ...summary,
-          unbound_quantity,
-          address:xcpBalances.length ? xcpBalances[0].address : '',
-          balance: xcp_balance ? xcp_balance : 0,
-          utxos
+          balance: xcp_balance ? xcp_balance.quantity : 0
         };
       });
     } catch (error) {
