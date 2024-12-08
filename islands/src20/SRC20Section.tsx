@@ -35,7 +35,9 @@ const ImageModal = (
   );
 };
 
-export function SRC20Section({ title, subTitle, type }: SRC20SectionProps) {
+export function SRC20Section(
+  { title, subTitle, type, fromPage }: SRC20SectionProps,
+) {
   const [data, setData] = useState<SRC20Row[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalImg, setModalImg] = useState<string | null>(null);
@@ -97,14 +99,14 @@ export function SRC20Section({ title, subTitle, type }: SRC20SectionProps) {
               ? (
                 <SRC20TokenMintingCard
                   src20={src20}
-                  fromPage={props.fromPage}
+                  fromPage={fromPage}
                   onImageClick={handleImageClick}
                 />
               )
               : (
                 <SRC20TokenOutmintedCard
                   src20={src20}
-                  fromPage={props.fromPage}
+                  fromPage={fromPage}
                   onImageClick={handleImageClick}
                 />
               )
