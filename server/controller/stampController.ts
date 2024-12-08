@@ -1,5 +1,5 @@
 import { StampService } from "$server/services/stampService.ts";
-import { BIG_LIMIT } from "$lib/utils/constants.ts";
+import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { HolderRow, SUBPROTOCOLS } from "globals";
 import { Src20Service } from "$server/services/src20/queryService.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
@@ -19,7 +19,6 @@ import { filterOptions } from "$lib/utils/filterOptions.ts";
 import { Dispense, Dispenser } from "$types/index.d.ts";
 import { CollectionController } from "./collectionController.ts";
 import { Src20Controller } from "./src20Controller.ts";
-import { CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
@@ -28,8 +27,9 @@ import { StampRepository } from "$server/database/stampRepository.ts";
 import { isCpid, getIdentifierType } from "$lib/utils/identifierUtils.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { detectContentType } from "$lib/utils/imageUtils.ts";
-import { getRecursiveHeaders } from "$lib/utils/securityHeaders.ts";
 import { getMimeType } from "$lib/utils/imageUtils.ts";
+import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
+import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 
 interface StampControllerOptions {
   cacheType: RouteType;
@@ -336,13 +336,11 @@ export class StampController {
     }
   }
 
-  static async getMultipleStampCategories(
-    categories: {
-      idents: SUBPROTOCOLS[];
-      limit: number;
-      type: STAMP_TYPES;
-    }[],
-  ) {
+  static async getMultipleStampCategories(categories: {
+    idents: SUBPROTOCOLS[];
+    limit: number;
+    type: STAMP_TYPES;
+  }[]) {
     const results = await Promise.all(
       categories.map(async (category) => {
         const serviceResult = await StampService.getStamps({
@@ -352,6 +350,8 @@ export class StampController {
           type: category.type,
           ident: category.idents,
           noPagination: false,
+          skipTotalCount: true,
+          includeSecondary: false
         });
 
         return {
@@ -367,73 +367,49 @@ export class StampController {
 
   static async getHomePageData() {
     try {
-      
-
-      const [
-        stampCategories,
-        src20Result,
-        trendingSrc20s,
-        collectionData,
-        carouselStamps,
-      ] = await Promise.all([
-        this.getMultipleStampCategories([
-          { idents: ["STAMP", "SRC-721"], limit: 20, type: "stamps" },
-          { idents: ["SRC-721"], limit: 12, type: "stamps" },
-          { idents: ["STAMP"], limit: 20, type: "stamps" },
-        ]),
-        Src20Controller.fetchSrc20DetailsWithHolders(null, {
-          op: "DEPLOY",
-          page: 1,
-          limit: 5,
-          sortBy: "ASC",
-        }),
-        Src20Controller.fetchTrendingTokens(null, 5, 1, 1000),
-        CollectionController.getCollectionStamps({
-          limit: 4,
-          page: 1,
-          creator: "",
-        }),
+      // Critical above-the-fold content first
+      const [carouselData, mainCategories, collections] = await Promise.all([
         this.getStamps({
           identifier: CAROUSEL_STAMP_IDS,
           allColumns: false,
           noPagination: true,
-          cacheDuration: 1000 * 60 * 20,
+          skipTotalCount: true,
+          includeSecondary: false,
+          type: "all"
         }),
+        this.getMultipleStampCategories([
+          { idents: ["STAMP", "SRC-721"], limit: 8, type: "stamps" },
+          { idents: ["SRC-721"], limit: 12, type: "stamps" },
+          { idents: ["STAMP"], limit: 20, type: "stamps" }, // Art stamps (increased to 20)
+        ]),
+        CollectionController.getCollectionStamps({
+          limit: 4,
+          page: 1,
+        })
       ]);
 
-      // Fetch the "posh" collection to get its collection_id
-      const poshCollection = await CollectionService.getCollectionByName(
-        "posh",
-      );
-
-      let stamps_posh = [];
+      // Get posh stamps
+      const poshCollection = await CollectionService.getCollectionByName("posh");
+      let poshStamps = [];
       if (poshCollection) {
-        const poshCollectionId = poshCollection.collection_id;
-
-        // Fetch stamps from the "posh" collection with limit and sortBy
-        const poshStampsResult = await this.getStamps({
-          collectionId: poshCollectionId,
+        const poshResult = await this.getStamps({
+          collectionId: poshCollection.collection_id,
           page: 1,
-          limit: 16, // Limit to 8 stamps
-          sortBy: "DESC", // Adjust sort order if needed
+          limit: 16,
+          sortBy: "DESC",
+          skipTotalCount: true,
         });
-
-        stamps_posh = poshStampsResult.data; // Extract the stamps array
-      } else {
-        logger.warn("stamps", {
-          message: "Posh collection not found"
-        });
+        poshStamps = poshResult.data;
       }
 
       return {
-        stamps_src721: stampCategories[1].stamps,
-        stamps_art: stampCategories[2].stamps,
-        stamps_posh,
-        src20s: src20Result.data,
-        trendingSrc20s: trendingSrc20s.data,
-        collectionData: collectionData.data,
-        carouselStamps: carouselStamps.data,
+        carouselStamps: carouselData.data ?? [],
+        stamps_src721: mainCategories[1]?.stamps ?? [],
+        stamps_art: mainCategories[2]?.stamps ?? [], // Now at index 2
+        stamps_posh: poshStamps,
+        collectionData: collections.data ?? [],
       };
+
     } catch (error) {
       logger.error("stamps", {
         message: "Error in getHomePageData",
@@ -498,36 +474,32 @@ export class StampController {
     }
   }
 
-  private static async createStampRedirect(
+  private static async proxyContentRouteToStampsRoute(
     identifier: string,
     stamp_url: string,
     baseUrl?: string,
     contentType: string = 'application/octet-stream'
   ) {
-    const redirectPath = baseUrl 
-      ? `${baseUrl}/stamps/${identifier.includes(".") ? identifier : stamp_url}`
-      : `/stamps/${identifier.includes(".") ? identifier : stamp_url}`;
-
+    const proxyPath = `${baseUrl}/stamps/${identifier}`;
+    
     try {
-      const response = await fetch(redirectPath);
+      const response = await fetch(proxyPath);
       
-      if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`);
-      }
-
-      const content = await response.arrayBuffer();
-      
-      return new Response(content, {
-        headers: {
+      return new Response(response.body, {
+        headers: normalizeHeaders({
+          ...Object.fromEntries(response.headers),
           "Content-Type": contentType,
-          "Content-Length": content.byteLength.toString(),
-        }
+          "X-API-Version": API_RESPONSE_VERSION,
+          "Vary": "Accept-Encoding, X-API-Version, Origin",
+        }),
       });
     } catch (error) {
       logger.error("content", {
         message: "Error fetching from CDN",
         error: error instanceof Error ? error.message : String(error),
-        path: redirectPath
+        path: proxyPath,
+        identifier,
+        contentType
       });
       return ResponseUtil.stampNotFound();
     }
@@ -537,19 +509,19 @@ export class StampController {
     identifier: string,
     routeType: RouteType,
     baseUrl?: string,
-    isFullPath?: boolean,
+    isFullPath = false
   ) {
     try {
-      // For full paths (file.suffix), redirect to /stamps/
+      // If full path, go directly to proxy
       if (isFullPath) {
-        const extension = identifier.split('.').pop() || '';
-        const mimeType = getMimeType(extension);
+        const [baseId, extension] = identifier.split(".");
+        const contentType = getMimeType(extension);
         
-        return this.createStampRedirect(
+        return this.proxyContentRouteToStampsRoute(
           identifier,
-          identifier,
+          `${baseUrl}/stamps/${identifier}`,
           baseUrl,
-          mimeType
+          contentType
         );
       }
 
@@ -575,11 +547,12 @@ export class StampController {
           const decodedContent = atob(result.body);
           return ResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
             binary: false,
-            headers: {
+            headers: normalizeHeaders({
               "CF-No-Transform": contentInfo.mimeType.includes('javascript') || 
                                 contentInfo.mimeType.includes('text/html'),
+              "X-API-Version": API_RESPONSE_VERSION,
               ...(result.headers || {}),
-            }
+            })
           });
         } catch (error) {
           logger.error("content", {
@@ -591,19 +564,22 @@ export class StampController {
         }
       }
 
-      // Binary content (images, audio, video, etc.) stays base64 encoded
+      // For binary content, return as-is
       return ResponseUtil.stampResponse(result.body, contentInfo.mimeType, {
         binary: true,
-        headers: result.headers
+        headers: normalizeHeaders({
+          "X-API-Version": API_RESPONSE_VERSION,
+          ...(result.headers || {}),
+        })
       });
 
     } catch (error) {
-      await logger.error("content", {
-        message: "StampController error",
-        error: error instanceof Error ? error.message : String(error),
+      logger.error("stamps", {
+        message: "Error in getStampFile",
         identifier,
+        error: error instanceof Error ? error.message : String(error)
       });
-      return ResponseUtil.internalError(error);
+      return ResponseUtil.stampNotFound();
     }
   }
 

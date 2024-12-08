@@ -1,16 +1,28 @@
+import { useEffect, useState } from "preact/hooks";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { formatUSDValue } from "$lib/utils/formatUtils.ts";
 
-interface GetStampingModuleProps {
-  btcPrice: number;
-  recommendedFee: number;
-}
+export function GetStampingModule({}: GetStampingModuleProps) {
+  const [btcPrice, setBtcPrice] = useState(0);
+  const [recommendedFee, setRecommendedFee] = useState(6);
+  const [isLoading, setIsLoading] = useState(true);
 
-export const GetStampingModule = ({
-  btcPrice = 0,
-  recommendedFee = 0,
-}: GetStampingModuleProps) => {
-  console.log("GetStampingModule received:", { btcPrice, recommendedFee });
+  useEffect(() => {
+    fetch("/api/internal/fees")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch");
+        return res.json();
+      })
+      .then(({ btcPrice, recommendedFee }) => {
+        setBtcPrice(btcPrice);
+        setRecommendedFee(recommendedFee);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Fees fetch error:", err);
+        setIsLoading(false);
+      });
+  }, []);
 
   const displayPrice = formatUSDValue(btcPrice).toLocaleString();
   const displayFee = typeof recommendedFee === "number" ? recommendedFee : "0";
@@ -70,23 +82,19 @@ export const GetStampingModule = ({
         </div>
         <div className="flex gap-3 mobileMd:gap-6 justify-end text-base mobileLg:text-lg text-stamp-grey font-light">
           <p>
-            <span className="text-stamp-grey-darker">
-              FEE
-            </span>&nbsp;<span className="font-medium">
-              {displayFee}
-            </span>{" "}
-            SAT/vB
+            <span className="text-stamp-grey-darker">FEE</span>&nbsp;
+            {isLoading
+              ? <span class="loading-skeleton w-12 h-6 inline-block" />
+              : <span className="font-medium">{displayFee}</span>} SAT/vB
           </p>
           <p>
-            <span className="text-stamp-grey-darker">
-              BTC
-            </span>&nbsp;<span className="font-medium">
-              {displayPrice}
-            </span>{" "}
-            USD
+            <span className="text-stamp-grey-darker">BTC</span>&nbsp;
+            {isLoading
+              ? <span class="loading-skeleton w-20 h-6 inline-block" />
+              : <span className="font-medium">{displayPrice}</span>} USD
           </p>
         </div>
       </div>
     </div>
   );
-};
+}

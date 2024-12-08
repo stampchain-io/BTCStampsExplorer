@@ -203,6 +203,11 @@ export default {
   plugins: [
     plugin(function ({ addUtilities }: PluginAPI) {
       addUtilities({
+        ".optimize-text": {
+          "will-change": "transform",
+          "transform": "translateZ(0)",
+          "backface-visibility": "hidden",
+        },
         ".text-stroke-glow": {
           "text-shadow": `
             /* Glow effect */

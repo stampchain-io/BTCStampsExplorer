@@ -1,12 +1,14 @@
 import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
 import {
+  getBinaryContentHeaders,
   getHtmlHeaders,
   getRecursiveHeaders,
   getSecurityHeaders,
 } from "$lib/utils/securityHeaders.ts";
+import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 
 // Update this when making breaking changes to response format
-const API_RESPONSE_VERSION = "v2.2.1";
+export const API_RESPONSE_VERSION = "v2.2.3";
 
 export interface ResponseOptions {
   status?: number;
@@ -31,12 +33,12 @@ export class ResponseUtil {
       if (options.forceNoCache || duration === 0) {
         return new Response(JSON.stringify(data), {
           status: 200,
-          headers: {
+          headers: normalizeHeaders({
             ...getSecurityHeaders({ forceNoCache: true }),
             "Content-Type": "application/json",
             "X-API-Version": API_RESPONSE_VERSION,
             ...(options.headers || {}),
-          },
+          }),
         });
       }
 
@@ -49,7 +51,7 @@ export class ResponseUtil {
         staleIfError ? `stale-if-error=${staleIfError}` : "",
       ].filter(Boolean).join(", ");
 
-      const headers = {
+      const headers = normalizeHeaders({
         ...getSecurityHeaders(),
         "Content-Type": "application/json",
         "Cache-Control": cacheControl,
@@ -60,7 +62,7 @@ export class ResponseUtil {
         "Vary": "Accept-Encoding, X-API-Version",
         "X-API-Version": API_RESPONSE_VERSION,
         ...(options.headers || {}),
-      };
+      });
 
       return new Response(JSON.stringify(data), {
         status: 200,
@@ -70,12 +72,12 @@ export class ResponseUtil {
 
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
+      headers: normalizeHeaders({
         ...getSecurityHeaders({ forceNoCache: true }),
         "Content-Type": "application/json",
         "X-API-Version": API_RESPONSE_VERSION,
         ...(options.headers || {}),
-      },
+      }),
     });
   }
 
@@ -90,12 +92,12 @@ export class ResponseUtil {
         : JSON.stringify(body),
       {
         status,
-        headers: {
+        headers: normalizeHeaders({
           ...getSecurityHeaders(options),
           "Content-Type": "application/json",
           "X-API-Version": API_RESPONSE_VERSION,
           ...(options.headers || {}),
-        },
+        }),
       },
     );
   }
@@ -110,12 +112,12 @@ export class ResponseUtil {
       }),
       {
         status: 400,
-        headers: {
+        headers: normalizeHeaders({
           ...getSecurityHeaders({ forceNoCache: true }),
           "Content-Type": "application/json",
           "X-API-Version": API_RESPONSE_VERSION,
           ...(options.headers || {}),
-        },
+        }),
       },
     );
   }
@@ -125,12 +127,12 @@ export class ResponseUtil {
       JSON.stringify({ error: message }),
       {
         status: 404,
-        headers: {
+        headers: normalizeHeaders({
           ...getSecurityHeaders({ forceNoCache: true }),
           "Content-Type": "application/json",
           "X-API-Version": API_RESPONSE_VERSION,
           ...(options.headers || {}),
-        },
+        }),
       },
     );
   }
@@ -149,12 +151,12 @@ export class ResponseUtil {
       }),
       {
         status: 500,
-        headers: {
+        headers: normalizeHeaders({
           ...getSecurityHeaders({ forceNoCache: true }),
           "Content-Type": "application/json",
           "X-API-Version": API_RESPONSE_VERSION,
           ...(options.headers || {}),
-        },
+        }),
       },
     );
   }
@@ -165,10 +167,14 @@ export class ResponseUtil {
     mimeType: string,
     options: StampResponseOptions = {},
   ) {
-    // Get appropriate headers based on content type
-    const headers = this.getContentTypeHeaders(mimeType, options);
+    const baseHeaders = this.getContentTypeHeaders(mimeType, options);
+    const headers = new Headers({
+      ...baseHeaders,
+      ...options.headers,
+      "X-API-Version": API_RESPONSE_VERSION,
+    });
 
-    // Handle binary content (images, audio, video, etc.)
+    // Binary content
     if (options.binary && content) {
       try {
         const binaryString = atob(content);
@@ -178,12 +184,15 @@ export class ResponseUtil {
         }
 
         return new Response(bytes, {
-          status: options.status || 200,
-          headers: new Headers({
-            ...headers,
-            ...options.headers,
-            "Content-Length": bytes.length.toString(),
-          }),
+          headers: normalizeHeaders(
+            new Headers({
+              ...headers,
+              ...getBinaryContentHeaders(mimeType, options),
+              "X-API-Version": API_RESPONSE_VERSION,
+              "Vary": "Accept-Encoding, X-API-Version, Origin",
+              "Content-Length": bytes.length.toString(),
+            }),
+          ),
         });
       } catch (error) {
         console.error("Failed to convert base64 to binary:", error);
@@ -191,7 +200,7 @@ export class ResponseUtil {
       }
     }
 
-    // Handle text-based content (already decoded in controller)
+    // Text content
     const isTextBased = mimeType.includes("text/") ||
       mimeType.includes("javascript") ||
       mimeType.includes("application/json") ||
@@ -199,26 +208,27 @@ export class ResponseUtil {
 
     if (isTextBased) {
       return new Response(content, {
-        status: options.status || 200,
-        headers: new Headers({
-          ...headers,
-          ...options.headers,
-          "Content-Type": `${mimeType}; charset=utf-8`,
-          // Only add CF-No-Transform for HTML and JS
-          ...(mimeType.includes("html") || mimeType.includes("javascript")
-            ? { "CF-No-Transform": "true" }
-            : {}),
-        }),
+        headers: normalizeHeaders(
+          new Headers({
+            ...headers,
+            "X-API-Version": API_RESPONSE_VERSION,
+            "Vary": "Accept-Encoding, X-API-Version, Origin",
+            "Content-Type": `${mimeType}; charset=utf-8`,
+          }),
+        ),
       });
     }
 
     // Regular content (shouldn't reach here, but just in case)
     return new Response(content, {
       status: options.status || 200,
-      headers: new Headers({
-        ...headers,
-        ...options.headers,
-      }),
+      headers: normalizeHeaders(
+        new Headers({
+          ...headers,
+          "X-API-Version": API_RESPONSE_VERSION,
+          "Vary": "Accept-Encoding, X-API-Version, Origin",
+        }),
+      ),
     });
   }
 
@@ -270,21 +280,27 @@ export class ResponseUtil {
   static stampNotFound(options: ResponseOptions = {}) {
     return new Response(null, {
       status: options.status || 404,
-      headers: new Headers({
-        ...getHtmlHeaders({ forceNoCache: true }),
-        ...(options.headers || {}),
-      }),
+      headers: normalizeHeaders(
+        new Headers({
+          ...getHtmlHeaders({ forceNoCache: true }),
+          "X-API-Version": API_RESPONSE_VERSION,
+          "Vary": "Accept-Encoding, X-API-Version, Origin",
+          ...(options.headers || {}),
+        }),
+      ),
     });
   }
 
   static jsonResponse(data: unknown, options: ResponseOptions = {}) {
     return new Response(JSON.stringify(data), {
       status: options.status || 200,
-      headers: new Headers({
-        ...getSecurityHeaders({ forceNoCache: false }),
-        "Content-Type": "application/json",
-        ...(options.headers || {}),
-      }),
+      headers: normalizeHeaders(
+        new Headers({
+          ...getSecurityHeaders({ forceNoCache: false }),
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        }),
+      ),
     });
   }
 }
