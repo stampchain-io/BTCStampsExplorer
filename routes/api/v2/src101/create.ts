@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { TX, TXError } from "globals";
+import { TX, TXError } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC101Service } from "$server/services/src101/index.ts";
 import { SRC101InputData } from "$types/index.d.ts";
@@ -21,7 +21,7 @@ export const handler: Handlers<TX | TXError> = {
         body.changeAddress;
       const effectiveChangeAddress = body.changeAddress || body.sourceAddress ||
         body.fromAddress;
-      const effectiveRecAddress = body.recAddress
+      const effectiveRecAddress = body.recAddress;
 
       // Ensure at least one address exists
       if (!effectiveSourceAddress) {
@@ -34,7 +34,12 @@ export const handler: Handlers<TX | TXError> = {
       // Validate operation for both transaction types
       const validationError = await SRC101Service.UtilityService
         .validateOperation(
-          body.op.toLowerCase() as "deploy" | "mint" | "transfer" | "setrecord" | "renew",
+          body.op.toLowerCase() as
+            | "deploy"
+            | "mint"
+            | "transfer"
+            | "setrecord"
+            | "renew",
           {
             ...body,
             sourceAddress: effectiveSourceAddress,
@@ -49,7 +54,12 @@ export const handler: Handlers<TX | TXError> = {
 
       if (trxType === "multisig") {
         var result = await SRC101Service.TransactionService.handleOperation(
-          body.op.toLowerCase() as "deploy" | "mint" | "transfer" | "setrecord" | "renew",
+          body.op.toLowerCase() as
+            | "deploy"
+            | "mint"
+            | "transfer"
+            | "setrecord"
+            | "renew",
           {
             ...body,
             sourceAddress: effectiveSourceAddress,
@@ -65,14 +75,13 @@ export const handler: Handlers<TX | TXError> = {
         if ("error" in result) {
           logger.error("stamps", {
             message: "Operation error",
-            error: result.error
+            error: result.error,
           });
           response = ResponseUtil.badRequest(result.error, 400);
-        }
-        else {
+        } else {
           response = ResponseUtil.success(result);
         }
-        console.log("response", response)
+        console.log("response", response);
 
         logger.debug("stamps", {
           message: "Final multisig response",

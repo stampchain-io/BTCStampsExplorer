@@ -1,4 +1,4 @@
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { HomeHeader } from "$components/home/HomeHeader.tsx";

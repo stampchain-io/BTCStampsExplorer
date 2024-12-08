@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { convertEmojiToTick, convertToEmoji } from "$lib/utils/emojiUtils.ts";
-import { PaginatedTickResponseBody } from "globals";
+import { PaginatedTickResponseBody } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";

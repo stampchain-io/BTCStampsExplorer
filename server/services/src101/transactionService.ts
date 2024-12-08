@@ -1,4 +1,4 @@
-import { TX, TXError } from "globals";
+import { TX, TXError } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { deploySRC101, mintSRC101, transferSRC101, setrecordSRC101, renewSRC101 } from "./index.ts";
 import type { IDeploySRC101, IMintSRC101, ITransferSRC101, ISetrecordSRC101, IRenewSRC101 } from "$types/index.d.ts";

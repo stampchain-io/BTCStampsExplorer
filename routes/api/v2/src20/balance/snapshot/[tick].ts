@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { AddressTickHandlerContext } from "globals";
+import { AddressTickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";

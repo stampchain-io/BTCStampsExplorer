@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { AddressHandlerContext } from "globals";
+import { AddressHandlerContext } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {

@@ -5,7 +5,7 @@ import {
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   SUBPROTOCOLS,
-} from "globals";
+} from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { BIG_LIMIT } from "$lib/utils/constants.ts";

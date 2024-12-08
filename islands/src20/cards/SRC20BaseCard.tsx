@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { SRC20Row } from "globals";
+import { SRC20Row } from "$globals";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 
 export const middleLayoutClassName =

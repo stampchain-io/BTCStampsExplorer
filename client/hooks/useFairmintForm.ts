@@ -8,7 +8,7 @@ import {
 import axiod from "axiod";
 import { decodeBase64 } from "@std/encoding/base64";
 import { encodeHex } from "@std/encoding/hex";
-import { Config } from "globals";
+import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import type { AncestorInfo } from "$types/index.d.ts";
 

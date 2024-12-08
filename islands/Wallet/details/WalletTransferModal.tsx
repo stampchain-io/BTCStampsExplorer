@@ -5,7 +5,7 @@ import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.ts
 import { SelectField } from "$islands/stamping/SelectField.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import type { StampRow } from "globals";
+import type { StampRow } from "$globals";
 
 interface Props {
   fee: number;

@@ -1,4 +1,4 @@
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 
 export type DispenserFilter = "open" | "closed" | "all";
 

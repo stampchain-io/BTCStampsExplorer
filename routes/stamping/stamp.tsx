@@ -1,4 +1,4 @@
-import type { StampRow } from "globals";
+import type { StampRow } from "$globals";
 import { Handlers, PageProps } from "$fresh/server.ts";
 
 import { OlgaContent } from "$islands/stamping/stamp/OlgaContent.tsx";

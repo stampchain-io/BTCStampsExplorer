@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useContext, useEffect, useState } from "preact/hooks";
-import { SRC20_TYPES, STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
+import { SRC20_TYPES, STAMP_FILTER_TYPES, STAMP_TYPES } from "$globals";
 
 // Define a union type for both STAMP_TYPES and SRC20_TYPES
 type NavigatorTypes = STAMP_TYPES | SRC20_TYPES;

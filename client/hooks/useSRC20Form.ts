@@ -7,7 +7,7 @@ import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
-import { Config } from "globals";
+import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import type { AncestorInfo } from "$types/index.d.ts";
 import { debounce } from "$lib/utils/debounce.ts";

@@ -1,5 +1,5 @@
 import { SRC101Repository } from "$server/database/src101Repository.ts";
-import { SRC101TokenidsParams, SRC101OwnerParams, SRC101TxParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams } from "globals";
+import { SRC101TokenidsParams, SRC101OwnerParams, SRC101TxParams, SRC101ValidTxParams, SRC101ValidTxTotalCountParams, Src101BalanceParams } from "$globals";
 
 export class SRC101QueryService {
   static async getTotalSrc101TXFromSRC101TableCount(

@@ -1,5 +1,5 @@
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Src20Detail, InputData } from "globals";
+import { Src20Detail, InputData } from "$globals";
 import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC20QueryService } from "./queryService.ts";

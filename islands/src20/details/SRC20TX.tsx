@@ -4,7 +4,7 @@ import {
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { SRC20Row } from "globals";
+import { SRC20Row } from "$globals";
 
 type SRC20TXProps = {
   txs: SRC20Row[];

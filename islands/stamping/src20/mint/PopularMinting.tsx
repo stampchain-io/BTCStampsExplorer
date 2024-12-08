@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
-import type { SRC20Row } from "globals";
+import type { SRC20Row } from "$globals";
 
 export default function PopularMinting() {
   const [isLoading, setIsLoading] = useState(true);

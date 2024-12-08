@@ -7,7 +7,7 @@ import {
   Src20ResponseBody,
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
-} from "globals";
+} from "$globals";
 import { SRC20UtilityService } from "./utilityService.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts"

@@ -1,5 +1,5 @@
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Src101Detail, TXError } from "globals";
+import { Src101Detail, TXError } from "$globals";
 import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC101QueryService } from "./queryService.ts";

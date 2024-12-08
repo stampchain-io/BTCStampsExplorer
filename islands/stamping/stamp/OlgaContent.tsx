@@ -9,7 +9,7 @@ import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
-import { Config } from "globals";
+import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";

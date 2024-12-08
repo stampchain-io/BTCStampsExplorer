@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionSectionProps } from "globals";
+import { Collection, CollectionSectionProps } from "$globals";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
 import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";

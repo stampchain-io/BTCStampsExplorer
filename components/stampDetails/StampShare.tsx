@@ -1,4 +1,4 @@
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 const rootUrl = globalThis.location?.origin || "https://stampchain.io";
 
 export function StampShare({ stamp }: { stamp: StampRow }) {

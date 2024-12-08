@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 
-import { SRC20_FILTER_TYPES } from "globals";
+import { SRC20_FILTER_TYPES } from "$globals";
 
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";

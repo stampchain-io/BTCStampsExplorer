@@ -1,4 +1,4 @@
-import { Collection } from "globals";
+import { Collection } from "$globals";
 import { useState } from "preact/hooks";
 
 const containerClassName =
