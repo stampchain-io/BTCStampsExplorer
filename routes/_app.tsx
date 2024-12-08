@@ -7,13 +7,9 @@ import { Footer } from "$islands/layout/Footer.tsx";
 import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { NavigatorProvider } from "$islands/Navigator/NavigatorProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
+import FontLoader from "$islands/home/FontLoader.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {
-  console.log("App state:", {
-    state,
-    path: state?.url ? new URL(state.url as string).pathname : null,
-  });
-
   if (state?.skipAppLayout) {
     return <Component />;
   }
@@ -22,26 +18,143 @@ export default function App({ Component, state }: PageProps<unknown>) {
     <html lang="en">
       <Head>
         <MetaTags />
-      </Head>
-      <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden">
-        <div class="bgGradientTop" />
-        <div class="bgGradientBottom" />
 
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1]" />
+        {/* Preconnect to critical domains first */}
+        <link
+          rel="preconnect"
+          href="https://esm.sh"
+          crossOrigin="anonymous"
+          as="script"
+        />
+
+        {/* Critical CSS first */}
+        <link rel="preload" href="/styles.css" as="style" />
+
+        {/* Main font loader */}
+        <FontLoader />
+
+        {/* Optimize text rendering */}
+        <style>
+          {`
+            .text-fill-transparent {
+              -webkit-text-fill-color: transparent;
+            }
+            
+            /* Critical text styles */
+            .home-header-text {
+              text-rendering: optimizeLegibility;
+              -webkit-font-smoothing: antialiased;
+              -moz-osx-font-smoothing: grayscale;
+            }
+          `}
+        </style>
+
+        {/* Preload critical resources */}
+        <link
+          rel="preload"
+          href="/img/transparent-bg.png"
+          as="image"
+        />
+
+        {/* Add font-display swap to prevent FOUT */}
+        <style>
+          {`
+            @font-face {
+              font-family: 'Work Sans';
+              font-style: normal;
+              font-weight: 700;
+              font-display: swap;
+            }
+            @font-face {
+              font-family: 'Work Sans';
+              font-style: normal;
+              font-weight: 900;
+              font-display: swap;
+            }
+          `}
+        </style>
+
+        {/* Add loading skeleton styles specific to content */}
+        <style>
+          {`
+            .loading-skeleton {
+              background: linear-gradient(
+                110deg,
+                #1f002e 30%,
+                #14001f 40%,
+                #1f002e 50%
+              );
+              background-size: 200% 100%;
+              animation: shimmer 1.5s infinite linear;
+            }
+
+
+
+            /* Match StampCard grid layout */
+            .stamp-grid-skeleton {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+              gap: 1.5rem;
+              padding: 1rem;
+            }
+
+            .stamp-card-skeleton {
+              aspect-ratio: 1;
+              border-radius: 0.5rem;
+            }
+
+            /* Match SRC20Section layout */
+            .src20-skeleton {
+              height: 120px;
+              margin: 1rem 0;
+            }
+
+            @keyframes shimmer {
+              to {
+                background-position: -200% 0;
+              }
+            }
+
+            .content-lazy {
+              content-visibility: auto;
+              contain-intrinsic-size: 0 500px;
+            }
+          `}
+        </style>
+
+        {/* Load non-critical CSS */}
+        <link
+          rel="stylesheet"
+          href="/carousel.css"
+          media="(min-width: 1px)"
+        />
+      </Head>
+
+      <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden">
+        <div
+          class="bgGradientTop contain-layout"
+          style="min-height: 100vh; position: fixed; inset: 0;"
+        />
+        <div
+          class="bgGradientBottom contain-layout"
+          style="min-height: 100vh; position: fixed; inset: 0;"
+        />
+
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
 
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           <ToastProvider>
             <NavigatorProvider>
               <div class="flex flex-col min-h-screen">
                 <Header />
-                <div
-                  class="flex flex-col flex-grow px-3 mobileMd:px-6 desktop:px-12 py-12 mobileLg:py-24 desktop:py-36 max-w-desktop mx-auto w-full"
+                <main
+                  class="flex flex-col flex-grow px-3 mobileMd:px-6 desktop:px-12 py-12 mobileLg:py-24 desktop:py-36 max-w-desktop mx-auto w-full content-lazy"
                   f-client-nav
                 >
                   <Partial name="body">
                     <Component />
                   </Partial>
-                </div>
+                </main>
                 <Footer />
               </div>
             </NavigatorProvider>

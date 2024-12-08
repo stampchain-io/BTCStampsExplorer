@@ -8,6 +8,8 @@ import {
 } from "$lib/utils/identifierUtils.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { FreshContext } from "$fresh/server.ts";
+import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
+import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 
 export async function handleContentRequest(
   identifier: string,
@@ -47,12 +49,55 @@ export async function handleContentRequest(
       }
     }
 
-    return await StampController.getStampFile(
+    const response = await StampController.getStampFile(
       identifier,
       RouteType.STAMP_DETAIL,
       ctx.state.baseUrl,
       isFullPath,
     );
+
+    if (
+      response.headers.get("content-type")?.toLowerCase().includes("text/html")
+    ) {
+      const html = await response.text();
+
+      // Clean up the HTML before sending to client
+      const cleanedHtml = html
+        // Remove Rocket Loader's type modification but preserve the src
+        .replace(
+          /<script src="(\/s\/[A-Z0-9]+)"[^>]*>/g,
+          '<script src="$1">',
+        )
+        // Clean up inline scripts (these we know are JavaScript)
+        .replace(
+          /<script type="[a-f0-9]+-text\/javascript">/g,
+          "<script>",
+        )
+        // Remove Rocket Loader's script if present
+        .replace(
+          /<script src="\/cdn-cgi\/scripts\/.*?rocket-loader\.min\.js".*?><\/script>/g,
+          "",
+        );
+      // Preserve existing headers but ensure version headers are present
+      const headers = {
+        ...Object.fromEntries(response.headers),
+        "Content-Type": "text/html",
+        "Cache-Control": "public, max-age=2592000, immutable",
+        "CDN-Cache-Control": "public, max-age=2592000, immutable",
+        "Surrogate-Control": "public, max-age=2592000, immutable",
+        "X-Content-Transformed": "true",
+        "X-API-Version": API_RESPONSE_VERSION,
+      };
+
+      return new Response(cleanedHtml, {
+        headers: normalizeHeaders(headers),
+      });
+    }
+
+    // For non-HTML, preserve response but ensure version headers
+    return new Response(response.body, {
+      headers: normalizeHeaders(response.headers),
+    });
   } catch (error) {
     logger.error("content", {
       message: "Content handler error",

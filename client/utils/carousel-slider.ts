@@ -216,6 +216,60 @@ const debug = (message: string, data?: unknown) => {
   // console.log(`Carousel Debug: ${message}`, data);
 };
 
+const calculateTransforms = (
+  swiper: SwiperType,
+  containerWidth: number,
+  isMobile: boolean,
+  baseWidth: number,
+  centerX: number,
+) => {
+  return swiper.slides.map((slideEl, i) => {
+    let distance = i - swiper.activeIndex;
+    if (distance > swiper.slides.length / 2) distance -= swiper.slides.length;
+    if (distance < -swiper.slides.length / 2) distance += swiper.slides.length;
+
+    const isCenter = distance === 0;
+    const isAdjacent = Math.abs(distance) === 1;
+    const shouldShow = isMobile
+      ? Math.abs(distance) <= 1
+      : Math.abs(distance) <= 2;
+
+    // Keep existing scale and transform calculations
+    const scale = isCenter
+      ? CAROUSEL_CONFIG.SCALE.CENTER
+      : isAdjacent
+      ? CAROUSEL_CONFIG.SCALE.ADJACENT
+      : CAROUSEL_CONFIG.SCALE.OUTER;
+
+    const translateX = calculateTranslateX(distance, baseWidth, isMobile);
+    const finalTranslateX = translateX - (baseWidth / 2);
+
+    return {
+      el: slideEl,
+      transform: {
+        visibility: shouldShow ? "visible" : "hidden",
+        width: `${baseWidth}px`,
+        position: "absolute",
+        left: `${centerX}px`,
+        transform: `translateX(${finalTranslateX}px) scale(${scale})`,
+        zIndex: isCenter ? "3" : isAdjacent ? "2" : "1",
+        opacity: isCenter
+          ? CAROUSEL_CONFIG.EFFECTS.OPACITY.CENTER
+          : isAdjacent
+          ? CAROUSEL_CONFIG.EFFECTS.OPACITY.ADJACENT
+          : CAROUSEL_CONFIG.EFFECTS.OPACITY.OUTER,
+        filter: isCenter
+          ? "none"
+          : `blur(${
+            isAdjacent
+              ? CAROUSEL_CONFIG.EFFECTS.BLUR.ADJACENT
+              : CAROUSEL_CONFIG.EFFECTS.BLUR.OUTER
+          }px)`,
+      },
+    };
+  });
+};
+
 export default function createCarouselSlider(
   el: CarouselElement,
 ): SwiperType | undefined {
@@ -305,52 +359,21 @@ export default function createCarouselSlider(
         const { baseWidth } = calculateDimensions(containerWidth);
         const centerX = containerWidth / 2;
 
-        const slides = swiper.slides;
-        for (let i = 0; i < slides.length; i++) {
-          const slideEl = slides[i] as HTMLElement;
+        // Calculate all transforms first
+        const transforms = calculateTransforms(
+          swiper,
+          containerWidth,
+          isMobile,
+          baseWidth,
+          centerX,
+        );
 
-          let distance = i - swiper.activeIndex;
-          if (distance > slides.length / 2) distance -= slides.length;
-          if (distance < -slides.length / 2) distance += slides.length;
-
-          const isCenter = distance === 0;
-          const isAdjacent = Math.abs(distance) === 1;
-          const isOuter = Math.abs(distance) === 2;
-
-          // Only show 3 slides on mobile
-          const shouldShow = isMobile
-            ? Math.abs(distance) <= 1 // Only center and adjacent for mobile
-            : Math.abs(distance) <= 2; // All 5 slides for desktop
-
-          if (!shouldShow) {
-            slideEl.style.visibility = "hidden";
-            slideEl.style.opacity = "0";
-            slideEl.style.zIndex = "-1";
-            continue;
-          }
-
-          // Keep existing styling logic
-          slideEl.style.visibility = "visible";
-          slideEl.style.width = `${baseWidth}px`;
-          slideEl.style.position = "absolute";
-
-          // Use existing scale and translation calculations
-          const scale = isCenter ? 1 : isAdjacent ? 0.8 : 0.6;
-          const translateX = calculateTranslateX(distance, baseWidth, isMobile);
-
-          const finalTranslateX = translateX - (baseWidth / 2);
-          slideEl.style.left = `${centerX}px`;
-          slideEl.style.transform =
-            `translateX(${finalTranslateX}px) scale(${scale})`;
-
-          slideEl.style.zIndex = isCenter ? "3" : isAdjacent ? "2" : "1";
-          slideEl.style.opacity = isCenter ? "1" : isAdjacent ? "0.8" : "0.6";
-          slideEl.style.filter = isCenter
-            ? "none"
-            : isAdjacent
-            ? "blur(1px)"
-            : "blur(2px)";
-        }
+        // Apply transforms in one batch
+        requestAnimationFrame(() => {
+          transforms.forEach(({ el, transform }) => {
+            Object.assign(el.style, transform);
+          });
+        });
       },
 
       afterInit: function (swiper: SwiperType) {
