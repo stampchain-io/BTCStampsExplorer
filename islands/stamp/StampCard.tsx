@@ -14,6 +14,7 @@ import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
+import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 
 // Text style constants for different breakpoints
 
@@ -163,15 +164,6 @@ export function StampCard({
 
     // Handle HTML content
     if (stamp.stamp_mimetype === "text/html") {
-      console.log("Rendering HTML content (detailed):", {
-        src,
-        mimetype: stamp.stamp_mimetype,
-        stamp: {
-          ...stamp,
-          base64: stamp.stamp_base64 ? atob(stamp.stamp_base64) : "missing",
-        },
-      });
-
       return (
         <div class="relative w-full h-full">
           <div class="relative pt-[100%]">
@@ -202,15 +194,6 @@ export function StampCard({
 
     // Handle JavaScript content
     if (stamp.stamp_mimetype === "application/javascript") {
-      console.log("Rendering JavaScript content (detailed):", {
-        src,
-        mimetype: stamp.stamp_mimetype,
-        stamp: {
-          ...stamp,
-          base64: stamp.stamp_base64 ? atob(stamp.stamp_base64) : "missing",
-        },
-      });
-
       // Create a container for the script's output
       return (
         <div class="relative w-full h-full">
@@ -241,7 +224,7 @@ export function StampCard({
     if (stamp.stamp_mimetype === "image/svg+xml") {
       return validatedContent || (
         <img
-          src="/not-available.png"
+          src={NOT_AVAILABLE_IMAGE}
           alt="Loading..."
           class="absolute inset-0 w-full h-full object-contain pixelart"
         />

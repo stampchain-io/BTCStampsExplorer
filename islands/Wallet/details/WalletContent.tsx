@@ -12,6 +12,7 @@ import { StampRow } from "globals";
 import { Dispenser } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 interface WalletContentProps {
   stamps: {
     data: StampRow[];
@@ -299,8 +300,7 @@ function DispenserRow(
                   src={getStampImageSrc(dispenser.stamp)}
                   alt={`Stamp ${dispenser.stamp.stamp}`}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "/img/stamp/not-available.png";
+                    (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
                   }}
                 />
               </div>
@@ -550,10 +550,7 @@ export default function WalletContent(
         />
         {Math.ceil(src20.pagination.total / src20.pagination.limit) > 1 && (
           <div class="mt-3 mobileLg:mt-6">
-            <SRC20Section
-              type="all"
-              data={src20.data}
-            />
+            <SRC20Section type="all" />
           </div>
         )}
       </div>

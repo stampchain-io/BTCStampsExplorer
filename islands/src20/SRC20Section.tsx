@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { SRC20Row } from "globals";
 
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
@@ -7,12 +7,11 @@ import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCar
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 
-type SRC20SectionProps = {
+interface SRC20SectionProps {
   title?: string;
   subTitle?: string;
   type: "all" | "trending";
-  data: SRC20Row[];
-};
+}
 
 const ImageModal = (
   { imgSrc, isOpen, onClose }: {
@@ -35,30 +34,52 @@ const ImageModal = (
   );
 };
 
-export const SRC20Section = (props: SRC20SectionProps) => {
-  const { data } = props;
+export function SRC20Section({ title, subTitle, type }: SRC20SectionProps) {
+  const [data, setData] = useState<SRC20Row[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    const endpoint = type === "trending"
+      ? "/api/internal/src20/trending?limit=5&page=1"
+      : "/api/internal/src20/details?op=DEPLOY&limit=5&page=1&sortBy=ASC";
+
+    fetch(endpoint)
+      .then((res) => res.json())
+      .then((response) => {
+        setData(response.data || []);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(`SRC20 ${type} fetch error:`, error);
+        setIsLoading(false);
+      });
+  }, [type]);
 
   const handleCloseModal = () => setModalOpen(false);
   const handleImageClick = (imgSrc: string) => {
     setModalImg(imgSrc);
     setModalOpen(!isModalOpen);
   };
-  console.log("src20====>", data);
+
+  if (isLoading) {
+    return <div class="loading-skeleton h-[400px]" />;
+  }
+
   return (
     <div>
-      {props.title && (
+      {title && (
         <h1 class={ModulesStyles.titlePurpleDL}>
-          {props.title}
+          {title}
         </h1>
       )}
-      {props.subTitle && (
+      {subTitle && (
         <h2
           class={ModulesStyles.subTitlePurple +
             " mb-3 mobileMd:mb-6 desktop:mb-9"}
         >
-          {props.subTitle}
+          {subTitle}
         </h2>
       )}
 
@@ -90,9 +111,9 @@ export const SRC20Section = (props: SRC20SectionProps) => {
         </div>
 
         <div className="flex justify-end">
-          <ViewAllButton href={`/src20?type=${props.type}`} />
+          <ViewAllButton href={`/src20?type=${type}`} />
         </div>
       </div>
     </div>
   );
-};
+}

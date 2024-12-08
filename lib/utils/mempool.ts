@@ -22,13 +22,19 @@ export const getRecommendedFees = async (
       );
     }
     const data = await response.json();
+
+    // Validate the response shape
+    if (typeof data?.fastestFee !== "number") {
+      throw new Error("Invalid fee data structure");
+    }
+
     return data;
   } catch (error) {
     if (retries < MAX_RETRIES) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return await getRecommendedFees(retries + 1);
     } else {
-      console.error(error);
+      console.error("Mempool fees error:", error);
       return null;
     }
   }

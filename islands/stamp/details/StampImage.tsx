@@ -5,9 +5,9 @@ import { StampRow } from "globals";
 import {
   getStampImageSrc,
   handleImageError,
-  NOT_AVAILABLE_IMAGE,
   validateStampContent,
 } from "$lib/utils/imageUtils.ts";
+import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";

@@ -12,6 +12,7 @@ import { validateWalletAddressForMinting } from "$lib/utils/scriptTypeUtils.ts";
 import { Config } from "globals";
 import { logger } from "$lib/utils/logger.ts";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
+import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 
 const log = (message: string, data?: unknown) => {
   logger.debug("stamps", {
@@ -223,6 +224,12 @@ interface SubmissionMessage {
   txid?: string | undefined;
 }
 
+interface FileValidationResult {
+  isValid: boolean;
+  error?: string;
+  warning?: string | undefined;
+}
+
 export function OlgaContent() {
   const { config, isLoading } = useConfig<Config>();
 
@@ -307,9 +314,6 @@ export function OlgaContent() {
       setAddressError(undefined);
     }
   }, [address, isConnected]);
-
-  // Add state to track if we have a valid transaction to estimate
-  const [hasValidTransaction, setHasValidTransaction] = useState(false);
 
   // When file is uploaded
   useEffect(() => {
@@ -401,16 +405,43 @@ export function OlgaContent() {
 
   // Update the fee recalculation effect
   useEffect(() => {
-    if (hasValidTransaction && txDetails && fee) {
-      const newFee = Math.ceil((txDetails.txDetails.estimatedSize || 0) * fee);
-      setFeeDetails({
-        minerFee: newFee,
-        dustValue: txDetails.dust || 0,
-        totalValue: (txDetails.total || 0) - (txDetails.fee || 0) + newFee,
-        hasExactFees: true,
-      });
+    if (txDetails && fee) {
+      try {
+        // Use the API-provided miner fee instead of calculating it
+        const minerFee = txDetails.est_miner_fee;
+
+        setFeeDetails({
+          minerFee,
+          dustValue: txDetails.total_dust_value || 0,
+          // Add API-provided miner fee to total output value
+          totalValue: (txDetails.total_output_value || 0) + minerFee,
+          hasExactFees: true,
+        });
+
+        logger.debug("stamps", {
+          message: "Fee calculation updated",
+          data: {
+            estimatedSize: txDetails.est_tx_size,
+            feeRate: fee,
+            minerFee,
+            outputValue: txDetails.total_output_value,
+            totalWithFee: txDetails.total_output_value + minerFee,
+          },
+        });
+      } catch (error) {
+        logger.error("stamps", {
+          message: "Fee calculation failed",
+          error,
+        });
+        setFeeDetails({
+          minerFee: 0,
+          dustValue: 0,
+          totalValue: 0,
+          hasExactFees: false,
+        });
+      }
     }
-  }, [fee, txDetails, hasValidTransaction]);
+  }, [fee, txDetails]);
 
   const validateWalletAddress = (address: string) => {
     const { isValid, error } = validateWalletAddressForMinting(address);
@@ -506,15 +537,6 @@ export function OlgaContent() {
     const input = e.target as HTMLInputElement;
     const selectedFile = input.files?.[0];
 
-    logger.debug("stamps", {
-      message: "Handle image called",
-      data: {
-        hasFile: !!selectedFile,
-        fileSize: selectedFile?.size,
-        fileType: selectedFile?.type,
-      },
-    });
-
     if (!selectedFile) {
       logger.debug("stamps", {
         message: "No file selected",
@@ -525,12 +547,14 @@ export function OlgaContent() {
       return;
     }
 
-    if (selectedFile.size > 64 * 1024) {
+    const validation = validateFile(selectedFile);
+
+    if (!validation.isValid) {
       logger.debug("stamps", {
-        message: "File too large",
-        size: selectedFile.size,
+        message: "File validation failed",
+        error: validation.error,
       });
-      setFileError("File size must be less than 64KB.");
+      setFileError(validation.error || "Invalid file");
       setFile(null);
       setFileSize(undefined);
       return;
@@ -548,6 +572,34 @@ export function OlgaContent() {
     setFileError("");
     setFile(selectedFile);
     setFileSize(selectedFile.size);
+
+    // Set warning message if file is not an image
+    if (validation.warning) {
+      setSubmissionMessage({
+        message: validation.warning,
+      });
+    } else {
+      setSubmissionMessage(null);
+    }
+  };
+
+  const validateFile = (file: File): FileValidationResult => {
+    if (file.size > 64 * 1024) {
+      return {
+        isValid: false,
+        error: "File size must be less than 64KB.",
+      };
+    }
+
+    // Check if file is an image by extension
+    const isImage = /\.(jpg|jpeg|png|gif|webp|svg|avif)$/i.test(file.name);
+
+    return {
+      isValid: true,
+      warning: isImage
+        ? undefined
+        : "Note: Non-image files may not become numbered stamps.",
+    };
   };
 
   const handleIssuanceChange = (e: Event) => {
@@ -630,8 +682,8 @@ export function OlgaContent() {
 
       try {
         log("Converting file to base64");
-        const data = await toBase64(file);
-        log("File converted to base64", { fileSize: data.length });
+        const fileData = await toBase64(file);
+        log("File converted to base64", { fileSize: fileData.length });
 
         // Do not convert fee rate; use it directly
         logger.debug("stamps", {
@@ -645,7 +697,7 @@ export function OlgaContent() {
           qty: issuance,
           locked: isLocked,
           filename: file.name,
-          file: data,
+          file: fileData,
           satsPerKB: fee * 1000, // Convert sat/vB to satsPerKB
           service_fee: config?.MINTING_SERVICE_FEE,
           service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
@@ -666,27 +718,22 @@ export function OlgaContent() {
           throw new Error("No data received from API");
         }
 
-        log("Response data", response.data);
-        console.log("txDetails:", response.data.txDetails);
+        const mintResponse = response.data as MintResponse;
 
-        if (!response.data.hex) {
+        if (!mintResponse.hex) {
           throw new Error("Invalid response structure: missing hex field");
         }
 
-        const { hex, cpid, txDetails } = response.data;
-        log("Extracted data from response", {
-          hex,
-          cpid,
-          inputCount: txDetails.length,
-          outputCount: 0,
-        });
+        setTxDetails(mintResponse);
 
         const walletProvider = getWalletProvider(
           wallet.provider,
         );
 
         // Update the inputsToSign construction to use the new format
-        const inputsToSign = txDetails.map((input: TransactionInput) => ({
+        const inputsToSign = mintResponse.txDetails.map((
+          input: TransactionInput,
+        ) => ({
           index: input.signingIndex,
         }));
         logger.debug("stamps", {
@@ -694,7 +741,10 @@ export function OlgaContent() {
           data: { inputsToSign },
         });
 
-        const result = await walletProvider.signPSBT(hex, inputsToSign);
+        const result = await walletProvider.signPSBT(
+          mintResponse.hex,
+          inputsToSign,
+        );
 
         logger.debug("stamps", {
           message: "Raw wallet provider response",
@@ -762,6 +812,7 @@ export function OlgaContent() {
         });
         setApiError(errorMsg);
         setSubmissionMessage(null);
+        setTxDetails(null); // Reset transaction details on error
       }
     } catch (error) {
       // This catch block should only handle unexpected errors
@@ -911,7 +962,6 @@ export function OlgaContent() {
                 id="upload"
                 type="file"
                 class="hidden"
-                accept="image/*"
                 onChange={handleImage}
               />
               {file !== null
@@ -920,29 +970,46 @@ export function OlgaContent() {
                     for="upload"
                     class="cursor-pointer h-full w-full flex flex-col items-center justify-center"
                   >
-                    <img
-                      width={120}
-                      style={{
-                        height: "100%",
-                        objectFit: "contain",
-                        imageRendering: "pixelated",
-                        backgroundColor: "rgb(0,0,0)",
-                        borderRadius: "6px",
-                      }}
-                      src={URL.createObjectURL(file)}
-                      alt="Preview"
-                      onError={(e) => {
-                        logger.error("stamps", {
-                          message: "Image preview failed to load",
-                          error: e,
-                        });
-                      }}
-                    />
+                    {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
+                      ? (
+                        <img
+                          width={120}
+                          style={{
+                            height: "100%",
+                            objectFit: "contain",
+                            imageRendering: "pixelated",
+                            backgroundColor: "rgb(0,0,0)",
+                            borderRadius: "6px",
+                          }}
+                          src={URL.createObjectURL(file)}
+                          alt="Preview"
+                          onError={(e) => {
+                            logger.error("stamps", {
+                              message: "Image preview failed to load",
+                              error: e,
+                            });
+                          }}
+                        />
+                      )
+                      : (
+                        <img
+                          width={120}
+                          style={{
+                            height: "100%",
+                            objectFit: "contain",
+                            imageRendering: "pixelated",
+                            backgroundColor: "rgb(0,0,0)",
+                            borderRadius: "6px",
+                          }}
+                          src={NOT_AVAILABLE_IMAGE}
+                          alt={`File: ${file.name}`}
+                        />
+                      )}
                     <div class="absolute inset-0 hover:bg-black hover:bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                       <img
                         src="/img/stamping/image-upload.svg"
                         class="w-12 h-12"
-                        alt="Change image"
+                        alt="Change file"
                       />
                     </div>
                   </label>

@@ -10,12 +10,15 @@ import * as $about_index from "./routes/about/index.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
 import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
+import * as $api_internal_carousel from "./routes/api/internal/carousel.ts";
 import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts";
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
 import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
-import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
+import * as $api_internal_fees from "./routes/api/internal/fees.ts";
+import * as $api_internal_src20_details from "./routes/api/internal/src20/details.ts";
 import * as $api_internal_src20_recentTransactions from "./routes/api/internal/src20/recentTransactions.ts";
 import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
+import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
@@ -154,10 +157,10 @@ import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
-import * as $home_HomeCarousel from "./islands/home/HomeCarousel.tsx";
-import * as $home_HomeHeader from "./islands/home/HomeHeader.tsx";
+import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
+import * as $home_SwiperStyles from "./islands/home/SwiperStyles.tsx";
 import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
@@ -221,13 +224,16 @@ const manifest = {
     "./routes/api/internal/bitcoinNotifications.ts":
       $api_internal_bitcoinNotifications,
     "./routes/api/internal/btcPrice.ts": $api_internal_btcPrice,
+    "./routes/api/internal/carousel.ts": $api_internal_carousel,
     "./routes/api/internal/creatorName.ts": $api_internal_creatorName,
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
-    "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
+    "./routes/api/internal/fees.ts": $api_internal_fees,
+    "./routes/api/internal/src20/details.ts": $api_internal_src20_details,
     "./routes/api/internal/src20/recentTransactions.ts":
       $api_internal_src20_recentTransactions,
     "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
+    "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
@@ -403,10 +409,10 @@ const manifest = {
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
-    "./islands/home/HomeCarousel.tsx": $home_HomeCarousel,
-    "./islands/home/HomeHeader.tsx": $home_HomeHeader,
+    "./islands/home/FontLoader.tsx": $home_FontLoader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
+    "./islands/home/SwiperStyles.tsx": $home_SwiperStyles,
     "./islands/layout/Footer.tsx": $layout_Footer,
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,
