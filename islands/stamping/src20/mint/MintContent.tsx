@@ -108,6 +108,7 @@ export function MintContent({
   const { isConnected, wallet } = walletContext;
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [showList, setShowList] = useState<boolean>(true);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectedTokenImage, setSelectedTokenImage] = useState<string | null>(
@@ -173,6 +174,7 @@ export function MintContent({
 
   // Update handleResultClick to be more efficient
   const handleResultClick = async (tick: string) => {
+    setShowList(false);
     setIsSelecting(true);
     setSearchResults([]); // Clear results immediately
     setSearchTerm(tick);
@@ -251,6 +253,13 @@ export function MintContent({
     }
   };
 
+  useEffect(() => {
+    if (tick) {
+      setSearchTerm(tick);
+      handleResultClick(tick);
+    }
+  }, [tick]);
+
   return (
     <div class={bodyToolsClassName}>
       <h1 class={titlePurpleLDCenterClassName}>MINT SRC-20</h1>
@@ -287,12 +296,14 @@ export function MintContent({
               type="text"
               placeholder="Token"
               value={searchTerm}
-              onChange={(e) =>
-                setSearchTerm((e.target as HTMLInputElement).value)}
+              onChange={(e) => {
+                setShowList(true);
+                setSearchTerm((e.target as HTMLInputElement).value);
+              }}
               error={formState.tokenError}
               isUppercase
             />
-            {searchResults.length > 1 && (
+            {showList && searchResults.length > 1 && (
               <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[11] max-h-60 overflow-y-auto">
                 {searchResults.map((result: SearchResult) => (
                   <li
