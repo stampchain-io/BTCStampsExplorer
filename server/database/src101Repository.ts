@@ -15,7 +15,7 @@ import {
   SRC101TokenidsParams,
   SRC101OwnerParams,
   Src101BalanceParams,
-} from "globals";
+} from "$globals";
 
 import { dbManager } from "$server/database/databaseManager.ts";
 

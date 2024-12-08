@@ -6,7 +6,7 @@ import {
   validateRequiredParams,
   validateSortParam,
 } from "$server/services/routeValidationService.ts";
-import { SRC20TrxRequestParams } from "globals";
+import { SRC20TrxRequestParams } from "$globals";
 
 export const handler: Handlers = {
   async GET(req, ctx) {

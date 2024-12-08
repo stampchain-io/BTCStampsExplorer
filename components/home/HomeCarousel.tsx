@@ -1,5 +1,5 @@
 import Carousel from "$islands/Carousel.tsx";
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 import SwiperStyles from "$islands/home/SwiperStyles.tsx";
 
 interface HomeCarouselProps {

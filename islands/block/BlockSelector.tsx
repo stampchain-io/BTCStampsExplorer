@@ -1,6 +1,6 @@
 import type { Signal } from "@preact/signals";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
-import { BlockRow } from "globals";
+import { BlockRow } from "$globals";
 
 interface BlockProps {
   block: BlockRow;

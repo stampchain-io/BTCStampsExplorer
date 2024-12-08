@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { SRC20TX } from "./SRC20TX.tsx";
-import { SRC20Row } from "globals";
+import { SRC20Row } from "$globals";
 
 interface SRC20DetailsTabProps {
   tick: string;

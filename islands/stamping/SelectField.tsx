@@ -1,5 +1,5 @@
 import { JSX } from "preact";
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 
 interface SelectFieldProps {
   placeholder?: string;

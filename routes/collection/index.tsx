@@ -3,7 +3,7 @@ import {
   CollectionSectionProps,
   StampRow,
   StampSectionProps,
-} from "globals";
+} from "$globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
 import StampSection from "$islands/stamp/StampSection.tsx";

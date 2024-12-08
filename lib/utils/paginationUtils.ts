@@ -1,4 +1,4 @@
-import { PaginationQueryParams } from "globals";
+import { PaginationQueryParams } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 export function getPaginationParams(

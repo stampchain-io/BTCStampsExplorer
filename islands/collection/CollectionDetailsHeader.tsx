@@ -1,4 +1,4 @@
-import { Collection, StampRow } from "globals";
+import { Collection, StampRow } from "$globals";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
 

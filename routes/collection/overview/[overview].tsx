@@ -6,7 +6,7 @@ import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { CollectionController } from "$server/controller/collectionController.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
-import { STAMP_FILTER_TYPES, StampPageProps, SUBPROTOCOLS } from "globals";
+import { STAMP_FILTER_TYPES, StampPageProps, SUBPROTOCOLS } from "$globals";
 
 const MAX_PAGE_SIZE = 120;
 

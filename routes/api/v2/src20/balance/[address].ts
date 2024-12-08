@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { AddressHandlerContext } from "globals";
+import { AddressHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";

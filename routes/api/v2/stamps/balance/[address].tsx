@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { AddressHandlerContext } from "globals";
+import { AddressHandlerContext } from "$globals";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import {

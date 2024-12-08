@@ -4,7 +4,7 @@ import {
   SRC20_FILTER_TYPES,
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
-} from "globals";
+} from "$globals";
 
 type FilterTypes =
   | STAMP_FILTER_TYPES

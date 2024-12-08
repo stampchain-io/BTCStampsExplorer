@@ -6,7 +6,7 @@ import {
   SRC101TxParams,
   SRC101ValidTxTotalCountParams,
   SRC101BalanceParams,
-} from "globals";
+} from "$globals";
 import { StampService } from "$server/services/stampService.ts";
 // import { getBtcAddressInfo } from "$lib/utils/btc.ts";
 import { BlockService } from "$server/services/blockService.ts";

@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { BlockController } from "$server/controller/blockController.ts";
-import { BlockHandlerContext } from "globals";
+import { BlockHandlerContext } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 export const sharedBlockWithStampsHandler: Handlers<BlockHandlerContext> = {

@@ -4,7 +4,7 @@ import {
   SRC20BalanceRequestParams,
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
-} from "globals";
+} from "$globals";
 import { StampService } from "$server/services/stampService.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";

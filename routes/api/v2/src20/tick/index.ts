@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { SRC20TrxRequestParams } from "globals";
+import { SRC20TrxRequestParams } from "$globals";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 
 export const handler: Handlers = {

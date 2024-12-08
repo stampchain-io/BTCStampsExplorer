@@ -1,5 +1,5 @@
 import { StampCard } from "$islands/stamp/StampCard.tsx";
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 
 export function StampContent({ stamps, isRecentSales = false }: {
   stamps: (StampRow & {

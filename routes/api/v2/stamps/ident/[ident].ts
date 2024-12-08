@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { PROTOCOL_IDENTIFIERS } from "$lib/utils/protocol.ts";
-import { IdentHandlerContext, PaginatedIdResponseBody } from "globals";
+import { IdentHandlerContext, PaginatedIdResponseBody } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
@@ -10,7 +10,7 @@ import {
   validateRequiredParams,
   validateSortParam,
 } from "$server/services/routeValidationService.ts";
-import { SUBPROTOCOLS } from "globals";
+import { SUBPROTOCOLS } from "$globals";
 
 export const handler: Handlers<IdentHandlerContext> = {
   async GET(req, ctx) {

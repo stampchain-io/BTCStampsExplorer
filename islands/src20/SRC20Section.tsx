@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { SRC20Row } from "globals";
+import { SRC20Row } from "$globals";
 
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 

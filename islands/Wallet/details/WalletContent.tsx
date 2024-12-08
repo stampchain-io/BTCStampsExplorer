@@ -8,7 +8,7 @@ import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import WalletTransferModal from "$islands/Wallet/details/WalletTransferModal.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 import { Dispenser } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
