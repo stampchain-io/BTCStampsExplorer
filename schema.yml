@@ -82,8 +82,10 @@ paths:
                       mempool:
                         type: boolean
                         description: Mempool API connectivity
+                        description: Mempool API connectivity
                       database:
                         type: boolean
+                        description: Database connectivity
                         description: Database connectivity
                       xcp:
                         type: boolean
@@ -2353,6 +2355,13 @@ components:
           type: string
         unbounded_quantity:
           type: number
+        utxos:
+          type: object
+          properties:
+            quantity:
+              type: number
+            utxo:
+              type: string
 
     MintStatus:
       type: object
