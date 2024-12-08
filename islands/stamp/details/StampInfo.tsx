@@ -7,7 +7,7 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 
 interface StampInfoProps {
   stamp: StampRow;

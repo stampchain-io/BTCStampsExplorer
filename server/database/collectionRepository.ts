@@ -1,6 +1,6 @@
 import { SMALL_LIMIT, STAMP_TABLE } from "$constants";
 import { dbManager } from "$server/database/databaseManager.ts";
-import { Collection } from "globals";
+import { Collection } from "$globals";
 export class CollectionRepository {
   static async getCollectionDetails(
     options: {

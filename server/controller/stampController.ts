@@ -1,6 +1,6 @@
 import { StampService } from "$server/services/stampService.ts";
 import { BIG_LIMIT, CAROUSEL_STAMP_IDS } from "$lib/utils/constants.ts";
-import { HolderRow, SUBPROTOCOLS } from "globals";
+import { HolderRow, SUBPROTOCOLS } from "$globals";
 import { Src20Service } from "$server/services/src20/queryService.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { BlockService } from "$server/services/blockService.ts";
@@ -12,7 +12,7 @@ import {
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   StampRow,
-} from "globals";
+} from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { decodeBase64 } from "@std/encoding";
 import { filterOptions } from "$lib/utils/filterOptions.ts";

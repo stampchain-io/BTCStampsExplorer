@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { TX, TXError } from "globals";
+import { TX, TXError } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { InputData } from "$types/index.d.ts";

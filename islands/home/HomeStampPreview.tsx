@@ -3,7 +3,7 @@ import {
   CollectionSectionProps,
   StampRow,
   StampSectionProps,
-} from "globals";
+} from "$globals";
 
 import StampSection from "$islands/stamp/StampSection.tsx";
 import CollectionSection from "$islands/collection/CollectionSection.tsx";

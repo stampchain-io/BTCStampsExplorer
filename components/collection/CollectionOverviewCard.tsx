@@ -1,4 +1,4 @@
-import { Collection } from "globals";
+import { Collection } from "$globals";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 function abbreviateCollectionName(name: string): string {

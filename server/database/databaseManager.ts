@@ -1,6 +1,6 @@
 import "$/server/config/env.ts";
 
-import { Client } from "$mysql/mod.ts";
+import { Client } from "mysql/mod.ts";
 import { connect, Redis } from "redis";
 import { crypto } from "@std/crypto";
 import {

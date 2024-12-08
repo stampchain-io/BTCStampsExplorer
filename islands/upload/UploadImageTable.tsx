@@ -1,4 +1,4 @@
-import { SRC20Row } from "globals";
+import { SRC20Row } from "$globals";
 import { useEffect, useState } from "preact/hooks";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";

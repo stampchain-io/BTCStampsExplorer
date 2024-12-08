@@ -1,5 +1,5 @@
 import { FreshContext, Handlers } from "$fresh/server.ts";
-import { MintStampInputData, TransactionInput, TX, TXError } from "globals";
+import { MintStampInputData, TransactionInput, TX, TXError } from "$globals";
 import { serverConfig } from "$server/config/config.ts";
 import {
   StampMintService,

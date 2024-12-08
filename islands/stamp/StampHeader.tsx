@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 
-import { STAMP_FILTER_TYPES, STAMP_TYPES } from "globals";
+import { STAMP_FILTER_TYPES, STAMP_TYPES } from "$globals";
 
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";

@@ -1,7 +1,7 @@
 import type { TransactionInput, TransactionOutput } from "./transaction.d.ts";
 
 // Import StampRow and SRC20Row from globals
-import type { SRC20Row, StampRow } from "globals";
+import type { SRC20Row, StampRow } from "$globals";
 
 // Base transaction interface with common properties
 interface BaseTransaction {

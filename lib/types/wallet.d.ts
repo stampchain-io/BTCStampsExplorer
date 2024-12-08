@@ -1,6 +1,6 @@
 import { WalletProviderKey } from "$lib/utils/constants.ts";
 import { Dispenser, DispenserStats } from "./services.d.ts";
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 
 export interface StampBalance {
   cpid?: string;

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { VNode } from "preact";
 
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 import {
   getStampImageSrc,
   handleImageError,

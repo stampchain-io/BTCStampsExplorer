@@ -3,7 +3,7 @@ import {
   Collection,
   CollectionQueryParams,
   PaginatedCollectionResponseBody,
-} from "globals";
+} from "$globals";
 import { StampController } from "$server/controller/stampController.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { Collection, CollectionOverviewSectionProps } from "globals";
+import { Collection, CollectionOverviewSectionProps } from "$globals";
 
 import { BREAKPOINTS } from "$client/utils/constants.ts";
 

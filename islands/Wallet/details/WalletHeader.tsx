@@ -3,7 +3,7 @@ import { useState } from "preact/hooks";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 
-import { WALLET_FILTER_TYPES } from "globals";
+import { WALLET_FILTER_TYPES } from "$globals";
 
 interface WalletHeaderProps {
   filterBy: WALLET_FILTER_TYPES[];

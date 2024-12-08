@@ -1,4 +1,4 @@
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 export const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",

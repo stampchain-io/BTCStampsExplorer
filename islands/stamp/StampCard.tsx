@@ -9,7 +9,7 @@ import {
   validateStampContent,
 } from "$lib/utils/imageUtils.ts";
 
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import { BREAKPOINTS } from "$client/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";

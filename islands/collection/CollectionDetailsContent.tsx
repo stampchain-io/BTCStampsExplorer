@@ -1,4 +1,4 @@
-import { StampRow } from "globals";
+import { StampRow } from "$globals";
 
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 

@@ -6,7 +6,7 @@ import {
   SRC20BalanceRequestParams,
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
-} from "globals";
+} from "$globals";
 import { dbManager } from "$server/database/databaseManager.ts";
 
 export class SRC20Repository {

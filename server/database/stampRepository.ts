@@ -1,12 +1,12 @@
 import { DEFAULT_CACHE_DURATION, SMALL_LIMIT, STAMP_TABLE } from "$constants";
-import { SUBPROTOCOLS } from "globals";
+import { SUBPROTOCOLS } from "$globals";
 import { BIG_LIMIT } from "$lib/utils/constants.ts";
 import {
   STAMP_FILTER_TYPES,
   STAMP_SUFFIX_FILTERS,
   STAMP_TYPES,
   StampBalance,
-} from "globals";
+} from "$globals";
 import { XcpBalance } from "$types/index.d.ts";
 import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
