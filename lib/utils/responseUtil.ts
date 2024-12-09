@@ -14,7 +14,7 @@ export interface ResponseOptions {
   status?: number;
   headers?: Record<string, string>;
   routeType?: RouteType;
-  forceNoCache?: boolean;
+  forceNoCache?: boolean | undefined;
   raw?: boolean;
 }
 
@@ -25,59 +25,45 @@ export interface StampResponseOptions extends ResponseOptions {
 
 export class ResponseUtil {
   static success(data: unknown, options: ResponseOptions = {}): Response {
+    const headers = {
+      // When forceNoCache is true, getSecurityHeaders sets no-cache directives
+      ...getSecurityHeaders({ forceNoCache: options.forceNoCache ?? false }),
+      "Content-Type": "application/json",
+      "X-API-Version": API_RESPONSE_VERSION,
+      ...(options.headers || {}),
+    };
+
     if (options.routeType) {
       const { duration, staleWhileRevalidate, staleIfError } = getCacheConfig(
         options.routeType,
       );
 
-      if (options.forceNoCache || duration === 0) {
-        return new Response(JSON.stringify(data), {
-          status: 200,
-          headers: normalizeHeaders({
-            ...getSecurityHeaders({ forceNoCache: true }),
-            "Content-Type": "application/json",
-            "X-API-Version": API_RESPONSE_VERSION,
-            ...(options.headers || {}),
-          }),
+      // Only set caching headers if not forcing no-cache and duration > 0
+      if (!options.forceNoCache && duration > 0) {
+        const cacheControl = [
+          "public",
+          `max-age=${duration}`,
+          staleWhileRevalidate
+            ? `stale-while-revalidate=${staleWhileRevalidate}`
+            : "",
+          staleIfError ? `stale-if-error=${staleIfError}` : "",
+        ].filter(Boolean).join(", ");
+
+        // These headers affect different layers of caching:
+        Object.assign(headers, {
+          "Cache-Control": cacheControl, // Browser caching
+          "CDN-Cache-Control": cacheControl, // General CDN caching
+          "Cloudflare-CDN-Cache-Control": cacheControl, // Cloudflare specific
+          "Surrogate-Control": `max-age=${duration}`, // Legacy CDN control
+          "Edge-Control": `cache-maxage=${duration}`, // Edge caching
+          "Vary": "Accept-Encoding, X-API-Version",
         });
       }
-
-      const cacheControl = [
-        "public",
-        `max-age=${duration}`,
-        staleWhileRevalidate
-          ? `stale-while-revalidate=${staleWhileRevalidate}`
-          : "",
-        staleIfError ? `stale-if-error=${staleIfError}` : "",
-      ].filter(Boolean).join(", ");
-
-      const headers = normalizeHeaders({
-        ...getSecurityHeaders(),
-        "Content-Type": "application/json",
-        "Cache-Control": cacheControl,
-        "CDN-Cache-Control": cacheControl,
-        "Cloudflare-CDN-Cache-Control": cacheControl,
-        "Surrogate-Control": `max-age=${duration}`,
-        "Edge-Control": `cache-maxage=${duration}`,
-        "Vary": "Accept-Encoding, X-API-Version",
-        "X-API-Version": API_RESPONSE_VERSION,
-        ...(options.headers || {}),
-      });
-
-      return new Response(JSON.stringify(data), {
-        status: 200,
-        headers,
-      });
     }
 
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: normalizeHeaders({
-        ...getSecurityHeaders({ forceNoCache: true }),
-        "Content-Type": "application/json",
-        "X-API-Version": API_RESPONSE_VERSION,
-        ...(options.headers || {}),
-      }),
+      headers: normalizeHeaders(headers),
     });
   }
 

@@ -90,6 +90,6 @@ export const handler: Handlers = {
       health.status = "ERROR";
     }
 
-    return ResponseUtil.success(health);
+    return ResponseUtil.success(health, { forceNoCache: true });
   },
 };
