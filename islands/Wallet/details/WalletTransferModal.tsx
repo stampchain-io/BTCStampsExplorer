@@ -31,6 +31,7 @@ function WalletTransferModal({
   stamps,
 }: Props) {
   const { wallet } = walletContext;
+  const [maxQuantity, setMaxQuantity] = useState(1);
   const [quantity, setQuantity] = useState(1);
   const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
 
@@ -47,7 +48,6 @@ function WalletTransferModal({
     type: "transfer",
     initialFee,
   });
-
   // Sync external fee state with internal state
   useEffect(() => {
     handleChangeFee(formState.fee);
@@ -80,7 +80,7 @@ function WalletTransferModal({
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || "Failed to create transfer transaction.",
+          errorData.error || "Failed to create transfer transaction."
         );
       }
 
@@ -93,12 +93,12 @@ function WalletTransferModal({
         wallet,
         responseData.result.psbt,
         [], // Empty array for inputs to sign
-        true, // Enable RBF
+        true // Enable RBF
       );
 
       if (signResult.signed && signResult.txid) {
         setSuccessMessage(
-          `Transfer initiated successfully. TXID: ${signResult.txid}`,
+          `Transfer initiated successfully. TXID: ${signResult.txid}`
         );
         setTimeout(toggleModal, 5000);
       } else if (signResult.cancelled) {
@@ -109,6 +109,31 @@ function WalletTransferModal({
     });
   };
 
+  const handleQuantityChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value)) {
+      if (value >= 1 && value <= maxQuantity) {
+        setQuantity(value);
+      } else if (value < 1) {
+        setQuantity(1);
+      } else if (value > maxQuantity) {
+        setQuantity(maxQuantity);
+      }
+    }
+  };
+  const getMaxQuantity = () => {
+    const max = Math.max(
+      ...stamps.data.map((stamp) => stamp.unbounded_quantity)
+    );
+    setMaxQuantity(max);
+  };
+
+  useEffect(() => {
+    getMaxQuantity();
+  }, [stamps]);
+
   const inputField =
     "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
@@ -116,22 +141,20 @@ function WalletTransferModal({
     <ModalLayout onClose={handleCloseModal} title="TRANSFER">
       <div className="flex w-full gap-3 mobileMd:gap-6">
         <div className="min-w-[108px] h-[108px] mobileMd:min-w-[120px] mobileMd:h-[120px] bg-[#660099] rounded-md flex items-center justify-center">
-          {selectedStamp
-            ? (
-              <img
-                // src={`/api/v2/stamp/${selectedStamp.stamp}/content`}
-                src={selectedStamp.stamp_url}
-                alt={`Stamp #${selectedStamp.stamp}`}
-                className="w-full h-full object-contain"
-              />
-            )
-            : (
-              <img
-                src="/img/stamping/image-upload.svg"
-                class="w-12 h-12"
-                alt=""
-              />
-            )}
+          {selectedStamp ? (
+            <img
+              // src={`/api/v2/stamp/${selectedStamp.stamp}/content`}
+              src={selectedStamp.stamp_url}
+              alt={`Stamp #${selectedStamp.stamp}`}
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <img
+              src="/img/stamping/image-upload.svg"
+              class="w-12 h-12"
+              alt=""
+            />
+          )}
         </div>
 
         <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
@@ -140,7 +163,7 @@ function WalletTransferModal({
             value={selectedStamp?.stamp?.toString() || ""}
             onChange={(e) => {
               const selectedItem = stamps.data.find(
-                (item) => item.tx_hash === e.currentTarget.value,
+                (item) => item.tx_hash === e.currentTarget.value
               );
 
               if (selectedItem) {
@@ -155,15 +178,15 @@ function WalletTransferModal({
                 EDITIONS
               </p>
               <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
-                MAX XX
+                MAX {maxQuantity}
               </p>
             </div>
             <input
               type="number"
               min="1"
-              /* max={maxQuantity}*/
+              max={maxQuantity}
               value={quantity}
-              /*onChange={handleQuantityChange}*/
+              onChange={handleQuantityChange}
               className={`${inputField} !w-12 text-center`}
             />
           </div>
@@ -177,7 +200,8 @@ function WalletTransferModal({
             setFormState({
               ...formState,
               recipientAddress: (e.target as HTMLInputElement).value,
-            })}
+            })
+          }
           placeholder="Recipient address"
           className={inputField}
         />
