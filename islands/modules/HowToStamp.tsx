@@ -56,7 +56,7 @@ export const HowToStampModule = () => {
           the <b>toggle</b>.<br />
         </p>
       </div>
-      <ReadAllButton />
+      <ReadAllButton href="/howto/getstamping" />
     </div>
   );
 };
