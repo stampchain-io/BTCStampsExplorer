@@ -9,7 +9,7 @@ export function ReadAllButton() {
         f-partial="/faq"
         class={buttonGreyOutline}
       >
-        Read All
+        READ ALL
       </a>
     </div>
   );
