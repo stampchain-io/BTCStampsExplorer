@@ -69,7 +69,7 @@ export function Mint101Content(
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
-          type="src20"
+          type="src101"
           fileType="application/json"
           fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}
