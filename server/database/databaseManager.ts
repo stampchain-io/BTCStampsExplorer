@@ -26,6 +26,10 @@ interface DatabaseConfig {
   CACHE?: string;
 }
 
+async function shouldInitializeRedis(): Promise<boolean> {
+  return !(globalThis as any).SKIP_REDIS_CONNECTION;
+}
+
 class DatabaseManager {
   private pool: Client[] = [];
   private redisClient: Redis | undefined;
@@ -46,8 +50,12 @@ class DatabaseManager {
   }
 
   public async initialize(): Promise<void> {
-    await this.initializeRedisConnection();
-    this.redisAvailableAtStartup = this.redisAvailable;
+    if (await shouldInitializeRedis()) {
+      await this.initializeRedisConnection();
+      this.redisAvailableAtStartup = this.redisAvailable;
+    } else {
+      this.logger.info("Skipping Redis initialization due to SKIP_REDIS_CONNECTION flag");
+    }
   }
 
   private setupLogging(): void {
@@ -368,4 +376,3 @@ const dbConfig: DatabaseConfig = {
 };
 
 export const dbManager = new DatabaseManager(dbConfig);
-await dbManager.initialize();
