@@ -7,9 +7,12 @@ import { logger } from "$lib/utils/logger.ts";
 
 type TrxType = "multisig" | "olga";
 
-export const handler: Handlers<TX | TXError> = {
-  async POST(req: Request) {
+export const handler: Handlers = {
+  async POST(req: Request): Promise<Response> {
     try {
+      let result: TX | TXError;
+      let response: Response;
+
       const rawBody = await req.text();
       console.log("SRC-101 request body:", rawBody);
 
@@ -27,7 +30,6 @@ export const handler: Handlers<TX | TXError> = {
       if (!effectiveSourceAddress) {
         return ResponseUtil.badRequest(
           "Either sourceAddress/fromAddress or changeAddress is required",
-          400,
         );
       }
 
@@ -49,11 +51,17 @@ export const handler: Handlers<TX | TXError> = {
         );
 
       if (validationError) {
-        return validationError;
+        return ResponseUtil.badRequest(
+          validationError.error || "Validation error",
+        );
       }
 
       if (trxType === "multisig") {
-        var result = await SRC101Service.TransactionService.handleOperation(
+        if (!effectiveSourceAddress || !effectiveChangeAddress) {
+          return ResponseUtil.badRequest("Missing required addresses");
+        }
+
+        result = await SRC101Service.TransactionService.handleOperation(
           body.op.toLowerCase() as
             | "deploy"
             | "mint"
@@ -63,7 +71,7 @@ export const handler: Handlers<TX | TXError> = {
           {
             ...body,
             sourceAddress: effectiveSourceAddress,
-            recAddress: effectiveRecAddress,
+            recAddress: effectiveRecAddress || effectiveSourceAddress,
             changeAddress: effectiveChangeAddress,
           },
         );
@@ -71,16 +79,17 @@ export const handler: Handlers<TX | TXError> = {
           message: "Multisig transaction result",
           result: JSON.stringify(result, null, 2),
         });
-        var response;
+
         if ("error" in result) {
           logger.error("stamps", {
             message: "Operation error",
             error: result.error,
           });
-          response = ResponseUtil.badRequest(result.error, 400);
+          response = ResponseUtil.badRequest(result.error);
         } else {
-          response = ResponseUtil.success(result);
+          response = ResponseUtil.success(result, { forceNoCache: true });
         }
+
         console.log("response", response);
 
         logger.debug("stamps", {
@@ -89,16 +98,15 @@ export const handler: Handlers<TX | TXError> = {
         });
         return response;
       } else {
-        return ResponseUtil.badRequest("Not supported yet", 400);
+        return ResponseUtil.badRequest("Not supported yet");
       }
     } catch (error: unknown) {
       console.error("Error processing request:", error);
       if (error instanceof SyntaxError) {
-        return ResponseUtil.badRequest("Invalid JSON in request body", 400);
+        return ResponseUtil.badRequest("Invalid JSON in request body");
       }
       return ResponseUtil.badRequest(
         error instanceof Error ? error.message : "Unknown error occurred",
-        400,
       );
     }
   },

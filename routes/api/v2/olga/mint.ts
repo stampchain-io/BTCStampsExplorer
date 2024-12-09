@@ -110,7 +110,7 @@ export const handler: Handlers<TX | TXError> = {
           change_value: Number(mint_tx.totalChangeOutput),
           total_output_value: Number(mint_tx.totalOutputValue),
           txDetails: [], // Empty for dry run
-        } as NormalizedMintResponse);
+        } as NormalizedMintResponse, { forceNoCache: true });
       }
 
       // Regular mint response - already in the correct format
@@ -177,7 +177,7 @@ export const handler: Handlers<TX | TXError> = {
           vout: input.vout,
           signingIndex: input.signingIndex,
         })),
-      } as NormalizedMintResponse);
+      } as NormalizedMintResponse, { forceNoCache: true });
     } catch (error: unknown) {
       console.error("Minting error:", error);
       const errorMessage = error instanceof Error
