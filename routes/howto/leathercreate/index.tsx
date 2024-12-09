@@ -22,7 +22,7 @@ const WALLET_STEPS: WalletStep[] = [
   },
   {
     number: 3,
-    title: 'Click on "Add extension" button in the popup.',
+    title: 'CLICK ON "Add extension" BUTTON IN THE POPUP',
     image: "/img/how-tos/createleatherwallet/03.png",
     description: 'Click on "Add extension" button in the popup.',
   },
@@ -57,7 +57,7 @@ const WALLET_STEPS: WalletStep[] = [
     number: 8,
     title: "SET A PASSWORD",
     image: "/img/how-tos/createleatherwallet/08.png",
-    description: 'Click on "Set a password.',
+    description: 'Click on "Set a password".',
   },
   {
     number: 9,
@@ -85,7 +85,7 @@ const IMPORTANT_NOTES = [
 
 function IntroSection() {
   return (
-    <p class="mb-12">
+    <p class="mb-6 mobileLg:mb-12">
       In this article the focus will be on create a Leather wallet which
       basically will have 2 steps:
       <ul class="list-decimal pl-5 space-y-2">
@@ -101,8 +101,8 @@ function IntroSection() {
 
 function WalletSteps() {
   return (
-    <h2 class="text-2xl md:text-5xl font-extralight">
-      <ul class="list-decimal pl-5 space-y-16">
+    <h2 class="text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-extralight text-stamp-grey-light">
+      <ul class="space-y-9 mobileLg:space-y-12">
         {WALLET_STEPS.map((step) => (
           <Step
             key={step.number}

@@ -18,8 +18,8 @@ export function HowToLayout(
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
 
   return (
-    <div class="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 tablet:mt-5">
-      <div class="max-w-[1080px] w-full mx-auto flex flex-col gap-12">
+    <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36 text-base mobileLg:text-lg font-medium text-stamp-grey-light">
+      <div class="flex flex-col w-full tablet:max-w-[1080px] tablet:mx-auto">
         <section>
           <h1 className={titleGreyDL}>HOW-TO</h1>
           <h2 className={subTitleGrey}>{subtitle}</h2>
@@ -27,20 +27,19 @@ export function HowToLayout(
             src={headerImage}
             width="1020"
             alt="Screenshot"
+            class="pb-3 mobileMd:pb-6"
           />
           {children}
           {importantNotes.length > 0 && (
             <>
-              <br />
-              <b>IMPORTANT:</b>
-              <br />
+              <p className="pt-6 mobileLg:pt-12 text-xl mobileLg:text-2xl font-bold">
+                IMPORTANT
+              </p>
               {importantNotes.map((note) => (
                 <>
                   {note}
-                  <br />
                 </>
               ))}
-              <br /> <br />
             </>
           )}
         </section>
