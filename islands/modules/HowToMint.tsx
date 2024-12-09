@@ -51,8 +51,7 @@ export const HowToMintModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
-
-      <ReadAllButton />
+      <ReadAllButton href="/howto/mint" />
     </div>
   );
 };

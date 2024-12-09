@@ -69,7 +69,7 @@ export const HowToDeployModule = () => {
           All related costs are listed in the <b>details</b> section.
         </p>
       </div>
-      <ReadAllButton />
+      <ReadAllButton href="/howto/deploytoken" />
     </div>
   );
 };
