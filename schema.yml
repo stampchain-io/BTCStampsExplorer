@@ -2356,13 +2356,14 @@ components:
         unbounded_quantity:
           type: number
         utxos:
-          type: object
-          properties:
-            quantity:
-              type: number
-            utxo:
-              type: string
-
+          type: array
+          items:
+            type: object
+            properties:
+              utxo:
+                type: string
+              quantity:
+                type: number
     MintStatus:
       type: object
       properties:
