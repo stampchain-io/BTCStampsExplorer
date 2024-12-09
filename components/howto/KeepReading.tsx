@@ -24,7 +24,7 @@ export function KeepReading() {
                 key={`${title}-${href}`}
                 href={href}
                 f-partial={href}
-                class="inline-block text-xl tablet:text-2xl font-bold gray-gradient1"
+                class="inline-block text-xl tablet:text-2xl font-bold gray-gradient1-hover"
               >
                 {title}
               </a>
