@@ -38,35 +38,33 @@ interface WalletContentProps {
   anchor: string;
 }
 
-const ItemHeader = (
-  {
-    title = "STAMP",
-    sortBy = "ASC",
-    isOpen = false,
-    isOpenSetting = false,
-    handleOpenSetting = () => {},
-    handleOpen = () => {},
-    isOpenFilter = false,
-    handleOpenFilter = () => {},
-    sort = true,
-    search = true,
-    filter = true,
-    setting = false,
-  }: {
-    title: string;
-    sortBy: string;
-    isOpen: boolean;
-    sort: boolean;
-    search: boolean;
-    filter: boolean;
-    setting: boolean;
-    isOpenFilter: boolean;
-    isOpenSetting: boolean;
-    handleOpenSetting: (open: boolean) => void;
-    handleOpenFilter: (open: boolean) => void;
-    handleOpen: (type: string) => void;
-  },
-) => {
+const ItemHeader = ({
+  title = "STAMP",
+  sortBy = "ASC",
+  isOpen = false,
+  isOpenSetting = false,
+  handleOpenSetting = () => {},
+  handleOpen = () => {},
+  isOpenFilter = false,
+  handleOpenFilter = () => {},
+  sort = true,
+  search = true,
+  filter = true,
+  setting = false,
+}: {
+  title: string;
+  sortBy: string;
+  isOpen: boolean;
+  sort: boolean;
+  search: boolean;
+  filter: boolean;
+  setting: boolean;
+  isOpenFilter: boolean;
+  isOpenSetting: boolean;
+  handleOpenSetting: (open: boolean) => void;
+  handleOpenFilter: (open: boolean) => void;
+  handleOpen: (type: string) => void;
+}) => {
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full">
       <div class="flex items-end">
@@ -80,9 +78,7 @@ const ItemHeader = (
             initFilter={[]}
             open={isOpenSetting}
             handleOpen={handleOpenSetting}
-            filterButtons={[
-              "Transfer",
-            ]}
+            filterButtons={["Transfer"]}
           />
         )}
         {filter && (
@@ -90,11 +86,7 @@ const ItemHeader = (
             initFilter={[]}
             open={isOpenFilter}
             handleOpen={handleOpenFilter}
-            filterButtons={[
-              "all",
-              "psbt",
-              "dispensers",
-            ]}
+            filterButtons={["all", "psbt", "dispensers"]}
           />
         )}
         {sort && <Sort initSort={sortBy} />}
@@ -149,11 +141,11 @@ function DispenserItem({
 
   // Filter dispensers to only include those with stamp data, then split into open/closed
   const dispensersWithStamps = dispensers.filter((d) => d.stamp);
-  const openDispensers = dispensersWithStamps.filter((d) =>
-    d.give_remaining > 0
+  const openDispensers = dispensersWithStamps.filter(
+    (d) => d.give_remaining > 0
   );
-  const closedDispensers = dispensersWithStamps.filter((d) =>
-    d.give_remaining === 0
+  const closedDispensers = dispensersWithStamps.filter(
+    (d) => d.give_remaining === 0
   );
 
   // If no dispensers with stamps, show empty state
@@ -276,11 +268,10 @@ function DispenserItem({
 
 function DispenserRow(
   /* mobile = mobileSm/Md // tablet = mobileLg/tablet/desktop */
-  { dispenser, view }: { dispenser: Dispenser; view: "mobile" | "tablet" },
+  { dispenser, view }: { dispenser: Dispenser; view: "mobile" | "tablet" }
 ) {
-  const imageSize = view === "mobile"
-    ? "w-[146px] h-[146px]"
-    : "w-[172px] h-[172px]";
+  const imageSize =
+    view === "mobile" ? "w-[146px] h-[146px]" : "w-[172px] h-[172px]";
 
   return (
     <div class="flex justify-between dark-gradient rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
@@ -335,9 +326,7 @@ function DispenserRow(
                 <span class="hidden mobileLg:inline tablet:hidden">
                   {abbreviateAddress(dispenser.origin, 10)}
                 </span>
-                <span class="hidden tablet:inline">
-                  {dispenser.origin}
-                </span>
+                <span class="hidden tablet:inline">{dispenser.origin}</span>
               </span>
             </p>
             <div class="flex flex-row gap-[9px] mobileLg:gap-3">
@@ -367,9 +356,11 @@ function DispenserRow(
               <span class="font-bold text-stamp-grey-light">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
-                  : `${Number(dispenser.give_remaining).toLocaleString()}/${
-                    Number(dispenser.escrow_quantity).toLocaleString()
-                  }`}
+                  : `${Number(
+                      dispenser.give_remaining
+                    ).toLocaleString()}/${Number(
+                      dispenser.escrow_quantity
+                    ).toLocaleString()}`}
               </span>
             </p>
             <p
@@ -397,8 +388,9 @@ function DispenserRow(
             >
               {formatBTCAmount(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
-                { includeSymbol: false },
-              )} <span class="text-stamp-grey-light font-light">BTC</span>
+                { includeSymbol: false }
+              )}{" "}
+              <span class="text-stamp-grey-light font-light">BTC</span>
             </p>
           </div>
         </div>
@@ -407,9 +399,14 @@ function DispenserRow(
   );
 }
 
-export default function WalletContent(
-  { stamps, src20, dispensers, address, showItem, anchor }: WalletContentProps,
-) {
+export default function WalletContent({
+  stamps,
+  src20,
+  dispensers,
+  address,
+  showItem,
+  anchor,
+}: WalletContentProps) {
   const [filterBy, setFilterBy] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("ASC");
   const [openS, setOpenS] = useState<boolean>(false);
@@ -498,10 +495,10 @@ export default function WalletContent(
       auto-rows-fr
     `,
     displayCounts: {
-      "mobileSm": 16, // 4 columns x 4 rows
-      "mobileLg": 24, // 6 columns x 4 rows
-      "tablet": 24, // 6 columns x 4 rows
-      "desktop": 32, // 8 columns x 4 rows
+      mobileSm: 16, // 4 columns x 4 rows
+      mobileLg: 24, // 6 columns x 4 rows
+      tablet: 24, // 6 columns x 4 rows
+      desktop: 32, // 8 columns x 4 rows
     },
     pagination: {
       page: stamps.pagination.page,
@@ -550,10 +547,7 @@ export default function WalletContent(
         />
         {Math.ceil(src20.pagination.total / src20.pagination.limit) > 1 && (
           <div class="mt-3 mobileLg:mt-6">
-            <SRC20Section
-              type="all"
-              fromPage="wallet"
-            />
+            <SRC20Section type="all" fromPage="wallet" />
           </div>
         )}
       </div>
@@ -592,14 +586,13 @@ export default function WalletContent(
           <DispenserItem dispensers={dispensers || []} />
         </div>
       </div>
-      {openSettingModal &&
-        (
-          <WalletTransferModal
-            stamps={stamps}
-            toggleModal={handleOpenSettingModal}
-            handleCloseModal={handleCloseSettingModal}
-          />
-        )}
+      {openSettingModal && (
+        <WalletTransferModal
+          stamps={stamps}
+          toggleModal={handleOpenSettingModal}
+          handleCloseModal={handleCloseSettingModal}
+        />
+      )}
     </>
   );
 }
