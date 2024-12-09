@@ -1,10 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { validateSortDirection } from "$server/services/validationService.ts";
-
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 type StampHandlerConfig = {
   type: "stamps" | "cursed";
   isIndex: boolean;
@@ -85,7 +84,7 @@ export const createStampHandler = (
           cacheType,
         });
 
-        return ResponseUtil.success(result, { routeType: cacheType });
+        return ApiResponseUtil.success(result, { routeType: cacheType });
       } else {
         const { id } = ctx.params;
         const path = new URL(req.url).pathname;
@@ -113,9 +112,9 @@ export const createStampHandler = (
           );
 
           if (!holders || !holders.data?.length) {
-            return ResponseUtil.notFound("No holders found for this stamp");
+            return ApiResponseUtil.notFound("No holders found for this stamp");
           }
-          return ResponseUtil.success(holders, { routeType: cacheType });
+          return ApiResponseUtil.success(holders, { routeType: cacheType });
         }
 
         if (path.includes("/dispensers")) {
@@ -135,9 +134,11 @@ export const createStampHandler = (
           );
 
           if (!dispensers || !dispensers.data?.length) {
-            return ResponseUtil.notFound("No dispensers found for this stamp");
+            return ApiResponseUtil.notFound(
+              "No dispensers found for this stamp",
+            );
           }
-          return ResponseUtil.success(dispensers, { routeType: cacheType });
+          return ApiResponseUtil.success(dispensers, { routeType: cacheType });
         }
 
         if (path.includes("/sends")) {
@@ -157,9 +158,9 @@ export const createStampHandler = (
           );
 
           if (!sends || !sends.data?.length) {
-            return ResponseUtil.notFound("No sends found for this stamp");
+            return ApiResponseUtil.notFound("No sends found for this stamp");
           }
-          return ResponseUtil.success(sends, { routeType: cacheType });
+          return ApiResponseUtil.success(sends, { routeType: cacheType });
         }
 
         if (path.includes("/dispenses")) {
@@ -179,9 +180,11 @@ export const createStampHandler = (
           );
 
           if (!dispenses || !dispenses.data?.length) {
-            return ResponseUtil.notFound("No dispenses found for this stamp");
+            return ApiResponseUtil.notFound(
+              "No dispenses found for this stamp",
+            );
           }
-          return ResponseUtil.success(dispenses, { routeType: cacheType });
+          return ApiResponseUtil.success(dispenses, { routeType: cacheType });
         }
 
         // For individual stamp details, we want both core and secondary columns
@@ -194,19 +197,22 @@ export const createStampHandler = (
         );
 
         if (!stampData) {
-          return ResponseUtil.notFound("Stamp not found");
+          return ApiResponseUtil.notFound("Stamp not found");
         }
 
-        return ResponseUtil.success({
-          last_block: stampData.last_block,
-          data: stampData.data,
-        }, { routeType: cacheType });
+        return ApiResponseUtil.success(
+          {
+            last_block: stampData.last_block,
+            data: stampData.data,
+          },
+          { routeType: cacheType },
+        );
       }
     } catch (error) {
       const errorMessage = routeConfig.isIndex
         ? `Error fetching paginated ${routeConfig.type}`
         : "Error fetching stamp data";
-      return ResponseUtil.internalError(error, errorMessage);
+      return ApiResponseUtil.internalError(error, errorMessage);
     }
   },
 });

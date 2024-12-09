@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { getCurrentBlock } from "$lib/utils/mempool.ts";
 import { StampService } from "$server/services/stampService.ts";
@@ -90,6 +90,6 @@ export const handler: Handlers = {
       health.status = "ERROR";
     }
 
-    return ResponseUtil.success(health, { forceNoCache: true });
+    return ApiResponseUtil.success(health, { forceNoCache: true });
   },
 };

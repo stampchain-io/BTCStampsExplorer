@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { BitcoinNotificationService } from "$server/services/notification/bitcoinNotificationService.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 
@@ -15,11 +15,11 @@ export const handler: Handlers = {
 
       await BitcoinNotificationService.handleNotification(data);
 
-      return ResponseUtil.success({ status: "OK" }, {
+      return ApiResponseUtil.success({ status: "OK" }, {
         forceNoCache: true,
       });
     } catch (error) {
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Failed to process Bitcoin notification",
       );

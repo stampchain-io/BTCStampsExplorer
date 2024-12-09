@@ -16,7 +16,6 @@ export function normalizeHeaders(headers: Headers | Record<string, string>) {
     if (
       baseType.startsWith("text/") ||
       baseType.includes("javascript") ||
-      baseType.includes("json") ||
       baseType.includes("xml")
     ) {
       normalized.set("content-type", `${baseType}; charset=utf-8`);

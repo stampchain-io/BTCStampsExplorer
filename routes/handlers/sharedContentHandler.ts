@@ -6,7 +6,7 @@ import {
   isCpid,
   isTxHash,
 } from "$lib/utils/identifierUtils.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { FreshContext } from "$fresh/server.ts";
 import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
@@ -39,13 +39,13 @@ export async function handleContentRequest(
           identifier,
           idType,
         });
-        return ResponseUtil.stampNotFound();
+        return WebResponseUtil.stampNotFound();
       }
     } else {
       // Extract the base identifier without extension
       const [id] = identifier.split(".");
       if (!isTxHash(id)) {
-        return ResponseUtil.stampNotFound();
+        return WebResponseUtil.stampNotFound();
       }
     }
 
@@ -105,6 +105,6 @@ export async function handleContentRequest(
       error: error instanceof Error ? error.message : String(error),
       path: ctx.url.pathname,
     });
-    return ResponseUtil.stampNotFound();
+    return WebResponseUtil.stampNotFound();
   }
 }

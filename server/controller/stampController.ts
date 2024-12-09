@@ -30,6 +30,7 @@ import { detectContentType } from "$lib/utils/imageUtils.ts";
 import { getMimeType } from "$lib/utils/imageUtils.ts";
 import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 
 interface StampControllerOptions {
   cacheType: RouteType;
@@ -501,7 +502,7 @@ export class StampController {
         identifier,
         contentType
       });
-      return ResponseUtil.stampNotFound();
+      return WebResponseUtil.stampNotFound();
     }
   }
 
@@ -514,92 +515,104 @@ export class StampController {
     try {
       // If full path, go directly to proxy
       if (isFullPath) {
-        const [baseId, extension] = identifier.split(".");
-        const contentType = getMimeType(extension);
-        
-        return this.proxyContentRouteToStampsRoute(
-          identifier,
-          `${baseUrl}/stamps/${identifier}`,
-          baseUrl,
-          contentType
-        );
+        return await this.handleFullPathStamp(identifier, baseUrl);
       }
 
-      // For non-full paths, proceed with DB lookup and content handling
       const result = await StampService.getStampFile(identifier);
-      if (!result) return ResponseUtil.stampNotFound();
+      if (!result) return WebResponseUtil.stampNotFound();
 
-      const contentInfo = detectContentType(
-        result.body,
-        undefined,
-        result.headers["Content-Type"] as string | undefined
-      );
-
-      // Content types that need base64 decoding before serving
-      const needsDecoding = 
-        contentInfo.mimeType.includes('javascript') || 
-        contentInfo.mimeType.includes('text/') ||    // All text content (HTML, CSS, etc.)
-        contentInfo.mimeType.includes('application/json') ||
-        contentInfo.mimeType.includes('xml');
-
-      if (needsDecoding) {
-        try {
-          const decodedContent = atob(result.body);
-          return ResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
-            binary: false,
-            headers: normalizeHeaders({
-              "CF-No-Transform": contentInfo.mimeType.includes('javascript') || 
-                                contentInfo.mimeType.includes('text/html'),
-              "X-API-Version": API_RESPONSE_VERSION,
-              ...(result.headers || {}),
-            })
-          });
-        } catch (error) {
-          logger.error("content", {
-            message: "Error decoding text content",
-            error: error instanceof Error ? error.message : String(error),
-            identifier,
-          });
-          return ResponseUtil.internalError(error);
-        }
-      }
-
-      // For binary content, return as-is
-      return ResponseUtil.stampResponse(result.body, contentInfo.mimeType, {
-        binary: true,
-        headers: normalizeHeaders({
-          "X-API-Version": API_RESPONSE_VERSION,
-          ...(result.headers || {}),
-        })
-      });
-
+      return await this.handleStampContent(result, identifier);
     } catch (error) {
       logger.error("stamps", {
         message: "Error in getStampFile",
         identifier,
         error: error instanceof Error ? error.message : String(error)
       });
-      return ResponseUtil.stampNotFound();
+      return WebResponseUtil.stampNotFound();
     }
+  }
+
+  private static async handleFullPathStamp(identifier: string, baseUrl?: string) {
+    const [, extension] = identifier.split(".");
+    const contentType = getMimeType(extension);
+    
+    return this.proxyContentRouteToStampsRoute(
+      identifier,
+      `${baseUrl}/stamps/${identifier}`,
+      baseUrl,
+      contentType
+    );
+  }
+
+  private static async handleStampContent(result: any, identifier: string) {
+    const contentInfo = detectContentType(
+      result.body,
+      undefined,
+      result.headers["Content-Type"] as string | undefined
+    );
+
+    const needsDecoding = 
+      contentInfo.mimeType.includes('javascript') || 
+      contentInfo.mimeType.includes('text/') ||
+      contentInfo.mimeType.includes('application/json') ||
+      contentInfo.mimeType.includes('xml');
+
+    if (needsDecoding) {
+      return this.handleTextContent(result, contentInfo, identifier);
+    }
+
+    return this.handleBinaryContent(result, contentInfo);
+  }
+
+  private static async handleTextContent(result: any, contentInfo: any, identifier: string) {
+    try {
+      const decodedContent = atob(result.body);
+      return WebResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
+        binary: false,
+        headers: normalizeHeaders({
+          "CF-No-Transform": contentInfo.mimeType.includes('javascript') || 
+                            contentInfo.mimeType.includes('text/html'),
+          "X-API-Version": API_RESPONSE_VERSION,
+          ...(result.headers || {}),
+        })
+      });
+    } catch (error) {
+      logger.error("content", {
+        message: "Error decoding text content",
+        error: error instanceof Error ? error.message : String(error),
+        identifier,
+      });
+      return ResponseUtil.internalError(error);
+    }
+  }
+
+  private static handleBinaryContent(result: any, contentInfo: any) {
+    return WebResponseUtil.stampResponse(result.body, contentInfo.mimeType, {
+      binary: true,
+      headers: normalizeHeaders({
+        "X-API-Version": API_RESPONSE_VERSION,
+        ...(result.headers || {}),
+      })
+    });
   }
 
   static async getCreatorNameByAddress(address: string): Promise<Response> {
     try {
       const name = await StampService.getCreatorNameByAddress(address);
-      return ResponseUtil.jsonResponse({ name });
+      return WebResponseUtil.jsonResponse({ name });
     } catch (error) {
       console.error("Error in getCreatorNameByAddress:", error);
-      return ResponseUtil.internalError(error, "Error getting creator name");
+      return WebResponseUtil.internalError(error, "Error getting creator name");
     }
   }
 
   static async updateCreatorName(address: string, newName: string): Promise<Response> {
     try {
       const success = await StampService.updateCreatorName(address, newName);
-      return ResponseUtil.jsonResponse({ success });
+      return WebResponseUtil.jsonResponse({ success });
     } catch (error) {
       console.error("Error in updateCreatorName:", error);
-      return ResponseUtil.internalError(error, "Error updating creator name");
+      return WebResponseUtil.internalError(error, "Error updating creator name");
     }
   }
 

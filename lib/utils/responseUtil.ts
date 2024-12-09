@@ -1,14 +1,8 @@
-import { getCacheConfig, RouteType } from "$server/services/cacheService.ts";
-import {
-  getBinaryContentHeaders,
-  getHtmlHeaders,
-  getRecursiveHeaders,
-  getSecurityHeaders,
-} from "$lib/utils/securityHeaders.ts";
-import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { ApiResponseUtil } from "./apiResponseUtil.ts";
+import { WebResponseUtil } from "./webResponseUtil.ts";
 
-// Update this when making breaking changes to response format
-export const API_RESPONSE_VERSION = "v2.2.3";
+// Re-export from apiResponseUtil for backward compatibility
+export { API_RESPONSE_VERSION } from "./apiResponseUtil.ts";
 
 export interface ResponseOptions {
   status?: number;
@@ -24,269 +18,62 @@ export interface StampResponseOptions extends ResponseOptions {
 }
 
 export class ResponseUtil {
-  static success(data: unknown, options: ResponseOptions = {}): Response {
-    const headers = {
-      // When forceNoCache is true, getSecurityHeaders sets no-cache directives
-      ...getSecurityHeaders({ forceNoCache: options.forceNoCache ?? false }),
-      "Content-Type": "application/json",
-      "X-API-Version": API_RESPONSE_VERSION,
-      ...(options.headers || {}),
-    };
-
-    if (options.routeType) {
-      const { duration, staleWhileRevalidate, staleIfError } = getCacheConfig(
-        options.routeType,
-      );
-
-      // Only set caching headers if not forcing no-cache and duration > 0
-      if (!options.forceNoCache && duration > 0) {
-        const cacheControl = [
-          "public",
-          `max-age=${duration}`,
-          staleWhileRevalidate
-            ? `stale-while-revalidate=${staleWhileRevalidate}`
-            : "",
-          staleIfError ? `stale-if-error=${staleIfError}` : "",
-        ].filter(Boolean).join(", ");
-
-        // These headers affect different layers of caching:
-        Object.assign(headers, {
-          "Cache-Control": cacheControl, // Browser caching
-          "CDN-Cache-Control": cacheControl, // General CDN caching
-          "Cloudflare-CDN-Cache-Control": cacheControl, // Cloudflare specific
-          "Surrogate-Control": `max-age=${duration}`, // Legacy CDN control
-          "Edge-Control": `cache-maxage=${duration}`, // Edge caching
-          "Vary": "Accept-Encoding, X-API-Version",
-        });
-      }
+  /** @deprecated Use ApiResponseUtil.success for API routes */
+  static success(
+    data: unknown,
+    options: ResponseOptions = { forceNoCache: true },
+  ): Response {
+    if (new Error().stack?.includes("/api/")) {
+      console.warn("Warning: Use ApiResponseUtil.success for API routes");
+      return ApiResponseUtil.success(data, options);
     }
-
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: normalizeHeaders(headers),
-    });
+    return WebResponseUtil.success(data, options);
   }
 
+  /** @deprecated Use ApiResponseUtil.custom for API routes */
   static custom<T>(
     body: T,
     status: number,
     options: ResponseOptions = {},
   ): Response {
-    return new Response(
-      body instanceof ArrayBuffer || body instanceof Uint8Array
-        ? body
-        : JSON.stringify(body),
-      {
-        status,
-        headers: normalizeHeaders({
-          ...getSecurityHeaders(options),
-          "Content-Type": "application/json",
-          "X-API-Version": API_RESPONSE_VERSION,
-          ...(options.headers || {}),
-        }),
-      },
-    );
+    if (new Error().stack?.includes("/api/")) {
+      console.warn("Warning: Use ApiResponseUtil.custom for API routes");
+      return ApiResponseUtil.custom(body, status, options);
+    }
+    return WebResponseUtil.custom(body, status, options);
   }
 
+  /** @deprecated Use ApiResponseUtil.badRequest for API routes */
   static badRequest(message: string, options: ResponseOptions = {}): Response {
-    console.error("Bad Request:", message);
-    return new Response(
-      JSON.stringify({
-        error: message,
-        status: "error",
-        code: "BAD_REQUEST",
-      }),
-      {
-        status: 400,
-        headers: normalizeHeaders({
-          ...getSecurityHeaders({ forceNoCache: true }),
-          "Content-Type": "application/json",
-          "X-API-Version": API_RESPONSE_VERSION,
-          ...(options.headers || {}),
-        }),
-      },
-    );
+    if (new Error().stack?.includes("/api/")) {
+      console.warn("Warning: Use ApiResponseUtil.badRequest for API routes");
+      return ApiResponseUtil.badRequest(message, undefined, options);
+    }
+    return WebResponseUtil.badRequest(message, options);
   }
 
-  static notFound(message: string, options: ResponseOptions = {}) {
-    return new Response(
-      JSON.stringify({ error: message }),
-      {
-        status: 404,
-        headers: normalizeHeaders({
-          ...getSecurityHeaders({ forceNoCache: true }),
-          "Content-Type": "application/json",
-          "X-API-Version": API_RESPONSE_VERSION,
-          ...(options.headers || {}),
-        }),
-      },
-    );
+  /** @deprecated Use ApiResponseUtil.notFound for API routes */
+  static notFound(
+    message = "Not Found",
+    options: ResponseOptions = {},
+  ): Response {
+    if (new Error().stack?.includes("/api/")) {
+      console.warn("Warning: Use ApiResponseUtil.notFound for API routes");
+      return ApiResponseUtil.notFound(message, undefined, options);
+    }
+    return WebResponseUtil.notFound(message, options);
   }
 
+  /** @deprecated Use ApiResponseUtil.internalError for API routes */
   static internalError(
     error: unknown,
     message = "Internal server error",
     options: ResponseOptions = {},
   ): Response {
-    console.error("Internal Error:", error);
-    return new Response(
-      JSON.stringify({
-        error: message,
-        status: "error",
-        code: "INTERNAL_ERROR",
-      }),
-      {
-        status: 500,
-        headers: normalizeHeaders({
-          ...getSecurityHeaders({ forceNoCache: true }),
-          "Content-Type": "application/json",
-          "X-API-Version": API_RESPONSE_VERSION,
-          ...(options.headers || {}),
-        }),
-      },
-    );
-  }
-
-  // Stamp-specific response methods
-  static stampResponse(
-    content: string | null,
-    mimeType: string,
-    options: StampResponseOptions = {},
-  ) {
-    const baseHeaders = this.getContentTypeHeaders(mimeType, options);
-    const headers = new Headers({
-      ...baseHeaders,
-      ...options.headers,
-      "X-API-Version": API_RESPONSE_VERSION,
-    });
-
-    // Binary content
-    if (options.binary && content) {
-      try {
-        const binaryString = atob(content);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-
-        return new Response(bytes, {
-          headers: normalizeHeaders(
-            new Headers({
-              ...headers,
-              ...getBinaryContentHeaders(mimeType, options),
-              "X-API-Version": API_RESPONSE_VERSION,
-              "Vary": "Accept-Encoding, X-API-Version, Origin",
-              "Content-Length": bytes.length.toString(),
-            }),
-          ),
-        });
-      } catch (error) {
-        console.error("Failed to convert base64 to binary:", error);
-        return this.internalError(error, "Failed to process binary content");
-      }
+    if (new Error().stack?.includes("/api/")) {
+      console.warn("Warning: Use ApiResponseUtil.internalError for API routes");
+      return ApiResponseUtil.internalError(error, message, options);
     }
-
-    // Text content
-    const isTextBased = mimeType.includes("text/") ||
-      mimeType.includes("javascript") ||
-      mimeType.includes("application/json") ||
-      mimeType.includes("xml");
-
-    if (isTextBased) {
-      return new Response(content, {
-        headers: normalizeHeaders(
-          new Headers({
-            ...headers,
-            "X-API-Version": API_RESPONSE_VERSION,
-            "Vary": "Accept-Encoding, X-API-Version, Origin",
-            "Content-Type": `${mimeType}; charset=utf-8`,
-          }),
-        ),
-      });
-    }
-
-    // Regular content (shouldn't reach here, but just in case)
-    return new Response(content, {
-      status: options.status || 200,
-      headers: normalizeHeaders(
-        new Headers({
-          ...headers,
-          "X-API-Version": API_RESPONSE_VERSION,
-          "Vary": "Accept-Encoding, X-API-Version, Origin",
-        }),
-      ),
-    });
-  }
-
-  private static getContentTypeHeaders(
-    mimeType: string,
-    options: StampResponseOptions,
-  ) {
-    if (mimeType.includes("html")) {
-      return {
-        ...getHtmlHeaders(options),
-        "Content-Type": `${mimeType}; charset=utf-8`,
-      };
-    }
-
-    if (mimeType.includes("javascript")) {
-      return {
-        ...getRecursiveHeaders(options),
-        "Content-Type": `${mimeType}; charset=utf-8`,
-      };
-    }
-
-    if (mimeType.includes("image/")) {
-      return {
-        ...getSecurityHeaders(options),
-        "Content-Type": mimeType,
-        "Cache-Control": "public, max-age=31536000, immutable",
-      };
-    }
-
-    // Text-based content types
-    if (
-      mimeType.includes("text/") ||
-      mimeType.includes("application/json") ||
-      mimeType.includes("xml")
-    ) {
-      return {
-        ...getSecurityHeaders(options),
-        "Content-Type": `${mimeType}; charset=utf-8`,
-      };
-    }
-
-    // Default headers for other types
-    return {
-      ...getSecurityHeaders(options),
-      "Content-Type": mimeType,
-    };
-  }
-
-  static stampNotFound(options: ResponseOptions = {}) {
-    return new Response(null, {
-      status: options.status || 404,
-      headers: normalizeHeaders(
-        new Headers({
-          ...getHtmlHeaders({ forceNoCache: true }),
-          "X-API-Version": API_RESPONSE_VERSION,
-          "Vary": "Accept-Encoding, X-API-Version, Origin",
-          ...(options.headers || {}),
-        }),
-      ),
-    });
-  }
-
-  static jsonResponse(data: unknown, options: ResponseOptions = {}) {
-    return new Response(JSON.stringify(data), {
-      status: options.status || 200,
-      headers: normalizeHeaders(
-        new Headers({
-          ...getSecurityHeaders({ forceNoCache: false }),
-          "Content-Type": "application/json",
-          ...(options.headers || {}),
-        }),
-      ),
-    });
+    return WebResponseUtil.internalError(error, message, options);
   }
 }
