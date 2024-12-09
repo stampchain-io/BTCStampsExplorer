@@ -53,27 +53,28 @@ const SUPPORTED_WALLETS = [
 
 const IMPORTANT_NOTES = [
   "Never share your seed words nor your private keys.",
-  "Always verify the website URL before connecting your wallet.",
-  "Ensure your wallet has sufficient funds before proceeding with transactions.",
+  " Always verify the website URL before connecting your wallet.",
+  " Ensure your wallet has sufficient funds before proceeding with transactions.",
 ];
 
 function IntroSection() {
   return (
-    <div class="mb-12">
-      <p class="mb-6">
-        Connect wallet!
+    <div class="mb-6 mobileLg:mb-12">
+      <p class="mb-3 mobileLg:mb-6">
+        Connect wallet
       </p>
-      <p class="mb-6">
+      <p class="mb-3 mobileLg:mb-6">
         To start creating, sending, and storing Bitcoin Stamps, SRC-20s you'll
         need a compatible wallet.<br />
         Some options include:
       </p>
-      <ul class="list-disc pl-5 space-y-2">
+      <ul class="list-disc pl-5 space-y-1.5">
         {SUPPORTED_WALLETS.map((wallet) => <li key={wallet}>{wallet}</li>)}
       </ul>
-      <p class="mt-6">
+      <p class="mt-3 mobileLg:mt-6">
         In this example we will make use of Leather.io wallet.<br />
-        Note: There is a How-TO to create a Leather wallet.
+        <br />
+        NOTE: There is a How-To article to create a Leather wallet.
       </p>
     </div>
   );
@@ -81,8 +82,8 @@ function IntroSection() {
 
 function ConnectSteps() {
   return (
-    <h2 class="text-2xl md:text-5xl font-extralight">
-      <ul class="list-decimal pl-5 space-y-16">
+    <h2 class="text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-extralight text-stamp-grey-light">
+      <ul class="space-y-9 mobileLg:space-y-12">
         {CONNECT_STEPS.map((step) => (
           <Step
             key={step.number}

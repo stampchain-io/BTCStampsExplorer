@@ -36,7 +36,7 @@ const STEPS: StepProps[] = [
 ];
 
 const IMPORTANT_NOTES = [
-  "Lowering the fee might slow down the stamping process.",
+  "Lowering the fee might slow down the minting process. ",
   "Fees are displayed in BTC by default, but you can toggle to switch to USDT.",
 ];
 
@@ -48,18 +48,18 @@ export default function MintToken() {
       headerImage="/img/how-tos/mintsrc20/00.png"
       importantNotes={IMPORTANT_NOTES}
     >
-      <p class="mb-12">
+      <p class="mb-6 mobileLg:mb-12">
         SRC-20 is a fungible token protocol that records transactions directly
         on the Bitcoin blockchain. In this guide, you'll learn how to mint your
         own SRC-20 token!
         <br />
         <br />
-        Note: Before starting, please ensure that your wallet is connected to
+        NOTE: Before starting, please ensure that your wallet is connected to
         stampchain.io and has sufficient funds.
       </p>
       <br />
-      <h2 class="text-2xl md:text-5xl font-extralight">
-        <ul class="list-decimal pl-5 space-y-16">
+      <h2 class="text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-extralight text-stamp-grey-light">
+        <ul class="space-y-9 mobileLg:space-y-12">
           {STEPS.map((step, index) => <Step key={index} {...step} />)}
         </ul>
       </h2>
