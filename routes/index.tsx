@@ -109,10 +109,11 @@ export default function Home({ data }: PageProps<HomePageData>) {
               subTitle="HOT STAMPS"
               variant="home"
               displayCounts={{
-                mobileSm: 4,
+                mobileSm: 3,
+                mobileMd: 4,
                 mobileLg: 5,
                 tablet: 6,
-                desktop: 6,
+                desktop: 7,
               }}
             />
           </div>
