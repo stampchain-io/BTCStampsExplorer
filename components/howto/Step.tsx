@@ -6,16 +6,17 @@ export interface StepProps {
 
 export function Step({ title, image, description }: StepProps) {
   return (
-    <li>
-      <section class="flex flex-col gap-3">
+    <li class="list-decimal list-inside">
+      <div class="inline-flex">
         {title}
-        <br />
+      </div>
+      <section class="flex flex-col gap-3 mobileMd:gap-6 !mt-1.5 mobileLg:!mt-3">
         <img
           src={image}
           width="1020"
           alt="Screenshot"
         />
-        <p class="text-[#CCCCCC] text-lg font-medium flex flex-col gap-12 mt-20 md:mt-5">
+        <p class="flex flex-col text-base mobileLg:text-lg font-medium text-stamp-grey-light">
           {Array.isArray(description)
             ? (
               description.map((text, index) => (
