@@ -586,11 +586,11 @@ export class XcpManager {
 
             response.result
                 .filter((balance: any) => balance.quantity > 0)
-                .forEach((balance: any) => {
+                .forEach((balance: any,index:number) => {
                     const effectiveAddress = balance.address || balance.utxo_address;
                     
                     if (effectiveAddress) {
-                        const key = `${effectiveAddress}-${balance.asset}`;
+                        const key = `${effectiveAddress}-${balance.asset}-${index}`;
                         const existing = balanceMap.get(key);
                         
                         if (existing) {

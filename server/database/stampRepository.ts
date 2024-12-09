@@ -12,7 +12,13 @@ import { summarize_issuances } from "./index.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
-import { isStampNumber, isTxHash, isStampHash, isCpid, getIdentifierType } from "$lib/utils/identifierUtils.ts";
+import {
+  isStampNumber,
+  isTxHash,
+  isStampHash,
+  isCpid,
+  getIdentifierType,
+} from "$lib/utils/identifierUtils.ts";
 import { getMimeType, getFileSuffixFromMime } from "$lib/utils/imageUtils.ts";
 import { logger, LogNamespace } from "$lib/utils/logger.ts";
 
@@ -30,12 +36,13 @@ export class StampRepository {
     blockIdentifier?: number | string,
     collectionId?: string | string[],
     filterBy?: STAMP_FILTER_TYPES[],
-    suffixFilters?: STAMP_SUFFIX_FILTERS[],
+    suffixFilters?: STAMP_SUFFIX_FILTERS[]
   ) {
     if (identifier !== undefined) {
       if (Array.isArray(identifier)) {
-        const validIdentifiers = identifier.filter(id => 
-          isStampNumber(id) || isTxHash(id) || isStampHash(id) || isCpid(id)
+        const validIdentifiers = identifier.filter(
+          (id) =>
+            isStampNumber(id) || isTxHash(id) || isStampHash(id) || isCpid(id)
         );
 
         if (validIdentifiers.length === 0) {
@@ -43,25 +50,37 @@ export class StampRepository {
           return;
         }
 
-        const numericIds = validIdentifiers.filter((id): id is number => isStampNumber(id));
-        const txHashes = validIdentifiers.filter((id): id is string => isTxHash(id));
-        const stampHashes = validIdentifiers.filter((id): id is string => isStampHash(id));
+        const numericIds = validIdentifiers.filter((id): id is number =>
+          isStampNumber(id)
+        );
+        const txHashes = validIdentifiers.filter((id): id is string =>
+          isTxHash(id)
+        );
+        const stampHashes = validIdentifiers.filter((id): id is string =>
+          isStampHash(id)
+        );
         const cpids = validIdentifiers.filter((id): id is string => isCpid(id));
 
         const conditions: string[] = [];
 
         if (numericIds.length > 0) {
-          conditions.push(`st.stamp IN (${numericIds.map(() => "?").join(",")})`);
+          conditions.push(
+            `st.stamp IN (${numericIds.map(() => "?").join(",")})`
+          );
           queryParams.push(...numericIds.map(Number));
         }
 
         if (txHashes.length > 0) {
-          conditions.push(`st.tx_hash IN (${txHashes.map(() => "?").join(",")})`);
+          conditions.push(
+            `st.tx_hash IN (${txHashes.map(() => "?").join(",")})`
+          );
           queryParams.push(...txHashes);
         }
 
         if (stampHashes.length > 0) {
-          conditions.push(`st.stamp_hash IN (${stampHashes.map(() => "?").join(",")})`);
+          conditions.push(
+            `st.stamp_hash IN (${stampHashes.map(() => "?").join(",")})`
+          );
           queryParams.push(...stampHashes);
         }
 
@@ -128,12 +147,14 @@ export class StampRepository {
     // Block identifier condition
     if (blockIdentifier !== undefined) {
       if (
-        typeof blockIdentifier === "number" || /^\d+$/.test(blockIdentifier)
+        typeof blockIdentifier === "number" ||
+        /^\d+$/.test(blockIdentifier)
       ) {
         whereConditions.push("st.block_index = ?");
         queryParams.push(Number(blockIdentifier));
       } else if (
-        typeof blockIdentifier === "string" && blockIdentifier.length === 64
+        typeof blockIdentifier === "string" &&
+        blockIdentifier.length === 64
       ) {
         whereConditions.push("st.block_hash = ?");
         queryParams.push(blockIdentifier);
@@ -143,9 +164,9 @@ export class StampRepository {
     if (collectionId) {
       if (Array.isArray(collectionId)) {
         whereConditions.push(
-          `cs1.collection_id IN (${
-            collectionId.map(() => "UNHEX(?)").join(",")
-          })`,
+          `cs1.collection_id IN (${collectionId
+            .map(() => "UNHEX(?)")
+            .join(",")})`
         );
         queryParams.push(...collectionId);
       } else {
@@ -156,9 +177,9 @@ export class StampRepository {
 
     // File suffix condition from suffixFilters
     if (suffixFilters && suffixFilters.length > 0) {
-      const suffixCondition = suffixFilters.map((suffix) =>
-        `st.stamp_url LIKE '%${suffix}'`
-      ).join(" OR ");
+      const suffixCondition = suffixFilters
+        .map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
+        .join(" OR ");
       whereConditions.push(`(${suffixCondition})`);
     }
 
@@ -171,16 +192,17 @@ export class StampRepository {
           const { suffixFilters: filterSuffixes, ident: filterIdent } =
             filterOptions[filter];
 
-          const suffixCondition = filterSuffixes && filterSuffixes.length > 0
-            ? `(${
-              filterSuffixes.map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
-                .join(" OR ")
-            })`
-            : "";
+          const suffixCondition =
+            filterSuffixes && filterSuffixes.length > 0
+              ? `(${filterSuffixes
+                  .map((suffix) => `st.stamp_url LIKE '%${suffix}'`)
+                  .join(" OR ")})`
+              : "";
 
-          const identCondition = filterIdent && filterIdent.length > 0
-            ? `(${filterIdent.map(() => "st.ident = ?").join(" OR ")})`
-            : "";
+          const identCondition =
+            filterIdent && filterIdent.length > 0
+              ? `(${filterIdent.map(() => "st.ident = ?").join(" OR ")})`
+              : "";
 
           // Add ident parameters to queryParams
           if (filterIdent && filterIdent.length > 0) {
@@ -203,17 +225,15 @@ export class StampRepository {
     }
   }
 
-  static async getTotalStampCountFromDb(
-    options: {
-      type?: STAMP_TYPES;
-      ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
-      identifier?: string | number | (string | number)[];
-      blockIdentifier?: number | string;
-      collectionId?: string | string[];
-      filterBy?: STAMP_FILTER_TYPES[];
-      suffixFilters?: STAMP_SUFFIX_FILTERS[];
-    },
-  ) {
+  static async getTotalStampCountFromDb(options: {
+    type?: STAMP_TYPES;
+    ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
+    identifier?: string | number | (string | number)[];
+    blockIdentifier?: number | string;
+    collectionId?: string | string[];
+    filterBy?: STAMP_FILTER_TYPES[];
+    suffixFilters?: STAMP_SUFFIX_FILTERS[];
+  }) {
     const {
       type = "stamps",
       ident,
@@ -236,12 +256,13 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
-      suffixFilters,
+      suffixFilters
     );
 
-    const whereClause = whereConditions.length > 0
-      ? `WHERE ${whereConditions.join(" AND ")}`
-      : "";
+    const whereClause =
+      whereConditions.length > 0
+        ? `WHERE ${whereConditions.join(" AND ")}`
+        : "";
 
     // Build join clause
     let joinClause = `
@@ -266,7 +287,7 @@ export class StampRepository {
     const resultTotal = await dbManager.executeQueryWithCache(
       queryTotal,
       queryParams,
-      1000 * 60 * 3,
+      1000 * 60 * 3
     );
 
     return resultTotal;
@@ -285,14 +306,16 @@ export class StampRepository {
     xcpBalances: XcpBalance[]
   ) {
     try {
-      const assets = xcpBalances.map(balance => balance.cpid);
+      const assets = xcpBalances.map((balance) => balance.cpid);
       if (assets.length === 0) {
         return {
-          rows: [{ total: 0 }]
+          rows: [{ total: 0 }],
         };
       }
 
-      console.log(`[StampRepository] Counting total stamps for ${assets.length} assets`);
+      console.log(
+        `[StampRepository] Counting total stamps for ${assets.length} assets`
+      );
 
       const query = `
         SELECT COUNT(*) AS total
@@ -307,7 +330,9 @@ export class StampRepository {
         DEFAULT_CACHE_DURATION
       );
 
-      console.log(`[StampRepository] Total count query returned: ${result.rows[0]?.total}`);
+      console.log(
+        `[StampRepository] Total count query returned: ${result.rows[0]?.total}`
+      );
       return result;
     } catch (error) {
       console.error("Error getting balance count:", error);
@@ -399,13 +424,13 @@ export class StampRepository {
       const row = data.rows[0];
 
       // Build filename from tx_hash and stamp_url if available
-      const suffix = row.stamp_url ? row.stamp_url.split('.').pop() : null;
+      const suffix = row.stamp_url ? row.stamp_url.split(".").pop() : null;
       const fileName = suffix ? `${row.tx_hash}.${suffix}` : row.tx_hash;
 
       // Clean stamp_url to be relative path
       const cleanStampUrl = row.stamp_url
-        ?.replace(/^https?:\/\/[^\/]+\/stamps\//, '')  // Remove domain and /stamps/
-        ?.replace(/^stamps\//, '');  // Also remove any standalone /stamps/ prefix
+        ?.replace(/^https?:\/\/[^\/]+\/stamps\//, "") // Remove domain and /stamps/
+        ?.replace(/^stamps\//, ""); // Also remove any standalone /stamps/ prefix
 
       await logger.debug("content" as LogNamespace, {
         message: "StampRepository processing URLs",
@@ -418,12 +443,12 @@ export class StampRepository {
       return {
         fileName,
         stamp_base64: row.stamp_base64,
-        stamp_url: cleanStampUrl,  // Store relative path
+        stamp_url: cleanStampUrl, // Store relative path
         tx_hash: row.tx_hash,
         stamp_mimetype: row.stamp_mimetype,
         stamp_hash: row.stamp_hash,
         cpid: row.cpid,
-        stamp: row.stamp
+        stamp: row.stamp,
       };
     } catch (error) {
       await logger.error("content" as LogNamespace, {
@@ -435,30 +460,28 @@ export class StampRepository {
     }
   }
 
-  static async getStamps(
-    options: {
-      limit?: number;
-      page?: number;
-      sortBy?: "ASC" | "DESC";
-      type?: STAMP_TYPES;
-      ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
-      identifier?: string | number | (string | number)[];
-      blockIdentifier?: number | string;
-      allColumns?: boolean;
-      noPagination?: boolean;
-      cacheDuration?: number | "never";
-      collectionId?: string | string[];
-      sortColumn?: string;
-      filterBy?: STAMP_FILTER_TYPES[];
-      suffixFilters?: STAMP_SUFFIX_FILTERS[];
-      groupBy?: string;
-      groupBySubquery?: boolean;
-      collectionStampLimit?: number;
-      skipTotalCount?: boolean;
-      selectColumns?: string[];
-      includeSecondary?: boolean;
-    },
-  ) {
+  static async getStamps(options: {
+    limit?: number;
+    page?: number;
+    sortBy?: "ASC" | "DESC";
+    type?: STAMP_TYPES;
+    ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
+    identifier?: string | number | (string | number)[];
+    blockIdentifier?: number | string;
+    allColumns?: boolean;
+    noPagination?: boolean;
+    cacheDuration?: number | "never";
+    collectionId?: string | string[];
+    sortColumn?: string;
+    filterBy?: STAMP_FILTER_TYPES[];
+    suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    groupBy?: string;
+    groupBySubquery?: boolean;
+    collectionStampLimit?: number;
+    skipTotalCount?: boolean;
+    selectColumns?: string[];
+    includeSecondary?: boolean;
+  }) {
     const queryOptions = {
       limit: SMALL_LIMIT,
       page: 1,
@@ -466,10 +489,12 @@ export class StampRepository {
       type: "stamps",
       includeSecondary: true,
       ...options,
-      ...(options.collectionId && (!options.groupBy || !options.groupBySubquery) ? {
-        groupBy: "collection_id",
-        groupBySubquery: true
-      } : {})
+      ...(options.collectionId && (!options.groupBy || !options.groupBySubquery)
+        ? {
+            groupBy: "collection_id",
+            groupBySubquery: true,
+          }
+        : {}),
     };
 
     const {
@@ -507,7 +532,7 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
-      suffixFilters,
+      suffixFilters
     );
 
     // Core stamp fields that are always needed
@@ -546,13 +571,13 @@ export class StampRepository {
     `;
 
     // Select either custom columns, or core+extended columns, or just core columns
-    let selectClause = selectColumns 
-      ? `st.${selectColumns.join(', st.')}` // Only selected columns if specified
-      : allColumns 
-        ? `${coreColumns}, ${secondaryColumns}, ${extendedColumns}` // All columns including secondary
-        : includeSecondary
-          ? `${coreColumns}, ${secondaryColumns}` // Core + secondary columns
-          : coreColumns; // Just core columns by default
+    let selectClause = selectColumns
+      ? `st.${selectColumns.join(", st.")}` // Only selected columns if specified
+      : allColumns
+      ? `${coreColumns}, ${secondaryColumns}, ${extendedColumns}` // All columns including secondary
+      : includeSecondary
+      ? `${coreColumns}, ${secondaryColumns}` // Core + secondary columns
+      : coreColumns; // Just core columns by default
 
     // Only include collection_id in select clause if collectionId is provided
     if (collectionId) {
@@ -560,9 +585,10 @@ export class StampRepository {
       HEX(cs1.collection_id) AS collection_id`;
     }
 
-    const whereClause = whereConditions.length > 0
-      ? `WHERE ${whereConditions.join(" AND ")}`
-      : "";
+    const whereClause =
+      whereConditions.length > 0
+        ? `WHERE ${whereConditions.join(" AND ")}`
+        : "";
 
     const order = sortBy.toUpperCase() === "DESC" ? "DESC" : "ASC";
     const orderClause = `ORDER BY st.${sortColumn} ${order}`;
@@ -602,7 +628,7 @@ export class StampRepository {
       groupByClause = `GROUP BY ${groupBy}`;
     }
 
-    let query = ''; // Declare query variable
+    let query = ""; // Declare query variable
 
     if (collectionId && groupBy === "collection_id") {
       // Handle single collection case differently from multiple collections
@@ -630,7 +656,9 @@ export class StampRepository {
               ) as rn
             FROM ${STAMP_TABLE} st
             ${joinClause}
-            WHERE cs1.collection_id IN (${collectionId.map(() => "UNHEX(?)").join(",")})
+            WHERE cs1.collection_id IN (${collectionId
+              .map(() => "UNHEX(?)")
+              .join(",")})
               AND (
                 st.stamp_url IS NOT NULL
                 AND st.stamp_url != ''
@@ -672,7 +700,7 @@ export class StampRepository {
     const dataResult = await dbManager.executeQueryWithCache(
       query,
       queryParams,
-      cacheDuration,
+      cacheDuration
     );
 
     // Get total count only if needed
@@ -719,11 +747,13 @@ export class StampRepository {
     order = "DESC"
   ): Promise<StampBalance[]> {
     try {
-      const assets = xcpBalances.map(balance => balance.cpid);
+      const assets = xcpBalances.map((balance) => balance.cpid);
       if (assets.length === 0) return [];
 
       const offset = (page - 1) * limit;
-      console.log(`[StampRepository] Fetching stamps with limit: ${limit}, offset: ${offset}`);
+      console.log(
+        `[StampRepository] Fetching stamps with limit: ${limit}, offset: ${offset}`
+      );
 
       const query = `
         SELECT 
@@ -751,7 +781,9 @@ export class StampRepository {
         DEFAULT_CACHE_DURATION
       );
 
-      console.log(`[StampRepository] Query returned ${balances.rows.length} rows of ${assets.length} total stamps`);
+      console.log(
+        `[StampRepository] Query returned ${balances.rows.length} rows of ${assets.length} total stamps`
+      );
 
       const grouped = balances.rows.reduce(
         (acc: Record<string, StampBalance[]>, cur: StampBalance) => {
@@ -762,24 +794,34 @@ export class StampRepository {
         {}
       );
 
-      const summarized = Object.keys(grouped).map(key => 
+      const summarized = Object.keys(grouped).map((key) =>
         summarize_issuances(grouped[key])
       );
-
       // Use the passed xcpBalances for quantity info
       return summarized.map((summary: StampBalance) => {
-        const xcp_balance = xcpBalances.filter(
-          balance => balance.cpid === summary.cpid
-        ).reduce((acc,balance)=>acc+balance.quantity,0);
-        const utxos = xcpBalances.filter(balance => balance.cpid === summary.cpid && balance.utxo_address).map(balance => ({ quantity: balance.quantity, utxo_address: balance.utxo_address}))
-        const unbound_quantity = xcpBalances.filter(balance =>  balance.cpid === summary.cpid && !balance.utxo_address).length
+        const xcp_balance = xcpBalances
+          .filter((balance) => balance.cpid === summary.cpid)
+          .reduce((acc, balance) => acc + balance.quantity, 0);
+        const utxos = xcpBalances
+          .filter(
+            (balance) => balance.cpid === summary.cpid && balance.utxo_address
+          )
+          .map((balance) => ({
+            quantity: balance.quantity,
+            utxo_address: balance.utxo_address,
+          }));
+        const unbound_quantity = xcpBalances
+          .filter(
+            (balance) => balance.cpid === summary.cpid && !balance.utxo_address
+          )
+          .reduce((total, balance) => total + (balance.quantity || 0), 0);
         return {
           ...summary,
           unbound_quantity,
-          address: xcpBalances.length ? xcpBalances[0].address : '',
+          address: xcpBalances.length ? xcpBalances[0].address : "",
           balance: xcp_balance ? xcp_balance : 0,
-          utxos
-        }
+          utxos,
+        };
       });
     } catch (error) {
       console.error("Error getting balances:", error);
@@ -798,7 +840,7 @@ export class StampRepository {
     const result = await dbManager.executeQueryWithCache(
       query,
       [],
-      cacheDuration,
+      cacheDuration
     );
 
     console.log(`Query result:`, result.rows);
@@ -807,7 +849,7 @@ export class StampRepository {
   }
 
   static async getCreatorNameByAddress(
-    address: string,
+    address: string
   ): Promise<string | null> {
     const query = `
       SELECT creator
@@ -818,7 +860,7 @@ export class StampRepository {
     const result = await dbManager.executeQueryWithCache(
       query,
       [address],
-      "never",
+      "never"
     );
 
     if (result && result.rows && result.rows.length > 0) {
@@ -830,7 +872,7 @@ export class StampRepository {
 
   static async updateCreatorName(
     address: string,
-    newName: string,
+    newName: string
   ): Promise<boolean> {
     const query = `
       INSERT INTO creator (address, creator)
@@ -851,11 +893,14 @@ export class StampRepository {
     }
   }
 
-  static async countTotalStamps(): Promise<{ isValid: boolean; count: number }> {
+  static async countTotalStamps(): Promise<{
+    isValid: boolean;
+    count: number;
+  }> {
     try {
       const result = await this.getTotalStampCountFromDb({
         type: "all",
-        skipTotalCount: false
+        skipTotalCount: false,
       });
       // If we can't get a count or it's 0, that indicates a database problem
       if (!result?.rows?.[0]?.total) {
@@ -864,13 +909,13 @@ export class StampRepository {
       const total = result.rows[0].total;
       return {
         isValid: true,
-        count: total
+        count: total,
       };
     } catch (error) {
       console.error("Database connection check failed:", error);
       return {
         isValid: false,
-        count: 0
+        count: 0,
       };
     }
   }
