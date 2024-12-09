@@ -146,7 +146,7 @@ export default function StampingSrc20Page(
         {renderContent()}
       </div>
 
-      <div class="flex flex-col gap-3 mobileMd:gap-6 w-full desktop:gap-9 tablet:flex-row">
+      <div class="flex flex-col tablet:flex-row gap-12 mobileLg:gap-24 tablet:gap-6 desktop:gap-9">
         <div class="w-full tablet:w-1/2">
           {renderLeftSidebar()}
         </div>
