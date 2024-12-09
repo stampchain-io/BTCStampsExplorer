@@ -66,7 +66,7 @@ export default function StampingStampPage({ data }: PageProps<StampPageData>) {
       <div class="self-center max-w-[680px] w-full mx-auto">
         <OlgaContent />
       </div>
-      <div class="flex flex-col tablet:flex-row gap-3 mobileMd:gap-6 desktop:gap-9 w-full">
+      <div class="flex flex-col tablet:flex-row w-full gap-12 mobileLg:gap-24 tablet:gap-6 desktop:gap-9">
         <div class="w-full tablet:w-1/2">
           <HowToStampModule />
         </div>
