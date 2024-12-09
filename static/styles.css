@@ -434,5 +434,5 @@ html, body {
 }
 
 .stamp-audio-container audio {
-  @apply relative z-2;
+  @apply relative z-20;
 }
