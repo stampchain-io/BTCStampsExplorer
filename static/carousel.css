@@ -61,7 +61,7 @@
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 48px;
+  margin-top: 24px;
   z-index: 20;
 }
 
@@ -92,6 +92,10 @@
   .carousel-slider .swiper-pagination-bullet-active {
     width: 36px;
   }
+  .carousel-slider .swiper-pagination {
+    gap: 9px;
+    margin-top: 0px;
+  }
 }
 @media (max-width: 1023px) {
   .carousel-slider .swiper-pagination-bullet {
@@ -100,6 +104,10 @@
   
   .carousel-slider .swiper-pagination-bullet-active {
     width: 30px;
+  }
+.carousel-slider .swiper-pagination {
+  gap: 9px;
+  margin-top: 0px;
   }
 }
 @media (max-width: 767px) {
@@ -112,13 +120,13 @@
   }
   .carousel-slider .swiper-pagination {
     gap: 9px;
-    margin-top: 36px;
+    margin-top: 0px;
   }
 }
 @media (max-width: 567px) {
   .carousel-slider .swiper-pagination {
     gap: 9px;
-    margin-top: 24px;
+    margin-top: -12px;
   }
 }
 
