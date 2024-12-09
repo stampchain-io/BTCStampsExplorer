@@ -45,9 +45,7 @@ export default function Carousel(props: CarouselProps) {
   return (
     <>
       <div
-        class={`carousel-slider relative h-[240px] mobileMd:h-[340px] mobileLg:h-[300px] tablet:h-[380px] desktop:h-[520px] w-full ${
-          props.class ?? ""
-        }`}
+        class={`carousel-slider ${props.class ?? ""}`}
       >
         <div class="swiper h-full">
           <div class="swiper-wrapper ">
