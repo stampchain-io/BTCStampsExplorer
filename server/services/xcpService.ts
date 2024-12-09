@@ -1638,7 +1638,8 @@ export class XcpManager {
     const queryParams = new URLSearchParams();
 
     try {
-      const response = await fetchXcpV2WithCache<{ result: { status: string } }>(
+      // Use the non-cached version of the fetch
+      const response = await fetchXcpV2<{ result: { status: string } }>(
         endpoint,
         queryParams
       );
