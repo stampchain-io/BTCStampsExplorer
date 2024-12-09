@@ -209,6 +209,7 @@ export function StampImage(
   const src = getStampImageSrc(stamp);
   const isHtml = stamp.stamp_mimetype === "text/html";
   const isPlainText = stamp.stamp_mimetype === "text/plain";
+  const isAudio = stamp.stamp_mimetype?.startsWith("audio/");
 
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
 
@@ -306,7 +307,33 @@ export function StampImage(
         <TextContentIsland src={src} />
       )}
 
-      {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && (
+      {src !== NOT_AVAILABLE_IMAGE && isAudio && (
+        <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
+          <div className="relative dark-gradient p-3 mobileMd:p-6">
+            <div className="stamp-container">
+              <div className="stamp-audio-container relative pt-[100%] flex items-center justify-center">
+                <audio
+                  controls
+                  className="stamp-audio-player absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                >
+                  <source src={src} type={stamp.stamp_mimetype} />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            </div>
+          </div>
+          {flag && (
+            <RightPanel
+              stamp={stamp}
+              toggleCodeModal={toggleCodeModal}
+              toggleFullScreenModal={toggleFullScreenModal}
+              showCodeButton={false}
+            />
+          )}
+        </div>
+      )}
+
+      {src !== NOT_AVAILABLE_IMAGE && !isHtml && !isPlainText && !isAudio && (
         flag
           ? (
             <div className="flex flex-col gap-3 mobileMd:gap-6">
