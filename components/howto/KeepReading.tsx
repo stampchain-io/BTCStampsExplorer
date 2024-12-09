@@ -1,14 +1,21 @@
 import { ARTICLE_LINKS } from "$/lib/utils/constants.ts";
 
 export function KeepReading() {
+  const titleGreyLD =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
+  const subTitleGrey =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
+  const buttonGreyOutline =
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+
   return (
     <section class="mt-24">
-      <h1 class="gray-gradient3 text-4xl tablet:text-5xl desktop:text-6xl font-black">
+      <h1 class={titleGreyLD}>
         KEEP READING
       </h1>
       <div class="grid grid-cols-1 tablet:grid-cols-2 gap-6">
         <div>
-          <h2 class="text-2xl tablet:text-5xl font-extralight">HOW-TO</h2>
+          <h2 class={subTitleGrey}>HOW-TO</h2>
           {ARTICLE_LINKS.map(({ title, href }) => (
             <a
               key={`${title}-${href}`}
@@ -21,7 +28,7 @@ export function KeepReading() {
           ))}
         </div>
         <div class="flex flex-col tablet:items-end tablet:text-right">
-          <h2 class="text-2xl tablet:text-5xl font-extralight">FAQ</h2>
+          <h2 class={subTitleGrey}>FAQ</h2>
           <p>
             All you ever wanted to know about the Bitcoin Stamps protocol and
             stuff you never thought you needed to know.
@@ -30,7 +37,7 @@ export function KeepReading() {
             <a
               href="/faq"
               f-partial="/faq"
-              class="float-right border-2 border-[#999999] text-[#999999] w-[78px] h-[48px] flex justify-center items-center rounded-md"
+              class={`${buttonGreyOutline} float-right`}
             >
               FAQ
             </a>
