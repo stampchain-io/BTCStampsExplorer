@@ -5,6 +5,8 @@ import { HomeHeader } from "$components/home/HomeHeader.tsx";
 import { HomeStampPreview } from "$islands/home/HomeStampPreview.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { GetStampingModule } from "$islands/modules/GetStamping.tsx";
+import { PartnersModule } from "$islands/modules/Partners.tsx";
+import { StampChainModule } from "$islands/modules/StampChain.tsx";
 import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
 import { HomeCarousel } from "$components/home/HomeCarousel.tsx";
 import { StampController } from "$server/controller/stampController.ts";
@@ -101,18 +103,20 @@ export default function Home({ data }: PageProps<HomePageData>) {
         {/* Lazy load below-the-fold content */}
         <div style="content-visibility: auto; contain-intrinsic-size: 0 800px;">
           <GetStampingModule />
-          <RecentSales
-            title="RECENT SALES"
-            subTitle="HOT STAMPS"
-            variant="home"
-            displayCounts={{
-              mobileSm: 4,
-              mobileLg: 5,
-              tablet: 6,
-              desktop: 6,
-            }}
-          />
-          <div class="flex flex-col gap-12 mobileLg:gap-[72px]">
+          <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
+            <RecentSales
+              title="RECENT SALES"
+              subTitle="HOT STAMPS"
+              variant="home"
+              displayCounts={{
+                mobileSm: 4,
+                mobileLg: 5,
+                tablet: 6,
+                desktop: 6,
+              }}
+            />
+          </div>
+          <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
             <SRC20Section
               title="SRC-20 TOKENS"
               subTitle="TOP TICKERS"
@@ -125,6 +129,10 @@ export default function Home({ data }: PageProps<HomePageData>) {
               fromPage="src20"
             />
           </div>
+        </div>
+        <div class="flex flex-col gap-6 mobileLg:gap-12">
+          <StampChainModule />
+          <PartnersModule />
         </div>
       </div>
     </>
