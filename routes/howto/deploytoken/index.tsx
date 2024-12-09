@@ -59,7 +59,7 @@ export default function DeployToken() {
         In this guide, you'll learn how to deploy your own SRC-20 token!
         <br />
         <br />
-        Note: Before starting, please ensure that your wallet is connected to
+        NOTE: Before starting, please ensure that your wallet is connected to
         stampchain.io and has sufficient funds.
       </p>
       <br />
