@@ -158,6 +158,21 @@ export function StampCard({
   }, [src, stamp.stamp_mimetype]);
 
   const renderContent = () => {
+    if (stamp.stamp_mimetype?.startsWith("audio/")) {
+      return (
+        <div class="stamp-audio-container relative w-full h-full flex items-center justify-center">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <audio
+              controls
+              class="stamp-audio-player"
+            >
+              <source src={src} type={stamp.stamp_mimetype} />
+            </audio>
+          </div>
+        </div>
+      );
+    }
+
     if (stamp.stamp_mimetype === "text/plain") {
       return <TextContentIsland src={src} />;
     }
