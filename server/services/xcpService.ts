@@ -594,15 +594,36 @@ export class XcpManager {
                         const existing = balanceMap.get(key);
                         
                         if (existing) {
-                            existing.quantity += balance.quantity;
-                        } else {
+                            // Update existing balance
+                            const updatedUtxos = [...(existing.utxos || [])];
+                            if (balance.utxo && balance.utxo_address) {
+                                updatedUtxos.push({
+                                    quantity: balance.quantity,
+                                    utxo_address: balance.utxo_address
+                                });
+                            }
+
+                            // Calculate total balance from unbound and UTXO quantities
+                            const utxoTotal = updatedUtxos.reduce((sum, utxo) => sum + (utxo.quantity || 0), 0);
+                            const unboundQuantity = balance.utxo ? 0 : (balance.quantity || 0);
+
                             balanceMap.set(key, {
-                                address: effectiveAddress,
-                                cpid: balance.asset,
-                                quantity: balance.quantity,
-                                utxo: balance.utxo || "",
-                                utxo_address: balance.utxo_address || "",
-                                divisible: balance.divisible || false,
+                                ...existing,
+                                unbound_quantity: existing.utxo ? existing.unbound_quantity : (existing.unbound_quantity || 0) + unboundQuantity,
+                                balance: utxoTotal + (existing.unbound_quantity || 0) + unboundQuantity,
+                                utxos: updatedUtxos
+                            });
+                        } else {
+                            // Create new balance entry
+                            const isUnbound = !balance.utxo;
+                            balanceMap.set(key, {
+                                ...balance,
+                                unbound_quantity: isUnbound ? balance.quantity : 0,
+                                balance: balance.quantity,
+                                utxos: balance.utxo && balance.utxo_address ? [{
+                                    quantity: balance.quantity,
+                                    utxo_address: balance.utxo_address
+                                }] : []
                             });
                         }
                     }
@@ -669,91 +690,108 @@ export class XcpManager {
           utxoOnly
         });
 
-        // Initialize collection for all balances
-        let allBalances: XcpBalance[] = [];
+        let balanceMap = new Map<string, XcpBalance>();
         let cursor: string | null = null;
         let expectedTotal: number | null = null;
+        let hasMoreResults = true;
         
-        do {
-          // Prepare options for each request
-          const options: XcpBalanceOptions = {
-            type: "all",
-            limit: 500,
-            verbose: true
-          };
-          
-          if (cursor) {
-            options.cursor = cursor;
+        while (hasMoreResults) {
+          try {
+            const options: XcpBalanceOptions = {
+              type: "all",
+              limit: 500,
+              verbose: true,
+              cursor: cursor || undefined
+            };
+
+            const result = await this.getXcpBalancesByAddress(
+              address,
+              undefined,
+              utxoOnly,
+              options
+            );
+
+            if (expectedTotal === null) {
+              expectedTotal = result.total;
+            }
+
+            // Process each balance in the current page
+            if (result.balances?.length) {
+              result.balances.forEach(balance => {
+                const key = `${balance.asset}_${balance.address || balance.utxo_address}`;
+                const existing = balanceMap.get(key);
+
+                if (existing) {
+                  // Update existing balance
+                  const updatedUtxos = [...(existing.utxos || [])];
+                  if (balance.utxo && balance.utxo_address) {
+                    updatedUtxos.push({
+                      quantity: balance.quantity,
+                      utxo_address: balance.utxo_address
+                    });
+                  }
+
+                  balanceMap.set(key, {
+                    ...existing,
+                    balance: (existing.balance || 0) + (balance.quantity || 0),
+                    utxos: updatedUtxos
+                  });
+                } else {
+                  // Create new balance entry
+                  balanceMap.set(key, {
+                    ...balance,
+                    balance: balance.quantity,
+                    utxos: balance.utxo && balance.utxo_address ? [{
+                      quantity: balance.quantity,
+                      utxo_address: balance.utxo_address
+                    }] : []
+                  });
+                }
+              });
+            }
+
+            await logger.debug("api", {
+              message: "[XcpManager] Pagination progress",
+              currentCount: balanceMap.size,
+              expectedTotal,
+              currentCursor: cursor,
+              nextCursor: result.next_cursor,
+              address
+            });
+
+            // Update cursor and check if we should continue
+            cursor = result.next_cursor;
+            hasMoreResults = !!cursor && balanceMap.size < expectedTotal;
+
+          } catch (error) {
+            await logger.error("api", {
+              message: "[XcpManager] Error during pagination",
+              error,
+              cursor,
+              address
+            });
+            throw error;
           }
-
-          const result = await this.getXcpBalancesByAddress(
-            address,
-            undefined,
-            utxoOnly,
-            options
-          );
-
-          // Set expected total from first response's aggregated count
-          if (expectedTotal === null) {
-            expectedTotal = result.total;
-          }
-
-          // Add new balances to collection
-          if (result.balances?.length) {
-            allBalances = [...allBalances, ...result.balances];
-          }
-
-          await logger.debug("api", {
-            message: "[XcpManager] Pagination progress",
-            currentCount: allBalances.length,
-            expectedTotal,
-            cursor,
-            nextCursor: result.next_cursor,
-            address
-          });
-
-          cursor = result.next_cursor;
-
-          // Break if we have all expected results or more
-          // Note: We might get more than expected due to new transactions
-          if (allBalances.length >= expectedTotal) {
-            break;
-          }
-
-          if (!cursor) {
-            break;
-          }
-
-        } while (cursor);
-
-        // Simplified success check - if we have balances, consider it successful
-        if (allBalances.length === 0) {
-          return { balances: [], total: 0 };
-        } else {
-          await logger.info("api", {
-            message: "[XcpManager] Successfully fetched balances",
-            finalCount: allBalances.length,
-            expectedTotal,
-            address
-          });
-          // Use actual aggregated count for total
-          return { balances: allBalances, total: allBalances.length };
         }
 
-        await logger.warn("api", {
-          message: "[XcpManager] Incomplete balance set",
-          currentCount: allBalances.length,
+        // Check if we have any results
+        if (balanceMap.size === 0) {
+          return { balances: [], total: 0 };
+        }
+
+        const mergedBalances = Array.from(balanceMap.values());
+        
+        await logger.info("api", {
+          message: "[XcpManager] Successfully fetched balances",
+          finalCount: mergedBalances.length,
           expectedTotal,
-          attempt: attempt + 1,
-          address,
-          retryDelay: 1000 * (attempt + 1)
+          address
         });
 
-        attempt++;
-        
-        if (attempt < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-        }
+        return { 
+          balances: mergedBalances, 
+          total: mergedBalances.length 
+        };
       }
 
       throw new Error(`Failed to fetch complete balance set after ${MAX_RETRIES} attempts`);
