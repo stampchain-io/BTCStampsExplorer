@@ -59,12 +59,12 @@ const TEXT_STYLES = {
         "text-xs mobileSm:text-xs mobileLg:text-xl tablet:text-xl desktop:text-xl",
     },
     stampNumber: {
-      base: "font-black text-stamp-grey-darker truncate",
+      base: "font-black gray-gradient1 truncate",
       sizes:
-        "text-xs mobileSm:text-xs mobileLg:text-xl tablet:text-xl desktop:text-xl",
+        "text-sm mobileSm:text-sm mobileLg:text-xl tablet:text-xl desktop:text-xl",
     },
     price: {
-      base: "font-medium text-stamp-grey truncate text-nowrap",
+      base: "font-medium text-stamp-grey-light truncate text-nowrap",
       sizes:
         "text-[10px] mobileSm:text-[10px] mobileLg:text-base tablet:text-base desktop:text-base",
     },
@@ -385,7 +385,7 @@ export function StampCard({
 
         {/* Minimal Details Section */}
         {showMinDetails && !showDetails && (
-          <div class="flex flex-col items-center px-2 tablet:px-3 py-2">
+          <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
             <div class="flex items-center justify-center">
               {shouldDisplayHash && (
                 <span
@@ -400,7 +400,7 @@ export function StampCard({
                 {stampValue}
               </span>
             </div>
-            <div class="mt-1">
+            <div class="-mt-1 mobileLg:mt-0.5">
               <span
                 class={`${TEXT_STYLES.minimal.price.base} ${TEXT_STYLES.minimal.price.sizes}`}
               >

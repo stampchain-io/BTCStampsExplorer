@@ -5,6 +5,7 @@ import { ModulesStyles } from "$islands/modules/Styles.ts";
 
 interface DisplayCountBreakpoints {
   mobileSm: number;
+  mobileMd: number;
   mobileLg: number;
   tablet: number;
   desktop: number;
@@ -45,7 +46,7 @@ export function RecentSales({
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch("/api/v2/stamps/recentSales?page=1&limit=6");
+      const response = await fetch("/api/v2/stamps/recentSales?page=1&limit=8");
       if (!response.ok) {
         throw new Error("Failed to fetch recent sales");
       }
@@ -79,10 +80,11 @@ export function RecentSales({
   }
 
   const defaultHomeDisplayCounts: DisplayCountBreakpoints = {
-    mobileSm: 4,
+    mobileSm: 3,
+    mobileMd: 4,
     mobileLg: 5,
     tablet: 6,
-    desktop: 6,
+    desktop: 7,
   };
 
   const defaultDetailDisplayCounts: DisplayCountBreakpoints = {
@@ -94,12 +96,12 @@ export function RecentSales({
 
   const defaultHomeGridClass = `
     grid w-full gap-3 mobileMd:gap-6
-    grid-cols-4 mobileMd:grid-cols-5 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-6
+    grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7
     auto-rows-fr
   `;
 
   const defaultDetailGridClass = `
-    grid w-full gap-3 mobileLg:gap-4
+    grid w-full gap-3 mobileLg:gap-6
     grid-cols-2 mobileSm:grid-cols-3 
     mobileLg:grid-cols-4 desktop:grid-cols-6
   `;
