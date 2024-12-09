@@ -76,15 +76,14 @@ export const handler: Handlers = {
       };
 
       // Update overall status
-      if (
-        !Object.values({
-          ...health.services,
-          src20: src20Deployments.isValid,
-          stamps: stampCount.isValid,
-        }).every(Boolean)
-      ) {
-        health.status = "ERROR";
-      }
+      const isError = !Object.values({
+        ...health.services,
+        src20: src20Deployments.isValid,
+        stamps: stampCount.isValid,
+      }).every(Boolean) ||
+        (health.services.blockSync && !health.services.blockSync.isSynced);
+
+      health.status = isError ? "ERROR" : "OK";
     } catch (error) {
       console.error("Health check failed:", error);
       health.status = "ERROR";
