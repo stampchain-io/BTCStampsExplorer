@@ -53,10 +53,9 @@ export const HowToStampModule = () => {
           All related costs are listed under the <b>details</b> section. <br />
           Lowering the fee may delay your art being stamped.<br />
           Fees are displayed in BTC by default, but you can switch to USDT using
-          the <b>TOGGLE</b>.<br />
+          the <b>toggle</b>.<br />
         </p>
       </div>
-
       <ReadAllButton />
     </div>
   );
