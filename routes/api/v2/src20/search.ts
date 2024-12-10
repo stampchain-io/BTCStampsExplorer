@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -10,10 +10,10 @@ export const handler: Handlers = {
 
       const results = await Src20Controller.handleSearchRequest(query);
 
-      return ResponseUtil.success({ data: results });
+      return ApiResponseUtil.success({ data: results });
     } catch (error) {
       console.error("Error in search handler:", error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error processing search request",
       );

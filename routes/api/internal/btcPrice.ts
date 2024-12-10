@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { BTCPriceService } from "$server/services/price/btcPriceService.ts";
 import { InternalRouteGuard } from "$server/services/security/internalRouteGuard.ts";
 import { RouteType } from "$server/services/cacheService.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
 // Use an atomic counter for round-robin
 let requestCounter = 0;
@@ -43,12 +43,12 @@ export const handler: Handlers = {
 
       if ("error" in result) {
         console.error(`[${requestId}] Price service error:`, result.error);
-        return ResponseUtil.internalError(result.error);
+        return ApiResponseUtil.internalError(result.error);
       }
 
       if (!result.price) {
         console.error(`[${requestId}] No price data available`);
-        return ResponseUtil.internalError("No price data available");
+        return ApiResponseUtil.internalError("No price data available");
       }
 
       const btcPrice = "bitcoin" in result.price
@@ -68,13 +68,13 @@ export const handler: Handlers = {
       console.log(
         `[${requestId}] Sending response with price: ${btcPrice} from ${result.source}`,
       );
-      return ResponseUtil.success(formattedResult, {
+      return ApiResponseUtil.success(formattedResult, {
         routeType: RouteType.PRICE,
         forceNoCache: false,
       });
     } catch (error) {
       console.error(`[${requestId}] Unexpected error:`, error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error instanceof Error ? error.message : "Unknown error",
         "Failed to fetch BTC price",
       );

@@ -1,6 +1,7 @@
 import { UTXO } from "$types/index.d.ts";
 import { decodeBase58 } from "@std/encoding/base58";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { detectScriptType } from "$lib/utils/scriptTypeUtils.ts";
 
 const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
@@ -192,41 +193,55 @@ function isValidScript(script: string): boolean {
   return hasValidPrefix;
 }
 
-// Update script construction for P2WPKH addresses
+// Update script construction for all address types
 function constructScriptFromAddress(address: string): string | null {
   try {
     console.log("Constructing script for address:", address);
+    const scriptType = detectScriptType(address);
 
-    if (address.startsWith("bc1q")) {
-      // For P2WPKH addresses
-      const witnessProgram = address.slice(4);
-      const script = `0014${witnessProgram}`;
-      console.log("Constructed P2WPKH script:", script);
-      return script;
-    } else if (address.startsWith("bc1p")) {
-      // For P2TR addresses
-      const witnessProgram = address.slice(4);
-      const script = `5120${witnessProgram}`;
-      console.log("Constructed P2TR script:", script);
-      return script;
-    } else if (address.startsWith("3")) {
-      // For P2SH addresses
-      const decoded = decodeBase58(address);
-      const pubKeyHash = decoded.slice(1, -4);
-      const script = `a914${pubKeyHash}87`;
-      console.log("Constructed P2SH script:", script);
-      return script;
-    } else if (address.startsWith("1")) {
-      // For legacy P2PKH addresses
-      const decoded = decodeBase58(address);
-      const pubKeyHash = decoded.slice(1, -4);
-      const script = `76a914${pubKeyHash}88ac`;
-      console.log("Constructed P2PKH script:", script);
-      return script;
+    // Helper function to convert Uint8Array to hex string
+    const toHexString = (bytes: Uint8Array): string =>
+      Array.from(bytes)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+    switch (scriptType) {
+      case "P2WPKH": {
+        // For P2WPKH addresses (bc1q...)
+        if (!address.startsWith("bc1q")) {
+          throw new Error("Invalid P2WPKH address");
+        }
+        // Extract the witness program (20 bytes after bc1q)
+        const decoded = address.slice(4);
+        return `0014${decoded}`;
+      }
+      case "P2TR": {
+        // For P2TR addresses (bc1p...)
+        if (!address.startsWith("bc1p")) {
+          throw new Error("Invalid P2TR address");
+        }
+        // Extract the witness program (32 bytes after bc1p)
+        const decoded = address.slice(4);
+        return `5120${decoded}`;
+      }
+      case "P2SH": {
+        // For P2SH addresses (3...)
+        const decoded = decodeBase58(address);
+        // Skip version byte (1) and checksum (4)
+        const pubKeyHash = decoded.slice(1, -4);
+        return `a914${toHexString(pubKeyHash)}87`;
+      }
+      case "P2PKH": {
+        // For P2PKH addresses (1...)
+        const decoded = decodeBase58(address);
+        // Skip version byte (1) and checksum (4)
+        const pubKeyHash = decoded.slice(1, -4);
+        return `76a914${toHexString(pubKeyHash)}88ac`;
+      }
+      default:
+        console.log("Unknown address format:", address);
+        return null;
     }
-
-    console.log("Unknown address format:", address);
-    return null;
   } catch (error) {
     console.warn("Failed to construct script from address:", error);
     return null;

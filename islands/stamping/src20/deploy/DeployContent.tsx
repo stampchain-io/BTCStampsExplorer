@@ -21,7 +21,6 @@ export function DeployContent(
     handleInputChange,
     handleSubmit,
     fetchFees,
-    isLoading,
     config,
     isSubmitting,
     submissionMessage,
@@ -35,10 +34,6 @@ export function DeployContent(
   const [tosAgreed, setTosAgreed] = useState(false);
 
   const { wallet, isConnected } = walletContext;
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
@@ -242,7 +237,13 @@ export function DeployContent(
                 type="text"
                 placeholder="Token ticker name"
                 value={formState.token}
-                onChange={(e) => handleInputChange(e, "token")}
+                onChange={(e) => {
+                  const newValue = (e.target as HTMLInputElement).value
+                    .toUpperCase();
+                  if (newValue !== formState.token) {
+                    handleInputChange(e, "token");
+                  }
+                }}
                 onBlur={() => handleInputBlur("token")}
                 error={formState.tokenError}
                 maxLength={5}

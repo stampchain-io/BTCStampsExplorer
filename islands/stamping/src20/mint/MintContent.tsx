@@ -63,9 +63,9 @@ interface MintContentProps {
 // Add interface for search results
 interface SearchResult {
   tick: string;
-  // Add other fields that might be in the search results
-  status?: string;
-  progress?: number;
+  progress: number;
+  total_minted: string;
+  max_supply: number;
 }
 
 // Add consistent class names at the top
@@ -84,6 +84,8 @@ export function MintContent({
   mintStatus: initialMintStatus,
   holders: initialHolders,
 }: MintContentProps = { trxType: "olga" }) {
+  const [isSearching, setIsSearching] = useState(false);
+
   const {
     formState,
     handleChangeFee,
@@ -97,7 +99,6 @@ export function MintContent({
     apiError,
     setFormState,
     handleInputBlur,
-    setIsSearching,
   } = useSRC20Form("mint", trxType, tick ?? undefined);
 
   const [mintStatus, setMintStatus] = useState<any>(initialMintStatus || null);
@@ -126,58 +127,70 @@ export function MintContent({
     }));
   };
 
-  // Update useEffect to handle search results with better debouncing
+  // Update the useEffect that handles URL params
   useEffect(() => {
-    if (isSelecting) {
-      setIsSelecting(false);
+    if (tick) {
+      setShowList(false); // Ensure dropdown is hidden initially
+      setSearchTerm(tick);
+      handleResultClick(tick).then(() => {
+        // After loading the token data, ensure the dropdown stays hidden
+        setShowList(false);
+        setSearchResults([]); // Clear search results
+      });
+    }
+  }, [tick]);
+
+  // Update the search useEffect to prevent search after selection
+  useEffect(() => {
+    if (isSelecting || tick) {
+      return;
+    }
+
+    // Don't show results if field is empty and not focused
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      setShowList(false);
       return;
     }
 
     setIsSearching(true);
     const delayDebounceFn = setTimeout(async () => {
-      if (searchTerm.trim()) {
-        try {
-          const response = await fetch(
-            `/api/v2/src20/search?q=${encodeURIComponent(searchTerm.trim())}`,
-          );
-          const data = await response.json();
+      try {
+        const response = await fetch(
+          `/api/v2/src20/search?q=${encodeURIComponent(searchTerm.trim())}`,
+        );
+        const data = await response.json();
 
-          logger.debug("stamps", {
-            message: "Search results received",
-            searchTerm,
-            resultsCount: data.data?.length || 0,
-          });
-
-          if (data.data && Array.isArray(data.data)) {
-            setSearchResults(data.data);
-          }
-        } catch (error) {
-          logger.error("stamps", {
-            message: "Search error",
-            error,
-            searchTerm,
-          });
-          setSearchResults([]);
+        if (data.data && Array.isArray(data.data)) {
+          setSearchResults(data.data);
+          // Only show list if we're not in selection mode
+          setShowList(!isSelecting);
         }
-      } else {
+      } catch (error) {
+        logger.error("stamps", {
+          message: "Search error",
+          error,
+          searchTerm,
+        });
         setSearchResults([]);
-        resetTokenData();
+        setShowList(false);
+      } finally {
+        setIsSearching(false);
       }
-      setIsSearching(false);
     }, 300);
 
     return () => {
       clearTimeout(delayDebounceFn);
       setIsSearching(false);
     };
-  }, [searchTerm, isSelecting]);
+  }, [searchTerm, isSelecting, tick]);
 
-  // Update handleResultClick to be more efficient
+  // Update handleResultClick to properly handle dropdown visibility
   const handleResultClick = async (tick: string) => {
-    setShowList(false);
-    setIsSelecting(true);
+    setShowList(false); // Hide dropdown immediately
+    setIsSelecting(true); // Set selecting state
     setSearchResults([]); // Clear results immediately
-    setSearchTerm(tick);
+    setSearchTerm(tick.toUpperCase()); // Ensure uppercase
 
     // Update form state after getting token data
     try {
@@ -213,6 +226,8 @@ export function MintContent({
       resetTokenData();
     } finally {
       setIsImageLoading(false);
+      setIsSelecting(false); // Reset selecting state
+      setShowList(false); // Ensure dropdown is hidden after selection
     }
   };
 
@@ -297,13 +312,35 @@ export function MintContent({
               placeholder="Token"
               value={searchTerm}
               onChange={(e) => {
-                setShowList(true);
-                setSearchTerm((e.target as HTMLInputElement).value);
+                const newValue = (e.target as HTMLInputElement).value
+                  .toUpperCase();
+                if (newValue !== searchTerm) {
+                  if (!isSelecting) { // Only show dropdown if not selecting
+                    setShowList(true);
+                  }
+                  setSearchTerm(newValue);
+                }
+              }}
+              onFocus={() => {
+                // Only show all results if field is empty
+                if (!searchTerm.trim()) {
+                  setShowList(true);
+                }
+                setIsSelecting(false); // Reset selecting state on focus
+              }}
+              onBlur={() => {
+                // Only hide dropdown if we have a value or are selecting
+                if (searchTerm.trim() || isSelecting) {
+                  setTimeout(() => {
+                    setShowList(false);
+                    setIsSelecting(false);
+                  }, 150);
+                }
               }}
               error={formState.tokenError}
               isUppercase
             />
-            {showList && searchResults.length > 1 && (
+            {showList && searchResults.length > 0 && (
               <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[11] max-h-60 overflow-y-auto">
                 {searchResults.map((result: SearchResult) => (
                   <li
@@ -312,6 +349,9 @@ export function MintContent({
                     class="cursor-pointer p-2 hover:bg-gray-600 uppercase"
                   >
                     {result.tick}
+                    <span class="text-[10px] ml-2">
+                      ({(result.progress || 0).toFixed(1)}% minted)
+                    </span>
                   </li>
                 ))}
               </ul>
