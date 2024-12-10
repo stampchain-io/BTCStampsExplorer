@@ -6,6 +6,7 @@ import { SelectField } from "$islands/stamping/SelectField.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import type { StampRow } from "$globals";
+import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 
 interface Props {
   fee: number;
@@ -33,10 +34,12 @@ function WalletTransferModal({
   const { wallet } = walletContext;
   const [maxQuantity, setMaxQuantity] = useState(1);
   const [quantity, setQuantity] = useState(1);
+  const [imgSrc, setImgSrc] = useState("");
   const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
 
   const {
     formState,
+    setFormState,
     handleChangeFee: internalHandleChangeFee,
     handleSubmit,
     isSubmitting,
@@ -80,7 +83,7 @@ function WalletTransferModal({
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || "Failed to create transfer transaction."
+          errorData.error || "Failed to create transfer transaction.",
         );
       }
 
@@ -93,12 +96,12 @@ function WalletTransferModal({
         wallet,
         responseData.result.psbt,
         [], // Empty array for inputs to sign
-        true // Enable RBF
+        true, // Enable RBF
       );
 
       if (signResult.signed && signResult.txid) {
         setSuccessMessage(
-          `Transfer initiated successfully. TXID: ${signResult.txid}`
+          `Transfer initiated successfully. TXID: ${signResult.txid}`,
         );
         setTimeout(toggleModal, 5000);
       } else if (signResult.cancelled) {
@@ -110,7 +113,7 @@ function WalletTransferModal({
   };
 
   const handleQuantityChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value)) {
@@ -124,15 +127,15 @@ function WalletTransferModal({
     }
   };
   const getMaxQuantity = () => {
-    const max = Math.max(
-      ...stamps.data.map((stamp) => stamp.unbounded_quantity)
-    );
-    setMaxQuantity(max);
+    if (selectedStamp) {
+      setMaxQuantity(selectedStamp?.unbound_quantity);
+    }
   };
 
   useEffect(() => {
     getMaxQuantity();
-  }, [stamps]);
+    setImgSrc(getStampImageSrc(selectedStamp as StampRow));
+  }, [selectedStamp]);
 
   const inputField =
     "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
@@ -141,20 +144,23 @@ function WalletTransferModal({
     <ModalLayout onClose={handleCloseModal} title="TRANSFER">
       <div className="flex w-full gap-3 mobileMd:gap-6">
         <div className="min-w-[108px] h-[108px] mobileMd:min-w-[120px] mobileMd:h-[120px] bg-[#660099] rounded-md flex items-center justify-center">
-          {selectedStamp ? (
-            <img
-              // src={`/api/v2/stamp/${selectedStamp.stamp}/content`}
-              src={selectedStamp.stamp_url}
-              alt={`Stamp #${selectedStamp.stamp}`}
-              className="w-full h-full object-contain"
-            />
-          ) : (
-            <img
-              src="/img/stamping/image-upload.svg"
-              class="w-12 h-12"
-              alt=""
-            />
-          )}
+          {selectedStamp
+            ? (
+              <img
+                src={imgSrc}
+                onError={handleImageError}
+                loading="lazy"
+                alt={`Stamp #${selectedStamp.stamp}`}
+                className="w-full h-full object-contain pixelart"
+              />
+            )
+            : (
+              <img
+                src="/img/stamping/image-upload.svg"
+                class="w-12 h-12"
+                alt=""
+              />
+            )}
         </div>
 
         <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
@@ -163,7 +169,7 @@ function WalletTransferModal({
             value={selectedStamp?.stamp?.toString() || ""}
             onChange={(e) => {
               const selectedItem = stamps.data.find(
-                (item) => item.tx_hash === e.currentTarget.value
+                (item) => item.tx_hash === e.currentTarget.value,
               );
 
               if (selectedItem) {
@@ -200,8 +206,7 @@ function WalletTransferModal({
             setFormState({
               ...formState,
               recipientAddress: (e.target as HTMLInputElement).value,
-            })
-          }
+            })}
           placeholder="Recipient address"
           className={inputField}
         />
