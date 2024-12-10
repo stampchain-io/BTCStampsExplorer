@@ -117,6 +117,9 @@ export function MintContent({
   );
   const [isImageLoading, setIsImageLoading] = useState(false);
 
+  // Add a ref to track if we're switching fields
+  const [isSwitchingFields, setIsSwitchingFields] = useState(false);
+
   const resetTokenData = () => {
     setMintStatus(null);
     setHolders(0);
@@ -140,9 +143,9 @@ export function MintContent({
     }
   }, [tick]);
 
-  // Update the search useEffect to prevent search after selection
+  // Update the search useEffect to respect switching fields state
   useEffect(() => {
-    if (isSelecting || tick) {
+    if (isSelecting || tick || isSwitchingFields) {
       return;
     }
 
@@ -163,8 +166,7 @@ export function MintContent({
 
         if (data.data && Array.isArray(data.data)) {
           setSearchResults(data.data);
-          // Only show list if we're not in selection mode
-          setShowList(!isSelecting);
+          setShowList(!isSelecting && !isSwitchingFields);
         }
       } catch (error) {
         logger.error("stamps", {
@@ -183,16 +185,16 @@ export function MintContent({
       clearTimeout(delayDebounceFn);
       setIsSearching(false);
     };
-  }, [searchTerm, isSelecting, tick]);
+  }, [searchTerm, isSelecting, tick, isSwitchingFields]);
 
-  // Update handleResultClick to properly handle dropdown visibility
+  // Update handleResultClick to handle field switching
   const handleResultClick = async (tick: string) => {
-    setShowList(false); // Hide dropdown immediately
-    setIsSelecting(true); // Set selecting state
-    setSearchResults([]); // Clear results immediately
-    setSearchTerm(tick.toUpperCase()); // Ensure uppercase
+    setShowList(false);
+    setIsSelecting(true);
+    setIsSwitchingFields(true); // Set switching state when selecting
+    setSearchResults([]);
+    setSearchTerm(tick.toUpperCase());
 
-    // Update form state after getting token data
     try {
       setIsImageLoading(true);
       setError(null);
@@ -204,12 +206,10 @@ export function MintContent({
         setError("Token not deployed");
         resetTokenData();
       } else {
-        // Set all token-related state at once
         setMintStatus(data.mintStatus);
         setHolders(data.holders || 0);
         setSelectedTokenImage(`/content/${data.mintStatus.tx_hash}.svg`);
 
-        // Update form state last to minimize re-renders
         setFormState((prevState) => ({
           ...prevState,
           token: tick,
@@ -226,8 +226,7 @@ export function MintContent({
       resetTokenData();
     } finally {
       setIsImageLoading(false);
-      setIsSelecting(false); // Reset selecting state
-      setShowList(false); // Ensure dropdown is hidden after selection
+      // Keep isSelecting and isSwitchingFields true until next focus
     }
   };
 
@@ -315,27 +314,29 @@ export function MintContent({
                 const newValue = (e.target as HTMLInputElement).value
                   .toUpperCase();
                 if (newValue !== searchTerm) {
-                  if (!isSelecting) { // Only show dropdown if not selecting
+                  if (!isSelecting && !isSwitchingFields) { // Only show dropdown if not selecting and not switching fields
                     setShowList(true);
                   }
                   setSearchTerm(newValue);
                 }
               }}
               onFocus={() => {
-                // Only show all results if field is empty
-                if (!searchTerm.trim()) {
+                // Only show all results if field is empty and not switching fields
+                if (!searchTerm.trim() && !isSwitchingFields && !isSelecting) {
                   setShowList(true);
                 }
-                setIsSelecting(false); // Reset selecting state on focus
+                setIsSelecting(false);
               }}
               onBlur={() => {
-                // Only hide dropdown if we have a value or are selecting
-                if (searchTerm.trim() || isSelecting) {
-                  setTimeout(() => {
-                    setShowList(false);
+                // Set switching fields state
+                setIsSwitchingFields(true);
+                setTimeout(() => {
+                  setShowList(false);
+                  setIsSwitchingFields(false);
+                  if (!searchTerm.trim()) {
                     setIsSelecting(false);
-                  }, 150);
-                }
+                  }
+                }, 150);
               }}
               error={formState.tokenError}
               isUppercase
