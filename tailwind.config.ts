@@ -211,14 +211,14 @@ export default {
         ".text-stroke-glow": {
           "text-shadow": `
             /* Glow effect */
-            -0.05em -0.05em 0.25em #A0F,    /* top-left */
-            0.05em -0.05em 0.25em #A0F,     /* top-right */
-            0.05em 0.05em 0.25em #A0F,      /* bottom-right */
-            -0.05em 0.05em 0.25em #A0F,     /* bottom-left */
-            -0.05em 0 0.25em #A0F,         /* left */
-            0.05em 0 0.25em #A0F,          /* right */
-            0 -0.05em 0.25em #A0F,         /* top */
-            0 0.05em 0.25em #A0F,          /* bottom */
+            -0.05em -0.05em 0.25em #80C,    /* top-left */
+            0.05em -0.05em 0.25em #80C,     /* top-right */
+            0.05em 0.05em 0.25em #80C,      /* bottom-right */
+            -0.05em 0.05em 0.25em #80C,     /* bottom-left */
+            -0.05em 0 0.25em #80C,         /* left */
+            0.05em 0 0.25em #80C,          /* right */
+            0 -0.05em 0.25em #80C,         /* top */
+            0 0.05em 0.25em #80C,          /* bottom */
             
             /* Stroke effect */
             -3px -3px 0 #A0F,
