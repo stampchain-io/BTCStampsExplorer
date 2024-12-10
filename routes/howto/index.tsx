@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 
 export default function HowTo() {
-  const body = "flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36";
+  const body = "flex flex-col gap-12 mobileLg:gap-[72px] desktop:gap-24";
   const titleGreyDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
   const subTitleGrey =
@@ -12,7 +12,7 @@ export default function HowTo() {
     "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
   return (
     <div className={body}>
-      <section className="mb-6">
+      <section className="mb-3 mobileLg:mb-6">
         <h1 className={titleGreyDL}>HOW-TO</h1>
         <h2 className={subTitleGrey}>OUR STEP-BY-STEP GUIDES</h2>
         <p className={bodyTextLight}>
@@ -38,7 +38,7 @@ export default function HowTo() {
             width="100%"
             alt="Deploy a SRC-20 token on Bitcoin"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
+          <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
               To deploy a SRC-20 token, stamp the transaction on Bitcoin with
               the token's supply and metadata. This makes the token immutable
@@ -71,7 +71,7 @@ export default function HowTo() {
             alt="How to mint a SRC-20 Bitcoin stamps token"
             class="block mobileLg:order-last"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
+          <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
               After deployment, token holders can mint SRC-20 tokens based on
               the initial supply set in the contract.<br />
@@ -99,7 +99,7 @@ export default function HowTo() {
             width="100%"
             alt="Guide on how to create NFTs on Bitcoin using the stamps protocol"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
+          <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
               Store your art permanently on Bitcoin - the most resilient
               blockchain in the world.<br />
@@ -128,7 +128,7 @@ export default function HowTo() {
             alt="Transfer SRC-20 tokens on the Bitcoin blockchain"
             class="block mobileLg:order-last"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
+          <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
               Send your assets swiftly and securely across the Bitcoin
               blockchain
@@ -160,7 +160,7 @@ export default function HowTo() {
             width="100%"
             alt="Create, setup and install Bitcoin Leather wallet"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
+          <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
               New to Bitcoin, Stamps, wallet and all the other fancy lingo?{" "}
               <br />
@@ -190,7 +190,7 @@ export default function HowTo() {
             alt="Connect your Bitcoin Leather wallet to the Stampchain website"
             class="block mobileLg:order-last"
           />
-          <div className="desktop:col-span-2 flex flex-col gap-6 desktop:gap-9 justify-between">
+          <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
               <b>
                 In this guide, you'll learn how connect your Leather wallet to
