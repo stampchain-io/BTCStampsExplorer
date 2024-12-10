@@ -7,14 +7,34 @@ import * as msgpack from "msgpack";
 import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 const STAMP_PREFIX = "stamp:";
 
-async function decodeSRC20OLGATransaction(txHash: string): Promise<string> {
+let mockQuicknodeService: typeof QuicknodeService | undefined;
+
+if (import.meta.main) {
+  mockQuicknodeService = undefined;
+} else {
+  // In test environment
+  mockQuicknodeService = {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    getTransaction: async (_txid: string) => globalThis.mockTxData,
+  } as typeof QuicknodeService;
+}
+
+export async function decodeSRC20OLGATransaction(
+  txHash: string,
+): Promise<string> {
   try {
-    const txDetails = await QuicknodeService.getTransaction(txHash);
+    // Use mock service in test environment
+    const service = mockQuicknodeService || QuicknodeService;
+    const txDetails = await service.getTransaction(txHash);
+
+    console.log("Transaction Details:", txDetails);
 
     // Find P2WSH outputs (starting from the second output)
     const dataOutputs = txDetails.vout.slice(1).filter(
       (output: any) => output.scriptPubKey.type === "witness_v0_scripthash",
     );
+
+    console.log("Data Outputs:", dataOutputs);
 
     if (dataOutputs.length === 0) {
       throw new Error("No data outputs found in the transaction");
@@ -81,8 +101,8 @@ async function decodeSRC20OLGATransaction(txHash: string): Promise<string> {
   }
 }
 
-// Example usage
-async function main() {
+// Optional: Keep the CLI functionality
+if (import.meta.main) {
   const txHash = Deno.args[0];
   if (!txHash) {
     console.error("Please provide a transaction hash as an argument.");
@@ -99,5 +119,3 @@ async function main() {
     console.error("Failed to decode SRC-20 OLGA transaction:", error);
   }
 }
-
-main();

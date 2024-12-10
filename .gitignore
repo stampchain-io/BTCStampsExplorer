@@ -14,3 +14,4 @@ reports/
 openapitools.json
 package-lock.json
 app.log
+logs/

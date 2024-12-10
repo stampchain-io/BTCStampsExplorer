@@ -65,17 +65,26 @@ function shouldLog(namespace: LogNamespace): boolean {
     namespaces.includes(namespace.toLowerCase());
 }
 
-const LOG_FILE = "app.log";
+const LOG_DIR = "./logs";
+const LOG_FILE = `${LOG_DIR}/app.log`;
 
 async function writeToFile(data: string) {
   if (!isServer()) return;
 
-  if (Deno.env.get("DENO_ENV") !== "development") {
-    return;
-  }
-
   try {
-    await Deno.writeTextFile(LOG_FILE, data + "\n", { append: true });
+    // Ensure log directory exists
+    try {
+      await Deno.mkdir(LOG_DIR, { recursive: true });
+    } catch (error) {
+      if (!(error instanceof Deno.errors.AlreadyExists)) {
+        throw error;
+      }
+    }
+
+    // Write log with timestamp
+    const timestamp = new Date().toISOString();
+    const logEntry = `${timestamp} ${data}\n`;
+    await Deno.writeTextFile(LOG_FILE, logEntry, { append: true });
   } catch (error) {
     console.error("Failed to write to log file:", error);
   }
@@ -99,21 +108,18 @@ export const logger = {
     const logData = formatLog("debug", namespace, msg);
 
     if (!isServer()) {
-      if (isDevelopment() || shouldLog(namespace)) {
+      if (shouldLog(namespace)) {
         console.debug(logData);
       }
       return;
     }
 
     const formatted = JSON.stringify(logData, null, 2);
-    if (isDevelopment()) {
-      writeToFile(formatted);
-      console.debug(formatted);
-      return;
-    }
 
+    // Always write to file on server if namespace is enabled
     if (shouldLog(namespace)) {
       console.debug(formatted);
+      writeToFile(formatted);
     }
   },
 
