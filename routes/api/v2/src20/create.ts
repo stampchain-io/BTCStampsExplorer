@@ -6,6 +6,7 @@ import { InputData } from "$types/index.d.ts";
 import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
 type TrxType = "multisig" | "olga";
 
@@ -17,9 +18,9 @@ interface AncestorInfo {
 }
 
 interface ExtendedInputData extends Omit<InputData, "feeRate"> {
-  feeRate?: number; // legacy support
+  feeRate?: number;
   satsPerVB?: number;
-  satsPerKB?: number; // included for completeness but shouldn't be used
+  satsPerKB?: number;
   utxoAncestors?: AncestorInfo[];
 }
 
@@ -33,98 +34,7 @@ interface PSBTParams {
   service_fee_address: string;
   changeAddress: string;
   utxoAncestors?: AncestorInfo[];
-  dryRun?: boolean;
-}
-
-// Add basic size estimation without UTXO fetching
-function estimateBasicSize(data: ExtendedInputData): number {
-  // Base transaction size
-  let size = 10; // Version + locktime
-
-  // Estimate input size (assume one P2WPKH input for estimation)
-  size += 68; // Basic input size
-
-  // Get decimal places for accurate size estimation
-  const decimals = parseInt(data.dec || "18", 10);
-
-  // Calculate outputs based on operation
-  switch (data.op.toLowerCase()) {
-    case "deploy": {
-      // Calculate data size for deploy
-      const deployData = {
-        op: "DEPLOY",
-        p: "SRC-20",
-        tick: data.tick || "",
-        max: data.max || "0",
-        lim: data.lim || "0",
-        dec: decimals || "18",
-      };
-      const dataSize = Math.ceil(JSON.stringify(deployData).length / 2);
-      size += Math.ceil(dataSize / 62) * 43; // Each data chunk in P2WSH
-      size += 31; // Change output
-      break;
-    }
-    case "mint": {
-      const mintData = {
-        op: "MINT",
-        p: "SRC-20",
-        tick: data.tick || "",
-        amt: data.amt || "0",
-      };
-      const dataSize = Math.ceil(JSON.stringify(mintData).length / 2);
-      size += 43; // Recipient output
-      size += Math.ceil(dataSize / 62) * 43; // Data outputs
-      size += 31; // Change output
-      break;
-    }
-    case "transfer": {
-      const transferData = {
-        op: "TRANSFER",
-        p: "SRC-20",
-        tick: data.tick || "",
-        amt: data.amt || "0",
-      };
-      const dataSize = Math.ceil(JSON.stringify(transferData).length / 2);
-      size += 43; // Recipient output
-      size += Math.ceil(dataSize / 62) * 43; // Data output
-      size += 31; // Change output
-      break;
-    }
-  }
-
-  // Add extra size for multisig if needed
-  if (data.trxType === "multisig") {
-    size += 107; // Additional multisig overhead
-  }
-
-  return size;
-}
-
-function calculateBasicDustValue(operation: string): number {
-  const DUST_AMOUNT = 546;
-  switch (operation) {
-    case "deploy":
-      return DUST_AMOUNT; // One recipient output
-    case "mint":
-      return DUST_AMOUNT * 2; // Recipient + data output
-    case "transfer":
-      return DUST_AMOUNT * 2; // Recipient + data output
-    default:
-      return DUST_AMOUNT;
-  }
-}
-
-function estimateOutputCount(data: ExtendedInputData): number {
-  switch (data.op.toLowerCase()) {
-    case "deploy":
-      return Math.ceil((data.max?.length || 0) / 62) + 2; // Data chunks + recipient + change
-    case "mint":
-      return Math.ceil((data.amt?.length || 0) / 62) + 2; // Data chunks + recipient + change
-    case "transfer":
-      return 3; // Recipient + data + change
-    default:
-      return 2;
-  }
+  trxType?: "olga" | "multisig";
 }
 
 export const handler: Handlers<TX | TXError> = {
@@ -139,7 +49,6 @@ export const handler: Handlers<TX | TXError> = {
 
       let body: ExtendedInputData & {
         trxType?: TrxType;
-        dryRun?: boolean;
       };
       try {
         body = JSON.parse(rawBody);
@@ -198,43 +107,23 @@ export const handler: Handlers<TX | TXError> = {
       });
 
       // Validate operation for both transaction types
-      let validationError;
-      if (body.dryRun) {
-        validationError = await SRC20Service.UtilityService
-          .validateOperation(
-            body.op.toLowerCase() as "deploy" | "mint" | "transfer",
-            {
-              sourceAddress: effectiveSourceAddress,
-              changeAddress: effectiveChangeAddress,
-              tick: body.tick || "TEST",
-              max: body.max || "1000",
-              lim: body.lim || "1000",
-              dec: body.dec || "18",
-              amt: body.amt || "1",
-              toAddress: body.toAddress || effectiveSourceAddress,
-              isEstimate: true,
-            },
-          );
-      } else {
-        validationError = await SRC20Service.UtilityService
-          .validateOperation(
-            body.op.toLowerCase() as "deploy" | "mint" | "transfer",
-            {
-              sourceAddress: effectiveSourceAddress,
-              changeAddress: effectiveChangeAddress,
-              tick: body.tick,
-              max: body.max?.toString(),
-              lim: body.lim?.toString(),
-              dec: body.dec?.toString(),
-              amt: body.amt?.toString(),
-              toAddress: body.toAddress,
-              x: body.x,
-              web: body.web,
-              email: body.email,
-              isEstimate: false,
-            },
-          );
-      }
+      const validationError = await SRC20Service.UtilityService
+        .validateOperation(
+          body.op.toLowerCase() as "deploy" | "mint" | "transfer",
+          {
+            sourceAddress: effectiveSourceAddress,
+            changeAddress: effectiveChangeAddress,
+            tick: body.tick,
+            max: body.max?.toString(),
+            lim: body.lim?.toString(),
+            dec: body.dec?.toString(),
+            amt: body.amt?.toString(),
+            toAddress: body.toAddress,
+            x: body.x,
+            web: body.web,
+            email: body.email,
+          },
+        );
 
       if (validationError) {
         logger.debug("stamps", {
@@ -253,72 +142,11 @@ export const handler: Handlers<TX | TXError> = {
         return validationError;
       }
 
-      // If it's a dry run, use accurate estimation
-      if (body.dryRun) {
-        // Ensure we have all required fields for estimation
-        const estimationData = {
-          ...body,
-          dec: body.dec || "18",
-          max: body.max || "1000",
-          lim: body.lim || "1000",
-          amt: body.amt || "1",
-        };
-
-        const estimatedSize = estimateBasicSize(estimationData);
-        const minerFee = Math.ceil(
-          estimatedSize * normalizedFees.normalizedSatsPerVB,
-        );
-        const dustValue = calculateBasicDustValue(body.op.toLowerCase());
-
-        return ResponseUtil.success({
-          minerFee,
-          dustValue,
-          estimatedSize,
-          outputCount: estimateOutputCount(estimationData),
-        });
-      }
-
-      // Only do full UTXO fetching and PSBT construction for actual transactions
-      if (trxType === "multisig") {
-        logger.debug("stamps", {
-          message: "Starting multisig transaction handling",
-          operation: body.op.toLowerCase(),
-        });
-
-        // Destructure and reconstruct with required properties
-        const {
-          satsPerVB: _satsPerVB, // Omit these optional properties
-          satsPerKB: _satsPerKB,
-          feeRate: _feeRate,
-          ...restBody
-        } = body;
-
-        const operationData: InputData = {
-          ...restBody,
-          changeAddress: effectiveChangeAddress || effectiveSourceAddress,
-          feeRate: normalizedFees.normalizedSatsPerVB,
-        };
-
-        const result = await SRC20Service.TransactionService.handleOperation(
-          body.op.toLowerCase() as "deploy" | "mint" | "transfer",
-          operationData,
-        );
-
-        logger.debug("stamps", {
-          message: "Multisig transaction result",
-          result: JSON.stringify(result, null, 2),
-        });
-
-        const response = ResponseUtil.success(result);
-        logger.debug("stamps", {
-          message: "Final multisig response",
-          response: JSON.stringify(response, null, 2),
-        });
-
-        return response;
-      } else {
-        // Handle Olga/p2wsh transaction
-        const src20Action = {
+      // Always prepare PSBT with full data
+      const psbtData = await SRC20Service.PSBTService.preparePSBT({
+        sourceAddress: effectiveSourceAddress,
+        toAddress: body.toAddress || effectiveSourceAddress,
+        src20Action: {
           op: body.op.toUpperCase(),
           p: "SRC-20",
           tick: body.tick,
@@ -331,33 +159,84 @@ export const handler: Handlers<TX | TXError> = {
           ...(body.email && { email: body.email }),
           ...(body.tg && { tg: body.tg }),
           ...(body.description && { description: body.description }),
-        };
+        },
+        satsPerVB: normalizedFees.normalizedSatsPerVB,
+        service_fee: 0,
+        service_fee_address: "",
+        changeAddress: effectiveChangeAddress || effectiveSourceAddress,
+        ...(body.utxoAncestors && { utxoAncestors: body.utxoAncestors }),
+        trxType: body.trxType || "olga",
+      } as PSBTParams);
 
-        const psbtData = await SRC20Service.PSBTService.preparePSBT({
-          sourceAddress: effectiveSourceAddress,
-          toAddress: body.toAddress,
-          src20Action,
-          satsPerVB: normalizedFees.normalizedSatsPerVB,
-          service_fee: body.service_fee || 0,
-          service_fee_address: body.service_fee_address || "",
-          changeAddress: effectiveChangeAddress || effectiveSourceAddress,
-          utxoAncestors: body.utxoAncestors,
-          dryRun: body.dryRun,
-        } as PSBTParams);
+      // Calculate actual fees
+      const actualFee = psbtData.totalInputValue - psbtData.totalOutputValue -
+        psbtData.totalChangeOutput;
 
-        return ResponseUtil.success({
-          hex: psbtData.psbt.toHex(),
-          est_tx_size: psbtData.estimatedTxSize,
-          input_value: psbtData.totalInputValue,
-          total_dust_value: psbtData.totalDustValue,
-          est_miner_fee: psbtData.estMinerFee,
-          fee: psbtData.totalDustValue + psbtData.estMinerFee,
-          change_value: psbtData.totalChangeOutput,
-          inputsToSign: psbtData.psbt.data.inputs.map((_, index) => index),
-          sourceAddress: body.sourceAddress,
-          changeAddress: effectiveChangeAddress,
-        });
+      // Add validation before returning
+      const outputs = psbtData.psbt.txOutputs;
+      const dataOutputs = outputs.filter((
+        output: { script: { toString: (format: string) => string } },
+      ) => output.script.toString("hex").startsWith("0020"));
+
+      // Validate data structure
+      let fullData = "";
+      for (const output of dataOutputs) {
+        const script = output.script.toString("hex");
+        // Remove witness version and push bytes (0020)
+        const data = script.slice(4);
+        fullData += data;
       }
+
+      // Remove padding zeros
+      fullData = fullData.replace(/0+$/, "");
+
+      try {
+        // First two bytes are length prefix
+        const lengthPrefix = parseInt(fullData.slice(0, 4), 16);
+        const data = fullData.slice(4);
+
+        // Convert to binary and decode
+        const decodedData = new TextDecoder().decode(
+          new Uint8Array(hex2bin(data)),
+        );
+
+        // Validate prefix
+        if (!decodedData.startsWith("stamp:")) {
+          throw new Error("Invalid data format: missing STAMP prefix");
+        }
+
+        // Validate JSON structure
+        const jsonStart = decodedData.indexOf("{");
+        if (jsonStart === -1) {
+          throw new Error("Invalid data format: no JSON structure found");
+        }
+
+        const jsonData = decodedData.slice(jsonStart);
+        JSON.parse(jsonData); // This will throw if JSON is invalid
+      } catch (error) {
+        logger.error("stamps", {
+          message: "Invalid transaction data structure",
+          error: error instanceof Error ? error.message : String(error),
+          fullData,
+        });
+        throw new Error("Invalid transaction data structure");
+      }
+
+      // Return consistent response format
+      return ApiResponseUtil.success({
+        hex: psbtData.psbt.toHex(),
+        est_tx_size: psbtData.estimatedTxSize,
+        input_value: psbtData.totalInputValue,
+        total_dust_value: psbtData.totalDustValue,
+        est_miner_fee: actualFee,
+        fee: psbtData.totalDustValue + actualFee,
+        change_value: psbtData.totalChangeOutput,
+        inputsToSign: psbtData.psbt.data.inputs.map((_, index: number) =>
+          index
+        ),
+        sourceAddress: body.sourceAddress,
+        changeAddress: effectiveChangeAddress,
+      });
     } catch (error: unknown) {
       logger.error("stamps", {
         message: "Error processing request",
@@ -366,9 +245,11 @@ export const handler: Handlers<TX | TXError> = {
       });
 
       if (error instanceof SyntaxError) {
-        return ResponseUtil.badRequest("Invalid JSON in request body");
+        return ApiResponseUtilResponseUtil.badRequest(
+          "Invalid JSON in request body",
+        );
       }
-      return ResponseUtil.internalError(error, "Unknown error occurred");
+      return ApiResponseUtil.internalError(error, "Unknown error occurred");
     }
   },
 };

@@ -18,6 +18,26 @@ import { TX_CONSTANTS } from "$lib/utils/minting/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 
+interface PSBTParams {
+  sourceAddress: string;
+  toAddress: string;
+  src20Action: Record<string, unknown>;
+  satsPerVB: number;
+  service_fee: number;
+  service_fee_address: string;
+  changeAddress: string;
+  utxoAncestors?: AncestorInfo[];
+  dryRun?: boolean;
+  trxType?: "olga" | "multisig";
+  utxos?: Array<{
+    txid: string;
+    vout: number;
+    value: number;
+    script: string;
+    address: string;
+  }>;
+}
+
 export class SRC20PSBTService {
   private static readonly DUST_SIZE = 420; // Min is 330
   private static readonly STAMP_PREFIX = "stamp:";
@@ -30,6 +50,7 @@ export class SRC20PSBTService {
     service_fee,
     service_fee_address,
     changeAddress,
+    utxoAncestors = [],
     dryRun = false,
     trxType = "olga",
   }: {
@@ -40,6 +61,11 @@ export class SRC20PSBTService {
     service_fee: number;
     service_fee_address: string;
     changeAddress: string;
+    utxoAncestors?: Array<{
+      txid: string;
+      vout: number;
+      weight?: number;
+    }>;
     dryRun?: boolean;
     trxType?: "olga" | "multisig";
   }) {
@@ -49,68 +75,47 @@ export class SRC20PSBTService {
     const vouts = [];
 
     // Prepare action data and CIP33 addresses
-    const { actionData, finalData, hex_data } = await this.prepareActionData(src20Action);
-    const expectedOutputs = this.calculateExpectedOutputs(hex_data);
-    
-    logger.debug("stamps", {
-      message: "Action data prepared",
-      data: {
-        actionDataLength: actionData.length,
-        finalDataLength: finalData.length,
-        hex_dataLength: hex_data.length,
-        expectedCIP33Outputs: expectedOutputs,
-        hex_data: hex_data.substring(0, 100) + "..."
-      }
-    });
-
-    const cip33Addresses = await this.generateCIP33Addresses(hex_data);
-
-    // Verify we got the expected number of addresses
-    if (cip33Addresses.length !== expectedOutputs.numOutputs) {
-      logger.warn("stamps", {
-        message: "CIP33 address count mismatch",
-        data: {
-          expected: expectedOutputs.numOutputs,
-          actual: cip33Addresses.length,
-          hex_dataLength: hex_data.length
-        }
-      });
-    }
-
-    logger.debug("stamps", {
-      message: "Generated CIP33 addresses",
-      data: {
-        addressCount: cip33Addresses.length,
-        addresses: cip33Addresses,
-        hex_dataLength: hex_data.length,
-        expectedOutputs: cip33Addresses.length + 2 // +1 for real pubkey, +1 for change
-      }
-    });
+    const { actionData, finalData, hex_data, chunks } = await this.prepareActionData(src20Action);
 
     // Add the first output (toAddress) as a real pubkey output
     const toAddressScript = address.toOutputScript(toAddress, network);
     vouts.push({
       script: toAddressScript,
       value: this.DUST_SIZE,
-      isReal: true // Flag to identify real pubkey outputs
+      isReal: true
     });
 
-    logger.debug("stamps", {
-      message: "Added real pubkey output",
-      data: {
-        address: toAddress,
-        value: this.DUST_SIZE,
-        scriptType: "real_pubkey"
+    // Add data outputs
+    for (let i = 0; i < chunks.length; i++) {
+      // Get CIP33 address for this chunk
+      const cip33Address = CIP33.file_to_addresses(hex_data)[i];
+      if (!cip33Address) {
+        throw new Error(`Failed to generate CIP33 address for chunk ${i}`);
       }
-    });
 
-    // Add CIP33 fake pubkey outputs
-    for (let i = 0; i < cip33Addresses.length; i++) {
-      const dustValue = this.DUST_SIZE + i;
-      vouts.push(this.createAddressOutput(cip33Addresses[i], dustValue));
+      // Create output script from address
+      const outputScript = address.toOutputScript(cip33Address, network);
+
+      vouts.push({
+        script: outputScript,
+        value: this.DUST_SIZE + i,
+        isReal: false,
+        address: cip33Address // Keep address for reference
+      });
+
+      logger.debug("stamps", {
+        message: "Created CIP33 output",
+        data: {
+          chunkIndex: i,
+          address: cip33Address,
+          scriptHex: Array.from(outputScript)
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('')
+        }
+      });
     }
 
-    // Add service fee output if applicable (as real pubkey)
+    // Add service fee output if applicable
     if (service_fee > 0 && service_fee_address) {
       const serviceFeeScript = address.toOutputScript(service_fee_address, network);
       vouts.push({
@@ -120,22 +125,19 @@ export class SRC20PSBTService {
       });
     }
 
+    // Log outputs for debugging
     logger.debug("stamps", {
-      message: "Initial outputs prepared",
-      outputCount: vouts.length,
-      outputs: vouts.map(v => ({
-        value: v.value,
-        isReal: v.isReal || false,
-        script: v.script ? 
-          (v.script instanceof Uint8Array ? 
-            Array.from(v.script)
-              .map(b => b.toString(16).padStart(2, '0'))
-              .join('') 
-            : Array.from(new Uint8Array(v.script))
-              .map(b => b.toString(16).padStart(2, '0'))
-              .join(''))
-          : v.address // Fallback to address if script is undefined
-      }))
+      message: "Prepared outputs",
+      data: {
+        outputCount: vouts.length,
+        outputs: vouts.map(v => ({
+          value: v.value,
+          isReal: v.isReal,
+          scriptHex: Array.from(v.script)
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('')
+        }))
+      }
     });
 
     // Select UTXOs and calculate fees
@@ -147,13 +149,6 @@ export class SRC20PSBTService {
       1.5,
       { filterStampUTXOs: true, includeAncestors: true }
     );
-
-    logger.debug("stamps", {
-      message: "UTXO selection completed",
-      inputCount: inputs.length,
-      change,
-      fee
-    });
 
     // Calculate estimated size based on transaction type
     const estimatedTxSize = estimateTransactionSize({
@@ -172,7 +167,7 @@ export class SRC20PSBTService {
           value: this.DUST_SIZE
         },
         // CIP33 outputs - use actual CIP33 address count
-        ...cip33Addresses.map((_, index) => ({
+        ...chunks.map((_, index) => ({
           type: trxType === "olga" ? "P2WSH" : "P2SH",
           size: TX_CONSTANTS[trxType === "olga" ? "P2WSH" : "P2SH"].size,
           isWitness: trxType === "olga",
@@ -184,12 +179,12 @@ export class SRC20PSBTService {
       isMultisig: trxType === "multisig"
     });
 
-    const estMinerFee = calculateMiningFee(
+    const { fee: estMinerFee, vsize: txVsize } = this.calculateTotalFee(
       inputs.map(input => ({
         type: getScriptTypeInfo(input.script).type,
         size: input.size,
         isWitness: this.isWitnessInput(input.script),
-        ancestor: input.ancestor
+        ancestor: utxoAncestors.find(a => a.txid === input.txid && a.vout === input.vout)
       })),
       [
         // Real pubkey output
@@ -199,18 +194,12 @@ export class SRC20PSBTService {
           isWitness: trxType === "olga",
           value: this.DUST_SIZE
         },
-        ...cip33Addresses.map((_, index) => ({
+        ...chunks.map((_, index) => ({
           type: trxType === "olga" ? "P2WSH" : "P2SH",
           size: TX_CONSTANTS[trxType === "olga" ? "P2WSH" : "P2SH"].size,
           isWitness: trxType === "olga",
           value: this.DUST_SIZE + index
-        })),
-        ...(change > this.DUST_SIZE ? [{
-          type: trxType === "olga" ? "P2WPKH" : "P2SH",
-          size: TX_CONSTANTS[trxType === "olga" ? "P2WPKH" : "P2SH"].size,
-          isWitness: trxType === "olga",
-          value: change
-        }] : [])
+        }))
       ],
       satsPerVB,
       {
@@ -220,27 +209,74 @@ export class SRC20PSBTService {
       }
     );
 
+    // Add verification logging
+    logger.debug("stamps", {
+      message: "Transaction fee verification",
+      data: {
+        inputs: inputs.map(input => ({
+          txid: input.txid,
+          vout: input.vout,
+          value: input.value
+        })),
+        outputs: [
+          ...vouts.map(vout => ({
+            value: vout.value,
+            isReal: vout.isReal
+          })),
+          ...(change > this.DUST_SIZE ? [{
+            value: change,
+            isChange: true
+          }] : [])
+        ],
+        feeBreakdown: {
+          totalInput: inputs.reduce((sum, input) => sum + Number(input.value), 0),
+          totalOutput: vouts.reduce((sum, vout) => sum + Number(vout.value), 0) + 
+            (change > this.DUST_SIZE ? change : 0),
+          calculatedFee: estMinerFee,
+          actualFee: inputs.reduce((sum, input) => sum + Number(input.value), 0) -
+            (vouts.reduce((sum, vout) => sum + Number(vout.value), 0) + 
+            (change > this.DUST_SIZE ? change : 0)),
+          txVsize,
+          effectiveFeeRate: estMinerFee / txVsize
+        }
+      }
+    });
+
+    // Add debug logging for ancestor-aware fee calculation
+    logger.debug("stamps", {
+      message: "Ancestor-aware fee calculation details",
+      data: {
+        requestedFeeRate: satsPerVB,
+        calculatedFee: estMinerFee,
+        effectiveFeeRate: estMinerFee / (estimatedTxSize / 4),
+        ancestorCount: utxoAncestors.length,
+        ancestors: utxoAncestors,
+        estimatedTxSize,
+        inputs: inputs.map(input => ({
+          txid: input.txid,
+          vout: input.vout,
+          hasAncestor: utxoAncestors.some(a => a.txid === input.txid && a.vout === input.vout)
+        }))
+      }
+    });
+
     // Add debug logging for fee calculation
     logger.debug("stamps", {
       message: "Fee calculation details",
       data: {
+        requestedFeeRate: satsPerVB,
+        calculatedFee: estMinerFee,
+        effectiveFeeRate: estMinerFee / (estimatedTxSize / 4),
+        transactionType: trxType,
+        isMultisig: trxType === "multisig",
         inputs: inputs.map(input => ({
+          txid: input.txid,
+          vout: input.vout,
           type: getScriptTypeInfo(input.script).type,
-          isWitness: this.isWitnessInput(input.script),
-          size: input.size
-        })),
-        outputs: vouts.map(vout => ({
-          isReal: vout.isReal,
-          type: vout.isReal ? 
-            (trxType === "olga" ? "P2WPKH" : "P2SH") : 
-            (trxType === "olga" ? "P2WSH" : "P2SH"),
-          value: vout.value
+          ancestor: utxoAncestors.find(a => a.txid === input.txid && a.vout === input.vout)
         })),
         estimatedTxSize,
-        estMinerFee,
-        satsPerVB,
-        trxType,
-        changeIncluded: change > this.DUST_SIZE
+        totalWeight: estimatedTxSize * 4
       }
     });
 
@@ -258,90 +294,26 @@ export class SRC20PSBTService {
       };
     }
 
-    // Create PSBT only if not dryRun
+    // Create PSBT
     psbt = new Psbt({ network });
 
-    // Add inputs to PSBT
+    // Add inputs
     for (const input of inputs) {
       const txDetails = await QuicknodeService.getTransaction(input.txid);
       if (!txDetails) {
         throw new Error(`Failed to fetch transaction details for ${input.txid}`);
       }
 
-      logger.debug("stamps", {
-        message: "Creating PSBT input",
-        data: {
-          txid: input.txid,
-          vout: input.vout,
-          value: Number(input.value),
-          address: input.address,
-          script: input.script,
-        }
-      });
-
-      const psbtInput: PSBTInput = {
-        hash: input.txid,
-        index: input.vout,
-        sequence: 0xfffffffd, // Enable RBF
-      };
-
-      // Always include nonWitnessUtxo
-      psbtInput.nonWitnessUtxo = new Uint8Array(hex2bin(txDetails.hex));
-
-      // Add witnessUtxo for witness inputs
-      if (this.isWitnessInput(input.script)) {
-        psbtInput.witnessUtxo = {
-          script: new Uint8Array(hex2bin(input.script)),
-          value: BigInt(input.value), // Ensure value is BigInt
-        };
-
-        logger.debug("stamps", {
-          message: "Adding witness UTXO",
-          data: {
-            script: Array.from(new Uint8Array(hex2bin(input.script)))
-              .map(b => b.toString(16).padStart(2, '0'))
-              .join(''),
-            value: input.value,
-            valueAsBigInt: BigInt(input.value).toString()
-          }
-        });
-      }
-
+      const psbtInput = this.createPsbtInput(input, txDetails);
       psbt.addInput(psbtInput);
     }
 
-    // Add outputs to PSBT with appropriate handling
+    // Add outputs
     for (const vout of vouts) {
-      let outputScript: Uint8Array;
       try {
-        if (vout.isReal && vout.script) {
-          // For real pubkey outputs, use the script directly
-          outputScript = vout.script instanceof Uint8Array ? 
-            vout.script : 
-            new Uint8Array(vout.script);
-        } else if (vout.address) {
-          // For CIP33 fake pubkey outputs, use the address-based script
-          const script = address.toOutputScript(vout.address, network);
-          outputScript = script instanceof Uint8Array ? script : new Uint8Array(script);
-        } else {
-          throw new Error("Output must have either script or address");
-        }
-
-        logger.debug("stamps", {
-          message: "Adding PSBT output",
-          data: {
-            isReal: vout.isReal,
-            value: vout.value,
-            scriptLength: outputScript.length,
-            scriptHex: Array.from(outputScript)
-              .map(b => b.toString(16).padStart(2, '0'))
-              .join('')
-          }
-        });
-
         psbt.addOutput({
-          script: outputScript,
-          value: BigInt(vout.value), // Convert to BigInt for consistency
+          script: vout.script,
+          value: BigInt(vout.value)
         });
       } catch (error) {
         logger.error("stamps", {
@@ -350,80 +322,24 @@ export class SRC20PSBTService {
           output: {
             isReal: vout.isReal,
             hasScript: !!vout.script,
-            hasAddress: !!vout.address,
-            value: vout.value
-          }
-        });
-        throw error;
-      }
-    }
-
-    // Update change output handling
-    if (change > this.DUST_SIZE) {
-      try {
-        const changeScript = address.toOutputScript(effectiveChangeAddress, network);
-        const changeOutputScript = changeScript instanceof Uint8Array ? 
-          changeScript : 
-          new Uint8Array(changeScript);
-
-        logger.debug("stamps", {
-          message: "Adding change output",
-          data: {
-            address: effectiveChangeAddress,
-            value: change,
-            scriptLength: changeOutputScript.length,
-            scriptHex: Array.from(changeOutputScript)
+            value: vout.value,
+            scriptHex: Array.from(vout.script)
               .map(b => b.toString(16).padStart(2, '0'))
               .join('')
           }
         });
-
-        psbt.addOutput({
-          script: changeOutputScript,
-          value: BigInt(change), // Convert to BigInt for consistency
-        });
-      } catch (error) {
-        logger.error("stamps", {
-          message: "Error adding change output to PSBT",
-          error: error instanceof Error ? error.message : String(error),
-          changeAddress: effectiveChangeAddress,
-          changeAmount: change
-        });
         throw error;
       }
     }
 
-    logger.debug("stamps", {
-      message: "Final PSBT data prepared",
-      data: {
-        hex: psbt.toHex(),
-        base64: psbt.toBase64(),
-        estimatedTxSize: estimatedTxSize,
-        totalInputValue: inputs.reduce((sum, input) => 
-          sum + Number(input.value), 0),
-        totalOutputValue: vouts.reduce((sum, vout) => 
-          sum + Number(vout.value), 0),
-        totalChangeOutput: change,
-        totalDustValue: vouts.reduce((sum, vout) => 
-          Number(vout.value) <= this.DUST_SIZE ? 
-            sum + Number(vout.value) : sum, 0),
-        estMinerFee,
-        outputScripts: vouts.map(v => ({
-          value: v.value,
-          isReal: v.isReal || false,
-          script: v.script ? 
-            (v.script instanceof Uint8Array ? 
-              Array.from(v.script)
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('') 
-              : Array.from(new Uint8Array(v.script))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join(''))
-            : v.address, // Fallback to address if script is undefined
-          address: v.address // Include address for reference
-        }))
-      }
-    });
+    // Add change output if needed
+    if (change > this.DUST_SIZE) {
+      const changeScript = address.toOutputScript(effectiveChangeAddress, network);
+      psbt.addOutput({
+        script: changeScript,
+        value: BigInt(change)
+      });
+    }
 
     return {
       psbt,
@@ -439,83 +355,93 @@ export class SRC20PSBTService {
   }
 
   private static async prepareActionData(src20Action: string | object) {
-    let actionData: Uint8Array;
-    const stampPrefixBytes = new TextEncoder().encode(this.STAMP_PREFIX);
-
-    logger.debug("stamps", {
-      message: "Preparing action data",
-      data: {
-        inputType: typeof src20Action,
-        stampPrefix: this.STAMP_PREFIX,
-      }
-    });
-
     try {
-      const parsedAction = typeof src20Action === "string"
-        ? JSON.parse(src20Action)
+      // Parse action if it's a string
+      const parsedAction = typeof src20Action === "string" 
+        ? JSON.parse(src20Action) 
         : src20Action;
 
-      const msgpackData = msgpack.encode(parsedAction);
-      const { compressedData, compressed } = await SRC20Service.CompressionService.compressWithCheck(msgpackData);
-      actionData = compressed ? compressedData : msgpackData;
+      // Ensure protocol field is uppercase
+      const normalizedAction = {
+        ...parsedAction,
+        p: "SRC-20" // Always use uppercase for protocol
+      };
 
-      logger.debug("stamps", {
-        message: "Action data encoded",
-        data: {
-          wasCompressed: compressed,
-          originalLength: msgpackData.length,
-          finalLength: actionData.length
-        }
+      // First encode the action data as JSON
+      const actionString = JSON.stringify(normalizedAction);
+      const jsonData = new TextEncoder().encode(actionString);
+
+      // Create the stamp prefix
+      const stampPrefix = new TextEncoder().encode(this.STAMP_PREFIX);
+      
+      // Combine stamp prefix and JSON data first (without length prefix)
+      const dataWithPrefix = new Uint8Array([...stampPrefix, ...jsonData]);
+      
+      // Calculate length
+      const dataLength = dataWithPrefix.length;
+
+      // Create hex string in correct format for CIP33
+      const hex_data = Array.from(dataWithPrefix)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+
+      // Debug log the exact format
+      console.log("Data Format:", {
+        stampPrefix: Array.from(stampPrefix).map(b => b.toString(16).padStart(2, '0')).join(''),
+        jsonData: Array.from(jsonData).map(b => b.toString(16).padStart(2, '0')).join(''),
+        hex_data,
+        dataLength,
+        stampPrefixLength: stampPrefix.length,
+        jsonDataLength: jsonData.length,
+        normalizedAction
       });
+
+      // Let CIP33 handle length prefix and chunking
+      const cip33Addresses = CIP33.file_to_addresses(hex_data);
+      if (!cip33Addresses || cip33Addresses.length === 0) {
+        throw new Error("Failed to generate CIP33 addresses");
+      }
+
+      return {
+        actionData: jsonData,
+        finalData: dataWithPrefix,
+        hex_data,
+        chunks: cip33Addresses
+      };
     } catch (error) {
-      logger.warn("stamps", {
-        message: "Failed to encode/compress action data, falling back to JSON string",
+      logger.error("stamps", {
+        message: "Error in prepareActionData",
         error: error instanceof Error ? error.message : String(error)
       });
-      const actionString = JSON.stringify(src20Action);
-      actionData = new TextEncoder().encode(actionString);
+      throw error;
     }
-
-    const fullData = new Uint8Array([...stampPrefixBytes, ...actionData]);
-    const dataLength = fullData.length;
-    const lengthPrefix = new Uint8Array(2);
-    new DataView(lengthPrefix.buffer).setUint16(0, dataLength, false);
-    const finalData = new Uint8Array([...lengthPrefix, ...fullData]);
-    
-    const hex_data = Array.from(finalData)
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-
-    logger.debug("stamps", {
-      message: "Final action data prepared",
-      data: {
-        prefixLength: stampPrefixBytes.length,
-        actionDataLength: actionData.length,
-        fullDataLength: fullData.length,
-        finalDataLength: finalData.length,
-        hex_dataLength: hex_data.length,
-        lengthPrefix: Array.from(lengthPrefix).map(b => b.toString(16).padStart(2, '0')).join('')
-      }
-    });
-
-    return { 
-      actionData,   // The original action data
-      finalData,    // The complete data with prefix and length
-      hex_data      // The hex string representation
-    };
   }
 
   private static createAddressOutput(
     address: string, 
     value: number
-  ): { address: string; value: number; isReal?: boolean } {
+  ): { script: Uint8Array; value: number; isReal?: boolean } {
     if (!address) {
       throw new Error("Invalid address: address is undefined");
     }
+
+    // Convert bech32 address to script
+    const scriptHash = CIP33.cip33_bech32toHex(address);
+    if (!scriptHash) {
+      throw new Error(`Invalid CIP33 address: ${address}`);
+    }
+
+    // Create P2WSH script
+    const script = new Uint8Array([
+      0x00, // witness version
+      0x20, // push 32 bytes
+      ...scriptHash.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+    ]);
+
     return { 
-      address, 
+      script,
       value,
-      isReal: false // Mark as fake pubkey output
+      isReal: false
     };
   }
 
@@ -644,11 +570,12 @@ export class SRC20PSBTService {
   }
 
   private static async generateCIP33Addresses(hex_data: string) {
-    const cip33Addresses = CIP33.file_to_addresses(hex_data);
-    if (!cip33Addresses || cip33Addresses.length === 0) {
+    // Let CIP33 handle the chunking and address generation
+    const addresses = CIP33.file_to_addresses(hex_data);
+    if (!addresses || addresses.length === 0) {
       throw new Error("Failed to generate CIP33 addresses");
     }
-    return cip33Addresses;
+    return addresses;
   }
 
   private static isWitnessInput(script: string): boolean {
@@ -722,6 +649,103 @@ export class SRC20PSBTService {
       minerFee,
       dustValue,
       requiredOutputs,
+    };
+  }
+
+  private static calculateTotalFee(
+    inputs: Array<{
+      txid: string;
+      vout: number;
+      value: number;
+      type: string;
+      size: number;
+      isWitness: boolean;
+      hasAncestor?: boolean;
+      ancestor?: {
+        txid: string;
+        vout: number;
+        weight?: number;
+      };
+    }>,
+    outputs: Array<{
+      value: number;
+      isReal?: boolean;
+      isChange?: boolean;
+    }>,
+    satsPerVB: number
+  ): { fee: number; vsize: number } {
+    // Calculate base transaction size
+    const baseSize = estimateTransactionSize({
+      inputs: inputs.map(input => ({
+        type: input.type,
+        size: input.size,
+        isWitness: input.isWitness
+      })),
+      outputs: outputs.map(output => ({
+        value: output.value,
+        isReal: output.isReal,
+        isChange: output.isChange
+      }))
+    });
+
+    // Calculate ancestor weight
+    const ancestorWeight = inputs.reduce((sum, input) => {
+      if (input.ancestor?.weight) {
+        return sum + input.ancestor.weight;
+      }
+      return sum;
+    }, 0);
+
+    // Convert weight to vsize (weight units / 4)
+    const ancestorVsize = Math.ceil(ancestorWeight / 4);
+    
+    // Total vsize including ancestors
+    const totalVsize = baseSize + ancestorVsize;
+
+    // Calculate values
+    const totalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
+    const totalOutputValue = outputs.reduce((sum, output) => sum + Number(output.value), 0);
+    
+    // Calculate fee based on total vsize including ancestors
+    const requestedFee = Math.ceil(totalVsize * satsPerVB);
+    const actualFee = totalInputValue - totalOutputValue;
+    const effectiveFeeRate = actualFee / totalVsize;
+
+    logger.debug("stamps", {
+      message: "Fee calculation with ancestors",
+      data: {
+        sizes: {
+          baseSize,
+          ancestorWeight,
+          ancestorVsize,
+          totalVsize
+        },
+        fees: {
+          requested: {
+            rate: satsPerVB,
+            amount: requestedFee
+          },
+          actual: {
+            amount: actualFee,
+            effectiveRate: effectiveFeeRate.toFixed(1)
+          }
+        },
+        ancestors: inputs.map(input => ({
+          txid: input.txid,
+          vout: input.vout,
+          hasAncestor: !!input.ancestor,
+          ancestorWeight: input.ancestor?.weight
+        })),
+        values: {
+          totalInput: totalInputValue,
+          totalOutput: totalOutputValue
+        }
+      }
+    });
+
+    return {
+      fee: requestedFee,
+      vsize: totalVsize
     };
   }
 }

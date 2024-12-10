@@ -18,7 +18,9 @@
     "dev:safe": "deno task cleanup && deno task dev",
     "validate:schema": "npx @redocly/cli lint --config .redocly.yaml --format stylish ./schema.yml",
     "dredd": "deno task validate:schema && npx dredd",
-    "test:version": "deno test -A --log-level=debug --no-check tests/versioning/versionChain.test.ts"
+    "test:version": "deno test -A --log-level=debug --no-check tests/versioning/versionChain.test.ts",
+    "test:src20": "deno test --allow-net tests/src20/createTransaction.test.ts --no-check --allow-read --allow-env --allow-write",
+    "test:src20:watch": "deno test --allow-net tests/src20/createTransaction.test.ts --no-check --allow-read --allow-env --allow-write --watch"
   },
   "lint": {
     "rules": {
