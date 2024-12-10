@@ -84,6 +84,35 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
       }
     });
   };
+
+  const handleMaxClick = async () => {
+    if (!wallet?.balance) return;
+
+    try {
+      // Estimate the transaction fee for a P2WPKH input and output
+      const estimatedVSize = 141; // Standard size for P2WPKH tx (1-in 1-out)
+      const feeInSatoshis = Math.ceil((formState.fee * estimatedVSize) / 1000);
+
+      // Ensure we have enough balance to cover the fee
+      if (wallet.balance <= feeInSatoshis) {
+        setError("Insufficient balance to cover network fees");
+        return;
+      }
+
+      // Calculate max amount after subtracting fee
+      const maxAmountSats = wallet.balance - feeInSatoshis;
+      const maxAmountBTC = (maxAmountSats / 100000000).toFixed(8);
+
+      setFormState({
+        ...formState,
+        amount: maxAmountBTC,
+      });
+    } catch (error) {
+      setError("Failed to calculate maximum amount");
+      console.error("Max amount calculation error:", error);
+    }
+  };
+
   const inputField1colClassName =
     "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
   const inputField2colClassName =
@@ -91,18 +120,96 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
 
   return (
     <ModalLayout onClose={onClose} title="SEND">
-      <div class="flex flex-col gap-6">
-        <input
-          type="text"
-          value={formState.amount}
-          onInput={(e) =>
-            setFormState({
-              ...formState,
-              amount: (e.target as HTMLInputElement).value,
-            })}
-          placeholder="Enter amount"
-          class={inputField1colClassName}
-        />
+      <div class="flex flex-col gap-6 -mt-3">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex justify-center items-baseline w-full">
+            <div class="inline-flex items-baseline gap-1.5">
+              <input
+                type="text"
+                value={formState.amount}
+                onInput={(e) => {
+                  const value = (e.target as HTMLInputElement).value;
+                  // Only allow numbers and decimal point
+                  let sanitizedValue = value.replace(/[^0-9.]/g, "");
+
+                  // Ensure only one decimal point
+                  const parts = sanitizedValue.split(".");
+                  if (parts.length > 2) {
+                    sanitizedValue = parts[0] + "." + parts[1];
+                  }
+
+                  // Limit decimal places to 8
+                  if (parts.length === 2 && parts[1].length > 8) {
+                    sanitizedValue = parts[0] + "." + parts[1].slice(0, 8);
+                  }
+
+                  // Limit total length to 10
+                  sanitizedValue = sanitizedValue.slice(0, 10);
+
+                  setFormState({
+                    ...formState,
+                    amount: sanitizedValue,
+                  });
+                }}
+                placeholder="0"
+                class="bg-transparent text-4xl mobileLg:text-5xl text-stamp-grey-light placeholder:text-stamp-grey font-black outline-none text-right -ms-1.5 mobileLg:-ms-0.75"
+                style={{
+                  width: (() => {
+                    const value = formState.amount || "";
+
+                    // Define pixel values for different screen sizes
+                    const smallScreenChar = { one: 17, other: 23 };
+                    const largeScreenChar = { one: 22, other: 30 };
+
+                    // Use CSS media query to determine screen size
+                    const isSmallScreen =
+                      window.matchMedia("(max-width: 767px)").matches;
+                    const { one, other } = isSmallScreen
+                      ? smallScreenChar
+                      : largeScreenChar;
+
+                    // Calculate width based on input value
+                    const baseWidth = !value
+                      ? other // Use 'other' width (24px) for empty/placeholder
+                      : value.split("").reduce((total, char) => {
+                        return total +
+                          (char === "1" || char === "." ? one : other);
+                      }, 0);
+
+                    console.log({
+                      value,
+                      isSmallScreen,
+                      one,
+                      other,
+                      baseWidth,
+                      finalWidth: `${baseWidth}px`,
+                    });
+
+                    return `${baseWidth}px`;
+                  })(),
+                }}
+              />
+              <span class="text-4xl mobileLg:text-5xl text-stamp-grey-light font-extralight ml-0.75 mobileLg:ml-1.5">
+                BTC
+              </span>
+            </div>
+          </div>
+          <div class="text-lg mobileLg:text-xl text-stamp-grey-darker font-light mt-0.75">
+            {formState.amount && formState.BTCPrice
+              ? (parseFloat(formState.amount) * formState.BTCPrice)
+                .toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              : "0.00"} USD
+          </div>
+          <div
+            class="text-xs mobileLg:text-sm text-stamp-grey font-medium hover:stamp-grey-light mt-1.5 cursor-pointer"
+            onClick={handleMaxClick}
+          >
+            MAX
+          </div>
+        </div>
 
         <input
           value={formState.recipientAddress}
