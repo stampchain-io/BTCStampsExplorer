@@ -117,6 +117,21 @@ export class SRC101QueryService {
     }
   }
 
+  static async getSrc101OwnerCount(
+    params:SRC101OwnerParams,
+  ): Promise<number> {
+    try{
+      if(params.tokenid){
+        params.tokenid = decodeURIComponent(params.tokenid);
+        params.tokenid = params.tokenid.replace(/-/g, "+").replace(/_/g, "/");
+      }
+      return await SRC101Repository.getSrc101OwnerCount(params);
+    } catch (error) {
+      console.error("Error getting SRC101 owner:", error);
+      throw error;
+    }
+  }
+
   static async getTotalSrc101TokenidsCount(
     params: Partial<SRC101TokenidsParams>,
   ): Promise<number> {

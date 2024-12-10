@@ -989,6 +989,42 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v2/src101/{deploy_hash}:
+    get:
+      operationId: getSrc101Owner
+      tags:
+        - SRC-101
+      summary: Get SRC-101 from owners table
+      description: Return all src101 data that matches the rule by filtering
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - in: path
+          name: deploy_hash
+          required: true
+          example: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+          schema:
+            type: string
+          description: The hash of the deploy transaction
+        - in: query
+          name: expire
+          schema:
+            type: integer
+          description: 0 is false, 1 is true. false means there are no expired domain names
+      responses:
+        "200":
+          description: Successful response with deployment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedSrc101ResponseBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v2/src101/{deploy_hash}/total:
     get:
       operationId: getSrc101TotalSupply
