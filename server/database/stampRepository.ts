@@ -804,15 +804,15 @@ export class StampRepository {
           .reduce((acc, balance) => acc + balance.quantity, 0);
         const utxos = xcpBalances
           .filter(
-            (balance) => balance.cpid === summary.cpid && balance.utxo_address
+            (balance) => balance.cpid === summary.cpid && balance.utxo
           )
           .map((balance) => ({
             quantity: balance.quantity,
-            utxo_address: balance.utxo_address,
+            utxo: balance.utxo,
           }));
         const unbound_quantity = xcpBalances
           .filter(
-            (balance) => balance.cpid === summary.cpid && !balance.utxo_address
+            (balance) => balance.cpid === summary.cpid && !balance.utxo
           )
           .reduce((total, balance) => total + (balance.quantity || 0), 0);
         return {
