@@ -51,7 +51,7 @@ export const handler: Handlers = {
         getCurrentBlock(),
         StampService.countTotalStamps(),
         SRC20Repository.checkSrc20Deployments(),
-        XcpManager.checkHealth(),
+        XcpManager.checkHealth(0),
       ]);
 
       // Update service statuses
