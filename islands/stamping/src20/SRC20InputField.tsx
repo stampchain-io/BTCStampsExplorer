@@ -9,6 +9,7 @@ interface SRC20InputFieldProps {
   isUppercase?: boolean;
   inputMode?: "numeric" | "text" | "email";
   pattern?: string;
+  onFocus?: () => void;
 }
 
 export function SRC20InputField({
@@ -22,6 +23,7 @@ export function SRC20InputField({
   isUppercase,
   inputMode,
   pattern,
+  onFocus,
 }: SRC20InputFieldProps) {
   return (
     <div class="w-full">
@@ -34,6 +36,7 @@ export function SRC20InputField({
         value={value}
         onInput={onChange}
         onBlur={onBlur}
+        onFocus={onFocus}
         maxLength={maxLength}
         inputMode={inputMode}
         pattern={pattern}

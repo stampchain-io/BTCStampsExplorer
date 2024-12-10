@@ -30,7 +30,7 @@ export function Mint101Content(
     submissionMessage,
     walletError,
     apiError,
-  } = useSRC20Form("transfer", trxType);
+  } = useSRC20Form("mint", trxType);
 
   const [tosAgreed, setTosAgreed] = useState(false);
   const { wallet } = walletContext;
@@ -59,9 +59,9 @@ export function Mint101Content(
         <InputField
           type="text"
           placeholder="Bitname Ticker"
-          value={formState.toAddress}
-          onChange={(e) => handleInputChange(e, "toAddress")}
-          error={formState.toAddressError}
+          value={formState.token}
+          onChange={(e) => handleInputChange(e, "token")}
+          error={formState.tokenError}
         />
       </div>
 

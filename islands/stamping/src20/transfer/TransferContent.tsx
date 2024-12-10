@@ -8,18 +8,23 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "../SRC20InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
-import { SearchResult } from "$islands/datacontrol/Search.tsx";
+import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 
-const bodyToolsClassName =
-  "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenterClassName =
+interface Balance {
+  tick: string;
+  amt: string;
+  // Add other balance fields as needed
+}
+
+const bodyToolsclass = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+const titlePurpleLDCenterclass =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
 
-const inputFieldContainerClassName =
+const inputFieldContainerclass =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
-const inputField2colClassName =
+const inputField2colclass =
   "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-const feeSelectorContainerClassName =
+const feeSelectorContainerclass =
   "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 
 export function TransferContent(
@@ -32,7 +37,6 @@ export function TransferContent(
     handleInputChange,
     handleSubmit,
     fetchFees,
-    isLoading,
     config,
     isSubmitting,
     submissionMessage,
@@ -42,15 +46,12 @@ export function TransferContent(
   } = useSRC20Form("transfer", trxType);
 
   const [tosAgreed, setTosAgreed] = useState(false);
-  const [balances, setBalances] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [balances, setBalances] = useState<Balance[]>([]);
+  const [searchResults, setSearchResults] = useState<Balance[]>([]);
   const [openDrop, setOpenDrop] = useState<boolean>(false);
+  const [isSelecting, setIsSelecting] = useState(false);
 
   const { wallet, isConnected } = walletContext;
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
@@ -72,58 +73,109 @@ export function TransferContent(
     }
   };
 
-  // Update useEffect to handle search results with better debouncing
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(async () => {
-      if (formState.token?.trim()) {
-        try {
-          const data = balances.filter((item) => {
-            const regex = new RegExp(formState.token, "i"); // 'i' makes it case-insensitive
-            return regex.test(item.tick);
-          });
+  const handleDropDown = (ticker: string, amount: string) => {
+    setOpenDrop(false);
+    setIsSelecting(true);
 
-          if (data && Array.isArray(data)) {
-            setSearchResults(data);
-          } else {
-            setSearchResults([]);
-          }
-        } catch (error) {
-          setSearchResults([]);
+    const selectedBalance = balances.find((b) => b.tick === ticker);
+
+    if (selectedBalance) {
+      const maxAmount = stripTrailingZeros(selectedBalance.amt);
+
+      setFormState((prev) => ({
+        ...prev,
+        token: ticker,
+        amt: "",
+        maxAmount: maxAmount,
+      }));
+
+      requestAnimationFrame(() => {
+        const amountInput = document.querySelector(
+          "[data-amount-input]",
+        ) as HTMLInputElement;
+        if (amountInput) {
+          amountInput.placeholder = `Amount (MAX: ${maxAmount})`;
         }
-      } else {
-        setSearchResults([]);
-      }
+      });
+    }
+  };
+
+  const handleTokenFieldFocus = () => {
+    if (!formState.token?.trim()) {
+      setSearchResults(balances);
+      setOpenDrop(true);
+    }
+    setIsSelecting(false);
+  };
+
+  useEffect(() => {
+    if (isSelecting) {
+      return;
+    }
+
+    if (!formState.token?.trim()) {
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(() => {
+      const filteredResults = balances.filter((item) => {
+        const regex = new RegExp(formState.token, "i");
+        return regex.test(item.tick);
+      });
+
+      setSearchResults(filteredResults);
+      setOpenDrop(filteredResults.length > 0);
     }, 300);
 
-    return () => {
-      clearTimeout(delayDebounceFn);
-    };
-  }, [formState.token, balances]);
+    return () => clearTimeout(delayDebounceFn);
+  }, [formState.token, balances, isSelecting]);
 
   useEffect(() => {
     const getBalances = async () => {
-      const response = await fetch(
-        `/api/v2/src20/balance/${wallet.address}`,
-      );
-      const data = await response.json();
-      setBalances(data.data);
-    };
-    getBalances();
-  }, []);
+      if (!wallet?.address) return;
 
-  const handleDropDown = (ticket: string) => {
-    setOpenDrop(false);
-    setFormState((prev) => ({
-      ...prev,
-      token: ticket as string,
-    }));
+      try {
+        const response = await fetch(`/api/v2/src20/balance/${wallet.address}`);
+        const data = await response.json();
+
+        if (data.data && Array.isArray(data.data)) {
+          setBalances(data.data);
+        }
+      } catch (error) {
+        logger.error("stamps", {
+          message: "Error fetching balances",
+          error,
+        });
+      }
+    };
+
+    getBalances();
+  }, [wallet?.address]);
+
+  const handleAmountChange = (e: Event) => {
+    const value = (e.target as HTMLInputElement).value;
+    const selectedBalance = balances.find((b) => b.tick === formState.token);
+
+    if (selectedBalance) {
+      const maxAmount = parseFloat(stripTrailingZeros(selectedBalance.amt));
+      const inputAmount = parseFloat(value);
+
+      if (!isNaN(inputAmount) && inputAmount > maxAmount) {
+        handleInputChange({
+          target: { value: maxAmount.toString() },
+        } as Event, "amt");
+        return;
+      }
+    }
+
+    handleInputChange(e, "amt");
   };
 
   return (
-    <div className={bodyToolsClassName}>
-      <h1 className={titlePurpleLDCenterClassName}>TRANSFER</h1>
+    <div class={bodyToolsclass}>
+      <h1 class={titlePurpleLDCenterclass}>TRANSFER</h1>
 
-      <div className={inputFieldContainerClassName}>
+      <div class={inputFieldContainerclass}>
         <SRC20InputField
           type="text"
           placeholder="Recipient address"
@@ -133,30 +185,45 @@ export function TransferContent(
           error={formState.toAddressError}
         />
 
-        <div className={inputField2colClassName}>
-          <div className="relative">
+        <div class={inputField2colclass}>
+          <div class="relative">
             <SRC20InputField
               type="text"
               placeholder="Token"
               value={formState.token}
               onChange={(e) => {
-                if (e.currentTarget.value) {
-                  setOpenDrop(true);
+                const newValue = (e.target as HTMLInputElement).value
+                  .toUpperCase();
+                if (newValue !== formState.token) {
+                  handleInputChange(e, "token");
+                  if (!isSelecting) {
+                    setOpenDrop(true);
+                  }
                 }
-                handleInputChange(e, "token");
               }}
-              onBlur={() => handleInputBlur("token")}
+              onFocus={handleTokenFieldFocus}
+              onBlur={() => {
+                if (formState.token?.trim() || isSelecting) {
+                  setTimeout(() => {
+                    setOpenDrop(false);
+                    setIsSelecting(false);
+                  }, 150);
+                }
+              }}
               isUppercase
             />
-            {(openDrop && searchResults.length > 0) && (
+            {openDrop && searchResults.length > 0 && !isSelecting && (
               <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[11] max-h-60 overflow-y-auto">
-                {searchResults.map((result: SearchResult) => (
+                {searchResults.map((result) => (
                   <li
                     key={result.tick}
-                    onClick={() => handleDropDown(result.tick)}
+                    onClick={() => handleDropDown(result.tick, result.amt)}
                     class="cursor-pointer p-2 hover:bg-gray-600 uppercase"
                   >
                     {result.tick}
+                    <span class="text-[10px] ml-2">
+                      (Balance: {stripTrailingZeros(result.amt)})
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -169,14 +236,15 @@ export function TransferContent(
             pattern="[0-9]*"
             placeholder="Amount"
             value={formState.amt}
-            onChange={(e) => handleInputChange(e, "amt")}
+            onChange={handleAmountChange}
             onBlur={() => handleInputBlur("amt")}
             error={formState.amtError}
+            data-amount-input
           />
         </div>
       </div>
 
-      <div className={feeSelectorContainerClassName}>
+      <div class={feeSelectorContainerclass}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

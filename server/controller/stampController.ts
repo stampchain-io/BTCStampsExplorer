@@ -14,7 +14,6 @@ import {
   StampRow,
 } from "$globals";
 import { DispenserManager } from "$server/services/xcpService.ts";
-import { decodeBase64 } from "@std/encoding";
 import { filterOptions } from "$lib/utils/filterOptions.ts";
 import { Dispense, Dispenser } from "$types/index.d.ts";
 import { CollectionController } from "./collectionController.ts";

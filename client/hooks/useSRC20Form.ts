@@ -45,11 +45,6 @@ interface SRC20FormState {
   psbtFees?: PSBTFees;
 }
 
-interface UTXOAncestorResponse {
-  ancestors: AncestorInfo[];
-  error?: string;
-}
-
 interface TxDetails {
   estimatedSize: number;
   minerFee: number;
@@ -65,6 +60,166 @@ const sizeEstimateCache = new Map<string, {
   size: number;
   timestamp: number;
 }>();
+
+// Add a new interface for cache keys
+interface SizeEstimateCacheKey {
+  action: string;
+  token: string;
+  trxType: string;
+  dec?: string;
+  amt?: string;
+  max?: string;
+  lim?: string;
+  x?: string;
+  tg?: string;
+  web?: string;
+  email?: string;
+  toAddress?: string;
+}
+
+export class SRC20FormController {
+  private static prepareTxDebounced = debounce(async (
+    params: {
+      wallet: { address?: string };
+      formState: SRC20FormState;
+      action: string;
+      trxType: string;
+      canEstimateFees: (partial: boolean) => boolean;
+    },
+    callbacks: {
+      setTxDetails: (details: any) => void;
+      setFormState: (fn: (prev: SRC20FormState) => SRC20FormState) => void;
+      logger: typeof logger;
+    },
+  ) => {
+    const { wallet, formState, action, trxType, canEstimateFees } = params;
+    const { setTxDetails, setFormState, logger } = callbacks;
+
+    if (!wallet.address) return;
+
+    // Generate cache key for this request
+    const cacheKey = JSON.stringify(
+      {
+        action,
+        token: formState.token,
+        trxType,
+        dec: formState.dec,
+        ...(action !== "deploy" && { amt: formState.amt }),
+        ...(action === "deploy" && {
+          max: formState.max,
+          lim: formState.lim,
+        }),
+      } satisfies SizeEstimateCacheKey,
+    );
+
+    // Check size estimate cache first
+    const cached = sizeEstimateCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      const newFee = Math.ceil(cached.size * formState.fee);
+      setFormState((prev) => ({
+        ...prev,
+        psbtFees: {
+          estMinerFee: newFee,
+          totalDustValue: prev.psbtFees?.totalDustValue || 546,
+          hasExactFees: true,
+        } satisfies PSBTFees,
+      }));
+      return;
+    }
+
+    try {
+      // Skip API call if we don't have minimum required fields
+      if (!canEstimateFees(true)) return;
+
+      const response = await axiod.post("/api/v2/src20/create", {
+        sourceAddress: wallet.address,
+        toAddress: wallet.address,
+        satsPerVB: formState.fee,
+        trxType,
+        op: action,
+        tick: formState.token || "TEST",
+        ...(action === "deploy" && {
+          max: formState.max || "1000",
+          lim: formState.lim || "1000",
+          dec: formState.dec || "18",
+          ...(formState.x && { x: formState.x }),
+          ...(formState.tg && { tg: formState.tg }),
+          ...(formState.web && { web: formState.web }),
+          ...(formState.email && { email: formState.email }),
+        }),
+        ...(action === "mint" && {
+          amt: formState.amt || "1",
+        }),
+        ...(action === "transfer" && {
+          amt: formState.amt || "1",
+          toAddress: formState.toAddress,
+        }),
+        dryRun: true,
+      });
+
+      // Cache the size estimate
+      sizeEstimateCache.set(cacheKey, {
+        size: response.data.estimatedSize,
+        timestamp: Date.now(),
+      });
+
+      setTxDetails(response.data);
+      setFormState((prev) => ({
+        ...prev,
+        psbtFees: {
+          estMinerFee: response.data.minerFee,
+          totalDustValue: response.data.dustValue,
+          hasExactFees: true,
+        } satisfies PSBTFees,
+      }));
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Transaction preparation error",
+        error,
+      });
+    }
+  }, 1000); // Increase debounce time for fee calculations
+
+  private static checkTokenExistenceDebounced = debounce(async (
+    token: string,
+    setFormState: (fn: (prev: SRC20FormState) => SRC20FormState) => void,
+  ) => {
+    try {
+      const response = await axiod.get(`/api/v2/src20/tick/${token}/deploy`);
+      if (response.data && response.data.data) {
+        setFormState((prev) => ({
+          ...prev,
+          tokenError: "This tick already exists.",
+        }));
+      } else {
+        setFormState((prev) => ({ ...prev, tokenError: "" }));
+      }
+    } catch (error) {
+      console.error("Error checking tick existence:", error);
+      setFormState((prev) => ({ ...prev, tokenError: "" }));
+    }
+  }, 800);
+
+  static prepareTx(
+    ...args: Parameters<typeof SRC20FormController.prepareTxDebounced>
+  ) {
+    return this.prepareTxDebounced(...args);
+  }
+
+  static checkTokenExistence(
+    ...args: Parameters<typeof SRC20FormController.checkTokenExistenceDebounced>
+  ) {
+    return this.checkTokenExistenceDebounced(...args);
+  }
+
+  static cancelPrepareTx() {
+    this.prepareTxDebounced.cancel();
+  }
+
+  static cancelTokenCheck() {
+    this.checkTokenExistenceDebounced.cancel();
+  }
+}
 
 export function useSRC20Form(
   action: string,
@@ -117,7 +272,6 @@ export function useSRC20Form(
   const [walletError, setWalletError] = useState<string | null>(null);
 
   const { wallet } = walletContext;
-  const address = wallet.address;
 
   useEffect(() => {
     if (fees) {
@@ -138,26 +292,35 @@ export function useSRC20Form(
   const [hasValidTransaction, setHasValidTransaction] = useState(false);
   const [txDetails, setTxDetails] = useState<TxDetails | null>(null);
 
-  // Add state to track if we have a valid estimate
-  const [hasValidEstimate, setHasValidEstimate] = useState(false);
-
   // Separate fee estimation logic
-  const estimateFees = async (partialEstimate = false) => {
+  const estimateFees = async (partialEstimate = false): Promise<void> => {
     if (!canEstimateFees(partialEstimate)) return;
 
-    // Generate cache key based on relevant fields
-    const cacheKey = JSON.stringify({
-      action,
-      token: formState.token,
-      amt: formState.amt,
-      max: formState.max,
-      lim: formState.lim,
-    });
+    // Generate consistent cache key with all relevant fields
+    const cacheKey = JSON.stringify(
+      {
+        action,
+        token: formState.token,
+        trxType,
+        ...(action === "deploy" && {
+          dec: formState.dec,
+          max: formState.max,
+          lim: formState.lim,
+          ...(formState.x && { x: formState.x }),
+          ...(formState.tg && { tg: formState.tg }),
+          ...(formState.web && { web: formState.web }),
+          ...(formState.email && { email: formState.email }),
+        }),
+        ...(action !== "deploy" && {
+          amt: formState.amt,
+          ...(action === "transfer" && { toAddress: formState.toAddress }),
+        }),
+      } satisfies SizeEstimateCacheKey,
+    );
 
     // Check cache first
     const cached = sizeEstimateCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      // Just update fee based on cached size
       const newFee = Math.ceil(cached.size * formState.fee);
       setFormState((prev) => ({
         ...prev,
@@ -171,29 +334,36 @@ export function useSRC20Form(
     }
 
     try {
-      const response = await axiod.post("/api/v2/src20/create", {
+      // Always include essential fields for accurate estimation
+      const requestData = {
         sourceAddress: wallet.address,
         toAddress: action === "transfer" ? formState.toAddress : wallet.address,
         satsPerVB: formState.fee,
         trxType,
         op: action,
         tick: formState.token,
-        inputType: trxType === "olga" ? "P2WSH" : "P2SH",
-        outputTypes: trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"],
-        utxoAncestors: formState.utxoAncestors,
-        // Only include optional fields if not a partial estimate
-        ...(!partialEstimate && {
-          ...(formState.max && { max: formState.max }),
-          ...(formState.lim && { lim: formState.lim }),
-          ...(formState.dec && { dec: formState.dec }),
-          ...(formState.amt && { amt: formState.amt }),
+
+        // Include operation-specific fields with all optional fields
+        ...(action === "deploy" && {
+          max: formState.max || "1000",
+          lim: formState.lim || "1000",
+          dec: formState.dec || "18",
+          ...(formState.x && { x: formState.x }),
+          ...(formState.tg && { tg: formState.tg }),
+          ...(formState.web && { web: formState.web }),
+          ...(formState.email && { email: formState.email }),
+        }),
+        ...(["mint", "transfer"].includes(action) && {
+          amt: formState.amt || "1",
         }),
         dryRun: true,
         isEstimate: true,
-      });
+      };
+
+      const response = await axiod.post("/api/v2/src20/create", requestData);
 
       if (response.data) {
-        // Cache the size estimate
+        // Cache the size estimate with the consistent key
         sizeEstimateCache.set(cacheKey, {
           size: response.data.estimatedSize,
           timestamp: Date.now(),
@@ -223,66 +393,6 @@ export function useSRC20Form(
     }
   };
 
-  // Add a longer debounce for fee estimation
-  const FEE_ESTIMATION_DEBOUNCE = 1000; // 1 second
-
-  // Separate the fee estimation trigger conditions
-  const [isSearching, setIsSearching] = useState(false);
-
-  useEffect(() => {
-    if (!wallet?.address || formState.fee <= 0 || isSearching) return;
-
-    // Skip estimation if we already have a valid estimate and only the tick changed
-    if (hasValidEstimate && action !== "deploy" && !formState.amt) {
-      return;
-    }
-
-    const debouncedEstimate = debounce(() => {
-      const shouldEstimate = action === "deploy"
-        ? !!(formState.max && formState.lim && formState.dec)
-        : !!formState.amt;
-
-      if (shouldEstimate) {
-        estimateFees(true);
-        setHasValidEstimate(true);
-      }
-    }, FEE_ESTIMATION_DEBOUNCE);
-
-    debouncedEstimate();
-
-    return () => {
-      debouncedEstimate.cancel();
-    };
-  }, [
-    wallet?.address,
-    formState.fee,
-    isSearching,
-    // Only include fields that affect transaction size
-    action === "deploy" ? formState.max + formState.lim : formState.amt,
-  ]);
-
-  // Reset valid estimate when amount changes
-  useEffect(() => {
-    if (formState.amt) {
-      setHasValidEstimate(false);
-    }
-  }, [formState.amt]);
-
-  // Keep only the fee rate change handler
-  useEffect(() => {
-    if (txDetails && formState.fee > 0) {
-      const newFee = Math.ceil(txDetails.estimatedSize * formState.fee);
-      setFormState((prev) => ({
-        ...prev,
-        psbtFees: {
-          estMinerFee: newFee,
-          totalDustValue: prev.psbtFees?.totalDustValue || 0,
-          hasExactFees: true,
-        } satisfies PSBTFees,
-      }));
-    }
-  }, [formState.fee, txDetails?.estimatedSize]); // Only depend on fee rate and size
-
   // When essential data changes
   useEffect(() => {
     logger.debug("stamps", {
@@ -293,7 +403,6 @@ export function useSRC20Form(
         fee: formState.fee,
         token: formState.token,
         action,
-        // Log relevant fields based on action
         ...(action === "deploy" && {
           max: formState.max,
           lim: formState.lim,
@@ -304,65 +413,35 @@ export function useSRC20Form(
 
     if (wallet?.address && formState.fee > 0 && !isSubmitting) {
       setHasValidTransaction(true);
-      const prepareTx = async () => {
-        try {
-          const response = await axiod.post("/api/v2/src20/create", {
-            sourceAddress: wallet.address,
-            toAddress: wallet.address,
-            satsPerVB: formState.fee,
-            trxType,
-            op: action,
-            tick: formState.token || "TEST",
-            // Include action-specific fields
-            ...(action === "deploy" && {
-              max: formState.max || "1000",
-              lim: formState.lim || "1000",
-              dec: formState.dec || "18",
-              ...(formState.x && { x: formState.x }),
-              ...(formState.tg && { tg: formState.tg }),
-              ...(formState.web && { web: formState.web }),
-              ...(formState.email && { email: formState.email }),
-            }),
-            ...(action === "mint" && {
-              amt: formState.amt || "1",
-            }),
-            ...(action === "transfer" && {
-              amt: formState.amt || "1",
-              toAddress: formState.toAddress, // Include recipient address for transfers
-            }),
-            dryRun: true, // Add this for fee estimation
-          });
 
-          setTxDetails(response.data);
-          setFormState((prev) => ({
-            ...prev,
-            psbtFees: {
-              estMinerFee: response.data.minerFee,
-              totalDustValue: response.data.dustValue,
-              hasExactFees: true,
-            } satisfies PSBTFees,
-          }));
-        } catch (error) {
-          logger.error("stamps", {
-            message: "Transaction preparation error",
-            error,
-          });
-        }
-      };
-
-      // Debounce the fee estimation to prevent too many requests
-      const debouncedPrepareTx = debounce(prepareTx, 500);
-      debouncedPrepareTx();
+      SRC20FormController.prepareTx(
+        {
+          wallet,
+          formState,
+          action,
+          trxType,
+          canEstimateFees,
+        },
+        {
+          setTxDetails,
+          setFormState,
+          logger,
+        },
+      );
     } else {
       setHasValidTransaction(false);
       setTxDetails(null);
     }
+
+    return () => {
+      // Now we can properly cancel the debounced function
+      SRC20FormController.cancelPrepareTx();
+    };
   }, [
     wallet?.address,
     formState.fee,
     action,
     formState.token,
-    // Include deploy-specific fields
     ...(action === "deploy"
       ? [
         formState.max,
@@ -373,10 +452,7 @@ export function useSRC20Form(
         formState.web,
         formState.email,
       ]
-      : [
-        // Include action-specific fields for other types
-        formState.amt,
-      ]),
+      : [formState.amt]),
     trxType,
     isSubmitting,
   ]);
@@ -403,7 +479,22 @@ export function useSRC20Form(
 
     if (field === "token") {
       newValue = value.toUpperCase().slice(0, 5);
-    } else if (["lim", "max"].includes(field)) {
+      setFormState((prev) => ({
+        ...prev,
+        [field]: newValue,
+        [`${field}Error`]: "",
+      }));
+
+      // Only check token existence if we're deploying and have a value
+      if (action === "deploy" && newValue) {
+        SRC20FormController.checkTokenExistence(newValue, setFormState);
+      }
+      return () => {
+        SRC20FormController.cancelTokenCheck();
+      };
+    }
+
+    if (["lim", "max"].includes(field)) {
       newValue = handleIntegerInput(value, field);
     } else if (field === "dec") {
       newValue = handleDecimalInput(value);
@@ -414,27 +505,6 @@ export function useSRC20Form(
       [field]: newValue,
       [`${field}Error`]: "",
     }));
-
-    if (field === "token" && action === "deploy") {
-      try {
-        const response = await axiod.get(
-          `/api/v2/src20/tick/${newValue}/deploy`,
-        );
-        if (response.data && response.data.data) {
-          setFormState((prev) => ({
-            ...prev,
-            tokenError: "This tick already exists.",
-          }));
-        } else {
-          // The tick doesn't exist, which is what we want for deployment
-          setFormState((prev) => ({ ...prev, tokenError: "" }));
-        }
-      } catch (error) {
-        console.error("Error checking tick existence:", error);
-        // Don't set an error message here, as a failure to check doesn't necessarily mean the tick is invalid
-        setFormState((prev) => ({ ...prev, tokenError: "" }));
-      }
-    }
   };
 
   // Add blur handler
@@ -574,26 +644,14 @@ export function useSRC20Form(
       }
 
       const endpoint = "/api/v2/src20/create";
-      let requestData;
-
-      logger.debug("ui", {
-        message: "Preparing request data",
-        action,
+      const requestData = {
+        sourceAddress: wallet.address,
+        toAddress: action === "transfer" ? formState.toAddress : wallet.address,
+        changeAddress: wallet.address,
         trxType,
-        endpoint,
-      });
-
-      requestData = {
-        trxType,
-        toAddress: action === "transfer" ? formState.toAddress : address,
-        fromAddress: action === "transfer" ? address : undefined,
-        changeAddress: address,
         op: action,
         tick: formState.token,
-        feeRate: formState.fee,
-        amt: formState.amt,
-        service_fee: config?.MINTING_SERVICE_FEE,
-        service_fee_address: config?.MINTING_SERVICE_FEE_ADDRESS,
+        satsPerVB: Number(formState.fee),
         ...(action === "deploy" && {
           max: formState.max,
           lim: formState.lim,
@@ -603,50 +661,35 @@ export function useSRC20Form(
           web: formState.web,
           email: formState.email,
         }),
+        ...(["mint", "transfer"].includes(action) && {
+          amt: formState.amt,
+        }),
+        service_fee: config.MINTING_SERVICE_FEE,
+        service_fee_address: config.MINTING_SERVICE_FEE_ADDRESS,
+        ...(formState.utxoAncestors?.length && {
+          utxoAncestors: formState.utxoAncestors.map((ancestor) => ({
+            txid: ancestor.txid,
+            vout: ancestor.vout,
+            weight: ancestor.weight,
+          })),
+        }),
         ...additionalData,
-        utxoAncestors: formState.utxoAncestors?.map((ancestor) => ({
-          txid: ancestor.txid,
-          vout: ancestor.vout,
-          weight: ancestor.weight,
-        })),
       };
 
-      // Cache key based on relevant data
-      const cacheKey = JSON.stringify({
-        address,
-        action,
-        fileSize: formState.jsonSize,
-        utxoCount: formState.utxoAncestors?.length,
+      logger.debug("stamps", {
+        message: "Sending request to create endpoint",
+        requestData,
       });
 
-      // Check cache first
-      const cachedFee = feeCache.get(cacheKey);
-      if (cachedFee && Date.now() - cachedFee.timestamp < CACHE_DURATION) {
-        setFormState((prev) => ({
-          ...prev,
-          psbtFees: {
-            estMinerFee: cachedFee.fee,
-            totalDustValue: formState.psbtFees?.totalDustValue || 0,
-            hasExactFees: true,
-          } as PSBTFees,
-        }));
-      }
+      const response = await axiod.post(endpoint, requestData);
 
-      const response = await axiod.post(endpoint, requestData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      logger.debug("stamps", {
+        message: "Received response from create endpoint",
+        responseData: response.data,
       });
 
-      logger.debug("ui", {
-        message: "API response received",
-        responseData: JSON.stringify(response.data, null, 2),
-      });
-
-      if (!response.data || !response.data.hex) {
-        throw new Error(
-          "Invalid response from server: missing transaction data",
-        );
+      if (!response.data?.hex) {
+        throw new Error("No transaction hex received from server");
       }
 
       logger.debug("ui", {
@@ -760,6 +803,5 @@ export function useSRC20Form(
     setApiError,
     apiError,
     handleInputBlur,
-    setIsSearching,
   };
 }

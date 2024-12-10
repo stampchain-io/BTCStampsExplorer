@@ -44,25 +44,57 @@ function estimateBasicSize(data: ExtendedInputData): number {
   // Estimate input size (assume one P2WPKH input for estimation)
   size += 68; // Basic input size
 
+  // Get decimal places for accurate size estimation
+  const decimals = parseInt(data.dec || "18", 10);
+
   // Calculate outputs based on operation
   switch (data.op.toLowerCase()) {
-    case "deploy":
-      // P2WSH output for deploy data + change output
-      size += Math.ceil((data.max?.length || 0) / 62) * 43; // Each data chunk in P2WSH
+    case "deploy": {
+      // Calculate data size for deploy
+      const deployData = {
+        op: "DEPLOY",
+        p: "SRC-20",
+        tick: data.tick || "",
+        max: data.max || "0",
+        lim: data.lim || "0",
+        dec: decimals || "18",
+      };
+      const dataSize = Math.ceil(JSON.stringify(deployData).length / 2);
+      size += Math.ceil(dataSize / 62) * 43; // Each data chunk in P2WSH
       size += 31; // Change output
       break;
-    case "mint":
-      // Basic mint outputs + change
+    }
+    case "mint": {
+      const mintData = {
+        op: "MINT",
+        p: "SRC-20",
+        tick: data.tick || "",
+        amt: data.amt || "0",
+      };
+      const dataSize = Math.ceil(JSON.stringify(mintData).length / 2);
       size += 43; // Recipient output
-      size += Math.ceil((data.amt?.length || 0) / 62) * 43; // Data outputs
+      size += Math.ceil(dataSize / 62) * 43; // Data outputs
       size += 31; // Change output
       break;
-    case "transfer":
-      // Transfer outputs + change
+    }
+    case "transfer": {
+      const transferData = {
+        op: "TRANSFER",
+        p: "SRC-20",
+        tick: data.tick || "",
+        amt: data.amt || "0",
+      };
+      const dataSize = Math.ceil(JSON.stringify(transferData).length / 2);
       size += 43; // Recipient output
-      size += 43; // Data output
+      size += Math.ceil(dataSize / 62) * 43; // Data output
       size += 31; // Change output
       break;
+    }
+  }
+
+  // Add extra size for multisig if needed
+  if (data.trxType === "multisig") {
+    size += 107; // Additional multisig overhead
   }
 
   return size;
@@ -221,9 +253,18 @@ export const handler: Handlers<TX | TXError> = {
         return validationError;
       }
 
-      // If it's a dry run, use quick estimation without UTXO fetching
+      // If it's a dry run, use accurate estimation
       if (body.dryRun) {
-        const estimatedSize = estimateBasicSize(body);
+        // Ensure we have all required fields for estimation
+        const estimationData = {
+          ...body,
+          dec: body.dec || "18",
+          max: body.max || "1000",
+          lim: body.lim || "1000",
+          amt: body.amt || "1",
+        };
+
+        const estimatedSize = estimateBasicSize(estimationData);
         const minerFee = Math.ceil(
           estimatedSize * normalizedFees.normalizedSatsPerVB,
         );
@@ -233,7 +274,7 @@ export const handler: Handlers<TX | TXError> = {
           minerFee,
           dustValue,
           estimatedSize,
-          outputCount: estimateOutputCount(body),
+          outputCount: estimateOutputCount(estimationData),
         });
       }
 

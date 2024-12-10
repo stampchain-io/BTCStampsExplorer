@@ -626,17 +626,23 @@ static async searchValidSrc20TxFromDb(query: string) {
     );
 
     return result.rows.map((row: any) => {
-      const maxSupply = new BigFloat(row?.max_supply || "1"); // Avoid division by zero
+      const maxSupply = new BigFloat(row?.max_supply || "1");
       const totalMinted = new BigFloat(row.total_minted || "0");
       const progress = bigFloatToString(totalMinted.div(maxSupply).mul(100), 3);
+      const progressNum = parseFloat(progress);
+
+      // Only filter out 100% minted tokens
+      if (progressNum >= 100) {
+        return null;
+      }
 
       return {
         tick: row.tick,
-        progress: parseFloat(progress).toFixed(3), // Convert to number and format
+        progress: progressNum,
+        total_minted: row.total_minted,
+        max_supply: row.max_supply
       };
-    }).filter(item => parseFloat(item.progress) !== 100)
-          .map(item => ({ tick: item.tick }))
-
+    }).filter(Boolean); // Remove null entries
   } catch (error) {
     console.error("Error executing query:", error);
     return [];
