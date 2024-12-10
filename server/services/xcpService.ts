@@ -1633,15 +1633,15 @@ export class XcpManager {
     }
   }
 
-  static async checkHealth(): Promise<boolean> {
+  static async checkHealth(cacheTimeout: number = 0): Promise<boolean> {
     const endpoint = "/healthz";
     const queryParams = new URLSearchParams();
 
     try {
-      // Use the non-cached version of the fetch
-      const response = await fetchXcpV2<{ result: { status: string } }>(
+      const response = await this.fetchXcpV2WithCache<{ result: { status: string } }>(
         endpoint,
-        queryParams
+        queryParams,
+        cacheTimeout
       );
 
       return response?.result?.status === "Healthy";
