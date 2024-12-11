@@ -4,11 +4,13 @@
 @tailwind utilities;
 
 /* Ensure html and body take full height without overflow */
-html, body {
+html,
+body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background-color: #000; /* Fallback color */
+  background-color: #000;
+  /* Fallback color */
   overflow-x: hidden;
 }
 
@@ -19,6 +21,7 @@ html, body {
 .image-rendering-pixelated {
   position: relative;
 }
+
 .image-rendering-pixelated::before {
   content: "";
   position: absolute;
@@ -30,12 +33,14 @@ html, body {
   background-size: 3px;
   z-index: 1;
 }
+
 .image-rendering-pixelated img,
 .image-rendering-pixelated iframe,
-.image-rendering-pixelated > div {
+.image-rendering-pixelated>div {
   position: relative;
   z-index: 2;
 }
+
 .image-rendering-pixelated img {
   mix-blend-mode: multiply;
 }
@@ -48,6 +53,7 @@ html, body {
 }
 
 @media (max-width: 768px) {
+
   /* Adjust the max-width as needed */
   ::-webkit-scrollbar {
     width: 8px;
@@ -63,17 +69,21 @@ html, body {
   height: 6px;
   width: 6px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #aa00ff;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #660099;
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-track {
   background: #333333;
   border-radius: 3px;
 }
+
 /* New custom scrollbar styles for specific class */
 .custom-scrollbar::-webkit-scrollbar {
   width: 28px;
@@ -83,6 +93,7 @@ html, body {
 }
 
 @media (max-width: 768px) {
+
   /* Adjust the max-width as needed */
   .custom-scrollbar::-webkit-scrollbar {
     width: 17px;
@@ -153,53 +164,38 @@ html, body {
   height: 2000px;
   z-index: 1;
   background:
-    radial-gradient(
-      ellipse 50% 50% at 5% 5%,
+    radial-gradient(ellipse 50% 50% at 5% 5%,
       rgba(120, 80, 0, 0.15),
-      transparent 90%
-    ),
-    radial-gradient(
-      ellipse 75% 150% at 20% 0,
+      transparent 90%),
+    radial-gradient(ellipse 75% 150% at 20% 0,
       rgba(1, 0, 1, 0.9) 10%,
-      transparent 50%
-    ),
-    radial-gradient(
-      ellipse 50% 50% at 100% 10%,
+      transparent 50%),
+    radial-gradient(ellipse 50% 50% at 100% 10%,
       rgba(120, 80, 0, 0.15),
-      transparent 80%
-    ),
-    radial-gradient(
-      ellipse 40% 40% at 70% 0,
+      transparent 80%),
+    radial-gradient(ellipse 40% 40% at 70% 0,
       rgba(0, 120, 80, 0.2) 10%,
-      transparent 80%
-    ),
-    radial-gradient(
-      ellipse 100% 60% at 120% 70%,
+      transparent 80%),
+    radial-gradient(ellipse 100% 60% at 120% 70%,
       var(--gradient-cyan),
-      transparent 90%
-    ),
-    linear-gradient(
-      rgba(80, 0, 120, 0.4),
+      transparent 90%),
+    linear-gradient(rgba(80, 0, 120, 0.4),
       rgba(0, 0, 0, 0.8) 70%,
-      rgba(0, 0, 0, 1) 100%
-    );
-  mask-image: linear-gradient(
-    to bottom,
-    black 0%,
-    black 60%,
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    black 0%,
-    black 60%,
-    transparent 100%
-  );
+      rgba(0, 0, 0, 1) 100%);
+  mask-image: linear-gradient(to bottom,
+      black 0%,
+      black 60%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom,
+      black 0%,
+      black 60%,
+      transparent 100%);
   animation:
     fadeInOutCyan 4s linear infinite alternate;
 }
 
 @layer base {
+
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -212,47 +208,31 @@ html, body {
   height: 1000px;
   z-index: 1;
   background:
-    radial-gradient(
-      ellipse 75% 100% at 20% 100%,
+    radial-gradient(ellipse 75% 100% at 20% 100%,
       rgba(1, 0, 1, 0.6) 10%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 40% 60% at 30% 60%,
+      transparent 70%),
+    radial-gradient(ellipse 40% 60% at 30% 60%,
       var(--gradient-purple),
-      transparent
-    ),
-    radial-gradient(
-      ellipse 20% 60% at 0% 90%,
+      transparent),
+    radial-gradient(ellipse 20% 60% at 0% 90%,
       rgba(120, 80, 0, 0.3),
-      transparent
-    ),
-    radial-gradient(
-      ellipse 20% 60% at 70% 100%,
+      transparent),
+    radial-gradient(ellipse 20% 60% at 70% 100%,
       var(--gradient-orange),
-      transparent
-    ),
-    radial-gradient(
-      ellipse 60% 50% at 120% 60%,
+      transparent),
+    radial-gradient(ellipse 60% 50% at 120% 60%,
       rgba(80, 0, 120, 0.4),
-      transparent
-    ),
-    linear-gradient(
-      rgba(0, 0, 0, 1),
-      rgba(0, 120, 80, 0.1)
-    );
-  mask-image: linear-gradient(
-    to top,
-    black 0%,
-    black 60%,
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to top,
-    black 0%,
-    black 60%,
-    transparent 100%
-  );
+      transparent),
+    linear-gradient(rgba(0, 0, 0, 1),
+      rgba(0, 120, 80, 0.1));
+  mask-image: linear-gradient(to top,
+      black 0%,
+      black 60%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(to top,
+      black 0%,
+      black 60%,
+      transparent 100%);
   animation:
     fadeInOutOrange 4s linear infinite alternate,
     fadeInOutPurple 2s linear infinite alternate;
@@ -262,6 +242,7 @@ html, body {
   .bgGradientTop {
     height: 1000px;
   }
+
   .bgGradientBottom {
     height: 500px;
   }
@@ -277,33 +258,43 @@ html, body {
   0% {
     --gradient-orange: rgba(120, 80, 0, 0.1);
   }
+
   10% {
     --gradient-orange: rgba(120, 80, 0, 0.105);
   }
+
   20% {
     --gradient-orange: rgba(120, 80, 0, 0.11);
   }
+
   30% {
     --gradient-orange: rgba(120, 80, 0, 0.115);
   }
+
   40% {
     --gradient-orange: rgba(120, 80, 0, 0.12);
   }
+
   50% {
     --gradient-orange: rgba(120, 80, 0, 0.125);
   }
+
   60% {
     --gradient-orange: rgba(120, 80, 0, 0.13);
   }
+
   70% {
-      --gradient-orange: rgba(120, 80, 0, 0.135);
+    --gradient-orange: rgba(120, 80, 0, 0.135);
   }
+
   80% {
     --gradient-orange: rgba(120, 80, 0, 0.14);
   }
+
   90% {
     --gradient-orange: rgba(120, 80, 0, 0.145);
   }
+
   100% {
     --gradient-orange: rgba(120, 80, 0, 0.15);
   }
@@ -313,33 +304,43 @@ html, body {
   0% {
     --gradient-purple: rgba(80, 0, 120, 0.2);
   }
+
   10% {
     --gradient-purple: rgba(80, 0, 120, 0.21);
   }
+
   20% {
     --gradient-purple: rgba(80, 0, 120, 0.22);
   }
+
   30% {
     --gradient-purple: rgba(80, 0, 120, 0.23);
   }
+
   40% {
     --gradient-purple: rgba(80, 0, 120, 0.24);
   }
+
   50% {
     --gradient-purple: rgba(80, 0, 120, 0.25);
   }
+
   60% {
     --gradient-purple: rgba(80, 0, 120, 0.26);
   }
+
   70% {
     --gradient-purple: rgba(80, 0, 120, 0.27);
   }
+
   80% {
     --gradient-purple: rgba(80, 0, 120, 0.28);
   }
+
   90% {
     --gradient-purple: rgba(80, 0, 120, 0.29);
   }
+
   100% {
     --gradient-purple: rgba(80, 0, 120, 0.3);
   }
@@ -349,33 +350,43 @@ html, body {
   0% {
     --gradient-cyan: rgba(0, 120, 80, 0.3);
   }
+
   10% {
     --gradient-cyan: rgba(0, 120, 80, 0.305);
   }
+
   20% {
     --gradient-cyan: rgba(0, 120, 80, 0.31);
   }
+
   30% {
     --gradient-cyan: rgba(0, 120, 80, 0.315);
   }
+
   40% {
     --gradient-cyan: rgba(0, 120, 80, 0.32);
   }
+
   50% {
     --gradient-cyan: rgba(0, 120, 80, 0.325);
   }
+
   60% {
     --gradient-cyan: rgba(0, 120, 80, 0.33);
   }
+
   70% {
     --gradient-cyan: rgba(0, 120, 80, 0.335);
   }
+
   80% {
     --gradient-cyan: rgba(0, 120, 80, 0.34);
   }
+
   90% {
     --gradient-cyan: rgba(0, 120, 80, 0.345);
   }
+
   100% {
     --gradient-cyan: rgba(0, 120, 80, 0.35);
   }
@@ -435,4 +446,10 @@ html, body {
 
 .stamp-audio-container audio {
   @apply relative z-20;
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
 }
