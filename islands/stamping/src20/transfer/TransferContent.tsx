@@ -1,5 +1,5 @@
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import { walletContext } from "$client/wallet/wallet.ts";
 
@@ -50,12 +50,45 @@ export function TransferContent(
   const [searchResults, setSearchResults] = useState<Balance[]>([]);
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [isSelecting, setIsSelecting] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { wallet, isConnected } = walletContext;
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpenDrop(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleTransferSubmit = async () => {
+    if (!isConnected) {
+      logger.debug("stamps", {
+        message: "Showing wallet connect modal - user not connected",
+      });
+      walletContext.showConnectModal();
+      return;
+    }
+
+    try {
+      await handleSubmit();
+    } catch (error) {
+      console.error("Transfer error:", error);
+    }
+  };
 
   const handleDropDown = (ticker: string, amount: string) => {
     setOpenDrop(false);
@@ -165,7 +198,7 @@ export function TransferContent(
         />
 
         <div class={inputField2colclass}>
-          <div class="relative">
+          <div class="relative" ref={dropdownRef}>
             <SRC20InputField
               type="text"
               placeholder="Token"
@@ -192,17 +225,18 @@ export function TransferContent(
               isUppercase
             />
             {openDrop && searchResults.length > 0 && !isSelecting && (
-              <ul class="absolute top-[54px] left-0 w-full bg-[#999999] rounded-b text-[#333333] font-bold text-[12px] leading-[14px] z-[11] max-h-60 overflow-y-auto">
+              <ul class="absolute top-[42px] left-0 max-h-[206px] w-full bg-stamp-grey-light rounded-b-md text-[#333333] text-base leading-none font-bold z-[11] overflow-y-auto [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666]">
                 {searchResults.map((result) => (
                   <li
                     key={result.tick}
-                    onClick={() => handleDropDown(result.tick, result.amt)}
-                    class="cursor-pointer p-2 hover:bg-gray-600 uppercase"
+                    class="first:pt-3 cursor-pointer"
                   >
-                    {result.tick}
-                    <span class="text-[10px] ml-2">
-                      (Balance: {stripTrailingZeros(result.amt)})
-                    </span>
+                    <div class="p-1.5 pl-3 hover:bg-[#BBBBBB] uppercase">
+                      {result.tick}
+                      <p class="text-sm font-medium">
+                        {stripTrailingZeros(result.amt)}
+                      </p>
+                    </div>
                   </li>
                 ))}
               </ul>

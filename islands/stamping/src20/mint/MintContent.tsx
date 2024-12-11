@@ -285,7 +285,7 @@ export function MintContent({
 
   return (
     <div class={bodyToolsClassName}>
-      <h1 class={titlePurpleLDCenterClassName}>MINT SRC-20</h1>
+      <h1 class={titlePurpleLDCenterClassName}>MINT</h1>
 
       {error && (
         <div class="w-full text-red-500 text-center font-bold">
