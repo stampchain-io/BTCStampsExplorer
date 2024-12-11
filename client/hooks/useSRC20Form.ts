@@ -1,15 +1,11 @@
 import { useEffect, useState } from "preact/hooks";
-import {
-  showConnectWalletModal,
-  walletContext,
-} from "$client/wallet/wallet.ts";
+import { walletContext } from "$client/wallet/wallet.ts";
 import axiod from "axiod";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
-import type { AncestorInfo } from "$types/index.d.ts";
 import { debounce } from "$lib/utils/debounce.ts";
 interface PSBTFees {
   estMinerFee: number;
@@ -43,8 +39,8 @@ interface SRC20FormState {
   web: string;
   email: string;
   file: File | null;
-  utxoAncestors?: AncestorInfo[];
   psbtFees?: PSBTFees;
+  maxAmount?: string;
 }
 
 interface TxDetails {
@@ -60,8 +56,6 @@ interface TxDetails {
   changeAddress: string;
 }
 
-const feeCache = new Map<string, { fee: number; timestamp: number }>();
-
 export class SRC20FormController {
   private static prepareTxDebounced = debounce(async (
     params: {
@@ -72,31 +66,16 @@ export class SRC20FormController {
       canEstimateFees: (partial: boolean) => boolean;
     },
     callbacks: {
-      setTxDetails: (details: any) => void;
       setFormState: (fn: (prev: SRC20FormState) => SRC20FormState) => void;
       logger: typeof logger;
     },
   ) => {
-    const { wallet, formState, action, trxType, canEstimateFees } = params;
-    const { setTxDetails, setFormState, logger } = callbacks;
+    const { wallet, formState, action, trxType } = params;
+    const { setFormState, logger } = callbacks;
 
-    if (!wallet.address || !canEstimateFees(true)) return;
+    if (!wallet.address) return;
 
     try {
-      // Get ancestors only once if needed
-      if (!formState.utxoAncestors) {
-        const ancestorsResponse = await axiod.get(
-          `/api/v2/utxo/ancestors/${wallet.address}`,
-        );
-        if (ancestorsResponse.data?.ancestors) {
-          setFormState((prev) => ({
-            ...prev,
-            utxoAncestors: ancestorsResponse.data.ancestors,
-          }));
-        }
-      }
-
-      // Get fee estimation with all required parameters
       const response = await axiod.post("/api/v2/src20/create", {
         sourceAddress: wallet.address,
         toAddress: action === "transfer" ? formState.toAddress : wallet.address,
@@ -104,8 +83,6 @@ export class SRC20FormController {
         trxType,
         op: action,
         tick: formState.token || "TEST",
-        utxoAncestors: formState.utxoAncestors,
-        // Include all operation-specific fields
         ...(action === "deploy" && {
           max: formState.max || "1000",
           lim: formState.lim || "1000",
@@ -121,48 +98,71 @@ export class SRC20FormController {
       });
 
       if (response.data) {
-        // Store full transaction details
-        setTxDetails(response.data);
+        // Log raw response for debugging
+        logger.debug("stamps", {
+          message: "Raw PSBT response",
+          data: {
+            feeDetails: response.data.feeDetails,
+            totalOutputValue: response.data.totalOutputValue,
+            estMinerFee: response.data.estMinerFee,
+            fullResponse: response.data,
+          },
+        });
 
-        // Update form state with fee details from the response
-        setFormState((prev) => ({
-          ...prev,
-          psbtFees: {
-            estMinerFee: response.data.est_miner_fee,
-            totalDustValue: response.data.total_dust_value,
-            hasExactFees: true,
-            totalValue: response.data.input_value,
-            effectiveFeeRate: response.data.est_miner_fee /
-              response.data.est_tx_size,
-            estimatedSize: response.data.est_tx_size,
-            totalVsize: response.data.est_tx_size,
-          } satisfies PSBTFees,
-        }));
+        // Extract fee values from response
+        const minerFee = Number(response.data.feeDetails?.total) || 0;
+        const dustValue = Number(response.data.totalOutputValue) || 1683; // Default to standard SRC20 dust
+        const totalValue = minerFee + dustValue;
 
         logger.debug("stamps", {
-          message: "Fee calculation updated",
+          message: "Extracted fee values",
           data: {
-            requestedFeeRate: formState.fee,
-            actualFee: response.data.est_miner_fee,
-            totalFee: response.data.fee,
-            effectiveFeeRate: response.data.est_miner_fee /
-              response.data.est_tx_size,
-            totalInput: response.data.input_value,
-            changeValue: response.data.change_value,
-            estimatedSize: response.data.est_tx_size,
-            ancestorCount: formState.utxoAncestors?.length || 0,
+            minerFee,
+            dustValue,
+            totalValue,
+            feeDetails: response.data.feeDetails,
+            rawResponse: {
+              totalOutputValue: response.data.totalOutputValue,
+              feeDetails: response.data.feeDetails,
+            },
           },
+        });
+
+        setFormState((prev) => {
+          const newState = {
+            ...prev,
+            psbtFees: {
+              estMinerFee: minerFee,
+              totalDustValue: dustValue, // Set the dust value
+              hasExactFees: true,
+              totalValue: minerFee + dustValue, // Total should be sum of both
+              est_tx_size: Number(response.data.estimatedSize) || 312,
+              hex: response.data.hex,
+              inputsToSign: response.data.inputsToSign || [],
+            },
+          };
+
+          logger.debug("stamps", {
+            message: "Updated form state",
+            data: {
+              oldPsbtFees: prev.psbtFees,
+              newPsbtFees: newState.psbtFees,
+              rawFeeDetails: response.data.feeDetails,
+              rawOutputValue: response.data.totalOutputValue,
+            },
+          });
+
+          return newState;
         });
       }
     } catch (error) {
       logger.error("stamps", {
-        message: "Fee estimation failed",
+        message: "Fee calculation failed",
         error,
         data: {
           action,
           token: formState.token,
           fee: formState.fee,
-          ancestorCount: formState.utxoAncestors?.length || 0,
         },
       });
     }
@@ -247,7 +247,13 @@ export function useSRC20Form(
     web: "",
     email: "",
     file: null as File | null,
-    utxoAncestors: [],
+    psbtFees: {
+      estMinerFee: 0,
+      totalDustValue: 0,
+      hasExactFees: false,
+      totalValue: 0,
+      est_tx_size: 0,
+    },
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -257,7 +263,6 @@ export function useSRC20Form(
       txid?: string;
     } | null
   >(null);
-  const [walletError, setWalletError] = useState<string | null>(null);
 
   const { wallet } = walletContext;
 
@@ -275,10 +280,6 @@ export function useSRC20Form(
     };
     fetchPrice();
   }, []);
-
-  // Add state to track if we have a valid transaction to estimate
-  const [hasValidTransaction, setHasValidTransaction] = useState(false);
-  const [txDetails, setTxDetails] = useState<TxDetails | null>(null);
 
   function validateFormState(
     formState: SRC20FormState,
@@ -335,26 +336,15 @@ export function useSRC20Form(
   useEffect(() => {
     const { isValid, error } = validateFormState(formState, action);
 
-    if (!wallet?.address) {
-      setHasValidTransaction(false);
-      setFormState((prev) => ({ ...prev, apiError: "Wallet not connected" }));
-      return;
-    }
-
-    if (isSubmitting) {
-      return;
-    }
+    if (!wallet?.address || isSubmitting) return;
 
     if (!isValid) {
-      setHasValidTransaction(false);
-      setFormState((prev) => ({ ...prev, apiError: error }));
-      setTxDetails(null);
+      setFormState((prev) => ({ ...prev, apiError: error || "" }));
       return;
     }
 
     // Clear any previous errors
     setFormState((prev) => ({ ...prev, apiError: "" }));
-    setHasValidTransaction(true);
 
     // Prepare transaction only if all validations pass
     SRC20FormController.prepareTx(
@@ -363,10 +353,9 @@ export function useSRC20Form(
         formState,
         action,
         trxType,
-        canEstimateFees: () => isValid, // Use validation result
+        canEstimateFees: () => isValid,
       },
       {
-        setTxDetails,
         setFormState,
         logger,
       },
@@ -378,19 +367,10 @@ export function useSRC20Form(
   }, [
     wallet?.address,
     formState.fee,
-    action,
     formState.token,
-    ...(action === "deploy"
-      ? [
-        formState.max,
-        formState.lim,
-        formState.dec,
-        formState.x,
-        formState.tg,
-        formState.web,
-        formState.email,
-      ]
-      : [formState.amt, formState.toAddress]), // Include toAddress for transfer
+    formState.amt,
+    formState.toAddress,
+    action,
     trxType,
     isSubmitting,
   ]);
@@ -492,179 +472,122 @@ export function useSRC20Form(
     return formState.dec;
   };
 
-  const validateForm = () => {
-    let isValid = true;
-    const newState = { ...formState };
-
-    if (!formState.token) {
-      newState.tokenError = "Token is required";
-      isValid = false;
-    }
-
-    if (action !== "deploy" && !formState.amt) {
-      newState.amtError = "Amount is required";
-      isValid = false;
-    }
-
-    if (action === "transfer" && !formState.toAddress) {
-      newState.toAddressError = "To Address is required";
-      isValid = false;
-    }
-
-    if (formState.fee <= 0) {
-      newState.feeError = "Fee must be set";
-      isValid = false;
-    }
-
-    if (action === "deploy") {
-      if (!formState.max) {
-        newState.maxError = "Max circulation is required";
-        isValid = false;
-      }
-      if (!formState.lim) {
-        newState.limError = "Limit per mint is required";
-        isValid = false;
-      }
-    }
-
-    setFormState(newState);
-    return isValid;
-  };
-
-  const handleSubmit = async (additionalData = {}) => {
-    logger.debug("ui", {
-      message: "handleSubmit called",
-      trxType,
-      action,
-      additionalData,
-    });
-
-    if (!walletContext.isConnected) {
-      logger.info("ui", {
-        message: "Wallet not connected, showing connect modal",
-      });
-      showConnectWalletModal.value = true;
-      return;
-    }
-
-    setWalletError(null);
-    setApiError("");
-
-    if (!validateForm()) {
-      logger.warn("ui", {
-        message: "Form validation failed",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmissionMessage({ message: "Please wait..." });
-
+  const handleSubmit = async (additionalData?: Record<string, unknown>) => {
     try {
-      if (!config) {
-        throw new Error("Configuration not loaded");
-      }
+      setIsSubmitting(true);
+      setApiError("");
 
-      const endpoint = "/api/v2/src20/create";
-      const requestData = {
-        sourceAddress: wallet.address,
-        toAddress: action === "transfer" ? formState.toAddress : wallet.address,
-        changeAddress: wallet.address,
-        trxType,
-        op: action,
-        tick: formState.token,
-        satsPerVB: Number(formState.fee),
-        ...(action === "deploy" && {
-          max: formState.max,
-          lim: formState.lim,
-          dec: formState.dec,
-          x: formState.x,
-          tg: formState.tg,
-          web: formState.web,
-          email: formState.email,
-        }),
-        ...(["mint", "transfer"].includes(action) && {
-          amt: formState.amt,
-        }),
-        service_fee: config.MINTING_SERVICE_FEE,
-        service_fee_address: config.MINTING_SERVICE_FEE_ADDRESS,
-        ...(formState.utxoAncestors?.length && {
-          utxoAncestors: formState.utxoAncestors.map((ancestor) => ({
-            txid: ancestor.txid,
-            vout: ancestor.vout,
-            weight: ancestor.weight,
-          })),
-        }),
-        ...additionalData,
-      };
-
+      // Log submission attempt
       logger.debug("stamps", {
-        message: "Sending request to create endpoint",
-        requestData,
+        message: "Transaction submission started",
+        data: {
+          action,
+          trxType,
+          satsPerVB: formState.fee,
+          currentEstimate: formState.psbtFees,
+        },
       });
 
-      const response = await axiod.post(endpoint, requestData);
+      // Use the stored PSBT if available
+      if (formState.psbtFees?.hex && formState.psbtFees?.inputsToSign) {
+        const walletResult = await walletContext.signPSBT(
+          wallet,
+          formState.psbtFees.hex,
+          formState.psbtFees.inputsToSign,
+          true,
+        );
 
-      logger.debug("stamps", {
-        message: "Received response from create endpoint",
-        responseData: response.data,
-      });
+        if (walletResult.signed) {
+          setSubmissionMessage({
+            message: "Transaction broadcasted successfully.",
+            txid: walletResult.txid,
+          });
+        } else if (walletResult.cancelled) {
+          setSubmissionMessage({
+            message: "Transaction signing cancelled by user.",
+          });
+        } else {
+          setSubmissionMessage({
+            message: `Transaction signing failed: ${walletResult.error}`,
+          });
+        }
 
-      if (!response.data?.hex) {
-        throw new Error("No transaction hex received from server");
-      }
-
-      logger.debug("ui", {
-        message: "Preparing to sign PSBT",
-        hexLength: response.data.hex.length,
-        inputsToSignCount: response.data.inputsToSign?.length,
-      });
-
-      const walletResult = await walletContext.signPSBT(
-        wallet,
-        response.data.hex,
-        response.data.inputsToSign || [],
-        true,
-      );
-
-      logger.debug("ui", {
-        message: "Wallet signing completed",
-        result: walletResult,
-      });
-
-      if (walletResult.signed) {
-        setSubmissionMessage({
-          message: "Transaction broadcasted successfully.",
-          txid: walletResult.txid,
-        });
-      } else if (walletResult.cancelled) {
-        setSubmissionMessage({
-          message: "Transaction signing cancelled by user.",
-        });
+        return walletResult;
       } else {
-        setSubmissionMessage({
-          message: `Transaction signing failed: ${walletResult.error}`,
+        // Create new PSBT only if we don't have one
+        const response = await axiod.post("/api/v2/src20/create", {
+          sourceAddress: wallet?.address,
+          toAddress: action === "transfer"
+            ? formState.toAddress
+            : wallet?.address,
+          satsPerVB: formState.fee,
+          trxType,
+          op: action,
+          tick: formState.token,
+          ...(action === "deploy" && {
+            max: formState.max,
+            lim: formState.lim,
+            dec: formState.dec,
+            ...(formState.x && { x: formState.x }),
+            ...(formState.tg && { tg: formState.tg }),
+            ...(formState.web && { web: formState.web }),
+            ...(formState.email && { email: formState.email }),
+          }),
+          ...(["mint", "transfer"].includes(action) && {
+            amt: formState.amt,
+          }),
         });
-      }
 
-      if (response.data?.estMinerFee && response.data?.totalDustValue) {
-        // Update cache
-        feeCache.set(cacheKey, {
-          fee: response.data.estMinerFee,
-          timestamp: Date.now(),
+        // Log the PSBT response
+        logger.debug("stamps", {
+          message: "Transaction PSBT created",
+          data: {
+            estimatedSize: response.data.est_tx_size,
+            minerFee: response.data.est_miner_fee,
+            totalValue: response.data.input_value,
+            changeValue: response.data.change_value,
+          },
         });
 
-        setFormState((prev) => ({
-          ...prev,
-          psbtFees: {
-            estMinerFee: response.data.estMinerFee,
-            totalDustValue: response.data.totalDustValue,
-            hasExactFees: true,
-          } as PSBTFees,
-        }));
-      }
+        if (!response.data?.hex) {
+          throw new Error("No transaction hex received from server");
+        }
 
-      return response.data;
+        logger.debug("ui", {
+          message: "Preparing to sign PSBT",
+          hexLength: response.data.hex.length,
+          inputsToSignCount: response.data.inputsToSign?.length,
+        });
+
+        const walletResult = await walletContext.signPSBT(
+          wallet,
+          response.data.hex,
+          response.data.inputsToSign || [],
+          true,
+        );
+
+        logger.debug("ui", {
+          message: "Wallet signing completed",
+          result: walletResult,
+        });
+
+        if (walletResult.signed) {
+          setSubmissionMessage({
+            message: "Transaction broadcasted successfully.",
+            txid: walletResult.txid,
+          });
+        } else if (walletResult.cancelled) {
+          setSubmissionMessage({
+            message: "Transaction signing cancelled by user.",
+          });
+        } else {
+          setSubmissionMessage({
+            message: `Transaction signing failed: ${walletResult.error}`,
+          });
+        }
+
+        return response.data;
+      }
     } catch (error) {
       logger.error("ui", {
         message: `${action} error occurred`,
@@ -689,28 +612,6 @@ export function useSRC20Form(
     setFormState((prev) => ({ ...prev, fee: newFee }));
   };
 
-  // Add a function to check if we have enough data for estimation
-  const canEstimateFees = (partialEstimate = false) => {
-    // Basic requirements
-    if (!wallet?.address || formState.fee <= 0) return false;
-    if (!formState.token) return false;
-
-    // For partial estimates, only require the basic fields
-    if (partialEstimate) return true;
-
-    // Full validation for final estimates
-    switch (action) {
-      case "deploy":
-        return !!(formState.max && formState.lim && formState.dec);
-      case "mint":
-        return !!formState.amt;
-      case "transfer":
-        return !!formState.amt;
-      default:
-        return false;
-    }
-  };
-
   return {
     formState,
     setFormState,
@@ -721,7 +622,6 @@ export function useSRC20Form(
     config,
     isSubmitting,
     submissionMessage,
-    walletError,
     setApiError,
     apiError,
     handleInputBlur,

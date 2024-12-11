@@ -97,7 +97,7 @@ export function DeployContent(
     reader.readAsDataURL(file);
   };
 
-  const handleDeploySubmit = async () => {
+  const handleSubmitWithUpload = async () => {
     if (!isConnected) {
       logger.debug("stamps", {
         message: "Showing wallet connect modal - user not connected",
@@ -106,39 +106,16 @@ export function DeployContent(
       return;
     }
 
-    let fileUploaded = false;
     if (formState.file) {
       try {
         await handleFileUpload(formState.file);
-        fileUploaded = true;
       } catch (error) {
-        console.error("File upload failed:", error);
-        setFileUploadError(
-          "File upload failed. The deployment will continue without the background image.",
-        );
+        console.error("File upload error:", error);
+        // Continue with deployment even if file upload fails
       }
     }
 
-    try {
-      const result = await handleSubmit({
-        fileUploaded,
-        trxType: trxType || "multisig",
-      });
-
-      if (!result?.hex) {
-        throw new Error("No transaction hex received from server");
-      }
-
-      logger.debug("stamps", {
-        message: "PSBT received from server",
-        hex: result.hex.substring(0, 100) + "...",
-      });
-    } catch (error) {
-      console.error("Deployment error:", error);
-      setApiError(
-        error instanceof Error ? error.message : "Unknown error occurred",
-      );
-    }
+    await handleSubmit();
   };
 
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
@@ -337,21 +314,28 @@ export function DeployContent(
           handleChangeFee={handleChangeFee}
           type="src20"
           fileType="application/json"
+          fileSize={undefined}
+          issuance={undefined}
+          serviceFee={undefined}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
-          onSubmit={handleDeploySubmit}
+          onSubmit={handleSubmitWithUpload}
           buttonName={isConnected ? "DEPLOY" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           userAddress={wallet?.address}
-          utxoAncestors={formState.utxoAncestors}
+          disabled={undefined}
+          effectiveFeeRate={undefined}
+          utxoAncestors={undefined}
           feeDetails={{
             minerFee: formState.psbtFees?.estMinerFee || 0,
             dustValue: formState.psbtFees?.totalDustValue || 0,
-            hasExactFees: !!formState.psbtFees?.hasExactFees,
+            hasExactFees: true,
+            totalValue: formState.psbtFees?.totalValue || 0,
+            estimatedSize: formState.psbtFees?.est_tx_size || 0,
           }}
         />
 

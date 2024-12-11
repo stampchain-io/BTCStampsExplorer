@@ -41,75 +41,38 @@ export const handler: Handlers<TX | TXError> = {
   async POST(req: Request) {
     try {
       const rawBody = await req.text();
-      console.log("SRC-20 request body:", rawBody);
-
       if (!rawBody) {
         return ResponseUtil.badRequest("Empty request body");
       }
 
-      let body: ExtendedInputData & {
-        trxType?: TrxType;
-      };
+      let body: ExtendedInputData & { trxType?: TrxType };
       try {
         body = JSON.parse(rawBody);
       } catch (e) {
-        console.error("JSON parse error:", e);
         return ResponseUtil.badRequest("Invalid JSON in request body");
       }
 
-      // Normalize fee rate from any of the possible inputs
-      let normalizedFees;
-      try {
-        const feeInput = {
-          satsPerKB: body.satsPerKB,
-          satsPerVB: body.satsPerVB,
-        };
+      // Normalize fee rate
+      const normalizedFees = normalizeFeeRate({
+        satsPerKB: body.satsPerKB,
+        satsPerVB: body.satsPerVB,
+        feeRate: body.feeRate,
+      });
 
-        // If neither is provided but legacy feeRate exists, use that as satsPerVB
-        if (
-          body.feeRate !== undefined && !feeInput.satsPerKB &&
-          !feeInput.satsPerVB
-        ) {
-          console.log("Using legacy feeRate as satsPerVB:", body.feeRate);
-          feeInput.satsPerVB = body.feeRate;
-        }
-
-        normalizedFees = normalizeFeeRate(feeInput);
-      } catch (error) {
-        return ResponseUtil.badRequest(
-          error instanceof Error ? error.message : "Invalid fee rate",
-        );
-      }
-
-      console.log("Parsed request body:", body);
-
-      const trxType = body.trxType || "olga";
-
-      // Handle backward compatibility for fromAddress
+      // Validate addresses and operation
       const effectiveSourceAddress = body.sourceAddress || body.fromAddress ||
         body.changeAddress;
       const effectiveChangeAddress = body.changeAddress || body.sourceAddress ||
         body.fromAddress;
 
-      // Ensure at least one address exists
       if (!effectiveSourceAddress) {
-        return ResponseUtil.badRequest(
-          "Either sourceAddress/fromAddress or changeAddress is required",
-        );
+        return ResponseUtil.badRequest("Source address is required");
       }
 
-      logger.debug("stamps", {
-        message: "Processing request",
-        trxType,
-        operation: body.op.toLowerCase(),
-        effectiveChangeAddress,
-        effectiveSourceAddress,
-      });
-
-      // Validate operation for both transaction types
+      // Validate operation
       const validationError = await SRC20Service.UtilityService
         .validateOperation(
-          body.op.toLowerCase() as "deploy" | "mint" | "transfer",
+          body.op.toLowerCase(),
           {
             sourceAddress: effectiveSourceAddress,
             changeAddress: effectiveChangeAddress,
@@ -119,36 +82,26 @@ export const handler: Handlers<TX | TXError> = {
             dec: body.dec?.toString(),
             amt: body.amt?.toString(),
             toAddress: body.toAddress,
-            x: body.x,
-            web: body.web,
-            email: body.email,
           },
         );
 
       if (validationError) {
-        logger.debug("stamps", {
-          message: "Validation error",
-          error: validationError,
-          requestData: {
-            operation: body.op.toLowerCase(),
-            sourceAddress: effectiveSourceAddress,
-            changeAddress: effectiveChangeAddress,
-            tick: body.tick,
-            max: body.max,
-            lim: body.lim,
-            dec: body.dec,
-          },
-        });
         return validationError;
       }
 
-      // Always prepare PSBT with full data
-      const psbtData = await SRC20Service.PSBTService.preparePSBT({
+      // Use single path for PSBT creation
+      if (body.trxType === "multisig") {
+        return ResponseUtil.badRequest(
+          "Multisig transactions should use /api/v2/src20/multisig/[operation] endpoint",
+        );
+      }
+
+      const psbtResult = await SRC20Service.PSBTService.preparePSBT({
         sourceAddress: effectiveSourceAddress,
         toAddress: body.toAddress || effectiveSourceAddress,
         src20Action: {
-          op: body.op.toUpperCase(),
           p: "SRC-20",
+          op: body.op.toUpperCase(),
           tick: body.tick,
           ...(body.max && { max: body.max.toString() }),
           ...(body.lim && { lim: body.lim.toString() }),
@@ -157,99 +110,34 @@ export const handler: Handlers<TX | TXError> = {
           ...(body.x && { x: body.x }),
           ...(body.web && { web: body.web }),
           ...(body.email && { email: body.email }),
-          ...(body.tg && { tg: body.tg }),
-          ...(body.description && { description: body.description }),
         },
         satsPerVB: normalizedFees.normalizedSatsPerVB,
-        service_fee: 0,
-        service_fee_address: "",
-        changeAddress: effectiveChangeAddress || effectiveSourceAddress,
-        ...(body.utxoAncestors && { utxoAncestors: body.utxoAncestors }),
+        service_fee: body.service_fee || 0,
+        service_fee_address: body.service_fee_address || "",
+        changeAddress: effectiveChangeAddress,
         trxType: body.trxType || "olga",
-      } as PSBTParams);
-
-      // Calculate actual fees
-      const actualFee = psbtData.totalInputValue - psbtData.totalOutputValue -
-        psbtData.totalChangeOutput;
-
-      // Add validation before returning
-      const outputs = psbtData.psbt.txOutputs;
-      const dataOutputs = outputs.filter((
-        output: { script: { toString: (format: string) => string } },
-      ) => output.script.toString("hex").startsWith("0020"));
-
-      // Validate data structure
-      let fullData = "";
-      for (const output of dataOutputs) {
-        const script = output.script.toString("hex");
-        // Remove witness version and push bytes (0020)
-        const data = script.slice(4);
-        fullData += data;
-      }
-
-      // Remove padding zeros
-      fullData = fullData.replace(/0+$/, "");
-
-      try {
-        // First two bytes are length prefix
-        const lengthPrefix = parseInt(fullData.slice(0, 4), 16);
-        const data = fullData.slice(4);
-
-        // Convert to binary and decode
-        const decodedData = new TextDecoder().decode(
-          new Uint8Array(hex2bin(data)),
-        );
-
-        // Validate prefix
-        if (!decodedData.startsWith("stamp:")) {
-          throw new Error("Invalid data format: missing STAMP prefix");
-        }
-
-        // Validate JSON structure
-        const jsonStart = decodedData.indexOf("{");
-        if (jsonStart === -1) {
-          throw new Error("Invalid data format: no JSON structure found");
-        }
-
-        const jsonData = decodedData.slice(jsonStart);
-        JSON.parse(jsonData); // This will throw if JSON is invalid
-      } catch (error) {
-        logger.error("stamps", {
-          message: "Invalid transaction data structure",
-          error: error instanceof Error ? error.message : String(error),
-          fullData,
-        });
-        throw new Error("Invalid transaction data structure");
-      }
+      });
 
       // Return consistent response format
       return ApiResponseUtil.success({
-        hex: psbtData.psbt.toHex(),
-        est_tx_size: psbtData.estimatedTxSize,
-        input_value: psbtData.totalInputValue,
-        total_dust_value: psbtData.totalDustValue,
-        est_miner_fee: actualFee,
-        fee: psbtData.totalDustValue + actualFee,
-        change_value: psbtData.totalChangeOutput,
-        inputsToSign: psbtData.psbt.data.inputs.map((_, index: number) =>
-          index
-        ),
-        sourceAddress: body.sourceAddress,
-        changeAddress: effectiveChangeAddress,
+        hex: psbtResult.psbt?.toHex(),
+        est_tx_size: psbtResult.estimatedTxSize,
+        input_value: psbtResult.totalInputValue,
+        total_dust_value: psbtResult.totalDustValue,
+        est_miner_fee: psbtResult.estMinerFee,
+        fee: psbtResult.totalDustValue + psbtResult.estMinerFee,
+        change_value: psbtResult.totalChangeOutput,
+        inputsToSign: psbtResult.psbt?.data.inputs.map((_, index) => index),
+        sourceAddress: effectiveSourceAddress,
+        changeAddress: psbtResult.changeAddress,
+        feeDetails: psbtResult.feeDetails,
       });
-    } catch (error: unknown) {
+    } catch (error) {
       logger.error("stamps", {
         message: "Error processing request",
         error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
       });
-
-      if (error instanceof SyntaxError) {
-        return ApiResponseUtilResponseUtil.badRequest(
-          "Invalid JSON in request body",
-        );
-      }
-      return ApiResponseUtil.internalError(error, "Unknown error occurred");
+      return ApiResponseUtil.internalError(error);
     }
   },
 };

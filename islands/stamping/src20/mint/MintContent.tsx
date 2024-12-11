@@ -247,32 +247,41 @@ export function MintContent({
   const limit = mintStatus ? Number(mintStatus.limit).toLocaleString() : "0";
   const minters = holders ? holders.toString() : "0";
 
+  useEffect(() => {
+    logger.debug("stamps", {
+      message: "MintContent formState updated",
+      data: {
+        fee: formState.fee,
+        psbtFees: formState.psbtFees,
+        hasFeesData: !!formState.psbtFees,
+      },
+    });
+  }, [formState.fee, formState.psbtFees]);
+
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
 
-  const handleMintSubmit = async () => {
-    if (!isConnected) {
-      logger.debug("stamps", {
-        message: "Showing wallet connect modal - user not connected",
-      });
-      walletContext.showConnectModal();
-      return;
-    }
-
-    try {
-      await handleSubmit();
-    } catch (error) {
-      console.error("Minting error:", error);
-    }
+  // Before rendering ComplexFeeCalculator
+  const feeDetailsForCalculator = {
+    minerFee: formState.psbtFees?.estMinerFee || 0,
+    dustValue: formState.psbtFees?.totalDustValue || 0,
+    hasExactFees: true,
+    totalValue: formState.psbtFees?.totalValue || 0,
+    estimatedSize: formState.psbtFees?.est_tx_size || 0,
   };
 
-  useEffect(() => {
-    if (tick) {
-      setSearchTerm(tick);
-      handleResultClick(tick);
-    }
-  }, [tick]);
+  logger.debug("stamps", {
+    message: "Fee details for calculator",
+    data: {
+      psbtFees: formState.psbtFees,
+      calculatorInput: feeDetailsForCalculator,
+      formState: {
+        fee: formState.fee,
+        BTCPrice: formState.BTCPrice,
+      },
+    },
+  });
 
   return (
     <div class={bodyToolsClassName}>
@@ -385,22 +394,23 @@ export function MintContent({
           handleChangeFee={handleChangeFee}
           type="src20"
           fileType="application/json"
+          fileSize={undefined}
+          issuance={undefined}
+          serviceFee={undefined}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
-          onSubmit={handleMintSubmit}
+          onSubmit={handleSubmit}
           buttonName={isConnected ? "MINT" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
           userAddress={wallet?.address}
-          utxoAncestors={formState.utxoAncestors}
-          feeDetails={{
-            minerFee: formState.psbtFees?.estMinerFee || 0,
-            dustValue: formState.psbtFees?.totalDustValue || 0,
-            hasExactFees: !!formState.psbtFees?.hasExactFees,
-          }}
+          disabled={undefined}
+          effectiveFeeRate={undefined}
+          utxoAncestors={undefined}
+          feeDetails={feeDetailsForCalculator}
         />
 
         <StatusMessages

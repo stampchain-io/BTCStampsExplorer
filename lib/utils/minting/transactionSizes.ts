@@ -1,6 +1,19 @@
 import { TX_CONSTANTS } from "./constants.ts";
-import type { ScriptType, TransactionSizeOptions } from "$types/index.d.ts";
+import type { ScriptType } from "$types/index.d.ts";
 import { getScriptTypeInfo } from "$lib/utils/scriptTypeUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
+
+interface TransactionSizeOptions {
+  inputs: Array<{
+    type: ScriptType;
+    isWitness?: boolean;
+    size?: number;
+    ancestor?: { txid: string; vout: number; weight?: number };
+  }>;
+  outputs: Array<{ type: ScriptType }>;
+  includeChangeOutput?: boolean;
+  changeOutputType?: ScriptType;
+}
 
 function calculateWitnessWeight(
   input: { type: ScriptType; isWitness?: boolean },
@@ -41,13 +54,16 @@ export function estimateTransactionSize({
     weight += (TX_CONSTANTS.MARKER + TX_CONSTANTS.FLAG) * 4;
   }
 
-  console.log("Base transaction components:", {
-    version: TX_CONSTANTS.VERSION * 4,
-    locktime: TX_CONSTANTS.LOCKTIME * 4,
-    witnessOverhead: hasWitness
-      ? (TX_CONSTANTS.MARKER + TX_CONSTANTS.FLAG) * 4
-      : 0,
-    totalBase: weight,
+  logger.debug("stamps", {
+    message: "Base transaction components",
+    data: {
+      version: TX_CONSTANTS.VERSION * 4,
+      locktime: TX_CONSTANTS.LOCKTIME * 4,
+      witnessOverhead: hasWitness
+        ? (TX_CONSTANTS.MARKER + TX_CONSTANTS.FLAG) * 4
+        : 0,
+      totalBase: weight,
+    },
   });
 
   // Calculate input weights
@@ -67,18 +83,24 @@ export function estimateTransactionSize({
       inputWeight = outpointWeight + sequenceWeight + scriptSigWeight +
         witnessWeight;
 
-      console.log(`Witness input weight breakdown for ${input.type}:`, {
-        nonWitnessWeight: outpointWeight + sequenceWeight + scriptSigWeight,
-        witnessWeight,
-        witnessDetails: TX_CONSTANTS.WITNESS_STACK[input.type],
-        total: inputWeight,
+      logger.debug("stamps", {
+        message: `Witness input weight breakdown for ${input.type}`,
+        data: {
+          nonWitnessWeight: outpointWeight + sequenceWeight + scriptSigWeight,
+          witnessWeight,
+          witnessDetails: TX_CONSTANTS.WITNESS_STACK[input.type],
+          total: inputWeight,
+        },
       });
     } else {
       // Non-witness inputs use TX_CONSTANTS sizes
       inputWeight = TX_CONSTANTS[input.type].size * 4;
-      console.log(`Non-witness input weight for ${input.type}:`, {
-        scriptSize: TX_CONSTANTS[input.type].size,
-        weight: inputWeight,
+      logger.debug("stamps", {
+        message: `Non-witness input weight for ${input.type}`,
+        data: {
+          scriptSize: TX_CONSTANTS[input.type].size,
+          weight: inputWeight,
+        },
       });
     }
     return inputWeight;
@@ -102,10 +124,13 @@ export function estimateTransactionSize({
       scriptWeight = TX_CONSTANTS[output.type].size * 4;
     }
 
-    console.log(`Output weight breakdown for ${output.type}:`, {
-      baseWeight,
-      scriptWeight,
-      total: baseWeight + scriptWeight,
+    logger.debug("stamps", {
+      message: `Output weight breakdown for ${output.type}`,
+      data: {
+        baseWeight,
+        scriptWeight,
+        total: baseWeight + scriptWeight,
+      },
     });
 
     return baseWeight + scriptWeight;
@@ -123,11 +148,14 @@ export function estimateTransactionSize({
     const scriptSize = changeOutputType === "P2WPKH" ? 22 : 34;
     changeWeight = baseWeight + (scriptSize * 4);
 
-    console.log("Change output weight breakdown:", {
-      type: changeOutputType,
-      baseWeight,
-      scriptWeight: scriptSize * 4,
-      total: changeWeight,
+    logger.debug("stamps", {
+      message: "Change output weight breakdown",
+      data: {
+        type: changeOutputType,
+        baseWeight,
+        scriptWeight: scriptSize * 4,
+        total: changeWeight,
+      },
     });
   }
 
@@ -135,20 +163,23 @@ export function estimateTransactionSize({
     changeWeight;
   const vsize = TX_CONSTANTS.weightToVsize(totalWeight);
 
-  console.log("Final weight calculation breakdown:", {
-    baseWeight: weight,
-    inputWeight: totalInputWeight,
-    outputWeight: totalOutputWeight,
-    changeWeight,
-    totalWeight,
-    vsize,
-    effectiveRate: `${vsize} vbytes`,
-    inputBreakdown: inputWeights,
-    outputBreakdown: outputWeights,
-    hasWitness,
-    witnessInputCount: inputs.filter((input) =>
-      getScriptTypeInfo(input.type).isWitness
-    ).length,
+  logger.debug("stamps", {
+    message: "Final weight calculation breakdown",
+    data: {
+      baseWeight: weight,
+      inputWeight: totalInputWeight,
+      outputWeight: totalOutputWeight,
+      changeWeight,
+      totalWeight,
+      vsize,
+      effectiveRate: `${vsize} vbytes`,
+      inputBreakdown: inputWeights,
+      outputBreakdown: outputWeights,
+      hasWitness,
+      witnessInputCount: inputs.filter((input) =>
+        getScriptTypeInfo(input.type).isWitness
+      ).length,
+    },
   });
 
   return vsize;
