@@ -168,6 +168,7 @@ import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_HowToDeploy from "./islands/modules/HowToDeploy.tsx";
 import * as $modules_HowToMint from "./islands/modules/HowToMint.tsx";
+import * as $modules_HowToRegister from "./islands/modules/HowToRegister.tsx";
 import * as $modules_HowToStamp from "./islands/modules/HowToStamp.tsx";
 import * as $modules_HowToTransfer from "./islands/modules/HowToTransfer.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
@@ -201,6 +202,7 @@ import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
 import * as $stamping_src101_mint_MintContent from "./islands/stamping/src101/mint/MintContent.tsx";
+import * as $stamping_src101_mint_RecentRegister from "./islands/stamping/src101/mint/RecentRegister.tsx";
 import * as $stamping_src20_SRC20InputField from "./islands/stamping/src20/SRC20InputField.tsx";
 import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/deploy/DeployContent.tsx";
 import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
@@ -422,6 +424,7 @@ const manifest = {
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/HowToDeploy.tsx": $modules_HowToDeploy,
     "./islands/modules/HowToMint.tsx": $modules_HowToMint,
+    "./islands/modules/HowToRegister.tsx": $modules_HowToRegister,
     "./islands/modules/HowToStamp.tsx": $modules_HowToStamp,
     "./islands/modules/HowToTransfer.tsx": $modules_HowToTransfer,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
@@ -463,6 +466,8 @@ const manifest = {
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
     "./islands/stamping/src101/mint/MintContent.tsx":
       $stamping_src101_mint_MintContent,
+    "./islands/stamping/src101/mint/RecentRegister.tsx":
+      $stamping_src101_mint_RecentRegister,
     "./islands/stamping/src20/SRC20InputField.tsx":
       $stamping_src20_SRC20InputField,
     "./islands/stamping/src20/deploy/DeployContent.tsx":

@@ -28,6 +28,7 @@ export function InputField({
   disabled = false,
   textAlign = "left",
   isUppercase = false,
+  class: extraClass = "",
 }: InputFieldProps) {
   return (
     <div class="w-full">
@@ -35,7 +36,7 @@ export function InputField({
         type={type}
         class={`h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light ${
           textAlign === "center" ? "text-center" : ""
-        } ${isUppercase ? "uppercase" : ""}`}
+        } ${isUppercase ? "uppercase" : ""} ${extraClass}`}
         placeholder={placeholder}
         value={isUppercase ? value?.toUpperCase() : value}
         onChange={onChange}
