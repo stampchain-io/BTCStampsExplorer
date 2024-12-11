@@ -74,31 +74,13 @@ export function TransferContent(
     };
   }, []);
 
-  const handleTransferSubmit = async () => {
-    if (!isConnected) {
-      logger.debug("stamps", {
-        message: "Showing wallet connect modal - user not connected",
-      });
-      walletContext.showConnectModal();
-      return;
-    }
-
-    try {
-      await handleSubmit();
-    } catch (error) {
-      console.error("Transfer error:", error);
-    }
-  };
-
   const handleDropDown = (ticker: string, amount: string) => {
     setOpenDrop(false);
     setIsSelecting(true);
 
     const selectedBalance = balances.find((b) => b.tick === ticker);
-
     if (selectedBalance) {
       const maxAmount = stripTrailingZeros(selectedBalance.amt);
-
       setFormState((prev) => ({
         ...prev,
         token: ticker,
@@ -106,23 +88,31 @@ export function TransferContent(
         maxAmount: maxAmount,
       }));
 
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         const amountInput = document.querySelector(
           "[data-amount-input]",
         ) as HTMLInputElement;
         if (amountInput) {
           amountInput.placeholder = `Amount (MAX: ${maxAmount})`;
+          amountInput.focus();
+          setIsSelecting(false);
         }
-      });
+      }, 100);
     }
   };
 
   const handleTokenFieldFocus = () => {
-    if (!formState.token?.trim()) {
+    if (!formState.token?.trim() && !isSelecting) {
       setSearchResults(balances);
       setOpenDrop(true);
     }
-    setIsSelecting(false);
+  };
+
+  const handleTokenBlur = () => {
+    setTimeout(() => {
+      setOpenDrop(false);
+      setIsSelecting(false);
+    }, 200);
   };
 
   useEffect(() => {
@@ -206,22 +196,13 @@ export function TransferContent(
               onChange={(e) => {
                 const newValue = (e.target as HTMLInputElement).value
                   .toUpperCase();
-                if (newValue !== formState.token) {
+                if (newValue !== formState.token && !isSelecting) {
                   handleInputChange(e, "token");
-                  if (!isSelecting) {
-                    setOpenDrop(true);
-                  }
+                  setOpenDrop(true);
                 }
               }}
               onFocus={handleTokenFieldFocus}
-              onBlur={() => {
-                if (formState.token?.trim() || isSelecting) {
-                  setTimeout(() => {
-                    setOpenDrop(false);
-                    setIsSelecting(false);
-                  }, 150);
-                }
-              }}
+              onBlur={handleTokenBlur}
               isUppercase
             />
             {openDrop && searchResults.length > 0 && !isSelecting && (
@@ -230,6 +211,8 @@ export function TransferContent(
                   <li
                     key={result.tick}
                     class="first:pt-3 cursor-pointer"
+                    onClick={() => handleDropDown(result.tick, result.amt)}
+                    onMouseDown={(e) => e.preventDefault()}
                   >
                     <div class="p-1.5 pl-3 hover:bg-[#BBBBBB] uppercase">
                       {result.tick}
