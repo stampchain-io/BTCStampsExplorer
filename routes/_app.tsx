@@ -131,14 +131,8 @@ export default function App({ Component, state }: PageProps<unknown>) {
       </Head>
 
       <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden">
-        <div
-          class="bgGradientTop contain-layout"
-          style="min-height: 100vh; position: fixed; inset: 0;"
-        />
-        <div
-          class="bgGradientBottom contain-layout"
-          style="min-height: 100vh; position: fixed; inset: 0;"
-        />
+        <div class="bgGradientTop contain-layout" />
+        <div class="bgGradientBottom contain-layout" />
 
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
 
