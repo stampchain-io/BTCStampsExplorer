@@ -57,6 +57,7 @@ import * as $api_v2_src20_block_block_index_tick_ from "./routes/api/v2/src20/bl
 import * as $api_v2_src20_block_block_index_index from "./routes/api/v2/src20/block/[block_index]/index.ts";
 import * as $api_v2_src20_create from "./routes/api/v2/src20/create.ts";
 import * as $api_v2_src20_index from "./routes/api/v2/src20/index.ts";
+import * as $api_v2_src20_multisig_operation_ from "./routes/api/v2/src20/multisig/[operation].ts";
 import * as $api_v2_src20_search from "./routes/api/v2/src20/search.ts";
 import * as $api_v2_src20_tick_tick_deploy from "./routes/api/v2/src20/tick/[tick]/deploy.ts";
 import * as $api_v2_src20_tick_tick_index from "./routes/api/v2/src20/tick/[tick]/index.ts";
@@ -292,6 +293,8 @@ const manifest = {
       $api_v2_src20_block_block_index_index,
     "./routes/api/v2/src20/create.ts": $api_v2_src20_create,
     "./routes/api/v2/src20/index.ts": $api_v2_src20_index,
+    "./routes/api/v2/src20/multisig/[operation].ts":
+      $api_v2_src20_multisig_operation_,
     "./routes/api/v2/src20/search.ts": $api_v2_src20_search,
     "./routes/api/v2/src20/tick/[tick]/deploy.ts":
       $api_v2_src20_tick_tick_deploy,
