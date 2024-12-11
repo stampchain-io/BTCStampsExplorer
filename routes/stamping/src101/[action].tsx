@@ -1,6 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { Mint101Content } from "$islands/stamping/src101/mint/MintContent.tsx";
-import { HowToMintModule } from "$islands/modules/HowToMint.tsx";
+import { HowToRegisterModule } from "$islands/modules/HowToRegister.tsx";
+import RecentRegister from "$islands/stamping/src101/mint/RecentRegister.tsx";
 
 interface StampingSrc101PageProps {
   selectedTab: string;
@@ -56,7 +57,10 @@ export default function StampingSrc101Page(
 
       <div class="flex flex-col gap-3 mobileMd:gap-6 w-full desktop:gap-9 tablet:flex-row">
         <div class="w-full tablet:w-1/2">
-          <HowToMintModule />
+          <HowToRegisterModule />
+        </div>
+        <div class="w-full tablet:w-1/2">
+          <RecentRegister />
         </div>
       </div>
     </div>
