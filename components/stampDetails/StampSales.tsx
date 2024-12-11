@@ -83,7 +83,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
                 <th
                   key={key}
                   scope="col"
-                  className={`${tableLabelClassName} ${
+                  class={`${tableLabelClassName} pb-1.5 ${
                     key === "from"
                       ? "text-left"
                       : key === "confirmed"

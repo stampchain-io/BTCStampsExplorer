@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 
 import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
 import { StampSales } from "$components/stampDetails/StampSales.tsx";
@@ -54,143 +54,164 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
     transfers: 0,
   });
 
-  const fetchData = async (pageNum: number) => {
-    if (isLoading || !hasMore) return;
+  const fetchData = useCallback(
+    async (pageNum: number, isTabChange = false) => {
+      if (isLoading) return;
+      if (!isTabChange && !hasMore) return;
 
-    setIsLoading(true);
-    try {
-      const encodedCpid = encodeURIComponent(cpid);
+      setIsLoading(true);
+      try {
+        const encodedCpid = encodeURIComponent(cpid);
 
-      // Fetch total counts if it's the first page
-      if (pageNum === 1) {
-        const countParams = new URLSearchParams({
-          limit: "1",
+        // Fetch total counts if it's the first page
+        if (pageNum === 1) {
+          const countParams = new URLSearchParams({
+            limit: "1",
+            sort: "DESC",
+          });
+
+          // Fetch counts for all tabs
+          const [dispensersCount, salesCount, transfersCount] = await Promise
+            .all(
+              [
+                fetch(
+                  `/api/v2/stamps/${encodedCpid}/dispensers?${countParams}`,
+                ),
+                fetch(`/api/v2/stamps/${encodedCpid}/dispenses?${countParams}`),
+                fetch(`/api/v2/stamps/${encodedCpid}/sends?${countParams}`),
+              ],
+            );
+
+          const [dispensersData, salesData, transfersData] = await Promise.all([
+            dispensersCount.json(),
+            salesCount.json(),
+            transfersCount.json(),
+          ]);
+
+          setTotalCounts({
+            dispensers: dispensersData.total || 0,
+            sales: salesData.total || 0,
+            transfers: transfersData.total || 0,
+          });
+        }
+
+        console.log(`Fetching ${selectedTab} data for page ${pageNum}`);
+        const params = new URLSearchParams({
+          page: pageNum.toString(),
+          limit: PAGE_SIZE.toString(),
           sort: "DESC",
         });
 
-        // Fetch counts for all tabs
-        const [dispensersCount, salesCount, transfersCount] = await Promise.all(
-          [
-            fetch(`/api/v2/stamps/${encodedCpid}/dispensers?${countParams}`),
-            fetch(`/api/v2/stamps/${encodedCpid}/dispenses?${countParams}`),
-            fetch(`/api/v2/stamps/${encodedCpid}/sends?${countParams}`),
-          ],
-        );
+        let response;
 
-        const [dispensersData, salesData, transfersData] = await Promise.all([
-          dispensersCount.json(),
-          salesCount.json(),
-          transfersCount.json(),
-        ]);
+        switch (selectedTab) {
+          case "dispensers": {
+            response = await fetch(
+              `/api/v2/stamps/${encodedCpid}/dispensers?${params}`,
+            );
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("Dispensers data:", data);
+            if (data.data) {
+              setDispensers((prev) =>
+                pageNum === 1 ? data.data : [...prev, ...data.data]
+              );
+              setHasMore(data.data.length === PAGE_SIZE);
+            }
+            break;
+          }
+          case "sales": {
+            const [dispenseResponse, dispensersResponse] = await Promise.all([
+              fetch(`/api/v2/stamps/${encodedCpid}/dispenses?${params}`),
+              fetch(
+                `/api/v2/stamps/${encodedCpid}/dispensers?${new URLSearchParams(
+                  {
+                    limit: "1000",
+                    sort: "DESC",
+                  },
+                )}`,
+              ),
+            ]);
 
-        setTotalCounts({
-          dispensers: dispensersData.total || 0,
-          sales: salesData.total || 0,
-          transfers: transfersData.total || 0,
-        });
+            if (!dispenseResponse.ok) {
+              throw new Error(`HTTP error! status: ${dispenseResponse.status}`);
+            }
+            if (!dispensersResponse.ok) {
+              throw new Error(
+                `HTTP error! status: ${dispensersResponse.status}`,
+              );
+            }
+
+            const [dispenseData, dispensersData] = await Promise.all([
+              dispenseResponse.json(),
+              dispensersResponse.json(),
+            ]);
+
+            console.log("Sales data:", {
+              dispenses: dispenseData,
+              dispensers: dispensersData,
+            });
+
+            if (dispenseData.data) {
+              setDispenses((prev) =>
+                pageNum === 1
+                  ? dispenseData.data
+                  : [...prev, ...dispenseData.data]
+              );
+              setHasMore(dispenseData.data.length === PAGE_SIZE);
+            }
+            if (dispensersData.data) {
+              setDispensers(dispensersData.data);
+            }
+            break;
+          }
+          case "transfers": {
+            response = await fetch(
+              `/api/v2/stamps/${encodedCpid}/sends?${params}`,
+            );
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("Transfers data:", data);
+            if (data.data) {
+              setSends((prev) =>
+                pageNum === 1 ? data.data : [...prev, ...data.data]
+              );
+              setHasMore(data.data.length === PAGE_SIZE);
+            }
+            break;
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setHasMore(false);
+      } finally {
+        setIsLoading(false);
       }
+    },
+    [cpid, hasMore, isLoading, selectedTab],
+  );
 
-      console.log(`Fetching ${selectedTab} data for page ${pageNum}`);
-      const params = new URLSearchParams({
-        page: pageNum.toString(),
-        limit: PAGE_SIZE.toString(),
-        sort: "DESC",
-      });
+  const handleTabChange = useCallback((newTab: TabType) => {
+    if (selectedTab === newTab) return;
+    setSelectedTab(newTab);
+  }, [selectedTab]);
 
-      let response;
-
-      switch (selectedTab) {
-        case "dispensers": {
-          response = await fetch(
-            `/api/v2/stamps/${encodedCpid}/dispensers?${params}`,
-          );
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          console.log("Dispensers data:", data);
-          if (data.data) {
-            setDispensers((prev) =>
-              pageNum === 1 ? data.data : [...prev, ...data.data]
-            );
-            setHasMore(data.data.length === PAGE_SIZE);
-          }
-          break;
-        }
-        case "sales": {
-          const [dispenseResponse, dispensersResponse] = await Promise.all([
-            fetch(`/api/v2/stamps/${encodedCpid}/dispenses?${params}`),
-            fetch(
-              `/api/v2/stamps/${encodedCpid}/dispensers?${new URLSearchParams({
-                limit: "1000",
-                sort: "DESC",
-              })}`,
-            ),
-          ]);
-
-          if (!dispenseResponse.ok) {
-            throw new Error(`HTTP error! status: ${dispenseResponse.status}`);
-          }
-          if (!dispensersResponse.ok) {
-            throw new Error(`HTTP error! status: ${dispensersResponse.status}`);
-          }
-
-          const [dispenseData, dispensersData] = await Promise.all([
-            dispenseResponse.json(),
-            dispensersResponse.json(),
-          ]);
-
-          console.log("Sales data:", {
-            dispenses: dispenseData,
-            dispensers: dispensersData,
-          });
-
-          if (dispenseData.data) {
-            setDispenses((prev) =>
-              pageNum === 1
-                ? dispenseData.data
-                : [...prev, ...dispenseData.data]
-            );
-            setHasMore(dispenseData.data.length === PAGE_SIZE);
-          }
-          if (dispensersData.data) {
-            setDispensers(dispensersData.data);
-          }
-          break;
-        }
-        case "transfers": {
-          response = await fetch(
-            `/api/v2/stamps/${encodedCpid}/sends?${params}`,
-          );
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          console.log("Transfers data:", data);
-          if (data.data) {
-            setSends((prev) =>
-              pageNum === 1 ? data.data : [...prev, ...data.data]
-            );
-            setHasMore(data.data.length === PAGE_SIZE);
-          }
-          break;
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setHasMore(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Remove the separate effects and combine into one
   useEffect(() => {
-    // Reset state when tab changes
+    if (!selectedTab) return;
+
     setPage(1);
     setHasMore(true);
-    setIsLoading(false);
-    fetchData(1);
-  }, [selectedTab]);
+    const timer = setTimeout(() => {
+      fetchData(1, true);
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [selectedTab]); // Only depend on selectedTab change
 
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLDivElement;
@@ -291,7 +312,7 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
             class={`cursor-pointer pb-4 hover:text-stamp-grey-light group ${
               selectedTab === id ? "text-stamp-grey-darker" : ""
             }`}
-            onClick={() => setSelectedTab(id)}
+            onClick={() => handleTabChange(id as TabType)}
           >
             {label}
           </p>
