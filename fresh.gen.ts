@@ -41,6 +41,7 @@ import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src101_deploy_hash_tokenid_ from "./routes/api/v2/src101/[deploy_hash]/[tokenid].ts";
 import * as $api_v2_src101_deploy_hash_address_address_btc_ from "./routes/api/v2/src101/[deploy_hash]/address/[address_btc].ts";
 import * as $api_v2_src101_deploy_hash_deploy from "./routes/api/v2/src101/[deploy_hash]/deploy.ts";
+import * as $api_v2_src101_deploy_hash_index from "./routes/api/v2/src101/[deploy_hash]/index.ts";
 import * as $api_v2_src101_deploy_hash_total from "./routes/api/v2/src101/[deploy_hash]/total.ts";
 import * as $api_v2_src101_balance_address_ from "./routes/api/v2/src101/balance/[address].ts";
 import * as $api_v2_src101_create from "./routes/api/v2/src101/create.ts";
@@ -264,6 +265,8 @@ const manifest = {
       $api_v2_src101_deploy_hash_address_address_btc_,
     "./routes/api/v2/src101/[deploy_hash]/deploy.ts":
       $api_v2_src101_deploy_hash_deploy,
+    "./routes/api/v2/src101/[deploy_hash]/index.ts":
+      $api_v2_src101_deploy_hash_index,
     "./routes/api/v2/src101/[deploy_hash]/total.ts":
       $api_v2_src101_deploy_hash_total,
     "./routes/api/v2/src101/balance/[address].ts":

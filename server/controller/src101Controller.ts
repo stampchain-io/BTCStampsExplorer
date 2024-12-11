@@ -167,15 +167,24 @@ export class Src101Controller{
     params: SRC101OwnerParams,
   ){
     try{
-      const [lastBlock, owner] = await Promise.all([
+      const [lastBlock, owner, totalCount] = await Promise.all([
         BlockService.getLastBlock(),
         SRC101Service.QueryService.getSrc101Owner(params),
+        SRC101Service.QueryService.getSrc101OwnerCount(params),
       ]);
   
       let restructuredResult: any = {
         last_block: lastBlock,
       };
-  
+      const limit = params.limit;
+      const page = params.page;
+      restructuredResult = {
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit),
+        total: totalCount,
+        ...restructuredResult,
+      };
       restructuredResult.data = owner;
       return restructuredResult;
     } catch (error) {

@@ -432,6 +432,7 @@ export interface SRC101OwnerParams {
   deploy_hash?: string;
   tokenid?: string;
   index?: number;
+  expire?: number;
   limit?: number;
   page?: number;
   sort?: string;

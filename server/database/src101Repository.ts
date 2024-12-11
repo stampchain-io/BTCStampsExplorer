@@ -622,6 +622,54 @@ export class SRC101Repository {
     return results;
   }
 
+  static async getSrc101OwnerCount(
+    params:SRC101OwnerParams
+  ) {
+    const queryParams = [];
+    const whereClauses = [];
+    if (params.deploy_hash) {
+      whereClauses.push(`deploy_hash = ?`);
+      queryParams.push(params.deploy_hash);
+    }
+    if (params.tokenid) {
+      whereClauses.push(`tokenid = ?`);
+      queryParams.push(params.tokenid);
+    }
+
+    if (params.index) {
+      whereClauses.push(`${SRC101_OWNERS_TABLE}.index = ?`);
+      queryParams.push(params.index);
+    }
+
+    if (params.expire && params.expire == 1) {
+      whereClauses.push(`expire_timestamp < ?`);
+      queryParams.push(new Date().getTime() / 1000);
+    } else {
+      whereClauses.push(`expire_timestamp > ?`);
+      queryParams.push(new Date().getTime() / 1000);
+    }
+
+    const validOrder = ["ASC", "DESC"].includes(params.sort.toUpperCase())
+      ? params.sort.toUpperCase()
+      : "ASC";
+
+    const sqlQuery = `
+      SELECT COUNT(*) AS total
+      FROM ${SRC101_OWNERS_TABLE}
+      WHERE ${whereClauses.join(" AND ")}
+      ORDER BY last_update ${validOrder}
+    `;
+
+    const results = (await dbManager.executeQueryWithCache(
+      sqlQuery,
+      queryParams,
+      1000 * 60 * 2, // Cache duration
+    )).rows.map((result) => ({
+      ...result,
+    }));;
+    return results[0].total;
+  }
+
   static async getSrc101Owner(
     params:SRC101OwnerParams
   ) {
@@ -639,6 +687,14 @@ export class SRC101Repository {
     if (params.index) {
       whereClauses.push(`${SRC101_OWNERS_TABLE}.index = ?`);
       queryParams.push(params.index);
+    }
+
+    if (params.expire && params.expire == 1) {
+      whereClauses.push(`? > expire_timestamp`);
+      queryParams.push(new Date().getTime() / 1000);
+    } else {
+      whereClauses.push(`? < expire_timestamp`);
+      queryParams.push(new Date().getTime() / 1000);
     }
 
     const offset = params.limit && params.page ? Number(params.limit) * (Number(params.page) - 1) : 0;
