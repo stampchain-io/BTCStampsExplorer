@@ -35,10 +35,10 @@ export default function RecentDeploy(): JSX.Element {
     <div class="flex flex-col items-start tablet:items-end">
       <div>
         <h1 class={`${ModulesStyles.titlePurpleDL} tablet:hidden`}>
-          REGISTERED DOMAINS
+          BITNAMES
         </h1>
-        <h1 class={`hidden tablet:block ${ModulesStyles.titlePurpleLD}`}>
-          REGISTERED DOMAINS
+        <h1 class={`${ModulesStyles.titlePurpleLD} hidden tablet:block`}>
+          BITNAMES
         </h1>
       </div>
       {transactions.length > 0 && (

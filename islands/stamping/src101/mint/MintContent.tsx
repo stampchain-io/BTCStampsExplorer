@@ -106,7 +106,7 @@ export function Mint101Content(
               type="submit"
               className={buttonPurpleOutline}
             >
-              REGISTER
+              AVAILABILITY
             </button>
           </div>
         </div>
@@ -123,7 +123,7 @@ export function Mint101Content(
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleTransferSubmit}
-          buttonName="MINT"
+          buttonName="REGISTER"
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           userAddress={wallet?.address}
