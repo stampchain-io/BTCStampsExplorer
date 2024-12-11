@@ -7,6 +7,7 @@
   background-clip: text;
   text-fill-color: transparent;
 }
+
 .purple-gradient2 {
   /* TODO: Migrate to Tailwind: bg-text-purple-2 bg-clip-text text-fill-transparent */
   background: linear-gradient(to right, #440066, #660099, #8800cc, #aa00ff);
@@ -15,6 +16,7 @@
   background-clip: text;
   text-fill-color: transparent;
 }
+
 .purple-gradient3 {
   /* TODO: Migrate to Tailwind: bg-text-purple-3 bg-clip-text text-fill-transparent */
   background: linear-gradient(to right, #8800cc, #660099, #440066);
@@ -23,6 +25,7 @@
   background-clip: text;
   text-fill-color: transparent;
 }
+
 .purple-gradient4 {
   /* TODO: Migrate to Tailwind: bg-text-purple-4 bg-clip-text text-fill-transparent */
   background: linear-gradient(to right, #aa00ff, #8800cc, #660099, #440066);
@@ -31,6 +34,7 @@
   background-clip: text;
   text-fill-color: transparent;
 }
+
 .gray-gradient1 {
   /* TODO: Migrate to Tailwind: bg-text-gray-1 bg-clip-text text-fill-transparent */
   background: linear-gradient(to right, #cccccc, #999999, #666666);
@@ -39,6 +43,7 @@
   background-clip: text;
   text-fill-color: transparent;
 }
+
 .gray-gradient1-hover {
   background: linear-gradient(to right, #cccccc, #999999, #666666);
   -webkit-text-fill-color: transparent;
@@ -51,6 +56,7 @@
   -webkit-text-fill-color: #CCCCCC;
   text-fill-color: #CCCCCC;
 }
+
 .gray-gradient2 {
   /* TODO: Migrate to Tailwind: bg-text-gray-2 bg-clip-text text-fill-transparent */
   background: linear-gradient(to right, #999999, #666666);
@@ -59,6 +65,7 @@
   background-clip: text;
   text-fill-color: transparent;
 }
+
 .gray-gradient3 {
   /* TODO: Migrate to Tailwind: bg-text-gray-3 bg-clip-text text-fill-transparent */
   background: linear-gradient(to right, #666666, #999999, #cccccc);
@@ -66,6 +73,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
 .gray-gradient4 {
   /* TODO: Migrate to Tailwind: bg-text-gray-4 bg-clip-text text-fill-transparent */
   background: linear-gradient(to right, #666666, #999999);
@@ -80,6 +88,7 @@
   /* TODO: Migrate to Tailwind: bg-stamp-dark */
   background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff);
 }
+
 .purple-bg-gradient {
   /* TODO: Migrate to Tailwind: bg-stamp-purple-bg */
   background: linear-gradient(to right, #8800cc, #7700aa, #660099);
@@ -88,27 +97,24 @@
 /* Hoverable Text Gradient Colors */
 .purple-hover-gradient {
   /* TODO: Migrate to Tailwind: bg-text-purple-hover bg-clip-text text-fill-transparent */
-  background: linear-gradient(
-    90deg,
-    #440066 0%,
-    #660099 50%,
-    #8800cc 75%,
-    #aa00ff 100%
-  );
+  background: linear-gradient(90deg,
+      #440066 0%,
+      #660099 50%,
+      #8800cc 75%,
+      #aa00ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
 }
+
 .purple-hover-gradient:hover {
   /* TODO: Migrate to Tailwind: hover:bg-text-purple-hover bg-clip-text text-fill-transparent */
-  background: linear-gradient(
-    90deg,
-    #440066 0%,
-    #660099 25%,
-    #8800cc 50%,
-    #aa00ff 75%
-  );
+  background: linear-gradient(90deg,
+      #440066 0%,
+      #660099 25%,
+      #8800cc 50%,
+      #aa00ff 75%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

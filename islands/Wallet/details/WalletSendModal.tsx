@@ -189,7 +189,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
                   })(),
                 }}
               />
-              <span class="text-4xl mobileLg:text-5xl text-stamp-grey-light font-extralight ml-0.75 mobileLg:ml-1.5">
+              <span class="text-4xl mobileLg:text-5xl text-stamp-grey-light font-extralight">
                 BTC
               </span>
             </div>
