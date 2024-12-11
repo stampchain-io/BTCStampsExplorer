@@ -27,7 +27,6 @@ interface PSBTParams {
   service_fee_address: string;
   changeAddress: string;
   utxoAncestors?: AncestorInfo[];
-  dryRun?: boolean;
   trxType?: "olga" | "multisig";
   utxos?: Array<{
     txid: string;
@@ -36,6 +35,24 @@ interface PSBTParams {
     script: string;
     address: string;
   }>;
+}
+
+interface PSBTResponse {
+  psbt?: Psbt;
+  estimatedTxSize: number;
+  totalInputValue: number;
+  totalOutputValue: number;
+  totalChangeOutput: number;
+  totalDustValue: number;
+  estMinerFee: number;
+  feeDetails: {
+    baseFee: number;
+    ancestorFee: number;
+    effectiveFeeRate: number;
+    ancestorCount: number;
+    totalVsize: number;
+  };
+  changeAddress?: string;
 }
 
 export class SRC20PSBTService {
@@ -51,24 +68,19 @@ export class SRC20PSBTService {
     service_fee_address,
     changeAddress,
     utxoAncestors = [],
-    dryRun = false,
     trxType = "olga",
-  }: {
-    sourceAddress: string;
-    toAddress: string;
-    src20Action: string | object;
-    satsPerVB: number;
-    service_fee: number;
-    service_fee_address: string;
-    changeAddress: string;
-    utxoAncestors?: Array<{
-      txid: string;
-      vout: number;
-      weight?: number;
-    }>;
-    dryRun?: boolean;
-    trxType?: "olga" | "multisig";
-  }) {
+  }: PSBTParams) {
+    logger.debug("stamps", {
+      message: "preparePSBT called",
+      data: {
+        sourceAddress,
+        toAddress,
+        satsPerVB,
+        trxType,
+        action: src20Action.op,
+      }
+    });
+
     const effectiveChangeAddress = changeAddress || sourceAddress;
     const network = networks.bitcoin;
     let psbt: Psbt | undefined;
@@ -77,67 +89,23 @@ export class SRC20PSBTService {
     // Prepare action data and CIP33 addresses
     const { actionData, finalData, hex_data, chunks } = await this.prepareActionData(src20Action);
 
-    // Add the first output (toAddress) as a real pubkey output
+    // Add all outputs as P2WSH
     const toAddressScript = address.toOutputScript(toAddress, network);
     vouts.push({
       script: toAddressScript,
       value: this.DUST_SIZE,
-      isReal: true
+      isReal: false,
+      type: "p2wsh"
     });
 
-    // Add data outputs
-    for (let i = 0; i < chunks.length; i++) {
-      // Get CIP33 address for this chunk
-      const cip33Address = CIP33.file_to_addresses(hex_data)[i];
-      if (!cip33Address) {
-        throw new Error(`Failed to generate CIP33 address for chunk ${i}`);
-      }
-
-      // Create output script from address
-      const outputScript = address.toOutputScript(cip33Address, network);
-
+    chunks.forEach((chunk, i) => {
+      const outputScript = address.toOutputScript(chunk, network);
       vouts.push({
         script: outputScript,
         value: this.DUST_SIZE + i,
         isReal: false,
-        address: cip33Address // Keep address for reference
+        type: "p2wsh"
       });
-
-      logger.debug("stamps", {
-        message: "Created CIP33 output",
-        data: {
-          chunkIndex: i,
-          address: cip33Address,
-          scriptHex: Array.from(outputScript)
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('')
-        }
-      });
-    }
-
-    // Add service fee output if applicable
-    if (service_fee > 0 && service_fee_address) {
-      const serviceFeeScript = address.toOutputScript(service_fee_address, network);
-      vouts.push({
-        script: serviceFeeScript,
-        value: service_fee,
-        isReal: true
-      });
-    }
-
-    // Log outputs for debugging
-    logger.debug("stamps", {
-      message: "Prepared outputs",
-      data: {
-        outputCount: vouts.length,
-        outputs: vouts.map(v => ({
-          value: v.value,
-          isReal: v.isReal,
-          scriptHex: Array.from(v.script)
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('')
-        }))
-      }
     });
 
     // Select UTXOs and calculate fees
@@ -149,150 +117,6 @@ export class SRC20PSBTService {
       1.5,
       { filterStampUTXOs: true, includeAncestors: true }
     );
-
-    // Calculate estimated size based on transaction type
-    const estimatedTxSize = estimateTransactionSize({
-      inputs: inputs.map(input => ({
-        type: getScriptTypeInfo(input.script).type,
-        size: input.size,
-        isWitness: this.isWitnessInput(input.script),
-        ancestor: input.ancestor
-      })),
-      outputs: [
-        // Real pubkey output (first output)
-        {
-          type: trxType === "olga" ? "P2WPKH" : "P2SH",
-          size: TX_CONSTANTS[trxType === "olga" ? "P2WPKH" : "P2SH"].size,
-          isWitness: trxType === "olga",
-          value: this.DUST_SIZE
-        },
-        // CIP33 outputs - use actual CIP33 address count
-        ...chunks.map((_, index) => ({
-          type: trxType === "olga" ? "P2WSH" : "P2SH",
-          size: TX_CONSTANTS[trxType === "olga" ? "P2WSH" : "P2SH"].size,
-          isWitness: trxType === "olga",
-          value: this.DUST_SIZE + index
-        }))
-      ],
-      includeChangeOutput: change > this.DUST_SIZE,
-      changeOutputType: trxType === "olga" ? "P2WPKH" : "P2SH",
-      isMultisig: trxType === "multisig"
-    });
-
-    const { fee: estMinerFee, vsize: txVsize } = this.calculateTotalFee(
-      inputs.map(input => ({
-        type: getScriptTypeInfo(input.script).type,
-        size: input.size,
-        isWitness: this.isWitnessInput(input.script),
-        ancestor: utxoAncestors.find(a => a.txid === input.txid && a.vout === input.vout)
-      })),
-      [
-        // Real pubkey output
-        {
-          type: trxType === "olga" ? "P2WPKH" : "P2SH",
-          size: TX_CONSTANTS[trxType === "olga" ? "P2WPKH" : "P2SH"].size,
-          isWitness: trxType === "olga",
-          value: this.DUST_SIZE
-        },
-        ...chunks.map((_, index) => ({
-          type: trxType === "olga" ? "P2WSH" : "P2SH",
-          size: TX_CONSTANTS[trxType === "olga" ? "P2WSH" : "P2SH"].size,
-          isWitness: trxType === "olga",
-          value: this.DUST_SIZE + index
-        }))
-      ],
-      satsPerVB,
-      {
-        includeChangeOutput: change > this.DUST_SIZE,
-        changeOutputType: trxType === "olga" ? "P2WPKH" : "P2SH",
-        isMultisig: trxType === "multisig"
-      }
-    );
-
-    // Add verification logging
-    logger.debug("stamps", {
-      message: "Transaction fee verification",
-      data: {
-        inputs: inputs.map(input => ({
-          txid: input.txid,
-          vout: input.vout,
-          value: input.value
-        })),
-        outputs: [
-          ...vouts.map(vout => ({
-            value: vout.value,
-            isReal: vout.isReal
-          })),
-          ...(change > this.DUST_SIZE ? [{
-            value: change,
-            isChange: true
-          }] : [])
-        ],
-        feeBreakdown: {
-          totalInput: inputs.reduce((sum, input) => sum + Number(input.value), 0),
-          totalOutput: vouts.reduce((sum, vout) => sum + Number(vout.value), 0) + 
-            (change > this.DUST_SIZE ? change : 0),
-          calculatedFee: estMinerFee,
-          actualFee: inputs.reduce((sum, input) => sum + Number(input.value), 0) -
-            (vouts.reduce((sum, vout) => sum + Number(vout.value), 0) + 
-            (change > this.DUST_SIZE ? change : 0)),
-          txVsize,
-          effectiveFeeRate: estMinerFee / txVsize
-        }
-      }
-    });
-
-    // Add debug logging for ancestor-aware fee calculation
-    logger.debug("stamps", {
-      message: "Ancestor-aware fee calculation details",
-      data: {
-        requestedFeeRate: satsPerVB,
-        calculatedFee: estMinerFee,
-        effectiveFeeRate: estMinerFee / (estimatedTxSize / 4),
-        ancestorCount: utxoAncestors.length,
-        ancestors: utxoAncestors,
-        estimatedTxSize,
-        inputs: inputs.map(input => ({
-          txid: input.txid,
-          vout: input.vout,
-          hasAncestor: utxoAncestors.some(a => a.txid === input.txid && a.vout === input.vout)
-        }))
-      }
-    });
-
-    // Add debug logging for fee calculation
-    logger.debug("stamps", {
-      message: "Fee calculation details",
-      data: {
-        requestedFeeRate: satsPerVB,
-        calculatedFee: estMinerFee,
-        effectiveFeeRate: estMinerFee / (estimatedTxSize / 4),
-        transactionType: trxType,
-        isMultisig: trxType === "multisig",
-        inputs: inputs.map(input => ({
-          txid: input.txid,
-          vout: input.vout,
-          type: getScriptTypeInfo(input.script).type,
-          ancestor: utxoAncestors.find(a => a.txid === input.txid && a.vout === input.vout)
-        })),
-        estimatedTxSize,
-        totalWeight: estimatedTxSize * 4
-      }
-    });
-
-    // If dryRun, return fee estimation without creating PSBT
-    if (dryRun) {
-      return {
-        estimatedTxSize,
-        totalInputValue: inputs.reduce((sum, input) => sum + Number(input.value), 0),
-        totalOutputValue: vouts.reduce((sum, vout) => sum + Number(vout.value), 0),
-        totalChangeOutput: change,
-        totalDustValue: vouts.reduce((sum, vout) => 
-          Number(vout.value) <= this.DUST_SIZE ? sum + Number(vout.value) : sum, 0),
-        estMinerFee,
-        outputCount: vouts.length,
-      };
-    }
 
     // Create PSBT
     psbt = new Psbt({ network });
@@ -308,49 +132,66 @@ export class SRC20PSBTService {
       psbt.addInput(psbtInput);
     }
 
-    // Add outputs
+    // Add all P2WSH outputs
     for (const vout of vouts) {
-      try {
-        psbt.addOutput({
-          script: vout.script,
-          value: BigInt(vout.value)
-        });
-      } catch (error) {
-        logger.error("stamps", {
-          message: "Error adding output to PSBT",
-          error: error instanceof Error ? error.message : String(error),
-          output: {
-            isReal: vout.isReal,
-            hasScript: !!vout.script,
-            value: vout.value,
-            scriptHex: Array.from(vout.script)
-              .map(b => b.toString(16).padStart(2, '0'))
-              .join('')
-          }
-        });
-        throw error;
-      }
+      psbt.addOutput({
+        script: vout.script,
+        value: BigInt(vout.value)
+      });
     }
 
     // Add change output if needed
     if (change > this.DUST_SIZE) {
-      const changeScript = address.toOutputScript(effectiveChangeAddress, network);
+      const changeOutput = this.createOutputMatchingInputType(
+        effectiveChangeAddress,
+        "p2wpkh", // Always use P2WPKH for change
+        network
+      );
       psbt.addOutput({
-        script: changeScript,
+        script: changeOutput.output,
         value: BigInt(change)
       });
     }
 
+    // Calculate actual transaction size
+    const txSize = estimateTransactionSize({
+      inputs: inputs.map(input => ({
+        type: getScriptTypeInfo(input.script).type,
+        isWitness: this.isWitnessInput(input.script),
+      })),
+      outputs: [
+        ...vouts.map(() => ({ type: "P2WSH" as const })),
+        ...(change > this.DUST_SIZE ? [{ type: "P2WPKH" as const }] : [])
+      ],
+    });
+
+    logger.debug("stamps", {
+      message: "Transaction details",
+      data: {
+        estimatedSize: txSize,
+        estMinerFee: fee,
+        totalInputValue: inputs.reduce((sum, input) => sum + Number(input.value), 0),
+        totalOutputValue: vouts.reduce((sum, vout) => sum + Number(vout.value), 0),
+        totalChangeOutput: change,
+        inputCount: inputs.length,
+        outputCount: vouts.length,
+        hasChange: change > this.DUST_SIZE,
+      }
+    });
+
     return {
       psbt,
-      estimatedTxSize,
-      totalInputValue: inputs.reduce((sum, input) => sum + Number(input.value), 0),
-      totalOutputValue: vouts.reduce((sum, vout) => sum + Number(vout.value), 0),
-      totalChangeOutput: change,
-      totalDustValue: vouts.reduce((sum, vout) => 
-        Number(vout.value) <= this.DUST_SIZE ? sum + Number(vout.value) : sum, 0),
-      estMinerFee,
+      hex: psbt.toHex(),
+      est_tx_size: txSize,
+      est_miner_fee: fee,
+      input_value: inputs.reduce((sum, input) => sum + Number(input.value), 0),
+      change_value: change,
+      inputsToSign: inputs.map((_, index) => index),
       changeAddress: effectiveChangeAddress,
+      feeDetails: {
+        rate: satsPerVB,
+        total: fee,
+      },
     };
   }
 
@@ -445,27 +286,6 @@ export class SRC20PSBTService {
     };
   }
 
-  private static getInputType(inputDetails: any): string {
-    if (!inputDetails?.scriptPubKey?.type) {
-      throw new Error("Invalid input details: missing scriptPubKey or type");
-    }
-
-    const scriptType = inputDetails.scriptPubKey.type;
-    switch (scriptType) {
-      case "pubkeyhash":
-        return "p2pkh";
-      case "scripthash":
-        return "p2sh";
-      case "witness_v0_keyhash":
-        return "p2wpkh";
-      case "witness_v0_scripthash":
-        return "p2wsh";
-      default:
-        console.warn(`Unknown script type: ${scriptType}`);
-        return "unknown";
-    }
-  }
-
   private static createPsbtInput(input: UTXO, txDetails: any): PSBTInput {
     logger.debug("stamps", {
       message: "Creating PSBT input",
@@ -534,219 +354,9 @@ export class SRC20PSBTService {
     };
   }
 
-  private static createP2WSHOutput(
-    address: string,
-    value: number,
-    network: bitcoin.Network,
-  ): { script: Uint8Array; value: number } {
-    if (!address) {
-      throw new Error("Invalid address: address is undefined");
-    }
-
-    try {
-      const script = address.toOutputScript(address, network);
-      const p2wshOutput = payments.p2wsh({ 
-        redeem: { 
-          output: script instanceof Uint8Array ? script : new Uint8Array(script),
-          network 
-        },
-        network 
-      });
-
-      if (!p2wshOutput.output) {
-        throw new Error("Failed to create P2WSH output");
-      }
-
-      return {
-        script: p2wshOutput.output instanceof Uint8Array ? 
-          p2wshOutput.output : 
-          new Uint8Array(p2wshOutput.output),
-        value,
-      };
-    } catch (error) {
-      console.error(`Error creating P2WSH output for address ${address}:`, error);
-      throw error;
-    }
-  }
-
-  private static async generateCIP33Addresses(hex_data: string) {
-    // Let CIP33 handle the chunking and address generation
-    const addresses = CIP33.file_to_addresses(hex_data);
-    if (!addresses || addresses.length === 0) {
-      throw new Error("Failed to generate CIP33 addresses");
-    }
-    return addresses;
-  }
-
   private static isWitnessInput(script: string): boolean {
     const scriptType = getScriptTypeInfo(script);
     return scriptType.isWitness;
-  }
-
-  // Add a method to calculate expected CIP33 outputs
-  private static calculateExpectedOutputs(hex_data: string) {
-    // Each P2WSH output can hold ~520 bytes of data
-    const BYTES_PER_OUTPUT = 520;
-    const totalBytes = hex_data.length / 2; // Convert hex length to bytes
-    const numCIP33Outputs = Math.ceil(totalBytes / BYTES_PER_OUTPUT);
-
-    // Log the calculation for debugging
-    logger.debug("stamps", {
-      message: "Calculating expected outputs",
-      data: {
-        totalBytes,
-        bytesPerOutput: BYTES_PER_OUTPUT,
-        numCIP33Outputs,
-        hex_dataLength: hex_data.length,
-      }
-    });
-
-    return {
-      numOutputs: numCIP33Outputs,
-      totalBytes,
-      bytesPerOutput: BYTES_PER_OUTPUT,
-      expectedTotalOutputs: numCIP33Outputs + 2 // +1 for real pubkey, +1 for change
-    };
-  }
-
-  private static calculateRequiredOutputs(actionData: object) {
-    const jsonString = JSON.stringify(actionData);
-    const BYTES_PER_OUTPUT = 520;
-    return Math.ceil(jsonString.length / BYTES_PER_OUTPUT);
-  }
-
-  static async estimateFees({
-    sourceAddress,
-    actionData,
-    satsPerVB,
-    cachedUTXOs = null, // Allow passing cached UTXOs
-  }) {
-    const requiredOutputs = this.calculateRequiredOutputs(actionData);
-    
-    // Basic size estimation without fetching UTXOs
-    const baseSize = 41; // version + locktime + input count + output count
-    const inputSize = 68; // P2WPKH input
-    const witnessSize = 107; // P2WPKH witness
-    const p2wshOutputSize = 43; // P2WSH output size
-    
-    // 1 real output + CIP33 outputs + change
-    const totalOutputs = 1 + requiredOutputs + 1;
-    
-    const estimatedSize = baseSize + 
-      inputSize + 
-      (witnessSize / 4) + 
-      (totalOutputs * p2wshOutputSize);
-
-    // Calculate dust outputs (all outputs except change)
-    const dustOutputs = totalOutputs - 1;
-    const dustValue = dustOutputs * 420;
-
-    // Estimate miner fee
-    const minerFee = Math.ceil(estimatedSize * satsPerVB);
-
-    return {
-      estimatedSize,
-      minerFee,
-      dustValue,
-      requiredOutputs,
-    };
-  }
-
-  private static calculateTotalFee(
-    inputs: Array<{
-      txid: string;
-      vout: number;
-      value: number;
-      type: string;
-      size: number;
-      isWitness: boolean;
-      hasAncestor?: boolean;
-      ancestor?: {
-        txid: string;
-        vout: number;
-        weight?: number;
-      };
-    }>,
-    outputs: Array<{
-      value: number;
-      isReal?: boolean;
-      isChange?: boolean;
-    }>,
-    satsPerVB: number
-  ): { fee: number; vsize: number } {
-    // Calculate base transaction size
-    const baseSize = estimateTransactionSize({
-      inputs: inputs.map(input => ({
-        type: input.type,
-        size: input.size,
-        isWitness: input.isWitness
-      })),
-      outputs: outputs.map(output => ({
-        value: output.value,
-        isReal: output.isReal,
-        isChange: output.isChange
-      }))
-    });
-
-    // Calculate ancestor weight
-    const ancestorWeight = inputs.reduce((sum, input) => {
-      if (input.ancestor?.weight) {
-        return sum + input.ancestor.weight;
-      }
-      return sum;
-    }, 0);
-
-    // Convert weight to vsize (weight units / 4)
-    const ancestorVsize = Math.ceil(ancestorWeight / 4);
-    
-    // Total vsize including ancestors
-    const totalVsize = baseSize + ancestorVsize;
-
-    // Calculate values
-    const totalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
-    const totalOutputValue = outputs.reduce((sum, output) => sum + Number(output.value), 0);
-    
-    // Calculate fee based on total vsize including ancestors
-    const requestedFee = Math.ceil(totalVsize * satsPerVB);
-    const actualFee = totalInputValue - totalOutputValue;
-    const effectiveFeeRate = actualFee / totalVsize;
-
-    logger.debug("stamps", {
-      message: "Fee calculation with ancestors",
-      data: {
-        sizes: {
-          baseSize,
-          ancestorWeight,
-          ancestorVsize,
-          totalVsize
-        },
-        fees: {
-          requested: {
-            rate: satsPerVB,
-            amount: requestedFee
-          },
-          actual: {
-            amount: actualFee,
-            effectiveRate: effectiveFeeRate.toFixed(1)
-          }
-        },
-        ancestors: inputs.map(input => ({
-          txid: input.txid,
-          vout: input.vout,
-          hasAncestor: !!input.ancestor,
-          ancestorWeight: input.ancestor?.weight
-        })),
-        values: {
-          totalInput: totalInputValue,
-          totalOutput: totalOutputValue
-        }
-      }
-    });
-
-    return {
-      fee: requestedFee,
-      vsize: totalVsize
-    };
   }
 }
 

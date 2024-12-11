@@ -13,6 +13,7 @@ export class SRC20Service {
   static readonly MarketService = SRC20MarketService;
   static readonly UtilityService = SRC20UtilityService;
   static readonly PSBTService = SRC20PSBTService;
+  // Multisig specific operations
   static readonly OperationService = SRC20OperationService;
   static readonly CompressionService = SRC20CompressionService;
 }

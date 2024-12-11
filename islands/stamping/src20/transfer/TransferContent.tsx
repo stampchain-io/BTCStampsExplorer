@@ -57,22 +57,6 @@ export function TransferContent(
     return <div>Error: Failed to load configuration</div>;
   }
 
-  const handleTransferSubmit = async () => {
-    if (!isConnected) {
-      logger.debug("stamps", {
-        message: "Showing wallet connect modal - user not connected",
-      });
-      walletContext.showConnectModal();
-      return;
-    }
-
-    try {
-      await handleSubmit();
-    } catch (error) {
-      console.error("Transfer error:", error);
-    }
-  };
-
   const handleDropDown = (ticker: string, amount: string) => {
     setOpenDrop(false);
     setIsSelecting(true);
@@ -153,19 +137,14 @@ export function TransferContent(
   }, [wallet?.address]);
 
   const handleAmountChange = (e: Event) => {
-    const value = (e.target as HTMLInputElement).value;
-    const selectedBalance = balances.find((b) => b.tick === formState.token);
+    const inputAmount = Number((e.target as HTMLInputElement).value);
+    const maxAmount = Number(formState.maxAmount);
 
-    if (selectedBalance) {
-      const maxAmount = parseFloat(stripTrailingZeros(selectedBalance.amt));
-      const inputAmount = parseFloat(value);
-
-      if (!isNaN(inputAmount) && inputAmount > maxAmount) {
-        handleInputChange({
-          target: { value: maxAmount.toString() },
-        } as Event, "amt");
-        return;
-      }
+    if (!isNaN(inputAmount) && !isNaN(maxAmount) && inputAmount > maxAmount) {
+      handleInputChange({
+        target: { value: maxAmount.toString() },
+      } as Event, "amt");
+      return;
     }
 
     handleInputChange(e, "amt");
@@ -248,23 +227,30 @@ export function TransferContent(
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
-          type="src20-transfer"
+          type="src20"
           fileType="application/json"
+          fileSize={undefined}
+          issuance={undefined}
+          serviceFee={undefined}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
-          onSubmit={handleTransferSubmit}
+          onSubmit={handleSubmit}
           buttonName={isConnected ? "TRANSFER" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
-          userAddress={wallet?.address}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
-          utxoAncestors={formState.utxoAncestors}
+          userAddress={wallet?.address}
+          disabled={undefined}
+          effectiveFeeRate={undefined}
+          utxoAncestors={undefined}
           feeDetails={{
             minerFee: formState.psbtFees?.estMinerFee || 0,
             dustValue: formState.psbtFees?.totalDustValue || 0,
-            hasExactFees: !!formState.psbtFees?.hasExactFees,
+            hasExactFees: true,
+            totalValue: formState.psbtFees?.totalValue || 0,
+            estimatedSize: formState.psbtFees?.est_tx_size || 0,
           }}
         />
 

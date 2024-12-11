@@ -70,6 +70,9 @@ export interface FeeDetails {
   dustValue: number;
   hasExactFees: boolean;
   totalValue?: number;
+  effectiveFeeRate?: number;
+  estimatedSize?: number;
+  totalVsize?: number;
 }
 
 export interface BaseFeeCalculatorProps {
@@ -100,17 +103,18 @@ export interface BasicFeeProps
 
 export interface ComplexFeeProps extends BaseFeeCalculatorProps {
   type: string;
-  fileType?: string;
-  fileSize?: number;
-  issuance?: number;
-  serviceFee?: number;
-  userAddress?: string;
-  outputTypes?: ScriptType[];
-  utxoAncestors?: AncestorInfo[];
-  feeDetails?: FeeDetails;
-  onRefresh?: () => Promise<void>;
-  disabled?: boolean;
-  inputType?: string;
+  fileType: string | undefined;
+  fileSize: number | undefined;
+  issuance: number | undefined;
+  serviceFee: number | undefined;
+  userAddress: string | undefined;
+  outputTypes: ScriptType[] | undefined;
+  utxoAncestors: AncestorInfo[] | undefined;
+  feeDetails: FeeDetails | undefined;
+  effectiveFeeRate: number | undefined;
+  onRefresh: (() => Promise<void>) | undefined;
+  disabled: boolean | undefined;
+  inputType: string | undefined;
 }
 
 interface PSBTFees extends FeeDetails {
