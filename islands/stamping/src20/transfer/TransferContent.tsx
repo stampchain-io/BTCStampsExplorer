@@ -17,15 +17,13 @@ interface Balance {
 }
 
 const bodyToolsclass = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenterclass =
+const titlePurpleLDCenter =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
 
-const inputFieldContainerclass =
+const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
-const inputField2colclass =
-  "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-const feeSelectorContainerclass =
-  "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+const inputField2colAll = "flex flex-row gap-3 mobileMd:gap-6 w-full";
+const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
@@ -176,9 +174,9 @@ export function TransferContent(
 
   return (
     <div class={bodyToolsclass}>
-      <h1 class={titlePurpleLDCenterclass}>TRANSFER</h1>
+      <h1 class={titlePurpleLDCenter}>TRANSFER</h1>
 
-      <div class={inputFieldContainerclass}>
+      <div class={inputFieldContainer}>
         <SRC20InputField
           type="text"
           placeholder="Recipient address"
@@ -188,7 +186,7 @@ export function TransferContent(
           error={formState.toAddressError}
         />
 
-        <div class={inputField2colclass}>
+        <div class={inputField2colAll}>
           <div
             class={`relative ${
               openDrop && searchResults.length > 0 && !isSelecting
@@ -215,20 +213,18 @@ export function TransferContent(
               isUppercase
             />
             {openDrop && searchResults.length > 0 && !isSelecting && (
-              <ul class="absolute top-[calc(100%-1px)] left-0 max-h-48 w-full bg-stamp-grey-light rounded-b-md text-[#333333] text-base leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
+              <ul class="absolute top-[calc(100%-1px)] left-0 max-h-[168px] mobileLg:max-h-[208px] w-full bg-stamp-grey-light rounded-b-md text-stamp-grey-darkest text-sm mobileLg:text-base leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
                 {searchResults.map((result) => (
                   <li
                     key={result.tick}
-                    class="cursor-pointer"
+                    class="cursor-pointer p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase"
                     onClick={() => handleDropDown(result.tick, result.amt)}
                     onMouseDown={(e) => e.preventDefault()}
                   >
-                    <div class="p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase">
-                      {result.tick}
-                      <p class="text-sm font-medium">
-                        {stripTrailingZeros(result.amt)}
-                      </p>
-                    </div>
+                    {result.tick}
+                    <p class="text-xs mobileLg:text-sm text-stamp-grey-darker font-medium mobileLg:-mt-1">
+                      {stripTrailingZeros(result.amt)}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -249,7 +245,7 @@ export function TransferContent(
         </div>
       </div>
 
-      <div class={feeSelectorContainerclass}>
+      <div class={feeSelectorContainer}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
