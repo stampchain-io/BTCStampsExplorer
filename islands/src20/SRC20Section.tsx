@@ -1,8 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
-
-import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
-
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
@@ -12,6 +9,8 @@ interface SRC20SectionProps {
   subTitle?: string;
   type: "all" | "trending";
   fromPage: "src20" | "wallet" | "stamping/src20";
+  page?: number;
+  sortBy?: "ASC" | "DESC";
 }
 
 const ImageModal = (
@@ -36,7 +35,7 @@ const ImageModal = (
 };
 
 export function SRC20Section(
-  { title, subTitle, type, fromPage }: SRC20SectionProps,
+  { title, subTitle, type, fromPage, page, sortBy }: SRC20SectionProps,
 ) {
   const [data, setData] = useState<SRC20Row[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,8 +44,8 @@ export function SRC20Section(
 
   useEffect(() => {
     const endpoint = type === "trending"
-      ? "/api/internal/src20/trending?limit=5&page=1"
-      : "/api/internal/src20/details?op=DEPLOY&limit=5&page=1&sortBy=ASC";
+      ? `/api/internal/src20/trending?limit=5&page=${page}&sortBy=${sortBy}`
+      : `/api/internal/src20/details?op=DEPLOY&limit=5&page=${page}&sortBy=${sortBy}`;
 
     fetch(endpoint)
       .then((res) => res.json())
@@ -58,7 +57,7 @@ export function SRC20Section(
         console.error(`SRC20 ${type} fetch error:`, error);
         setIsLoading(false);
       });
-  }, [type]);
+  }, [type, page, sortBy]);
 
   const handleCloseModal = () => setModalOpen(false);
   const handleImageClick = (imgSrc: string) => {
@@ -111,10 +110,6 @@ export function SRC20Section(
                 />
               )
           ))}
-        </div>
-
-        <div className="flex justify-end -mt-3 mobileMd:-mt-6">
-          <ViewAllButton href={`/src20?type=${type}`} />
         </div>
       </div>
     </div>
