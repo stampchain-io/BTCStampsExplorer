@@ -122,6 +122,10 @@ body {
   /* Custom handle hover color */
 }
 
+.scrollbar-grey {
+  @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
+}
+
 .pixelart {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
@@ -448,8 +452,15 @@ body {
   @apply relative z-20;
 }
 
+/* conic gradient for input field animated border */
 @property --angle {
   syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
+}
+
+/* remove border radius for input field when dropdown is open */
+.input-open input {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }
