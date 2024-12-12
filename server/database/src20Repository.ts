@@ -632,9 +632,9 @@ static async searchValidSrc20TxFromDb(query: string) {
       const progressNum = parseFloat(progress);
 
       // Only filter out 100% minted tokens
-      if (progressNum >= 100) {
-        return null;
-      }
+      // if (progressNum >= 100) {
+      //   return null;
+      // }
 
       return {
         tick: row.tick,
