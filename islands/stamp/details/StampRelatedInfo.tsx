@@ -66,7 +66,7 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
         // Fetch total counts if it's the first page
         if (pageNum === 1) {
           const countParams = new URLSearchParams({
-            limit: "1",
+            limit: PAGE_SIZE.toString(),
             sort: "DESC",
           });
 
