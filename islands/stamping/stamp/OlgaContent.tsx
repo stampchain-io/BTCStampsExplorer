@@ -878,10 +878,10 @@ export function OlgaContent() {
     addressError,
   ]);
 
-  const bodyToolsClassName =
-    "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-  const titlePurpleLDCenterClassName =
+  const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+  const titlePurpleLDCenter =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+  const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 
   const isFormValid = isValidForMinting({
     file,
@@ -942,8 +942,8 @@ export function OlgaContent() {
   }, [isConnected, wallet.address, file, fee]);
 
   return (
-    <div class={bodyToolsClassName}>
-      <h1 class={titlePurpleLDCenterClassName}>STAMP</h1>
+    <div class={bodyTools}>
+      <h1 class={titlePurpleLDCenter}>STAMP</h1>
 
       {isConnected && addressError && (
         <div class="w-full text-red-500 text-center font-bold">
@@ -1204,7 +1204,7 @@ export function OlgaContent() {
       </div> */
       }
 
-      <div className="p-3 mobileMd:p-6 dark-gradient z-[10] w-full">
+      <div className={feeSelectorContainer}>
         <ComplexFeeCalculator
           fee={fee}
           handleChangeFee={handleChangeFee}
