@@ -16,16 +16,14 @@ interface Balance {
   // Add other balance fields as needed
 }
 
-const bodyToolsclass = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenterclass =
+const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+const titlePurpleLDCenter =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
 
-const inputFieldContainerclass =
+const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
-const inputField2colclass =
-  "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-const feeSelectorContainerclass =
-  "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+const inputField2colAll = "flex flex-row gap-3 mobileMd:gap-6 w-full";
+const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
@@ -51,6 +49,7 @@ export function TransferContent(
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const tokenInputRef = useRef<HTMLInputElement>(null);
 
   const { wallet, isConnected } = walletContext;
 
@@ -174,10 +173,10 @@ export function TransferContent(
   };
 
   return (
-    <div class={bodyToolsclass}>
-      <h1 class={titlePurpleLDCenterclass}>TRANSFER</h1>
+    <div class={bodyTools}>
+      <h1 class={titlePurpleLDCenter}>TRANSFER</h1>
 
-      <div class={inputFieldContainerclass}>
+      <div class={inputFieldContainer}>
         <SRC20InputField
           type="text"
           placeholder="Recipient address"
@@ -187,9 +186,17 @@ export function TransferContent(
           error={formState.toAddressError}
         />
 
-        <div class={inputField2colclass}>
-          <div class="relative" ref={dropdownRef}>
+        <div class={inputField2colAll}>
+          <div
+            class={`relative ${
+              openDrop && searchResults.length > 0 && !isSelecting
+                ? "input-open"
+                : ""
+            }`}
+            ref={dropdownRef}
+          >
             <SRC20InputField
+              ref={tokenInputRef}
               type="text"
               placeholder="Token"
               value={formState.token}
@@ -206,20 +213,18 @@ export function TransferContent(
               isUppercase
             />
             {openDrop && searchResults.length > 0 && !isSelecting && (
-              <ul class="absolute top-[42px] left-0 max-h-[206px] w-full bg-stamp-grey-light rounded-b-md text-[#333333] text-base leading-none font-bold z-[11] overflow-y-auto [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666]">
+              <ul class="absolute top-[100%] left-0 max-h-[168px] mobileLg:max-h-[208px] w-full bg-stamp-grey-light rounded-b-md text-stamp-grey-darkest text-sm mobileLg:text-base leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
                 {searchResults.map((result) => (
                   <li
                     key={result.tick}
-                    class="first:pt-3 cursor-pointer"
+                    class="cursor-pointer p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase"
                     onClick={() => handleDropDown(result.tick, result.amt)}
                     onMouseDown={(e) => e.preventDefault()}
                   >
-                    <div class="p-1.5 pl-3 hover:bg-[#BBBBBB] uppercase">
-                      {result.tick}
-                      <p class="text-sm font-medium">
-                        {stripTrailingZeros(result.amt)}
-                      </p>
-                    </div>
+                    {result.tick}
+                    <p class="text-xs mobileLg:text-sm text-stamp-grey-darker font-medium mobileLg:-mt-1">
+                      {stripTrailingZeros(result.amt)}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -240,7 +245,7 @@ export function TransferContent(
         </div>
       </div>
 
-      <div class={feeSelectorContainerclass}>
+      <div class={feeSelectorContainer}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

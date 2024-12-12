@@ -146,16 +146,14 @@ export function DeployContent(
     }
   }, []);
 
-  const bodyToolsClassName =
-    "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-  const titlePurpleLDCenterClassName =
+  const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+  const titlePurpleLDCenter =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
-  const feeSelectorContainerClassName =
-    "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+  const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 
   return (
-    <div className={bodyToolsClassName}>
-      <h1 className={titlePurpleLDCenterClassName}>DEPLOY</h1>
+    <div className={bodyTools}>
+      <h1 className={titlePurpleLDCenter}>DEPLOY</h1>
 
       <div className="dark-gradient p-2 mobileMd:p-6 w-full">
         <div className="flex gap-3 mobileMd:gap-6">
@@ -308,7 +306,7 @@ export function DeployContent(
         </div>
       </div>
 
-      <div className={feeSelectorContainerClassName}>
+      <div className={feeSelectorContainer}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
