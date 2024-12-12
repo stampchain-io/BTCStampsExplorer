@@ -215,7 +215,7 @@ export function TransferContent(
               isUppercase
             />
             {openDrop && searchResults.length > 0 && !isSelecting && (
-              <ul class="absolute top-[calc(100%-1px)] left-0 max-h-48 w-full bg-stamp-grey-light rounded-b-md text-[#333333] text-base leading-none font-bold z-[11] overflow-y-auto [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666]">
+              <ul class="absolute top-[calc(100%-1px)] left-0 max-h-48 w-full bg-stamp-grey-light rounded-b-md text-[#333333] text-base leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
                 {searchResults.map((result) => (
                   <li
                     key={result.tick}

@@ -122,6 +122,10 @@ body {
   /* Custom handle hover color */
 }
 
+.scrollbar-grey {
+  @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
+}
+
 .pixelart {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
