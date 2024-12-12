@@ -37,6 +37,14 @@ interface PSBTParams {
   trxType?: "olga" | "multisig";
 }
 
+// Update the response interface to include more input details
+interface EnhancedInputToSign {
+  index: number;
+  address?: string; // The address that needs to sign
+  sighashType?: number; // Optional sighash type
+  derivationPath?: string; // Optional derivation path
+}
+
 export const handler: Handlers<TX | TXError> = {
   async POST(req: Request) {
     try {
@@ -127,7 +135,7 @@ export const handler: Handlers<TX | TXError> = {
         est_miner_fee: psbtResult.estMinerFee,
         fee: psbtResult.totalDustValue + psbtResult.estMinerFee,
         change_value: psbtResult.totalChangeOutput,
-        inputsToSign: psbtResult.psbt?.data.inputs.map((_, index) => index),
+        inputsToSign: psbtResult.inputs,
         sourceAddress: effectiveSourceAddress,
         changeAddress: psbtResult.changeAddress,
         feeDetails: psbtResult.feeDetails,

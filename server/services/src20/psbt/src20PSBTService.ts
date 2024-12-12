@@ -53,6 +53,11 @@ interface PSBTResponse {
     totalVsize: number;
   };
   changeAddress?: string;
+  inputs: Array<{
+    index: number;
+    address: string;
+    sighashType?: number;
+  }>;
 }
 
 export class SRC20PSBTService {
@@ -181,17 +186,25 @@ export class SRC20PSBTService {
 
     return {
       psbt,
-      hex: psbt.toHex(),
-      est_tx_size: txSize,
-      est_miner_fee: fee,
-      input_value: inputs.reduce((sum, input) => sum + Number(input.value), 0),
-      change_value: change,
-      inputsToSign: inputs.map((_, index) => index),
-      changeAddress: effectiveChangeAddress,
+      estimatedTxSize: txSize,
+      totalInputValue: inputs.reduce((sum, input) => sum + Number(input.value), 0),
+      totalOutputValue: vouts.reduce((sum, vout) => sum + Number(vout.value), 0),
+      totalChangeOutput: change,
+      totalDustValue: vouts.reduce((sum, vout) => vout.isReal ? 0 : Number(vout.value), 0),
+      estMinerFee: fee,
       feeDetails: {
-        rate: satsPerVB,
-        total: fee,
+        baseFee: fee,
+        ancestorFee: 0,
+        effectiveFeeRate: satsPerVB,
+        ancestorCount: 0,
+        totalVsize: txSize
       },
+      changeAddress: effectiveChangeAddress,
+      inputs: inputs.map((input, index) => ({
+        index,
+        address: input.address,
+        sighashType: 1
+      }))
     };
   }
 
