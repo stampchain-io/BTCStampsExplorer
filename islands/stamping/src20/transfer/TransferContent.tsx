@@ -51,6 +51,7 @@ export function TransferContent(
   const [openDrop, setOpenDrop] = useState<boolean>(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const tokenInputRef = useRef<HTMLInputElement>(null);
 
   const { wallet, isConnected } = walletContext;
 
@@ -188,8 +189,16 @@ export function TransferContent(
         />
 
         <div class={inputField2colclass}>
-          <div class="relative" ref={dropdownRef}>
+          <div
+            class={`relative ${
+              openDrop && searchResults.length > 0 && !isSelecting
+                ? "input-open"
+                : ""
+            }`}
+            ref={dropdownRef}
+          >
             <SRC20InputField
+              ref={tokenInputRef}
               type="text"
               placeholder="Token"
               value={formState.token}
@@ -206,15 +215,15 @@ export function TransferContent(
               isUppercase
             />
             {openDrop && searchResults.length > 0 && !isSelecting && (
-              <ul class="absolute top-[42px] left-0 max-h-[206px] w-full bg-stamp-grey-light rounded-b-md text-[#333333] text-base leading-none font-bold z-[11] overflow-y-auto [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666]">
+              <ul class="absolute top-[calc(100%-1px)] left-0 max-h-48 w-full bg-stamp-grey-light rounded-b-md text-[#333333] text-base leading-none font-bold z-[11] overflow-y-auto [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666]">
                 {searchResults.map((result) => (
                   <li
                     key={result.tick}
-                    class="first:pt-3 cursor-pointer"
+                    class="cursor-pointer"
                     onClick={() => handleDropDown(result.tick, result.amt)}
                     onMouseDown={(e) => e.preventDefault()}
                   >
-                    <div class="p-1.5 pl-3 hover:bg-[#BBBBBB] uppercase">
+                    <div class="p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase">
                       {result.tick}
                       <p class="text-sm font-medium">
                         {stripTrailingZeros(result.amt)}
