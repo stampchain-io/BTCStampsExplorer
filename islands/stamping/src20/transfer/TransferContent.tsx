@@ -16,7 +16,7 @@ interface Balance {
   // Add other balance fields as needed
 }
 
-const bodyToolsclass = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
 
@@ -173,7 +173,7 @@ export function TransferContent(
   };
 
   return (
-    <div class={bodyToolsclass}>
+    <div class={bodyTools}>
       <h1 class={titlePurpleLDCenter}>TRANSFER</h1>
 
       <div class={inputFieldContainer}>

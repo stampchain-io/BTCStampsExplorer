@@ -69,13 +69,11 @@ interface SearchResult {
 }
 
 // Add consistent class names at the top
-const bodyToolsClassName =
-  "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenterClassName =
+const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+const titlePurpleLDCenter =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
-const feeSelectorContainerClassName =
-  "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
-const inputFieldContainerClassName =
+const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
 
 export function MintContent({
@@ -285,8 +283,8 @@ export function MintContent({
   });
 
   return (
-    <div class={bodyToolsClassName}>
-      <h1 class={titlePurpleLDCenterClassName}>MINT</h1>
+    <div class={bodyTools}>
+      <h1 class={titlePurpleLDCenter}>MINT</h1>
 
       {error && (
         <div class="w-full text-red-500 text-center font-bold">
@@ -294,7 +292,7 @@ export function MintContent({
         </div>
       )}
 
-      <div class={inputFieldContainerClassName}>
+      <div class={inputFieldContainer}>
         <div class="w-full flex gap-3 mobileMd:gap-6">
           <div
             id="image-preview"
@@ -400,7 +398,7 @@ export function MintContent({
         />
       </div>
 
-      <div class={feeSelectorContainerClassName}>
+      <div class={feeSelectorContainer}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
