@@ -132,13 +132,12 @@ export class SRC20FormController {
           const newState = {
             ...prev,
             psbtFees: {
-              estMinerFee: minerFee,
-              totalDustValue: dustValue, // Set the dust value
+              estMinerFee: Number(response.data.est_miner_fee) || 0,
+              totalDustValue: Number(response.data.total_dust_value) || 0,
               hasExactFees: true,
-              totalValue: minerFee + dustValue, // Total should be sum of both
-              est_tx_size: Number(response.data.estimatedSize) || 312,
-              hex: response.data.hex,
-              inputsToSign: response.data.inputsToSign || [],
+              totalValue: Number(response.data.est_miner_fee) +
+                  Number(response.data.total_dust_value) || 0,
+              est_tx_size: Number(response.data.est_tx_size) || 0,
             },
           };
 

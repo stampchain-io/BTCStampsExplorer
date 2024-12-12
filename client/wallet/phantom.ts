@@ -5,6 +5,7 @@ import { checkWalletAvailability, getGlobalWallets } from "./wallet.ts";
 import { handleWalletError } from "./walletHelper.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { broadcastTransaction } from "$lib/utils/minting/broadcast.ts";
 
 export const isPhantomInstalled = signal<boolean>(false);
 
@@ -110,7 +111,7 @@ const uint8ArrayToHex = (bytes: Uint8Array): string => {
 
 const signPSBT = async (
   psbtHex: string,
-  inputsToSign: { index: number }[],
+  inputsToSign: { index: number; address?: string; sighashType?: number }[],
   enableRBF = true,
   sighashTypes?: number[],
   autoBroadcast = true,
@@ -133,14 +134,14 @@ const signPSBT = async (
 
     const psbtBuffer = hexToUint8Array(psbtHex);
     const inputsToSignArray = inputsToSign?.map((input) => ({
-      address: walletContext.wallet.address,
+      address: input.address || walletContext.wallet.address,
       signingIndexes: [input.index],
-      sigHash: sighashTypes ? sighashTypes[0] : undefined,
+      sigHash: input.sighashType || sighashTypes?.[0],
     }));
 
     const result = await provider.signPSBT(psbtBuffer, {
       inputsToSign: inputsToSignArray,
-      enableRBF, // Note: Check if Phantom supports RBF in their options
+      enableRBF,
     });
 
     logger.debug("ui", {
@@ -155,12 +156,31 @@ const signPSBT = async (
     const signedPsbtHex = uint8ArrayToHex(result);
 
     if (autoBroadcast) {
-      // Phantom doesn't support direct broadcasting
-      return {
-        signed: true,
-        psbt: signedPsbtHex,
-        error: "Auto-broadcasting not supported with Phantom wallet",
-      };
+      try {
+        const txid = await broadcastTransaction(signedPsbtHex);
+        logger.debug("ui", {
+          message: "Transaction broadcast successful",
+          data: { txid },
+        });
+        return {
+          signed: true,
+          psbt: signedPsbtHex,
+          txid,
+          broadcast: true,
+        };
+      } catch (broadcastError) {
+        logger.error("ui", {
+          message: "Transaction broadcast failed",
+          error: broadcastError,
+        });
+        return {
+          signed: true,
+          psbt: signedPsbtHex,
+          error:
+            `Transaction signed but broadcast failed: ${broadcastError.message}`,
+          broadcast: false,
+        };
+      }
     }
 
     return { signed: true, psbt: signedPsbtHex };
