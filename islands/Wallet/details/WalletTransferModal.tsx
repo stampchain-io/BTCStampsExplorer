@@ -138,12 +138,12 @@ function WalletTransferModal({
   }, [selectedStamp]);
 
   const inputField =
-    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
+    "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
   return (
     <ModalLayout onClose={handleCloseModal} title="TRANSFER">
       <div className="flex w-full gap-3 mobileMd:gap-6">
-        <div className="min-w-[108px] h-[108px] mobileMd:min-w-[120px] mobileMd:h-[120px] bg-[#660099] rounded-md flex items-center justify-center">
+        <div className="flex items-center justify-center rounded-sm min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
           {selectedStamp
             ? (
               <img
@@ -157,7 +157,7 @@ function WalletTransferModal({
             : (
               <img
                 src="/img/stamping/image-upload.svg"
-                class="w-12 h-12"
+                class="-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
                 alt=""
               />
             )}
@@ -193,7 +193,7 @@ function WalletTransferModal({
               max={maxQuantity}
               value={quantity}
               onChange={handleQuantityChange}
-              className={`${inputField} !w-12 text-center`}
+              className={`${inputField} !w-[42px] mobileLg:!w-12 text-center`}
             />
           </div>
         </div>

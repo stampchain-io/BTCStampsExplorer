@@ -1,5 +1,5 @@
 import axiod from "axiod";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
@@ -32,6 +32,12 @@ export function DeployContent(
 
   const [fileUploadError, setFileUploadError] = useState<string | null>(null);
   const [tosAgreed, setTosAgreed] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
+  const [isToggleTooltipVisible, setIsToggleTooltipVisible] = useState(false);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+  const uploadTooltipTimeoutRef = useRef<number | null>(null);
+  const toggleTooltipTimeoutRef = useRef<number | null>(null);
 
   const { wallet, isConnected } = walletContext;
 
@@ -122,17 +128,20 @@ export function DeployContent(
   const handleShowAdvancedOptions = () => {
     const switchToggle = document.querySelector("#switch-toggle-advanced");
     if (!switchToggle) return;
+    setAllowTooltip(false);
+    setIsToggleTooltipVisible(false);
+
     if (showAdvancedOptions !== true) {
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-stamp-purple-dark'></div>`;
+          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-dark'></div>`;
       }, 150);
     } else {
       switchToggle.classList.remove("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
+          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
       }, 150);
     }
     setShowAdvancedOptions(!showAdvancedOptions);
@@ -142,25 +151,91 @@ export function DeployContent(
     const advancedToggle = document.getElementById("switch-toggle-advanced");
     if (advancedToggle) {
       advancedToggle.innerHTML =
-        `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
+        `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
     }
+  }, []);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    setTooltipPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleUploadMouseEnter = () => {
+    setIsUploadTooltipVisible(true);
+
+    if (uploadTooltipTimeoutRef.current) {
+      window.clearTimeout(uploadTooltipTimeoutRef.current);
+    }
+
+    uploadTooltipTimeoutRef.current = window.setTimeout(() => {
+      setIsUploadTooltipVisible(false);
+    }, 1500);
+  };
+
+  const handleUploadMouseLeave = () => {
+    if (uploadTooltipTimeoutRef.current) {
+      window.clearTimeout(uploadTooltipTimeoutRef.current);
+    }
+    setIsUploadTooltipVisible(false);
+  };
+
+  const handleToggleMouseEnter = () => {
+    if (allowTooltip) {
+      setIsToggleTooltipVisible(true);
+
+      if (toggleTooltipTimeoutRef.current) {
+        window.clearTimeout(toggleTooltipTimeoutRef.current);
+      }
+
+      toggleTooltipTimeoutRef.current = window.setTimeout(() => {
+        setIsToggleTooltipVisible(false);
+      }, 1500);
+    }
+  };
+
+  const handleToggleMouseLeave = () => {
+    if (toggleTooltipTimeoutRef.current) {
+      window.clearTimeout(toggleTooltipTimeoutRef.current);
+    }
+    setIsToggleTooltipVisible(false);
+    setAllowTooltip(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (uploadTooltipTimeoutRef.current) {
+        window.clearTimeout(uploadTooltipTimeoutRef.current);
+      }
+      if (toggleTooltipTimeoutRef.current) {
+        window.clearTimeout(toggleTooltipTimeoutRef.current);
+      }
+    };
   }, []);
 
   const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
   const titlePurpleLDCenter =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
   const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+  const tooltipButton =
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+  const tooltipImage =
+    "fixed bg-[#000000BF] px-2 py-1 mb-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50";
 
   return (
     <div className={bodyTools}>
       <h1 className={titlePurpleLDCenter}>DEPLOY</h1>
 
-      <div className="dark-gradient p-2 mobileMd:p-6 w-full">
+      <div className="dark-gradient p-3 mobileMd:p-6 w-full">
         <div className="flex gap-3 mobileMd:gap-6">
           <div className="flex flex-col gap-3 mobileMd:gap-6 !w-[108px] mobileMd:!w-[120px]">
             <div
               id="image-preview"
-              class="relative rounded-[3px] items-center text-center cursor-pointer min-w-[108px] mobileMd:min-w-[120px] h-[108px] mobileMd:h-[120px] content-center bg-stamp-purple-darker"
+              class="relative rounded-sm items-center text-center cursor-pointer min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300"
+              onMouseMove={handleMouseMove}
+              onMouseEnter={handleUploadMouseEnter}
+              onMouseLeave={handleUploadMouseLeave}
             >
               <input
                 id="upload"
@@ -189,9 +264,21 @@ export function DeployContent(
                 >
                   <img
                     src="/img/stamping/image-upload.svg"
-                    class="w-12 h-12"
+                    class="w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
                     alt=""
                   />
+                  <div
+                    class={`${tooltipImage} ${
+                      isUploadTooltipVisible ? "block" : "hidden"
+                    }`}
+                    style={{
+                      left: `${tooltipPosition.x}px`,
+                      top: `${tooltipPosition.y - 6}px`,
+                      transform: "translate(-50%, -100%)",
+                    }}
+                  >
+                    UPLOAD COVER IMAGE
+                  </div>
                 </label>
               )}
             </div>
@@ -210,7 +297,7 @@ export function DeployContent(
             <div class="w-full flex gap-3 mobileMd:gap-6">
               <SRC20InputField
                 type="text"
-                placeholder="Token ticker name"
+                placeholder="Ticker name"
                 value={formState.token}
                 onChange={(e) => {
                   const newValue = (e.target as HTMLInputElement).value
@@ -225,13 +312,22 @@ export function DeployContent(
                 isUppercase
               />
               <button
-                class="min-w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
+                class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
                 onClick={handleShowAdvancedOptions}
+                onMouseEnter={handleToggleMouseEnter}
+                onMouseLeave={handleToggleMouseLeave}
               >
                 <div
                   id="switch-toggle-advanced"
-                  class="w-6 h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
+                  class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
                 >
+                </div>
+                <div
+                  className={`${tooltipButton} ${
+                    isToggleTooltipVisible ? "block" : "hidden"
+                  }`}
+                >
+                  {showAdvancedOptions ? "MANDATORY" : "OPTIONAL"}
                 </div>
               </button>
             </div>
@@ -240,7 +336,7 @@ export function DeployContent(
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              placeholder="Limit pr. mint"
+              placeholder="Limit per mint"
               value={formState.lim}
               onChange={(e) => handleInputChange(e, "lim")}
               onBlur={() => handleInputBlur("lim")}
@@ -270,7 +366,7 @@ export function DeployContent(
           <div className="flex flex-col gap-3 mobileMd:gap-6">
             <textarea
               type="text"
-              class="h-[108px] mobileMd:h-[120px] p-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC]"
+              class="h-[96px] mobileMd:h-[108px] mobileLg:h-[120px] p-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-[#CCCCCC]"
               placeholder="Description"
               rows={5}
             />
