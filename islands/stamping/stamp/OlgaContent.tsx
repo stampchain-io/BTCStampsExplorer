@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { useConfig } from "$client/hooks/useConfig.ts";
 import axiod from "axiod";
 import { walletContext } from "$client/wallet/wallet.ts";
@@ -230,6 +230,10 @@ interface FileValidationResult {
   warning?: string | undefined;
 }
 
+// At the top of the file with other constants
+const PREVIEW_SIZE_CLASSES =
+  "w-[96px] h-[96px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:w-[120px] mobileLg:h-[120px]" as const;
+
 export function OlgaContent() {
   const { config, isLoading } = useConfig<Config>();
 
@@ -273,6 +277,75 @@ export function OlgaContent() {
   );
 
   const [txDetails, setTxDetails] = useState<MintResponse | null>(null);
+
+  // Add new state and refs for tooltips
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
+  const [isToggleTooltipVisible, setIsToggleTooltipVisible] = useState(false);
+  const uploadTooltipTimeoutRef = useRef<number | null>(null);
+  const toggleTooltipTimeoutRef = useRef<number | null>(null);
+  const [allowTooltip, setAllowTooltip] = useState(true);
+
+  // Add tooltip handlers
+  const handleMouseMove = (e: MouseEvent) => {
+    setTooltipPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleUploadMouseEnter = () => {
+    setIsUploadTooltipVisible(true);
+
+    if (uploadTooltipTimeoutRef.current) {
+      window.clearTimeout(uploadTooltipTimeoutRef.current);
+    }
+
+    uploadTooltipTimeoutRef.current = window.setTimeout(() => {
+      setIsUploadTooltipVisible(false);
+    }, 1500);
+  };
+
+  const handleUploadMouseLeave = () => {
+    if (uploadTooltipTimeoutRef.current) {
+      window.clearTimeout(uploadTooltipTimeoutRef.current);
+    }
+    setIsUploadTooltipVisible(false);
+  };
+
+  const handleToggleMouseEnter = () => {
+    if (allowTooltip) {
+      setIsToggleTooltipVisible(true);
+
+      if (toggleTooltipTimeoutRef.current) {
+        window.clearTimeout(toggleTooltipTimeoutRef.current);
+      }
+
+      toggleTooltipTimeoutRef.current = window.setTimeout(() => {
+        setIsToggleTooltipVisible(false);
+      }, 1500);
+    }
+  };
+
+  const handleToggleMouseLeave = () => {
+    if (toggleTooltipTimeoutRef.current) {
+      window.clearTimeout(toggleTooltipTimeoutRef.current);
+    }
+    setIsToggleTooltipVisible(false);
+    setAllowTooltip(true); // Reset the flag when mouse leaves
+  };
+
+  // Add cleanup effect
+  useEffect(() => {
+    return () => {
+      if (uploadTooltipTimeoutRef.current) {
+        window.clearTimeout(uploadTooltipTimeoutRef.current);
+      }
+      if (toggleTooltipTimeoutRef.current) {
+        window.clearTimeout(toggleTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (fees && !loading) {
@@ -461,17 +534,20 @@ export function OlgaContent() {
   const handleShowAdvancedOptions = () => {
     const switchToggle = document.querySelector("#switch-toggle-advanced");
     if (!switchToggle) return;
+    setAllowTooltip(false);
+    setIsToggleTooltipVisible(false);
+
     if (showAdvancedOptions !== true) {
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-stamp-purple-dark'></div>`;
+          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-dark'></div>`;
       }, 150);
     } else {
       switchToggle.classList.remove("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
+          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
       }, 150);
     }
     setShowAdvancedOptions(!showAdvancedOptions);
@@ -481,18 +557,21 @@ export function OlgaContent() {
     const switchToggle = document.querySelector("#switch-toggle-locked");
     if (!switchToggle) return;
 
+    setAllowPoshTooltip(false);
+    setIsPoshTooltipVisible(false);
+
     if (!isPoshStamp) {
       switchToggle.classList.add("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-stamp-purple-dark'></div>`;
+          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-dark'></div>`;
       }, 150);
       setStampName(""); // Clear the input when switching to POSH
     } else {
       switchToggle.classList.remove("translate-x-full");
       setTimeout(() => {
         switchToggle.innerHTML =
-          `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
+          `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
       }, 150);
       setStampName(""); // Clear the input when switching to CUSTOM CPID
     }
@@ -503,13 +582,13 @@ export function OlgaContent() {
     const advancedToggle = document.getElementById("switch-toggle-advanced");
     if (advancedToggle) {
       advancedToggle.innerHTML =
-        `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
+        `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
     }
 
     const lockedToggle = document.getElementById("switch-toggle-locked");
     if (lockedToggle) {
       lockedToggle.innerHTML =
-        `<div class='w-5 h-5 rounded-full bg-stamp-purple-darker'></div>`;
+        `<div class='w-[17px] h-[17px] mobileLg:w-5 mobileLg:h-5 rounded-full bg-stamp-purple-darker'></div>`;
     }
   }, []);
 
@@ -880,8 +959,13 @@ export function OlgaContent() {
 
   const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
   const titlePurpleLDCenter =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
-  const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
+  const tooltipButton =
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+  const tooltipImage =
+    "fixed bg-[#000000BF] px-2 py-1 mb-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50";
+  const tooltipButtonOverflow =
+    "fixed bg-[#000000BF] px-2 py-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50";
 
   const isFormValid = isValidForMinting({
     file,
@@ -941,6 +1025,246 @@ export function OlgaContent() {
     // ... rest of the effect
   }, [isConnected, wallet.address, file, fee]);
 
+  // Update the image preview div
+  const imagePreviewDiv = (
+    <div
+      id="image-preview"
+      class={`relative rounded-sm items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300`}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleUploadMouseEnter}
+      onMouseLeave={handleUploadMouseLeave}
+    >
+      <input
+        id="upload"
+        type="file"
+        class="hidden"
+        onChange={handleImage}
+      />
+      {file !== null
+        ? (
+          <label
+            for="upload"
+            class="cursor-pointer h-full w-full flex flex-col items-center justify-center"
+          >
+            {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
+              ? (
+                <img
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-black [image-rendering:pixelated]`}
+                  src={URL.createObjectURL(file)}
+                  alt="Preview"
+                  onError={(e) => {
+                    logger.error("stamps", {
+                      message: "Image preview failed to load",
+                      error: e,
+                    });
+                  }}
+                />
+              )
+              : (
+                <img
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-black [image-rendering:pixelated]`}
+                  src={NOT_AVAILABLE_IMAGE}
+                  alt={`File: ${file.name}`}
+                />
+              )}
+            <div class="absolute inset-0 hover:bg-black hover:bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+              <img
+                src="/img/stamping/image-upload.svg"
+                class="w-7 h-7 mobileMd:min-w-8 mobileMd:min-h-8 mobileLg:min-w-9 mobileLg:min-h-9"
+                alt="Change file"
+              />
+            </div>
+          </label>
+        )
+        : (
+          <label
+            for="upload"
+            class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
+          >
+            <img
+              src="/img/stamping/image-upload.svg"
+              class="w-7 h-7 mobileMd:min-w-8 mobileMd:min-h-8 mobileLg:min-w-9 mobileLg:min-h-9"
+              alt="Upload image"
+            />
+          </label>
+        )}
+      <div
+        class={`${tooltipImage} ${isUploadTooltipVisible ? "block" : "hidden"}`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 6}px`,
+          transform: "translate(-50%, -100%)",
+        }}
+      >
+        UPLOAD FILE
+      </div>
+    </div>
+  );
+
+  // Update the advanced options toggle button
+  const advancedToggleButton = (
+    <button
+      class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
+      onClick={handleShowAdvancedOptions}
+      onMouseEnter={handleToggleMouseEnter}
+      onMouseLeave={handleToggleMouseLeave}
+    >
+      <div
+        id="switch-toggle-advanced"
+        class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
+      >
+      </div>
+      <div
+        className={`${tooltipButton} ${
+          isToggleTooltipVisible ? "block" : "hidden"
+        }`}
+      >
+        {showAdvancedOptions ? "SIMPLE" : "ADVANCED"}
+      </div>
+    </button>
+  );
+
+  // Add new state variable for POSH tooltip
+  const [isPoshTooltipVisible, setIsPoshTooltipVisible] = useState(false);
+  const [allowPoshTooltip, setAllowPoshTooltip] = useState(true);
+  const poshTooltipTimeoutRef = useRef<number | null>(null);
+
+  // Add a ref to get the button's position
+  const poshButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Update the mouse enter handler to position the tooltip
+  const handlePoshMouseEnter = () => {
+    if (allowPoshTooltip && showAdvancedOptions) {
+      const buttonRect = poshButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        setTooltipPosition({
+          x: buttonRect.left + buttonRect.width / 2,
+          y: buttonRect.top,
+        });
+      }
+      setIsPoshTooltipVisible(true);
+
+      if (poshTooltipTimeoutRef.current) {
+        window.clearTimeout(poshTooltipTimeoutRef.current);
+      }
+
+      poshTooltipTimeoutRef.current = window.setTimeout(() => {
+        setIsPoshTooltipVisible(false);
+      }, 1500);
+    }
+  };
+
+  const handlePoshMouseLeave = () => {
+    if (poshTooltipTimeoutRef.current) {
+      window.clearTimeout(poshTooltipTimeoutRef.current);
+    }
+    setIsPoshTooltipVisible(false);
+    setAllowPoshTooltip(true);
+  };
+
+  // Update the POSH toggle button JSX
+  const poshToggleButton = (
+    <button
+      ref={poshButtonRef}
+      class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
+      onClick={handleIsPoshStamp}
+      onMouseEnter={handlePoshMouseEnter}
+      onMouseLeave={handlePoshMouseLeave}
+    >
+      <div
+        id="switch-toggle-locked"
+        class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
+      >
+      </div>
+      <div
+        className={`${tooltipButton} ${
+          isPoshTooltipVisible ? "block" : "hidden"
+        }`}
+      >
+        {isPoshStamp ? "CPID" : "POSH"}
+      </div>
+    </button>
+  );
+
+  // Add these state declarations where other tooltip states are defined
+  const [isLockTooltipVisible, setIsLockTooltipVisible] = useState(false);
+  const [allowLockTooltip, setAllowLockTooltip] = useState(true);
+  const lockButtonRef = useRef<HTMLDivElement>(null);
+
+  // Add these handlers where other mouse handlers are defined
+  const handleLockMouseEnter = () => {
+    if (allowLockTooltip && showAdvancedOptions) {
+      const buttonRect = lockButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        setTooltipPosition({
+          x: buttonRect.left + buttonRect.width / 2,
+          y: buttonRect.top,
+        });
+      }
+      setIsLockTooltipVisible(true);
+
+      // Clear any existing timeout
+      if (lockTooltipTimeoutRef.current) {
+        window.clearTimeout(lockTooltipTimeoutRef.current);
+      }
+
+      // Set new timeout
+      lockTooltipTimeoutRef.current = window.setTimeout(() => {
+        setIsLockTooltipVisible(false);
+      }, 1500);
+    }
+  };
+
+  const handleLockMouseLeave = () => {
+    if (lockTooltipTimeoutRef.current) {
+      window.clearTimeout(lockTooltipTimeoutRef.current);
+    }
+    setIsLockTooltipVisible(false);
+    setAllowLockTooltip(true);
+  };
+
+  // Add this with other refs
+  const lockTooltipTimeoutRef = useRef<number | null>(null);
+
+  // Add state for preview tooltip (with other tooltip states)
+  const [isPreviewTooltipVisible, setIsPreviewTooltipVisible] = useState(false);
+  const [allowPreviewTooltip, setAllowPreviewTooltip] = useState(true);
+  const previewButtonRef = useRef<HTMLDivElement>(null);
+
+  // Add ref for timeout
+  const previewTooltipTimeoutRef = useRef<number | null>(null);
+
+  // Update the handlePreviewMouseEnter to include timeout
+  const handlePreviewMouseEnter = () => {
+    if (allowPreviewTooltip && showAdvancedOptions) {
+      const buttonRect = previewButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        setTooltipPosition({
+          x: buttonRect.left + buttonRect.width / 2,
+          y: buttonRect.top,
+        });
+      }
+      setIsPreviewTooltipVisible(true);
+
+      if (previewTooltipTimeoutRef.current) {
+        window.clearTimeout(previewTooltipTimeoutRef.current);
+      }
+
+      previewTooltipTimeoutRef.current = window.setTimeout(() => {
+        setIsPreviewTooltipVisible(false);
+      }, 1500);
+    }
+  };
+
+  // Update handlePreviewMouseLeave to clear timeout
+  const handlePreviewMouseLeave = () => {
+    if (previewTooltipTimeoutRef.current) {
+      window.clearTimeout(previewTooltipTimeoutRef.current);
+    }
+    setIsPreviewTooltipVisible(false);
+    setAllowPreviewTooltip(true);
+  };
+
   return (
     <div class={bodyTools}>
       <h1 class={titlePurpleLDCenter}>STAMP</h1>
@@ -954,79 +1278,7 @@ export function OlgaContent() {
       <div className="dark-gradient p-3 mobileMd:p-6 w-full">
         <div className="flex gap-3 mobileMd:gap-6">
           <div className="flex gap-3 mobileMd:gap-6">
-            <div
-              id="image-preview"
-              class="relative rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-stamp-purple-dark"
-            >
-              <input
-                id="upload"
-                type="file"
-                class="hidden"
-                onChange={handleImage}
-              />
-              {file !== null
-                ? (
-                  <label
-                    for="upload"
-                    class="cursor-pointer h-full w-full flex flex-col items-center justify-center"
-                  >
-                    {file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)
-                      ? (
-                        <img
-                          width={120}
-                          style={{
-                            height: "100%",
-                            objectFit: "contain",
-                            imageRendering: "pixelated",
-                            backgroundColor: "rgb(0,0,0)",
-                            borderRadius: "6px",
-                          }}
-                          src={URL.createObjectURL(file)}
-                          alt="Preview"
-                          onError={(e) => {
-                            logger.error("stamps", {
-                              message: "Image preview failed to load",
-                              error: e,
-                            });
-                          }}
-                        />
-                      )
-                      : (
-                        <img
-                          width={120}
-                          style={{
-                            height: "100%",
-                            objectFit: "contain",
-                            imageRendering: "pixelated",
-                            backgroundColor: "rgb(0,0,0)",
-                            borderRadius: "6px",
-                          }}
-                          src={NOT_AVAILABLE_IMAGE}
-                          alt={`File: ${file.name}`}
-                        />
-                      )}
-                    <div class="absolute inset-0 hover:bg-black hover:bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                      <img
-                        src="/img/stamping/image-upload.svg"
-                        class="w-12 h-12"
-                        alt="Change file"
-                      />
-                    </div>
-                  </label>
-                )
-                : (
-                  <label
-                    for="upload"
-                    class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
-                  >
-                    <img
-                      src="/img/stamping/image-upload.svg"
-                      class="w-12 h-12"
-                      alt="Upload image"
-                    />
-                  </label>
-                )}
-            </div>
+            {imagePreviewDiv}
 
             {
               /* <div class="p-6 rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]">
@@ -1054,21 +1306,12 @@ export function OlgaContent() {
           </div>
 
           <div class="w-full flex flex-col justify-between items-end">
-            <button
-              class="min-w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
-              onClick={handleShowAdvancedOptions}
-            >
-              <div
-                id="switch-toggle-advanced"
-                class="w-6 h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
-              >
-              </div>
-            </button>
+            {advancedToggleButton}
             <div className="flex gap-3 mobileMd:gap-6 items-center">
-              <p className="text-xl mobileMd:text-2xl desktop:text-3xl font-semibold text-stamp-grey uppercase">
-                Editions
+              <p className="text-xl mobileLg:text-2xl desktop:text-3xl font-semibold text-stamp-grey">
+                EDITIONS
               </p>
-              <div className="w-12">
+              <div className="w-[42px] mobileLg:w-12">
                 <InputField
                   type="text"
                   value={issuance}
@@ -1084,34 +1327,34 @@ export function OlgaContent() {
         <div
           className={`overflow-hidden transition-all duration-500 ${
             showAdvancedOptions
-              ? "max-h-[200px] opacity-100 mt-3 mobileMd:mt-6" // Adjust max-h value based on your content
+              ? "max-h-[200px] opacity-100 mt-3 mobileMd:mt-6"
               : "max-h-0 opacity-0 mt-0"
           }`}
         >
-          <div className="flex gap-3 mobileMd:gap-6 justify-between">
-            <button
-              class="min-w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
-              onClick={handleIsPoshStamp}
+          <div className="flex gap-3 mobileMd:gap-6 justify-between mb-3 mobileMd:mb-6">
+            {poshToggleButton}
+            <div
+              ref={lockButtonRef}
+              className="w-[42px] h-[42px] mobileLg:w-12 mobileLg:h-12 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center"
+              onClick={() => {
+                setIsLocked(!isLocked);
+                setIsLockTooltipVisible(false);
+                setAllowLockTooltip(false);
+              }}
+              onMouseEnter={handleLockMouseEnter}
+              onMouseLeave={handleLockMouseLeave}
             >
-              <div
-                id="switch-toggle-locked"
-                class="w-6 h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
-              >
-              </div>
-            </button>
-            <img
-              src={isLocked
-                ? "/img/stamping/LockSimple.svg"
-                : "/img/stamping/LockSimpleOpen.svg"}
-              className="bg-stamp-grey p-3 rounded-md cursor-pointer"
-              onClick={() => setIsLocked(!isLocked)}
-            />
+              <img
+                src={isLocked
+                  ? "/img/stamping/LockSimple.svg"
+                  : "/img/stamping/LockSimpleOpen.svg"}
+                className="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6"
+                alt={isLocked ? "Locked" : "Unlocked"}
+              />
+            </div>
           </div>
           <div className="flex items-end gap-3 mobileMd:gap-6">
             <div className="w-full">
-              <p className="text-base mobileLg:text-lg font-medium text-stamp-grey leading-[2px] mobileMd:leading-[8px] mobileLg:leading-[12px] pb-2 mobileMd:pb-3">
-                {isPoshStamp ? "POSH" : "CUSTOM CPID"}
-              </p>
               <InputField
                 type="text"
                 value={stampName}
@@ -1123,13 +1366,21 @@ export function OlgaContent() {
                 error={stampNameError}
               />
             </div>
-            <img
-              src="/img/stamping/CornersOut.svg"
-              className={`p-3 rounded-md cursor-pointer ${
-                file ? "bg-[#999999]" : "bg-[#999999]"
-              }`}
+            <div
+              ref={previewButtonRef}
+              className="min-w-[42px] h-[42px] mobileLg:min-w-12 mobileLg:h-12 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center"
               onClick={toggleFullScreenModal}
-            />
+              onMouseEnter={handlePreviewMouseEnter}
+              onMouseLeave={handlePreviewMouseLeave}
+            >
+              <img
+                src="/img/stamping/CornersOut.svg"
+                className={`w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 ${
+                  file ? "bg-[#999999]" : "bg-[#999999]"
+                }`}
+                alt="Toggle fullscreen"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -1200,8 +1451,7 @@ export function OlgaContent() {
               Max quality
             </label>
           </div>
-        </div>
-      </div> */
+        </div> */
       }
 
       <div className={feeSelectorContainer}>
@@ -1238,6 +1488,45 @@ export function OlgaContent() {
           contentType={file?.type?.startsWith("text/html") ? "html" : "image"}
         />
       )}
+
+      <div
+        className={`${tooltipButtonOverflow} ${
+          isPoshTooltipVisible && showAdvancedOptions ? "block" : "hidden"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 28}px`,
+          transform: "translate(-50%, 0)",
+        }}
+      >
+        {isPoshStamp ? "CPID" : "POSH"}
+      </div>
+
+      <div
+        className={`${tooltipButtonOverflow} ${
+          isLockTooltipVisible && showAdvancedOptions ? "block" : "hidden"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 28}px`,
+          transform: "translate(-50%, 0)",
+        }}
+      >
+        {isLocked ? "UNLOCK" : "LOCK"}
+      </div>
+
+      <div
+        className={`${tooltipButtonOverflow} ${
+          isPreviewTooltipVisible && showAdvancedOptions ? "block" : "hidden"
+        }`}
+        style={{
+          left: `${tooltipPosition.x}px`,
+          top: `${tooltipPosition.y - 28}px`,
+          transform: "translate(-50%, 0)",
+        }}
+      >
+        FULLSCREEN
+      </div>
     </div>
   );
 }

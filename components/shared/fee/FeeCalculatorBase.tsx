@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { logger } from "$lib/utils/logger.ts";
 import {
@@ -45,6 +45,9 @@ export function FeeCalculatorBase({
   const { fees } = useFeePolling();
   const [visible, setVisible] = useState(false);
   const [coinType, setCoinType] = useState("BTC");
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const tooltipTimeoutRef = useRef<number | null>(null);
 
   const handleCoinToggle = () => {
     logger.debug("stamps", {
@@ -55,6 +58,32 @@ export function FeeCalculatorBase({
       },
     });
     setCoinType(coinType === "BTC" ? "USDT" : "BTC");
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    setTooltipPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleMouseEnter = () => {
+    setIsTooltipVisible(true);
+
+    if (tooltipTimeoutRef.current) {
+      window.clearTimeout(tooltipTimeoutRef.current);
+    }
+
+    tooltipTimeoutRef.current = window.setTimeout(() => {
+      setIsTooltipVisible(false);
+    }, 1500);
+  };
+
+  const handleMouseLeave = () => {
+    if (tooltipTimeoutRef.current) {
+      window.clearTimeout(tooltipTimeoutRef.current);
+    }
+    setIsTooltipVisible(false);
   };
 
   // Fee selector component
@@ -70,7 +99,11 @@ export function FeeCalculatorBase({
           <span className="font-medium">{fees.recommendedFee}</span> SAT/vB
         </p>
       )}
-      <div className="relative w-full">
+      <div
+        className="relative w-full group"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <input
           type="range"
           value={fee}
@@ -79,53 +112,62 @@ export function FeeCalculatorBase({
           step="1"
           onInput={(e) =>
             handleChangeFee(parseInt((e.target as HTMLInputElement).value, 10))}
-          className="accent-stamp-purple-dark w-full h-[6px] rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[22px] [&::-webkit-slider-thumb]:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[22px] [&::-moz-range-thumb]:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+          onMouseMove={handleMouseMove}
+          className="accent-stamp-purple-dark w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
         />
+        <div
+          className={`${tooltipFloat} ${isTooltipVisible ? "block" : "hidden"}`}
+          style={{
+            left: `${tooltipPosition.x}px`,
+            top: `${tooltipPosition.y - 6}px`,
+            transform: "translate(-50%, -100%)",
+          }}
+        >
+          SELECT FEE
+        </div>
       </div>
     </div>
   );
 
   // Estimate details component
   const renderDetails = () => {
-    const detailsTitleClassName = "text-stamp-grey-darker font-light";
-    const detailsTextClassName =
+    const detailsTitle = "text-stamp-grey-darker font-light";
+    const detailsText =
       "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
 
     return (
       <div className={`${visible ? "visible" : "invisible"} gap-1 mt-1.5`}>
         {/* File Type - Only show for stamp type */}
         {type === "stamp" && fileType && (
-          <p className={detailsTextClassName}>
-            <span className={detailsTitleClassName}>FILE</span>{" "}
-            {fileType.toUpperCase()}
+          <p className={detailsText}>
+            <span className={detailsTitle}>FILE</span> {fileType.toUpperCase()}
           </p>
         )}
 
         {/* Editions - Only show for stamp type */}
         {type === "stamp" && issuance && (
-          <p className={detailsTextClassName}>
-            <span className={detailsTitleClassName}>EDITIONS</span> {issuance}
+          <p className={detailsText}>
+            <span className={detailsTitle}>EDITIONS</span> {issuance}
           </p>
         )}
 
         {/* File Size */}
         {fileSize && (
-          <p className={detailsTextClassName}>
-            <span className={detailsTitleClassName}>SIZE</span> {fileSize}{" "}
+          <p className={detailsText}>
+            <span className={detailsTitle}>SIZE</span> {fileSize}{" "}
             <span className="font-light">BYTES</span>
           </p>
         )}
 
         {/* Sats Per Byte */}
-        <p className={detailsTextClassName}>
-          <span className={detailsTitleClassName}>SATS PER BYTE</span> {fee}
+        <p className={detailsText}>
+          <span className={detailsTitle}>SATS PER BYTE</span> {fee}
         </p>
 
         {/* Miner Fee */}
         {feeDetails?.minerFee && (
-          <p className={detailsTextClassName}>
-            <span className={detailsTitleClassName}>MINER FEE</span>{" "}
-            {coinType === "BTC"
+          <p className={detailsText}>
+            <span className={detailsTitle}>MINER FEE</span> {coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.minerFee, {
                 includeSymbol: false,
               })
@@ -136,8 +178,8 @@ export function FeeCalculatorBase({
 
         {/* Service Fee */}
         {serviceFee && serviceFee > 0 && (
-          <p className={detailsTextClassName}>
-            <span className={detailsTitleClassName}>
+          <p className={detailsText}>
+            <span className={detailsTitle}>
               {isModal ? "SERVICE FEE" : "MINTING FEE"}
             </span>{" "}
             {coinType === "BTC"
@@ -159,9 +201,8 @@ export function FeeCalculatorBase({
 
         {/* Dust Value */}
         {feeDetails?.dustValue && feeDetails.dustValue > 0 && (
-          <p className={detailsTextClassName}>
-            <span className={detailsTitleClassName}>DUST</span>{" "}
-            {coinType === "BTC"
+          <p className={detailsText}>
+            <span className={detailsTitle}>DUST</span> {coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.dustValue, {
                 includeSymbol: false,
               })
@@ -172,9 +213,8 @@ export function FeeCalculatorBase({
 
         {/* Total */}
         {feeDetails?.totalValue && (
-          <p className={detailsTextClassName}>
-            <span className={detailsTitleClassName}>TOTAL</span>{" "}
-            {coinType === "BTC"
+          <p className={detailsText}>
+            <span className={detailsTitle}>TOTAL</span> {coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.totalValue, {
                 includeSymbol: false,
               })
@@ -186,10 +226,20 @@ export function FeeCalculatorBase({
     );
   };
 
-  const buttonPurpleOutlineClassName =
+  const tooltipFloat =
+    "fixed text-stamp-grey-light text-[10px] mobileLg:text-xs mb-1 bg-black px-2 py-1 rounded-sm whitespace-nowrap pointer-events-none z-50";
+  const buttonPurpleOutline =
     "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
-  const buttonPurpleFlatClassName =
+  const buttonPurpleFlat =
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
+
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        window.clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className={`text-[#999999] ${className}`}>
@@ -202,11 +252,11 @@ export function FeeCalculatorBase({
             }`}
           >
             <button
-              className="w-12 h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
+              className="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
               onClick={handleCoinToggle}
             >
               <div
-                className={`w-6 h-6 relative rounded-full transition duration-500 transform bg-stamp-grey text-white ${
+                className={`w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey ${
                   coinType === "BTC" ? "translate-x-full" : ""
                 }`}
               >
@@ -318,7 +368,7 @@ export function FeeCalculatorBase({
         <div className="flex justify-end gap-6">
           {isModal && onCancel && (
             <button
-              className={`${buttonPurpleOutlineClassName} ${
+              className={`${buttonPurpleOutline} ${
                 (disabled || isSubmitting || (!isModal && !tosAgreed))
                   ? "opacity-50 cursor-not-allowed"
                   : ""
@@ -330,7 +380,7 @@ export function FeeCalculatorBase({
             </button>
           )}
           <button
-            className={`${buttonPurpleFlatClassName} ${
+            className={`${buttonPurpleFlat} ${
               (disabled || isSubmitting || (!isModal && !tosAgreed))
                 ? "opacity-50 cursor-not-allowed"
                 : ""
@@ -350,8 +400,7 @@ export function FeeCalculatorBase({
 const btcIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    className="w-[20px] h-[20px] mobileLg:w-6 mobileLg:h-6"
     viewBox="0 0 24 24"
   >
     <path
@@ -364,8 +413,7 @@ const btcIcon = (
 const usdIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    className="w-[20px] h-[20px] mobileLg:w-6 mobileLg:h-6"
     style={{ padding: "1px" }}
     viewBox="0 0 32 32"
   >
