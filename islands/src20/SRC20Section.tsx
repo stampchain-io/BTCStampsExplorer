@@ -3,12 +3,13 @@ import { SRC20Row } from "$globals";
 import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCard.tsx";
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 
 interface SRC20SectionProps {
   title?: string;
   subTitle?: string;
   type: "all" | "trending";
-  fromPage: "src20" | "wallet" | "stamping/src20";
+  fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   page?: number;
   sortBy?: "ASC" | "DESC";
 }
@@ -111,6 +112,11 @@ export function SRC20Section(
               )
           ))}
         </div>
+        {fromPage === "home" && (
+          <div className="flex justify-end -mt-3 mobileMd:-mt-6">
+            <ViewAllButton href={`/src20?type=${type}`} />
+          </div>
+        )}
       </div>
     </div>
   );
