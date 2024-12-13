@@ -113,10 +113,8 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
     }
   };
 
-  const inputField1colClassName =
-    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
-  const inputField2colClassName =
-    "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
+  const inputField =
+    "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
   return (
     <ModalLayout onClose={onClose} title="SEND">
@@ -219,7 +217,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
               recipientAddress: (e.target as HTMLInputElement).value,
             })}
           placeholder="Recipient address"
-          class={inputField1colClassName}
+          class={inputField}
         />
       </div>
 

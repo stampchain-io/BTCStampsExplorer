@@ -18,11 +18,12 @@ interface Balance {
 
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
-  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+  "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
 
 const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
-const inputField2colAll = "flex flex-row gap-3 mobileMd:gap-6 w-full";
+const inputField2col =
+  "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
 const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 
 export function TransferContent(
@@ -186,7 +187,7 @@ export function TransferContent(
           error={formState.toAddressError}
         />
 
-        <div class={inputField2colAll}>
+        <div class={inputField2col}>
           <div
             class={`relative ${
               openDrop && searchResults.length > 0 && !isSelecting

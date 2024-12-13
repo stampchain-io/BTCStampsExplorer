@@ -30,9 +30,9 @@ const MintProgress = (
           </span>
           %
         </p>
-        <div class="w-full max-w-[420px] h-[6px] bg-stamp-grey relative rounded-full">
+        <div class="relative w-full max-w-[420px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
           <div
-            class="absolute left-0 top-0 h-[6px] bg-[#660099] rounded-full"
+            class="absolute left-0 top-0 h-1 mobileLg:h-1.5 bg-stamp-purple-dark rounded-full"
             style={{ width: progressWidth }}
           />
         </div>
@@ -71,7 +71,7 @@ interface SearchResult {
 // Add consistent class names at the top
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
-  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
+  "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
 const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
 const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
@@ -296,18 +296,18 @@ export function MintContent({
         <div class="w-full flex gap-3 mobileMd:gap-6">
           <div
             id="image-preview"
-            class="relative rounded-md items-center justify-center mx-auto text-center min-w-[100px] w-[100px] h-[100px] mobileMd:min-w-[112px] mobileMd:w-[112px] mobileMd:h-[112px] mobileLg:min-w-[120px] mobileLg:w-[120px] mobileLg:h-[120px] content-center bg-[#660099] flex flex-col"
+            class="relative rounded-sm items-center justify-center mx-auto text-center min-w-[96px] h-[96px] w-[96px] mobileMd:min-w-[108px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:w-[120px] mobileLg:h-[120px] content-center bg-stamp-purple-darker flex flex-col"
           >
             {isImageLoading
               ? (
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+                <div class="animate-spin rounded-full w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9 border-b-[3px] border-stamp-grey" />
               )
               : (
                 <img
                   src={selectedTokenImage || `/img/stamping/image-upload.svg`}
                   class={selectedTokenImage
                     ? "w-full h-full"
-                    : "w-9 h-9 mobileLg:w-12 mobileLg:h-12"}
+                    : "w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"}
                   alt=""
                   loading="lazy"
                   onLoad={() => setIsImageLoading(false)}
