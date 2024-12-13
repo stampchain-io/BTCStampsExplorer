@@ -14,7 +14,7 @@ const dataValueSm =
 
 export interface SRC20BaseCardProps {
   src20: SRC20Row;
-  fromPage?: "src20" | "wallet" | "stamping/src20";
+  fromPage?: "src20" | "wallet" | "stamping/src20" | "home";
   onImageClick?: (imgSrc: string) => void;
 }
 
