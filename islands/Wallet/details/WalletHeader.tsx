@@ -31,7 +31,7 @@ const WalletHeader = ({
   return (
     <div class="flex justify-between items-center gap-3 w-full">
       <h1 className={titlePurpleDL}>WALLET</h1>
-      <div class="flex gap-3 justify-between h-[40px]">
+      <div class="flex gap-3 justify-between h-9 items-center">
         <Filter
           initFilter={filterBy}
           open={isOpen1}
