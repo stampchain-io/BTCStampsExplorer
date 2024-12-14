@@ -7,6 +7,7 @@ import {
   WALLET_FILTER_TYPES,
 } from "$globals";
 import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
+import { Button } from "$components/shared/Button.tsx";
 
 type FilterTypes =
   | SRC20_FILTER_TYPES
@@ -48,9 +49,9 @@ export function Filter({
   return (
     <div
       class={`${
-        open ? "" : "cursor-pointer"
-      } border-2 border-[#8800CC] bg-gradient-filters rounded-md flex flex-col items-center gap-1 h-fit relative z-[10] ${
-        open ? "px-6 py-4" : "p-[10px]"
+        open ? "bg-gradient-filters h-fit" : "cursor-pointer"
+      } rounded-md flex flex-col items-center gap-1 relative z-[10] ${
+        open ? "px-6 py-4" : ""
       }`}
       onClick={() => {
         if (open) return;
@@ -86,10 +87,11 @@ export function Filter({
           </>
         )
         : (
-          <img
-            class="cursor-pointer"
-            src="/img/stamp/List.svg"
-            alt="Navigator list"
+          <Button
+            variant="icon"
+            icon="/img/stamp/List.svg"
+            iconAlt="Navigator list"
+            class="cursor-pointer bg-transparent"
           />
         )}
     </div>

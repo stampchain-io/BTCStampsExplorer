@@ -72,7 +72,7 @@ const ItemHeader = ({
           {title}
         </p>
       </div>
-      <div class="flex gap-3 justify-between h-[40px]">
+      <div class="flex gap-3 justify-between h-[36px] items-center">
         {setting && (
           <Setting
             initFilter={[]}
@@ -142,10 +142,10 @@ function DispenserItem({
   // Filter dispensers to only include those with stamp data, then split into open/closed
   const dispensersWithStamps = dispensers.filter((d) => d.stamp);
   const openDispensers = dispensersWithStamps.filter(
-    (d) => d.give_remaining > 0
+    (d) => d.give_remaining > 0,
   );
   const closedDispensers = dispensersWithStamps.filter(
-    (d) => d.give_remaining === 0
+    (d) => d.give_remaining === 0,
   );
 
   // If no dispensers with stamps, show empty state
@@ -268,10 +268,11 @@ function DispenserItem({
 
 function DispenserRow(
   /* mobile = mobileSm/Md // tablet = mobileLg/tablet/desktop */
-  { dispenser, view }: { dispenser: Dispenser; view: "mobile" | "tablet" }
+  { dispenser, view }: { dispenser: Dispenser; view: "mobile" | "tablet" },
 ) {
-  const imageSize =
-    view === "mobile" ? "w-[146px] h-[146px]" : "w-[172px] h-[172px]";
+  const imageSize = view === "mobile"
+    ? "w-[146px] h-[146px]"
+    : "w-[172px] h-[172px]";
 
   return (
     <div class="flex justify-between dark-gradient rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
@@ -356,11 +357,15 @@ function DispenserRow(
               <span class="font-bold text-stamp-grey-light">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
-                  : `${Number(
-                      dispenser.give_remaining
-                    ).toLocaleString()}/${Number(
-                      dispenser.escrow_quantity
-                    ).toLocaleString()}`}
+                  : `${
+                    Number(
+                      dispenser.give_remaining,
+                    ).toLocaleString()
+                  }/${
+                    Number(
+                      dispenser.escrow_quantity,
+                    ).toLocaleString()
+                  }`}
               </span>
             </p>
             <p
@@ -388,9 +393,8 @@ function DispenserRow(
             >
               {formatBTCAmount(
                 Number(dispenser.btcrate) * Number(dispenser.escrow_quantity),
-                { includeSymbol: false }
-              )}{" "}
-              <span class="text-stamp-grey-light font-light">BTC</span>
+                { includeSymbol: false },
+              )} <span class="text-stamp-grey-light font-light">BTC</span>
             </p>
           </div>
         </div>
@@ -452,7 +456,7 @@ export default function WalletContent({
   };
 
   const handleOpen = (type: string) => {
-    if (type == "STAMP") {
+    if (type == "STAMPS") {
       setOpenS(!openS);
     } else if (type == "TOKENS") {
       setOpenT(!openT);

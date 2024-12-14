@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import { Button } from "$components/shared/Button.tsx";
 
 export function SRC20SearchClient(
   { open2, handleOpen2 }: {
@@ -39,7 +40,7 @@ export function SRC20SearchClient(
         <>
           <input
             type="text"
-            class={`min-w-[260px] tablet:min-w-[360px] h-[40px] purple-bg-gradient pl-3 pr-2 py-3 text-[12px] leading-[14px] text-[#333333] font-bold placeholder:text-[#333333] outline-none ${
+            class={`min-w-[260px] tablet:min-w-[360px] h-7 mobileLg:h-9 purple-bg-gradient pl-3 pr-2 py-3 text-[12px] leading-[14px] text-[#333333] font-bold placeholder:text-[#333333] outline-none ${
               results.length > 0 ? "rounded-t" : "rounded"
             }`}
             placeholder="Token Name, Tx Hash, or Address"
@@ -68,10 +69,11 @@ export function SRC20SearchClient(
         </>
       )}
       {!open2 && (
-        <img
-          src="/img/stamp/search-glass.png"
-          alt="Search icon"
-          class="bg-[#660099] rounded-md p-[12px] cursor-pointer"
+        <Button
+          variant="icon"
+          icon="/img/stamp/search-glass.png"
+          iconAlt="Search icon"
+          class="bg-[#660099] rounded-md cursor-pointer"
           onClick={() => handleOpen2(true)}
         />
       )}
