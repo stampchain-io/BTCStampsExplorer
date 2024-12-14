@@ -1,7 +1,10 @@
 import { useState } from "preact/hooks";
 import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { logger } from "$lib/utils/logger.ts";
-import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+import {
+  formatSatoshisToBTC,
+  formatSatoshisToUSD,
+} from "$lib/utils/formatUtils.ts";
 import type { BaseFeeCalculatorProps } from "$lib/types/base.d.ts";
 
 interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
@@ -123,19 +126,11 @@ export function FeeCalculatorBase({
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>MINER FEE</span>{" "}
             {coinType === "BTC"
-              ? (
-                <>
-                  {formatSatoshisToBTC(feeDetails.minerFee, {
-                    includeSymbol: false,
-                  })} <span className="font-light">BTC</span>
-                </>
-              )
-              : (
-                <>
-                  {((feeDetails.minerFee / 1e8) * BTCPrice).toFixed(2)}{" "}
-                  <span className="font-light">USDT</span>
-                </>
-              )}
+              ? formatSatoshisToBTC(feeDetails.minerFee, {
+                includeSymbol: false,
+              })
+              : formatSatoshisToUSD(feeDetails.minerFee, BTCPrice)}{" "}
+            <span className="font-light">{coinType}</span>
           </p>
         )}
 
@@ -167,19 +162,24 @@ export function FeeCalculatorBase({
           <p className={detailsTextClassName}>
             <span className={detailsTitleClassName}>DUST</span>{" "}
             {coinType === "BTC"
-              ? (
-                <>
-                  {formatSatoshisToBTC(feeDetails.dustValue, {
-                    includeSymbol: false,
-                  })} <span className="font-light">BTC</span>
-                </>
-              )
-              : (
-                <>
-                  {((feeDetails.dustValue / 1e8) * BTCPrice).toFixed(2)}{" "}
-                  <span className="font-light">USDT</span>
-                </>
-              )}
+              ? formatSatoshisToBTC(feeDetails.dustValue, {
+                includeSymbol: false,
+              })
+              : formatSatoshisToUSD(feeDetails.dustValue, BTCPrice)}{" "}
+            <span className="font-light">{coinType}</span>
+          </p>
+        )}
+
+        {/* Total */}
+        {feeDetails?.totalValue && (
+          <p className={detailsTextClassName}>
+            <span className={detailsTitleClassName}>TOTAL</span>{" "}
+            {coinType === "BTC"
+              ? formatSatoshisToBTC(feeDetails.totalValue, {
+                includeSymbol: false,
+              })
+              : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}{" "}
+            <span className="font-light">{coinType}</span>
           </p>
         )}
       </div>

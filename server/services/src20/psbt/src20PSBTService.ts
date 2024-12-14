@@ -51,6 +51,10 @@ interface PSBTResponse {
     effectiveFeeRate: number;
     ancestorCount: number;
     totalVsize: number;
+    total: number;
+    minerFee: number;
+    dustValue: number;
+    totalValue: number;
   };
   changeAddress?: string;
   inputs: Array<{
@@ -61,8 +65,17 @@ interface PSBTResponse {
 }
 
 export class SRC20PSBTService {
-  private static readonly DUST_SIZE = 420; // Min is 330
+  private static readonly DUST_SIZE = 420;
   private static readonly STAMP_PREFIX = "stamp:";
+
+  // Add constants for witness sizes
+  private static readonly WITNESS_SIZES = {
+    P2WPKH: {
+      SIGNATURE: 72,  // DER signature + sighash flag
+      PUBKEY: 33,    // Compressed public key
+      ITEMS_COUNT: 1  // Number of witness items
+    }
+  };
 
   static async preparePSBT({
     sourceAddress,
@@ -88,43 +101,39 @@ export class SRC20PSBTService {
 
     const effectiveChangeAddress = changeAddress || sourceAddress;
     const network = networks.bitcoin;
-    let psbt: Psbt | undefined;
-    const vouts = [];
+    
+    // 1. First prepare the action data and get CIP33 addresses
+    const { chunks } = await this.prepareActionData(src20Action);
 
-    // Prepare action data and CIP33 addresses
-    const { actionData, finalData, hex_data, chunks } = await this.prepareActionData(src20Action);
-
-    // Add all outputs as P2WSH
-    const toAddressScript = address.toOutputScript(toAddress, network);
-    vouts.push({
-      script: toAddressScript,
-      value: this.DUST_SIZE,
-      isReal: false,
-      type: "p2wsh"
-    });
-
-    chunks.forEach((chunk, i) => {
-      const outputScript = address.toOutputScript(chunk, network);
-      vouts.push({
-        script: outputScript,
+    // 2. Construct all outputs with their exact scripts and values
+    const outputs = [
+      // First output is the recipient
+      {
+        script: address.toOutputScript(toAddress, network),
+        value: this.DUST_SIZE,
+      },
+      // Then add all CIP33 data outputs
+      ...chunks.map((chunk, i) => ({
+        script: address.toOutputScript(chunk, network),
         value: this.DUST_SIZE + i,
-        isReal: false,
-        type: "p2wsh"
-      });
-    });
+      }))
+    ];
 
-    // Select UTXOs and calculate fees
-    const { inputs, change, fee } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+    // 3. Calculate total output value needed
+    const totalOutputValue = outputs.reduce((sum, out) => sum + out.value, 0);
+
+    // 4. Select UTXOs with the target fee rate
+    const { inputs, change } = await TransactionService.UTXOService.selectUTXOsForTransaction(
       sourceAddress,
-      vouts,
+      outputs,
       satsPerVB,
       0,
       1.5,
-      { filterStampUTXOs: true, includeAncestors: true }
+      { filterStampUTXOs: true }
     );
 
-    // Create PSBT
-    psbt = new Psbt({ network });
+    // 5. Create PSBT with actual inputs and outputs
+    const psbt = new Psbt({ network });
 
     // Add inputs
     for (const input of inputs) {
@@ -132,72 +141,70 @@ export class SRC20PSBTService {
       if (!txDetails) {
         throw new Error(`Failed to fetch transaction details for ${input.txid}`);
       }
-
-      const psbtInput = this.createPsbtInput(input, txDetails);
-      psbt.addInput(psbtInput);
+      psbt.addInput(this.createPsbtInput(input, txDetails));
     }
 
-    // Add all P2WSH outputs
-    for (const vout of vouts) {
+    // Add all outputs
+    outputs.forEach(output => {
       psbt.addOutput({
-        script: vout.script,
-        value: BigInt(vout.value)
+        script: output.script,
+        value: BigInt(output.value)
       });
-    }
+    });
 
     // Add change output if needed
     if (change > this.DUST_SIZE) {
-      const changeOutput = this.createOutputMatchingInputType(
-        effectiveChangeAddress,
-        "p2wpkh", // Always use P2WPKH for change
-        network
-      );
       psbt.addOutput({
-        script: changeOutput.output,
+        script: address.toOutputScript(effectiveChangeAddress, network),
         value: BigInt(change)
       });
     }
 
-    // Calculate actual transaction size
-    const txSize = estimateTransactionSize({
-      inputs: inputs.map(input => ({
-        type: getScriptTypeInfo(input.script).type,
-        isWitness: this.isWitnessInput(input.script),
-      })),
-      outputs: [
-        ...vouts.map(() => ({ type: "P2WSH" as const })),
-        ...(change > this.DUST_SIZE ? [{ type: "P2WPKH" as const }] : [])
-      ],
-    });
+    // 6. Calculate actual transaction fee from input/output values
+    const totalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
+    const totalOutputAmount = outputs.reduce((sum, out) => sum + out.value, 0) + 
+                             (change > this.DUST_SIZE ? change : 0);
+    const actualFee = totalInputValue - totalOutputAmount;
+    const dustTotal = outputs.reduce((sum, out) => sum + out.value, 0);
 
+    // Log exact values for debugging
     logger.debug("stamps", {
       message: "Transaction details",
       data: {
-        estimatedSize: txSize,
-        estMinerFee: fee,
-        totalInputValue: inputs.reduce((sum, input) => sum + Number(input.value), 0),
-        totalOutputValue: vouts.reduce((sum, vout) => sum + Number(vout.value), 0),
-        totalChangeOutput: change,
-        inputCount: inputs.length,
-        outputCount: vouts.length,
-        hasChange: change > this.DUST_SIZE,
+        totalInputValue,
+        totalOutputAmount,
+        actualFee,
+        dustTotal,
+        changeAmount: change,
+        feeBreakdown: {
+          minerFee: actualFee,
+          dustValue: dustTotal,
+          total: actualFee + dustTotal
+        },
+        outputs: outputs.map(o => o.value),
+        change,
+        inputValues: inputs.map(i => i.value)
       }
     });
 
     return {
       psbt,
-      estimatedTxSize: txSize,
-      totalInputValue: inputs.reduce((sum, input) => sum + Number(input.value), 0),
-      totalOutputValue: vouts.reduce((sum, vout) => sum + Number(vout.value), 0),
+      estimatedTxSize: Math.ceil(actualFee / satsPerVB),
+      totalInputValue,
+      totalOutputValue: totalOutputAmount,
       totalChangeOutput: change,
-      totalDustValue: vouts.reduce((sum, vout) => vout.isReal ? 0 : Number(vout.value), 0),
-      estMinerFee: fee,
+      totalDustValue: dustTotal,
+      estMinerFee: actualFee,
       feeDetails: {
-        baseFee: fee,
+        baseFee: actualFee,
         ancestorFee: 0,
         effectiveFeeRate: satsPerVB,
         ancestorCount: 0,
-        totalVsize: txSize
+        totalVsize: Math.ceil(actualFee / satsPerVB),
+        total: actualFee + dustTotal,
+        minerFee: actualFee,
+        dustValue: dustTotal,
+        totalValue: actualFee + dustTotal
       },
       changeAddress: effectiveChangeAddress,
       inputs: inputs.map((input, index) => ({
@@ -371,6 +378,7 @@ export class SRC20PSBTService {
     const scriptType = getScriptTypeInfo(script);
     return scriptType.isWitness;
   }
+
 }
 
 function toOutputScript(address: string): Buffer {

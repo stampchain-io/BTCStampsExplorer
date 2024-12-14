@@ -133,12 +133,17 @@ export const handler: Handlers<TX | TXError> = {
         input_value: psbtResult.totalInputValue,
         total_dust_value: psbtResult.totalDustValue,
         est_miner_fee: psbtResult.estMinerFee,
-        fee: psbtResult.totalDustValue + psbtResult.estMinerFee,
+        fee: psbtResult.feeDetails.totalValue,
         change_value: psbtResult.totalChangeOutput,
         inputsToSign: psbtResult.inputs,
         sourceAddress: effectiveSourceAddress,
         changeAddress: psbtResult.changeAddress,
-        feeDetails: psbtResult.feeDetails,
+        feeDetails: {
+          ...psbtResult.feeDetails,
+          minerFee: psbtResult.estMinerFee,
+          dustValue: psbtResult.totalDustValue,
+          totalValue: psbtResult.estMinerFee + psbtResult.totalDustValue,
+        },
       });
     } catch (error) {
       logger.error("stamps", {

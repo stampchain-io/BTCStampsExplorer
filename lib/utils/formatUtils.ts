@@ -48,6 +48,27 @@ export function formatSatoshisToBTC(
   return formatBTCAmount(btcValue, options);
 }
 
+export function formatSatoshisToUSD(
+  satoshis: number,
+  btcPrice: number,
+  options: {
+    decimals?: number;
+    includeSymbol?: boolean;
+  } = {},
+): string {
+  const { decimals = 2, includeSymbol = false } = options;
+
+  // Convert satoshis to BTC then to USD
+  const btcValue = satoshis / SATOSHIS_PER_BTC;
+  const usdValue = btcValue * btcPrice;
+
+  // Format with specified decimal places
+  const formatted = usdValue.toFixed(decimals);
+
+  // Return with or without symbol
+  return includeSymbol ? `$${formatted}` : formatted;
+}
+
 export function formatNumber(value: number, decimals: number = 8): string {
   return value.toLocaleString(undefined, {
     minimumFractionDigits: decimals,
