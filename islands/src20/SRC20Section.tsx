@@ -12,6 +12,14 @@ interface SRC20SectionProps {
   fromPage: "src20" | "wallet" | "stamping/src20" | "home";
   page?: number;
   sortBy?: "ASC" | "DESC";
+  initialData?: SRC20Row[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  address?: string;
 }
 
 const ImageModal = (
@@ -36,29 +44,80 @@ const ImageModal = (
 };
 
 export function SRC20Section(
-  { title, subTitle, type, fromPage, page, sortBy }: SRC20SectionProps,
+  {
+    title,
+    subTitle,
+    type,
+    fromPage,
+    page,
+    sortBy,
+    initialData,
+    pagination,
+    address,
+  }: SRC20SectionProps,
 ) {
-  const [data, setData] = useState<SRC20Row[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<SRC20Row[]>(initialData || []);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    const endpoint = type === "trending"
-      ? `/api/internal/src20/trending?limit=5&page=${page}&sortBy=${sortBy}`
-      : `/api/internal/src20/details?op=DEPLOY&limit=5&page=${page}&sortBy=${sortBy}`;
+    if (!initialData) {
+      const endpoint = fromPage === "wallet" && address
+        ? `/api/v2/src20/balance/${address}?page=${
+          pagination?.page || 1
+        }&limit=${pagination?.limit || 5}`
+        : type === "trending"
+        ? `/api/internal/src20/trending?limit=5&page=${page}&sortBy=${sortBy}`
+        : `/api/internal/src20/details?op=DEPLOY&limit=5&page=${page}&sortBy=${sortBy}`;
 
-    fetch(endpoint)
-      .then((res) => res.json())
-      .then((response) => {
-        setData(response.data || []);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(`SRC20 ${type} fetch error:`, error);
-        setIsLoading(false);
-      });
-  }, [type, page, sortBy]);
+      fetch(endpoint)
+        .then((res) => res.json())
+        .then((response) => {
+          setData(response.data || []);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error(`SRC20 ${type} fetch error:`, error);
+          setIsLoading(false);
+        });
+    }
+  }, [type, page, sortBy, initialData, fromPage, address, pagination]);
+
+  useEffect(() => {
+    if (data.length > 0 && fromPage === "wallet") {
+      const fetchMintData = async () => {
+        const updatedData = await Promise.all(
+          data.map(async (token) => {
+            try {
+              const response = await fetch(
+                `/api/v2/src20/tick/${encodeURIComponent(token.tick)}/mintData`,
+              );
+              const mintData = await response.json();
+
+              return {
+                ...token,
+                progress: mintData.mintStatus?.progress || "0",
+                holders: mintData.holders || 0,
+                max_supply: mintData.mintStatus?.max_supply,
+                total_minted: mintData.mintStatus?.total_minted,
+                limit: mintData.mintStatus?.limit,
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching mint data for ${token.tick}:`,
+                error,
+              );
+              return token;
+            }
+          }),
+        );
+        setData(updatedData);
+      };
+
+      fetchMintData();
+    }
+  }, [data, fromPage]);
 
   const handleCloseModal = () => setModalOpen(false);
   const handleImageClick = (imgSrc: string) => {
@@ -95,16 +154,16 @@ export function SRC20Section(
 
         <div class="flex flex-col gap-6">
           {data.map((src20) => (
-            src20.progress !== "100"
+            src20.progress === "100"
               ? (
-                <SRC20TokenMintingCard
+                <SRC20TokenOutmintedCard
                   src20={src20}
                   fromPage={fromPage}
                   onImageClick={handleImageClick}
                 />
               )
               : (
-                <SRC20TokenOutmintedCard
+                <SRC20TokenMintingCard
                   src20={src20}
                   fromPage={fromPage}
                   onImageClick={handleImageClick}

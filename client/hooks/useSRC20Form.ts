@@ -132,22 +132,28 @@ export class SRC20FormController {
           const newState = {
             ...prev,
             psbtFees: {
-              estMinerFee: Number(response.data.est_miner_fee) || 0,
-              totalDustValue: Number(response.data.total_dust_value) || 0,
+              estMinerFee: Number(response.data.est_miner_fee),
+              totalDustValue: Number(response.data.total_dust_value),
               hasExactFees: true,
               totalValue: Number(response.data.est_miner_fee) +
-                  Number(response.data.total_dust_value) || 0,
-              est_tx_size: Number(response.data.est_tx_size) || 0,
+                Number(response.data.total_dust_value),
+              effectiveFeeRate:
+                Number(response.data.feeDetails?.effectiveFeeRate) || 0,
+              estimatedSize: Number(response.data.est_tx_size),
+              totalVsize: Number(response.data.feeDetails?.totalVsize),
+              hex: response.data.hex,
+              inputsToSign: response.data.inputsToSign,
             },
           };
 
           logger.debug("stamps", {
-            message: "Updated form state",
+            message: "Updated form state with fees",
             data: {
               oldPsbtFees: prev.psbtFees,
               newPsbtFees: newState.psbtFees,
-              rawFeeDetails: response.data.feeDetails,
-              rawOutputValue: response.data.totalOutputValue,
+              rawResponse: response.data,
+              calculatedTotal: totalValue,
+              responseTotal: response.data.fee,
             },
           });
 
