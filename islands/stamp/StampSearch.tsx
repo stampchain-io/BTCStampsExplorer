@@ -1,4 +1,5 @@
 import { useState } from "preact/hooks";
+import { Button } from "$components/shared/Button.tsx";
 
 export function StampSearchClient(
   { open2, handleOpen2 }: {
@@ -26,7 +27,7 @@ export function StampSearchClient(
         <>
           <input
             type="text"
-            className="min-w-[260px] tablet:min-w-[360px] h-[40px] bg-stamp-purple px-4 py-2 rounded-md text-[13px] text-black placeholder:text-black placeholder:uppercase"
+            className="min-w-[260px] tablet:min-w-[360px] h-[40px] bg-stamp-purple px-4 py-2 pr-9 rounded-md text-[13px] text-black placeholder:text-black placeholder:uppercase"
             placeholder="stamp #, CPID, wallet address or tx_hash"
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
@@ -41,10 +42,11 @@ export function StampSearchClient(
         </>
       )}
       {!open2 && (
-        <img
-          src="/img/stamp/search-glass.png"
-          alt="Search icon"
-          className="bg-stamp-purple rounded-stamp p-search-icon cursor-pointer"
+        <Button
+          variant="icon"
+          icon="/img/stamp/search-glass.png"
+          iconAlt="Search icon"
+          class="bg-stamp-purple rounded-stamp cursor-pointer"
           onClick={() => handleOpen2(true)}
         />
       )}

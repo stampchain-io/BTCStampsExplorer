@@ -8,6 +8,7 @@ import {
   WALLET_FILTER_TYPES,
 } from "$globals";
 import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
+import { Button } from "$components/shared/Button.tsx";
 
 type FilterTypes =
   | SRC20_FILTER_TYPES
@@ -78,10 +79,11 @@ export function Setting({
           </>
         )
         : (
-          <img
-            src="/img/wallet/icon_setting.svg"
-            alt="Tools icon"
-            class="bg-stamp-purple rounded-md p-[12px] cursor-pointer"
+          <Button
+            variant="icon"
+            icon="/img/wallet/icon_setting.svg"
+            iconAlt="Tools icon"
+            class="bg-stamp-purple rounded-md cursor-pointer"
             onClick={() => handleOpen(true)}
           />
         )}
