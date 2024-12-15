@@ -34,7 +34,7 @@ export const StampHeader = (
       f-partial="/stamp"
     >
       <h1 className={titlePurpleDLClassName}>ART STAMPS</h1>
-      <div className="flex gap-3 justify-between h-[40px]">
+      <div className="flex gap-3 justify-between mobileLg:h-9 h-7 items-center">
         <Sort initSort={sortBy} />
         <Filter
           initFilter={filterBy}

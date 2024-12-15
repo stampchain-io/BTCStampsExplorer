@@ -72,7 +72,7 @@ const ItemHeader = ({
           {title}
         </p>
       </div>
-      <div class="flex gap-3 justify-between h-[40px]">
+      <div class="flex gap-3 justify-between h-[36px] items-center">
         {setting && (
           <Setting
             initFilter={[]}
@@ -456,7 +456,7 @@ export default function WalletContent({
   };
 
   const handleOpen = (type: string) => {
-    if (type == "STAMP") {
+    if (type == "STAMPS") {
       setOpenS(!openS);
     } else if (type == "TOKENS") {
       setOpenT(!openT);

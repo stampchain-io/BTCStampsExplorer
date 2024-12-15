@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
+import { Button } from "$components/shared/Button.tsx";
 
 interface SortProps {
   initSort?: "ASC" | "DESC";
@@ -20,18 +21,16 @@ export function Sort({ initSort = "DESC" }: SortProps) {
   };
 
   return (
-    <button
+    <Button
+      variant="icon"
+      icon={`${
+        localSort === "DESC"
+          ? "/img/stamp/SortAscending"
+          : "/img/stamp/SortDescending"
+      }.svg`}
+      iconAlt={`Sort ${localSort === "DESC" ? "ascending" : "descending"}`}
       onClick={handleSortChange}
-      class="border-2 border-[#8800CC] bg-transparent px-[10px] py-[10px] rounded-md"
-    >
-      <img
-        src={`${
-          localSort === "DESC"
-            ? "/img/stamp/SortAscending"
-            : "/img/stamp/SortDescending"
-        }.svg`}
-        alt={`Sort ${localSort === "DESC" ? "ascending" : "descending"}`}
-      />
-    </button>
+      class="border-2 border-[#8800CC] bg-transparent rounded-md"
+    />
   );
 }

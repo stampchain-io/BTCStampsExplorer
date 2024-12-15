@@ -33,7 +33,7 @@ export const SRC20Header = (
         <h1 className="block tablet:hidden text-4xl mobileLg:text-5xl purple-gradient1 font-black">
           TOKENS
         </h1>
-        <div class="flex gap-3 justify-between h-[40px]">
+        <div class="flex gap-3 justify-between mobileLg:h-9 h-7 items-center">
           <Sort initSort={sortBy} />
           <Filter
             initFilter={Array.isArray(filterBy) ? filterBy : [filterBy]}
