@@ -29,7 +29,7 @@ const dataValueXl =
 const tooltip2 =
   "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
 const tooltipIcon =
-  "absolute left-1/2 -translate-x-1/2 bg-[#1F002E] px-2 py-1 rounded-sm mb-0 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+  "absolute left-1/2 -translate-x-1/2 bg-[#00000080] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
 
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
@@ -92,11 +92,32 @@ function WalletOverview(
   const [allowTooltip, setAllowTooltip] = useState(true);
   const copyButtonRef = useRef<HTMLDivElement>(null);
   const tooltipTimeoutRef = useRef<number | null>(null);
+  const [isSendTooltipVisible, setIsSendTooltipVisible] = useState(false);
+  const [allowSendTooltip, setAllowSendTooltip] = useState(true);
+  const sendButtonRef = useRef<HTMLDivElement>(null);
+  const sendTooltipTimeoutRef = useRef<number | null>(null);
+  const [isReceiveTooltipVisible, setIsReceiveTooltipVisible] = useState(false);
+  const [allowReceiveTooltip, setAllowReceiveTooltip] = useState(true);
+  const receiveButtonRef = useRef<HTMLDivElement>(null);
+  const receiveTooltipTimeoutRef = useRef<number | null>(null);
+  const [isHistoryTooltipVisible, setIsHistoryTooltipVisible] = useState(false);
+  const [allowHistoryTooltip, setAllowHistoryTooltip] = useState(true);
+  const historyButtonRef = useRef<HTMLDivElement>(null);
+  const historyTooltipTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
         window.clearTimeout(tooltipTimeoutRef.current);
+      }
+      if (sendTooltipTimeoutRef.current) {
+        window.clearTimeout(sendTooltipTimeoutRef.current);
+      }
+      if (receiveTooltipTimeoutRef.current) {
+        window.clearTimeout(receiveTooltipTimeoutRef.current);
+      }
+      if (historyTooltipTimeoutRef.current) {
+        window.clearTimeout(historyTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -146,6 +167,81 @@ function WalletOverview(
         console.error("Failed to copy:", err);
       }
     }
+  };
+
+  const handleSendMouseEnter = () => {
+    if (allowSendTooltip) {
+      const buttonRect = sendButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        setIsSendTooltipVisible(true);
+      }
+
+      if (sendTooltipTimeoutRef.current) {
+        window.clearTimeout(sendTooltipTimeoutRef.current);
+      }
+
+      sendTooltipTimeoutRef.current = window.setTimeout(() => {
+        setIsSendTooltipVisible(false);
+      }, 1500);
+    }
+  };
+
+  const handleSendMouseLeave = () => {
+    if (sendTooltipTimeoutRef.current) {
+      window.clearTimeout(sendTooltipTimeoutRef.current);
+    }
+    setIsSendTooltipVisible(false);
+    setAllowSendTooltip(true);
+  };
+
+  const handleReceiveMouseEnter = () => {
+    if (allowReceiveTooltip) {
+      const buttonRect = receiveButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        setIsReceiveTooltipVisible(true);
+      }
+
+      if (receiveTooltipTimeoutRef.current) {
+        window.clearTimeout(receiveTooltipTimeoutRef.current);
+      }
+
+      receiveTooltipTimeoutRef.current = window.setTimeout(() => {
+        setIsReceiveTooltipVisible(false);
+      }, 1500);
+    }
+  };
+
+  const handleReceiveMouseLeave = () => {
+    if (receiveTooltipTimeoutRef.current) {
+      window.clearTimeout(receiveTooltipTimeoutRef.current);
+    }
+    setIsReceiveTooltipVisible(false);
+    setAllowReceiveTooltip(true);
+  };
+
+  const handleHistoryMouseEnter = () => {
+    if (allowHistoryTooltip) {
+      const buttonRect = historyButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        setIsHistoryTooltipVisible(true);
+      }
+
+      if (historyTooltipTimeoutRef.current) {
+        window.clearTimeout(historyTooltipTimeoutRef.current);
+      }
+
+      historyTooltipTimeoutRef.current = window.setTimeout(() => {
+        setIsHistoryTooltipVisible(false);
+      }, 1500);
+    }
+  };
+
+  const handleHistoryMouseLeave = () => {
+    if (historyTooltipTimeoutRef.current) {
+      window.clearTimeout(historyTooltipTimeoutRef.current);
+    }
+    setIsHistoryTooltipVisible(false);
+    setAllowHistoryTooltip(true);
   };
 
   return (
@@ -244,7 +340,12 @@ function WalletOverview(
               {showCopied ? "COPIED" : "COPY"}
             </div>
           </div>
-          <div class="relative group">
+          <div
+            ref={sendButtonRef}
+            class="relative group"
+            onMouseEnter={handleSendMouseEnter}
+            onMouseLeave={handleSendMouseLeave}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="18"
@@ -253,15 +354,27 @@ function WalletOverview(
               viewBox="0 0 32 32"
               role="button"
               aria-label="Send"
-              onClick={onSend}
+              onClick={() => {
+                setIsSendTooltipVisible(false);
+                onSend();
+              }}
             >
               <path d="M28 13C28 13.2652 27.8946 13.5196 27.7071 13.7071C27.5196 13.8946 27.2652 14 27 14C26.7348 14 26.4804 13.8946 26.2929 13.7071C26.1054 13.5196 26 13.2652 26 13V7.415L17.7087 15.7075C17.5211 15.8951 17.2666 16.0006 17.0012 16.0006C16.7359 16.0006 16.4814 15.8951 16.2938 15.7075C16.1061 15.5199 16.0007 15.2654 16.0007 15C16.0007 14.7346 16.1061 14.4801 16.2938 14.2925L24.585 6H19C18.7348 6 18.4804 5.89464 18.2929 5.70711C18.1054 5.51957 18 5.26522 18 5C18 4.73478 18.1054 4.48043 18.2929 4.29289C18.4804 4.10536 18.7348 4 19 4H27C27.2652 4 27.5196 4.10536 27.7071 4.29289C27.8946 4.48043 28 4.73478 28 5V13ZM23 16C22.7348 16 22.4804 16.1054 22.2929 16.2929C22.1054 16.4804 22 16.7348 22 17V26H6V10H15C15.2652 10 15.5196 9.89464 15.7071 9.70711C15.8946 9.51957 16 9.26522 16 9C16 8.73478 15.8946 8.48043 15.7071 8.29289C15.5196 8.10536 15.2652 8 15 8H6C5.46957 8 4.96086 8.21071 4.58579 8.58579C4.21071 8.96086 4 9.46957 4 10V26C4 26.5304 4.21071 27.0391 4.58579 27.4142C4.96086 27.7893 5.46957 28 6 28H22C22.5304 28 23.0391 27.7893 23.4142 27.4142C23.7893 27.0391 24 26.5304 24 26V17C24 16.7348 23.8946 16.4804 23.7071 16.2929C23.5196 16.1054 23.2652 16 23 16Z" />
             </svg>
-            <div class={tooltip2}>
+            <div
+              class={`${tooltipIcon} ${
+                isSendTooltipVisible ? "block" : "hidden"
+              }`}
+            >
               SEND
             </div>
           </div>
-          <div class="relative group">
+          <div
+            ref={receiveButtonRef}
+            class="relative group"
+            onMouseEnter={handleReceiveMouseEnter}
+            onMouseLeave={handleReceiveMouseLeave}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="18"
@@ -270,18 +383,31 @@ function WalletOverview(
               viewBox="0 0 32 32"
               role="button"
               aria-label="Receive"
-              onClick={onReceive}
+              onClick={() => {
+                setIsReceiveTooltipVisible(false);
+                onReceive();
+              }}
             >
               <path d="M16 17V25C16 25.2652 15.8946 25.5196 15.7071 25.7071C15.5196 25.8946 15.2652 26 15 26C14.7348 26 14.4804 25.8946 14.2929 25.7071C14.1054 25.5196 14 25.2652 14 25V19.415L5.70751 27.7075C5.6146 27.8004 5.5043 27.8741 5.3829 27.9244C5.26151 27.9747 5.1314 28.0006 5.00001 28.0006C4.86861 28.0006 4.7385 27.9747 4.61711 27.9244C4.49572 27.8741 4.38542 27.8004 4.29251 27.7075C4.1996 27.6146 4.1259 27.5043 4.07561 27.3829C4.02533 27.2615 3.99945 27.1314 3.99945 27C3.99945 26.8686 4.02533 26.7385 4.07561 26.6171C4.1259 26.4957 4.1996 26.3854 4.29251 26.2925L12.585 18H7.00001C6.73479 18 6.48044 17.8946 6.2929 17.7071C6.10536 17.5196 6.00001 17.2652 6.00001 17C6.00001 16.7348 6.10536 16.4804 6.2929 16.2929C6.48044 16.1054 6.73479 16 7.00001 16H15C15.2652 16 15.5196 16.1054 15.7071 16.2929C15.8946 16.4804 16 16.7348 16 17ZM26 4H10C9.46957 4 8.96087 4.21071 8.58579 4.58579C8.21072 4.96086 8.00001 5.46957 8.00001 6V12C8.00001 12.2652 8.10536 12.5196 8.2929 12.7071C8.48044 12.8946 8.73479 13 9.00001 13C9.26522 13 9.51958 12.8946 9.70711 12.7071C9.89465 12.5196 10 12.2652 10 12V6H26V22H20C19.7348 22 19.4804 22.1054 19.2929 22.2929C19.1054 22.4804 19 22.7348 19 23C19 23.2652 19.1054 23.5196 19.2929 23.7071C19.4804 23.8946 19.7348 24 20 24H26C26.5304 24 27.0391 23.7893 27.4142 23.4142C27.7893 23.0391 28 22.5304 28 22V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4Z" />
             </svg>
-            <div class={tooltip2}>
+            <div
+              class={`${tooltipIcon} ${
+                isReceiveTooltipVisible ? "block" : "hidden"
+              }`}
+            >
               RECEIVE
             </div>
           </div>
-          <div class="relative group">
+          <div
+            ref={historyButtonRef}
+            class="relative group"
+            onMouseEnter={handleHistoryMouseEnter}
+            onMouseLeave={handleHistoryMouseLeave}
+          >
             <a
               href={`https://mempool.space/address/${walletData.address}`}
               target="_blank"
+              onClick={() => setIsHistoryTooltipVisible(false)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -295,7 +421,11 @@ function WalletOverview(
                 <path d="M17 10V15.4338L21.515 18.1425C21.7424 18.2791 21.9063 18.5005 21.9705 18.7579C22.0347 19.0152 21.9941 19.2876 21.8575 19.515C21.7209 19.7425 21.4996 19.9063 21.2422 19.9705C20.9848 20.0348 20.7124 19.9941 20.485 19.8575L15.485 16.8575C15.337 16.7686 15.2146 16.6429 15.1296 16.4927C15.0446 16.3424 14.9999 16.1727 15 16V10C15 9.73482 15.1054 9.48047 15.2929 9.29293C15.4804 9.10539 15.7348 9.00004 16 9.00004C16.2652 9.00004 16.5196 9.10539 16.7071 9.29293C16.8946 9.48047 17 9.73482 17 10ZM16 4.00004C14.4225 3.99611 12.8599 4.30508 11.4026 4.90907C9.94527 5.51306 8.62222 6.40008 7.51 7.51879C6.60125 8.43879 5.79375 9.32379 5 10.25V8.00004C5 7.73482 4.89464 7.48047 4.70711 7.29293C4.51957 7.10539 4.26522 7.00004 4 7.00004C3.73478 7.00004 3.48043 7.10539 3.29289 7.29293C3.10536 7.48047 3 7.73482 3 8.00004V13C3 13.2653 3.10536 13.5196 3.29289 13.7071C3.48043 13.8947 3.73478 14 4 14H9C9.26522 14 9.51957 13.8947 9.70711 13.7071C9.89464 13.5196 10 13.2653 10 13C10 12.7348 9.89464 12.4805 9.70711 12.2929C9.51957 12.1054 9.26522 12 9 12H6.125C7.01875 10.9475 7.90875 9.95629 8.92375 8.92879C10.3136 7.53898 12.0821 6.58955 14.0085 6.19913C15.9348 5.80872 17.9335 5.99463 19.7547 6.73364C21.576 7.47266 23.1391 8.73199 24.2487 10.3543C25.3584 11.9766 25.9653 13.8899 25.9938 15.8552C26.0222 17.8205 25.4708 19.7506 24.4086 21.4043C23.3463 23.0581 21.8203 24.3621 20.0212 25.1535C18.2221 25.9448 16.2296 26.1885 14.2928 25.854C12.356 25.5194 10.5607 24.6216 9.13125 23.2725C9.03571 23.1823 8.92333 23.1117 8.80052 23.0648C8.6777 23.018 8.54686 22.9958 8.41547 22.9995C8.28407 23.0032 8.15469 23.0328 8.03472 23.0865C7.91475 23.1402 7.80653 23.217 7.71625 23.3125C7.62597 23.4081 7.55538 23.5205 7.50853 23.6433C7.46168 23.7661 7.43948 23.8969 7.44319 24.0283C7.44691 24.1597 7.47647 24.2891 7.53018 24.4091C7.58389 24.529 7.66071 24.6373 7.75625 24.7275C9.18056 26.0716 10.9122 27.0467 12.8 27.5677C14.6878 28.0886 16.6744 28.1396 18.5865 27.7162C20.4986 27.2929 22.278 26.4079 23.7694 25.1387C25.2608 23.8695 26.4189 22.2545 27.1427 20.4348C27.8664 18.6151 28.1338 16.6459 27.9215 14.699C27.7091 12.7522 27.0236 10.8869 25.9246 9.26595C24.8256 7.64501 23.3466 6.31766 21.6166 5.39977C19.8867 4.48187 17.9584 4.00131 16 4.00004Z" />
               </svg>
             </a>
-            <div class={tooltip2}>
+            <div
+              class={`${tooltipIcon} ${
+                isHistoryTooltipVisible ? "block" : "hidden"
+              }`}
+            >
               HISTORY
             </div>
           </div>
