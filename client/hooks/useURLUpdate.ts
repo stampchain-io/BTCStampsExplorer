@@ -33,7 +33,7 @@ export function useURLUpdate() {
 
     url.searchParams.set("page", "1");
 
-    self.history.pushState({}, "", url.toString());
+    // self.history.pushState({}, "", url.toString());
     self.dispatchEvent(
       new CustomEvent("urlChanged", { detail: url.toString() }),
     );
