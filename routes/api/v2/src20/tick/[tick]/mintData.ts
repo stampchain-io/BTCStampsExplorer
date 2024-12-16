@@ -11,54 +11,22 @@ export const handler: Handlers = {
         throw new Error("Tick parameter is required");
       }
 
-      // Debug logging with structured logger
-      logger.debug("stamps", {
-        message: "Processing tick request",
-        data: {
-          originalTick: tick,
-        },
-      });
+      const normalizedTick = convertEmojiToTick(decodeURIComponent(tick));
 
-      const decodedTick = decodeURIComponent(tick);
-      logger.debug("stamps", {
-        message: "Decoded tick",
-        data: {
-          decodedTick,
-        },
-      });
-
-      const normalizedTick = convertEmojiToTick(decodedTick);
-      logger.debug("stamps", {
-        message: "Normalized tick",
-        data: {
-          normalizedTick,
-        },
-      });
-
-      // Fetch mint progress data with normalized tick
-      const mintStatus = await Src20Controller.handleSrc20MintProgressRequest(
-        normalizedTick,
-      );
-      logger.debug("stamps", {
-        message: "Mint status retrieved",
-        data: {
-          mintStatus,
-        },
-      });
-
-      // Fetch holders count with normalized tick
-      const balanceData = await Src20Controller.handleSrc20BalanceRequest({
-        tick: normalizedTick,
-        includePagination: true,
-        limit: 1,
-        page: 1,
-      });
-      const holders = balanceData.total || 0;
+      const [mintStatus, balanceData] = await Promise.all([
+        Src20Controller.handleSrc20MintProgressRequest(normalizedTick),
+        Src20Controller.handleSrc20BalanceRequest({
+          tick: normalizedTick,
+          includePagination: true,
+          limit: 1,
+          page: 1,
+        }),
+      ]);
 
       return new Response(
         JSON.stringify({
           mintStatus,
-          holders,
+          holders: balanceData.total || 0,
         }),
         {
           status: 200,

@@ -124,6 +124,7 @@ export class StampService {
     groupBySubquery?: boolean;
     skipTotalCount?: boolean;
     cacheType?: RouteType;
+    creatorAddress?: string;
   }) {
     // Create a new options object instead of modifying the input
     const queryOptions = {
@@ -227,21 +228,22 @@ export class StampService {
     }));
   }
 
-  static async getRecentSales(page?: number, limit?: number) { // FIXME: this is temoprorary until we add recent sales in db
+  static async getRecentSales(page?: number, limit?: number) {
     // Fetch dispense events and extract unique asset values
-    const dispenseEvents = await XcpManager.fetchDispenseEvents(500); // Fetch recent dispense events
-    const uniqueAssets = [
-      ...new Set(dispenseEvents.map((event) => event.params.asset)),
-    ];
+    const dispenseEvents = await XcpManager.fetchDispenseEvents(500);
+    const uniqueAssets = [...new Set(dispenseEvents.map((event) => event.params.asset))];
 
     const stampDetails = await this.getStamps({
       identifier: uniqueAssets,
       allColumns: false,
       noPagination: true,
+      type: "all",
+      skipTotalCount: true,
+      creatorAddress: undefined
     });
 
     const stampDetailsMap = new Map(
-      stampDetails.stamps.map((stamp) => [stamp.cpid, stamp]),
+      stampDetails.stamps.map((stamp) => [stamp.cpid, stamp])
     );
 
     const allRecentSales = dispenseEvents

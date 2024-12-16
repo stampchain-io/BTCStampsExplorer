@@ -233,6 +233,7 @@ export class StampRepository {
     collectionId?: string | string[];
     filterBy?: STAMP_FILTER_TYPES[];
     suffixFilters?: STAMP_SUFFIX_FILTERS[];
+    creatorAddress?: string;
   }) {
     const {
       type = "stamps",
@@ -242,6 +243,7 @@ export class StampRepository {
       collectionId,
       filterBy,
       suffixFilters,
+      creatorAddress,
     } = options;
 
     const whereConditions: string[] = [];
@@ -258,6 +260,11 @@ export class StampRepository {
       filterBy,
       suffixFilters
     );
+
+    if (creatorAddress) {
+      whereConditions.push("st.creator = ?");
+      queryParams.push(creatorAddress);
+    }
 
     const whereClause =
       whereConditions.length > 0
@@ -481,6 +488,7 @@ export class StampRepository {
     skipTotalCount?: boolean;
     selectColumns?: string[];
     includeSecondary?: boolean;
+    creatorAddress?: string;
   }) {
     const queryOptions = {
       limit: SMALL_LIMIT,
@@ -518,6 +526,7 @@ export class StampRepository {
       skipTotalCount = false,
       selectColumns,
       includeSecondary = true,
+      creatorAddress,
     } = queryOptions;
 
     const whereConditions: string[] = [];
@@ -534,6 +543,11 @@ export class StampRepository {
       filterBy,
       suffixFilters
     );
+
+    if (creatorAddress) {
+      whereConditions.push("st.creator = ?");
+      queryParams.push(creatorAddress);
+    }
 
     // Core stamp fields that are always needed
     const coreColumns = `
@@ -918,5 +932,24 @@ export class StampRepository {
         count: 0,
       };
     }
+  }
+
+  static async getStampsCreatedCount(address: string): Promise<{ total: number }> {
+    const query = `
+      SELECT COUNT(DISTINCT st.stamp) as total
+      FROM ${STAMP_TABLE} st
+      WHERE st.creator = ?
+      AND st.ident IN ('STAMP', 'SRC-721')
+    `;
+
+    const result = await dbManager.executeQueryWithCache(
+      query,
+      [address],
+      1000 * 60 * 3 // 3 minute cache
+    );
+
+    return {
+      total: result.rows[0]?.total || 0
+    };
   }
 }

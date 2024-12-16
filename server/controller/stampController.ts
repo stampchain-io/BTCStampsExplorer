@@ -805,4 +805,19 @@ export class StampController {
       throw error;
     }
   }
+
+  static async getStampsCreatedCount(address: string): Promise<number> {
+    try {
+      // Use a direct count query instead of getStamps
+      const result = await StampRepository.getStampsCreatedCount(address);
+      return result.total || 0;
+    } catch (error) {
+      logger.error("stamps", {
+        message: "Error getting stamps created count",
+        error: error instanceof Error ? error.message : String(error),
+        address
+      });
+      return 0;
+    }
+  }
 }
