@@ -4,10 +4,10 @@ import { Handlers } from "$fresh/server.ts";
 import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
 import WalletDetails from "$islands/Wallet/details/WalletDetails.tsx";
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
-import { serverConfig } from "$server/config/config.ts";
-import { Dispenser, WalletData, WalletPageProps } from "$lib/types/index.d.ts";
+import { WalletData, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -38,13 +38,20 @@ export const handler: Handlers = {
         btcInfoResponse,
         openDispensersResponse,
         closedDispensersResponse,
+        stampsCreatedCount,
       ] = await Promise.allSettled([
-        fetch(
-          `${url.origin}/api/v2/stamps/balance/${address}?page=${stampsParams.page}&limit=${stampsParams.limit}`,
-        ).then((res) => res.json()),
-        fetch(
-          `${url.origin}/api/v2/src20/balance/${address}?page=${src20Params.page}&limit=${src20Params.limit}`,
-        ).then((res) => res.json()),
+        StampController.getStampBalancesByAddress(
+          address,
+          stampsParams.limit,
+          stampsParams.page,
+        ),
+        Src20Controller.handleSrc20BalanceRequest({
+          address,
+          includePagination: true,
+          limit: src20Params.limit,
+          page: src20Params.page,
+          includeMintData: true,
+        }),
         getBTCBalanceInfo(address, {
           includeUSD: true,
           apiBaseUrl: url.origin,
@@ -61,6 +68,7 @@ export const handler: Handlers = {
           closedListingsParams.page || 1,
           "closed",
         ),
+        StampController.getStampsCreatedCount(address),
       ]);
 
       const stampsData = stampsResponse.status === "fulfilled"
@@ -157,6 +165,9 @@ export const handler: Handlers = {
         walletData,
         stampsTotal: stampsData.total || 0,
         src20Total: src20Data.total || 0,
+        stampsCreated: stampsCreatedCount.status === "fulfilled"
+          ? stampsCreatedCount.value
+          : 0,
         anchor: anchor,
       });
     } catch (error) {
@@ -196,6 +207,7 @@ export const handler: Handlers = {
         },
         stampsTotal: 0,
         src20Total: 0,
+        stampsCreated: 0,
       });
     }
   },
@@ -214,7 +226,7 @@ export default function Wallet(props: WalletPageProps) {
         walletData={data.walletData}
         stampsTotal={data.stampsTotal}
         src20Total={data.src20Total}
-        stampsCreated={0}
+        stampsCreated={data.stampsCreated}
         setShowItem={() => {}}
       />
       <WalletContent
