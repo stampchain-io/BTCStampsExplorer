@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { AddressHandlerContext } from "$globals";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
@@ -34,10 +34,13 @@ export const handler: Handlers<AddressHandlerContext> = {
         limit || DEFAULT_PAGINATION.limit,
         page || DEFAULT_PAGINATION.page,
       );
-      return ResponseUtil.success(body);
+      return ApiResponseUtil.success(body);
     } catch (error) {
       console.error("Error in stamp balance handler:", error);
-      return ResponseUtil.internalError(error, "Error fetching stamp balance");
+      return ApiResponseUtil.internalError(
+        error,
+        "Error fetching stamp balance",
+      );
     }
   },
 };
