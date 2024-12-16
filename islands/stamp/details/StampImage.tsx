@@ -14,7 +14,7 @@ import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 
 const tooltipIcon =
-  "absolute left-1/2 -translate-x-1/2 bg-[#00000080] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
 
 function RightPanel(
   { stamp, toggleCodeModal, toggleFullScreenModal, showCodeButton }: {
