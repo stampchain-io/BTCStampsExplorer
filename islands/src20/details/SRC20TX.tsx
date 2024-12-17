@@ -52,44 +52,21 @@ export function SRC20TX(props: SRC20TXProps) {
     if (type === "TRANSFER") {
       return (
         <tr class="w-full table table-fixed">
-          <th scope="col" class="text-sm mobileLg:text-base px-6 py-3">From</th>
-          <th scope="col" class="text-sm mobileLg:text-base px-6 py-3">To</th>
-          <th scope="col" class="text-sm mobileLg:text-base px-6 py-3">
-            Amount
-          </th>
-          <th
-            scope="col"
-            class="text-sm mobileLg:text-base px-6 py-3 hidden mobileLg:table-cell"
-          >
-            Tx Hash
-          </th>
-          <th scope="col" class="text-sm mobileLg:text-base px-6 py-3">Date</th>
+          <th scope="col" class="px-6 py-3">From</th>
+          <th scope="col" class="px-6 py-3">To</th>
+          <th scope="col" class="px-6 py-3">Amount</th>
+          <th scope="col" class="px-6 py-3">Tx Hash</th>
+          <th scope="col" class="px-6 py-3">Date</th>
         </tr>
       );
     } else if (type === "MINT") {
       return (
         <tr class="w-full table table-fixed">
-          <th scope="col" class="text-sm mobileLg:text-base px-6 py-3">
-            Block
-          </th>
-          <th scope="col" class="text-sm mobileLg:text-base px-6 py-3">
-            Address
-          </th>
-          <th scope="col" class="text-sm mobileLg:text-base px-6 py-3">
-            Amount
-          </th>
-          <th
-            scope="col"
-            class="text-sm mobileLg:text-base px-6 py-3 hidden mobileLg:table-cell"
-          >
-            Tx Hash
-          </th>
-          <th
-            scope="col"
-            class="text-sm mobileLg:text-base px-6 py-3 hidden mobileLg:table-cell"
-          >
-            Date
-          </th>
+          <th scope="col" class="px-6 py-3">Block</th>
+          <th scope="col" class="px-6 py-3">Address</th>
+          <th scope="col" class="px-6 py-3">Amount</th>
+          <th scope="col" class="px-6 py-3">Tx Hash</th>
+          <th scope="col" class="px-6 py-3">Date</th>
         </tr>
       );
     }
@@ -114,27 +91,24 @@ export function SRC20TX(props: SRC20TXProps) {
             key={tx.tx_hash}
             class="w-full table table-fixed text-xs mobileLg:text-sm font-normal text-stamp-grey-light"
           >
-            <td class="px-6 py-3">{abbreviateAddress(tx.creator)}</td>
-            <td class="px-6 py-3">{abbreviateAddress(tx.destination)}</td>
-            <td class="px-6 py-3">{formattedAmt}</td>
-            <td class="px-6 py-3">
+            <td class="px-3 py-2">{abbreviateAddress(tx.creator)}</td>
+            <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
+            <td class="px-3 py-2">{formattedAmt}</td>
+            <td class="px-3 py-2">
               {formatDate(new Date(tx.block_time), {
                 month: "numeric",
                 day: "numeric",
                 year: "numeric",
               })}
             </td>
-            <td class="px-6 py-3 hidden mobileLg:table-cell">***</td>
           </tr>
         );
       } else if (type === "MINT") {
         return (
           <tr key={tx.tx_hash} class="w-full table table-fixed text-xs">
-            <td class="px-6 py-3">{tx.block_index}</td>
-            <td class="px-6 py-3">{abbreviateAddress(tx.destination)}</td>
-            <td class="px-6 py-3">{formattedAmt}</td>
-            <td class="px-6 py-3 hidden mobileLg:table-cell">***</td>
-            <td class="px-6 py-3 hidden mobileLg:table-cell">***</td>
+            <td class="px-3 py-2">{tx.block_index}</td>
+            <td class="px-3 py-2">{abbreviateAddress(tx.destination)}</td>
+            <td class="px-3 py-2">{formattedAmt}</td>
           </tr>
         );
       }
