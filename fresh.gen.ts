@@ -28,6 +28,7 @@ import * as $api_v2_block_related_block_index_ from "./routes/api/v2/block/relat
 import * as $api_v2_collections_creator_creator_ from "./routes/api/v2/collections/creator/[creator].ts";
 import * as $api_v2_collections_index from "./routes/api/v2/collections/index.ts";
 import * as $api_v2_create_dispense from "./routes/api/v2/create/dispense.ts";
+import * as $api_v2_create_send from "./routes/api/v2/create/send.ts";
 import * as $api_v2_cursed_id_ from "./routes/api/v2/cursed/[id].ts";
 import * as $api_v2_cursed_block from "./routes/api/v2/cursed/block.ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
@@ -251,6 +252,7 @@ const manifest = {
       $api_v2_collections_creator_creator_,
     "./routes/api/v2/collections/index.ts": $api_v2_collections_index,
     "./routes/api/v2/create/dispense.ts": $api_v2_create_dispense,
+    "./routes/api/v2/create/send.ts": $api_v2_create_send,
     "./routes/api/v2/cursed/[id].ts": $api_v2_cursed_id_,
     "./routes/api/v2/cursed/block.ts": $api_v2_cursed_block,
     "./routes/api/v2/cursed/block/[block_index].ts":

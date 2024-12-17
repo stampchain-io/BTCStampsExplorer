@@ -1026,6 +1026,98 @@ export class XcpManager {
     throw new Error(lastError || "All nodes failed to compose dispense transaction.");
   }
 
+  static async createSend(
+    address: string,
+    destination: string,
+    asset: string,
+    quantity: number,
+    options: {
+      memo?: string;
+      memo_is_hex?: boolean;
+      use_enhanced_send?: boolean;
+      encoding?: string;
+      fee_per_kb?: number;
+      regular_dust_size?: number;
+      multisig_dust_size?: number;
+      pubkeys?: string;
+      allow_unconfirmed_inputs?: boolean;
+      exact_fee?: number;
+      fee_provided?: number;
+      unspent_tx_hash?: string;
+      dust_return_pubkey?: string;
+      disable_utxo_locks?: boolean;
+      p2sh_pretx_txid?: string;
+      segwit?: boolean;
+      confirmation_target?: number;
+      exclude_utxos?: string;
+      inputs_set?: string;
+      return_psbt?: boolean;
+      return_only_data?: boolean;
+      extended_tx_info?: boolean;
+      old_style_api?: boolean;
+      use_utxos_with_balances?: boolean;
+      exclude_utxos_with_balances?: boolean;
+      validate?: boolean;
+      verbose?: boolean;
+      show_unconfirmed?: boolean;
+    } = {},
+  ): Promise<any> {
+    const endpoint = `/addresses/${address}/compose/send`;
+    const queryParams = new URLSearchParams();
+
+    queryParams.append("destination", destination);
+    queryParams.append("asset", asset);
+    queryParams.append("quantity", quantity.toString());
+    
+    // Set default dust size if not provided
+    if (!options.regular_dust_size) {
+      queryParams.append("regular_dust_size", "546"); // Bitcoin's standard dust limit
+    }
+
+    // Append optional parameters if provided
+    for (const [key, value] of Object.entries(options)) {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, value.toString());
+      }
+    }
+
+    let lastError: string | null = null;
+
+    for (const node of xcp_v2_nodes) {
+      const url = `${node.url}${endpoint}?${queryParams.toString()}`;
+      console.log(`Attempting to fetch from URL: ${url}`);
+
+      try {
+        const response = await fetch(url);
+        console.log(`Response status from ${node.name}: ${response.status}`);
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          console.error(`Error response body from ${node.name}: ${errorBody}`);
+          try {
+            const errorJson = JSON.parse(errorBody);
+            if (errorJson.error) {
+              lastError = errorJson.error;
+            }
+          } catch (e) {
+            lastError = errorBody;
+          }
+          continue; // Try the next node
+        }
+
+        const data = await response.json();
+        console.log(`Successful response from ${node.name}`);
+        return data;
+      } catch (error) {
+        console.error(`Fetch error for ${url}:`, error);
+        lastError = error.message;
+      }
+    }
+
+    // Throw the last error message instead of generic message
+    throw new Error(lastError || "All nodes failed to compose dispense transaction.");
+  }
+
   static async composeAttach(
     address: string,
     asset: string,
