@@ -20,7 +20,7 @@ const VARIANT_STYLES = {
   default:
     "inline-flex items-center justify-center w-7 h-7 mobileLg:w-9 mobileLg:h-9 bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors",
   mint:
-    "inline-flex items-center justify-center w-7 h-7 mobileLg:w-9 mobileLg:h-9 bg-stamp-purple border-2 border-stamp-purple rounded-md text-xs mobileLg:text-sm font-extrabold text-black tracking-[0.05em] px-3 mobileLg:px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors",
+    "inline-flex items-center justify-center h-7 mobileLg:h-9 bg-stamp-purple border-2 border-stamp-purple rounded-md text-xs mobileLg:text-sm font-extrabold text-black tracking-[0.05em] px-3 mobileLg:px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors",
   wallet:
     "flex items-center justify-center w-7 h-7 mobileLg:w-9 mobileLg:h-9 w-8 h-8 cursor-pointer",
   cancel:
