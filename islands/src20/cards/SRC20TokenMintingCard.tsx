@@ -25,10 +25,10 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
 
   return (
     <SRC20BaseCard {...props}>
-      {fromPage === "src20" && (
+      {(fromPage === "src20" || fromPage === "home") && (
         <>
           {/* Holders & Deploy */}
-          <div class="flex flex-col justify-end">
+          <div class="flex flex-col -mb-6 mobileLg:-mb-[44px]">
             <div class="hidden tablet:flex flex-col justify-center text-center -space-y-0.5 ">
               <p class={dataLabelSm}>
                 HOLDERS{" "}
@@ -49,7 +49,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
           </div>
 
           {/* Top Mints & Progress Bar */}
-          <div class="flex flex-col -mb-3 mobileLg:-mb-[20px] -ml-24 tablet:ml-0 ">
+          <div class="flex flex-col -mb-3 mobileLg:-mb-[22px] -ml-24 tablet:ml-0 ">
             <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
               <p class={dataLabelSm}>
                 TOP MINTS <span class={dataValueSm}>N/A%</span>
@@ -74,7 +74,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
       {fromPage === "wallet" && (
         // Holders & Deploy
         <div class="flex flex-col justify-end">
-          <div class="hidden tablet:flex flex-col justify-center text-center -space-y-0.5 ">
+          <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
             <p class={dataLabelSm}>
               HOLDERS{" "}
               <span class={dataValueSm}>

@@ -11,9 +11,9 @@ export const RecursiveLayeringModule = () => {
           class={`grid grid-cols-1 tablet:grid-cols-2 gap-3 mobileLg:gap-6 ${ModulesStyles.bodyTextLight}`}
         >
           <p>
-            <span class="font-bold">
+            <b>
               SRC-721r allows for recursive NFT creation
-            </span>{" "}
+            </b>{" "}
             by leveraging multiple layers of data utilizing not just JSON, but
             also on-chain JS libraries to build complex recursion and on-chain
             web applications.<br />
@@ -25,16 +25,16 @@ export const RecursiveLayeringModule = () => {
             Get in contact with us if you're planning a large PFP collection or
             dreaming of complex multilayered art compositions.<br />
             <br />
-            <span class="font-bold">
+            <b>
               We would love to get involved and can definitely help you out !
-            </span>
+            </b>
           </p>
         </div>
       </div>
       <a
         href="/about#contact"
         f-partial="/about#contact"
-        class={`${ModulesStyles.buttonGreyOutline} float-right w-[120px]`}
+        class={`${ModulesStyles.buttonGreyOutline} float-right mt-3 mobileMd:mt-6`}
       >
         CONTACT
       </a>

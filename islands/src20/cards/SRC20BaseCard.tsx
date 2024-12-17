@@ -114,7 +114,7 @@ export function SRC20BaseCard(
             </div>
           </p>
 
-          {fromPage === "src20" && (
+          {(fromPage === "src20" || fromPage === "home") && (
             <div class="flex flex-col pt-0.75 mobileLg:pt-1.5 -space-y-0.5">
               <p class={dataLabelSm}>
                 SUPPLY{" "}

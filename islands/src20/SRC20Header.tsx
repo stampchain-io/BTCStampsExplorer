@@ -34,7 +34,6 @@ export const SRC20Header = (
           TOKENS
         </h1>
         <div class="flex gap-3 justify-between mobileLg:h-9 h-7 items-center">
-          <Sort initSort={sortBy} />
           <Filter
             initFilter={Array.isArray(filterBy) ? filterBy : [filterBy]}
             open={isOpen1}
@@ -49,18 +48,18 @@ export const SRC20Header = (
               "volume",
               "price change",
             ]}
+            dropdownPosition="absolute top-[100px] right-[-79px] mobileMd:top-[96px] mobileMd:right-[-96px] mobileLg:top-[128px] mobileLg:right-[-96px] desktop:top-[125px] desktop:right-[-108px]"
           />
-          <SRC20SearchClient open2={isOpen2} handleOpen2={handleOpen2} />
-          {
-            /* <Search
-            open={isOpen2}
-            handleOpen={handleOpen2}
-            placeholder="Token Name, Tx Hash, or Address"
-            searchEndpoint="/api/v2/src20/search?q="
-            onResultClick={handleResultClick}
-            resultDisplay={(result) => result.id || ""}
-          /> */
-          }
+          <div
+            class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
+          >
+            <Sort initSort={sortBy} />
+          </div>
+          <div
+            class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
+          >
+            <SRC20SearchClient open2={isOpen2} handleOpen2={handleOpen2} />
+          </div>
         </div>
       </div>
     </div>

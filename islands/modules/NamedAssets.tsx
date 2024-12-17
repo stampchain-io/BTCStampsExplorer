@@ -16,16 +16,16 @@ export const NamedAssetsModule = () => {
             <br />
             While they require additional steps to acquire XCP to conform to the
             Counterparty Meta-Protocol rules,{" "}
-            <span class="font-bold">
+            <b>
               this allows artists to create a vanity name on-chain for their
               stamps and collections.
-            </span>
+            </b>
           </p>
           <p>
-            <span class="font-bold">
+            <b>
               With the Stampchain stamping tool we've made it smooth and
               frictionless to create Posh stamps.
-            </span>
+            </b>
             <br />
             We handle the XCP fee and you pay in BTC.<br />
             <br />
@@ -37,7 +37,7 @@ export const NamedAssetsModule = () => {
       <a
         href="/stamping/stamp"
         f-partial="/stamping/stamp"
-        class={`${ModulesStyles.buttonGreyFlat} float-right w-[96px]`}
+        class={`${ModulesStyles.buttonGreyFlat} float-right mt-3 mobileMd:mt-6`}
       >
         STAMP
       </a>

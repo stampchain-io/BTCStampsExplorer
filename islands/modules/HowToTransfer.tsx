@@ -46,7 +46,7 @@ export const HowToTransferModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
-      <ReadAllButton href="/howto/transfer" />
+      {/* <ReadAllButton href="/howto/transfer" /> */}
     </div>
   );
 };

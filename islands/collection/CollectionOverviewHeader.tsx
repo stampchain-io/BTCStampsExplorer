@@ -13,9 +13,8 @@ function CollectionOverviewHeader() {
       <p className={ModulesStyles.titlePurpleDL}>
         COLLECTIONS
       </p>
-      <div class="h-[40px]">
-        <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
-      </div>
+
+      <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
     </div>
   );
 }
