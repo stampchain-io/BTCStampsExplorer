@@ -92,7 +92,7 @@ export function HoldersGraph(
         </div>
 
         <div className="relative w-full max-w-full">
-          <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
+          <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6">
             <table className={tableValueClassName}>
               <thead className={tableLabelClassName}>
                 <tr>
