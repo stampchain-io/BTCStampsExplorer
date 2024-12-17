@@ -2211,6 +2211,20 @@ components:
           type: string
           description: "The image associated with the deploy token"
 
+    BtcInfo:
+      type: object
+      properties:
+        address:
+          type: string
+        balance:
+          type: number
+        txCount:
+          type: number
+        unconfirmedBalance:
+          type: number
+        unconfirmedTxCount:
+          type: number
+
     Src20Detail:
       type: object
       properties:

@@ -8,6 +8,7 @@ import {
   validateRequiredParams,
 } from "$server/services/routeValidationService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
+import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
   async GET(req: Request, ctx): Promise<Response> {
@@ -33,13 +34,14 @@ export const handler: Handlers<AddressHandlerContext> = {
       } = pagination;
 
       // Use full limit for both endpoints to ensure we get all available data
-      const [stampsRes, src20Res] = await Promise.all([
+      const [stampsRes, src20Res, btcInfo] = await Promise.all([
         fetch(
           `${url.origin}/api/v2/stamps/balance/${address}?limit=${limit}&page=${page}`,
         ),
         fetch(
           `${url.origin}/api/v2/src20/balance/${address}?limit=${limit}&page=${page}`,
         ),
+        getBTCBalanceInfo(address),
       ]);
 
       const [stamps, src20] = await Promise.all([
@@ -66,6 +68,10 @@ export const handler: Handlers<AddressHandlerContext> = {
         last_block: Math.max(stamps.last_block || 0, src20.last_block || 0),
         btc: {
           address: address,
+          balance: btcInfo?.balance ?? 0,
+          txCount: btcInfo?.txCount ?? 0,
+          unconfirmedBalance: btcInfo?.unconfirmedBalance ?? 0,
+          unconfirmedTxCount: btcInfo?.unconfirmedTxCount ?? 0,
         },
         data: {
           stamps: stamps.data || [],
