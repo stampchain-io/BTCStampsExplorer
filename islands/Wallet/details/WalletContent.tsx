@@ -13,6 +13,8 @@ import { Dispenser } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
+
 interface WalletContentProps {
   stamps: {
     data: StampRow[];
@@ -420,6 +422,9 @@ export default function WalletContent({
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
 
+  const { updateURL } = useURLUpdate();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   useEffect(() => {
     if (anchor) {
       const sectionMap = {
@@ -438,6 +443,31 @@ export default function WalletContent({
       }
     }
   }, [anchor, stamps, src20, dispensers]);
+
+  useEffect(() => {
+    const url = new URL(globalThis.location.href);
+    const params = new URLSearchParams(url.search);
+    const src20Page = params.get('src20_page');
+    const src20Limit = params.get('src20_limit');
+
+    if (src20Page && src20Limit && !isRefreshing) {
+      const page = parseInt(src20Page, 10);
+      const limit = parseInt(src20Limit, 10);
+
+      if (page !== src20.pagination.page || limit !== src20.pagination.limit) {
+        setIsRefreshing(true);
+        updateURL({
+          src20_page: page.toString(),
+          src20_limit: limit.toString(),
+          anchor: "src20"
+        });
+      }
+    }
+  }, [globalThis.location.search, src20.pagination, isRefreshing]);
+
+  useEffect(() => {
+    setIsRefreshing(false);
+  }, [src20.data]);
 
   const handleOpenSettingModal = () => {
     setOpenSettingModal(!openSettingModal);
@@ -481,6 +511,15 @@ export default function WalletContent({
       setOpenSettingModal(true);
     }
   }, []);
+
+  const handleSrc20PageChange = (page: number) => {
+    setIsRefreshing(true);
+    updateURL({
+      src20_page: page.toString(),
+      src20_limit: src20.pagination.limit.toString(),
+      anchor: "src20"
+    });
+  };
 
   const stampSection = {
     title: "", // Empty title means no header
@@ -561,6 +600,7 @@ export default function WalletContent({
               totalPages: src20.pagination.totalPages,
             }}
             address={address}
+            onPageChange={handleSrc20PageChange}
           />
         </div>
       </div>

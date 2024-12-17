@@ -4,6 +4,7 @@ import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCar
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 interface SRC20SectionProps {
   title?: string;
@@ -20,6 +21,7 @@ interface SRC20SectionProps {
     totalPages: number;
   };
   address?: string;
+  onPageChange?: (page: number) => void;
 }
 
 const ImageModal = (
@@ -54,18 +56,20 @@ export function SRC20Section(
     initialData,
     pagination,
     address,
+    onPageChange,
   }: SRC20SectionProps,
 ) {
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(pagination?.page || 1);
 
   useEffect(() => {
     if (!initialData) {
       const endpoint = fromPage === "wallet" && address
         ? `/api/v2/src20/balance/${address}?page=${
-          pagination?.page || 1
+          pagination?.page || currentPage
         }&limit=${pagination?.limit || 5}`
         : type === "trending"
         ? `/api/internal/src20/trending?limit=5&page=${page}&sortBy=${sortBy}`
@@ -82,7 +86,7 @@ export function SRC20Section(
           setIsLoading(false);
         });
     }
-  }, [type, page, sortBy, initialData, fromPage, address, pagination]);
+  }, [type, page, sortBy, initialData, fromPage, address, pagination, currentPage]);
 
   useEffect(() => {
     if (data.length > 0 && fromPage === "wallet") {
@@ -123,6 +127,11 @@ export function SRC20Section(
   const handleImageClick = (imgSrc: string) => {
     setModalImg(imgSrc);
     setModalOpen(!isModalOpen);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    onPageChange?.(newPage);
   };
 
   if (isLoading) {
@@ -171,6 +180,22 @@ export function SRC20Section(
               )
           ))}
         </div>
+
+        {pagination && pagination.totalPages > 1 && (
+          <div class="mt-6">
+            <Pagination
+              page={currentPage}
+              page_size={pagination.limit}
+              key="Token"
+              type="Token_id"
+              data_length={pagination.total}
+              pages={pagination.totalPages}
+              prefix="src20"
+              onChange={handlePageChange}
+            />
+          </div>
+        )}
+
         {fromPage === "home" && (
           <div className="flex justify-end -mt-3 mobileMd:-mt-6">
             <ViewAllButton href={`/src20?type=${type}`} />

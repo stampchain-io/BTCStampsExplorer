@@ -12,32 +12,29 @@ type FilterTypes =
   | COLLECTION_FILTER_TYPES
   | WALLET_FILTER_TYPES;
 
-interface URLUpdateParams {
-  sortBy?: "ASC" | "DESC";
-  filterBy?: FilterTypes[];
+interface URLParams {
+  [key: string]: string | undefined;
 }
 
 export function useURLUpdate() {
-  const updateURL = useCallback((params: URLUpdateParams) => {
+  const updateURL = useCallback((params: URLParams) => {
     if (typeof self === "undefined") return;
 
     const url = new URL(self.location.href);
 
-    if (params.sortBy) url.searchParams.set("sortBy", params.sortBy);
+    // Update URL parameters
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        url.searchParams.set(key, value);
+      } else {
+        url.searchParams.delete(key);
+      }
+    });
 
-    if (params.filterBy !== undefined) {
-      params.filterBy.length > 0
-        ? url.searchParams.set("filterBy", params.filterBy.join(","))
-        : url.searchParams.delete("filterBy");
-    }
-
-    url.searchParams.set("page", "1");
-
+    // Use Fresh's navigation instead of direct location update
     self.history.pushState({}, "", url.toString());
-    self.dispatchEvent(
-      new CustomEvent("urlChanged", { detail: url.toString() }),
-    );
-    self.location.href = url.toString();
+    // Trigger a partial update using PopStateEvent
+    self.dispatchEvent(new PopStateEvent("popstate"));
   }, []);
 
   return { updateURL };

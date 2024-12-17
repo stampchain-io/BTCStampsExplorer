@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
+import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
 
 const MOBILE_MAX_PAGE_RANGE = 2;
 const DESKTOP_MAX_PAGE_RANGE = 4;
@@ -52,11 +53,30 @@ export const Pagination = (
   const { getSort, getFilter, getType } = useNavigator();
   const [isClient, setIsClient] = useState(false);
   const _prefix = prefix ? `${prefix}_` : "";
+  const { updateURL } = useURLUpdate();
 
   useEffect(() => {
     setCurrentPage(page);
     setIsClient(true);
   }, [page]);
+
+  const handlePageChange = useCallback((pageNum: number) => {
+    setCurrentPage(pageNum);
+    const params: Record<string, string> = {
+      [`${_prefix}page`]: pageNum.toString(),
+      [`${_prefix}limit`]: page_size.toString(),
+      anchor: prefix || "",
+      type: getType(),
+      sortBy: getSort(),
+    };
+
+    const filterBy = getFilter().join(",");
+    if (filterBy) {
+      params.filterBy = filterBy;
+    }
+
+    updateURL(params);
+  }, [_prefix, page_size, prefix, getType, getSort, getFilter, updateURL]);
 
   const buildPageUrl = useCallback((pageNum: number) => {
     if (!isClient) {
@@ -64,48 +84,20 @@ export const Pagination = (
     }
 
     const url = new URL(globalThis.location.href);
-
-    const stampsPage = url.searchParams.get("stamps_page");
-    const stampsLimit = url.searchParams.get("stamps_limit");
-    const src20Page = url.searchParams.get("src20_page");
-    const src20Limit = url.searchParams.get("src20_limit");
-
-    if (stampsPage && stampsLimit) {
-      url.searchParams.set("stamps_page", stampsPage);
-      url.searchParams.set("stamps_limit", stampsLimit);
-    }
-    if (src20Page && src20Limit) {
-      url.searchParams.set("src20_page", src20Page);
-      url.searchParams.set("src20_limit", src20Limit);
-    }
-
-    url.searchParams.set("anchor", prefix ? prefix : "");
-
     url.searchParams.set(`${_prefix}page`, pageNum.toString());
     url.searchParams.set(`${_prefix}limit`, page_size.toString());
-
-    const currentType = url.searchParams.get("type") || getType();
-    const currentSort = url.searchParams.get("sortBy") || getSort();
-    const currentFilter = url.searchParams.get("filterBy") ||
-      getFilter().join(",");
-
-    url.searchParams.set("type", currentType);
-    url.searchParams.set("sortBy", currentSort);
-    if (currentFilter) {
-      url.searchParams.set("filterBy", currentFilter);
-    } else {
-      url.searchParams.delete("filterBy");
-    }
-
     return url.toString();
-  }, [isClient, type, page_size, getSort, getFilter, getType]);
+  }, [isClient, type, page_size, _prefix]);
 
   const renderPageLink = (pageNum: number, icon: string) => (
     <li key={icon}>
       <a
         href={buildPageUrl(pageNum)}
-        f-partial={buildPageUrl(pageNum)}
-        class={navArrow}
+        onClick={(e) => {
+          e.preventDefault();
+          handlePageChange(pageNum);
+        }}
+        class={navArrowClassName}
       >
         <img
           src={`/img/datacontrol/${icon}.svg`}
@@ -127,8 +119,11 @@ export const Pagination = (
         <li key={p}>
           <a
             href={pageUrl}
-            f-partial={pageUrl}
-            class={navContent + " " +
+            onClick={(e) => {
+              e.preventDefault();
+              handlePageChange(p);
+            }}
+            class={navContentClassName + " " +
               (currentPage === p
                 ? " bg-stamp-purple "
                 : " bg-stamp-purple-dark")}
@@ -139,7 +134,7 @@ export const Pagination = (
       );
     }
     return [items];
-  }, [currentPage, totalPages, maxPagesToShow, buildPageUrl]);
+  }, [currentPage, totalPages, maxPagesToShow, buildPageUrl, handlePageChange]);
 
   if (totalPages === 1) return null;
 
