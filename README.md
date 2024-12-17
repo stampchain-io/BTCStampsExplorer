@@ -14,7 +14,7 @@ with the [Bitcoin Stamps Indexer](https://github.com/stampchain-io/btc_stamps).
 ## Prerequisites
 
 1. **Install Deno**
-   > ⚠️ **Required Version**: 2.1.3
+   > ⚠️ **Required Version**: 2.1.4
    ```sh
    curl -fsSL https://deno.land/install.sh | sh
    ```
@@ -82,8 +82,8 @@ deno task validate:schema
 Docker deployment is also supported:
 
 ```sh
-docker build -t btc-stamps-explorer:2.1.3 .
-docker run -p 8000:8000 btc-stamps-explorer:2.1.3
+docker build -t btc-stamps-explorer:2.1.4 .
+docker run -p 8000:8000 btc-stamps-explorer:2.1.4
 ```
 
 The container uses:
