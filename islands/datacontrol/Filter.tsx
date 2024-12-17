@@ -6,7 +6,7 @@ import {
   STAMP_FILTER_TYPES,
   WALLET_FILTER_TYPES,
 } from "$globals";
-import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
+import { useURLUpdate } from "$lib/hooks/useURLUpdate.ts";
 import { Button } from "$components/shared/Button.tsx";
 
 type FilterTypes =

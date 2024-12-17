@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
+import { useURLUpdate } from "$lib/hooks/useURLUpdate.ts";
 import { Button } from "$components/shared/Button.tsx";
 
 interface SortProps {

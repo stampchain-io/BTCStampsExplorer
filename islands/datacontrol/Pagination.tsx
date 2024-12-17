@@ -1,6 +1,8 @@
+/** @jsx h */
+import { h } from "preact";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
-import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
+import { useURLUpdate } from "$lib/hooks/useURLUpdate.ts";
 
 const MOBILE_MAX_PAGE_RANGE = 2;
 const DESKTOP_MAX_PAGE_RANGE = 4;
@@ -38,10 +40,12 @@ interface PaginationProps {
   type: string;
   data_length: number;
   prefix?: string;
+  onChange?: (page: number) => void;
+  onPageChange?: (page: number) => void;
 }
 
 export const Pagination = (
-  { page, pages, page_size, type = "stamp", data_length, prefix }:
+  { page, pages, page_size, type = "stamp", data_length, prefix, onChange, onPageChange }:
     PaginationProps,
 ) => {
   const isMobile = useIsMobile();
@@ -76,7 +80,9 @@ export const Pagination = (
     }
 
     updateURL(params);
-  }, [_prefix, page_size, prefix, getType, getSort, getFilter, updateURL]);
+    onChange?.(pageNum);
+    onPageChange?.(pageNum);
+  }, [_prefix, page_size, prefix, getType, getSort, getFilter, updateURL, onChange, onPageChange]);
 
   const buildPageUrl = useCallback((pageNum: number) => {
     if (!isClient) {

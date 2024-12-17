@@ -1,3 +1,44 @@
+/// <reference no-default-lib="true" />
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+/// <reference lib="dom.asynciterable" />
+/// <reference lib="esnext" />
+/// <reference lib="es2015" />
+/// <reference lib="es2015.promise" />
+/// <reference lib="es2015.iterable" />
+/// <reference lib="es2015.symbol" />
+/// <reference types="npm:@types/node" />
+
+import type { ComponentType, JSX, VNode } from "preact";
+import type { Signal } from "@preact/signals";
+import type { Big } from "big";
+
+declare module "preact" {
+  namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+  }
+}
+
+declare interface Window {
+  __DEBUG?: {
+    namespaces: string;
+    enabled: boolean;
+  };
+}
+
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
+  mkdir(path: string, options?: { recursive?: boolean }): Promise<void>;
+  writeTextFile(path: string, data: string, options?: { append?: boolean }): Promise<void>;
+  errors: {
+    AlreadyExists: { new(): Error };
+  };
+};
+
 // General Types ---------------------------------------------------------------
 
 export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
@@ -59,8 +100,6 @@ export type LISTING_FILTER_TYPES =
   | "psbt"
   | "dispensers";
 
-import Big from "big";
-
 export interface BlockRow {
   block_index: number;
   block_hash: string;
@@ -75,30 +114,30 @@ export interface BlockRow {
   sends?: number;
 }
 export interface StampRow {
-  stamp: number | null;
-  block_index: number;
-  cpid: string;
-  creator: string;
-  divisible: boolean;
-  keyburn: number | null;
-  locked: number;
-  stamp_base64: string;
-  stamp_mimetype: string;
-  stamp_url: string;
-  supply: number;
-  block_time: Date;
   tx_hash: string;
-  ident: SUBPROTOCOLS;
-  creator_name: string | null;
-  stamp_hash: string;
-  file_hash: string;
-  floorPrice?: number | "priceless";
-  marketCap?: number | "priceless";
-  balance?: number | string;
-  floorPriceUSD?: number | null;
-  marketCapUSD?: number | null;
-  recentSalePrice?: number | "priceless";
-  unbound_quantity: number;
+  block_index: number;
+  block_time: string;
+  creator: string;
+  creator_name: string;
+  destination: string;
+  p: string;
+  op: string;
+  stamp_url?: string;
+  mime_type?: string;
+  file_type?: string;
+  file_size?: number;
+  content_length?: number;
+  content_type?: string;
+  sha256?: string;
+  stamp_mime?: string;
+  stamp_type?: string;
+  stamp_size?: number;
+  sale_data?: {
+    tx_hash: string;
+    block_index: number;
+    block_time: string;
+    price: number;
+  };
 }
 
 export interface DisplayCountBreakpoints {
@@ -110,20 +149,48 @@ export interface DisplayCountBreakpoints {
 }
 
 export interface StampSectionProps {
+  stamps: StampRow[];
+  pagination?: {
+    page: number;
+    pages: number;
+    page_size: number;
+    type: string;
+    data_length: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
   title?: string;
   subTitle?: string;
   type?: string;
-  stamps: StampRow[];
-  layout: "grid" | "row";
-  isRecentSales?: boolean;
-  filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
-  showDetails?: boolean;
+  layout?: "grid" | "list";
+  filterBy?: string[];
   gridClass?: string;
   displayCounts?: DisplayCountBreakpoints;
-  pagination?: Pagination;
+  viewAllLink?: string;
+  customHeader?: boolean;
+  customGridClass?: string;
+  showDetails?: boolean;
   showMinDetails?: boolean;
   variant?: "default" | "grey";
-  viewAllLink?: string;
+  alignRight?: boolean;
+}
+
+export interface StampWithSaleData extends Omit<StampRow, 'sale_data'> {
+  sale_data?: {
+    btc_amount: number;
+    block_index: number;
+    tx_hash: string;
+    block_time?: string;
+    price?: number;
+  };
+  stamp?: number;
+  cpid?: string;
+  balance?: number;
+  supply?: number;
+  divisible?: boolean;
+  floorPrice?: string | number;
+  recentSalePrice?: string | number;
+  ident?: string;
 }
 
 export interface CollectionSectionProps {
@@ -145,29 +212,29 @@ export interface CollectionOverviewSectionProps {
 export interface SRC20Row {
   tx_hash: string;
   block_index: number;
+  block_time: string;
+  creator: string;
+  creator_name: string;
+  destination: string;
   p: string;
   op: string;
   tick: string;
-  tick_hash: string;
-  creator: string;
-  creator_name: string | null;
-  amt?: string | bigint;
-  deci?: number;
-  max?: string | bigint;
-  lim?: string | bigint;
-  destination: string;
-  destination_name?: string;
-  block_time: Date;
-  status: string;
-  row_num: number;
-  progress?: string | null;
-  email?: string;
-  web?: string;
-  tg?: string;
+  amt: number;
+  max: number;
+  lim: number;
+  dec: number;
+  stamp_url?: string;
+  deploy_img?: string;
+  deploy_tx?: string;
   x?: string;
-  holders: number;
-  floor_unit_price?: number;
-  mcap?: number;
+  web?: string;
+  email?: string;
+  tg?: string;
+  description?: string;
+  total_minted?: number;
+  total_mints?: number;
+  total_holders?: number;
+  total_transfers?: number;
 }
 
 interface SendRow {
@@ -584,7 +651,7 @@ export interface StampsResponseBody {
   last_block: number;
 }
 export interface PaginatedIdResponseBody extends Pagination {
-  ident: string | null;
+  ident: SUBPROTOCOLS;
   last_block: number;
   data: StampRow[];
 }
@@ -765,13 +832,31 @@ export {};
 
 export interface PaginationProps {
   page: number;
-  pageSize: number;
-  total: number;
-  onPageChange: (page: number) => void;
+  pages: number;
+  page_size: number;
+  type: string;
+  data_length: number;
+  prefix?: string;
+  onChange?: (page: number) => void;
+  onPageChange?: (page: number) => void;
 }
 
-export interface WalletStampSectionProps extends StampSectionProps {
-  pagination?: Pagination;
+export interface WalletStampSectionProps {
+  stamps: StampRow[];
+  pagination?: {
+    page: number;
+    pages: number;
+    page_size: number;
+    type: string;
+    data_length: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
   customHeader?: boolean;
   customGridClass?: string;
+  showDetails?: boolean;
+  showMinDetails?: boolean;
+  variant?: "default" | "grey";
+  alignRight?: boolean;
+  layout?: "grid" | "list";
 }

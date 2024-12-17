@@ -1,12 +1,14 @@
 // islands/stamp/details/WalletTransferModal.tsx
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "https://esm.sh/preact@10.22.0/hooks";
+import { JSX } from "https://esm.sh/preact@10.22.0/jsx-runtime";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { SelectField } from "$islands/stamping/SelectField.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-import type { StampRow } from "$globals";
+import type { StampRow, WALLET_FILTER_TYPES } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
+import { NOT_AVAILABLE_IMAGE } from "$constants";
 
 interface Props {
   fee: number;
@@ -33,7 +35,7 @@ function WalletTransferModal({
 }: Props) {
   const { wallet } = walletContext;
   const [maxQuantity, setMaxQuantity] = useState(1);
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const [imgSrc, setImgSrc] = useState("");
   const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
 
@@ -69,13 +71,12 @@ function WalletTransferModal({
 
       const requestBody = {
         address: wallet.address,
-        destination: formState.recipientAddress,
-        asset: selectedStamp.stamp,
+        stampId: selectedStamp.stamp,
         quantity,
         options,
       };
 
-      const response = await fetch("/api/v2/create/send", {
+      const response = await fetch("/api/v2/create/transfer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -84,13 +85,13 @@ function WalletTransferModal({
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || "Failed to create send transaction.",
+          errorData.error || "Failed to create transfer transaction.",
         );
       }
 
       const responseData = await response.json();
       if (!responseData?.result?.psbt) {
-        throw new Error("Failed to create send transaction.");
+        throw new Error("Failed to create transfer transaction.");
       }
 
       const signResult = await walletContext.signPSBT(
@@ -114,23 +115,17 @@ function WalletTransferModal({
   };
 
   const handleQuantityChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: JSX.TargetedEvent<HTMLInputElement>,
   ): void => {
-    const value = parseInt(e.target.value, 10);
-    let tmpValue = value;
+    const value = parseInt((e.target as HTMLInputElement).value, 10);
     if (!isNaN(value)) {
       if (value >= 1 && value <= maxQuantity) {
-        tmpValue = value;
+        setQuantity(value);
       } else if (value < 1) {
-        tmpValue = 1;
+        setQuantity(1);
       } else if (value > maxQuantity) {
-        tmpValue = maxQuantity;
+        setQuantity(maxQuantity);
       }
-      setQuantity(tmpValue);
-      setFormState({
-        ...formState,
-        amount: tmpValue.toString(),
-      });
     }
   };
   const getMaxQuantity = () => {

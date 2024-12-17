@@ -121,7 +121,9 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "exactOptionalPropertyTypes": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
   },
   "fmt": {
     "include": ["**/*.ts", "**/*.tsx"],

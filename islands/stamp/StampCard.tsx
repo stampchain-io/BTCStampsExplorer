@@ -1,3 +1,5 @@
+import type { ComponentChild } from "preact";
+import { useEffect, useState } from "preact/hooks";
 import {
   abbreviateAddress,
   formatSupplyValue,
@@ -8,13 +10,10 @@ import {
   handleImageError,
   validateStampContent,
 } from "$lib/utils/imageUtils.ts";
-
-import { StampRow } from "$globals";
-import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
-import { BREAKPOINTS } from "$client/utils/constants.ts";
-import { useEffect, useState } from "preact/hooks";
+import type { StampRow, StampWithSaleData } from "$types/utils.d.ts";
+import TextContentIsland from "./details/StampTextContent.tsx";
+import { BREAKPOINTS, NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 
 // Text style constants for different breakpoints
 
@@ -93,14 +92,8 @@ const ABBREVIATION_LENGTHS = {
   mobileSm: 6,
 } as const;
 
-interface StampWithSaleData extends Omit<StampRow, "stamp_base64"> {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-  };
-  stamp_base64?: string;
-}
+
+
 
 export function StampCard({
   stamp,
@@ -130,13 +123,13 @@ export function StampCard({
   const src = getStampImageSrc(stamp as StampRow);
 
   // Add state for validated content
-  const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
+  const [validatedContent, setValidatedContent] = useState<ComponentChild | null>(
     null,
   );
 
   useEffect(() => {
     const validateContent = async () => {
-      if (stamp.stamp_mimetype === "image/svg+xml") {
+      if (stamp.stamp_mime === "image/svg+xml") {
         const { isValid } = await validateStampContent(src);
         if (isValid) {
           setValidatedContent(
@@ -155,10 +148,10 @@ export function StampCard({
     };
 
     validateContent();
-  }, [src, stamp.stamp_mimetype]);
+  }, [src, stamp.stamp_mime]);
 
   const renderContent = () => {
-    if (stamp.stamp_mimetype?.startsWith("audio/")) {
+    if (stamp.stamp_mime?.startsWith("audio/")) {
       return (
         <div class="stamp-audio-container relative w-full h-full flex items-center justify-center">
           <div class="absolute inset-0 flex items-center justify-center">
@@ -166,19 +159,19 @@ export function StampCard({
               controls
               class="stamp-audio-player"
             >
-              <source src={src} type={stamp.stamp_mimetype} />
+              <source src={src} type={stamp.stamp_mime} />
             </audio>
           </div>
         </div>
       );
     }
 
-    if (stamp.stamp_mimetype === "text/plain") {
+    if (stamp.stamp_mime === "text/plain") {
       return <TextContentIsland src={src} />;
     }
 
     // Handle HTML content
-    if (stamp.stamp_mimetype === "text/html") {
+    if (stamp.stamp_mime === "text/html") {
       return (
         <div class="relative w-full h-full">
           <div class="relative pt-[100%]">
@@ -208,7 +201,7 @@ export function StampCard({
     }
 
     // Handle JavaScript content
-    if (stamp.stamp_mimetype === "application/javascript") {
+    if (stamp.stamp_mime === "application/javascript") {
       // Create a container for the script's output
       return (
         <div class="relative w-full h-full">
@@ -236,7 +229,7 @@ export function StampCard({
       );
     }
 
-    if (stamp.stamp_mimetype === "image/svg+xml") {
+    if (stamp.stamp_mime === "image/svg+xml") {
       return validatedContent || (
         <img
           src={NOT_AVAILABLE_IMAGE}
@@ -280,7 +273,7 @@ export function StampCard({
       };
     } else {
       return {
-        text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
+        text: stamp.stamp_mime?.split("/")[1].toUpperCase() || "UNKNOWN",
         style: TEXT_STYLES.mimeType,
       };
     }
@@ -290,12 +283,12 @@ export function StampCard({
     (stamp.cpid && stamp.cpid.charAt(0) === "A");
 
   const supplyDisplay = stamp.ident !== "SRC-20" && stamp.balance
-    ? `${formatSupplyValue(Number(stamp.balance), stamp.divisible)}/${
-      stamp.supply < 100000 && !stamp.divisible
-        ? formatSupplyValue(stamp.supply ?? 0, stamp.divisible)
+    ? `${formatSupplyValue(Number(stamp.balance), stamp.divisible ?? false)}/${
+      stamp.supply && stamp.supply < 100000 && !stamp.divisible
+        ? formatSupplyValue(stamp.supply, stamp.divisible ?? false)
         : "+100000"
     }`
-    : `1/${formatSupplyValue(stamp.supply ?? 0, stamp.divisible)}`;
+    : `1/${formatSupplyValue(stamp.supply ?? 0, stamp.divisible ?? false)}`;
 
   // Use dynamic abbreviation length
   const creatorDisplay = stamp.creator_name

@@ -1,11 +1,44 @@
+/** @jsx h */
+/** @jsxFrag Fragment */
+import { h, Fragment } from "preact";
 import { useEffect, useState } from "preact/hooks";
-import { StampRow, StampSectionProps } from "$globals";
+import type { StampRow, StampWithSaleData } from "$types/utils.d.ts";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { BREAKPOINTS } from "$client/utils/constants.ts";
+import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
+
+interface StampSectionProps {
+  title?: string;
+  subTitle?: string;
+  type?: string;
+  stamps: StampRow[];
+  layout?: "grid" | "list";
+  isRecentSales?: boolean;
+  filterBy?: string | string[];
+  showDetails?: boolean;
+  gridClass?: string;
+  displayCounts?: {
+    desktop?: number;
+    tablet?: number;
+    mobileLg?: number;
+    mobileMd?: number;
+    mobileSm?: number;
+  };
+  pagination?: {
+    page: number;
+    page_size: number;
+    data_length: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
+  showMinDetails?: boolean;
+  variant?: "default" | "grey";
+  viewAllLink?: string;
+  alignRight?: boolean;
+}
 
 export default function StampSection({
   title,
@@ -84,6 +117,14 @@ export default function StampSection({
     }
   }, [pagination?.page]);
 
+  const stampWithSaleData = (stamp: StampRow): StampWithSaleData => ({
+    ...stamp,
+    sale_data: stamp.sale_data ? {
+      ...stamp.sale_data,
+      btc_amount: stamp.sale_data.price || 0,
+    } : undefined
+  });
+
   return (
     <div class="w-full">
       {title && (
@@ -133,7 +174,7 @@ export default function StampSection({
                 : stamp.tx_hash}
             >
               <StampCard
-                stamp={stamp}
+                stamp={stampWithSaleData(stamp)}
                 isRecentSale={isRecentSales}
                 showDetails={showDetails}
                 showMinDetails={showMinDetails}
@@ -149,11 +190,12 @@ export default function StampSection({
           <div class="mt-9 mobileLg:mt-[72px]">
             <Pagination
               page={pagination.page}
-              page_size={pagination.pageSize}
+              page_size={pagination.page_size}
               type="stamp_card_id"
-              data_length={pagination.total}
-              pages={Math.ceil(pagination.total / pagination.pageSize)}
+              data_length={pagination.data_length}
+              pages={Math.ceil(pagination.data_length / pagination.page_size)}
               prefix={pagination.prefix}
+              onPageChange={pagination.onPageChange}
             />
           </div>
         )

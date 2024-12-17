@@ -1,5 +1,7 @@
-import { StampRow } from "$globals";
-import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+/** @jsx h */
+import { h } from "preact";
+import type { StampRow } from "$globals";
+import { NOT_AVAILABLE_IMAGE } from "$constants";
 export const mimeTypes: { [key: string]: string } = {
   "jpg": "image/jpeg",
   "jpeg": "image/jpeg",

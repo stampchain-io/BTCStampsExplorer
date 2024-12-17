@@ -40,7 +40,7 @@ export interface UTXO {
   index?: number;
 }
 
-type Output = {
+export type Output = {
   address: string;
   value: number;
 } | {
@@ -66,4 +66,118 @@ export interface BalanceOptions {
 export interface BTCBalanceInfoOptions {
   includeUSD?: boolean;
   apiBaseUrl?: string;
+}
+
+export interface BlockCypherAddressBalanceResponse {
+  address: string;
+  total_received: number;
+  total_sent: number;
+  balance: number;
+  unconfirmed_balance: number;
+  final_balance: number;
+  n_tx: number;
+  unconfirmed_n_tx: number;
+  final_n_tx: number;
+}
+
+export interface WindowSize {
+  width: number;
+  height: number;
+}
+
+export interface StampRow {
+  stamp: number;
+  stamp_mime?: string;
+  stamp_size?: number;
+  tx_hash: string;
+  block_index: number;
+  block_time: string;
+  creator: string;
+  creator_name: string;
+  destination: string;
+  p: string;
+  op: string;
+  supply: number;
+  supply_left: number;
+  stamp_type: string;
+  stamp_url: string;
+  stamp_preview_url?: string;
+  divisible?: boolean;
+  cpid?: string;
+  balance?: number;
+  sale_data?: {
+    tx_hash: string;
+    block_index: number;
+    block_time: string;
+    price: number;
+    btc_amount: number;
+  };
+}
+
+export interface StampWithSaleData extends StampRow {
+  floorPrice?: string | number;
+  recentSalePrice?: string | number;
+  ident?: string;
+}
+
+export interface SRC20Row {
+  tx_hash: string;
+  block_index: number;
+  block_time: string;
+  creator: string;
+  creator_name: string;
+  destination: string;
+  p: string;
+  op: string;
+  supply: number;
+  supply_left: number;
+  holders: number;
+  floor_unit_price?: number;
+  progress?: string;
+}
+
+export interface DispenserRow {
+  tx_hash: string;
+  block_index: number;
+  block_time: string;
+  creator: string;
+  destination: string;
+  p: string;
+  op: string;
+  supply: number;
+  supply_left: number;
+  status: string;
+  price: number;
+  stamp?: {
+    stamp: number;
+    stamp_mime?: string;
+    stamp_size?: number;
+  };
+  give_remaining: number;
+  give_quantity: number;
+  escrow_quantity: number;
+  btcrate: number;
+  origin: string;
+}
+
+export interface StampSectionProps {
+  title: string;
+  type: "all" | "recent" | "featured";
+  stamps: StampRow[];
+  layout: "grid" | "list";
+  showDetails: boolean;
+  gridClass?: string;
+  displayCounts?: {
+    mobileSm: number;
+    mobileLg: number;
+    tablet: number;
+    desktop: number;
+  };
+  pagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
 }

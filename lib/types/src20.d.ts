@@ -79,3 +79,31 @@ export interface MintStatus {
   total_minted: number;
   total_mints: number;
 }
+
+export interface SRC20Row {
+  tick: string;
+  holders: number;
+  floor_unit_price?: number;
+  block_index: number;
+  block_time: string;
+  creator: string;
+  creator_name?: string;
+  destination: string;
+  p: string;
+  op: string;
+  tx_hash: string;
+  amt: number;
+  max: number;
+  lim: number;
+  deci: number;
+  total_minted?: number;
+  total_mints?: number;
+  progress?: number;
+  deploy_img?: string;
+  deploy_tx?: string;
+  x?: string;
+  web?: string;
+  email?: string;
+  tg?: string;
+  description?: string;
+}

@@ -25,6 +25,14 @@ export const CAROUSEL_STAMP_IDS = [
 
 export const NOT_AVAILABLE_IMAGE = "/not-available.webp";
 
+export const BREAKPOINTS = {
+  mobileSm: 360,
+  mobileMd: 568,
+  mobileLg: 768,
+  tablet: 1024,
+  desktop: 1440,
+};
+
 export const BLOCKCYPHER_API_BASE_URL = "https://api.blockcypher.com";
 export const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
 export const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
