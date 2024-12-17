@@ -71,17 +71,17 @@ export function FeeCalculatorBase({
     setIsTooltipVisible(true);
 
     if (tooltipTimeoutRef.current) {
-      window.clearTimeout(tooltipTimeoutRef.current);
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
     }
 
-    tooltipTimeoutRef.current = window.setTimeout(() => {
+    tooltipTimeoutRef.current = globalThis.setTimeout(() => {
       setIsTooltipVisible(false);
     }, 1500);
   };
 
   const handleMouseLeave = () => {
     if (tooltipTimeoutRef.current) {
-      window.clearTimeout(tooltipTimeoutRef.current);
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
     }
     setIsTooltipVisible(false);
   };
