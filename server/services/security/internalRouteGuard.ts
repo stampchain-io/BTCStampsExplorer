@@ -1,18 +1,51 @@
 import { SecurityService } from "./securityService.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { serverConfig } from "$server/config/config.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 export class InternalRouteGuard {
   // For routes that require CSRF
   static async requireCSRF(req: Request) {
-    const csrfToken = req.headers.get("X-CSRF-Token");
+    const csrfToken = req.headers.get("X-CSRF-Token") || req.headers.get("x-csrf-token");
+    
+    logger.debug("stamps", {
+      message: "CSRF check started",
+      hasToken: !!csrfToken,
+      tokenPreview: csrfToken ? csrfToken.slice(0, 10) + "..." : "none",
+      headers: Object.fromEntries(req.headers.entries()),
+    });
+
     if (!csrfToken) {
+      logger.error("stamps", {
+        message: "Missing CSRF token",
+        headers: Object.fromEntries(req.headers.entries()),
+      });
       return ResponseUtil.badRequest("Missing CSRF token");
     }
 
-    const isValid = await SecurityService.validateCSRFToken(csrfToken);
-    if (!isValid) {
-      return ResponseUtil.badRequest("Invalid CSRF token");
+    try {
+      const isValid = await SecurityService.validateCSRFToken(csrfToken);
+      
+      logger.debug("stamps", {
+        message: "CSRF validation completed",
+        isValid,
+        tokenPreview: csrfToken.slice(0, 10) + "...",
+      });
+
+      if (!isValid) {
+        logger.error("stamps", {
+          message: "Invalid CSRF token",
+          tokenPreview: csrfToken.slice(0, 10) + "...",
+        });
+        return ResponseUtil.badRequest("Invalid CSRF token");
+      }
+    } catch (error) {
+      logger.error("stamps", {
+        message: "CSRF validation error",
+        error: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return ResponseUtil.badRequest("CSRF validation failed");
     }
 
     return null; // No error

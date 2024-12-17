@@ -9,12 +9,21 @@ export class FileOperations {
     base64Data: string,
   ): Promise<boolean> {
     try {
+      console.log("Starting database save operation:", {
+        tick,
+        tickHashLength: tickHash.length,
+        dataLength: base64Data.length,
+      });
+
       const query = `
         INSERT INTO ${SRC20_BACKGROUND_TABLE} (tick, tick_hash, base64)
         VALUES (?, ?, ?)
-        tick_hash = VALUES(tick_hash),
-        base64 = VALUES(base64)
+        ON DUPLICATE KEY UPDATE
+          tick_hash = VALUES(tick_hash),
+          base64 = VALUES(base64)
       `;
+
+      console.log("Executing query:", query.replace(/\s+/g, ' ').trim());
 
       const result = await dbManager.executeQuery(query, [
         tick,
@@ -22,9 +31,24 @@ export class FileOperations {
         base64Data,
       ]);
 
+      console.log("Database operation completed:", {
+        affectedRows: (result as any).affectedRows,
+        success: (result as any).affectedRows > 0,
+        tick,
+        tickHashLength: tickHash.length,
+        dataLength: base64Data.length,
+      });
+
       return (result as any).affectedRows > 0;
     } catch (error) {
-      console.error("Error saving file to database:", error);
+      console.error("Error saving file to database:", {
+        error: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        tick,
+        tickHashLength: tickHash.length,
+        dataLength: base64Data.length,
+        query: query.replace(/\s+/g, ' ').trim(),
+      });
       return false;
     }
   }

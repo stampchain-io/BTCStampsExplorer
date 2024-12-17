@@ -9,6 +9,11 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "../SRC20InputField.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
+import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
+
+interface UploadResponse extends APIResponse {
+  url?: string;
+}
 
 export function DeployContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
@@ -75,29 +80,66 @@ export function DeployContent(
       try {
         const csrfToken = await getCSRFToken();
 
-        const response = await axiod.post("/api/internal/src20Background", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-Token": csrfToken,
-          },
-          body: JSON.stringify({
+        logger.debug("stamps", {
+          message: "Preparing background image upload",
+          tick: formState.token,
+          fileSize: file.size,
+          mimeType: file.type,
+          csrfTokenPresent: !!csrfToken,
+          csrfTokenPreview: csrfToken ? csrfToken.slice(0, 10) + "..." : "none",
+        });
+
+        const response = await axiod.post<UploadResponse>(
+          "/api/internal/src20Background",
+          {
             fileData: base64String,
             tick: formState.token,
-            csrfToken,
-          }),
-        });
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": csrfToken,
+            },
+          },
+        );
 
         if (!response.data.success) {
           throw new Error(response.data.message || "Upload failed");
         }
-        console.log("File uploaded successfully");
+
+        logger.debug("stamps", {
+          message: "Background image uploaded successfully",
+          tick: formState.token,
+          url: response.data.url,
+        });
       } catch (error) {
-        console.error("Error uploading file:", error);
+        // Improved error logging
+        const errorMessage = error instanceof Error
+          ? error.message
+          : (error as { response?: { data?: { message?: string } } })?.response
+            ?.data?.message ||
+            "Unknown error";
+
+        logger.error("stamps", {
+          message: "Background image upload failed",
+          error: errorMessage,
+          tick: formState.token,
+          details: error instanceof Error ? error.stack : undefined,
+        });
+
         setFileUploadError(
-          "File upload failed. The deployment will continue without the background image.",
+          `File upload failed: ${errorMessage}. The deployment will continue without the background image.`,
         );
       }
+    };
+
+    reader.onerror = (error) => {
+      logger.error("stamps", {
+        message: "Failed to read image file",
+        error: error,
+        tick: formState.token,
+      });
+      setFileUploadError("Failed to read the image file");
     };
 
     reader.readAsDataURL(file);
@@ -166,17 +208,17 @@ export function DeployContent(
     setIsUploadTooltipVisible(true);
 
     if (uploadTooltipTimeoutRef.current) {
-      window.clearTimeout(uploadTooltipTimeoutRef.current);
+      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
     }
 
-    uploadTooltipTimeoutRef.current = window.setTimeout(() => {
+    uploadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
       setIsUploadTooltipVisible(false);
     }, 1500);
   };
 
   const handleUploadMouseLeave = () => {
     if (uploadTooltipTimeoutRef.current) {
-      window.clearTimeout(uploadTooltipTimeoutRef.current);
+      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
     }
     setIsUploadTooltipVisible(false);
   };
@@ -186,10 +228,10 @@ export function DeployContent(
       setIsToggleTooltipVisible(true);
 
       if (toggleTooltipTimeoutRef.current) {
-        window.clearTimeout(toggleTooltipTimeoutRef.current);
+        globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
       }
 
-      toggleTooltipTimeoutRef.current = window.setTimeout(() => {
+      toggleTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsToggleTooltipVisible(false);
       }, 1500);
     }
@@ -197,7 +239,7 @@ export function DeployContent(
 
   const handleToggleMouseLeave = () => {
     if (toggleTooltipTimeoutRef.current) {
-      window.clearTimeout(toggleTooltipTimeoutRef.current);
+      globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
     }
     setIsToggleTooltipVisible(false);
     setAllowTooltip(true);
@@ -206,10 +248,10 @@ export function DeployContent(
   useEffect(() => {
     return () => {
       if (uploadTooltipTimeoutRef.current) {
-        window.clearTimeout(uploadTooltipTimeoutRef.current);
+        globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
       }
       if (toggleTooltipTimeoutRef.current) {
-        window.clearTimeout(toggleTooltipTimeoutRef.current);
+        globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
       }
     };
   }, []);

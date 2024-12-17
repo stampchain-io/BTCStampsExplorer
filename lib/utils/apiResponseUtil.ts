@@ -25,6 +25,15 @@ export interface ApiErrorResponse {
   details?: unknown;
 }
 
+export interface APIResponse {
+  success: boolean;
+  message?: string;
+  status?: string;
+  error?: string;
+  code?: string;
+  details?: unknown;
+}
+
 export class ApiResponseUtil {
   private static createHeaders(options: ApiResponseOptions = {}): Headers {
     const headers: Record<string, string> = {
