@@ -92,7 +92,11 @@ export function HoldersGraph(
         </div>
 
         <div className="relative w-full max-w-full">
+<<<<<<< HEAD
           <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6">
+=======
+          <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
+>>>>>>> 00e558a (chore: update button style on mint & fix stamping/stamp page loading & update table for responsive)
             <table className={tableValueClassName}>
               <thead className={tableLabelClassName}>
                 <tr>
