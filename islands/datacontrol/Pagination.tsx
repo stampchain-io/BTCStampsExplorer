@@ -4,15 +4,15 @@ import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 const MOBILE_MAX_PAGE_RANGE = 2;
 const DESKTOP_MAX_PAGE_RANGE = 4;
 
-const navArrowClassName = `
+const navArrow = `
   flex items-center justify-center
   bg-stamp-purple-dark hover:bg-stamp-primary-hover rounded-md
   w-7 h-7 mobileLg:h-9 mobileLg:w-9`;
-const navContentClassName = `
+const navContent = `
   flex items-center justify-center
   w-7 h-7 mobileLg:h-9 mobileLg:w-9 rounded-md hover:bg-stamp-primary-hover
   text-sm leading-[16.5px] mobileLg:text-base mobileLg:leading-[19px]
-  font-medium font-work-sans text-stamp-bg-grey-darkest`;
+  font-medium text-black`;
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -105,12 +105,12 @@ export const Pagination = (
       <a
         href={buildPageUrl(pageNum)}
         f-partial={buildPageUrl(pageNum)}
-        class={navArrowClassName}
+        class={navArrow}
       >
         <img
           src={`/img/datacontrol/${icon}.svg`}
           alt={`arrow ${icon.toLowerCase()}`}
-          class="w-[13px] h-[13px]"
+          class="w-[14px] h-[14px] mobileLg:w-[18px] mobileLg:h-[18px]"
         />
       </a>
     </li>
@@ -128,7 +128,7 @@ export const Pagination = (
           <a
             href={pageUrl}
             f-partial={pageUrl}
-            class={navContentClassName + " " +
+            class={navContent + " " +
               (currentPage === p
                 ? " bg-stamp-purple "
                 : " bg-stamp-purple-dark")}
@@ -150,7 +150,7 @@ export const Pagination = (
       aria-label="Page navigation"
       class="flex items-center justify-center"
     >
-      <ul class="inline-flex items-center -space-x-px text-sm gap-2">
+      <ul class="inline-flex items-center -space-x-px gap-[9px] mobileLg:gap-3">
         {currentPage !== 1 && (
           <>
             {renderPageLink(1, "CaretDoubleLeft")}

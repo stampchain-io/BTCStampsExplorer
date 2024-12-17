@@ -523,7 +523,7 @@ export default function WalletContent({
           sort={true}
           search={true}
           filter={false}
-          setting={true}
+          setting={false}
           isOpenFilter={false}
           isOpenSetting={openSetting}
           handleOpenFilter={() => {}}
@@ -586,8 +586,8 @@ export default function WalletContent({
           isOpen={openD}
           handleOpen={handleOpen}
           sort={true}
-          filter={true}
-          search={true}
+          filter={false}
+          search={false}
           setting={false}
           isOpenFilter={openFilter}
           isOpenSetting={false}

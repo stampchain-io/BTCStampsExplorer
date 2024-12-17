@@ -114,8 +114,6 @@ export function Header() {
   const toggleWalletModal = () => setIsWalletModalOpen(!isWalletModalOpen);
 
   const toggleMenu = () => {
-    const isMobileScreen = globalThis.matchMedia("(max-width: 767px)").matches;
-    if (!isMobileScreen) return;
     setOpen(!open);
 
     // Toggle body scroll lock
@@ -170,8 +168,8 @@ export function Header() {
               <div
                 className={`${
                   isMobile
-                    ? "hidden group-hover:flex flex-col z-[100] w-full"
-                    : "hidden group-hover:flex flex-col absolute top-0 left-0 z-[100] pt-[30px] pb-[15px] w-full"
+                    ? "hidden group-hover:flex flex-col z-90 w-full gap-1.5"
+                    : "hidden group-hover:flex flex-col absolute top-0 left-0 z-90 pt-[32px] pb-[15px] space-y-[3px] w-full"
                 }`}
               >
                 {link.subLinks?.map((subLink) => (
@@ -183,7 +181,7 @@ export function Header() {
                       toggleMenu();
                       setCurrentPath(subLink?.href ? subLink?.href : null);
                     }}
-                    className={`hover:text-stamp-purple-highlight text-lg tablet:text-base mobileLg:text-base ${
+                    className={`hover:text-stamp-purple-highlight text-base mobileLg:text-lg tablet:text-base ${
                       currentPath === subLink.href
                         ? "text-stamp-purple-highlight"
                         : ""
@@ -213,14 +211,14 @@ export function Header() {
         </a>
         <button
           onClick={toggleMenu}
-          className="tablet:hidden block z-[100]"
+          className="tablet:hidden block relative z-40"
           id="navbar-toggle"
         >
           {open && (
             <img
               src="/img/header/menu-close.svg"
               alt="menu"
-              className="w-5 h-5"
+              className="w-5 h-5 mr-1.5"
             />
           )}
           {!open && (
@@ -241,7 +239,7 @@ export function Header() {
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex tablet:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-50 bg-[#080808CC] scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] backdrop-blur-md font-black text-stamp-primary ${
+        className={`duration-500 flex tablet:hidden flex-col justify-between fixed left-0 top-0 w-full h-screen z-30 backdrop-blur-md bg-gradient-to-b from-[#171717]/40 to-[#171717]/80 scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] font-black text-stamp-primary ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"

@@ -307,8 +307,6 @@ function WalletOverview(
               <div class="relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
                   class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
                   viewBox="0 0 32 32"
                   role="button"
@@ -329,8 +327,6 @@ function WalletOverview(
               <div class="relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
                   class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
                   viewBox="0 0 32 32"
                   role="button"
@@ -358,7 +354,7 @@ function WalletOverview(
             {abbreviateAddress(walletData.address, 8)}
           </p>
         </div>
-        <div class="flex gap-[9px] mobileLg:gap-3 pt-1">
+        <div class="flex gap-3">
           <div
             ref={copyButtonRef}
             class="relative"
@@ -367,9 +363,7 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              class="w-[18px] h-[18px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+              class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
               role="button"
               aria-label="Copy"
@@ -393,9 +387,7 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              class="w-[18px] h-[18px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+              class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
               role="button"
               aria-label="Send"
@@ -422,9 +414,7 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              class="w-[18px] h-[18px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+              class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
               role="button"
               aria-label="Receive"
@@ -456,9 +446,7 @@ function WalletOverview(
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                class="w-[18px] h-[18px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+                class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
                 viewBox="0 0 32 32"
                 role="button"
                 aria-label="History"
@@ -547,7 +535,7 @@ function DispenserStats(
           value={dispensers.open.toString()}
           align="left"
         />
-        <div class="hidden mobileMd:block">
+        <div class="hidden">
           <StatItem label="ATOMIC" value="N/A" align="center" />
         </div>
         <StatItem
@@ -576,7 +564,7 @@ function TokenStats(
         label="VALUE"
         value={
           <>
-            <span class="font-light">
+            <span class="font-black">
               N/A
             </span>&nbsp;<span class="font-extralight">BTC</span>
           </>

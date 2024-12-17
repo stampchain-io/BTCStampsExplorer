@@ -125,6 +125,9 @@ body {
 .scrollbar-grey {
   @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
 }
+.scrollbar-purple {
+  @apply [&::-webkit-scrollbar-track]:!bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
+}
 
 .pixelart {
   image-rendering: pixelated;
@@ -181,7 +184,7 @@ body {
       rgba(0, 120, 80, 0.2) 10%,
       transparent 80%),
     radial-gradient(ellipse 100% 60% at 120% 70%,
-      var(--gradient-cyan),
+      var(--gradient-purple),
       transparent 90%),
     linear-gradient(rgba(80, 0, 120, 0.4),
       rgba(0, 0, 0, 0.8) 70%,

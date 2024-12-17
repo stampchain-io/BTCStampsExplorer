@@ -135,11 +135,11 @@ export default function HowTo() {
               <br />
               <br />
               <b>
-                In this guide, you'll learn how to transfer SRC-20 tokens and
-                stamp art!
+                We are finnishing off the last details of this guide and will
+                hopefully have it ready for you soon!
               </b>
             </p>
-            <div className="flex justify-start">
+            <div className="flex justify-start hidden">
               <a
                 href="/howto/transfer"
                 f-partial="/howto/transfer"
