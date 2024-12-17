@@ -2,6 +2,22 @@ import { useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 
+function splitTextAndEmojis(text: string): { text: string; emoji: string } {
+  // Regex to match emojis
+  const emojiRegex =
+    /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]/gu;
+
+  // Find the first emoji's position
+  const match = text.match(emojiRegex);
+  if (!match) return { text, emoji: "" };
+
+  const emojiIndex = text.indexOf(match[0]);
+  return {
+    text: text.slice(0, emojiIndex),
+    emoji: text.slice(emojiIndex),
+  };
+}
+
 export const middleLayoutClassName =
   "hidden tablet:flex text-center flex-col justify-center";
 export const defaultTextClassName =
@@ -50,12 +66,26 @@ export function SRC20BaseCard(
           alt={convertToEmoji(src20.tick)}
         />
         <div class="flex flex-col">
-          <p
-            class={`text-2xl mobileLg:text-4xl font-black uppercase  ${
-              isHovered ? "text-stamp-primary-hover" : "gray-gradient1"
-            } flex gap-4`}
-          >
-            {convertToEmoji(src20.tick)}
+          <p class="text-2xl mobileLg:text-4xl font-black uppercase flex gap-4">
+            {(() => {
+              const { text, emoji } = splitTextAndEmojis(
+                convertToEmoji(src20.tick),
+              );
+              return (
+                <>
+                  {text && (
+                    <span
+                      class={isHovered
+                        ? "text-stamp-primary-hover"
+                        : "gray-gradient1"}
+                    >
+                      {text}
+                    </span>
+                  )}
+                  {emoji && <span>{emoji}</span>}
+                </>
+              );
+            })()}
             {/* Social Icons */}
             <div class="flex gap-2">
               {src20.email != null && (
