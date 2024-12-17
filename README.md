@@ -14,6 +14,7 @@ with the [Bitcoin Stamps Indexer](https://github.com/stampchain-io/btc_stamps).
 ## Prerequisites
 
 1. **Install Deno**
+   > ⚠️ **Required Version**: 2.1.3
    ```sh
    curl -fsSL https://deno.land/install.sh | sh
    ```
