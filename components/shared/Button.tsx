@@ -11,24 +11,24 @@ type ButtonVariant =
 
 interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
-  icon?: string;
+  icon?: string | JSX.Element;
   iconAlt?: string;
   isSubmitting?: boolean;
 }
 
 const VARIANT_STYLES = {
   default:
-    "inline-flex items-center justify-center w-7 h-7 mobileLg:w-9 mobileLg:h-9 bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors",
+    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
   mint:
-    "inline-flex items-center justify-center h-7 mobileLg:h-9 bg-stamp-purple border-2 border-stamp-purple rounded-md text-xs mobileLg:text-sm font-extrabold text-black tracking-[0.05em] px-3 mobileLg:px-4 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors",
-  wallet:
-    "flex items-center justify-center w-7 h-7 mobileLg:w-9 mobileLg:h-9 w-8 h-8 cursor-pointer",
+    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-xs mobileLg:text-sm font-extrabold text-black tracking-[0.05em] h-[36px] mobileLg:h-[42px] px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
   cancel:
-    "inline-flex items-center justify-center w-7 h-7 mobileLg:w-9 mobileLg:h-9 border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors",
+    "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:text-stamp-purple-bright transition-colors",
   submit:
-    "inline-flex items-center justify-center w-7 h-7 mobileLg:w-9 mobileLg:h-9 bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors disabled:bg-stamp-purple-darker disabled:text-black disabled:cursor-not-allowed",
+    "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors",
+  wallet:
+    "flex items-center justify-center w-7 h-7 mobileMd:w-9 mobileMd:h-9 desktop:w-[42px] desktop:h-[42px] w-8 h-8 cursor-pointer",
   icon:
-    "flex justify-center items-center w-7 h-7 mobileLg:w-9 mobileLg:h-9 bg-stamp-purple rounded-md p-0 cursor-pointer border-2 border-[#8800CC]",
+    "flex justify-center items-center w-7 h-7 mobileMd:w-9 mobileMd:h-9 desktop:w-[42px] desktop:h-[42px] bg-stamp-purple rounded-md p-0 cursor-pointer border-2 border-stamp-purple group",
 };
 
 export function Button({
@@ -40,6 +40,8 @@ export function Button({
 }: ButtonProps) {
   const baseClass = VARIANT_STYLES[variant];
   const className = props.class ? `${baseClass} ${props.class}` : baseClass;
+  const iconClass =
+    "w-[14px] h-[14px] mobileMd:w-[18px] mobileMd:h-[18px] desktop:w-[20px] desktop:h-[20px]";
 
   return (
     <button
@@ -48,20 +50,22 @@ export function Button({
       class={className}
     >
       {icon
-        ? (
-          <img
-            src={icon}
-            alt={iconAlt || ""}
-            className="w-[14px] h-[14px] mobileLg:w-[18px] mobileLg:h-[18px]"
-          />
-        )
+        ? typeof icon === "string"
+          ? (
+            <img
+              src={icon}
+              alt={iconAlt || ""}
+              className={iconClass}
+            />
+          )
+          : (
+            <div className={iconClass}>
+              {icon}
+            </div>
+          )
         : isSubmitting
-        ? (
-          "Processing..."
-        )
-        : (
-          props.children
-        )}
+        ? "Processing..."
+        : props.children}
     </button>
   );
 }

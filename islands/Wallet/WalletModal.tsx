@@ -285,7 +285,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
               type="button"
               ref={buttonRef}
               // onClick={toggleModal}
-              class="hidden tablet:block text-stamp-primary bg-black font-extrabold border-2 border-stamp-primary rounded-md opacity-100 group-hover:opacity-0 text-sm mobileLg:text-base tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5"
+              class="hidden tablet:block text-stamp-purple backdrop-blur-md bg-transparent font-extrabold border-2 border-stamp-purple rounded-md opacity-100 group-hover:opacity-0 group-hover:border-stamp-purple-bright text-sm mobileLg:text-base tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5"
             >
               {abbreviateAddress(address)}
             </button>
@@ -293,33 +293,37 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             <button
               type="button"
               ref={buttonRef}
-              class="block tablet:hidden text-stamp-primary-dark font-extrabold text-xl mobileLg:text-2xl -mt-1 mobileLg:-mt-4"
+              class="block tablet:hidden text-stamp-purple-dark font-extrabold text-xl mobileLg:text-2xl -mt-1"
             >
               CONNECTED
             </button>
 
-            <div class="z-[1000] absolute top-full tablet:top-0 -left-2 tablet:left-0 text-lg tablet:text-base bg-transparent tablet:bg-black text-stamp-primary hidden group-hover:block transition-opacity duration-300 tablet:border-2 tablet:border-stamp-primary tablet:rounded-md">
+            <div class="z-[1000] absolute top-full tablet:top-0 -left-2 tablet:left-0 text-base mobileLg:text-lg tablet:text-base font-extrabold text-stamp-purple hidden group-hover:block transition-opacity duration-300 tablet:border-2 tablet:border-stamp-purple tablet:rounded-md tablet:hover:border-stamp-purple-bright">
               <button
                 type="button"
                 ref={buttonRef}
                 // onClick={toggleModal}
-                class="hidden tablet:block text-stamp-primary px-5 py-3 bg-black font-extrabold text-sm mobileLg:text-base"
+                class="hidden tablet:block text-stamp-purple-bright px-5 py-2.5 text-sm mobileLg:text-base tracking-[0.05em]"
               >
                 {abbreviateAddress(address)}
               </button>
 
-              <p class="block tablet:hidden px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer">
+              <p class="block tablet:hidden px-4 py-2 items-center hover:text-stamp-purple-bright cursor-pointer">
                 {abbreviateAddress(address)}
               </p>
-              <a
-                href={isConnected && address ? `/wallet/${address}` : "#"}
-                class="px-4 py-2 !pt-1 text-center hover:text-stamp-primary-hover cursor-pointer"
+              <button
+                onClick={() => {
+                  if (isConnected && address) {
+                    window.location.href = `/wallet/${address}`;
+                  }
+                }}
+                class="-mt-1 items-center tablet:text-stamp-purple hover:text-stamp-purple-bright cursor-pointer w-full text-center"
               >
                 DASHBOARD
-              </a>
+              </button>
               <button
                 onClick={() => walletSignOut()}
-                class="px-4 py-2 text-center hover:text-stamp-primary-hover cursor-pointer"
+                class="pt-1.5 tablet:pt-1 pb-3 items-center tablet:text-stamp-purple hover:text-stamp-purple-bright cursor-pointer w-full text-center"
               >
                 SIGN OUT
               </button>
@@ -334,7 +338,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
             type="button"
             ref={buttonRef}
             onClick={toggleModal}
-            class="bg-stamp-purple border-2 border-stamp-purple rounded-md  hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 mt-6 mobileLg:mt-9 tablet:mt-0 "
+            class="bg-stamp-purple border-2 border-stamp-purple rounded-md  hover:border-stamp-purple-bright hover:bg-stamp-purple-bright transition-colors text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 mt-6 mobileLg:mt-9 tablet:mt-0 "
           >
             CONNECT
           </button>

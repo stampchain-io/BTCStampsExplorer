@@ -10,12 +10,20 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
 
   const dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+  const dataLabel =
+    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
   const dataValueSm =
     "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
+  const dataValue =
+    "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
+  const dataValueLg =
+    "text-2xl mobileLg:text-3xl font-black text-stamp-grey-light -mt-0.5";
+  const dataValueXl =
+    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
 
   return (
     <SRC20BaseCard {...props}>
-      {fromPage === "src20" && (
+      {(fromPage === "src20" || fromPage === "home") && (
         <>
           {/* Price, Change, Volume group */}
 
@@ -34,7 +42,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
                 <span class="text-stamp-grey-light">%</span>
               </p>
               <p class={dataLabelSm}>
-                VOLUME <span class={dataValueSm}>0.00</span>{" "}
+                VOLUME <span class={dataValueSm}>N/A</span>{" "}
                 <span class="text-stamp-grey-light">BTC</span>
               </p>
             </div>
@@ -74,7 +82,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
         <>
           {/* Price, Change, Volume group */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
-            <div class="hidden min-[720px]:flex flex-col justify-center text-center -space-y-0.5 ">
+            <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
               <p class={dataLabelSm}>
                 PRICE{" "}
                 <span class={dataValueSm}>
@@ -90,7 +98,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
               </p>
               {/* TODO: Get Volume from Backend */}
               <p class={dataLabelSm}>
-                VOLUME <span class={dataValueSm}>0.00</span>{" "}
+                VOLUME <span class={dataValueSm}>N/A</span>{" "}
                 <span class="text-stamp-grey-light">BTC</span>
               </p>
             </div>
@@ -103,8 +111,8 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
               <p class={dataLabelSm}>
                 VALUE{" "}
               </p>
-              <p class={dataValueSm}>
-                0.00 <span class="text-stamp-grey-light">BTC</span>
+              <p class={dataValueLg}>
+                N/A <span class="font-extralight">BTC</span>
               </p>
             </div>
           </div>

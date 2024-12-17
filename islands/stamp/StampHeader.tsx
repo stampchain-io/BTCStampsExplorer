@@ -25,7 +25,7 @@ export const StampHeader = (
     setIsOpen2(open);
   };
 
-  const titlePurpleDLClassName =
+  const titlePurpleDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
 
   return (
@@ -33,9 +33,8 @@ export const StampHeader = (
       className="flex flex-row justify-between items-center gap-3 w-full relative"
       f-partial="/stamp"
     >
-      <h1 className={titlePurpleDLClassName}>ART STAMPS</h1>
-      <div className="flex gap-3 justify-between mobileLg:h-9 h-7 items-center ">
-        <Sort initSort={sortBy} />
+      <h1 className={titlePurpleDL}>ART STAMPS</h1>
+      <div className="flex gap-3 justify-between mobileLg:h-9 h-7 items-center relative">
         <Filter
           initFilter={filterBy}
           open={isOpen1}
@@ -47,8 +46,18 @@ export const StampHeader = (
             "trending sales",
             "sold",
           ]}
+          dropdownPosition="absolute top-[70px] right-[-79px] mobileMd:top-[66px] mobileMd:right-[-96px] mobileLg:top-[86px] mobileLg:right-[-96px] desktop:top-[83px] desktop:right-[-108px]"
         />
-        <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
+        <div
+          class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
+        >
+          <Sort initSort={sortBy} />
+        </div>
+        <div
+          class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
+        >
+          <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
+        </div>
       </div>
     </div>
   );
