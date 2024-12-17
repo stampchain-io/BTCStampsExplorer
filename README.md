@@ -88,7 +88,7 @@ docker run -p 8000:8000 btc-stamps-explorer:2.1.4
 
 The container uses:
 
-- Deno 2.1.3 Alpine base image
+- Deno 2.1.4 Alpine base image
 - Production environment
 - Port 8000
 - Required permissions for network, file system, and environment variables
