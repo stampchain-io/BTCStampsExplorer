@@ -33,7 +33,7 @@ function WalletTransferModal({
 }: Props) {
   const { wallet } = walletContext;
   const [maxQuantity, setMaxQuantity] = useState(1);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
   const [imgSrc, setImgSrc] = useState("");
   const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
 
@@ -69,12 +69,13 @@ function WalletTransferModal({
 
       const requestBody = {
         address: wallet.address,
-        stampId: selectedStamp.stamp,
+        destination: formState.recipientAddress,
+        asset: selectedStamp.stamp,
         quantity,
         options,
       };
 
-      const response = await fetch("/api/v2/create/transfer", {
+      const response = await fetch("/api/v2/create/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -83,13 +84,13 @@ function WalletTransferModal({
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || "Failed to create transfer transaction.",
+          errorData.error || "Failed to create send transaction.",
         );
       }
 
       const responseData = await response.json();
       if (!responseData?.result?.psbt) {
-        throw new Error("Failed to create transfer transaction.");
+        throw new Error("Failed to create send transaction.");
       }
 
       const signResult = await walletContext.signPSBT(
@@ -116,14 +117,20 @@ function WalletTransferModal({
     e: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const value = parseInt(e.target.value, 10);
+    let tmpValue = value;
     if (!isNaN(value)) {
       if (value >= 1 && value <= maxQuantity) {
-        setQuantity(value);
+        tmpValue = value;
       } else if (value < 1) {
-        setQuantity(1);
+        tmpValue = 1;
       } else if (value > maxQuantity) {
-        setQuantity(maxQuantity);
+        tmpValue = maxQuantity;
       }
+      setQuantity(tmpValue);
+      setFormState({
+        ...formState,
+        amount: tmpValue.toString(),
+      });
     }
   };
   const getMaxQuantity = () => {
