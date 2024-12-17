@@ -96,6 +96,7 @@ export function HoldersGraph(
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6">
 =======
           <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
@@ -109,6 +110,9 @@ export function HoldersGraph(
 =======
           <div className="max-h-46 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
 >>>>>>> 4d7ca8c (chore: update button style on mint & fix stamping/stamp page loading & update table for responsive)
+=======
+          <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
+>>>>>>> 34c4b6b (chore: update button style on mint & fix stamping/stamp page loading & update table for responsive)
             <table className={tableValueClassName}>
               <thead className={tableLabelClassName}>
                 <tr>
