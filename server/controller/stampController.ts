@@ -426,7 +426,7 @@ export class StampController {
         stampCategories,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["SRC-721"], limit: 12 },
+          { idents: ["SRC-721"], limit: 12, sortBy: "DESC" },
         ]),
       ]);
       // Fetch the "posh" collection to get its collection_id

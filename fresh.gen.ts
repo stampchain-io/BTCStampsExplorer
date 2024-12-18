@@ -65,6 +65,7 @@ import * as $api_v2_src20_tick_tick_index from "./routes/api/v2/src20/tick/[tick
 import * as $api_v2_src20_tick_tick_mintData from "./routes/api/v2/src20/tick/[tick]/mintData.ts";
 import * as $api_v2_src20_tick_index from "./routes/api/v2/src20/tick/index.ts";
 import * as $api_v2_src20_tx_tx_hash_ from "./routes/api/v2/src20/tx/[tx_hash].ts";
+import * as $api_v2_stamp_stamp_preview from "./routes/api/v2/stamp/[stamp]/preview.ts";
 import * as $api_v2_stamps_id_ from "./routes/api/v2/stamps/[id].ts";
 import * as $api_v2_stamps_id_dispensers from "./routes/api/v2/stamps/[id]/dispensers.ts";
 import * as $api_v2_stamps_id_dispenses from "./routes/api/v2/stamps/[id]/dispenses.ts";
@@ -305,6 +306,7 @@ const manifest = {
       $api_v2_src20_tick_tick_mintData,
     "./routes/api/v2/src20/tick/index.ts": $api_v2_src20_tick_index,
     "./routes/api/v2/src20/tx/[tx_hash].ts": $api_v2_src20_tx_tx_hash_,
+    "./routes/api/v2/stamp/[stamp]/preview.ts": $api_v2_stamp_stamp_preview,
     "./routes/api/v2/stamps/[id].ts": $api_v2_stamps_id_,
     "./routes/api/v2/stamps/[id]/dispensers.ts": $api_v2_stamps_id_dispensers,
     "./routes/api/v2/stamps/[id]/dispenses.ts": $api_v2_stamps_id_dispenses,
