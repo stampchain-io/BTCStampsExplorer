@@ -6,7 +6,7 @@ interface SendRow {
   quantity: number;
   memo: string;
   tx_hash: string;
-  block_time: number;
+  block_time: string;  // Changed from number to string
   cpid?: string;
 }
 
