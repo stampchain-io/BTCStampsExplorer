@@ -69,7 +69,7 @@ function TransferRow({ send }: { send: SendRow }) {
         {abbreviateAddress(send.tx_hash)}
       </td>
       <td className="text-right uppercase py-0">
-        {formatDate(new Date(send.block_time), {
+        {formatDate(new Date(send.block_time * 1000), {
           includeRelative: false,
         })}
       </td>
