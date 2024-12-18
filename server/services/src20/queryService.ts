@@ -243,18 +243,23 @@ export class SRC20QueryService {
     transactionCount: number = 1000,
   ): Promise<PaginatedSrc20ResponseBody> {
     try {
-      const offset = limit * (page - 1);
+      // Validate and sanitize input parameters
+      const validLimit = Number.isFinite(Number(limit)) ? Math.max(1, Number(limit)) : 50;
+      const validPage = Number.isFinite(Number(page)) ? Math.max(1, Number(page)) : 1;
+      const validTransactionCount = Number.isFinite(Number(transactionCount)) ? Math.max(1, Number(transactionCount)) : 1000;
+
+      const offset = validLimit * (validPage - 1);
       const data = await SRC20Repository.getTrendingSrc20TxFromDb(
-        limit,
+        validLimit,
         offset,
-        transactionCount,
+        validTransactionCount,
       );
 
       const totalResult = await SRC20Repository.getTrendingSrc20TotalCount(
-        transactionCount,
+        validTransactionCount,
       );
       const total = totalResult.rows[0].total;
-      const pagination = paginate(total, page, limit);
+      const pagination = paginate(total, validPage, validLimit);
 
       const mappedData = this.mapTransactionData(data.rows);
       const formattedData = this.formatTransactionData(mappedData, {});
