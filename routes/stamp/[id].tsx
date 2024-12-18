@@ -74,6 +74,7 @@ export const handler: Handlers<StampData> = {
         StampController.getStamps({
           limit: 12,
           page: 1,
+          sortBy: "desc",
         }),
       ]);
 
