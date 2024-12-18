@@ -441,6 +441,7 @@ export class Src20Controller {
           floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
           progress,
           mint_count: row.mint_count,
+          top_mints_percentage: row.top_mints_percentage || 0,
           total_minted: mintProgress?.total_minted || "0",
           max_supply: mintProgress?.max_supply || "0",
         });

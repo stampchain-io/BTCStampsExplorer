@@ -69,6 +69,7 @@ export interface Deployment {
   p: string;
   tick: string;
   tx_hash: string;
+  top_mints_percentage?: number;
 }
 
 export interface MintStatus {
