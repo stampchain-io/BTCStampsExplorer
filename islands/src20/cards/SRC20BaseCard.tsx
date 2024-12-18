@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
 import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
+import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {
   // Regex to match emojis
@@ -138,7 +139,7 @@ export function SRC20BaseCard(
                 AMOUNT
               </p>
               <p class={dataValueSm}>
-                {Number(src20.amt).toFixed(2).toLocaleString()}
+                {stripTrailingZeros(Number(src20.amt).toFixed(2))}
               </p>
             </div>
           )}
