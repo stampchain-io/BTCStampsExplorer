@@ -2577,10 +2577,7 @@ components:
             last_block:
               type: number
             btc:
-              type: object
-              properties:
-                address:
-                  type: string
+              $ref: "#/components/schemas/BtcInfo"
             data:
               type: object
               properties:
