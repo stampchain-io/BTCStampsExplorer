@@ -577,7 +577,7 @@ export function StampImage(
                   width="100%"
                   height="100%"
                   scrolling="no"
-                  className={`${className} rounded-sm absolute top-0 left-0`}
+                  className={`${className} rounded-sm absolute top-0 left-0 pointer-events-none`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src}
                   loading="lazy"
@@ -585,6 +585,7 @@ export function StampImage(
                   onError={handleImageError}
                   title="Stamp"
                 />
+                <div className="absolute inset-0 cursor-pointer" />
               </div>
             </div>
           </div>
