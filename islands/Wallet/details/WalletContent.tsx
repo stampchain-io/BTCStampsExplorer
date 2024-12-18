@@ -579,30 +579,34 @@ export default function WalletContent({
         </div>
       )}
 
-      <div class="mt-48">
-        <ItemHeader
-          title="LISTINGS"
-          sortBy={sortBy}
-          isOpen={openD}
-          handleOpen={handleOpen}
-          sort={true}
-          filter={false}
-          search={false}
-          setting={false}
-          isOpenFilter={openFilter}
-          isOpenSetting={false}
-          handleOpenFilter={handleOpenFilter}
-          handleOpenSetting={() => {}}
-        />
-        <div class="mt-3 mobileMd:mt-6">
-          <DispenserItem dispensers={dispensers || []} />
+      {dispensers && dispensers.length > 0 && (
+        <div class="mt-48">
+          <ItemHeader
+            title="LISTINGS"
+            sortBy={sortBy}
+            isOpen={openD}
+            handleOpen={handleOpen}
+            sort={true}
+            filter={false}
+            search={false}
+            setting={false}
+            isOpenFilter={openFilter}
+            isOpenSetting={false}
+            handleOpenFilter={handleOpenFilter}
+            handleOpenSetting={() => {}}
+          />
+          <div class="mt-3 mobileMd:mt-6">
+            <DispenserItem dispensers={dispensers} />
+          </div>
         </div>
-      </div>
+      )}
       {openSettingModal && (
         <WalletTransferModal
           stamps={stamps}
           toggleModal={handleOpenSettingModal}
           handleCloseModal={handleCloseSettingModal}
+          fee={0}
+          handleChangeFee={() => {}}
         />
       )}
     </>
