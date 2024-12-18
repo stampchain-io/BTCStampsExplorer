@@ -88,7 +88,7 @@ export interface WindowSize {
 export interface StampRow {
   stamp: number;
   stamp_mime?: string;
-  stamp_mimetype?: string;  // Alias for backward compatibility
+  stamp_mimetype?: string; // Alias for backward compatibility
   stamp_size?: number;
   tx_hash: string;
   block_index: number;
