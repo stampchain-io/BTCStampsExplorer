@@ -1,6 +1,6 @@
 /** @jsx h */
 /** @jsxFrag Fragment */
-import { h, Fragment } from "preact";
+import { Fragment, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
 interface TextContentIslandProps {

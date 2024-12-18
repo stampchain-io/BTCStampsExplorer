@@ -45,8 +45,16 @@ interface PaginationProps {
 }
 
 export const Pagination = (
-  { page, pages, page_size, type = "stamp", data_length, prefix, onChange, onPageChange }:
-    PaginationProps,
+  {
+    page,
+    pages,
+    page_size,
+    type = "stamp",
+    data_length,
+    prefix,
+    onChange,
+    onPageChange,
+  }: PaginationProps,
 ) => {
   const isMobile = useIsMobile();
   const maxPagesToShow = isMobile
@@ -82,7 +90,17 @@ export const Pagination = (
     updateURL(params);
     onChange?.(pageNum);
     onPageChange?.(pageNum);
-  }, [_prefix, page_size, prefix, getType, getSort, getFilter, updateURL, onChange, onPageChange]);
+  }, [
+    _prefix,
+    page_size,
+    prefix,
+    getType,
+    getSort,
+    getFilter,
+    updateURL,
+    onChange,
+    onPageChange,
+  ]);
 
   const buildPageUrl = useCallback((pageNum: number) => {
     if (!isClient) {
