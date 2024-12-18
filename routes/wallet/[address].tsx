@@ -236,7 +236,7 @@ export default function Wallet(props: WalletPageProps) {
   const { data } = props;
 
   return (
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-8" f-client-nav>
       <WalletHeader
         filterBy={[]}
         sortBy="DESC"

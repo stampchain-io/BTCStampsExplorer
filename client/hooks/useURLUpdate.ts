@@ -33,11 +33,10 @@ export function useURLUpdate() {
 
     url.searchParams.set("page", "1");
 
-    self.history.pushState({}, "", url.toString());
-    self.dispatchEvent(
-      new CustomEvent("urlChanged", { detail: url.toString() }),
-    );
-    self.location.href = url.toString();
+    const event = new CustomEvent("fresh-navigate", {
+      detail: { url: url.toString() },
+    });
+    self.dispatchEvent(event);
   }, []);
 
   return { updateURL };
