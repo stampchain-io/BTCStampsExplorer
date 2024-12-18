@@ -66,7 +66,7 @@ const ItemHeader = ({
   handleOpen: (type: string) => void;
 }) => {
   return (
-    <div class="flex flex-row justify-between items-center gap-3 w-full">
+    <div class="flex flex-row justify-between items-center gap-3 w-full relative">
       <div class="flex items-end">
         <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight">
           {title}

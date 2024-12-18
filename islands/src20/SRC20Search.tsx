@@ -35,12 +35,16 @@ export function SRC20SearchClient(
   };
 
   return (
-    <div class="relative flex items-center">
+    <div
+      class={open2
+        ? "absolute right-0 z-10 w-full mobileLg:w-[360px]"
+        : "relative flex items-center"}
+    >
       {open2 && (
         <>
           <input
             type="text"
-            class={`min-w-[260px] tablet:min-w-[360px] h-7 mobileLg:h-9 purple-bg-gradient pl-3 pr-2 py-3 text-[12px] leading-[14px] text-[#333333] font-bold placeholder:text-[#333333] outline-none ${
+            class={`w-full mobileLg:w-[360px] tablet:min-w-[360px] h-7 mobileLg:h-9 purple-bg-gradient pl-3 pr-2 py-3 text-[12px] leading-[14px] text-[#333333] font-bold placeholder:text-[#333333] outline-none ${
               results.length > 0 ? "rounded-t" : "rounded"
             }`}
             placeholder="Token Name, Tx Hash, or Address"
@@ -63,7 +67,7 @@ export function SRC20SearchClient(
           <img
             src="/img/stamp/search-glass.png"
             alt="Search icon"
-            class="absolute top-[11px] right-[9px] cursor-pointer w-[18px] h-[18px]"
+            class="absolute top-1.5 mobileLg:top-[11px] right-[9px] cursor-pointer w-[18px] h-[18px]"
             onClick={() => handleOpen2(false)}
           />
         </>

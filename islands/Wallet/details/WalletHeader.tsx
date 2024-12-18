@@ -29,7 +29,7 @@ const WalletHeader = ({
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
 
   return (
-    <div class="flex justify-between items-center gap-3 w-full">
+    <div class="flex justify-between items-center gap-3 w-full relative">
       <h1 className={titlePurpleDL}>WALLET</h1>
       <div class="flex gap-3 justify-between h-9 items-center">
         <Filter
