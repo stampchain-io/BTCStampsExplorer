@@ -26,7 +26,7 @@ export const SRC20Header = (
 
   return (
     <div className="tabs">
-      <div class="flex flex-row justify-between items-center gap-3 w-full">
+      <div class="flex flex-row justify-between items-center gap-3 w-full relative">
         <h1 className="hidden tablet:block text-5xl desktop:text-6xl purple-gradient1 font-black">
           SRC-20 TOKENS
         </h1>
