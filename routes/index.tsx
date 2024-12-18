@@ -101,7 +101,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
         </div>
 
         {/* Lazy load below-the-fold content */}
-        <div style="content-visibility: auto; contain-intrinsic-size: 0 800px;">
+        <div style="margin-top: -48px; content-visibility: auto; contain-intrinsic-size: 0 800px;">
           <GetStampingModule />
           <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36">
             <RecentSales
