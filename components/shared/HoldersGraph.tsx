@@ -92,27 +92,7 @@ export function HoldersGraph(
         </div>
 
         <div className="relative w-full max-w-full">
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
           <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6">
-=======
-          <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
->>>>>>> 00e558a (chore: update button style on mint & fix stamping/stamp page loading & update table for responsive)
-=======
-          <div className="max-h-46 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
->>>>>>> 24b02e1 (chore: change file for updating)
-=======
-          <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
->>>>>>> 71faa52 (chore: update button style on mint & fix stamping/stamp page loading & update table for responsive)
-=======
-          <div className="max-h-46 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
->>>>>>> 4d7ca8c (chore: update button style on mint & fix stamping/stamp page loading & update table for responsive)
-=======
-          <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto mt-3 mobileMd:mt-6">
->>>>>>> 34c4b6b (chore: update button style on mint & fix stamping/stamp page loading & update table for responsive)
             <table className={tableValueClassName}>
               <thead className={tableLabelClassName}>
                 <tr>
