@@ -84,18 +84,18 @@ export const handler: Handlers = {
 
       const src20Data = src20Response.status === "fulfilled"
         ? {
-            ...src20Response.value,
-            data: src20Response.value.data.map((token: any) => {
-              const marketInfo = marketData.find(
-                (item) => item.tick.toUpperCase() === token.tick.toUpperCase()
-              ) || { floor_unit_price: 0 };
-              return {
-                ...token,
-                floor_unit_price: marketInfo.floor_unit_price,
-                value: marketInfo.floor_unit_price * Number(token.amt || 0)
-              };
-            })
-          }
+          ...src20Response.value,
+          data: src20Response.value.data.map((token: any) => {
+            const marketInfo = marketData.find(
+              (item) => item.tick.toUpperCase() === token.tick.toUpperCase(),
+            ) || { floor_unit_price: 0 };
+            return {
+              ...token,
+              floor_unit_price: marketInfo.floor_unit_price,
+              value: marketInfo.floor_unit_price * Number(token.amt || 0),
+            };
+          }),
+        }
         : { data: [], total: 0 };
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
