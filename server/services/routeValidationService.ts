@@ -134,7 +134,10 @@ export function validateFileUpload(
     const fileData = String(body.fileData);
     
     // Check file size
-    const sizeInBytes = Buffer.byteLength(fileData, 'base64');
+    const base64Data = fileData.includes(";base64,") 
+      ? fileData.split(";base64,")[1]
+      : fileData;
+    const sizeInBytes = (base64Data.length * 3) / 4; // Base64 size estimation
     if (sizeInBytes > maxSizeBytes) {
       return {
         isValid: false,

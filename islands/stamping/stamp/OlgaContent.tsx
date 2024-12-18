@@ -298,17 +298,17 @@ export function OlgaContent() {
     setIsUploadTooltipVisible(true);
 
     if (uploadTooltipTimeoutRef.current) {
-      window.clearTimeout(uploadTooltipTimeoutRef.current);
+      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
     }
 
-    uploadTooltipTimeoutRef.current = window.setTimeout(() => {
+    uploadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
       setIsUploadTooltipVisible(false);
     }, 1500);
   };
 
   const handleUploadMouseLeave = () => {
     if (uploadTooltipTimeoutRef.current) {
-      window.clearTimeout(uploadTooltipTimeoutRef.current);
+      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
     }
     setIsUploadTooltipVisible(false);
   };
@@ -318,10 +318,10 @@ export function OlgaContent() {
       setIsToggleTooltipVisible(true);
 
       if (toggleTooltipTimeoutRef.current) {
-        window.clearTimeout(toggleTooltipTimeoutRef.current);
+        globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
       }
 
-      toggleTooltipTimeoutRef.current = window.setTimeout(() => {
+      toggleTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsToggleTooltipVisible(false);
       }, 1500);
     }
@@ -329,7 +329,7 @@ export function OlgaContent() {
 
   const handleToggleMouseLeave = () => {
     if (toggleTooltipTimeoutRef.current) {
-      window.clearTimeout(toggleTooltipTimeoutRef.current);
+      globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
     }
     setIsToggleTooltipVisible(false);
     setAllowTooltip(true); // Reset the flag when mouse leaves
@@ -339,10 +339,10 @@ export function OlgaContent() {
   useEffect(() => {
     return () => {
       if (uploadTooltipTimeoutRef.current) {
-        window.clearTimeout(uploadTooltipTimeoutRef.current);
+        globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
       }
       if (toggleTooltipTimeoutRef.current) {
-        window.clearTimeout(toggleTooltipTimeoutRef.current);
+        globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -1146,10 +1146,10 @@ export function OlgaContent() {
       setIsPoshTooltipVisible(true);
 
       if (poshTooltipTimeoutRef.current) {
-        window.clearTimeout(poshTooltipTimeoutRef.current);
+        globalThis.clearTimeout(poshTooltipTimeoutRef.current);
       }
 
-      poshTooltipTimeoutRef.current = window.setTimeout(() => {
+      poshTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsPoshTooltipVisible(false);
       }, 1500);
     }
@@ -1157,7 +1157,7 @@ export function OlgaContent() {
 
   const handlePoshMouseLeave = () => {
     if (poshTooltipTimeoutRef.current) {
-      window.clearTimeout(poshTooltipTimeoutRef.current);
+      globalThis.clearTimeout(poshTooltipTimeoutRef.current);
     }
     setIsPoshTooltipVisible(false);
     setAllowPoshTooltip(true);
@@ -1206,11 +1206,11 @@ export function OlgaContent() {
 
       // Clear any existing timeout
       if (lockTooltipTimeoutRef.current) {
-        window.clearTimeout(lockTooltipTimeoutRef.current);
+        globalThis.clearTimeout(lockTooltipTimeoutRef.current);
       }
 
       // Set new timeout
-      lockTooltipTimeoutRef.current = window.setTimeout(() => {
+      lockTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsLockTooltipVisible(false);
       }, 1500);
     }
@@ -1218,7 +1218,7 @@ export function OlgaContent() {
 
   const handleLockMouseLeave = () => {
     if (lockTooltipTimeoutRef.current) {
-      window.clearTimeout(lockTooltipTimeoutRef.current);
+      globalThis.clearTimeout(lockTooltipTimeoutRef.current);
     }
     setIsLockTooltipVisible(false);
     setAllowLockTooltip(true);
@@ -1248,10 +1248,10 @@ export function OlgaContent() {
       setIsPreviewTooltipVisible(true);
 
       if (previewTooltipTimeoutRef.current) {
-        window.clearTimeout(previewTooltipTimeoutRef.current);
+        globalThis.clearTimeout(previewTooltipTimeoutRef.current);
       }
 
-      previewTooltipTimeoutRef.current = window.setTimeout(() => {
+      previewTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsPreviewTooltipVisible(false);
       }, 1500);
     }
@@ -1260,7 +1260,7 @@ export function OlgaContent() {
   // Update handlePreviewMouseLeave to clear timeout
   const handlePreviewMouseLeave = () => {
     if (previewTooltipTimeoutRef.current) {
-      window.clearTimeout(previewTooltipTimeoutRef.current);
+      globalThis.clearTimeout(previewTooltipTimeoutRef.current);
     }
     setIsPreviewTooltipVisible(false);
     setAllowPreviewTooltip(true);

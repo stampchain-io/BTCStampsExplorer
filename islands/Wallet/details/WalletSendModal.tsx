@@ -161,7 +161,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
 
                     // Use CSS media query to determine screen size
                     const isSmallScreen =
-                      window.matchMedia("(max-width: 767px)").matches;
+                      globalThis.matchMedia("(max-width: 767px)").matches;
                     const { one, other } = isSmallScreen
                       ? smallScreenChar
                       : largeScreenChar;

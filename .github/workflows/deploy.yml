@@ -36,6 +36,15 @@ jobs:
         with:
           deno-version: v2.1.4
 
+      - name: Check formatting
+        run: deno task check:fmt
+
+      # - name: Check linting
+      #   run: deno task check:lint
+
+      # - name: Type check
+      #   run: deno task check:types
+
       - name: Build step
         run: deno task build
 

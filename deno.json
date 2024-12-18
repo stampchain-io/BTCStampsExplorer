@@ -2,7 +2,14 @@
   "lock": false,
   "lockfile": "deno.lock",
   "tasks": {
-    "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
+    "check:fmt": "deno fmt --check .",
+    "check:fmt:debug": "deno fmt --check --log-level=debug . && find . -type f -name '*.ts' -o -name '*.tsx' | grep -v -E '(node_modules|_fresh|.git|coverage|tmp|.cache|build|vendor|static)' | wc -l",
+    "check:lint": "deno lint --quiet",
+    "check:lint:debug": "deno lint --json",
+    "check:types": "deno check main.ts dev.ts",
+    "check:types:debug": "deno check --log-level=debug main.ts dev.ts",
+    "check": "deno task check:fmt && deno task check:lint && deno task check:types",
+    "check:debug": "deno task check:fmt:debug && deno task check:lint:debug && deno task check:types:debug",
     "start": "deno task check_version && deno run -A main.ts",
     "dev": "DENO_ENV=development && deno run --inspect --allow-all --watch --watch-exclude=dist/,node_modules/,_fresh/,.git/,coverage/,tmp/,tests/ --no-clear-screen dev.ts --host",
     "build": "deno run -A main.ts build",
@@ -25,13 +32,40 @@
   "lint": {
     "rules": {
       "tags": ["fresh", "recommended"],
-      "include": ["ban-untagged-todo"],
+      "include": [
+        "ban-untagged-todo",
+        "no-node-buffer",
+        "prefer-native-node-imports"
+      ],
       "exclude": ["no-explicit-any"]
-    }
+    },
+    "exclude": [
+      "**/_fresh/**/*",
+      "**/node_modules/**/*",
+      "**/dist/**/*",
+      "**/.git/**/*",
+      "**/coverage/**/*",
+      "**/tmp/**/*",
+      "**/.cache/**/*",
+      "**/build/**/*",
+      "**/vendor/**/*"
+    ],
+    "include": ["routes/", "components/", "islands/", "lib/", "utils/", "client/", "tests/"]
   },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
   "nodeModulesDir": "auto",
   "imports": {
+    "stream": "node:stream",
+    "stream/promises": "node:stream/promises",
+    "stream/consumers": "node:stream/consumers",
+    "stream/web": "node:stream/web",
+    "events": "node:events",
+    "buffer": "node:buffer",
+    "crypto": "node:crypto",
+    "tls": "node:tls",
+    "net": "node:net",
+    "dns": "node:dns",
+    "dns/promises": "node:dns/promises",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
     "@std/assert": "jsr:/@std/assert@^1.0.9",
@@ -84,7 +118,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "strict": true,
-    "types": ["npm:@types/node"],
+    "types": ["npm:@types/node", "npm:@types/bitcoinjs-lib"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
@@ -92,15 +126,41 @@
     "noFallthroughCasesInSwitch": true
   },
   "fmt": {
-    "files": {
-      "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"]
-    },
-    "options": {
-      "useTabs": false,
-      "lineWidth": 80,
-      "indentWidth": 2,
-      "singleQuote": false,
-      "proseWrap": "preserve"
-    }
+    "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": [
+      "**/_fresh/**/*",
+      "**/server/**/*",
+      "**/node_modules/**/*",
+      "**/dist/**/*",
+      "**/.git/**/*",
+      "**/coverage/**/*",
+      "**/tmp/**/*",
+      "**/.cache/**/*",
+      "**/.*/",
+      "**/.*",
+      "**/build/**/*",
+      "**/vendor/**/*",
+      "**/*.yml",
+      "**/*.yaml",
+      "**/schema.yml",
+      "**/swagger/**/*.yml",
+      "**/swagger/**/*.yaml",
+      "**/.redocly.*",
+      "**/*.css",
+      "**/*.json",
+      "**/*.md",
+      "**/*.html",
+      "**/static/**/*",
+      ".vscode/**/*",
+      ".idea/**/*",
+      ".github/**/*",
+      ".git/**/*",
+      ".env*"
+    ],
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "singleQuote": false,
+    "proseWrap": "preserve",
+    "useTabs": false
   }
 }
