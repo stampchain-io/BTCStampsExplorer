@@ -91,6 +91,7 @@ const ABBREVIATION_LENGTHS = {
   mobileMd: 6,
   mobileSm: 6,
 } as const;
+
 export function StampCard({
   stamp,
   isRecentSale = false,
