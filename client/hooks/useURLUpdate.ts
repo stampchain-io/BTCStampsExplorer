@@ -37,7 +37,6 @@ export function useURLUpdate() {
     self.dispatchEvent(
       new CustomEvent("urlChanged", { detail: url.toString() }),
     );
-    self.location.href = url.toString();
   }, []);
 
   return { updateURL };
