@@ -49,7 +49,7 @@ export const NavigatorProvider = (
     url.searchParams.set("page", "1");
     setType(newType);
     const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() }
+      detail: { url: url.toString() },
     });
     self.dispatchEvent(event);
     if (reload) {
@@ -63,7 +63,7 @@ export const NavigatorProvider = (
     url.searchParams.set("page", "1");
     setSort(newSort);
     const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() }
+      detail: { url: url.toString() },
     });
     self.dispatchEvent(event);
   };
@@ -82,7 +82,7 @@ export const NavigatorProvider = (
     }
     url.searchParams.set("page", "1");
     const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() }
+      detail: { url: url.toString() },
     });
     self.dispatchEvent(event);
   };

@@ -34,7 +34,7 @@ export function useURLUpdate() {
     url.searchParams.set("page", "1");
 
     const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() }
+      detail: { url: url.toString() },
     });
     self.dispatchEvent(event);
   }, []);

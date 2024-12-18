@@ -58,13 +58,14 @@ export function SRC20Section(
 ) {
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
-
-
   useEffect(() => {
     if (!initialData) {
+      setIsTransitioning(true);
+      setIsLoading(true);
       const endpoint = fromPage === "wallet" && address
         ? `/api/v2/src20/balance/${address}?page=${
           pagination?.page || 1
@@ -78,10 +79,12 @@ export function SRC20Section(
         .then((response) => {
           setData(response.data || []);
           setIsLoading(false);
+          setIsTransitioning(false);
         })
         .catch((error) => {
           console.error(`SRC20 ${type} fetch error:`, error);
           setIsLoading(false);
+          setIsTransitioning(false);
         });
     }
   }, [type, page, sortBy, initialData, fromPage, address, pagination]);
@@ -127,8 +130,8 @@ export function SRC20Section(
     setModalOpen(!isModalOpen);
   };
 
-  if (isLoading) {
-    return <div class="loading-skeleton h-[400px]" />;
+  if (isLoading || isTransitioning) {
+    return <div class="src20-skeleton loading-skeleton h-[400px]" />;
   }
 
   return (
