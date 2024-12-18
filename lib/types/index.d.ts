@@ -1,6 +1,6 @@
 export type {
-  Dispense,
   Dispenser,
+  Dispense,
   DispenserStats,
   Fairminter,
   XcpBalance,
