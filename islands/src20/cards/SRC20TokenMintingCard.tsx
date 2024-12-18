@@ -52,7 +52,11 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
           <div class="flex flex-col -mb-3 mobileLg:-mb-[22px] -ml-24 tablet:ml-0 ">
             <div class="hidden min-[640px]:flex flex-col justify-center text-center -space-y-0.5 ">
               <p class={dataLabelSm}>
-                TOP MINTS <span class={dataValueSm}>{src20.top_mints_percentage?.toFixed(1) || "N/A"}%</span>
+                TOP MINTS{" "}
+                <span class={dataValueSm}>
+                  {src20.top_mints_percentage?.toFixed(1) || "N/A"}
+                </span>{" "}
+                %
               </p>
               <div class="flex flex-col gap-1">
                 <p class={dataLabelSm}>
@@ -83,7 +87,11 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             </p>
             {/* TODO: Get Top Mints from Backend */}
             <p class={dataLabelSm}>
-              TOP MINTS <span class={dataValueSm}>{src20.top_mints_percentage?.toFixed(1) || "N/A"}%</span>
+              TOP MINTS{" "}
+              <span class={dataValueSm}>
+                {src20.top_mints_percentage?.toFixed(1) || "N/A"}
+              </span>{" "}
+              %
             </p>
             <div class="flex flex-col gap-1">
               <p class={dataLabelSm}>
@@ -113,8 +121,9 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             <p class={dataLabelSm}>
               TOP MINTS{" "}
               <span class={dataValueSm}>
-                {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
-              </span>
+                {src20.top_mints_percentage?.toFixed(1) || "N/A"}
+              </span>{" "}
+              %
             </p>
           </div>
         </div>
