@@ -19,9 +19,11 @@ export default function About() {
       <div id="donate"></div>
       <AboutDonate />
 
-      {/* Contact */}
+      {
+        /* Contact
       <div id="contact"></div>
-      <AboutContact />
+      <AboutContact />*/
+      }
     </div>
   );
 }
