@@ -3,6 +3,7 @@
 /// <reference lib="dom.iterable" />
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
+/// <reference types="npm:@types/node" />
 
 import "$/globals.d.ts";
 import { start } from "$fresh/server.ts";

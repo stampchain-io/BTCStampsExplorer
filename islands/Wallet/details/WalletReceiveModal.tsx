@@ -40,10 +40,10 @@ function WalletReceiveModal({ onClose, address }: Props) {
       }
 
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
 
-      tooltipTimeoutRef.current = window.setTimeout(() => {
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsTooltipVisible(false);
       }, 1500);
     }
@@ -51,7 +51,7 @@ function WalletReceiveModal({ onClose, address }: Props) {
 
   const handleCopyMouseLeave = () => {
     if (tooltipTimeoutRef.current) {
-      window.clearTimeout(tooltipTimeoutRef.current);
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
     }
     setIsTooltipVisible(false);
     setShowCopied(false);
@@ -66,10 +66,10 @@ function WalletReceiveModal({ onClose, address }: Props) {
       setAllowTooltip(false);
 
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
 
-      tooltipTimeoutRef.current = window.setTimeout(() => {
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setShowCopied(false);
       }, 1500);
     } catch (err) {
@@ -80,7 +80,7 @@ function WalletReceiveModal({ onClose, address }: Props) {
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
     };
   }, []);

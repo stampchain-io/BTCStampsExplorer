@@ -23,11 +23,13 @@ declare global {
   }
 }
 
-interface GlobalWithDebug {
-  __DEBUG?: {
-    namespaces: string;
-    enabled: boolean;
-  };
+declare global {
+  interface globalThis {
+    __DEBUG?: {
+      namespaces: string;
+      enabled: boolean;
+    };
+  }
 }
 
 function isServer(): boolean {
@@ -36,7 +38,7 @@ function isServer(): boolean {
 
 function initializeClientDebug() {
   if (!isServer()) {
-    const existingNamespaces = window.__DEBUG?.namespaces;
+    const existingNamespaces = globalThis.__DEBUG?.namespaces;
 
     globalThis.__DEBUG = {
       namespaces: existingNamespaces || "stamps,ui,debug,all",
@@ -47,9 +49,9 @@ function initializeClientDebug() {
 
 function shouldLog(namespace: LogNamespace): boolean {
   if (!isServer()) {
-    if (!window.__DEBUG?.enabled) return false;
+    if (!globalThis.__DEBUG?.enabled) return false;
 
-    const namespaces = (window.__DEBUG.namespaces || "")
+    const namespaces = (globalThis.__DEBUG.namespaces || "")
       .split(",")
       .map((n) => n.trim().toLowerCase());
 

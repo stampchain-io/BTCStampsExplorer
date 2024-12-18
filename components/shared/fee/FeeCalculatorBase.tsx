@@ -236,7 +236,7 @@ export function FeeCalculatorBase({
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
     };
   }, []);

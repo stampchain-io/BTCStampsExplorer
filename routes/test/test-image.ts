@@ -394,7 +394,7 @@ export const handler: Handlers = {
             .error { color: red; }
           </style>
           <script>
-            window.DENO_ENV = "${denoEnv}";
+            globalThis.DENO_ENV = "${denoEnv}";
           </script>
         </head>
         <body>

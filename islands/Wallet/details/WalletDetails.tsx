@@ -110,19 +110,19 @@ function WalletOverview(
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
       if (sendTooltipTimeoutRef.current) {
-        window.clearTimeout(sendTooltipTimeoutRef.current);
+        globalThis.clearTimeout(sendTooltipTimeoutRef.current);
       }
       if (receiveTooltipTimeoutRef.current) {
-        window.clearTimeout(receiveTooltipTimeoutRef.current);
+        globalThis.clearTimeout(receiveTooltipTimeoutRef.current);
       }
       if (historyTooltipTimeoutRef.current) {
-        window.clearTimeout(historyTooltipTimeoutRef.current);
+        globalThis.clearTimeout(historyTooltipTimeoutRef.current);
       }
       if (balanceTooltipTimeoutRef.current) {
-        window.clearTimeout(balanceTooltipTimeoutRef.current);
+        globalThis.clearTimeout(balanceTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -135,10 +135,10 @@ function WalletOverview(
       }
 
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
 
-      tooltipTimeoutRef.current = window.setTimeout(() => {
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsTooltipVisible(false);
       }, 1500);
     }
@@ -146,7 +146,7 @@ function WalletOverview(
 
   const handleCopyMouseLeave = () => {
     if (tooltipTimeoutRef.current) {
-      window.clearTimeout(tooltipTimeoutRef.current);
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
     }
     setIsTooltipVisible(false);
     setShowCopied(false);
@@ -162,10 +162,10 @@ function WalletOverview(
         setAllowTooltip(false);
 
         if (tooltipTimeoutRef.current) {
-          window.clearTimeout(tooltipTimeoutRef.current);
+          globalThis.clearTimeout(tooltipTimeoutRef.current);
         }
 
-        tooltipTimeoutRef.current = window.setTimeout(() => {
+        tooltipTimeoutRef.current = globalThis.setTimeout(() => {
           setShowCopied(false);
         }, 1500);
       } catch (err) {
@@ -182,10 +182,10 @@ function WalletOverview(
       }
 
       if (sendTooltipTimeoutRef.current) {
-        window.clearTimeout(sendTooltipTimeoutRef.current);
+        globalThis.clearTimeout(sendTooltipTimeoutRef.current);
       }
 
-      sendTooltipTimeoutRef.current = window.setTimeout(() => {
+      sendTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsSendTooltipVisible(false);
       }, 1500);
     }
@@ -193,7 +193,7 @@ function WalletOverview(
 
   const handleSendMouseLeave = () => {
     if (sendTooltipTimeoutRef.current) {
-      window.clearTimeout(sendTooltipTimeoutRef.current);
+      globalThis.clearTimeout(sendTooltipTimeoutRef.current);
     }
     setIsSendTooltipVisible(false);
     setAllowSendTooltip(true);
@@ -207,10 +207,10 @@ function WalletOverview(
       }
 
       if (receiveTooltipTimeoutRef.current) {
-        window.clearTimeout(receiveTooltipTimeoutRef.current);
+        globalThis.clearTimeout(receiveTooltipTimeoutRef.current);
       }
 
-      receiveTooltipTimeoutRef.current = window.setTimeout(() => {
+      receiveTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsReceiveTooltipVisible(false);
       }, 1500);
     }
@@ -218,7 +218,7 @@ function WalletOverview(
 
   const handleReceiveMouseLeave = () => {
     if (receiveTooltipTimeoutRef.current) {
-      window.clearTimeout(receiveTooltipTimeoutRef.current);
+      globalThis.clearTimeout(receiveTooltipTimeoutRef.current);
     }
     setIsReceiveTooltipVisible(false);
     setAllowReceiveTooltip(true);
@@ -232,10 +232,10 @@ function WalletOverview(
       }
 
       if (historyTooltipTimeoutRef.current) {
-        window.clearTimeout(historyTooltipTimeoutRef.current);
+        globalThis.clearTimeout(historyTooltipTimeoutRef.current);
       }
 
-      historyTooltipTimeoutRef.current = window.setTimeout(() => {
+      historyTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsHistoryTooltipVisible(false);
       }, 1500);
     }
@@ -243,7 +243,7 @@ function WalletOverview(
 
   const handleHistoryMouseLeave = () => {
     if (historyTooltipTimeoutRef.current) {
-      window.clearTimeout(historyTooltipTimeoutRef.current);
+      globalThis.clearTimeout(historyTooltipTimeoutRef.current);
     }
     setIsHistoryTooltipVisible(false);
     setAllowHistoryTooltip(true);
@@ -257,10 +257,10 @@ function WalletOverview(
       }
 
       if (balanceTooltipTimeoutRef.current) {
-        window.clearTimeout(balanceTooltipTimeoutRef.current);
+        globalThis.clearTimeout(balanceTooltipTimeoutRef.current);
       }
 
-      balanceTooltipTimeoutRef.current = window.setTimeout(() => {
+      balanceTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsBalanceTooltipVisible(false);
       }, 1500);
     }
@@ -268,7 +268,7 @@ function WalletOverview(
 
   const handleBalanceMouseLeave = () => {
     if (balanceTooltipTimeoutRef.current) {
-      window.clearTimeout(balanceTooltipTimeoutRef.current);
+      globalThis.clearTimeout(balanceTooltipTimeoutRef.current);
     }
     setIsBalanceTooltipVisible(false);
     setAllowBalanceTooltip(true);

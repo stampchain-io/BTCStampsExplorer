@@ -1,4 +1,9 @@
-export type SRC101Operation = "deploy" | "mint" | "transfer" | "setrecord" | "renew";
+export type SRC101Operation =
+  | "deploy"
+  | "mint"
+  | "transfer"
+  | "setrecord"
+  | "renew";
 
 export interface SRC101InputData {
   op: SRC101Operation;

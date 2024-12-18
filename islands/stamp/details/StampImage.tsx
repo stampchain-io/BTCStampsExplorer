@@ -78,16 +78,16 @@ function RightPanel(
   useEffect(() => {
     return () => {
       if (xTooltipTimeoutRef.current) {
-        window.clearTimeout(xTooltipTimeoutRef.current);
+        globalThis.clearTimeout(xTooltipTimeoutRef.current);
       }
       if (shareTooltipTimeoutRef.current) {
-        window.clearTimeout(shareTooltipTimeoutRef.current);
+        globalThis.clearTimeout(shareTooltipTimeoutRef.current);
       }
       if (codeTooltipTimeoutRef.current) {
-        window.clearTimeout(codeTooltipTimeoutRef.current);
+        globalThis.clearTimeout(codeTooltipTimeoutRef.current);
       }
       if (fullscreenTooltipTimeoutRef.current) {
-        window.clearTimeout(fullscreenTooltipTimeoutRef.current);
+        globalThis.clearTimeout(fullscreenTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -100,10 +100,10 @@ function RightPanel(
       }
 
       if (xTooltipTimeoutRef.current) {
-        window.clearTimeout(xTooltipTimeoutRef.current);
+        globalThis.clearTimeout(xTooltipTimeoutRef.current);
       }
 
-      xTooltipTimeoutRef.current = window.setTimeout(() => {
+      xTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsXTooltipVisible(false);
       }, 1500);
     }
@@ -111,7 +111,7 @@ function RightPanel(
 
   const handleXMouseLeave = () => {
     if (xTooltipTimeoutRef.current) {
-      window.clearTimeout(xTooltipTimeoutRef.current);
+      globalThis.clearTimeout(xTooltipTimeoutRef.current);
     }
     setIsXTooltipVisible(false);
     setAllowXTooltip(true);
@@ -125,10 +125,10 @@ function RightPanel(
       }
 
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
 
-      tooltipTimeoutRef.current = window.setTimeout(() => {
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsTooltipVisible(false);
       }, 1500);
     }
@@ -136,7 +136,7 @@ function RightPanel(
 
   const handleCopyMouseLeave = () => {
     if (tooltipTimeoutRef.current) {
-      window.clearTimeout(tooltipTimeoutRef.current);
+      globalThis.clearTimeout(tooltipTimeoutRef.current);
     }
     setIsTooltipVisible(false);
     setShowCopied(false);
@@ -158,10 +158,10 @@ function RightPanel(
       setAllowTooltip(false);
 
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
 
-      tooltipTimeoutRef.current = window.setTimeout(() => {
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setShowCopied(false);
       }, 1500);
     }).catch((error) => {
@@ -177,10 +177,10 @@ function RightPanel(
       }
 
       if (shareTooltipTimeoutRef.current) {
-        window.clearTimeout(shareTooltipTimeoutRef.current);
+        globalThis.clearTimeout(shareTooltipTimeoutRef.current);
       }
 
-      shareTooltipTimeoutRef.current = window.setTimeout(() => {
+      shareTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsShareTooltipVisible(false);
       }, 1500);
     }
@@ -188,7 +188,7 @@ function RightPanel(
 
   const handleShareMouseLeave = () => {
     if (shareTooltipTimeoutRef.current) {
-      window.clearTimeout(shareTooltipTimeoutRef.current);
+      globalThis.clearTimeout(shareTooltipTimeoutRef.current);
     }
     setIsShareTooltipVisible(false);
     setAllowShareTooltip(true);
@@ -203,10 +203,10 @@ function RightPanel(
       }
 
       if (codeTooltipTimeoutRef.current) {
-        window.clearTimeout(codeTooltipTimeoutRef.current);
+        globalThis.clearTimeout(codeTooltipTimeoutRef.current);
       }
 
-      codeTooltipTimeoutRef.current = window.setTimeout(() => {
+      codeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsCodeTooltipVisible(false);
       }, 1500);
     }
@@ -214,7 +214,7 @@ function RightPanel(
 
   const handleCodeMouseLeave = () => {
     if (codeTooltipTimeoutRef.current) {
-      window.clearTimeout(codeTooltipTimeoutRef.current);
+      globalThis.clearTimeout(codeTooltipTimeoutRef.current);
     }
     setIsCodeTooltipVisible(false);
     setAllowCodeTooltip(true);
@@ -229,10 +229,10 @@ function RightPanel(
       }
 
       if (fullscreenTooltipTimeoutRef.current) {
-        window.clearTimeout(fullscreenTooltipTimeoutRef.current);
+        globalThis.clearTimeout(fullscreenTooltipTimeoutRef.current);
       }
 
-      fullscreenTooltipTimeoutRef.current = window.setTimeout(() => {
+      fullscreenTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsFullscreenTooltipVisible(false);
       }, 1500);
     }
@@ -240,7 +240,7 @@ function RightPanel(
 
   const handleFullscreenMouseLeave = () => {
     if (fullscreenTooltipTimeoutRef.current) {
-      window.clearTimeout(fullscreenTooltipTimeoutRef.current);
+      globalThis.clearTimeout(fullscreenTooltipTimeoutRef.current);
     }
     setIsFullscreenTooltipVisible(false);
     setAllowFullscreenTooltip(true);
@@ -496,7 +496,7 @@ export function StampImage(
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -511,10 +511,10 @@ export function StampImage(
   useEffect(() => {
     return () => {
       if (tooltipTimeoutRef.current) {
-        window.clearTimeout(tooltipTimeoutRef.current);
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
       if (xTooltipTimeoutRef.current) {
-        window.clearTimeout(xTooltipTimeoutRef.current);
+        globalThis.clearTimeout(xTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -528,10 +528,10 @@ export function StampImage(
       }
 
       if (xTooltipTimeoutRef.current) {
-        window.clearTimeout(xTooltipTimeoutRef.current);
+        globalThis.clearTimeout(xTooltipTimeoutRef.current);
       }
 
-      xTooltipTimeoutRef.current = window.setTimeout(() => {
+      xTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsXTooltipVisible(false);
       }, 1500);
     }
@@ -539,7 +539,7 @@ export function StampImage(
 
   const handleXMouseLeave = () => {
     if (xTooltipTimeoutRef.current) {
-      window.clearTimeout(xTooltipTimeoutRef.current);
+      globalThis.clearTimeout(xTooltipTimeoutRef.current);
     }
     setIsXTooltipVisible(false);
     setAllowXTooltip(true);

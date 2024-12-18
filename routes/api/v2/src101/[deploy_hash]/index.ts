@@ -16,7 +16,7 @@ export const handler: Handlers<AddressHandlerContext> = {
         index: null,
         expire: Number(params.get("expire")) || 0,
         limit: Number(params.get("limit")) || 1000,
-        page: Number(params.get("page")) || 1, 
+        page: Number(params.get("page")) || 1,
         sort: params.get("sort") || "ASC",
       };
       const result = await Src101Controller.handleSrc101OwnerRequest(

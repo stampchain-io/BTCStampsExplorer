@@ -222,6 +222,35 @@ code_quality:
     indent: 2
     use_spaces: true
     single_quote: false
+    commands:
+      check: "deno task check:fmt"
+      debug: "deno task check:fmt:debug"
+    excludes:
+      - "**/_fresh/**/*"
+      - "**/server/**/*"
+      - "**/node_modules/**/*"
+      - "**/dist/**/*"
+      - "**/.git/**/*"
+      - "**/coverage/**/*"
+      - "**/tmp/**/*"
+      - "**/.cache/**/*"
+      - "**/.*/",
+      - "**/.*"
+      - "**/build/**/*"
+      - "**/vendor/**/*"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.css"
+      - "**/*.json"
+      - "**/*.md"
+      - "**/*.html"
+      - "**/static/**/*"
+    file_types:
+      include: ["**/*.ts", "**/*.tsx"]
+    ci:
+      workflow: "github-actions"
+      step_name: "Check formatting"
+      command: "deno task check:fmt"
   linting:
     rules:
       - "fresh"
@@ -231,6 +260,10 @@ code_quality:
   checks:
     command: "deno task check"
     run: "before commits"
+    sequence:
+      - format: "deno task check:fmt"
+      - lint: "deno task check:lint"
+      - types: "deno task check:types"
 
 # Security implementations from your codebase
 security:
