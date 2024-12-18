@@ -340,13 +340,14 @@ export class StampController {
     idents: SUBPROTOCOLS[];
     limit: number;
     type: STAMP_TYPES;
+    sortBy?: "ASC" | "DESC";
   }[]) {
     const results = await Promise.all(
       categories.map(async (category) => {
         const serviceResult = await StampService.getStamps({
           page: 1,
           limit: category.limit,
-          sortBy: "DESC",
+          sortBy: category.sortBy || "ASC",
           type: category.type,
           ident: category.idents,
           noPagination: false,
@@ -378,9 +379,9 @@ export class StampController {
           type: "all"
         }),
         this.getMultipleStampCategories([
-          { idents: ["STAMP", "SRC-721"], limit: 8, type: "stamps" },
-          { idents: ["SRC-721"], limit: 12, type: "stamps" },
-          { idents: ["STAMP"], limit: 20, type: "stamps" }, // Art stamps (increased to 20)
+          { idents: ["STAMP", "SRC-721"], limit: 8, type: "stamps", sortBy: "DESC" },
+          { idents: ["SRC-721"], limit: 12, type: "stamps", sortBy: "DESC"  },
+          { idents: ["STAMP"], limit: 20, type: "stamps", sortBy: "DESC" }, // Art stamps with DESC order
         ]),
         CollectionController.getCollectionStamps({
           limit: 4,
