@@ -54,9 +54,8 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
               <p class={dataLabelSm}>
                 TOP MINTS{" "}
                 <span class={dataValueSm}>
-                  {src20.top_mints_percentage?.toFixed(1) || "N/A"}
-                </span>{" "}
-                %
+                  {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
+                </span>
               </p>
               <div class="flex flex-col gap-1">
                 <p class={dataLabelSm}>
@@ -89,9 +88,8 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             <p class={dataLabelSm}>
               TOP MINTS{" "}
               <span class={dataValueSm}>
-                {src20.top_mints_percentage?.toFixed(1) || "N/A"}
-              </span>{" "}
-              %
+                {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
+              </span>
             </p>
             <div class="flex flex-col gap-1">
               <p class={dataLabelSm}>
@@ -121,9 +119,8 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             <p class={dataLabelSm}>
               TOP MINTS{" "}
               <span class={dataValueSm}>
-                {src20.top_mints_percentage?.toFixed(1) || "N/A"}
-              </span>{" "}
-              %
+                {src20.top_mints_percentage?.toFixed(1) || "N/A"}%
+              </span>
             </p>
           </div>
         </div>
