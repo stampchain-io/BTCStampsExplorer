@@ -64,18 +64,22 @@ export const handler: Handlers<StampData> = {
       }
 
       // Use the CPID from stamp data for other queries
-      const [holders, recentStamps] = await Promise.all([
+      const [holders, mainCategories] = await Promise.all([
         StampController.getStampHolders(
-          stampData.data.stamp.cpid, // Use CPID directly
+          stampData.data.stamp.cpid,
           1,
           1000000,
           RouteType.BALANCE,
         ),
-        StampController.getStamps({
-          limit: 12,
-          page: 1,
-          sortBy: "desc",
-        }),
+        // Use the same pattern as getHomePageData
+        StampController.getMultipleStampCategories([
+          {
+            idents: ["STAMP", "SRC-721"],
+            limit: 12,
+            type: "stamps",
+            sortBy: "DESC",
+          },
+        ]),
       ]);
 
       // Only fetch dispensers for STAMP or SRC-721
@@ -92,40 +96,16 @@ export const handler: Handlers<StampData> = {
           stampData.data.stamp.cpid,
         );
         dispensers = dispensersData?.dispensers || [];
-
-        // Find the lowest price open dispenser
-        const openDispensers = dispensers.filter((d) => d.give_remaining > 0);
-        lowestPriceDispenser = openDispensers.reduce(
-          (lowest, dispenser) => {
-            if (!lowest || dispenser.satoshirate < lowest.satoshirate) {
-              return dispenser;
-            }
-            return lowest;
-          },
-          null,
-        );
-
-        // Calculate floor price from lowest price dispenser
-        floorPrice = lowestPriceDispenser
-          ? Number(
-            formatSatoshisToBTC(lowestPriceDispenser.satoshirate, {
-              includeSymbol: false,
-            }),
-          )
-          : null;
+        lowestPriceDispenser = findLowestPriceDispenser(dispensers);
+        floorPrice = calculateFloorPrice(lowestPriceDispenser);
       }
 
       const btcPrice = await fetchBTCPriceInUSD(url.origin);
-
-      // Calculate USD values
-      const stampWithPrices = {
-        ...stampData.data.stamp,
+      const stampWithPrices = addPricesToStamp(
+        stampData.data.stamp,
         floorPrice,
-        floorPriceUSD: floorPrice !== null ? floorPrice * btcPrice : null,
-        marketCapUSD: typeof stampData.data.stamp.marketCap === "number"
-          ? stampData.data.stamp.marketCap * btcPrice
-          : null,
-      };
+        btcPrice,
+      );
 
       const calculateHoldersWithPercentage = (rawHolders: Holder[]) => {
         const totalQuantity = rawHolders.reduce(
@@ -134,7 +114,7 @@ export const handler: Handlers<StampData> = {
         );
         return rawHolders.map((holder) => ({
           ...holder,
-          amt: holder.quantity, // Add amt for compatibility
+          amt: holder.quantity,
           percentage: Number(
             ((holder.quantity / totalQuantity) * 100).toFixed(2),
           ),
@@ -145,7 +125,7 @@ export const handler: Handlers<StampData> = {
         ...stampData.data,
         stamp: stampWithPrices,
         last_block: stampData.last_block,
-        stamps_recent: recentStamps?.data || [],
+        stamps_recent: mainCategories[0]?.stamps ?? [], // Use the stamps from mainCategories
         holders: calculateHoldersWithPercentage(holders.data),
         lowestPriceDispenser: lowestPriceDispenser,
         url: req.url,
@@ -161,6 +141,45 @@ export const handler: Handlers<StampData> = {
     }
   },
 };
+
+// Helper functions to improve readability
+function findLowestPriceDispenser(dispensers: any[]) {
+  const openDispensers = dispensers.filter((d) => d.give_remaining > 0);
+  return openDispensers.reduce(
+    (lowest, dispenser) => {
+      if (!lowest || dispenser.satoshirate < lowest.satoshirate) {
+        return dispenser;
+      }
+      return lowest;
+    },
+    null,
+  );
+}
+
+function calculateFloorPrice(dispenser: any) {
+  return dispenser
+    ? Number(
+      formatSatoshisToBTC(dispenser.satoshirate, {
+        includeSymbol: false,
+      }),
+    )
+    : null;
+}
+
+function addPricesToStamp(
+  stamp: any,
+  floorPrice: number | null,
+  btcPrice: number,
+) {
+  return {
+    ...stamp,
+    floorPrice,
+    floorPriceUSD: floorPrice !== null ? floorPrice * btcPrice : null,
+    marketCapUSD: typeof stamp.marketCap === "number"
+      ? stamp.marketCap * btcPrice
+      : null,
+  };
+}
 
 export default function StampPage(props: StampDetailPageProps) {
   const {
