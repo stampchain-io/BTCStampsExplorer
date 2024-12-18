@@ -277,6 +277,11 @@ export default {
         ".gradient-text": {
           "@apply bg-clip-text text-fill-transparent": {},
         },
+        "html *:focus-visible": {
+          "outline": "2px solid #CCCCCCBF !important",
+          "outline-offset": "-2px !important",
+          "outline-style": "solid !important",
+        },
       });
     }),
   ],
