@@ -51,12 +51,6 @@ interface StampData {
   lowestPriceDispenser: any;
 }
 
-// Update CollectionRow interface to be simpler since we only need basic info
-interface CollectionRow {
-  collection_id: string;
-  name: string;
-}
-
 export const handler: Handlers<StampData> = {
   async GET(req: Request, ctx) {
     try {
@@ -153,6 +147,7 @@ export const handler: Handlers<StampData> = {
         stamps_recent: recentStamps?.data || [],
         holders: calculateHoldersWithPercentage(holders.data),
         lowestPriceDispenser: lowestPriceDispenser,
+        url: req.url,
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
@@ -180,6 +175,32 @@ export default function StampPage(props: StampDetailPageProps) {
   const title = stamp.name
     ? `${stamp.name}`
     : `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
+
+  // Update the getMetaImageUrl and add dimension handling
+  const getMetaImageInfo = (stamp: StampRow, baseUrl: string) => {
+    // For HTML/SVG content, use preview endpoint with known dimensions
+    if (
+      stamp.stamp_mimetype === "text/html" ||
+      stamp.stamp_mimetype === "image/svg+xml"
+    ) {
+      return {
+        url: `${baseUrl}/api/v2/stamp/${stamp.stamp}/preview`,
+        width: 1200,
+        height: 1200,
+      };
+    }
+
+    // For direct images, use original URL and dimensions
+    return {
+      url: stamp.stamp_url,
+    };
+  };
+
+  const baseUrl = new URL(props.url).origin;
+  const metaInfo = getMetaImageInfo(stamp, baseUrl);
+  const metaDescription = `Bitcoin Stamp #${stamp.stamp} - ${
+    stamp.name || "Unprunable UTXO Art"
+  }`;
 
   const bodyClassName = "flex flex-col gap-6";
 
@@ -217,13 +238,26 @@ export default function StampPage(props: StampDetailPageProps) {
       <Head>
         <title>{title}</title>
         <meta property="og:title" content={title} />
-        <meta
-          property="og:description"
-          content="Unprunable UTXO Art, Because Sats Don't Exist"
-        />
-        <meta property="og:image" content={stamp.stamp_url} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:image" content={metaInfo.url} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={metaDescription} />
+        <meta name="twitter:image" content={metaInfo.url} />
+        {/* Only add dimension meta tags if we have the dimensions */}
+        {metaInfo.width && metaInfo.height && (
+          <>
+            <meta
+              property="og:image:width"
+              content={metaInfo.width.toString()}
+            />
+            <meta
+              property="og:image:height"
+              content={metaInfo.height.toString()}
+            />
+          </>
+        )}
       </Head>
 
       <div class={bodyClassName}>

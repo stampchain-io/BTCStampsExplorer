@@ -65,6 +65,7 @@
     "tls": "node:tls",
     "net": "node:net",
     "dns": "node:dns",
+    "puppeteer": "npm:puppeteer@^21.5.0",
     "dns/promises": "node:dns/promises",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
