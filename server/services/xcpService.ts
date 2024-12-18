@@ -6,6 +6,7 @@ import { DispenserFilter, DispenseEvent, XcpBalance } from "$types/index.d.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { BlockService } from "$server/services/blockService.ts";
 
 export const xcp_v2_nodes = [
   {
@@ -799,15 +800,31 @@ export class XcpManager {
           break;
         }
 
-        const sends = response.result.map((send: any) => ({
-          tx_hash: send.tx_hash,
-          block_index: send.block_index,
-          source: send.source,
-          destination: send.destination,
-          quantity: send.quantity,
-          asset: cpid,
-          status: send.status,
-        }));
+        // Get block times for all block indexes in this batch
+        const blockIndexes = response.result.map((send: any) => send.block_index);
+        console.log('Block indexes to fetch:', blockIndexes);
+        const blockTimes = await BlockService.getBlockTimesByIndexes(blockIndexes);
+        console.log('Block times received:', JSON.stringify(blockTimes, null, 2));
+
+        const sends = response.result.map((send: any) => {
+          const blockTime = blockTimes[send.block_index];
+          console.log('Processing send:', {
+            block_index: send.block_index,
+            block_time: blockTime,
+            raw_block_time: blockTimes[send.block_index]
+          });
+
+          return {
+            tx_hash: send.tx_hash,
+            block_index: send.block_index,
+            block_time: blockTime,
+            source: send.source,
+            destination: send.destination,
+            quantity: send.quantity,
+            asset: cpid,
+            status: send.status,
+          };
+        });
 
         allSends = allSends.concat(sends);
         processedCount += sends.length;
@@ -830,15 +847,17 @@ export class XcpManager {
 
     // Apply pagination to the collected results
     const paginatedSends = allSends.slice(skipCount, skipCount + limit);
-    const total = allSends.length;
-
-    console.log(
-      `Fetched XCP sends for CPID: ${cpid}, Count: ${total}`,
-    );
+    console.log('Final paginated sends:', paginatedSends.map(send => ({
+      block_index: send.block_index,
+      block_time: send.block_time
+    })));
 
     return {
       sends: paginatedSends,
-      total
+      total: allSends.length,
+      page,
+      limit,
+      totalPages: Math.ceil(allSends.length / limit)
     };
   }
 

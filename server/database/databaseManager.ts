@@ -1,18 +1,16 @@
 import "$/server/config/env.ts";
 
-import { Client } from "mysql/mod.ts";
-import { connect, Redis } from "redis";
-import { crypto } from "@std/crypto";
+import { Client } from "https://deno.land/x/mysql@v2.12.1/mod.ts";
+import { connect, Redis } from "https://deno.land/x/redis@v0.32.4/mod.ts";
+import { crypto } from "jsr:/@std/crypto@^1.0.3";
 import {
-  ConsoleHandler,
+  Handler as ConsoleHandler,
   FileHandler,
   getLogger,
   LogRecord,
   setup,
-} from "@std/log";
-import {
-  deadline,
-} from "@std/async";
+} from "jsr:/@std/log@0.224.0";
+import { deadline } from "jsr:/@std/async@^1.0.5";
 
 interface DatabaseConfig {
   DB_HOST: string;
@@ -150,13 +148,15 @@ class DatabaseManager {
 
   private createConnection(): Promise<Client> {
     const { DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME } = this.config;
-    const charset= 'utf8mb4'
+    const charset = 'utf8mb4';
+    // URL encode the password to handle special characters
+    const encodedPassword = encodeURIComponent(DB_PASSWORD);
     return new Client().connect({
       hostname: DB_HOST,
       port: DB_PORT,
       username: DB_USER,
       db: DB_NAME,
-      password: DB_PASSWORD,
+      password: encodedPassword,
       charset: charset,
     });
   }

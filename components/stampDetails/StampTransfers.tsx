@@ -1,4 +1,5 @@
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { type ComponentChildren } from "preact";
 
 interface SendRow {
   source: string;
@@ -6,7 +7,7 @@ interface SendRow {
   quantity: number;
   memo: string;
   tx_hash: string;
-  block_time: number; // Unix timestamp in seconds
+  block_time: string; // ISO 8601 format (e.g. 2024-12-12T18:58:05.000Z)
   cpid?: string;
 }
 
@@ -69,9 +70,24 @@ function TransferRow({ send }: { send: SendRow }) {
         {abbreviateAddress(send.tx_hash)}
       </td>
       <td className="text-right uppercase py-0">
-        {formatDate(new Date(send.block_time * 1000), {
-          includeRelative: false,
-        })}
+        {(() => {
+          try {
+            console.log('Parsing block_time:', send.block_time);
+            if (!send.block_time) {
+              console.error('Missing block_time');
+              return 'N/A';
+            }
+            const date = new Date(send.block_time);
+            if (isNaN(date.getTime())) {
+              console.error('Invalid date:', send.block_time);
+              return 'Invalid Date';
+            }
+            return formatDate(date);
+          } catch (error) {
+            console.error('Error parsing date:', error, 'block_time:', send.block_time);
+            return 'Invalid Date';
+          }
+        })()}
       </td>
     </tr>
   );

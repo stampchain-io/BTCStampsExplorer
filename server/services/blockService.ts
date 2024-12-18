@@ -69,4 +69,36 @@ export class BlockService {
 
     return last_block.rows[0].last_block;
   }
+
+  static async getBlockTimesByIndexes(blockIndexes: number[]): Promise<Record<number, string>> {
+    console.log('getBlockTimesByIndexes called with:', blockIndexes);
+
+    if (!blockIndexes.length) {
+      console.log('No block indexes provided, returning empty object');
+      return {};
+    }
+
+    const uniqueIndexes = [...new Set(blockIndexes)];
+    console.log('Unique block indexes:', uniqueIndexes);
+
+    const blocks = await BlockRepository.getBlockInfoFromDb(uniqueIndexes);
+    console.log('Retrieved blocks from repository:', blocks);
+
+    if (!blocks || !blocks.rows) {
+      console.log('No blocks found or invalid response');
+      return {};
+    }
+
+    const result = blocks.rows.reduce((acc: Record<number, string>, block: any) => {
+      console.log('Processing block:', block);
+      console.log('Block time value:', block.block_time, 'for block index:', block.block_index);
+      if (block && block.block_time) {
+        acc[block.block_index] = block.block_time;
+      }
+      return acc;
+    }, {});
+
+    console.log('Final block times mapping:', result);
+    return result;
+  }
 }

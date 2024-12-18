@@ -7,15 +7,26 @@ const BLOCK_FIELDS =
   `block_index, block_time, block_hash, previous_block_hash, ledger_hash, txlist_hash, messages_hash`;
 
 export class BlockRepository {
-  /**
-   * Retrieves block information by block index or hash using the provided database client.
-   * @param client - The database client to use for the query.
-   * @param blockIdentifier - The block index or hash to retrieve information for.
-   * @returns A promise that resolves to the block information.
-   */
   static async getBlockInfoFromDb(
-    blockIdentifier: number | string,
+    blockIdentifier: number | string | number[],
   ) {
+    if (Array.isArray(blockIdentifier)) {
+      if (blockIdentifier.length === 0) return { rows: [] };
+
+      console.log('Executing block query for indexes:', blockIdentifier);
+      const result = await dbManager.executeQueryWithCache(
+        `
+        SELECT ${BLOCK_FIELDS}
+        FROM blocks
+        WHERE block_index IN (${blockIdentifier.map(() => '?').join(',')});
+        `,
+        blockIdentifier,
+        "never",
+      );
+      console.log('Block query result:', result);
+      return result;
+    }
+
     const isIndex = typeof blockIdentifier === "number" ||
       /^\d+$/.test(blockIdentifier);
     const field = isIndex ? "block_index" : "block_hash";
@@ -31,12 +42,7 @@ export class BlockRepository {
       "never",
     );
   }
-  /**
-   * Retrieves the last block index from the database using the provided client.
-   *
-   * @param client - The database client to use for the query.
-   * @returns A promise that resolves to the last block index.
-   */
+
   static async getLastBlockFromDb() {
     return await dbManager.executeQueryWithCache(
       `
