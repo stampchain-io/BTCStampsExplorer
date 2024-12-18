@@ -93,7 +93,9 @@ export class BlockService {
       console.log('Processing block:', block);
       console.log('Block time value:', block.block_time, 'for block index:', block.block_index);
       if (block && block.block_time) {
-        acc[block.block_index] = block.block_time;
+        // Convert MySQL datetime to ISO 8601 format
+        const date = new Date(block.block_time);
+        acc[block.block_index] = date.toISOString();
       }
       return acc;
     }, {});
