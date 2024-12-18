@@ -189,7 +189,7 @@ export function StampCard({
               loading="lazy"
               sandbox="allow-scripts allow-same-origin"
               src={src}
-              class="absolute top-0 left-0 w-full h-full object-contain"
+              class="absolute top-0 left-0 w-full h-full object-contain pointer-events-none"
               onError={(e) => {
                 console.error("iframe error (detailed):", {
                   error: e,
@@ -202,6 +202,7 @@ export function StampCard({
                 handleImageError(e);
               }}
             />
+            <div class="absolute inset-0 cursor-pointer" />
           </div>
         </div>
       );
