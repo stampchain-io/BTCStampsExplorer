@@ -241,7 +241,7 @@ export function Header() {
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex tablet:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-20 bg-[#080808CC] scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] backdrop-blur-md font-black text-stamp-primary ${
+        className={`duration-500 flex tablet:hidden flex-col justify-between fixed right-0 top-0 w-full h-screen z-50 bg-[#080808CC] scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] backdrop-blur-md font-black text-stamp-primary ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"

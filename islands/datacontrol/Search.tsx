@@ -48,12 +48,16 @@ export function Search({
   }, [searchTerm]);
 
   return (
-    <div class="relative flex items-center">
+    <div
+      class={open
+        ? "absolute right-0 z-10 w-full mobileLg:w-[360px]"
+        : "relative flex items-center"}
+    >
       {open && (
         <>
           <input
             type="text"
-            class="min-w-[260px] tablet:min-w-[360px] h-7 mobileLg:h-9 bg-stamp-purple px-4 py-2 pr-9 rounded-md text-[13px] text-black placeholder:text-black placeholder:uppercase"
+            class="w-full mobileLg:w-[360px] tablet:min-w-[360px] h-7 mobileLg:h-9 bg-stamp-purple px-4 py-2 pr-9 rounded-md text-[13px] text-black placeholder:text-black placeholder:uppercase"
             placeholder={placeholder}
             value={searchTerm}
             onInput={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
@@ -74,7 +78,7 @@ export function Search({
           <img
             src="/img/stamp/search-glass.png"
             alt="Search icon"
-            className="absolute top-2 right-3 cursor-pointer"
+            className="absolute top-1.5 right-2.5 mobileLg:top-2 mobileLg:right-3 cursor-pointer"
             onClick={handleOpen}
           />
         </>
