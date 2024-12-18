@@ -1,4 +1,3 @@
-/** @jsx h */
 import { h } from "preact";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";

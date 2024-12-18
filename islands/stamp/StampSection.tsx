@@ -1,5 +1,3 @@
-/** @jsx h */
-/** @jsxFrag Fragment */
 import { Fragment, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import type { StampRow, StampWithSaleData } from "$types/utils.d.ts";
@@ -121,9 +119,9 @@ export default function StampSection({
     ...stamp,
     sale_data: stamp.sale_data
       ? {
-        ...stamp.sale_data,
-        btc_amount: stamp.sale_data.price || 0,
-      }
+          ...stamp.sale_data,
+          btc_amount: stamp.sale_data.price || 0,
+        }
       : undefined,
   });
 

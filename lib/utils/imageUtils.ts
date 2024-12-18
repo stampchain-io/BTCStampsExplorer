@@ -1,4 +1,3 @@
-/** @jsx h */
 import { h } from "preact";
 import type { StampRow } from "$globals";
 import { NOT_AVAILABLE_IMAGE } from "$constants";
