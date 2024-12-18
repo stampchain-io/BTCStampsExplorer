@@ -111,8 +111,9 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
               <p class={dataLabelSm}>
                 VALUE{" "}
               </p>
-              <p class={dataValueLg}>
-                N/A <span class="font-extralight">BTC</span>
+              <p class={dataValueSm}>
+                {Math.round((src20.value ?? 0) * 1e8).toLocaleString()}{" "}
+                <span class="text-stamp-grey-light">SATS</span>
               </p>
             </div>
           </div>

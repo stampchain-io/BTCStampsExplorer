@@ -8,6 +8,7 @@ import { WalletData, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { SRC20MarketService } from "$server/services/src20/marketService.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -39,6 +40,7 @@ export const handler: Handlers = {
         openDispensersResponse,
         closedDispensersResponse,
         stampsCreatedCount,
+        marketDataResponse,  // Add market data response
       ] = await Promise.allSettled([
         StampController.getStampBalancesByAddress(
           address,
@@ -69,14 +71,31 @@ export const handler: Handlers = {
           "closed",
         ),
         StampController.getStampsCreatedCount(address),
+        SRC20MarketService.fetchMarketListingSummary(),  // Add market data fetch
       ]);
+
+      const marketData = marketDataResponse.status === "fulfilled"
+        ? marketDataResponse.value
+        : [];
 
       const stampsData = stampsResponse.status === "fulfilled"
         ? stampsResponse.value
         : { data: [], total: 0 };
 
       const src20Data = src20Response.status === "fulfilled"
-        ? src20Response.value
+        ? {
+            ...src20Response.value,
+            data: src20Response.value.data.map((token: any) => {
+              const marketInfo = marketData.find(
+                (item) => item.tick.toUpperCase() === token.tick.toUpperCase()
+              ) || { floor_unit_price: 0 };
+              return {
+                ...token,
+                floor_unit_price: marketInfo.floor_unit_price,
+                value: marketInfo.floor_unit_price * Number(token.amt || 0)
+              };
+            })
+          }
         : { data: [], total: 0 };
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
