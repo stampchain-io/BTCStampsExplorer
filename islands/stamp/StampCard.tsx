@@ -91,7 +91,6 @@ const ABBREVIATION_LENGTHS = {
   mobileMd: 6,
   mobileSm: 6,
 } as const;
-
 export function StampCard({
   stamp,
   isRecentSale = false,
@@ -120,9 +119,9 @@ export function StampCard({
   const src = getStampImageSrc(stamp as StampRow);
 
   // Add state for validated content
-  const [validatedContent, setValidatedContent] = useState<
-    ComponentChild | null
-  >(null);
+  const [validatedContent, setValidatedContent] = useState<ComponentChild | null>(
+    null
+  );
 
   useEffect(() => {
     const validateContent = async () => {
