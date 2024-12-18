@@ -121,9 +121,9 @@ export default function StampSection({
     ...stamp,
     sale_data: stamp.sale_data
       ? {
-          ...stamp.sale_data,
-          btc_amount: stamp.sale_data.price || 0,
-        }
+        ...stamp.sale_data,
+        btc_amount: stamp.sale_data.price || 0,
+      }
       : undefined,
   });
 

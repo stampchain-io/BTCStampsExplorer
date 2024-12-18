@@ -179,7 +179,7 @@ export interface StampSectionProps {
   alignRight?: boolean;
 }
 
-export interface StampWithSaleData extends Omit<StampRow, 'sale_data'> {
+export interface StampWithSaleData extends Omit<StampRow, "sale_data"> {
   sale_data?: {
     btc_amount: number;
     block_index: number;
