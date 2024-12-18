@@ -20,7 +20,7 @@ export function ModalLayout({
       class={`fixed inset-0 z-50 flex items-center justify-center bg-[#0b0b0b] bg-opacity-95 backdrop-filter backdrop-blur-sm ${className}`}
       onClick={preventPropagation ? onClose : undefined}
     >
-      <div class="relative w-[360px] mobileLg:w-[420px] h-[600px] mobileLg:h-[680px] p-6 dark-gradient rounded-lg overflow-hidden">
+      <div class="relative w-[360px] mobileLg:w-[420px] h-[600px] mobileLg:h-[700px] p-6 dark-gradient rounded-lg overflow-hidden">
         <div
           class={`relative ${contentClassName}`}
           onClick={preventPropagation ? (e) => e.stopPropagation() : undefined}
