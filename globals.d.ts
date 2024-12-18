@@ -117,32 +117,7 @@ export interface BlockRow {
   issuances?: number;
   sends?: number;
 }
-export interface StampRow {
-  tx_hash: string;
-  block_index: number;
-  block_time: string;
-  creator: string;
-  creator_name: string;
-  destination: string;
-  p: string;
-  op: string;
-  stamp_url?: string;
-  mime_type?: string;
-  file_type?: string;
-  file_size?: number;
-  content_length?: number;
-  content_type?: string;
-  sha256?: string;
-  stamp_mime?: string;
-  stamp_type?: string;
-  stamp_size?: number;
-  sale_data?: {
-    tx_hash: string;
-    block_index: number;
-    block_time: string;
-    price: number;
-  };
-}
+export type { StampRow } from "./lib/types/utils.d.ts";
 
 export interface DisplayCountBreakpoints {
   "mobileSm": number; // 360px+
@@ -179,23 +154,7 @@ export interface StampSectionProps {
   alignRight?: boolean;
 }
 
-export interface StampWithSaleData extends Omit<StampRow, "sale_data"> {
-  sale_data?: {
-    btc_amount: number;
-    block_index: number;
-    tx_hash: string;
-    block_time?: string;
-    price?: number;
-  };
-  stamp?: number;
-  cpid?: string;
-  balance?: number;
-  supply?: number;
-  divisible?: boolean;
-  floorPrice?: string | number;
-  recentSalePrice?: string | number;
-  ident?: string;
-}
+export type { StampWithSaleData } from "./lib/types/utils.d.ts";
 
 export interface CollectionSectionProps {
   title?: string;

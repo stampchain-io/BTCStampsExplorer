@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
-import { StampRow } from "$globals";
+import type { StampRow } from "$types/utils.d.ts";
 import createCarouselSlider from "$client/utils/carousel-slider.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 

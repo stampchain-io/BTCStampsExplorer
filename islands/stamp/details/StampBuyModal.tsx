@@ -1,6 +1,6 @@
 // islands/stamp/details/StampBuyModal.tsx
 import { useEffect, useState } from "preact/hooks";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/utils.d.ts";
 import StampImage from "$islands/stamp/details/StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";

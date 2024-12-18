@@ -88,6 +88,7 @@ export interface WindowSize {
 export interface StampRow {
   stamp: number;
   stamp_mime?: string;
+  stamp_mimetype?: string;  // Alias for backward compatibility
   stamp_size?: number;
   tx_hash: string;
   block_index: number;
@@ -105,6 +106,18 @@ export interface StampRow {
   divisible?: boolean;
   cpid?: string;
   balance?: number;
+  mime_type?: string;
+  file_type?: string;
+  file_size?: number;
+  content_length?: number;
+  content_type?: string;
+  sha256?: string;
+  floorPrice?: string | number;
+  floorPriceUSD?: number;
+  marketCap?: number;
+  marketCapUSD?: number;
+  keyburn?: boolean;
+  locked?: boolean;
   sale_data?: {
     tx_hash: string;
     block_index: number;

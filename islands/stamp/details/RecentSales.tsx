@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import StampSection from "$islands/stamp/StampSection.tsx";
-import type { StampRow } from "$globals";
+import type { StampRow } from "$types/utils.d.ts";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 
 interface DisplayCountBreakpoints {
