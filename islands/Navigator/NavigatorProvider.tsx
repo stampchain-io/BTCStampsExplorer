@@ -47,8 +47,11 @@ export const NavigatorProvider = (
     const url = new URL(self.location.href);
     url.searchParams.set("type", newType);
     url.searchParams.set("page", "1");
-    self.history.pushState({}, "", url.toString());
     setType(newType);
+    const event = new CustomEvent("fresh-navigate", {
+      detail: { url: url.toString() }
+    });
+    self.dispatchEvent(event);
     if (reload) {
       self.location.reload();
     }
@@ -58,8 +61,11 @@ export const NavigatorProvider = (
     const url = new URL(self.location.href);
     url.searchParams.set("sortBy", newSort);
     url.searchParams.set("page", "1");
-    self.history.pushState({}, "", url.toString());
     setSort(newSort);
+    const event = new CustomEvent("fresh-navigate", {
+      detail: { url: url.toString() }
+    });
+    self.dispatchEvent(event);
   };
 
   const setFilterOption = (newFilter: STAMP_FILTER_TYPES) => {
@@ -75,7 +81,10 @@ export const NavigatorProvider = (
       url.searchParams.delete("filterBy");
     }
     url.searchParams.set("page", "1");
-    self.history.pushState({}, "", url.toString());
+    const event = new CustomEvent("fresh-navigate", {
+      detail: { url: url.toString() }
+    });
+    self.dispatchEvent(event);
   };
 
   const getSort = () => sort;

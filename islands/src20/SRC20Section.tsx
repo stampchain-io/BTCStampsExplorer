@@ -61,36 +61,7 @@ export function SRC20Section(
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  useEffect(() => {
-    const handleUrlChange = () => {
-      if (!initialData) {
-        setIsLoading(true);
-        const url = new URL(self.location.href);
-        const currentPage = url.searchParams.get("src20_page") || "1";
-        const currentLimit = url.searchParams.get("src20_limit") || "8";
 
-        const endpoint = fromPage === "wallet" && address
-          ? `/api/v2/src20/balance/${address}?page=${currentPage}&limit=${currentLimit}`
-          : type === "trending"
-          ? `/api/internal/src20/trending?limit=5&page=${page}&sortBy=${sortBy}`
-          : `/api/internal/src20/details?op=DEPLOY&limit=5&page=${page}&sortBy=${sortBy}`;
-
-        fetch(endpoint)
-          .then((res) => res.json())
-          .then((response) => {
-            setData(response.data || []);
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            console.error(`SRC20 ${type} fetch error:`, error);
-            setIsLoading(false);
-          });
-      }
-    };
-
-    self.addEventListener("urlChanged", handleUrlChange);
-    return () => self.removeEventListener("urlChanged", handleUrlChange);
-  }, [type, fromPage, address, initialData]);
 
   useEffect(() => {
     if (!initialData) {
