@@ -417,7 +417,8 @@ export class SRC20Repository {
         LIMIT ?
       ),
       mint_counts AS (
-        SELECT tick, COUNT(*) as mint_count
+        SELECT tick, COUNT(*) as mint_count,
+               (COUNT(*) * 100.0 / ?) as top_mints_percentage
         FROM latest_mint_transactions
         GROUP BY tick
       ),
@@ -442,6 +443,7 @@ export class SRC20Repository {
       SELECT
         mc.tick,
         mc.mint_count,
+        mc.top_mints_percentage,
         src20_deploy.tx_hash,
         src20_deploy.block_index,
         src20_deploy.p,
@@ -466,6 +468,7 @@ export class SRC20Repository {
     `;
     const queryParams = [
       transactionCount, // Number of recent mint transactions to consider
+      transactionCount, // For top_mints_percentage calculation
       limit,
       offset,
     ];
