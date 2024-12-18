@@ -72,20 +72,25 @@ function TransferRow({ send }: { send: SendRow }) {
       <td className="text-right uppercase py-0">
         {(() => {
           try {
-            console.log('Parsing block_time:', send.block_time);
+            console.log("Parsing block_time:", send.block_time);
             if (!send.block_time) {
-              console.error('Missing block_time');
-              return 'N/A';
+              console.error("Missing block_time");
+              return "N/A";
             }
             const date = new Date(send.block_time);
             if (isNaN(date.getTime())) {
-              console.error('Invalid date:', send.block_time);
-              return 'Invalid Date';
+              console.error("Invalid date:", send.block_time);
+              return "Invalid Date";
             }
             return formatDate(date);
           } catch (error) {
-            console.error('Error parsing date:', error, 'block_time:', send.block_time);
-            return 'Invalid Date';
+            console.error(
+              "Error parsing date:",
+              error,
+              "block_time:",
+              send.block_time,
+            );
+            return "Invalid Date";
           }
         })()}
       </td>
