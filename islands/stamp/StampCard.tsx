@@ -123,9 +123,9 @@ export function StampCard({
   const src = getStampImageSrc(stamp as StampRow);
 
   // Add state for validated content
-  const [validatedContent, setValidatedContent] = useState<ComponentChild | null>(
-    null,
-  );
+  const [validatedContent, setValidatedContent] = useState<
+    ComponentChild | null
+  >(null);
 
   useEffect(() => {
     const validateContent = async () => {

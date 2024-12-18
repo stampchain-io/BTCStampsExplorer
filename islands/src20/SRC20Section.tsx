@@ -86,7 +86,16 @@ export function SRC20Section(
           setIsLoading(false);
         });
     }
-  }, [type, page, sortBy, initialData, fromPage, address, pagination, currentPage]);
+  }, [
+    type,
+    page,
+    sortBy,
+    initialData,
+    fromPage,
+    address,
+    pagination,
+    currentPage,
+  ]);
 
   useEffect(() => {
     if (data.length > 0 && fromPage === "wallet") {

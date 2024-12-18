@@ -33,9 +33,13 @@ declare const Deno: {
     get(key: string): string | undefined;
   };
   mkdir(path: string, options?: { recursive?: boolean }): Promise<void>;
-  writeTextFile(path: string, data: string, options?: { append?: boolean }): Promise<void>;
+  writeTextFile(
+    path: string,
+    data: string,
+    options?: { append?: boolean },
+  ): Promise<void>;
   errors: {
-    AlreadyExists: { new(): Error };
+    AlreadyExists: { new (): Error };
   };
 };
 
