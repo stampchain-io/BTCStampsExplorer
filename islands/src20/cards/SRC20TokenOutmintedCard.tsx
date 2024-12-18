@@ -139,7 +139,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
             <p class={dataLabelSm}>
               TOP MINTS{" "}
               <span class={dataValueSm}>
-                0
+                {src20.top_mints_percentage?.toFixed(1) || "N/A"}
               </span>{" "}
               %
             </p>
