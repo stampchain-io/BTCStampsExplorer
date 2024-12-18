@@ -49,10 +49,10 @@ export function Filter({
   return (
     <div
       class={`${
-        open ? "bg-gradient-filters h-fit" : "cursor-pointer"
-      } rounded-md flex flex-col items-center gap-1 relative z-[10] ${
-        open ? "px-6 py-4" : ""
-      }`}
+        open
+          ? "bg-gradient-filters h-fit px-6 py-4 absolute top-0 right-10 z-20 border-2 border-stamp-purple"
+          : "cursor-pointer relative z-[10]"
+      } rounded-md flex flex-col items-center gap-1 `}
       onClick={() => {
         if (open) return;
         handleOpen(true);

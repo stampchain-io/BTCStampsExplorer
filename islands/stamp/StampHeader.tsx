@@ -30,11 +30,11 @@ export const StampHeader = (
 
   return (
     <div
-      className="flex flex-row justify-between items-center gap-3 w-full"
+      className="flex flex-row justify-between items-center gap-3 w-full relative"
       f-partial="/stamp"
     >
       <h1 className={titlePurpleDLClassName}>ART STAMPS</h1>
-      <div className="flex gap-3 justify-between mobileLg:h-9 h-7 items-center">
+      <div className="flex gap-3 justify-between mobileLg:h-9 h-7 items-center ">
         <Sort initSort={sortBy} />
         <Filter
           initFilter={filterBy}
