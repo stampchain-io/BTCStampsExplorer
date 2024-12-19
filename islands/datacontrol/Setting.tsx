@@ -18,26 +18,29 @@ type FilterTypes =
   | LISTING_FILTER_TYPES
   | SRC20_TYPES;
 
-interface FilterProps {
-  initFilter?: FilterTypes[];
+interface SettingProps {
+  initFilter: string[];
   open: boolean;
   handleOpen: (open: boolean) => void;
-  filterButtons: FilterTypes[];
+  filterButtons: string[];
+  onFilterClick?: (filter: string) => void;
 }
+
 export function Setting({
   initFilter = [],
   open = false,
   handleOpen,
   filterButtons,
-}: FilterProps) {
-  const [localFilters, setLocalFilters] = useState<FilterTypes[]>(initFilter);
+  onFilterClick,
+}: SettingProps) {
+  const [localFilters, setLocalFilters] = useState<string[]>(initFilter);
   const { updateURL } = useURLUpdate();
 
   useEffect(() => {
     setLocalFilters(initFilter);
   }, [initFilter]);
 
-  const handleFilterChange = (value: FilterTypes) => {
+  const handleFilterChange = (value: string) => {
     setLocalFilters((prevFilters) => {
       const newFilters = prevFilters.includes(value)
         ? prevFilters.filter((f) => f !== value)
@@ -45,6 +48,13 @@ export function Setting({
       updateURL({ filterBy: newFilters });
       return newFilters;
     });
+  };
+
+  const handleFilterClick = (filter: string) => {
+    if (onFilterClick) {
+      onFilterClick(filter);
+    }
+    handleOpen(false);
   };
 
   return (
@@ -71,7 +81,7 @@ export function Setting({
                     ? "text-stamp-purple-bright "
                     : "text-stamp-purple hover:text-stamp-purple-bright"
                 }`}
-                onClick={() => handleFilterChange(filter)}
+                onClick={() => handleFilterClick(filter)}
               >
                 {filter.toUpperCase()}
               </button>
