@@ -22,31 +22,31 @@ const AboutContact = () => {
   return (
     <>
       <section>
-        <div className="flex flex-col">
-          <h1 className={titleGreyDL}>
+        <div class="flex flex-col">
+          <h1 class={titleGreyDL}>
             CONTACT
           </h1>
-          <h3 className={subTitleGrey}>
+          <h3 class={subTitleGrey}>
             DROP US A MESSAGE
           </h3>
         </div>
-        <div className="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-          <div className="w-full mobileLg:w-1/2 space-y-3 mobileMd:space-y-6">
-            <p className={bodyTextLight}>
+        <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
+          <div class="w-full mobileLg:w-1/2 space-y-3 mobileMd:space-y-6">
+            <p class={bodyTextLight}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
               vulputate, lacus at faucibus fringilla, urna urna pretium magna,
               et porttitor odio massa sit amet arcu.
             </p>
-            <p className={bodyTextLight}>
+            <p class={bodyTextLight}>
               Curabitur dolor elit, ornare at dolor in, interdum laoreet dolor.
               Pellentesque ut diam erat. Pellentesque id gravida tortor.
               Praesent lacus diam, imperdiet at orci at, venenatis vulputate
               velit.
             </p>
           </div>
-          <div className="w-full mobileLg:w-1/2">
-            <form className="flex flex-col gap-3 mobileMd:gap-6">
-              <div className={inputField2col}>
+          <div class="w-full mobileLg:w-1/2">
+            <form class="flex flex-col gap-3 mobileMd:gap-6">
+              <div class={inputField2col}>
                 <InputField
                   type="text"
                   value={name}
@@ -60,7 +60,7 @@ const AboutContact = () => {
                   placeholder="Email"
                 />
               </div>
-              <div className={inputField1col}>
+              <div class={inputField1col}>
                 <InputField
                   type="text"
                   value={subject}
@@ -68,18 +68,18 @@ const AboutContact = () => {
                   placeholder="Subject"
                 />
               </div>
-              <div className={inputField1col}>
+              <div class={inputField1col}>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.currentTarget.value)}
-                  className="h-[108px] mobileMd:h-[120px] p-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
+                  class="h-[108px] mobileMd:h-[120px] p-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
                   placeholder="Message"
                 />
               </div>
-              <div className="w-full flex justify-end">
+              <div class="w-full flex justify-end">
                 <button
                   type="submit"
-                  className={buttonGreyOutline}
+                  class={buttonGreyOutline}
                 >
                   SEND
                 </button>

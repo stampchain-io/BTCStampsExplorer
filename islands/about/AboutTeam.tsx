@@ -9,46 +9,46 @@ export default function AboutTeam() {
   return (
     <>
       <section>
-        <div className="w-full flex justify-start items-start pt-6">
-          <div className="w-full">
-            <h2 className={subTitlePurple}>
+        <div class="w-full flex justify-start items-start pt-6">
+          <div class="w-full">
+            <h2 class={subTitlePurple}>
               THE TEAM
             </h2>
-            <div className="flex justify-between items-start mx-0 mobileLg:mx-10 desktop:mx-28 gap-3 mobileMd:gap-6 mt-3">
-              <div className="flex flex-col items-center">
+            <div class="flex justify-between items-start mx-0 mobileLg:mx-10 desktop:mx-28 gap-3 mobileMd:gap-6 mt-3">
+              <div class="flex flex-col items-center">
                 <img src="/img/about/code.png" />
-                <p className={aboutTitlePurpleLD}>
+                <p class={aboutTitlePurpleLD}>
                   MIKE IN SPACE
                 </p>
-                <p className={aboutSubTitlePurple}>
+                <p class={aboutSubTitlePurple}>
                   CODE{" "}
-                  <span className="mobileMd:hidden">
+                  <span class="mobileMd:hidden">
                     <br />
                   </span>
                   CONOISSEUR
                 </p>
               </div>
-              <div className="flex flex-col items-center">
+              <div class="flex flex-col items-center">
                 <img src="/img/about/backend.png" />
-                <p className={aboutTitlePurpleLD}>
+                <p class={aboutTitlePurpleLD}>
                   REINAMORA
                 </p>
-                <p className={aboutSubTitlePurple}>
+                <p class={aboutSubTitlePurple}>
                   BACKEND{" "}
-                  <span className="mobileMd:hidden">
+                  <span class="mobileMd:hidden">
                     <br />
                   </span>
                   BIGBRAINS
                 </p>
               </div>
-              <div className="flex flex-col items-center">
+              <div class="flex flex-col items-center">
                 <img src="/img/about/memetic.png" />
-                <p className={aboutTitlePurpleLD}>
+                <p class={aboutTitlePurpleLD}>
                   ARWYN
                 </p>
-                <p className={aboutSubTitlePurple}>
+                <p class={aboutSubTitlePurple}>
                   MEMETIC{" "}
-                  <span className="mobileMd:hidden">
+                  <span class="mobileMd:hidden">
                     <br />
                   </span>MASTER
                 </p>
@@ -59,4 +59,3 @@ export default function AboutTeam() {
       </section>
     </>
   );
-}
