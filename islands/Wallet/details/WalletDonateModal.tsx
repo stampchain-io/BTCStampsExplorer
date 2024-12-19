@@ -44,31 +44,6 @@ function WalletDonateModal({
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
-  const handleMaxClick = async () => {
-    if (!wallet?.balance) return;
-
-    try {
-      const estimatedVSize = 141; // Standard size for P2WPKH tx (1-in 1-out)
-      const feeInSatoshis = Math.ceil((formState.fee * estimatedVSize) / 1000);
-
-      if (wallet.balance <= feeInSatoshis) {
-        setError("Insufficient balance to cover network fees");
-        return;
-      }
-
-      const maxAmountSats = wallet.balance - feeInSatoshis;
-      const maxAmountBTC = (maxAmountSats / 100000000).toFixed(8);
-
-      setFormState({
-        ...formState,
-        amount: maxAmountBTC,
-      });
-    } catch (error) {
-      setError("Failed to calculate maximum amount");
-      console.error("Max amount calculation error:", error);
-    }
-  };
-
   const handleDonateSubmit = async () => {
     await handleSubmit(async () => {
       if (!donateAddress) {
@@ -209,12 +184,6 @@ function WalletDonateModal({
                   maximumFractionDigits: 2,
                 })
               : "0.00"} USD
-          </div>
-          <div
-            className="text-xs mobileLg:text-sm text-stamp-grey font-medium hover:stamp-grey-light mt-1.5 cursor-pointer"
-            onClick={handleMaxClick}
-          >
-            MAX
           </div>
         </div>
 
