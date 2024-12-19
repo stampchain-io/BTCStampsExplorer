@@ -1,6 +1,6 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect as _useEffect, useState as _useState } from "preact/hooks";
 import { paginate } from "$lib/utils/paginationUtils.ts";
-import { initialWallet, walletContext } from "$client/wallet/wallet.ts";
+import { initialWallet as _initialWallet, walletContext } from "$client/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -9,7 +9,7 @@ export const handler: Handlers = {
   async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-      const { wallet, isConnected } = walletContext;
+      const { wallet: _wallet, isConnected: _isConnected } = walletContext;
       const limit = Number(url.searchParams.get("limit")) || 1000;
       const page = Number(url.searchParams.get("page")) || 1;
 

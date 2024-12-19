@@ -1,5 +1,5 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
-import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
+import { ReadAllButton as _ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
 export const HowToTransferModule = () => {
   return (
