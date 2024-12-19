@@ -68,7 +68,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
   const tableLabelClassName =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
   const tableValueClassName =
-    "text-xs mobileLg:text-sm font-normal text-stamp-grey-light";
+    "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
   const totalHolders = holders.length;
 
   return (
@@ -83,7 +83,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
         </div>
 
         <div className="relative w-full max-w-full">
-          <div className="h-48 mobileLg:h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+          <div className="h-48 mobileLg:h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 px-1">
             <table className={tableValueClassName}>
               <thead className={tableLabelClassName}>
                 <tr>
