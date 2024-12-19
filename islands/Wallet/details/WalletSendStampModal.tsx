@@ -1,4 +1,4 @@
-// islands/stamp/details/WalletTransferModal.tsx
+// islands/stamp/details/WalletSendStampModal.tsx
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
@@ -7,6 +7,7 @@ import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import type { StampRow } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface Props {
   fee: number;
@@ -24,7 +25,7 @@ interface Props {
   };
 }
 
-function WalletTransferModal({
+function WalletSendStampModal({
   fee: initialFee,
   handleChangeFee = () => {},
   toggleModal,
@@ -57,66 +58,169 @@ function WalletTransferModal({
   }, [formState.fee]);
 
   const handleTransferSubmit = async () => {
-    await handleSubmit(async () => {
-      if (!selectedStamp) {
-        throw new Error("Please select a stamp to transfer");
-      }
-
-      const options = {
-        return_psbt: true,
-        fee_per_kb: formState.fee,
-      };
-
-      const requestBody = {
-        address: wallet.address,
-        destination: formState.recipientAddress,
-        asset: selectedStamp.stamp,
+    try {
+      await logger.debug("stamps", {
+        message: "Starting transfer submit",
+        selectedStamp,
+        formState,
         quantity,
-        options,
-      };
-
-      const response = await fetch("/api/v2/create/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+        recipientAddress: formState.recipientAddress,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Failed to create send transaction.",
-        );
+      // Validate required fields before proceeding
+      if (!formState.recipientAddress) {
+        await logger.error("stamps", {
+          message: "Transfer failed - missing recipient address",
+        });
+        setError("Recipient address is required");
+        return;
       }
 
-      const responseData = await response.json();
-      if (!responseData?.result?.psbt) {
-        throw new Error("Failed to create send transaction.");
+      if (!quantity || quantity <= 0) {
+        await logger.error("stamps", {
+          message: "Transfer failed - invalid quantity",
+          quantity,
+        });
+        setError("Invalid quantity");
+        return;
       }
 
-      const signResult = await walletContext.signPSBT(
-        wallet,
-        responseData.result.psbt,
-        [], // Empty array for inputs to sign
-        true, // Enable RBF
-      );
+      await handleSubmit(async () => {
+        if (!selectedStamp) {
+          await logger.error("stamps", {
+            message: "Transfer failed - no stamp selected",
+          });
+          throw new Error("Please select a stamp to transfer");
+        }
 
-      if (signResult.signed && signResult.txid) {
-        setSuccessMessage(
-          `Transfer initiated successfully. TXID: ${signResult.txid}`,
-        );
-        setTimeout(toggleModal, 5000);
-      } else if (signResult.cancelled) {
-        throw new Error("Transaction signing was cancelled.");
-      } else {
-        throw new Error(`Failed to sign PSBT: ${signResult.error}`);
-      }
-    });
+        if (!wallet?.address) {
+          await logger.error("stamps", {
+            message: "Transfer failed - no wallet connected",
+          });
+          throw new Error("No wallet connected");
+        }
+
+        // Convert fee rate from sat/vB to sat/kB
+        const feeRateKB = formState.fee * 1000;
+        await logger.debug("stamps", {
+          message: "Transfer fee rate conversion",
+          satVB: formState.fee,
+          satKB: feeRateKB,
+          wallet: wallet?.address,
+        });
+
+        const options = {
+          return_psbt: true,
+          fee_per_kb: feeRateKB,
+          allow_unconfirmed_inputs: true,
+          validate: true,
+        };
+
+        const requestBody = {
+          address: wallet.address,
+          destination: formState.recipientAddress,
+          asset: selectedStamp.cpid,
+          quantity: quantity,
+          options,
+        };
+
+        await logger.debug("stamps", {
+          message: "Preparing send request",
+          requestBody,
+          endpoint: "/api/v2/create/send",
+        });
+
+        try {
+          const response = await fetch("/api/v2/create/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+          });
+
+          await logger.debug("stamps", {
+            message: "Received response from /api/v2/create/send",
+            status: response.status,
+            ok: response.ok,
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            await logger.error("stamps", {
+              message: "Send transaction creation failed",
+              error: errorData.error,
+              status: response.status,
+            });
+            throw new Error(
+              errorData.error || "Failed to create send transaction.",
+            );
+          }
+
+          const responseData = await response.json();
+          await logger.debug("stamps", {
+            message: "Send response received",
+            responseData,
+          });
+
+          if (!responseData?.psbt || !responseData?.inputsToSign) {
+            await logger.error("stamps", {
+              message: "Invalid response structure",
+              responseData,
+            });
+            throw new Error("Invalid response: Missing PSBT or inputsToSign");
+          }
+
+          // Sign the PSBT
+          await logger.debug("stamps", {
+            message: "Attempting to sign PSBT",
+            psbt: responseData.psbt,
+            inputsToSign: responseData.inputsToSign,
+          });
+
+          const signResult = await walletContext.signPSBT(
+            wallet,
+            responseData.psbt,
+            responseData.inputsToSign,
+            true, // Enable RBF
+          );
+
+          await logger.debug("stamps", {
+            message: "PSBT signing result",
+            signResult,
+          });
+
+          if (signResult.signed && signResult.txid) {
+            setSuccessMessage(
+              `Transfer initiated successfully. TXID: ${signResult.txid}`,
+            );
+            setTimeout(toggleModal, 5000);
+          } else if (signResult.cancelled) {
+            throw new Error("Transaction signing was cancelled.");
+          } else {
+            throw new Error(`Failed to sign PSBT: ${signResult.error}`);
+          }
+        } catch (fetchError) {
+          await logger.error("stamps", {
+            message: "Fetch error in send request",
+            error: fetchError instanceof Error
+              ? fetchError.message
+              : "Unknown error",
+          });
+          throw fetchError;
+        }
+      });
+    } catch (error) {
+      await logger.error("stamps", {
+        message: "Transfer submit error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      setError(error instanceof Error ? error.message : "Unknown error");
+    }
   };
 
   const handleQuantityChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: Event,
   ): void => {
-    const value = parseInt(e.target.value, 10);
+    const value = parseInt((e.target as HTMLInputElement).value, 10);
     let tmpValue = value;
     if (!isNaN(value)) {
       if (value >= 1 && value <= maxQuantity) {
@@ -143,6 +247,15 @@ function WalletTransferModal({
     getMaxQuantity();
     setImgSrc(getStampImageSrc(selectedStamp as StampRow));
   }, [selectedStamp]);
+
+  useEffect(() => {
+    logger.debug("stamps", {
+      message: "Form state updated",
+      formState,
+      selectedStamp,
+      quantity,
+    });
+  }, [formState, selectedStamp, quantity]);
 
   const inputField =
     "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
@@ -236,12 +349,18 @@ function WalletTransferModal({
         tosAgreed={true}
       />
 
-      {error && <div className="text-red-500 mt-2">{error}</div>}
+      {error && (
+        <div className="text-red-500 text-center mt-4 font-medium">
+          {error}
+        </div>
+      )}
       {successMessage && (
-        <div className="text-green-500 mt-2">{successMessage}</div>
+        <div className="text-green-500 text-center mt-4 font-medium">
+          {successMessage}
+        </div>
       )}
     </ModalLayout>
   );
 }
 
-export default WalletTransferModal;
+export default WalletSendStampModal;

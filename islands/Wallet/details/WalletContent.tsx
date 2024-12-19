@@ -5,7 +5,7 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import WalletTransferModal from "$islands/Wallet/details/WalletTransferModal.tsx";
+import WalletSendStampModal from "$islands/Wallet/details/WalletSendStampModal.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { StampRow } from "$globals";
@@ -51,6 +51,7 @@ const ItemHeader = ({
   search = true,
   filter = true,
   setting = false,
+  setOpenSettingModal = () => {},
 }: {
   title: string;
   sortBy: string;
@@ -64,6 +65,7 @@ const ItemHeader = ({
   handleOpenSetting: (open: boolean) => void;
   handleOpenFilter: (open: boolean) => void;
   handleOpen: (type: string) => void;
+  setOpenSettingModal?: (open: boolean) => void;
 }) => {
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full relative">
@@ -78,7 +80,12 @@ const ItemHeader = ({
             initFilter={[]}
             open={isOpenSetting}
             handleOpen={handleOpenSetting}
-            filterButtons={["Transfer"]}
+            filterButtons={["transfer"]}
+            onFilterClick={(filter) => {
+              if (filter === "transfer") {
+                setOpenSettingModal(true);
+              }
+            }}
           />
         )}
         {filter && (
@@ -87,6 +94,7 @@ const ItemHeader = ({
             open={isOpenFilter}
             handleOpen={handleOpenFilter}
             filterButtons={["all", "psbt", "dispensers"]}
+            dropdownPosition="bottom"
           />
         )}
         {sort && <Sort initSort={sortBy} />}
@@ -99,6 +107,7 @@ const ItemHeader = ({
             onResultClick={() => {}}
             resultDisplay={(result) => {
               console.log(result);
+              return result.toString();
             }}
           />
         )}
@@ -411,6 +420,7 @@ export default function WalletContent({
   showItem,
   anchor,
 }: WalletContentProps) {
+  const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
   const [filterBy, setFilterBy] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("ASC");
   const [openS, setOpenS] = useState<boolean>(false);
@@ -418,7 +428,6 @@ export default function WalletContent({
   const [openD, setOpenD] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
-  const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (anchor) {
@@ -523,11 +532,12 @@ export default function WalletContent({
           sort={true}
           search={true}
           filter={false}
-          setting={false}
+          setting={true}
           isOpenFilter={false}
           isOpenSetting={openSetting}
           handleOpenFilter={() => {}}
           handleOpenSetting={handleOpenSetting}
+          setOpenSettingModal={setOpenSettingModal}
         />
         <div class="mt-3 mobileLg:mt-6">
           <StampSection {...stampSection} />
@@ -601,12 +611,12 @@ export default function WalletContent({
         </div>
       )}
       {openSettingModal && (
-        <WalletTransferModal
+        <WalletSendStampModal
           stamps={stamps}
-          toggleModal={handleOpenSettingModal}
-          handleCloseModal={handleCloseSettingModal}
           fee={0}
           handleChangeFee={() => {}}
+          toggleModal={handleOpenSettingModal}
+          handleCloseModal={handleCloseSettingModal}
         />
       )}
     </>
