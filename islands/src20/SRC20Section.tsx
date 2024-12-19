@@ -70,7 +70,9 @@ export function SRC20Section(
       const endpoint = fromPage === "wallet" && address
         ? `/api/v2/src20/balance/${address}?page=${
           pagination?.page || 1
-        }&limit=${pagination?.limit || 8}&type=${type || 'all'}&sortBy=${sortBy || 'DESC'}`
+        }&limit=${pagination?.limit || 8}&type=${type || "all"}&sortBy=${
+          sortBy || "DESC"
+        }`
         : type === "trending"
         ? `/api/internal/src20/trending?limit=5&page=${page}&sortBy=${sortBy}`
         : `/api/internal/src20/details?op=DEPLOY&limit=5&page=${page}&sortBy=${sortBy}`;

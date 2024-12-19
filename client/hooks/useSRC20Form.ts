@@ -477,7 +477,7 @@ export function useSRC20Form(
     return formState.dec;
   };
 
-  const handleSubmit = async (additionalData?: Record<string, unknown>) => {
+  const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
       setApiError("");

@@ -29,9 +29,7 @@ export function DeployContent(
     config,
     isSubmitting,
     submissionMessage,
-    walletError,
     apiError,
-    setApiError,
     handleInputBlur,
   } = useSRC20Form("deploy", trxType);
 
@@ -70,7 +68,7 @@ export function DeployContent(
     }
   };
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = (file: File) => {
     if (!file) return;
 
     const reader = new FileReader();
@@ -479,7 +477,6 @@ export function DeployContent(
           submissionMessage={submissionMessage}
           apiError={apiError}
           fileUploadError={fileUploadError}
-          walletError={walletError}
         />
       </div>
     </div>

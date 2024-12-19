@@ -33,14 +33,13 @@ interface WalletContentProps {
     };
   };
   dispensers?: Dispenser[];
-  showItem: string;
   address: string;
   anchor: string;
 }
 
 const ItemHeader = ({
   title = "STAMP",
-  sortBy = "ASC",
+  sortBy = "ASC" as const,
   isOpen = false,
   isOpenSetting = false,
   handleOpenSetting = () => {},
@@ -54,7 +53,7 @@ const ItemHeader = ({
   setOpenSettingModal = () => {},
 }: {
   title: string;
-  sortBy: string;
+  sortBy: "ASC" | "DESC";
   isOpen: boolean;
   sort: boolean;
   search: boolean;
@@ -120,8 +119,6 @@ function DispenserItem({
   dispensers = [],
   openPagination,
   closedPagination,
-  onOpenPageChange,
-  onClosedPageChange,
 }: {
   dispensers?: Dispenser[];
   openPagination?: {
@@ -136,8 +133,6 @@ function DispenserItem({
     total: number;
     totalPages: number;
   };
-  onOpenPageChange?: (page: number) => void;
-  onClosedPageChange?: (page: number) => void;
 }) {
   // If no dispensers, show empty state
   if (!dispensers?.length) {
@@ -188,8 +183,11 @@ function DispenserItem({
               <div class="mt-6">
                 <Pagination
                   page={openPagination.page}
-                  totalPages={openPagination.totalPages}
-                  onChange={onOpenPageChange}
+                  page_size={openPagination.limit}
+                  data_length={openPagination.total}
+                  pages={openPagination.totalPages}
+                  prefix="open_listings"
+                  type="stamp_id"
                 />
               </div>
             )}
@@ -212,8 +210,11 @@ function DispenserItem({
               <div class="mt-6">
                 <Pagination
                   page={closedPagination.page}
-                  totalPages={closedPagination.totalPages}
-                  onChange={onClosedPageChange}
+                  page_size={closedPagination.limit}
+                  data_length={closedPagination.total}
+                  pages={closedPagination.totalPages}
+                  prefix="closed_listings"
+                  type="stamp_id"
                 />
               </div>
             )}
@@ -239,8 +240,11 @@ function DispenserItem({
               <div class="mt-6">
                 <Pagination
                   page={openPagination.page}
-                  totalPages={openPagination.totalPages}
-                  onChange={onOpenPageChange}
+                  page_size={openPagination.limit}
+                  data_length={openPagination.total}
+                  pages={openPagination.totalPages}
+                  prefix="open_listings"
+                  type="stamp_id"
                 />
               </div>
             )}
@@ -263,8 +267,11 @@ function DispenserItem({
               <div class="mt-6">
                 <Pagination
                   page={closedPagination.page}
-                  totalPages={closedPagination.totalPages}
-                  onChange={onClosedPageChange}
+                  page_size={closedPagination.limit}
+                  data_length={closedPagination.total}
+                  pages={closedPagination.totalPages}
+                  prefix="closed_listings"
+                  type="stamp_id"
                 />
               </div>
             )}
@@ -282,6 +289,10 @@ function DispenserRow(
   const imageSize = view === "mobile"
     ? "w-[146px] h-[146px]"
     : "w-[172px] h-[172px]";
+
+  if (!dispenser.stamp) {
+    return null;
+  }
 
   return (
     <div class="flex justify-between dark-gradient rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
@@ -417,12 +428,10 @@ export default function WalletContent({
   src20,
   dispensers,
   address,
-  showItem,
   anchor,
 }: WalletContentProps) {
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
-  const [filterBy, setFilterBy] = useState<string>("");
-  const [sortBy, setSortBy] = useState<string>("ASC");
+  const [sortBy] = useState<"ASC" | "DESC">("ASC");
   const [openS, setOpenS] = useState<boolean>(false);
   const [openT, setOpenT] = useState<boolean>(false);
   const [openD, setOpenD] = useState<boolean>(false);
@@ -495,7 +504,7 @@ export default function WalletContent({
     title: "", // Empty title means no header
     type: "all",
     stamps: stamps.data,
-    layout: "grid",
+    layout: "grid" as const,
     showDetails: false,
     gridClass: `
       grid w-full
@@ -508,16 +517,18 @@ export default function WalletContent({
       auto-rows-fr
     `,
     displayCounts: {
-      mobileSm: 16, // 4 columns x 4 rows
-      mobileLg: 24, // 6 columns x 4 rows
-      tablet: 24, // 6 columns x 4 rows
-      desktop: 32, // 8 columns x 4 rows
+      mobileSm: 16,
+      mobileLg: 24,
+      tablet: 24,
+      desktop: 32,
     },
     pagination: {
       page: stamps.pagination.page,
       pageSize: stamps.pagination.limit,
       total: stamps.pagination.total,
+      totalPages: Math.ceil(stamps.pagination.total / stamps.pagination.limit),
       prefix: "stamps",
+      type: "stamp_id",
     },
   };
 
@@ -580,11 +591,10 @@ export default function WalletContent({
           <Pagination
             page={src20.pagination.page}
             page_size={src20.pagination.limit}
-            key="Token"
-            type="Token_id"
             data_length={src20.pagination.total}
             pages={Math.ceil(src20.pagination.total / src20.pagination.limit)}
             prefix="src20"
+            type="token_id"
           />
         </div>
       )}

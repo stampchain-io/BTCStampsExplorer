@@ -605,7 +605,9 @@ export function OlgaContent() {
           );
           resolve(base64);
         } catch (error) {
-          reject(new Error("Failed to convert file to base64"));
+          reject(
+            new Error("Failed to convert file to base64", { cause: error }),
+          );
         }
       };
       reader.onerror = () => reject(new Error("Failed to read file"));
@@ -734,7 +736,7 @@ export function OlgaContent() {
           );
         }
       } catch (error) {
-        setStampNameError("Invalid number format after 'A'");
+        setStampNameError("Invalid number format after 'A', error: " + error);
       }
     }
   };
@@ -894,7 +896,6 @@ export function OlgaContent() {
         setTxDetails(null); // Reset transaction details on error
       }
     } catch (error) {
-      // This catch block should only handle unexpected errors
       logger.error("stamps", {
         message: "Unexpected minting error",
         error,

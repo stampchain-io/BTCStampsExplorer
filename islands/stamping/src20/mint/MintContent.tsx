@@ -82,7 +82,7 @@ export function MintContent({
   mintStatus: initialMintStatus,
   holders: initialHolders,
 }: MintContentProps = { trxType: "olga" }) {
-  const [isSearching, setIsSearching] = useState(false);
+  const [setIsSearching] = useState(false);
 
   const {
     formState,
