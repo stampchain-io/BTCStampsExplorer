@@ -3,7 +3,9 @@ on:
   push:
     branches: [dev]
   pull_request:
-    branches: [dev] 
+    branches:
+      - main
+      - dev
 
 jobs:
   deploy:
@@ -36,8 +38,20 @@ jobs:
         with:
           deno-version: v2.1.4
 
-      - name: Check formatting
-        run: deno task check:fmt
+      - name: Install reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Run deno fmt with reviewdog
+        run: |
+          deno fmt --check | reviewdog -f=diff \
+            -name="deno-fmt" \
+            -reporter=github-pr-review \
+            -filter-mode=diff \
+            -fail-on-error=true
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Check linting
       #   run: deno task check:lint
