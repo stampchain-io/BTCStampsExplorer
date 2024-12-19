@@ -66,23 +66,23 @@ export function HoldersGraph(
     );
   }
 
-  const dataLabelClassName =
+  const dataLabel =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-  const dataValueXLClassName =
+  const dataValueXL =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
-  const tableLabelClassName =
+  const tableLabel =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  const tableValueClassName =
+  const tableValue =
     "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full table-auto";
   const totalHolders = holders.length;
 
   return (
     <div className="flex flex-col dark-gradient p-3 mobileMd:p-6 relative">
       <div className="text-left tablet:text-right">
-        <p className={dataLabelClassName}>
+        <p className={dataLabel}>
           HOLDERS
         </p>
-        <p className={dataValueXLClassName}>
+        <p className={dataValueXL}>
           {totalHolders}
         </p>
       </div>
@@ -93,14 +93,14 @@ export function HoldersGraph(
 
         <div className="relative w-full max-w-full">
           <div className="max-h-48 mobileLg:max-h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6">
-            <table className={tableValueClassName}>
-              <thead className={tableLabelClassName}>
+            <table className={tableValue}>
+              <thead className={tableLabel}>
                 <tr>
                   {tableHeaders.map(({ key, label }) => (
                     <th
                       key={key}
                       scope="col"
-                      class={`${tableLabelClassName} pb-1.5 ${
+                      class={`${tableLabel} pb-1.5 ${
                         key === "address"
                           ? "text-left"
                           : key === "percent"
