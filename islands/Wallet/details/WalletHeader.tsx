@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { Filter } from "$islands/datacontrol/Filter.tsx";
+import { StampSearchClient as _StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { Filter as _Filter } from "$islands/datacontrol/Filter.tsx";
 
 import { WALLET_FILTER_TYPES } from "$globals";
 
@@ -11,7 +11,7 @@ interface WalletHeaderProps {
 }
 
 const WalletHeader = ({
-  filterBy,
+  _filterBy,
   _sortBy,
 }: WalletHeaderProps) => {
   // State management for the open states

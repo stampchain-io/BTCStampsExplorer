@@ -1,11 +1,11 @@
 import { useState } from "preact/hooks";
 
 export function CollectionCreateButton() {
-  const [name, setName] = useState("");
-  const [twitter, setTwitter] = useState("");
-  const [website, setWebsite] = useState("");
-  const [description, setDescription] = useState("");
-  const [stamps, setStamps] = useState("");
+  const [_name, setName] = useState("");
+  const [_twitter, setTwitter] = useState("");
+  const [_website, setWebsite] = useState("");
+  const [_description, setDescription] = useState("");
+  const [_stamps, setStamps] = useState("");
 
   const handlePreview = () => {
   };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect as _useEffect, useState } from "preact/hooks";
 import { useFairmintForm } from "$client/hooks/useFairmintForm.ts";
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";

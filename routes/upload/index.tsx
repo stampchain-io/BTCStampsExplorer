@@ -43,7 +43,7 @@ export const handler: Handlers = {
 };
 
 export function UploadBackground(props) {
-  const { data, total, page, pages, limit } = props.data;
+  const { data, _total, _page, _pages, _limit } = props.data;
 
   return (
     <>
