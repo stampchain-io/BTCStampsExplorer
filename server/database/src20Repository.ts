@@ -167,7 +167,7 @@ export class SRC20Repository {
     const rowNumberInit = offset;
 
     const query = `
-      SELECT 
+      SELECT
         (@row_number:=@row_number + 1) AS row_num,
         src20.tx_hash,
         src20.block_index,
@@ -185,14 +185,14 @@ export class SRC20Repository {
         destination_info.creator as destination_name
       FROM
         ${SRC20_TABLE} src20
-      LEFT JOIN 
+      LEFT JOIN
         creator creator_info ON src20.creator = creator_info.address
       LEFT JOIN
         creator destination_info ON src20.destination = destination_info.address
       CROSS JOIN
         (SELECT @row_number := ?) AS init
       ${whereClause}
-      ORDER BY 
+      ORDER BY
         src20.tx_index ${validOrder}
       ${limitOffsetClause};
     `;
