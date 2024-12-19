@@ -82,7 +82,9 @@ function WalletDonateModal({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create donation transaction.");
+        throw new Error(
+          errorData.error || "Failed to create donation transaction.",
+        );
       }
 
       const responseData = await response.json();
@@ -100,7 +102,9 @@ function WalletDonateModal({
       );
 
       if (signResult.signed && signResult.txid) {
-        setSuccessMessage(`Donation sent successfully. TXID: ${signResult.txid}`);
+        setSuccessMessage(
+          `Donation sent successfully. TXID: ${signResult.txid}`,
+        );
         setTimeout(toggleModal, 5000);
       } else if (signResult.cancelled) {
         throw new Error("Transaction signing was cancelled.");
@@ -158,15 +162,18 @@ function WalletDonateModal({
                 style={{
                   width: (() => {
                     const value = formState.amount || "";
-                    const isSmallScreen = globalThis.matchMedia("(max-width: 767px)").matches;
+                    const isSmallScreen =
+                      globalThis.matchMedia("(max-width: 767px)").matches;
                     const { one, other } = isSmallScreen
                       ? { one: 17, other: 23 }
                       : { one: 22, other: 30 };
                     const baseWidth = !value
                       ? other
-                      : value.split("").reduce((total, char) => {
-                        return total + (char === "1" || char === "." ? one : other);
-                      }, 0);
+                      : value.split("").reduce(
+                          (total, char) =>
+                            total + (char === "1" || char === "." ? one : other),
+                          0,
+                        );
                     return `${baseWidth}px`;
                   })(),
                 }}
