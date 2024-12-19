@@ -314,7 +314,7 @@ export const WalletModal = ({ connectors = [] }: Props) => {
               <button
                 onClick={() => {
                   if (isConnected && address) {
-                    window.location.href = `/wallet/${address}`;
+                    globalThis.location.href = `/wallet/${address}`;
                   }
                 }}
                 class="-mt-1 items-center tablet:text-stamp-purple hover:text-stamp-purple-bright cursor-pointer w-full text-center"
