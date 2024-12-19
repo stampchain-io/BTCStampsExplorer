@@ -20,7 +20,7 @@ const tableHeaders = [
   { key: "quantity", label: "Quantity" },
   { key: "memo", label: "Memo" },
   { key: "txHash", label: "Tx Hash" },
-  { key: "created", label: "Date" },
+  // { key: "created", label: "Date" },
 ];
 
 const tableLabelClassName =
@@ -68,11 +68,13 @@ function TransferRow({ send }: { send: SendRow }) {
       <td className="text-center py-0">
         {abbreviateAddress(send.tx_hash)}
       </td>
-      <td className="text-right uppercase py-0">
+      {
+        /* <td className="text-right uppercase py-0">
         {formatDate(new Date(send.block_time), {
           includeRelative: false,
         })}
-      </td>
+      </td> */
+      }
     </tr>
   );
 }
@@ -88,7 +90,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
             <col className="w-[10%]" /> {/* Quantity */}
             <col className="w-[18%]" /> {/* Memo */}
             <col className="w-[18%]" /> {/* Tx hash */}
-            <col className="w-[18%]" /> {/* Created */}
+            {/* <col className="w-[18%]" /> Created */}
           </colgroup>
           <thead>
             <tr>
