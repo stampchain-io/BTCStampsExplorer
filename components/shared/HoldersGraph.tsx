@@ -84,7 +84,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
 
         <div className="relative w-full max-w-full">
           <div className="h-48 mobileLg:h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-            <table className="w-full table-auto border-separate border-spacing-y-2">
+            <table className={tableValueClassName}>
               <thead className={tableLabelClassName}>
                 <tr>
                   {tableHeaders.map(({ key, label }) => (

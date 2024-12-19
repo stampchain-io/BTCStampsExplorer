@@ -122,7 +122,7 @@ export function SRC20Section(
 
       fetchMintData();
     }
-  }, [data, fromPage]);
+  }, [fromPage]);
 
   const handleCloseModal = () => setModalOpen(false);
   const handleImageClick = (imgSrc: string) => {
