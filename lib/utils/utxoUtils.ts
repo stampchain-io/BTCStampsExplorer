@@ -22,6 +22,31 @@ export function isValidBitcoinAddress(address: string): boolean {
   );
 }
 
+export async function getTxInfo(tx: string): Promise<number | string> {
+  const endpoint = `${BLOCKSTREAM_API_BASE_URL}/tx/${tx}`;
+  let timestamp: number | string = "N/A";
+
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      console.error(`Failed to fetch transaction data: ${response.statusText}`);
+      return "N/A";
+    }
+
+    const data = await response.json();
+    if (data.status && data.status.block_time) {
+      timestamp = data.status.block_time * 1000;
+    } else {
+      console.warn("Block time not found in the API response.");
+      return "N/A";
+    }
+  } catch (error) {
+    console.error("Error fetching transaction data:", error);
+    return "N/A";
+  }
+  return timestamp;
+}
+
 function reverseEndian(hexString: string): string {
   if (hexString.length % 2 !== 0) {
     hexString = "0" + hexString;
