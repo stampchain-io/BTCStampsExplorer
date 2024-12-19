@@ -116,28 +116,28 @@ export function SRC20TickHeader({
   // Format Satoshi value with commas (no decimals needed)
   const floorUnitPriceSatsFormatted = floorUnitPriceSats.toLocaleString();
 
-  const titleGreyLDClassName =
+  const _titleGreyLDClassName =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
-  const subTitleGreyClassName =
+  const _subTitleGreyClassName =
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
-  const dataContainerClassName =
+  const _dataContainerClassName =
     "flex justify-between items-center dark-gradient p-3 mobileMd:p-6";
-  const dataContainer =
+  const _dataContainer =
     "flex justify-between items-center dark-gradient p-3 mobileLg:p-6";
-  const dataColumn = "flex flex-col -space-y-1";
-  const dataLabelSm =
+  const _dataColumn = "flex flex-col -space-y-1";
+  const _dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  const dataLabel =
+  const _dataLabel =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-  const dataValueXs =
+  const _dataValueXs =
     "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
-  const dataValueSm =
+  const _dataValueSm =
     "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  const dataValue =
+  const _dataValue =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
-  const dataValueXl =
+  const _dataValueXl =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
-  const tooltip =
+  const _tooltip =
     "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
 
   return (

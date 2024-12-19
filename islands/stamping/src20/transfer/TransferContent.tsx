@@ -74,7 +74,7 @@ export function TransferContent(
     };
   }, []);
 
-  const handleDropDown = (ticker: string, amount: string) => {
+  const handleDropDown = (ticker: string, _amount: string) => {
     setOpenDrop(false);
     setIsSelecting(true);
 

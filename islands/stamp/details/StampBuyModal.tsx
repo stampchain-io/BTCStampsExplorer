@@ -27,7 +27,7 @@ const StampBuyModal = ({
   const { wallet } = walletContext;
   const [quantity, setQuantity] = useState(1);
   const [maxQuantity, setMaxQuantity] = useState(1);
-  const [pricePerUnit, setPricePerUnit] = useState(0);
+  const [_pricePerUnit, setPricePerUnit] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
 
   const {
@@ -36,7 +36,7 @@ const StampBuyModal = ({
     handleSubmit,
     isSubmitting,
     error,
-    setError,
+    _setError,
     successMessage,
     setSuccessMessage,
   } = useTransactionForm({
