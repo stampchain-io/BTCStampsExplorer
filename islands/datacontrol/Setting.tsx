@@ -40,7 +40,7 @@ export function Setting({
     setLocalFilters(initFilter);
   }, [initFilter]);
 
-  const handleFilterChange = (value: string) => {
+  const _handleFilterChange = (value: string) => {
     setLocalFilters((prevFilters) => {
       const newFilters = prevFilters.includes(value)
         ? prevFilters.filter((f) => f !== value)

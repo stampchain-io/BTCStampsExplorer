@@ -233,7 +233,7 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
       }
     }
   };
-  const dataLabelClassName =
+  const _dataLabelClassName =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
   const dataValueXLlinkClassName =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";

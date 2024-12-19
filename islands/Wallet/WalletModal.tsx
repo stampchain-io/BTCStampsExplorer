@@ -14,7 +14,7 @@ const WalletPopup = (
   { logout, onClose }: { logout: () => void; onClose: () => void },
 ) => {
   const displayNameRef = useRef<HTMLInputElement>(null);
-  const xNameRef = useRef<HTMLInputElement>(null);
+  const _xNameRef = useRef<HTMLInputElement>(null);
   const { wallet } = walletContext;
   const popupRef = useRef<HTMLDivElement>(null);
   const [currency, setCurrency] = useState("BTC");
