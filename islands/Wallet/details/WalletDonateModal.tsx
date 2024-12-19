@@ -1,3 +1,4 @@
+import { h } from "preact";
 import { useEffect } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
@@ -134,6 +135,16 @@ function WalletDonateModal({
     });
   };
 
+  const dataColumn = "flex flex-col -space-y-1";
+  const dataLabelSm =
+    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+  const dataValueXs =
+    "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
+  const dataValueSm =
+    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
+  const inputField =
+    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
+
   return (
     <ModalLayout onClose={handleCloseModal} title="DONATE">
       <div className="flex flex-col gap-6 -mt-3">
@@ -168,7 +179,7 @@ function WalletDonateModal({
                   });
                 }}
                 placeholder="0"
-                className="bg-transparent text-4xl mobileLg:text-5xl text-stamp-grey-light placeholder:text-stamp-grey font-black outline-none text-right -ms-1.5 mobileLg:-ms-0.75"
+                className={`${inputField} bg-transparent text-4xl mobileLg:text-5xl text-stamp-grey-light placeholder:text-stamp-grey font-black text-right -ms-1.5 mobileLg:-ms-0.75`}
                 style={{
                   width: (() => {
                     const value = formState.amount || "";
@@ -208,11 +219,11 @@ function WalletDonateModal({
         </div>
 
         {donateAddress && (
-          <div className="flex flex-col -space-y-1">
-            <p className="text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase">
+          <div className={dataColumn}>
+            <p className={dataLabelSm}>
               TO
             </p>
-            <p className="text-xs mobileLg:text-sm font-medium text-stamp-grey-light">
+            <p className={dataValueXs}>
               {donateAddress}
             </p>
           </div>
