@@ -17,11 +17,11 @@ export interface SRC20TickHeaderProps {
     tg?: string;
     x?: string;
   };
-  mintStatus: MintStatus;
-  totalMints: number;
-  totalTransfers: number;
+  _mintStatus: MintStatus;
+  _totalMints: number;
+  _totalTransfers: number;
   marketInfo?: MarketListingSummary;
-  align?: "left" | "center" | "right";
+  _align?: "left" | "center" | "right";
 }
 
 function StatItem(
@@ -81,11 +81,11 @@ function StatItem(
 
 export function SRC20TickHeader({
   deployment,
-  mintStatus,
-  totalMints,
-  totalTransfers,
+  _mintStatus,
+  _totalMints,
+  _totalTransfers,
   marketInfo,
-  align,
+  _align,
 }: SRC20TickHeaderProps) {
   const tickValue = deployment.tick
     ? (() => {
