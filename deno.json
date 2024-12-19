@@ -126,37 +126,7 @@
   },
   "fmt": {
     "files": {
-      "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
-      "exclude": [
-        "**/_fresh/**/*",
-        "**/server/**/*",
-        "**/node_modules/**/*",
-        "**/dist/**/*",
-        "**/.git/**/*",
-        "**/coverage/**/*",
-        "**/tmp/**/*",
-        "**/.cache/**/*",
-        "**/.*/",
-        "**/.*",
-        "**/build/**/*",
-        "**/vendor/**/*",
-        "**/*.yml",
-        "**/*.yaml",
-        "**/schema.yml",
-        "**/swagger/**/*.yml",
-        "**/swagger/**/*.yaml",
-        "**/.redocly.*",
-        "**/*.css",
-        "**/*.json",
-        "**/*.md",
-        "**/*.html",
-        "**/static/**/*",
-        ".vscode/**/*",
-        ".idea/**/*",
-        ".github/**/*",
-        ".git/**/*",
-        ".env*"
-      ]
+      "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"]
     },
     "options": {
       "useTabs": false,
