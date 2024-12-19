@@ -90,21 +90,21 @@ environments:
       requests: 30
       response_time: 2s
     deployment:
-        rolling: 'default'
-        circuit_breaker:
-          rollback: true
-          maximum_percent: 200
-          minimum_healthy_percent: 50
+      rolling: 'default'
+      circuit_breaker:
+        rollback: true
+        maximum_percent: 200
+        minimum_healthy_percent: 50
     variables:
       LOG_LEVEL: info
       DB_HOST: stamps-prod.endpoint.proxy-cbdenncm0tno.us-east-1.rds.amazonaws.com
       CACHE: true
-      http:
-        healthcheck:
-          healthy_threshold: 3      # More successes required to mark as healthy
-          unhealthy_threshold: 2    # Less tolerant of failures
-          interval: 30s            # Less frequent checks to reduce load
-          timeout: 15s             # Longer timeout for stability
-          grace_period: 180s       # Longer grace period for stability
+    http:
+      healthcheck:
+        healthy_threshold: 3
+        unhealthy_threshold: 2
+        interval: 30s
+        timeout: 15s
+        grace_period: 180s
 
       
