@@ -763,6 +763,29 @@ export class XcpManager {
     }
   }
 
+  static async getTxInfo(tx: string): Promise<number | null> {
+    const endpoint = `https://blockstream.info/api/tx/${tx}`;
+    let timestamp: number | null = null;
+
+    try {
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        console.error(`Failed to fetch transaction data: ${response.statusText}`);
+        return null;
+      }
+
+      const data = await response.json();
+      if (data.status && data.status.block_time) {
+        timestamp = data.status.block_time * 1000;
+      } else {
+        console.warn("Block time not found in the API response.");
+      }
+    } catch (error) {
+      console.error("Error fetching transaction data:", error);
+    }
+    return timestamp;
+  }
+
   static async getXcpSendsByCPID(
     cpid: string,
     page: number = 1,
@@ -799,16 +822,18 @@ export class XcpManager {
           break;
         }
 
-        const sends = response.result.map((send: any) => ({
-          tx_hash: send.tx_hash,
-          block_index: send.block_index,
-          source: send.source,
-          destination: send.destination,
-          quantity: send.quantity,
-          asset: cpid,
-          status: send.status,
-        }));
-
+        const sends = await Promise.all(
+          response.result.map(async (send: any) => ({
+            tx_hash: send.tx_hash,
+            block_index: send.block_index,
+            block_time: await this.getTxInfo(send.tx_hash), // Fetch block time
+            source: send.source,
+            destination: send.destination,
+            quantity: send.quantity,
+            asset: cpid,
+            status: send.status,
+          }))
+        );
         allSends = allSends.concat(sends);
         processedCount += sends.length;
 
