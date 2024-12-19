@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import puppeteer from "npm:puppeteer";
+import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -28,44 +28,28 @@ export const handler: Handlers = {
 
       // Launch headless browser
       const browser = await puppeteer.launch({
-        headless: "new",
+        headless: true,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
 
       try {
         const page = await browser.newPage();
-
-        // Set viewport size to square dimensions
-        // Using 1200x1200 for high quality, can be adjusted if needed
-        await page.setViewport({
-          width: 1200,
-          height: 1200,
-          deviceScaleFactor: 1,
-        });
-
-        // Load the stamp content
+        await page.setViewport({ width: 1200, height: 1200 });
         await page.goto(stamp_url, {
           waitUntil: "networkidle0",
           timeout: 10000,
         });
 
-        // For HTML content, wait for any animations/renders
+        // For HTML content, wait for any animations
         if (stamp_mimetype === "text/html") {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((r) => setTimeout(r, 1000));
         }
 
-        // Take screenshot
         const screenshot = await page.screenshot({
           type: "webp",
           quality: 90,
-          encoding: "binary",
           fullPage: false,
-          clip: {
-            x: 0,
-            y: 0,
-            width: 1200,
-            height: 1200,
-          },
+          clip: { x: 0, y: 0, width: 1200, height: 1200 },
         });
 
         return new Response(screenshot, {
@@ -79,13 +63,9 @@ export const handler: Handlers = {
       }
     } catch (error) {
       console.error("Preview generation error:", error);
-
-      // Return a default preview image on error
       return new Response(null, {
         status: 302,
-        headers: {
-          Location: "/static/images/default-preview.png",
-        },
+        headers: { Location: "/static/images/default-preview.png" },
       });
     }
   },
