@@ -19,7 +19,7 @@ const tableHeaders = [
   { key: "to", label: "To" },
   { key: "quantity", label: "Quantity" },
   { key: "txHash", label: "Tx Hash" },
-  // { key: "created", label: "Date" },
+  { key: "created", label: "Date" },
 ];
 
 const tableLabelClassName =
@@ -85,7 +85,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
             <col className="w-[18%]" /> {/* To */}
             <col className="w-[10%]" /> {/* Quantity */}
             <col className="w-[18%]" /> {/* Tx hash */}
-            {/* <col className="w-[18%]" /> Created */}
+            <col className="w-[18%]" /> {/* Created */}
           </colgroup>
           <thead>
             <tr>
