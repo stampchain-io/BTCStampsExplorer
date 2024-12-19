@@ -4,6 +4,7 @@ import { SRC20TokenMintingCard } from "$islands/src20/cards/SRC20TokenMintingCar
 import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutmintedCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
 interface SRC20SectionProps {
   title?: string;
@@ -69,7 +70,7 @@ export function SRC20Section(
       const endpoint = fromPage === "wallet" && address
         ? `/api/v2/src20/balance/${address}?page=${
           pagination?.page || 1
-        }&limit=${pagination?.limit || 5}`
+        }&limit=${pagination?.limit || 8}&type=${type || 'all'}&sortBy=${sortBy || 'DESC'}`
         : type === "trending"
         ? `/api/internal/src20/trending?limit=5&page=${page}&sortBy=${sortBy}`
         : `/api/internal/src20/details?op=DEPLOY&limit=5&page=${page}&sortBy=${sortBy}`;
@@ -179,6 +180,18 @@ export function SRC20Section(
         {fromPage === "home" && (
           <div className="flex justify-end -mt-3 mobileMd:-mt-6">
             <ViewAllButton href={`/src20?type=${type}`} />
+          </div>
+        )}
+        {fromPage === "wallet" && pagination && (
+          <div class="flex justify-center mt-6">
+            <Pagination
+              page={pagination.page}
+              pages={pagination.totalPages}
+              page_size={pagination.limit}
+              type={type || "all"}
+              data_length={data.length}
+              prefix="src20"
+            />
           </div>
         )}
       </div>
