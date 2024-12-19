@@ -1,0 +1,70 @@
+name: Docker Build Test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'feature/**'
+      - 'fix/**'
+      - 'release/**'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/*.yml'
+      - 'LICENSE'
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/*.yml'
+      - 'LICENSE'
+
+jobs:
+  docker-build-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: stamps-app:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test container startup
+        run: |
+          # Run container in detached mode without port binding
+          docker run -d \
+            --name test-container \
+            stamps-app:test  # Not binding port for CI, but still exposed in Dockerfile
+
+          # Wait briefly to check for immediate crashes
+          sleep 5
+
+          # Check if container is still running
+          if ! docker ps | grep test-container > /dev/null; then
+            echo "Container crashed during startup"
+            docker logs test-container
+            exit 1
+          fi
+
+          echo "Container built and started successfully"
+          
+          # Show logs
+          docker logs test-container
+
+          # Clean up
+          docker stop test-container
+          docker rm test-container
