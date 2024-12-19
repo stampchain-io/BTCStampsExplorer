@@ -48,7 +48,7 @@ jobs:
           deno fmt --check | reviewdog -f=diff \
             -name="deno-fmt" \
             -reporter=github-pr-review \
-            -filter-mode=diff \
+            -filter-mode=added \
             -fail-on-error=true
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
