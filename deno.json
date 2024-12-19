@@ -50,7 +50,15 @@
       "**/build/**/*",
       "**/vendor/**/*"
     ],
-    "include": ["routes/", "components/", "islands/", "lib/", "utils/", "client/", "tests/"]
+    "include": [
+      "routes/",
+      "components/",
+      "islands/",
+      "lib/",
+      "utils/",
+      "client/",
+      "tests/"
+    ]
   },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
   "nodeModulesDir": "auto",
@@ -156,10 +164,10 @@
       ".git/**/*",
       ".env*"
     ],
+    "useTabs": false,
     "lineWidth": 80,
     "indentWidth": 2,
     "singleQuote": false,
-    "proseWrap": "preserve",
-    "useTabs": false
+    "proseWrap": "preserve"
   }
 }
