@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
-// TODO: add to documentation:
+// TODO(@stampchain): add to documentation:
 // This supports multiple operations, separated by a slash.
 // For example, /transfer/mint/deploy  /api/v2/src20/mint/deploy
 

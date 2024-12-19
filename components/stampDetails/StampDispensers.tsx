@@ -72,7 +72,7 @@ function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
 }
 
 export function StampDispensers({ dispensers }: StampDispensersProps) {
-  // TODO: the secondary sort should be by creation date
+  // TODO(@stampchain): the secondary sort should be by creation date
   const sortedDispensers = [...dispensers].sort((a, b) =>
     b.give_remaining - a.give_remaining
   );

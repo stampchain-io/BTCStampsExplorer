@@ -18,7 +18,8 @@ import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 
 // Text style constants for different breakpoints
 
-// TODO add a variant for the inline detail display
+
+// TODO(@stampchain): add a variant for the inline detail display
 
 const TEXT_STYLES = {
   hashSymbol: {
