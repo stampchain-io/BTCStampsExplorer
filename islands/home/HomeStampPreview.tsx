@@ -43,7 +43,7 @@ export function HomeStampPreview({
 
   const FeaturedArtistsSection: CollectionSectionProps = {
     title: "FEATURED ARTISTS",
-    subTitle: "POPULAR COLLECTIONS",
+    subTitle: "RECURSIVE COLLECTIONS",
     collections: collectionData,
     gridClass: `
       grid
@@ -141,8 +141,10 @@ export function HomeStampPreview({
         <StampSection key={section.title} {...section} />
       ))}
 
-      {/* CUTTING EDGE */}
-      <CollectionSection {...CuttingEdgeSection} />
+      {
+        /* CUTTING EDGE
+      <CollectionSection {...CuttingEdgeSection} /> */
+      }
     </div>
   );
 }

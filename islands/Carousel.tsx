@@ -75,20 +75,20 @@ export default function Carousel(props: CarouselProps) {
                             >
                               <div className="w-full mobileLg:pb-4 pb-1">
                                 <div className="w-full flex justify-center items-center">
-                                  <h3 className="desktop:text-4xl mobileLg:text-2xl text-xl purple-gradient3 font-black">
-                                    <span className="text-stamp-purple-bright font-light">
+                                  <h3 className="desktop:text-4xl mobileLg:text-2xl text-xl gray-gradient1 font-black">
+                                    <span className="text-stamp-grey-light font-light">
                                       #
                                     </span>
                                     {stamp.stamp}
                                   </h3>
                                 </div>
                                 <div className="w-full px-4 py-1 flex justify-between items-center">
-                                  <h4 className="desktop:text-2xl mobileLg:text-lg text-base purple-gradient1 font-bold mobileMd:text-start text-center w-full">
+                                  <h4 className="desktop:text-2xl mobileLg:text-lg text-base gray-gradient3 font-bold mobileMd:text-start text-center w-full">
                                     {stamp.creator_name
                                       ? stamp.creator_name
                                       : abbreviateAddress(stamp.creator, 4)}
                                   </h4>
-                                  <h5 className="desktop:text-2xl mobileLg:text-xl text-base text-stamp-purple-dark font-bold mobileMd:block text-end w-full hidden">
+                                  <h5 className="desktop:text-2xl mobileLg:text-xl text-base text-stamp-grey-darker font-bold mobileMd:block text-end w-full hidden">
                                     {stamp.divisible
                                       ? (stamp.supply / 100000000).toFixed(2)
                                       : stamp.supply > 100000
