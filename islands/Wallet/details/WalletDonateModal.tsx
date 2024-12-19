@@ -167,13 +167,11 @@ function WalletDonateModal({
                     const { one, other } = isSmallScreen
                       ? { one: 17, other: 23 }
                       : { one: 22, other: 30 };
-                    const baseWidth = !value
-                      ? other
-                      : value.split("").reduce(
-                          (total, char) =>
-                            total + (char === "1" || char === "." ? one : other),
-                          0,
-                        );
+                    const baseWidth = !value ? other : value.split("").reduce(
+                      (total, char) =>
+                        total + (char === "1" || char === "." ? one : other),
+                      0,
+                    );
                     return `${baseWidth}px`;
                   })(),
                 }}

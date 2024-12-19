@@ -50,7 +50,15 @@
       "**/build/**/*",
       "**/vendor/**/*"
     ],
-    "include": ["routes/", "components/", "islands/", "lib/", "utils/", "client/", "tests/"]
+    "include": [
+      "routes/",
+      "components/",
+      "islands/",
+      "lib/",
+      "utils/",
+      "client/",
+      "tests/"
+    ]
   },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
   "nodeModulesDir": "auto",
@@ -162,3 +170,4 @@
     "singleQuote": false,
     "proseWrap": "preserve"
   }
+}
