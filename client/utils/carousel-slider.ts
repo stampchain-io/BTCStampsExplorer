@@ -57,98 +57,7 @@ const CAROUSEL_CONFIG = {
   },
 } as const;
 
-const validateLayout = (
-  containerWidth: number,
-  dimensions: {
-    baseWidth: number;
-    translations: { adjacent: number; outer: number };
-    centerOffset: number;
-  },
-) => {
-  const { baseWidth, translations, centerOffset } = dimensions;
-  const adjacentWidth = baseWidth * CAROUSEL_CONFIG.SCALE.ADJACENT;
-  const outerWidth = baseWidth * CAROUSEL_CONFIG.SCALE.OUTER;
-
-  // Calculate exact positions and overlaps
-  const positions = {
-    center: {
-      left: centerOffset,
-      right: centerOffset + baseWidth,
-      width: baseWidth,
-    },
-    adjacent: {
-      left: {
-        start: centerOffset - (adjacentWidth * 0.5), // Should overlap center by 50%
-        end: centerOffset + (adjacentWidth * 0.5),
-      },
-      right: {
-        start: centerOffset + baseWidth - (adjacentWidth * 0.5),
-        end: centerOffset + baseWidth + (adjacentWidth * 0.5),
-      },
-      width: adjacentWidth,
-    },
-    outer: {
-      left: {
-        start: centerOffset - adjacentWidth - (outerWidth * 0.4), // Should overlap adjacent by 60%
-        end: centerOffset - adjacentWidth + (outerWidth * 0.6),
-      },
-      right: {
-        start: centerOffset + baseWidth + adjacentWidth - (outerWidth * 0.6),
-        end: centerOffset + baseWidth + adjacentWidth + (outerWidth * 0.4),
-      },
-      width: outerWidth,
-    },
-  };
-
-  debug("Position Validation:", {
-    containerWidth,
-    positions,
-    overlaps: {
-      adjacentWithCenter: (baseWidth -
-        (positions.adjacent.right.start - positions.adjacent.left.end)) /
-        baseWidth,
-      outerWithAdjacent: (adjacentWidth -
-        (positions.outer.right.start - positions.outer.left.end)) /
-        adjacentWidth,
-    },
-  });
-
-  return {
-    positions,
-    isValid: {
-      scaling: {
-        adjacent: Math.abs(adjacentWidth / baseWidth - 0.8) < 0.01,
-        outer: Math.abs(outerWidth / baseWidth - 0.6) < 0.01,
-      },
-      overlaps: {
-        adjacentWithCenter: 0.5,
-        outerWithAdjacent: 0.5,
-      },
-      // overlaps: {
-      //   adjacent: Math.abs(
-      //     (baseWidth -
-      //           (positions.adjacent.right.start -
-      //             positions.adjacent.left.end)) / baseWidth - 0.5,
-      //   ) < 0.01,
-      //   outer: Math.abs(
-      //     (adjacentWidth -
-      //           (positions.outer.right.start - positions.outer.left.end)) /
-      //         adjacentWidth - 0.6,
-      //   ) < 0.01,
-      // },
-      centering: Math.abs(
-        positions.center.left -
-          (containerWidth -
-              (positions.outer.right.end - positions.outer.left.start)) / 2,
-      ) < 1,
-      containerFit: positions.outer.right.end <= containerWidth &&
-        positions.outer.left.start >= 0,
-    },
-  };
-};
-
 const calculateDimensions = (containerWidth: number) => {
-  // Use existing calculations as they work well
   const baseWidth = Math.min(
     CAROUSEL_CONFIG.SLIDES.MAX_WIDTH,
     containerWidth * CAROUSEL_CONFIG.SLIDES.CONTAINER_WIDTH_RATIO,
@@ -161,20 +70,13 @@ const calculateDimensions = (containerWidth: number) => {
     (1 - CAROUSEL_CONFIG.OVERLAP.ADJACENT);
   const outerVisible = outerWidth * (1 - CAROUSEL_CONFIG.OVERLAP.OUTER);
 
-  // Calculate total width needed for all slides
-  const totalWidth = baseWidth + // Center
-    (2 * adjacentVisible) + // Two adjacent slides
-    (2 * outerVisible); // Two outer slides
+  const totalWidth = baseWidth +
+    (2 * adjacentVisible) +
+    (2 * outerVisible);
   const centerOffset = (containerWidth - totalWidth) / 2;
 
-  // Calculate translations for proper overlap
-  // const adjacentTranslate = (baseWidth / 2) -
-  //   (adjacentWidth * CAROUSEL_CONFIG.OVERLAP.ADJACENT);
-  // const outerTranslate = adjacentTranslate +
-  //   (adjacentWidth / 2) - (outerWidth * CAROUSEL_CONFIG.OVERLAP.OUTER);
-
-  const adjacentTranslate = baseWidth * 0.5; // Exact 50% overlap for adjacent
-  const outerTranslate = baseWidth * 0.5 + adjacentWidth * 0.5; // Exact 50% overlap for outer
+  const adjacentTranslate = baseWidth * 0.5;
+  const outerTranslate = baseWidth * 0.5 + adjacentWidth * 0.5;
 
   return {
     baseWidth,
@@ -198,14 +100,11 @@ const calculateTranslateX = (
     return direction * (baseWidth * 0.75);
   }
 
-  // Calculate positions based on base width
   if (Math.abs(distance) === 1) {
-    // Adjacent slides: move by base width * 0.75 (creates 50% overlap)
     return direction * (baseWidth * 0.5);
   }
 
   if (Math.abs(distance) === 2) {
-    // Outer slides: move by base width * 1.25 (creates 60% overlap with adjacent)
     return direction * (baseWidth * 0.9);
   }
 
@@ -213,7 +112,9 @@ const calculateTranslateX = (
 };
 
 const debug = (message: string, data?: unknown) => {
-  // console.log(`Carousel Debug: ${message}`, data);
+  if (CAROUSEL_CONFIG.DEBUG.ENABLED) {
+    console.log(`Carousel Debug: ${message}`, data);
+  }
 };
 
 const calculateTransforms = (
@@ -234,7 +135,6 @@ const calculateTransforms = (
       ? Math.abs(distance) <= 1
       : Math.abs(distance) <= 2;
 
-    // Keep existing scale and transform calculations
     const scale = isCenter
       ? CAROUSEL_CONFIG.SCALE.CENTER
       : isAdjacent
@@ -293,7 +193,6 @@ export default function createCarouselSlider(
     allowTouchMove: true,
     virtualTranslate: true,
     initialSlide: 1,
-    // Enhanced autoplay configuration
     autoplay: {
       delay: CAROUSEL_CONFIG.ANIMATION.AUTOPLAY,
       disableOnInteraction: false,
@@ -302,13 +201,12 @@ export default function createCarouselSlider(
       enabled: true,
     },
 
-    // Custom slide transition effect
     effect: "custom",
 
     pagination: {
       el: ".swiper-pagination",
       clickable: true,
-      renderBullet: function (index, className) {
+      renderBullet: function (_index, className) {
         return '<div class="w-6 h-1 bg-stamp-primary ' + className +
           '"></div>';
       },
@@ -324,7 +222,6 @@ export default function createCarouselSlider(
       },
 
       init: function (swiper: SwiperType) {
-        // Force start autoplay
         swiper.autoplay.start();
 
         debug("Carousel Initialized:", {
@@ -339,17 +236,15 @@ export default function createCarouselSlider(
         });
       },
 
-      // Add autoplay state monitoring
-      autoplayStart: function (swiper: SwiperType) {
+      autoplayStart: function (_swiper: SwiperType) {
         debug("Autoplay Started", { running: true });
       },
 
-      autoplayStop: function (swiper: SwiperType) {
+      autoplayStop: function (_swiper: SwiperType) {
         debug("Autoplay Stopped", { running: false });
       },
 
       setTranslate: function (swiper: SwiperType) {
-        // Prevent Swiper's default translation
         swiper.wrapperEl.style.transform = "translate3d(0, 0, 0)";
       },
 
@@ -359,7 +254,6 @@ export default function createCarouselSlider(
         const { baseWidth } = calculateDimensions(containerWidth);
         const centerX = containerWidth / 2;
 
-        // Calculate all transforms first
         const transforms = calculateTransforms(
           swiper,
           containerWidth,
@@ -368,7 +262,6 @@ export default function createCarouselSlider(
           centerX,
         );
 
-        // Apply transforms in one batch
         requestAnimationFrame(() => {
           transforms.forEach(({ el, transform }) => {
             Object.assign(el.style, transform);
@@ -377,7 +270,6 @@ export default function createCarouselSlider(
       },
 
       afterInit: function (swiper: SwiperType) {
-        // Ensure autoplay starts properly
         setTimeout(() => {
           swiper.autoplay.start();
           debug("Autoplay Started After Init", {
@@ -397,7 +289,6 @@ export default function createCarouselSlider(
           time: Date.now(),
         });
 
-        // Force slide movement
         requestAnimationFrame(() => {
           swiper.slideTo(nextIndex, CAROUSEL_CONFIG.ANIMATION.SPEED);
         });
@@ -414,7 +305,6 @@ export default function createCarouselSlider(
           ".swiper-pagination .swiper-pagination-bullet",
         );
 
-        // Hide extra pagination bullets when the slide changes
         const visibleSlides = isMobile
           ? CAROUSEL_CONFIG.SLIDES.COUNT.MOBILE
           : CAROUSEL_CONFIG.SLIDES.COUNT.DESKTOP;
@@ -437,7 +327,6 @@ export default function createCarouselSlider(
           }
         });
 
-        // Ensure autoplay continues
         if (!swiper.autoplay.running) {
           swiper.autoplay.start();
         }
@@ -445,10 +334,8 @@ export default function createCarouselSlider(
     },
   });
 
-  // Force autoplay to start and stay running
   swiper.autoplay.start();
 
-  // Monitor and restart autoplay if needed
   const autoplayMonitor = setInterval(() => {
     if (!swiper.autoplay.running) {
       debug("Autoplay Monitor - Restarting");
@@ -456,14 +343,12 @@ export default function createCarouselSlider(
     }
   }, 1000);
 
-  // Clean up monitor on destroy
   swiper.on("destroy", () => {
     clearInterval(autoplayMonitor);
   });
 
   return swiper;
 }
-
 // Let me clearly state the design requirements and then propose a solution:
 // Design Requirements:
 // Center Image (Active):

@@ -7,7 +7,6 @@ import {
   WalletOverviewInfo,
   WalletStatsProps,
 } from "$lib/types/index.d.ts";
-import { Button } from "$components/shared/Button.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 // Style Constants
@@ -488,7 +487,14 @@ function WalletStats(
         stampsCreated={stampsCreated}
         handleType={handleType}
       />
-      <DispenserStats dispensers={dispensers} handleType={handleType} />
+      <DispenserStats
+        dispensers={{
+          open: dispensers?.open ?? 0,
+          closed: dispensers?.closed ?? 0,
+          total: dispensers?.total ?? 0,
+        }}
+        handleType={handleType}
+      />
       <TokenStats src20Total={src20Total} handleType={handleType} />
     </div>
   );
