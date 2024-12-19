@@ -1,3 +1,7 @@
+/** @jsx h */
+/** @jsxFrag Fragment */
+import { Fragment, h } from "preact";
+
 export default function AboutTeam() {
   const subTitlePurple =
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
@@ -59,3 +63,4 @@ export default function AboutTeam() {
       </section>
     </>
   );
+}

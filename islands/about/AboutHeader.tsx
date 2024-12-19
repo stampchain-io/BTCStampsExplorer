@@ -1,5 +1,8 @@
-import axiod from "axiod";
+/** @jsx h */
+/** @jsxFrag Fragment */
+import { Fragment, h } from "preact";
 import { useEffect, useState } from "preact/hooks";
+import axiod from "axiod";
 
 export default function AboutHeader() {
   const [isLoading, setIsLoading] = useState(true);
@@ -81,8 +84,7 @@ export default function AboutHeader() {
         <div class="flex flex-col col-span-12 mobileLg:col-span-6 desktop:col-span-8 gap-3 mobileMd:gap-6 w-full">
           <p class={bodyTextLight}>
             The introduction of{" "}
-            <span class="text-stamp-purple-highlight">SRC-20 tokens</span>
-            {" "}
+            <span class="text-stamp-purple-highlight">SRC-20 tokens</span>{" "}
             marked a watershed moment, proving that Bitcoin Stamps could do more
             than just store data—it could breathe new life into the entire
             ecosystem. In a delightful twist of fate, the success of this
