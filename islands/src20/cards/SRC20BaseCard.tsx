@@ -67,7 +67,7 @@ export function SRC20BaseCard(
           alt={convertToEmoji(src20.tick)}
         />
         <div class="flex flex-col">
-          <p class="text-2xl mobileLg:text-4xl font-black uppercase flex gap-4">
+          <p class="text-2xl mobileLg:text-4xl font-black uppercase flex gap-4 relative z-[20]">
             {(() => {
               const { text, emoji } = splitTextAndEmojis(
                 convertToEmoji(src20.tick),
@@ -83,11 +83,10 @@ export function SRC20BaseCard(
                       {text}
                     </span>
                   )}
-                  {emoji && <span>{emoji}</span>}
+                  {emoji && <span class="emoji-ticker">{emoji}</span>}
                 </>
               );
             })()}
-            {/* Social Icons */}
             <div class="flex gap-2">
               {src20.email != null && (
                 <a href={src20.email} target="_blank">
