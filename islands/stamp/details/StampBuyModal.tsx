@@ -200,7 +200,8 @@ const StampBuyModal = ({
       />
 
       {error && <div class="text-red-500 mt-2">{error}</div>}
-      {successMessage && <div class="text-green-500 mt-2">{successMessage}</div>}
+      {successMessage && <div class="text-green-500 mt-2">{successMessage}
+      </div>}
     </ModalLayout>
   );
 };
