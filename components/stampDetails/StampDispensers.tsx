@@ -28,9 +28,9 @@ const tableHeaders = [
   { key: "closeBlock", label: "Closed" },
 ];
 
-const tableLabelClassName =
+const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const tableValueClassName =
+const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 
 function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
@@ -80,7 +80,7 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
   return (
     <div className="relative max-w-full">
       <div className="max-h-96 overflow-x-auto">
-        <table class={`${tableValueClassName} w-full table-fixed`}>
+        <table class={`${tableValue} w-full table-fixed`}>
           <colgroup>
             <col class="w-[16%] tablet:w-[14%]" /> {/* Price */}
             <col class="w-[12%] tablet:w-[10%]" /> {/* Escrow */}
@@ -96,7 +96,7 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
                 <th
                   key={key}
                   scope="col"
-                  class={`${tableLabelClassName} pb-1.5 ${
+                  class={`${tableLabel} pb-1.5 ${
                     key === "price"
                       ? "text-left"
                       : key === "closeBlock"
