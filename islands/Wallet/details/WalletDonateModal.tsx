@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
@@ -20,10 +20,9 @@ function WalletDonateModal({
   donateAddress,
 }: Props) {
   const { wallet } = walletContext;
-  const [amount, setAmount] = useState("");
-
   const {
     formState,
+    setFormState,
     handleChangeFee: internalHandleChangeFee,
     handleSubmit,
     isSubmitting,
@@ -41,6 +40,31 @@ function WalletDonateModal({
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
+  const handleMaxClick = async () => {
+    if (!wallet?.balance) return;
+
+    try {
+      const estimatedVSize = 141; // Standard size for P2WPKH tx (1-in 1-out)
+      const feeInSatoshis = Math.ceil((formState.fee * estimatedVSize) / 1000);
+
+      if (wallet.balance <= feeInSatoshis) {
+        setError("Insufficient balance to cover network fees");
+        return;
+      }
+
+      const maxAmountSats = wallet.balance - feeInSatoshis;
+      const maxAmountBTC = (maxAmountSats / 100000000).toFixed(8);
+
+      setFormState({
+        ...formState,
+        amount: maxAmountBTC,
+      });
+    } catch (error) {
+      setError("Failed to calculate maximum amount");
+      console.error("Max amount calculation error:", error);
+    }
+  };
+
   const handleDonateSubmit = async () => {
     await handleSubmit(async () => {
       if (!donateAddress) {
@@ -49,13 +73,13 @@ function WalletDonateModal({
 
       const options = {
         return_psbt: true,
-        fee_per_kb: formState.fee * 1000, // Convert to sat/kB
+        fee_per_kb: formState.fee,
       };
 
       const requestBody = {
         address: wallet.address,
         toAddress: donateAddress,
-        amount: parseFloat(amount),
+        amount: parseFloat(formState.amount),
         options,
       };
 
@@ -109,14 +133,87 @@ function WalletDonateModal({
 
   return (
     <ModalLayout onClose={handleCloseModal} title="DONATE">
-      <div className="flex flex-col gap-3 mobileLg:gap-6">
-        <input
-          type="text"
-          value={amount}
-          onInput={(e) => setAmount((e.target as HTMLInputElement).value)}
-          placeholder="Enter amount"
-          className={inputField}
-        />
+      <div className="flex flex-col gap-6 -mt-3">
+        <div className="flex flex-col items-center text-center">
+          <div className="flex justify-center items-baseline w-full">
+            <div className="inline-flex items-baseline gap-1.5">
+              <input
+                type="text"
+                value={formState.amount}
+                onInput={(e) => {
+                  const value = (e.target as HTMLInputElement).value;
+                  // Only allow numbers and decimal point
+                  let sanitizedValue = value.replace(/[^0-9.]/g, "");
+
+                  // Ensure only one decimal point
+                  const parts = sanitizedValue.split(".");
+                  if (parts.length > 2) {
+                    sanitizedValue = parts[0] + "." + parts[1];
+                  }
+
+                  // Limit decimal places to 8
+                  if (parts.length === 2 && parts[1].length > 8) {
+                    sanitizedValue = parts[0] + "." + parts[1].slice(0, 8);
+                  }
+
+                  // Limit total length to 10
+                  sanitizedValue = sanitizedValue.slice(0, 10);
+
+                  setFormState({
+                    ...formState,
+                    amount: sanitizedValue,
+                  });
+                }}
+                placeholder="0"
+                className="bg-transparent text-4xl mobileLg:text-5xl text-stamp-grey-light placeholder:text-stamp-grey font-black outline-none text-right -ms-1.5 mobileLg:-ms-0.75"
+                style={{
+                  width: (() => {
+                    const value = formState.amount || "";
+
+                    // Define pixel values for different screen sizes
+                    const smallScreenChar = { one: 17, other: 23 };
+                    const largeScreenChar = { one: 22, other: 30 };
+
+                    // Use CSS media query to determine screen size
+                    const isSmallScreen =
+                      globalThis.matchMedia("(max-width: 767px)").matches;
+                    const { one, other } = isSmallScreen
+                      ? smallScreenChar
+                      : largeScreenChar;
+
+                    // Calculate width based on input value
+                    const baseWidth = !value
+                      ? other // Use 'other' width for empty/placeholder
+                      : value.split("").reduce((total, char) => {
+                        return total +
+                          (char === "1" || char === "." ? one : other);
+                      }, 0);
+
+                    return `${baseWidth}px`;
+                  })(),
+                }}
+              />
+              <span className="text-4xl mobileLg:text-5xl text-stamp-grey-light font-extralight">
+                BTC
+              </span>
+            </div>
+          </div>
+          <div className="text-lg mobileLg:text-xl text-stamp-grey-darker font-light mt-0.75">
+            {formState.amount && formState.BTCPrice
+              ? (parseFloat(formState.amount) * formState.BTCPrice)
+                .toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              : "0.00"} USD
+          </div>
+          <div
+            className="text-xs mobileLg:text-sm text-stamp-grey font-medium hover:stamp-grey-light mt-1.5 cursor-pointer"
+            onClick={handleMaxClick}
+          >
+            MAX
+          </div>
+        </div>
 
         {donateAddress && (
           <div className={dataColumn}>
@@ -131,7 +228,7 @@ function WalletDonateModal({
         fee={formState.fee}
         handleChangeFee={internalHandleChangeFee}
         type="send"
-        amount={amount ? parseFloat(amount) : 0}
+        amount={formState.amount ? parseFloat(formState.amount) : 0}
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={handleDonateSubmit}
@@ -151,6 +248,5 @@ function WalletDonateModal({
       )}
     </ModalLayout>
   );
-}
 
 export default WalletDonateModal;
