@@ -4,6 +4,7 @@ import { StampService } from "$server/services/stampService.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
 import { DispenserFilter, DispenseEvent, XcpBalance } from "$types/index.d.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
+import { getTxInfo } from "$lib/utils/utxoUtils.ts";
 import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
 
@@ -799,15 +800,18 @@ export class XcpManager {
           break;
         }
 
-        const sends = response.result.map((send: any) => ({
-          tx_hash: send.tx_hash,
-          block_index: send.block_index,
-          source: send.source,
-          destination: send.destination,
-          quantity: send.quantity,
-          asset: cpid,
-          status: send.status,
-        }));
+        const sends = await Promise.all(
+          response.result.map(async (send: any) => ({
+            tx_hash: send.tx_hash,
+            block_index: send.block_index,
+            block_time: await getTxInfo(send.tx_hash), // Fetch block time
+            source: send.source,
+            destination: send.destination,
+            quantity: send.quantity,
+            asset: cpid,
+            status: send.status,
+          }))
+        );
 
         allSends = allSends.concat(sends);
         processedCount += sends.length;
