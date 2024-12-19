@@ -16,11 +16,11 @@ export default function TextContentIsland({ src }: { src: string }) {
       .catch((e) => setError(`Error loading content: ${e.message}`));
   }, [src]);
 
-  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (error) return <div class="text-red-500">Error: {error}</div>;
 
   return (
-    <div className="w-full h-full overflow-auto p-4 text-sm !text-gray-500 flex items-center justify-center">
-      <pre className="whitespace-pre-wrap break-words max-w-full">{content}</pre>
+    <div class="w-full h-full overflow-auto p-4 text-sm !text-gray-500 flex items-center justify-center">
+      <pre class="whitespace-pre-wrap break-words max-w-full">{content}</pre>
     </div>
   );
 }
