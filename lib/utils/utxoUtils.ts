@@ -8,6 +8,31 @@ const BLOCKCHAIN_API_BASE_URL = "https://blockchain.info";
 const MEMPOOL_API_BASE_URL = "https://mempool.space/api";
 const BLOCKSTREAM_API_BASE_URL = "https://blockstream.info/api";
 
+export async function getTxInfo(tx: string): Promise<number | string> {
+  const endpoint = `${BLOCKSTREAM_API_BASE_URL}/tx/${tx}`;
+  let timestamp: number | string = "N/A";
+
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      console.error(`Failed to fetch transaction data: ${response.statusText}`);
+      return "N/A";
+    }
+
+    const data = await response.json();
+    if (data.status && data.status.block_time) {
+      timestamp = data.status.block_time * 1000;
+    } else {
+      console.warn("Block time not found in the API response.");
+      return "N/A";
+    }
+  } catch (error) {
+    console.error("Error fetching transaction data:", error);
+    return "N/A";
+  }
+  return timestamp;
+}
+
 export function isValidBitcoinAddress(address: string): boolean {
   const p2pkhRegex = /^1[1-9A-HJ-NP-Za-km-z]{25,34}$/; // Legacy P2PKH
   const p2shRegex = /^3[1-9A-HJ-NP-Za-km-z]{25,34}$/; // P2SH

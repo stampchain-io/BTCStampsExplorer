@@ -64,7 +64,7 @@ export function SRC20Section(
   const [isModalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!initialData) {
+    if (!initialData?.length) {
       setIsTransitioning(true);
       setIsLoading(true);
       const endpoint = fromPage === "wallet" && address

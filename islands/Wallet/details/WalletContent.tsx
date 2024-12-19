@@ -574,7 +574,7 @@ export default function WalletContent({
           <SRC20Section
             type="all"
             fromPage="wallet"
-            initialData={src20.data}
+            initialData={[]}
             pagination={{
               page: src20.pagination.page,
               limit: src20.pagination.limit,
