@@ -25,14 +25,6 @@ function mapDispensesWithRates(dispenses: any[], dispensers: any[]) {
   }));
 }
 
-// Remove the static tabs array and create a function to get tabs with counts
-function getTabsWithCounts(dispensers: any[], dispenses: any[], sends: any[]) {
-  return [
-    { id: "dispensers", label: `DISPENSERS (${dispensers.length})` },
-    { id: "sales", label: `SALES (${dispenses.length})` },
-    { id: "transfers", label: `TRANSFERS (${sends.length})` },
-  ] as const;
-}
 
 const PAGE_SIZE = 20;
 
