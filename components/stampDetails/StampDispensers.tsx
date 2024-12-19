@@ -39,30 +39,30 @@ function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
 
   return (
     <tr class={rowClassName}>
-      <td className="text-left py-0">
+      <td class="text-left py-0">
         {formatSatoshisToBTC(dispenser.satoshirate)}
       </td>
-      <td className="text-center py-0">
+      <td class="text-center py-0">
         {formatNumber(dispenser.escrow_quantity, 0)}
       </td>
-      <td className="text-center py-0">
+      <td class="text-center py-0">
         {formatNumber(dispenser.give_quantity, 0)}
       </td>
-      <td className="text-center py-0">
+      <td class="text-center py-0">
         {formatNumber(dispenser.give_remaining, 0)}
       </td>
-      <td className="text-center py-0">
-        <span className="tablet:hidden">
+      <td class="text-center py-0">
+        <span class="tablet:hidden">
           {abbreviateAddress(dispenser.source, 4)}
         </span>
-        <span className="hidden tablet:inline">
+        <span class="hidden tablet:inline">
           {abbreviateAddress(dispenser.source, 8)}
         </span>
       </td>
-      <td className="text-center py-0">
+      <td class="text-center py-0">
         {dispenser.confirmed ? "YES" : "NO"}
       </td>
-      <td className="text-right py-0">
+      <td class="text-right py-0">
         {!dispenser.close_block_index || dispenser.close_block_index <= 0
           ? "OPEN"
           : dispenser.close_block_index}
@@ -78,8 +78,8 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
   );
 
   return (
-    <div className="relative max-w-full">
-      <div className="max-h-96 overflow-x-auto">
+    <div class="relative max-w-full">
+      <div class="max-h-96 overflow-x-auto">
         <table class={`${tableValue} w-full table-fixed`}>
           <colgroup>
             <col class="w-[16%] tablet:w-[14%]" /> {/* Price */}

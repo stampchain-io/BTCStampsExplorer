@@ -143,32 +143,32 @@ const StampBuyModal = ({
 
   return (
     <ModalLayout onClose={handleCloseModal} title="BUY">
-      <div className="flex flex-row gap-6">
-        <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
+      <div class="flex flex-row gap-6">
+        <div class="flex flex-col w-[156px] mobileLg:w-[164px]">
           <StampImage
             stamp={stamp}
             className=""
             flag={false}
           />
         </div>
-        <div className="flex flex-col w-full">
-          <p className="text-3xl mobileLg:text-4xl gray-gradient1 font-black">
-            <span className="text-stamp-grey-light font-light">
+        <div class="flex flex-col w-full">
+          <p class="text-3xl mobileLg:text-4xl gray-gradient1 font-black">
+            <span class="text-stamp-grey-light font-light">
               #
             </span>
             {stamp.stamp}
           </p>
 
-          <div className="flex flex-row pt-3 w-full justify-between items-center">
-            <div className="flex flex-col items-start -space-y-0.5">
-              <p className="text-xl mobileLg:text-2xl font-bold text-stamp-grey">
+          <div class="flex flex-row pt-3 w-full justify-between items-center">
+            <div class="flex flex-col items-start -space-y-0.5">
+              <p class="text-xl mobileLg:text-2xl font-bold text-stamp-grey">
                 EDITIONS
               </p>
-              <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+              <p class="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
                 MAX {maxQuantity}
               </p>
             </div>
-            <div className="flex flex-col items-end">
+            <div class="flex flex-col items-end">
               <input
                 type="number"
                 min="1"
@@ -199,9 +199,9 @@ const StampBuyModal = ({
         outputTypes={["P2WPKH"]}
       />
 
-      {error && <div className="text-red-500 mt-2">{error}</div>}
+      {error && <div class="text-red-500 mt-2">{error}</div>}
       {successMessage && (
-        <div className="text-green-500 mt-2">{successMessage}</div>
+        <div class="text-green-500 mt-2">{successMessage}</div>
       )}
     </ModalLayout>
   );

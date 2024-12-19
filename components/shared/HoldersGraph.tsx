@@ -20,21 +20,21 @@ const tableHeaders = [
 
 function HolderRow({ holder }: { holder: Holder }) {
   return (
-    <tr className="bg-stamp-grey-darker/10 hover:bg-stamp-grey-darker/20 transition-colors">
-      <td className="text-left py-2 px-4 first:rounded-l-lg last:rounded-r-lg">
+    <tr class="bg-stamp-grey-darker/10 hover:bg-stamp-grey-darker/20 transition-colors">
+      <td class="text-left py-2 px-4 first:rounded-l-lg last:rounded-r-lg">
         <a
           href={`/wallet/${holder.address}`}
           data-tooltip-target={holder.address || "Unknown"}
           title={holder.address || "Unknown"}
-          className="hover:text-stamp-purple transition-colors"
+          class="hover:text-stamp-purple transition-colors"
         >
           {holder.address
             ? (
               <>
-                <span className="mobileLg:hidden">
+                <span class="mobileLg:hidden">
                   {abbreviateAddress(holder.address, 8)}
                 </span>
-                <span className="hidden mobileLg:inline">
+                <span class="hidden mobileLg:inline">
                   {holder.address}
                 </span>
               </>
@@ -42,10 +42,10 @@ function HolderRow({ holder }: { holder: Holder }) {
             : "Unknown"}
         </a>
       </td>
-      <td className="text-center py-2 px-4 first:rounded-l-lg last:rounded-r-lg">
+      <td class="text-center py-2 px-4 first:rounded-l-lg last:rounded-r-lg">
         {holder.amt}
       </td>
-      <td className="text-right py-2 px-4 first:rounded-l-lg last:rounded-r-lg">
+      <td class="text-right py-2 px-4 first:rounded-l-lg last:rounded-r-lg">
         {holder.percentage}%
       </td>
     </tr>
@@ -55,8 +55,8 @@ function HolderRow({ holder }: { holder: Holder }) {
 export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
   if (!holders.length) {
     return (
-      <div className="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-lg">
-        <div className="text-center py-10">No holder data available</div>
+      <div class="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-lg">
+        <div class="text-center py-10">No holder data available</div>
       </div>
     );
   }
@@ -72,26 +72,26 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
   const totalHolders = holders.length;
 
   return (
-    <div className="flex flex-col dark-gradient p-3 mobileMd:p-6 relative rounded-lg">
-      <div className="text-left tablet:text-right">
-        <p className={dataLabelClassName}>HOLDERS</p>
-        <p className={dataValueXLClassName}>{totalHolders}</p>
+    <div class="flex flex-col dark-gradient p-3 mobileMd:p-6 relative rounded-lg">
+      <div class="text-left tablet:text-right">
+        <p class={dataLabelClassName}>HOLDERS</p>
+        <p class={dataValueXLClassName}>{totalHolders}</p>
       </div>
-      <div className="flex flex-col tablet:flex-row w-full gap-6">
-        <div className="flex justify-center tablet:justify-start">
+      <div class="flex flex-col tablet:flex-row w-full gap-6">
+        <div class="flex justify-center tablet:justify-start">
           <HoldersPieChart holders={holders} />
         </div>
 
-        <div className="relative w-full max-w-full">
-          <div className="h-48 mobileLg:h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-            <table className={tableValueClassName}>
-              <thead className={tableLabelClassName}>
+        <div class="relative w-full max-w-full">
+          <div class="h-48 mobileLg:h-64 overflow-x-auto overflow-y-auto mt-3 mobileMd:mt-6 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+            <table class={tableValueClassName}>
+              <thead class={tableLabelClassName}>
                 <tr>
                   {tableHeaders.map(({ key, label }) => (
                     <th
                       key={key}
                       scope="col"
-                      className={`pb-1.5 px-4 ${
+                      class={`pb-1.5 px-4 ${
                         key === "address"
                           ? "text-left"
                           : key === "percent"
@@ -104,7 +104,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
                   ))}
                 </tr>
               </thead>
-              <tbody className={tableValueClassName}>
+              <tbody class={tableValueClassName}>
                 {holders.map((holder, index) => (
                   <HolderRow key={index} holder={holder} />
                 ))}
