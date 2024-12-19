@@ -3,7 +3,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 
 export const handler: Handlers = {
-  async GET(req, ctx) {
+  async GET(_req, ctx) {
     try {
       const { stamp } = ctx.params;
 

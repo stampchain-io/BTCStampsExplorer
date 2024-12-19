@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { logger, LogNamespace } from "$lib/utils/logger.ts";
+import { logger, LogNamespace as _LogNamespace } from "$lib/utils/logger.ts";
 import { serverConfig } from "$server/config/config.ts";
 
 interface TestResult {

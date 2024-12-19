@@ -101,7 +101,7 @@ function formatLog(level: LogLevel, namespace: LogNamespace, msg: LogMessage) {
   };
 }
 
-const isDevelopment = () =>
+const _isDevelopment = () =>
   isServer() && Deno.env.get("DENO_ENV") === "development";
 
 export const logger = {

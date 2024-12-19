@@ -1,5 +1,5 @@
 import { Swiper } from "swiper";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Autoplay, Navigation as _Navigation, Pagination } from "swiper/modules";
 import type { SwiperType } from "swiper";
 
 type CarouselElement = HTMLElement | null;
@@ -119,7 +119,7 @@ const debug = (message: string, data?: unknown) => {
 
 const calculateTransforms = (
   swiper: SwiperType,
-  containerWidth: number,
+  _containerWidth: number,
   isMobile: boolean,
   baseWidth: number,
   centerX: number,

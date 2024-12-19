@@ -40,7 +40,7 @@ export const NavigatorProvider = (
   }, []);
 
   const setTypeOption = (
-    page: string,
+    _page: string,
     newType: NavigatorTypes,
     reload = false,
   ) => {

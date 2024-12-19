@@ -11,7 +11,7 @@ import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 
 const WalletPopup = (
-  { logout, onClose }: { logout: () => void; onClose: () => void },
+  { logout, _onClose }: { logout: () => void; onClose: () => void },
 ) => {
   const displayNameRef = useRef<HTMLInputElement>(null);
   const _xNameRef = useRef<HTMLInputElement>(null);

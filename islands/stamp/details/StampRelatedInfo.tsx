@@ -5,7 +5,7 @@ import { StampSales } from "$components/stampDetails/StampSales.tsx";
 import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
 
 interface StampRelatedInfoProps {
-  stampId: string;
+  _stampId: string;
   cpid: string;
 }
 
@@ -28,7 +28,7 @@ function mapDispensesWithRates(dispenses: any[], dispensers: any[]) {
 
 const PAGE_SIZE = 20;
 
-export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
+export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
   const [selectedTab, setSelectedTab] = useState<TabType>("dispensers");
   const [dispensers, setDispensers] = useState<any[]>([]);
   const [dispenses, setDispenses] = useState<any[]>([]);

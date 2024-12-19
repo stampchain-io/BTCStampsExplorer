@@ -7,21 +7,21 @@ import { WALLET_FILTER_TYPES } from "$globals";
 
 interface WalletHeaderProps {
   filterBy: WALLET_FILTER_TYPES[];
-  sortBy: string;
+  _sortBy: string;
 }
 
 const WalletHeader = ({
   filterBy,
-  sortBy,
+  _sortBy,
 }: WalletHeaderProps) => {
   // State management for the open states
-  const [isOpen1, setIsOpen1] = useState(false);
-  const [isOpen2, setIsOpen2] = useState(false);
-  const handleOpen1 = (open: boolean) => {
+  const [_isOpen1, setIsOpen1] = useState(false);
+  const [_isOpen2, setIsOpen2] = useState(false);
+  const _handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
     setIsOpen2(false);
   };
-  const handleOpen2 = (open: boolean) => {
+  const _handleOpen2 = (open: boolean) => {
     setIsOpen1(false);
     setIsOpen2(open);
   };
