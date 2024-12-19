@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head as _Head } from "$fresh/runtime.ts";
 
 export default function HowTo() {
   const body = "flex flex-col gap-12 mobileLg:gap-[72px] desktop:gap-24";

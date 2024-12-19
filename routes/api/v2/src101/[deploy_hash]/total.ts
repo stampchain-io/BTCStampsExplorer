@@ -4,7 +4,7 @@ import { AddressHandlerContext } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
 export const handler: Handlers<AddressHandlerContext> = {
-  async GET(req, ctx) {
+  async GET(_req, ctx) {
     try {
       var { deploy_hash } = ctx.params;
 
