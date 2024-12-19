@@ -449,3 +449,12 @@ linear-gradient(rgba(80, 0, 120, 0.4),
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
+
+/* Emoji ticker styling for SRC20 cards */
+.emoji-ticker {
+  @apply text-stamp-primary-hover;
+  font-family: system-ui;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
