@@ -13,14 +13,11 @@ function stripColorCodes(text: string): string {
 }
 
 /**
- * Parse "TSxxxx [ERROR]: ..." or "error TSxxxx:" or "error[...]:" lines, etc.
- * Also parse lines prefixed by "at file://" to extract file and line numbers.
- * If your output doesn't match one of these patterns, tweak the regexes below.
+ * Run the "check:types" task and parse any discovered TypeScript errors.
  */
 async function getTypeErrors(): Promise<TypeError[]> {
   console.log("Running 'deno task check:types' and capturing output...");
 
-  // Use Deno.Command to run and capture the output from your "check:types" script.
   const process = new Deno.Command("deno", {
     args: ["task", "check:types"],
     stderr: "piped",
@@ -40,16 +37,11 @@ async function getTypeErrors(): Promise<TypeError[]> {
   const lines = mergedOutput.split("\n");
   const errors: TypeError[] = [];
 
-  // We’ll hold partial info in currentError until we see the next error boundary
   let currentError: Partial<TypeError> = {};
 
   for (const line of lines) {
     const trimmedLine = line.trim();
-    // This pattern matches:
-    //   "TS18046 [ERROR]: ..."
-    //   "error TS18046:"
-    //   "error[ts18046]:"
-    //   "error:"
+    // This pattern matches lines like "TS18046 [ERROR]: ..." or "error TS18046:", etc.
     const errorMatch = trimmedLine.match(
       /(?:TS\d+\s*\[ERROR\]:)|(?:error\s*TS\d+:)|(?:error\[.*?\]:)|(?:error:)/i,
     );
@@ -59,17 +51,15 @@ async function getTypeErrors(): Promise<TypeError[]> {
       if (currentError.file && currentError.message) {
         errors.push(currentError as TypeError);
       }
-      // Start a new error with a default category
       let category = "type-error";
 
-      // Attempt to capture TS code from line (like TS18046)
+      // Attempt to capture TS code
       const tsCodeMatch = trimmedLine.match(/TS(\d+)\s*\[ERROR\]/i) ||
         trimmedLine.match(/TS(\d+):/i);
       if (tsCodeMatch) {
         category = `TS${tsCodeMatch[1]}`;
       }
 
-      // The message is everything after the colon, if we want a rough read
       const errorMsgParts = trimmedLine.split(":").slice(1);
       currentError = {
         category,
@@ -78,8 +68,7 @@ async function getTypeErrors(): Promise<TypeError[]> {
       continue;
     }
 
-    // Match file references in the “at file:///…:line:col” lines
-    // Example: at file:///home/ubuntu/BTCStampsExplorer/server/services/xcpService.ts:1607:11
+    // Match file references in lines like “at file:///…:line:column”
     const fileMatch = trimmedLine.match(
       /at (file:\/\/\/.*?\.(?:ts|tsx)):(\d+):(\d+)/,
     );
@@ -89,14 +78,13 @@ async function getTypeErrors(): Promise<TypeError[]> {
       continue;
     }
 
-    // If the line contains more text and we haven't assigned a message yet,
-    // we can use it to expand on the current error message
+    // If line has more text, append to the current error message
     if (currentError.category && trimmedLine.length) {
       currentError.message = (currentError.message ?? "") + " " + trimmedLine;
     }
   }
 
-  // Finally, push any leftover partial error if it’s populated
+  // Push any leftover error
   if (currentError.file && currentError.message) {
     errors.push(currentError as TypeError);
   }
@@ -107,9 +95,7 @@ async function getTypeErrors(): Promise<TypeError[]> {
 function categorizeErrors(errors: TypeError[]): Record<string, TypeError[]> {
   const categories: Record<string, TypeError[]> = {};
   for (const err of errors) {
-    if (!categories[err.category]) {
-      categories[err.category] = [];
-    }
+    categories[err.category] ||= [];
     categories[err.category].push(err);
   }
 
@@ -117,14 +103,19 @@ function categorizeErrors(errors: TypeError[]): Record<string, TypeError[]> {
   const sortedCategories: Record<string, TypeError[]> = {};
   Object.entries(categories)
     .sort(([, a], [, b]) => b.length - a.length)
-    .forEach(([categoryKey, categoryErrors]) => {
-      sortedCategories[categoryKey] = categoryErrors;
+    .forEach(([key, value]) => {
+      sortedCategories[key] = value;
     });
 
   return sortedCategories;
 }
 
-function generateReport(categories: Record<string, TypeError[]>): string {
+/**
+ * Generate a Markdown-based error report that's more human-friendly.
+ */
+function generateMarkdownReport(
+  categories: Record<string, TypeError[]>,
+): string {
   let report = "🔎 **# TypeScript Error Analysis Report**\n\n";
 
   const totalErrors = Object.values(categories)
@@ -135,13 +126,7 @@ function generateReport(categories: Record<string, TypeError[]>): string {
 
   report += "## Error Categories\n\n";
   for (const [category, errs] of Object.entries(categories)) {
-    // Show an emoji next to each category
     let categoryEmoji = "❓";
-    // Some fun examples:
-    //   TS2339 might be a property related error -> "🏷️"
-    //   TS2304 might be a not found error -> "🔍"
-    //   TS7005 or TS7006 might be param error -> "🔧"
-    // Feel free to add more if/else mappings or a dictionary
     if (/TS2339/.test(category)) categoryEmoji = "🏷️";
     if (/TS2304/.test(category)) categoryEmoji = "🔍";
     if (/TS7005|TS7006/.test(category)) categoryEmoji = "🔧";
@@ -151,9 +136,7 @@ function generateReport(categories: Record<string, TypeError[]>): string {
     // Group by file
     const fileMap: Record<string, TypeError[]> = {};
     for (const err of errs) {
-      if (!fileMap[err.file]) {
-        fileMap[err.file] = [];
-      }
+      fileMap[err.file] ||= [];
       fileMap[err.file].push(err);
     }
 
@@ -165,7 +148,6 @@ function generateReport(categories: Record<string, TypeError[]>): string {
     for (const [file, fileErrors] of sortedFiles) {
       report += `#### 📁 ${file} (${fileErrors.length} errors)\n\n`;
       for (const error of fileErrors.sort((a, b) => a.line - b.line)) {
-        // Include a colored bullet (like a red circle) for each error
         report += `- 🔴 **Line ${error.line}**: ${error.message}\n`;
       }
       report += "\n";
@@ -173,7 +155,6 @@ function generateReport(categories: Record<string, TypeError[]>): string {
   }
 
   report += "## Recommendations\n\n";
-  // Styled with bullets and an emoji
   report += "1. ✅ **Check the most frequent error categories first**\n";
   report += "2. ✅ **Focus on files with the most errors first**\n";
   report += "3. ✅ **Look for patterns in similar errors**\n";
@@ -188,15 +169,22 @@ function generateReport(categories: Record<string, TypeError[]>): string {
   Object.values(categories).flat().forEach((err) => {
     fileCounts[err.file] = (fileCounts[err.file] || 0) + 1;
   });
+
   Object.entries(fileCounts)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
     .forEach(([file, count]) => {
-      // Add an arrow bullet and a warning triangle
       report += `- 🔸 **${file}**: ${count} errors\n`;
     });
 
   return report;
+}
+
+/**
+ * Generate a machine-readable JSON report of the raw errors (no grouping).
+ */
+function generateJsonReport(errors: TypeError[]): string {
+  return JSON.stringify(errors, null, 2);
 }
 
 async function main() {
@@ -206,11 +194,19 @@ async function main() {
     await Deno.mkdir("reports", { recursive: true });
     const errors = await getTypeErrors();
     const categories = categorizeErrors(errors);
-    const report = generateReport(categories);
 
-    await Deno.writeTextFile("reports/type-errors-report.md", report);
+    // Generate the human-readable Markdown report
+    const markdownReport = generateMarkdownReport(categories);
+    await Deno.writeTextFile("reports/type-errors-report.md", markdownReport);
+
+    // Generate JSON for AI or other machine consumption
+    const jsonReport = generateJsonReport(errors);
+    await Deno.writeTextFile("reports/type-errors-report.json", jsonReport);
+
     console.log(
-      `Analysis complete! Found ${errors.length} errors. Check reports/type-errors-report.md for details.`,
+      `Analysis complete! Found ${errors.length} errors.
+       • Check reports/type-errors-report.md for a human-readable summary.
+       • Check reports/type-errors-report.json for machine-readable data.`,
     );
   } catch (error) {
     console.error("Error during analysis:", error);
