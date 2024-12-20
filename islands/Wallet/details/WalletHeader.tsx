@@ -1,30 +1,4 @@
-import { useState } from "preact/hooks";
-
-import { StampSearchClient as _StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { Filter as _Filter } from "$islands/datacontrol/Filter.tsx";
-
-import { WALLET_FILTER_TYPES } from "$globals";
-
-interface WalletHeaderProps {
-  filterBy: WALLET_FILTER_TYPES[];
-  _sortBy: string;
-}
-
-const WalletHeader = ({
-  _filterBy,
-  _sortBy,
-}: WalletHeaderProps) => {
-  // State management for the open states
-  const [_isOpen1, setIsOpen1] = useState(false);
-  const [_isOpen2, setIsOpen2] = useState(false);
-  const _handleOpen1 = (open: boolean) => {
-    setIsOpen1(open);
-    setIsOpen2(false);
-  };
-  const _handleOpen2 = (open: boolean) => {
-    setIsOpen1(false);
-    setIsOpen2(open);
-  };
+const WalletHeader = () => {
   const titlePurpleDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
 

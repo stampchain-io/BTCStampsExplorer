@@ -2,7 +2,6 @@ import AboutHeader from "$islands/about/AboutHeader.tsx";
 import AboutTeam from "$islands/about/AboutTeam.tsx";
 import { PartnersModule } from "$islands/modules/Partners.tsx";
 import AboutDonate from "$islands/about/AboutDonate.tsx";
-import { AboutContact as _AboutContact } from "$islands/about/AboutContact.tsx";
 
 export default function About() {
   return (

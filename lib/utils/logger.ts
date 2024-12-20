@@ -73,7 +73,14 @@ const LOG_FILE = `${LOG_DIR}/app.log`;
 async function writeToFile(data: string) {
   if (!isServer()) return;
 
+  const isDevelopment = Deno.env.get("DENO_ENV") === "development";
+
   try {
+    // In production, only write errors to file
+    if (!isDevelopment && !data.includes('"level":"error"')) {
+      return;
+    }
+
     // Ensure log directory exists
     try {
       await Deno.mkdir(LOG_DIR, { recursive: true });
@@ -100,9 +107,6 @@ function formatLog(level: LogLevel, namespace: LogNamespace, msg: LogMessage) {
     ...msg,
   };
 }
-
-const _isDevelopment = () =>
-  isServer() && Deno.env.get("DENO_ENV") === "development";
 
 export const logger = {
   debug: (namespace: LogNamespace, msg: LogMessage) => {

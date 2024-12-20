@@ -3,7 +3,6 @@ import { SRC20TrxRequestParams } from "$globals";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { DeployMintModule as _DeployMintModule } from "$islands/modules/DeployMint.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {

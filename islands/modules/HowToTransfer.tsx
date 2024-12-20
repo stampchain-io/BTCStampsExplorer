@@ -1,5 +1,4 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
-import { ReadAllButton as _ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
 export const HowToTransferModule = () => {
   return (
@@ -46,7 +45,6 @@ export const HowToTransferModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
-      {/* <ReadAllButton href="/howto/transfer" /> */}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect as _useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 
 import { STAMP_FILTER_TYPES, STAMP_TYPES as _STAMP_TYPES } from "$globals";
 
@@ -6,7 +6,6 @@ import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator as _useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { Search as _Search, SearchResult as _SearchResult } from "$islands/datacontrol/Search.tsx";
 
 export const StampHeader = (
   { filterBy, sortBy }: {

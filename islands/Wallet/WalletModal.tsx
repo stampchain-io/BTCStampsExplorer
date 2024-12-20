@@ -51,7 +51,7 @@ const WalletPopup = (
     fetchCreatorName();
   }, [wallet.address]);
 
-  // TODO: This will need to move to the new dashboard /wallet page
+  // TODO(@reinamora137): This will need to move to the new dashboard /wallet page
 
   const handleUpdateDisplayName = async () => {
     if (!displayNameRef.current) return;

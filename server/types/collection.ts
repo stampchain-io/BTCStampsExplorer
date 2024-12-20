@@ -1,4 +1,4 @@
-interface CollectionRow {
+export interface CollectionRow {
   collection_id: string;
   collection_name: string;
   collection_description: string;
@@ -8,13 +8,13 @@ interface CollectionRow {
   stamps: number[];
 }
 
-interface CollectionQueryParams {
+export interface CollectionQueryParams {
   limit?: number;
   page?: number;
   creator?: string;
 }
 
-interface PaginatedCollectionResponseBody {
+export interface PaginatedCollectionResponseBody {
   page: number;
   limit: number;
   totalPages: number;

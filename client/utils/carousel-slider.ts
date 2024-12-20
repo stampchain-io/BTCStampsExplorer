@@ -1,6 +1,6 @@
 import { Swiper } from "swiper";
-import { Autoplay, Navigation as _Navigation, Pagination } from "swiper/modules";
-import type { SwiperType } from "swiper";
+import { Autoplay, Pagination } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
 
 type CarouselElement = HTMLElement | null;
 

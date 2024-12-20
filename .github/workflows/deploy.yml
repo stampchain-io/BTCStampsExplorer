@@ -43,6 +43,10 @@ jobs:
         with:
           reviewdog_version: latest
 
+      # Formatting checks
+      - name: Check formatting
+        run: deno fmt --check
+
       - name: Run deno fmt with reviewdog
         run: |
           deno fmt --check | reviewdog -f=diff \
@@ -53,8 +57,19 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Check linting
-      #   run: deno task check:lint
+      # Linting checks
+      - name: Check linting
+        run: deno task check:lint
+
+      - name: Run deno lint with reviewdog
+        run: |
+          deno lint 2>&1 | reviewdog -f=rdjsonl \
+            -name="deno-lint" \
+            -reporter=github-pr-review \
+            -filter-mode=added \
+            -fail-on-error
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Type check
       #   run: deno task check:types

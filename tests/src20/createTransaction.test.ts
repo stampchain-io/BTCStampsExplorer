@@ -4,7 +4,7 @@ import { decodeSRC20OLGATransaction } from "../../utils/decodeSrc20OlgaTx.ts";
 import { Psbt } from "bitcoinjs-lib";
 
 declare global {
-  var mockTxData: {
+  let mockTxData: {
     vout: Array<{
       scriptPubKey: {
         type: string;

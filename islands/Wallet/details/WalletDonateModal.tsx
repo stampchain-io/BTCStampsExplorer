@@ -1,4 +1,3 @@
-import { h as _h } from "preact";
 import { useEffect } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
