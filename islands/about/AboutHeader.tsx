@@ -36,11 +36,11 @@ export default function AboutHeader() {
   const dataLabelPurple =
     "text-base mobileLg:text-lg font-light text-stamp-purple-highlight";
   const dataValuePurpleSm =
-    "text-2xl mobileLg:text-3xl font-black text-black text-stroke-glow";
+    "text-2xl mobileLg:text-3xl font-black text-black text-stroke-glow-small";
   const dataValuePurple =
-    "text-4xl mobileLg:text-5xl desktop:text-6xl font-black text-black text-stroke-glow";
+    "text-4xl mobileLg:text-5xl desktop:text-6xl font-black text-black text-stroke-glow-small";
   const dataValuePurpleXl =
-    "text-6xl mobileLg:text-7xl desktop:text-8xl font-black text-black text-stroke-glow";
+    "text-6xl mobileLg:text-7xl desktop:text-8xl font-black text-black text-stroke-glow-large";
 
   return (
     <div>
