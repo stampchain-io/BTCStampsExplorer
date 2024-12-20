@@ -172,6 +172,7 @@ import * as $modules_HowToMint from "./islands/modules/HowToMint.tsx";
 import * as $modules_HowToRegister from "./islands/modules/HowToRegister.tsx";
 import * as $modules_HowToStamp from "./islands/modules/HowToStamp.tsx";
 import * as $modules_HowToTransfer from "./islands/modules/HowToTransfer.tsx";
+import * as $modules_HowToTransferStamp from "./islands/modules/HowToTransferStamp.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
@@ -213,6 +214,7 @@ import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/tr
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
+import * as $stamping_stamp_transfer_TransferStamp from "./islands/stamping/stamp/transfer/TransferStamp.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -429,6 +431,7 @@ const manifest = {
     "./islands/modules/HowToRegister.tsx": $modules_HowToRegister,
     "./islands/modules/HowToStamp.tsx": $modules_HowToStamp,
     "./islands/modules/HowToTransfer.tsx": $modules_HowToTransfer,
+    "./islands/modules/HowToTransferStamp.tsx": $modules_HowToTransferStamp,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
@@ -487,6 +490,8 @@ const manifest = {
     "./islands/stamping/src20/transfer/TransferContent.tsx":
       $stamping_src20_transfer_TransferContent,
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
+    "./islands/stamping/stamp/transfer/TransferStamp.tsx":
+      $stamping_stamp_transfer_TransferStamp,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
   },
