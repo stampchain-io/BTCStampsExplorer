@@ -1,4 +1,3 @@
-import { h } from "preact";
 import { useEffect } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
@@ -31,7 +30,7 @@ function WalletDonateModal({
     handleSubmit,
     isSubmitting,
     error,
-    setError,
+    _setError,
     successMessage,
     setSuccessMessage,
   } = useTransactionForm({
@@ -119,7 +118,7 @@ function WalletDonateModal({
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
   const dataValueXs =
     "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
-  const dataValueSm =
+  const _dataValueSm =
     "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
   const inputField =
     "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";

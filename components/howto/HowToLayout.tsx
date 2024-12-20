@@ -1,7 +1,7 @@
 import { KeepReading } from "$components/howto/KeepReading.tsx";
 
 interface HowToLayoutProps {
-  title: string;
+  _title: string;
   subtitle: string;
   headerImage: string;
   children: preact.ComponentChildren;
@@ -9,7 +9,7 @@ interface HowToLayoutProps {
 }
 
 export function HowToLayout(
-  { title, subtitle, headerImage, children, importantNotes = [] }:
+  { _title, subtitle, headerImage, children, importantNotes = [] }:
     HowToLayoutProps,
 ) {
   const titleGreyDL =

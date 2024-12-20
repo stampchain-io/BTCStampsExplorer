@@ -19,10 +19,10 @@ type CollectionPageProps = {
   data: {
     collections: CollectionRow[];
     total: number;
-    page: number;
-    pages: number;
-    page_size: number;
-    filterBy: string[];
+    _page: number;
+    _pages: number;
+    _page_size: number;
+    _filterBy: string[];
     stamps_src721: StampRow[];
     stamps_posh: StampRow[];
   };
@@ -69,10 +69,10 @@ export const handler: Handlers = {
 export default function Collection(props: CollectionPageProps) {
   const {
     collections,
-    page,
-    pages,
-    page_size,
-    filterBy,
+    _page,
+    _pages,
+    _page_size,
+    _filterBy,
     stamps_src721 = [],
     stamps_posh = [],
   } = props.data;

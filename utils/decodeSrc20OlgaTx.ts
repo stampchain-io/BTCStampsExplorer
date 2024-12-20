@@ -15,7 +15,7 @@ if (import.meta.main) {
   // In test environment
   mockQuicknodeService = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    getTransaction: async (_txid: string) => globalThis.mockTxData,
+    getTransaction: (_txid: string) => globalThis.mockTxData,
   } as typeof QuicknodeService;
 }
 

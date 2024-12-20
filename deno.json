@@ -27,7 +27,8 @@
     "dredd": "deno task validate:schema && npx dredd",
     "test:version": "deno test -A --log-level=debug --no-check tests/versioning/versionChain.test.ts",
     "test:src20": "deno test --allow-net tests/src20/createTransaction.test.ts --no-check --allow-read --allow-env --allow-write",
-    "test:src20:watch": "deno test --allow-net tests/src20/createTransaction.test.ts --no-check --allow-read --allow-env --allow-write --watch"
+    "test:src20:watch": "deno test --allow-net tests/src20/createTransaction.test.ts --no-check --allow-read --allow-env --allow-write --watch",
+    "analyze:types": "deno run --allow-run --allow-write scripts/analyze-type-errors.ts"
   },
   "lint": {
     "rules": {

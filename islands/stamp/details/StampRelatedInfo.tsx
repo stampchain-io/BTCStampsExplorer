@@ -5,7 +5,7 @@ import { StampSales } from "$components/stampDetails/StampSales.tsx";
 import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
 
 interface StampRelatedInfoProps {
-  stampId: string;
+  _stampId: string;
   cpid: string;
 }
 
@@ -25,18 +25,9 @@ function mapDispensesWithRates(dispenses: any[], dispensers: any[]) {
   }));
 }
 
-// Remove the static tabs array and create a function to get tabs with counts
-function getTabsWithCounts(dispensers: any[], dispenses: any[], sends: any[]) {
-  return [
-    { id: "dispensers", label: `DISPENSERS (${dispensers.length})` },
-    { id: "sales", label: `SALES (${dispenses.length})` },
-    { id: "transfers", label: `TRANSFERS (${sends.length})` },
-  ] as const;
-}
-
 const PAGE_SIZE = 20;
 
-export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
+export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
   const [selectedTab, setSelectedTab] = useState<TabType>("dispensers");
   const [dispensers, setDispensers] = useState<any[]>([]);
   const [dispenses, setDispenses] = useState<any[]>([]);
@@ -241,7 +232,7 @@ export function StampRelatedInfo({ stampId, cpid }: StampRelatedInfoProps) {
       }
     }
   };
-  const dataLabelClassName =
+  const _dataLabelClassName =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
   const dataValueXLlinkClassName =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";

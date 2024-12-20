@@ -95,7 +95,7 @@ async function decodeSRC20Transaction(txHash: string): Promise<string> {
       // Decode using MessagePack
       const decodedData = msgpack.decode(uncompressedData);
       return JSON.stringify(decodedData);
-    } catch (error) {
+    } catch (_error) {
       console.warn("Failed to decompress data, raw text output");
       // If decompression fails, return the data as a string without parsing
       return new TextDecoder().decode(data).trim();

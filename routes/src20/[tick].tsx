@@ -52,7 +52,7 @@ interface SRC20TickPageProps {
 function SRC20TickPage(props: SRC20TickPageProps) {
   const {
     deployment,
-    total_holders,
+    _total_holders,
     holders,
     mint_status,
     total_mints,

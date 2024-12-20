@@ -7,7 +7,7 @@ export const handler: Handlers<AddressHandlerContext> = {
   async GET(req, ctx) {
     try {
       const { deploy_hash } = ctx.params;
-      var url = new URL(req.url);
+      const url = new URL(req.url);
       const params = url.searchParams;
 
       const queryParams = {

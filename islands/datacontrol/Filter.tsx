@@ -34,7 +34,7 @@ export function Filter({
   const [localFilters, setLocalFilters] = useState<FilterTypes[]>(initFilter);
   const { updateURL } = useURLUpdate();
   const filterContainerRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const [_isHovered, _setIsHovered] = useState(false);
 
   useEffect(() => {
     setLocalFilters(initFilter);

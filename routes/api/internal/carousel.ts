@@ -13,7 +13,7 @@ export const handler: Handlers = {
       });
 
       return Response.json(stamps.data);
-    } catch (error) {
+    } catch (_error) {
       return Response.json([], { status: 500 });
     }
   },
