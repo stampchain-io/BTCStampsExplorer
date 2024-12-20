@@ -210,7 +210,7 @@ export default {
           "transform": "translateZ(0)",
           "backface-visibility": "hidden",
         },
-        ".text-stroke-glow": {
+        ".text-stroke-glow-large": {
           "text-shadow": `
             /* Glow effect */
             -0.05em -0.05em 0.25em #80C,    /* top-left */
@@ -231,6 +231,29 @@ export default {
             3px 0 0 #A0F,
             0 -3px 0 #A0F,
             0 3px 0 #A0F
+          `,
+        },
+        ".text-stroke-glow-small": {
+          "text-shadow": `
+            /* Glow effect */
+            -0.02em -0.02em 0.3em #80C,  /* top-left */
+            0.02em -0.02em 0.3em #80C,   /* top-right */
+            0.02em 0.02em 0.3em #80C,    /* bottom-right */
+            -0.02em 0.02em 0.3em #80C,   /* bottom-left */
+            -0.02em 0 0.3em #80C,         /* left */
+            0.02em 0 0.3em #80C,          /* right */
+            0 -0.02em 0.3em #80C,         /* top */
+            0 0.02em 0.3em #80C,          /* bottom */
+            
+            /* Stroke effect */
+            -2px -2px 0 #A0F,
+            2px -2px 0 #A0F,
+            -2px 2px 0 #A0F,
+            2px 2px 0 #A0F,
+            -2px 0 0 #A0F,
+            2px 0 0 #A0F,
+            0 -2px 0 #A0F,
+            0 2px 0 #A0F
           `,
         },
         ".bg-clip-text": {
