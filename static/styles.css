@@ -231,8 +231,8 @@ body {
   height: 1000px;
   z-index: 1;
   background:
-    radial-gradient(ellipse 75% 100% at 20% 100%,
-    rgba(0, 0, 0, 0.7) 10%,
+  radial-gradient(ellipse 75% 100% at 20% 100%,
+    rgba(0, 0, 0, 0.9) 10%,
     transparent 70%),
     radial-gradient(ellipse 30% 40% at 30% 60%,
       var(--gradient-orange),
@@ -249,13 +249,13 @@ body {
     radial-gradient(ellipse 80% 30% at 120% 25%,
       rgba(80, 0, 120, 0.3),
       transparent),
-    radial-gradient(ellipse 15% 30% at 75% 120%,
+    radial-gradient(ellipse 25% 30% at 70% 120%,
       var(--gradient-orange),
       transparent),
-    radial-gradient(ellipse 30% 60% at 75% 100%,
+    radial-gradient(ellipse 50% 60% at 70% 100%,
       var(--gradient-purple),
       transparent),
-    radial-gradient(ellipse 15% 80% at 75% 120%,
+    radial-gradient(ellipse 25% 80% at 70% 120%,
         var(--gradient-cyan),
         transparent 80%),
     linear-gradient(rgba(0, 0, 0, 1),
@@ -363,37 +363,37 @@ body {
 }
 @keyframes fadeInOutCyan {
     0% {
-      --gradient-cyan: rgba(0, 120, 80, 0.2);
+      --gradient-cyan: rgba(0, 120, 80, 0.15);
     }
     10% {
-      --gradient-cyan: rgba(0, 120, 80, 0.205);
+      --gradient-cyan: rgba(0, 120, 80, 0.155);
     }
     20% {
-      --gradient-cyan: rgba(0, 120, 80, 0.21);
+      --gradient-cyan: rgba(0, 120, 80, 0.16);
     }
     30% {
-      --gradient-cyan: rgba(0, 120, 80, 0.215);
+      --gradient-cyan: rgba(0, 120, 80, 0.165);
     }
     40% {
-      --gradient-cyan: rgba(0, 120, 80, 0.22);
+      --gradient-cyan: rgba(0, 120, 80, 0.17);
     }
     50% {
-      --gradient-cyan: rgba(0, 120, 80, 0.225);
+      --gradient-cyan: rgba(0, 120, 80, 0.175);
     }
     60% {
-      --gradient-cyan: rgba(0, 120, 80, 0.23);
+      --gradient-cyan: rgba(0, 120, 80, 0.18);
     }
     70% {
-      --gradient-cyan: rgba(0, 120, 80, 0.235);
+      --gradient-cyan: rgba(0, 120, 80, 0.185);
     }
     80% {
-      --gradient-cyan: rgba(0, 120, 80, 0.24);
+      --gradient-cyan: rgba(0, 120, 80, 0.19);
     }
     90% {
-      --gradient-cyan: rgba(0, 120, 80, 0.245);
+      --gradient-cyan: rgba(0, 120, 80, 0.195);
     }
     100% {
-      --gradient-cyan: rgba(0, 120, 80, 0.25);
+      --gradient-cyan: rgba(0, 120, 80, 0.20);
     }
 }
 
