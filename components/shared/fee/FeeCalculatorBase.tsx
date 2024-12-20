@@ -76,6 +76,7 @@ export function FeeCalculatorBase({
 
     tooltipTimeoutRef.current = globalThis.setTimeout(() => {
       setIsTooltipVisible(false);
+      tooltipTimeoutRef.current = null;
     }, 1500);
   };
 
@@ -103,6 +104,7 @@ export function FeeCalculatorBase({
         className="relative w-full group"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onClick={(e) => e.stopPropagation()} // Prevent click events from reaching modal
       >
         <input
           type="range"
