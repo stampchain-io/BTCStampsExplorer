@@ -25,7 +25,6 @@ function mapDispensesWithRates(dispenses: any[], dispensers: any[]) {
   }));
 }
 
-
 const PAGE_SIZE = 20;
 
 export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {

@@ -1,6 +1,9 @@
 import { useEffect as _useEffect, useState as _useState } from "preact/hooks";
 import { paginate } from "$lib/utils/paginationUtils.ts";
-import { initialWallet as _initialWallet, walletContext } from "$client/wallet/wallet.ts";
+import {
+  initialWallet as _initialWallet,
+  walletContext,
+} from "$client/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
