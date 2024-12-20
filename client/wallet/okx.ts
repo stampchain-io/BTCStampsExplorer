@@ -187,7 +187,7 @@ const signPSBT = async (
           data: { txid },
         });
         return { signed: true, txid };
-      } catch (broadcastError) {
+      } catch (_broadcastError) {
         return {
           signed: true,
           psbt: signedPsbtHex,

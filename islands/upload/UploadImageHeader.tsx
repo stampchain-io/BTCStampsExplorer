@@ -1,6 +1,4 @@
 import { useEffect, useState } from "preact/hooks";
-import { StampSearchClient } from "../stamp/StampSearch.tsx";
-import { router } from "$fresh/src/server/router.ts";
 import { initialWallet } from "$client/wallet/wallet.ts";
 
 export const UploadImageHeader = () => {

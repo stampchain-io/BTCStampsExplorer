@@ -1,4 +1,4 @@
-import { Head } from "$fresh/runtime.ts";
+import { Head as _Head } from "$fresh/runtime.ts";
 import Accordion from "$islands/Accordion.tsx";
 
 export default function FAQ() {

@@ -11,10 +11,10 @@ import { ConnectorsModal } from "./ConnectorsModal.tsx";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 
 const WalletPopup = (
-  { logout, onClose }: { logout: () => void; onClose: () => void },
+  { logout, _onClose }: { logout: () => void; onClose: () => void },
 ) => {
   const displayNameRef = useRef<HTMLInputElement>(null);
-  const xNameRef = useRef<HTMLInputElement>(null);
+  const _xNameRef = useRef<HTMLInputElement>(null);
   const { wallet } = walletContext;
   const popupRef = useRef<HTMLDivElement>(null);
   const [currency, setCurrency] = useState("BTC");
@@ -51,7 +51,7 @@ const WalletPopup = (
     fetchCreatorName();
   }, [wallet.address]);
 
-  // TODO: This will need to move to the new dashboard /wallet page
+  // TODO(@reinamora137): This will need to move to the new dashboard /wallet page
 
   const handleUpdateDisplayName = async () => {
     if (!displayNameRef.current) return;

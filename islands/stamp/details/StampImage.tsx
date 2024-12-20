@@ -502,7 +502,7 @@ export function StampImage(
   }, []);
 
   // Add these state declarations for X button
-  const [isXTooltipVisible, setIsXTooltipVisible] = useState(false);
+  const [_isXTooltipVisible, setIsXTooltipVisible] = useState(false);
   const [allowXTooltip, setAllowXTooltip] = useState(true);
   const xButtonRef = useRef<HTMLDivElement>(null);
   const xTooltipTimeoutRef = useRef<number | null>(null);
@@ -520,7 +520,7 @@ export function StampImage(
   }, []);
 
   // Add these handler functions
-  const handleXMouseEnter = () => {
+  const _handleXMouseEnter = () => {
     if (allowXTooltip) {
       const buttonRect = xButtonRef.current?.getBoundingClientRect();
       if (buttonRect) {
@@ -537,7 +537,7 @@ export function StampImage(
     }
   };
 
-  const handleXMouseLeave = () => {
+  const _handleXMouseLeave = () => {
     if (xTooltipTimeoutRef.current) {
       globalThis.clearTimeout(xTooltipTimeoutRef.current);
     }
@@ -546,7 +546,9 @@ export function StampImage(
   };
 
   // Update shareToX function
-  const shareToX = () => {
+  const _shareToX = () => {
+    const url = `https://stampchain.io/stamp/${stamp.stamp}`;
+    const text = "Check out what I found @Stampchain";
     const xShareUrl = `https://x.com/intent/post?text=${
       encodeURIComponent(text)
     }&url=${encodeURIComponent(url)}`;

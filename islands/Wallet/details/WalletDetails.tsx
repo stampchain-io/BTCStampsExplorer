@@ -10,18 +10,18 @@ import {
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 // Style Constants
-const dataContainer =
+const _dataContainer =
   "flex justify-between items-center dark-gradient p-3 mobileLg:p-6";
 const dataColumn = "flex flex-col -space-y-1";
-const dataLabelSm =
+const _dataLabelSm =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
 const dataLabel =
   "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-const dataValueXs =
+const _dataValueXs =
   "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
-const dataValueSm =
+const _dataValueSm =
   "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-const dataValue =
+const _dataValue =
   "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
 const dataValueXl =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";

@@ -1,13 +1,12 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src101Controller } from "$server/controller/src101Controller.ts";
-import { AddressHandlerContext } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 
-export const handler: Handlers<AddressHandlerContext> = {
-  async GET(req, ctx) {
-    try {
-      var { deploy_hash } = ctx.params;
+export const handler: Handlers = {
+  async GET(_req, ctx) {
+    const { deploy_hash } = ctx.params;
 
+    try {
       const result = await Src101Controller.handleSrc101TotalCountRequest(
         deploy_hash,
       );

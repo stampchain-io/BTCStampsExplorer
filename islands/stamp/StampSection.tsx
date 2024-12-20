@@ -12,7 +12,7 @@ export default function StampSection({
   subTitle,
   type,
   stamps,
-  layout,
+  _layout,
   isRecentSales,
   filterBy,
   showDetails = false,

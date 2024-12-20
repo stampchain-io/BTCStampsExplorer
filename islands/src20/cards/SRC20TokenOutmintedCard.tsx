@@ -10,15 +10,15 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
 
   const dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  const dataLabel =
-    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
   const dataValueSm =
     "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  const dataValue =
+  const _dataLabel =
+    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+  const _dataValue =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
-  const dataValueLg =
+  const _dataValueLg =
     "text-2xl mobileLg:text-3xl font-black text-stamp-grey-light -mt-0.5";
-  const dataValueXl =
+  const _dataValueXl =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
 
   return (

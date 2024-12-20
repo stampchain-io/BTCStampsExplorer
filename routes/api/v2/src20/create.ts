@@ -3,7 +3,7 @@ import { TX, TXError } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { InputData } from "$types/index.d.ts";
-import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
+import { convertEmojiToTick as _convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
@@ -56,7 +56,7 @@ export const handler: Handlers<TX | TXError> = {
       let body: ExtendedInputData & { trxType?: TrxType };
       try {
         body = JSON.parse(rawBody);
-      } catch (e) {
+      } catch (_e) {
         return ResponseUtil.badRequest("Invalid JSON in request body");
       }
 

@@ -185,10 +185,10 @@ export default function StampPage(props: StampDetailPageProps) {
   const {
     stamp,
     holders,
-    sends,
+    _sends,
     stamps_recent,
-    dispensers = [],
-    dispenses = [],
+    _dispensers = [],
+    _dispenses = [],
     lowestPriceDispenser = null,
   } = props.data;
 

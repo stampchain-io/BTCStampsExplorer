@@ -97,7 +97,7 @@ export function HomeStampPreview({
     },
   ];
 
-  const CuttingEdgeSection: CollectionSectionProps = {
+  const _CuttingEdgeSection: CollectionSectionProps = {
     title: "CUTTING EDGE",
     subTitle: "RECURSIVE COLLECTIONS",
     collections: collectionData,

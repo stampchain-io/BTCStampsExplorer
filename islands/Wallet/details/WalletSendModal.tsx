@@ -85,7 +85,7 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
     });
   };
 
-  const handleMaxClick = async () => {
+  const handleMaxClick = () => {
     if (!wallet?.balance) return;
 
     try {

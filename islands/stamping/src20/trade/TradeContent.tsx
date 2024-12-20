@@ -235,7 +235,7 @@ export function TradeContent() {
 
       const data = await response.json();
       const psbtHex = data.psbt;
-      let inputsToSign: InputToSign[] = data.inputsToSign.map((
+      const inputsToSign: InputToSign[] = data.inputsToSign.map((
         input: { index: number },
       ) => ({
         index: input.index,
