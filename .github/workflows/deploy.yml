@@ -1,4 +1,4 @@
-name: Deploy
+name: Code Quality
 on:
   push:
     branches: [dev]
@@ -8,8 +8,8 @@ on:
       - dev
 
 jobs:
-  deploy:
-    name: Deploy
+  quality-checks:
+    name: Quality Checks
     runs-on: ubuntu-latest
     env:
       CSRF_SECRET_KEY: "12323"  # Placeholder key
