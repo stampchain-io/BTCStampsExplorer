@@ -120,10 +120,8 @@ export function SRC20TickHeader({
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
   const _subTitleGreyClassName =
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
-  const _dataContainerClassName =
-    "flex justify-between items-center dark-gradient p-3 mobileMd:p-6";
   const _dataContainer =
-    "flex justify-between items-center dark-gradient p-3 mobileLg:p-6";
+    "flex justify-between items-center dark-gradient rounded-lg p-3 mobileLg:p-6";
   const _dataColumn = "flex flex-col -space-y-1";
   const _dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
@@ -142,12 +140,12 @@ export function SRC20TickHeader({
 
   return (
     <div class="flex w-full flex-col gap-6">
-      <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient">
+      <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg">
         <div class="flex flex-row w-full">
           <div className="flex gap-[18px] mobileMd:gap-[30px]">
             <img
               src={`/content/${deployment.tx_hash}.svg`}
-              class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] desktop:max-w-[116px] rounded-sm relative z-10"
+              class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] desktop:max-w-[116px] rounded relative z-10"
               alt={`${deployment.tick} token image`}
               loading="lazy"
             />
@@ -256,7 +254,7 @@ export function SRC20TickHeader({
       </div>
 
       {/* Market Information */}
-      <div class="flex flex-col dark-gradient p-3 mobileMd:p-6">
+      <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
         <div className="flex flex-col">
           <StatItem
             label="MARKET CAP"

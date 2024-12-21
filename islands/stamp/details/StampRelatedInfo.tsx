@@ -295,7 +295,7 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
   }
 
   return (
-    <div class="dark-gradient p-3 mobileMd:p-6">
+    <div class="dark-gradient rounded-lg p-3 mobileMd:p-6">
       <div class="flex justify-between w-full overflow-y-auto text-base mobileLg:text-lg text-stamp-grey-darker font-light -mb-1 mobileLg:mb-2">
         {getTabsWithCounts().map(({ id, label }) => (
           <p

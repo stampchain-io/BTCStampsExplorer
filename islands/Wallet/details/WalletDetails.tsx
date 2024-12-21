@@ -7,7 +7,7 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 // Style Constants
 const _dataContainer =
-  "flex justify-between items-center dark-gradient p-3 mobileLg:p-6";
+  "flex justify-between items-center dark-gradient rounded-lg p-3 mobileLg:p-6";
 const dataColumn = "flex flex-col -space-y-1";
 const _dataLabelSm =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
@@ -272,7 +272,7 @@ function WalletOverview(
   };
 
   return (
-    <div class="w-full dark-gradient flex flex-col justify-between p-6">
+    <div class="w-full dark-gradient rounded-lg flex flex-col justify-between p-6">
       <div class="flex justify-between">
         <div class={`${hideBalance ? "blur-sm" : ""}`}>
           <p class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl select-none">
@@ -522,7 +522,7 @@ function StampStats(
 ) {
   return (
     <div
-      class="w-full dark-gradient p-6 flex flex-col gap-6 rounded-md"
+      class="w-full dark-gradient rounded-lg p-6 flex flex-col gap-6"
       onClick={() => handleType("stamp")}
     >
       <div class="flex justify-between">
@@ -545,7 +545,7 @@ function DispenserStats(
 ) {
   return (
     <div
-      class="flex flex-col w-full dark-gradient p-6 gap-6 rounded-md"
+      class="flex flex-col w-full dark-gradient rounded-lg p-6 gap-6"
       onClick={() => handleType("dispenser")}
     >
       <div class="flex justify-between">
@@ -579,7 +579,7 @@ function TokenStats(
 
   return (
     <div
-      class="flex justify-between w-full dark-gradient p-6 gap-6 rounded-md"
+      class="flex justify-between w-full dark-gradient rounded-lg p-6 gap-6"
       onClick={() => handleType("token")}
     >
       <StatItem label="TOKENS" value={src20Total.toString()} />

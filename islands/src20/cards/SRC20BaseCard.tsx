@@ -54,7 +54,7 @@ export function SRC20BaseCard(
   return (
     <a
       href={href}
-      class="flex justify-between items-center border-2 border-transparent rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] w-full bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] p-3 mobileMd:p-6"
+      class="flex justify-between items-center border-2 border-transparent rounded-lg hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] w-full bg-gradient-to-br from-[#0A000F00] via-[#14001FFF] to-[#1F002EFF] p-3 mobileMd:p-6"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -62,7 +62,7 @@ export function SRC20BaseCard(
       <div class="cursor-pointer flex gap-[18px] mobileMd:gap-[30px]">
         <img
           src={imageUrl}
-          class="w-[72px] h-[72px] mobileLg:w-[92px] mobileLg:h-[92px] rounded-sm"
+          class="w-[72px] h-[72px] mobileLg:w-[92px] mobileLg:h-[92px] rounded"
           onClick={() => onImageClick?.(imageUrl)}
           alt={unicodeEscapeToEmoji(src20.tick)}
         />

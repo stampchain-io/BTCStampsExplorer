@@ -507,7 +507,7 @@ export function TradeContent() {
         ATTACH STAMP TO UTXO / CREATE PSBT
       </p>
 
-      <div className="dark-gradient p-6 w-full">
+      <div className="dark-gradient rounded-lg p-6 w-full">
         <div className="flex flex-col gap-4">
           <InputField
             type="text"
@@ -544,7 +544,7 @@ export function TradeContent() {
         />
 
         {tradeFormState.psbtHex && (
-          <div className="dark-gradient p-3 tablet:p-6 w-full break-words mt-6">
+          <div className="dark-gradient rounded-lg p-3 tablet:p-6 w-full break-words mt-6">
             <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
               className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
@@ -559,7 +559,7 @@ export function TradeContent() {
       </div>
 
       {/* New UTXO Attach Form */}
-      <div className="dark-gradient p-6 w-full">
+      <div className="dark-gradient rounded-lg p-6 w-full">
         <h2 class="text-xl font-bold mb-4 text-gray-400">UTXO Attach</h2>
         <div className="flex flex-col gap-4">
           {/* Asset (CPID) section with query button */}
@@ -715,7 +715,7 @@ export function TradeContent() {
         />
 
         {attachFormState.psbtHex && (
-          <div className="dark-gradient p-3 tablet:p-6 w-full break-words mt-6">
+          <div className="dark-gradient rounded-lg p-3 tablet:p-6 w-full break-words mt-6">
             <h2 className="text-xl font-bold mb-2">Signed PSBT (Hex):</h2>
             <textarea
               className="w-full h-40 p-2 bg-gray-800 text-white rounded-md"
@@ -730,7 +730,7 @@ export function TradeContent() {
       </div>
 
       {/* Complete Swap (Buyer) */}
-      <div className="dark-gradient p-6 w-full mt-6">
+      <div className="dark-gradient rounded-lg p-6 w-full mt-6">
         <h2 class="text-xl font-bold mb-4 text-gray-400">
           Complete Swap (Buyer)
         </h2>
