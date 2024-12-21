@@ -49,7 +49,7 @@ const CAROUSEL_CONFIG = {
   },
 
   DEBUG: {
-    ENABLED: true,
+    ENABLED: false,
   },
 
   BREAKPOINTS: {
