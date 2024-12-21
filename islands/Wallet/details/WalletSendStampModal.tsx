@@ -263,7 +263,7 @@ function WalletSendStampModal({
   return (
     <ModalLayout onClose={handleCloseModal} title="TRANSFER">
       <div className="flex w-full gap-3 mobileMd:gap-6">
-        <div className="flex items-center justify-center rounded-sm min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
+        <div className="flex items-center justify-center rounded min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
           {selectedStamp
             ? (
               <img

@@ -64,7 +64,7 @@ export default function Carousel(props: CarouselProps) {
                           src={`/content/${stamp.tx_hash}.${extension}`}
                           alt={`Stamp #${stamp.stamp}`}
                           loading="lazy"
-                          class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded-sm"
+                          class="object-contain cursor-pointer desktop:min-w-[408px] tablet:min-w-[269px] mobileLg:min-w-[200px] mobileMd:min-w-[242px] min-w-[150px] rounded"
                           onLoad={handleLoad}
                         />
                         {activeSlideIndex - 1 == index &&

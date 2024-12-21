@@ -176,9 +176,6 @@ export default {
         "calc-24": "calc(100% - 24px)",
         "calc-12": "calc(100% - 12px)",
       },
-      borderRadius: {
-        "stamp": "6px",
-      },
       boxShadow: {
         "stamp": "0px 0px 30px #aa00ff",
         "stamp-hover": "0px 0px 40px #aa00ff",

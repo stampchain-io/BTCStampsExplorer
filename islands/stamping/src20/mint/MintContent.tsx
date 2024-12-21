@@ -72,9 +72,10 @@ interface SearchResult {
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
   "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
-const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+const feeSelectorContainer =
+  "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
 const inputFieldContainer =
-  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient w-full";
+  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 
 export function MintContent({
   trxType = "olga",
@@ -296,7 +297,7 @@ export function MintContent({
         <div class="w-full flex gap-3 mobileMd:gap-6">
           <div
             id="image-preview"
-            class="relative rounded-sm items-center justify-center mx-auto text-center min-w-[96px] h-[96px] w-[96px] mobileMd:min-w-[108px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:w-[120px] mobileLg:h-[120px] content-center bg-stamp-purple-darker flex flex-col"
+            class="relative rounded items-center justify-center mx-auto text-center min-w-[96px] h-[96px] w-[96px] mobileMd:min-w-[108px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:w-[120px] mobileLg:h-[120px] content-center bg-stamp-purple-darker flex flex-col"
           >
             {isImageLoading
               ? (

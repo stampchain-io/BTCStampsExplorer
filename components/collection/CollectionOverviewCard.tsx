@@ -17,10 +17,10 @@ export function CollectionOverviewCard(
   return (
     <a
       href={`/collection/details/${collection.collection_name}`}
-      className={`flex flex-col rounded-md w-full dark-gradient p-3 mobileMd:p-6 gap-3 mobileMd:gap-6 hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
+      className={`flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-3 mobileMd:gap-6 hover:border-stamp-purple-bright hover:shadow-stamp hover:border-solid border-2 border-transparent group`}
     >
       <div className="flex gap-6 w-full">
-        <div className="aspect-stamp min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[112px] mobileMd:min-h-[112px] mobileMd:max-w-[112px] mobileMd:max-h-[112px] mobileLg:min-w-[114px] mobileLg:min-h-[114px] mobileLg:max-w-[114px] mobileLg:max-h-[114px] desktop:min-w-[120px] desktop:min-h-[120px] desktop:max-w-[120px] desktop:max-h-[120px] overflow-hidden image-rendering-pixelated rounded-sm">
+        <div className="aspect-stamp min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[112px] mobileMd:min-h-[112px] mobileMd:max-w-[112px] mobileMd:max-h-[112px] mobileLg:min-w-[114px] mobileLg:min-h-[114px] mobileLg:max-w-[114px] mobileLg:max-h-[114px] desktop:min-w-[120px] desktop:min-h-[120px] desktop:max-w-[120px] desktop:max-h-[120px] overflow-hidden image-rendering-pixelated rounded">
           <div className="center relative w-full h-full">
             <img
               src={collection.first_stamp_image}
@@ -100,7 +100,7 @@ export function CollectionOverviewCard(
             (imageUrl, index) => {
               return (
                 <div
-                  className={`aspect-stamp w-full h-full overflow-hidden image-rendering-pixelated rounded-sm ${
+                  className={`aspect-stamp w-full h-full overflow-hidden image-rendering-pixelated rounded ${
                     index >= 8
                       ? "hidden desktop:block"
                       : index >= 6

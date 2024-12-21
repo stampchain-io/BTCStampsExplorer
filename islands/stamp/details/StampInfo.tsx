@@ -137,7 +137,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   return (
     <div className={"flex flex-col gap-3 mobileMd:gap-6"}>
       <div
-        className={"flex flex-col dark-gradient p-3 mobileMd:p-6"}
+        className={"flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6"}
       >
         <div>
           <p className={titleGreyLD}>
@@ -213,7 +213,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         </div>
       </div>
 
-      <div className="flex flex-col dark-gradient p-3 mobileLg:p-6">
+      <div className="flex flex-col dark-gradient rounded-lg p-3 mobileLg:p-6">
         <div className="flex flex-col">
           <p className={dataLabel}>{editionLabel}</p>
           <p className={dataValueXl}>{editionCount}{" "}</p>

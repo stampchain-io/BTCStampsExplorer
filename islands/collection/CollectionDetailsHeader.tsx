@@ -25,7 +25,7 @@ export const CollectionDetailsHeader = (
 
   return (
     <div className="flex flex-col gap-3 mobileMd:gap-6">
-      <div className="flex flex-col dark-gradient p-3 mobileMd:p-6">
+      <div className="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
         <div className="flex justify-between">
           <div className="flex">
             <img
@@ -105,7 +105,7 @@ export const CollectionDetailsHeader = (
         )}
       </div>
 
-      <div class="flex flex-col dark-gradient p-3 mobileMd:p-6 ">
+      <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6 ">
         <div className="flex flex-col">
           <p className={dataLabel}>
             MARKETCAP

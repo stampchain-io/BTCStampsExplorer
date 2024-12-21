@@ -9,6 +9,9 @@ interface ModalLayoutProps {
   contentClassName?: string;
 }
 
+const modalBgBlur =
+  "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-60 backdrop-filter backdrop-blur-md";
+
 export function ModalLayout({
   onClose,
   title,
@@ -43,10 +46,10 @@ export function ModalLayout({
 
   return (
     <div
-      class={`fixed inset-0 z-50 flex items-center justify-center bg-[#0b0b0b] bg-opacity-95 backdrop-filter backdrop-blur-sm ${className}`}
+      class={`${modalBgBlur} ${className}`}
       onClick={handleClose}
     >
-      <div class="relative w-[360px] mobileLg:w-[420px] h-[600px] mobileLg:h-[700px] p-6 dark-gradient rounded-lg overflow-hidden">
+      <div class="relative w-[360px] mobileLg:w-[420px] h-[600px] mobileLg:h-[700px] p-6 dark-gradient-modal rounded-lg overflow-hidden">
         <div class={`relative ${contentClassName}`}>
           <div class="w-6 h-6 ms-auto cursor-pointer absolute top-0 right-0 -mr-1.5 -mt-1.5">
             <svg
