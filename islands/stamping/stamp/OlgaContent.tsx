@@ -961,7 +961,8 @@ export function OlgaContent() {
   const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
   const titlePurpleLDCenter =
     "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
-  const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient z-[10] w-full";
+  const feeSelectorContainer =
+    "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
   const tooltipButton =
     "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
   const tooltipImage =
@@ -1031,7 +1032,7 @@ export function OlgaContent() {
   const imagePreviewDiv = (
     <div
       id="image-preview"
-      class={`relative rounded-sm items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300`}
+      class={`relative rounded items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300`}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
@@ -1277,7 +1278,7 @@ export function OlgaContent() {
         </div>
       )}
 
-      <div className="dark-gradient p-3 mobileMd:p-6 w-full">
+      <div className="dark-gradient rounded-lg p-3 mobileMd:p-6 w-full">
         <div className="flex gap-3 mobileMd:gap-6">
           <div className="flex gap-3 mobileMd:gap-6">
             {imagePreviewDiv}

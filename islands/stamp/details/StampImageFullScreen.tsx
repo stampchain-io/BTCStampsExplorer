@@ -19,13 +19,16 @@ const StampImageFullScreen = ({
     });
   }
 
+  const modalBgBlur =
+    "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-60 backdrop-filter backdrop-blur-md";
+
   return (
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#0b0b0b] bg-opacity-95 backdrop-filter backdrop-blur-sm"
+      class={modalBgBlur}
       onClick={handleCloseModal}
     >
       <div class="relative w-full max-w-[800px] max-h-[800px] p-6 mobileLg:p-12">
-        <div class="flex flex-col p-3 mobileMd:p-6 dark-gradient rounded-md overflow-hidden">
+        <div class="flex flex-col p-3 mobileMd:p-12 dark-gradient-modal rounded-lg overflow-hidden">
           <div class="flex flex-col stamp-container">
             {contentType === "html"
               ? (
@@ -33,7 +36,7 @@ const StampImageFullScreen = ({
                   width="100%"
                   height="100%"
                   scrolling="no"
-                  className="aspect-square rounded-sm"
+                  className="aspect-square rounded-md"
                   sandbox="allow-scripts allow-same-origin"
                   src={imageUrl}
                   loading="lazy"
@@ -42,7 +45,7 @@ const StampImageFullScreen = ({
               )
               : (
                 <img
-                  className="max-w-full rounded-sm pixelart stamp-image aspect-square"
+                  className="max-w-full rounded-md pixelart stamp-image aspect-square"
                   style={{
                     objectFit: "contain",
                     imageRendering: "pixelated",

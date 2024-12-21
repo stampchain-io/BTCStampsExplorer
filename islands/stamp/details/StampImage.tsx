@@ -247,7 +247,7 @@ function RightPanel(
   };
 
   return (
-    <div className="flex justify-between pt-[10px] mobileMd:pt-[22px] pb-2 mobileMd:pb-5 px-3 mobileMd:px-6 dark-gradient">
+    <div className="flex justify-between pt-[10px] mobileMd:pt-[22px] pb-2 mobileMd:pb-5 px-3 mobileMd:px-6 dark-gradient rounded-lg">
       <div className="flex gap-3">
         <div
           ref={copyButtonRef}
@@ -481,7 +481,7 @@ export function StampImage(
                 src={src}
                 loading="lazy"
                 alt={`Stamp No. ${stamp.stamp}`}
-                className="max-w-none object-contain rounded-sm pixelart stamp-image h-full w-full"
+                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
                 onError={handleImageError}
               />
             </div>,
@@ -590,7 +590,7 @@ export function StampImage(
           <img
             width="100%"
             loading="lazy"
-            className={`max-w-none object-contain rounded-sm ${className} pixelart stamp-image`}
+            className={`max-w-none object-contain rounded ${className} pixelart stamp-image`}
             src={src}
             alt="Not Available"
           />
@@ -599,14 +599,14 @@ export function StampImage(
 
       {src !== NOT_AVAILABLE_IMAGE && isHtml && (
         <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
-          <div className="relative dark-gradient p-3 mobileMd:p-6">
+          <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
             <div className="stamp-container">
               <div className="relative pt-[100%]">
                 <iframe
                   width="100%"
                   height="100%"
                   scrolling="no"
-                  className={`${className} rounded-sm absolute top-0 left-0 pointer-events-none`}
+                  className={`${className} rounded absolute top-0 left-0 pointer-events-none`}
                   sandbox="allow-scripts allow-same-origin"
                   src={src}
                   loading="lazy"
@@ -635,7 +635,7 @@ export function StampImage(
 
       {src !== NOT_AVAILABLE_IMAGE && isAudio && (
         <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
-          <div className="relative dark-gradient p-3 mobileMd:p-6">
+          <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
             <div className="stamp-container">
               <div className="stamp-audio-container relative pt-[100%] flex items-center justify-center">
                 <audio
@@ -663,14 +663,14 @@ export function StampImage(
         flag
           ? (
             <div className="flex flex-col gap-3 mobileMd:gap-6">
-              <div className="relative p-3 mobileMd:p-6 dark-gradient">
+              <div className="relative p-3 mobileMd:p-6 dark-gradient rounded-lg">
                 <div className="stamp-container">
                   <div className="relative z-10 aspect-square">
                     {validatedContent || (
                       <img
                         width="100%"
                         loading="lazy"
-                        className="max-w-none object-contain rounded-sm pixelart stamp-image h-full w-full"
+                        className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
                         src={src}
                         onError={handleImageError}
                         alt="Stamp"
@@ -694,7 +694,7 @@ export function StampImage(
                   <img
                     width="100%"
                     loading="lazy"
-                    className="max-w-none object-contain rounded-sm pixelart stamp-image h-full w-full"
+                    className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
                     src={src}
                     onError={handleImageError}
                     alt="Stamp"

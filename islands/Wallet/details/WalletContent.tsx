@@ -240,7 +240,7 @@ function DispenserRow(
   }
 
   return (
-    <div class="flex justify-between dark-gradient rounded-md hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
+    <div class="flex justify-between dark-gradient rounded-lg hover:border-stamp-primary-light hover:shadow-[0px_0px_20px_#9900EE] group border-2 border-transparent">
       <div class="flex p-3 mobileLg:p-6 gap-6 uppercase w-full">
         <a
           href={`/stamp/${dispenser.stamp.stamp}`}
@@ -253,7 +253,7 @@ function DispenserRow(
                   width="100%"
                   height="100%"
                   loading="lazy"
-                  class="max-w-none w-full h-full object-contain rounded-lg pixelart stamp-image"
+                  class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
                   src={getStampImageSrc(dispenser.stamp)}
                   alt={`Stamp ${dispenser.stamp.stamp}`}
                   onError={(e) => {
