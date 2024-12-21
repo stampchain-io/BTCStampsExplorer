@@ -1,7 +1,7 @@
 // routes/api/v2/dispense.ts
 import { Handlers } from "$fresh/server.ts";
 import { XcpManager } from "$server/services/xcpService.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { PSBTService } from "$server/services/transaction/psbtService.ts";
 
 interface DispenseInput {
@@ -22,9 +22,11 @@ export const handler: Handlers = {
 
       const { address, dispenser, quantity, options } = input;
 
-      // Validate fee rate
+      // Only validate what's specific to our API endpoint
       if (typeof options?.fee_per_kb !== "number" || options.fee_per_kb <= 0) {
-        return ResponseUtil.badRequest("Invalid fee rate");
+        return ApiResponseUtil.badRequest("Invalid fee rate", {
+          field: "fee_per_kb",
+        });
       }
 
       // Add dust size to options
@@ -44,14 +46,27 @@ export const handler: Handlers = {
           dispenserOptions,
         );
 
-        if (!response?.result?.psbt) {
-          if (response?.error) {
-            return ResponseUtil.badRequest(response.error);
-          }
-          throw new Error("Failed to create dispense transaction.");
+        if (!response) {
+          return ApiResponseUtil.serviceUnavailable(
+            "XCP service unavailable",
+            { service: "XCP" },
+          );
         }
 
-        console.log("PSBT Base64 from XCP:", response.result.psbt);
+        if (response.error) {
+          return ApiResponseUtil.badRequest(response.error, {
+            service: "XCP",
+            dispenser,
+            quantity,
+          });
+        }
+
+        if (!response?.result?.psbt) {
+          return ApiResponseUtil.badRequest(
+            "Failed to create dispense transaction: No PSBT returned",
+            { service: "XCP", dispenser },
+          );
+        }
 
         // Process PSBT using shared service
         const processedPSBT = await PSBTService.processCounterpartyPSBT(
@@ -61,22 +76,34 @@ export const handler: Handlers = {
           { validateInputs: true, validateFees: true },
         );
 
-        return new Response(JSON.stringify(processedPSBT), {
-          headers: { "Content-Type": "application/json" },
-        });
+        if (!processedPSBT) {
+          return ApiResponseUtil.serviceUnavailable(
+            "PSBT service unavailable",
+            { service: "PSBT" },
+          );
+        }
+
+        return ApiResponseUtil.success(processedPSBT);
       } catch (error: unknown) {
-        // Pass through the specific error message
+        // Pass through the specific error message from XcpManager or PSBTService
         const errorMessage = error instanceof Error
           ? error.message
           : "Unknown error";
-        return ResponseUtil.badRequest(errorMessage);
+        return ApiResponseUtil.badRequest(errorMessage, {
+          service: "XCP",
+          dispenser,
+          quantity,
+          details: error instanceof Error ? error.stack : undefined,
+        });
       }
     } catch (error: unknown) {
       console.error("Error processing dispense request:", error);
       const errorMessage = error instanceof Error
         ? error.message
-        : "Failed to process dispense request";
-      return ResponseUtil.badRequest(errorMessage);
+        : "Invalid request format";
+      return ApiResponseUtil.badRequest(errorMessage, {
+        error: error instanceof Error ? error.stack : "Unknown error",
+      });
     }
   },
 };
