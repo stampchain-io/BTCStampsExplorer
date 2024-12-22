@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { SRC20Row } from "$globals";
-import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 
 function splitTextAndEmojis(text: string): { text: string; emoji: string } {
@@ -42,7 +42,7 @@ export function SRC20BaseCard(
 ) {
   const [isHovered, setIsHovered] = useState(false);
 
-  const href = `/src20/${encodeURIComponent(convertToEmoji(src20.tick))}`;
+  const href = `/src20/${encodeURIComponent(unicodeEscapeToEmoji(src20.tick))}`;
   const progress = src20.progress || "0";
   const progressWidth = `${progress}%`;
 
@@ -64,13 +64,13 @@ export function SRC20BaseCard(
           src={imageUrl}
           class="w-[72px] h-[72px] mobileLg:w-[92px] mobileLg:h-[92px] rounded-sm"
           onClick={() => onImageClick?.(imageUrl)}
-          alt={convertToEmoji(src20.tick)}
+          alt={unicodeEscapeToEmoji(src20.tick)}
         />
         <div class="flex flex-col">
           <p class="text-2xl mobileLg:text-4xl font-black uppercase flex gap-4 relative z-[20]">
             {(() => {
               const { text, emoji } = splitTextAndEmojis(
-                convertToEmoji(src20.tick),
+                unicodeEscapeToEmoji(src20.tick),
               );
               return (
                 <>

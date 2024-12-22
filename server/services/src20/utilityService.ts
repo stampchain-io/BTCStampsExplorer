@@ -1,4 +1,4 @@
-import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Src20Detail, InputData } from "$globals";
 import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
@@ -12,7 +12,7 @@ export class SRC20UtilityService {
   static formatSRC20Row(row: Src20Detail) {
     return {
       ...row,
-      tick: convertToEmoji(row.tick),
+      tick: unicodeEscapeToEmoji(row.tick),
       max: row.max ? row.max.toString() : null,
       lim: row.lim ? row.lim.toString() : null,
       amt: row.amt ? row.amt.toString() : null,
@@ -28,7 +28,7 @@ export class SRC20UtilityService {
   }
 
   static async checkDeployedTick(tick: string) {
-    const mintInfo = await SRC20QueryService.getSrc20MintProgressByTick(tick);
+    const mintInfo = await SRC20QueryService.fetchSrc20MintProgress(tick);
     return { deployed: !!mintInfo };
   }
 

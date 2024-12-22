@@ -3,7 +3,6 @@ import { TX, TXError } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { InputData } from "$types/index.d.ts";
-import { convertEmojiToTick as _convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
 import { normalizeFeeRate } from "$server/services/xcpService.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
@@ -22,27 +21,6 @@ interface ExtendedInputData extends Omit<InputData, "feeRate"> {
   satsPerVB?: number;
   satsPerKB?: number;
   utxoAncestors?: AncestorInfo[];
-}
-
-// Update the PSBTService.preparePSBT interface by extending its parameters
-interface PSBTParams {
-  sourceAddress: string;
-  toAddress: string;
-  src20Action: Record<string, unknown>;
-  satsPerVB: number;
-  service_fee: number;
-  service_fee_address: string;
-  changeAddress: string;
-  utxoAncestors?: AncestorInfo[];
-  trxType?: "olga" | "multisig";
-}
-
-// Update the response interface to include more input details
-interface EnhancedInputToSign {
-  index: number;
-  address?: string; // The address that needs to sign
-  sighashType?: number; // Optional sighash type
-  derivationPath?: string; // Optional derivation path
 }
 
 export const handler: Handlers<TX | TXError> = {

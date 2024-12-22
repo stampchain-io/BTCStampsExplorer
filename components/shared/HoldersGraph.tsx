@@ -3,7 +3,6 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 interface Holder {
   address: string | null;
-  quantity: number;
   amt: number;
   percentage: number;
 }
