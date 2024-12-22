@@ -107,7 +107,7 @@ export default function Collection(props: CollectionPageProps) {
       subTitle: "RECENT RECURSIVE",
       type: "recursive",
       stamps: stamps_src721,
-      layout: "row",
+      layout: "grid",
       showDetails: false,
       gridClass: `
         grid w-full

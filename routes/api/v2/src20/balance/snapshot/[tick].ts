@@ -1,7 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { AddressTickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
@@ -39,7 +38,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
       }
 
       const snapshotParams = {
-        tick: convertEmojiToTick(String(tick)),
+        tick: decodeURIComponent(String(tick)),
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         amt: Number(url.searchParams.get("amt")) || 0,

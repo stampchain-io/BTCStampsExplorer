@@ -2,7 +2,6 @@ import { Handlers } from "$fresh/server.ts";
 import { AddressTickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   checkEmptyResult,
@@ -48,7 +47,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 
       const balanceParams = {
         address,
-        tick: convertEmojiToTick(String(tick)),
+        tick: decodeURIComponent(String(tick)),
         includePagination,
         limit: paginationParams.limit || DEFAULT_PAGINATION.limit,
         page: paginationParams.page || DEFAULT_PAGINATION.page,

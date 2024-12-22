@@ -1,5 +1,4 @@
 import { Handlers } from "$fresh/server.ts";
-import { convertEmojiToTick, convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { PaginatedTickResponseBody } from "$globals";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -41,7 +40,7 @@ export const handler: Handlers = {
 
       // Ensure required pagination values
       const params = {
-        tick: convertEmojiToTick(String(tick)),
+        tick: decodeURIComponent(String(tick)),
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         op: opParam,
@@ -58,7 +57,6 @@ export const handler: Handlers = {
       // Map data, ensuring all necessary fields are included
       const data = src20_txs.rows.map((tx: any) => ({
         ...tx,
-        tick: convertToEmoji(tx.tick),
         max: tx.max ? new BigFloat(tx.max).toString() : null,
         lim: tx.lim ? new BigFloat(tx.lim).toString() : null,
         amt: tx.amt ? new BigFloat(tx.amt).toString() : null,

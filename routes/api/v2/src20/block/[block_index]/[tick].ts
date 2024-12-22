@@ -1,26 +1,24 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
     try {
-      const { block_index, tick: emojiTick } = ctx.params;
-      const tick = convertEmojiToTick(emojiTick);
+      const { block_index, tick: rawTick } = ctx.params;
       const params = {
         block_index: parseInt(block_index, 10),
-        tick,
+        tick: decodeURIComponent(rawTick),
       };
 
       const result = await Src20Controller.handleSrc20TransactionsRequest(
         req,
         params,
       );
-      return ResponseUtil.success(result);
+      return ApiResponseUtil.success(result);
     } catch (error) {
       console.error("Error in block/tick handler:", error);
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error processing block/tick request",
       );

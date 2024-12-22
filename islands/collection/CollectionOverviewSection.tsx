@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionOverviewSectionProps } from "$globals";
 
-import { BREAKPOINTS } from "$client/utils/constants.ts";
+import { BREAKPOINTS } from "$lib/utils/constants.ts";
 
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { CollectionOverviewCard } from "$components/collection/CollectionOverviewCard.tsx";

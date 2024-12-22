@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { Collection, CollectionSectionProps } from "$globals";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { BREAKPOINTS } from "$client/utils/constants.ts";
+import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { CollectionListCard } from "$components/collection/CollectionListCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 

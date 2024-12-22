@@ -4,6 +4,33 @@ version_info:
   fresh: "1.7.3"
   project: "BTCStampsExplorer"
 
+# Emoji and Unicode handling patterns
+emoji_handling:
+  description: "Standardized approach for handling emoji ticks across the application"
+  flow:
+    api_layer:
+      - accepts_both_formats: ["emoji (🧧)", "unicode escape (\\U0001F9E7)"]
+      - decodes_uri: "decodeURIComponent for URL-encoded ticks"
+      - passes_through: "No format conversion at API layer"
+    repository_layer:
+      - converts_to_unicode: "For DB operations"
+      - converts_to_emoji: "For API responses"
+      - helper_functions:
+        - ensureUnicodeEscape: "Checks and converts to unicode escape if needed"
+        - convertResponseToEmoji: "Converts DB response ticks back to emoji"
+    database_layer:
+      - stores_unicode: "Always stores in unicode escape format"
+  examples:
+    emoji: "🧧"
+    unicode_escape: "\\U0001F9E7"
+    url_encoded: "%F0%9F%A7%A7"
+  rules:
+    - "API routes accept any format"
+    - "Repository handles all format conversions"
+    - "Database always stores unicode escape"
+    - "Responses always return emoji format"
+    - "No manual conversions in controllers or services"
+
 # Expanding code style with project-specific patterns
 code_style:
   framework: "Deno Fresh 2.1.4"
