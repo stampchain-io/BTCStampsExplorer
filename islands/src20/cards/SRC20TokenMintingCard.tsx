@@ -11,8 +11,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
   const mintHref = `/stamping/src20/mint?tick=${
     encodeURIComponent(src20.tick)
   }&trxType=olga`;
-  const progress = src20.progress || "0";
-  const progressWidth = `${progress}%`;
+  const progressWidth = `${src20.progress}%`;
 
   const handleMintClick = () => {
     globalThis.location.href = mintHref;
@@ -59,7 +58,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
               </p>
               <div class="flex flex-col gap-1">
                 <p class={dataLabelSm}>
-                  PROGRESS <span class={dataValueSm}>{progress}</span>
+                  PROGRESS <span class={dataValueSm}>{src20.progress}</span>
                   <span class="text-stamp-grey-light">%</span>
                 </p>
                 <div class="relative min-w-[144px] mobileLg:min-w-[192px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
@@ -84,7 +83,6 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
                 {Number(src20.holders).toLocaleString()}
               </span>
             </p>
-            {/* TODO: Get Top Mints from Backend */}
             <p class={dataLabelSm}>
               TOP MINTS{" "}
               <span class={dataValueSm}>
@@ -93,7 +91,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             </p>
             <div class="flex flex-col gap-1">
               <p class={dataLabelSm}>
-                PROGRESS <span class={dataValueSm}>{progress}</span>
+                PROGRESS <span class={dataValueSm}>{src20.progress}</span>
                 <span class="text-stamp-grey-light">%</span>
               </p>
             </div>

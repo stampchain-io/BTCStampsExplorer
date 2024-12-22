@@ -7,7 +7,7 @@ import { CollectionController } from "$server/controller/collectionController.ts
 import { StampController } from "$server/controller/stampController.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES } from "$globals";
-import { CollectionRow } from "$server/types/collection.ts";
+import { CollectionRow } from "$server/types/collection.d.ts";
 const MAX_PAGE_SIZE = 120;
 
 interface CollectionOverviewPageProps {

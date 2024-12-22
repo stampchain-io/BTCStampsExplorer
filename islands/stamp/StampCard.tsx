@@ -11,7 +11,7 @@ import {
 
 import { StampRow } from "$globals";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
-import { BREAKPOINTS } from "$client/utils/constants.ts";
+import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";

@@ -1,6 +1,13 @@
 export const LOGO_STAMPCHAIN = "/img/stampchain.png";
 export const LOGO = LOGO_STAMPCHAIN;
 export const MAX_XCP_RETRIES = 5;
+export const BREAKPOINTS = {
+  desktop: 1440,
+  tablet: 1024,
+  mobileLg: 768,
+  mobileMd: 568,
+  mobileSm: 360,
+};
 export const STAMP_TABLE = "StampTableV4";
 export const BLOCK_TABLE = "blocks";
 export const SRC20_TABLE = "SRC20Valid";
