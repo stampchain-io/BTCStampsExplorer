@@ -65,8 +65,8 @@ export async function handleContentRequest(
       const cleanedHtml = html
         // Remove Rocket Loader's type modification but preserve the src
         .replace(
-          /<script src="(\/s\/[A-Z0-9]+)"[^>]*>/g,
-          '<script src="$1">',
+          /<script src="(\/s\/[A-Z0-9]+)"([^>]*)>/g,
+          '<script src="$1"$2>',
         )
         // Clean up inline scripts (these we know are JavaScript)
         .replace(
