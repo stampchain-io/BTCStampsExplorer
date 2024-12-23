@@ -23,7 +23,7 @@ jobs:
       - name: Check if PR author is Devin
         id: check_author
         run: |
-          if [[ "${{ github.event.pull_request.user.login }}" == "devin" ]]; then
+          if [[ "${{ github.event.pull_request.user.login }}" == "devin-ai-integration" ]]; then
             echo "is_devin=true" >> $GITHUB_OUTPUT
           else
             echo "is_devin=false" >> $GITHUB_OUTPUT
