@@ -104,7 +104,8 @@ export function FeeCalculatorBase({
         className="relative w-full group"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onClick={(e) => e.stopPropagation()} // Prevent click events from reaching modal
+        onClick={(e) =>
+          e.stopPropagation()} // Prevent click events from reaching modal
       >
         <input
           type="range"
