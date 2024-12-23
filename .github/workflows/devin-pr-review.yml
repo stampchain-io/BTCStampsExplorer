@@ -88,16 +88,28 @@ jobs:
             const prBody = context.payload.pull_request.body || '';
             const summary = process.env.SUMMARY;
             
+            // Get existing comments to prevent duplicates
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            const hasImpactComment = comments.data.some(comment => 
+              comment.body.includes('### 💡 Additional Context') && 
+              comment.body.includes('📊 Impact Analysis')
+            );
+            
             if (!prBody.trim()) {
-              // If PR description is blank, post detailed comment
-              await github.rest.issues.createComment({
+              // If PR description is blank, update PR description
+              await github.rest.pulls.update({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
+                pull_number: context.issue.number,
                 body: summary
               });
-            } else {
-              // If PR has description, add supplementary insights
+            } else if (!hasImpactComment) {
+              // If PR has description and no impact comment exists, add supplementary insights
               const sections = summary.split('\n### ');
               const impactSection = sections.find(s => s.startsWith('📊 Impact Analysis'));
               await github.rest.issues.createComment({
