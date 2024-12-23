@@ -28,8 +28,7 @@ export const handler: Handlers = {
       );
 
       let result;
-      const useV2 = new URL(req.url).searchParams.get("v2") === "1";
-      const type = new URL(req.url).searchParams.get("type") || "minting";
+      const useV2 = url.searchParams.get("v2") === "1";
       
       if (type === "market") {
         // Get top tickers by market cap (fully minted)
