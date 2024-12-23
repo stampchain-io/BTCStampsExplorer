@@ -1,0 +1,102 @@
+name: Devin PR Reviewer
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  devin-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check if PR author is Devin
+        id: check_author
+        run: |
+          if [[ "${{ github.event.pull_request.user.login }}" == "devin" ]]; then
+            echo "is_devin=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_devin=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate PR Summary
+        if: steps.check_author.outputs.is_devin == 'false'
+        id: summary
+        run: |
+          # Get the PR diff stats
+          DIFF_STATS=$(git diff --shortstat ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          
+          # Get list of modified files
+          MODIFIED_FILES=$(git diff --name-status ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          
+          # Generate summary
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          echo "## PR Changes Summary" >> $GITHUB_OUTPUT
+          echo "### Changes Overview" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "$DIFF_STATS" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "### Modified Files" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "$MODIFIED_FILES" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Process PR Description
+        if: steps.check_author.outputs.is_devin == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            const summary = process.env.SUMMARY;
+            
+            if (!prBody.trim()) {
+              // If PR description is blank, post detailed comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: summary
+              });
+            } else {
+              // If PR has description, post a shorter summary comment
+              const shortSummary = summary.split('### Modified Files')[0]; // Just the changes overview
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `### Additional Changes Summary\n${shortSummary}`
+              });
+            }
+        env:
+          SUMMARY: ${{ steps.summary.outputs.summary }}
+
+  devin-pr-comment-response:
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Process Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = context.payload.comment.body;
+            // For now, just acknowledge the comment
+            // In future versions, this could be expanded to parse and act on specific review comments
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Acknowledged review comment:\n> ${comment}\n\nDevin will process this feedback in a future update.`
+            });
