@@ -1,6 +1,6 @@
 import { SRC20Row } from "$globals";
 import { useEffect, useState } from "preact/hooks";
-import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 
 type SRC20BalanceTableProps = {
@@ -86,7 +86,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                 {data.filter((row) => row.creator === wallet.address).map(
                   // data.map(
                   (src20: SRC20Row) => {
-                    const href = `/upload/${convertToEmoji(src20.tick)}`;
+                    const href = `/upload/${unicodeEscapeToEmoji(src20.tick)}`;
                     return (
                       <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                         <td class="px-6 py-4 uppercase">
@@ -104,7 +104,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                         </td>
                         <td class="px-6 py-4 uppercase">
                           <a href={href}>
-                            {convertToEmoji(src20.tick)}
+                            {unicodeEscapeToEmoji(src20.tick)}
                           </a>
                         </td>
                         <td class="px-6 py-4">

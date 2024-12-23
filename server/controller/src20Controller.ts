@@ -1,16 +1,16 @@
 import { SRC20Service } from "$server/services/src20/index.ts";
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import {
-  SRC20BalanceRequestParams,
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
 } from "$globals";
+import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { StampService } from "$server/services/stampService.ts";
 import { BlockService } from "$server/services/blockService.ts";
-import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
-import { MarketListingSummary } from "$types/index.d.ts";
+import { MarketListingAggregated } from "$types/index.d.ts";
 import { WalletData } from "$lib/types/index.d.ts";
+import { formatAmount } from "$lib/utils/formatUtils.ts";
 
 export class Src20Controller {
   static async getTotalCountValidSrc20Tx(
@@ -29,28 +29,22 @@ export class Src20Controller {
     }
   }
 
+  /**
+   * @deprecated Use SRC20Service.QueryService.fetchAndFormatSrc20Data directly.
+   * This method is kept for backward compatibility with existing API routes.
+   */
   static async handleSrc20TransactionsRequest(
-    _req: Request,
+    req: Request,
     params: SRC20TrxRequestParams,
     excludeFullyMinted = false,
   ) {
     try {
-      // Use QueryService from the new structure
       return await SRC20Service.QueryService.fetchAndFormatSrc20Data(
         params,
         excludeFullyMinted,
       );
     } catch (error) {
       console.error("Error processing SRC20 transaction request:", error);
-      throw error;
-    }
-  }
-
-  static async handleAllSrc20DataForTickRequest(tick: string) {
-    try {
-      return await SRC20Service.QueryService.fetchAllSrc20DataForTick(tick);
-    } catch (error) {
-      console.error("Error processing all SRC20 data request for tick:", error);
       throw error;
     }
   }
@@ -131,41 +125,6 @@ export class Src20Controller {
     }
   }
 
-  static async handleSrc20MintProgressRequest(tick: string) {
-    if (!tick) {
-      return null;
-    }
-
-    try {
-      const responseBody = await SRC20Service.QueryService.getSrc20MintProgressByTick(tick);
-      return responseBody || null;
-    } catch (error) {
-      console.error("Error processing SRC20 mint progress request:", error);
-      return null;
-    }
-  }
-
-  static async handleCheckMintedOut(tick: string, amount: string) {
-    try {
-      return await SRC20Service.QueryService.checkMintedOut(tick, amount);
-    } catch (error) {
-      console.error("Error checking minted out status:", error);
-      throw error;
-    }
-  }
-
-  static async getValidSrc20Tx(params: SRC20TrxRequestParams) {
-    return await SRC20Repository.getValidSrc20TxFromDb(params);
-  }
-
-  static async getLastBlock() {
-    return await BlockService.getLastBlock();
-  }
-
-  static async getSrc20MintProgressByTick(tick: string) {
-    return await SRC20Service.QueryService.getSrc20MintProgressByTick(tick);
-  }
-
   static async getTickData(params: {
     tick: string;
     limit: number;
@@ -174,10 +133,10 @@ export class Src20Controller {
     sortBy?: string;
   }) {
     const [src20_txs, totalResult, lastBlock, mint_status] = await Promise.all([
-      this.getValidSrc20Tx(params),
+      SRC20Service.QueryService.fetchRawSrc20Data(params),
       this.getTotalCountValidSrc20Tx({ tick: params.tick, op: params.op }),
-      this.getLastBlock(),
-      this.getSrc20MintProgressByTick(params.tick),
+      BlockService.getLastBlock(),
+      SRC20Service.QueryService.fetchSrc20MintProgress(params.tick),
     ]);
 
     const total = totalResult;
@@ -190,9 +149,9 @@ export class Src20Controller {
     page: number;
   }) {
     const [data, totalResult, lastBlock] = await Promise.all([
-      this.getValidSrc20Tx(params),
+      SRC20Service.QueryService.fetchRawSrc20Data(params),
       this.getTotalCountValidSrc20Tx({ op: params.op }),
-      this.getLastBlock(),
+      BlockService.getLastBlock(),
     ]);
 
     const total = totalResult;
@@ -203,14 +162,14 @@ export class Src20Controller {
     try {
       const [deploymentData, mintStatusData, lastBlockData] = await Promise.all(
         [
-          this.handleSrc20TransactionsRequest(req, {
+          SRC20Service.QueryService.fetchAndFormatSrc20Data({
             tick: [tick],
             op: "DEPLOY",
             limit: 1,
             page: 1,
           }),
-          this.handleSrc20MintProgressRequest(tick).catch(() => null),
-          this.handleSrc20TransactionsRequest(req, {
+          SRC20Service.QueryService.fetchSrc20MintProgress(tick).catch(() => null),
+          SRC20Service.QueryService.fetchAndFormatSrc20Data({
             limit: 1,
             page: 1,
             sortBy: "DESC",
@@ -230,10 +189,7 @@ export class Src20Controller {
       return {
         last_block: lastBlockData.last_block,
         mint_status: mintStatusData,
-        data: {
-          ...deploymentData.data[0],
-          tick: convertToEmoji(deploymentData.data[0].tick),
-        },
+        data: deploymentData.data[0],
       };
     } catch (error) {
       console.error("Error in handleDeploymentRequest:", error);
@@ -241,7 +197,7 @@ export class Src20Controller {
     }
   }
 
-  static async handleTickPageRequest(tick: string) {
+  static async fetchSrc20TickPageData(tick: string): Promise<SRC20TickPageData> {
     try {
       const balanceParams = {
         tick,
@@ -257,8 +213,8 @@ export class Src20Controller {
         marketData,
       ] = await Promise.all([
         this.handleSrc20BalanceRequest(balanceParams),
-        this.handleSrc20MintProgressRequest(tick),
-        this.handleAllSrc20DataForTickRequest(tick),
+        SRC20Service.QueryService.fetchSrc20MintProgress(tick), // tick is unicode
+        SRC20Service.QueryService.fetchAllSrc20DataForTick(tick),
         SRC20MarketService.fetchMarketListingSummary(),
       ]);
 
@@ -286,8 +242,8 @@ export class Src20Controller {
           : 0,
         holders: Array.isArray(balanceResponse.data)
           ? balanceResponse.data.map((row) => {
-            const amt = this.formatAmount(row.amt || "0");
-            const totalMinted = this.formatAmount(
+            const amt = formatAmount(row.amt || "0");
+            const totalMinted = formatAmount(
               mintProgressResponse?.total_minted || "1",
             );
             const percentage = this.calculatePercentage(amt, totalMinted);
@@ -304,15 +260,9 @@ export class Src20Controller {
         marketInfo: marketInfoForTick,
       };
     } catch (error) {
-      console.error("Error in handleTickPageRequest:", error);
+      console.error("Error in fetchSrc20TickPageData:", error);
       throw error;
     }
-  }
-
-  private static formatAmount(value: string): string {
-    const [whole, decimal = ""] = value.replace(/^0+/, "").split(".");
-    const trimmedDecimal = decimal.replace(/0+$/, "");
-    return trimmedDecimal ? `${whole}.${trimmedDecimal}` : whole;
   }
 
   private static calculatePercentage(amount: string, total: string): string {
@@ -323,92 +273,258 @@ export class Src20Controller {
     return percentage.toFixed(2);
   }
 
-  static async fetchSrc20DetailsWithHolders(
-    _req: Request | null, // Allow for null
-    params: SRC20TrxRequestParams,
-    excludeFullyMinted: boolean = false,
+  static async fetchFullyMintedByMarketCap(
+    limit: number = 50,
+    page: number = 1,
   ) {
     try {
-      const [resultData, marketData] = await Promise.all([
-        this.handleSrc20TransactionsRequest(_req, params, excludeFullyMinted),
-        SRC20MarketService.fetchMarketListingSummary(),
-      ]);
+      // Get market data first to sort by market cap
+      const marketData = await SRC20MarketService.fetchMarketListingSummary();
 
-      const marketDataMap = new Map<string, MarketListingSummary>(
-        marketData.map((item) => [item.tick, item]),
-      );
+      // Get all SRC20 data with mint progress
+      const allSrc20Data = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
+        op: "DEPLOY",
+        limit: 1000, // Get a large batch to filter
+      }, false);
 
       const enrichedData = [];
 
-      for (
-        const row of Array.isArray(resultData.data)
-          ? resultData.data
-          : [resultData.data]
-      ) {
-        const balanceParams: SRC20BalanceRequestParams = {
-          tick: row.tick,
-          includePagination: true,
-        };
-        const balanceResult = await this.handleSrc20BalanceRequest(
-          balanceParams,
-        );
+      // Enrich and filter for fully minted tokens
+      for (const row of allSrc20Data.data) {
+        if (!row) continue;
 
-        const marketInfo = marketDataMap.get(row.tick) || {
+        const mintProgress = await SRC20Service.QueryService.fetchSrc20MintProgress(row.tick);
+        if (!mintProgress || parseFloat(mintProgress.progress) < 100) continue;
+
+        const marketInfo = marketData.find(item => item.tick === row.tick) || {
           mcap: 0,
           floor_unit_price: 0,
         };
 
-        // Fetch mint progress data
-        const mintProgress = await this.handleSrc20MintProgressRequest(
-          row.tick,
-        );
-        const progress = mintProgress ? mintProgress.progress : null;
+        const balanceResult = await this.handleSrc20BalanceRequest({
+          tick: row.tick,
+          includePagination: true,
+        });
 
         enrichedData.push({
           ...row,
           holders: balanceResult.total,
           mcap: marketInfo.mcap,
-          floor_unit_price: Number(
-            marketInfo.floor_unit_price.toFixed(10),
-          ),
-          progress,
+          floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
+          progress: mintProgress.progress,
         });
       }
 
-      // Use total from resultData, which now correctly reflects the total items
-      const total = resultData.total;
-      const limit = params.limit || 50;
-      const page = params.page || 1;
-      const totalPages = Math.ceil(total / limit);
+      // Sort by market cap descending
+      enrichedData.sort((a, b) => b.mcap - a.mcap);
+
+      // Apply pagination
+      const startIndex = (page - 1) * limit;
+      const paginatedData = enrichedData.slice(startIndex, startIndex + limit);
 
       return {
-        data: enrichedData,
-        total,
+        data: paginatedData,
+        total: enrichedData.length,
         page,
-        totalPages,
+        totalPages: Math.ceil(enrichedData.length / limit),
         limit,
       };
     } catch (error) {
-      console.error("Error fetching SRC20 details with holders:", error);
+      console.error("Error in fetchFullyMintedByMarketCap:", error);
       throw error;
     }
   }
 
-  static async fetchTrendingTokens(
-    _req: Request | null, // Allow for null
+  static async fetchSrc20DetailsWithHolders(
+    params: SRC20TrxRequestParams,
+    excludeFullyMinted: boolean = false,
+    onlyFullyMinted: boolean = false,
+  ) {
+    try {
+      // For fully minted tokens sorted by market cap
+      if (onlyFullyMinted) {
+        // Get all DEPLOY transactions first
+        const allDeployData = await SRC20Service.QueryService.fetchAndFormatSrc20Data(
+          {
+            ...params,
+            limit: 1000, // Get a larger batch to filter from
+            page: 1,
+            op: "DEPLOY",
+          },
+          false, // Don't exclude any yet
+          false, // Don't filter yet
+        );
+
+        if (!allDeployData.data || allDeployData.data.length === 0) {
+          return {
+            data: [],
+            total: 0,
+            page: params.page || 1,
+            totalPages: 0,
+            limit: params.limit || 50,
+          };
+        }
+
+        // Process in batches for better performance
+        const batchSize = 10;
+        const rows = Array.isArray(allDeployData.data) ? allDeployData.data : [allDeployData.data];
+        const enrichedData = [];
+        
+        // Get market data once
+        const marketData = await SRC20MarketService.fetchMarketListingSummary();
+        const marketDataMap = new Map(marketData.map(item => [item.tick, item]));
+        
+        for (let i = 0; i < rows.length; i += batchSize) {
+          const batch = rows.slice(i, i + batchSize);
+          
+          // Get mint progress and balances in parallel for the batch
+          const [batchMintProgress, batchBalances] = await Promise.all([
+            Promise.all(
+              batch
+                .filter(Boolean)
+                .map(row => SRC20Service.QueryService.fetchSrc20MintProgress(row.tick))
+            ),
+            Promise.all(
+              batch
+                .filter(Boolean)
+                .map(row => this.handleSrc20BalanceRequest({
+                  tick: row.tick,
+                  includePagination: true,
+                }))
+            ),
+          ]);
+
+          // Process each item in the batch
+          batch.forEach((row, index) => {
+            if (!row) return;
+
+            const mintProgress = batchMintProgress[index];
+            // Only include if fully minted
+            if (!mintProgress || parseFloat(mintProgress.progress) < 100) return;
+
+            const marketInfo = marketDataMap.get(row.tick);
+            // Only include if it has market data
+            if (!marketInfo) return;
+
+            enrichedData.push({
+              ...row,
+              holders: batchBalances[index]?.total || 0,
+              mcap: marketInfo.mcap,
+              floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
+              progress: mintProgress.progress,
+            });
+          });
+        }
+
+        // Sort by market cap
+        enrichedData.sort((a, b) => b.mcap - a.mcap);
+
+        // Apply pagination
+        const start = ((params.page || 1) - 1) * (params.limit || 50);
+        const paginatedData = enrichedData.slice(start, start + (params.limit || 50));
+
+        return {
+          data: paginatedData,
+          total: enrichedData.length,
+          page: params.page || 1,
+          totalPages: Math.ceil(enrichedData.length / (params.limit || 50)),
+          limit: params.limit || 50,
+        };
+      }
+
+      // For non-market-cap sorting (regular flow)
+      const [resultData, marketData] = await Promise.all([
+        SRC20Service.QueryService.fetchAndFormatSrc20Data(params, excludeFullyMinted),
+        excludeFullyMinted ? null : SRC20MarketService.fetchMarketListingSummary(),
+      ]);
+
+      if (!resultData.data || resultData.data.length === 0) {
+        return {
+          data: [],
+          total: 0,
+          page: params.page || 1,
+          totalPages: 0,
+          limit: params.limit || 50,
+        };
+      }
+
+      // Create market data map for quick lookups (if we have market data)
+      const marketDataMap = marketData 
+        ? new Map(marketData.map(item => [item.tick, item]))
+        : new Map();
+
+      // Process in batches for better performance
+      const batchSize = 10;
+      const rows = Array.isArray(resultData.data) ? resultData.data : [resultData.data];
+      const enrichedData = [];
+      
+      for (let i = 0; i < rows.length; i += batchSize) {
+        const batch = rows.slice(i, i + batchSize);
+        
+        // Get mint progress and balances in parallel for the batch
+        const [batchMintProgress, batchBalances] = await Promise.all([
+          Promise.all(
+            batch
+              .filter(Boolean)
+              .map(row => SRC20Service.QueryService.fetchSrc20MintProgress(row.tick))
+          ),
+          Promise.all(
+            batch
+              .filter(Boolean)
+              .map(row => this.handleSrc20BalanceRequest({
+                tick: row.tick,
+                includePagination: true,
+              }))
+          ),
+        ]);
+
+        // Process each item in the batch
+        batch.forEach((row, index) => {
+          if (!row) return;
+
+          const marketInfo = marketDataMap.get(row.tick) || {
+            mcap: 0,
+            floor_unit_price: 0,
+          };
+
+          enrichedData.push({
+            ...row,
+            holders: batchBalances[index]?.total || 0,
+            mcap: marketInfo.mcap,
+            floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
+            progress: batchMintProgress[index]?.progress || "0",
+          });
+        });
+      }
+
+      return {
+        data: enrichedData,
+        total: resultData.total,
+        page: params.page || 1,
+        totalPages: Math.ceil(resultData.total / (params.limit || 50)),
+        limit: params.limit || 50,
+      };
+    } catch (error) {
+      console.error("Error in fetchSrc20DetailsWithHolders:", error);
+      throw error;
+    }
+  }
+
+  static async fetchTrendingActiveMintingTokens(
     limit: number,
     page: number,
     transactionCount: number,
   ) {
     try {
-      const trendingData = await SRC20Service.QueryService.fetchTrendingSrc20Data(
+      const trendingData = await SRC20Service.QueryService.fetchTrendingActiveMintingTokens(
         limit,
         page,
         transactionCount,
       );
 
       const marketData = await SRC20Service.MarketService.fetchMarketListingSummary();
-      const marketDataMap = new Map<string, MarketListingSummary>(
+      // Market data is already in emoji format, create map using emoji ticks
+      const marketDataMap = new Map<string, MarketListingAggregated>(
         marketData.map((item) => [item.tick, item]),
       );
 
@@ -423,14 +539,15 @@ export class Src20Controller {
           balanceParams,
         );
 
+        // Use emoji tick directly since market data is in emoji format
         const marketInfo = marketDataMap.get(row.tick) || {
           mcap: 0,
           floor_unit_price: 0,
         };
 
-        // Fetch mint progress data
-        const mintProgress = await this.handleSrc20MintProgressRequest(
-          row.tick,
+        // Fetch mint progress data - repository handles format conversion
+        const mintProgress = await SRC20Service.QueryService.fetchSrc20MintProgress(
+          row.tick
         );
         const progress = mintProgress ? mintProgress.progress : null;
 
@@ -441,13 +558,15 @@ export class Src20Controller {
           floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
           progress,
           mint_count: row.mint_count,
-          top_mints_percentage: row.top_mints_percentage || 0,
+          top_mints_percentage: row.top_mints_percentage
+            ? Number(row.top_mints_percentage)
+            : 0,
           total_minted: mintProgress?.total_minted || "0",
           max_supply: mintProgress?.max_supply || "0",
         });
       }
 
-      const total = trendingData.total;
+      const total = enrichedData.length;
       const totalPages = Math.ceil(total / limit);
 
       return {
@@ -458,16 +577,7 @@ export class Src20Controller {
         limit,
       };
     } catch (error) {
-      console.error("Error fetching trending SRC20 tokens:", error);
-      throw error;
-    }
-  }
-
-  static async handleSearchRequest(query: string) {
-    try {
-      return await SRC20Service.QueryService.searchSrc20Data(query);
-    } catch (error) {
-      console.error("Error processing search request:", error);
+      console.error("Error fetching trending active minting SRC20 tokens:", error);
       throw error;
     }
   }

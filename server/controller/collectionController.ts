@@ -1,9 +1,8 @@
 import { CollectionService } from "$server/services/collectionService.ts";
 import {
   Collection,
-  CollectionQueryParams,
-  PaginatedCollectionResponseBody,
 } from "$globals";
+import { CollectionQueryParams, PaginatedCollectionResponseBody } from "$server/types/collection.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 

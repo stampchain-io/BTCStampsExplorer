@@ -200,6 +200,18 @@ export class WebResponseUtil {
     status: number,
     options: WebResponseOptions = {},
   ): Response {
+    // For 204 No Content or null body, return response without body
+    if (status === 204 || body === null || body === undefined) {
+      return new Response(null, {
+        status,
+        headers: normalizeHeaders({
+          ...getSecurityHeaders(options),
+          "X-API-Version": API_RESPONSE_VERSION,
+          ...(options.headers || {}),
+        }),
+      });
+    }
+
     return new Response(
       body instanceof ArrayBuffer || body instanceof Uint8Array
         ? body
