@@ -33,23 +33,51 @@ jobs:
         if: steps.check_author.outputs.is_devin == 'false'
         id: summary
         run: |
-          # Get the PR diff stats
-          DIFF_STATS=$(git diff --shortstat ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          # Get commit messages for context
+          COMMIT_MESSAGES=$(git log --format=%s ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
           
-          # Get list of modified files
-          MODIFIED_FILES=$(git diff --name-status ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          # Extract types of changes from conventional commits
+          TYPES=$(echo "$COMMIT_MESSAGES" | grep -oE '^(feat|fix|refactor|style|test|docs|chore|perf|ci|build)' | sort | uniq)
           
-          # Generate summary
+          # Generate narrative summary
           echo "summary<<EOF" >> $GITHUB_OUTPUT
-          echo "## PR Changes Summary" >> $GITHUB_OUTPUT
-          echo "### Changes Overview" >> $GITHUB_OUTPUT
-          echo "\`\`\`" >> $GITHUB_OUTPUT
-          echo "$DIFF_STATS" >> $GITHUB_OUTPUT
-          echo "\`\`\`" >> $GITHUB_OUTPUT
-          echo "### Modified Files" >> $GITHUB_OUTPUT
-          echo "\`\`\`" >> $GITHUB_OUTPUT
-          echo "$MODIFIED_FILES" >> $GITHUB_OUTPUT
-          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "## Pull Request Overview" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          
+          # Analyze commit types to determine PR purpose
+          if echo "$TYPES" | grep -q "feat"; then
+            echo "### 🚀 New Features" >> $GITHUB_OUTPUT
+            echo "$COMMIT_MESSAGES" | grep "^feat" | sed 's/^feat(\([^)]*\)): /- /' >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+          fi
+          
+          if echo "$TYPES" | grep -q "fix"; then
+            echo "### 🔧 Bug Fixes" >> $GITHUB_OUTPUT
+            echo "$COMMIT_MESSAGES" | grep "^fix" | sed 's/^fix(\([^)]*\)): /- /' >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+          fi
+          
+          if echo "$TYPES" | grep -q "refactor\|style\|perf"; then
+            echo "### 🔄 Improvements" >> $GITHUB_OUTPUT
+            echo "$COMMIT_MESSAGES" | grep -E "^(refactor|style|perf)" | sed -E 's/^(refactor|style|perf)(\([^)]*\))?: /- /' >> $GITHUB_OUTPUT
+            echo "" >> $GITHUB_OUTPUT
+          fi
+          
+          # Add impact analysis
+          echo "### 📊 Impact Analysis" >> $GITHUB_OUTPUT
+          echo "This PR primarily focuses on:" >> $GITHUB_OUTPUT
+          if echo "$TYPES" | grep -q "feat"; then
+            echo "- Adding new functionality to the system" >> $GITHUB_OUTPUT
+          fi
+          if echo "$TYPES" | grep -q "fix"; then
+            echo "- Resolving existing issues and improving stability" >> $GITHUB_OUTPUT
+          fi
+          if echo "$TYPES" | grep -q "refactor\|style\|perf"; then
+            echo "- Enhancing code quality and performance" >> $GITHUB_OUTPUT
+          fi
+          if echo "$TYPES" | grep -q "test"; then
+            echo "- Improving test coverage and reliability" >> $GITHUB_OUTPUT
+          fi
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Process PR Description
@@ -69,13 +97,14 @@ jobs:
                 body: summary
               });
             } else {
-              // If PR has description, post a shorter summary comment
-              const shortSummary = summary.split('### Modified Files')[0]; // Just the changes overview
+              // If PR has description, add supplementary insights
+              const sections = summary.split('\n### ');
+              const impactSection = sections.find(s => s.startsWith('📊 Impact Analysis'));
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: `### Additional Changes Summary\n${shortSummary}`
+                body: `### 💡 Additional Context\n\n${impactSection || 'No additional impact analysis available.'}`
               });
             }
         env:
