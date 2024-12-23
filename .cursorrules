@@ -330,3 +330,698 @@ environment:
     - DENO_ENV
     - DEV_BASE_URL
     - SKIP_REDIS_CONNECTION
+
+# SRC20 Optimization Plan
+src20_optimization:
+  overview:
+    description: "Safe optimization plan for SRC20 data fetching and filtering with focus on API stability"
+    goals:
+      - "Maintain backward compatibility for all API routes"
+      - "Introduce enhanced functionality alongside existing"
+      - "Optimize data fetching patterns"
+      - "Support comprehensive filtering"
+      - "Improve performance monitoring"
+
+  critical_dependencies:
+    api_routes:
+      - endpoint: "/api/v2/src20/index"
+        function: "handleSrc20TransactionsRequest"
+        notes: "Base SRC20 transaction endpoint - must maintain response format"
+      
+      - endpoint: "/api/v2/src20/tick/[tick]/deploy"
+        function: "handleDeploymentRequest"
+        notes: "Critical deployment info endpoint"
+      
+      - endpoint: "/api/v2/src20/balance/*"
+        function: "handleSrc20BalanceRequest"
+        notes: "Balance endpoints - high traffic"
+
+  functions_to_refactor:
+    queryService:
+      fetchAndFormatSrc20Data:
+        strategy: "Parallel versions"
+        current: "Keep existing implementation untouched"
+        new_version:
+          name: "fetchAndFormatSrc20DataV2"
+          features:
+            - "Optional data enrichment"
+            - "Parallel data fetching"
+            - "Performance monitoring"
+            - "Fallback safety"
+        shared_helpers:
+          - name: "enrichData"
+            purpose: "Centralized data enrichment logic"
+            features:
+              - "Market data enrichment"
+              - "Mint progress data"
+              - "Batch processing"
+              - "Error handling with fallback"
+    
+    controller:
+      fetchSrc20DetailsWithHolders:
+        strategy: "Gradual migration"
+        steps:
+          - "Create V2 version using new query service"
+          - "Test in parallel with existing"
+          - "Migrate internal routes first"
+          - "Monitor performance before full migration"
+
+  testing_strategy:
+    unit_tests:
+      queryService:
+        - name: "fetchAndFormatSrc20DataV2"
+          cases:
+            - "Empty response handling"
+            - "Pagination edge cases"
+            - "Filter combinations"
+            - "Market data enrichment"
+            - "Error fallbacks"
+        - name: "enrichData"
+          cases:
+            - "Batch processing limits"
+            - "Partial data handling"
+            - "Cache hits/misses"
+            - "Error recovery"
+    
+    integration_tests:
+      critical_routes:
+        - endpoint: "/api/v2/src20/index"
+          cases:
+            - "Basic pagination"
+            - "Filter combinations"
+            - "Sort orders"
+            - "Response format stability"
+        
+        - endpoint: "/api/v2/src20/tick/[tick]/deploy"
+          cases:
+            - "Valid deployment data"
+            - "Non-existent tick"
+            - "Emoji tick handling"
+            - "Response structure"
+        
+        - endpoint: "/api/v2/src20/balance/*"
+          cases:
+            - "Valid balance data"
+            - "Multiple holder snapshots"
+            - "Zero balance handling"
+            - "Response pagination"
+      
+      internal_routes:
+        - endpoint: "/api/internal/src20/trending"
+          cases:
+            - "Trending calculation"
+            - "Time window filtering"
+            - "Cache validation"
+            - "Data enrichment"
+    
+    performance_tests:
+      scenarios:
+        - name: "High load - GET /api/v2/src20/index"
+          conditions:
+            - "1000 concurrent users"
+            - "Mixed filter combinations"
+            - "Various page sizes"
+          metrics:
+            - "Response time < 500ms"
+            - "Error rate < 0.1%"
+            - "Memory usage stable"
+        
+        - name: "Cache effectiveness"
+          conditions:
+            - "Repeated queries"
+            - "Market data updates"
+            - "Trending calculations"
+          metrics:
+            - "Cache hit rate > 80%"
+            - "Stale data < 30s"
+        
+        - name: "Data enrichment overhead"
+          conditions:
+            - "Large result sets"
+            - "Multiple data sources"
+            - "Parallel requests"
+          metrics:
+            - "Enrichment time < 100ms"
+            - "Memory overhead < 50MB"
+    
+    validation_suites:
+      response_format:
+        - "Schema validation"
+        - "Type consistency"
+        - "Nullable handling"
+        - "Empty state handling"
+      
+      data_integrity:
+        - "Market data consistency"
+        - "Balance calculation accuracy"
+        - "Mint progress tracking"
+        - "Holder count validation"
+      
+      error_handling:
+        - "API error responses"
+        - "Fallback behaviors"
+        - "Cache invalidation"
+        - "Recovery procedures"
+
+  optimization_phases:
+    phase_1_foundation:
+      title: "Enhanced Query Service"
+      steps:
+        - "Add fetchAndFormatSrc20DataV2 alongside existing"
+        - "Implement enrichData helper"
+        - "Add performance monitoring"
+        - "Comprehensive testing suite"
+        - "Document all changes"
+      safety_measures:
+        - "Type safety for all new functions"
+        - "Error handling with fallbacks"
+        - "Performance threshold warnings"
+        - "Response format validation"
+      testing:
+        setup:
+          - "Create test data fixtures"
+          - "Set up integration test environment"
+          - "Define performance baselines"
+        
+        validation:
+          - "Unit test new functions"
+          - "Integration test critical paths"
+          - "Validate response formats"
+          - "Measure performance impact"
+    
+    phase_2_internal_migration:
+      title: "Update Internal Routes"
+      steps:
+        - "Migrate trending.ts to V2"
+        - "Update index.tsx to use V2"
+        - "Add filter support to internal routes"
+        - "Test thoroughly in staging"
+      monitoring:
+        - "Response time comparisons"
+        - "Error rate tracking"
+        - "Memory usage patterns"
+      testing:
+        setup:
+          - "Expand test fixtures for internal routes"
+          - "Create parallel test environments"
+          - "Set up monitoring dashboards"
+        
+        validation:
+          - "Compare V1 vs V2 responses"
+          - "Validate data consistency"
+          - "Monitor performance metrics"
+          - "Test error scenarios"
+    
+    phase_3_optimization:
+      title: "Performance Optimization"
+      steps:
+        - "Implement caching strategy"
+        - "Optimize batch sizes"
+        - "Add parallel processing"
+        - "Enhance error handling"
+      metrics:
+        - "Response times"
+        - "Cache hit rates"
+        - "Error rates"
+        - "Memory usage"
+      testing:
+        setup:
+          - "Configure load test scenarios"
+          - "Set up long-running tests"
+          - "Prepare rollback validation"
+        
+        validation:
+          - "Run load tests"
+          - "Validate cache behavior"
+          - "Monitor resource usage"
+          - "Test recovery procedures"
+
+  deployment_strategy:
+    staging:
+      steps:
+        - "Deploy V2 functions"
+        - "Run full test suite"
+        - "Compare performance metrics"
+        - "Validate response formats"
+      
+      validation:
+        - "Zero deployment errors"
+        - "All tests passing"
+        - "Performance within bounds"
+        - "No type mismatches"
+    
+    production:
+      steps:
+        - "Deploy with feature flags"
+        - "Gradual traffic migration"
+        - "Monitor error rates"
+        - "Validate response times"
+      
+      validation:
+        - "Error rate < 0.1%"
+        - "Response time < baseline + 10%"
+        - "Cache hit rate > 80%"
+        - "Zero critical errors"
+
+  type_updates:
+    overview:
+      description: "Type system consolidation and alignment with OpenAPI schema"
+      goals:
+        - "Consolidate overlapping types between globals.d.ts and src20.d.ts"
+        - "Ensure type definitions match API contract in schema.yml"
+        - "Improve type safety across the application"
+        - "Reduce duplication and improve maintainability"
+    
+    consolidation_plan:
+      shared_types:
+        base_interfaces:
+          - name: "SRC20Base"
+            description: "Common properties shared across SRC20 types"
+            source: "schema.yml#/components/schemas/Src20Detail"
+            properties:
+              - "tx_hash: string"
+              - "block_index: number"
+              - "tick: string"
+              - "op: SRC20Operation"
+              - "amt?: string | bigint"
+              - "block_time: Date"
+        
+        response_types:
+          - name: "SRC20Response"
+            description: "Standardized response format for SRC20 endpoints"
+            source: "schema.yml#/components/schemas/Src20ResponseBody"
+            properties:
+              - "last_block: number"
+              - "data: SRC20Detail"
+              - "performance?: PerformanceMetrics"
+        
+        request_types:
+          - name: "SRC20RequestParams"
+            description: "Unified request parameters"
+            source: "schema.yml components"
+            properties:
+              - "tick?: string"
+              - "op?: SRC20Operation"
+              - "limit?: number"
+              - "page?: number"
+              - "sortBy?: string"
+    
+    new_types:
+      performance_monitoring:
+        PerformanceMetrics:
+          description: "Metrics for monitoring and optimization"
+          properties:
+            - "duration: number"
+            - "cacheHit: boolean"
+            - "dataSize: number"
+            - "queryTime?: number"
+            - "enrichmentTime?: number"
+      
+      market_data:
+        MarketMetrics:
+          description: "Market-related data types"
+          properties:
+            - "floor_price: number"
+            - "market_cap: number"
+            - "volume_24h: number"
+            - "holders: number"
+      
+      enrichment_options:
+        EnrichmentConfig:
+          description: "Configuration for data enrichment"
+          properties:
+            - "includeMarketData: boolean"
+            - "enrichWithProgress: boolean"
+            - "batchSize?: number"
+            - "cacheDuration?: number"
+    
+    filter_options:
+      interface: "FilterOptions"
+      description: "Comprehensive filtering options for SRC20 tokens"
+      options:
+        minting:
+          description: "Filter by minting status and activity"
+          properties:
+            - "progress: number - Current mint progress percentage"
+            - "recent_activity: number - Recent mint transactions count"
+        
+        trending_mints:
+          description: "Filter trending mints by time period"
+          properties:
+            - "time_period: '24h' | '7d' - Time window for trending calculation"
+            - "min_mints: number - Minimum number of mint transactions"
+        
+        deploy:
+          description: "Filter by deployment date"
+          properties:
+            - "date_range: DateRange - Start and end dates for deployment"
+        
+        supply:
+          description: "Filter by token supply range"
+          properties:
+            - "min: number - Minimum supply amount"
+            - "max: number - Maximum supply amount"
+        
+        marketcap:
+          description: "Filter by market capitalization"
+          properties:
+            - "min: number - Minimum market cap in BTC"
+            - "max: number - Maximum market cap in BTC"
+        
+        holders:
+          description: "Filter by number of holders"
+          properties:
+            - "min: number - Minimum number of holders"
+            - "max: number - Maximum number of holders"
+        
+        volume:
+          description: "Filter by trading volume"
+          properties:
+            - "min: number - Minimum volume in BTC"
+            - "time_period: '24h' | '7d' - Time period for volume calculation"
+        
+        price_change:
+          description: "Filter by price movement"
+          properties:
+            - "percentage: number - Price change percentage"
+            - "time_period: '24h' | '7d' - Time period for price change"
+    
+    main_scenarios:
+      all_tokens_view:
+        description: "Complete view of all SRC20 tokens"
+        data_requirements:
+          - "All DEPLOY transactions"
+          - "Mint progress for each token"
+          - "Market data for fully minted tokens"
+          - "Holders count for each token"
+        filtering_options:
+          - "By status (minting/outminted)"
+          - "By supply range"
+          - "By market cap range"
+          - "By holder count range"
+          - "By volume range"
+          - "By price change"
+        sorting_options:
+          - "ASC/DESC by deploy date"
+          - "By market cap"
+          - "By holder count"
+          - "By volume"
+      
+      minting_only_view:
+        description: "View of actively minting tokens"
+        data_requirements:
+          - "DEPLOY transactions where progress < 100%"
+          - "Current mint progress"
+          - "Holders count"
+          - "Recent mint activity"
+        filtering_options:
+          - "By supply range"
+          - "By holder count range"
+          - "By mint progress range"
+          - "By mint activity"
+        sorting_options:
+          - "By mint progress"
+          - "By recent activity"
+          - "By deploy date"
+      
+      trending_view:
+        description: "View of trending tokens"
+        data_requirements:
+          - "Recent mint transactions"
+          - "Mint progress"
+          - "Top mints percentage"
+          - "Holders count"
+        filtering_options:
+          - "By time period (24h, 7d)"
+          - "By mint volume"
+          - "By holder growth"
+        sorting_options:
+          - "By mint activity"
+          - "By holder growth"
+      
+      specialized_views:
+        trending_minting:
+          description: "Trending tokens currently minting"
+          data_requirements:
+            - "Active minting tokens"
+            - "Recent mint transactions"
+            - "Mint progress"
+            - "Top mints percentage"
+          parameters:
+            - "Transaction count (default 1000)"
+            - "Time period"
+            - "Page/limit"
+        
+        top_market_cap:
+          description: "Top tokens by market capitalization"
+          data_requirements:
+            - "Fully minted tokens"
+            - "Market data (price, mcap, volume)"
+            - "Holder counts"
+          parameters:
+            - "Page/limit"
+            - "Min market cap"
+            - "Min volume"
+    
+    migrations:
+      phase_1:
+        - "Create base interfaces in shared types directory"
+        - "Update existing types to extend base interfaces"
+        - "Add JSDoc documentation for all types"
+      
+      phase_2:
+        - "Implement new performance monitoring types"
+        - "Add market data types with proper validation"
+        - "Update service layer to use new types"
+      
+      phase_3:
+        - "Consolidate duplicate types across files"
+        - "Remove deprecated type definitions"
+        - "Update all imports to use new type paths"
+    
+    validation:
+      typescript:
+        - "Run type checking with strict mode"
+        - "Verify no any types in core logic"
+        - "Ensure proper nullability handling"
+      
+      runtime:
+        - "Add runtime type validation for API responses"
+        - "Implement schema validation using OpenAPI spec"
+        - "Add error boundaries for type mismatches"
+    
+    documentation:
+      - "Generate TypeDoc documentation"
+      - "Update API documentation to reflect type changes"
+      - "Add examples for common type usage"
+
+  affected_files:
+    services:
+      - "server/services/src20/queryService.ts"
+      changes:
+        - "Add fetchAndFormatSrc20DataV2"
+        - "Add enrichData helper"
+        - "Add performance monitoring"
+        - "Add type definitions"
+      
+      - "server/services/src20/marketService.ts"
+      changes:
+        - "Add batch market data fetching"
+        - "Add caching layer"
+        - "Add performance metrics"
+    
+    controller:
+      - "server/controller/src20Controller.ts"
+      changes:
+        - "Add V2 versions of handlers"
+        - "Implement gradual migration"
+        - "Add monitoring"
+    
+    routes:
+      internal:
+        - "routes/src20/index.tsx"
+        - "routes/api/internal/src20/trending.ts"
+        changes:
+          - "Migrate to V2 functions"
+          - "Add enhanced error handling"
+          - "Add performance monitoring"
+      
+      api_v2:
+        - "routes/api/v2/src20/*"
+        notes: "Maintain existing behavior"
+        changes:
+          - "Add performance monitoring only"
+          - "No functional changes in Phase 1"
+
+  backward_compatibility:
+    guarantees:
+      - "All existing API response formats maintained"
+      - "No breaking changes to public endpoints"
+      - "Fallback to original behavior on error"
+      - "Performance regression protection"
+    
+    monitoring:
+      - "Response time tracking"
+      - "Error rate comparison"
+      - "Memory usage patterns"
+      - "Cache effectiveness"
+
+  rollback_plan:
+    triggers:
+      - "Error rate increase > 0.1%"
+      - "Response time increase > 100ms"
+      - "Memory usage spike > 20%"
+    
+    steps:
+      - "Disable V2 functions"
+      - "Revert to original implementations"
+      - "Clear caches"
+      - "Notify monitoring"
+
+  data_fetching_strategy:
+    overview:
+      description: "Strategy for optimizing data fetching between backend routes and frontend client-side"
+      goals:
+        - "Optimize above-the-fold content loading"
+        - "Balance server vs client-side data fetching"
+        - "Maintain responsive UI during data loading"
+        - "Support efficient pagination for large datasets"
+    
+    current_state:
+      client_side:
+        - component: "SRC20Section.tsx"
+          benefits:
+            - "Real-time updates without full page reload"
+            - "Smooth UI transitions"
+            - "Reduced server load for small datasets"
+          considerations:
+            - "Initial page load performance"
+            - "Memory usage for large datasets"
+            - "SEO implications"
+      
+      server_side:
+        - routes: "api/v2/src20/*"
+          benefits:
+            - "Efficient pagination"
+            - "Better handling of large datasets"
+            - "Improved SEO"
+            - "Reduced client-side processing"
+          considerations:
+            - "Additional server load"
+            - "Page reload on data updates"
+    
+    optimization_plan:
+      phase_1_analysis:
+        tasks:
+          - "Identify critical above-the-fold content"
+          - "Measure current performance metrics"
+          - "Map data dependencies between components"
+          - "Analyze dataset sizes and update frequencies"
+        metrics:
+          - "Time to First Contentful Paint (FCP)"
+          - "Time to Interactive (TTI)"
+          - "First Input Delay (FID)"
+          - "Memory usage patterns"
+      
+      phase_2_hybrid_approach:
+        server_side:
+          components:
+            - name: "Initial token list"
+              strategy: "Pre-render first page of results"
+              benefits:
+                - "Faster initial page load"
+                - "Better SEO"
+                - "Reduced client-side processing"
+            
+            - name: "Market data summaries"
+              strategy: "Server-side aggregation"
+              benefits:
+                - "Reduced API calls"
+                - "Consistent data presentation"
+        
+        client_side:
+          components:
+            - name: "Trending tokens"
+              strategy: "Real-time updates via client"
+              benefits:
+                - "Immediate user feedback"
+                - "Reduced server load"
+            
+            - name: "Filter interactions"
+              strategy: "Client-side filtering with cached data"
+              benefits:
+                - "Instant UI response"
+                - "Reduced API calls"
+      
+      phase_3_implementation:
+        steps:
+          - "Implement server-side rendering for initial data"
+          - "Add client-side hydration for interactivity"
+          - "Optimize data caching strategy"
+          - "Implement progressive loading"
+        
+        optimizations:
+          above_fold:
+            - "Pre-render critical content"
+            - "Defer non-essential data loading"
+            - "Implement placeholder loading states"
+          
+          pagination:
+            - "Virtual scrolling for large lists"
+            - "Prefetch next page data"
+            - "Cache previous pages"
+          
+          caching:
+            - "Implement service worker caching"
+            - "Use memory cache for frequent lookups"
+            - "Add cache invalidation strategy"
+    
+    component_specific_plans:
+      SRC20Section:
+        current: "Client-side fetching"
+        proposed:
+          initial_load:
+            - "Server-side render first page"
+            - "Include critical market data"
+            - "Pre-calculate trending tokens"
+          
+          subsequent_updates:
+            - "Client-side fetch for filters"
+            - "Real-time updates for trending"
+            - "Progressive load for additional pages"
+        
+        optimization_targets:
+          - "Reduce Time to First Meaningful Paint"
+          - "Minimize Content Layout Shift"
+          - "Optimize memory usage"
+      
+      TokenDetails:
+        current: "Server-side rendering"
+        maintain: true
+        reasons:
+          - "Complex data aggregation"
+          - "SEO requirements"
+          - "Infrequent updates"
+    
+    monitoring_and_metrics:
+      performance:
+        - "Page load times by component"
+        - "Server response times"
+        - "Client-side rendering times"
+        - "Memory usage patterns"
+      
+      user_experience:
+        - "Time to interactivity"
+        - "Input responsiveness"
+        - "Layout stability"
+      
+      resource_usage:
+        - "API call frequency"
+        - "Cache hit rates"
+        - "Browser memory usage"
+    
+    validation_criteria:
+      - "Improved or maintained Lighthouse scores"
+      - "Reduced Time to Interactive"
+      - "Stable memory usage"
+      - "Maintained server response times"

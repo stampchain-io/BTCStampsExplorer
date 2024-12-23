@@ -1,4 +1,4 @@
-import { convertToEmoji } from "$lib/utils/emojiUtils.ts";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { Src101Detail, TXError } from "$globals";
 import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";

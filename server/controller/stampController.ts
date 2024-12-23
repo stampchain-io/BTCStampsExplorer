@@ -301,6 +301,7 @@ export class StampController {
     address: string,
     limit: number,
     page: number,
+    sortBy: "ASC" | "DESC" = "DESC"
   ): Promise<PaginatedStampBalanceResponseBody> {
     try {
       const { balances: xcpBalances, total: xcpTotal } = await XcpManager.getAllXcpBalancesByAddress(
@@ -310,25 +311,27 @@ export class StampController {
       
       console.log(`[StampController] Got ${xcpBalances.length} XCP balances out of ${xcpTotal} total`);
 
-      // Get all stamps first
-      const [{ stamps }, lastBlock] = await Promise.all([
-        StampService.getStampBalancesByAddress(address, xcpTotal, 1, xcpBalances),
+      // Get paginated stamps and total count
+      const [{ stamps, total }, lastBlock] = await Promise.all([
+        StampService.getStampBalancesByAddress(
+          address, 
+          limit, 
+          page, 
+          xcpBalances,
+          sortBy
+        ),
         BlockService.getLastBlock(),
       ]);
 
-      // Apply standard pagination
-      const startIndex = (page - 1) * limit;
-      const endIndex = Math.min(startIndex + limit, stamps.length);
-      const paginatedStamps = stamps.slice(startIndex, endIndex);
-
-      console.log(`[StampController] Got ${stamps.length} total stamps, showing ${paginatedStamps.length} for page ${page}`);
-
-      const pagination = paginate(stamps.length, page, limit);
+      console.log(`[StampController] Got ${stamps.length} stamps for page ${page}, total stamps: ${total}`);
 
       return {
-        ...pagination,
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
         last_block: lastBlock,
-        data: paginatedStamps,
+        data: stamps,
       };
     } catch (error) {
       console.error("Error in getStampBalancesByAddress:", error);
@@ -623,12 +626,30 @@ export class StampController {
     options = {}
   ) {
     try {
-      // First get dispensers with pagination
+      // Add logging
+      console.log("[StampController] Getting dispensers with params:", {
+        address,
+        page,
+        limit,
+        options
+      });
+
       const dispensersData = await XcpManager.getDispensersByAddress(address, {
         verbose: true,
         page,
         limit,
         ...options
+      });
+
+      // Add detailed logging for dispenser data
+      console.log("[StampController] Dispenser data details:", {
+        total: dispensersData.total,
+        dispensersCount: dispensersData.dispensers.length,
+        page,
+        limit,
+        hasDispensers: dispensersData.dispensers.length > 0,
+        firstDispenser: dispensersData.dispensers[0]?.cpid,
+        lastDispenser: dispensersData.dispensers[dispensersData.dispensers.length - 1]?.cpid
       });
 
       if (!dispensersData.dispensers.length) {
@@ -819,6 +840,95 @@ export class StampController {
         address
       });
       return 0;
+    }
+  }
+
+  /**
+   * Calculate total value of stamps in a wallet
+   * This is a specialized method for the wallet page that won't affect API endpoints
+   */
+  static async calculateWalletStampValues(stamps: StampBalance[]): Promise<{
+    stampValues: { [cpid: string]: string | number };
+    totalValue: number;
+  }> {
+    try {
+      const stampValues: { [cpid: string]: string | number } = {};
+      let totalValue = 0;
+
+      // Process stamps in batches to avoid too many concurrent requests
+      const BATCH_SIZE = 10;
+      for (let i = 0; i < stamps.length; i += BATCH_SIZE) {
+        const batch = stamps.slice(i, i + BATCH_SIZE);
+        
+        // Process each stamp in the batch concurrently
+        const batchResults = await Promise.all(
+          batch.map(async (stamp) => {
+            try {
+              // Get all dispensers for the stamp
+              const allDispensersResponse = await DispenserManager.getDispensersByCpid(
+                stamp.cpid,
+                undefined,
+                undefined,
+                undefined,
+                "all"
+              );
+              
+              // Filter open and closed dispensers
+              const openDispensers = allDispensersResponse.dispensers.filter(d => d.give_remaining > 0);
+              const closedDispensers = allDispensersResponse.dispensers.filter(d => d.give_remaining === 0);
+              
+              let unitPrice = 0;
+              if (openDispensers.length > 0) {
+                // Use floor price if there are open dispensers
+                const floorPrice = this.calculateFloorPrice(openDispensers);
+                unitPrice = typeof floorPrice === 'number' ? floorPrice : 0;
+              } else if (closedDispensers.length > 0) {
+                // Use most recent closed dispenser price if no open dispensers
+                // Sort by block_index in descending order to get most recent first
+                const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
+                unitPrice = sortedClosedDispensers[0].btcrate || 0;
+              }
+
+              // Calculate total value for this stamp based on quantity owned
+              const totalStampValue = unitPrice * stamp.balance;
+              
+              return {
+                cpid: stamp.cpid,
+                value: totalStampValue
+              };
+            } catch (error) {
+              logger.error("calculateWalletStampValues", {
+                message: "Error processing individual stamp",
+                error: error instanceof Error ? error.message : String(error),
+                cpid: stamp.cpid,
+                quantity: stamp.balance
+              });
+              return { cpid: stamp.cpid, value: 0 };
+            }
+          })
+        );
+
+        // Add batch results to totals
+        batchResults.forEach(({ cpid, value }) => {
+          stampValues[cpid] = value;
+          if (typeof value === 'number') {
+            totalValue += value;
+          }
+        });
+
+        // Optional: Add a small delay between batches to prevent rate limiting
+        if (i + BATCH_SIZE < stamps.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+
+      return { stampValues, totalValue };
+    } catch (error) {
+      logger.error("calculateWalletStampValues", {
+        message: "Error calculating wallet stamp values",
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return { stampValues: {}, totalValue: 0 };
     }
   }
 }

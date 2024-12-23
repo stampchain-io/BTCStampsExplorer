@@ -1686,7 +1686,25 @@ export class XcpManager {
     const skipCount = (page - 1) * limit;
 
     try {
-      const response = await this.fetchXcpV2WithCache<any>(endpoint, queryParams);
+      // First, get total count by fetching with a large limit
+      // FIXME: This is a hack to get the total count of dispensers for pagination
+      const countParams = new URLSearchParams(queryParams);
+      countParams.set('limit', '1000'); // Use a larger limit for counting
+      const countResponse = await this.fetchXcpV2WithCache<any>(endpoint, countParams);
+      const totalCount = countResponse?.result?.length || 0;
+
+      console.log("[XcpManager] Total dispenser count:", {
+        address,
+        totalCount,
+        page,
+        limit
+      });
+
+      // Then fetch the actual page
+      const pageParams = new URLSearchParams(queryParams);
+      pageParams.set('limit', limit.toString());
+      pageParams.set('offset', skipCount.toString());
+      const response = await this.fetchXcpV2WithCache<any>(endpoint, pageParams);
       
       if (!response || !Array.isArray(response.result)) {
         return {
@@ -1713,12 +1731,17 @@ export class XcpManager {
         dispenser_info: dispenser.dispenser_info
       }));
 
-      // Apply pagination
-      const paginatedDispensers = dispensers.slice(skipCount, skipCount + limit);
+      console.log("[XcpManager] Returning dispensers:", {
+        address,
+        dispensersCount: dispensers.length,
+        totalCount,
+        page,
+        limit
+      });
 
       return {
-        dispensers: paginatedDispensers,
-        total: dispensers.length
+        dispensers,
+        total: totalCount
       };
     } catch (error) {
       console.error(`Error fetching dispensers for address ${address}:`, error);

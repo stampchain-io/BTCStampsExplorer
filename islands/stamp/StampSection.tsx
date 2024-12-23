@@ -1,19 +1,18 @@
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
+import { StampCard } from "$islands/stamp/StampCard.tsx";
+import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { useEffect, useState } from "preact/hooks";
 import { StampRow, StampSectionProps } from "$globals";
-import { StampCard } from "$islands/stamp/StampCard.tsx";
-import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
-import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import { BREAKPOINTS } from "$client/utils/constants.ts";
-import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { BREAKPOINTS } from "$lib/utils/constants.ts";
 
 export default function StampSection({
   title,
   subTitle,
   type,
   stamps,
-  _layout,
-  isRecentSales,
+  layout = "grid",
+  isRecentSales = false,
   filterBy,
   showDetails = false,
   gridClass,
@@ -24,57 +23,73 @@ export default function StampSection({
   viewAllLink,
   alignRight = false,
 }: StampSectionProps) {
-  const stampArray = Array.isArray(stamps) ? stamps : [];
-  const [displayCount, setDisplayCount] = useState(stampArray.length);
   const [isLoading, setIsLoading] = useState(false);
-  const { width } = useWindowSize();
+  const [displayCount, setDisplayCount] = useState(
+    displayCounts?.mobileSm || 16,
+  );
 
-  // Build the "See All"  link parameters
-  const params = new URLSearchParams();
-  if (isRecentSales) {
-    params.append("recentSales", "true");
-  } else if (type) {
-    params.append("type", type);
-  }
-  if (filterBy) {
-    const filterArray = Array.isArray(filterBy) ? filterBy : [filterBy];
-    if (filterArray.length > 0) {
-      params.append("filterBy", filterArray.join(","));
-    }
-  }
-  const seeAllLink = viewAllLink ? viewAllLink : `/stamp?${params.toString()}`;
+  // Filter stamps based on filterBy prop if provided
+  const filteredStamps = filterBy
+    ? (stamps || []).filter((stamp) => {
+      if (Array.isArray(filterBy)) {
+        // Handle array of filters
+        return filterBy.some((filter) => {
+          switch (filter) {
+            case "pixel":
+              return stamp.stamp_mimetype.includes("image");
+            case "vector":
+              return stamp.stamp_mimetype === "image/svg+xml";
+            case "for sale":
+              return stamp.unbound_quantity > 0;
+            case "trending sales":
+              return stamp.recentSalePrice !== undefined;
+            case "sold":
+              return stamp.sale_data !== undefined;
+            case "recursive":
+              return stamp.stamp_mimetype === "text/html";
+            default:
+              return true;
+          }
+        });
+      }
+      return true;
+    })
+    : stamps || [];
 
-  // Handle display count updates
+  // Apply layout-specific styling
+  const containerClass = layout === "grid" ? gridClass : "flex flex-col gap-4"; // Row layout default styling
+
+  // Update display count based on window width
   useEffect(() => {
-    const updateDisplayCount = () => {
+    const handleResize = () => {
+      const width = globalThis.innerWidth;
       if (displayCounts) {
         if (width >= BREAKPOINTS.desktop) {
-          setDisplayCount(displayCounts.desktop || stampArray.length);
+          setDisplayCount(
+            displayCounts.desktop || displayCounts.tablet ||
+              displayCounts.mobileLg || displayCounts.mobileSm || stamps.length,
+          );
         } else if (width >= BREAKPOINTS.tablet) {
           setDisplayCount(
-            displayCounts.tablet || displayCounts.desktop || stampArray.length,
+            displayCounts.tablet || displayCounts.mobileLg ||
+              displayCounts.mobileSm || stamps.length,
           );
         } else if (width >= BREAKPOINTS.mobileLg) {
           setDisplayCount(
-            displayCounts.mobileLg || displayCounts.tablet ||
-              displayCounts.desktop || stampArray.length,
+            displayCounts.mobileLg || displayCounts.mobileSm || stamps.length,
           );
         } else {
-          setDisplayCount(
-            displayCounts.mobileSm ||
-              displayCounts.mobileMd ||
-              displayCounts.mobileLg ||
-              displayCounts.tablet ||
-              displayCounts.desktop ||
-              stampArray.length,
-          );
+          setDisplayCount(displayCounts.mobileSm || stamps.length);
         }
       } else {
-        setDisplayCount(stampArray.length);
+        setDisplayCount(stamps.length);
       }
     };
-    updateDisplayCount();
-  }, [width, displayCounts, stampArray.length]);
+
+    handleResize();
+    globalThis.addEventListener("resize", handleResize);
+    return () => globalThis.removeEventListener("resize", handleResize);
+  }, [displayCounts, stamps.length]);
 
   // Handle pagination loading state
   useEffect(() => {
@@ -83,6 +98,13 @@ export default function StampSection({
       setTimeout(() => setIsLoading(false), 300);
     }
   }, [pagination?.page]);
+
+  const seeAllLink = viewAllLink ||
+    (type === "all" ? "/stamp" : `/stamp?type=${type}`);
+
+  const handlePageChange = (page: number) => {
+    pagination?.onPageChange?.(page);
+  };
 
   return (
     <div class="w-full">
@@ -124,9 +146,9 @@ export default function StampSection({
         </div>
       )}
 
-      <div class={gridClass}>
+      <div class={containerClass}>
         {isLoading ? <div>Loading...</div> : (
-          stampArray.slice(0, displayCount).map((stamp: StampRow) => (
+          filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
             <div
               key={isRecentSales && stamp.sale_data
                 ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
@@ -144,20 +166,22 @@ export default function StampSection({
         )}
       </div>
 
-      {pagination
-        ? (
-          <div class="mt-9 mobileLg:mt-[72px]">
-            <Pagination
-              page={pagination.page}
-              page_size={pagination.pageSize}
-              type="stamp_card_id"
-              data_length={pagination.total}
-              pages={Math.ceil(pagination.total / pagination.pageSize)}
-              prefix={pagination.prefix}
-            />
-          </div>
-        )
-        : <ViewAllButton href={seeAllLink} />}
+      {viewAllLink && (
+        <div class="flex justify-end -mt-3 mobileMd:-mt-6">
+          <ViewAllButton href={seeAllLink} />
+        </div>
+      )}
+
+      {pagination && pagination.totalPages > 1 && (
+        <div class="mt-9 mobileLg:mt-[72px]">
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            prefix={pagination.prefix || ""}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

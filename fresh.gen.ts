@@ -15,7 +15,6 @@ import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
 import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
 import * as $api_internal_fees from "./routes/api/internal/fees.ts";
-import * as $api_internal_src20_details from "./routes/api/internal/src20/details.ts";
 import * as $api_internal_src20_recentTransactions from "./routes/api/internal/src20/recentTransactions.ts";
 import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
@@ -235,7 +234,6 @@ const manifest = {
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
     "./routes/api/internal/fees.ts": $api_internal_fees,
-    "./routes/api/internal/src20/details.ts": $api_internal_src20_details,
     "./routes/api/internal/src20/recentTransactions.ts":
       $api_internal_src20_recentTransactions,
     "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,

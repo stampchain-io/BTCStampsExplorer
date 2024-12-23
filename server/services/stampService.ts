@@ -196,12 +196,13 @@ export class StampService {
     address: string,
     limit: number,
     page: number,
-    xcpBalances: XcpBalance[]
+    xcpBalances: XcpBalance[],
+    sortBy: "ASC" | "DESC" = "DESC"
   ) {
     try {
       // Get stamps and total count in parallel using the passed XCP balances
       const [stamps, totalResult] = await Promise.all([
-        StampRepository.getStampBalancesByAddress(address, limit, page, xcpBalances),
+        StampRepository.getStampBalancesByAddress(address, limit, page, xcpBalances, sortBy),
         StampRepository.getCountStampBalancesByAddressFromDb(address, xcpBalances)
       ]);
 

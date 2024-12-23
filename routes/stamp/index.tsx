@@ -1,5 +1,4 @@
 import { StampPageProps } from "$globals";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Handlers } from "$fresh/server.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { StampContent } from "$islands/stamp/StampContent.tsx";
@@ -94,7 +93,6 @@ export function StampPage(props: StampPageProps) {
     stamps,
     page,
     totalPages,
-    limit,
     filterBy,
     sortBy,
     selectedTab,
@@ -112,13 +110,16 @@ export function StampPage(props: StampPageProps) {
       <StampContent
         stamps={stampsArray}
         isRecentSales={isRecentSales}
-      />
-      <Pagination
-        page={page}
-        pages={totalPages}
-        page_size={limit}
-        type={selectedTab}
-        data_length={stampsArray.length}
+        pagination={{
+          page,
+          totalPages,
+          prefix: "stamps",
+          onPageChange: (newPage: number) => {
+            const url = new URL(globalThis.location.href);
+            url.searchParams.set("page", newPage.toString());
+            globalThis.location.href = url.toString();
+          },
+        }}
       />
     </div>
   );

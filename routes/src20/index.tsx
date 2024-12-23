@@ -2,7 +2,6 @@ import { Handlers } from "$fresh/server.ts";
 import { SRC20TrxRequestParams } from "$globals";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
-import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
@@ -19,13 +18,13 @@ export const handler: Handlers = {
 
       if (selectedTab === "trending") {
         const transactionCount =
-          Number(url.searchParams.get("transactionCount")) || 1000; // Allow dynamic adjustment if needed
-        const trendingData = await Src20Controller.fetchTrendingTokens(
-          req,
-          limit,
-          page,
-          transactionCount,
-        );
+          Number(url.searchParams.get("transactionCount")) || 1000;
+        const trendingData = await Src20Controller
+          .fetchTrendingActiveMintingTokens(
+            limit,
+            page,
+            transactionCount,
+          );
 
         data = {
           src20s: trendingData.data || [],
@@ -38,20 +37,20 @@ export const handler: Handlers = {
           selectedTab,
         };
       } else {
-        // Existing code for 'all' and 'minting' tabs
         const params: SRC20TrxRequestParams = {
           op: "DEPLOY",
           page,
           limit,
-          sortBy, // Changed from 'sort: sortBy' to 'sortBy'
+          sortBy,
         };
 
         const excludeFullyMinted = selectedTab === "minting";
+        const onlyFullyMinted = !excludeFullyMinted;
 
         const resultData = await Src20Controller.fetchSrc20DetailsWithHolders(
-          req,
           params,
           excludeFullyMinted,
+          onlyFullyMinted,
         );
 
         data = {
@@ -82,10 +81,8 @@ export default function SRC20Page(props: any) {
   const { data } = props.data;
   const {
     src20s = [],
-    _total = 0,
-    _page = 1,
+    page = 1,
     totalPages = 1,
-    _limit = 11,
     filterBy = [],
     sortBy = "ASC",
     selectedTab,
@@ -103,23 +100,39 @@ export default function SRC20Page(props: any) {
         selectedTab={selectedTab}
       />
       {selectedTab === "all" && (
-        <SRC20Section type="all" fromPage="src20" page={page} sortBy={sortBy} />
+        <SRC20Section
+          type="all"
+          fromPage="src20"
+          sortBy={sortBy}
+          initialData={src20s}
+          pagination={{
+            page,
+            totalPages,
+            onPageChange: (newPage: number) => {
+              const url = new URL(globalThis.location.href);
+              url.searchParams.set("page", newPage.toString());
+              globalThis.location.href = url.toString();
+            },
+          }}
+        />
       )}
       {selectedTab === "trending" && (
         <SRC20Section
           type="trending"
           fromPage="src20"
-          page={page}
           sortBy={sortBy}
+          initialData={src20s}
+          pagination={{
+            page,
+            totalPages,
+            onPageChange: (newPage: number) => {
+              const url = new URL(globalThis.location.href);
+              url.searchParams.set("page", newPage.toString());
+              globalThis.location.href = url.toString();
+            },
+          }}
         />
       )}
-      <Pagination
-        page={page}
-        pages={totalPages}
-        page_size={limit}
-        type={"src20"}
-        data_length={src20s.length}
-      />
     </div>
   );
 }

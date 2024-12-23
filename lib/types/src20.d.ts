@@ -1,4 +1,5 @@
-import type { BufferLike } from "./utils.d.ts";
+import type { BufferLike } from "$types/utils.d.ts";
+import type { MarketListingSummary } from "$types/marketData.d.ts";
 
 type INETWORK = "mainnet" | "testnet";
 
@@ -72,11 +73,47 @@ export interface Deployment {
   top_mints_percentage?: number;
 }
 
-export interface MintStatus {
-  decimals: number;
-  limit: number;
-  max_supply: number;
-  progress: number;
-  total_minted: number;
+export interface SRC20MintStatus {
+  max_supply: string;
+  total_minted: string;
+  limit: string;
   total_mints: number;
+  progress: string;
+  decimals: number;
+  tx_hash: string;
+}
+
+export interface SRC20MintDataResponse {
+  mintStatus: SRC20MintStatus | null;
+  holders: number;
+}
+
+export interface SRC20HolderData {
+  amt: string;
+  percentage: string;
+  address?: string;
+}
+
+export interface SRC20TickPageData {
+  last_block: number;
+  deployment: Deployment;
+  total_transfers: number;
+  total_mints: number;
+  total_holders: number;
+  holders: SRC20HolderData[];
+  mint_status: SRC20MintStatus;
+  total_transactions: number;
+  marketInfo?: MarketListingSummary;
+}
+
+export interface SRC20BalanceRequestParams {
+  address?: string;
+  tick?: string;
+  amt?: number;
+  limit?: number;
+  page?: number;
+  sortBy?: string;
+  sortField?: string;
+  includePagination?: boolean;
+  includeMintData?: boolean;
 }

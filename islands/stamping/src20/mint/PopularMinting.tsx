@@ -9,10 +9,11 @@ export default function PopularMinting() {
   const [transactions, setTransactions] = useState<SRC20Row[]>([]);
 
   useEffect(() => {
-    const fetchTrendingTokens = async () => {
+    const fetchTrendingActiveMintingTokens = async () => {
       try {
         const response = await fetch(
-          "/api/internal/src20/trending?limit=5&page=1&transactionCount=1000",
+          // Use the consolidated trending endpoint with type=minting
+          "/api/internal/src20/trending?type=minting&limit=5&page=1&transactionCount=1000",
         );
         if (!response.ok) throw new Error("Failed to fetch trending tokens");
         const data = await response.json();
@@ -24,7 +25,7 @@ export default function PopularMinting() {
       }
     };
 
-    fetchTrendingTokens();
+    fetchTrendingActiveMintingTokens();
   }, []);
 
   if (isLoading) {
