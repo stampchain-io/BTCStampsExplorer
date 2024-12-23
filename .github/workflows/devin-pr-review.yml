@@ -86,7 +86,7 @@ jobs:
         with:
           script: |
             const prBody = context.payload.pull_request.body || '';
-            const summary = process.env.SUMMARY;
+            const summary = `${{ steps.summary.outputs.summary }}`;
             
             // Get existing comments to prevent duplicates
             const comments = await github.rest.issues.listComments({
@@ -119,8 +119,6 @@ jobs:
                 body: `### 💡 Additional Context\n\n${impactSection || 'No additional impact analysis available.'}`
               });
             }
-        env:
-          SUMMARY: ${{ steps.summary.outputs.summary }}
 
   devin-pr-comment-response:
     if: github.event_name == 'issue_comment' && github.event.issue.pull_request
