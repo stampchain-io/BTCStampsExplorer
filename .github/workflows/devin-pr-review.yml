@@ -1,0 +1,91 @@
+name: Devin.ai PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronized]
+
+jobs:
+  trigger-devin-ai:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Check if PR author is Devin
+        id: check_author
+        run: |
+          if [[ "${{ github.event.pull_request.user.login }}" == "devin-ai-integration" ]]; then
+            echo "is_devin=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_devin=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Call Devin.ai API
+        if: steps.check_author.outputs.is_devin == 'false'
+        run: |
+          # Get PR description status
+          PR_DESC="${{ github.event.pull_request.body }}"
+          DESC_STATUS=""
+          if [[ -z "$PR_DESC" ]]; then
+            DESC_STATUS="blank"
+          else
+            DESC_STATUS="has_description"
+          fi
+
+          # Call Devin.ai API with appropriate context
+          curl -X POST \
+            https://api.devin.ai/v1/trigger-action \
+            -H 'Authorization: Bearer ${{ secrets.DEVIN_AI_API_KEY }}' \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "event_type": "pull_request",
+              "pull_request_id": "${{ github.event.pull_request.id }}",
+              "repository": "${{ github.repository }}",
+              "description_status": "'"$DESC_STATUS"'",
+              "pull_request_number": "${{ github.event.pull_request.number }}",
+              "pull_request_title": "${{ github.event.pull_request.title }}",
+              "pull_request_body": "'"${PR_DESC}"'",
+              "pull_request_url": "${{ github.event.pull_request.html_url }}",
+              "base_branch": "${{ github.event.pull_request.base.ref }}",
+              "head_branch": "${{ github.event.pull_request.head.ref }}",
+              "commits_url": "${{ github.event.pull_request.commits_url }}",
+              "diff_url": "${{ github.event.pull_request.diff_url }}"
+            }'
+
+      - name: Process API Response
+        if: steps.check_author.outputs.is_devin == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+            
+            // Get existing comments to prevent duplicates
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            // Check if we've already commented
+            const existingComment = comments.data.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              comment.body.includes('Devin.ai Review')
+            );
+            
+            // If PR description is blank, update it with Devin's review
+            if (!prBody.trim()) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                body: `### 📝 Devin.ai Review\n\nAnalyzing changes and generating detailed review...\n\n### Purpose\nThis PR...\n\n### Changes Overview\n- ...\n\n### Impact Analysis\n- ...\n\n### Testing Notes\n- ...`
+              });
+            } else if (!existingComment) {
+              // If there's a description but no existing review comment, add one
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `### 🔍 Devin.ai Review\n\nAnalyzing changes and providing additional context...\n\n### Changes Analysis\n- ...\n\n### Impact Assessment\n- ...\n\n### Review Notes\n- ...`
+              });
+            }
