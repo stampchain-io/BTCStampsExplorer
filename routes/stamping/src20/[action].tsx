@@ -12,13 +12,16 @@ import { HowToMintModule } from "$islands/modules/HowToMint.tsx";
 import { HowToTransferModule } from "$islands/modules/HowToTransfer.tsx";
 
 import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
+import type { SRC20MintStatus } from "$lib/types/src20.d.ts";
 
 interface StampingSrc20PageProps {
   selectedTab: string;
   trxType: "multisig" | "olga";
   tick?: string | null;
-  mintStatus?: any;
+  mintStatus?: SRC20MintStatus | null;
   holders?: number;
+  error?: string;
 }
 
 export const handler: Handlers<StampingSrc20PageProps> = {
@@ -43,9 +46,8 @@ export const handler: Handlers<StampingSrc20PageProps> = {
       if (tick) {
         try {
           // Fetch mint status and holders on the server
-          mintStatus = await Src20Controller.handleSrc20MintProgressRequest(
-            tick,
-          );
+          mintStatus = await SRC20Service.QueryService
+            .fetchSrc20MintProgress(tick);
 
           // Fetch holders count
           const balanceData = await Src20Controller.handleSrc20BalanceRequest({
@@ -55,9 +57,9 @@ export const handler: Handlers<StampingSrc20PageProps> = {
             page: 1,
           });
           holders = balanceData.total || 0;
-        } catch (error) {
+        } catch (error: unknown) {
           console.error("Error fetching SRC20 data:", error);
-          if (error.message?.includes("not found")) {
+          if (error instanceof Error && error.message?.includes("not found")) {
             return ctx.renderNotFound();
           }
           throw error;
@@ -71,14 +73,14 @@ export const handler: Handlers<StampingSrc20PageProps> = {
         mintStatus,
         holders,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error in stamping SRC20:", error);
-      if ((error as Error).message?.includes("not found")) {
+      if (error instanceof Error && error.message?.includes("not found")) {
         return ctx.renderNotFound();
       }
       return ctx.render({
         error: error instanceof Error ? error.message : "Internal server error",
-      });
+      } as StampingSrc20PageProps);
     }
   },
 };

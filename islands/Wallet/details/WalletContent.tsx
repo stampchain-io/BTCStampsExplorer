@@ -8,34 +8,11 @@ import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import WalletSendStampModal from "$islands/Wallet/details/WalletSendStampModal.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
-import { StampRow } from "$globals";
+import { WalletContentProps } from "$types/wallet.d.ts";
 import { Dispenser } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-interface WalletContentProps {
-  stamps: {
-    data: StampRow[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  };
-  src20: {
-    data: any[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  };
-  dispensers?: Dispenser[];
-  address: string;
-  anchor: string;
-}
 
 const ItemHeader = ({
   title = "STAMP",
@@ -51,6 +28,7 @@ const ItemHeader = ({
   filter = true,
   setting = false,
   setOpenSettingModal = () => {},
+  onChangeSort = () => {},
 }: {
   title: string;
   sortBy: "ASC" | "DESC";
@@ -65,6 +43,8 @@ const ItemHeader = ({
   handleOpenFilter: (open: boolean) => void;
   handleOpen: (type: string) => void;
   setOpenSettingModal?: (open: boolean) => void;
+  // We add onChangeSort to get a new sort direction ("ASC"/"DESC").
+  onChangeSort?: (newSortBy: "ASC" | "DESC") => void;
 }) => {
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full relative">
@@ -96,7 +76,17 @@ const ItemHeader = ({
             dropdownPosition="bottom"
           />
         )}
-        {sort && <Sort initSort={sortBy} />}
+        {sort && (
+          <Sort
+            initSort={sortBy}
+            onChangeSort={onChangeSort}
+            sortParam={title === "STAMPS"
+              ? "stampsSortBy"
+              : title === "TOKENS"
+              ? "src20SortBy"
+              : "dispensersSortBy"}
+          />
+        )}
         {search && (
           <Search
             open={isOpen}
@@ -117,21 +107,14 @@ const ItemHeader = ({
 
 function DispenserItem({
   dispensers = [],
-  openPagination,
-  closedPagination,
+  pagination,
 }: {
   dispensers?: Dispenser[];
-  openPagination?: {
+  pagination?: {
     page: number;
-    limit: number;
-    total: number;
     totalPages: number;
-  };
-  closedPagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
   };
 }) {
   // If no dispensers, show empty state
@@ -143,17 +126,16 @@ function DispenserItem({
     );
   }
 
-  // Filter dispensers to only include those with stamp data, then split into open/closed
+  // Filter dispensers by open/closed status
   const dispensersWithStamps = dispensers.filter((d) => d.stamp);
-  const openDispensers = dispensersWithStamps.filter(
-    (d) => d.give_remaining > 0,
+  const openDispensers = dispensersWithStamps.filter((d) =>
+    d.give_remaining > 0
   );
-  const closedDispensers = dispensersWithStamps.filter(
-    (d) => d.give_remaining === 0,
+  const closedDispensers = dispensersWithStamps.filter((d) =>
+    d.give_remaining === 0
   );
 
-  // If no dispensers with stamps, show empty state
-  if (!dispensersWithStamps.length) {
+  if (!openDispensers.length && !closedDispensers.length) {
     return (
       <div>
         <h3 class="inline-block text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-black bg-text-purple-3 gradient-text">
@@ -165,7 +147,6 @@ function DispenserItem({
 
   return (
     <div class="relative shadow-md">
-      {/* MobileMd/Tablet/Desktop View */}
       <div class="hidden mobileLg:flex flex-col gap-6 -mt-6">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
@@ -178,19 +159,6 @@ function DispenserItem({
                 <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
             </div>
-            {/* Open Listings Pagination */}
-            {openPagination && openPagination.totalPages > 1 && (
-              <div class="mt-6">
-                <Pagination
-                  page={openPagination.page}
-                  page_size={openPagination.limit}
-                  data_length={openPagination.total}
-                  pages={openPagination.totalPages}
-                  prefix="open_listings"
-                  type="stamp_id"
-                />
-              </div>
-            )}
           </div>
         )}
 
@@ -205,24 +173,11 @@ function DispenserItem({
                 <DispenserRow dispenser={dispenser} view="tablet" />
               ))}
             </div>
-            {/* Closed Listings Pagination */}
-            {closedPagination && closedPagination.totalPages > 1 && (
-              <div class="mt-6">
-                <Pagination
-                  page={closedPagination.page}
-                  page_size={closedPagination.limit}
-                  data_length={closedPagination.total}
-                  pages={closedPagination.totalPages}
-                  prefix="closed_listings"
-                  type="stamp_id"
-                />
-              </div>
-            )}
           </div>
         )}
       </div>
 
-      {/* MobileSm/MobileMd View */}
+      {/* For mobile */}
       <div class="flex mobileLg:hidden flex-col gap-3">
         {/* Open Dispensers Section */}
         {openDispensers.length > 0 && (
@@ -235,19 +190,6 @@ function DispenserItem({
                 <DispenserRow dispenser={dispenser} view="mobile" />
               ))}
             </div>
-            {/* Open Listings Pagination (Mobile) */}
-            {openPagination && openPagination.totalPages > 1 && (
-              <div class="mt-6">
-                <Pagination
-                  page={openPagination.page}
-                  page_size={openPagination.limit}
-                  data_length={openPagination.total}
-                  pages={openPagination.totalPages}
-                  prefix="open_listings"
-                  type="stamp_id"
-                />
-              </div>
-            )}
           </div>
         )}
 
@@ -262,28 +204,31 @@ function DispenserItem({
                 <DispenserRow dispenser={dispenser} view="mobile" />
               ))}
             </div>
-            {/* Closed Listings Pagination (Mobile) */}
-            {closedPagination && closedPagination.totalPages > 1 && (
-              <div class="mt-6">
-                <Pagination
-                  page={closedPagination.page}
-                  page_size={closedPagination.limit}
-                  data_length={closedPagination.total}
-                  pages={closedPagination.totalPages}
-                  prefix="closed_listings"
-                  type="stamp_id"
-                />
-              </div>
-            )}
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div class="mt-6">
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            prefix="dispensers"
+            onPageChange={(page: number) => {
+              const url = new URL(globalThis.location.href);
+              url.searchParams.set("dispensers_page", page.toString());
+              url.searchParams.set("anchor", "closed_listings");
+              globalThis.location.href = url.toString();
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 function DispenserRow(
-  /* mobile = mobileSm/Md // tablet = mobileLg/tablet/desktop */
   { dispenser, view }: { dispenser: Dispenser; view: "mobile" | "tablet" },
 ) {
   const imageSize = view === "mobile"
@@ -338,6 +283,7 @@ function DispenserRow(
               }`}
             >
               <span class="font-bold text-stamp-primary text-base mobileLg:text-xl normal-case">
+                {/* Abbreviate origin address differently depending on screen size */}
                 <span class="mobileMd:hidden">
                   {abbreviateAddress(dispenser.origin, 4)}
                 </span>
@@ -377,14 +323,8 @@ function DispenserRow(
               <span class="font-bold text-stamp-grey-light">
                 {dispenser.give_remaining === 0
                   ? Number(dispenser.escrow_quantity).toLocaleString()
-                  : `${
-                    Number(
-                      dispenser.give_remaining,
-                    ).toLocaleString()
-                  }/${
-                    Number(
-                      dispenser.escrow_quantity,
-                    ).toLocaleString()
+                  : `${Number(dispenser.give_remaining).toLocaleString()}/${
+                    Number(dispenser.escrow_quantity).toLocaleString()
                   }`}
               </span>
             </p>
@@ -429,15 +369,31 @@ export default function WalletContent({
   dispensers,
   address,
   anchor,
+  stampsSortBy = "DESC",
+  src20SortBy = "DESC",
+  dispensersSortBy = "DESC",
 }: WalletContentProps) {
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
-  const [sortBy] = useState<"ASC" | "DESC">("ASC");
+
+  // Track sorting state for all sections
+  const [sortStamps, setSortStamps] = useState<"ASC" | "DESC">(stampsSortBy);
+  const [sortTokens, setSortTokens] = useState<"ASC" | "DESC">(src20SortBy);
+  const [sortDispensers, setSortDispensers] = useState<"ASC" | "DESC">(
+    dispensersSortBy,
+  );
+
+  // Toggle states for search / filter / setting modals
   const [openS, setOpenS] = useState<boolean>(false);
   const [openT, setOpenT] = useState<boolean>(false);
   const [openD, setOpenD] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
+  // Calculate dispenser counts
+  const openDispensersCount =
+    dispensers.data.filter((d) => d.give_remaining > 0).length;
+
+  // Scroll into the correct section if anchor is set
   useEffect(() => {
     if (anchor) {
       const sectionMap = {
@@ -446,7 +402,6 @@ export default function WalletContent({
         open_listings: "open-listings-section",
         closed_listings: "closed-listings-section",
       };
-
       const sectionId = sectionMap[anchor as keyof typeof sectionMap];
       if (sectionId) {
         const element = document.getElementById(sectionId);
@@ -474,34 +429,59 @@ export default function WalletContent({
   };
 
   const handleOpen = (type: string) => {
-    if (type == "STAMPS") {
+    if (type === "STAMPS") {
       setOpenS(!openS);
-    } else if (type == "TOKENS") {
+    } else if (type === "TOKENS") {
       setOpenT(!openT);
     } else {
       setOpenD(!openD);
     }
   };
 
+  // Handle sort changes for each section
+  const handleChangeSort = (newSort: "ASC" | "DESC") => {
+    setSortStamps(newSort);
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set("stampsSortBy", newSort);
+    url.searchParams.delete("stamps_page");
+    url.searchParams.set("anchor", "stamps");
+    globalThis.location.href = url.toString();
+  };
+
+  const handleTokenSort = (newSort: "ASC" | "DESC") => {
+    setSortTokens(newSort);
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set("src20SortBy", newSort);
+    url.searchParams.delete("src20_page");
+    url.searchParams.set("anchor", "src20");
+    globalThis.location.href = url.toString();
+  };
+
+  const handleDispenserSort = (newSort: "ASC" | "DESC") => {
+    setSortDispensers(newSort);
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set("dispensersSortBy", newSort);
+    url.searchParams.delete("dispensers_page");
+    url.searchParams.set(
+      "anchor",
+      openDispensersCount > 0 ? "open_listings" : "closed_listings",
+    );
+    globalThis.location.href = url.toString();
+  };
+
+  // If pressing "transfer" in the Setting filter, open the stamp transfer modal
   useEffect(() => {
-    // Get the current URL
     const currentUrl = globalThis.location.href;
-
-    // Create a URL object
     const url = new URL(currentUrl);
-
-    // Use URLSearchParams to get the filterBy parameter
-    const params = new URLSearchParams(url.search);
-    const filterByValue = params.get("filterBy") || "";
-
-    // Set the filterBy state
-    if (filterByValue == "Transfer") {
+    const filterByValue = url.searchParams.get("filterBy") || "";
+    if (filterByValue === "Transfer") {
       setOpenSettingModal(true);
     }
   }, []);
 
+  // Build the stampSection config
   const stampSection = {
-    title: "", // Empty title means no header
+    title: "",
     type: "all",
     stamps: stamps.data,
     layout: "grid" as const,
@@ -524,23 +504,28 @@ export default function WalletContent({
     },
     pagination: {
       page: stamps.pagination.page,
-      pageSize: stamps.pagination.limit,
-      total: stamps.pagination.total,
       totalPages: Math.ceil(stamps.pagination.total / stamps.pagination.limit),
-      prefix: "stamps",
-      type: "stamp_id",
+      prefix: "stamps_page",
+      onPageChange: (page: number) => {
+        const url = new URL(globalThis.location.href);
+        url.searchParams.set("stamps_page", page.toString());
+        url.searchParams.set("anchor", "stamps");
+        globalThis.location.href = url.toString();
+      },
     },
   };
 
   return (
     <>
+      {/* Stamps Section */}
       <div class="mt-6 mobileLg:mt-12 desktop:mt-24" id="stamps-section">
         <ItemHeader
           title="STAMPS"
-          sortBy={sortBy}
+          sort={true}
+          sortBy={sortStamps}
+          onChangeSort={handleChangeSort}
           isOpen={openS}
           handleOpen={handleOpen}
-          sort={true}
           search={true}
           filter={false}
           setting={true}
@@ -555,18 +540,20 @@ export default function WalletContent({
         </div>
       </div>
 
+      {/* SRC20 (TOKENS) Section */}
       <div class="mt-12 mobileLg:mt-24 desktop:mt-36" id="src20-section">
         <ItemHeader
           title="TOKENS"
-          sortBy={sortBy}
-          isOpen={openT}
           sort={true}
+          sortBy={sortTokens}
+          onChangeSort={handleTokenSort}
+          isOpen={openT}
+          handleOpen={handleOpen}
           search={true}
           filter={false}
           setting={false}
           isOpenFilter={false}
           isOpenSetting={false}
-          handleOpen={handleOpen}
           handleOpenFilter={() => {}}
           handleOpenSetting={() => {}}
         />
@@ -574,41 +561,36 @@ export default function WalletContent({
           <SRC20Section
             type="all"
             fromPage="wallet"
-            initialData={[]}
+            initialData={src20.data}
             pagination={{
               page: src20.pagination.page,
-              limit: src20.pagination.limit,
-              total: src20.pagination.total,
               totalPages: src20.pagination.totalPages,
+              prefix: "src20",
+              onPageChange: (page: number) => {
+                const url = new URL(globalThis.location.href);
+                url.searchParams.set("src20_page", page.toString());
+                url.searchParams.set("anchor", "src20");
+                globalThis.location.href = url.toString();
+              },
             }}
             address={address}
+            sortBy={sortTokens}
           />
         </div>
       </div>
 
-      {src20.data.length > 0 && (
-        <div class="mt-9 mobileLg:mt-[72px]">
-          <Pagination
-            page={src20.pagination.page}
-            page_size={src20.pagination.limit}
-            data_length={src20.pagination.total}
-            pages={Math.ceil(src20.pagination.total / src20.pagination.limit)}
-            prefix="src20"
-            type="token_id"
-          />
-        </div>
-      )}
-
-      {dispensers && dispensers.length > 0 && (
+      {/* Dispensers Section */}
+      {dispensers.data.length > 0 && (
         <div class="mt-48">
           <ItemHeader
             title="LISTINGS"
-            sortBy={sortBy}
+            sort={true}
+            sortBy={sortDispensers}
+            onChangeSort={handleDispenserSort}
             isOpen={openD}
             handleOpen={handleOpen}
-            sort={true}
-            filter={false}
             search={false}
+            filter={false}
             setting={false}
             isOpenFilter={openFilter}
             isOpenSetting={false}
@@ -616,10 +598,25 @@ export default function WalletContent({
             handleOpenSetting={() => {}}
           />
           <div class="mt-3 mobileMd:mt-6">
-            <DispenserItem dispensers={dispensers} />
+            <DispenserItem
+              dispensers={dispensers.data}
+              pagination={{
+                page: dispensers.pagination.page,
+                totalPages: dispensers.pagination.totalPages,
+                prefix: "dispensers",
+                onPageChange: (page: number) => {
+                  const url = new URL(globalThis.location.href);
+                  url.searchParams.set("dispensers_page", page.toString());
+                  url.searchParams.set("anchor", "closed_listings");
+                  globalThis.location.href = url.toString();
+                },
+              }}
+            />
           </div>
         </div>
       )}
+
+      {/* Modal for sending stamps */}
       {openSettingModal && (
         <WalletSendStampModal
           stamps={stamps}

@@ -1,18 +1,18 @@
 import { SRC20Repository } from "$server/database/src20Repository.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { 
-  SRC20BalanceRequestParams, 
   SRC20TrxRequestParams,
   PaginatedSrc20ResponseBody,
   Src20ResponseBody,
   Src20SnapShotDetail,
   SRC20SnapshotRequestParams,
 } from "$globals";
+import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { SRC20UtilityService } from "./utilityService.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts"
 import { Big } from "big";
-import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
+import { SRC20MarketService } from "./marketService.ts";
 
 // Change class name from Src20Service to SRC20QueryService
 export class SRC20QueryService {
@@ -27,9 +27,22 @@ export class SRC20QueryService {
     return result.rows[0].total;
   }
 
+  /**
+   * Fetches raw SRC20 transaction data directly from the repository
+   * without additional formatting or pagination processing.
+   * Used when we need the raw DB result structure.
+   */
+  static async fetchRawSrc20Data(
+    params: SRC20TrxRequestParams,
+    excludeFullyMinted = false,
+  ) {
+    return await SRC20Repository.getValidSrc20TxFromDb(params, excludeFullyMinted);
+  }
+
   static async fetchAndFormatSrc20Data(
     params: SRC20TrxRequestParams = {},
     excludeFullyMinted: boolean = false,
+    onlyFullyMinted: boolean = false,
   ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
     try {
       const sanitizedParams = {
@@ -78,13 +91,24 @@ export class SRC20QueryService {
         SRC20Repository.getValidSrc20TxFromDb(queryParams, excludeFullyMinted),
         SRC20Repository.getTotalCountValidSrc20TxFromDb(
           queryParams,
-          excludeFullyMinted, // Passed excludeFullyMinted here
+          excludeFullyMinted,
         ),
         BlockService.getLastBlock(),
       ]);
 
       const total = totalResult.rows[0].total;
-      const pagination = paginate(total, queryParams.page, queryParams.limit);
+
+      // Only map and format if we have data
+      if (!data.rows || data.rows.length === 0) {
+        return {
+          data: [],
+          total: 0,
+          page,
+          totalPages: 0,
+          limit,
+          last_block: lastBlock,
+        };
+      }
 
       const mappedData = this.mapTransactionData(data.rows);
       const formattedData = this.formatTransactionData(
@@ -101,6 +125,8 @@ export class SRC20QueryService {
           data: formattedData[0],
         };
       }
+
+      const pagination = paginate(total, page, limit);
 
       return {
         ...pagination,
@@ -197,8 +223,8 @@ export class SRC20QueryService {
     }
   }
 
-  static async getSrc20MintProgressByTick(tick: string) {
-    return await SRC20Repository.getSrc20MintProgressByTickFromDb(tick);
+  static async fetchSrc20MintProgress(tick: string) {
+    return await SRC20Repository.fetchSrc20MintProgress(tick);
   }
 
   private static mapTransactionData(rows: any[]) {
@@ -215,9 +241,7 @@ export class SRC20QueryService {
   }
 
   static async checkMintedOut(tick: string, amount: string) {
-    const mint_status = await SRC20Repository.getSrc20MintProgressByTickFromDb(
-      convertEmojiToTick(tick),
-    );
+    const mint_status = await SRC20Repository.fetchSrc20MintProgress(tick);
     if (!mint_status) {
       throw new Error(`Tick ${tick} not found`);
     }
@@ -237,7 +261,7 @@ export class SRC20QueryService {
     }
   }
 
-  static async fetchTrendingSrc20Data(
+  static async fetchTrendingActiveMintingTokens(
     limit: number = 50,
     page: number = 1,
     transactionCount: number = 1000,
@@ -248,34 +272,258 @@ export class SRC20QueryService {
       const validPage = Number.isFinite(Number(page)) ? Math.max(1, Number(page)) : 1;
       const validTransactionCount = Number.isFinite(Number(transactionCount)) ? Math.max(1, Number(transactionCount)) : 1000;
 
-      const offset = validLimit * (validPage - 1);
-      const data = await SRC20Repository.getTrendingSrc20TxFromDb(
-        validLimit,
-        offset,
+      // Get all trending data first
+      const data = await SRC20Repository.fetchTrendingActiveMintingTokens(
         validTransactionCount,
       );
 
-      const totalResult = await SRC20Repository.getTrendingSrc20TotalCount(
-        validTransactionCount,
-      );
-      const total = totalResult.rows[0].total;
-      const pagination = paginate(total, validPage, validLimit);
-
+      // Map and format all data
       const mappedData = this.mapTransactionData(data.rows);
       const formattedData = this.formatTransactionData(mappedData, {});
+
+      // Apply pagination after formatting
+      const startIndex = (validPage - 1) * validLimit;
+      const paginatedData = formattedData.slice(startIndex, startIndex + validLimit);
+      
+      const pagination = paginate(data.total, validPage, validLimit);
 
       return {
         ...pagination,
         last_block: await BlockService.getLastBlock(),
-        data: formattedData,
+        data: paginatedData,
       };
     } catch (error) {
-      console.error("Error in fetchTrendingSrc20Data:", error);
+      console.error("Error in fetchTrendingActiveMintingTokens:", error);
       throw error;
     }
   }
 
   static async searchSrc20Data(query: string) {
     return await SRC20Repository.searchValidSrc20TxFromDb(query);
+  }
+
+  /**
+   * Enhanced version of fetchAndFormatSrc20Data with optional data enrichment
+   * and performance monitoring. This version maintains backward compatibility
+   * while adding new features.
+   */
+  static async fetchAndFormatSrc20DataV2(
+    params: SRC20TrxRequestParams = {},
+    options: {
+      excludeFullyMinted?: boolean;
+      onlyFullyMinted?: boolean;
+      includeMarketData?: boolean;
+      enrichWithProgress?: boolean;
+      batchSize?: number;
+    } = {}
+  ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
+    const startTime = performance.now();
+    const metrics: PerformanceMetrics = {
+      duration: 0,
+      cacheHit: false,
+      dataSize: 0
+    };
+
+    try {
+      // Sanitize and prepare parameters (reusing existing logic)
+      const sanitizedParams = {
+        ...params,
+        tick: params.tick
+          ? (Array.isArray(params.tick)
+            ? params.tick.map((t) => t.replace(/[^\w-]/g, ""))
+            : params.tick.replace(/[^\w-]/g, ""))
+          : params.tick,
+        op: Array.isArray(params.op)
+          ? params.op.map((o) => o.replace(/[^\w-]/g, ""))
+          : params.op
+          ? params.op.replace(/[^\w-]/g, "")
+          : undefined,
+        tx_hash: params.tx_hash
+          ? params.tx_hash.replace(/[^\w-]/g, "")
+          : params.tx_hash,
+      };
+
+      // Ensure limit and page have default numeric values
+      const limit = Number.isFinite(Number(sanitizedParams.limit)) &&
+          Number(sanitizedParams.limit) > 0
+        ? Number(sanitizedParams.limit)
+        : 50;
+      const page = Number.isFinite(Number(sanitizedParams.page)) &&
+          Number(sanitizedParams.page) > 0
+        ? Math.max(1, Number(sanitizedParams.page))
+        : 1;
+
+      const queryParams: SRC20TrxRequestParams = {
+        ...sanitizedParams,
+        tick: Array.isArray(sanitizedParams.tick)
+          ? sanitizedParams.tick[0]
+          : sanitizedParams.tick,
+        limit,
+        page,
+        sortBy: sanitizedParams.sortBy || "ASC",
+      };
+
+      // Remove undefined op property
+      if (queryParams.op === undefined) {
+        delete queryParams.op;
+      }
+
+      // Fetch base data and metadata in parallel
+      const [data, totalResult, lastBlock] = await Promise.all([
+        SRC20Repository.getValidSrc20TxFromDb(
+          queryParams, 
+          options.excludeFullyMinted
+        ),
+        SRC20Repository.getTotalCountValidSrc20TxFromDb(
+          queryParams,
+          options.excludeFullyMinted
+        ),
+        BlockService.getLastBlock(),
+      ]);
+
+      const total = totalResult.rows[0].total;
+      metrics.dataSize = data.rows?.length || 0;
+
+      // Early return for empty data
+      if (!data.rows || data.rows.length === 0) {
+        metrics.duration = performance.now() - startTime;
+        return {
+          data: [],
+          total: 0,
+          page,
+          totalPages: 0,
+          limit,
+          last_block: lastBlock,
+          performance: metrics
+        };
+      }
+
+      // Map and format base data
+      let mappedData = this.mapTransactionData(data.rows);
+      let formattedData = this.formatTransactionData(
+        mappedData,
+        queryParams
+      );
+
+      // Optional data enrichment
+      if (options.includeMarketData || options.enrichWithProgress) {
+        formattedData = await this.enrichData(
+          formattedData,
+          {
+            includeMarketData: options.includeMarketData,
+            enrichWithProgress: options.enrichWithProgress,
+            batchSize: options.batchSize || 50
+          }
+        );
+      }
+
+      // Handle single result case
+      if (
+        params.singleResult && 
+        Array.isArray(formattedData) && 
+        formattedData.length > 0
+      ) {
+        metrics.duration = performance.now() - startTime;
+        return {
+          last_block: lastBlock,
+          data: formattedData[0],
+          performance: metrics
+        };
+      }
+
+      // Return paginated response
+      const pagination = paginate(total, page, limit);
+      metrics.duration = performance.now() - startTime;
+
+      return {
+        ...pagination,
+        last_block: lastBlock,
+        data: Array.isArray(formattedData) ? formattedData : [formattedData],
+        performance: metrics
+      };
+    } catch (error) {
+      console.error("Error in fetchAndFormatSrc20DataV2:", error);
+      metrics.duration = performance.now() - startTime;
+      
+      if (error.message.includes("Stamps Down")) {
+        throw new Error("Stamps Down...");
+      }
+      
+      // Add metrics to error for monitoring
+      error.performance = metrics;
+      throw error;
+    }
+  }
+
+  /**
+   * Helper function to enrich SRC20 data with market and progress information
+   * Handles batching and error recovery
+   */
+  private static async enrichData(
+    data: SRC20Row | SRC20Row[],
+    options: {
+      includeMarketData?: boolean;
+      enrichWithProgress?: boolean;
+      batchSize?: number;
+    }
+  ): Promise<SRC20Row | SRC20Row[]> {
+    const rows = Array.isArray(data) ? data : [data];
+    const enriched = [...rows];
+    const batchSize = options.batchSize || 50;
+
+    try {
+      // Process in batches if needed
+      for (let i = 0; i < rows.length; i += batchSize) {
+        const batch = rows.slice(i, i + batchSize);
+        const ticks = batch.map(row => row.tick);
+
+        // Parallel fetch of additional data for the batch
+        const [marketData, mintProgress] = await Promise.all([
+          options.includeMarketData
+            ? SRC20MarketService.fetchMarketListingSummary()
+            : null,
+          options.enrichWithProgress
+            ? Promise.all(ticks.map(tick => 
+                this.fetchSrc20MintProgress(tick).catch(() => null)
+              ))
+            : null
+        ]);
+
+        // Enrich market data
+        if (marketData) {
+          const marketMap = new Map(
+            marketData.map(item => [item.tick, item])
+          );
+          batch.forEach((row, index) => {
+            const market = marketMap.get(row.tick);
+            if (market) {
+              enriched[i + index] = {
+                ...row,
+                market_data: market
+              };
+            }
+          });
+        }
+
+        // Enrich mint progress
+        if (mintProgress) {
+          batch.forEach((row, index) => {
+            const progress = mintProgress[index];
+            if (progress) {
+              enriched[i + index] = {
+                ...enriched[i + index],
+                mint_progress: progress
+              };
+            }
+          });
+        }
+      }
+
+      return Array.isArray(data) ? enriched : enriched[0];
+    } catch (error) {
+      console.error("Error in enrichData:", error);
+      // On error, return original data without enrichment
+      return data;
+    }
   }
 }

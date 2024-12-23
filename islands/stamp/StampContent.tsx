@@ -1,12 +1,23 @@
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { StampRow } from "$globals";
+import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 
-export function StampContent({ stamps, isRecentSales = false }: {
-  stamps: (StampRow & {
-    sale_data?: { btc_amount: number; block_index: number; tx_hash: string };
-  })[];
+interface StampContentProps {
+  stamps: StampRow[];
   isRecentSales?: boolean;
-}) {
+  pagination?: {
+    page: number;
+    totalPages: number;
+    prefix?: string;
+    onPageChange?: (page: number) => void;
+  };
+}
+
+export function StampContent({
+  stamps,
+  isRecentSales = false,
+  pagination,
+}: StampContentProps) {
   return (
     <div class="w-full pt-3 pb-12 mobileMd:pt-6 mobileMd:pb-[72px]">
       <div class="grid grid-cols-2 mobileMd:grid-cols-3 mobileLg:grid-cols-4 tablet:grid-cols-5 desktop:grid-cols-6 gap-3 mobileMd:gap-6 w-full auto-rows-fr">
@@ -22,6 +33,16 @@ export function StampContent({ stamps, isRecentSales = false }: {
           />
         ))}
       </div>
+      {pagination && pagination.totalPages > 1 && (
+        <div class="mt-9 mobileLg:mt-[72px]">
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            prefix={pagination.prefix}
+            onPageChange={pagination.onPageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

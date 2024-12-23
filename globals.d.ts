@@ -99,6 +99,11 @@ export interface StampRow {
   marketCapUSD?: number | null;
   recentSalePrice?: number | "priceless";
   unbound_quantity: number;
+  sale_data?: {
+    btc_amount: number;
+    block_index: number;
+    tx_hash: string;
+  };
 }
 
 export interface DisplayCountBreakpoints {
@@ -124,6 +129,7 @@ export interface StampSectionProps {
   showMinDetails?: boolean;
   variant?: "default" | "grey";
   viewAllLink?: string;
+  alignRight?: boolean;
 }
 
 export interface CollectionSectionProps {
@@ -168,6 +174,9 @@ export interface SRC20Row {
   holders: number;
   floor_unit_price?: number;
   mcap?: number;
+  top_mints_percentage?: number;
+  volume_7d?: number;
+  value?: number;
 }
 
 interface SendRow {
@@ -374,15 +383,6 @@ interface Src101Detail {
 }
 // Request Types ---------------------------------------------------------------
 
-export interface PaginationQueryParams {
-  limit?: number;
-  page?: number;
-}
-
-export interface PaginatedRequest extends Request {
-  query: PaginationQueryParams;
-}
-
 export interface SRC20TrxRequestParams {
   block_index?: number | null;
   tick?: string | string[] | null;
@@ -395,17 +395,6 @@ export interface SRC20TrxRequestParams {
   address?: string | null;
   noPagination?: boolean;
   singleResult?: boolean;
-}
-
-export interface SRC20BalanceRequestParams {
-  address?: string;
-  tick?: string;
-  amt?: number;
-  limit?: number;
-  page?: number;
-  sortBy?: string;
-  sortField?: string;
-  includePagination?: boolean;
 }
 
 export interface SRC101TokenidsParams {
@@ -470,13 +459,12 @@ export interface Src101BalanceParams {
 
 export interface Pagination {
   page: number;
-  pageSize: number;
   totalPages: number;
-  total: number;
   prefix?: string;
+  onPageChange?: (page: number) => void;
 }
 
-export interface PaginatedStampResponseBody extends Pagination {
+export interface PaginatedStampResponseBody {
   last_block: number;
   page: number;
   limit: number;
@@ -488,18 +476,27 @@ export interface PaginatedIdResponseBody extends PaginatedStampResponseBody {
   ident: SUBPROTOCOLS;
 }
 
-export interface PaginatedStampBalanceResponseBody extends Pagination {
+export interface PaginatedStampBalanceResponseBody {
   last_block: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   data: StampBalance[];
 }
 
-export interface PaginatedSrc20ResponseBody extends Pagination {
+export interface PaginatedSrc20ResponseBody {
   last_block: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   data: Src20Detail[];
 }
 
-export interface PaginatedSrc101ResponseBody extends Pagination {
+export interface PaginatedSrc101ResponseBody {
   last_block: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   data: Src101Detail[];
 }
 
@@ -508,21 +505,21 @@ export interface TotalSrc101ResponseBody {
   data: number;
 }
 
-export interface TokenidSrc101ResponseBody extends Pagination {
+export interface TokenidSrc101ResponseBody {
   last_block: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   data: string;
 }
 
-export interface PaginatedTickResponseBody extends Pagination {
+export interface PaginatedTickResponseBody {
   last_block: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   mint_status: MintStatus;
   data: Src20Detail[];
-}
-
-export interface TickResponseBody extends Pagination {
-  last_block: number;
-  mint_status: MintStatus;
-  data: Src20Detail;
 }
 
 export interface DeployResponseBody {
@@ -541,8 +538,11 @@ export interface Src20ResponseBody {
   data: Src20Detail;
 }
 
-export interface PaginatedSrc20BalanceResponseBody extends Pagination {
+export interface PaginatedSrc20BalanceResponseBody {
   last_block: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   data: SRC20Balance[] | [];
 }
 
@@ -552,73 +552,17 @@ export interface Src20BalanceResponseBody {
   pagination?: Pagination;
 }
 
-export interface Src101BalanceResponseBody extends Pagination {
-  last_block: number;
-  data: SRC101Balance;
-}
-
-export interface Src101DeployDetailResponseBody {
-  last_block: number;
-  data: SRC101DeployDetail;
-}
-
-export interface Src20SnapshotResponseBody extends Pagination {
-  snapshot_block: number;
-  data: Src20SnapShotDetail[];
-  pagination?: Pagination;
-}
-
-export interface PaginatedBalanceResponseBody extends Pagination {
-  last_block: number;
-  btc: BtcInfo;
-  data: StampsAndSrc20;
-}
-
-export interface StampResponseBody {
-  data: StampRow;
-  last_block: number;
-}
-
-export interface StampsResponseBody {
-  data: StampRow[];
-  last_block: number;
-}
-export interface PaginatedIdResponseBody extends Pagination {
-  ident: string | null;
-  last_block: number;
-  data: StampRow[];
-}
-
 export type StampPageProps = {
   data: {
     stamps: StampRow[];
-    total: number;
     page: number;
     totalPages: number;
-    limit: number;
     selectedTab: "all" | "classic" | "posh" | "recent_sales";
-    sortBy: any;
-    filterBy: string[];
+    sortBy: "ASC" | "DESC";
+    filterBy: STAMP_FILTER_TYPES[];
   };
 };
 
-type MintPageProps = {
-  data: {
-    selectedTab: "mint" | "deploy" | "transfer";
-  };
-};
-
-export interface ErrorResponseBody {
-  error: string;
-}
-
-export type PaginatedResponseBody =
-  | PaginatedStampResponseBody
-  | ErrorResponseBody;
-
-export interface BlockCountHandlerContext {
-  params: { number: string };
-}
 export interface BlockInfoResponseBody {
   block_info: BlockRow;
   issuances: StampRow[];
@@ -632,11 +576,6 @@ export interface StampBlockResponseBody {
   last_block: number;
 }
 
-export interface DispenserResponseBody {
-  dispensers: DispenserRow[];
-  last_block: number;
-}
-
 export interface PaginatedDispenserResponseBody {
   page: number;
   limit: number;
@@ -644,14 +583,6 @@ export interface PaginatedDispenserResponseBody {
   total: number;
   last_block: number;
   dispensers: DispenserRow[];
-}
-// Handler Contexts ------------------------------------------------------------
-
-// IdHandlerContext is used when the context requires an 'id' parameter
-export interface IdHandlerContext {
-  params: {
-    id: string;
-  };
 }
 
 // IdentHandlerContext is used when the context requires an 'ident' parameter
@@ -685,13 +616,6 @@ export interface TickHandlerContext {
   params: {
     tick: string | number;
     op?: string; // future use for mint/transfer deploy is defined in routes
-  };
-}
-
-export interface BlockTickHandlerContext {
-  params: {
-    block_index: number | string;
-    tick: string | number;
   };
 }
 
@@ -729,15 +653,6 @@ export interface Collection {
   stamp_images?: string[] | null;
 }
 
-export interface CollectionQueryParams extends PaginationQueryParams {
-  creator?: string;
-}
-
-export interface PaginatedCollectionResponseBody extends Pagination {
-  last_block: number;
-  data: Collection[];
-}
-
 export interface SRC20SnapshotRequestParams {
   tick: string;
   limit: number;
@@ -762,16 +677,3 @@ declare global {
   }
 }
 export {};
-
-export interface PaginationProps {
-  page: number;
-  pageSize: number;
-  total: number;
-  onPageChange: (page: number) => void;
-}
-
-export interface WalletStampSectionProps extends StampSectionProps {
-  pagination?: Pagination;
-  customHeader?: boolean;
-  customGridClass?: string;
-}

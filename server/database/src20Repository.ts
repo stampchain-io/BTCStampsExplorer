@@ -3,13 +3,50 @@ import { BigFloat } from "bigfloat/mod.ts";
 import { bigFloatToString } from "$lib/utils/formatUtils.ts";
 import { SRC20_BALANCE_TABLE, SRC20_TABLE } from "$lib/utils/constants.ts";
 import {
-  SRC20BalanceRequestParams,
   SRC20SnapshotRequestParams,
   SRC20TrxRequestParams,
 } from "$globals";
+import { SRC20BalanceRequestParams } from "$lib/types/src20.d.ts";
 import { dbManager } from "$server/database/databaseManager.ts";
+import { emojiToUnicodeEscape, unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 
 export class SRC20Repository {
+  /**
+   * Ensures a tick is in unicode escape format for DB operations
+   * Accepts either emoji or unicode escape format and returns unicode escape
+   */
+  private static ensureUnicodeEscape(tick: string): string {
+    if (!tick) return tick;
+    // If it starts with \U and has valid format, assume it's already unicode escape
+    if (tick.startsWith('\\U') && /^\\U[0-9A-F]{8}$/.test(tick)) {
+      return tick;
+    }
+    return emojiToUnicodeEscape(tick);
+  }
+
+  /**
+   * Converts DB response ticks to emoji format
+   * @param data Object or array containing tick field(s)
+   */
+  private static convertResponseToEmoji<T extends { tick: string }>(data: T[]): T[] {
+    return data.map(item => ({
+      ...item,
+      tick: unicodeEscapeToEmoji(item.tick)
+    }));
+  }
+
+  /**
+   * Converts a single DB response row to emoji format
+   * @param row Object containing tick field
+   */
+  private static convertSingleResponseToEmoji<T extends { tick: string }>(row: T | null): T | null {
+    if (!row) return null;
+    return {
+      ...row,
+      tick: unicodeEscapeToEmoji(row.tick)
+    };
+  }
+
   static async getTotalCountValidSrc20TxFromDb(
     params: SRC20TrxRequestParams,
     excludeFullyMinted: boolean = false,
@@ -30,20 +67,20 @@ export class SRC20Repository {
         whereConditions.push(
           `tick IN (${tick.map(() => "?").join(", ")})`,
         );
-        queryParams.push(...tick);
+        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t)));
       } else {
         whereConditions.push(`tick = ?`);
-        queryParams.push(tick);
+        queryParams.push(this.ensureUnicodeEscape(tick));
       }
     }
 
     if (op !== null) {
       if (Array.isArray(op)) {
         whereConditions.push(`op IN (${op.map(() => "?").join(", ")})`);
-        queryParams.push(...op);
+        queryParams.push(...op.map(o => this.ensureUnicodeEscape(o)));
       } else {
         whereConditions.push(`op = ?`);
-        queryParams.push(op);
+        queryParams.push(this.ensureUnicodeEscape(op));
       }
     }
 
@@ -111,20 +148,20 @@ export class SRC20Repository {
     if (tick !== undefined) {
       if (Array.isArray(tick)) {
         whereClauses.push(`src20.tick IN (${tick.map(() => "?").join(", ")})`);
-        queryParams.push(...tick);
+        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t)));
       } else {
         whereClauses.push(`src20.tick = ?`);
-        queryParams.push(tick);
+        queryParams.push(this.ensureUnicodeEscape(tick));
       }
     }
 
     if (op !== undefined) {
       if (Array.isArray(op)) {
         whereClauses.push(`src20.op IN (${op.map(() => "?").join(", ")})`);
-        queryParams.push(...op);
+        queryParams.push(...op.map(o => this.ensureUnicodeEscape(o)));
       } else {
         whereClauses.push(`src20.op = ?`);
-        queryParams.push(op);
+        queryParams.push(this.ensureUnicodeEscape(op));
       }
     }
 
@@ -205,7 +242,11 @@ export class SRC20Repository {
       1000 * 60 * 5, // Cache duration
     );
 
-    return results;
+    // Convert response ticks to emoji format
+    return {
+      ...results,
+      rows: this.convertResponseToEmoji(results.rows)
+    };
   }
 
   static async getSrc20BalanceFromDb(
@@ -234,10 +275,10 @@ export class SRC20Repository {
         whereClauses.push(
           `tick IN (${tickPlaceholders})`,
         );
-        queryParams.push(...tick);
+        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t)));
       } else {
         whereClauses.push(`tick = ?`);
-        queryParams.push(tick);
+        queryParams.push(this.ensureUnicodeEscape(tick));
       }
     }
 
@@ -325,10 +366,10 @@ export class SRC20Repository {
         whereConditions.push(
           `tick IN (${tickPlaceholders})`,
         );
-        queryParams.push(...tick);
+        queryParams.push(...tick.map(t => this.ensureUnicodeEscape(t)));
       } else {
         whereConditions.push(`tick = ?`);
-        queryParams.push(tick);
+        queryParams.push(this.ensureUnicodeEscape(tick));
       }
     }
 
@@ -353,15 +394,17 @@ export class SRC20Repository {
     return result.rows[0].total;
   }
 
-  static async getSrc20MintProgressByTickFromDb(
+  static async fetchSrc20MintProgress(
     tick: string,
   ) {
+    const unicodeTick = this.ensureUnicodeEscape(tick);
     const query = `
         SELECT 
             dep.max,
             dep.deci,
             dep.lim,
             dep.tx_hash,
+            dep.tick,
             (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
             (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted
         FROM ${SRC20_TABLE} AS dep
@@ -373,7 +416,7 @@ export class SRC20Repository {
 
     const data = await dbManager.executeQueryWithCache(
       query,
-      [tick],
+      [unicodeTick],
       1000 * 60 * 2,
     );
 
@@ -388,24 +431,20 @@ export class SRC20Repository {
     const total_mints = parseInt(row["total_mints"] ?? 0);
     const total_minted = new BigFloat(row["total_minted"] ?? 0);
     const progress = bigFloatToString(total_minted.div(max_supply).mul(100), 3);
-    const tx_hash = row["tx_hash"];
 
-    const response = {
+    return this.convertSingleResponseToEmoji({
       max_supply: max_supply.toString(),
       total_minted: total_minted.toString(),
       limit: limit.toString(),
       total_mints: total_mints,
       progress,
       decimals,
-      tx_hash,
-    };
-
-    return response;
+      tx_hash: row["tx_hash"],
+      tick: row["tick"],
+    });
   }
 
-  static async getTrendingSrc20TxFromDb(
-    limit: number,
-    offset: number,
+  static async fetchTrendingActiveMintingTokens(
     transactionCount: number = 1000,
   ) {
     const query = `
@@ -422,25 +461,22 @@ export class SRC20Repository {
         FROM latest_mint_transactions
         GROUP BY tick
       ),
-      max_supply_data AS (
-        SELECT tick, max
-        FROM ${SRC20_TABLE}
-        WHERE op = 'DEPLOY'
+      deploy_info AS (
+        SELECT 
+          d.tick,
+          d.max,
+          (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} b WHERE b.tick = d.tick) as total_minted
+        FROM ${SRC20_TABLE} d
+        WHERE d.op = 'DEPLOY'
       ),
-      total_minted_data AS (
-        SELECT tick, SUM(amt) as total_minted
+      holders_count AS (
+        SELECT tick, COUNT(*) as holders
         FROM ${SRC20_BALANCE_TABLE}
+        WHERE amt > 0
         GROUP BY tick
-      ),
-      mint_status AS (
-        SELECT
-          msd.tick,
-          msd.max,
-          COALESCE(tmd.total_minted, 0) as total_minted
-        FROM max_supply_data msd
-        LEFT JOIN total_minted_data tmd ON msd.tick = tmd.tick
       )
       SELECT
+        'data' as type,
         mc.tick,
         mc.mint_count,
         mc.top_mints_percentage,
@@ -455,84 +491,88 @@ export class SRC20Repository {
         src20_deploy.max,
         src20_deploy.destination,
         src20_deploy.block_time,
-        mint_status.total_minted,
-        mint_status.max as max_supply,
-        creator_info.creator as creator_name
+        creator_info.creator as creator_name,
+        COALESCE(hc.holders, 0) as holders
       FROM mint_counts mc
       JOIN ${SRC20_TABLE} src20_deploy ON mc.tick = src20_deploy.tick AND src20_deploy.op = 'DEPLOY'
-      JOIN mint_status ON mc.tick = mint_status.tick
+      JOIN deploy_info di ON mc.tick = di.tick
       LEFT JOIN creator creator_info ON src20_deploy.creator = creator_info.address
-      WHERE mint_status.total_minted < mint_status.max
-      ORDER BY mc.mint_count DESC
-      LIMIT ? OFFSET ?;
+      LEFT JOIN holders_count hc ON mc.tick = hc.tick
+      WHERE di.total_minted < di.max
+      ORDER BY mc.mint_count DESC;
     `;
     const queryParams = [
       transactionCount, // Number of recent mint transactions to consider
       transactionCount, // For top_mints_percentage calculation
-      limit,
-      offset,
     ];
     const results = await dbManager.executeQueryWithCache(
       query,
       queryParams,
-      1000 * 60 * 2, // Cache duration
+      1000 * 60 * 10, // Cache duration
     );
-    return results;
+    
+    return {
+      rows: this.convertResponseToEmoji(results.rows),
+      total: results.rows.length
+    };
   }
 
-  static async getTrendingSrc20TotalCount(transactionCount: number = 1000) {
+  static async getDeploymentAndCountsForTick(tick: string) {
+    const unicodeTick = this.ensureUnicodeEscape(tick);
     const query = `
-      WITH latest_mint_transactions AS (
-        SELECT tx_index, tick
-        FROM ${SRC20_TABLE}
-        WHERE op = 'MINT'
-        ORDER BY tx_index DESC
-        LIMIT ?
-      ),
-      mint_counts AS (
-        SELECT tick, COUNT(*) as mint_count
-        FROM latest_mint_transactions
-        GROUP BY tick
-      ),
-      max_supply_data AS (
-        SELECT tick, max
-        FROM ${SRC20_TABLE}
-        WHERE op = 'DEPLOY'
-      ),
-      total_minted_data AS (
-        SELECT tick, SUM(amt) as total_minted
-        FROM ${SRC20_BALANCE_TABLE}
-        GROUP BY tick
-      ),
-      mint_status AS (
-        SELECT
-          msd.tick,
-          msd.max,
-          COALESCE(tmd.total_minted, 0) as total_minted
-        FROM max_supply_data msd
-        LEFT JOIN total_minted_data tmd ON msd.tick = tmd.tick
-      )
-      SELECT COUNT(*) as total
-      FROM mint_counts mc
-      JOIN mint_status ON mc.tick = mint_status.tick
-      WHERE mint_status.total_minted < mint_status.max;
+      SELECT 
+        dep.*,
+        creator_info.creator AS creator_name,
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'MINT') AS total_mints,
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
+      FROM ${SRC20_TABLE} dep
+      LEFT JOIN 
+        creator creator_info ON dep.destination = creator_info.address
+      WHERE dep.tick = ? AND dep.op = 'DEPLOY'
+      LIMIT 1
     `;
-    const queryParams = [transactionCount];
-    const results = await dbManager.executeQueryWithCache(
+    const params = [unicodeTick, unicodeTick, unicodeTick];
+    const result = await dbManager.executeQueryWithCache(
       query,
-      queryParams,
-      1000 * 60 * 2,
+      params,
+      1000 * 60 * 10,
     );
-    return results;
+
+    if (!result.rows || result.rows.length === 0) {
+      return null;
+    }
+
+    const row = result.rows[0];
+
+    return {
+      deployment: this.convertSingleResponseToEmoji({
+        tick: row.tick,
+        tx_hash: row.tx_hash,
+        block_index: row.block_index,
+        p: row.p,
+        op: row.op,
+        creator: row.creator,
+        creator_name: row.creator_name,
+        amt: row.amt,
+        deci: row.deci,
+        lim: row.lim,
+        max: row.max,
+        destination: row.destination,
+        block_time: row.block_time,
+      }),
+      total_mints: row.total_mints,
+      total_transfers: row.total_transfers,
+    };
   }
 
   static async getCountsForTick(tick: string) {
+    const unicodeTick = this.ensureUnicodeEscape(tick);
     const query = `
       SELECT 
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'MINT') AS total_mints,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
     `;
-    const params = [tick, tick];
+    const params = [unicodeTick, unicodeTick];
     const result = await dbManager.executeQueryWithCache(
       query,
       params,
@@ -549,109 +589,55 @@ export class SRC20Repository {
     };
   }
 
-  static async getDeploymentAndCountsForTick(tick: string) {
-    const query = `
-      SELECT 
-        dep.*,
-        creator_info.creator AS creator_name,
-        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'MINT') AS total_mints,
-        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = ? AND op = 'TRANSFER') AS total_transfers
+  static async searchValidSrc20TxFromDb(query: string) {
+    const sanitizedQuery = query.replace(/[^\w-]/g, "");
+
+    const sqlQuery = `
+      SELECT DISTINCT 
+        tick, 
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
+        (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted,
+        dep.max AS max_supply, 
+        dep.lim AS lim, 
+        dep.deci AS decimals
       FROM ${SRC20_TABLE} dep
-      LEFT JOIN 
-        creator creator_info ON dep.destination = creator_info.address
-      WHERE dep.tick = ? AND dep.op = 'DEPLOY'
-      LIMIT 1
+      WHERE
+        (tick LIKE ? OR
+        tx_hash LIKE ? OR
+        creator LIKE ? OR
+        destination LIKE ?)
+        AND dep.max IS NOT NULL
+      LIMIT 10;
     `;
-    const params = [tick, tick, tick];
-    const result = await dbManager.executeQueryWithCache(
-      query,
-      params,
-      1000 * 60 * 10,
-    );
 
-    if (!result.rows || result.rows.length === 0) {
-      return null;
+    const searchParam = `%${sanitizedQuery}%`;
+    const queryParams = [searchParam, searchParam, searchParam, searchParam];
+
+    try {
+      const result = await dbManager.executeQueryWithCache(
+        sqlQuery,
+        queryParams,
+        1000 * 60 * 2 // Cache duration: 2 minutes
+      );
+
+      return this.convertResponseToEmoji(result.rows.map((row: any) => {
+        const maxSupply = new BigFloat(row?.max_supply || "1");
+        const totalMinted = new BigFloat(row.total_minted || "0");
+        const progress = bigFloatToString(totalMinted.div(maxSupply).mul(100), 3);
+        const progressNum = parseFloat(progress);
+
+        return {
+          tick: row.tick,
+          progress: progressNum,
+          total_minted: row.total_minted,
+          max_supply: row.max_supply
+        };
+      }).filter(Boolean)); // Remove null entries
+    } catch (error) {
+      console.error("Error executing query:", error);
+      return [];
     }
-
-    const row = result.rows[0];
-
-    return {
-      deployment: {
-        tick: row.tick,
-        tx_hash: row.tx_hash,
-        block_index: row.block_index,
-        p: row.p,
-        op: row.op,
-        creator: row.creator,
-        creator_name: row.creator_name,
-        amt: row.amt,
-        deci: row.deci,
-        lim: row.lim,
-        max: row.max,
-        destination: row.destination,
-        block_time: row.block_time,
-      },
-      total_mints: row.total_mints,
-      total_transfers: row.total_transfers,
-    };
   }
-
-  // Add the new method here
-static async searchValidSrc20TxFromDb(query: string) {
-  const sanitizedQuery = query.replace(/[^\w-]/g, "");
-
-  const sqlQuery = `
-    SELECT DISTINCT 
-      tick, 
-      (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
-      (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted,
-      dep.max AS max_supply, 
-      dep.lim AS lim, 
-      dep.deci AS decimals
-    FROM ${SRC20_TABLE} dep
-    WHERE
-      (tick LIKE ? OR
-      tx_hash LIKE ? OR
-      creator LIKE ? OR
-      destination LIKE ?)
-      AND dep.max IS NOT NULL
-    LIMIT 10;
-  `;
-
-  const searchParam = `%${sanitizedQuery}%`;
-  const queryParams = [searchParam, searchParam, searchParam, searchParam];
-
-  try {
-    const result = await dbManager.executeQueryWithCache(
-      sqlQuery,
-      queryParams,
-      1000 * 60 * 2 // Cache duration: 2 minutes
-    );
-
-    return result.rows.map((row: any) => {
-      const maxSupply = new BigFloat(row?.max_supply || "1");
-      const totalMinted = new BigFloat(row.total_minted || "0");
-      const progress = bigFloatToString(totalMinted.div(maxSupply).mul(100), 3);
-      const progressNum = parseFloat(progress);
-
-      // Only filter out 100% minted tokens
-      // if (progressNum >= 100) {
-      //   return null;
-      // }
-
-      return {
-        tick: row.tick,
-        progress: progressNum,
-        total_minted: row.total_minted,
-        max_supply: row.max_supply
-      };
-    }).filter(Boolean); // Remove null entries
-  } catch (error) {
-    console.error("Error executing query:", error);
-    return [];
-  }
-}
-
 
   static async checkSrc20Deployments(): Promise<{ isValid: boolean; count: number }> {
     try {

@@ -1,25 +1,19 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
 import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
-import { convertEmojiToTick } from "$lib/utils/emojiUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { set_precision } from "bigfloat/mod.ts";
-import { MarketListingSummary } from "$types/index.d.ts";
 import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
+import { SRC20TickPageData } from "$lib/types/src20.d.ts";
 
 export const handler: Handlers = {
-  async GET(_req: Request, ctx) {
+  async GET(_req, ctx) {
     try {
-      let { tick } = ctx.params;
-      if (!tick) {
-        return ctx.renderNotFound();
-      }
+      const rawTick = ctx.params.tick; // Could be "%F0%9F%9B%B8" or "\U0001F6F8"
+      const decodedTick = decodeURIComponent(rawTick); // Could be "🛸" or "\U0001F6F8"
 
-      tick = convertEmojiToTick(tick);
-      set_precision(-4);
-      const body = await Src20Controller.handleTickPageRequest(tick);
-
-      if (!body || body.error) {
+      // Pass directly to controller - repository will handle format conversion
+      const body = await Src20Controller.fetchSrc20TickPageData(decodedTick);
+      if (!body) {
         return ctx.renderNotFound();
       }
 
@@ -37,37 +31,26 @@ export const handler: Handlers = {
 };
 
 interface SRC20TickPageProps {
-  data: {
-    deployment: any;
-    total_holders: number;
-    holders: any[];
-    mint_status: any;
-    total_mints: number;
-    total_transfers: number;
-    error?: string;
-    marketInfo?: MarketListingSummary; // Updated type
-  };
+  data: SRC20TickPageData | { error: string };
 }
 
 function SRC20TickPage(props: SRC20TickPageProps) {
+  if ("error" in props.data) {
+    return (
+      <div class="text-center text-red-500">
+        {props.data.error}
+      </div>
+    );
+  }
+
   const {
     deployment,
-    _total_holders,
     holders,
     mint_status,
     total_mints,
     total_transfers,
-    error,
     marketInfo,
   } = props.data;
-
-  if (error) {
-    return (
-      <div class="text-center text-red-500">
-        {error}
-      </div>
-    );
-  }
 
   const tick = deployment.tick;
 
@@ -78,7 +61,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
         mintStatus={mint_status}
         totalMints={total_mints}
         totalTransfers={total_transfers}
-        marketInfo={marketInfo} // Now contains data for current tick
+        marketInfo={marketInfo}
       />
       <HoldersGraph holders={holders} />
       <SRC20DetailsTab tick={tick} />

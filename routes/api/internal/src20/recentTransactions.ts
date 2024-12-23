@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 
 export const handler: Handlers = {
@@ -9,11 +9,11 @@ export const handler: Handlers = {
       const recentTransactions = await Src20Controller
         .fetchRecentTransactions();
 
-      return ResponseUtil.success(recentTransactions, {
+      return ApiResponseUtil.success(recentTransactions, {
         routeType: RouteType.DYNAMIC,
       });
     } catch (error) {
-      return ResponseUtil.internalError(
+      return ApiResponseUtil.internalError(
         error,
         "Error fetching recent transactions",
       );

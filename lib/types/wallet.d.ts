@@ -94,8 +94,13 @@ export interface WalletStatsProps {
   stampsTotal: number;
   src20Total: number;
   stampsCreated: number;
-  dispensers: WalletData["dispensers"];
-  setShowItem: (type: string) => void;
+  stampValue: number;
+  dispensers?: {
+    open: number;
+    closed: number;
+    total: number;
+  };
+  setShowItem?: (type: string) => void;
 }
 
 // Interface for paginated data
@@ -104,6 +109,7 @@ export interface PaginatedData {
   limit: number;
   total: number;
   totalPages: number;
+  onPageChange?: (page: number) => void;
 }
 
 // Interface for wallet page data structure
@@ -116,7 +122,10 @@ export interface WalletPageData {
     data: any[]; // Could be typed more specifically if we have SRC20 type
     pagination: PaginatedData;
   };
-  dispensers: Dispenser[];
+  dispensers: {
+    data: Dispenser[];
+    pagination: PaginatedData;
+  };
 }
 
 // Props interface for the wallet page
@@ -127,6 +136,45 @@ export interface WalletPageProps {
     walletData: WalletData;
     stampsTotal: number;
     src20Total: number;
+    stampsCreated: number;
     anchor: string;
   };
+  stampsSortBy?: "ASC" | "DESC";
+  src20SortBy?: "ASC" | "DESC";
+  dispensersSortBy?: "ASC" | "DESC";
+}
+
+interface WalletContentProps {
+  stamps: {
+    data: StampRow[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+  src20: {
+    data: any[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+  dispensers: {
+    data: Dispenser[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+  address: string;
+  anchor: string;
+  stampsSortBy?: "ASC" | "DESC";
+  src20SortBy?: "ASC" | "DESC";
+  dispensersSortBy?: "ASC" | "DESC";
 }

@@ -198,3 +198,15 @@ export function formatUSDValue(value: number): number {
   // Round to 2 decimal places and ensure it's a number
   return Number(value.toFixed(2));
 }
+
+/**
+ * Formats a numeric string by removing leading zeros before the decimal
+ * and trailing zeros after the decimal point
+ * @param value The string value to format
+ * @returns Formatted string without unnecessary zeros
+ */
+export function formatAmount(value: string): string {
+  const [whole, decimal = ""] = value.replace(/^0+/, "").split(".");
+  const trimmedDecimal = decimal.replace(/0+$/, "");
+  return trimmedDecimal ? `${whole}.${trimmedDecimal}` : whole;
+}

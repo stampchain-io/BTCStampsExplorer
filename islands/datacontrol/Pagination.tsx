@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-import { useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
+import { useEffect, useState } from "preact/hooks";
+import { PaginationProps } from "$types/pagination.d.ts";
 
 const MOBILE_MAX_PAGE_RANGE = 2;
 const DESKTOP_MAX_PAGE_RANGE = 4;
 
-const navArrow = `
+const _navArrow = `
   flex items-center justify-center
   bg-stamp-purple-dark hover:bg-stamp-primary-hover rounded-md
   w-7 h-7 mobileLg:h-9 mobileLg:w-9`;
@@ -30,144 +30,113 @@ const useIsMobile = () => {
   return isMobile;
 };
 
-interface PaginationProps {
-  page: number;
-  pages: number;
-  page_size: number;
-  type: string;
-  data_length: number;
-  prefix?: string;
-}
-
-export const Pagination = (
-  { page, pages, page_size, type = "stamp", data_length, prefix }:
-    PaginationProps,
-) => {
+export function Pagination({
+  page,
+  totalPages,
+  prefix = "",
+  onPageChange,
+}: PaginationProps) {
   const isMobile = useIsMobile();
-  const maxPagesToShow = isMobile
+  const maxPageRange = isMobile
     ? MOBILE_MAX_PAGE_RANGE
     : DESKTOP_MAX_PAGE_RANGE;
-  const [currentPage, setCurrentPage] = useState(page);
-  const totalPages = pages;
-  const { getSort, getFilter, getType } = useNavigator();
-  const [isClient, setIsClient] = useState(false);
-  const _prefix = prefix ? `${prefix}_` : "";
 
-  useEffect(() => {
-    setCurrentPage(page);
-    setIsClient(true);
-  }, [page]);
-
-  const buildPageUrl = useCallback((pageNum: number) => {
-    if (!isClient) {
-      return `/${type}?page=${pageNum}`;
+  const handlePageChange = (newPage: number) => {
+    if (onPageChange) {
+      onPageChange(newPage);
+      return;
     }
 
+    // Legacy URL-based navigation if no onPageChange provided
     const url = new URL(globalThis.location.href);
+    url.searchParams.set(
+      prefix ? `${prefix}_page` : "page",
+      newPage.toString(),
+    );
+    globalThis.location.href = url.toString();
+  };
 
-    const stampsPage = url.searchParams.get("stamps_page");
-    const stampsLimit = url.searchParams.get("stamps_limit");
-    const src20Page = url.searchParams.get("src20_page");
-    const src20Limit = url.searchParams.get("src20_limit");
+  const renderPageButton = (pageNum: number, icon?: string) => {
+    const isCurrentPage = pageNum === page;
+    const buttonClass = isCurrentPage
+      ? `${navContent} bg-stamp-purple`
+      : `${navContent} bg-stamp-purple-dark`;
 
-    if (stampsPage && stampsLimit) {
-      url.searchParams.set("stamps_page", stampsPage);
-      url.searchParams.set("stamps_limit", stampsLimit);
-    }
-    if (src20Page && src20Limit) {
-      url.searchParams.set("src20_page", src20Page);
-      url.searchParams.set("src20_limit", src20Limit);
-    }
-
-    url.searchParams.set("anchor", prefix ? prefix : "");
-
-    url.searchParams.set(`${_prefix}page`, pageNum.toString());
-    url.searchParams.set(`${_prefix}limit`, page_size.toString());
-
-    const currentType = url.searchParams.get("type") || getType();
-    const currentSort = url.searchParams.get("sortBy") || getSort();
-    const currentFilter = url.searchParams.get("filterBy") ||
-      getFilter().join(",");
-
-    url.searchParams.set("type", currentType);
-    url.searchParams.set("sortBy", currentSort);
-    if (currentFilter) {
-      url.searchParams.set("filterBy", currentFilter);
-    } else {
-      url.searchParams.delete("filterBy");
-    }
-
-    return url.toString();
-  }, [isClient, type, page_size, getSort, getFilter, getType]);
-
-  const renderPageLink = (pageNum: number, icon: string) => (
-    <li key={icon}>
-      <a
-        href={buildPageUrl(pageNum)}
-        f-partial={buildPageUrl(pageNum)}
-        class={navArrow}
+    return (
+      <button
+        class={buttonClass}
+        onClick={() => handlePageChange(pageNum)}
+        disabled={isCurrentPage}
       >
-        <img
-          src={`/img/datacontrol/${icon}.svg`}
-          alt={`arrow ${icon.toLowerCase()}`}
-          class="w-[14px] h-[14px] mobileLg:w-[18px] mobileLg:h-[18px]"
-        />
-      </a>
-    </li>
-  );
+        {icon
+          ? (
+            <img
+              src={`/img/datacontrol/${icon}.svg`}
+              alt={`arrow ${icon.toLowerCase()}`}
+              class="w-[14px] h-[14px] mobileLg:w-[18px] mobileLg:h-[18px]"
+            />
+          )
+          : <span>{pageNum}</span>}
+      </button>
+    );
+  };
 
-  const [pageItems] = useMemo(() => {
-    const startPage = Math.max(1, currentPage - maxPagesToShow);
-    const endPage = Math.min(totalPages, currentPage + maxPagesToShow);
-    const items = [];
+  if (totalPages <= 1) return null;
 
-    for (let p = startPage; p <= endPage; p++) {
-      const pageUrl = buildPageUrl(p);
-      items.push(
-        <li key={p}>
-          <a
-            href={pageUrl}
-            f-partial={pageUrl}
-            class={navContent + " " +
-              (currentPage === p
-                ? " bg-stamp-purple "
-                : " bg-stamp-purple-dark")}
-          >
-            {p}
-          </a>
-        </li>,
-      );
-    }
-    return [items];
-  }, [currentPage, totalPages, maxPagesToShow, buildPageUrl]);
+  // Calculate the range of pages to show
+  let startPage = Math.max(1, page - maxPageRange);
+  let endPage = Math.min(totalPages, page + maxPageRange);
 
-  if (totalPages === 1) return null;
-
-  if (data_length === 0) return null;
+  // Adjust the range if we're near the start or end
+  if (page <= maxPageRange) {
+    endPage = Math.min(totalPages, maxPageRange * 2 + 1);
+  }
+  if (page > totalPages - maxPageRange) {
+    startPage = Math.max(1, totalPages - maxPageRange * 2);
+  }
 
   return (
-    <nav
-      aria-label="Page navigation"
-      class="flex items-center justify-center"
-    >
+    <nav aria-label="Page navigation" class="flex items-center justify-center">
       <ul class="inline-flex items-center -space-x-px gap-[9px] mobileLg:gap-3">
-        {currentPage !== 1 && (
+        {/* First and Previous */}
+        {page > 1 && (
           <>
-            {renderPageLink(1, "CaretDoubleLeft")}
-            {renderPageLink(Math.max(1, currentPage - 1), "CaretLeft")}
+            {renderPageButton(1, "CaretDoubleLeft")}
+            {renderPageButton(page - 1, "CaretLeft")}
           </>
         )}
-        {pageItems}
-        {currentPage < totalPages && (
+
+        {/* Show ellipsis if there are pages before the range */}
+        {startPage > 1 && (
           <>
-            {renderPageLink(
-              Math.min(totalPages, currentPage + 1),
-              "CaretRight",
-            )}
-            {renderPageLink(totalPages, "CaretDoubleRight")}
+            {renderPageButton(1)}
+            <span class="text-stamp-purple-dark">...</span>
+          </>
+        )}
+
+        {/* Page numbers */}
+        {Array.from({ length: endPage - startPage + 1 }, (_, i) =>
+          startPage + i)
+          .map((pageNum) =>
+            renderPageButton(pageNum)
+          )}
+
+        {/* Show ellipsis if there are pages after the range */}
+        {endPage < totalPages && (
+          <>
+            <span class="text-stamp-purple-dark">...</span>
+            {renderPageButton(totalPages)}
+          </>
+        )}
+
+        {/* Next and Last */}
+        {page < totalPages && (
+          <>
+            {renderPageButton(page + 1, "CaretRight")}
+            {renderPageButton(totalPages, "CaretDoubleRight")}
           </>
         )}
       </ul>
     </nav>
   );
-};
+}
