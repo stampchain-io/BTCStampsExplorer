@@ -308,7 +308,14 @@ export class SRC20QueryService {
    * while adding new features.
    */
   static async fetchAndFormatSrc20DataV2(
-    params: SRC20TrxRequestParams = {},
+    params: SRC20TrxRequestParams & {
+      dateFrom?: string;  // ISO date string
+      dateTo?: string;    // ISO date string
+      minPrice?: number;  // Market data filters
+      maxPrice?: number;
+      minVolume?: number;
+      maxVolume?: number;
+    } = {},
     options: {
       excludeFullyMinted?: boolean;
       onlyFullyMinted?: boolean;
@@ -333,6 +340,12 @@ export class SRC20QueryService {
             ? params.tick.map((t) => t.replace(/[^\w-]/g, ""))
             : params.tick.replace(/[^\w-]/g, ""))
           : params.tick,
+        dateFrom: params.dateFrom ? new Date(params.dateFrom).toISOString() : undefined,
+        dateTo: params.dateTo ? new Date(params.dateTo).toISOString() : undefined,
+        minPrice: typeof params.minPrice === 'number' ? Math.max(0, params.minPrice) : undefined,
+        maxPrice: typeof params.maxPrice === 'number' ? Math.max(0, params.maxPrice) : undefined,
+        minVolume: typeof params.minVolume === 'number' ? Math.max(0, params.minVolume) : undefined,
+        maxVolume: typeof params.maxVolume === 'number' ? Math.max(0, params.maxVolume) : undefined,
         op: Array.isArray(params.op)
           ? params.op.map((o) => o.replace(/[^\w-]/g, ""))
           : params.op
@@ -405,6 +418,17 @@ export class SRC20QueryService {
         queryParams
       );
 
+      // Apply date range filtering if specified
+      if (sanitizedParams.dateFrom || sanitizedParams.dateTo) {
+        formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
+        formattedData = formattedData.filter(item => {
+          const itemDate = new Date(item.block_time);
+          if (sanitizedParams.dateFrom && itemDate < new Date(sanitizedParams.dateFrom)) return false;
+          if (sanitizedParams.dateTo && itemDate > new Date(sanitizedParams.dateTo)) return false;
+          return true;
+        });
+      }
+
       // Optional data enrichment
       if (options.includeMarketData || options.enrichWithProgress) {
         formattedData = await this.enrichData(
@@ -415,6 +439,28 @@ export class SRC20QueryService {
             batchSize: options.batchSize || 50
           }
         );
+
+        // Apply market data based filtering if specified
+        if (options.includeMarketData && (
+          sanitizedParams.minPrice !== undefined || 
+          sanitizedParams.maxPrice !== undefined ||
+          sanitizedParams.minVolume !== undefined ||
+          sanitizedParams.maxVolume !== undefined
+        )) {
+          formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
+          formattedData = formattedData.filter(item => {
+            if (!item.market_data) return false;
+            
+            const { floor_price = 0, volume_24h = 0 } = item.market_data;
+            
+            if (sanitizedParams.minPrice !== undefined && floor_price < sanitizedParams.minPrice) return false;
+            if (sanitizedParams.maxPrice !== undefined && floor_price > sanitizedParams.maxPrice) return false;
+            if (sanitizedParams.minVolume !== undefined && volume_24h < sanitizedParams.minVolume) return false;
+            if (sanitizedParams.maxVolume !== undefined && volume_24h > sanitizedParams.maxVolume) return false;
+            
+            return true;
+          });
+        }
       }
 
       // Handle single result case
