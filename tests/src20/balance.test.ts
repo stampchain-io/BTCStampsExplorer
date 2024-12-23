@@ -8,13 +8,15 @@ const mockBalanceData = [{ tick: "TEST", balance: "1000" }];
 const mockMintProgress = {
   max_supply: "1000",
   total_minted: "500",
-  progress: "50"
+  progress: "50",
 };
 
 // Create spy functions
 const originalFetchBalance = SRC20Service.QueryService.fetchSrc20Balance;
-const originalGetTotalCount = SRC20Service.QueryService.getTotalSrc20BalanceCount;
-const originalFetchMintProgress = SRC20Service.QueryService.fetchSrc20MintProgress;
+const originalGetTotalCount =
+  SRC20Service.QueryService.getTotalSrc20BalanceCount;
+const originalFetchMintProgress =
+  SRC20Service.QueryService.fetchSrc20MintProgress;
 const originalGetLastBlock = BlockService.getLastBlock;
 
 // Setup spy implementations
@@ -36,7 +38,6 @@ Deno.test({
     BlockService.getLastBlock = spyGetLastBlock;
 
     try {
-
       // Test basic functionality
       const basicResult = await Src20Controller.handleSrc20BalanceRequest({
         address: "bc1qtest",
@@ -99,8 +100,10 @@ Deno.test({
     } finally {
       // Restore original method implementations
       SRC20Service.QueryService.fetchSrc20Balance = originalFetchBalance;
-      SRC20Service.QueryService.getTotalSrc20BalanceCount = originalGetTotalCount;
-      SRC20Service.QueryService.fetchSrc20MintProgress = originalFetchMintProgress;
+      SRC20Service.QueryService.getTotalSrc20BalanceCount =
+        originalGetTotalCount;
+      SRC20Service.QueryService.fetchSrc20MintProgress =
+        originalFetchMintProgress;
       BlockService.getLastBlock = originalGetLastBlock;
     }
   },

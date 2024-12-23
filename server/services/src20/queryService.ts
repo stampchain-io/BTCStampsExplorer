@@ -322,6 +322,7 @@ export class SRC20QueryService {
       includeMarketData?: boolean;
       enrichWithProgress?: boolean;
       batchSize?: number;
+      prefetchedMarketData?: MarketListingAggregated[];
     } = {}
   ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
     const startTime = performance.now();
@@ -368,9 +369,7 @@ export class SRC20QueryService {
 
       const queryParams: SRC20TrxRequestParams = {
         ...sanitizedParams,
-        tick: Array.isArray(sanitizedParams.tick)
-          ? sanitizedParams.tick[0]
-          : sanitizedParams.tick,
+        tick: sanitizedParams.tick,
         limit,
         page,
         sortBy: sanitizedParams.sortBy || "ASC",
@@ -436,7 +435,8 @@ export class SRC20QueryService {
           {
             includeMarketData: options.includeMarketData,
             enrichWithProgress: options.enrichWithProgress,
-            batchSize: options.batchSize || 50
+            batchSize: options.batchSize || 50,
+            prefetchedMarketData: options.prefetchedMarketData
           }
         );
 
@@ -511,6 +511,7 @@ export class SRC20QueryService {
       includeMarketData?: boolean;
       enrichWithProgress?: boolean;
       batchSize?: number;
+      prefetchedMarketData?: MarketListingAggregated[];
     }
   ): Promise<SRC20Row | SRC20Row[]> {
     const rows = Array.isArray(data) ? data : [data];
@@ -523,10 +524,10 @@ export class SRC20QueryService {
         const batch = rows.slice(i, i + batchSize);
         const ticks = batch.map(row => row.tick);
 
-        // Parallel fetch of additional data for the batch
+        // Fetch market data and mint progress in parallel
         const [marketData, mintProgress] = await Promise.all([
           options.includeMarketData
-            ? SRC20MarketService.fetchMarketListingSummary()
+            ? options.prefetchedMarketData || await SRC20MarketService.fetchMarketListingSummary()
             : null,
           options.enrichWithProgress
             ? Promise.all(ticks.map(tick => 
@@ -535,7 +536,7 @@ export class SRC20QueryService {
             : null
         ]);
 
-        // Enrich market data
+        // Enrich market data and holders
         if (marketData) {
           const marketMap = new Map(
             marketData.map(item => [item.tick, item])
@@ -545,7 +546,8 @@ export class SRC20QueryService {
             if (market) {
               enriched[i + index] = {
                 ...row,
-                market_data: market
+                market_data: market,
+                holders: row.holders || market.holders || 0
               };
             }
           });
@@ -558,7 +560,11 @@ export class SRC20QueryService {
             if (progress) {
               enriched[i + index] = {
                 ...enriched[i + index],
-                mint_progress: progress
+                mint_progress: {
+                  progress: row.progress || progress.progress || "0",
+                  current: progress.total_minted || 0,
+                  max: progress.max_supply || 0
+                }
               };
             }
           });

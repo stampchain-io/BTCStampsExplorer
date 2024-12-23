@@ -181,10 +181,6 @@ export class SRC20Repository {
       );
     }
 
-    const whereClause = whereClauses.length > 0
-      ? `WHERE ${whereClauses.join(" AND ")}`
-      : "";
-
     // Enforce limit and pagination
     const safeLimit = Number.isFinite(Number(limit)) && Number(limit) > 0
       ? Number(limit)
@@ -194,59 +190,93 @@ export class SRC20Repository {
       : 1;
     const offset = safeLimit * (safePage - 1);
 
-    const limitOffsetClause = `LIMIT ? OFFSET ?`;
-    queryParams.push(safeLimit, offset);
-
     const validOrder = ["ASC", "DESC"].includes(sortBy.toUpperCase())
       ? sortBy.toUpperCase()
       : "ASC";
 
     const rowNumberInit = offset;
+    const limitOffsetClause = `LIMIT ? OFFSET ?`;
+    const whereClause = whereClauses.length > 0
+      ? `WHERE ${whereClauses.join(" AND ")}`
+      : "";
 
-    const query = `
-      SELECT 
-        (@row_number:=@row_number + 1) AS row_num,
-        src20.tx_hash,
-        src20.block_index,
-        src20.p,
-        src20.op,
-        src20.tick,
-        src20.creator,
-        src20.amt,
-        src20.deci,
-        src20.lim,
-        src20.max,
-        src20.destination,
-        src20.block_time,
-        creator_info.creator as creator_name,
-        destination_info.creator as destination_name
-      FROM
-        ${SRC20_TABLE} src20
-      LEFT JOIN 
-        creator creator_info ON src20.creator = creator_info.address
-      LEFT JOIN
-        creator destination_info ON src20.destination = destination_info.address
-      CROSS JOIN
-        (SELECT @row_number := ?) AS init
-      ${whereClause}
-      ORDER BY 
-        src20.tx_index ${validOrder}
-      ${limitOffsetClause};
-    `;
+    queryParams.push(safeLimit, offset);
 
-    const fullQueryParams = [rowNumberInit, ...queryParams];
+    try {
+      const query = `
+        WITH base_query AS (
+          SELECT 
+            (@row_number:=@row_number + 1) AS row_num,
+            src20.tx_hash,
+            src20.block_index,
+            src20.p,
+            src20.op,
+            src20.tick,
+            src20.creator,
+            src20.amt,
+            src20.deci,
+            src20.lim,
+            src20.max,
+            src20.destination,
+            src20.block_time,
+            creator_info.creator as creator_name,
+            destination_info.creator as destination_name
+          FROM ${SRC20_TABLE} src20
+          LEFT JOIN creator creator_info ON src20.creator = creator_info.address
+          LEFT JOIN creator destination_info ON src20.destination = destination_info.address
+          CROSS JOIN (SELECT @row_number := ?) AS init
+          ${whereClause}
+        ),
+        holders AS (
+          SELECT 
+            tick,
+            COUNT(DISTINCT address) as holders
+          FROM ${SRC20_BALANCE_TABLE}
+          WHERE amt > 0
+          GROUP BY tick
+        ),
+        mint_progress AS (
+          SELECT 
+            tick,
+            FORMAT(
+              ROUND(
+                (CAST(SUM(CASE WHEN op = 'MINT' THEN amt ELSE 0 END) AS DECIMAL(65,30)) / 
+                CAST(MAX(CASE WHEN op = 'DEPLOY' THEN amt ELSE 0 END) AS DECIMAL(65,30)) * 100),
+                2
+              ),
+              2
+            ) as progress
+          FROM ${SRC20_TABLE}
+          GROUP BY tick
+        )
+        SELECT 
+          b.*,
+          h.holders,
+          mp.progress
+        FROM base_query b
+        LEFT JOIN holders h ON h.tick = b.tick
+        LEFT JOIN mint_progress mp ON mp.tick = b.tick
+        ORDER BY b.block_index ${validOrder}
+        ${limitOffsetClause}
+      `;
 
-    const results = await dbManager.executeQueryWithCache(
-      query,
-      fullQueryParams,
-      1000 * 60 * 5, // Cache duration
-    );
+      const fullQueryParams = [rowNumberInit, ...queryParams];
 
-    // Convert response ticks to emoji format
-    return {
-      ...results,
-      rows: this.convertResponseToEmoji(results.rows)
-    };
+      const results = await dbManager.executeQueryWithCache(
+        query,
+        fullQueryParams,
+        1000 * 60 * 5, // Cache duration
+      );
+
+      // Convert response ticks to emoji format
+      return {
+        ...results,
+        rows: this.convertResponseToEmoji(results.rows)
+      };
+    } catch (error) {
+      console.error("Error in getValidSrc20TxFromDb:", error);
+      throw error;
+    }
   }
 
   static async getSrc20BalanceFromDb(
