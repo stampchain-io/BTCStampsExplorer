@@ -61,7 +61,7 @@ export class Src20Controller {
       balanceParams.limit = limit;
       balanceParams.page = page;
 
-      const [fetchedData, lastBlock] = await Promise.all([
+      const [rawData, lastBlock] = await Promise.all([
         SRC20Service.QueryService.fetchSrc20Balance(balanceParams),
         BlockService.getLastBlock(),
       ]);
@@ -69,6 +69,30 @@ export class Src20Controller {
       let restructuredResult: any = {
         last_block: lastBlock,
       };
+
+      // Process data with mint progress if requested
+      let processedData = [...rawData];
+      if (balanceParams.includeMintData) {
+        const ticks = processedData.map(row => row.tick).filter(Boolean);
+        if (ticks.length > 0) {
+          const mintProgressData = await Promise.all(
+            ticks.map(tick => 
+              SRC20Service.QueryService.fetchSrc20MintProgress(tick)
+            )
+          );
+          
+          // Create a map of tick to mint progress for efficient lookup
+          const mintProgressMap = new Map(
+            mintProgressData.map((progress, index) => [ticks[index], progress])
+          );
+
+          // Enrich data with mint progress
+          processedData = processedData.map(row => ({
+            ...row,
+            mint_progress: mintProgressMap.get(row.tick) || null
+          }));
+        }
+      }
 
       if (balanceParams.includePagination) {
         const fetchedTotalCount = await SRC20Service.QueryService.getTotalSrc20BalanceCount(
@@ -84,7 +108,7 @@ export class Src20Controller {
         };
       }
 
-      restructuredResult.data = fetchedData;
+      restructuredResult.data = processedData;
 
       return restructuredResult;
     } catch (error) {
