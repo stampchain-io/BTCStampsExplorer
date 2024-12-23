@@ -273,61 +273,52 @@ export class Src20Controller {
     return percentage.toFixed(2);
   }
 
-  static async fetchFullyMintedByMarketCap(
+  static async fetchFullyMintedByMarketCapV2(
     limit: number = 50,
     page: number = 1,
+    useV2: boolean = false
   ) {
+    if (!useV2) {
+      return this.fetchFullyMintedByMarketCap(limit, page);
+    }
+
     try {
-      // Get market data first to sort by market cap
-      const marketData = await SRC20MarketService.fetchMarketListingSummary();
+      // Use V2 endpoint with market data and progress enrichment
+      const enrichedData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
+        {
+          op: "DEPLOY",
+          limit: 1000, // Get a large batch to filter
+          sortBy: "DESC",
+        },
+        {
+          onlyFullyMinted: true,
+          includeMarketData: true,
+          enrichWithProgress: true,
+          batchSize: 10
+        }
+      );
 
-      // Get all SRC20 data with mint progress
-      const allSrc20Data = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
-        op: "DEPLOY",
-        limit: 1000, // Get a large batch to filter
-      }, false);
-
-      const enrichedData = [];
-
-      // Enrich and filter for fully minted tokens
-      for (const row of allSrc20Data.data) {
-        if (!row) continue;
-
-        const mintProgress = await SRC20Service.QueryService.fetchSrc20MintProgress(row.tick);
-        if (!mintProgress || parseFloat(mintProgress.progress) < 100) continue;
-
-        const marketInfo = marketData.find(item => item.tick === row.tick) || {
-          mcap: 0,
-          floor_unit_price: 0,
-        };
-
-        const balanceResult = await this.handleSrc20BalanceRequest({
-          tick: row.tick,
-          includePagination: true,
-        });
-
-        enrichedData.push({
+      const formattedData = (Array.isArray(enrichedData.data) ? enrichedData.data : [enrichedData.data])
+        .filter(row => row && row.mint_progress?.progress === "100")
+        .map(row => ({
           ...row,
-          holders: balanceResult.total,
-          mcap: marketInfo.mcap,
-          floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
-          progress: mintProgress.progress,
-        });
-      }
-
-      // Sort by market cap descending
-      enrichedData.sort((a, b) => b.mcap - a.mcap);
+          holders: row.holders || 0,
+          mcap: row.market_data?.mcap || 0,
+          floor_unit_price: Number((row.market_data?.floor_unit_price || 0).toFixed(10)),
+          progress: row.mint_progress?.progress || "0",
+        }))
+        .sort((a, b) => (b.mcap || 0) - (a.mcap || 0));
 
       // Apply pagination
       const startIndex = (page - 1) * limit;
-      const paginatedData = enrichedData.slice(startIndex, startIndex + limit);
+      const resultData = formattedData.slice(startIndex, startIndex + limit);
 
       return {
-        data: paginatedData,
-        total: enrichedData.length,
+        data: resultData,
+        total: formattedData.length,
         page,
-        totalPages: Math.ceil(enrichedData.length / limit),
-        limit,
+        totalPages: Math.ceil(formattedData.length / limit),
+        limit
       };
     } catch (error) {
       console.error("Error in fetchFullyMintedByMarketCap:", error);
@@ -510,11 +501,16 @@ export class Src20Controller {
     }
   }
 
-  static async fetchTrendingActiveMintingTokens(
+  static async fetchTrendingActiveMintingTokensV2(
     limit: number,
     page: number,
     transactionCount: number,
+    useV2: boolean = false
   ) {
+    if (!useV2) {
+      return this.fetchTrendingActiveMintingTokens(limit, page, transactionCount);
+    }
+
     try {
       const trendingData = await SRC20Service.QueryService.fetchTrendingActiveMintingTokens(
         limit,
@@ -522,110 +518,53 @@ export class Src20Controller {
         transactionCount,
       );
 
-      const marketData = await SRC20Service.MarketService.fetchMarketListingSummary();
-      // Market data is already in emoji format, create map using emoji ticks
-      const marketDataMap = new Map<string, MarketListingAggregated>(
-        marketData.map((item) => [item.tick, item]),
+      // Use V2 endpoint for enriched data with market info
+      const enrichedData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
+        {
+          tick: trendingData.data.map(row => row.tick),
+          includeMarketData: true,
+          enrichWithProgress: true,
+        },
+        {
+          excludeFullyMinted: true,
+          includeMarketData: true,
+          enrichWithProgress: true,
+          batchSize: 10
+        }
       );
 
-      const enrichedData = [];
-
-      for (const row of trendingData.data) {
-        const balanceParams: SRC20BalanceRequestParams = {
-          tick: row.tick,
-          includePagination: true,
-        };
-        const balanceResult = await this.handleSrc20BalanceRequest(
-          balanceParams,
-        );
-
-        // Use emoji tick directly since market data is in emoji format
-        const marketInfo = marketDataMap.get(row.tick) || {
-          mcap: 0,
-          floor_unit_price: 0,
-        };
-
-        // Fetch mint progress data - repository handles format conversion
-        const mintProgress = await SRC20Service.QueryService.fetchSrc20MintProgress(
-          row.tick
-        );
-        const progress = mintProgress ? mintProgress.progress : null;
-
-        enrichedData.push({
+      // Merge trending data with enriched data
+      const enrichedResult = trendingData.data.map(row => {
+        const enrichedItem = Array.isArray(enrichedData.data) 
+          ? enrichedData.data.find(item => item.tick === row.tick)
+          : enrichedData.data;
+        
+        return {
           ...row,
-          holders: balanceResult.total,
-          mcap: marketInfo.mcap,
-          floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
-          progress,
+          ...enrichedItem,
+          holders: enrichedItem?.holders || 0,
+          mcap: enrichedItem?.market_data?.mcap || 0,
+          floor_unit_price: enrichedItem?.market_data?.floor_unit_price || 0,
+          progress: enrichedItem?.mint_progress?.progress || null,
           mint_count: row.mint_count,
           top_mints_percentage: row.top_mints_percentage
             ? Number(row.top_mints_percentage)
             : 0,
-          total_minted: mintProgress?.total_minted || "0",
-          max_supply: mintProgress?.max_supply || "0",
-        });
-      }
-
-      const total = enrichedData.length;
-      const totalPages = Math.ceil(total / limit);
+          total_minted: enrichedItem?.mint_progress?.total_minted || "0",
+          max_supply: enrichedItem?.mint_progress?.max_supply || "0",
+        };
+      });
 
       return {
-        data: enrichedData,
-        total,
+        data: enrichedResult,
+        total: trendingData.total,
         page,
-        totalPages,
-        limit,
+        totalPages: Math.ceil(trendingData.total / limit),
+        limit
       };
     } catch (error) {
-      console.error("Error fetching trending active minting SRC20 tokens:", error);
+      console.error("Error in fetchTrendingActiveMintingTokensV2:", error);
       throw error;
     }
-  }
-
-  static async fetchRecentTransactions() {
-    const limit = 8;
-    const page = 1;
-
-    const [deployTransactions, mintTransactions, transferTransactions] =
-      await Promise.all([
-        SRC20Service.QueryService.fetchAndFormatSrc20Data({
-          op: "DEPLOY",
-          limit,
-          page,
-          sortBy: "DESC",
-        }),
-        SRC20Service.QueryService.fetchAndFormatSrc20Data({
-          op: "MINT",
-          limit,
-          page,
-          sortBy: "DESC",
-        }),
-        SRC20Service.QueryService.fetchAndFormatSrc20Data({
-          op: "TRANSFER",
-          limit,
-          page,
-          sortBy: "DESC",
-        }),
-      ]);
-
-    // Enrich transactions with stamp_url and stamp_mimetype
-    const mapTransactions = (transactions: any[]) =>
-      transactions.map((tx: any) => ({
-        ...tx,
-        stamp_url: `https://stampchain.io/stamps/${tx.tx_hash}.svg`,
-        stamp_mimetype: "image/svg+xml",
-        // Map additional properties to match the expected shape
-        // stamp: tx.block_index,
-        // cpid: tx.tx_hash,
-        block_time: tx.block_time,
-        creator: tx.creator,
-        creator_name: tx.creator_name,
-      }));
-
-    return {
-      deploy: mapTransactions(deployTransactions.data),
-      mint: mapTransactions(mintTransactions.data),
-      transfer: mapTransactions(transferTransactions.data),
-    };
   }
 }

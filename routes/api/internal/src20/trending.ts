@@ -28,24 +28,23 @@ export const handler: Handlers = {
       );
 
       let result;
+      const useV2 = new URL(req.url).searchParams.get("v2") === "1";
+      const type = new URL(req.url).searchParams.get("type") || "minting";
+      
       if (type === "market") {
         // Get top tickers by market cap (fully minted)
-        result = await Src20Controller.fetchSrc20DetailsWithHolders(
-          {
-            op: "DEPLOY",
-            limit,
-            page,
-            sortBy: "DESC",
-          },
-          false, // excludeFullyMinted
-          true, // onlyFullyMinted
+        result = await Src20Controller.fetchFullyMintedByMarketCapV2(
+          limit,
+          page,
+          useV2
         );
       } else {
         // Get trending minting tokens
-        result = await Src20Controller.fetchTrendingActiveMintingTokens(
+        result = await Src20Controller.fetchTrendingActiveMintingTokensV2(
           limit,
           page,
           transactionCount,
+          useV2
         );
       }
 
@@ -55,7 +54,7 @@ export const handler: Handlers = {
     } catch (error) {
       return ApiResponseUtil.internalError(
         error,
-        `Error fetching ${url.searchParams.get("type") || "minting"} tokens`,
+        `Error fetching ${type || "minting"} tokens`,
       );
     }
   },
