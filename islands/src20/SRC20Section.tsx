@@ -163,7 +163,7 @@ export function SRC20Section({
 
         <div class="flex flex-col gap-6">
           {data.map((src20) => (
-            parseFloat(src20.mint_progress?.progress || "0") >= 100
+            parseFloat(src20.progress || "0") >= 100
               ? (
                 <SRC20TokenOutmintedCard
                   src20={src20}
