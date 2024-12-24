@@ -391,6 +391,7 @@ export interface SRC20TrxRequestParams {
   page?: number;
   sort?: string; // sort is only used on API requests
   sortBy?: string;
+  filterBy?: string | string[] | null;
   tx_hash?: string | null;
   address?: string | null;
   noPagination?: boolean;

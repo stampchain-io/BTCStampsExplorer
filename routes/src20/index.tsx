@@ -47,6 +47,7 @@ export const handler: Handlers = {
           page,
           limit,
           sortBy,
+          filterBy,
         };
 
         // Add market data filters if they exist

@@ -133,6 +133,7 @@ export class SRC20Repository {
       limit = 50, // Default limit
       page = 1, // Default page
       sortBy = "ASC",
+      filterBy,
       tx_hash,
       address,
     } = params;

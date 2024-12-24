@@ -80,15 +80,29 @@ export class SRC20MarketService {
   }
 
   private static async fetchOpenStampMarketData(): Promise<OpenStampMarketData[]> {
-    const response = await fetch("https://openapi.openstamp.io/v1/src20MarketData", {
-      headers: {
-        ...(OPENSTAMP_API_KEY && { Authorization: OPENSTAMP_API_KEY }),
-      },
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch market data from OpenStamp");
+    try {
+      const response = await fetch("https://openapi.openstamp.io/v1/src20MarketData", {
+        headers: {
+          ...(OPENSTAMP_API_KEY && { Authorization: OPENSTAMP_API_KEY }),
+        },
+      });
+      if (!response.ok) {
+        console.error("HTTP Error:", response.status, response.statusText);
+        return [];
+      }
+      
+      const data = await response.json();
+
+      // Ensure `data.data` is an array, otherwise return an empty array
+      if (Array.isArray(data.data)) {
+        return data.data;
+      } else {
+        console.warn("Unexpected data format: data.data is not an array");
+        return [];
+      }
+    } catch (error) {
+      console.error("Fetch Error:", error.message);
+      return [];
     }
-    const data = await response.json();
-    return data.data;
   }
 }
