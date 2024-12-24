@@ -5,6 +5,7 @@ import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutminte
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { useLoading } from "$islands/loading/LoadingProvider.tsx";
 
 interface SRC20SectionProps {
   title?: string;
@@ -57,6 +58,7 @@ export function SRC20Section(
     address,
   }: SRC20SectionProps,
 ) {
+  const { setLoading } = useLoading();
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -65,6 +67,7 @@ export function SRC20Section(
 
   useEffect(() => {
     if (!initialData?.length) {
+      setLoading(true);
       setIsTransitioning(true);
       setIsLoading(true);
       const endpoint = fromPage === "wallet" && address
@@ -83,11 +86,13 @@ export function SRC20Section(
           setData(response.data || []);
           setIsLoading(false);
           setIsTransitioning(false);
+          setLoading(false);
         })
         .catch((error) => {
           console.error(`SRC20 ${type} fetch error:`, error);
           setIsLoading(false);
           setIsTransitioning(false);
+          setLoading(false);
         });
     }
   }, [type, page, sortBy, initialData, fromPage, address, pagination]);
