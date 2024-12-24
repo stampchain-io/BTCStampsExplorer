@@ -1,8 +1,8 @@
 import { useLoading } from "$/islands/loading/LoadingProvider.tsx";
 
 const LoadingContent = () => {
-  const { loading } = useLoading()
-  if (!loading) return null
+  const { loading } = useLoading();
+  if (!loading) return null;
 
   return (
     <>
@@ -15,6 +15,6 @@ const LoadingContent = () => {
       </div>
     </>
   );
-}
+};
 
 export default LoadingContent;

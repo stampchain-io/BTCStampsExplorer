@@ -13,13 +13,13 @@ const LoadingContext = createContext<LoadingContextType | undefined>(
 export const LoadingProvider = (
   { children }: { children: preact.ComponentChildren },
 ) => {
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false);
 
   return (
     <LoadingContext.Provider
       value={{
         loading,
-        setLoading
+        setLoading,
       }}
     >
       {children}
