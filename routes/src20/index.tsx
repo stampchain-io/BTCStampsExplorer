@@ -131,7 +131,7 @@ export default function SRC20Page(props: any) {
     totalPages = 1,
     filterBy = [],
     sortBy = "ASC",
-    selectedTab,
+    selectedTab = "all",
   } = data;
 
   if (!src20s || src20s.length === 0) {

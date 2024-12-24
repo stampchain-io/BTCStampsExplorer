@@ -113,7 +113,6 @@ export function StampPage(props: StampPageProps) {
         pagination={{
           page,
           totalPages,
-          prefix: "stamps",
           onPageChange: (newPage: number) => {
             const url = new URL(globalThis.location.href);
             url.searchParams.set("page", newPage.toString());

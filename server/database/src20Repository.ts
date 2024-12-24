@@ -236,18 +236,19 @@ export class SRC20Repository {
           GROUP BY tick
         ),
         mint_progress AS (
-          SELECT 
-            tick,
-            FORMAT(
-              ROUND(
-                (CAST(SUM(CASE WHEN op = 'MINT' THEN amt ELSE 0 END) AS DECIMAL(65,30)) / 
-                CAST(MAX(CASE WHEN op = 'DEPLOY' THEN amt ELSE 0 END) AS DECIMAL(65,30)) * 100),
-                2
-              ),
-              2
-            ) as progress
-          FROM ${SRC20_TABLE}
-          GROUP BY tick
+          SELECT
+            dep.tick,
+            dep.max,
+            COALESCE((
+                SELECT SUM(amt) FROM balances WHERE tick = dep.tick
+            ), 0) AS total_minted,
+            ROUND(
+                COALESCE((
+                    SELECT SUM(amt) FROM balances WHERE tick = dep.tick
+                ), 0) / dep.max * 100, 2
+            ) AS progress
+          FROM SRC20Valid dep
+          WHERE dep.op = 'DEPLOY'
         )
         SELECT 
           b.*,
