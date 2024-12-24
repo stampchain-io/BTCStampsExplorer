@@ -5,6 +5,7 @@ import { SRC20TokenOutmintedCard } from "$islands/src20/cards/SRC20TokenOutminte
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import { useLoading } from "$islands/loading/LoadingProvider.tsx";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 
 interface SRC20SectionProps {
@@ -46,17 +47,20 @@ const ImageModal = (
   );
 };
 
-export function SRC20Section({
-  title,
-  subTitle,
-  type,
-  fromPage,
-  sortBy,
-  initialData,
-  pagination,
-  address,
-  useClientFetch = fromPage === "home" || fromPage === "wallet",
-}: SRC20SectionProps) {
+export function SRC20Section(
+  {
+    title,
+    subTitle,
+    type,
+    fromPage,
+    sortBy,
+    initialData,
+    pagination,
+    address,
+    useClientFetch = fromPage === "home" || fromPage === "wallet",
+  }: SRC20SectionProps,
+) {
+  const { setLoading } = useLoading();
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -65,6 +69,7 @@ export function SRC20Section({
 
   useEffect(() => {
     if (!initialData?.length && useClientFetch) {
+      setLoading(true);
       setIsTransitioning(true);
       setIsLoading(true);
 
@@ -101,9 +106,9 @@ export function SRC20Section({
         } finally {
           setIsLoading(false);
           setIsTransitioning(false);
+          setLoading(false);
         }
       };
-
       fetchData();
     }
   }, [
