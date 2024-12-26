@@ -88,17 +88,19 @@ jobs:
           echo "Processing format issues..."
           current_file=""
           while IFS= read -r line; do
-            if [[ "$line" =~ ^from[[:space:]]*([^:]+): ]]; then
+            if [[ "$line" =~ ^from[[:space:]]([^:]+): ]]; then
               current_file="${BASH_REMATCH[1]}"
               echo "Processing file: $current_file"
-            elif [[ "$line" =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*(-.*) ]]; then
+            elif [[ "$line" =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*([+-].+)$ ]]; then
               line_num="${BASH_REMATCH[1]}"
-              old_content="${BASH_REMATCH[2]}"
-              # Read the next line which should contain the new content
-              read -r next_line || true
-              if [[ "$next_line" =~ ^[[:space:]]*[0-9]+[[:space:]]*\|[[:space:]]*(\+.*) ]]; then
-                new_content="${BASH_REMATCH[1]}"
-                echo "$current_file:$line_num:1:[deno-fmt] Format diff - Old: $old_content | New: $new_content" >> fmt_processed.txt
+              content="${BASH_REMATCH[2]}"
+              if [[ "$content" =~ ^- ]]; then
+                old_content="$content"
+                read -r next_line || true
+                if [[ "$next_line" =~ ^[[:space:]]*[0-9]+[[:space:]]*\|[[:space:]]*\+(.+)$ ]]; then
+                  new_content="+${BASH_REMATCH[1]}"
+                  echo "$current_file:$line_num:1:[deno-fmt] Format diff - Old: $old_content | New: $new_content" >> fmt_processed.txt
+                fi
               fi
             fi
           done < fmt_output.txt
@@ -106,15 +108,16 @@ jobs:
           # Process and report linting issues
           echo "Processing lint issues..."
           while IFS= read -r line; do
-            if [[ "$line" =~ ^error\[([^]]+)\]:[[:space:]]*(.+) ]]; then
+            if [[ "$line" =~ ^error\[([^]]+)\]:[[:space:]]*(.+)$ ]]; then
               rule="${BASH_REMATCH[1]}"
               message="${BASH_REMATCH[2]}"
               # Read the next line which contains the file path with arrow
               read -r file_line || true
-              if [[ "$file_line" =~ [[:space:]]*--[[:space:]]*([^:]+):([0-9]+) ]]; then
+              if [[ "$file_line" =~ ^[[:space:]]*-->[[:space:]]*([^:]+):([0-9]+):([0-9]+)$ ]]; then
                 file="${BASH_REMATCH[1]}"
                 line_num="${BASH_REMATCH[2]}"
-                echo "$file:$line_num:1:[deno-lint/$rule] $message" >> lint_processed.txt
+                col_num="${BASH_REMATCH[3]}"
+                echo "$file:$line_num:$col_num:[deno-lint/$rule] $message" >> lint_processed.txt
               fi
             fi
           done < lint_output.txt
