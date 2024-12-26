@@ -127,8 +127,8 @@ export function SRC20TickHeader({
   const _dataColumn = "flex flex-col -space-y-1";
   const _dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  const dataLabel =
-    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+  // const dataLabel =
+  //   "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
   const _dataValueXs =
     "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
   const _dataValueSm =
