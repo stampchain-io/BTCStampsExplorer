@@ -8,7 +8,6 @@ import {
 import StampSection from "$islands/stamp/StampSection.tsx";
 import CollectionSection from "$islands/collection/CollectionSection.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
-import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 
 export function HomeStampPreview({
   stamps_src721 = [],
@@ -28,6 +27,7 @@ export function HomeStampPreview({
       stamps: stamps_art,
       layout: "grid",
       showDetails: false,
+      viewAllLink: "/stamps/art",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
@@ -66,6 +66,7 @@ export function HomeStampPreview({
       stamps: stamps_posh,
       layout: "grid",
       showDetails: false,
+      viewAllLink: "/stamps/posh",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
@@ -84,6 +85,7 @@ export function HomeStampPreview({
       stamps: stamps_src721,
       layout: "grid",
       showDetails: false,
+      viewAllLink: "/collection/overview/recursive",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-6
@@ -131,31 +133,19 @@ export function HomeStampPreview({
           {LatestArtStampsSection.map((section) => (
             <StampSection key={section.title} {...section} />
           ))}
-          <div className="flex justify-end -mt-3 mobileMd:-mt-6">
-            <ViewAllButton href="/stamp/art" />
-          </div>
         </div>
       </div>
 
       {/* FEATURED ARTISTS */}
       <CollectionSection {...FeaturedArtistsSection} />
-      <div className="flex justify-end -mt-3 mobileMd:-mt-6">
-        <ViewAllButton href="/collection/overview/artist" />
-      </div>
 
       {/* COLLECTIONS */}
       {CollectionsSection.map((section) => (
         <StampSection key={section.title} {...section} />
       ))}
-      <div className="flex justify-end -mt-3 mobileMd:-mt-6">
-        <ViewAllButton href="/collection" />
-      </div>
 
       {/* CUTTING EDGE */}
       <CollectionSection {...CuttingEdgeSection} />
-      <div className="flex justify-end -mt-3 mobileMd:-mt-6">
-        <ViewAllButton href="/collection/overview/recursive" />
-      </div>
     </div>
   );
 }
