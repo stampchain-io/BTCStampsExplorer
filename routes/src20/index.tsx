@@ -3,7 +3,7 @@ import { SRC20TrxRequestParams } from "$globals";
 import { SRC20Header } from "$islands/src20/SRC20Header.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
-import { SRC20QueryService } from "$server/services/src20/queryService.ts";
+import { SRC20Service } from "$server/services/src20/index.ts";
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
@@ -79,7 +79,7 @@ export const handler: Handlers = {
         // Determine if we need market data based on filters
         const hasMarketFilters = Object.keys(marketFilters).length > 0;
 
-        const resultData = await SRC20QueryService.QueryService
+        const resultData = await SRC20Service.QueryService
           .fetchAndFormatSrc20DataV2(
             {
               ...baseParams,
