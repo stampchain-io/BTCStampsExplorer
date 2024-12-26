@@ -132,7 +132,7 @@ export function HomeStampPreview({
             <StampSection key={section.title} {...section} />
           ))}
           <div className="flex justify-end -mt-3 mobileMd:-mt-6">
-            <ViewAllButton href="/stamps/art" />
+            <ViewAllButton href="/stamp/art" />
           </div>
         </div>
       </div>
@@ -148,7 +148,7 @@ export function HomeStampPreview({
         <StampSection key={section.title} {...section} />
       ))}
       <div className="flex justify-end -mt-3 mobileMd:-mt-6">
-        <ViewAllButton href="/stamps/collections" />
+        <ViewAllButton href="/collection" />
       </div>
 
       {/* CUTTING EDGE */}
