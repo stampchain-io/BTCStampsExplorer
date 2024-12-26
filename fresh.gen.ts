@@ -214,7 +214,6 @@ import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/tr
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
-import * as $stamping_stamp_transfer_TransferStamp from "./islands/stamping/stamp/transfer/TransferStamp.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -490,8 +489,6 @@ const manifest = {
     "./islands/stamping/src20/transfer/TransferContent.tsx":
       $stamping_src20_transfer_TransferContent,
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
-    "./islands/stamping/stamp/transfer/TransferStamp.tsx":
-      $stamping_stamp_transfer_TransferStamp,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
   },
