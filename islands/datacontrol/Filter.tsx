@@ -46,6 +46,13 @@ export function Filter({
         ? prevFilters.filter((f) => f !== value)
         : [...prevFilters, value];
       updateURL({ filterBy: newFilters });
+
+      const url = new URL(globalThis.location.href);
+      url.searchParams.set(
+        "filterBy",
+        newFilters.length > 0 ? newFilters.join(",") : "",
+      );
+      globalThis.location.href = url.toString();
       return newFilters;
     });
   };

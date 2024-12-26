@@ -61,7 +61,7 @@ export class Src20Controller {
       balanceParams.limit = limit;
       balanceParams.page = page;
 
-      const [fetchedData, lastBlock] = await Promise.all([
+      const [rawData, lastBlock] = await Promise.all([
         SRC20Service.QueryService.fetchSrc20Balance(balanceParams),
         BlockService.getLastBlock(),
       ]);
@@ -69,6 +69,30 @@ export class Src20Controller {
       let restructuredResult: any = {
         last_block: lastBlock,
       };
+
+      // Process data with mint progress if requested
+      let processedData = [...rawData];
+      if (balanceParams.includeMintData) {
+        const ticks = processedData.map(row => row.tick).filter(Boolean);
+        if (ticks.length > 0) {
+          const mintProgressData = await Promise.all(
+            ticks.map(tick => 
+              SRC20Service.QueryService.fetchSrc20MintProgress(tick)
+            )
+          );
+          
+          // Create a map of tick to mint progress for efficient lookup
+          const mintProgressMap = new Map(
+            mintProgressData.map((progress, index) => [ticks[index], progress])
+          );
+
+          // Enrich data with mint progress
+          processedData = processedData.map(row => ({
+            ...row,
+            mint_progress: mintProgressMap.get(row.tick) || null
+          }));
+        }
+      }
 
       if (balanceParams.includePagination) {
         const fetchedTotalCount = await SRC20Service.QueryService.getTotalSrc20BalanceCount(
@@ -84,7 +108,7 @@ export class Src20Controller {
         };
       }
 
-      restructuredResult.data = fetchedData;
+      restructuredResult.data = processedData;
 
       return restructuredResult;
     } catch (error) {
@@ -273,248 +297,62 @@ export class Src20Controller {
     return percentage.toFixed(2);
   }
 
-  static async fetchFullyMintedByMarketCap(
+  static async fetchFullyMintedByMarketCapV2(
     limit: number = 50,
     page: number = 1,
-  ) {
+  ): Promise<PaginatedSrc20ResponseBody> {
     try {
-      // Get market data first to sort by market cap
+      // First fetch market data to get top ticks by market cap
       const marketData = await SRC20MarketService.fetchMarketListingSummary();
+      
+      // Sort by market cap and get top ticks
+      const sortedTicks = marketData
+        .sort((a, b) => b.mcap - a.mcap)
+        .slice(0, 1000)
+        .map(item => item.tick);
 
-      // Get all SRC20 data with mint progress
-      const allSrc20Data = await SRC20Service.QueryService.fetchAndFormatSrc20Data({
-        op: "DEPLOY",
-        limit: 1000, // Get a large batch to filter
-      }, false);
-
-      const enrichedData = [];
-
-      // Enrich and filter for fully minted tokens
-      for (const row of allSrc20Data.data) {
-        if (!row) continue;
-
-        const mintProgress = await SRC20Service.QueryService.fetchSrc20MintProgress(row.tick);
-        if (!mintProgress || parseFloat(mintProgress.progress) < 100) continue;
-
-        const marketInfo = marketData.find(item => item.tick === row.tick) || {
-          mcap: 0,
-          floor_unit_price: 0,
-        };
-
-        const balanceResult = await this.handleSrc20BalanceRequest({
-          tick: row.tick,
-          includePagination: true,
-        });
-
-        enrichedData.push({
-          ...row,
-          holders: balanceResult.total,
-          mcap: marketInfo.mcap,
-          floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
-          progress: mintProgress.progress,
-        });
-      }
-
-      // Sort by market cap descending
-      enrichedData.sort((a, b) => b.mcap - a.mcap);
-
-      // Apply pagination
-      const startIndex = (page - 1) * limit;
-      const paginatedData = enrichedData.slice(startIndex, startIndex + limit);
-
-      return {
-        data: paginatedData,
-        total: enrichedData.length,
-        page,
-        totalPages: Math.ceil(enrichedData.length / limit),
-        limit,
-      };
-    } catch (error) {
-      console.error("Error in fetchFullyMintedByMarketCap:", error);
-      throw error;
-    }
-  }
-
-  static async fetchSrc20DetailsWithHolders(
-    params: SRC20TrxRequestParams,
-    excludeFullyMinted: boolean = false,
-    onlyFullyMinted: boolean = false,
-  ) {
-    try {
-      // For fully minted tokens sorted by market cap
-      if (onlyFullyMinted) {
-        // Get all DEPLOY transactions first
-        const allDeployData = await SRC20Service.QueryService.fetchAndFormatSrc20Data(
-          {
-            ...params,
-            limit: 1000, // Get a larger batch to filter from
-            page: 1,
-            op: "DEPLOY",
-          },
-          false, // Don't exclude any yet
-          false, // Don't filter yet
-        );
-
-        if (!allDeployData.data || allDeployData.data.length === 0) {
-          return {
-            data: [],
-            total: 0,
-            page: params.page || 1,
-            totalPages: 0,
-            limit: params.limit || 50,
-          };
-        }
-
-        // Process in batches for better performance
-        const batchSize = 10;
-        const rows = Array.isArray(allDeployData.data) ? allDeployData.data : [allDeployData.data];
-        const enrichedData = [];
-        
-        // Get market data once
-        const marketData = await SRC20MarketService.fetchMarketListingSummary();
-        const marketDataMap = new Map(marketData.map(item => [item.tick, item]));
-        
-        for (let i = 0; i < rows.length; i += batchSize) {
-          const batch = rows.slice(i, i + batchSize);
-          
-          // Get mint progress and balances in parallel for the batch
-          const [batchMintProgress, batchBalances] = await Promise.all([
-            Promise.all(
-              batch
-                .filter(Boolean)
-                .map(row => SRC20Service.QueryService.fetchSrc20MintProgress(row.tick))
-            ),
-            Promise.all(
-              batch
-                .filter(Boolean)
-                .map(row => this.handleSrc20BalanceRequest({
-                  tick: row.tick,
-                  includePagination: true,
-                }))
-            ),
-          ]);
-
-          // Process each item in the batch
-          batch.forEach((row, index) => {
-            if (!row) return;
-
-            const mintProgress = batchMintProgress[index];
-            // Only include if fully minted
-            if (!mintProgress || parseFloat(mintProgress.progress) < 100) return;
-
-            const marketInfo = marketDataMap.get(row.tick);
-            // Only include if it has market data
-            if (!marketInfo) return;
-
-            enrichedData.push({
-              ...row,
-              holders: batchBalances[index]?.total || 0,
-              mcap: marketInfo.mcap,
-              floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
-              progress: mintProgress.progress,
-            });
-          });
-        }
-
-        // Sort by market cap
-        enrichedData.sort((a, b) => b.mcap - a.mcap);
-
-        // Apply pagination
-        const start = ((params.page || 1) - 1) * (params.limit || 50);
-        const paginatedData = enrichedData.slice(start, start + (params.limit || 50));
-
-        return {
-          data: paginatedData,
-          total: enrichedData.length,
-          page: params.page || 1,
-          totalPages: Math.ceil(enrichedData.length / (params.limit || 50)),
-          limit: params.limit || 50,
-        };
-      }
-
-      // For non-market-cap sorting (regular flow)
-      const [resultData, marketData] = await Promise.all([
-        SRC20Service.QueryService.fetchAndFormatSrc20Data(params, excludeFullyMinted),
-        excludeFullyMinted ? null : SRC20MarketService.fetchMarketListingSummary(),
-      ]);
-
-      if (!resultData.data || resultData.data.length === 0) {
+      if (sortedTicks.length === 0) {
         return {
           data: [],
           total: 0,
-          page: params.page || 1,
+          page,
           totalPages: 0,
-          limit: params.limit || 50,
+          limit,
+          last_block: await BlockService.getLastBlock()
         };
       }
 
-      // Create market data map for quick lookups (if we have market data)
-      const marketDataMap = marketData 
-        ? new Map(marketData.map(item => [item.tick, item]))
-        : new Map();
+      // Fetch SRC20 data for these ticks
+      const result = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
+        {
+          tick: sortedTicks,
+          limit,
+          page,
+          op: "DEPLOY",
+          sortBy: "DESC"
+        },
+        {
+          onlyFullyMinted: true,
+          includeMarketData: true,
+          enrichWithProgress: true,
+          prefetchedMarketData: marketData
+        }
+      );
 
-      // Process in batches for better performance
-      const batchSize = 10;
-      const rows = Array.isArray(resultData.data) ? resultData.data : [resultData.data];
-      const enrichedData = [];
-      
-      for (let i = 0; i < rows.length; i += batchSize) {
-        const batch = rows.slice(i, i + batchSize);
-        
-        // Get mint progress and balances in parallel for the batch
-        const [batchMintProgress, batchBalances] = await Promise.all([
-          Promise.all(
-            batch
-              .filter(Boolean)
-              .map(row => SRC20Service.QueryService.fetchSrc20MintProgress(row.tick))
-          ),
-          Promise.all(
-            batch
-              .filter(Boolean)
-              .map(row => this.handleSrc20BalanceRequest({
-                tick: row.tick,
-                includePagination: true,
-              }))
-          ),
-        ]);
-
-        // Process each item in the batch
-        batch.forEach((row, index) => {
-          if (!row) return;
-
-          const marketInfo = marketDataMap.get(row.tick) || {
-            mcap: 0,
-            floor_unit_price: 0,
-          };
-
-          enrichedData.push({
-            ...row,
-            holders: batchBalances[index]?.total || 0,
-            mcap: marketInfo.mcap,
-            floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
-            progress: batchMintProgress[index]?.progress || "0",
-          });
-        });
-      }
-
-      return {
-        data: enrichedData,
-        total: resultData.total,
-        page: params.page || 1,
-        totalPages: Math.ceil(resultData.total / (params.limit || 50)),
-        limit: params.limit || 50,
-      };
+      return result as PaginatedSrc20ResponseBody;
     } catch (error) {
-      console.error("Error in fetchSrc20DetailsWithHolders:", error);
+      console.error("Error in fetchFullyMintedByMarketCapV2:", error);
       throw error;
     }
   }
 
-  static async fetchTrendingActiveMintingTokens(
+
+  static async fetchTrendingActiveMintingTokensV2(
     limit: number,
     page: number,
     transactionCount: number,
   ) {
+
     try {
       const trendingData = await SRC20Service.QueryService.fetchTrendingActiveMintingTokens(
         limit,
@@ -522,110 +360,53 @@ export class Src20Controller {
         transactionCount,
       );
 
-      const marketData = await SRC20Service.MarketService.fetchMarketListingSummary();
-      // Market data is already in emoji format, create map using emoji ticks
-      const marketDataMap = new Map<string, MarketListingAggregated>(
-        marketData.map((item) => [item.tick, item]),
+      // Use V2 endpoint for enriched data with market info
+      const enrichedData = await SRC20Service.QueryService.fetchAndFormatSrc20DataV2(
+        {
+          tick: trendingData.data.map(row => row.tick),
+          includeMarketData: true,
+          enrichWithProgress: true,
+        },
+        {
+          excludeFullyMinted: true,
+          includeMarketData: true,
+          enrichWithProgress: true,
+          batchSize: 10
+        }
       );
 
-      const enrichedData = [];
-
-      for (const row of trendingData.data) {
-        const balanceParams: SRC20BalanceRequestParams = {
-          tick: row.tick,
-          includePagination: true,
-        };
-        const balanceResult = await this.handleSrc20BalanceRequest(
-          balanceParams,
-        );
-
-        // Use emoji tick directly since market data is in emoji format
-        const marketInfo = marketDataMap.get(row.tick) || {
-          mcap: 0,
-          floor_unit_price: 0,
-        };
-
-        // Fetch mint progress data - repository handles format conversion
-        const mintProgress = await SRC20Service.QueryService.fetchSrc20MintProgress(
-          row.tick
-        );
-        const progress = mintProgress ? mintProgress.progress : null;
-
-        enrichedData.push({
+      // Merge trending data with enriched data
+      const enrichedResult = trendingData.data.map(row => {
+        const enrichedItem = Array.isArray(enrichedData.data) 
+          ? enrichedData.data.find(item => item.tick === row.tick)
+          : enrichedData.data;
+        
+        return {
           ...row,
-          holders: balanceResult.total,
-          mcap: marketInfo.mcap,
-          floor_unit_price: Number(marketInfo.floor_unit_price.toFixed(10)),
-          progress,
+          ...enrichedItem,
+          holders: enrichedItem?.holders || 0,
+          mcap: enrichedItem?.market_data?.mcap || 0,
+          floor_unit_price: enrichedItem?.market_data?.floor_unit_price || 0,
+          progress: enrichedItem?.mint_progress?.progress || null,
           mint_count: row.mint_count,
           top_mints_percentage: row.top_mints_percentage
             ? Number(row.top_mints_percentage)
             : 0,
-          total_minted: mintProgress?.total_minted || "0",
-          max_supply: mintProgress?.max_supply || "0",
-        });
-      }
-
-      const total = enrichedData.length;
-      const totalPages = Math.ceil(total / limit);
+          total_minted: enrichedItem?.mint_progress?.total_minted || "0",
+          max_supply: enrichedItem?.mint_progress?.max_supply || "0",
+        };
+      });
 
       return {
-        data: enrichedData,
-        total,
+        data: enrichedResult,
+        total: trendingData.total,
         page,
-        totalPages,
-        limit,
+        totalPages: Math.ceil(trendingData.total / limit),
+        limit
       };
     } catch (error) {
-      console.error("Error fetching trending active minting SRC20 tokens:", error);
+      console.error("Error in fetchTrendingActiveMintingTokensV2:", error);
       throw error;
     }
-  }
-
-  static async fetchRecentTransactions() {
-    const limit = 8;
-    const page = 1;
-
-    const [deployTransactions, mintTransactions, transferTransactions] =
-      await Promise.all([
-        SRC20Service.QueryService.fetchAndFormatSrc20Data({
-          op: "DEPLOY",
-          limit,
-          page,
-          sortBy: "DESC",
-        }),
-        SRC20Service.QueryService.fetchAndFormatSrc20Data({
-          op: "MINT",
-          limit,
-          page,
-          sortBy: "DESC",
-        }),
-        SRC20Service.QueryService.fetchAndFormatSrc20Data({
-          op: "TRANSFER",
-          limit,
-          page,
-          sortBy: "DESC",
-        }),
-      ]);
-
-    // Enrich transactions with stamp_url and stamp_mimetype
-    const mapTransactions = (transactions: any[]) =>
-      transactions.map((tx: any) => ({
-        ...tx,
-        stamp_url: `https://stampchain.io/stamps/${tx.tx_hash}.svg`,
-        stamp_mimetype: "image/svg+xml",
-        // Map additional properties to match the expected shape
-        // stamp: tx.block_index,
-        // cpid: tx.tx_hash,
-        block_time: tx.block_time,
-        creator: tx.creator,
-        creator_name: tx.creator_name,
-      }));
-
-    return {
-      deploy: mapTransactions(deployTransactions.data),
-      mint: mapTransactions(mintTransactions.data),
-      transfer: mapTransactions(transferTransactions.data),
-    };
   }
 }
