@@ -22,6 +22,7 @@ interface SRC20SectionProps {
     onPageChange?: (page: number) => void;
   };
   address?: string;
+  useClientFetch?: boolean;
 }
 
 const ImageModal = (
@@ -45,17 +46,17 @@ const ImageModal = (
   );
 };
 
-export function SRC20Section(
-  {
-    title,
-    subTitle,
-    type,
-    fromPage,
-    sortBy,
-    initialData,
-    pagination,
-  }: SRC20SectionProps,
-) {
+export function SRC20Section({
+  title,
+  subTitle,
+  type,
+  fromPage,
+  sortBy,
+  initialData,
+  pagination,
+  address,
+  useClientFetch = fromPage === "home" || fromPage === "wallet",
+}: SRC20SectionProps) {
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -63,36 +64,38 @@ export function SRC20Section(
   const [isModalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!initialData?.length && fromPage !== "wallet") {
+    if (!initialData?.length && useClientFetch) {
       setIsTransitioning(true);
       setIsLoading(true);
 
       const fetchData = async () => {
         try {
           let endpoint = "";
+          const params = new URLSearchParams({
+            limit: String(pagination?.limit || 5),
+            page: String(pagination?.page || 1),
+            sortBy: sortBy || "ASC",
+          });
 
-          if (type === "trending") {
-            // Endpoint for trending mints
-            endpoint = `/api/internal/src20/trending?type=minting&limit=${
-              pagination?.limit || 5
-            }&page=${pagination?.page || 1}&transactionCount=1000`;
-          } else {
-            // Endpoint for top tickers by market cap
-            endpoint = `/api/internal/src20/trending?type=market&limit=${
-              pagination?.limit || 5
-            }&page=${pagination?.page || 1}`;
+          if (fromPage === "home") {
+            endpoint = type === "trending"
+              ? `/api/internal/src20/trending?type=minting&transactionCount=1000`
+              : `/api/internal/src20/trending?type=market`;
+          } else if (fromPage === "wallet" && address) {
+            endpoint = `/api/v2/src20/balance/${address}`;
           }
 
-          const response = await fetch(endpoint);
-          const result = await response.json();
+          if (endpoint) {
+            const response = await fetch(`${endpoint}&${params.toString()}`);
+            const result = await response.json();
 
-          // Ensure ticks are in emoji format for display
-          const formattedData = result.data?.map((item: SRC20Row) => ({
-            ...item,
-            tick: unicodeEscapeToEmoji(item.tick),
-          })) || [];
+            const formattedData = result.data?.map((item: SRC20Row) => ({
+              ...item,
+              tick: unicodeEscapeToEmoji(item.tick),
+            })) || [];
 
-          setData(formattedData);
+            setData(formattedData);
+          }
         } catch (error) {
           console.error(`SRC20 ${type} fetch error:`, error);
         } finally {
@@ -103,7 +106,25 @@ export function SRC20Section(
 
       fetchData();
     }
-  }, [type, pagination?.page, sortBy, initialData, fromPage]);
+  }, [
+    type,
+    pagination?.page,
+    sortBy,
+    initialData,
+    fromPage,
+    address,
+    useClientFetch,
+  ]);
+
+  const handlePageChange = (page: number) => {
+    if (pagination?.onPageChange) {
+      pagination.onPageChange(page);
+    } else if (!useClientFetch) {
+      const url = new URL(globalThis.location.href);
+      url.searchParams.set("page", page.toString());
+      globalThis.location.href = url.toString();
+    }
+  };
 
   const handleCloseModal = () => setModalOpen(false);
   const handleImageClick = (imgSrc: string | null) => {
@@ -142,7 +163,7 @@ export function SRC20Section(
 
         <div class="flex flex-col gap-6">
           {data.map((src20) => (
-            parseFloat(src20.progress) >= 100
+            parseFloat(src20?.progress || "0") >= 100
               ? (
                 <SRC20TokenOutmintedCard
                   src20={src20}
@@ -159,18 +180,20 @@ export function SRC20Section(
               )
           ))}
         </div>
+
         {fromPage === "home" && (
           <div class="flex justify-end -mt-3 mobileMd:-mt-6">
             <ViewAllButton href={`/src20?type=${type}`} />
           </div>
         )}
+
         {pagination && pagination.totalPages > 1 && (
           <div class="mt-9 mobileLg:mt-[72px]">
             <Pagination
               page={pagination.page}
               totalPages={pagination.totalPages}
               prefix={fromPage === "wallet" ? "src20" : ""}
-              onPageChange={(page: number) => pagination.onPageChange?.(page)}
+              onPageChange={handlePageChange}
             />
           </div>
         )}

@@ -308,13 +308,21 @@ export class SRC20QueryService {
    * while adding new features.
    */
   static async fetchAndFormatSrc20DataV2(
-    params: SRC20TrxRequestParams = {},
+    params: SRC20TrxRequestParams & {
+      dateFrom?: string;  // ISO date string
+      dateTo?: string;    // ISO date string
+      minPrice?: number;  // Market data filters
+      maxPrice?: number;
+      minVolume?: number;
+      maxVolume?: number;
+    } = {},
     options: {
       excludeFullyMinted?: boolean;
       onlyFullyMinted?: boolean;
       includeMarketData?: boolean;
       enrichWithProgress?: boolean;
       batchSize?: number;
+      prefetchedMarketData?: MarketListingAggregated[];
     } = {}
   ): Promise<PaginatedSrc20ResponseBody | Src20ResponseBody> {
     const startTime = performance.now();
@@ -333,6 +341,12 @@ export class SRC20QueryService {
             ? params.tick.map((t) => t.replace(/[^\w-]/g, ""))
             : params.tick.replace(/[^\w-]/g, ""))
           : params.tick,
+        dateFrom: params.dateFrom ? new Date(params.dateFrom).toISOString() : undefined,
+        dateTo: params.dateTo ? new Date(params.dateTo).toISOString() : undefined,
+        minPrice: typeof params.minPrice === 'number' ? Math.max(0, params.minPrice) : undefined,
+        maxPrice: typeof params.maxPrice === 'number' ? Math.max(0, params.maxPrice) : undefined,
+        minVolume: typeof params.minVolume === 'number' ? Math.max(0, params.minVolume) : undefined,
+        maxVolume: typeof params.maxVolume === 'number' ? Math.max(0, params.maxVolume) : undefined,
         op: Array.isArray(params.op)
           ? params.op.map((o) => o.replace(/[^\w-]/g, ""))
           : params.op
@@ -355,9 +369,7 @@ export class SRC20QueryService {
 
       const queryParams: SRC20TrxRequestParams = {
         ...sanitizedParams,
-        tick: Array.isArray(sanitizedParams.tick)
-          ? sanitizedParams.tick[0]
-          : sanitizedParams.tick,
+        tick: sanitizedParams.tick,
         limit,
         page,
         sortBy: sanitizedParams.sortBy || "ASC",
@@ -405,6 +417,17 @@ export class SRC20QueryService {
         queryParams
       );
 
+      // Apply date range filtering if specified
+      if (sanitizedParams.dateFrom || sanitizedParams.dateTo) {
+        formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
+        formattedData = formattedData.filter(item => {
+          const itemDate = new Date(item.block_time);
+          if (sanitizedParams.dateFrom && itemDate < new Date(sanitizedParams.dateFrom)) return false;
+          if (sanitizedParams.dateTo && itemDate > new Date(sanitizedParams.dateTo)) return false;
+          return true;
+        });
+      }
+
       // Optional data enrichment
       if (options.includeMarketData || options.enrichWithProgress) {
         formattedData = await this.enrichData(
@@ -412,9 +435,32 @@ export class SRC20QueryService {
           {
             includeMarketData: options.includeMarketData,
             enrichWithProgress: options.enrichWithProgress,
-            batchSize: options.batchSize || 50
+            batchSize: options.batchSize || 50,
+            prefetchedMarketData: options.prefetchedMarketData
           }
         );
+
+        // Apply market data based filtering if specified
+        if (options.includeMarketData && (
+          sanitizedParams.minPrice !== undefined || 
+          sanitizedParams.maxPrice !== undefined ||
+          sanitizedParams.minVolume !== undefined ||
+          sanitizedParams.maxVolume !== undefined
+        )) {
+          formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
+          formattedData = formattedData.filter(item => {
+            if (!item.market_data) return false;
+            
+            const { floor_price = 0, volume_24h = 0 } = item.market_data;
+            
+            if (sanitizedParams.minPrice !== undefined && floor_price < sanitizedParams.minPrice) return false;
+            if (sanitizedParams.maxPrice !== undefined && floor_price > sanitizedParams.maxPrice) return false;
+            if (sanitizedParams.minVolume !== undefined && volume_24h < sanitizedParams.minVolume) return false;
+            if (sanitizedParams.maxVolume !== undefined && volume_24h > sanitizedParams.maxVolume) return false;
+            
+            return true;
+          });
+        }
       }
 
       // Handle single result case
@@ -465,6 +511,7 @@ export class SRC20QueryService {
       includeMarketData?: boolean;
       enrichWithProgress?: boolean;
       batchSize?: number;
+      prefetchedMarketData?: MarketListingAggregated[];
     }
   ): Promise<SRC20Row | SRC20Row[]> {
     const rows = Array.isArray(data) ? data : [data];
@@ -477,10 +524,10 @@ export class SRC20QueryService {
         const batch = rows.slice(i, i + batchSize);
         const ticks = batch.map(row => row.tick);
 
-        // Parallel fetch of additional data for the batch
+        // Fetch market data and mint progress in parallel
         const [marketData, mintProgress] = await Promise.all([
           options.includeMarketData
-            ? SRC20MarketService.fetchMarketListingSummary()
+            ? options.prefetchedMarketData || await SRC20MarketService.fetchMarketListingSummary()
             : null,
           options.enrichWithProgress
             ? Promise.all(ticks.map(tick => 
@@ -489,7 +536,7 @@ export class SRC20QueryService {
             : null
         ]);
 
-        // Enrich market data
+        // Enrich market data and holders
         if (marketData) {
           const marketMap = new Map(
             marketData.map(item => [item.tick, item])
@@ -499,7 +546,8 @@ export class SRC20QueryService {
             if (market) {
               enriched[i + index] = {
                 ...row,
-                market_data: market
+                market_data: market,
+                holders: row.holders || market.holders || 0
               };
             }
           });
@@ -512,7 +560,11 @@ export class SRC20QueryService {
             if (progress) {
               enriched[i + index] = {
                 ...enriched[i + index],
-                mint_progress: progress
+                mint_progress: {
+                  progress: row.progress || progress.progress || "0",
+                  current: progress.total_minted || 0,
+                  max: progress.max_supply || 0
+                }
               };
             }
           });
