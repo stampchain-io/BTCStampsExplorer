@@ -85,22 +85,24 @@ jobs:
             if [[ $line =~ ^from[[:space:]](.+): ]]; then
               current_file="${BASH_REMATCH[1]}"
               echo "Processing file: $current_file"
-            elif [[ $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+] ]]; then
+            elif [[ $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+][[:space:]]*(.*) ]]; then
               line_num="${BASH_REMATCH[1]}"
-              content=$(echo "$line" | sed 's/^[[:space:]]*[0-9]*[[:space:]]*|[[:space:]]*[-+][[:space:]]*//')
-              echo "$current_file:$line_num:1:[deno-fmt] Formatting issue: $content" >> fmt_processed.txt
+              content="${BASH_REMATCH[2]}"
+              if [[ $content =~ ^[-+] ]]; then
+                echo "$current_file:$line_num:1:[deno-fmt] Formatting issue: $content" >> fmt_processed.txt
+              fi
             fi
           done < fmt_output.txt
           
           # Process and report linting issues
           echo "Processing lint issues..."
           while IFS= read -r line; do
-            if [[ $line =~ ^error\[(.*)\]: ]]; then
+            if [[ $line =~ ^error\[(.*)\]:[[:space:]]*(.*) ]]; then
               rule="${BASH_REMATCH[1]}"
-              message=$(echo "$line" | sed 's/^error\[[^]]*\]:[[:space:]]*//')
+              message="${BASH_REMATCH[2]}"
               # Read the next line which contains the file path
               read -r file_line
-              if [[ $file_line =~ [[:space:]]*--\>[[:space:]]*([^:]+):([0-9]+) ]]; then
+              if [[ $file_line =~ .*-->.*([^:]+):([0-9]+) ]]; then
                 file="${BASH_REMATCH[1]}"
                 line_num="${BASH_REMATCH[2]}"
                 echo "$file:$line_num:1:[deno-lint/$rule] $message" >> lint_processed.txt
