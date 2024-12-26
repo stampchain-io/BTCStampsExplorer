@@ -63,7 +63,10 @@ jobs:
         id: fmt
         if: always()
         run: |
-          deno task check:fmt > fmt_output.txt || true
+          # Capture only the formatting output after initialization
+          deno task check:fmt 2>&1 | tee full_fmt.txt
+          # Extract only the formatting diff output
+          sed -n '/^from.*:/,/^error: Found.*files$/p' full_fmt.txt > fmt_output.txt
           echo "Formatting check output:"
           cat fmt_output.txt
 
@@ -71,7 +74,10 @@ jobs:
         id: lint
         if: always()
         run: |
-          deno task check:lint > lint_output.txt || true
+          # Capture only the linting output after initialization
+          deno task check:lint 2>&1 | tee full_lint.txt
+          # Extract only the actual lint errors
+          sed -n '/^error\[.*\]:/,/^$/p' full_lint.txt > lint_output.txt
           echo "Lint check output:"
           cat lint_output.txt
 
@@ -85,11 +91,14 @@ jobs:
             if [[ $line =~ ^from[[:space:]](.+): ]]; then
               current_file="${BASH_REMATCH[1]}"
               echo "Processing file: $current_file"
-            elif [[ $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+][[:space:]]*(.*) ]]; then
+            elif [[ $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*(\-.*) ]]; then
               line_num="${BASH_REMATCH[1]}"
-              content="${BASH_REMATCH[2]}"
-              if [[ $content =~ ^[-+] ]]; then
-                echo "$current_file:$line_num:1:[deno-fmt] Formatting issue: $content" >> fmt_processed.txt
+              old_content="${BASH_REMATCH[2]}"
+              # Read the next line which should contain the new content
+              read -r next_line
+              if [[ $next_line =~ ^[[:space:]]*[0-9]+[[:space:]]*\|[[:space:]]*(\+.*) ]]; then
+                new_content="${BASH_REMATCH[1]}"
+                echo "$current_file:$line_num:1:[deno-fmt] Format diff - Old: $old_content | New: $new_content" >> fmt_processed.txt
               fi
             fi
           done < fmt_output.txt
@@ -100,9 +109,9 @@ jobs:
             if [[ $line =~ ^error\[(.*)\]:[[:space:]]*(.*) ]]; then
               rule="${BASH_REMATCH[1]}"
               message="${BASH_REMATCH[2]}"
-              # Read the next line which contains the file path
+              # Read the next line which contains the file path with arrow
               read -r file_line
-              if [[ $file_line =~ .*-->.*([^:]+):([0-9]+) ]]; then
+              if [[ $file_line =~ [[:space:]]*-->[[:space:]]*([^:]+):([0-9]+) ]]; then
                 file="${BASH_REMATCH[1]}"
                 line_num="${BASH_REMATCH[2]}"
                 echo "$file:$line_num:1:[deno-lint/$rule] $message" >> lint_processed.txt
