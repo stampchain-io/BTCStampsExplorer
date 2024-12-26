@@ -34,7 +34,7 @@ const row = "h-8 hover:bg-stamp-purple/10";
 function DispenseRow({ dispense }: { dispense: Dispense }) {
   const handleClick = (e: MouseEvent, address: string) => {
     e.preventDefault();
-    window.location.href = `/wallet/${address}`;
+    globalThis.location.href = `/wallet/${address}`;
   };
 
   return (

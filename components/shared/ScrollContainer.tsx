@@ -6,7 +6,7 @@ const scrollbarPadding = `
     const checkScrollbar = () => {
       const hasScrollbar = container.scrollHeight > container.clientHeight;
       container.style.paddingRight = hasScrollbar 
-        ? (window.innerWidth >= 568 ? '24px' : '18px')
+        ? (globalThis.innerWidth >= 568 ? '24px' : '18px')
         : '0px';
     };
 

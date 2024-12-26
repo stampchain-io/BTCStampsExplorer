@@ -30,9 +30,7 @@ const tableHeaders = [
 ];
 
 const tableLabel =
-const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const tableValue =
 const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 
