@@ -8,6 +8,7 @@ import {
 import StampSection from "$islands/stamp/StampSection.tsx";
 import CollectionSection from "$islands/collection/CollectionSection.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 
 export function HomeStampPreview({
   stamps_src721 = [],
@@ -97,7 +98,7 @@ export function HomeStampPreview({
     },
   ];
 
-  const _CuttingEdgeSection: CollectionSectionProps = {
+  const CuttingEdgeSection: CollectionSectionProps = {
     title: "CUTTING EDGE",
     subTitle: "RECURSIVE COLLECTIONS",
     collections: collectionData,
@@ -130,21 +131,31 @@ export function HomeStampPreview({
           {LatestArtStampsSection.map((section) => (
             <StampSection key={section.title} {...section} />
           ))}
+          <div className="flex justify-end -mt-3 mobileMd:-mt-6">
+            <ViewAllButton href="/stamps/art" />
+          </div>
         </div>
       </div>
 
       {/* FEATURED ARTISTS */}
       <CollectionSection {...FeaturedArtistsSection} />
+      <div className="flex justify-end -mt-3 mobileMd:-mt-6">
+        <ViewAllButton href="/collection/overview/artist" />
+      </div>
 
       {/* COLLECTIONS */}
       {CollectionsSection.map((section) => (
         <StampSection key={section.title} {...section} />
       ))}
+      <div className="flex justify-end -mt-3 mobileMd:-mt-6">
+        <ViewAllButton href="/stamps/collections" />
+      </div>
 
-      {
-        /* CUTTING EDGE
-      <CollectionSection {...CuttingEdgeSection} /> */
-      }
+      {/* CUTTING EDGE */}
+      <CollectionSection {...CuttingEdgeSection} />
+      <div className="flex justify-end -mt-3 mobileMd:-mt-6">
+        <ViewAllButton href="/collection/overview/recursive" />
+      </div>
     </div>
   );
 }
