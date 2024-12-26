@@ -12,7 +12,7 @@ import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
-
+import { logger } from "$lib/utils/logger.ts";
 const tooltipIcon =
   "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
 
@@ -493,11 +493,38 @@ export function StampImage(
     validateContent();
   }, [src, stamp.stamp_mimetype]);
 
+  // All tooltip-related refs
+  const tooltipTimeoutRef = useRef<number | null>(null);
+  const copyTooltipTimeoutRef = useRef<number | null>(null);
+  const shareTooltipTimeoutRef = useRef<number | null>(null);
+  const codeTooltipTimeoutRef = useRef<number | null>(null);
+  const fullscreenTooltipTimeoutRef = useRef<number | null>(null);
+
+  // Add cleanup effect for tooltips
   useEffect(() => {
+    logger.debug("ui", {
+      message: "StampImage mounted",
+      component: "StampImage",
+    });
+
     return () => {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
+      logger.debug("ui", {
+        message: "StampImage unmounting",
+        component: "StampImage",
+      });
+      // Clean up all tooltip timeouts
+      [
+        tooltipTimeoutRef,
+        copyTooltipTimeoutRef,
+        shareTooltipTimeoutRef,
+        codeTooltipTimeoutRef,
+        fullscreenTooltipTimeoutRef,
+      ].forEach((ref) => {
+        if (ref.current !== null) {
+          globalThis.clearTimeout(ref.current);
+          ref.current = null;
+        }
+      });
     };
   }, []);
 
