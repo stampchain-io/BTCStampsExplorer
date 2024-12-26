@@ -6,6 +6,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
+import { logger } from "$lib/utils/logger.ts";
 
 interface Props {
   stamp: StampRow;
@@ -141,8 +142,32 @@ const StampBuyModal = ({
   const inputField =
     "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
+  // Add debug logging
+  useEffect(() => {
+    logger.debug("ui", {
+      message: "StampBuyModal mounted",
+      component: "StampBuyModal",
+    });
+
+    return () => {
+      logger.debug("ui", {
+        message: "StampBuyModal unmounting",
+        component: "StampBuyModal",
+      });
+    };
+  }, []);
+
   return (
-    <ModalLayout onClose={handleCloseModal} title="BUY">
+    <ModalLayout
+      onClose={() => {
+        logger.debug("ui", {
+          message: "Modal closing",
+          component: "StampBuyModal",
+        });
+        handleCloseModal();
+      }}
+      title="BUY"
+    >
       <div className="flex flex-row gap-6">
         <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
           <StampImage
@@ -185,13 +210,32 @@ const StampBuyModal = ({
       <BasicFeeCalculator
         isModal={true}
         fee={formState.fee}
-        handleChangeFee={internalHandleChangeFee}
+        handleChangeFee={(newFee) => {
+          logger.debug("ui", {
+            message: "Fee changing",
+            newFee,
+            component: "StampBuyModal",
+          });
+          internalHandleChangeFee(newFee);
+        }}
         type="buy"
         amount={totalPrice}
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
-        onSubmit={handleBuyClick}
-        onCancel={toggleModal}
+        onSubmit={() => {
+          logger.debug("ui", {
+            message: "Submit clicked",
+            component: "StampBuyModal",
+          });
+          handleBuyClick();
+        }}
+        onCancel={() => {
+          logger.debug("ui", {
+            message: "Cancel clicked",
+            component: "StampBuyModal",
+          });
+          toggleModal();
+        }}
         buttonName="BUY"
         className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}

@@ -83,10 +83,11 @@ jobs:
       - name: Report linting issues
         if: always() && steps.lint.outcome == 'failure'
         run: |
-          deno lint --json | reviewdog -f=json \
+          deno lint 2>&1 | reviewdog \
             -name="deno-lint" \
             -reporter=github-pr-review \
             -filter-mode=added \
+            -efm="%f:%l:%c: %m" \
             -fail-level=error
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}

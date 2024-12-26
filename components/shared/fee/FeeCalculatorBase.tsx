@@ -43,11 +43,30 @@ export function FeeCalculatorBase({
   serviceFee,
 }: ExtendedBaseFeeCalculatorProps) {
   const { fees } = useFeePolling();
+  const tooltipTimeoutRef = useRef<number | null>(null);
   const [visible, setVisible] = useState(false);
   const [coinType, setCoinType] = useState("BTC");
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-  const tooltipTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    logger.debug("ui", {
+      message: "FeeCalculatorBase mounted",
+      component: "FeeCalculatorBase",
+    });
+
+    return () => {
+      logger.debug("ui", {
+        message: "FeeCalculatorBase unmounting",
+        component: "FeeCalculatorBase",
+      });
+      if (tooltipTimeoutRef.current !== null) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+        tooltipTimeoutRef.current = null;
+      }
+      setIsTooltipVisible(false);
+    };
+  }, []);
 
   const handleCoinToggle = () => {
     logger.debug("stamps", {
@@ -68,22 +87,30 @@ export function FeeCalculatorBase({
   };
 
   const handleMouseEnter = () => {
-    setIsTooltipVisible(true);
-
-    if (tooltipTimeoutRef.current) {
-      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    try {
+      if (tooltipTimeoutRef.current !== null) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      }
+      setIsTooltipVisible(true);
+      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsTooltipVisible(false);
+        tooltipTimeoutRef.current = null;
+      }, 1500);
+    } catch (error) {
+      console.error("Error in handleMouseEnter:", error);
     }
-
-    tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-      setIsTooltipVisible(false);
-    }, 1500);
   };
 
   const handleMouseLeave = () => {
-    if (tooltipTimeoutRef.current) {
-      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    try {
+      if (tooltipTimeoutRef.current !== null) {
+        globalThis.clearTimeout(tooltipTimeoutRef.current);
+        tooltipTimeoutRef.current = null;
+      }
+      setIsTooltipVisible(false);
+    } catch (error) {
+      console.error("Error in handleMouseLeave:", error);
     }
-    setIsTooltipVisible(false);
   };
 
   // Fee selector component
@@ -103,6 +130,8 @@ export function FeeCalculatorBase({
         className="relative w-full group"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onClick={(e) =>
+          e.stopPropagation()} // Prevent click events from reaching modal
       >
         <input
           type="range"
@@ -232,14 +261,6 @@ export function FeeCalculatorBase({
     "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
   const buttonPurpleFlat =
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
-
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className={`text-[#999999] ${className}`}>
