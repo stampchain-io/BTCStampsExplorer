@@ -1,0 +1,16 @@
+runner:
+  denofmt:
+    cmd: deno fmt --check .
+    errorformat:
+      - "%f: Diff in %f"
+    level: warning
+  denolint:
+    cmd: deno lint .
+    errorformat:
+      - "%f:%l:%c %m"
+    level: warning
+
+github:
+  reporter: github-pr-review
+  filter-mode: file
+  fail-on-error: false

@@ -59,48 +59,13 @@ jobs:
           reviewdog_version: latest
 
       # Code Quality Checks
-      - name: Check formatting
-        id: fmt
-        run: |
-          deno fmt --check . > fmt_output.txt 2>&1 || true
-          if [ ! -s fmt_output.txt ]; then
-            echo "No formatting issues found" > fmt_output.txt
-          fi
-        continue-on-error: true
-
-      - name: Report formatting issues
+      - name: Run reviewdog
         if: always()
         run: |
-          cat fmt_output.txt | reviewdog \
-            -name="deno-fmt" \
-            -reporter=github-pr-review \
-            -filter-mode=file \
-            -fail-on-error=false \
-            -level=error
+          reviewdog -runners=denofmt,denolint
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check linting
-        id: lint
-        run: |
-          deno lint . > lint_output.txt 2>&1 || true
-          if [ ! -s lint_output.txt ]; then
-            echo "No linting issues found" > lint_output.txt
-          fi
-        continue-on-error: true
-
-      - name: Report linting issues
-        if: always()
-        run: |
-          cat lint_output.txt | reviewdog \
-            -name="deno-lint" \
-            -reporter=github-pr-review \
-            -filter-mode=file \
-            -fail-on-error=false \
-            -efm="%f:%l:%c: %m" \
-            -level=error
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_DEBUG: 1
 
       # Fail the workflow if any checks failed
       - name: Check for failures
