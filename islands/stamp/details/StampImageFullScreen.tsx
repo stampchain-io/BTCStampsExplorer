@@ -27,8 +27,11 @@ const StampImageFullScreen = ({
       class={modalBgBlur}
       onClick={handleCloseModal}
     >
-      <div class="relative w-full max-w-[800px] max-h-[800px] p-6 mobileLg:p-12">
-        <div class="flex flex-col p-3 mobileMd:p-12 dark-gradient-modal rounded-lg overflow-hidden">
+      <div
+        class="relative w-[calc(100vw-48px)] max-w-[800px] h-[calc(100vh-48px)] max-h-[800px]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div class="flex flex-col p-3 mobileMd:p-6 dark-gradient-modal rounded-lg overflow-hidden">
           <div class="flex flex-col stamp-container">
             {contentType === "html"
               ? (

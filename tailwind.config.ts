@@ -271,6 +271,9 @@ export default {
           "--stamp-scrollbar-thumb": "#660099",
           "--stamp-scrollbar-hover": "#aa00ff",
         },
+        "*::-webkit-scrollbar-corner": {
+          "background-color": "transparent !important",
+        },
         ".gradient-text": {
           "@apply bg-clip-text text-fill-transparent": {},
         },
