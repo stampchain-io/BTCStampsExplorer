@@ -296,7 +296,9 @@ export default function StampPage(props: StampDetailPageProps) {
           </div>
         </div>
 
-        <HoldersGraph holders={holders || []} />
+        {holders && holders.length > 0 && (
+          <HoldersGraph holders={holders || []} />
+        )}
 
         <StampRelatedInfo
           stampId={stamp.stamp?.toString() || ""}
