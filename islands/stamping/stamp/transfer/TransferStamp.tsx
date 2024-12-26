@@ -268,20 +268,19 @@ function WalletSendStampModal({
     "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
   return (
-    <div class={bodyTools}>
-      <h1 class={titlePurpleLDCenter}>TRANSFER</h1>
+    <div className={bodyTools}>
+      <h1 className={titlePurpleLDCenter}>TRANSFER</h1>
 
       {error && (
-        <div class="w-full text-red-500 text-center font-bold">
+        <div className="w-full text-red-500 text-center font-bold">
           {error}
         </div>
       )}
 
-      <div class={inputFieldContainer}>
-        <div class="flex w-full gap-3 mobileMd:gap-6">
-          <div class="flex items-center justify-center rounded-sm min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
-          {selectedStamp
-            ? (
+      <div className={inputFieldContainer}>
+        <div className="flex w-full gap-3 mobileMd:gap-6">
+          <div className="flex items-center justify-center rounded-sm min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
+            {selectedStamp ? (
               <img
                 src={imgSrc}
                 onError={handleImageError}
@@ -289,91 +288,91 @@ function WalletSendStampModal({
                 alt={`Stamp #${selectedStamp.stamp}`}
                 className="w-full h-full object-contain pixelart"
               />
-            )
-            : (
+            ) : (
               <img
                 src="/img/stamping/image-upload.svg"
-                class="-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
+                className="w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
                 alt=""
               />
             )}
-        </div>
+          </div>
 
-        <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
-          <SelectField
-            options={stamps.data}
-            value={selectedStamp?.stamp?.toString() || ""}
-            onChange={(e) => {
-              const selectedItem = stamps.data.find(
-                (item) => item.tx_hash === e.currentTarget.value,
-              );
+          <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
+            <SelectField
+              options={stamps.data}
+              value={selectedStamp?.stamp?.toString() || ""}
+              onChange={(e) => {
+                const selectedItem = stamps.data.find(
+                  (item) => item.tx_hash === e.currentTarget.value,
+                );
 
-              if (selectedItem) {
-                setSelectedStamp(selectedItem);
-              }
-            }}
-          />
+                if (selectedItem) {
+                  setSelectedStamp(selectedItem);
+                }
+              }}
+            />
 
-          <div className="flex w-full justify-between items-start">
-            <div className="flex flex-col justify-start -space-y-0.5">
-              <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey">
-                EDITIONS
-              </p>
-              <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
-                MAX {maxQuantity}
-              </p>
-            </div>
-            <input
-              type="number"
-              min="1"
-              max={maxQuantity}
-              value={quantity}
-              onChange={handleQuantityChange}
+            <div className="flex w-full justify-between items-start">
+              <div className="flex flex-col justify-start -space-y-0.5">
+                <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey">
+                  EDITIONS
+                </p>
+                <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+                  MAX {maxQuantity}
+                </p>
+              </div>
+              <input
+                type="number"
+                min="1"
+                max={maxQuantity}
+                value={quantity}
+                onChange={handleQuantityChange}
                 className={`${inputField} !w-[42px] mobileLg:!w-12 text-center`}
               />
             </div>
           </div>
-        </div>
 
           <div className="flex pt-3 mobileMd:pt-6">
             <input
-          value={formState.recipientAddress}
-          onInput={(e) =>
-            setFormState({
-              ...formState,
-              recipientAddress: (e.target as HTMLInputElement).value,
-            })}
-          placeholder="Recipient address"
-          className={inputField}
-        />
+              value={formState.recipientAddress}
+              onInput={(e) =>
+                setFormState({
+                  ...formState,
+                  recipientAddress: (e.target as HTMLInputElement).value,
+                })}
+              placeholder="Recipient address"
+              className={inputField}
+            />
+          </div>
+
+          <BasicFeeCalculator
+            fee={formState.fee}
+            handleChangeFee={internalHandleChangeFee}
+            type="transfer"
+            BTCPrice={formState.BTCPrice}
+            isSubmitting={isSubmitting}
+            onSubmit={handleTransferSubmit}
+            onCancel={toggleModal}
+            buttonName="TRANSFER"
+            className="pt-9 mobileLg:pt-12"
+            userAddress={wallet?.address}
+            inputType="P2WPKH"
+            outputTypes={["P2WPKH"]}
+            tosAgreed={true}
+              />
+
+          {error && (
+            <div className="text-red-500 text-center mt-4 font-medium">
+              {error}
+            </div>
+          )}
+          {successMessage && (
+            <div className="text-green-500 text-center mt-4 font-medium">
+              {successMessage}
+            </div>
+          )}
+        </div>
       </div>
-
-      <BasicFeeCalculator
-        fee={formState.fee}
-        handleChangeFee={internalHandleChangeFee}
-        type="transfer"
-        BTCPrice={formState.BTCPrice}
-        isSubmitting={isSubmitting}
-        onSubmit={handleTransferSubmit}
-        onCancel={toggleModal}
-        buttonName="TRANSFER"
-        className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address}
-        inputType="P2WPKH"
-        outputTypes={["P2WPKH"]}
-        tosAgreed={true}
-      />
-
-      {error && (
-        <div className="text-red-500 text-center mt-4 font-medium">
-          {error}
-        </div>
-      )}
-      {successMessage && (
-        <div className="text-green-500 text-center mt-4 font-medium">
-          {successMessage}
-        </div>
-      )}
     </div>
   );
 }
