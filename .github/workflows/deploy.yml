@@ -59,15 +59,51 @@ jobs:
           reviewdog_version: latest
 
       # Code Quality Checks
+      - name: Check formatting
+        id: fmt
+        if: always()
+        run: |
+          deno fmt --check . > fmt_output.txt || true
+          echo "Formatting check output:"
+          cat fmt_output.txt
+
+      - name: Check linting
+        id: lint
+        if: always()
+        run: |
+          deno lint . > lint_output.txt || true
+          echo "Lint check output:"
+          cat lint_output.txt
+
       - name: Run reviewdog
         if: always()
         run: |
-          ls -la .reviewdog.yml
-          echo "Current directory:"
-          pwd
-          echo "ReviewDog config contents:"
-          cat .reviewdog.yml
-          reviewdog -conf=.reviewdog.yml -reporter=github-pr-review
+          # Process and report formatting issues
+          echo "Processing format issues..."
+          while IFS= read -r line; do
+            if [[ $line =~ ^.*\.tsx?[[:space:]]diff ]]; then
+              file=$(echo "$line" | cut -d' ' -f1)
+              echo "$file:1:1:[deno-fmt] Formatting issues detected" >> fmt_processed.txt
+            fi
+          done < fmt_output.txt
+          
+          # Process and report linting issues
+          echo "Processing lint issues..."
+          while IFS= read -r line; do
+            if [[ $line =~ ^.*\.tsx?:[0-9]+:[0-9]+.* ]]; then
+              echo "$line" >> lint_processed.txt
+            fi
+          done < lint_output.txt
+          
+          # Report formatting issues
+          if [ -f fmt_processed.txt ]; then
+            cat fmt_processed.txt | reviewdog -f=golint -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning
+          fi
+          
+          # Report linting issues
+          if [ -f lint_processed.txt ]; then
+            cat lint_processed.txt | reviewdog -f=golint -name=deno-lint -reporter=github-pr-review -filter-mode=file -level=warning
+          fi
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REVIEWDOG_DEBUG: 1
