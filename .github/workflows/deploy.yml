@@ -117,7 +117,7 @@ jobs:
               message="${BASH_REMATCH[2]}"
               # Read the next line which contains the file path with arrow
               read -r file_line || true
-              if [[ "$file_line" =~ ^[[:space:]]*-->[[:space:]]*([^:]+):([0-9]+):([0-9]+)$ ]]; then
+              if [[ "$file_line" =~ ^[[:space:]]*"-->"[[:space:]]*([^:]+):([0-9]+):([0-9]+)$ ]]; then
                 file="${BASH_REMATCH[1]}"
                 line_num="${BASH_REMATCH[2]}"
                 col_num="${BASH_REMATCH[3]}"
