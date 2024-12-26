@@ -107,7 +107,7 @@ jobs:
                 fi
               fi
             fi
-          done < fmt_output.txt
+          done < full_fmt.txt
           
           # Process and report linting issues
           echo "Processing lint issues..."
@@ -124,7 +124,7 @@ jobs:
                 echo "$file:$line_num:$col_num:[deno-lint/$rule] $message" >> lint_processed.txt
               fi
             fi
-          done < lint_output.txt
+          done < full_lint.txt
           
           # Debug output
           echo "=== Debug: Processed Files ==="
