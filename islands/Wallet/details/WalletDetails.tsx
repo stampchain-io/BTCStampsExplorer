@@ -1,6 +1,6 @@
 import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
-import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
+import WalletSendModal from "./WalletSendBTCModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
