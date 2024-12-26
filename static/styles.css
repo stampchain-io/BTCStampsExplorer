@@ -474,3 +474,10 @@ body {
   display: inline-flex;
   align-items: center;
 }
+
+/* Remove outline from input fields */
+.no-outline:focus-visible {
+  outline: 0px solid transparent !important;
+  outline-offset: 0 !important;
+  outline-style: none !important;
+}

@@ -43,9 +43,12 @@ export default function StampCodeModal(
       class={modalBgBlur}
       onClick={handleCloseModal}
     >
-      <div class="relative max-w-[800px] max-h-[800px] h-[calc(100vh-24px)] p-6 mobileLg:p-12 overflow-hidden">
-        <div class="flex flex-col p-6 mobileMd:p-9 rounded-lg bg-[#FAFAFA] h-full overflow-hidden">
-          <div class="relative top-0 right-0 -mr-3 mobileMd:-mr-[18px] mobileLg:-mr-1.5 -mt-1.5 mobileMd:-mt-3 mobileLg:-mt-1.5 w-6 h-6 ms-auto cursor-pointer">
+      <div
+        class="relative w-[calc(100vw-48px)] max-w-[800px] h-[calc(100vh-48px)] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div class="flex flex-col p-6 mobileMd:p-9 rounded-md bg-[#FAFAFA] h-full overflow-hidden">
+          <div class="relative top-0 right-0 -mr-3 mobileLg:-mr-2 -mt-1.5 mobileMd:-mt-3 mobileLg:-mt-2 w-6 h-6 ms-auto cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="18"

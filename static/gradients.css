@@ -89,6 +89,11 @@
   background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff);
 }
 
+.dark-gradient-modal {
+  /* TODO: Migrate to Tailwind: bg-stamp-dark */
+  background: linear-gradient(to bottom right, #1f002e00, #14001f7f, #1f002eff), #000000;
+}
+
 .purple-bg-gradient {
   /* TODO: Migrate to Tailwind: bg-stamp-purple-bg */
   background: linear-gradient(to right, #8800cc, #7700aa, #660099);

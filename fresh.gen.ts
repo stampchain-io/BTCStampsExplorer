@@ -134,7 +134,7 @@ import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletD
 import * as $Wallet_details_WalletDonateModal from "./islands/Wallet/details/WalletDonateModal.tsx";
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
 import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
-import * as $Wallet_details_WalletSendModal from "./islands/Wallet/details/WalletSendModal.tsx";
+import * as $Wallet_details_WalletSendBTCModal from "./islands/Wallet/details/WalletSendBTCModal.tsx";
 import * as $Wallet_details_WalletSendStampModal from "./islands/Wallet/details/WalletSendStampModal.tsx";
 import * as $about_AboutContact from "./islands/about/AboutContact.tsx";
 import * as $about_AboutDonate from "./islands/about/AboutDonate.tsx";
@@ -383,8 +383,8 @@ const manifest = {
     "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
     "./islands/Wallet/details/WalletReceiveModal.tsx":
       $Wallet_details_WalletReceiveModal,
-    "./islands/Wallet/details/WalletSendModal.tsx":
-      $Wallet_details_WalletSendModal,
+    "./islands/Wallet/details/WalletSendBTCModal.tsx":
+      $Wallet_details_WalletSendBTCModal,
     "./islands/Wallet/details/WalletSendStampModal.tsx":
       $Wallet_details_WalletSendStampModal,
     "./islands/about/AboutContact.tsx": $about_AboutContact,

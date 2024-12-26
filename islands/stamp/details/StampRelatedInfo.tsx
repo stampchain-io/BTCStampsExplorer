@@ -295,8 +295,8 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
   }
 
   return (
-    <div class="dark-gradient rounded-lg p-3 mobileMd:p-6">
-      <div class="flex justify-between w-full overflow-y-auto text-base mobileLg:text-lg text-stamp-grey-darker font-light -mb-1 mobileLg:mb-2">
+    <div class="dark-gradient p-3 mobileMd:p-6 rounded-md">
+      <div class="flex justify-between w-full -mb-1 mobileLg:mb-2 text-base mobileLg:text-lg text-stamp-grey-darker font-light">
         {getTabsWithCounts().map(({ id, label }) => (
           <p
             key={id}
@@ -309,7 +309,10 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
           </p>
         ))}
       </div>
-      <div onScroll={handleScroll} class="overflow-y-auto max-h-48">
+      <div
+        onScroll={handleScroll}
+        class="overflow-auto overscroll-contain"
+      >
         {renderTabContent()}
         {isLoading && <div class="text-center p-6">Loading...</div>}
       </div>

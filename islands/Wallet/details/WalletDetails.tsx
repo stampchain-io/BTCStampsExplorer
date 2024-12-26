@@ -1,6 +1,6 @@
 import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
-import WalletSendModal from "$islands/Wallet/details/WalletSendModal.tsx";
+import WalletSendModal from "./WalletSendBTCModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
@@ -59,6 +59,7 @@ function WalletDetails(
       {isSendModalOpen && (
         <WalletSendModal
           fee={fee}
+          balance={walletData.balance}
           handleChangeFee={setFee}
           onClose={() => setIsSendModalOpen(false)}
         />
@@ -126,17 +127,15 @@ function WalletOverview(
 
   const handleCopyMouseEnter = () => {
     if (allowTooltip) {
-      const buttonRect = copyButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsTooltipVisible(true);
-      }
-
       if (tooltipTimeoutRef.current) {
         globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
 
       tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsTooltipVisible(false);
+        const buttonRect = copyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -173,17 +172,15 @@ function WalletOverview(
 
   const handleSendMouseEnter = () => {
     if (allowSendTooltip) {
-      const buttonRect = sendButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsSendTooltipVisible(true);
-      }
-
       if (sendTooltipTimeoutRef.current) {
         globalThis.clearTimeout(sendTooltipTimeoutRef.current);
       }
 
       sendTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsSendTooltipVisible(false);
+        const buttonRect = sendButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsSendTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -198,17 +195,15 @@ function WalletOverview(
 
   const handleReceiveMouseEnter = () => {
     if (allowReceiveTooltip) {
-      const buttonRect = receiveButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsReceiveTooltipVisible(true);
-      }
-
       if (receiveTooltipTimeoutRef.current) {
         globalThis.clearTimeout(receiveTooltipTimeoutRef.current);
       }
 
       receiveTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsReceiveTooltipVisible(false);
+        const buttonRect = receiveButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsReceiveTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -223,17 +218,15 @@ function WalletOverview(
 
   const handleHistoryMouseEnter = () => {
     if (allowHistoryTooltip) {
-      const buttonRect = historyButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsHistoryTooltipVisible(true);
-      }
-
       if (historyTooltipTimeoutRef.current) {
         globalThis.clearTimeout(historyTooltipTimeoutRef.current);
       }
 
       historyTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsHistoryTooltipVisible(false);
+        const buttonRect = historyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsHistoryTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -248,17 +241,15 @@ function WalletOverview(
 
   const handleBalanceMouseEnter = () => {
     if (allowBalanceTooltip) {
-      const buttonRect = balanceButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsBalanceTooltipVisible(true);
-      }
-
       if (balanceTooltipTimeoutRef.current) {
         globalThis.clearTimeout(balanceTooltipTimeoutRef.current);
       }
 
       balanceTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsBalanceTooltipVisible(false);
+        const buttonRect = balanceButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsBalanceTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -304,7 +295,7 @@ function WalletOverview(
               <div class="relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+                  class="w-[30px] h-[30px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
                   viewBox="0 0 32 32"
                   role="button"
                   aria-label="Show Balance"
@@ -324,7 +315,7 @@ function WalletOverview(
               <div class="relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+                  class="w-[30px] h-[30px]  fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
                   viewBox="0 0 32 32"
                   role="button"
                   aria-label="Hide Balance"
@@ -360,7 +351,7 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+              class="w-[30px] h-[30px]  fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
               role="button"
               aria-label="Copy"
@@ -384,7 +375,7 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+              class="w-[30px] h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
               role="button"
               aria-label="Send"
@@ -411,7 +402,7 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+              class="w-[30px] h-[30px] rotate-180 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
               role="button"
               aria-label="Receive"
@@ -443,7 +434,7 @@ function WalletOverview(
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+                class="w-[30px] h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
                 viewBox="0 0 32 32"
                 role="button"
                 aria-label="History"

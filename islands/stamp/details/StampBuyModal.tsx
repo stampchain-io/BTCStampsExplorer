@@ -167,6 +167,7 @@ const StampBuyModal = ({
         handleCloseModal();
       }}
       title="BUY"
+      preventPropagation={false}
     >
       <div className="flex flex-row gap-6">
         <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
@@ -200,7 +201,7 @@ const StampBuyModal = ({
                 max={maxQuantity}
                 value={quantity}
                 onChange={handleQuantityChange}
-                className={`${inputField} !w-12 text-center`}
+                className={`${inputField} !w-[42px] mobileLg:!w-12 text-center`}
               />
             </div>
           </div>
@@ -234,7 +235,7 @@ const StampBuyModal = ({
             message: "Cancel clicked",
             component: "StampBuyModal",
           });
-          toggleModal();
+          handleCloseModal();
         }}
         buttonName="BUY"
         className="pt-9 mobileLg:pt-12"
