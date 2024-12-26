@@ -59,144 +59,132 @@ jobs:
           reviewdog_version: latest
 
       # Code Quality Checks
-      - name: Check formatting
-        id: fmt
+      - name: Check formatting and linting
+        id: checks
         if: always()
         run: |
+          # Run checks and capture output
           echo "Running deno fmt check..."
           deno task check:fmt > full_fmt.txt 2>&1 || true
+          echo "Running deno lint..."
+          deno task check:lint > full_lint.txt 2>&1 || true
           
-          echo "=== Debug: Raw fmt output ==="
+          echo "=== Debug: Raw outputs ==="
+          echo "=== fmt output ==="
           cat full_fmt.txt
-          echo "=== End raw fmt output ==="
+          echo "=== lint output ==="
+          cat full_lint.txt
+          echo "=== End raw outputs ==="
+          
+          # Create output directories
+          mkdir -p fmt_output lint_output
           
           # Process formatting issues
           echo "Processing format issues..."
           current_file=""
+          > fmt_current.txt
           while IFS= read -r line; do
-            echo "Processing line: $line"
-            if [[ "$line" =~ ^Task[[:space:]]check:fmt[[:space:]]deno[[:space:]]fmt[[:space:]]--check ]]; then
-              continue
-            elif [[ "$line" =~ ^from[[:space:]]+([^:]+): ]]; then
-              current_file="${BASH_REMATCH[1]}"
-              echo "Found file: $current_file"
-            elif [[ "$line" =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*(-[^|]+)\|[[:space:]]*(\+.*)$ ]]; then
-              # Combined line format with both - and + content
-              line_num="${BASH_REMATCH[1]}"
-              old_content="${BASH_REMATCH[2]}"
-              new_content="${BASH_REMATCH[3]}"
-              echo "$current_file:$line_num:1:[deno-fmt] Format diff - Old: $old_content | New: $new_content" >> fmt_processed.txt
-            elif [[ "$line" =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*(-.*) ]]; then
-              # Single line with old content
-              line_num="${BASH_REMATCH[1]}"
-              old_content="${BASH_REMATCH[2]}"
-              read -r next_line || true
-              if [[ "$next_line" =~ ^[[:space:]]*[0-9]+[[:space:]]*\|[[:space:]]*(\+.*) ]]; then
-                new_content="${BASH_REMATCH[1]}"
-                echo "$current_file:$line_num:1:[deno-fmt] Format diff - Old: $old_content | New: $new_content" >> fmt_processed.txt
+            if [[ "$line" =~ ^from[[:space:]]+([^:]+): ]]; then
+              if [ -n "$current_file" ] && [ -s fmt_current.txt ]; then
+                # Wrap previous file's content in checkstyle format
+                output_file="fmt_output/${current_file//\//_}.xml"
+                echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
+                echo "<checkstyle version=\"4.3\">" >> "$output_file"
+                echo "<file name=\"$current_file\">" >> "$output_file"
+                cat fmt_current.txt >> "$output_file"
+                echo "</file>" >> "$output_file"
+                echo "</checkstyle>" >> "$output_file"
               fi
+              current_file="${BASH_REMATCH[1]}"
+              > fmt_current.txt
+            elif [[ "$line" =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+](.*)$ ]] && [ -n "$current_file" ]; then
+              line_num="${BASH_REMATCH[1]}"
+              content="${BASH_REMATCH[2]}"
+              echo "<error line=\"$line_num\" column=\"1\" severity=\"warning\" message=\"Formatting issue detected\" source=\"deno-fmt\"><![CDATA[$content]]></error>" >> fmt_current.txt
             fi
           done < full_fmt.txt
           
-          echo "=== Debug: Processed fmt output ==="
-          cat fmt_processed.txt || echo "No formatting issues found"
-          echo "=== End processed fmt output ==="
-
-      - name: Check linting
-        id: lint
-        if: always()
-        run: |
-          echo "Running deno lint..."
-          deno task check:lint > full_lint.txt 2>&1 || true
-          
-          echo "=== Debug: Raw lint output ==="
-          cat full_lint.txt
-          echo "=== End raw lint output ==="
+          # Handle last file for fmt
+          if [ -n "$current_file" ] && [ -s fmt_current.txt ]; then
+            output_file="fmt_output/${current_file//\//_}.xml"
+            echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
+            echo "<checkstyle version=\"4.3\">" >> "$output_file"
+            echo "<file name=\"$current_file\">" >> "$output_file"
+            cat fmt_current.txt >> "$output_file"
+            echo "</file>" >> "$output_file"
+            echo "</checkstyle>" >> "$output_file"
+          fi
           
           # Process lint issues
           echo "Processing lint issues..."
-          while IFS= read -r line; do
-            echo "Processing line: $line"
-            if [[ "$line" =~ ^Task[[:space:]]check:lint[[:space:]]deno[[:space:]]lint[[:space:]]--quiet ]]; then
-              continue
-            elif [[ "$line" =~ ^error\[([^]]+)\]:[[:space:]]*(.+)$ ]]; then
-              rule="${BASH_REMATCH[1]}"
-              message="${BASH_REMATCH[2]}"
-              read -r file_line || true
-              echo "Checking file line: $file_line"
-              if [[ "$file_line" =~ ^[[:space:]]*"-->"[[:space:]]*([^:]+):([0-9]+):([0-9]+) ]]; then
-                file="${BASH_REMATCH[1]}"
-                line_num="${BASH_REMATCH[2]}"
-                col_num="${BASH_REMATCH[3]}"
-                echo "$file:$line_num:$col_num:[deno-lint/$rule] $message" >> lint_processed.txt
-              fi
-            fi
-          done < full_lint.txt
-          
-          echo "=== Debug: Processed lint output ==="
-          cat lint_processed.txt || echo "No linting issues found"
-          echo "=== End processed lint output ==="
-
-      - name: Run reviewdog
-        if: always()
-        run: |
-          # Process and report formatting issues
-          echo "Processing format issues..."
-          current_file=""
-          while IFS= read -r line; do
-            if [[ "$line" =~ ^from[[:space:]]([^:]+): ]]; then
-              current_file="${BASH_REMATCH[1]}"
-              echo "Processing file: $current_file"
-            elif [[ "$line" =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*([+-].+)$ ]]; then
-              line_num="${BASH_REMATCH[1]}"
-              content="${BASH_REMATCH[2]}"
-              if [[ "$content" =~ ^- ]]; then
-                old_content="$content"
-                read -r next_line || true
-                if [[ "$next_line" =~ ^[[:space:]]*[0-9]+[[:space:]]*\|[[:space:]]*\+(.+)$ ]]; then
-                  new_content="+${BASH_REMATCH[1]}"
-                  echo "$current_file:$line_num:1:[deno-fmt] Format diff - Old: $old_content | New: $new_content" >> fmt_processed.txt
-                fi
-              fi
-            fi
-          done < full_fmt.txt
-          
-          # Process and report linting issues
-          echo "Processing lint issues..."
+          declare -A lint_files
           while IFS= read -r line; do
             if [[ "$line" =~ ^error\[([^]]+)\]:[[:space:]]*(.+)$ ]]; then
               rule="${BASH_REMATCH[1]}"
               message="${BASH_REMATCH[2]}"
-              # Read the next line which contains the file path with arrow
               read -r file_line || true
-              if [[ "$file_line" =~ ^[[:space:]]*"-->"[[:space:]]*([^:]+):([0-9]+):([0-9]+)$ ]]; then
+              if [[ "$file_line" =~ ^[[:space:]]*"-->"[[:space:]]*([^:]+):([0-9]+):([0-9]+) ]]; then
                 file="${BASH_REMATCH[1]}"
                 line_num="${BASH_REMATCH[2]}"
                 col_num="${BASH_REMATCH[3]}"
-                echo "$file:$line_num:$col_num:[deno-lint/$rule] $message" >> lint_processed.txt
+                output_file="lint_output/${file//\//_}.xml"
+                if [ ! -f "$output_file" ]; then
+                  echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
+                  echo "<checkstyle version=\"4.3\">" >> "$output_file"
+                  echo "<file name=\"$file\">" >> "$output_file"
+                fi
+                echo "<error line=\"$line_num\" column=\"$col_num\" severity=\"warning\" message=\"[$rule] $message\" source=\"deno-lint\"><![CDATA[$message]]></error>" >> "$output_file"
+                lint_files["$file"]=1
               fi
             fi
           done < full_lint.txt
           
+          # Close all lint output files
+          for file in "${!lint_files[@]}"; do
+            output_file="lint_output/${file//\//_}.xml"
+            echo "</file>" >> "$output_file"
+            echo "</checkstyle>" >> "$output_file"
+          done
+          
           # Debug output
-          echo "=== Debug: Processed Files ==="
-          echo "fmt_processed.txt contents:"
+          echo "=== Debug: Processed outputs ==="
+          echo "=== fmt output files ==="
+          ls -l fmt_output/
+          for f in fmt_output/*.xml; do
+            [ -f "$f" ] && echo "=== $f ===" && cat "$f"
+          done
+          echo "=== lint output files ==="
+          ls -l lint_output/
+          for f in lint_output/*.xml; do
+            [ -f "$f" ] && echo "=== $f ===" && cat "$f"
+          done
+          
+          
+          echo "=== Debug: Processed outputs ==="
+          echo "=== fmt_processed.txt ==="
           cat fmt_processed.txt || echo "No formatting issues found"
-          echo "lint_processed.txt contents:"
+          echo "=== lint_processed.txt ==="
           cat lint_processed.txt || echo "No linting issues found"
-          echo "=== End Debug ==="
+          echo "=== End processed outputs ==="
 
+      - name: Run reviewdog
+        if: always()
+        run: |
           # Report formatting issues
-          if [ -f fmt_processed.txt ]; then
-            echo "Sending formatting issues to ReviewDog..."
-            cat fmt_processed.txt | reviewdog -f=golint -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning -tee
-          fi
+          for f in fmt_output/*.xml; do
+            if [ -f "$f" ]; then
+              echo "Sending formatting issues to ReviewDog from $f..."
+              cat "$f" | reviewdog -f=checkstyle -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning
+            fi
+          done
           
           # Report linting issues
-          if [ -f lint_processed.txt ]; then
-            echo "Sending linting issues to ReviewDog..."
-            cat lint_processed.txt | reviewdog -f=golint -name=deno-lint -reporter=github-pr-review -filter-mode=file -level=warning -tee
-          fi
+          for f in lint_output/*.xml; do
+            if [ -f "$f" ]; then
+              echo "Sending linting issues to ReviewDog from $f..."
+              cat "$f" | reviewdog -f=checkstyle -name=deno-lint -reporter=github-pr-review -filter-mode=file -level=warning
+            fi
+          done
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REVIEWDOG_DEBUG: 1
