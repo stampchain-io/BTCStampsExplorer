@@ -108,7 +108,9 @@ import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
 import * as $src20_index from "./routes/src20/index.tsx";
 import * as $stamp_id_ from "./routes/stamp/[id].tsx";
+import * as $stamp_art from "./routes/stamp/art.tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
+import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $stamp_trade from "./routes/stamp/trade.tsx";
 import * as $stamping_src101_action_ from "./routes/stamping/src101/[action].tsx";
 import * as $stamping_src20 from "./routes/stamping/src20.tsx";
@@ -353,7 +355,9 @@ const manifest = {
     "./routes/src20/[tick].tsx": $src20_tick_,
     "./routes/src20/index.tsx": $src20_index,
     "./routes/stamp/[id].tsx": $stamp_id_,
+    "./routes/stamp/art.tsx": $stamp_art,
     "./routes/stamp/index.tsx": $stamp_index,
+    "./routes/stamp/posh.tsx": $stamp_posh,
     "./routes/stamp/trade.tsx": $stamp_trade,
     "./routes/stamping/src101/[action].tsx": $stamping_src101_action_,
     "./routes/stamping/src20.tsx": $stamping_src20,

@@ -27,7 +27,7 @@ export function HomeStampPreview({
       stamps: stamps_art,
       layout: "grid",
       showDetails: false,
-      viewAllLink: "/stamps/art",
+      viewAllLink: "/stamp/art",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
@@ -66,7 +66,7 @@ export function HomeStampPreview({
       stamps: stamps_posh,
       layout: "grid",
       showDetails: false,
-      viewAllLink: "/stamps/posh",
+      viewAllLink: "/stamp/posh",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
