@@ -69,11 +69,12 @@ jobs:
         run: |
           cat fmt_output.txt | reviewdog -f=diff \
             -name="deno-fmt" \
-            -reporter=github-pr-review \
-            -filter-mode=added \
-            -fail-level=any
+            -reporter="github-pr-check,github-pr-review" \
+            -filter-mode=diff_context \
+            -level=warning
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_FAIL_ON_ERROR: "true"
 
       - name: Check linting
         id: lint
@@ -85,12 +86,13 @@ jobs:
         run: |
           cat lint_output.txt | reviewdog \
             -name="deno-lint" \
-            -reporter=github-pr-review \
-            -filter-mode=added \
+            -reporter="github-pr-check,github-pr-review" \
+            -filter-mode=diff_context \
             -efm="%f:%l:%c: %m" \
-            -fail-level=error
+            -level=warning
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_FAIL_ON_ERROR: "true"
 
       # Fail the workflow if any checks failed
       - name: Check for failures
