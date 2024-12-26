@@ -63,7 +63,7 @@ jobs:
         id: fmt
         if: always()
         run: |
-          deno fmt --check . > fmt_output.txt || true
+          deno task check:fmt > fmt_output.txt || true
           echo "Formatting check output:"
           cat fmt_output.txt
 
@@ -71,7 +71,7 @@ jobs:
         id: lint
         if: always()
         run: |
-          deno lint . > lint_output.txt || true
+          deno task check:lint > lint_output.txt || true
           echo "Lint check output:"
           cat lint_output.txt
 
