@@ -80,23 +80,26 @@ jobs:
         run: |
           # Process and report formatting issues
           echo "Processing format issues..."
+          current_file=""
           while IFS= read -r line; do
-            if [[ $line =~ ^from[[:space:]]/.*\.tsx?: ]]; then
-              file=$(echo "$line" | cut -d' ' -f2 | tr -d ':')
-              echo "$file:1:1:[deno-fmt] Formatting issues detected" >> fmt_processed.txt
+            if [[ $line =~ ^from[[:space:]](.+): ]]; then
+              current_file="${BASH_REMATCH[1]}"
+              echo "Processing file: $current_file"
+            elif [[ $line =~ ^[[:space:]]*[0-9]+[[:space:]]*\| ]]; then
+              line_num=$(echo "$line" | grep -o '^[[:space:]]*[0-9]\+' | tr -d ' ')
+              echo "$current_file:$line_num:1:[deno-fmt] Formatting issue detected" >> fmt_processed.txt
             fi
           done < fmt_output.txt
           
           # Process and report linting issues
           echo "Processing lint issues..."
           while IFS= read -r line; do
-            if [[ $line =~ ^error ]]; then
+            if [[ $line =~ ^error:[[:space:]](.+) ]]; then
+              error_msg="${BASH_REMATCH[1]}"
               read -r file_line
-              read -r separator_line
-              read -r code_line
-              file_info=$(echo "$file_line" | grep -o '/.*\.tsx?:[0-9]\+:[0-9]\+')
-              if [ ! -z "$file_info" ]; then
-                echo "$file_info: $line" >> lint_processed.txt
+              if [[ $file_line =~ ^[[:space:]]*at[[:space:]](.+:[0-9]+:[0-9]+) ]]; then
+                file_info="${BASH_REMATCH[1]}"
+                echo "$file_info: $error_msg" >> lint_processed.txt
               fi
             fi
           done < lint_output.txt
