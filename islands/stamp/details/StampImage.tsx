@@ -94,17 +94,15 @@ function RightPanel(
 
   const handleXMouseEnter = () => {
     if (allowXTooltip) {
-      const buttonRect = xButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsXTooltipVisible(true);
-      }
-
       if (xTooltipTimeoutRef.current) {
         globalThis.clearTimeout(xTooltipTimeoutRef.current);
       }
 
       xTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsXTooltipVisible(false);
+        const buttonRect = xButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsXTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -119,17 +117,15 @@ function RightPanel(
 
   const handleCopyMouseEnter = () => {
     if (allowTooltip) {
-      const buttonRect = copyButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsTooltipVisible(true);
-      }
-
       if (tooltipTimeoutRef.current) {
         globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
 
       tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsTooltipVisible(false);
+        const buttonRect = copyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -171,17 +167,15 @@ function RightPanel(
 
   const handleShareMouseEnter = () => {
     if (allowShareTooltip) {
-      const buttonRect = shareButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsShareTooltipVisible(true);
-      }
-
       if (shareTooltipTimeoutRef.current) {
         globalThis.clearTimeout(shareTooltipTimeoutRef.current);
       }
 
       shareTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsShareTooltipVisible(false);
+        const buttonRect = shareButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsShareTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -197,17 +191,15 @@ function RightPanel(
   // Add handlers for code tooltip
   const handleCodeMouseEnter = () => {
     if (allowCodeTooltip) {
-      const buttonRect = codeButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsCodeTooltipVisible(true);
-      }
-
       if (codeTooltipTimeoutRef.current) {
         globalThis.clearTimeout(codeTooltipTimeoutRef.current);
       }
 
       codeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsCodeTooltipVisible(false);
+        const buttonRect = codeButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsCodeTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -223,17 +215,15 @@ function RightPanel(
   // Add handlers for fullscreen tooltip
   const handleFullscreenMouseEnter = () => {
     if (allowFullscreenTooltip) {
-      const buttonRect = fullscreenButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsFullscreenTooltipVisible(true);
-      }
-
       if (fullscreenTooltipTimeoutRef.current) {
         globalThis.clearTimeout(fullscreenTooltipTimeoutRef.current);
       }
 
       fullscreenTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsFullscreenTooltipVisible(false);
+        const buttonRect = fullscreenButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsFullscreenTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -549,17 +539,15 @@ export function StampImage(
   // Add these handler functions
   const _handleXMouseEnter = () => {
     if (allowXTooltip) {
-      const buttonRect = xButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsXTooltipVisible(true);
-      }
-
       if (xTooltipTimeoutRef.current) {
         globalThis.clearTimeout(xTooltipTimeoutRef.current);
       }
 
       xTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsXTooltipVisible(false);
+        const buttonRect = xButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsXTooltipVisible(true);
+        }
       }, 1500);
     }
   };

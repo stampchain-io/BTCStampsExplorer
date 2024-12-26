@@ -1,12 +1,12 @@
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
+import { ScrollContainer } from "../shared/ScrollContainer.tsx";
 
 interface SendRow {
   source: string;
   destination: string;
   quantity: number;
-  memo: string;
   tx_hash: string;
-  block_time: string; // Changed from number to string
+  block_time: string;
   cpid?: string;
 }
 
@@ -22,54 +22,66 @@ const tableHeaders = [
   { key: "created", label: "Date" },
 ];
 
-const tableLabelClassName =
+const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const tableValueClassName =
+const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
+const row = "h-8 hover:bg-stamp-purple/10";
 
 function TransferRow({ send }: { send: SendRow }) {
+  const handleClick = (e: MouseEvent, address: string) => {
+    e.preventDefault();
+    window.location.href = `/wallet/${address}`;
+  };
+
   return (
-    <tr key={send.tx_hash}>
-      <td className="text-left py-0">
+    <tr key={send.tx_hash} class={row}>
+      <td className="text-left">
         {send.source
           ? (
-            <>
+            <a
+              href={`/wallet/${send.source}`}
+              onClick={(e) => handleClick(e, send.source)}
+              className="hover:text-stamp-purple-bright cursor-pointer"
+            >
               <span className="tablet:hidden">
                 {abbreviateAddress(send.source, 4)}
               </span>
               <span className="hidden tablet:inline">
                 {abbreviateAddress(send.source, 6)}
               </span>
-            </>
+            </a>
           )
           : "NULL"}
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {send.destination
           ? (
-            <>
+            <a
+              href={`/wallet/${send.destination}`}
+              onClick={(e) => handleClick(e, send.destination)}
+              className="hover:text-stamp-purple-bright cursor-pointer"
+            >
               <span className="tablet:hidden">
                 {abbreviateAddress(send.destination, 4)}
               </span>
               <span className="hidden tablet:inline">
                 {abbreviateAddress(send.destination, 6)}
               </span>
-            </>
+            </a>
           )
           : "NULL"}
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {send.quantity}
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {abbreviateAddress(send.tx_hash)}
       </td>
-      <td className="text-right uppercase py-0">
-        {send.block_time
-          ? formatDate(new Date(send.block_time), {
-            includeRelative: false,
-          })
-          : "N/A"}
+      <td className="text-right uppercase">
+        {formatDate(new Date(send.block_time), {
+          includeRelative: false,
+        })}
       </td>
     </tr>
   );
@@ -77,45 +89,47 @@ function TransferRow({ send }: { send: SendRow }) {
 
 export function StampTransfers({ sends }: StampTransfersProps) {
   return (
-    <div className="relative max-w-full">
-      <div className="max-h-96 overflow-x-auto">
-        <table className={`${tableValueClassName} w-full table-fixed`}>
-          <colgroup>
-            <col className="w-[18%]" /> {/* From column */}
-            <col className="w-[18%]" /> {/* To */}
-            <col className="w-[10%]" /> {/* Quantity */}
-            <col className="w-[18%]" /> {/* Tx hash */}
-            <col className="w-[18%]" /> {/* Created */}
-          </colgroup>
-          <thead>
-            <tr>
-              {tableHeaders.map(({ key, label }) => (
-                <th
-                  key={key}
-                  scope="col"
-                  class={`${tableLabelClassName} pb-1.5 ${
-                    key === "from"
-                      ? "text-left"
-                      : key === "created"
-                      ? "text-right"
-                      : "text-center"
-                  }`}
-                >
-                  {label}
-                </th>
+    <div class="relative w-full">
+      <ScrollContainer class="max-h-48">
+        <div class="w-[480px] min-[480px]:w-full">
+          <table class={tableValue}>
+            <colgroup>
+              <col className="w-[20%]" /> {/* From column */}
+              <col className="w-[20%]" /> {/* To */}
+              <col className="w-[20%]" /> {/* Quantity */}
+              <col className="w-[20%]" /> {/* Tx hash */}
+              <col className="w-[20%]" /> {/* Created */}
+            </colgroup>
+            <thead>
+              <tr>
+                {tableHeaders.map(({ key, label }) => (
+                  <th
+                    key={key}
+                    scope="col"
+                    class={`${tableLabel} pb-1.5 ${
+                      key === "from"
+                        ? "text-left"
+                        : key === "created"
+                        ? "text-right"
+                        : "text-center"
+                    }`}
+                  >
+                    {label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sends.map((send) => (
+                <TransferRow
+                  key={send.tx_hash}
+                  send={send}
+                />
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sends.map((send) => (
-              <TransferRow
-                key={send.tx_hash}
-                send={send}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      </ScrollContainer>
     </div>
   );
 }

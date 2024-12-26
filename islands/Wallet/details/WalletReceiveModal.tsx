@@ -34,17 +34,15 @@ function WalletReceiveModal({ onClose, address }: Props) {
 
   const handleCopyMouseEnter = () => {
     if (allowTooltip) {
-      const buttonRect = copyButtonRef.current?.getBoundingClientRect();
-      if (buttonRect) {
-        setIsTooltipVisible(true);
-      }
-
       if (tooltipTimeoutRef.current) {
         globalThis.clearTimeout(tooltipTimeoutRef.current);
       }
 
       tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsTooltipVisible(false);
+        const buttonRect = copyButtonRef.current?.getBoundingClientRect();
+        if (buttonRect) {
+          setIsTooltipVisible(true);
+        }
       }, 1500);
     }
   };
@@ -110,7 +108,7 @@ function WalletReceiveModal({ onClose, address }: Props) {
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
-            class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+            class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] mb-6 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
             viewBox="0 0 32 32"
             role="button"
             aria-label="Copy"

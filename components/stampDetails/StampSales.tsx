@@ -2,6 +2,7 @@ import {
   abbreviateAddress,
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
+import { ScrollContainer } from "../shared/ScrollContainer.tsx";
 
 interface Dispense {
   source: string;
@@ -24,16 +25,26 @@ const tableHeaders = [
   { key: "confirmed", label: "Confirmed" },
 ];
 
-const tableLabelClassName =
+const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const tableValueClassName =
+const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
+const row = "h-8 hover:bg-stamp-purple/10";
 
 function DispenseRow({ dispense }: { dispense: Dispense }) {
+  const handleClick = (e: MouseEvent, address: string) => {
+    e.preventDefault();
+    window.location.href = `/wallet/${address}`;
+  };
+
   return (
-    <tr>
-      <td className="text-left py-0">
-        <a href={`/wallet/${dispense.source}`}>
+    <tr class={row}>
+      <td className="text-left">
+        <a
+          href={`/wallet/${dispense.source}`}
+          onClick={(e) => handleClick(e, dispense.source)}
+          className="hover:text-stamp-purple-bright cursor-pointer"
+        >
           <span className="tablet:hidden">
             {abbreviateAddress(dispense.source, 4)}
           </span>
@@ -42,8 +53,12 @@ function DispenseRow({ dispense }: { dispense: Dispense }) {
           </span>
         </a>
       </td>
-      <td className="text-center py-0">
-        <a href={`/wallet/${dispense.destination}`}>
+      <td className="text-center">
+        <a
+          href={`/wallet/${dispense.destination}`}
+          onClick={(e) => handleClick(e, dispense.destination)}
+          className="hover:text-stamp-purple-bright cursor-pointer"
+        >
           <span className="tablet:hidden">
             {abbreviateAddress(dispense.destination, 4)}
           </span>
@@ -52,13 +67,13 @@ function DispenseRow({ dispense }: { dispense: Dispense }) {
           </span>
         </a>
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {dispense.dispense_quantity}
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {formatSatoshisToBTC(dispense.satoshirate)}
       </td>
-      <td className="text-right py-0">
+      <td className="text-right">
         {dispense.confirmed ? "YES" : "NO"}
       </td>
     </tr>
@@ -67,42 +82,44 @@ function DispenseRow({ dispense }: { dispense: Dispense }) {
 
 export function StampSales({ dispenses }: StampSalesProps) {
   return (
-    <div className="relative shadow-md max-w-full">
-      <div className="max-h-96 overflow-x-auto">
-        <table className={`${tableValueClassName} w-full table-fixed`}>
-          <colgroup>
-            <col className="w-[20%]" /> {/* From column */}
-            <col className="w-[20%]" /> {/* To */}
-            <col className="w-[20%]" /> {/* Quantity */}
-            <col className="w-[20%]" /> {/* Price */}
-            <col className="w-[20%]" /> {/* Confirmed */}
-          </colgroup>
-          <thead>
-            <tr>
-              {tableHeaders.map(({ key, label }) => (
-                <th
-                  key={key}
-                  scope="col"
-                  class={`${tableLabelClassName} pb-1.5 ${
-                    key === "from"
-                      ? "text-left"
-                      : key === "confirmed"
-                      ? "text-right"
-                      : "text-center"
-                  }`}
-                >
-                  {label}
-                </th>
+    <div class="relative w-full">
+      <ScrollContainer class="max-h-48">
+        <div class="w-[480px] min-[480px]:w-full">
+          <table className={tableValue}>
+            <colgroup>
+              <col className="w-[20%]" /> {/* From column */}
+              <col className="w-[20%]" /> {/* To */}
+              <col className="w-[20%]" /> {/* Quantity */}
+              <col className="w-[20%]" /> {/* Price */}
+              <col className="w-[20%]" /> {/* Confirmed */}
+            </colgroup>
+            <thead>
+              <tr>
+                {tableHeaders.map(({ key, label }) => (
+                  <th
+                    key={key}
+                    scope="col"
+                    class={`${tableLabel} pb-1.5 ${
+                      key === "from"
+                        ? "text-left"
+                        : key === "confirmed"
+                        ? "text-right"
+                        : "text-center"
+                    }`}
+                  >
+                    {label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {dispenses.map((dispense, index) => (
+                <DispenseRow key={index} dispense={dispense} />
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {dispenses.map((dispense, index) => (
-              <DispenseRow key={index} dispense={dispense} />
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      </ScrollContainer>
     </div>
   );
 }

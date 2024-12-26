@@ -1,17 +1,26 @@
-import { useEffect } from "preact/hooks";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
+import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
+import type { Output } from "$types/index.d.ts";
 
-interface Props {
+interface WalletSendModalProps {
   fee: number;
+  balance: number;
   handleChangeFee: (fee: number) => void;
   onClose: () => void;
 }
 
-function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
+function WalletSendModal(
+  { fee: initialFee, handleChangeFee, onClose, balance }: WalletSendModalProps,
+) {
   const { wallet } = walletContext;
+  const [isSendingMax, setIsSendingMax] = useState(false);
+  const [isMaxTooltipVisible, setIsMaxTooltipVisible] = useState(false);
+  const [allowMaxTooltip, setAllowMaxTooltip] = useState(true);
+  const maxTooltipTimeoutRef = useRef<number | null>(null);
   const {
     formState,
     setFormState,
@@ -31,6 +40,15 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
+
+  // Add cleanup effect
+  useEffect(() => {
+    return () => {
+      if (maxTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(maxTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSendSubmit = async () => {
     await handleSubmit(async () => {
@@ -103,35 +121,83 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
       const maxAmountSats = wallet.balance - feeInSatoshis;
       const maxAmountBTC = (maxAmountSats / 100000000).toFixed(8);
 
-      setFormState({
-        ...formState,
+      setFormState((prev) => ({
+        ...prev,
         amount: maxAmountBTC,
-      });
+      }));
     } catch (error) {
-      setError("Failed to calculate maximum amount");
       console.error("Max amount calculation error:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to calculate maximum amount",
+      );
     }
+  };
+
+  const handleMaxMouseEnter = () => {
+    if (allowMaxTooltip) {
+      if (maxTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(maxTooltipTimeoutRef.current);
+      }
+      maxTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsMaxTooltipVisible(true);
+      }, 1500);
+    }
+  };
+
+  const handleMaxMouseLeave = () => {
+    if (maxTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(maxTooltipTimeoutRef.current);
+    }
+    setIsMaxTooltipVisible(false);
+    setAllowMaxTooltip(true);
   };
 
   const inputField =
     "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
+
+  const tooltipIcon =
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
 
   return (
     <ModalLayout onClose={onClose} title="SEND">
       <div class="flex flex-col gap-6 -mt-3">
         <div class="flex flex-col items-center text-center">
           <div class="flex justify-center items-baseline w-full">
-            <div class="inline-flex items-baseline gap-1.5">
+            <div
+              class="inline-flex items-baseline gap-3"
+              style={{ background: "transparent", border: "none" }}
+            >
               <input
                 type="text"
                 value={formState.amount}
                 onInput={(e) => {
-                  const value = (e.target as HTMLInputElement).value;
-                  // Only allow numbers and decimal point
-                  let sanitizedValue = value.replace(/[^0-9.]/g, "");
+                  const inputValue = (e.target as HTMLInputElement).value;
+
+                  // Special handling for deleting "0."
+                  if (formState.amount === "0." && inputValue === "0") {
+                    setFormState((prev) => ({
+                      ...prev,
+                      amount: "",
+                    }));
+                    return;
+                  }
+
+                  // Handle initial "0" input
+                  if (inputValue === "0") {
+                    setFormState((prev) => ({
+                      ...prev,
+                      amount: "0.",
+                    }));
+                    return;
+                  }
+
+                  // Regular input handling
+                  let sanitizedValue = inputValue.replace(/[^0-9.]/g, "");
+                  const parts = sanitizedValue.split(".");
 
                   // Ensure only one decimal point
-                  const parts = sanitizedValue.split(".");
                   if (parts.length > 2) {
                     sanitizedValue = parts[0] + "." + parts[1];
                   }
@@ -141,23 +207,23 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
                     sanitizedValue = parts[0] + "." + parts[1].slice(0, 8);
                   }
 
-                  // Limit total length to 10
+                  // Limit total length to 10 characters
                   sanitizedValue = sanitizedValue.slice(0, 10);
 
-                  setFormState({
-                    ...formState,
+                  setFormState((prev) => ({
+                    ...prev,
                     amount: sanitizedValue,
-                  });
+                  }));
                 }}
                 placeholder="0"
-                class="bg-transparent text-4xl mobileLg:text-5xl text-stamp-grey-light placeholder:text-stamp-grey font-black outline-none text-right -ms-1.5 mobileLg:-ms-0.75"
+                class="bg-transparent text-[30px] mobileLg:text-[42px] text-stamp-grey-light placeholder:text-stamp-grey font-black text-right -ms-0 mobileLg:-ms-0 pointer-events-auto no-outline"
                 style={{
                   width: (() => {
                     const value = formState.amount || "";
 
                     // Define pixel values for different screen sizes
-                    const smallScreenChar = { one: 17, other: 23 };
-                    const largeScreenChar = { one: 22, other: 30 };
+                    const smallScreenChar = { one: 14, other: 19 };
+                    const largeScreenChar = { one: 19, other: 27 };
 
                     // Use CSS media query to determine screen size
                     const isSmallScreen =
@@ -174,25 +240,22 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
                           (char === "1" || char === "." ? one : other);
                       }, 0);
 
-                    console.log({
-                      value,
-                      isSmallScreen,
-                      one,
-                      other,
-                      baseWidth,
-                      finalWidth: `${baseWidth}px`,
-                    });
-
                     return `${baseWidth}px`;
                   })(),
+                  background: "transparent",
+                  boxShadow: "none",
+                  border: "none",
+                  outline: "0px solid transparent",
+                  outlineOffset: "0",
+                  outlineStyle: "none",
                 }}
               />
-              <span class="text-4xl mobileLg:text-5xl text-stamp-grey-light font-extralight">
+              <span class="text-[30px] mobileLg:text-[42px] text-stamp-grey-light font-extralight">
                 BTC
               </span>
             </div>
           </div>
-          <div class="text-lg mobileLg:text-xl text-stamp-grey-darker font-light mt-0.75">
+          <div class="text-sm mobileLg:text-base text-stamp-grey-darker font-light">
             {formState.amount && formState.BTCPrice
               ? (parseFloat(formState.amount) * formState.BTCPrice)
                 .toLocaleString("en-US", {
@@ -202,10 +265,19 @@ function WalletSendModal({ fee: initialFee, handleChangeFee, onClose }: Props) {
               : "0.00"} USD
           </div>
           <div
-            class="text-xs mobileLg:text-sm text-stamp-grey font-medium hover:stamp-grey-light mt-1.5 cursor-pointer"
+            className="relative text-base mobileLg:text-lg text-stamp-grey font-medium hover:text-stamp-grey-light mt-2 cursor-pointer"
             onClick={handleMaxClick}
+            onMouseEnter={handleMaxMouseEnter}
+            onMouseLeave={handleMaxMouseLeave}
           >
             MAX
+            <div
+              className={`${tooltipIcon} ${
+                isMaxTooltipVisible ? "block" : "hidden"
+              }`}
+            >
+              EMPTY YOUR WALLET
+            </div>
           </div>
         </div>
 

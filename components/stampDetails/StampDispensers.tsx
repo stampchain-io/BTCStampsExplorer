@@ -3,6 +3,7 @@ import {
   formatNumber,
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
+import { ScrollContainer } from "../shared/ScrollContainer.tsx";
 
 interface Dispenser {
   source: string;
@@ -29,29 +30,33 @@ const tableHeaders = [
 ];
 
 const tableLabel =
+const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
+const tableValue =
 const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 
 function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
-  const isClosedDispenser = dispenser.close_block_index > 0;
-  const rowClassName = isClosedDispenser ? "text-stamp-grey-darker" : "";
+  const isEmpty = dispenser.give_remaining === 0;
+  const rowDispensers = `${
+    isEmpty ? "text-stamp-grey-darker" : ""
+  } h-8 hover:bg-stamp-purple/10`;
 
   return (
-    <tr class={rowClassName}>
-      <td className="text-left py-0">
+    <tr class={rowDispensers}>
+      <td className="text-left">
         {formatSatoshisToBTC(dispenser.satoshirate)}
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {formatNumber(dispenser.escrow_quantity, 0)}
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {formatNumber(dispenser.give_quantity, 0)}
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {formatNumber(dispenser.give_remaining, 0)}
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         <span className="tablet:hidden">
           {abbreviateAddress(dispenser.source, 4)}
         </span>
@@ -59,10 +64,10 @@ function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
           {abbreviateAddress(dispenser.source, 8)}
         </span>
       </td>
-      <td className="text-center py-0">
+      <td className="text-center">
         {dispenser.confirmed ? "YES" : "NO"}
       </td>
-      <td className="text-right py-0">
+      <td className="text-right">
         {!dispenser.close_block_index || dispenser.close_block_index <= 0
           ? "OPEN"
           : dispenser.close_block_index}
@@ -78,44 +83,46 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
   );
 
   return (
-    <div className="relative max-w-full">
-      <div className="max-h-96 overflow-x-auto">
-        <table class={`${tableValue} w-full table-fixed`}>
-          <colgroup>
-            <col class="w-[16%] tablet:w-[14%]" /> {/* Price */}
-            <col class="w-[12%] tablet:w-[10%]" /> {/* Escrow */}
-            <col class="w-[12%] tablet:w-[10%]" /> {/* Give */}
-            <col class="w-[12%] tablet:w-[10%]" /> {/* Remain */}
-            <col class="w-[20%] tablet:w-[28%]" /> {/* Address column */}
-            <col class="w-[14%] tablet:w-[14%]" /> {/* Confirmed */}
-            <col class="w-[14%] tablet:w-[14%]" /> {/* Closed */}
-          </colgroup>
-          <thead>
-            <tr>
-              {tableHeaders.map(({ key, label }) => (
-                <th
-                  key={key}
-                  scope="col"
-                  class={`${tableLabel} pb-1.5 ${
-                    key === "price"
-                      ? "text-left"
-                      : key === "closeBlock"
-                      ? "text-right"
-                      : "text-center"
-                  }`}
-                >
-                  {label}
-                </th>
+    <div class="relative w-full">
+      <ScrollContainer class="max-h-48">
+        <div class="w-[660px] min-[660px]:w-full">
+          <table class={tableValue}>
+            <colgroup>
+              <col class="w-[16%]" /> {/* Price */}
+              <col class="w-[10%]" /> {/* Escrow */}
+              <col class="w-[10%]" /> {/* Give */}
+              <col class="w-[10%]" /> {/* Remain */}
+              <col class="w-[26%]" /> {/* Address column */}
+              <col class="w-[14%]" /> {/* Confirmed */}
+              <col class="w-[14%]" /> {/* Closed */}
+            </colgroup>
+            <thead>
+              <tr>
+                {tableHeaders.map(({ key, label }) => (
+                  <th
+                    key={key}
+                    scope="col"
+                    class={`${tableLabel} pb-1.5 ${
+                      key === "price"
+                        ? "text-left"
+                        : key === "closeBlock"
+                        ? "text-right"
+                        : "text-center"
+                    }`}
+                  >
+                    {label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedDispensers.map((dispenser) => (
+                <DispenserRow key={dispenser.source} dispenser={dispenser} />
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedDispensers.map((dispenser) => (
-              <DispenserRow key={dispenser.source} dispenser={dispenser} />
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      </ScrollContainer>
     </div>
   );
 }
