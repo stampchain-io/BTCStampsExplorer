@@ -280,21 +280,23 @@ function WalletSendStampModal({
       <div className={inputFieldContainer}>
         <div className="flex w-full gap-3 mobileMd:gap-6">
           <div className="flex items-center justify-center rounded-sm min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker">
-            {selectedStamp ? (
-              <img
-                src={imgSrc}
-                onError={handleImageError}
-                loading="lazy"
-                alt={`Stamp #${selectedStamp.stamp}`}
-                className="w-full h-full object-contain pixelart"
-              />
-            ) : (
-              <img
-                src="/img/stamping/image-upload.svg"
-                className="w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
-                alt=""
-              />
-            )}
+            {selectedStamp
+              ? (
+                <img
+                  src={imgSrc}
+                  onError={handleImageError}
+                  loading="lazy"
+                  alt={`Stamp #${selectedStamp.stamp}`}
+                  className="w-full h-full object-contain pixelart"
+                />
+              )
+              : (
+                <img
+                  src="/img/stamping/image-upload.svg"
+                  className="w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
+                  alt=""
+                />
+              )}
           </div>
 
           <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
@@ -359,7 +361,7 @@ function WalletSendStampModal({
             inputType="P2WPKH"
             outputTypes={["P2WPKH"]}
             tosAgreed={true}
-              />
+          />
 
           {error && (
             <div className="text-red-500 text-center mt-4 font-medium">
