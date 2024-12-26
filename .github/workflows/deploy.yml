@@ -64,12 +64,24 @@ jobs:
         run: deno fmt --check 2>&1 | tee fmt_output.txt
         continue-on-error: true  # Allow the workflow to continue for reviewdog
 
-      - name: Report formatting issues
+      - name: Report formatting issues (PR Check)
         if: always()
         run: |
           cat fmt_output.txt | reviewdog -f=diff \
             -name="deno-fmt" \
-            -reporter="github-pr-check,github-pr-review" \
+            -reporter=github-pr-check \
+            -filter-mode=diff_context \
+            -level=warning
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_FAIL_ON_ERROR: "true"
+
+      - name: Report formatting issues (PR Review)
+        if: always()
+        run: |
+          cat fmt_output.txt | reviewdog -f=diff \
+            -name="deno-fmt" \
+            -reporter=github-pr-review \
             -filter-mode=diff_context \
             -level=warning
         env:
@@ -78,15 +90,32 @@ jobs:
 
       - name: Check linting
         id: lint
-        run: deno lint 2>&1 | tee lint_output.txt
+        run: |
+          deno lint 2>&1 | tee lint_output.txt
+          if [ ! -s lint_output.txt ]; then
+            echo "No linting issues found" > lint_output.txt
+          fi
         continue-on-error: true  # Allow the workflow to continue for reviewdog
 
-      - name: Report linting issues
+      - name: Report linting issues (PR Check)
         if: always()
         run: |
           cat lint_output.txt | reviewdog \
             -name="deno-lint" \
-            -reporter="github-pr-check,github-pr-review" \
+            -reporter=github-pr-check \
+            -filter-mode=diff_context \
+            -efm="%f:%l:%c: %m" \
+            -level=warning
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_FAIL_ON_ERROR: "true"
+
+      - name: Report linting issues (PR Review)
+        if: always()
+        run: |
+          cat lint_output.txt | reviewdog \
+            -name="deno-lint" \
+            -reporter=github-pr-review \
             -filter-mode=diff_context \
             -efm="%f:%l:%c: %m" \
             -level=warning
