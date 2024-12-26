@@ -96,7 +96,7 @@ jobs:
               old_content="${BASH_REMATCH[2]}"
               # Read the next line which should contain the new content
               read -r next_line || true
-              if [[ "$next_line" =~ ^[[:space:]]*[0-9]+[[:space:]]*\|[[:space:]]*(\\+.*) ]]; then
+              if [[ "$next_line" =~ ^[[:space:]]*[0-9]+[[:space:]]*\|[[:space:]]*(\+.*) ]]; then
                 new_content="${BASH_REMATCH[1]}"
                 echo "$current_file:$line_num:1:[deno-fmt] Format diff - Old: $old_content | New: $new_content" >> fmt_processed.txt
               fi
@@ -111,7 +111,7 @@ jobs:
               message="${BASH_REMATCH[2]}"
               # Read the next line which contains the file path with arrow
               read -r file_line || true
-              if [[ "$file_line" =~ [[:space:]]*--\>[[:space:]]*([^:]+):([0-9]+) ]]; then
+              if [[ "$file_line" =~ [[:space:]]*--[[:space:]]*([^:]+):([0-9]+) ]]; then
                 file="${BASH_REMATCH[1]}"
                 line_num="${BASH_REMATCH[2]}"
                 echo "$file:$line_num:1:[deno-lint/$rule] $message" >> lint_processed.txt
