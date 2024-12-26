@@ -64,7 +64,7 @@ jobs:
         if: always()
         run: |
           echo "Running deno fmt check..."
-          deno fmt --check . 2>&1 | tee full_fmt.txt || true
+          deno task check:fmt 2>&1 | tee full_fmt.txt || true
           if [ -s full_fmt.txt ]; then
             echo "Processing format issues..."
             awk '/^from.*:/{p=1;file=$2;sub(/:$/,"",file);next} p&&/^[0-9]+/{if($0~/^\s*[0-9]+\s*\|\s*-/){old=$0;getline;if($0~/^\s*[0-9]+\s*\|\s*\+/){print file ":" substr(old,1,index(old,"|")-1) ":1:[deno-fmt] Format diff - Old:" substr(old,index(old,"|")+1) "| New:" substr($0,index($0,"|")+1)}}}' full_fmt.txt > fmt_processed.txt
@@ -77,7 +77,7 @@ jobs:
         if: always()
         run: |
           echo "Running deno lint..."
-          deno lint . 2>&1 | tee full_lint.txt || true
+          deno task check:lint 2>&1 | tee full_lint.txt || true
           if [ -s full_lint.txt ]; then
             echo "Processing lint issues..."
             awk '/^error\[.*\]:/{rule=$0;sub(/^error\[/,"",rule);sub(/\]:.*/,"",rule);msg=substr($0,index($0,":")+2);getline;if($0~/^.*-->/){split($0,a,":");print a[1] ":" a[2] ":" a[3] ":[deno-lint/" rule "] " msg}}' full_lint.txt > lint_processed.txt
