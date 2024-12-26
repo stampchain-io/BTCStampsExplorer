@@ -10,7 +10,7 @@ interface ModalLayoutProps {
 }
 
 const modalBgBlur =
-  "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-60 backdrop-filter backdrop-blur-md";
+  "fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#000000] bg-opacity-70 backdrop-filter backdrop-blur-md";
 
 export function ModalLayout({
   onClose,
