@@ -1,9 +1,9 @@
-// islands/stamp/details/WalletSendStampModal.tsx
+/** @jsx h */
+import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { SelectField } from "$islands/stamping/SelectField.tsx";
-import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import type { StampRow } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
@@ -13,7 +13,6 @@ interface Props {
   fee: number;
   handleChangeFee: (fee: number) => void;
   toggleModal: () => void;
-  handleCloseModal: () => void;
   stamps: {
     data: StampRow[];
     pagination: {
@@ -29,7 +28,6 @@ function WalletSendStampModal({
   fee: initialFee,
   handleChangeFee = () => {},
   toggleModal,
-  handleCloseModal,
   stamps,
 }: Props) {
   const { wallet } = walletContext;
@@ -260,8 +258,6 @@ function WalletSendStampModal({
   const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
   const titlePurpleLDCenter =
     "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
-  const feeSelectorContainer =
-    "p-3 mobileMd:p-6 dark-gradient rounded-md z-[10] w-full";
   const inputFieldContainer =
     "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-md w-full";
   const inputField =
@@ -296,6 +292,7 @@ function WalletSendStampModal({
               />
             )}
           </div>
+
 
           <div className="flex flex-col gap-3 mobileMd:gap-6 flex-1">
             <SelectField
@@ -344,34 +341,34 @@ function WalletSendStampModal({
               className={inputField}
             />
           </div>
-
-          <BasicFeeCalculator
-            fee={formState.fee}
-            handleChangeFee={internalHandleChangeFee}
-            type="transfer"
-            BTCPrice={formState.BTCPrice}
-            isSubmitting={isSubmitting}
-            onSubmit={handleTransferSubmit}
-            onCancel={toggleModal}
-            buttonName="TRANSFER"
-            className="pt-9 mobileLg:pt-12"
-            userAddress={wallet?.address}
-            inputType="P2WPKH"
-            outputTypes={["P2WPKH"]}
-            tosAgreed={true}
-              />
-
-          {error && (
-            <div className="text-red-500 text-center mt-4 font-medium">
-              {error}
-            </div>
-          )}
-          {successMessage && (
-            <div className="text-green-500 text-center mt-4 font-medium">
-              {successMessage}
-            </div>
-          )}
         </div>
+
+        <BasicFeeCalculator
+          fee={formState.fee}
+          handleChangeFee={internalHandleChangeFee}
+          type="transfer"
+          BTCPrice={formState.BTCPrice}
+          isSubmitting={isSubmitting}
+          onSubmit={handleTransferSubmit}
+          onCancel={toggleModal}
+          buttonName="TRANSFER"
+          className="pt-9 mobileLg:pt-12"
+          userAddress={wallet?.address}
+          inputType="P2WPKH"
+          outputTypes={["P2WPKH"]}
+          tosAgreed={true}
+        />
+
+        {error && (
+          <div className="text-red-500 text-center mt-4 font-medium">
+            {error}
+          </div>
+        )}
+        {successMessage && (
+          <div className="text-green-500 text-center mt-4 font-medium">
+            {successMessage}
+          </div>
+        )}
       </div>
     </div>
   );
