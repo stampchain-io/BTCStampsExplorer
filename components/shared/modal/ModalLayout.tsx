@@ -1,8 +1,10 @@
+import { useEffect } from "preact/hooks";
+import { logger } from "$lib/utils/logger.ts";
+
 interface ModalLayoutProps {
   onClose: () => void;
   title: string;
   children: preact.ComponentChildren;
-  preventPropagation?: boolean;
   className?: string;
   contentClassName?: string;
 }
@@ -11,20 +13,41 @@ export function ModalLayout({
   onClose,
   title,
   children,
-  preventPropagation = true,
   className = "",
   contentClassName = "",
 }: ModalLayoutProps) {
+  useEffect(() => {
+    logger.debug("ui", {
+      message: "ModalLayout mounted",
+      component: "ModalLayout",
+    });
+
+    return () => {
+      logger.debug("ui", {
+        message: "ModalLayout unmounting",
+        component: "ModalLayout",
+      });
+    };
+  }, []);
+
+  const handleClose = (e: MouseEvent) => {
+    // Only close if clicking the overlay itself, not its children
+    if (e.target === e.currentTarget) {
+      logger.debug("ui", {
+        message: "Modal closing via handleClose",
+        component: "ModalLayout",
+      });
+      onClose();
+    }
+  };
+
   return (
     <div
       class={`fixed inset-0 z-50 flex items-center justify-center bg-[#0b0b0b] bg-opacity-95 backdrop-filter backdrop-blur-sm ${className}`}
-      onClick={preventPropagation ? onClose : undefined}
+      onClick={handleClose}
     >
       <div class="relative w-[360px] mobileLg:w-[420px] h-[600px] mobileLg:h-[700px] p-6 dark-gradient rounded-lg overflow-hidden">
-        <div
-          class={`relative ${contentClassName}`}
-          onClick={preventPropagation ? (e) => e.stopPropagation() : undefined}
-        >
+        <div class={`relative ${contentClassName}`}>
           <div class="w-6 h-6 ms-auto cursor-pointer absolute top-0 right-0 -mr-1.5 -mt-1.5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +55,10 @@ export function ModalLayout({
               height="24"
               viewBox="0 0 32 32"
               class="cursor-pointer w-6 h-6 mobileLg:w-[28px] mobileLg:h-[28px] hover:fill-stamp-purple-bright"
-              onClick={onClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
               role="button"
               aria-label="Close Modal"
               fill="url(#closeModalGradient)"
