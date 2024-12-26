@@ -87,8 +87,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const tooltipIcon =
     "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
 
-  const tooltip =
+  const _tooltip =
     "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
+
   const buttonPurpleFlat =
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
 
@@ -246,6 +247,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         });
     }
   }, [stamp?.stamp_mimetype]);
+
   return (
     <div className={"flex flex-col gap-3 mobileMd:gap-6"}>
       <div

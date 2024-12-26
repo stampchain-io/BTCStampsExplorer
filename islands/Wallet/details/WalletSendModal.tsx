@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
-import { estimateFee } from "$lib/utils/minting/feeCalculations.ts";
-import type { Output } from "$types/index.d.ts";
 
 interface WalletSendModalProps {
   fee: number;
@@ -14,10 +12,10 @@ interface WalletSendModalProps {
 }
 
 function WalletSendModal(
-  { fee: initialFee, handleChangeFee, onClose, balance }: WalletSendModalProps,
+  { fee: initialFee, handleChangeFee, onClose, _balance }: WalletSendModalProps,
 ) {
   const { wallet } = walletContext;
-  const [isSendingMax, setIsSendingMax] = useState(false);
+  const [_isSendingMax, _setIsSendingMax] = useState(false);
   const [isMaxTooltipVisible, setIsMaxTooltipVisible] = useState(false);
   const [allowMaxTooltip, setAllowMaxTooltip] = useState(true);
   const maxTooltipTimeoutRef = useRef<number | null>(null);
