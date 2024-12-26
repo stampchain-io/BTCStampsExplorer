@@ -79,19 +79,20 @@ export const handler: Handlers = {
         // Determine if we need market data based on filters
         const hasMarketFilters = Object.keys(marketFilters).length > 0;
 
-        const resultData = await SRC20QueryService.fetchAndFormatSrc20DataV2(
-          {
-            ...baseParams,
-            ...marketFilters,
-            ...dateFilters,
-          },
-          {
-            excludeFullyMinted,
-            onlyFullyMinted,
-            includeMarketData: onlyFullyMinted || hasMarketFilters,
-            enrichWithProgress: true,
-          },
-        );
+        const resultData = await SRC20QueryService.QueryService
+          .fetchAndFormatSrc20DataV2(
+            {
+              ...baseParams,
+              ...marketFilters,
+              ...dateFilters,
+            },
+            {
+              excludeFullyMinted,
+              onlyFullyMinted,
+              includeMarketData: onlyFullyMinted || hasMarketFilters,
+              enrichWithProgress: true,
+            },
+          );
 
         // We know this will be a paginated response based on the params
         if (
