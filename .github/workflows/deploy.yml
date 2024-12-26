@@ -101,14 +101,24 @@ jobs:
             fi
           done < lint_output.txt
           
+          # Debug output
+          echo "=== Debug: Processed Files ==="
+          echo "fmt_processed.txt contents:"
+          cat fmt_processed.txt || echo "No formatting issues found"
+          echo "lint_processed.txt contents:"
+          cat lint_processed.txt || echo "No linting issues found"
+          echo "=== End Debug ==="
+
           # Report formatting issues
           if [ -f fmt_processed.txt ]; then
-            cat fmt_processed.txt | reviewdog -f=golint -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning
+            echo "Sending formatting issues to ReviewDog..."
+            cat fmt_processed.txt | reviewdog -f=golint -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning -tee
           fi
           
           # Report linting issues
           if [ -f lint_processed.txt ]; then
-            cat lint_processed.txt | reviewdog -f=golint -name=deno-lint -reporter=github-pr-review -filter-mode=file -level=warning
+            echo "Sending linting issues to ReviewDog..."
+            cat lint_processed.txt | reviewdog -f=golint -name=deno-lint -reporter=github-pr-review -filter-mode=file -level=warning -tee
           fi
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
