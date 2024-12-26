@@ -61,13 +61,13 @@ jobs:
       # Code Quality Checks
       - name: Check formatting
         id: fmt
-        run: deno fmt --check
+        run: deno fmt --check 2>&1 | tee fmt_output.txt
         continue-on-error: true  # Allow the workflow to continue for reviewdog
 
       - name: Report formatting issues
-        if: always() && steps.fmt.outcome == 'failure'
+        if: always()
         run: |
-          deno fmt --check | reviewdog -f=diff \
+          cat fmt_output.txt | reviewdog -f=diff \
             -name="deno-fmt" \
             -reporter=github-pr-review \
             -filter-mode=added \
@@ -77,13 +77,13 @@ jobs:
 
       - name: Check linting
         id: lint
-        run: deno task check:lint
+        run: deno lint 2>&1 | tee lint_output.txt
         continue-on-error: true  # Allow the workflow to continue for reviewdog
 
       - name: Report linting issues
-        if: always() && steps.lint.outcome == 'failure'
+        if: always()
         run: |
-          deno lint 2>&1 | reviewdog \
+          cat lint_output.txt | reviewdog \
             -name="deno-lint" \
             -reporter=github-pr-review \
             -filter-mode=added \
