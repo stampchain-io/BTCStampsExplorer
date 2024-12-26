@@ -67,7 +67,21 @@ jobs:
           deno task check:fmt 2>&1 | tee full_fmt.txt || true
           if [ -s full_fmt.txt ]; then
             echo "Processing format issues..."
-            awk '/^from.*:/{p=1;file=$2;sub(/:$/,"",file);next} p&&/^[0-9]+/{if($0~/^\s*[0-9]+\s*\|\s*-/){old=$0;getline;if($0~/^\s*[0-9]+\s*\|\s*\+/){print file ":" substr(old,1,index(old,"|")-1) ":1:[deno-fmt] Format diff - Old:" substr(old,index(old,"|")+1) "| New:" substr($0,index($0,"|")+1)}}}' full_fmt.txt > fmt_processed.txt
+            while IFS= read -r line; do
+              if [[ "$line" =~ ^Task[[:space:]]check:fmt[[:space:]]deno[[:space:]]fmt[[:space:]]--check ]]; then
+                continue
+              elif [[ "$line" =~ ^from[[:space:]]+([^:]+): ]]; then
+                current_file="${BASH_REMATCH[1]}"
+              elif [[ "$line" =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*(-.*) ]]; then
+                line_num="${BASH_REMATCH[1]}"
+                old_content="${BASH_REMATCH[2]}"
+                read -r next_line || true
+                if [[ "$next_line" =~ ^[[:space:]]*[0-9]+[[:space:]]*\|[[:space:]]*(\+.*) ]]; then
+                  new_content="${BASH_REMATCH[1]}"
+                  echo "$current_file:$line_num:1:[deno-fmt] Format diff - Old:$old_content | New:$new_content" >> fmt_processed.txt
+                fi
+              fi
+            done < full_fmt.txt
           fi
           echo "Formatting check output:"
           cat fmt_processed.txt || echo "No formatting issues found"
@@ -80,7 +94,21 @@ jobs:
           deno task check:lint 2>&1 | tee full_lint.txt || true
           if [ -s full_lint.txt ]; then
             echo "Processing lint issues..."
-            awk '/^error\[.*\]:/{rule=$0;sub(/^error\[/,"",rule);sub(/\]:.*/,"",rule);msg=substr($0,index($0,":")+2);getline;if($0~/^.*-->/){split($0,a,":");print a[1] ":" a[2] ":" a[3] ":[deno-lint/" rule "] " msg}}' full_lint.txt > lint_processed.txt
+            while IFS= read -r line; do
+              if [[ "$line" =~ ^Task[[:space:]]check:lint[[:space:]]deno[[:space:]]lint[[:space:]]--quiet ]]; then
+                continue
+              elif [[ "$line" =~ ^error\[([^]]+)\]:[[:space:]]*(.+)$ ]]; then
+                rule="${BASH_REMATCH[1]}"
+                message="${BASH_REMATCH[2]}"
+                read -r file_line || true
+                if [[ "$file_line" =~ ^[[:space:]]*"-->"[[:space:]]*([^:]+):([0-9]+):([0-9]+) ]]; then
+                  file="${BASH_REMATCH[1]}"
+                  line_num="${BASH_REMATCH[2]}"
+                  col_num="${BASH_REMATCH[3]}"
+                  echo "$file:$line_num:$col_num:[deno-lint/$rule] $message" >> lint_processed.txt
+                fi
+              fi
+            done < full_lint.txt
           fi
           echo "Lint check output:"
           cat lint_processed.txt || echo "No linting issues found"
