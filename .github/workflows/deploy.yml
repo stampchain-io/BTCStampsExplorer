@@ -81,8 +81,8 @@ jobs:
           # Process and report formatting issues
           echo "Processing format issues..."
           while IFS= read -r line; do
-            if [[ $line =~ ^.*\.tsx?[[:space:]]diff ]]; then
-              file=$(echo "$line" | cut -d' ' -f1)
+            if [[ $line =~ ^from[[:space:]]/.*\.tsx?: ]]; then
+              file=$(echo "$line" | cut -d' ' -f2 | tr -d ':')
               echo "$file:1:1:[deno-fmt] Formatting issues detected" >> fmt_processed.txt
             fi
           done < fmt_output.txt
@@ -90,8 +90,14 @@ jobs:
           # Process and report linting issues
           echo "Processing lint issues..."
           while IFS= read -r line; do
-            if [[ $line =~ ^.*\.tsx?:[0-9]+:[0-9]+.* ]]; then
-              echo "$line" >> lint_processed.txt
+            if [[ $line =~ ^error ]]; then
+              read -r file_line
+              read -r separator_line
+              read -r code_line
+              file_info=$(echo "$file_line" | grep -o '/.*\.tsx?:[0-9]\+:[0-9]\+')
+              if [ ! -z "$file_info" ]; then
+                echo "$file_info: $line" >> lint_processed.txt
+              fi
             fi
           done < lint_output.txt
           
