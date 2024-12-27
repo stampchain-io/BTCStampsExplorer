@@ -59,37 +59,32 @@ jobs:
           reviewdog_version: latest
 
       # Code Quality Checks
-      - name: Check formatting and linting
-        id: checks
+      - name: Run deno fmt check
+        id: fmt
         if: always()
-        run: |
-          # Create output directories
-          mkdir -p fmt_output lint_output
-          
-          # Debug current directory
-          echo "Current working directory: $(pwd)"
-          echo "Directory contents:"
-          ls -la
-          
-          # Run checks directly into XML processing
-          echo "Running deno fmt check and processing output..."
-          deno task check:fmt 2>&1 | tee full_fmt.txt || true
-          
-          echo "Running deno lint and processing output..."
-          deno task check:lint 2>&1 | tee full_lint.txt || true
-          
-          # Show command outputs regardless of exit code
-          echo "=== fmt command output ==="
-          cat full_fmt.txt
-          echo "=== lint command output ==="
-          cat full_lint.txt
-          
-          echo "=== Debug: Raw outputs ==="
-          echo "=== fmt output ==="
-          cat full_fmt.txt
-          echo "=== lint output ==="
-          cat full_lint.txt
-          echo "=== End raw outputs ==="
+        run: deno fmt --check | tee fmt-results.txt || true
+
+      - name: Run deno lint
+        id: lint
+        if: always()
+        run: deno lint --json | tee lint-results.json || true
+
+      - name: Report lint results
+        if: always()
+        uses: praxis-it/deno-lint-pr-review@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          lint_results: lint-results.json
+
+      - name: Report fmt results
+        if: always()
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+      - run: |
+          cat fmt-results.txt | reviewdog -f=deno -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
           # Create output directories
           mkdir -p fmt_output lint_output
@@ -223,31 +218,11 @@ jobs:
           cat lint_processed.txt || echo "No linting issues found"
           echo "=== End processed outputs ==="
 
-      - name: Run reviewdog
-        if: always()
-        run: |
-          # Report formatting issues
-          for f in fmt_output/*.xml; do
-            if [ -f "$f" ]; then
-              echo "Sending formatting issues to ReviewDog from $f..."
-              cat "$f" | reviewdog -f=checkstyle -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning
-            fi
-          done
-          
-          # Report linting issues
-          for f in lint_output/*.xml; do
-            if [ -f "$f" ]; then
-              echo "Sending linting issues to ReviewDog from $f..."
-              cat "$f" | reviewdog -f=checkstyle -name=deno-lint -reporter=github-pr-review -filter-mode=file -level=warning
-            fi
-          done
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REVIEWDOG_DEBUG: 1
+
 
       # Fail the workflow if any checks failed
       - name: Check for failures
-        if: steps.checks.outcome == 'failure'
+        if: ${{ steps.fmt.outcome == 'failure' || steps.lint.outcome == 'failure' }}
         run: exit 1
 
       # Build check
