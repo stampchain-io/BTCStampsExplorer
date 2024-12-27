@@ -1,11 +1,11 @@
 runner:
   denofmt:
-    cmd: deno task check:fmt --json
+    cmd: deno task check:fmt --json | jq -r '[.diagnostics[] | {message: .message, location: {path: .filename | sub("file:///home/ubuntu/repos/BTCStampsExplorer/"; ""), range: {start: {line: .range.start.line, column: .range.start.col}, end: {line: .range.end.line, column: .range.end.col}}}, severity: "WARNING"}]'
     format: rdjson
     level: warning
     
   denolint:
-    cmd: deno task check:lint --json
+    cmd: deno task check:lint --json | jq -r '[.diagnostics[] | {message: .message, location: {path: .filename | sub("file:///home/ubuntu/repos/BTCStampsExplorer/"; ""), range: {start: {line: .range.start.line, column: .range.start.col}, end: {line: .range.end.line, column: .range.end.col}}}, severity: "WARNING"}]'
     format: rdjson
     level: warning
 
