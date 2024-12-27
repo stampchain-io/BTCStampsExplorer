@@ -12,42 +12,59 @@ create_empty_rdjson() {
 
 process_fmt_diff() {
   # Extract formatting issues from deno fmt output
-  local file=""
-  local changes=""
-  local in_diff=false
-  local current_line=""
   local diagnostics="[]"
-  local start_line=0
+  local current_file=""
+  local line_number=0
   
   while IFS= read -r line; do
-    # Skip debug and info lines, but keep error lines
-    if [[ $line =~ ^DEBUG || $line =~ ^Task || $line =~ ^Checked ]]; then
+    # Skip task and debug lines
+    if [[ $line =~ ^Task || $line =~ ^DEBUG ]]; then
       continue
     fi
     
-    # Capture error lines for formatting issues
-    if [[ $line =~ ^error: ]]; then
-      file=$(echo "$line" | sed -n 's/^error: \(.*\) is not formatted$/\1/p')
-      if [[ -n $file ]]; then
-        diagnostics=$(echo "$diagnostics" | jq --arg file "$file" \
-          '. + [{
-            "message": "File is not properly formatted",
-            "location": {
-              "path": $file,
-              "range": {
-                "start": {"line": 1, "column": 1},
-                "end": {"line": 1, "column": 1}
-              }
-            },
-            "severity": "WARNING",
-            "code": {
-              "value": "fmt",
-              "url": "https://deno.land/manual/tools/formatter"
-            }
-          }]')
-      fi
+    # Extract file path
+    if [[ $line =~ ^from[[:space:]](.*):[[:space:]]*$ ]]; then
+      current_file="${BASH_REMATCH[1]}"
       continue
     fi
+    
+    # Extract line number and changes
+    if [[ $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+] ]]; then
+      line_number="${BASH_REMATCH[1]}"
+      local old_line=""
+      local new_line=""
+      
+      # If this is a removal line, store it and read the next line for the addition
+      if [[ $line =~ \|[[:space:]]*-(.*) ]]; then
+        old_line="${BASH_REMATCH[1]}"
+        read -r next_line
+        if [[ $next_line =~ \|[[:space:]]*\+(.*) ]]; then
+          new_line="${BASH_REMATCH[1]}"
+          
+          # Create a diagnostic entry for this change
+          diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
+            --arg line "$line_number" --arg old "$old_line" --arg new "$new_line" \
+            '. + [{
+              "message": "Formatting issue:\n- " + $old + "\n+ " + $new,
+              "location": {
+                "path": $file,
+                "range": {
+                  "start": {"line": ($line|tonumber), "column": 1},
+                  "end": {"line": ($line|tonumber), "column": 1}
+                }
+              },
+              "severity": "WARNING",
+              "code": {
+                "value": "fmt",
+                "url": "https://deno.land/manual/tools/formatter"
+              }
+            }]')
+        fi
+      fi
+    fi
+  done < "$1"
+    fi
+  done < "$1"
     
     # Detect start of a new file diff
     if [[ $line =~ ^from[[:space:]]/.*: ]]; then

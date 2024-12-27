@@ -1,6 +1,6 @@
 runner:
   denofmt:
-    cmd: deno task check:fmt:debug 2>&1 | ./scripts/transform-deno-output.sh fmt
+    cmd: deno task check:fmt 2>&1 | ./scripts/transform-deno-output.sh fmt
     format: rdjson
     level: warning
   denolint:
