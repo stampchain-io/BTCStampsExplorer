@@ -185,7 +185,7 @@ jobs:
               current_rule=""
               current_message=""
             fi
-          done < <(deno lint 2>&1 | grep -v "^Warning")
+          done < <(cat full_lint.txt | grep -v "^Warning")
           
           # Close all lint output files
           for file in "${!lint_files[@]}"; do
