@@ -59,28 +59,18 @@ jobs:
           reviewdog_version: latest
 
       # Code Quality Checks
-      - name: Run deno fmt check
-        id: fmt
-        if: always()
-        run: deno task check:fmt | tee fmt-results.txt || true
-
-      - name: Run deno lint
-        id: lint
-        if: always()
-        run: deno task check:lint | tee lint-results.txt || true
-
-      - name: Report fmt and lint results
+      - name: Setup ReviewDog
         if: always()
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
-      - run: |
-          # Process fmt results
-          cat fmt-results.txt | reviewdog -f=deno -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning
-          # Process lint results
-          cat lint-results.txt | reviewdog -f=deno -name=deno-lint -reporter=github-pr-review -filter-mode=file -level=warning
+
+      - name: Run ReviewDog
+        if: always()
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -conf=.reviewdog.yml -reporter=github-pr-review
 
       # Fail the workflow if any checks failed
       - name: Check for failures

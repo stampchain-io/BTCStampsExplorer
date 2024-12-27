@@ -1,16 +1,15 @@
 runner:
   denofmt:
-    cmd: deno fmt --check .
-    errorformat:
-      - "%f: Diff in %f"
+    cmd: deno fmt --check --json .
+    format: rdjson
     level: warning
+    
   denolint:
-    cmd: deno lint .
-    errorformat:
-      - "%f:%l:%c %m"
+    cmd: deno lint --json .
+    format: rdjson
     level: warning
 
 github:
   reporter: github-pr-review
-  filter-mode: file
-  fail-on-error: false
+  filter_mode: file
+  fail_on_error: false
