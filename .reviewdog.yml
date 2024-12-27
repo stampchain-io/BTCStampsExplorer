@@ -3,12 +3,10 @@ runner:
     cmd: deno task check:fmt --json
     format: rdjson
     level: warning
-    
   denolint:
     cmd: deno task check:lint --json
     format: rdjson
     level: warning
-
 github:
   reporter: github-pr-review
   filter_mode: file
