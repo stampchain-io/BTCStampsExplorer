@@ -114,6 +114,7 @@ export function RecentSales({
       layout: "grid" as const,
       isRecentSales: true,
       showDetails: false,
+      viewAllLink: "/stamp?recentSales=true",
       showMinDetails: true,
       variant: "grey" as const,
       gridClass: gridClass || defaultHomeGridClass,
