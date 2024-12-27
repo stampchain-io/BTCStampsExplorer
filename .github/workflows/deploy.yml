@@ -63,11 +63,15 @@ jobs:
         id: checks
         if: always()
         run: |
-          # Run checks and capture output
-          echo "Running deno fmt check..."
-          deno task check:fmt > full_fmt.txt 2>&1 || true
-          echo "Running deno lint..."
-          deno task check:lint > full_lint.txt 2>&1 || true
+          # Create output directories
+          mkdir -p fmt_output lint_output
+          
+          # Run checks directly into XML processing
+          echo "Running deno fmt check and processing output..."
+          deno task check:fmt 2>&1 | tee full_fmt.txt
+          
+          echo "Running deno lint and processing output..."
+          deno task check:lint 2>&1 | tee full_lint.txt
           
           echo "=== Debug: Raw outputs ==="
           echo "=== fmt output ==="
@@ -81,28 +85,30 @@ jobs:
           
           # Process formatting issues
           echo "Processing format issues..."
-          current_file=""
-          > fmt_current.txt
           while IFS= read -r line; do
-            if [[ "$line" =~ ^from[[:space:]]+([^:]+): ]]; then
-              if [ -n "$current_file" ] && [ -s fmt_current.txt ]; then
-                # Wrap previous file's content in checkstyle format
-                output_file="fmt_output/${current_file//\//_}.xml"
+            if [[ "$line" =~ ^([^:]+):\ +([0-9]+):([0-9]+)\ +(.+)$ ]]; then
+              file="${BASH_REMATCH[1]}"
+              line_num="${BASH_REMATCH[2]}"
+              col_num="${BASH_REMATCH[3]}"
+              message="${BASH_REMATCH[4]}"
+              output_file="fmt_output/${file//\//_}.xml"
+              if [ ! -f "$output_file" ]; then
+                echo "Creating XML for $file -> $output_file"
                 echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
                 echo "<checkstyle version=\"4.3\">" >> "$output_file"
-                echo "<file name=\"$current_file\">" >> "$output_file"
-                cat fmt_current.txt >> "$output_file"
-                echo "</file>" >> "$output_file"
-                echo "</checkstyle>" >> "$output_file"
+                echo "<file name=\"$file\">" >> "$output_file"
               fi
-              current_file="${BASH_REMATCH[1]}"
-              > fmt_current.txt
-            elif [[ "$line" =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+](.*)$ ]] && [ -n "$current_file" ]; then
-              line_num="${BASH_REMATCH[1]}"
-              content="${BASH_REMATCH[2]}"
-              echo "<error line=\"$line_num\" column=\"1\" severity=\"warning\" message=\"Formatting issue detected\" source=\"deno-fmt\"><![CDATA[$content]]></error>" >> fmt_current.txt
+              echo "<error line=\"$line_num\" column=\"$col_num\" severity=\"warning\" message=\"$message\" source=\"deno-fmt\"/>" >> "$output_file"
             fi
-          done < full_fmt.txt
+          done < <(deno fmt --check 2>&1 | grep -v "^Checked\|^Found")
+          
+          # Close fmt XML files
+          for f in fmt_output/*.xml; do
+            if [ -f "$f" ]; then
+              echo "</file>" >> "$f"
+              echo "</checkstyle>" >> "$f"
+            fi
+          done
           
           # Handle last file for fmt
           if [ -n "$current_file" ] && [ -s fmt_current.txt ]; then
@@ -118,26 +124,39 @@ jobs:
           # Process lint issues
           echo "Processing lint issues..."
           declare -A lint_files
+          current_file=""
+          current_line=""
+          current_col=""
+          current_rule=""
+          current_message=""
+          
           while IFS= read -r line; do
-            if [[ "$line" =~ ^error\[([^]]+)\]:[[:space:]]*(.+)$ ]]; then
-              rule="${BASH_REMATCH[1]}"
-              message="${BASH_REMATCH[2]}"
-              read -r file_line || true
-              if [[ "$file_line" =~ ^[[:space:]]*"-->"[[:space:]]*([^:]+):([0-9]+):([0-9]+) ]]; then
-                file="${BASH_REMATCH[1]}"
-                line_num="${BASH_REMATCH[2]}"
-                col_num="${BASH_REMATCH[3]}"
-                output_file="lint_output/${file//\//_}.xml"
-                if [ ! -f "$output_file" ]; then
-                  echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
-                  echo "<checkstyle version=\"4.3\">" >> "$output_file"
-                  echo "<file name=\"$file\">" >> "$output_file"
-                fi
-                echo "<error line=\"$line_num\" column=\"$col_num\" severity=\"warning\" message=\"[$rule] $message\" source=\"deno-lint\"><![CDATA[$message]]></error>" >> "$output_file"
-                lint_files["$file"]=1
+            if [[ "$line" =~ ^error\[([^]]+)\]:\ +(.+)$ ]]; then
+              current_rule="${BASH_REMATCH[1]}"
+              current_message="${BASH_REMATCH[2]}"
+            elif [[ "$line" =~ ^[[:space:]]*"-->"[[:space:]]*([^:]+):([0-9]+):([0-9]+) ]]; then
+              current_file="${BASH_REMATCH[1]}"
+              current_line="${BASH_REMATCH[2]}"
+              current_col="${BASH_REMATCH[3]}"
+              
+              output_file="lint_output/${current_file//\//_}.xml"
+              if [ ! -f "$output_file" ]; then
+                echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
+                echo "<checkstyle version=\"4.3\">" >> "$output_file"
+                echo "<file name=\"$current_file\">" >> "$output_file"
+                lint_files["$current_file"]=1
               fi
+              
+              echo "<error line=\"$current_line\" column=\"$current_col\" severity=\"warning\" message=\"[$current_rule] $current_message\" source=\"deno-lint\"/>" >> "$output_file"
+              
+              # Reset for next error
+              current_file=""
+              current_line=""
+              current_col=""
+              current_rule=""
+              current_message=""
             fi
-          done < full_lint.txt
+          done < <(deno lint 2>&1 | grep -v "^Warning")
           
           # Close all lint output files
           for file in "${!lint_files[@]}"; do
@@ -147,16 +166,24 @@ jobs:
           done
           
           # Debug output
-          echo "=== Debug: Processed outputs ==="
-          echo "=== fmt output files ==="
-          ls -l fmt_output/
-          for f in fmt_output/*.xml; do
-            [ -f "$f" ] && echo "=== $f ===" && cat "$f"
-          done
-          echo "=== lint output files ==="
-          ls -l lint_output/
-          for f in lint_output/*.xml; do
-            [ -f "$f" ] && echo "=== $f ===" && cat "$f"
+          echo "=== Debug: XML File Generation ==="
+          echo "=== Formatting XML Files ==="
+          ls -l fmt_output/ || echo "No fmt_output directory"
+          echo "=== Linting XML Files ==="
+          ls -l lint_output/ || echo "No lint_output directory"
+          
+          # Verify XML file creation
+          echo "=== XML File Count ==="
+          find fmt_output/ -name "*.xml" -type f | wc -l
+          find lint_output/ -name "*.xml" -type f | wc -l
+          
+          # Show XML contents
+          echo "=== XML File Contents ==="
+          for f in fmt_output/*.xml lint_output/*.xml; do
+            if [ -f "$f" ]; then
+              echo "=== Contents of $f ==="
+              cat "$f"
+            fi
           done
           
           
