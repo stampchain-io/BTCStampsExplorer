@@ -1,12 +1,14 @@
 runner:
   denofmt:
-    cmd: deno task check:fmt --json | jq -r '{"source":{"name":"deno fmt","url":"https://deno.land"},"diagnostics":[.diagnostics[]|{"message":.message,"location":{"path":.filename|sub("file:///home/ubuntu/repos/BTCStampsExplorer/";""),"range":{"start":{"line":.range.start.line,"column":.range.start.col},"end":{"line":.range.end.line,"column":.range.end.col}}},"severity":"WARNING","code":{"value":"format","url":"https://deno.land/manual/tools/formatter"}}]}'
+    cmd: deno task check:fmt --json
     format: rdjson
     level: warning
+    
   denolint:
-    cmd: deno task check:lint --json | jq -r '{"source":{"name":"deno lint","url":"https://deno.land"},"diagnostics":[.diagnostics[]|{"message":.message,"location":{"path":.filename|sub("file:///home/ubuntu/repos/BTCStampsExplorer/";""),"range":{"start":{"line":.range.start.line,"column":.range.start.col},"end":{"line":.range.end.line,"column":.range.end.col}}},"severity":"WARNING","code":{"value":.code,"url":"https://deno.land/manual/tools/linter"}}]}'
+    cmd: deno task check:lint --json
     format: rdjson
     level: warning
+
 github:
   reporter: github-pr-review
   filter_mode: file
