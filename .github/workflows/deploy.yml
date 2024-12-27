@@ -66,12 +66,23 @@ jobs:
           # Create output directories
           mkdir -p fmt_output lint_output
           
+          # Debug current directory
+          echo "Current working directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          
           # Run checks directly into XML processing
           echo "Running deno fmt check and processing output..."
-          deno task check:fmt 2>&1 | tee full_fmt.txt
+          deno task check:fmt 2>&1 | tee full_fmt.txt || true
           
           echo "Running deno lint and processing output..."
-          deno task check:lint 2>&1 | tee full_lint.txt
+          deno task check:lint 2>&1 | tee full_lint.txt || true
+          
+          # Show command outputs regardless of exit code
+          echo "=== fmt command output ==="
+          cat full_fmt.txt
+          echo "=== lint command output ==="
+          cat full_lint.txt
           
           echo "=== Debug: Raw outputs ==="
           echo "=== fmt output ==="

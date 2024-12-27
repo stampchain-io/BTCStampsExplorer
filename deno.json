@@ -2,10 +2,10 @@
   "lock": false,
   "lockfile": "deno.lock",
   "tasks": {
-    "check:fmt": "deno fmt --check .",
+    "check:fmt": "deno fmt --check --log-level=info .",
     "check:fmt:debug": "deno fmt --check --log-level=debug . && find . -type f -name '*.ts' -o -name '*.tsx' | grep -v -E '(node_modules|_fresh|.git|coverage|tmp|.cache|build|vendor|static)' | wc -l",
-    "check:lint": "deno lint --quiet",
-    "check:lint:debug": "deno lint --json",
+    "check:lint": "deno lint .",
+    "check:lint:debug": "deno lint --json .",
     "check:types": "deno check main.ts dev.ts",
     "check:types:debug": "deno check --log-level=debug main.ts dev.ts",
     "check": "deno task check:fmt && deno task check:lint && deno task check:types",
