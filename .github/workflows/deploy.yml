@@ -99,23 +99,28 @@ jobs:
           current_file=""
           while IFS= read -r line; do
             if [[ "$line" =~ ^from\ +([^:]+):$ ]]; then
-              # Close previous file if exists
-              if [ -n "$current_file" ]; then
-                echo "</file>" >> "fmt_output/${current_file//\//_}.xml"
-                echo "</checkstyle>" >> "fmt_output/${current_file//\//_}.xml"
-              fi
               current_file="${BASH_REMATCH[1]}"
+              # Use absolute path for file name in XML
+              abs_path="$PWD/$current_file"
               output_file="fmt_output/${current_file//\//_}.xml"
-              echo "Creating XML for $current_file -> $output_file"
+              echo "Creating XML for $abs_path -> $output_file"
               echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
               echo "<checkstyle version=\"4.3\">" >> "$output_file"
-              echo "<file name=\"$current_file\">" >> "$output_file"
-            elif [[ "$line" =~ ^\ *([0-9]+)\ *\|\ *[-+].*$ ]] && [ -n "$current_file" ]; then
+              echo "<file name=\"$abs_path\">" >> "$output_file"
+            elif [[ "$line" =~ ^\ *([0-9]+)\ *\|\ *[-+](.*)$ ]] && [ -n "$current_file" ]; then
               line_num="${BASH_REMATCH[1]}"
-              message="${line#*|}"
-              echo "<error line=\"$line_num\" column=\"1\" severity=\"warning\" message=\"${message//\"/&quot;}\" source=\"deno-fmt\"/>" >> "fmt_output/${current_file//\//_}.xml"
+              content="${BASH_REMATCH[2]}"
+              echo "<error line=\"$line_num\" column=\"1\" severity=\"warning\" message=\"Formatting: ${content//\"/&quot;}\" source=\"deno-fmt\"/>" >> "fmt_output/${current_file//\//_}.xml"
             fi
           done < full_fmt.txt
+          
+          # Close all fmt files
+          for f in fmt_output/*.xml; do
+            if [ -f "$f" ]; then
+              echo "</file>" >> "$f"
+              echo "</checkstyle>" >> "$f"
+            fi
+          done
           # Close the last file if exists
           if [ -n "$current_file" ]; then
             echo "</file>" >> "fmt_output/${current_file//\//_}.xml"
@@ -154,8 +159,6 @@ jobs:
           echo "Processing lint issues..."
           declare -A lint_files
           current_file=""
-          current_line=""
-          current_col=""
           current_rule=""
           current_message=""
           
@@ -163,29 +166,26 @@ jobs:
             if [[ "$line" =~ ^error\[([^]]+)\]:\ +(.+)$ ]]; then
               current_rule="${BASH_REMATCH[1]}"
               current_message="${BASH_REMATCH[2]}"
-            elif [[ "$line" =~ ^[[:space:]]*"-->"[[:space:]]*([^:]+):([0-9]+):([0-9]+) ]]; then
+            elif [[ "$line" =~ ^[[:space:]]*-->\ *([^:]+):([0-9]+):([0-9]+) ]]; then
               current_file="${BASH_REMATCH[1]}"
               current_line="${BASH_REMATCH[2]}"
               current_col="${BASH_REMATCH[3]}"
               
+              # Use absolute path for file name in XML
+              abs_path="$PWD/$current_file"
               output_file="lint_output/${current_file//\//_}.xml"
               if [ ! -f "$output_file" ]; then
                 echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
                 echo "<checkstyle version=\"4.3\">" >> "$output_file"
-                echo "<file name=\"$current_file\">" >> "$output_file"
+                echo "<file name=\"$abs_path\">" >> "$output_file"
                 lint_files["$current_file"]=1
               fi
               
-              echo "<error line=\"$current_line\" column=\"$current_col\" severity=\"warning\" message=\"[$current_rule] $current_message\" source=\"deno-lint\"/>" >> "$output_file"
-              
-              # Reset for next error
-              current_file=""
-              current_line=""
-              current_col=""
-              current_rule=""
-              current_message=""
+              if [ -n "$current_rule" ] && [ -n "$current_message" ]; then
+                echo "<error line=\"$current_line\" column=\"$current_col\" severity=\"warning\" message=\"[$current_rule] $current_message\" source=\"deno-lint\"/>" >> "$output_file"
+              fi
             fi
-          done < <(cat full_lint.txt | grep -v "^Warning")
+          done < full_lint.txt
           
           # Close all lint output files
           for file in "${!lint_files[@]}"; do
