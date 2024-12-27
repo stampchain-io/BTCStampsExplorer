@@ -11,29 +11,82 @@ create_empty_rdjson() {
 }
 
 process_fmt_diff() {
-  # Extract JSON content from deno fmt output
-  local json_content
-  json_content=$(sed -n '/^{/,/^}/p' "$1" | sed 's/^Task check:fmt:debug$//' | tr -d '\r')
+  # Extract formatting issues from deno fmt output
+  local file=""
+  local changes=""
+  local in_diff=false
+  local current_line=""
+  local diagnostics="[]"
+  local start_line=0
   
-  if [ -z "$json_content" ]; then
-    echo "[]"
-    return
+  while IFS= read -r line; do
+    # Skip debug and info lines
+    if [[ $line =~ ^DEBUG || $line =~ ^Task || $line =~ ^Checked || $line =~ ^error: ]]; then
+      continue
+    fi
+    
+    # Detect start of a new file diff
+    if [[ $line =~ ^from[[:space:]]/.*: ]]; then
+      # Process previous file if exists
+      if [[ $in_diff == true && -n $file && -n $changes ]]; then
+        local escaped_changes=$(echo "$changes" | jq -R -s '.')
+        diagnostics=$(echo "$diagnostics" | jq --arg file "$file" --arg changes "$escaped_changes" --arg start_line "$start_line" \
+          '. + [{
+            "message": "File is not properly formatted:\n" + $changes,
+            "location": {
+              "path": $file,
+              "range": {
+                "start": {"line": ($start_line|tonumber), "column": 1},
+                "end": {"line": ($start_line|tonumber), "column": 1}
+              }
+            },
+            "severity": "WARNING",
+            "code": {
+              "value": "fmt",
+              "url": "https://deno.land/manual/tools/formatter"
+            }
+          }]')
+      fi
+      
+      # Extract new file path
+      file=$(echo "$line" | sed -n 's/^from \(.*\):/\1/p')
+      changes=""
+      in_diff=true
+      start_line=0
+      continue
+    fi
+    
+    # Extract line number and capture diff lines
+    if [[ $in_diff == true && $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+] ]]; then
+      if [[ $start_line == 0 ]]; then
+        start_line=${BASH_REMATCH[1]}
+      fi
+      changes+="$line"$'\n'
+    fi
+  done < "$1"
+  
+  # Process the last file if exists
+  if [[ $in_diff == true && -n $file && -n $changes ]]; then
+    local escaped_changes=$(echo "$changes" | jq -R -s '.')
+    diagnostics=$(echo "$diagnostics" | jq --arg file "$file" --arg changes "$escaped_changes" \
+      '. + [{
+        "message": "File is not properly formatted:\n" + $changes,
+        "location": {
+          "path": $file,
+          "range": {
+            "start": {"line": 1, "column": 1},
+            "end": {"line": 1, "column": 1}
+          }
+        },
+        "severity": "WARNING",
+        "code": {
+          "value": "fmt",
+          "url": "https://deno.land/manual/tools/formatter"
+        }
+      }]')
   fi
   
-  # Transform fmt output to rdjson format
-  echo "["
-  local first=true
-  
-  while IFS= read -r file; do
-    if [ "$first" = true ]; then
-      first=false
-    else
-      echo ","
-    fi
-    printf "{\"message\":\"File is not properly formatted\",\"location\":{\"path\":\"%s\",\"range\":{\"start\":{\"line\":1,\"column\":1},\"end\":{\"line\":1,\"column\":1}}},\"severity\":\"WARNING\",\"code\":{\"value\":\"fmt\",\"url\":\"https://deno.land/manual/tools/formatter\"}}" "$file"
-  done < <(echo "$json_content" | jq -r '.files[]? // empty' 2>/dev/null)
-  
-  echo "]"
+  echo "$diagnostics"
 }
 
 if [ "$MODE" = "lint" ]; then
