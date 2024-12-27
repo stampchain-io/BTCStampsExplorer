@@ -60,6 +60,12 @@ jobs:
         with:
           reviewdog_version: latest
 
+      - name: Install jq
+        if: always()
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
       - name: Run ReviewDog
         if: always()
         env:

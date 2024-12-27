@@ -1,10 +1,10 @@
 runner:
   denofmt:
-    cmd: deno fmt --check .
-    format: diff
+    cmd: deno task check:fmt:debug 2>&1 | ./scripts/transform-deno-output.sh fmt
+    format: rdjson
     level: warning
   denolint:
-    cmd: deno lint --json .
+    cmd: deno task check:lint:debug 2>&1 | ./scripts/transform-deno-output.sh lint
     format: rdjson
     level: warning
 github:
