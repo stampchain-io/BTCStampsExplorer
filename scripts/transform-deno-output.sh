@@ -20,8 +20,32 @@ process_fmt_diff() {
   local start_line=0
   
   while IFS= read -r line; do
-    # Skip debug and info lines
-    if [[ $line =~ ^DEBUG || $line =~ ^Task || $line =~ ^Checked || $line =~ ^error: ]]; then
+    # Skip debug and info lines, but keep error lines
+    if [[ $line =~ ^DEBUG || $line =~ ^Task || $line =~ ^Checked ]]; then
+      continue
+    fi
+    
+    # Capture error lines for formatting issues
+    if [[ $line =~ ^error: ]]; then
+      file=$(echo "$line" | sed -n 's/^error: \(.*\) is not formatted$/\1/p')
+      if [[ -n $file ]]; then
+        diagnostics=$(echo "$diagnostics" | jq --arg file "$file" \
+          '. + [{
+            "message": "File is not properly formatted",
+            "location": {
+              "path": $file,
+              "range": {
+                "start": {"line": 1, "column": 1},
+                "end": {"line": 1, "column": 1}
+              }
+            },
+            "severity": "WARNING",
+            "code": {
+              "value": "fmt",
+              "url": "https://deno.land/manual/tools/formatter"
+            }
+          }]')
+      fi
       continue
     fi
     
