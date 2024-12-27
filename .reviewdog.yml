@@ -1,11 +1,11 @@
 runner:
   denofmt:
-    cmd: deno task check:fmt --json | jq -r '[.diagnostics[] | {message: .message, location: {path: .filename | sub("file:///home/ubuntu/repos/BTCStampsExplorer/"; ""), range: {start: {line: .range.start.line, column: .range.start.col}, end: {line: .range.end.line, column: .range.end.col}}}, severity: "WARNING"}]'
+    cmd: deno task check:fmt --json | jq '{source: {name: "deno fmt", url: "https://deno.land"}, diagnostics: [.diagnostics[] | {message: .message, location: {path: .filename | sub("file:///home/ubuntu/repos/BTCStampsExplorer/"; ""), range: {start: {line: .range.start.line, column: .range.start.col}, end: {line: .range.end.line, column: .range.end.col}}}, severity: "WARNING", code: {value: "format", url: "https://deno.land/manual/tools/formatter"}}]}'
     format: rdjson
     level: warning
     
   denolint:
-    cmd: deno task check:lint --json | jq -r '[.diagnostics[] | {message: .message, location: {path: .filename | sub("file:///home/ubuntu/repos/BTCStampsExplorer/"; ""), range: {start: {line: .range.start.line, column: .range.start.col}, end: {line: .range.end.line, column: .range.end.col}}}, severity: "WARNING"}]'
+    cmd: deno task check:lint --json | jq '{source: {name: "deno lint", url: "https://deno.land"}, diagnostics: [.diagnostics[] | {message: .message, location: {path: .filename | sub("file:///home/ubuntu/repos/BTCStampsExplorer/"; ""), range: {start: {line: .range.start.line, column: .range.start.col}, end: {line: .range.end.line, column: .range.end.col}}}, severity: "WARNING", code: {value: .code, url: "https://deno.land/manual/tools/linter"}}]}'
     format: rdjson
     level: warning
 
