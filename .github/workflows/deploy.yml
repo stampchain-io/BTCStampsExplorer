@@ -86,21 +86,19 @@ jobs:
           # Process formatting issues
           echo "Processing format issues..."
           while IFS= read -r line; do
-            if [[ "$line" =~ ^([^:]+):\ +([0-9]+):([0-9]+)\ +(.+)$ ]]; then
-              file="${BASH_REMATCH[1]}"
-              line_num="${BASH_REMATCH[2]}"
-              col_num="${BASH_REMATCH[3]}"
-              message="${BASH_REMATCH[4]}"
-              output_file="fmt_output/${file//\//_}.xml"
-              if [ ! -f "$output_file" ]; then
-                echo "Creating XML for $file -> $output_file"
-                echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
-                echo "<checkstyle version=\"4.3\">" >> "$output_file"
-                echo "<file name=\"$file\">" >> "$output_file"
-              fi
-              echo "<error line=\"$line_num\" column=\"$col_num\" severity=\"warning\" message=\"$message\" source=\"deno-fmt\"/>" >> "$output_file"
+            if [[ "$line" =~ ^from\ +([^:]+):$ ]]; then
+              current_file="${BASH_REMATCH[1]}"
+              output_file="fmt_output/${current_file//\//_}.xml"
+              echo "Creating XML for $current_file -> $output_file"
+              echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > "$output_file"
+              echo "<checkstyle version=\"4.3\">" >> "$output_file"
+              echo "<file name=\"$current_file\">" >> "$output_file"
+            elif [[ "$line" =~ ^\ *([0-9]+)\ *\|\ *[-+].*$ ]] && [ -n "$current_file" ]; then
+              line_num="${BASH_REMATCH[1]}"
+              message="${line#*|}"
+              echo "<error line=\"$line_num\" column=\"1\" severity=\"warning\" message=\"$message\" source=\"deno-fmt\"/>" >> "fmt_output/${current_file//\//_}.xml"
             fi
-          done < <(deno fmt --check 2>&1 | grep -v "^Checked\|^Found")
+          done < full_fmt.txt
           
           # Close fmt XML files
           for f in fmt_output/*.xml; do
@@ -218,7 +216,7 @@ jobs:
 
       # Fail the workflow if any checks failed
       - name: Check for failures
-        if: steps.fmt.outcome == 'failure' || steps.lint.outcome == 'failure'
+        if: steps.checks.outcome == 'failure'
         run: exit 1
 
       # Build check
