@@ -251,6 +251,21 @@ export class WebResponseUtil {
     );
   }
 
+  static redirect(
+    location: string,
+    status = 302,
+    options: WebResponseOptions = {},
+  ): Response {
+    return new Response(null, {
+      status,
+      headers: normalizeHeaders({
+        ...(options.headers || {}),
+        Location: location,
+        "X-API-Version": API_RESPONSE_VERSION,
+      }),
+    });
+  }
+
   private static getContentTypeHeaders(
     mimeType: string,
     options: StampResponseOptions,

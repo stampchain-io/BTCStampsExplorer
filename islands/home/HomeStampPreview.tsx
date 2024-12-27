@@ -27,6 +27,7 @@ export function HomeStampPreview({
       stamps: stamps_art,
       layout: "grid",
       showDetails: false,
+      viewAllLink: "/stamp/art",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
@@ -65,6 +66,7 @@ export function HomeStampPreview({
       stamps: stamps_posh,
       layout: "grid",
       showDetails: false,
+      viewAllLink: "/stamp/posh",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
@@ -83,6 +85,7 @@ export function HomeStampPreview({
       stamps: stamps_src721,
       layout: "grid",
       showDetails: false,
+      viewAllLink: "/collection/overview/recursive",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-6
@@ -97,7 +100,7 @@ export function HomeStampPreview({
     },
   ];
 
-  const _CuttingEdgeSection: CollectionSectionProps = {
+  const CuttingEdgeSection: CollectionSectionProps = {
     title: "CUTTING EDGE",
     subTitle: "RECURSIVE COLLECTIONS",
     collections: collectionData,
@@ -141,10 +144,8 @@ export function HomeStampPreview({
         <StampSection key={section.title} {...section} />
       ))}
 
-      {
-        /* CUTTING EDGE
-      <CollectionSection {...CuttingEdgeSection} /> */
-      }
+      {/* CUTTING EDGE */}
+      <CollectionSection {...CuttingEdgeSection} />
     </div>
   );
 }
