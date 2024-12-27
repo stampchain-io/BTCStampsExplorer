@@ -1,10 +1,10 @@
 runner:
   denofmt:
-    cmd: deno task check:fmt --json
-    format: rdjson
+    cmd: deno fmt --check .
+    format: diff
     level: warning
   denolint:
-    cmd: deno task check:lint --json
+    cmd: deno lint --json .
     format: rdjson
     level: warning
 github:
