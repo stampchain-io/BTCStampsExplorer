@@ -62,27 +62,23 @@ jobs:
       - name: Run deno fmt check
         id: fmt
         if: always()
-        run: deno fmt --check | tee fmt-results.txt || true
+        run: deno task check:fmt | tee fmt-results.txt || true
 
       - name: Run deno lint
         id: lint
         if: always()
-        run: deno lint --json | tee lint-results.json || true
+        run: deno task check:lint | tee lint-results.txt || true
 
-      - name: Report lint results
-        if: always()
-        uses: praxis-it/deno-lint-pr-review@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          lint_results: lint-results.json
-
-      - name: Report fmt results
+      - name: Report fmt and lint results
         if: always()
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
       - run: |
+          # Process fmt results
           cat fmt-results.txt | reviewdog -f=deno -name=deno-fmt -reporter=github-pr-review -filter-mode=file -level=warning
+          # Process lint results
+          cat lint-results.txt | reviewdog -f=deno -name=deno-lint -reporter=github-pr-review -filter-mode=file -level=warning
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
