@@ -1,11 +1,11 @@
 runner:
   denofmt:
-    cmd: deno fmt --check --json .
+    cmd: deno task check:fmt --json
     format: rdjson
     level: warning
     
   denolint:
-    cmd: deno lint --json .
+    cmd: deno task check:lint --json
     format: rdjson
     level: warning
 

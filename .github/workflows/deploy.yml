@@ -53,11 +53,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deno-
 
-      - name: Install reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-
       # Code Quality Checks
       - name: Setup ReviewDog
         if: always()
