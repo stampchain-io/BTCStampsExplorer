@@ -85,8 +85,14 @@ jobs:
           
           # Process formatting issues
           echo "Processing format issues..."
+          current_file=""
           while IFS= read -r line; do
             if [[ "$line" =~ ^from\ +([^:]+):$ ]]; then
+              # Close previous file if exists
+              if [ -n "$current_file" ]; then
+                echo "</file>" >> "fmt_output/${current_file//\//_}.xml"
+                echo "</checkstyle>" >> "fmt_output/${current_file//\//_}.xml"
+              fi
               current_file="${BASH_REMATCH[1]}"
               output_file="fmt_output/${current_file//\//_}.xml"
               echo "Creating XML for $current_file -> $output_file"
@@ -96,9 +102,23 @@ jobs:
             elif [[ "$line" =~ ^\ *([0-9]+)\ *\|\ *[-+].*$ ]] && [ -n "$current_file" ]; then
               line_num="${BASH_REMATCH[1]}"
               message="${line#*|}"
-              echo "<error line=\"$line_num\" column=\"1\" severity=\"warning\" message=\"$message\" source=\"deno-fmt\"/>" >> "fmt_output/${current_file//\//_}.xml"
+              echo "<error line=\"$line_num\" column=\"1\" severity=\"warning\" message=\"${message//\"/&quot;}\" source=\"deno-fmt\"/>" >> "fmt_output/${current_file//\//_}.xml"
             fi
           done < full_fmt.txt
+          # Close the last file if exists
+          if [ -n "$current_file" ]; then
+            echo "</file>" >> "fmt_output/${current_file//\//_}.xml"
+            echo "</checkstyle>" >> "fmt_output/${current_file//\//_}.xml"
+          fi
+          
+          # Add debug output
+          echo "=== Debug: Generated XML files ==="
+          for f in fmt_output/*.xml; do
+            if [ -f "$f" ]; then
+              echo "=== Content of $f ==="
+              cat "$f"
+            fi
+          done
           
           # Close fmt XML files
           for f in fmt_output/*.xml; do
