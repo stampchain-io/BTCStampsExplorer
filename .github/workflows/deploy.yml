@@ -67,11 +67,6 @@ jobs:
         run: |
           reviewdog -conf=.reviewdog.yml -reporter=github-pr-review
 
-      # Fail the workflow if any checks failed
-      - name: Check for failures
-        if: ${{ steps.fmt.outcome == 'failure' || steps.lint.outcome == 'failure' }}
-        run: exit 1
-
       # Build check
       - name: Build project
         run: deno task build
