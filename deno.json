@@ -62,7 +62,7 @@
     ]
   },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
-  "nodeModulesDir": "auto",
+  "nodeModulesDir": true,
   "imports": {
     "stream": "node:stream",
     "stream/promises": "node:stream/promises",
