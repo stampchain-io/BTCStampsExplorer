@@ -36,40 +36,153 @@ export function StampSearchClient(
     }
   }, [open2]);
 
+  const validateBitcoinAddress = async (address: string) => {
+    // First check format
+    const isValidFormat = /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}$/.test(address);
+    if (!isValidFormat) return false;
+
+    try {
+      const response = await fetch(
+        `https://blockchain.info/rawaddr/${address}`,
+      );
+      if (!response.ok) return false;
+      const data = await response.json();
+      return data.n_tx > 0;
+    } catch (error) {
+      console.error("Error checking address history:", error);
+      return false;
+    }
+  };
+
+  const validateBitcoinTx = async (txHash: string) => {
+    try {
+      const response = await fetch(`https://blockchain.info/rawtx/${txHash}`);
+      if (!response.ok) return false;
+
+      const data = await response.json();
+      // Check if response has basic tx properties
+      return !!(data && data.hash && data.ver);
+    } catch (error) {
+      console.error("Error checking transaction:", error);
+      return false;
+    }
+  };
+
+  // Helper function to validate tx hash format (64 hex chars)
+  const isValidTxFormat = (hash: string): boolean => {
+    return /^[a-fA-F0-9]{64}$/.test(hash);
+  };
+
+  // Helper function to validate if string contains only hex chars
+  const isHexString = (str: string): boolean => {
+    return /^[a-fA-F0-9]+$/.test(str);
+  };
+
   const handleSearch = async () => {
     const query = searchTerm.trim();
     if (!query) return;
 
-    // Check if query is a stamp number
-    if (/^\d+$/.test(query)) {
-      globalThis.location.href = `/stamp/${query}`;
-      return;
+    try {
+      setError(""); // Clear any existing errors
+
+      // Handle potential tx hash (any hex string > 16 chars that's not a CPID)
+      if (isHexString(query) && query.length > 16 && !query.startsWith("A")) {
+        // Check if it's a valid tx hash (must be exactly 64 chars)
+        if (query.length !== 64) {
+          setError(
+            `NO RESULTS FOUND\n"${query}"\ndoesn't seem to be a valid transaction hash`,
+          );
+          return;
+        }
+
+        // Validate on blockchain
+        const isValidTx = await validateBitcoinTx(query);
+        if (!isValidTx) {
+          setError(
+            `NO RESULTS FOUND\n"${query}"\ndoesn't seem to be a valid transaction hash`,
+          );
+          return;
+        }
+
+        // Valid tx hash - check if it's a stamp
+        const stampResponse = await fetch(`/api/v2/stamps/${query}`);
+        const responseData = await stampResponse.json();
+
+        if (stampResponse.ok && responseData.data && responseData.data.stamp) {
+          globalThis.location.href = `/stamp/${query}`;
+          return;
+        }
+
+        // Not a stamp but valid tx - open blockchain explorer
+        window.open(
+          `https://www.blockchain.com/explorer/transactions/btc/${query}`,
+          "_blank",
+        );
+        return;
+      }
+
+      // Check for Bitcoin address formats
+      if (/^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}$/.test(query)) {
+        const isValidAndActive = await validateBitcoinAddress(query);
+        if (isValidAndActive) {
+          globalThis.location.href = `/wallet/${query}`;
+          return;
+        }
+        setError(
+          `NO RESULTS FOUND\n"${query}"\ndoesn't seem to be a valid Bitcoin address`,
+        );
+        return;
+      }
+
+      // Check for CPID format (starts with 'A' followed by at least 5 numeric chars)
+      if (query.startsWith("A") && /^A\d{5,}$/.test(query)) {
+        try {
+          const response = await fetch(`/api/v2/stamps/${query}`);
+          const responseData = await response.json();
+
+          if (response.ok && responseData.data && responseData.data.stamp) {
+            globalThis.location.href = `/stamp/${query}`;
+            return;
+          }
+
+          setError(
+            `NO RESULTS FOUND\nWe couldn't find a CPID matching "${query}"`,
+          );
+          return;
+        } catch (err) {
+          console.error("Error checking CPID:", err);
+          setError(
+            `NO RESULTS FOUND\nWe couldn't find a CPID matching "${query}"`,
+          );
+          return;
+        }
+      }
+
+      // Check for stamp number
+      if (/^\d+$/.test(query)) {
+        try {
+          const response = await fetch(`/api/v2/stamps/${query}`);
+          const responseData = await response.json();
+
+          if (response.ok && responseData.data && responseData.data.stamp) {
+            globalThis.location.href = `/stamp/${query}`;
+            return;
+          }
+
+          setError(`NO RESULTS FOUND\nWe couldn't find stamp #${query}`);
+          return;
+        } catch (err) {
+          console.error("Error checking stamp:", err);
+          setError(`NO RESULTS FOUND\nWe couldn't find stamp #${query}`);
+          return;
+        }
+      }
+
+      setError(`NO RESULTS FOUND\nInvalid search query "${query}"`);
+    } catch (err) {
+      console.error("Search error:", err);
+      setError(`An error occurred while searching. Please try again.`);
     }
-
-    // Check for Bitcoin address formats (Legacy, SegWit, Taproot)
-    if (/^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,62}$/.test(query)) {
-      globalThis.location.href = `/wallet/${query}`;
-      return;
-    }
-
-    // Check for Bitcoin transaction hash (64 hex characters)
-    if (/^[a-fA-F0-9]{64}$/.test(query)) {
-      window.open(
-        `https://www.blockchain.com/explorer/transactions/btc/${query}`,
-        "_blank",
-      );
-      return;
-    }
-
-    setError("");
-    const response = await fetch(`/api/v2/stamp/${query}`);
-
-    if (!response.ok) {
-      setError(`NO RESULTS FOUND\nWe couldn't find a match for "${query}"`);
-      return;
-    }
-
-    globalThis.location.href = `/stamp/${query}`;
   };
 
   const handleKeyPress = (event: KeyboardEvent) => {
@@ -105,7 +218,6 @@ export function StampSearchClient(
     before:[--angle:0deg] before:animate-rotate
   `;
 
-  // Clear input and error when modal closes
   useEffect(() => {
     if (!open2) {
       setSearchTerm("");
@@ -175,7 +287,7 @@ export function StampSearchClient(
                   </svg>
                 </div>
                 {error && (
-                  <ul class="-inset-x-0 !bg-[#080808] rounded-b-md z-[2] overflow-y-auto">
+                  <ul class="!bg-[#080808] rounded-b-md z-[2] overflow-y-auto">
                     <li class="flex flex-col items-center justify-end pt-1.5 mobileLg:pt-3 pb-3 px-[18px]">
                       <img
                         src="/img/broken.png"
