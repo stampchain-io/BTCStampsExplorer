@@ -6,6 +6,7 @@ export function SRC20SearchClient({ open2, handleOpen2 }) {
   const [results, setResults] = useState([]);
   const [error, setError] = useState("");
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open2) {
@@ -22,6 +23,22 @@ export function SRC20SearchClient({ open2, handleOpen2 }) {
     };
   }, [open2]);
 
+  useEffect(() => {
+    if (!open2) {
+      setSearchTerm("");
+      setError("");
+      setResults([]);
+    }
+  }, [open2]);
+
+  useEffect(() => {
+    if (open2) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [open2]);
+
   const handleSearch = async () => {
     if (searchTerm.trim()) {
       try {
@@ -32,7 +49,7 @@ export function SRC20SearchClient({ open2, handleOpen2 }) {
 
         if (!response.ok || !data.data || data.data.length === 0) {
           setError(
-            `NO TOKEN FOUND\n${searchTerm.trim()}\nThe token ticker doesn't seem valid`,
+            `NO TOKEN FOUND\n${searchTerm.trim()}\nThe token ticker isn't recognized`,
           );
           setResults([]);
           return;
@@ -122,6 +139,7 @@ export function SRC20SearchClient({ open2, handleOpen2 }) {
             <div className={animatedInputFieldSearch}>
               <div class="relative flex flex-col max-h-[90%] overflow-hidden">
                 <input
+                  ref={inputRef}
                   type="text"
                   placeholder="TOKEN, ADDY OR TX HASH"
                   value={searchTerm}
@@ -175,7 +193,7 @@ export function SRC20SearchClient({ open2, handleOpen2 }) {
                   </ul>
                 )}
                 {results.length > 0 && !error && (
-                  <ul class="max-h-[190px] mobileLg:max-h-[180px] !bg-[#080808] rounded-b-md z-[2] overflow-y-auto scrollbar-grey">
+                  <ul class="max-h-[190px] mobileLg:max-h-[180px] !bg-[#080808] rounded-b-md z-[2] overflow-y-auto [&::-webkit-scrollbar-track]:bg-[#333333] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#CCCCCC]">
                     {results.map((result) => (
                       <li
                         key={result.tick}
