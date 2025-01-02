@@ -49,7 +49,6 @@ export function StampSearchClient(
       const data = await response.json();
       return data.n_tx > 0;
     } catch (error) {
-      console.error("Error checking address history:", error);
       return false;
     }
   };
@@ -63,14 +62,8 @@ export function StampSearchClient(
       // Check if response has basic tx properties
       return !!(data && data.hash && data.ver);
     } catch (error) {
-      console.error("Error checking transaction:", error);
       return false;
     }
-  };
-
-  // Helper function to validate tx hash format (64 hex chars)
-  const isValidTxFormat = (hash: string): boolean => {
-    return /^[a-fA-F0-9]{64}$/.test(hash);
   };
 
   // Helper function to validate if string contains only hex chars
@@ -83,35 +76,29 @@ export function StampSearchClient(
     if (!query) return;
 
     try {
-      setError(""); // Clear any existing errors
+      setError("");
 
       // Handle potential tx hash (any hex string > 16 chars that's not a CPID)
       if (isHexString(query) && query.length > 16 && !query.startsWith("A")) {
-        // Check if it's a valid tx hash (must be exactly 64 chars)
-        if (query.length !== 64) {
+        // Check format and blockchain validity
+        if (query.length !== 64 || !(await validateBitcoinTx(query))) {
           setError(
-            `NO RESULTS FOUND\n"${query}"\ndoesn't seem to be a valid transaction hash`,
+            `NO TRANSACTION FOUND\n${query}\nThe transaction hash isn't valid`,
           );
           return;
         }
 
-        // Validate on blockchain
-        const isValidTx = await validateBitcoinTx(query);
-        if (!isValidTx) {
-          setError(
-            `NO RESULTS FOUND\n"${query}"\ndoesn't seem to be a valid transaction hash`,
-          );
-          return;
-        }
+        try {
+          const stampResponse = await fetch(`/api/v2/stamps/${query}`);
+          const responseData = await stampResponse.json();
 
-        // Valid tx hash - check if it's a stamp
-        const stampResponse = await fetch(`/api/v2/stamps/${query}`);
-        const responseData = await stampResponse.json();
-
-        if (stampResponse.ok && responseData.data && responseData.data.stamp) {
-          globalThis.location.href = `/stamp/${query}`;
-          return;
-        }
+          if (
+            stampResponse.ok && responseData.data && responseData.data.stamp
+          ) {
+            globalThis.location.href = `/stamp/${query}`;
+            return;
+          }
+        } catch {}
 
         // Not a stamp but valid tx - open blockchain explorer
         window.open(
@@ -129,33 +116,27 @@ export function StampSearchClient(
           return;
         }
         setError(
-          `NO RESULTS FOUND\n"${query}"\ndoesn't seem to be a valid Bitcoin address`,
+          `NO ADDY FOUND\n${query}\nThe Bitcoin address doesn't seem to exist`,
         );
         return;
       }
 
-      // Check for CPID format (starts with 'A' followed by at least 5 numeric chars)
-      if (query.startsWith("A") && /^A\d{5,}$/.test(query)) {
+      // Check for CPID format (starts with 'A' or 'a' followed by at least 5 numeric chars)
+      if (/^[Aa]\d{5,}$/.test(query)) {
         try {
-          const response = await fetch(`/api/v2/stamps/${query}`);
+          const response = await fetch(`/api/v2/stamps/${query.toUpperCase()}`);
           const responseData = await response.json();
 
           if (response.ok && responseData.data && responseData.data.stamp) {
-            globalThis.location.href = `/stamp/${query}`;
+            globalThis.location.href = `/stamp/${query.toUpperCase()}`;
             return;
           }
+        } catch {}
 
-          setError(
-            `NO RESULTS FOUND\nWe couldn't find a CPID matching "${query}"`,
-          );
-          return;
-        } catch (err) {
-          console.error("Error checking CPID:", err);
-          setError(
-            `NO RESULTS FOUND\nWe couldn't find a CPID matching "${query}"`,
-          );
-          return;
-        }
+        setError(
+          `NO STAMP FOUND\n${query}\nThe CPID doesn't seem to be valid`,
+        );
+        return;
       }
 
       // Check for stamp number
@@ -168,20 +149,21 @@ export function StampSearchClient(
             globalThis.location.href = `/stamp/${query}`;
             return;
           }
+        } catch {}
 
-          setError(`NO RESULTS FOUND\nWe couldn't find stamp #${query}`);
-          return;
-        } catch (err) {
-          console.error("Error checking stamp:", err);
-          setError(`NO RESULTS FOUND\nWe couldn't find stamp #${query}`);
-          return;
-        }
+        setError(
+          `NO STAMP FOUND\n#${query}\nThe stamp you are looking for doesn't exist`,
+        );
+        return;
       }
 
-      setError(`NO RESULTS FOUND\nInvalid search query "${query}"`);
+      setError(
+        `NO RESULTS FOUND\n${query}\nSorry, can't figure out what you're looking for`,
+      );
     } catch (err) {
-      console.error("Search error:", err);
-      setError(`An error occurred while searching. Please try again.`);
+      setError(
+        `SYSTEM ERROR\n${query}\nSomething went wrong, please try again`,
+      );
     }
   };
 
@@ -292,7 +274,7 @@ export function StampSearchClient(
                       <img
                         src="/img/broken.png"
                         alt="No results"
-                        class="w-[84px] mobileLg:w-[96px]"
+                        class="w-[84px] mobileLg:w-[96px] pb-3"
                       />
                       <span class="text-center w-full">
                         {error.split("\n").map((text, index) => (
@@ -300,8 +282,10 @@ export function StampSearchClient(
                             key={index}
                             class={`${
                               index === 0
-                                ? "text-base mobileLg:text-lg font-light text-stamp-grey"
-                                : "text-xs mobileLg:text-sm font-medium text-stamp-grey-light"
+                                ? "text-base mobileLg:text-lg font-light text-stamp-grey-light"
+                                : index === error.split("\n").length - 1
+                                ? "text-sm mobileLg:text-base font-medium text-stamp-grey-light"
+                                : "text-xs mobileLg:text-sm font-medium text-stamp-grey pt-0.5 pb-1"
                             } break-all overflow-hidden`}
                           >
                             {text}
