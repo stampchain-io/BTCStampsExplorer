@@ -29,12 +29,13 @@ export const StampHeader = (
 
   return (
     <div
-      className="flex flex-row justify-between items-center gap-3 w-full relative"
-      f-partial="/stamp"
+      class={`relative flex flex-row justify-between items-start w-full gap-3 ${
+        isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
+      }`}
     >
-      <h1 className={`${titlePurpleDL} block tablet:hidden`}>STAMPS</h1>
-      <h1 className={`${titlePurpleDL} hidden tablet:block`}>ART STAMPS</h1>
-      <div className="flex relative items-center justify-between gap-3">
+      <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>STAMPS</h1>
+      <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
+      <div className="flex relative items-start justify-between gap-3">
         <Filter
           initFilter={filterBy}
           open={isOpen1}
@@ -46,7 +47,7 @@ export const StampHeader = (
             "trending sales",
             "sold",
           ]}
-          dropdownPosition="absolute top-[70px] right-[-79px] mobileMd:top-[66px] mobileMd:right-[-96px] mobileLg:top-[86px] mobileLg:right-[-96px] desktop:top-[83px] desktop:right-[-108px]"
+          dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
         />
         <div
           class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}

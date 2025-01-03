@@ -79,7 +79,7 @@ export function Filter({
   return (
     <div
       ref={filterContainerRef}
-      class={`rounded-md flex flex-col items-center gap-1 relative z-20 transition-opacity duration-300 ${
+      class={`relative flex flex-col items-center gap-1 rounded-md z-20 transition-opacity duration-300 ${
         open
           ? `${dropdownPosition} backdrop-blur-md bg-gradient-to-b from-transparent to-[#171717]/30 h-fit px-6 py-4 border-2 border-stamp-purple-bright`
           : "cursor-pointer"
@@ -98,7 +98,7 @@ export function Filter({
             {filterButtons.map((filter) => (
               <button
                 key={filter}
-                class={`cursor-pointer text-xs mobileLg:text-base font-extrabold ${
+                class={`cursor-pointer text-xs mobileLg:text-base font-extrabold leading-relaxed tablet:leading-normal ${
                   localFilters.includes(filter)
                     ? "text-stamp-purple-bright"
                     : "text-stamp-grey hover:text-stamp-purple-bright"
