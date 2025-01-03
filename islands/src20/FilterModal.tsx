@@ -116,7 +116,6 @@ const FilterModal = (
         );
         break;
       case "supply":
-        if (supply.max < supply.min) return;
         url.searchParams.set(
           "minSupply",
           supply.min,
@@ -127,7 +126,6 @@ const FilterModal = (
         );
         break;
       case "marketcap":
-        if (marketcap.max < marketcap.min) return;
         if (!marketcap.min) return;
         url.searchParams.set(
           "minMarketCap",
@@ -139,7 +137,6 @@ const FilterModal = (
         );
         break;
       case "holders":
-        if (holder.max < holder.min) return;
         url.searchParams.set(
           "minHolder",
           holder.min,
@@ -150,7 +147,6 @@ const FilterModal = (
         );
         break;
       case "volume":
-        if (volume.max < volume.min) return;
         if (!volume.min) return;
         url.searchParams.set(
           "minVolume",
@@ -162,14 +158,13 @@ const FilterModal = (
         );
         break;
       case "price change":
-        if (price.max < price.min) return;
         url.searchParams.set(
-          "minPrice",
-          price.min,
+          "trendingDate",
+          new Date(priceDate).toISOString(),
         );
         url.searchParams.set(
-          "maxPrice",
-          price.max,
+          "priceMin",
+          price.min,
         );
         break;
     }
@@ -308,18 +303,17 @@ const FilterModal = (
         setTitle("Filter Price");
         return (
           <>
-            <InputField
-              type="text"
-              placeholder="Min Price"
-              value={price.min}
-              onChange={(e) => handleChange(e, "price_min")}
+            <DatePicker
+              setDateRange={(newDt) => {
+                setPriceDate(newDt);
+              }}
             />
 
             <InputField
               type="text"
-              placeholder="Max Price"
-              value={price.max}
-              onChange={(e) => handleChange(e, "price_max")}
+              placeholder="Price Chnage Percentage"
+              value={price.min}
+              onChange={(e) => handleChange(e, "price_min")}
             />
           </>
         );
