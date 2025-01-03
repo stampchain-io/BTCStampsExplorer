@@ -1,10 +1,12 @@
 import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { SRC20_FILTER_TYPES } from "$globals";
 
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
+import FilterModal from "$islands/src20/FilterModal.tsx";
 import FilterModal from "$islands/src20/FilterModal.tsx";
 
 export const SRC20Header = (
@@ -15,6 +17,16 @@ export const SRC20Header = (
 ) => {
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [filterValue, setFilterValue] = useState([]);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
   const [openModal, setOpenModal] = useState(false);
   const [filterValue, setFilterValue] = useState([]);
 
@@ -42,6 +54,12 @@ export const SRC20Header = (
     }
   }, [filterValue]);
 
+  useEffect(() => {
+    if (filterValue.length) {
+      handleOpenModal();
+    }
+  }, [filterValue]);
+
   return (
     <div
       class={`relative flex flex-row justify-between items-start w-full gap-3 ${
@@ -58,6 +76,7 @@ export const SRC20Header = (
           initFilter={Array.isArray(filterBy) ? filterBy : [filterBy]}
           open={isOpen1}
           handleOpen={handleOpen1}
+          setFilterValue={setFilterValue}
           filterButtons={[
             "minting",
             "trending mints",
@@ -78,6 +97,13 @@ export const SRC20Header = (
           <SRC20SearchClient open2={isOpen2} handleOpen2={handleOpen2} />
         </div>
       </div>
+      {openModal &&
+        (
+          <FilterModal
+            filterOptions={filterValue}
+            handleCloseModal={handleCloseModal}
+          />
+        )}
       {openModal &&
         (
           <FilterModal
