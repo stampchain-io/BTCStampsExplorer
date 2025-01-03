@@ -10,7 +10,6 @@ export function StampSearchClient(
   const [searchTerm, setSearchTerm] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
-  const [results, setResults] = useState([]);
 
   useEffect(() => {
     if (open2) {
@@ -49,6 +48,7 @@ export function StampSearchClient(
       const data = await response.json();
       return data.n_tx > 0;
     } catch (error) {
+      console.log("Stamp Search Error=========>", error);
       return false;
     }
   };
@@ -62,6 +62,7 @@ export function StampSearchClient(
       // Check if response has basic tx properties
       return !!(data && data.hash && data.ver);
     } catch (error) {
+      console.log("Stamp Search Error=========>", error);
       return false;
     }
   };
@@ -98,10 +99,12 @@ export function StampSearchClient(
             globalThis.location.href = `/stamp/${query}`;
             return;
           }
-        } catch {}
+        } catch (error) {
+          console.log("Stamp Search Error=========>", error);
+        }
 
         // Not a stamp but valid tx - open blockchain explorer
-        window.open(
+        globalThis.open(
           `https://www.blockchain.com/explorer/transactions/btc/${query}`,
           "_blank",
         );
@@ -131,7 +134,9 @@ export function StampSearchClient(
             globalThis.location.href = `/stamp/${query.toUpperCase()}`;
             return;
           }
-        } catch {}
+        } catch (error) {
+          console.log("Stamp Search Error=========>", error);
+        }
 
         setError(
           `NO STAMP FOUND\n${query}\nThe CPID doesn't seem to be valid`,
@@ -149,7 +154,9 @@ export function StampSearchClient(
             globalThis.location.href = `/stamp/${query}`;
             return;
           }
-        } catch {}
+        } catch (error) {
+          console.log("Stamp Search Error=========>", error);
+        }
 
         setError(
           `NO STAMP FOUND\n#${query}\nThe stamp you are looking for doesn't exist`,
@@ -161,6 +168,7 @@ export function StampSearchClient(
         `NO RESULTS FOUND\n${query}\nSorry, can't figure out what you're looking for`,
       );
     } catch (err) {
+      console.log("Stamp Search Error=========>", err);
       setError(
         `SYSTEM ERROR\n${query}\nSomething went wrong, please try again`,
       );
@@ -204,7 +212,6 @@ export function StampSearchClient(
     if (!open2) {
       setSearchTerm("");
       setError("");
-      setResults([]);
     }
   }, [open2]);
 

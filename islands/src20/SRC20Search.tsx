@@ -58,6 +58,7 @@ export function SRC20SearchClient({ open2, handleOpen2 }) {
         setError("");
         setResults(data.data);
       } catch (err) {
+        console.log("Src20 Search Error======>", err);
         setError("AN ERROR OCCURRED\nPlease try again later");
         setResults([]);
       }

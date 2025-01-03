@@ -58,7 +58,7 @@ export function Filter({
   // Handle overflow and resize
   useEffect(() => {
     const handleOverflow = () => {
-      const isMobileLg = window.matchMedia("(min-width: 768px)").matches;
+      const isMobileLg = globalThis.matchMedia("(min-width: 768px)").matches;
 
       if (open && !isMobileLg) {
         document.documentElement.style.overflow = "hidden";
@@ -73,10 +73,10 @@ export function Filter({
     handleOverflow();
 
     // Add resize listener
-    window.addEventListener("resize", handleOverflow);
+    globalThis.addEventListener("resize", handleOverflow);
 
     return () => {
-      window.removeEventListener("resize", handleOverflow);
+      globalThis.removeEventListener("resize", handleOverflow);
       document.documentElement.style.overflow = "";
       document.body.style.overflow = "";
     };
@@ -85,7 +85,7 @@ export function Filter({
   // Handle clicks outside for both modal and dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const isMobileLg = window.matchMedia("(min-width: 768px)").matches;
+      const isMobileLg = globalThis.matchMedia("(min-width: 768px)").matches;
 
       if (open) {
         // For mobileLg+ (dropdown), check if click is outside filterContainerRef
