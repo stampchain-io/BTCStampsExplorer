@@ -128,6 +128,12 @@ export default function App({ Component, state }: PageProps<unknown>) {
           href="/carousel.css"
           media="(min-width: 1px)"
         />
+
+        <link
+          rel="stylesheet"
+          href="/flatpickr.css"
+          media="(min-width: 1px)"
+        />
       </Head>
 
       <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden overflow-hidden">
