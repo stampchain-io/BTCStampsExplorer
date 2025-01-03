@@ -27,11 +27,15 @@ export function SelectField({
       >
         {options.length
           ? options.map((item) => (
-            <option key={item.tx_hash} value={item.tx_hash}>
+            <option
+              key={item.tx_hash}
+              value={item.tx_hash}
+              className="font-light uppercase"
+            >
               #{item.stamp}
             </option>
           ))
-          : <option>No Data</option>}
+          : <option className="font-light uppercase">NO STAMPS</option>}
       </select>
       {error && <p class="text-red-500 mt-2">{error}</p>}
     </div>
