@@ -25,7 +25,7 @@ export const StampHeader = (
   };
 
   const titlePurpleDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
 
   return (
     <div
