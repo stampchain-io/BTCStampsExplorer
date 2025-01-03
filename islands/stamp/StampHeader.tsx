@@ -32,8 +32,9 @@ export const StampHeader = (
       className="flex flex-row justify-between items-center gap-3 w-full relative"
       f-partial="/stamp"
     >
-      <h1 className={titlePurpleDL}>ART STAMPS</h1>
-      <div className="flex gap-3 justify-between mobileLg:h-9 h-7 items-center relative">
+      <h1 className={`${titlePurpleDL} block tablet:hidden`}>STAMPS</h1>
+      <h1 className={`${titlePurpleDL} hidden tablet:block`}>ART STAMPS</h1>
+      <div className="flex relative items-center justify-between gap-3">
         <Filter
           initFilter={filterBy}
           open={isOpen1}

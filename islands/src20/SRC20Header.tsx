@@ -24,17 +24,17 @@ export const SRC20Header = (
     setIsOpen1(false);
     setIsOpen2(open);
   };
+  const titlePurpleDL =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
 
   return (
     <div className="tabs">
       <div class="flex flex-row justify-between items-center gap-3 w-full relative">
-        <h1 className="hidden tablet:block text-5xl desktop:text-6xl purple-gradient1 font-black">
+        <h1 className={`${titlePurpleDL} block tablet:hidden`}>TOKENS</h1>
+        <h1 className={`${titlePurpleDL} hidden tablet:block`}>
           SRC-20 TOKENS
         </h1>
-        <h1 className="block tablet:hidden text-4xl mobileLg:text-5xl purple-gradient1 font-black">
-          TOKENS
-        </h1>
-        <div class="flex gap-3 justify-between mobileLg:h-9 h-7 items-center">
+        <div class="flex relative items-center justify-between gap-3">
           <Filter
             initFilter={Array.isArray(filterBy) ? filterBy : [filterBy]}
             open={isOpen1}
