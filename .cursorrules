@@ -698,7 +698,7 @@ src20_optimization:
           description: "Filter by trading volume"
           properties:
             - "min: number - Minimum volume in BTC"
-            - "time_period: '24h' | '7d' - Time period for volume calculation"
+            - "max: number - Maximum volume in BTC"
         
         price_change:
           description: "Filter by price movement"
