@@ -114,7 +114,6 @@ export function SRC20SearchClient({ open2, handleOpen2 }) {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            class="fill-black"
             role="button"
             aria-label="Search"
           >
@@ -122,7 +121,6 @@ export function SRC20SearchClient({ open2, handleOpen2 }) {
           </svg>
         }
         iconAlt="Search"
-        class="hover:bg-stamp-purple-bright hover:border-stamp-purple-bright cursor-pointer"
         onClick={() => handleOpen2(true)}
         role="button"
         aria-label="Search"
