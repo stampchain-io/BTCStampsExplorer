@@ -40,6 +40,22 @@ export function Filter({
     setLocalFilters(initFilter);
   }, [initFilter]);
 
+  useEffect(() => {
+    const handleKeyboardShortcut = (e: KeyboardEvent) => {
+      if (e.key === "f") {
+        e.preventDefault();
+        handleOpen(true);
+      }
+      if (e.key === "Escape" && open) {
+        handleOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyboardShortcut);
+    return () =>
+      document.removeEventListener("keydown", handleKeyboardShortcut);
+  }, [open, handleOpen]);
+
   const handleFilterChange = (value: FilterTypes) => {
     setLocalFilters((prevFilters) => {
       const newFilters = prevFilters.includes(value)
