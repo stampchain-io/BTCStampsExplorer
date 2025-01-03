@@ -1,10 +1,11 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { SRC20_FILTER_TYPES } from "$globals";
 
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
+import FilterModal from "$islands/src20/FilterModal.tsx";
 
 export const SRC20Header = (
   { filterBy, sortBy }: {
@@ -14,6 +15,16 @@ export const SRC20Header = (
 ) => {
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [filterValue, setFilterValue] = useState([]);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
@@ -24,6 +35,13 @@ export const SRC20Header = (
     setIsOpen1(false);
     setIsOpen2(open);
   };
+
+  useEffect(() => {
+    if (filterValue.length) {
+      handleOpenModal();
+    }
+  }, [filterValue]);
+
   const titlePurpleDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
 
@@ -61,6 +79,13 @@ export const SRC20Header = (
           <SRC20SearchClient open2={isOpen2} handleOpen2={handleOpen2} />
         </div>
       </div>
+      {openModal &&
+        (
+          <FilterModal
+            filterOptions={filterValue}
+            handleCloseModal={handleCloseModal}
+          />
+        )}
     </div>
   );
 };

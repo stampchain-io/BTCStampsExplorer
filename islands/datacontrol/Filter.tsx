@@ -18,6 +18,7 @@ type FilterTypes =
 
 interface FilterProps {
   initFilter?: FilterTypes[];
+  setFilterValue?: (value: FilterTypes) => void;
   open: boolean;
   handleOpen: (open: boolean) => void;
   filterButtons: FilterTypes[];
@@ -26,6 +27,7 @@ interface FilterProps {
 
 export function Filter({
   initFilter = [],
+  setFilterValue,
   open,
   handleOpen,
   filterButtons,
@@ -112,6 +114,8 @@ export function Filter({
       const newFilters = prevFilters.includes(value)
         ? prevFilters.filter((f) => f !== value)
         : [...prevFilters, value];
+
+      setFilterValue(newFilters);
       updateURL({ filterBy: newFilters });
 
       const url = new URL(globalThis.location.href);
@@ -119,7 +123,9 @@ export function Filter({
         "filterBy",
         newFilters.length > 0 ? newFilters.join(",") : "",
       );
-      globalThis.location.href = url.toString();
+      if (typeof setFilterValue !== "function") {
+        globalThis.location.href = url.toString();
+      }
       return newFilters;
     });
   };

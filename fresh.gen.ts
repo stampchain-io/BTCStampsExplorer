@@ -15,8 +15,8 @@ import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
 import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
 import * as $api_internal_fees from "./routes/api/internal/fees.ts";
-import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
+import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
 import * as $api_v2_balance_address_ from "./routes/api/v2/balance/[address].ts";
 import * as $api_v2_balance_getStampsBalance from "./routes/api/v2/balance/getStampsBalance.ts";
@@ -123,6 +123,7 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
+import * as $DateRangePicker from "./islands/DateRangePicker.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
@@ -180,6 +181,7 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
+import * as $src20_FilterModal from "./islands/src20/FilterModal.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
 import * as $src20_SRC20Section from "./islands/src20/SRC20Section.tsx";
@@ -236,8 +238,8 @@ const manifest = {
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
     "./routes/api/internal/fees.ts": $api_internal_fees,
-    "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
     "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
+    "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
     "./routes/api/v2/balance/[address].ts": $api_v2_balance_address_,
     "./routes/api/v2/balance/getStampsBalance.ts":
@@ -372,6 +374,7 @@ const manifest = {
   islands: {
     "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
+    "./islands/DateRangePicker.tsx": $DateRangePicker,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
@@ -440,6 +443,7 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
+    "./islands/src20/FilterModal.tsx": $src20_FilterModal,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
     "./islands/src20/SRC20Section.tsx": $src20_SRC20Section,
