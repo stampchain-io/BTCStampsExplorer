@@ -64,6 +64,12 @@ export const handler: Handlers = {
           ...(url.searchParams.get("maxVolume") && {
             maxVolume: Number(url.searchParams.get("maxVolume")),
           }),
+          ...(url.searchParams.get("minPrice") && {
+            minPrice: Number(url.searchParams.get("minPrice")),
+          }),
+          ...(url.searchParams.get("maxPrice") && {
+            maxPrice: Number(url.searchParams.get("maxPrice")),
+          }),
         };
 
         // Add date range filters if they exist
