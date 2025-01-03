@@ -78,7 +78,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
   const totalHolders = holders.length;
 
   return (
-    <div className="flex flex-col dark-gradient p-3 mobileMd:p-6 relative rounded-md">
+    <div className="relative flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
       <div className="text-left tablet:text-right">
         <p className={dataLabel}>HOLDERS</p>
         <p className={dataValueXL}>{totalHolders}</p>
