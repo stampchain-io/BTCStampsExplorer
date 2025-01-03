@@ -49,7 +49,7 @@ export function ModalLayout({
       class={`${modalBgBlur} ${className}`}
       onClick={handleClose}
     >
-      <div class="relative w-[360px] mobileLg:w-[420px] h-[600px] mobileLg:h-[700px] p-6 dark-gradient-modal rounded-lg overflow-hidden">
+      <div class="relative w-[360px] h-fit mobileLg:w-[420px] mobileLg:h-fit p-6 dark-gradient-modal rounded-lg overflow-hidden">
         <div class={`relative ${contentClassName}`}>
           <div class="w-6 h-6 ms-auto cursor-pointer absolute top-0 right-0 -mr-1.5 -mt-1.5">
             <svg
