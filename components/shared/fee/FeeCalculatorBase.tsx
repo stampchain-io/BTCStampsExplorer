@@ -327,7 +327,7 @@ export function FeeCalculatorBase({
 
       {renderDetails()}
 
-      <div className="flex flex-col items-end gap-4 mt-4">
+      <div className="flex flex-col items-end gap-4 pt-6 mobileLg:pt-9">
         {!isModal && (
           <div className="relative flex items-center">
             <input
@@ -388,7 +388,7 @@ export function FeeCalculatorBase({
           </div>
         )}
 
-        <div className="flex justify-end gap-6 pt-6 mobileLg:pt-9">
+        <div className="flex justify-end gap-6">
           {isModal && onCancel && (
             <button
               className={`${buttonPurpleOutline} ${
