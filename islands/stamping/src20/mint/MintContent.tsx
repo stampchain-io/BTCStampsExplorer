@@ -68,10 +68,9 @@ interface SearchResult {
   max_supply: number;
 }
 
-// Add consistent class names at the top
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
-  "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
+  "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
 const feeSelectorContainer =
   "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
 const inputFieldContainer =
