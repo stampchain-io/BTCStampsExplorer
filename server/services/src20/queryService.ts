@@ -315,6 +315,14 @@ export class SRC20QueryService {
       maxPrice?: number;
       minVolume?: number;
       maxVolume?: number;
+      minMarketCap?: number;
+      maxMarketCap?: number;
+      minSupply?: number;
+      maxSupply?: number;
+      minProgress?: number;
+      maxProgress?: number;
+      minTxCount?: number;
+      maxTxCount?: number;
     } = {},
     options: {
       excludeFullyMinted?: boolean;
@@ -347,6 +355,16 @@ export class SRC20QueryService {
         maxPrice: typeof params.maxPrice === 'number' ? Math.max(0, params.maxPrice) : undefined,
         minVolume: typeof params.minVolume === 'number' ? Math.max(0, params.minVolume) : undefined,
         maxVolume: typeof params.maxVolume === 'number' ? Math.max(0, params.maxVolume) : undefined,
+        minSupply: typeof params.minSupply === 'number' ? Math.max(0, params.minSupply) : undefined,
+        maxSupply: typeof params.maxSupply === 'number' ? Math.max(0, params.maxSupply) : undefined,
+        minMarketCap: typeof params.minMarketCap === 'number' ? Math.max(0, params.minMarketCap) : undefined,
+        maxMarketCap: typeof params.maxMarketCap === 'number' ? Math.max(0, params.maxMarketCap) : undefined,
+        minHolder: typeof params.minHolder === 'number' ? Math.max(0, params.minHolder) : undefined,
+        maxHolder: typeof params.maxHolder === 'number' ? Math.max(0, params.maxHolder) : undefined,
+          minProgress: typeof params.minProgress === 'number' ? Math.max(0, params.minProgress) : undefined,
+        maxProgress: typeof params.maxProgress === 'number' ? Math.max(0, params.maxProgress) : undefined,
+          minTxCount: typeof params.minTxCount === 'number' ? Math.max(0, params.minTxCount) : undefined,
+        maxTxCount: typeof params.maxTxCount === 'number' ? Math.max(0, params.maxTxCount) : undefined,
         op: Array.isArray(params.op)
           ? params.op.map((o) => o.replace(/[^\w-]/g, ""))
           : params.op
@@ -445,24 +463,60 @@ export class SRC20QueryService {
           sanitizedParams.minPrice !== undefined || 
           sanitizedParams.maxPrice !== undefined ||
           sanitizedParams.minVolume !== undefined ||
-          sanitizedParams.maxVolume !== undefined
+          sanitizedParams.maxVolume !== undefined ||
+          sanitizedParams.minSupply !== undefined ||
+          sanitizedParams.maxSupply !== undefined
         )) {
+
           formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
+
           formattedData = formattedData.filter(item => {
             if (!item.market_data) return false;
-            
-            const { floor_price = 0, volume_24h = 0 } = item.market_data;
+
+            const { floor_price = 0, volume_24h = 0, supply = 0 } = item.market_data;
             
             if (sanitizedParams.minPrice !== undefined && floor_price < sanitizedParams.minPrice) return false;
             if (sanitizedParams.maxPrice !== undefined && floor_price > sanitizedParams.maxPrice) return false;
             if (sanitizedParams.minVolume !== undefined && volume_24h < sanitizedParams.minVolume) return false;
             if (sanitizedParams.maxVolume !== undefined && volume_24h > sanitizedParams.maxVolume) return false;
-            
+            if (sanitizedParams.minSupply !== undefined && supply < sanitizedParams.minSupply) return false;
+            if (sanitizedParams.maxSupply !== undefined && supply > sanitizedParams.maxSupply) return false;
+           
             return true;
           });
         }
-      }
+    
+        if (sanitizedParams.minHolder !== undefined ||
+          sanitizedParams.maxHolder !== undefined)
+        {
+          formattedData = formattedData.filter(item => {
+            if (sanitizedParams.minHolder !== undefined && item.holders < sanitizedParams.minHolder) return false;
+            if (sanitizedParams.maxHolder !== undefined && item.holders > sanitizedParams.maxHolder) return false;
+            return true
+          })
+        }
 
+        if (sanitizedParams.minProgress !== undefined ||
+          sanitizedParams.maxProgress !== undefined)
+        {
+          formattedData = formattedData.filter(item => {
+            if (sanitizedParams.minProgress !== undefined && item.progress < sanitizedParams.minProgress) return false;
+            if (sanitizedParams.maxProgress !== undefined && item.progress > sanitizedParams.maxProgress) return false;
+            return true
+          })
+        }
+
+        if (sanitizedParams.minTxCount !== undefined ||
+          sanitizedParams.maxTxCount !== undefined)
+        {
+          formattedData = formattedData.filter(item => {
+            if (sanitizedParams.minTxCount !== undefined && item.mint_progress?.current < sanitizedParams.minTxCount) return false;
+            if (sanitizedParams.maxTxCount !== undefined && item.mint_progress?.current > sanitizedParams.maxTxCount) return false;
+            return true
+          })
+        }
+      }
+      
       // Handle single result case
       if (
         params.singleResult && 
