@@ -33,14 +33,6 @@ const FilterModal = (
     min: "",
     max: "",
   });
-  const [trendingDate, setTrendingDate] = useState<Date[] | null>([
-    null,
-    null,
-  ]);
-  const [priceDate, setPriceDate] = useState<Date[] | null>([
-    null,
-    null,
-  ]);
   const [dateRange, setDateRange] = useState<Date[] | null>([
     null,
     null,
@@ -55,9 +47,14 @@ const FilterModal = (
     e: React.ChangeEvent<HTMLInputElement>,
     type: string,
   ) => {
-    if (type === "minting") {
-    } else if (type === "trending_mints") {
-    } else if (type === "deploy") {
+    if (type === "progress_min") {
+      setProgress({ ...progress, min: e.target.value });
+    } else if (type === "progress_max") {
+      setProgress({ ...progress, max: e.target.value });
+    } else if (type === "min_tx") {
+      setTransactionCount({ ...transactionCount, min: e.target.value });
+    } else if (type === "max_tx") {
+      setTransactionCount({ ...transactionCount, max: e.target.value });
     } else if (type === "supply_min") {
       setSupply({ ...supply, min: e.target.value });
     } else if (type === "supply_max") {
@@ -95,10 +92,6 @@ const FilterModal = (
         );
         break;
       case "trending mints":
-        url.searchParams.set(
-          "trendingDate",
-          new Date(trendingDate).toISOString(),
-        );
         url.searchParams.set(
           "minTxCount",
           transactionCount.min,
@@ -189,7 +182,7 @@ const FilterModal = (
               type="text"
               placeholder="Transaction Count"
               value={transactionCount.max}
-              onChange={(e) => handleChange(e, "transactionCount_max")}
+              onChange={(e) => handleChange(e, "max_tx")}
             />
           </>
         );
@@ -198,15 +191,11 @@ const FilterModal = (
         setTitle("Filter Trending Mints");
         return (
           <>
-            <DatePicker
-              setDateRange={(newDt) => setTrendingDate(newDt)}
-            />
-
             <InputField
               type="text"
               placeholder="Min Transaction Count"
               value={transactionCount.min}
-              onChange={(e) => handleChange(e, "transactionCount_min")}
+              onChange={(e) => handleChange(e, "min_tx")}
             />
           </>
         );

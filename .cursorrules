@@ -668,7 +668,6 @@ src20_optimization:
         trending_mints:
           description: "Filter trending mints by time period"
           properties:
-            - "time_period: '24h' | '7d' - Time window for trending calculation"
             - "min_mints: number - Minimum number of mint transactions"
         
         deploy:
