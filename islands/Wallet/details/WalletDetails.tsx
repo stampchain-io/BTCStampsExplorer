@@ -5,24 +5,13 @@ import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
-// Style Constants
-const _dataContainer =
-  "flex justify-between items-center dark-gradient rounded-lg p-3 mobileLg:p-6";
 const dataColumn = "flex flex-col -space-y-1";
-const _dataLabelSm =
-  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
 const dataLabel =
   "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-const _dataValueXs =
-  "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
-const _dataValueSm =
-  "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-const _dataValue =
-  "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
 const dataValueXl =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
 const tooltipIcon =
-  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
 
 function WalletDetails(
   { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
@@ -104,6 +93,8 @@ function WalletOverview(
   const [allowBalanceTooltip, setAllowBalanceTooltip] = useState(true);
   const balanceButtonRef = useRef<HTMLButtonElement>(null);
   const balanceTooltipTimeoutRef = useRef<number | null>(null);
+  // Add state to track the hover tooltip text separately from the hideBalance state
+  const [tooltipText, setTooltipText] = useState("HIDE BALANCE");
 
   useEffect(() => {
     return () => {
@@ -241,6 +232,9 @@ function WalletOverview(
 
   const handleBalanceMouseEnter = () => {
     if (allowBalanceTooltip) {
+      // Set tooltip text based on current state when mouse enters
+      setTooltipText(hideBalance ? "SHOW BALANCE" : "HIDE BALANCE");
+
       if (balanceTooltipTimeoutRef.current) {
         globalThis.clearTimeout(balanceTooltipTimeoutRef.current);
       }
@@ -263,16 +257,16 @@ function WalletOverview(
   };
 
   return (
-    <div class="w-full dark-gradient rounded-lg flex flex-col justify-between p-6">
+    <div class="w-full dark-gradient rounded-lg flex flex-col justify-between p-3 mobileMd:p-6">
       <div class="flex justify-between">
         <div class={`${hideBalance ? "blur-sm" : ""}`}>
-          <p class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl select-none">
+          <p class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
             <span class="font-bold">
               {hideBalance ? "*********" : walletData.balance}
             </span>{" "}
             BTC
           </p>
-          <p class="text-stamp-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl desktop:text-2xl select-none pt-[3px]">
+          <p class="text-stamp-grey font-extralight text-base mobileMd:text-lg mobileLg:text-xl select-none pt-[3px]">
             <span class="font-medium">
               {hideBalance ? "*****" : walletData.usdValue.toLocaleString()}
             </span>{" "}
@@ -281,7 +275,7 @@ function WalletOverview(
         </div>
         <button
           ref={balanceButtonRef}
-          class="mb-7 mobileMd:mb-8 mobileLg:mb-9 tablet:mb-10 desktop:mb-11"
+          class="mb-7 mobileMd:mb-[34px]"
           onClick={() => {
             setHideBalance(!hideBalance);
             setIsBalanceTooltipVisible(false);
@@ -295,8 +289,8 @@ function WalletOverview(
               <div class="relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-[30px] h-[30px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
                   viewBox="0 0 32 32"
+                  class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
                   role="button"
                   aria-label="Show Balance"
                 >
@@ -304,10 +298,10 @@ function WalletOverview(
                 </svg>
                 <div
                   class={`${tooltipIcon} ${
-                    isBalanceTooltipVisible ? "block" : "hidden"
+                    isBalanceTooltipVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  SHOW BALANCE
+                  {tooltipText}
                 </div>
               </div>
             )
@@ -315,8 +309,8 @@ function WalletOverview(
               <div class="relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-[30px] h-[30px]  fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
                   viewBox="0 0 32 32"
+                  class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
                   role="button"
                   aria-label="Hide Balance"
                 >
@@ -324,10 +318,10 @@ function WalletOverview(
                 </svg>
                 <div
                   class={`${tooltipIcon} ${
-                    isBalanceTooltipVisible ? "block" : "hidden"
+                    isBalanceTooltipVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  HIDE BALANCE
+                  {tooltipText}
                 </div>
               </div>
             )}
@@ -335,14 +329,14 @@ function WalletOverview(
       </div>
       <div class="flex justify-between pt-3">
         <div class="flex items-center">
-          <p class="text-stamp-primary font-medium select-none text-base mobileLg:text-lg desktop:text-xl hidden mobileLg:block">
+          <p class="text-stamp-primary font-medium select-none text-base mobileLg:text-lg hidden mobileLg:block">
             {walletData.address}
           </p>
-          <p class="text-stamp-primary font-medium select-none text-base mobileLg:text-lg desktop:text-xl block mobileLg:hidden">
+          <p class="text-stamp-primary font-medium select-none text-base mobileLg:text-lg block mobileLg:hidden">
             {abbreviateAddress(walletData.address, 8)}
           </p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-3 mobileLg:gap-[9px]">
           <div
             ref={copyButtonRef}
             class="relative"
@@ -351,8 +345,8 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-[30px] h-[30px]  fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
+              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               role="button"
               aria-label="Copy"
               onClick={copy}
@@ -361,10 +355,17 @@ function WalletOverview(
             </svg>
             <div
               class={`${tooltipIcon} ${
-                (isTooltipVisible || showCopied) ? "block" : "hidden"
+                isTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
-              {showCopied ? "COPIED" : "COPY"}
+              COPY ADDY
+            </div>
+            <div
+              class={`${tooltipIcon} ${
+                showCopied ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              ADDY COPIED
             </div>
           </div>
           <div
@@ -375,8 +376,8 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-[30px] h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
+              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               role="button"
               aria-label="Send"
               onClick={() => {
@@ -388,7 +389,7 @@ function WalletOverview(
             </svg>
             <div
               class={`${tooltipIcon} ${
-                isSendTooltipVisible ? "block" : "hidden"
+                isSendTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               SEND
@@ -402,8 +403,8 @@ function WalletOverview(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-[30px] h-[30px] rotate-180 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               viewBox="0 0 32 32"
+              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 rotate-180 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
               role="button"
               aria-label="Receive"
               onClick={() => {
@@ -411,11 +412,11 @@ function WalletOverview(
                 onReceive();
               }}
             >
-              <path d="M16 17V25C16 25.2652 15.8946 25.5196 15.7071 25.7071C15.5196 25.8946 15.2652 26 15 26C14.7348 26 14.4804 25.8946 14.2929 25.7071C14.1054 25.5196 14 25.2652 14 25V19.415L5.70751 27.7075C5.6146 27.8004 5.5043 27.8741 5.3829 27.9244C5.26151 27.9747 5.1314 28.0006 5.00001 28.0006C4.86861 28.0006 4.7385 27.9747 4.61711 27.9244C4.49572 27.8741 4.38542 27.8004 4.29251 27.7075C4.1996 27.6146 4.1259 27.5043 4.07561 27.3829C4.02533 27.2615 3.99945 27.1314 3.99945 27C3.99945 26.8686 4.02533 26.7385 4.07561 26.6171C4.1259 26.4957 4.1996 26.3854 4.29251 26.2925L12.585 18H7.00001C6.73479 18 6.48044 17.8946 6.2929 17.7071C6.10536 17.5196 6.00001 17.2652 6.00001 17C6.00001 16.7348 6.10536 16.4804 6.2929 16.2929C6.48044 16.1054 6.73479 16 7.00001 16H15C15.2652 16 15.5196 16.1054 15.7071 16.2929C15.8946 16.4804 16 16.7348 16 17ZM26 4H10C9.46957 4 8.96087 4.21071 8.58579 4.58579C8.21072 4.96086 8.00001 5.46957 8.00001 6V12C8.00001 12.2652 8.10536 12.5196 8.2929 12.7071C8.48044 12.8946 8.73479 13 9.00001 13C9.26522 13 9.51958 12.8947 9.70711 12.7071C9.89464 12.5196 10 12.2653 10 13C10 13.2653 10.1054 13.5196 10.2929 13.7071C10.4804 13.8947 10.7348 14 11 14H27C27.2652 14 27.5196 13.8947 27.7071 13.7071C27.8946 13.5196 28 13.2653 28 13V7.415L19.7087 15.7075C19.5211 15.8951 19.2666 16.0006 19.0012 16.0006C18.7359 16.0006 18.4814 15.8951 18.2938 15.7075C18.1061 15.5199 18.0007 15.2654 18.0007 15C18.0007 14.7346 18.1061 14.4801 18.2938 14.2925L26.585 6H21C20.7348 6 20.4804 5.89464 20.2929 5.70711C20.1054 5.51957 20 5.26522 20 5C20 4.73478 20.1054 4.48043 20.2929 4.29289C20.4804 4.10536 20.7348 4 21 4H29C29.2652 4 29.5196 4.10536 29.7071 4.29289C29.8946 4.48043 30 4.73478 30 5V13ZM23 16C22.7348 16 22.4804 16.1054 22.2929 16.2929C22.1054 16.4804 22 16.7348 22 17V26H6V10H15C15.2652 10 15.5196 9.89464 15.7071 9.70711C15.8946 9.51957 16 9.26522 16 9C16 8.73478 15.8946 8.48043 15.7071 8.29289C15.5196 8.10536 15.2652 8 15 8H6C5.46957 8 4.96086 8.21071 4.58579 8.58579C4.21071 8.96086 4 9.46957 4 10V26C4 26.5304 4.21071 27.0391 4.58579 27.4142C4.96086 27.7893 5.46957 28 6 28H22C22.5304 28 23.0391 27.7893 23.4142 27.4142C23.7893 27.0391 24 26.5304 24 26V17C24 16.7348 23.8946 16.4804 23.7071 16.2929C23.5196 16.1054 23.2652 16 23 16Z" />
+              <path d="M16 17V25C16 25.2652 15.8946 25.5196 15.7071 25.7071C15.5196 25.8946 15.2652 26 15 26C14.7348 26 14.4804 25.8946 14.2929 25.7071C14.1054 25.5196 14 25.2652 14 25V19.415L5.70751 27.7075C5.6146 27.8004 5.5043 27.8741 5.3829 27.9244C5.26151 27.9747 5.1314 28.0006 5.00001 28.0006C4.86861 28.0006 4.7385 27.9747 4.61711 27.9244C4.49572 27.8741 4.38542 27.8004 4.29251 27.7075C4.1996 27.6146 4.1259 27.5043 4.07561 27.3829C4.02533 27.2615 3.99945 27.1314 3.99945 27C3.99945 26.8686 4.02533 26.7385 4.07561 26.6171C4.1259 26.4957 4.1996 26.3854 4.29251 26.2925L12.585 18H7.00001C6.73479 18 6.48044 17.8946 6.2929 17.7071C6.10536 17.5196 6.00001 17.2652 6.00001 17C6.00001 16.7348 6.10536 16.4804 6.2929 16.2929C6.48044 16.1054 6.73479 16 7.00001 16H15C15.2652 16 15.5196 16.1054 15.7071 16.2929C15.8946 16.4804 16 16.7348 16 17ZM26 4H10C9.46957 4 8.96087 4.21071 8.58579 4.58579C8.21072 4.96086 8.00001 5.46957 8.00001 6V12C8.00001 12.2652 8.10536 12.5196 8.2929 12.7071C8.48044 12.8946 8.73479 13 9.00001 13C9.26522 13 9.51958 12.8946 9.70711 12.7071C9.89465 12.5196 10 12.2652 10 12V6H26V22H20C19.7348 22 19.4804 22.1054 19.2929 22.2929C19.1054 22.4804 19 22.7348 19 23C19 23.2652 19.1054 23.5196 19.2929 23.7071C19.4804 23.8946 19.7348 24 20 24H26C26.5304 24 27.0391 23.7893 27.4142 23.4142C27.7893 23.0391 28 22.5304 28 22V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4Z" />
             </svg>
             <div
               class={`${tooltipIcon} ${
-                isReceiveTooltipVisible ? "block" : "hidden"
+                isReceiveTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               RECEIVE
@@ -434,8 +435,8 @@ function WalletOverview(
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="w-[30px] h-[30px] fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
                 viewBox="0 0 32 32"
+                class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
                 role="button"
                 aria-label="History"
               >
@@ -444,7 +445,7 @@ function WalletOverview(
             </a>
             <div
               class={`${tooltipIcon} ${
-                isHistoryTooltipVisible ? "block" : "hidden"
+                isHistoryTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               HISTORY
@@ -513,7 +514,7 @@ function StampStats(
 ) {
   return (
     <div
-      class="w-full dark-gradient rounded-lg p-6 flex flex-col gap-6"
+      class="w-full dark-gradient rounded-lg p-3 mobileMd:p-6 flex flex-col gap-6"
       onClick={() => handleType("stamp")}
     >
       <div class="flex justify-between">
@@ -536,7 +537,7 @@ function DispenserStats(
 ) {
   return (
     <div
-      class="flex flex-col w-full dark-gradient rounded-lg p-6 gap-6"
+      class="flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-6"
       onClick={() => handleType("dispenser")}
     >
       <div class="flex justify-between">
@@ -570,7 +571,7 @@ function TokenStats(
 
   return (
     <div
-      class="flex justify-between w-full dark-gradient rounded-lg p-6 gap-6"
+      class="flex justify-between w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-6"
       onClick={() => handleType("token")}
     >
       <StatItem label="TOKENS" value={src20Total.toString()} />

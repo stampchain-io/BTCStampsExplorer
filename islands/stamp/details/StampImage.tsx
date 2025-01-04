@@ -248,7 +248,7 @@ function RightPanel(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            className="w-7 h-7 mobileLg:w-[32px] mobileLg:h-[32px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer mb-0.5"
+            className="w-7 h-7 mobileLg:w-8 mobileLg:h-8 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer mb-0.5"
             onClick={copyLink}
             role="button"
             aria-label="Copy Link"
@@ -277,7 +277,7 @@ function RightPanel(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            className="w-7 h-7 mobileLg:w-[32px] mobileLg:h-[32px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+            className="w-7 h-7 mobileLg:w-8 mobileLg:h-8 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
             onClick={shareToX}
             role="button"
             aria-label="Share on X"
@@ -328,7 +328,7 @@ function RightPanel(
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
-              class="w-7 h-7 mobileLg:w-[32px] mobileLg:h-[32px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+              class="w-7 h-7 mobileLg:w-8 mobileLg:h-8 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -356,7 +356,7 @@ function RightPanel(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            class="w-7 h-7 mobileLg:w-[32px] mobileLg:h-[32px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+            class="w-7 h-7 mobileLg:w-8 mobileLg:h-8 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
