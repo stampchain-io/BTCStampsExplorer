@@ -70,6 +70,33 @@ export const handler: Handlers = {
           ...(url.searchParams.get("maxPrice") && {
             maxPrice: Number(url.searchParams.get("maxPrice")),
           }),
+          ...(url.searchParams.get("minHolder") && {
+            minHolder: Number(url.searchParams.get("minHolder")),
+          }),
+          ...(url.searchParams.get("maxHolder") && {
+            maxHolder: Number(url.searchParams.get("maxHolder")),
+          }),
+          ...(url.searchParams.get("minSupply") && {
+            minSupply: Number(url.searchParams.get("minSupply")),
+          }),
+          ...(url.searchParams.get("maxSupply") && {
+            maxSupply: Number(url.searchParams.get("maxSupply")),
+          }),
+          ...(url.searchParams.get("minTxCount") && {
+            minTxCount: Number(url.searchParams.get("minTxCount")),
+          }),
+          ...(url.searchParams.get("maxTxCount") && {
+            maxTxCount: Number(url.searchParams.get("maxTxCount")),
+          }),
+          ...(url.searchParams.get("minProgress") && {
+            minProgress: Number(url.searchParams.get("minProgress")),
+          }),
+          ...(url.searchParams.get("maxProgress") && {
+            maxProgress: Number(url.searchParams.get("maxProgress")),
+          }),
+          ...(url.searchParams.get("trendingDate") && {
+            trendingDate: Number(url.searchParams.get("trendingDate")),
+          }),
         };
 
         // Add date range filters if they exist
