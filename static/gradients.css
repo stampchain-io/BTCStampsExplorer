@@ -74,6 +74,19 @@
   background-clip: text;
 }
 
+.gray-gradient3-hover {
+  background: linear-gradient(to right, #666666, #999999, #cccccc);
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.gray-gradient3-hover:hover {
+  background: none;
+  -webkit-text-fill-color: #CCCCCC;
+  text-fill-color: #CCCCCC;
+}
+
 .gray-gradient4 {
   /* TODO: Migrate to Tailwind: bg-text-gray-4 bg-clip-text text-fill-transparent */
   background: linear-gradient(to right, #666666, #999999);
