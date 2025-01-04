@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { VNode } from "preact";
-
 import { StampRow } from "$globals";
 import {
   getStampImageSrc,
@@ -8,13 +7,10 @@ import {
   validateStampContent,
 } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-
 import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 import StampCodeModal from "$islands/stamp/details/StampCodeModal.tsx";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 import { logger } from "$lib/utils/logger.ts";
-const tooltipIcon =
-  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
 
 function RightPanel(
   { stamp, toggleCodeModal, toggleFullScreenModal, showCodeButton }: {
@@ -147,8 +143,9 @@ function RightPanel(
     globalThis.open(xShareUrl, "_blank", "noopener,noreferrer");
   };
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(url).then(() => {
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
       setShowCopied(true);
       setIsTooltipVisible(false);
       setAllowTooltip(false);
@@ -160,9 +157,9 @@ function RightPanel(
       tooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setShowCopied(false);
       }, 1500);
-    }).catch((error) => {
+    } catch (error) {
       console.error("Error copying to clipboard:", error);
-    });
+    }
   };
 
   const handleShareMouseEnter = () => {
@@ -236,6 +233,9 @@ function RightPanel(
     setAllowFullscreenTooltip(true);
   };
 
+  const tooltipIcon =
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
+
   return (
     <div className="flex justify-between pt-[10px] mobileMd:pt-[22px] pb-2 mobileMd:pb-5 px-3 mobileMd:px-6 dark-gradient rounded-lg">
       <div className="flex gap-3">
@@ -247,10 +247,8 @@ function RightPanel(
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
             viewBox="0 0 32 32"
-            className="cursor-pointer fill-stamp-grey-darker hover:fill-stamp-grey-light mb-0.5"
+            className="w-7 h-7 mobileLg:w-[32px] mobileLg:h-[32px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer mb-0.5"
             onClick={copyLink}
             role="button"
             aria-label="Copy Link"
@@ -259,10 +257,15 @@ function RightPanel(
           </svg>
           <div
             class={`${tooltipIcon} ${
-              (isTooltipVisible || showCopied) ? "block" : "hidden"
+              isTooltipVisible ? "opacity-100" : "opacity-0"
             }`}
           >
-            {showCopied ? "COPIED" : "COPY LINK"}
+            COPY LINK
+          </div>
+          <div
+            class={`${tooltipIcon} ${showCopied ? "opacity-100" : "opacity-0"}`}
+          >
+            LINK COPIED
           </div>
         </div>
         <div
@@ -273,10 +276,8 @@ function RightPanel(
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
             viewBox="0 0 32 32"
-            className="cursor-pointer fill-stamp-grey-darker hover:fill-stamp-grey-light"
+            className="w-7 h-7 mobileLg:w-[32px] mobileLg:h-[32px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
             onClick={shareToX}
             role="button"
             aria-label="Share on X"
@@ -284,7 +285,9 @@ function RightPanel(
             <path d="M26.8438 26.4638L19.0187 14.1663L26.74 5.6725C26.9146 5.47565 27.0046 5.21791 26.9905 4.95515C26.9764 4.69239 26.8592 4.44579 26.6645 4.26882C26.4697 4.09185 26.2131 3.99876 25.9502 4.00974C25.6873 4.02073 25.4393 4.1349 25.26 4.3275L17.905 12.4175L12.8437 4.46375C12.7535 4.32169 12.6289 4.20471 12.4814 4.12365C12.3339 4.04258 12.1683 4.00005 12 4H6C5.8207 3.99991 5.64468 4.04803 5.49036 4.13932C5.33604 4.23062 5.20911 4.36172 5.12285 4.5189C5.03659 4.67609 4.99417 4.85357 5.00005 5.03278C5.00593 5.21198 5.05988 5.3863 5.15625 5.5375L12.9812 17.8337L5.26 26.3337C5.16983 26.4306 5.09979 26.5444 5.05392 26.6685C5.00806 26.7927 4.98728 26.9247 4.99281 27.0569C4.99833 27.1891 5.03004 27.3189 5.0861 27.4388C5.14216 27.5586 5.22146 27.6662 5.31939 27.7552C5.41732 27.8442 5.53194 27.9129 5.65661 27.9572C5.78128 28.0016 5.91352 28.0208 6.04566 28.0137C6.1778 28.0066 6.30721 27.9733 6.4264 27.9158C6.54559 27.8583 6.65218 27.7777 6.74 27.6787L14.095 19.5888L19.1562 27.5425C19.2472 27.6834 19.3722 27.7991 19.5196 27.8791C19.6671 27.959 19.8323 28.0006 20 28H26C26.1791 27.9999 26.3549 27.9518 26.509 27.8606C26.6632 27.7693 26.79 27.6384 26.8762 27.4814C26.9624 27.3244 27.0049 27.1472 26.9992 26.9681C26.9935 26.7891 26.9398 26.6149 26.8438 26.4638ZM20.5487 26L7.82125 6H11.4462L24.1787 26H20.5487Z" />
           </svg>
           <div
-            class={`${tooltipIcon} ${isXTooltipVisible ? "block" : "hidden"}`}
+            class={`${tooltipIcon} ${
+              isXTooltipVisible ? "opacity-100" : "opacity-0"
+            }`}
           >
             SHARE ON X
           </div>
@@ -297,10 +300,8 @@ function RightPanel(
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
             viewBox="0 0 32 32"
-            className="cursor-pointer fill-stamp-grey-darker hover:fill-stamp-grey-light mt-0.5"
+            className="w-6 h-6 mobileLg:w-[28px] mobileLg:h-[28px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer mt-[2px]"
             onClick={shareContent}
             role="button"
             aria-label="Share Content"
@@ -309,7 +310,7 @@ function RightPanel(
           </svg>
           <div
             class={`${tooltipIcon} ${
-              isShareTooltipVisible ? "block" : "hidden"
+              isShareTooltipVisible ? "opacity-100" : "opacity-0"
             }`}
           >
             SHARE
@@ -326,10 +327,8 @@ function RightPanel(
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
               viewBox="0 0 32 32"
-              class="cursor-pointer fill-stamp-grey-darker hover:fill-stamp-grey-light"
+              class="w-7 h-7 mobileLg:w-[32px] mobileLg:h-[32px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
               onClick={() => {
                 setIsCodeTooltipVisible(false);
                 toggleCodeModal();
@@ -341,7 +340,7 @@ function RightPanel(
             </svg>
             <div
               class={`${tooltipIcon} ${
-                isCodeTooltipVisible ? "block" : "hidden"
+                isCodeTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               VIEW CODE
@@ -356,10 +355,8 @@ function RightPanel(
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
             viewBox="0 0 32 32"
-            class="cursor-pointer fill-stamp-grey-darker hover:fill-stamp-grey-light"
+            class="w-7 h-7 mobileLg:w-[32px] mobileLg:h-[32px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
             onClick={() => {
               setIsFullscreenTooltipVisible(false);
               toggleFullScreenModal();
@@ -371,7 +368,7 @@ function RightPanel(
           </svg>
           <div
             class={`${tooltipIcon} ${
-              isFullscreenTooltipVisible ? "block" : "hidden"
+              isFullscreenTooltipVisible ? "opacity-100" : "opacity-0"
             }`}
           >
             FULLSCREEN
