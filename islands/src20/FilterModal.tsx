@@ -86,11 +86,11 @@ const FilterModal = (
     switch (filterOptions[filterOptions.length - 1]) {
       case "minting":
         url.searchParams.set(
-          "progress",
+          "minProgress",
           progress.min,
         );
         url.searchParams.set(
-          "transactionMaxCount",
+          "maxTxCount",
           transactionCount.max,
         );
         break;
@@ -100,7 +100,7 @@ const FilterModal = (
           new Date(trendingDate).toISOString(),
         );
         url.searchParams.set(
-          "transactionMinCount",
+          "minTxCount",
           transactionCount.min,
         );
         break;
@@ -267,7 +267,7 @@ const FilterModal = (
               type="text"
               placeholder="Min Holders"
               value={holder.min}
-              onChange={(e) => handleChange(e, "holder.min")}
+              onChange={(e) => handleChange(e, "holder_min")}
             />
 
             <InputField
