@@ -47,7 +47,14 @@ export function FeeCalculatorBase({
   const [visible, setVisible] = useState(false);
   const [coinType, setCoinType] = useState("BTC");
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [isFeeTooltipVisible, setIsFeeTooltipVisible] = useState(false);
+  const feeTooltipTimeoutRef = useRef<number | null>(null);
+  const [isCurrencyTooltipVisible, setIsCurrencyTooltipVisible] = useState(
+    false,
+  );
+  const [currencyTooltipText, setCurrencyTooltipText] = useState("BTC");
+  const currencyTooltipTimeoutRef = useRef<number | null>(null);
+  const [allowCurrencyTooltip, setAllowCurrencyTooltip] = useState(true);
 
   useEffect(() => {
     logger.debug("ui", {
@@ -60,11 +67,12 @@ export function FeeCalculatorBase({
         message: "FeeCalculatorBase unmounting",
         component: "FeeCalculatorBase",
       });
-      if (tooltipTimeoutRef.current !== null) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-        tooltipTimeoutRef.current = null;
+      if (feeTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(feeTooltipTimeoutRef.current);
       }
-      setIsTooltipVisible(false);
+      if (currencyTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(currencyTooltipTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -77,6 +85,8 @@ export function FeeCalculatorBase({
       },
     });
     setCoinType(coinType === "BTC" ? "USDT" : "BTC");
+    setIsCurrencyTooltipVisible(false);
+    setAllowCurrencyTooltip(false);
   };
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -86,31 +96,51 @@ export function FeeCalculatorBase({
     });
   };
 
-  const handleMouseEnter = () => {
-    try {
-      if (tooltipTimeoutRef.current !== null) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
+  const handleFeeMouseEnter = () => {
+    if (feeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
+    }
+
+    feeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsFeeTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleFeeMouseLeave = () => {
+    if (feeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
+    }
+    setIsFeeTooltipVisible(false);
+  };
+
+  // Add mousedown handler to hide tooltip
+  const handleMouseDown = () => {
+    if (feeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(feeTooltipTimeoutRef.current);
+    }
+    setIsFeeTooltipVisible(false);
+  };
+
+  const handleCurrencyMouseEnter = () => {
+    if (allowCurrencyTooltip) {
+      setCurrencyTooltipText(coinType === "BTC" ? "USDT" : "BTC");
+
+      if (currencyTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(currencyTooltipTimeoutRef.current);
       }
-      setIsTooltipVisible(true);
-      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsTooltipVisible(false);
-        tooltipTimeoutRef.current = null;
+
+      currencyTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsCurrencyTooltipVisible(true);
       }, 1500);
-    } catch (error) {
-      console.error("Error in handleMouseEnter:", error);
     }
   };
 
-  const handleMouseLeave = () => {
-    try {
-      if (tooltipTimeoutRef.current !== null) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
-        tooltipTimeoutRef.current = null;
-      }
-      setIsTooltipVisible(false);
-    } catch (error) {
-      console.error("Error in handleMouseLeave:", error);
+  const handleCurrencyMouseLeave = () => {
+    if (currencyTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(currencyTooltipTimeoutRef.current);
     }
+    setIsCurrencyTooltipVisible(false);
+    setAllowCurrencyTooltip(true);
   };
 
   // Fee selector component
@@ -128,10 +158,12 @@ export function FeeCalculatorBase({
       )}
       <div
         className="relative w-full group"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleFeeMouseEnter}
+        onMouseLeave={handleFeeMouseLeave}
+        onMouseDown={handleMouseDown}
         onClick={(e) =>
-          e.stopPropagation()} // Prevent click events from reaching modal
+          e.stopPropagation()}
       >
         <input
           type="range"
@@ -141,12 +173,11 @@ export function FeeCalculatorBase({
           step="1"
           onInput={(e) =>
             handleChangeFee(parseInt((e.target as HTMLInputElement).value, 10))}
-          onMouseMove={handleMouseMove}
           className="accent-stamp-purple-dark w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
         />
         <div
-          className={`${tooltipButtonOverflow} ${
-            isTooltipVisible ? "block" : "hidden"
+          className={`${tooltipImage} ${
+            isFeeTooltipVisible ? "opacity-100" : "opacity-0"
           }`}
           style={{
             left: `${tooltipPosition.x}px`,
@@ -257,8 +288,10 @@ export function FeeCalculatorBase({
     );
   };
 
-  const tooltipButtonOverflow =
-    "fixed bg-[#000000BF] px-2 py-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50";
+  const tooltipButton =
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
+  const tooltipImage =
+    "fixed bg-[#000000BF] px-2 py-1 mb-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
   const buttonPurpleOutline =
     "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
   const buttonPurpleFlat =
@@ -275,8 +308,10 @@ export function FeeCalculatorBase({
             }`}
           >
             <button
-              className="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow"
+              className="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
               onClick={handleCoinToggle}
+              onMouseEnter={handleCurrencyMouseEnter}
+              onMouseLeave={handleCurrencyMouseLeave}
             >
               <div
                 className={`w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey ${
@@ -284,6 +319,13 @@ export function FeeCalculatorBase({
                 }`}
               >
                 {coinType === "BTC" ? btcIcon : usdIcon}
+              </div>
+              <div
+                className={`${tooltipButton} ${
+                  isCurrencyTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {currencyTooltipText}
               </div>
             </button>
           </div>
