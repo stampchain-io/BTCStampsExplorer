@@ -74,7 +74,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     : abbreviateAddress(stamp.creator, 8);
 
   const titleGreyLD =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1";
   const dataColumn = "flex flex-col -space-y-1";
   const dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
@@ -85,11 +85,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const dataValueXl =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
   const tooltipIcon =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
-
-  const _tooltip =
-    "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
-
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
   const buttonPurpleFlat =
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
 
@@ -137,7 +133,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       }
       divisibleTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsDivisibleTooltipVisible(true);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -156,7 +152,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       }
       keyburnTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsKeyburnTooltipVisible(true);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -175,7 +171,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       }
       lockedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsLockedTooltipVisible(true);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -194,7 +190,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       }
       unlockedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsUnlockedTooltipVisible(true);
-      }, 1500);
+      }, 500);
     }
   };
 
@@ -258,19 +254,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             <span className="font-light">#</span>
             <span className="font-black">{stamp.stamp}</span>
           </p>
-          <a
-            href={`https://explorer.unspendablelabs.com/assets/${stamp.cpid}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-base mobileLg:text-lg font-bold text-stamp-grey-darker hover-stamp-grey-light block"
-          >
+          <p className="text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
             {stamp.cpid}
-          </a>
+          </p>
 
           <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
             <p className={dataLabel}>BY</p>
             <a
-              className="text-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1"
+              className="text-xl mobileLg:text-2xl font-black gray-gradient3-hover -mt-1"
               href={`/wallet/${stamp.creator}`}
               target="_parent"
             >
@@ -348,7 +339,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 : "N/A"}
             </p>
           </div>
-          <div className="flex flex-1 justify-end items-end pb-1.5 space-x-3">
+          <div className="flex flex-1 justify-end items-end pb-1 space-x-[9px]">
             {stamp.divisible == true && (
               <div
                 className="relative group"
@@ -357,7 +348,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 fill-stamp-grey-darker"
+                  class="w-[20px] h-[20px] mobileLg:w-[26px] mobileLg:h-[26px] fill-stamp-grey-darker -mb-[1px]"
                   viewBox="0 0 32 32"
                   aria-label="Divisible"
                 >
@@ -365,8 +356,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 </svg>
                 <div
                   className={`${tooltipIcon} ${
-                    isDivisibleTooltipVisible ? "block" : "hidden"
-                  }`}
+                    isDivisibleTooltipVisible ? "opacity-100" : "opacity-0"
+                  } -mb-[1px]`}
                 >
                   DIVISIBLE
                 </div>
@@ -380,7 +371,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 fill-stamp-grey-darker"
+                  class="w-[18px] h-[18px] mobileLg:w-6 mobileLg:h-6 fill-stamp-grey-darker"
                   viewBox="0 0 32 32"
                   aria-label="Keyburned"
                 >
@@ -388,7 +379,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 </svg>
                 <div
                   className={`${tooltipIcon} ${
-                    isKeyburnTooltipVisible ? "block" : "hidden"
+                    isKeyburnTooltipVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
                   KEYBURNED
@@ -403,7 +394,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 fill-stamp-grey-darker"
+                  class="w-[18px] h-[18px] mobileLg:w-6 mobileLg:h-6 fill-stamp-grey-darker"
                   viewBox="0 0 32 32"
                   aria-label="Locked"
                 >
@@ -411,7 +402,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 </svg>
                 <div
                   className={`${tooltipIcon} ${
-                    isLockedTooltipVisible ? "block" : "hidden"
+                    isLockedTooltipVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
                   LOCKED
@@ -426,7 +417,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 fill-stamp-grey-darker"
+                  class="w-[18px] h-[18px] mobileLg:w-6 mobileLg:h-6 fill-stamp-grey-darker"
                   viewBox="0 0 32 32"
                   aria-label="Unlocked"
                 >
@@ -434,7 +425,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 </svg>
                 <div
                   className={`${tooltipIcon} ${
-                    isUnlockedTooltipVisible ? "block" : "hidden"
+                    isUnlockedTooltipVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
                   UNLOCKED
