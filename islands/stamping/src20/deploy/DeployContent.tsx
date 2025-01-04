@@ -276,6 +276,8 @@ export function DeployContent(
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
+              onMouseDown={() => setIsUploadTooltipVisible(false)}
+              onClick={() => setIsUploadTooltipVisible(false)}
             >
               <input
                 id="upload"
