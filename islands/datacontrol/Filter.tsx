@@ -23,6 +23,7 @@ interface FilterProps {
   handleOpen: (open: boolean) => void;
   filterButtons: FilterTypes[];
   dropdownPosition: string;
+  open2?: boolean;
 }
 
 export function Filter({
@@ -32,6 +33,7 @@ export function Filter({
   handleOpen,
   filterButtons,
   dropdownPosition,
+  open2 = false,
 }: FilterProps) {
   const [localFilters, setLocalFilters] = useState<FilterTypes[]>(initFilter);
   const { updateURL } = useURLUpdate();
@@ -43,6 +45,8 @@ export function Filter({
 
   useEffect(() => {
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
+      if (open2) return;
+
       if (e.key === "f") {
         e.preventDefault();
         handleOpen(true);
@@ -55,7 +59,7 @@ export function Filter({
     document.addEventListener("keydown", handleKeyboardShortcut);
     return () =>
       document.removeEventListener("keydown", handleKeyboardShortcut);
-  }, [open, handleOpen]);
+  }, [open, handleOpen, open2]);
 
   // Handle overflow and resize
   useEffect(() => {

@@ -69,6 +69,7 @@ export const SRC20Header = (
             "price change",
           ]}
           dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
+          open2={isOpen2}
         />
         <div class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}>
           <Sort initSort={sortBy} />
