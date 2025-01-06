@@ -55,11 +55,11 @@ export function Button({
             <img
               src={icon}
               alt={iconAlt || ""}
-              className={iconClass}
+              class={iconClass}
             />
           )
           : (
-            <div className={iconClass}>
+            <div class={iconClass}>
               {icon}
             </div>
           )
