@@ -53,7 +53,7 @@ export function StampSearchClient(
       const data = await response.json();
       return data.n_tx > 0;
     } catch (error) {
-      console.log("Stamp Search Error=========>", error);
+      console.log("Validate Bitcoin Address Error=========>", error);
       return false;
     }
   };
@@ -67,7 +67,7 @@ export function StampSearchClient(
       // Check if response has basic tx properties
       return !!(data && data.hash && data.ver);
     } catch (error) {
-      console.log("Stamp Search Error=========>", error);
+      console.log("Validate BitCoin Tx Error=========>", error);
       return false;
     }
   };
@@ -141,12 +141,11 @@ export function StampSearchClient(
           }
         } catch (error) {
           console.log("Stamp Search Error=========>", error);
+          setError(
+            `NO STAMP FOUND\n${query}\nThe CPID doesn't seem to be valid`,
+          );
+          return;
         }
-
-        setError(
-          `NO STAMP FOUND\n${query}\nThe CPID doesn't seem to be valid`,
-        );
-        return;
       }
 
       // Check for stamp number
@@ -161,12 +160,11 @@ export function StampSearchClient(
           }
         } catch (error) {
           console.log("Stamp Search Error=========>", error);
+          setError(
+            `NO STAMP FOUND\n#${query}\nThe stamp you are looking for doesn't exist`,
+          );
+          return;
         }
-
-        setError(
-          `NO STAMP FOUND\n#${query}\nThe stamp you are looking for doesn't exist`,
-        );
-        return;
       }
 
       setError(
