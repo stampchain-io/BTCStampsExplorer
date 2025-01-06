@@ -15,6 +15,12 @@ interface StampInfoProps {
   lowestPriceDispenser: any;
 }
 
+interface DimensionsType {
+  width: number | string;
+  height: number | string;
+  unit: string | "responsive";
+}
+
 export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   console.log("StampInfo received stamp:", {
     stamp_mimetype: stamp.stamp_mimetype,
@@ -62,10 +68,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     : stamp.supply;
 
   const editionLabel = stamp.supply === 1 ? "edition" : "editions";
-  const [imageDimensions, setImageDimensions] = useState<
-    { width: number; height: number } | null
-  >(null);
-  const [imageSize, setImageSize] = useState<number | null>(null);
+  const [imageDimensions, setImageDimensions] = useState<DimensionsType | null>(
+    null,
+  );
+  const [fileSize, setFileSize] = useState<number | null>(null);
 
   const fileExtension = stamp.stamp_url?.split(".")?.pop()?.toUpperCase() ||
     "UNKNOWN";
@@ -210,40 +216,109 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     }
 
     if (stamp.stamp_mimetype.startsWith("image/")) {
+      // Handle images
       const src = getStampImageSrc(stamp);
-      console.log("Attempting to load image from:", src);
-
       const img = new Image();
       img.onload = () => {
-        console.log("Image loaded with dimensions:", {
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-        });
         setImageDimensions({
           width: img.naturalWidth,
           height: img.naturalHeight,
+          unit: "px",
         });
-      };
-      img.onerror = (error) => {
-        console.error("Failed to load image for dimensions:", error);
       };
       img.src = src;
 
-      // Fetch the image to get file size
+      // Get image size
       fetch(src)
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          return response.blob();
-        })
-        .then((blob) => {
-          console.log("Image size fetched:", blob.size);
-          setImageSize(blob.size);
+        .then((response) => response.blob())
+        .then((blob) => setFileSize(blob.size))
+        .catch((error) => console.error("Failed to fetch image size:", error));
+    } else if (stamp.stamp_mimetype === "text/html") {
+      // Handle HTML stamps
+      fetch(stamp.stamp_url)
+        .then((response) => response.text())
+        .then((html) => {
+          // Set HTML file size
+          const blob = new Blob([html], { type: "text/html" });
+          setFileSize(blob.size);
+
+          // Parse HTML
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+
+          // Check for viewport meta tag
+          const hasViewportMeta = doc.querySelector('meta[name="viewport"]');
+
+          // Check for responsive units in style
+          const styleTag = doc.querySelector("style");
+          const hasResponsiveUnits = styleTag?.textContent?.includes("vw") ||
+            styleTag?.textContent?.includes("vh") ||
+            styleTag?.textContent?.includes("%");
+
+          if (hasViewportMeta || hasResponsiveUnits) {
+            setImageDimensions({
+              width: "responsive",
+              height: "responsive",
+              unit: "responsive",
+            });
+          } else {
+            // Try to get dimensions from style
+            const bodyStyle = doc.body.getAttribute("style");
+            const divStyle = doc.querySelector("div")?.getAttribute("style");
+
+            // Parse dimensions from style
+            const getDimension = (style: string | null) => {
+              if (!style) return null;
+              const widthMatch = style.match(/width:\s*(\d+)(px|rem|em)/);
+              const heightMatch = style.match(/height:\s*(\d+)(px|rem|em)/);
+              return {
+                width: widthMatch ? Number(widthMatch[1]) : null,
+                height: heightMatch ? Number(heightMatch[1]) : null,
+                unit: (widthMatch && widthMatch[2]) ||
+                  (heightMatch && heightMatch[2]) || "px",
+              };
+            };
+
+            const bodyDims = getDimension(bodyStyle);
+            const divDims = getDimension(divStyle);
+
+            // Use first available dimensions
+            const dims = bodyDims || divDims;
+
+            if (dims && dims.width && dims.height) {
+              setImageDimensions({
+                width: dims.width,
+                height: dims.height,
+                unit: dims.unit,
+              });
+            } else {
+              setImageDimensions({
+                width: "responsive",
+                height: "responsive",
+                unit: "responsive",
+              });
+            }
+          }
         })
         .catch((error) => {
-          console.error("Failed to fetch image size:", error);
+          console.error("Failed to fetch HTML content:", error);
+          setImageDimensions(null);
         });
     }
-  }, [stamp?.stamp_mimetype]);
+  }, [stamp.stamp_mimetype, stamp.stamp_url]);
+
+  // Format file size
+  const formatFileSize = (bytes: number | null) => {
+    if (!bytes) return "N/A";
+    return `${(bytes / 1024).toFixed(2)} KB`;
+  };
+
+  // Format dimensions display
+  const getDimensionsDisplay = (dims: DimensionsType | null) => {
+    if (!dims) return "N/A";
+    if (dims.unit === "responsive") return "RESPONSIVE";
+    return `${dims.width} x ${dims.height} ${dims.unit.toUpperCase()}`;
+  };
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -343,10 +418,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
               <p className={dataLabelSm}>DIMENSIONS</p>
-              <p className={`${dataValueSm}`}>
-                {imageDimensions
-                  ? `${imageDimensions.width} x ${imageDimensions.height} PX`
-                  : "N/A"}
+              <p className={dataValueSm}>
+                {getDimensionsDisplay(imageDimensions)}
               </p>
             </div>
             <div className="flex flex-1 justify-end items-end pb-1 space-x-[9px]">
@@ -449,7 +522,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             <div className={`${dataColumn} flex-1 items-start`}>
               <p className={dataLabelSm}>SIZE</p>
               <p className={dataValueSm}>
-                {imageSize ? `${(imageSize / 1024).toFixed(2)} KB` : "N/A"}
+                {formatFileSize(fileSize)}
               </p>
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
