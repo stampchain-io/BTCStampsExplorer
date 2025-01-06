@@ -43,7 +43,6 @@ export function FeeCalculatorBase({
   serviceFee,
 }: ExtendedBaseFeeCalculatorProps) {
   const { fees } = useFeePolling();
-  const tooltipTimeoutRef = useRef<number | null>(null);
   const [visible, setVisible] = useState(false);
   const [coinType, setCoinType] = useState("BTC");
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });

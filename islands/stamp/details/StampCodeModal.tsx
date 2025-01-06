@@ -7,7 +7,7 @@ interface StampCodeModalProps {
 }
 
 export default function StampCodeModal(
-  { src, toggleModal, handleCloseModal }: StampCodeModalProps,
+  { src, _toggleModal, handleCloseModal }: StampCodeModalProps,
 ) {
   const [formattedSrc, setFormattedSrc] = useState("");
 
@@ -62,7 +62,7 @@ export default function StampCodeModal(
       if (formatted.includes("<script")) {
         formatted = formatted.replace(
           /(<script.*?>)([\s\S]*?)(<\/script>)/g,
-          (match, openTag, content, closeTag) => {
+          (_match, openTag, content, closeTag) => {
             const formattedScript = content
               .replace(/([{}\[\]])/g, "$1\n")
               .replace(/;/g, ";\n")
@@ -105,7 +105,7 @@ export default function StampCodeModal(
       });
 
       return result.trim();
-    } catch (error) {
+    } catch (_error) {
       return "Error formatting content";
     }
   }

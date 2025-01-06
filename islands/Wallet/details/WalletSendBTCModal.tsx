@@ -35,7 +35,7 @@ function WalletSendModal(
     initialFee,
   });
   const [isMaxMode, setIsMaxMode] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(globalThis.innerWidth);
+  const [_windowWidth, setWindowWidth] = useState(globalThis.innerWidth);
 
   // Sync external fee state with internal state
   useEffect(() => {

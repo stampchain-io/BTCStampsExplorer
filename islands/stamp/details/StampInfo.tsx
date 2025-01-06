@@ -385,10 +385,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   };
 
   useEffect(() => {
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
-  }, [stamp.cpid, htmlStampTitle]); // Update scale when content changes
+    globalThis.addEventListener("resize", updateScale);
+    return () => globalThis.removeEventListener("resize", updateScale);
+  }, []);
 
   return (
     <>
