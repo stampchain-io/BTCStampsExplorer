@@ -48,6 +48,7 @@ export function Button({
       {...props}
       disabled={!IS_BROWSER || props.disabled || isSubmitting}
       class={className}
+      data-type="Icon-Button"
     >
       {icon
         ? typeof icon === "string"
