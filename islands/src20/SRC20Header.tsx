@@ -42,6 +42,9 @@ export const SRC20Header = (
     }
   }, [filterValue]);
 
+  const titlePurpleDL =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
+
   return (
     <div
       class={`relative flex flex-row justify-between items-start w-full gap-3 ${
