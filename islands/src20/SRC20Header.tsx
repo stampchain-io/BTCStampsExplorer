@@ -1,12 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
-import { useEffect, useState } from "preact/hooks";
 
 import { SRC20_FILTER_TYPES } from "$globals";
 
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
-import FilterModal from "$islands/src20/FilterModal.tsx";
 import FilterModal from "$islands/src20/FilterModal.tsx";
 
 export const SRC20Header = (
