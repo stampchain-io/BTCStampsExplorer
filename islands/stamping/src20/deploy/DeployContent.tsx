@@ -41,6 +41,7 @@ export function DeployContent(
   const [allowTooltip, setAllowTooltip] = useState(true);
   const uploadTooltipTimeoutRef = useRef<number | null>(null);
   const toggleTooltipTimeoutRef = useRef<number | null>(null);
+  const [tooltipText, setTooltipText] = useState("OPTIONAL");
 
   const { wallet, isConnected } = walletContext;
 
@@ -203,14 +204,12 @@ export function DeployContent(
   };
 
   const handleUploadMouseEnter = () => {
-    setIsUploadTooltipVisible(true);
-
     if (uploadTooltipTimeoutRef.current) {
       globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
     }
 
     uploadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-      setIsUploadTooltipVisible(false);
+      setIsUploadTooltipVisible(true);
     }, 1500);
   };
 
@@ -223,14 +222,14 @@ export function DeployContent(
 
   const handleToggleMouseEnter = () => {
     if (allowTooltip) {
-      setIsToggleTooltipVisible(true);
+      setTooltipText(showAdvancedOptions ? "MANDATORY" : "OPTIONAL");
 
       if (toggleTooltipTimeoutRef.current) {
         globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
       }
 
       toggleTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsToggleTooltipVisible(false);
+        setIsToggleTooltipVisible(true);
       }, 1500);
     }
   };
@@ -256,13 +255,13 @@ export function DeployContent(
 
   const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
   const titlePurpleLDCenter =
-    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
+    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
   const feeSelectorContainer =
     "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
   const tooltipButton =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
   const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50";
+    "fixed bg-[#000000BF] px-2 py-1 mb-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
 
   return (
     <div className={bodyTools}>
@@ -277,6 +276,8 @@ export function DeployContent(
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
+              onMouseDown={() => setIsUploadTooltipVisible(false)}
+              onClick={() => setIsUploadTooltipVisible(false)}
             >
               <input
                 id="upload"
@@ -310,7 +311,7 @@ export function DeployContent(
                   />
                   <div
                     class={`${tooltipImage} ${
-                      isUploadTooltipVisible ? "block" : "hidden"
+                      isUploadTooltipVisible ? "opacity-100" : "opacity-0"
                     }`}
                     style={{
                       left: `${tooltipPosition.x}px`,
@@ -354,7 +355,11 @@ export function DeployContent(
               />
               <button
                 class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
-                onClick={handleShowAdvancedOptions}
+                onClick={() => {
+                  handleShowAdvancedOptions();
+                  setIsToggleTooltipVisible(false);
+                  setAllowTooltip(false);
+                }}
                 onMouseEnter={handleToggleMouseEnter}
                 onMouseLeave={handleToggleMouseLeave}
               >
@@ -365,10 +370,10 @@ export function DeployContent(
                 </div>
                 <div
                   className={`${tooltipButton} ${
-                    isToggleTooltipVisible ? "block" : "hidden"
+                    isToggleTooltipVisible ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  {showAdvancedOptions ? "MANDATORY" : "OPTIONAL"}
+                  {tooltipText}
                 </div>
               </button>
             </div>
