@@ -82,8 +82,6 @@ export function MintContent({
   mintStatus: initialMintStatus,
   holders: initialHolders,
 }: MintContentProps = { trxType: "olga" }) {
-  const [setIsSearching] = useState(false);
-
   const {
     formState,
     handleChangeFee,
@@ -155,7 +153,6 @@ export function MintContent({
       return;
     }
 
-    setIsSearching(true);
     const delayDebounceFn = setTimeout(async () => {
       try {
         const response = await fetch(
@@ -175,8 +172,6 @@ export function MintContent({
         });
         setSearchResults([]);
         setOpenDrop(false);
-      } finally {
-        setIsSearching(false);
       }
     }, 300);
 
@@ -335,6 +330,7 @@ export function MintContent({
                     if (!isSelecting && !isSwitchingFields) {
                       setOpenDrop(true);
                     }
+                    setIsSelecting(false);
                     setSearchTerm(newValue);
                   }
                 }}
