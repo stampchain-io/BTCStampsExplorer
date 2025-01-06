@@ -393,8 +393,6 @@ export function StampImage(
   const updateTransform = () => {
     if (!imgScopeRef.current) return;
     const width = imgScopeRef.current.clientWidth;
-    console.log("counting====>", (width + 50) / 648);
-
     setTransform(
       `scale(${(width + 50) / 648}))`,
     );
@@ -692,8 +690,8 @@ export function StampImage(
 
       {isCodeModalOpen && (
         <StampCodeModal
-          src={htmlContent || ""}
-          toggleModal={handleCloseCodeModal}
+          src={htmlContent || src}
+          toggleModal={toggleCodeModal}
           handleCloseModal={handleCloseCodeModal}
         />
       )}
