@@ -25,16 +25,6 @@ export const SRC20Header = (
   const handleCloseModal = () => {
     setOpenModal(false);
   };
-  const [openModal, setOpenModal] = useState(false);
-  const [filterValue, setFilterValue] = useState([]);
-
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
 
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
