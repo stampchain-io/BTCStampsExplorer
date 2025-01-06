@@ -12,12 +12,13 @@ interface WalletSendModalProps {
 }
 
 function WalletSendModal(
-  { fee: initialFee, handleChangeFee, onClose, _balance }: WalletSendModalProps,
+  { fee: initialFee, balance, handleChangeFee, onClose }: WalletSendModalProps,
 ) {
   const { wallet } = walletContext;
   const [_isSendingMax, _setIsSendingMax] = useState(false);
   const [isMaxTooltipVisible, setIsMaxTooltipVisible] = useState(false);
   const [allowMaxTooltip, setAllowMaxTooltip] = useState(true);
+  const [maxTooltipText, setMaxTooltipText] = useState("EMPTY YOUR WALLET");
   const maxTooltipTimeoutRef = useRef<number | null>(null);
   const {
     formState,
@@ -33,6 +34,8 @@ function WalletSendModal(
     type: "send",
     initialFee,
   });
+  const [isMaxMode, setIsMaxMode] = useState(false);
+  const [_windowWidth, setWindowWidth] = useState(globalThis.innerWidth);
 
   // Sync external fee state with internal state
   useEffect(() => {
@@ -47,6 +50,69 @@ function WalletSendModal(
       }
     };
   }, []);
+
+  // Move calculateMaxAmount inside component
+  const calculateMaxAmount = (feeRate: number, balanceAmount: number) => {
+    const estimatedVSize = 141;
+    const feeInSatoshis = Math.ceil((feeRate * estimatedVSize) / 1000);
+    const feeInBTC = feeInSatoshis / 100000000;
+    return balanceAmount > feeInBTC
+      ? (balanceAmount - feeInBTC).toFixed(8)
+      : null;
+  };
+
+  // Extract input sanitization logic
+  const sanitizeAmountInput = (value: string) => {
+    let sanitized = value.replace(/[^0-9.]/g, "");
+    const parts = sanitized.split(".");
+
+    // Ensure only one decimal point
+    if (parts.length > 2) {
+      sanitized = parts[0] + "." + parts[1];
+    }
+
+    // Limit decimal places to 8
+    if (parts.length === 2 && parts[1].length > 8) {
+      sanitized = parts[0] + "." + parts[1].slice(0, 8);
+    }
+
+    // Limit total length to 10 characters
+    return sanitized.slice(0, 10);
+  };
+
+  // Effect to update amount when fee changes in max mode
+  useEffect(() => {
+    if (!isMaxMode || balance == null) return;
+
+    try {
+      const maxAmountBTC = calculateMaxAmount(formState.fee, balance);
+
+      if (!maxAmountBTC) {
+        setError("Insufficient balance to cover network fees");
+        return;
+      }
+
+      setFormState((prev) => ({
+        ...prev,
+        amount: maxAmountBTC,
+      }));
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to calculate maximum amount",
+      );
+    }
+  }, [formState.fee, balance, isMaxMode]);
+
+  // Reset tooltip state when fee changes or max mode is disabled
+  useEffect(() => {
+    if (!isMaxMode) {
+      setMaxTooltipText("EMPTY YOUR WALLET");
+      setIsMaxTooltipVisible(false);
+      setAllowMaxTooltip(true);
+    }
+  }, [isMaxMode, formState.fee]);
 
   const handleSendSubmit = async () => {
     await handleSubmit(async () => {
@@ -102,29 +168,35 @@ function WalletSendModal(
   };
 
   const handleMaxClick = () => {
-    if (!wallet?.balance) return;
+    if (balance == null) return;
 
     try {
-      // Estimate the transaction fee for a P2WPKH input and output
-      const estimatedVSize = 141; // Standard size for P2WPKH tx (1-in 1-out)
-      const feeInSatoshis = Math.ceil((formState.fee * estimatedVSize) / 1000);
+      const maxAmountBTC = calculateMaxAmount(formState.fee, balance);
 
-      // Ensure we have enough balance to cover the fee
-      if (wallet.balance <= feeInSatoshis) {
+      if (!maxAmountBTC) {
         setError("Insufficient balance to cover network fees");
         return;
       }
 
-      // Calculate max amount after subtracting fee
-      const maxAmountSats = wallet.balance - feeInSatoshis;
-      const maxAmountBTC = (maxAmountSats / 100000000).toFixed(8);
-
+      setIsMaxMode(true);
       setFormState((prev) => ({
         ...prev,
         amount: maxAmountBTC,
       }));
+
+      // Initial tooltip display on click
+      setMaxTooltipText("WALLET EMPTIED");
+      setIsMaxTooltipVisible(true);
+      setAllowMaxTooltip(true); // Allow tooltip to show on subsequent hovers
+
+      if (maxTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(maxTooltipTimeoutRef.current);
+      }
+
+      maxTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsMaxTooltipVisible(false);
+      }, 1500);
     } catch (error) {
-      console.error("Max amount calculation error:", error);
       setError(
         error instanceof Error
           ? error.message
@@ -135,9 +207,13 @@ function WalletSendModal(
 
   const handleMaxMouseEnter = () => {
     if (allowMaxTooltip) {
+      // Show different tooltip text based on max mode
+      setMaxTooltipText(isMaxMode ? "WALLET EMPTIED" : "EMPTY YOUR WALLET");
+
       if (maxTooltipTimeoutRef.current) {
         globalThis.clearTimeout(maxTooltipTimeoutRef.current);
       }
+
       maxTooltipTimeoutRef.current = globalThis.setTimeout(() => {
         setIsMaxTooltipVisible(true);
       }, 1500);
@@ -152,11 +228,55 @@ function WalletSendModal(
     setAllowMaxTooltip(true);
   };
 
+  const handleAmountInput = (e: Event) => {
+    const inputValue = (e.target as HTMLInputElement).value;
+    const maxAmountBTC = calculateMaxAmount(formState.fee, balance ?? 0);
+
+    // Only disable max mode if the new value is different from the calculated max amount
+    if (maxAmountBTC && inputValue !== maxAmountBTC) {
+      setIsMaxMode(false);
+      setAllowMaxTooltip(true);
+    }
+
+    // Special handling for deleting "0."
+    if (formState.amount === "0." && inputValue === "0") {
+      setFormState((prev) => ({
+        ...prev,
+        amount: "",
+      }));
+      return;
+    }
+
+    // Handle initial "0" or "." input
+    if (inputValue === "0" || inputValue === ".") {
+      setFormState((prev) => ({
+        ...prev,
+        amount: "0.",
+      }));
+      return;
+    }
+
+    // Regular input handling with validation
+    const sanitizedValue = sanitizeAmountInput(inputValue);
+    setFormState((prev) => ({
+      ...prev,
+      amount: sanitizedValue,
+    }));
+  };
+
   const inputField =
     "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
-
   const tooltipIcon =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(globalThis.innerWidth);
+    };
+
+    globalThis.addEventListener("resize", handleResize);
+    return () => globalThis.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <ModalLayout onClose={onClose} title="SEND">
@@ -170,49 +290,7 @@ function WalletSendModal(
               <input
                 type="text"
                 value={formState.amount}
-                onInput={(e) => {
-                  const inputValue = (e.target as HTMLInputElement).value;
-
-                  // Special handling for deleting "0."
-                  if (formState.amount === "0." && inputValue === "0") {
-                    setFormState((prev) => ({
-                      ...prev,
-                      amount: "",
-                    }));
-                    return;
-                  }
-
-                  // Handle initial "0" input
-                  if (inputValue === "0") {
-                    setFormState((prev) => ({
-                      ...prev,
-                      amount: "0.",
-                    }));
-                    return;
-                  }
-
-                  // Regular input handling
-                  let sanitizedValue = inputValue.replace(/[^0-9.]/g, "");
-                  const parts = sanitizedValue.split(".");
-
-                  // Ensure only one decimal point
-                  if (parts.length > 2) {
-                    sanitizedValue = parts[0] + "." + parts[1];
-                  }
-
-                  // Limit decimal places to 8
-                  if (parts.length === 2 && parts[1].length > 8) {
-                    sanitizedValue = parts[0] + "." + parts[1].slice(0, 8);
-                  }
-
-                  // Limit total length to 10 characters
-                  sanitizedValue = sanitizedValue.slice(0, 10);
-
-                  setFormState((prev) => ({
-                    ...prev,
-                    amount: sanitizedValue,
-                  }));
-                }}
+                onInput={handleAmountInput}
                 placeholder="0"
                 class="bg-transparent text-[30px] mobileLg:text-[42px] text-stamp-grey-light placeholder:text-stamp-grey font-black text-right -ms-0 mobileLg:-ms-0 pointer-events-auto no-outline"
                 style={{
@@ -271,10 +349,10 @@ function WalletSendModal(
             MAX
             <div
               className={`${tooltipIcon} ${
-                isMaxTooltipVisible ? "block" : "hidden"
+                isMaxTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
-              EMPTY YOUR WALLET
+              {maxTooltipText}
             </div>
           </div>
         </div>

@@ -8,15 +8,15 @@ interface Props {
 }
 
 const tooltipIcon =
-  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
 
 function WalletReceiveModal({ onClose, address }: Props) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
-  const [showCopied, setShowCopied] = useState(false);
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-  const [allowTooltip, setAllowTooltip] = useState(true);
+  const [isCopyTooltipVisible, setIsCopyTooltipVisible] = useState(false);
+  const [allowCopyTooltip, setAllowCopyTooltip] = useState(true);
+  const [copyTooltipText, setCopyTooltipText] = useState("COPY ADDY");
   const copyButtonRef = useRef<HTMLDivElement>(null);
-  const tooltipTimeoutRef = useRef<number | null>(null);
+  const copyTooltipTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const bitcoinUri = `bitcoin:${address}`;
@@ -33,42 +33,47 @@ function WalletReceiveModal({ onClose, address }: Props) {
   }, [address]);
 
   const handleCopyMouseEnter = () => {
-    if (allowTooltip) {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
+    if (allowCopyTooltip) {
+      setCopyTooltipText(
+        copyTooltipText === "ADDY COPIED" ? "ADDY COPIED" : "COPY ADDY",
+      );
+
+      if (copyTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(copyTooltipTimeoutRef.current);
       }
 
-      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        const buttonRect = copyButtonRef.current?.getBoundingClientRect();
-        if (buttonRect) {
-          setIsTooltipVisible(true);
-        }
+      copyTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsCopyTooltipVisible(true);
       }, 1500);
     }
   };
 
   const handleCopyMouseLeave = () => {
-    if (tooltipTimeoutRef.current) {
-      globalThis.clearTimeout(tooltipTimeoutRef.current);
+    if (copyTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(copyTooltipTimeoutRef.current);
     }
-    setIsTooltipVisible(false);
-    setShowCopied(false);
-    setAllowTooltip(true);
+    setIsCopyTooltipVisible(false);
+    setAllowCopyTooltip(true);
   };
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(address);
-      setShowCopied(true);
-      setIsTooltipVisible(false);
-      setAllowTooltip(false);
+      setCopyTooltipText("ADDY COPIED");
+      setIsCopyTooltipVisible(true); // Show immediately
+      setAllowCopyTooltip(false);
 
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      if (copyTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(copyTooltipTimeoutRef.current);
       }
 
-      tooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setShowCopied(false);
+      // Hide after 1.5s
+      copyTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsCopyTooltipVisible(false);
+        // Reset text after fade animation completes
+        globalThis.setTimeout(() => {
+          setCopyTooltipText("COPY ADDY");
+        }, 300); // matches transition duration
       }, 1500);
     } catch (err) {
       console.error("Failed to copy:", err);
@@ -77,8 +82,8 @@ function WalletReceiveModal({ onClose, address }: Props) {
 
   useEffect(() => {
     return () => {
-      if (tooltipTimeoutRef.current) {
-        globalThis.clearTimeout(tooltipTimeoutRef.current);
+      if (copyTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(copyTooltipTimeoutRef.current);
       }
     };
   }, []);
@@ -108,7 +113,7 @@ function WalletReceiveModal({ onClose, address }: Props) {
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
-            class="w-6 h-6 mobileLg:w-[30px] mobileLg:h-[30px] mb-6 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 mb-6 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
             viewBox="0 0 32 32"
             role="button"
             aria-label="Copy"
@@ -118,10 +123,10 @@ function WalletReceiveModal({ onClose, address }: Props) {
           </svg>
           <div
             class={`${tooltipIcon} ${
-              (isTooltipVisible || showCopied) ? "block" : "hidden"
+              isCopyTooltipVisible ? "opacity-100" : "opacity-0"
             }`}
           >
-            {showCopied ? "COPIED" : "COPY"}
+            {copyTooltipText}
           </div>
         </div>
       </div>

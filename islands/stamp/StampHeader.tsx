@@ -48,6 +48,7 @@ export const StampHeader = (
             "sold",
           ]}
           dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
+          open2={isOpen2}
         />
         <div
           class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}

@@ -1,3 +1,4 @@
+import { useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import {
   Deployment,
@@ -9,6 +10,7 @@ import {
   formatDate,
   formatNumber,
 } from "$lib/utils/formatUtils.ts";
+import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
 
 export interface SRC20TickHeaderProps {
   deployment: Deployment & {
@@ -87,6 +89,8 @@ export function SRC20TickHeader({
   marketInfo,
   _align,
 }: SRC20TickHeaderProps) {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   const tickValue = deployment.tick
     ? (() => {
       console.log("Original tick:", deployment.tick);
@@ -139,178 +143,186 @@ export function SRC20TickHeader({
     "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
 
   return (
-    <div class="flex w-full flex-col gap-6">
-      <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg">
-        <div class="flex flex-row w-full">
-          <div className="flex gap-[18px] mobileMd:gap-[30px]">
-            <img
-              src={`/content/${deployment.tx_hash}.svg`}
-              class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] desktop:max-w-[116px] rounded relative z-10"
-              alt={`${deployment.tick} token image`}
-              loading="lazy"
-            />
-            <div class="relative z-10">
-              <div class="flex">
-                <p class="relative z-10 inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1 uppercase">
-                  {tickValue}
+    <>
+      <SRC20SearchClient
+        open2={isSearchOpen}
+        handleOpen2={setIsSearchOpen}
+        showButton={false}
+      />
+
+      <div class="flex w-full flex-col gap-6">
+        <div class="relative w-full flex flex-wrap gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg">
+          <div class="flex flex-row w-full">
+            <div className="flex gap-[18px] mobileMd:gap-[30px]">
+              <img
+                src={`/content/${deployment.tx_hash}.svg`}
+                class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] desktop:max-w-[116px] rounded relative z-10"
+                alt={`${deployment.tick} token image`}
+                loading="lazy"
+              />
+              <div class="relative z-10">
+                <div class="flex">
+                  <p class="relative z-10 inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1 uppercase">
+                    {tickValue}
+                  </p>
+                  <div class="flex gap-3 items-center">
+                    {deployment.email && (
+                      <a href={deployment.email} target="_blank">
+                        <img src="/img/src20/details/EnvelopeSimple.svg" />
+                      </a>
+                    )}
+                    {deployment.web && (
+                      <a href={deployment.web} target="_blank">
+                        <img src="/img/src20/details/Globe.svg" />
+                      </a>
+                    )}
+                    {deployment.tg && (
+                      <a href={deployment.tg} target="_blank">
+                        <img src="/img/src20/details/TelegramLogo.svg" />
+                      </a>
+                    )}
+                    {deployment.x && (
+                      <a href={deployment.x} target="_blank">
+                        <img src="/img/src20/details/XLogo.svg" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <p class="text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase pt-1.5">
+                  CREATOR
                 </p>
-                <div class="flex gap-3 items-center">
-                  {deployment.email && (
-                    <a href={deployment.email} target="_blank">
-                      <img src="/img/src20/details/EnvelopeSimple.svg" />
-                    </a>
-                  )}
-                  {deployment.web && (
-                    <a href={deployment.web} target="_blank">
-                      <img src="/img/src20/details/Globe.svg" />
-                    </a>
-                  )}
-                  {deployment.tg && (
-                    <a href={deployment.tg} target="_blank">
-                      <img src="/img/src20/details/TelegramLogo.svg" />
-                    </a>
-                  )}
-                  {deployment.x && (
-                    <a href={deployment.x} target="_blank">
-                      <img src="/img/src20/details/XLogo.svg" />
-                    </a>
-                  )}
+                <p className="text-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1">
+                  {deployment.creator_name ||
+                    abbreviateAddress(deployment.destination)}
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col gap-0 justify-end ml-auto">
+              <div class="hidden mobileLg:flex flex-col ml-20 mb-0 -space-y-0.5 items-center">
+                <StatItem
+                  label="DEPLOY"
+                  value={deployDate.toUpperCase()}
+                  direction="row"
+                  align="center"
+                />
+                <StatItem
+                  label="BLOCK #"
+                  value={deployment.block_index}
+                  direction="row"
+                  align="center"
+                />
+                <StatItem
+                  label="TX ID"
+                  value={abbreviateAddress(deployment.tx_hash)}
+                  direction="row"
+                  align="center"
+                />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-0 justify-end items-end ml-auto">
+              <div class="flex flex-col -space-y-0.5 text-right">
+                <StatItem
+                  label="DECIMALS"
+                  value={deployment.deci}
+                  direction="row"
+                />
+                <StatItem
+                  label="LIMIT"
+                  value={formatNumber(deployment.lim, 0)}
+                  direction="row"
+                />
+                <div class="hidden">
+                  <StatItem
+                    label="SUPPLY"
+                    value={formatNumber(deployment.max, 0)}
+                    direction="col"
+                    align="right"
+                    large
+                  />
+                </div>
+                <div>
+                  <StatItem
+                    label="SUPPLY"
+                    value={formatNumber(deployment.max, 0)}
+                    direction="row"
+                    align="right"
+                  />
                 </div>
               </div>
-              <p class="text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase pt-1.5">
-                CREATOR
-              </p>
-              <p className="text-xl mobileLg:text-2xl font-black gray-gradient3 -mt-1">
-                {deployment.creator_name ||
-                  abbreviateAddress(deployment.destination)}
-              </p>
             </div>
           </div>
-          <div class="flex flex-col gap-0 justify-end ml-auto">
-            <div class="hidden mobileLg:flex flex-col ml-20 mb-0 -space-y-0.5 items-center">
-              <StatItem
-                label="DEPLOY"
-                value={deployDate.toUpperCase()}
-                direction="row"
-                align="center"
-              />
-              <StatItem
-                label="BLOCK #"
-                value={deployment.block_index}
-                direction="row"
-                align="center"
-              />
-              <StatItem
-                label="TX ID"
-                value={abbreviateAddress(deployment.tx_hash)}
-                direction="row"
-                align="center"
-              />
-            </div>
+          {
+            /*
+          <p class="text-sm text-[#CCCCCC] font-medium">
+            This is an SRC-20 token, there are many like it, but this one is{" "}
+            {deployment.tick.toUpperCase()}. This was deployed on block{" "}
+            {deployment.block_index}{" "}
+            without a description on the deploy. We hope you enjoy.
+          </p>
+          */
+          }
+        </div>
+
+        {/* Market Information */}
+        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
+          <div className="flex flex-col">
+            <StatItem
+              label="MARKET CAP"
+              value={mcapBTCFormatted}
+              currency="BTC"
+              direction="col"
+              large
+            />
+          </div>
+          <div class="flex flex-wrap justify-between pt-3 mobileLg:pt-6">
+            <StatItem
+              label="24H VOLUME"
+              value={sum1dBTCFormatted}
+              currency="BTC"
+              direction="col"
+              align="left"
+            />
+            <StatItem
+              label="3 DAY VOLUME"
+              value="N/A" // FIXME: not available from API request
+              currency="BTC"
+              direction="col"
+              align="center"
+            />
+            <StatItem
+              label="7 DAY VOLUME"
+              value={sum7dBTCFormatted}
+              currency="BTC"
+              direction="col"
+              align="right"
+            />
           </div>
 
-          <div class="flex flex-col gap-0 justify-end items-end ml-auto">
-            <div class="flex flex-col -space-y-0.5 text-right">
-              <StatItem
-                label="DECIMALS"
-                value={deployment.deci}
-                direction="row"
-              />
-              <StatItem
-                label="LIMIT"
-                value={formatNumber(deployment.lim, 0)}
-                direction="row"
-              />
-              <div class="hidden">
-                <StatItem
-                  label="SUPPLY"
-                  value={formatNumber(deployment.max, 0)}
-                  direction="col"
-                  align="right"
-                  large
-                />
-              </div>
-              <div>
-                <StatItem
-                  label="SUPPLY"
-                  value={formatNumber(deployment.max, 0)}
-                  direction="row"
-                  align="right"
-                />
-              </div>
-            </div>
+          <div class="flex flex-wrap justify-between pt-1.5 mobileLg:pt-3">
+            <StatItem
+              label="PRICE"
+              value={floorUnitPriceSatsFormatted}
+              currency="SATS"
+              direction="col"
+            />
+            <StatItem
+              label="24H CHANGE"
+              value="N/A" // FIXME: not available from API request
+              currency="%"
+              direction="col"
+              align="center"
+            />
+            <StatItem
+              label="7 DAY CHANGE"
+              value="N/A" // FIXME: not available from API request
+              currency="%"
+              direction="col"
+              align="right"
+            />
           </div>
-        </div>
-        {
-          /*
-        <p class="text-sm text-[#CCCCCC] font-medium">
-          This is an SRC-20 token, there are many like it, but this one is{" "}
-          {deployment.tick.toUpperCase()}. This was deployed on block{" "}
-          {deployment.block_index}{" "}
-          without a description on the deploy. We hope you enjoy.
-        </p>
-        */
-        }
-      </div>
-
-      {/* Market Information */}
-      <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
-        <div className="flex flex-col">
-          <StatItem
-            label="MARKET CAP"
-            value={mcapBTCFormatted}
-            currency="BTC"
-            direction="col"
-            large
-          />
-        </div>
-        <div class="flex flex-wrap justify-between pt-3 mobileLg:pt-6">
-          <StatItem
-            label="24H VOLUME"
-            value={sum1dBTCFormatted}
-            currency="BTC"
-            direction="col"
-            align="left"
-          />
-          <StatItem
-            label="3 DAY VOLUME"
-            value="N/A" // FIXME: not available from API request
-            currency="BTC"
-            direction="col"
-            align="center"
-          />
-          <StatItem
-            label="7 DAY VOLUME"
-            value={sum7dBTCFormatted}
-            currency="BTC"
-            direction="col"
-            align="right"
-          />
-        </div>
-
-        <div class="flex flex-wrap justify-between pt-1.5 mobileLg:pt-3">
-          <StatItem
-            label="PRICE"
-            value={floorUnitPriceSatsFormatted}
-            currency="SATS"
-            direction="col"
-          />
-          <StatItem
-            label="24H CHANGE"
-            value="N/A" // FIXME: not available from API request
-            currency="%"
-            direction="col"
-            align="center"
-          />
-          <StatItem
-            label="7 DAY CHANGE"
-            value="N/A" // FIXME: not available from API request
-            currency="%"
-            direction="col"
-            align="right"
-          />
         </div>
       </div>
-    </div>
+    </>
   );
 }

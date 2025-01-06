@@ -280,11 +280,6 @@ export function OlgaContent() {
 
   // Add new state and refs for tooltips
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
-  const [isToggleTooltipVisible, setIsToggleTooltipVisible] = useState(false);
-  const uploadTooltipTimeoutRef = useRef<number | null>(null);
-  const toggleTooltipTimeoutRef = useRef<number | null>(null);
-  const [allowTooltip, setAllowTooltip] = useState(true);
 
   // Add tooltip handlers
   const handleMouseMove = (e: MouseEvent) => {
@@ -293,59 +288,6 @@ export function OlgaContent() {
       y: e.clientY,
     });
   };
-
-  const handleUploadMouseEnter = () => {
-    setIsUploadTooltipVisible(true);
-
-    if (uploadTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
-    }
-
-    uploadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-      setIsUploadTooltipVisible(false);
-    }, 1500);
-  };
-
-  const handleUploadMouseLeave = () => {
-    if (uploadTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
-    }
-    setIsUploadTooltipVisible(false);
-  };
-
-  const handleToggleMouseEnter = () => {
-    if (allowTooltip) {
-      setIsToggleTooltipVisible(true);
-
-      if (toggleTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
-      }
-
-      toggleTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsToggleTooltipVisible(false);
-      }, 1500);
-    }
-  };
-
-  const handleToggleMouseLeave = () => {
-    if (toggleTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
-    }
-    setIsToggleTooltipVisible(false);
-    setAllowTooltip(true); // Reset the flag when mouse leaves
-  };
-
-  // Add cleanup effect
-  useEffect(() => {
-    return () => {
-      if (uploadTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
-      }
-      if (toggleTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(toggleTooltipTimeoutRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (fees && !loading) {
@@ -534,8 +476,9 @@ export function OlgaContent() {
   const handleShowAdvancedOptions = () => {
     const switchToggle = document.querySelector("#switch-toggle-advanced");
     if (!switchToggle) return;
-    setAllowTooltip(false);
-    setIsToggleTooltipVisible(false);
+
+    setAllowAdvancedTooltip(false);
+    setIsAdvancedTooltipVisible(false);
 
     if (showAdvancedOptions !== true) {
       switchToggle.classList.add("translate-x-full");
@@ -960,15 +903,15 @@ export function OlgaContent() {
 
   const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
   const titlePurpleLDCenter =
-    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 text-center";
+    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
   const feeSelectorContainer =
     "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
   const tooltipButton =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap";
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
   const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50";
+    "fixed bg-[#000000BF] px-2 py-1 mb-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
   const tooltipButtonOverflow =
-    "fixed bg-[#000000BF] px-2 py-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50";
+    "fixed bg-[#000000BF] px-2 py-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
 
   const isFormValid = isValidForMinting({
     file,
@@ -1036,6 +979,8 @@ export function OlgaContent() {
       onMouseMove={handleMouseMove}
       onMouseEnter={handleUploadMouseEnter}
       onMouseLeave={handleUploadMouseLeave}
+      onMouseDown={() => setIsUploadTooltipVisible(false)}
+      onClick={() => setIsUploadTooltipVisible(false)}
     >
       <input
         id="upload"
@@ -1092,7 +1037,9 @@ export function OlgaContent() {
           </label>
         )}
       <div
-        class={`${tooltipImage} ${isUploadTooltipVisible ? "block" : "hidden"}`}
+        class={`${tooltipImage} ${
+          _isUploadTooltipVisible ? "opacity-100" : "opacity-0"
+        }`}
         style={{
           left: `${tooltipPosition.x}px`,
           top: `${tooltipPosition.y - 6}px`,
@@ -1104,30 +1051,48 @@ export function OlgaContent() {
     </div>
   );
 
-  // Update the advanced options toggle button
-  const advancedToggleButton = (
-    <button
-      class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
-      onClick={handleShowAdvancedOptions}
-      onMouseEnter={handleToggleMouseEnter}
-      onMouseLeave={handleToggleMouseLeave}
-    >
-      <div
-        id="switch-toggle-advanced"
-        class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
-      >
-      </div>
-      <div
-        className={`${tooltipButton} ${
-          isToggleTooltipVisible ? "block" : "hidden"
-        }`}
-      >
-        {showAdvancedOptions ? "SIMPLE" : "ADVANCED"}
-      </div>
-    </button>
+  const [tooltipText, setTooltipText] = useState("SIMPLE");
+  const [isAdvancedTooltipVisible, setIsAdvancedTooltipVisible] = useState(
+    false,
   );
+  const [allowAdvancedTooltip, setAllowAdvancedTooltip] = useState(true);
+  const advancedTooltipTimeoutRef = useRef<number | null>(null);
+
+  const handleAdvancedMouseEnter = () => {
+    if (allowAdvancedTooltip) {
+      setTooltipText(
+        showAdvancedOptions ? "SIMPLE" : "ADVANCED",
+      );
+
+      if (advancedTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(advancedTooltipTimeoutRef.current);
+      }
+
+      advancedTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsAdvancedTooltipVisible(true);
+      }, 1500);
+    }
+  };
+
+  const handleAdvancedMouseLeave = () => {
+    if (advancedTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(advancedTooltipTimeoutRef.current);
+    }
+    setIsAdvancedTooltipVisible(false);
+    setAllowAdvancedTooltip(true);
+  };
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (advancedTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(advancedTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Add new state variable for POSH tooltip
+  const [poshTooltipText, setPoshTooltipText] = useState("POSH");
   const [isPoshTooltipVisible, setIsPoshTooltipVisible] = useState(false);
   const [allowPoshTooltip, setAllowPoshTooltip] = useState(true);
   const poshTooltipTimeoutRef = useRef<number | null>(null);
@@ -1138,6 +1103,9 @@ export function OlgaContent() {
   // Update the mouse enter handler to position the tooltip
   const handlePoshMouseEnter = () => {
     if (allowPoshTooltip && showAdvancedOptions) {
+      // Set tooltip text based on current state when mouse enters
+      setPoshTooltipText(isPoshStamp ? "CPID" : "POSH");
+
       const buttonRect = poshButtonRef.current?.getBoundingClientRect();
       if (buttonRect) {
         setTooltipPosition({
@@ -1145,14 +1113,13 @@ export function OlgaContent() {
           y: buttonRect.top,
         });
       }
-      setIsPoshTooltipVisible(true);
 
       if (poshTooltipTimeoutRef.current) {
         globalThis.clearTimeout(poshTooltipTimeoutRef.current);
       }
 
       poshTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsPoshTooltipVisible(false);
+        setIsPoshTooltipVisible(true);
       }, 1500);
     }
   };
@@ -1165,12 +1132,25 @@ export function OlgaContent() {
     setAllowPoshTooltip(true);
   };
 
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (poshTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(poshTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Update the POSH toggle button JSX
   const poshToggleButton = (
     <button
       ref={poshButtonRef}
       class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
-      onClick={handleIsPoshStamp}
+      onClick={() => {
+        handleIsPoshStamp();
+        setIsPoshTooltipVisible(false);
+        setAllowPoshTooltip(false);
+      }}
       onMouseEnter={handlePoshMouseEnter}
       onMouseLeave={handlePoshMouseLeave}
     >
@@ -1179,24 +1159,22 @@ export function OlgaContent() {
         class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
       >
       </div>
-      <div
-        className={`${tooltipButton} ${
-          isPoshTooltipVisible ? "block" : "hidden"
-        }`}
-      >
-        {isPoshStamp ? "CPID" : "POSH"}
-      </div>
     </button>
   );
 
-  // Add these state declarations where other tooltip states are defined
+  // Add state for lock tooltip text (near other tooltip states)
+  const [lockTooltipText, setLockTooltipText] = useState("LOCK");
   const [isLockTooltipVisible, setIsLockTooltipVisible] = useState(false);
   const [allowLockTooltip, setAllowLockTooltip] = useState(true);
   const lockButtonRef = useRef<HTMLDivElement>(null);
+  const lockTooltipTimeoutRef = useRef<number | null>(null);
 
-  // Add these handlers where other mouse handlers are defined
+  // Update handlers
   const handleLockMouseEnter = () => {
     if (allowLockTooltip && showAdvancedOptions) {
+      // Set tooltip text based on current state
+      setLockTooltipText(isLocked ? "UNLOCK" : "LOCK");
+
       const buttonRect = lockButtonRef.current?.getBoundingClientRect();
       if (buttonRect) {
         setTooltipPosition({
@@ -1204,16 +1182,15 @@ export function OlgaContent() {
           y: buttonRect.top,
         });
       }
-      setIsLockTooltipVisible(true);
 
       // Clear any existing timeout
       if (lockTooltipTimeoutRef.current) {
         globalThis.clearTimeout(lockTooltipTimeoutRef.current);
       }
 
-      // Set new timeout
+      // Set new timeout for 1500ms delay
       lockTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsLockTooltipVisible(false);
+        setIsLockTooltipVisible(true);
       }, 1500);
     }
   };
@@ -1226,10 +1203,17 @@ export function OlgaContent() {
     setAllowLockTooltip(true);
   };
 
-  // Add this with other refs
-  const lockTooltipTimeoutRef = useRef<number | null>(null);
+  // Add cleanup in useEffect
+  useEffect(() => {
+    return () => {
+      if (lockTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(lockTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
-  // Add state for preview tooltip (with other tooltip states)
+  // Add state for preview tooltip text (with other tooltip states)
+  const [previewTooltipText, setPreviewTooltipText] = useState("FULLSCREEN");
   const [isPreviewTooltipVisible, setIsPreviewTooltipVisible] = useState(false);
   const [allowPreviewTooltip, setAllowPreviewTooltip] = useState(true);
   const previewButtonRef = useRef<HTMLDivElement>(null);
@@ -1240,6 +1224,9 @@ export function OlgaContent() {
   // Update the handlePreviewMouseEnter to include timeout
   const handlePreviewMouseEnter = () => {
     if (allowPreviewTooltip && showAdvancedOptions) {
+      // Set tooltip text when mouse enters
+      setPreviewTooltipText("FULLSCREEN");
+
       const buttonRect = previewButtonRef.current?.getBoundingClientRect();
       if (buttonRect) {
         setTooltipPosition({
@@ -1247,14 +1234,13 @@ export function OlgaContent() {
           y: buttonRect.top,
         });
       }
-      setIsPreviewTooltipVisible(true);
 
       if (previewTooltipTimeoutRef.current) {
         globalThis.clearTimeout(previewTooltipTimeoutRef.current);
       }
 
       previewTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        setIsPreviewTooltipVisible(false);
+        setIsPreviewTooltipVisible(true);
       }, 1500);
     }
   };
@@ -1267,6 +1253,15 @@ export function OlgaContent() {
     setIsPreviewTooltipVisible(false);
     setAllowPreviewTooltip(true);
   };
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (previewTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(previewTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div class={bodyTools}>
@@ -1282,36 +1277,31 @@ export function OlgaContent() {
         <div className="flex gap-3 mobileMd:gap-6">
           <div className="flex gap-3 mobileMd:gap-6">
             {imagePreviewDiv}
-
-            {
-              /* <div class="p-6 rounded-md items-center mx-auto text-center cursor-pointer w-[120px] h-[120px] content-center bg-[#2B0E49]">
-              {file !== null && (
-                <img
-                  width={120}
-                  style={{
-                    height: "100%",
-                    objectFit: "contain",
-                    imageRendering: "pixelated",
-                    backgroundColor: "rgb(0,0,0)",
-                  }}
-                  src={URL.createObjectURL(file)}
-                />
-              )}
-              {file === null && (
-                <h5 class="cursor-pointer text-sm font-semibold text-[#F5F5F5]">
-                  Preview
-                </h5>
-              )}
-            </div> */
-            }
-
             {fileError && <p class="text-red-500 mt-2">{fileError}</p>}
           </div>
 
           <div class="w-full flex flex-col justify-between items-end">
-            {advancedToggleButton}
+            <button
+              class="min-w-[42px] h-[21px] mobileLg:min-w-12 mobileLg:h-6 rounded-full bg-stamp-grey flex items-center transition duration-300 focus:outline-none shadow relative"
+              onClick={handleShowAdvancedOptions}
+              onMouseEnter={handleAdvancedMouseEnter}
+              onMouseLeave={handleAdvancedMouseLeave}
+            >
+              <div
+                id="switch-toggle-advanced"
+                class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 relative rounded-full transition duration-500 transform flex justify-center items-center bg-stamp-grey"
+              >
+              </div>
+              <div
+                class={`${tooltipButton} ${
+                  isAdvancedTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {tooltipText}
+              </div>
+            </button>
             <div className="flex gap-3 mobileMd:gap-6 items-center">
-              <p className="text-xl mobileLg:text-2xl desktop:text-3xl font-semibold text-stamp-grey">
+              <p className="text-xl mobileLg:text-2xl font-semibold text-stamp-grey">
                 EDITIONS
               </p>
               <div className="w-[42px] mobileLg:w-12">
@@ -1338,7 +1328,7 @@ export function OlgaContent() {
             {poshToggleButton}
             <div
               ref={lockButtonRef}
-              className="w-[42px] h-[42px] mobileLg:w-12 mobileLg:h-12 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center"
+              className="w-[42px] h-[42px] mobileLg:w-12 mobileLg:h-12 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center group"
               onClick={() => {
                 setIsLocked(!isLocked);
                 setIsLockTooltipVisible(false);
@@ -1347,13 +1337,29 @@ export function OlgaContent() {
               onMouseEnter={handleLockMouseEnter}
               onMouseLeave={handleLockMouseLeave}
             >
-              <img
-                src={isLocked
-                  ? "/img/stamping/LockSimple.svg"
-                  : "/img/stamping/LockSimpleOpen.svg"}
-                className="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6"
-                alt={isLocked ? "Locked" : "Unlocked"}
-              />
+              {isLocked
+                ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 32 32"
+                    class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple-darker group-hover:fill-stamp-purple cursor-pointer"
+                    role="button"
+                    aria-label="Locked"
+                  >
+                    <path d="M26 9.5H22.5V7C22.5 5.27609 21.8152 3.62279 20.5962 2.40381C19.3772 1.18482 17.7239 0.5 16 0.5C14.2761 0.5 12.6228 1.18482 11.4038 2.40381C10.1848 3.62279 9.5 5.27609 9.5 7V9.5H6C5.33696 9.5 4.70107 9.76339 4.23223 10.2322C3.76339 10.7011 3.5 11.337 3.5 12V26C3.5 26.663 3.76339 27.2989 4.23223 27.7678C4.70107 28.2366 5.33696 28.5 6 28.5H26C26.663 28.5 27.2989 28.2366 27.7678 27.7678C28.2366 27.2989 28.5 26.663 28.5 26V12C28.5 11.337 28.2366 10.7011 27.7678 10.2322C27.2989 9.76339 26.663 9.5 26 9.5ZM12.5 7C12.5 6.07174 12.8687 5.1815 13.5251 4.52513C14.1815 3.86875 15.0717 3.5 16 3.5C16.9283 3.5 17.8185 3.86875 18.4749 4.52513C19.1313 5.1815 19.5 6.07174 19.5 7V9.5H12.5V7ZM25.5 25.5H6.5V12.5H25.5V25.5Z" />
+                  </svg>
+                )
+                : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 32 32"
+                    class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple-dark group-hover:fill-stamp-purple cursor-pointer"
+                    role="button"
+                    aria-label="Unlocked"
+                  >
+                    <path d="M26 9.5H12.5V7C12.5 6.07174 12.8687 5.1815 13.5251 4.52513C14.1815 3.86875 15.0717 3.5 16 3.5C17.6888 3.5 19.2063 4.7025 19.53 6.29875C19.5692 6.49179 19.6461 6.67522 19.7562 6.83855C19.8663 7.00189 20.0076 7.14193 20.1718 7.2507C20.336 7.35946 20.5201 7.4348 20.7135 7.47243C20.9068 7.51006 21.1057 7.50923 21.2987 7.47C21.4918 7.43077 21.6752 7.3539 21.8386 7.24378C22.0019 7.13366 22.1419 6.99244 22.2507 6.8282C22.3595 6.66396 22.4348 6.4799 22.4724 6.28654C22.5101 6.09317 22.5092 5.89429 22.47 5.70125C21.8587 2.6875 19.1375 0.5 16 0.5C14.2767 0.501985 12.6246 1.18744 11.406 2.406C10.1874 3.62455 9.50198 5.2767 9.5 7V9.5H6C5.33696 9.5 4.70107 9.76339 4.23223 10.2322C3.76339 10.7011 3.5 11.337 3.5 12V26C3.5 26.663 3.76339 27.2989 4.23223 27.7678C4.70107 28.2366 5.33696 28.5 6 28.5H26C26.663 28.5 27.2989 28.2366 27.7678 27.7678C28.2366 27.2989 28.5 26.663 28.5 26V12C28.5 11.337 28.2366 10.7011 27.7678 10.2322C27.2989 9.76339 26.663 9.5 26 9.5ZM25.5 25.5H6.5V12.5H25.5V25.5Z" />
+                  </svg>
+                )}
             </div>
           </div>
           <div className="flex items-end gap-3 mobileMd:gap-6">
@@ -1371,18 +1377,31 @@ export function OlgaContent() {
             </div>
             <div
               ref={previewButtonRef}
-              className="min-w-[42px] h-[42px] mobileLg:min-w-12 mobileLg:h-12 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center"
-              onClick={toggleFullScreenModal}
+              className="min-w-[42px] h-[42px] mobileLg:min-w-12 mobileLg:h-12 bg-stamp-grey rounded-md cursor-pointer flex items-center justify-center group"
+              onClick={() => {
+                toggleFullScreenModal();
+                setIsPreviewTooltipVisible(false);
+                setAllowPreviewTooltip(false);
+              }}
               onMouseEnter={handlePreviewMouseEnter}
               onMouseLeave={handlePreviewMouseLeave}
             >
-              <img
-                src="/img/stamping/CornersOut.svg"
-                className={`w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 ${
-                  file ? "bg-[#999999]" : "bg-[#999999]"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 32 32"
+                class="w-[21px] h-[21px] mobileLg:w-6 mobileLg:h-6 fill-stamp-purple-darker group-hover:fill-stamp-purple cursor-pointer"
+                role="button"
+                aria-label="View Fullscreen"
+              >
+                <path d="M27.5 6V11C27.5 11.3978 27.342 11.7794 27.0607 12.0607C26.7794 12.342 26.3978 12.5 26 12.5C25.6022 12.5 25.2206 12.342 24.9393 12.0607C24.658 11.7794 24.5 11.3978 24.5 11V7.5H21C20.6022 7.5 20.2206 7.34196 19.9393 7.06066C19.658 6.77936 19.5 6.39782 19.5 6C19.5 5.60218 19.658 5.22064 19.9393 4.93934C20.2206 4.65804 20.6022 4.5 21 4.5H26C26.3978 4.5 26.7794 4.65804 27.0607 4.93934C27.342 5.22064 27.5 5.60218 27.5 6ZM11 24.5H7.5V21C7.5 20.6022 7.34196 20.2206 7.06066 19.9393C6.77936 19.658 6.39782 19.5 6 19.5C5.60218 19.5 5.22064 19.658 4.93934 19.9393C4.65804 20.2206 4.5 20.6022 4.5 21V26C4.5 26.3978 4.65804 26.7794 4.93934 27.0607C5.22064 27.342 5.60218 27.5 6 27.5H11C11.3978 27.5 11.7794 27.342 12.0607 27.0607C12.342 26.7794 12.5 26.3978 12.5 26C12.5 25.6022 12.342 25.2206 12.0607 24.9393C11.7794 24.658 11.3978 24.5 11 24.5ZM26 19.5C25.6022 19.5 25.2206 19.658 24.9393 19.9393C24.658 20.2206 24.5 20.6022 24.5 21V24.5H21C20.6022 24.5 20.2206 24.658 19.9393 24.9393C19.658 25.2206 19.5 25.6022 19.5 26C19.5 26.3978 19.658 26.7794 19.9393 27.0607C20.2206 27.342 20.6022 27.5 21 27.5H26C26.3978 27.5 26.7794 27.342 27.0607 27.0607C27.342 26.7794 27.5 26.3978 27.5 26V21C27.5 20.6022 27.342 20.2206 27.0607 19.9393C26.7794 19.658 26.3978 19.5 26 19.5ZM11 4.5H6C5.60218 4.5 5.22064 4.65804 4.93934 4.93934C4.65804 5.22064 4.5 5.60218 4.5 6V11C4.5 11.3978 4.65804 11.7794 4.93934 12.0607C5.22064 12.342 5.60218 12.5 6 12.5C6.39782 12.5 6.77936 12.342 7.06066 12.0607C7.34196 11.7794 7.5 11.3978 7.5 11V7.5H11C11.3978 7.5 11.7794 7.34196 12.0607 7.06066C12.342 6.77936 12.5 6.39782 12.5 6C12.5 5.60218 12.342 5.22064 12.0607 4.93934C11.7794 4.65804 11.3978 4.5 11 4.5Z" />
+              </svg>
+              <div
+                class={`${tooltipButton} ${
+                  isPreviewTooltipVisible ? "opacity-100" : "opacity-0"
                 }`}
-                alt="Toggle fullscreen"
-              />
+              >
+                {previewTooltipText}
+              </div>
             </div>
           </div>
         </div>
@@ -1494,7 +1513,9 @@ export function OlgaContent() {
 
       <div
         className={`${tooltipButtonOverflow} ${
-          isPoshTooltipVisible && showAdvancedOptions ? "block" : "hidden"
+          isPoshTooltipVisible && showAdvancedOptions
+            ? "opacity-100"
+            : "opacity-0"
         }`}
         style={{
           left: `${tooltipPosition.x}px`,
@@ -1502,12 +1523,14 @@ export function OlgaContent() {
           transform: "translate(-50%, 0)",
         }}
       >
-        {isPoshStamp ? "CPID" : "POSH"}
+        {poshTooltipText}
       </div>
 
       <div
         className={`${tooltipButtonOverflow} ${
-          isLockTooltipVisible && showAdvancedOptions ? "block" : "hidden"
+          isLockTooltipVisible && showAdvancedOptions
+            ? "opacity-100"
+            : "opacity-0"
         }`}
         style={{
           left: `${tooltipPosition.x}px`,
@@ -1515,12 +1538,14 @@ export function OlgaContent() {
           transform: "translate(-50%, 0)",
         }}
       >
-        {isLocked ? "UNLOCK" : "LOCK"}
+        {lockTooltipText}
       </div>
 
       <div
         className={`${tooltipButtonOverflow} ${
-          isPreviewTooltipVisible && showAdvancedOptions ? "block" : "hidden"
+          isPreviewTooltipVisible && showAdvancedOptions
+            ? "opacity-100"
+            : "opacity-0"
         }`}
         style={{
           left: `${tooltipPosition.x}px`,
