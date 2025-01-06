@@ -43,19 +43,29 @@ export default function StampCodeModal(
     }
 
     try {
-      const formatted = html.replace(/</g, "\n<").replace(/>/g, ">\n");
+      const formatted = html
+        .replace(/;/g, ";\n")
+        .replace(/</g, "\n<")
+        .replace(/>/g, ">\n")
+        .replace(/\{/g, " {\n")
+        .replace(/\}/g, "\n}\n");
+
       let indent = 0;
       let result = "";
 
       formatted.split("\n").forEach((line) => {
         line = line.trim();
-        if (line.match(/^<\//) && indent > 0) {
-          indent -= 2;
+        if (!line) return;
+
+        if (line.match(/^<\//) || line === "}") {
+          indent = Math.max(0, indent - 2);
         }
-        if (line) {
-          result += " ".repeat(indent) + line + "\n";
-        }
-        if (line.match(/^<[^/]/) && !line.match(/\/>/)) {
+
+        result += " ".repeat(indent) + line + "\n";
+
+        if (
+          (line.match(/^<[^/]/) && !line.match(/\/>/)) || line.endsWith("{")
+        ) {
           indent += 2;
         }
       });
