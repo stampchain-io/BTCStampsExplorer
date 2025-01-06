@@ -26,6 +26,16 @@ const StampImageFullScreen = ({
       document.removeEventListener("keydown", handleKeyboardShortcut);
   }, [handleCloseModal]);
 
+  useEffect(() => {
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   if (src instanceof File) {
     globalThis.addEventListener("unload", () => {
       URL.revokeObjectURL(imageUrl);

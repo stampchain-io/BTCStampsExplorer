@@ -12,6 +12,16 @@ export default function StampCodeModal(
   const [formattedSrc, setFormattedSrc] = useState("");
 
   useEffect(() => {
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  useEffect(() => {
     setFormattedSrc(formatHtmlSource(src));
   }, [src]);
 
@@ -65,10 +75,10 @@ export default function StampCodeModal(
       onClick={handleCloseModal}
     >
       <div
-        class="relative w-[calc(100vw-48px)] h-[calc(100vh-48px)] mobileLg:w-[calc(100vw-96px)] mobileLg:h-[calc(100vh-96px)] max-w-full mobileLg:max-w-[800px] overflow-hidden"
+        class="relative w-[calc(100vw-48px)] h-[calc(100vh-48px)] mobileLg:w-[calc(100vw-96px)] mobileLg:h-[calc(100vh-96px)] max-w-full mobileLg:max-w-[800px]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div class="flex flex-col p-6 mobileMd:p-9 rounded-md bg-[#FAFAFA] w-full h-full overflow-hidden">
+        <div class="flex flex-col p-6 mobileMd:p-9 rounded-md bg-[#FAFAFA] w-full h-full">
           {
             /* <div class="relative top-0 right-0 -mr-3 mobileLg:-mr-2 -mt-1.5 mobileMd:-mt-3 mobileLg:-mt-2 w-6 h-6 ms-auto cursor-pointer">
             <svg
