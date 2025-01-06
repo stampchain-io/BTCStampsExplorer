@@ -1,5 +1,4 @@
 import { useEffect, useState } from "preact/hooks";
-import { useEffect, useState } from "preact/hooks";
 
 import { SRC20_FILTER_TYPES } from "$globals";
 
