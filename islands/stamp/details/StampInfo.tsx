@@ -304,6 +304,27 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           console.error("Failed to fetch HTML content:", error);
           setImageDimensions(null);
         });
+    } else if (
+      stamp.stamp_mimetype === "text/javascript" ||
+      stamp.stamp_mimetype === "application/javascript"
+    ) {
+      // Handle JS stamps - now checking for both common JS MIME types
+      fetch(stamp.stamp_url)
+        .then((response) => response.text())
+        .then((js) => {
+          const blob = new Blob([js], { type: stamp.stamp_mimetype });
+          setFileSize(blob.size);
+        })
+        .catch((error) => console.error("Failed to fetch JS size:", error));
+    } else if (stamp.stamp_mimetype === "application/gzip") {
+      // Handle GZIP stamps
+      fetch(stamp.stamp_url)
+        .then((response) => response.text())
+        .then((content) => {
+          const blob = new Blob([content], { type: "application/gzip" });
+          setFileSize(blob.size);
+        })
+        .catch((error) => console.error("Failed to fetch GZIP size:", error));
     }
   }, [stamp.stamp_mimetype, stamp.stamp_url]);
 
@@ -322,6 +343,53 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // Add this state for HTML title
+  const [htmlStampTitle, setHtmlStampTitle] = useState<string | null>(null);
+
+  // Add this effect to extract HTML title
+  useEffect(() => {
+    if (stamp.stamp_mimetype === "text/html" && stamp.stamp_url) {
+      fetch(stamp.stamp_url)
+        .then((response) => response.text())
+        .then((html) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+          const title = doc.querySelector("title")?.textContent?.trim();
+          if (title) {
+            setHtmlStampTitle(title);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch HTML title:", error);
+        });
+    }
+  }, [stamp.stamp_mimetype, stamp.stamp_url]);
+
+  // Add this helper function near the top of the component
+  const isPoshStamp = (cpid: string) => {
+    return !cpid.startsWith("A");
+  };
+
+  const titleRef = useRef<HTMLParagraphElement>(null);
+  const [scale, setScale] = useState(1);
+
+  const updateScale = () => {
+    if (titleRef.current) {
+      const container = titleRef.current.parentElement;
+      if (container) {
+        const containerWidth = container.clientWidth - 48; // Account for padding
+        const contentWidth = titleRef.current.scrollWidth;
+        setScale(Math.min(1, containerWidth / contentWidth));
+      }
+    }
+  };
+
+  useEffect(() => {
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, [stamp.cpid, htmlStampTitle]); // Update scale when content changes
+
   return (
     <>
       <StampSearchClient
@@ -335,13 +403,47 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           className={"flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6"}
         >
           <div>
-            <p className={titleGreyLD}>
-              <span className="font-light">#</span>
-              <span className="font-black">{stamp.stamp}</span>
+            <p
+              ref={titleRef}
+              className={`${titleGreyLD} whitespace-nowrap overflow-hidden`}
+              style={{
+                transform: `scale(${scale})`,
+                transformOrigin: "left",
+                maxWidth: scale === 1 ? "none" : `${(100 / scale)}%`,
+                marginTop: `${-0.2 * (1 / scale - 1)}em`,
+                marginBottom: `${-0.26 * (1 / scale - 1)}em`,
+              }}
+            >
+              {(isPoshStamp(stamp.cpid) ||
+                  (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
+                ? (
+                  <span className="font-black uppercase text-ellipsis overflow-hidden">
+                    {isPoshStamp(stamp.cpid) ? stamp.cpid : htmlStampTitle}
+                  </span>
+                )
+                : (
+                  <>
+                    <span className="font-light">#</span>
+                    <span className="font-black">{stamp.stamp}</span>
+                  </>
+                )}
             </p>
-            <p className="text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
-              {stamp.cpid}
+
+            <p className="-mt-1.5 text-xl mobileLg:text-2xl font-medium text-stamp-grey-light block">
+              {(isPoshStamp(stamp.cpid) ||
+                (htmlStampTitle && stamp.stamp_mimetype === "text/html")) && (
+                <>
+                  <span className="font-light">#</span>
+                  <span className="font-light">{stamp.stamp}</span>
+                </>
+              )}
             </p>
+
+            {!isPoshStamp(stamp.cpid) && (
+              <p className="text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+                {stamp.cpid}
+              </p>
+            )}
 
             <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
               <p className={dataLabel}>BY</p>
