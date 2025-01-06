@@ -625,25 +625,32 @@ export class SRC20Repository {
     const sanitizedQuery = query.replace(/[^\w-]/g, "");
 
     const sqlQuery = `
-      SELECT DISTINCT 
-        tick, 
+    SELECT DISTINCT
+        tick,
         (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
         (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted,
-        dep.max AS max_supply, 
-        dep.lim AS lim, 
+        dep.max AS max_supply,
+        dep.lim AS lim,
         dep.deci AS decimals
-      FROM ${SRC20_TABLE} dep
-      WHERE
+    FROM ${SRC20_TABLE} dep
+    WHERE
         (tick LIKE ? OR
         tx_hash LIKE ? OR
         creator LIKE ? OR
         destination LIKE ?)
         AND dep.max IS NOT NULL
-      LIMIT 10;
+    ORDER BY
+        CASE
+            WHEN tick LIKE ? THEN 0
+            ELSE 1
+        END,
+        tick
+    LIMIT 10;
     `;
 
     const searchParam = `%${sanitizedQuery}%`;
-    const queryParams = [searchParam, searchParam, searchParam, searchParam];
+    const startSearchParam = `${sanitizedQuery}%`;
+    const queryParams = [searchParam, searchParam, searchParam, searchParam, startSearchParam];
 
     try {
       const result = await dbManager.executeQueryWithCache(
