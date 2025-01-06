@@ -61,7 +61,6 @@ export const SRC20Header = (
           initFilter={Array.isArray(filterBy) ? filterBy : [filterBy]}
           open={isOpen1}
           handleOpen={handleOpen1}
-          setFilterValue={setFilterValue}
           filterButtons={[
             "minting",
             "trending mints",
