@@ -6,9 +6,9 @@ const LoadingContent = () => {
 
   return (
     <>
-      <div className="w-screen h-screen flex justify-center items-center fixed z-50 bg-[#000000ad]">
+      <div class="w-screen h-screen flex justify-center items-center fixed z-50 bg-[#000000ad]">
         <img
-          className="select-none"
+          class="select-none"
           src="/img/loading.gif"
           alt="loading"
         />
