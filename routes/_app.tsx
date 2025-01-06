@@ -8,6 +8,8 @@ import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { NavigatorProvider } from "$islands/Navigator/NavigatorProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
 import FontLoader from "$islands/home/FontLoader.tsx";
+import { LoadingProvider } from "$islands/loading/LoadingProvider.tsx";
+import LoadingContent from "$islands/loading/LoadingContent.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {
   if (state?.skipAppLayout) {
@@ -145,18 +147,21 @@ export default function App({ Component, state }: PageProps<unknown>) {
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           <ToastProvider>
             <NavigatorProvider>
-              <div class="flex flex-col min-h-screen">
-                <Header />
-                <main
-                  class="flex flex-col flex-grow px-3 mobileMd:px-6 desktop:px-12 py-12 mobileLg:py-24 desktop:py-36 max-w-desktop mx-auto w-full"
-                  f-client-nav
-                >
-                  <Partial name="body">
-                    <Component />
-                  </Partial>
-                </main>
-                <Footer />
-              </div>
+              <LoadingProvider>
+                <LoadingContent />
+                <div class="flex flex-col min-h-screen">
+                  <Header />
+                  <main
+                    class="flex flex-col flex-grow px-3 mobileMd:px-6 desktop:px-12 py-12 mobileLg:py-24 desktop:py-36 max-w-desktop mx-auto w-full"
+                    f-client-nav
+                  >
+                    <Partial name="body">
+                      <Component />
+                    </Partial>
+                  </main>
+                  <Footer />
+                </div>
+              </LoadingProvider>
             </NavigatorProvider>
           </ToastProvider>
         </div>
