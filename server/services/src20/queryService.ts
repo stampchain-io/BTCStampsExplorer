@@ -463,9 +463,7 @@ export class SRC20QueryService {
           sanitizedParams.minPrice !== undefined || 
           sanitizedParams.maxPrice !== undefined ||
           sanitizedParams.minVolume !== undefined ||
-          sanitizedParams.maxVolume !== undefined ||
-          sanitizedParams.minSupply !== undefined ||
-          sanitizedParams.maxSupply !== undefined
+          sanitizedParams.maxVolume !== undefined
         )) {
 
           formattedData = Array.isArray(formattedData) ? formattedData : [formattedData];
@@ -473,17 +471,25 @@ export class SRC20QueryService {
           formattedData = formattedData.filter(item => {
             if (!item.market_data) return false;
 
-            const { floor_price = 0, volume_24h = 0, supply = 0 } = item.market_data;
+            const { floor_price = 0, volume_24h = 0 } = item.market_data;
             
             if (sanitizedParams.minPrice !== undefined && floor_price < sanitizedParams.minPrice) return false;
             if (sanitizedParams.maxPrice !== undefined && floor_price > sanitizedParams.maxPrice) return false;
             if (sanitizedParams.minVolume !== undefined && volume_24h < sanitizedParams.minVolume) return false;
             if (sanitizedParams.maxVolume !== undefined && volume_24h > sanitizedParams.maxVolume) return false;
-            if (sanitizedParams.minSupply !== undefined && supply < sanitizedParams.minSupply) return false;
-            if (sanitizedParams.maxSupply !== undefined && supply > sanitizedParams.maxSupply) return false;
            
             return true;
           });
+        }
+
+        if (sanitizedParams.minSupply !== undefined ||
+          sanitizedParams.maxSupply !== undefined)
+        {
+          formattedData = formattedData.filter(item => {
+            if (sanitizedParams.minSupply !== undefined && item.max < sanitizedParams.minSupply) return false;
+            if (sanitizedParams.maxSupply !== undefined && item.max > sanitizedParams.maxSupply) return false;
+            return true
+          })
         }
     
         if (sanitizedParams.minHolder !== undefined ||

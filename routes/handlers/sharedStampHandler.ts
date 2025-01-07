@@ -52,6 +52,7 @@ export const createStampHandler = (
     try {
       const url = new URL(req.url);
       const cacheType = getCacheType(url.pathname, routeConfig.isIndex);
+      const requestQuery = url.searchParams.get("q");
 
       if (routeConfig.isIndex) {
         const pagination = getPaginationParams(url);
@@ -194,6 +195,7 @@ export const createStampHandler = (
           cacheType,
           undefined, // Use default cache duration
           true, // Explicitly include secondary columns for details
+          requestQuery ? requestQuery.includes("search") : false,
         );
 
         if (!stampData) {

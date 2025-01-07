@@ -36,8 +36,10 @@ export class StampRepository {
     blockIdentifier?: number | string,
     collectionId?: string | string[],
     filterBy?: STAMP_FILTER_TYPES[],
-    suffixFilters?: STAMP_SUFFIX_FILTERS[]
+    suffixFilters?: STAMP_SUFFIX_FILTERS[],
+    isSearchQuery?: boolean 
   ) {
+
     if (identifier !== undefined) {
       if (Array.isArray(identifier)) {
         const validIdentifiers = identifier.filter(
@@ -92,8 +94,8 @@ export class StampRepository {
         whereConditions.push(`(${conditions.join(" OR ")})`);
       } else {
         if (isStampNumber(identifier)) {
-          whereConditions.push("st.stamp = ?");
-          queryParams.push(Number(identifier));
+            whereConditions.push("st.stamp = ?");
+            queryParams.push(Number(identifier));
         } else if (isTxHash(identifier)) {
           whereConditions.push("st.tx_hash = ?");
           queryParams.push(identifier);
@@ -115,7 +117,10 @@ export class StampRepository {
       if (type === "cursed") {
         stampCondition = "st.stamp < 0";
       } else if (type === "stamps") {
-        stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
+        if (isSearchQuery)
+          stampCondition = "st.stamp >= 0";
+        else
+          stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
       } else if (type === "posh") {
         stampCondition =
           "st.stamp < 0 AND st.cpid NOT LIKE 'A%' AND st.ident != 'SRC-20'";
@@ -128,14 +133,14 @@ export class StampRepository {
       if (stampCondition) {
         whereConditions.push(`(${stampCondition})`);
       }
-    } else {
+    } else {  
       // For 'all' type, only exclude 'SRC-20'- this messes up the api/block route
       // stampCondition = "st.ident != 'SRC-20'";
       // whereConditions.push(`(${stampCondition})`);
     }
 
     // Ident condition
-    if (ident && ident.length > 0) {
+    if (ident && ident.length > 0 && !isSearchQuery) {
       const identList = Array.isArray(ident) ? ident : [ident];
       if (identList.length > 0) {
         const identCondition = identList.map(() => "st.ident = ?").join(" OR ");
@@ -184,7 +189,7 @@ export class StampRepository {
     }
 
     // **FilterBy conditions**
-    if (filterBy && filterBy.length > 0) {
+    if (filterBy && filterBy.length > 0 && !isSearchQuery) {
       const filterConditions: string[] = [];
 
       filterBy.forEach((filter) => {
@@ -489,6 +494,7 @@ export class StampRepository {
     selectColumns?: string[];
     includeSecondary?: boolean;
     creatorAddress?: string;
+    isSearchQuery?: boolean
   }) {
     const queryOptions = {
       limit: SMALL_LIMIT,
@@ -527,6 +533,7 @@ export class StampRepository {
       selectColumns,
       includeSecondary = true,
       creatorAddress,
+      isSearchQuery
     } = queryOptions;
 
     const whereConditions: string[] = [];
@@ -541,7 +548,8 @@ export class StampRepository {
       blockIdentifier,
       collectionId,
       filterBy,
-      suffixFilters
+      suffixFilters,
+      isSearchQuery
     );
 
     if (creatorAddress) {

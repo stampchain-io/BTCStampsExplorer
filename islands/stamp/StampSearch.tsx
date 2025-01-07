@@ -95,7 +95,7 @@ export function StampSearchClient(
         }
 
         try {
-          const stampResponse = await fetch(`/api/v2/stamps/${query}`);
+          const stampResponse = await fetch(`/api/v2/stamps/${query}?q=search`);
           const responseData = await stampResponse.json();
 
           if (
@@ -132,7 +132,9 @@ export function StampSearchClient(
       // Check for CPID format (starts with 'A' or 'a' followed by at least 5 numeric chars)
       if (/^[Aa]\d{5,}$/.test(query)) {
         try {
-          const response = await fetch(`/api/v2/stamps/${query.toUpperCase()}`);
+          const response = await fetch(
+            `/api/v2/stamps/${query.toUpperCase()}?q=search`,
+          );
           const responseData = await response.json();
 
           if (response.ok && responseData.data && responseData.data.stamp) {
@@ -151,7 +153,7 @@ export function StampSearchClient(
       // Check for stamp number
       if (/^\d+$/.test(query)) {
         try {
-          const response = await fetch(`/api/v2/stamps/${query}`);
+          const response = await fetch(`/api/v2/stamps/${query}?q=search`);
           const responseData = await response.json();
 
           if (response.ok && responseData.data && responseData.data.stamp) {
