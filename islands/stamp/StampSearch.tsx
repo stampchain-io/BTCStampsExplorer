@@ -151,7 +151,7 @@ export function StampSearchClient(
       }
 
       // Check for stamp number
-      if (/^\d+$/.test(query)) {
+      if (/^[-]?\d+$/.test(query)) {
         try {
           const response = await fetch(`/api/v2/stamps/${query}?q=search`);
           const responseData = await response.json();
