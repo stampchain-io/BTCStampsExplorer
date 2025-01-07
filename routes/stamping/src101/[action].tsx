@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { Mint101Content } from "$islands/stamping/src101/mint/MintContent.tsx";
-import { HowToRegisterModule } from "$islands/modules/HowToRegister.tsx";
+import { HowToRegisterModule } from "../../../islands/modules/HowToRegisterBitname.tsx";
 import RecentRegister from "$islands/stamping/src101/mint/RecentRegister.tsx";
 
 interface StampingSrc101PageProps {
