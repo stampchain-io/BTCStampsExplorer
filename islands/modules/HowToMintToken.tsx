@@ -51,7 +51,7 @@ export const HowToMintTokenModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
-      <ReadAllButton href="/howto/mint" />
+      <ReadAllButton href="/howto/minttoken" />
     </div>
   );
 };

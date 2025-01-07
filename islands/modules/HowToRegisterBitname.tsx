@@ -51,7 +51,7 @@ export const HowToRegisterBitnameModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
-      <ReadAllButton href="/howto/register" />
+      <ReadAllButton href="/howto/registerbitname" />
     </div>
   );
 };

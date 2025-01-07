@@ -46,7 +46,7 @@ export const HowToTransferBitnameModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
-      <ReadAllButton href="/howto/transfertoken" />
+      <ReadAllButton href="/howto/transferbitname" />
     </div>
   );
 };
