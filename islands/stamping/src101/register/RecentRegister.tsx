@@ -4,7 +4,7 @@ import { StampCard } from "$islands/stamp/StampCard.tsx";
 import type { StampTransaction } from "$lib/types/stamping.ts";
 import type { JSX } from "preact";
 
-export default function RecentDeploy(): JSX.Element {
+export default function RecentRegister(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<StampTransaction[]>([]);
 

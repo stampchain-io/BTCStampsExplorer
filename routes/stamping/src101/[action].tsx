@@ -1,7 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { Mint101Content } from "$islands/stamping/src101/mint/MintContent.tsx";
+import { RegisterBitnameContent } from "$islands/stamping/src101/register/RegisterContent.tsx";
 import { HowToRegisterBitnameModule } from "$islands/modules/HowToRegisterBitname.tsx";
-import RecentRegister from "$islands/stamping/src101/mint/RecentRegister.tsx";
+import RecentRegister from "$islands/stamping/src101/register/RecentRegister.tsx";
 
 interface StampingSrc101PageProps {
   selectedTab: string;
@@ -44,7 +44,7 @@ export default function StampingSrc101Page(
 
   const renderContent = () => {
     if (selectedTab === "mint") {
-      return <Mint101Content trxType={trxType} />;
+      return <RegisterBitnameContent trxType={trxType} />;
     }
     return null;
   };
