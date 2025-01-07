@@ -44,7 +44,7 @@ export default function RegisterBitName() {
   return (
     <HowToLayout
       title="HOW-TO"
-      subtitle="MINT A SRC-20 TOKEN"
+      subtitle="REGISTER A BITNAME DOMAIN"
       headerImage="/img/how-tos/mintsrc20/00.png"
       importantNotes={IMPORTANT_NOTES}
     >
