@@ -1,7 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { RegisterBitnameContent } from "$islands/stamping/src101/register/RegisterContent.tsx";
 import { HowToRegisterBitnameModule } from "$islands/modules/HowToRegisterBitname.tsx";
-import RecentRegister from "$islands/stamping/src101/register/RecentRegister.tsx";
+import RecentBitnameRegister from "$islands/stamping/src101/register/RecentRegister.tsx";
 
 interface StampingSrc101PageProps {
   selectedTab: string;
@@ -28,7 +28,7 @@ export const handler: Handlers<StampingSrc101PageProps> = {
         trxType,
       });
     } catch (error) {
-      console.error("Error in stamping SRC-101:", error);
+      console.error("Error in registering bitname domain:", error);
       if (error instanceof Error && error.message?.includes("not found")) {
         return ctx.renderNotFound();
       }
@@ -60,7 +60,7 @@ export default function StampingSrc101Page(
           <HowToRegisterBitnameModule />
         </div>
         <div class="w-full tablet:w-1/2">
-          <RecentRegister />
+          <RecentBitnameRegister />
         </div>
       </div>
     </div>
