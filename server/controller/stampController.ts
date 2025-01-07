@@ -57,7 +57,8 @@ export class StampController {
     groupBySubquery,
     skipTotalCount = false,
     cacheType = RouteType.STAMP_LIST,
-    enrichWithAssetInfo = false
+    enrichWithAssetInfo = false,
+    isSearchQuery = false
   } = {}) {
     try {
       const filterByArray = typeof filterBy === "string"
@@ -125,6 +126,7 @@ export class StampController {
         groupBySubquery,
         skipTotalCount,
         cacheType,
+        isSearchQuery
       });
 
       // Process stamps with floor prices and asset info if needed
@@ -192,7 +194,8 @@ export class StampController {
     stampType: STAMP_TYPES = "all",
     cacheType: RouteType = RouteType.STAMP_DETAIL,
     cacheDuration?: number | "never",
-    includeSecondary: boolean = true
+    includeSecondary: boolean = true,
+    isSearchQuery: boolean = false
   ) {
     return this.getStamps({
       identifier: id,
@@ -203,7 +206,8 @@ export class StampController {
       noPagination: true,
       skipTotalCount: true,
       enrichWithAssetInfo: true,
-      includeSecondary
+      includeSecondary,
+      isSearchQuery
     });
   }
 
