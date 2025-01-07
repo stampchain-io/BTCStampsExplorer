@@ -117,9 +117,7 @@ export class StampRepository {
       if (type === "cursed") {
         stampCondition = "st.stamp < 0";
       } else if (type === "stamps") {
-        if (isSearchQuery)
-          stampCondition = "st.stamp >= 0";
-        else
+        if (!isSearchQuery)
           stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
       } else if (type === "posh") {
         stampCondition =
