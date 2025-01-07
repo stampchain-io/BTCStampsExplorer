@@ -15,6 +15,7 @@ const desktopNavLinks: NavLink[] = [
       { title: "ALL", href: "/stamp?type=classic" },
       { title: "COLLECTIONS", href: "/collection" },
       { title: "STAMPING", href: "/stamping/stamp" },
+      { title: "TRANSFER", href: "/stamping/stamp/transfer" },
     ],
   },
   {
@@ -26,6 +27,15 @@ const desktopNavLinks: NavLink[] = [
       { title: "DEPLOY", href: "/stamping/src20/deploy" },
       { title: "MINT", href: "/stamping/src20/mint" },
       { title: "TRANSFER", href: "/stamping/src20/transfer" },
+    ],
+  },
+  {
+    title: "BITNAME DOMAINS",
+    href: "#",
+    subLinks: [
+      { title: "ALL", href: "/src101" },
+      { title: "REGISTER", href: "/stamping/src101/mint" },
+      { title: "TRANSFER", href: "/stamping/src101/transfer" },
     ],
   },
 ];
@@ -52,9 +62,12 @@ const mobileNavLinks: NavLink[] = [
     href: "#",
     subLinks: [
       { title: "STAMPING", href: "/stamping/stamp" },
-      { title: "DEPLOY", href: "/stamping/src20/deploy" },
-      { title: "MINT", href: "/stamping/src20/mint" },
-      { title: "TRANSFER", href: "/stamping/src20/transfer" },
+      { title: "TRANSFER STAMP", href: "/stamping/stamp/transfer" },
+      { title: "DEPLOY TOKEN", href: "/stamping/src20/deploy" },
+      { title: "MINT TOKEN", href: "/stamping/src20/mint" },
+      { title: "TRANSFER TOKEN", href: "/stamping/src20/transfer" },
+      { title: "REGISTER BITNAME", href: "/stamping/src101/mint" },
+      { title: "TRANSFER BITNAME", href: "/stamping/src101/transfer" },
     ],
   },
 ];
@@ -70,7 +83,7 @@ const socialLinks = [
 ];
 
 const logoClassName =
-  "purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black italic pr-2";
+  "purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black italic pr-2";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -156,10 +169,10 @@ export function Header() {
                 isMobile
                   ? `text-xl mobileLg:text-2xl ${
                     link.subLinks
-                      ? "text-stamp-primary-dark"
-                      : "text-stamp-primary"
+                      ? "text-stamp-purple-dark"
+                      : "text-stamp-purple"
                   }`
-                  : "text-lg desktop:text-xl text-center group-hover:text-stamp-primary-hover"
+                  : "text-lg text-center group-hover:text-stamp-purple-highlight"
               }`}
             >
               {link.title}
@@ -199,7 +212,7 @@ export function Header() {
   };
 
   return (
-    <header className="px-3 mobileMd:px-6 desktop:px-12 my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12 max-w-desktop w-full mx-auto tablet:flex justify-between items-center">
+    <header className="tablet:flex justify-between items-center max-w-desktop w-full mx-auto px-3 mobileMd:px-6 desktop:px-12 my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12">
       <div className="flex justify-between items-center w-full ">
         <a
           href="/home"
@@ -232,14 +245,14 @@ export function Header() {
       </div>
 
       {/* Desktop Navbar */}
-      <div className="hidden tablet:flex justify-between items-center gap-9 desktop:gap-12 font-black text-stamp-primary">
+      <div className="hidden tablet:flex justify-between items-center gap-9 font-black text-stamp-purple">
         {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex tablet:hidden flex-col justify-between fixed left-0 top-0 w-full h-screen z-30 backdrop-blur-md bg-gradient-to-b from-[#171717]/40 to-[#171717]/80 scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] font-black text-stamp-primary ${
+        className={`flex tablet:hidden flex-col justify-between fixed left-0 top-0 w-full h-screen z-30 backdrop-blur-md bg-gradient-to-b from-[#171717]/40 to-[#171717]/80 scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] font-black text-stamp-purple duration-500 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"
