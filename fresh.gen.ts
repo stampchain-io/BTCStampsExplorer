@@ -176,8 +176,8 @@ import * as $modules_HowToDeploy from "./islands/modules/HowToDeploy.tsx";
 import * as $modules_HowToMint from "./islands/modules/HowToMint.tsx";
 import * as $modules_HowToRegister from "./islands/modules/HowToRegister.tsx";
 import * as $modules_HowToStamp from "./islands/modules/HowToStamp.tsx";
-import * as $modules_HowToTransfer from "./islands/modules/HowToTransfer.tsx";
 import * as $modules_HowToTransferStamp from "./islands/modules/HowToTransferStamp.tsx";
+import * as $modules_HowToTransferToken from "./islands/modules/HowToTransferToken.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
@@ -440,8 +440,8 @@ const manifest = {
     "./islands/modules/HowToMint.tsx": $modules_HowToMint,
     "./islands/modules/HowToRegister.tsx": $modules_HowToRegister,
     "./islands/modules/HowToStamp.tsx": $modules_HowToStamp,
-    "./islands/modules/HowToTransfer.tsx": $modules_HowToTransfer,
     "./islands/modules/HowToTransferStamp.tsx": $modules_HowToTransferStamp,
+    "./islands/modules/HowToTransferToken.tsx": $modules_HowToTransferToken,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,

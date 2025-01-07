@@ -1,6 +1,6 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 
-export const HowToTransferModule = () => {
+export const HowToTransferTokenModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">

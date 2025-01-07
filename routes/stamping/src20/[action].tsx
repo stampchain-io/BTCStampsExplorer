@@ -9,7 +9,7 @@ import LatestTransfer from "$islands/stamping/src20/transfer/LatestTransfer.tsx"
 
 import { HowToDeployModule } from "$islands/modules/HowToDeploy.tsx";
 import { HowToMintModule } from "$islands/modules/HowToMint.tsx";
-import { HowToTransferModule } from "$islands/modules/HowToTransfer.tsx";
+import { HowToTransferTokenModule } from "$islands/modules/HowToTransferToken.tsx";
 
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
@@ -123,7 +123,7 @@ export default function StampingSrc20Page(
       case "deploy":
         return <HowToDeployModule />;
       case "transfer":
-        return <HowToTransferModule />;
+        return <HowToTransferTokenModule />;
       default:
         return null;
     }
