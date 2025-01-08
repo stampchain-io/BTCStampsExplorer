@@ -6,21 +6,15 @@ import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 
-const bodyToolsClassName =
-  "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
-  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient3 w-full text-center";
-
+  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 w-full text-center";
 const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-const feeSelectorContainerClassName =
+const feeSelectorContainer =
   "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
-
 const buttonPurpleOutline =
   "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
-
-// ... existing code ...
-
 const animatedInputContainer = `
   relative rounded-md !bg-[#100318]
   before:absolute before:inset-[-2px] before:rounded-md before:z-[1]
@@ -30,7 +24,7 @@ const animatedInputContainer = `
   focus-within:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
 `;
 
-export function Mint101Content(
+export function RegisterBitnameContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
 ) {
   const {
@@ -67,7 +61,7 @@ export function Mint101Content(
   };
 
   return (
-    <div className={bodyToolsClassName}>
+    <div className={bodyTools}>
       <h1 className={titlePurpleLDCenter}>REGISTER</h1>
 
       <div className={inputFieldContainer}>
@@ -112,7 +106,7 @@ export function Mint101Content(
         </div>
       </div>
 
-      <div className={feeSelectorContainerClassName}>
+      <div className={feeSelectorContainer}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

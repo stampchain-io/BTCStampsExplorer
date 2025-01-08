@@ -1,6 +1,5 @@
 import { HowToLayout } from "$components/howto/HowToLayout.tsx";
-import { Step } from "$components/howto/Step.tsx";
-import type { StepProps } from "$components/howto/Step.tsx";
+import { Step, StepProps } from "$components/howto/Step.tsx";
 
 interface WalletStep extends StepProps {
   number: number;

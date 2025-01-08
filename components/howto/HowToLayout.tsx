@@ -1,7 +1,7 @@
 import { KeepReading } from "$components/howto/KeepReading.tsx";
 
 interface HowToLayoutProps {
-  _title: string;
+  title: string;
   subtitle: string;
   headerImage: string;
   children: preact.ComponentChildren;
@@ -9,19 +9,19 @@ interface HowToLayoutProps {
 }
 
 export function HowToLayout(
-  { _title, subtitle, headerImage, children, importantNotes = [] }:
+  { title, subtitle, headerImage, children, importantNotes = [] }:
     HowToLayoutProps,
 ) {
   const titleGreyDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
   const subTitleGrey =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
 
   return (
-    <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36 text-base mobileLg:text-lg font-medium text-stamp-grey-light">
+    <div class="flex flex-col gap-12 mobileLg:gap-24 text-base mobileLg:text-lg font-medium text-stamp-grey-light">
       <div class="flex flex-col w-full tablet:max-w-[1080px] tablet:mx-auto">
         <section>
-          <h1 className={titleGreyDL}>HOW-TO</h1>
+          <h1 className={titleGreyDL}>{title}</h1>
           <h2 className={subTitleGrey}>{subtitle}</h2>
           <img
             src={headerImage}

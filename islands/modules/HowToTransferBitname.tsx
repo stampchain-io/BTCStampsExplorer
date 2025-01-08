@@ -1,6 +1,7 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
+import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
-export const HowToTransferModule = () => {
+export const HowToTransferBitnameModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
@@ -45,6 +46,7 @@ export const HowToTransferModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
+      <ReadAllButton href="/howto/transferbitname" />
     </div>
   );
 };
