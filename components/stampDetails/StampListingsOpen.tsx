@@ -1,8 +1,4 @@
-import {
-  abbreviateAddress,
-  formatNumber,
-  formatSatoshisToBTC,
-} from "$lib/utils/formatUtils.ts";
+import { formatNumber, formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "../shared/ScrollContainer.tsx";
 
 interface Dispenser {
@@ -15,18 +11,15 @@ interface Dispenser {
   close_block_index: number;
 }
 
-interface StampDispensersProps {
+interface StampListingsOpenProps {
   dispensers: Dispenser[];
 }
 
 const tableHeaders = [
   { key: "price", label: "Price" },
-  { key: "escrow", label: "Escrow" },
-  { key: "give", label: "Give" },
+  { key: "quantity", label: "Escrow/Give" },
   { key: "remaining", label: "Remain" },
-  { key: "address", label: "Address" },
-  { key: "confirmed", label: "Confirmed" },
-  { key: "closeBlock", label: "Closed" },
+  { key: "type", label: "Type" },
 ];
 
 const tableLabel =
@@ -46,36 +39,21 @@ function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
         {formatSatoshisToBTC(dispenser.satoshirate)}
       </td>
       <td className="text-center">
-        {formatNumber(dispenser.escrow_quantity, 0)}
-      </td>
-      <td className="text-center">
-        {formatNumber(dispenser.give_quantity, 0)}
+        {`${formatNumber(dispenser.escrow_quantity, 0)}/${
+          formatNumber(dispenser.give_quantity, 0)
+        }`}
       </td>
       <td className="text-center">
         {formatNumber(dispenser.give_remaining, 0)}
       </td>
-      <td className="text-center">
-        <span className="tablet:hidden">
-          {abbreviateAddress(dispenser.source, 4)}
-        </span>
-        <span className="hidden tablet:inline">
-          {abbreviateAddress(dispenser.source, 8)}
-        </span>
-      </td>
-      <td className="text-center">
-        {dispenser.confirmed ? "YES" : "NO"}
-      </td>
       <td className="text-right">
-        {!dispenser.close_block_index || dispenser.close_block_index <= 0
-          ? "OPEN"
-          : dispenser.close_block_index}
+        DISPENSER
       </td>
     </tr>
   );
 }
 
-export function StampDispensers({ dispensers }: StampDispensersProps) {
-  // TODO(@reinamora_137): the secondary sort should be by creation date
+export function StampListingsOpen({ dispensers }: StampListingsOpenProps) {
   const sortedDispensers = [...dispensers].sort((a, b) =>
     b.give_remaining - a.give_remaining
   );
@@ -86,13 +64,10 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
         <div class="w-[660px] min-[660px]:w-full">
           <table class={tableValue}>
             <colgroup>
-              <col class="w-[16%]" /> {/* Price */}
-              <col class="w-[10%]" /> {/* Escrow */}
-              <col class="w-[10%]" /> {/* Give */}
-              <col class="w-[10%]" /> {/* Remain */}
-              <col class="w-[26%]" /> {/* Address column */}
-              <col class="w-[14%]" /> {/* Confirmed */}
-              <col class="w-[14%]" /> {/* Closed */}
+              <col class="w-[25%]" /> {/* Price */}
+              <col class="w-[25%]" /> {/* Quantity */}
+              <col class="w-[25%]" /> {/* Remain */}
+              <col class="w-[25%]" /> {/* Type */}
             </colgroup>
             <thead>
               <tr>
@@ -103,7 +78,7 @@ export function StampDispensers({ dispensers }: StampDispensersProps) {
                     class={`${tableLabel} pb-1.5 ${
                       key === "price"
                         ? "text-left"
-                        : key === "closeBlock"
+                        : key === "type"
                         ? "text-right"
                         : "text-center"
                     }`}
