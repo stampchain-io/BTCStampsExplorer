@@ -516,73 +516,54 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           </div>
 
           <div className="flex flex-col w-full pt-6 mobileLg:pt-12 text-right">
-            {!showListings
-              ? (
-                // Default price view
-                <>
-                  {(stamp.floorPriceUSD || stamp.marketCapUSD) && (
-                    <p className={dataLabel}>
-                      {stamp.floorPriceUSD
-                        ? `${
-                          stamp.floorPriceUSD.toLocaleString("en-US", {
-                            maximumFractionDigits: 2,
-                          })
-                        }`
-                        : stamp.marketCapUSD
-                        ? `${
-                          stamp.marketCapUSD.toLocaleString("en-US", {
-                            maximumFractionDigits: 2,
-                          })
-                        }`
-                        : null}
-                      <span className="font-light">
-                        {" "}USD
-                      </span>
-                    </p>
-                  )}
+            {(stamp.floorPriceUSD || stamp.marketCapUSD) && (
+              <p className={dataLabel}>
+                {stamp.floorPriceUSD
+                  ? `${
+                    stamp.floorPriceUSD.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })
+                  }`
+                  : stamp.marketCapUSD
+                  ? `${
+                    stamp.marketCapUSD.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })
+                  }`
+                  : null}
+                <span className="font-light">
+                  {" "}USD
+                </span>
+              </p>
+            )}
 
-                  <p className={dataValueXl}>
-                    {(!stamp.floorPrice || stamp.floorPrice === "NOT LISTED") &&
-                        stamp.marketCap && typeof stamp.marketCap === "number"
-                      ? formatBTCAmount(stamp.marketCap, {
-                        excludeSuffix: true,
-                      })
-                      : typeof stamp.floorPrice === "number"
-                      ? formatBTCAmount(stamp.floorPrice, {
-                        excludeSuffix: true,
-                      })
-                      : stamp.floorPrice}
-                    {(typeof stamp.floorPrice === "number" ||
-                      (stamp.marketCap &&
-                        typeof stamp.marketCap === "number")) && (
-                      <span className="font-extralight">{" "}BTC</span>
-                    )}
-                  </p>
-                </>
-              )
-              : (
-                // Expanded listings view
-                <div className="flex flex-col gap-2 text-stamp-grey-light text-sm text-left">
-                  {isLoadingDispensers
-                    ? <p>Loading listings...</p>
-                    : (
-                      <StampListingsOpen
-                        dispensers={dispensers}
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                        isLoading={isLoadingDispensers}
-                      />
-                    )}
-                </div>
+            <p className={dataValueXl}>
+              {(!stamp.floorPrice || stamp.floorPrice === "NOT LISTED") &&
+                  stamp.marketCap && typeof stamp.marketCap === "number"
+                ? formatBTCAmount(stamp.marketCap, { excludeSuffix: true })
+                : typeof stamp.floorPrice === "number"
+                ? formatBTCAmount(stamp.floorPrice, { excludeSuffix: true })
+                : stamp.floorPrice}
+              {(typeof stamp.floorPrice === "number" ||
+                (stamp.marketCap && typeof stamp.marketCap === "number")) && (
+                <span className="font-extralight">{" "}BTC</span>
               )}
+            </p>
 
             <div className="flex w-full justify-between items-end mt-3 mobileMd:mt-6">
               <button
                 onClick={() => setShowListings((prev) => !prev)}
-                className="text-sm mobileLg:text-base font-light uppercase text-stamp-grey-darker hover:text-stamp-grey-light"
+                className="flex items-center"
               >
-                {showListings ? "CLOSE" : "SELECT LISTING"}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 32 32"
+                  className="w-6 h-6 mobileLg:w-[28px] mobileLg:h-[28px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+                  role="button"
+                  aria-label="Listings"
+                >
+                  <path d="M4 8C4 7.73478 4.10536 7.48043 4.29289 7.29289C4.48043 7.10536 4.73478 7 5 7H27C27.2652 7 27.5196 7.10536 27.7071 7.29289C27.8946 7.48043 28 7.73478 28 8C28 8.26522 27.8946 8.51957 27.7071 8.70711C27.5196 8.89464 27.2652 9 27 9H5C4.73478 9 4.48043 8.89464 4.29289 8.70711C4.10536 8.51957 4 8.26522 4 8ZM5 17H27C27.2652 17 27.5196 16.8946 27.7071 16.7071C27.8946 16.5196 28 16.2652 28 16C28 15.7348 27.8946 15.4804 27.7071 15.2929C27.5196 15.1054 27.2652 15 27 15H5C4.73478 15 4.48043 15.1054 4.29289 15.2929C4.10536 15.4804 4 15.7348 4 16C4 16.2652 4.10536 16.5196 4.29289 16.7071C4.48043 16.8946 4.73478 17 5 17ZM18 23H5C4.73478 23 4.48043 23.1054 4.29289 23.2929C4.10536 23.4804 4 23.7348 4 24C4 24.2652 4.10536 24.5196 4.29289 24.7071C4.48043 24.8946 4.73478 25 5 25H18C18.2652 25 18.5196 24.8946 18.7071 24.7071C18.8946 24.5196 19 24.2652 19 24C19 23.7348 18.8946 23.4804 18.7071 23.2929C18.5196 23.1054 18.2652 23 18 23ZM29 23H27V21C27 20.7348 26.8946 20.4804 26.7071 20.2929C26.5196 20.1054 26.2652 20 26 20C25.7348 20 25.4804 20.1054 25.2929 20.2929C25.1054 20.4804 25 20.7348 25 21V23H23C22.7348 23 22.4804 23.1054 22.2929 23.2929C22.1054 23.4804 22 23.7348 22 24C22 24.2652 22.1054 24.5196 22.2929 24.7071C22.4804 24.8946 22.7348 25 23 25H25V27C25 27.2652 25.1054 27.5196 25.2929 27.7071C25.4804 27.8946 25.7348 28 26 28C26.2652 28 26.5196 27.8946 26.7071 27.7071C26.8946 27.5196 27 27.2652 27 27V25H29C29.2652 25 29.5196 24.8946 29.7071 24.7071C29.8946 24.5196 30 24.2652 30 24C30 23.7348 29.8946 23.4804 29.7071 23.2929C29.5196 23.1054 29.2652 23 29 23Z" />
+                </svg>
               </button>
               {lowestPriceDispenser && (
                 <button
@@ -593,6 +574,22 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 </button>
               )}
             </div>
+
+            {showListings && (
+              <div className="flex flex-col gap-2 text-stamp-grey-light text-sm text-left mt-3 mobileMd:mt-6">
+                {isLoadingDispensers
+                  ? <p>Loading listings...</p>
+                  : (
+                    <StampListingsOpen
+                      dispensers={dispensers}
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                      isLoading={isLoadingDispensers}
+                    />
+                  )}
+              </div>
+            )}
           </div>
         </div>
 
