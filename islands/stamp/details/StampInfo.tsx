@@ -9,6 +9,7 @@ import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 
 import { StampRow } from "$globals";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.tsx";
 
 interface StampInfoProps {
   stamp: StampRow;
@@ -392,6 +393,61 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   // Move the showListings state to be preserved across dispenser data updates
   const [showListings, setShowListings] = useState(false);
 
+  // Add state for dispensers and page info
+  const [dispensers, setDispensers] = useState<any[]>([]);
+  const [isLoadingDispensers, setIsLoadingDispensers] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Add fetch function based on StampRelatedInfo pattern
+  const fetchDispensers = async (page = 1) => {
+    if (isLoadingDispensers) return;
+
+    setIsLoadingDispensers(true);
+    try {
+      const encodedCpid = encodeURIComponent(stamp.cpid); // Make sure we're using the correct ID
+      const params = new URLSearchParams({
+        limit: "20",
+        sort: "DESC",
+        page: page.toString(),
+      });
+
+      const response = await fetch(
+        `/api/v2/stamps/${encodedCpid}/dispensers?${params}`,
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Dispensers data:", data);
+
+      if (data.data) {
+        setDispensers(data.data);
+        setTotalPages(data.totalPages || 1);
+        setCurrentPage(page);
+      }
+    } catch (error) {
+      console.error("Error fetching dispensers:", error);
+      setDispensers([]);
+    } finally {
+      setIsLoadingDispensers(false);
+    }
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage: number) => {
+    fetchDispensers(newPage);
+  };
+
+  // Fetch dispensers when expanded
+  useEffect(() => {
+    if (showListings) {
+      fetchDispensers(1);
+    }
+  }, [showListings]);
+
   return (
     <>
       <StampSearchClient
@@ -507,27 +563,26 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               : (
                 // Expanded listings view
                 <div className="flex flex-col gap-2 text-stamp-grey-light text-sm text-left">
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    do eiusmod tempor incididunt ut labore.
-                  </p>
-                  <p>
-                    Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                    laboris nisi ut aliquip ex ea commodo.
-                  </p>
-                  <p>
-                    Duis aute irure dolor in reprehenderit in voluptate velit
-                    esse cillum dolore eu fugiat nulla.
-                  </p>
+                  {isLoadingDispensers
+                    ? <p>Loading listings...</p>
+                    : (
+                      <StampListingsOpen
+                        dispensers={dispensers}
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        isLoading={isLoadingDispensers}
+                      />
+                    )}
                 </div>
               )}
 
             <div className="flex w-full justify-between items-end mt-3 mobileMd:mt-6">
               <button
                 onClick={() => setShowListings((prev) => !prev)}
-                className="text-[#8257FF] text-sm mobileLg:text-base font-light uppercase hover:text-[#9e7cff] transition-colors duration-300"
+                className="text-sm mobileLg:text-base font-light uppercase text-stamp-grey-darker hover:text-stamp-grey-light"
               >
-                SELECT LISTING
+                {showListings ? "CLOSE" : "SELECT LISTING"}
               </button>
               {lowestPriceDispenser && (
                 <button
