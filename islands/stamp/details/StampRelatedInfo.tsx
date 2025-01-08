@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
 
-import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.tsx";
+import { StampListingsAll } from "$components/stampDetails/StampListingsAll.tsx";
 import { StampSales } from "$components/stampDetails/StampSales.tsx";
 import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
 
@@ -222,7 +222,7 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
   const renderTabContent = () => {
     switch (selectedTab) {
       case "dispensers": {
-        return <StampListingsOpen dispensers={dispensers} />;
+        return <StampListingsAll dispensers={dispensers} />;
       }
       case "sales": {
         return <StampSales dispenses={dispensesWithRates} />;

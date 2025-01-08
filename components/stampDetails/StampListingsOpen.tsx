@@ -1,19 +1,23 @@
 import { formatNumber, formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "../shared/ScrollContainer.tsx";
 
-interface Dispenser {
+export interface Dispenser {
+  satoshirate: number;
   source: string;
+  give_quantity: number;
   give_remaining: number;
   escrow_quantity: number;
-  give_quantity: number;
-  satoshirate: number;
   confirmed: boolean;
   close_block_index: number;
+  block_index?: number;
+  isSelected?: boolean;
 }
 
 interface StampListingsOpenProps {
   dispensers: Dispenser[];
   floorPrice: number;
+  onSelectDispenser: (dispenser: Dispenser) => void;
+  selectedDispenser: Dispenser | null;
 }
 
 const tableHeaders = [
@@ -28,45 +32,61 @@ const tableLabel =
 const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 
-function DispenserRow(
-  { dispenser, floorPrice }: { dispenser: Dispenser; floorPrice: number },
-) {
-  const isEmpty = dispenser.give_remaining === 0;
+export function StampListingsOpen({
+  dispensers,
+  floorPrice,
+  onSelectDispenser,
+  selectedDispenser,
+}: StampListingsOpenProps) {
+  function DispenserRow({
+    dispenser,
+    floorPrice,
+    onSelect,
+    isSelected,
+  }: {
+    dispenser: Dispenser;
+    floorPrice: number;
+    onSelect: () => void;
+    isSelected: boolean;
+  }) {
+    const isEmpty = dispenser.give_remaining === 0;
+    const isFloorPrice = (dispenser.satoshirate / 100000000) === floorPrice;
 
-  // Convert satoshirate to BTC for comparison
-  const dispenserBTC = dispenser.satoshirate / 100000000;
+    const rowDispensers = `${
+      isEmpty ? "text-stamp-grey-darker" : ""
+    } h-8 hover:bg-stamp-purple/10 cursor-pointer ${
+      isSelected || (!selectedDispenser && isFloorPrice)
+        ? "text-stamp-grey-light"
+        : "text-stamp-grey-darker"
+    }`;
 
-  const rowDispensers = `${
-    isEmpty ? "text-stamp-grey-darker" : ""
-  } h-8 hover:bg-stamp-purple/10 ${
-    dispenserBTC === floorPrice
-      ? "text-stamp-grey-light"
-      : "text-stamp-grey-darker"
-  }`;
+    return (
+      <tr
+        className={rowDispensers}
+        onClick={onSelect}
+      >
+        <td className="text-left">
+          {formatSatoshisToBTC(dispenser.satoshirate)}
+        </td>
+        <td className="text-center">
+          {`${formatNumber(dispenser.escrow_quantity, 0)}/${
+            formatNumber(dispenser.give_quantity, 0)
+          }`}
+        </td>
+        <td className="text-center">
+          {formatNumber(dispenser.give_remaining, 0)}
+        </td>
+        <td className="text-right">
+          DISPENSER
+        </td>
+      </tr>
+    );
+  }
 
-  return (
-    <tr className={rowDispensers}>
-      <td className="text-left">
-        {formatSatoshisToBTC(dispenser.satoshirate)}
-      </td>
-      <td className="text-center">
-        {`${formatNumber(dispenser.escrow_quantity, 0)}/${
-          formatNumber(dispenser.give_quantity, 0)
-        }`}
-      </td>
-      <td className="text-center">
-        {formatNumber(dispenser.give_remaining, 0)}
-      </td>
-      <td className="text-right">
-        DISPENSER
-      </td>
-    </tr>
-  );
-}
+  if (!dispensers || dispensers.length === 0) {
+    return <div>No listings available</div>;
+  }
 
-export function StampListingsOpen(
-  { dispensers, floorPrice }: StampListingsOpenProps,
-) {
   const sortedDispensers = [...dispensers].sort((a, b) =>
     b.give_remaining - a.give_remaining
   );
@@ -107,6 +127,8 @@ export function StampListingsOpen(
                   key={dispenser.source}
                   dispenser={dispenser}
                   floorPrice={floorPrice}
+                  onSelect={() => onSelectDispenser(dispenser)}
+                  isSelected={selectedDispenser?.source === dispenser.source}
                 />
               ))}
             </tbody>
