@@ -586,6 +586,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                       totalPages={totalPages}
                       onPageChange={handlePageChange}
                       isLoading={isLoadingDispensers}
+                      floorPrice={stamp.floorPrice}
                     />
                   )}
               </div>

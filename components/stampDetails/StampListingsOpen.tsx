@@ -13,6 +13,7 @@ interface Dispenser {
 
 interface StampListingsOpenProps {
   dispensers: Dispenser[];
+  floorPrice: number;
 }
 
 const tableHeaders = [
@@ -27,14 +28,24 @@ const tableLabel =
 const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 
-function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
+function DispenserRow(
+  { dispenser, floorPrice }: { dispenser: Dispenser; floorPrice: number },
+) {
   const isEmpty = dispenser.give_remaining === 0;
+
+  // Convert satoshirate to BTC for comparison
+  const dispenserBTC = dispenser.satoshirate / 100000000;
+
   const rowDispensers = `${
     isEmpty ? "text-stamp-grey-darker" : ""
-  } h-8 hover:bg-stamp-purple/10`;
+  } h-8 hover:bg-stamp-purple/10 ${
+    dispenserBTC === floorPrice
+      ? "text-stamp-grey-light"
+      : "text-stamp-grey-darker"
+  }`;
 
   return (
-    <tr class={rowDispensers}>
+    <tr className={rowDispensers}>
       <td className="text-left">
         {formatSatoshisToBTC(dispenser.satoshirate)}
       </td>
@@ -53,7 +64,9 @@ function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
   );
 }
 
-export function StampListingsOpen({ dispensers }: StampListingsOpenProps) {
+export function StampListingsOpen(
+  { dispensers, floorPrice }: StampListingsOpenProps,
+) {
   const sortedDispensers = [...dispensers].sort((a, b) =>
     b.give_remaining - a.give_remaining
   );
@@ -90,7 +103,11 @@ export function StampListingsOpen({ dispensers }: StampListingsOpenProps) {
             </thead>
             <tbody>
               {sortedDispensers.map((dispenser) => (
-                <DispenserRow key={dispenser.source} dispenser={dispenser} />
+                <DispenserRow
+                  key={dispenser.source}
+                  dispenser={dispenser}
+                  floorPrice={floorPrice}
+                />
               ))}
             </tbody>
           </table>
