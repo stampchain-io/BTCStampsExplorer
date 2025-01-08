@@ -389,6 +389,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     return () => globalThis.removeEventListener("resize", updateScale);
   }, []);
 
+  // Move the showListings state to be preserved across dispenser data updates
+  const [showListings, setShowListings] = useState(false);
+
   return (
     <>
       <StampSearchClient
@@ -456,51 +459,85 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
           </div>
 
-          <div className="flex flex-col pt-6 mobileLg:pt-12 items-end">
-            <div className="flex flex-col w-full text-right">
-              {(stamp.floorPriceUSD || stamp.marketCapUSD) && (
-                <p className={dataLabel}>
-                  {stamp.floorPriceUSD
-                    ? `${
-                      stamp.floorPriceUSD.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
+          <div className="flex flex-col w-full pt-6 mobileLg:pt-12 text-right">
+            {!showListings
+              ? (
+                // Default price view
+                <>
+                  {(stamp.floorPriceUSD || stamp.marketCapUSD) && (
+                    <p className={dataLabel}>
+                      {stamp.floorPriceUSD
+                        ? `${
+                          stamp.floorPriceUSD.toLocaleString("en-US", {
+                            maximumFractionDigits: 2,
+                          })
+                        }`
+                        : stamp.marketCapUSD
+                        ? `${
+                          stamp.marketCapUSD.toLocaleString("en-US", {
+                            maximumFractionDigits: 2,
+                          })
+                        }`
+                        : null}
+                      <span className="font-light">
+                        {" "}USD
+                      </span>
+                    </p>
+                  )}
+
+                  <p className={dataValueXl}>
+                    {(!stamp.floorPrice || stamp.floorPrice === "NOT LISTED") &&
+                        stamp.marketCap && typeof stamp.marketCap === "number"
+                      ? formatBTCAmount(stamp.marketCap, {
+                        excludeSuffix: true,
                       })
-                    }`
-                    : stamp.marketCapUSD
-                    ? `${
-                      stamp.marketCapUSD.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
+                      : typeof stamp.floorPrice === "number"
+                      ? formatBTCAmount(stamp.floorPrice, {
+                        excludeSuffix: true,
                       })
-                    }`
-                    : null}
-                  <span className="font-light">
-                    {" "}USD
-                  </span>
-                </p>
+                      : stamp.floorPrice}
+                    {(typeof stamp.floorPrice === "number" ||
+                      (stamp.marketCap &&
+                        typeof stamp.marketCap === "number")) && (
+                      <span className="font-extralight">{" "}BTC</span>
+                    )}
+                  </p>
+                </>
+              )
+              : (
+                // Expanded listings view
+                <div className="flex flex-col gap-2 text-stamp-grey-light text-sm text-left">
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    do eiusmod tempor incididunt ut labore.
+                  </p>
+                  <p>
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                    laboris nisi ut aliquip ex ea commodo.
+                  </p>
+                  <p>
+                    Duis aute irure dolor in reprehenderit in voluptate velit
+                    esse cillum dolore eu fugiat nulla.
+                  </p>
+                </div>
               )}
 
-              <p className={dataValueXl}>
-                {(!stamp.floorPrice || stamp.floorPrice === "NOT LISTED") &&
-                    stamp.marketCap && typeof stamp.marketCap === "number"
-                  ? formatBTCAmount(stamp.marketCap, { excludeSuffix: true })
-                  : typeof stamp.floorPrice === "number"
-                  ? formatBTCAmount(stamp.floorPrice, { excludeSuffix: true })
-                  : stamp.floorPrice}
-                {(typeof stamp.floorPrice === "number" ||
-                  (stamp.marketCap && typeof stamp.marketCap === "number")) && (
-                  <span className="font-extralight">{" "}BTC</span>
-                )}
-              </p>
-            </div>
-
-            {lowestPriceDispenser && (
+            <div className="flex w-full justify-between items-end mt-3 mobileMd:mt-6">
               <button
-                className={`${buttonPurpleFlat} float-right mt-3 mobileMd:mt-6`}
-                onClick={toggleModal}
+                onClick={() => setShowListings((prev) => !prev)}
+                className="text-[#8257FF] text-sm mobileLg:text-base font-light uppercase hover:text-[#9e7cff] transition-colors duration-300"
               >
-                BUY
+                SELECT LISTING
               </button>
-            )}
+              {lowestPriceDispenser && (
+                <button
+                  className={`${buttonPurpleFlat}`}
+                  onClick={toggleModal}
+                >
+                  BUY
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
