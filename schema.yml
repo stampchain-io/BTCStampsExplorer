@@ -2758,40 +2758,52 @@ components:
       properties:
         sourceWallet:
           type: string
+          example: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
         assetName:
           type: string
           nullable: true
+          example: "My Stamp"
         qty:
           type: number
+          example: 1
         locked:
           type: boolean
+          example: true
         divisible:
           type: boolean
           default: false
+          example: false
         filename:
           type: string
+          example: "test.png"
         file:
           type: string
+          example: "iVBORw0KGgoAAAANSUhEUgAAA..."
         feeRate:
           type: number
-          description: Fee rate in satoshis per virtual byte / backward compatible
+          description: "Fee rate in satoshis per virtual byte / backward compatible"
+          example: 20
         satsPerVB:
           oneOf:
             - type: number
             - type: string
+          example: 20
         satsPerKB:
           oneOf:
             - type: number
             - type: string
+          example: 2000
         service_fee:
           oneOf:
             - type: number
               nullable: true
             - type: string
               nullable: true
+          example: 1000
         service_fee_address:
           type: string
           nullable: true
+          example: "bc1qxyz..."
 
     PaginatedCollectionResponseBody:
       type: object
