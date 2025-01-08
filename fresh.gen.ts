@@ -95,12 +95,15 @@ import * as $handlers_sharedCollectionHandler from "./routes/handlers/sharedColl
 import * as $handlers_sharedContentHandler from "./routes/handlers/sharedContentHandler.ts";
 import * as $handlers_sharedStampHandler from "./routes/handlers/sharedStampHandler.ts";
 import * as $howto_deploytoken_index from "./routes/howto/deploytoken/index.tsx";
-import * as $howto_getstamping_index from "./routes/howto/getstamping/index.tsx";
 import * as $howto_index from "./routes/howto/index.tsx";
 import * as $howto_leatherconnect_index from "./routes/howto/leatherconnect/index.tsx";
 import * as $howto_leathercreate_index from "./routes/howto/leathercreate/index.tsx";
-import * as $howto_mint_index from "./routes/howto/mint/index.tsx";
-import * as $howto_transfer_index from "./routes/howto/transfer/index.tsx";
+import * as $howto_minttoken_index from "./routes/howto/minttoken/index.tsx";
+import * as $howto_registerbitname_index from "./routes/howto/registerbitname/index.tsx";
+import * as $howto_stamp_index from "./routes/howto/stamp/index.tsx";
+import * as $howto_transferbitname_index from "./routes/howto/transferbitname/index.tsx";
+import * as $howto_transferstamp_index from "./routes/howto/transferstamp/index.tsx";
+import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
@@ -172,12 +175,13 @@ import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
 import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
-import * as $modules_HowToDeploy from "./islands/modules/HowToDeploy.tsx";
-import * as $modules_HowToMint from "./islands/modules/HowToMint.tsx";
-import * as $modules_HowToRegister from "./islands/modules/HowToRegister.tsx";
+import * as $modules_HowToDeployToken from "./islands/modules/HowToDeployToken.tsx";
+import * as $modules_HowToMintToken from "./islands/modules/HowToMintToken.tsx";
+import * as $modules_HowToRegisterBitname from "./islands/modules/HowToRegisterBitname.tsx";
 import * as $modules_HowToStamp from "./islands/modules/HowToStamp.tsx";
-import * as $modules_HowToTransfer from "./islands/modules/HowToTransfer.tsx";
+import * as $modules_HowToTransferBitname from "./islands/modules/HowToTransferBitname.tsx";
 import * as $modules_HowToTransferStamp from "./islands/modules/HowToTransferStamp.tsx";
+import * as $modules_HowToTransferToken from "./islands/modules/HowToTransferToken.tsx";
 import * as $modules_NamedAssets from "./islands/modules/NamedAssets.tsx";
 import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
@@ -209,8 +213,8 @@ import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampT
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
-import * as $stamping_src101_mint_MintContent from "./islands/stamping/src101/mint/MintContent.tsx";
-import * as $stamping_src101_mint_RecentRegister from "./islands/stamping/src101/mint/RecentRegister.tsx";
+import * as $stamping_src101_register_RecentRegister from "./islands/stamping/src101/register/RecentRegister.tsx";
+import * as $stamping_src101_register_RegisterContent from "./islands/stamping/src101/register/RegisterContent.tsx";
 import * as $stamping_src20_SRC20InputField from "./islands/stamping/src20/SRC20InputField.tsx";
 import * as $stamping_src20_deploy_DeployContent from "./islands/stamping/src20/deploy/DeployContent.tsx";
 import * as $stamping_src20_deploy_RecentDeploy from "./islands/stamping/src20/deploy/RecentDeploy.tsx";
@@ -346,12 +350,15 @@ const manifest = {
     "./routes/handlers/sharedContentHandler.ts": $handlers_sharedContentHandler,
     "./routes/handlers/sharedStampHandler.ts": $handlers_sharedStampHandler,
     "./routes/howto/deploytoken/index.tsx": $howto_deploytoken_index,
-    "./routes/howto/getstamping/index.tsx": $howto_getstamping_index,
     "./routes/howto/index.tsx": $howto_index,
     "./routes/howto/leatherconnect/index.tsx": $howto_leatherconnect_index,
     "./routes/howto/leathercreate/index.tsx": $howto_leathercreate_index,
-    "./routes/howto/mint/index.tsx": $howto_mint_index,
-    "./routes/howto/transfer/index.tsx": $howto_transfer_index,
+    "./routes/howto/minttoken/index.tsx": $howto_minttoken_index,
+    "./routes/howto/registerbitname/index.tsx": $howto_registerbitname_index,
+    "./routes/howto/stamp/index.tsx": $howto_stamp_index,
+    "./routes/howto/transferbitname/index.tsx": $howto_transferbitname_index,
+    "./routes/howto/transferstamp/index.tsx": $howto_transferstamp_index,
+    "./routes/howto/transfertoken/index.tsx": $howto_transfertoken_index,
     "./routes/index.tsx": $index,
     "./routes/media/index.tsx": $media_index,
     "./routes/presskit/index.tsx": $presskit_index,
@@ -436,12 +443,13 @@ const manifest = {
     "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
-    "./islands/modules/HowToDeploy.tsx": $modules_HowToDeploy,
-    "./islands/modules/HowToMint.tsx": $modules_HowToMint,
-    "./islands/modules/HowToRegister.tsx": $modules_HowToRegister,
+    "./islands/modules/HowToDeployToken.tsx": $modules_HowToDeployToken,
+    "./islands/modules/HowToMintToken.tsx": $modules_HowToMintToken,
+    "./islands/modules/HowToRegisterBitname.tsx": $modules_HowToRegisterBitname,
     "./islands/modules/HowToStamp.tsx": $modules_HowToStamp,
-    "./islands/modules/HowToTransfer.tsx": $modules_HowToTransfer,
+    "./islands/modules/HowToTransferBitname.tsx": $modules_HowToTransferBitname,
     "./islands/modules/HowToTransferStamp.tsx": $modules_HowToTransferStamp,
+    "./islands/modules/HowToTransferToken.tsx": $modules_HowToTransferToken,
     "./islands/modules/NamedAssets.tsx": $modules_NamedAssets,
     "./islands/modules/Partners.tsx": $modules_Partners,
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
@@ -480,10 +488,10 @@ const manifest = {
     "./islands/stamping/InputField.tsx": $stamping_InputField,
     "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
-    "./islands/stamping/src101/mint/MintContent.tsx":
-      $stamping_src101_mint_MintContent,
-    "./islands/stamping/src101/mint/RecentRegister.tsx":
-      $stamping_src101_mint_RecentRegister,
+    "./islands/stamping/src101/register/RecentRegister.tsx":
+      $stamping_src101_register_RecentRegister,
+    "./islands/stamping/src101/register/RegisterContent.tsx":
+      $stamping_src101_register_RegisterContent,
     "./islands/stamping/src20/SRC20InputField.tsx":
       $stamping_src20_SRC20InputField,
     "./islands/stamping/src20/deploy/DeployContent.tsx":

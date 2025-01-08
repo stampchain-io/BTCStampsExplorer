@@ -1,12 +1,12 @@
 import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ReadAllButton } from "$components/shared/ReadAllButton.tsx";
 
-export const HowToMintModule = () => {
+export const HowToRegisterBitnameModule = () => {
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col">
         <h1 class={ModulesStyles.titleGreyDL}>HOW-TO</h1>
-        <h2 class={ModulesStyles.subTitleGrey}>MINT A TOKEN</h2>
+        <h2 class={ModulesStyles.subTitleGrey}>REGISTER A DOMAIN</h2>
         <p class={ModulesStyles.bodyTextLight}>
           <ul class="list-disc pl-5 space-y-2">
             <li>
@@ -51,7 +51,7 @@ export const HowToMintModule = () => {
           All related costs are listed in the <b>details</b> section.<br />
         </p>
       </div>
-      <ReadAllButton href="/howto/mint" />
+      <ReadAllButton href="/howto/registerbitname" />
     </div>
   );
 };

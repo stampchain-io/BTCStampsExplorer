@@ -95,10 +95,13 @@ export interface ArticleLink {
 }
 
 export const ARTICLE_LINKS: ArticleLink[] = [
-  { title: "DEPLOY YOUR OWN TOKEN", href: "/howto/deploytoken" },
-  { title: "MINT YOUR OWN TOKEN", href: "/howto/mint" },
-  { title: "STAMPING ART", href: "/howto/getstamping" },
-  { title: "TRANSFER FUNCTIONALITY", href: "/howto/transfer" },
   { title: "CREATE A WALLET", href: "/howto/leathercreate" },
   { title: "CONNECT YOUR LEATHER WALLET", href: "/howto/leatherconnect" },
+  { title: "DEPLOY YOUR OWN TOKEN", href: "/howto/deploytoken" },
+  { title: "MINT A TOKEN", href: "/howto/minttoken" },
+  { title: "TRANSFER TOKENS", href: "/howto/transfertoken" },
+  { title: "STAMP ART", href: "/howto/stamp" },
+  { title: "TRANSFER A STAMP", href: "/howto/transferstamp" },
+  { title: "REGISTER BITNAME DOMAIN", href: "/howto/registerbitname" },
+  { title: "TRANSFER A BITNAME DOMAIN", href: "/howto/transferbitname" },
 ];

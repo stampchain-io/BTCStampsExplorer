@@ -3,9 +3,9 @@ import { Head as _Head } from "$fresh/runtime.ts";
 export default function HowTo() {
   const body = "flex flex-col gap-12 mobileLg:gap-[72px] desktop:gap-24";
   const titleGreyDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
   const subTitleGrey =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const bodyTextLight =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
   const buttonGreyOutline =
@@ -28,6 +28,64 @@ export default function HowTo() {
           Reach out to us, and we'll be happy to create new how-tos based on
           your suggestions.
         </p>
+      </section>
+
+      <section>
+        <h2 className={subTitleGrey}>CREATE A LEATHER WALLET</h2>
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
+          <img
+            src="/img/how-tos/createleatherwallet/00.png"
+            width="100%"
+            alt="Create, setup and install Bitcoin Leather wallet"
+          />
+          <div className="flex flex-col desktop:col-span-2 gap-6">
+            <p className={bodyTextLight}>
+              New to Bitcoin, Stamps, wallet and all the other fancy lingo?{" "}
+              <br />
+              No worries! We've got you covered. <br />
+              <br />
+              <b>In this guide, you'll learn how to create a Leather wallet!</b>
+            </p>
+            <div className="flex justify-start">
+              <a
+                href="/howto/leathercreate"
+                f-partial="/howto/leathercreate"
+                className={buttonGreyOutline}
+              >
+                READ
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className={subTitleGrey}>CONNECT YOUR LEATHER WALLET</h2>
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
+          <img
+            src="/img/how-tos/connectleatherwallet/00.png"
+            width="100%"
+            alt="Connect your Bitcoin Leather wallet to the Stampchain website"
+            class="block mobileLg:order-last"
+          />
+          <div className="flex flex-col desktop:col-span-2 gap-6">
+            <p className={bodyTextLight}>
+              <b>
+                In this guide, you'll learn how connect your Leather wallet to
+                stampchain.io
+              </b>
+            </p>
+            <div className="flex justify-start">
+              <a
+                href="/howto/leatherconnect"
+                f-partial="/howto/leatherconnect"
+                className={buttonGreyOutline}
+              >
+                READ
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section>
@@ -80,8 +138,40 @@ export default function HowTo() {
             </p>
             <div className="flex justify-start">
               <a
-                href="/howto/mint"
-                f-partial="/howto/mint"
+                href="/howto/minttoken"
+                f-partial="/howto/minttoken"
+                className={buttonGreyOutline}
+              >
+                READ
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className={subTitleGrey}>TRANSFER TOKEN</h2>
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
+          <img
+            src="/img/how-tos/transfer/00.png"
+            width="100%"
+            alt="Transfer SRC-20 tokens on the Bitcoin blockchain"
+          />
+          <div className="flex flex-col desktop:col-span-2 gap-6">
+            <p className={bodyTextLight}>
+              Send your tokens swiftly and securely across the Bitcoin
+              blockchain
+              <br />
+              <br />
+              <b>
+                We are finishing off the last details of this guide and will
+                hopefully have it ready for you soon!
+              </b>
+            </p>
+            <div className="flex justify-start">
+              <a
+                href="/howto/transfertoken"
+                f-partial="/howto/transfertoken"
                 className={buttonGreyOutline}
               >
                 READ
@@ -98,6 +188,7 @@ export default function HowTo() {
             src="/img/how-tos/stamping/00.png"
             width="100%"
             alt="Guide on how to create NFTs on Bitcoin using the stamps protocol"
+            class="block mobileLg:order-last"
           />
           <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
@@ -108,8 +199,8 @@ export default function HowTo() {
             </p>
             <div className="flex justify-start">
               <a
-                href="/howto/getstamping"
-                f-partial="/howto/getstamping"
+                href="/howto/stamp"
+                f-partial="/howto/stamp"
                 className={buttonGreyOutline}
               >
                 READ
@@ -120,58 +211,27 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className={subTitleGrey}>TRANSFER FUNCTIONALITY</h2>
+        <h2 className={subTitleGrey}>TRANSFER STAMP</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
           <img
             src="/img/how-tos/transfer/00.png"
             width="100%"
             alt="Transfer SRC-20 tokens on the Bitcoin blockchain"
-            class="block mobileLg:order-last"
           />
           <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
-              Send your assets swiftly and securely across the Bitcoin
-              blockchain
+              Transfer stamps
               <br />
               <br />
               <b>
-                We are finnishing off the last details of this guide and will
+                We are finishing off the last details of this guide and will
                 hopefully have it ready for you soon!
               </b>
             </p>
-            <div className="flex justify-start hidden">
-              <a
-                href="/howto/transfer"
-                f-partial="/howto/transfer"
-                className={buttonGreyOutline}
-              >
-                READ
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h2 className={subTitleGrey}>CREATE A LEATHER WALLET</h2>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
-          <img
-            src="/img/how-tos/createleatherwallet/00.png"
-            width="100%"
-            alt="Create, setup and install Bitcoin Leather wallet"
-          />
-          <div className="flex flex-col desktop:col-span-2 gap-6">
-            <p className={bodyTextLight}>
-              New to Bitcoin, Stamps, wallet and all the other fancy lingo?{" "}
-              <br />
-              No worries! We've got you covered. <br />
-              <br />
-              <b>In this guide, you'll learn how to create a Leather wallet!</b>
-            </p>
             <div className="flex justify-start">
               <a
-                href="/howto/leathercreate"
-                f-partial="/howto/leathercreate"
+                href="/howto/transferstamp"
+                f-partial="/howto/transferstamp"
                 className={buttonGreyOutline}
               >
                 READ
@@ -182,25 +242,59 @@ export default function HowTo() {
       </section>
 
       <section>
-        <h2 className={subTitleGrey}>CONNECT YOUR LEATHER WALLET</h2>
+        <h2 className={subTitleGrey}>REGISTER BITNAME DOMAIN</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
           <img
-            src="/img/how-tos/connectleatherwallet/00.png"
+            src="/img/how-tos/stamping/00.png"
             width="100%"
-            alt="Connect your Bitcoin Leather wallet to the Stampchain website"
+            alt="Guide on how to register a bitname domain"
             class="block mobileLg:order-last"
           />
           <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
+              Register a bitname domain on Bitcoin - the most resilient
+              blockchain in the world.<br />
+              <br />
               <b>
-                In this guide, you'll learn how connect your Leather wallet to
-                stampchain.io
+                We are finishing off the last details of this guide and will
+                hopefully have it ready for you soon!
               </b>
             </p>
             <div className="flex justify-start">
               <a
-                href="/howto/leatherconnect"
-                f-partial="/howto/leatherconnect"
+                href="/howto/registerbitname"
+                f-partial="/howto/registerbitname"
+                className={buttonGreyOutline}
+              >
+                READ
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className={subTitleGrey}>TRANSFER DOMAIN</h2>
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
+          <img
+            src="/img/how-tos/transfer/00.png"
+            width="100%"
+            alt="Transfer SRC-20 tokens on the Bitcoin blockchain"
+          />
+          <div className="flex flex-col desktop:col-span-2 gap-6">
+            <p className={bodyTextLight}>
+              Transfer stamps
+              <br />
+              <br />
+              <b>
+                We are finishing off the last details of this guide and will
+                hopefully have it ready for you soon!
+              </b>
+            </p>
+            <div className="flex justify-start">
+              <a
+                href="/howto/transferbitname"
+                f-partial="/howto/transferbitname"
                 className={buttonGreyOutline}
               >
                 READ
