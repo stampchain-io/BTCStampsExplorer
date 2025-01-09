@@ -8,7 +8,7 @@ export const CollectionDetailsHeader = (
   console.log("collection: ", collection);
 
   const titleGreyLD =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1";
   const dataColumn = "flex flex-col -space-y-1";
   const dataLabelSm =
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
@@ -33,7 +33,7 @@ export const CollectionDetailsHeader = (
               loading="lazy"
               onError={handleImageError}
               alt="Collection image"
-              className="h-[78px] w-[78px] mobileMd:h-[82px] mobileMd:w-[82px] mobileLg:h-[108px] mobileLg:w-[108px] desktop:h-[120px] desktop:w-[120px] object-contain items-center standalone:h-24 standalone:w-auto pixelart image-rendering-pixelated"
+              className="h-[78px] w-[78px] mobileMd:h-[82px] mobileMd:w-[82px] mobileLg:h-[108px] mobileLg:w-[108px] object-contain items-center standalone:h-24 standalone:w-auto pixelart image-rendering-pixelated"
             />
             <div className="flex flex-col pl-[18px] mobileMd:pl-6">
               <p className={`${titleGreyLD} pb-0.75 mobileLg:pb-1.5`}>

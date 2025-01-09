@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { SRC20TX } from "./SRC20TX.tsx";
+import { SRC20TX } from "$islands/src20/details/SRC20TX.tsx";
 import { SRC20Row } from "$globals";
 
 interface SRC20DetailsTabProps {

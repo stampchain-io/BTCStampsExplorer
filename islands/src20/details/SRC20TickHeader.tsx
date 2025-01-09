@@ -120,27 +120,8 @@ export function SRC20TickHeader({
   // Format Satoshi value with commas (no decimals needed)
   const floorUnitPriceSatsFormatted = floorUnitPriceSats.toLocaleString();
 
-  const _titleGreyLDClassName =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1";
-  const _subTitleGreyClassName =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
-  const _dataContainer =
-    "flex justify-between items-center dark-gradient rounded-lg p-3 mobileLg:p-6";
-  const _dataColumn = "flex flex-col -space-y-1";
-  const _dataLabelSm =
-    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  // const dataLabel =
-  //   "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-  const _dataValueXs =
-    "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
-  const _dataValueSm =
-    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  const _dataValue =
-    "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
-  const _dataValueXl =
-    "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
-  const _tooltip =
-    "absolute left-1/2 -translate-x-1/2 bottom-full text-stamp-grey-light text-xs mb-1 hidden group-hover:block whitespace-nowrap";
+  const titleGreyLDClassName =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient1";
 
   return (
     <>
@@ -156,13 +137,13 @@ export function SRC20TickHeader({
             <div className="flex gap-[18px] mobileMd:gap-[30px]">
               <img
                 src={`/content/${deployment.tx_hash}.svg`}
-                class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] desktop:max-w-[116px] rounded relative z-10"
+                class="max-w-[83px] mobileMd:max-w-[91px] mobileLg:max-w-[103px] rounded relative z-10"
                 alt={`${deployment.tick} token image`}
                 loading="lazy"
               />
               <div class="relative z-10">
                 <div class="flex">
-                  <p class="relative z-10 inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient1 uppercase">
+                  <p class={titleGreyLDClassName + " uppercase"}>
                     {tickValue}
                   </p>
                   <div class="flex gap-3 items-center">
