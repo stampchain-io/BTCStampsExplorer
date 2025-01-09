@@ -2,23 +2,33 @@ import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
 
 interface NavLink {
-  title: string;
+  title: string | {
+    default: string;
+    tablet: string;
+  };
   href?: string;
   subLinks?: NavLink[];
 }
 
 const desktopNavLinks: NavLink[] = [
   {
-    title: "ART STAMPS",
+    title: {
+      default: "ART STAMPS",
+      tablet: "STAMPS",
+    },
     href: "#",
     subLinks: [
       { title: "ALL", href: "/stamp?type=classic" },
       { title: "COLLECTIONS", href: "/collection" },
       { title: "STAMPING", href: "/stamping/stamp" },
+      { title: "TRANSFER", href: "/stamping/stamp/transfer" },
     ],
   },
   {
-    title: "SRC-20 TOKENS",
+    title: {
+      default: "SRC-20 TOKENS",
+      tablet: "TOKENS",
+    },
     href: "#",
     subLinks: [
       { title: "ALL", href: "/src20" },
@@ -26,6 +36,16 @@ const desktopNavLinks: NavLink[] = [
       { title: "DEPLOY", href: "/stamping/src20/deploy" },
       { title: "MINT", href: "/stamping/src20/mint" },
       { title: "TRANSFER", href: "/stamping/src20/transfer" },
+    ],
+  },
+  {
+    title: {
+      default: "BITNAME DOMAINS",
+      tablet: "BITNAME",
+    },
+    href: "#",
+    subLinks: [
+      { title: "REGISTER", href: "/stamping/src101/mint" },
     ],
   },
 ];
@@ -52,9 +72,11 @@ const mobileNavLinks: NavLink[] = [
     href: "#",
     subLinks: [
       { title: "STAMPING", href: "/stamping/stamp" },
-      { title: "DEPLOY", href: "/stamping/src20/deploy" },
-      { title: "MINT", href: "/stamping/src20/mint" },
-      { title: "TRANSFER", href: "/stamping/src20/transfer" },
+      { title: "TRANSFER STAMP", href: "/stamping/stamp/transfer" },
+      { title: "DEPLOY TOKEN", href: "/stamping/src20/deploy" },
+      { title: "MINT TOKEN", href: "/stamping/src20/mint" },
+      { title: "TRANSFER TOKEN", href: "/stamping/src20/transfer" },
+      { title: "REGISTER BITNAME", href: "/stamping/src101/mint" },
     ],
   },
 ];
@@ -70,7 +92,7 @@ const socialLinks = [
 ];
 
 const logoClassName =
-  "purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black italic pr-2";
+  "text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black italic purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 pr-2";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -138,7 +160,9 @@ export function Header() {
       <>
         {filteredNavLinks.map((link) => (
           <div
-            key={link.title}
+            key={typeof link.title === "string"
+              ? link.title
+              : link.title.default}
             className={`group relative cursor-pointer text-nowrap ${
               isMobile ? "flex flex-col gap-[6px] text-lg" : ""
             }`}
@@ -156,13 +180,22 @@ export function Header() {
                 isMobile
                   ? `text-xl mobileLg:text-2xl ${
                     link.subLinks
-                      ? "text-stamp-primary-dark"
-                      : "text-stamp-primary"
+                      ? "text-stamp-purple-dark"
+                      : "text-stamp-purple hover:text-stamp-purple-bright"
                   }`
-                  : "text-lg desktop:text-xl text-center group-hover:text-stamp-primary-hover"
+                  : "text-lg text-center group-hover:text-stamp-purple-bright"
               }`}
             >
-              {link.title}
+              <span className="hidden tablet:inline min-[1180px]:hidden">
+                {typeof link.title === "string"
+                  ? link.title
+                  : link.title.tablet}
+              </span>
+              <span className="tablet:hidden min-[1180px]:inline">
+                {typeof link.title === "string"
+                  ? link.title
+                  : link.title.default}
+              </span>
             </a>
             {link.subLinks && (
               <div
@@ -181,9 +214,9 @@ export function Header() {
                       toggleMenu();
                       setCurrentPath(subLink?.href ? subLink?.href : null);
                     }}
-                    className={`hover:text-stamp-purple-highlight text-base mobileLg:text-lg tablet:text-base ${
+                    className={`hover:text-stamp-purple-bright text-base mobileLg:text-lg tablet:text-base ${
                       currentPath === subLink.href
-                        ? "text-stamp-purple-highlight"
+                        ? "text-stamp-purple-bright"
                         : ""
                     }`}
                   >
@@ -199,7 +232,7 @@ export function Header() {
   };
 
   return (
-    <header className="px-3 mobileMd:px-6 desktop:px-12 my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12 max-w-desktop w-full mx-auto tablet:flex justify-between items-center">
+    <header className="tablet:flex justify-between items-center max-w-desktop w-full mx-auto px-3 mobileMd:px-6 desktop:px-12 my-[18px] mobileMd:my-6 mobileLg:my-9 tablet:my-12">
       <div className="flex justify-between items-center w-full ">
         <a
           href="/home"
@@ -218,33 +251,33 @@ export function Header() {
             <img
               src="/img/header/menu-close.svg"
               alt="menu"
-              className="w-5 h-5 mr-1.5"
+              className="w-5 h-5 mobileLg:w-6 mobileLg:h-6 mr-1.5"
             />
           )}
           {!open && (
             <img
               src="/img/header/menu-open.svg"
               alt="menu"
-              className="w-5 h-5"
+              className="w-5 h-5 mobileLg:w-6 mobileLg:h-6"
             />
           )}
         </button>
       </div>
 
-      {/* Desktop Navbar */}
-      <div className="hidden tablet:flex justify-between items-center gap-9 desktop:gap-12 font-black text-stamp-primary">
+      {/* Tablet/Desktop Navbar */}
+      <div className="hidden tablet:flex justify-between items-center gap-6 desktop:gap-9 font-black text-stamp-purple">
         {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>
 
       {/* Mobile Navbar */}
       <div
-        className={`duration-500 flex tablet:hidden flex-col justify-between fixed left-0 top-0 w-full h-screen z-30 backdrop-blur-md bg-gradient-to-b from-[#171717]/40 to-[#171717]/80 scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] font-black text-stamp-primary ${
+        className={`flex tablet:hidden flex-col justify-between fixed left-0 top-0 w-full h-screen z-30 backdrop-blur-md bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 scroll-none px-6 pb-[18px] mobileLg:pb-[49px] pt-[89px] mobileLg:pt-[126px] font-black text-stamp-purple duration-300 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         id="navbar-collapse"
       >
-        <div className="font-black text-center flex flex-col items-center justify-between gap-3">
+        <div className="flex flex-col items-center justify-between font-black text-center gap-3">
           {renderNavLinks(true)}
           <ConnectWallet toggleModal={toggleWalletModal} />
         </div>
