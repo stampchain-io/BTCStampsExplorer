@@ -321,7 +321,7 @@ documentation:
 # Environment and configuration
 environment:
   development:
-    base_url: "https://dev.bitcoinstamps.xyz"
+    base_url: "https://dev.stampchain.io"
     skip_redis: true
   production:
     base_url: "https://stampchain.io"
