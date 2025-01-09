@@ -582,7 +582,11 @@ export function StampImage(
 
       {src !== NOT_AVAILABLE_IMAGE && isHtml && (
         <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
-          <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
+          <div
+            className={`relative ${
+              flag ? "dark-gradient rounded-lg p-3 mobileMd:p-6" : ""
+            }`}
+          >
             <div className="stamp-container">
               <div className="relative pt-[100%]">
                 <iframe
