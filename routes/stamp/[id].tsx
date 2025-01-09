@@ -16,7 +16,7 @@ import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
-import { DOMParser } from "$dom";
+import { DOMParser } from "dom";
 
 interface Holder {
   address: string | null;
@@ -209,7 +209,7 @@ export default function StampPage(props: StampDetailPageProps) {
     _dispenses = [],
     lowestPriceDispenser = null,
   } = props.data;
-  console.log("stamp====>", stamp);
+
   const title = htmlTitle
     ? htmlTitle.toUpperCase()
     : stamp.cpid.startsWith("A")
