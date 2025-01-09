@@ -582,7 +582,11 @@ export function StampImage(
 
       {src !== NOT_AVAILABLE_IMAGE && isHtml && (
         <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
-          <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
+          <div
+            className={`relative ${
+              flag ? "dark-gradient rounded-lg p-3 mobileMd:p-6" : ""
+            }`}
+          >
             <div className="stamp-container">
               <div className="relative pt-[100%]">
                 <iframe
@@ -613,7 +617,23 @@ export function StampImage(
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && isPlainText && (
-        <TextContentIsland src={src} />
+        <div className="flex flex-col gap-3 mobileMd:gap-6">
+          <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
+            <div className="stamp-container">
+              <div className="relative aspect-square">
+                <TextContentIsland src={src} className={className} />
+              </div>
+            </div>
+          </div>
+          {flag && (
+            <RightPanel
+              stamp={stamp}
+              toggleCodeModal={toggleCodeModal}
+              toggleFullScreenModal={toggleFullScreenModal}
+              showCodeButton={false}
+            />
+          )}
+        </div>
       )}
 
       {src !== NOT_AVAILABLE_IMAGE && isAudio && (
@@ -700,7 +720,11 @@ export function StampImage(
         <StampImageFullScreen
           src={src}
           handleCloseModal={handleCloseFullScreenModal}
-          contentType={stamp.stamp_mimetype === "text/html" ? "html" : "image"}
+          contentType={stamp.stamp_mimetype === "text/html"
+            ? "html"
+            : stamp.stamp_mimetype === "text/plain"
+            ? "text"
+            : "image"}
         />
       )}
     </>

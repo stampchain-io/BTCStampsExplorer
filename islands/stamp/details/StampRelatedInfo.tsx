@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
 
-import { StampDispensers } from "$components/stampDetails/StampDispensers.tsx";
+import { StampListingsAll } from "$components/stampDetails/StampListingsAll.tsx";
 import { StampSales } from "$components/stampDetails/StampSales.tsx";
 import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
 
@@ -222,7 +222,7 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
   const renderTabContent = () => {
     switch (selectedTab) {
       case "dispensers": {
-        return <StampDispensers dispensers={dispensers} />;
+        return <StampListingsAll dispensers={dispensers} />;
       }
       case "sales": {
         return <StampSales dispenses={dispensesWithRates} />;
@@ -232,9 +232,9 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
       }
     }
   };
-  const _dataLabelClassName =
+  const dataLabel =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-  const dataValueXLlinkClassName =
+  const dataValueXLlink =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
 
   // Update getTabsWithCounts to use totalCounts
@@ -244,9 +244,9 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
         id: "dispensers",
         label: (
           <div class="flex flex-col text-left">
-            DISPENSERS
+            LISTINGS
             <div
-              class={`${dataValueXLlinkClassName} ${
+              class={`${dataValueXLlink} ${
                 selectedTab === "dispensers"
                   ? "text-stamp-grey-light"
                   : "text-stamp-grey-darker"
@@ -263,7 +263,7 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
           <div class="flex flex-col text-center">
             SALES
             <div
-              class={`${dataValueXLlinkClassName} ${
+              class={`${dataValueXLlink} ${
                 selectedTab === "sales"
                   ? "text-stamp-grey-light"
                   : "text-stamp-grey-darker"
@@ -280,7 +280,7 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
           <div class="flex flex-col text-right">
             TRANSFERS
             <div
-              class={`${dataValueXLlinkClassName} ${
+              class={`${dataValueXLlink} ${
                 selectedTab === "transfers"
                   ? "text-stamp-grey-light"
                   : "text-stamp-grey-darker"
@@ -296,7 +296,9 @@ export function StampRelatedInfo({ _stampId, cpid }: StampRelatedInfoProps) {
 
   return (
     <div class="dark-gradient rounded-lg p-3 mobileMd:p-6">
-      <div class="flex justify-between w-full -mb-1 mobileLg:mb-2 text-base mobileLg:text-lg text-stamp-grey-darker font-light">
+      <div
+        class={`${dataLabel}  flex justify-between w-full -mb-1 mobileLg:mb-2`}
+      >
         {getTabsWithCounts().map(({ id, label }) => (
           <p
             key={id}

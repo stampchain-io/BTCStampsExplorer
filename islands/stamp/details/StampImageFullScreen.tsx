@@ -1,10 +1,11 @@
 import { useEffect } from "preact/hooks";
 import { handleImageError } from "$lib/utils/imageUtils.ts";
+import TextContentIsland from "$islands/stamp/details/StampTextContent.tsx";
 
 interface StampImageFullScreenProps {
   src: string | File;
   handleCloseModal: () => void;
-  contentType?: "html" | "image";
+  contentType?: "html" | "text" | "image";
 }
 
 const StampImageFullScreen = ({
@@ -69,6 +70,12 @@ const StampImageFullScreen = ({
                     loading="lazy"
                     title="Stamp Preview"
                   />
+                )
+                : contentType === "text"
+                ? (
+                  <div className="w-full h-full rounded-sm mobileMd:rounded-md aspect-square">
+                    <TextContentIsland src={imageUrl} />
+                  </div>
                 )
                 : (
                   <img
