@@ -6,9 +6,10 @@ import {
   formatDate,
 } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-
 import { StampRow } from "$globals";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.tsx";
+import type { Dispenser } from "$components/stampDetails/StampListingsOpen.tsx";
 
 interface StampInfoProps {
   stamp: StampRow;
@@ -37,7 +38,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-  const toggleModal = () => {
+  const toggleModal = (dispenser?: Dispenser) => {
+    if (dispenser) {
+      setSelectedDispenser(dispenser);
+    }
     setIsModalOpen(!isModalOpen);
   };
 
@@ -96,7 +100,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   const buttonPurpleFlat =
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
 
-  // Add tooltip states
   const [isDivisibleTooltipVisible, setIsDivisibleTooltipVisible] = useState(
     false,
   );
@@ -267,7 +270,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             const divStyle = doc.querySelector("div")?.getAttribute("style");
 
             // Parse dimensions from style
-            const getDimension = (style: string | null) => {
+            const getDimension = (style: string | null | undefined) => {
               if (!style) return null;
               const widthMatch = style.match(/width:\s*(\d+)(px|rem|em)/);
               const heightMatch = style.match(/height:\s*(\d+)(px|rem|em)/);
@@ -304,6 +307,15 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           console.error("Failed to fetch HTML content:", error);
           setImageDimensions(null);
         });
+    } else if (stamp.stamp_mimetype === "text/plain") {
+      // Add handling for plain text files
+      fetch(stamp.stamp_url)
+        .then((response) => response.text())
+        .then((text) => {
+          const blob = new Blob([text], { type: "text/plain" });
+          setFileSize(blob.size);
+        })
+        .catch((error) => console.error("Failed to fetch text size:", error));
     } else if (
       stamp.stamp_mimetype === "text/javascript" ||
       stamp.stamp_mimetype === "application/javascript"
@@ -329,13 +341,20 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   }, [stamp.stamp_mimetype, stamp.stamp_url]);
 
   // Format file size
-  const formatFileSize = (bytes: number | null) => {
-    if (!bytes) return "N/A";
-    return `${(bytes / 1024).toFixed(2)} KB`;
+  const formatFileSize = (size: number) => {
+    if (stamp.stamp_mimetype === "text/plain") {
+      return `${size} B`;
+    }
+
+    if (size < 1024) return size + " B";
+    return (size / 1024).toFixed(1) + " KB";
   };
 
   // Format dimensions display
   const getDimensionsDisplay = (dims: DimensionsType | null) => {
+    if (stamp.stamp_mimetype === "text/plain") {
+      return "FLUID";
+    }
     if (!dims) return "N/A";
     if (dims.unit === "responsive") return "RESPONSIVE";
     return `${dims.width} x ${dims.height} ${dims.unit.toUpperCase()}`;
@@ -388,6 +407,144 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     globalThis.addEventListener("resize", updateScale);
     return () => globalThis.removeEventListener("resize", updateScale);
   }, []);
+
+  // Move the showListings state to be preserved across dispenser data updates
+  const [showListings, setShowListings] = useState(false);
+
+  // Add state for dispensers and page info
+  const [dispensers, setDispensers] = useState<any[]>([]);
+  const [isLoadingDispensers, setIsLoadingDispensers] = useState(false);
+
+  // Add state for filtered dispensers
+  const [activeDispensers, setActiveDispensers] = useState<any[]>([]);
+
+  // Modify the fetch function to filter active dispensers
+  const fetchDispensers = async (page: number) => {
+    if (isLoadingDispensers) return;
+    setIsLoadingDispensers(true);
+    try {
+      const encodedCpid = encodeURIComponent(stamp.cpid);
+      const params = new URLSearchParams({
+        limit: "20",
+        sort: "DESC",
+        page: page.toString(),
+      });
+
+      const response = await fetch(
+        `/api/v2/stamps/${encodedCpid}/dispensers?${params}`,
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const openDispensers = data.data.filter((d: any) => d.status === "open");
+
+      setDispensers(data.data);
+      setActiveDispensers(openDispensers);
+    } catch (error) {
+      console.error("Error fetching dispensers:", error);
+      setDispensers([]);
+      setActiveDispensers([]);
+    } finally {
+      setIsLoadingDispensers(false);
+    }
+  };
+
+  // Fetch dispensers when expanded
+  useEffect(() => {
+    fetchDispensers(1);
+  }, []);
+
+  // Add state for selected dispenser
+  const [selectedDispenser, setSelectedDispenser] = useState<Dispenser | null>(
+    null,
+  );
+
+  // Add btcPrice state with proper initialization
+  const [btcPrice, setBtcPrice] = useState<number | null>(null);
+
+  // Fetch BTC price when component mounts
+  useEffect(() => {
+    const fetchBTCPrice = async () => {
+      try {
+        const response = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+        );
+        const data = await response.json();
+        setBtcPrice(data.bitcoin.usd);
+      } catch (error) {
+        console.error("Error fetching BTC price:", error);
+        setBtcPrice(null);
+      }
+    };
+
+    fetchBTCPrice();
+  }, []);
+
+  // First, ensure our calculations are correct
+  const displayPrice = selectedDispenser
+    ? parseInt(selectedDispenser.satoshirate.toString(), 10) / 100000000
+    : (typeof stamp.floorPrice === "number" ? stamp.floorPrice : 0);
+
+  const displayPriceUSD = selectedDispenser && btcPrice
+    ? (parseInt(selectedDispenser.satoshirate.toString(), 10) / 100000000) *
+      btcPrice
+    : stamp.floorPriceUSD;
+
+  // Add debug effect to track price updates
+  useEffect(() => {
+    console.log("Price update:", {
+      selectedDispenser,
+      satoshirate: selectedDispenser?.satoshirate,
+      displayPrice,
+      displayPriceUSD,
+      btcPrice,
+    });
+  }, [selectedDispenser, btcPrice]);
+
+  // Add debug logs to track state changes
+  useEffect(() => {
+    console.log("Price calculation values:", {
+      selectedDispenser,
+      satoshirate: selectedDispenser?.satoshirate,
+      floorPrice: stamp.floorPrice,
+      btcPrice,
+      calculatedDisplayPrice: displayPrice,
+      calculatedDisplayPriceUSD: displayPriceUSD,
+    });
+  }, [selectedDispenser, btcPrice, stamp.floorPrice]);
+
+  // Add handler for dispenser selection
+  const handleDispenserSelect = (dispenser: Dispenser) => {
+    const updatedDispenser = {
+      ...dispenser,
+      satoshirate: parseInt(dispenser.satoshirate.toString(), 10),
+    };
+    setSelectedDispenser(updatedDispenser);
+  };
+
+  // At the top of component, add logging for initial check
+  const hasMultipleDispensers = dispensers?.length >= 2;
+  console.log("Initial checks:", {
+    dispensersLength: dispensers?.length,
+    hasMultipleDispensers,
+    showListings,
+    hasFloorPrice: !!stamp.floorPrice,
+    dispensers: dispensers,
+  });
+
+  // Add this useEffect to track dispensers state
+  useEffect(() => {
+    console.log("Dispensers state changed:", {
+      dispensersLength: dispensers?.length,
+      hasDispensers: dispensers?.length > 0,
+      hasMultiple: dispensers?.length >= 2,
+      rawDispensers: dispensers,
+      floorPrice: stamp.floorPrice,
+    });
+  }, [dispensers]);
 
   return (
     <>
@@ -456,52 +613,83 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
           </div>
 
-          <div className="flex flex-col pt-6 mobileLg:pt-12 items-end">
-            <div className="flex flex-col w-full text-right">
-              {(stamp.floorPriceUSD || stamp.marketCapUSD) && (
-                <p className={dataLabel}>
-                  {stamp.floorPriceUSD
-                    ? `${
-                      stamp.floorPriceUSD.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })
-                    }`
-                    : stamp.marketCapUSD
-                    ? `${
-                      stamp.marketCapUSD.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })
-                    }`
-                    : null}
-                  <span className="font-light">
-                    {" "}USD
-                  </span>
-                </p>
-              )}
+          {(dispensers?.length > 0 || stamp.floorPrice)
+            ? (
+              <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
+                <div
+                  className={`flex w-full gap-3 mobileLg:gap-6 mb-3 mobileLg:mb-6 items-end ${
+                    activeDispensers?.length >= 2
+                      ? "justify-between"
+                      : "justify-end"
+                  }`}
+                >
+                  {activeDispensers?.length >= 2 && (
+                    <button
+                      onClick={() => setShowListings(!showListings)}
+                      className="pb-1.5"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 32 32"
+                        className="w-6 h-6 mobileLg:w-[28px] mobileLg:h-[28px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+                        role="button"
+                        aria-label="Listings"
+                      >
+                        <path d="M4 8C4 7.73478 4.10536 7.48043 4.29289 7.29289C4.48043 7.10536 4.73478 7 5 7H27C27.2652 7 27.5196 7.10536 27.7071 7.29289C27.8946 7.48043 28 7.73478 28 8C28 8.26522 27.8946 8.51957 27.7071 8.70711C27.5196 8.89464 27.2652 9 27 9H5C4.73478 9 4.48043 8.89464 4.29289 8.70711C4.10536 8.51957 4 8.26522 4 8ZM5 17H12C12.2652 17 12.5196 16.8946 12.7071 16.7071C12.8946 16.5196 13 16.2652 13 16C13 15.7348 12.8946 15.4804 12.7071 15.2929C12.5196 15.1054 12.2652 15 12 15H5C4.73478 15 4.48043 15.1054 4.29289 15.2929C4.10536 15.4804 4 15.7348 4 16C4 16.2652 4.10536 16.5196 4.29289 16.7071C4.48043 16.8946 4.73478 17 5 17ZM14 23H5C4.73478 23 4.48043 23.1054 4.29289 23.2929C4.10536 23.4804 4 23.7348 4 24C4 24.2652 4.10536 24.5196 4.29289 24.7071C4.48043 24.8946 4.73478 25 5 25H14C14.2652 25 14.5196 24.8946 14.7071 24.7071C14.8946 24.5196 15 24.2652 15 24C15 23.7348 14.8946 23.4804 14.7071 23.2929C14.5196 23.1054 14.2652 23 14 23ZM29.6362 17.9725L26.8213 20.2962L27.6787 23.76C27.7258 23.951 27.7154 24.1516 27.649 24.3367C27.5826 24.5218 27.463 24.6832 27.3053 24.8008C27.1476 24.9183 26.9588 24.9867 26.7624 24.9975C26.566 25.0083 26.3708 24.9609 26.2013 24.8612L23 22.9775L19.7987 24.8612C19.6292 24.9609 19.434 25.0083 19.2376 24.9975C19.0412 24.9867 18.8524 24.9183 18.6947 24.8008C18.537 24.6832 18.4174 24.5218 18.351 24.3367C18.2846 24.1516 18.2742 23.951 18.3213 23.76L19.1775 20.2962L16.3638 17.9725C16.2103 17.8456 16.0983 17.6758 16.0419 17.4848C15.9856 17.2938 15.9876 17.0903 16.0476 16.9005C16.1076 16.7106 16.2229 16.543 16.3788 16.4191C16.5347 16.2952 16.724 16.2206 16.9225 16.205L20.6525 15.9163L22.0812 12.6038C22.1585 12.4241 22.2866 12.271 22.4499 12.1635C22.6132 12.0559 22.8045 11.9986 23 11.9986C23.1955 11.9986 23.3868 12.0559 23.5501 12.1635C23.7134 12.271 23.8415 12.4241 23.9188 12.6038L25.3475 15.9163L29.0775 16.205C29.276 16.2206 29.4653 16.2952 29.6212 16.4191C29.7771 16.543 29.8924 16.7106 29.9524 16.9005C30.0124 17.0903 30.0144 17.2938 29.9581 17.4848C29.9018 17.6758 29.7897 17.8456 29.6362 17.9725ZM26.4525 18.0075L24.5912 17.8638C24.4097 17.8498 24.2354 17.7866 24.0871 17.6808C23.9389 17.5751 23.8223 17.4309 23.75 17.2638L23 15.5238L22.25 17.2638C22.1777 17.4309 22.0611 17.5751 21.9129 17.6808C21.7646 17.7866 21.5903 17.8498 21.4088 17.8638L19.5475 18.0075L20.9363 19.155C21.0817 19.2749 21.1903 19.4334 21.2496 19.6123C21.3089 19.7912 21.3164 19.9833 21.2712 20.1663L20.8337 21.9312L22.4925 20.955C22.6463 20.8644 22.8215 20.8167 23 20.8167C23.1785 20.8167 23.3537 20.8644 23.5075 20.955L25.1663 21.9312L24.7288 20.1663C24.6836 19.9833 24.6911 19.7912 24.7504 19.6123C24.8097 19.4334 24.9183 19.2749 25.0637 19.155L26.4525 18.0075Z" />
+                      </svg>
+                    </button>
+                  )}
 
-              <p className={dataValueXl}>
-                {(!stamp.floorPrice || stamp.floorPrice === "NOT LISTED") &&
-                    stamp.marketCap && typeof stamp.marketCap === "number"
-                  ? formatBTCAmount(stamp.marketCap, { excludeSuffix: true })
-                  : typeof stamp.floorPrice === "number"
-                  ? formatBTCAmount(stamp.floorPrice, { excludeSuffix: true })
-                  : stamp.floorPrice}
-                {(typeof stamp.floorPrice === "number" ||
-                  (stamp.marketCap && typeof stamp.marketCap === "number")) && (
-                  <span className="font-extralight">{" "}BTC</span>
-                )}
-              </p>
-            </div>
+                  <div className="text-right">
+                    {displayPriceUSD && (
+                      <p className={dataLabel}>
+                        {displayPriceUSD.toLocaleString("en-US", {
+                          maximumFractionDigits: 2,
+                        })} <span className="font-light">USD</span>
+                      </p>
+                    )}
+                    <p className={dataValueXl}>
+                      {formatBTCAmount(
+                        typeof displayPrice === "number" ? displayPrice : 0,
+                        { excludeSuffix: true },
+                      )} <span className="font-extralight">BTC</span>
+                    </p>
+                  </div>
+                </div>
 
-            {lowestPriceDispenser && (
-              <button
-                className={`${buttonPurpleFlat} float-right mt-3 mobileMd:mt-6`}
-                onClick={toggleModal}
-              >
-                BUY
-              </button>
-            )}
-          </div>
+                {(activeDispensers?.length >= 2)
+                  ? (
+                    showListings && (
+                      <div className="w-full mb-3 mobileLg:mb-6">
+                        {isLoadingDispensers
+                          ? <p>Loading listings...</p>
+                          : (
+                            <StampListingsOpen
+                              dispensers={activeDispensers}
+                              floorPrice={typeof stamp.floorPrice === "number"
+                                ? stamp.floorPrice
+                                : 0}
+                              onSelectDispenser={handleDispenserSelect}
+                              selectedDispenser={selectedDispenser}
+                            />
+                          )}
+                      </div>
+                    )
+                  )
+                  : null}
+
+                <div className="flex justify-end">
+                  <button
+                    className={`${buttonPurpleFlat}`}
+                    onClick={() =>
+                      toggleModal(selectedDispenser || lowestPriceDispenser)}
+                  >
+                    BUY
+                  </button>
+                </div>
+              </div>
+            )
+            : null}
         </div>
 
         <div className="flex flex-col dark-gradient rounded-lg p-3 mobileLg:p-6">
@@ -570,7 +758,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   </div>
                 </div>
               )}
-              {stamp.locked == true && (
+              {stamp.locked && (
                 <div
                   className="relative group"
                   onMouseEnter={handleLockedMouseEnter}
@@ -593,7 +781,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   </div>
                 </div>
               )}
-              {stamp.locked != true && (
+              {!stamp.locked && (
                 <div
                   className="relative group"
                   onMouseEnter={handleUnlockedMouseEnter}
@@ -653,7 +841,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             handleChangeFee={handleChangeFee}
             toggleModal={() => setIsModalOpen(false)}
             handleCloseModal={handleCloseModal}
-            dispenser={lowestPriceDispenser} // Pass the dispenser to the modal
+            dispenser={selectedDispenser || lowestPriceDispenser}
           />
         )}
       </div>

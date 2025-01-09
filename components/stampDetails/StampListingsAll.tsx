@@ -15,7 +15,7 @@ interface Dispenser {
   close_block_index: number;
 }
 
-interface StampDispensersProps {
+interface StampListingsAllProps {
   dispensers: Dispenser[];
 }
 
@@ -74,7 +74,7 @@ function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
   );
 }
 
-export function StampDispensers({ dispensers }: StampDispensersProps) {
+export function StampListingsAll({ dispensers }: StampListingsAllProps) {
   // TODO(@reinamora_137): the secondary sort should be by creation date
   const sortedDispensers = [...dispensers].sort((a, b) =>
     b.give_remaining - a.give_remaining
