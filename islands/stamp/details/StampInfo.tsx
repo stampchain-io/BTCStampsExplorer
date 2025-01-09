@@ -307,6 +307,15 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           console.error("Failed to fetch HTML content:", error);
           setImageDimensions(null);
         });
+    } else if (stamp.stamp_mimetype === "text/plain") {
+      // Add handling for plain text files
+      fetch(stamp.stamp_url)
+        .then((response) => response.text())
+        .then((text) => {
+          const blob = new Blob([text], { type: "text/plain" });
+          setFileSize(blob.size);
+        })
+        .catch((error) => console.error("Failed to fetch text size:", error));
     } else if (
       stamp.stamp_mimetype === "text/javascript" ||
       stamp.stamp_mimetype === "application/javascript"
@@ -332,13 +341,20 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   }, [stamp.stamp_mimetype, stamp.stamp_url]);
 
   // Format file size
-  const formatFileSize = (bytes: number | null) => {
-    if (!bytes) return "N/A";
-    return `${(bytes / 1024).toFixed(2)} KB`;
+  const formatFileSize = (size: number) => {
+    if (stamp.stamp_mimetype === "text/plain") {
+      return `${size} B`;
+    }
+
+    if (size < 1024) return size + " B";
+    return (size / 1024).toFixed(1) + " KB";
   };
 
   // Format dimensions display
   const getDimensionsDisplay = (dims: DimensionsType | null) => {
+    if (stamp.stamp_mimetype === "text/plain") {
+      return "FLUID";
+    }
     if (!dims) return "N/A";
     if (dims.unit === "responsive") return "RESPONSIVE";
     return `${dims.width} x ${dims.height} ${dims.unit.toUpperCase()}`;
