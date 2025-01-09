@@ -209,7 +209,6 @@ export default function StampPage(props: StampDetailPageProps) {
     _dispenses = [],
     lowestPriceDispenser = null,
   } = props.data;
-
   const title = htmlTitle
     ? htmlTitle.toUpperCase()
     : stamp.cpid.startsWith("A")
