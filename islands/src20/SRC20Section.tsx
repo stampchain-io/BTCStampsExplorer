@@ -64,7 +64,7 @@ export function SRC20Section({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [modalImg, setModalImg] = useState<string | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
-  console.log("market=====>", initialData);
+
   useEffect(() => {
     if (!initialData?.length && useClientFetch) {
       setIsTransitioning(true);
