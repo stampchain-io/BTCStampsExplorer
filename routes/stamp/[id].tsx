@@ -16,6 +16,7 @@ import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
+import { DOMParser } from "$dom";
 
 interface Holder {
   address: string | null;
@@ -27,6 +28,7 @@ interface Holder {
 interface StampDetailPageProps {
   data: {
     stamp: StampRow;
+    htmlTitle: string | undefined;
     total: number;
     sends: any;
     dispensers: any;
@@ -121,9 +123,24 @@ export const handler: Handlers<StampData> = {
         }));
       };
 
+      let htmlTitle = null;
+      if (
+        stampWithPrices.stamp_mimetype === "text/html" &&
+        stampWithPrices.stamp_url
+      ) {
+        const response = await fetch(stampWithPrices.stamp_url);
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        if (response.status === 200) {
+          htmlTitle = doc.querySelector("title")?.textContent?.trim();
+        }
+      }
+
       return ctx.render({
         ...stampData.data,
         stamp: stampWithPrices,
+        htmlTitle: htmlTitle,
         last_block: stampData.last_block,
         stamps_recent: mainCategories[0]?.stamps ?? [], // Use the stamps from mainCategories
         holders: calculateHoldersWithPercentage(holders.data),
@@ -184,6 +201,7 @@ function addPricesToStamp(
 export default function StampPage(props: StampDetailPageProps) {
   const {
     stamp,
+    htmlTitle,
     holders,
     _sends,
     stamps_recent,
@@ -191,10 +209,12 @@ export default function StampPage(props: StampDetailPageProps) {
     _dispenses = [],
     lowestPriceDispenser = null,
   } = props.data;
-
-  const title = stamp.name
-    ? `${stamp.name}`
-    : `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
+  console.log("stamp====>", stamp);
+  const title = htmlTitle
+    ? htmlTitle.toUpperCase()
+    : stamp.cpid.startsWith("A")
+    ? `Bitcoin Stamp #${stamp.stamp} - stampchain.io`
+    : stamp.cpid;
 
   // Update the getMetaImageUrl and add dimension handling
   const getMetaImageInfo = (stamp: StampRow, baseUrl: string) => {
