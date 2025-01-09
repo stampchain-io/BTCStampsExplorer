@@ -13,9 +13,9 @@ interface HoldersGraphProps {
 }
 
 const tableHeaders = [
-  { key: "address", label: "Address" },
-  { key: "amount", label: "Amount" },
-  { key: "percent", label: "Percent" },
+  { key: "address", label: "Address", width: "w-[50%]", align: "text-left" },
+  { key: "amount", label: "Amount", width: "w-[25%]", align: "text-center" },
+  { key: "percent", label: "Percent", width: "w-[25%]", align: "text-right" },
 ];
 
 const dataLabel =
@@ -26,41 +26,37 @@ const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
 const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
-const row = "h-8 hover:bg-stamp-purple/10";
+const row = "h-8 hover:bg-stamp-purple/10 group cursor-pointer";
 
 function HolderRow({ holder }: { holder: Holder }) {
-  const handleClick = (e: MouseEvent, address: string) => {
-    e.preventDefault();
-    globalThis.location.href = `/wallet/${address}`;
-  };
+  if (!holder.address) {
+    return (
+      <tr className={row}>
+        <td className="text-left">Unknown</td>
+        <td className="text-center">{holder.amt}</td>
+        <td className="text-right">{holder.percentage}%</td>
+      </tr>
+    );
+  }
 
   return (
     <tr className={row}>
-      <td className="text-left">
-        {holder.address
-          ? (
-            <a
-              href={`/wallet/${holder.address}`}
-              onClick={(e) => handleClick(e, holder.address)}
-              className="hover:text-stamp-purple-bright cursor-pointer"
-            >
-              <span className="mobileLg:hidden">
-                {abbreviateAddress(holder.address, 8)}
-              </span>
-              <span className="hidden mobileLg:inline">
-                {holder.address}
-              </span>
-            </a>
-          )
-          : (
-            "Unknown"
-          )}
-      </td>
-      <td className="text-center">
-        {holder.amt}
-      </td>
-      <td className="text-right">
-        {holder.percentage}%
+      <td colSpan={3} className="p-0">
+        <a
+          href={`/wallet/${holder.address}`}
+          className="flex w-full"
+        >
+          <span className="w-[50%] text-left group-hover:text-stamp-purple-bright">
+            <span className="mobileLg:hidden">
+              {abbreviateAddress(holder.address, 8)}
+            </span>
+            <span className="hidden mobileLg:inline">
+              {holder.address}
+            </span>
+          </span>
+          <span className="w-[25%] text-center">{holder.amt}</span>
+          <span className="w-[25%] text-right">{holder.percentage}%</span>
+        </a>
       </td>
     </tr>
   );
@@ -93,17 +89,11 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
             <table className={`${tableValue} table-auto`}>
               <thead className={tableLabel}>
                 <tr>
-                  {tableHeaders.map(({ key, label }) => (
+                  {tableHeaders.map(({ key, label, width, align }) => (
                     <th
                       key={key}
                       scope="col"
-                      class={`${tableLabel} pb-1.5 ${
-                        key === "address"
-                          ? "text-left"
-                          : key === "percent"
-                          ? "text-right"
-                          : "text-center"
-                      }`}
+                      className={`${tableLabel} pb-1.5 ${width} ${align}`}
                     >
                       {label}
                     </th>
