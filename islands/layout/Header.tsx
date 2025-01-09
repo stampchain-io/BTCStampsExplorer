@@ -91,7 +91,7 @@ const socialLinks = [
   },
 ];
 
-const logo =
+const headerLogo =
   "text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black italic purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 pr-2";
 
 export function Header() {
@@ -238,7 +238,7 @@ export function Header() {
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className={logo}
+          className={headerLogo}
         >
           STAMPCHAIN
         </a>
