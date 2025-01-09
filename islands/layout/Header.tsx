@@ -91,7 +91,7 @@ const socialLinks = [
   },
 ];
 
-const logoClassName =
+const logo =
   "text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black italic purple-hover-gradient hover:purple-hover-gradient2 transtion-all duration-300 pr-2";
 
 export function Header() {
@@ -202,7 +202,7 @@ export function Header() {
                 className={`${
                   isMobile
                     ? "hidden group-hover:flex flex-col z-90 w-full gap-1.5"
-                    : "hidden group-hover:flex flex-col absolute top-0 left-0 z-90 pt-[32px] pb-[15px] space-y-[3px] w-full"
+                    : "hidden group-hover:flex flex-col absolute top-[100%] left-0 z-90 pt-[3px] pb-[15px] space-y-[3px] w-full backdrop-blur-md bg-gradient-to-b from-transparent to-[#171717]/30 rounded-b-lg"
                 }`}
               >
                 {link.subLinks?.map((subLink) => (
@@ -238,7 +238,7 @@ export function Header() {
           href="/home"
           f-partial="/home"
           onClick={() => setCurrentPath("home")}
-          className={logoClassName}
+          className={logo}
         >
           STAMPCHAIN
         </a>
@@ -265,7 +265,7 @@ export function Header() {
       </div>
 
       {/* Tablet/Desktop Navbar */}
-      <div className="hidden tablet:flex justify-between items-center gap-6 desktop:gap-9 font-black text-stamp-purple">
+      <div className="hidden tablet:flex justify-between items-center gap-9 desktop:gap-9 font-black text-stamp-purple">
         {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>
