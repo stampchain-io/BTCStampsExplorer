@@ -7,7 +7,7 @@ export const CollectionDetailsContent = ({ stamps = [] }: {
 }) => {
   return (
     <div name="stamps">
-      <div className="grid grid-cols-2 tablet:grid-cols-4 desktop:grid-cols-5 gap-3 mobileMd:gap-6 transition-opacity duration-700 ease-in-out">
+      <div className="grid grid-cols-2 mobileMd:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5 gap-3 mobileMd:gap-6 transition-opacity duration-700 ease-in-out">
         {stamps.map((stamp: StampRow) => (
           <StampCard
             key={stamp.tx_hash}

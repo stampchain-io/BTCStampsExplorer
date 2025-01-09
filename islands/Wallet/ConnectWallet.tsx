@@ -1,6 +1,6 @@
 // connectWallet.tsx
-import { WalletModal } from "./WalletModal.tsx";
-import { WalletConnector } from "./connectors/Wallet.connector.tsx";
+import { WalletModal } from "$islands/Wallet/WalletModal.tsx";
+import { WalletConnector } from "$islands/Wallet/connectors/Wallet.connector.tsx";
 import { WalletProviderKey } from "$lib/utils/constants.ts";
 
 export function ConnectWallet({ toggleModal }: { toggleModal: () => void }) {
