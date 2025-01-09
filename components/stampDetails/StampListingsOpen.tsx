@@ -22,9 +22,10 @@ interface StampListingsOpenProps {
 
 const tableHeaders = [
   { key: "price", label: "Price" },
-  { key: "quantity", label: "Escrow/Give" },
-  { key: "remaining", label: "Remain" },
-  { key: "type", label: "Type" },
+  { key: "escrow", label: "Escrow" },
+  { key: "give", label: "Give" },
+  { key: "remain", label: "Remain" },
+  { key: "from", label: "From" },
 ];
 
 const tableLabel =
@@ -54,7 +55,7 @@ export function StampListingsOpen({
 
     const rowDispensers = `${
       isEmpty ? "text-stamp-grey-darker" : ""
-    } h-8 hover:bg-stamp-purple/10 cursor-pointer ${
+    } h-8 hover:bg-stamp-purple/10 cursor-pointer group ${
       isSelected || (!selectedDispenser && isFloorPrice)
         ? "text-stamp-grey-light"
         : "text-stamp-grey-darker"
@@ -65,13 +66,14 @@ export function StampListingsOpen({
         className={rowDispensers}
         onClick={onSelect}
       >
-        <td className="text-left">
+        <td className="text-left group-hover:text-stamp-purple-bright">
           {formatSatoshisToBTC(dispenser.satoshirate)}
         </td>
         <td className="text-center">
-          {`${formatNumber(dispenser.escrow_quantity, 0)}/${
-            formatNumber(dispenser.give_quantity, 0)
-          }`}
+          {formatNumber(dispenser.escrow_quantity, 0)}
+        </td>
+        <td className="text-center">
+          {formatNumber(dispenser.give_quantity, 0)}
         </td>
         <td className="text-center">
           {formatNumber(dispenser.give_remaining, 0)}
@@ -87,20 +89,35 @@ export function StampListingsOpen({
     return <div>No listings available</div>;
   }
 
-  const sortedDispensers = [...dispensers].sort((a, b) =>
-    b.give_remaining - a.give_remaining
-  );
+  const sortedDispensers = [...dispensers]
+    .filter((dispenser) => dispenser.give_remaining > 0)
+    .sort((a, b) => b.give_remaining - a.give_remaining);
+
+  if (sortedDispensers.length === 0) {
+    return <div>No listings available</div>;
+  }
 
   return (
     <div class="relative w-full">
       <ScrollContainer class="max-h-48">
-        <div class="w-[660px] min-[660px]:w-full">
-          <table class={tableValue}>
+        <div class="w-full">
+          <table class={`${tableValue} w-full`}>
             <colgroup>
-              <col class="w-[25%]" /> {/* Price */}
-              <col class="w-[25%]" /> {/* Quantity */}
-              <col class="w-[25%]" /> {/* Remain */}
-              <col class="w-[25%]" /> {/* Type */}
+              <col class="w-[35%] min-[420px]:w-[23%] min-[880px]:w-[35%] min-[1080px]:w-[23%]" />
+              {" "}
+              {/* Price */}
+              <col class="w-[14%] min-[420px]:w-[18%] min-[880px]:w-[14%] min-[1080px]:w-[18%]" />
+              {" "}
+              {/* Escrow */}
+              <col class="w-[14%] min-[420px]:w-[18%] min-[880px]:w-[14%] min-[1080px]:w-[18%]" />
+              {" "}
+              {/* Give */}
+              <col class="w-[14%] min-[420px]:w-[18%] min-[880px]:w-[14%] min-[1080px]:w-[18%]" />
+              {" "}
+              {/* Remain */}
+              <col class="w-[23%] min-[420px]:w-[23%] min-[880px]:w-[23%] min-[1080px]:w-[23%]" />
+              {" "}
+              {/* From */}
             </colgroup>
             <thead>
               <tr>
@@ -111,7 +128,7 @@ export function StampListingsOpen({
                     class={`${tableLabel} pb-1.5 ${
                       key === "price"
                         ? "text-left"
-                        : key === "type"
+                        : key === "from"
                         ? "text-right"
                         : "text-center"
                     }`}

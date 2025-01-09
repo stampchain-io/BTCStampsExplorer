@@ -99,6 +99,8 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
   const buttonPurpleFlat =
     "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
+  const buttonPurpleOutline =
+    "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-12 hover:border-stamp-purple-bright hover:text-stamp-purple-bright transition-colors";
 
   // Add tooltip states
   const [isDivisibleTooltipVisible, setIsDivisibleTooltipVisible] = useState(
@@ -594,81 +596,88 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             </div>
           </div>
 
-          <div className="flex flex-col w-full pt-6 mobileLg:pt-12 text-right">
-            {/* Debug price values */}
-            {console.log("Rendering prices:", {
-              displayPrice,
-              displayPriceUSD,
-            })}
+          {(dispensers?.length > 0 || stamp.floorPrice)
+            ? (
+              <div className="flex flex-col w-full pt-6 mobileLg:pt-12 text-right">
+                {/* Debug price values */}
+                {console.log("Rendering prices:", {
+                  displayPrice,
+                  displayPriceUSD,
+                })}
 
-            {(displayPriceUSD || stamp.floorPriceUSD) && (
-              <p className={dataLabel}>
-                {displayPriceUSD?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                }) || stamp.floorPriceUSD?.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                })} <span className="font-light">USD</span>
-              </p>
-            )}
+                {(displayPriceUSD || stamp.floorPriceUSD) && (
+                  <p className={dataLabel}>
+                    {displayPriceUSD?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    }) || stamp.floorPriceUSD?.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })} <span className="font-light">USD</span>
+                  </p>
+                )}
 
-            <p className={dataValueXl}>
-              {(!displayPrice || displayPrice === "NOT LISTED") &&
-                  stamp.marketCap &&
-                  typeof stamp.marketCap === "number"
-                ? formatBTCAmount(stamp.marketCap, { excludeSuffix: true })
-                : typeof displayPrice === "number"
-                ? formatBTCAmount(displayPrice, { excludeSuffix: true })
-                : displayPrice} {(typeof displayPrice === "number" ||
-                  (stamp.marketCap && typeof stamp.marketCap === "number")) && (
-                <span className="font-extralight">BTC</span>
-              )}
-            </p>
+                <div className="w-full">
+                  {/* Price and listings icon row */}
+                  <div className="flex w-full gap-3 mobileLg:gap-6 mb-3 mobileLg:mb-6 justify-between">
+                    <button
+                      onClick={() => setShowListings(!showListings)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 32 32"
+                        className="w-6 h-6 mobileLg:w-[28px] mobileLg:h-[28px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+                        role="button"
+                        aria-label="Listings"
+                      >
+                        <path d="M4 8C4 7.73478 4.10536 7.48043 4.29289 7.29289C4.48043 7.10536 4.73478 7 5 7H27C27.2652 7 27.5196 7.10536 27.7071 7.29289C27.8946 7.48043 28 7.73478 28 8C28 8.26522 27.8946 8.51957 27.7071 8.70711C27.5196 8.89464 27.2652 9 27 9H5C4.73478 9 4.48043 8.89464 4.29289 8.70711C4.10536 8.51957 4 8.26522 4 8ZM5 17H12C12.2652 17 12.5196 16.8946 12.7071 16.7071C12.8946 16.5196 13 16.2652 13 16C13 15.7348 12.8946 15.4804 12.7071 15.2929C12.5196 15.1054 12.2652 15 12 15H5C4.73478 15 4.48043 15.1054 4.29289 15.2929C4.10536 15.4804 4 15.7348 4 16C4 16.2652 4.10536 16.5196 4.29289 16.7071C4.48043 16.8946 4.73478 17 5 17ZM14 23H5C4.73478 23 4.48043 23.1054 4.29289 23.2929C4.10536 23.4804 4 23.7348 4 24C4 24.2652 4.10536 24.5196 4.29289 24.7071C4.48043 24.8946 4.73478 25 5 25H14C14.2652 25 14.5196 24.8946 14.7071 24.7071C14.8946 24.5196 15 24.2652 15 24C15 23.7348 14.8946 23.4804 14.7071 23.2929C14.5196 23.1054 14.2652 23 14 23ZM29.6362 17.9725L26.8213 20.2962L27.6787 23.76C27.7258 23.951 27.7154 24.1516 27.649 24.3367C27.5826 24.5218 27.463 24.6832 27.3053 24.8008C27.1476 24.9183 26.9588 24.9867 26.7624 24.9975C26.566 25.0083 26.3708 24.9609 26.2013 24.8612L23 22.9775L19.7987 24.8612C19.6292 24.9609 19.434 25.0083 19.2376 24.9975C19.0412 24.9867 18.8524 24.9183 18.6947 24.8008C18.537 24.6832 18.4174 24.5218 18.351 24.3367C18.2846 24.1516 18.2742 23.951 18.3213 23.76L19.1775 20.2962L16.3638 17.9725C16.2103 17.8456 16.0983 17.6758 16.0419 17.4848C15.9856 17.2938 15.9876 17.0903 16.0476 16.9005C16.1076 16.7106 16.2229 16.543 16.3788 16.4191C16.5347 16.2952 16.724 16.2206 16.9225 16.205L20.6525 15.9163L22.0812 12.6038C22.1585 12.4241 22.2866 12.271 22.4499 12.1635C22.6132 12.0559 22.8045 11.9986 23 11.9986C23.1955 11.9986 23.3868 12.0559 23.5501 12.1635C23.7134 12.271 23.8415 12.4241 23.9188 12.6038L25.3475 15.9163L29.0775 16.205C29.276 16.2206 29.4653 16.2952 29.6212 16.4191C29.7771 16.543 29.8924 16.7106 29.9524 16.9005C30.0124 17.0903 30.0144 17.2938 29.9581 17.4848C29.9018 17.6758 29.7897 17.8456 29.6362 17.9725ZM26.4525 18.0075L24.5912 17.8638C24.4097 17.8498 24.2354 17.7866 24.0871 17.6808C23.9389 17.5751 23.8223 17.4309 23.75 17.2638L23 15.5238L22.25 17.2638C22.1777 17.4309 22.0611 17.5751 21.9129 17.6808C21.7646 17.7866 21.5903 17.8498 21.4088 17.8638L19.5475 18.0075L20.9363 19.155C21.0817 19.2749 21.1903 19.4334 21.2496 19.6123C21.3089 19.7912 21.3164 19.9833 21.2712 20.1663L20.8337 21.9312L22.4925 20.955C22.6463 20.8644 22.8215 20.8167 23 20.8167C23.1785 20.8167 23.3537 20.8644 23.5075 20.955L25.1663 21.9312L24.7288 20.1663C24.6836 19.9833 24.6911 19.7912 24.7504 19.6123C24.8097 19.4334 24.9183 19.2749 25.0637 19.155L26.4525 18.0075Z" />
+                      </svg>
+                    </button>
 
-            <div className="flex w-full justify-between items-end mt-3 mobileMd:mt-6">
-              <button
-                onClick={() => setShowListings((prev) => !prev)}
-                className="flex items-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 32 32"
-                  className="w-6 h-6 mobileLg:w-[28px] mobileLg:h-[28px] fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
-                  role="button"
-                  aria-label="Listings"
-                >
-                  <path d="M4 8C4 7.73478 4.10536 7.48043 4.29289 7.29289C4.48043 7.10536 4.73478 7 5 7H27C27.2652 7 27.5196 7.10536 27.7071 7.29289C27.8946 7.48043 28 7.73478 28 8C28 8.26522 27.8946 8.51957 27.7071 8.70711C27.5196 8.89464 27.2652 9 27 9H5C4.73478 9 4.48043 8.89464 4.29289 8.70711C4.10536 8.51957 4 8.26522 4 8ZM5 17H27C27.2652 17 27.5196 16.8946 27.7071 16.7071C27.8946 16.5196 28 16.2652 28 16C28 15.7348 27.8946 15.4804 27.7071 15.2929C27.5196 15.1054 27.2652 15 27 15H5C4.73478 15 4.48043 15.1054 4.29289 15.2929C4.10536 15.4804 4 15.7348 4 16C4 16.2652 4.10536 16.5196 4.29289 16.7071C4.48043 16.8946 4.73478 17 5 17ZM18 23H5C4.73478 23 4.48043 23.1054 4.29289 23.2929C4.10536 23.4804 4 23.7348 4 24C4 24.2652 4.10536 24.5196 4.29289 24.7071C4.48043 24.8946 4.73478 25 5 25H18C18.2652 25 18.5196 24.8946 18.7071 24.7071C18.8946 24.5196 19 24.2652 19 24C19 23.7348 18.8946 23.4804 18.7071 23.2929C18.5196 23.1054 18.2652 23 18 23ZM29 23H27V21C27 20.7348 26.8946 20.4804 26.7071 20.2929C26.5196 20.1054 26.2652 20 26 20C25.7348 20 25.4804 20.1054 25.2929 20.2929C25.1054 20.4804 25 20.7348 25 21V23H23C22.7348 23 22.4804 23.1054 22.2929 23.2929C22.1054 23.4804 22 23.7348 22 24C22 24.2652 22.1054 24.5196 22.2929 24.7071C22.4804 24.8946 22.7348 25 23 25H25V27C25 27.2652 25.1054 27.5196 25.2929 27.7071C25.4804 27.8946 25.7348 28 26 28C26.2652 28 26.5196 27.8946 26.7071 27.7071C26.8946 27.5196 27 27.2652 27 27V25H29C29.2652 25 29.5196 24.8946 29.7071 24.7071C29.8946 24.5196 30 24.2652 30 24C30 23.7348 29.8946 23.4804 29.7071 23.2929C29.5196 23.1054 29.2652 23 29 23Z" />
-                </svg>
-              </button>
-              {(selectedDispenser || lowestPriceDispenser) && (
-                <button
-                  className={`${buttonPurpleFlat}`}
-                  onClick={() =>
-                    toggleModal(selectedDispenser || lowestPriceDispenser)}
-                >
-                  BUY
-                </button>
-              )}
-            </div>
+                    <p className={dataValueXl}>
+                      {(!displayPrice || displayPrice === "NOT LISTED") &&
+                          stamp.marketCap &&
+                          typeof stamp.marketCap === "number"
+                        ? formatBTCAmount(stamp.marketCap, {
+                          excludeSuffix: true,
+                        })
+                        : typeof displayPrice === "number"
+                        ? formatBTCAmount(displayPrice, { excludeSuffix: true })
+                        : displayPrice} {(typeof displayPrice === "number" ||
+                          (stamp.marketCap &&
+                            typeof stamp.marketCap === "number")) &&
+                        <span className="font-extralight">BTC</span>}
+                    </p>
+                  </div>
 
-            {showListings && (
-              <div className="flex flex-col gap-2 text-stamp-grey-light text-sm text-left mt-3 mobileMd:mt-6">
-                {isLoadingDispensers
-                  ? <p>Loading listings...</p>
-                  : (
-                    <StampListingsOpen
-                      dispensers={dispensers}
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={handlePageChange}
-                      isLoading={isLoadingDispensers}
-                      floorPrice={stamp.floorPrice}
-                      onSelectDispenser={handleDispenserSelect}
-                      selectedDispenser={selectedDispenser}
-                    />
+                  {/* Listings content */}
+                  {showListings && (
+                    <div className="w-full mb-3 mobileLg:mb-6">
+                      {isLoadingDispensers
+                        ? <p>Loading listings...</p>
+                        : (
+                          <StampListingsOpen
+                            dispensers={dispensers}
+                            floorPrice={stamp.floorPrice}
+                            onSelectDispenser={handleDispenserSelect}
+                            selectedDispenser={selectedDispenser}
+                          />
+                        )}
+                    </div>
                   )}
+
+                  {/* Buy button */}
+                  <div className="flex justify-end">
+                    <button
+                      className={`${buttonPurpleFlat}`}
+                      onClick={() =>
+                        toggleModal(selectedDispenser || lowestPriceDispenser)}
+                    >
+                      BUY
+                    </button>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
+            )
+            : null}
         </div>
 
         <div className="flex flex-col dark-gradient rounded-lg p-3 mobileLg:p-6">
