@@ -41,7 +41,7 @@ externalDocs:
 servers:
   - url: "https://stampchain.io"
     description: Production server (uses live data)
-  - url: "https://bitcoinstamps.xyz"
+  - url: "https://dev.stampchain.io"
     description: Production server (uses live data)
 
 security:

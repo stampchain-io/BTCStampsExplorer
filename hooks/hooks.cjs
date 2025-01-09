@@ -20,7 +20,7 @@ const comparisonResults = {};
 // Configuration
 const ENDPOINTS = {
   production: "https://stampchain.io",
-  development: "https://dev.bitcoinstamps.xyz",
+  development: "https://dev.stampchain.io",
 };
 
 // Helper function to extract path parameters from URI
