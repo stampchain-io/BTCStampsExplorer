@@ -29,7 +29,7 @@ const CACHE_DURATION = {
 
 function getBaseUrl(req: Request): string {
   if (Deno.env.get("DENO_ENV") === "development") {
-    return Deno.env.get("DEV_BASE_URL") || "https://bitcoinstamps.xyz";
+    return Deno.env.get("DEV_BASE_URL") || "https://dev.stampchain.io";
   }
   return new URL(req.url).origin;
 }
