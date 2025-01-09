@@ -7,7 +7,7 @@ export function CollectionOverviewArtistContent(
   { collections }: CollectionOverviewArtistContentProps,
 ) {
   return (
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-6">
       {/* <CollectionCreateButton /> */}
       <div className="flex flex-col gap-6">
         {collections.map((collection) => {
