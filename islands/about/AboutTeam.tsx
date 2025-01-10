@@ -1,10 +1,10 @@
 export default function AboutTeam() {
   const subTitlePurple =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
   const aboutTitlePurpleLD =
-    "inline-block text-sm mobileMd:text-lg mobileLg:text-xl desktop:text-2xl font-black purple-gradient1 text-center mt-3 mobileLg:mt-[18px]";
+    "inline-block text-sm mobileMd:text-lg mobileLg:text-xl font-black purple-gradient1 text-center mt-3 mobileLg:mt-[18px]";
   const aboutSubTitlePurple =
-    "text-xs mobileMd:text-base mobileLg:text-lg desktop:text-xl font-medium text-stamp-purple text-center whitespace-nowrap";
+    "text-xs mobileMd:text-base mobileLg:text-lg font-medium text-stamp-purple text-center whitespace-nowrap";
 
   return (
     <>
@@ -14,7 +14,7 @@ export default function AboutTeam() {
             <h2 className={subTitlePurple}>
               THE TEAM
             </h2>
-            <div className="flex justify-between items-start mx-0 mobileLg:mx-10 desktop:mx-28 gap-3 mobileMd:gap-6 mt-3">
+            <div className="flex justify-between items-start mx-0 mobileLg:mx-12 desktop:mx-16 gap-3 mobileMd:gap-6 mt-3">
               <div className="flex flex-col items-center">
                 <img src="/img/about/code.png" />
                 <p className={aboutTitlePurpleLD}>

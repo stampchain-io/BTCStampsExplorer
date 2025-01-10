@@ -1,11 +1,11 @@
 export default function Media() {
-  const body = "flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36";
+  const body = "flex flex-col gap-12 mobileLg:gap-[72px] desktop:gap-24";
   const titleGreyDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black gray-gradient3";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
   const subTitleGrey =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const articleLink =
-    "inline-block relative text-lg mobileMd:text-xl mobileLg:text-3xl desktop:text-4xl font-bold gray-gradient1-hover";
+    "inline-block relative text-xl mobileLg:text-2xl font-bold gray-gradient1-hover";
   const bodyTextLight =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
   const buttonGreyOutline =
@@ -28,7 +28,7 @@ export default function Media() {
 
       <section>
         <h1 className={titleGreyDL}>INTERVIEWS</h1>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 gap-6 desktop:gap-12">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           <div className="flex flex-col">
             <h2 className={subTitleGrey}>RICE TVX</h2>
             <div className="relative w-full pt-[56.25%]">
@@ -104,7 +104,7 @@ export default function Media() {
 
       <section>
         <h1 className={titleGreyDL}>REPORTS</h1>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-3 gap-3 mobileMd:gap-6 desktop:gap-12">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           <div className="col-span-1 mobileLg:col-span-2">
             <h2 className={subTitleGrey}>SQRR - DEEP DIVE</h2>
             <p className={bodyTextLight}>
