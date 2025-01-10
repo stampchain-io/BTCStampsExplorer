@@ -16,24 +16,26 @@ process_fmt_diff() {
   local line_number=0
   local changes=""
   local in_diff=false
-  local has_changes=false
   
   while IFS= read -r line; do
-    # Skip task and debug lines
-    if [[ $line =~ ^Task || $line =~ ^DEBUG ]]; then
+    # Skip warning lines and empty lines
+    if [[ $line =~ ^Warning || -z $line ]]; then
       continue
     fi
+    
+    echo "Processing line: $line" >&2
     
     # Detect start of a new file diff
     if [[ $line =~ ^from[[:space:]](.+): ]]; then
       # Process previous file if exists
       if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
         local escaped_changes=$(echo "$changes" | jq -R -s .)
+        echo "Processing changes for $current_file" >&2
         diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
                                             --arg changes "$escaped_changes" \
                                             --arg line "$line_number" \
           '. + [{
-            "message": "\($changes)",
+            "message": "Formatting issues found:\n" + $changes,
             "location": {
               "path": $file,
               "range": {
@@ -61,20 +63,20 @@ process_fmt_diff() {
     if [[ $in_diff == true && $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+] ]]; then
       if [[ $line_number == 0 ]]; then
         line_number="${BASH_REMATCH[1]}"
+        echo "Setting line number: $line_number" >&2
       fi
       changes+="$line"$'\n'
     fi
-  done < "$1"
+  done < "$TEMP_FILE"
   
   # Process the last file if exists
   if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
-    has_changes=true
     local escaped_changes=$(echo "$changes" | jq -R -s .)
     diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
                                         --arg changes "$escaped_changes" \
                                         --arg line "$line_number" \
       '. + [{
-        "message": "\($changes)",
+        "message": "Formatting issues found:\n" + $changes,
         "location": {
           "path": $file,
           "range": {
@@ -90,11 +92,7 @@ process_fmt_diff() {
       }]')
   fi
   
-  if [ "$has_changes" = false ]; then
-    echo "[]"
-  else
-    echo "$diagnostics"
-  fi
+  echo "$diagnostics"
 }
 
 if [ "$MODE" = "lint" ]; then
@@ -144,9 +142,16 @@ elif [ "$MODE" = "fmt" ]; then
   # Transform fmt output to rdjson
   (
     echo "{\"source\":{\"name\":\"denofmt\",\"url\":\"https://deno.land/manual/tools/formatter\"},\"diagnostics\":"
-    process_fmt_diff "$TEMP_FILE"
-    echo "}"
-  ) | jq '.' > "${TEMP_FILE}.json" && cat "${TEMP_FILE}.json"
+    process_fmt_diff
+    echo "}" 
+  ) | jq '.' > "${TEMP_FILE}.json"
+  
+  # Validate JSON and output
+  if jq empty "${TEMP_FILE}.json" 2>/dev/null; then
+    cat "${TEMP_FILE}.json"
+  else
+    echo "{\"source\":{\"name\":\"denofmt\",\"url\":\"https://deno.land/manual/tools/formatter\"},\"diagnostics\":[]}"
+  fi
 else
   echo "Usage: $0 <lint|fmt>" >&2
   rm "$TEMP_FILE" 2>/dev/null
