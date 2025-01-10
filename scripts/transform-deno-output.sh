@@ -27,12 +27,12 @@ process_fmt_diff() {
     if [[ $line =~ ^from[[:space:]](.+): ]]; then
       # Process previous file if exists
       if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
-        local escaped_changes=$(echo "$changes" | jq -R -s '.')
+        local escaped_changes=$(echo "$changes" | jq -R -s .)
         diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
                                             --arg changes "$escaped_changes" \
                                             --arg line "$line_number" \
           '. + [{
-            "message": "File is not properly formatted:\n" + $changes,
+            "message": "\($changes)",
             "location": {
               "path": $file,
               "range": {
@@ -67,12 +67,12 @@ process_fmt_diff() {
   
   # Process the last file if exists
   if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
-    local escaped_changes=$(echo "$changes" | jq -R -s '.')
+    local escaped_changes=$(echo "$changes" | jq -R -s .)
     diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
                                         --arg changes "$escaped_changes" \
                                         --arg line "$line_number" \
       '. + [{
-        "message": "File is not properly formatted:\n" + $changes,
+        "message": "\($changes)",
         "location": {
           "path": $file,
           "range": {
@@ -93,7 +93,7 @@ process_fmt_diff() {
 
 if [ "$MODE" = "lint" ]; then
   # Extract JSON from deno lint output
-  json_content=$(sed -n '/^{/,/^}/p' "$TEMP_FILE" | sed 's/^Task check:lint:debug$//' | tr -d '\r')
+  json_content=$(grep -v '^Task\|^DEBUG' "$TEMP_FILE" | tr -d '\r' | sed -n '/^{/,/^}/p')
   
   if [ -z "$json_content" ] || ! echo "$json_content" | jq empty 2>/dev/null; then
     create_empty_rdjson "denolint" "https://deno.land/manual/tools/linter"
