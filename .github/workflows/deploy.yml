@@ -69,12 +69,13 @@ jobs:
           echo "Files in scripts directory:"
           ls -la ./scripts/
 
-          # Function to process files in batches
+          # Function to process files in batches with rate limit handling
           process_files() {
             local check_type=$1
-            local batch_size=50
+            local batch_size=10  # Reduced batch size
             local total_files=0
             local batch_num=1
+            local retry_delay=60  # Initial retry delay in seconds
 
             # Count total files
             if [ "$check_type" = "fmt" ]; then
@@ -89,25 +90,47 @@ jobs:
               
               if [ "$check_type" = "fmt" ]; then
                 find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | \
-                  head -n $batch_size | \
+                  tail -n +$i | head -n $batch_size | \
                   xargs deno fmt --check 2>&1 | \
-                  ./scripts/transform-deno-output.sh fmt > "fmt_${batch_num}.json"
+                  ./scripts/transform-deno-output.sh fmt > "${check_type}_${batch_num}.json"
               else
                 find . -type f -name "*.ts" -o -name "*.tsx" | \
-                  head -n $batch_size | \
+                  tail -n +$i | head -n $batch_size | \
                   xargs deno lint --json 2>&1 | \
-                  ./scripts/transform-deno-output.sh lint > "lint_${batch_num}.json"
+                  ./scripts/transform-deno-output.sh lint > "${check_type}_${batch_num}.json"
               fi
 
-              # Run reviewdog on batch
+              # Run reviewdog on batch with retries
               if [ -s "${check_type}_${batch_num}.json" ]; then
-                echo "Running reviewdog on ${check_type} batch $batch_num..."
-                timeout $timeout_duration bash -c "cat ${check_type}_${batch_num}.json | reviewdog -f=rdjson -name=${check_type} -reporter=github-pr-review" || \
-                echo "Warning: ${check_type} batch $batch_num timed out but comments may have been posted"
+                local attempts=0
+                local max_attempts=3
+                
+                while [ $attempts -lt $max_attempts ]; do
+                  echo "Running reviewdog on ${check_type} batch $batch_num (attempt $((attempts + 1)))..."
+                  
+                  if timeout $timeout_duration bash -c "cat ${check_type}_${batch_num}.json | reviewdog -f=rdjson -name=${check_type} -reporter=github-pr-review"; then
+                    break  # Success, exit retry loop
+                  else
+                    local exit_code=$?
+                    # Check if it's a rate limit error
+                    if grep -q "API rate limit exceeded" "${check_type}_${batch_num}.json"; then
+                      echo "Rate limit exceeded. Waiting ${retry_delay} seconds before retry..."
+                      sleep $retry_delay
+                      retry_delay=$((retry_delay * 2))  # Exponential backoff
+                    else
+                      echo "Error running reviewdog (exit code: $exit_code)"
+                      break  # Exit on non-rate-limit errors
+                    fi
+                  fi
+                  ((attempts++))
+                done
               fi
 
               rm -f "${check_type}_${batch_num}.json"
               ((batch_num++))
+              
+              # Add a small delay between batches to avoid rate limiting
+              sleep 5
             done
           }
 
