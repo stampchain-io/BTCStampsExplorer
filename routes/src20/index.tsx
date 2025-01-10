@@ -111,6 +111,8 @@ export const handler: Handlers = {
 
         // Determine if we need market data based on filters
         const hasMarketFilters = Object.keys(marketFilters).length > 0;
+        const marketInfo = await SRC20Service.MarketService
+          .fetchMarketListingSummary();
 
         const resultData = await SRC20Service.QueryService
           .fetchAndFormatSrc20DataV2(
@@ -135,8 +137,18 @@ export const handler: Handlers = {
           throw new Error("Expected paginated response");
         }
 
+        const src20Data = resultData.data.map((item) => {
+          const marketItem = marketInfo.find((mItem) =>
+            mItem.tick.toLowerCase() === item.tick.toLowerCase()
+          );
+          return {
+            ...item,
+            floor_unit_price: marketItem ? marketItem.floor_unit_price : null, // Handle cases where no matching market item is found
+          };
+        });
+
         data = {
-          src20s: resultData.data || [],
+          src20s: src20Data || [],
           total: resultData.total,
           page: resultData.page,
           totalPages: resultData.totalPages,

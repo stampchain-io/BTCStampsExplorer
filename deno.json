@@ -122,7 +122,8 @@
     "$server/": "./server/",
     "$types/": "./lib/types/",
     "flatpickr": "https://esm.sh/flatpickr@4.6.13",
-    "flatpickr/": "https://esm.sh/flatpickr@4.6.13/"
+    "flatpickr/": "https://esm.sh/flatpickr@4.6.13/",
+    "dom": "https://deno.land/x/deno_dom/deno-dom-wasm.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

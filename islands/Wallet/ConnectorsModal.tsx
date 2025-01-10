@@ -21,7 +21,7 @@ export const ConnectorsModal = (
 
   return (
     <div
-      class={`fixed inset-0 z-90 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#000000] bg-opacity-60 backdrop-filter backdrop-blur-md ${
+      class={`fixed z-10 inset-0 z-90 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#000000] bg-opacity-60 backdrop-filter backdrop-blur-md ${
         showConnectWalletModal.value ? "" : "hidden"
       }`}
       onClick={handleCloseModal}
