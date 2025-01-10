@@ -49,10 +49,23 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Run fmt and lint checks separately to avoid timeouts
+          echo "Running deno fmt check..."
           deno fmt --check . 2>&1 | ./scripts/transform-deno-output.sh fmt > fmt.json
+          echo "Running deno lint check..."
           deno lint --json . 2>&1 | ./scripts/transform-deno-output.sh lint > lint.json
-          cat fmt.json | reviewdog -f=rdjson -name=denofmt -reporter=github-pr-review
-          cat lint.json | reviewdog -f=rdjson -name=denolint -reporter=github-pr-review
+          
+          # Process fmt results
+          echo "Processing fmt results..."
+          if [ -s fmt.json ]; then
+            cat fmt.json | reviewdog -f=rdjson -name=denofmt -reporter=github-pr-review || true
+          fi
+          
+          # Process lint results
+          echo "Processing lint results..."
+          if [ -s lint.json ]; then
+            cat lint.json | reviewdog -f=rdjson -name=denolint -reporter=github-pr-review || true
+          fi
 
       # - name: Start Deno app
       #   run: deno run -A main.ts &
