@@ -16,6 +16,7 @@ process_fmt_diff() {
   local line_number=0
   local changes=""
   local in_diff=false
+  local has_changes=false
   
   while IFS= read -r line; do
     # Skip task and debug lines
@@ -67,6 +68,7 @@ process_fmt_diff() {
   
   # Process the last file if exists
   if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
+    has_changes=true
     local escaped_changes=$(echo "$changes" | jq -R -s .)
     diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
                                         --arg changes "$escaped_changes" \
@@ -88,7 +90,11 @@ process_fmt_diff() {
       }]')
   fi
   
-  echo "$diagnostics"
+  if [ "$has_changes" = false ]; then
+    echo "[]"
+  else
+    echo "$diagnostics"
+  fi
 }
 
 if [ "$MODE" = "lint" ]; then
