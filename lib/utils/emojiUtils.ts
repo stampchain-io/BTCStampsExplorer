@@ -47,7 +47,7 @@ export function emojiToUnicodeEscape(emoji: string): string {
     // Join the characters back together
     const result = converted.join("");
     return result;
-  } catch (error) {
+  } catch (_error) {
     return emoji;
   }
 }
