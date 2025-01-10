@@ -70,7 +70,7 @@ export function unicodeEscapeToEmoji(unicodeStr: string): string {
     const codePoint = parseInt(grp, 16);
     try {
       return String.fromCodePoint(codePoint);
-    } catch {
+    } catch (_error) {
       return match;
     }
   });
