@@ -46,9 +46,14 @@ export const handler: Handlers<AddressTickHandlerContext> = {
         return sortValidation.error!;
       }
 
+      // Log tick parameter transformation for debugging
+      console.log("Raw tick parameter:", tick);
+      const normalizedTick = emojiToUnicodeEscape(String(tick));
+      console.log("Normalized tick parameter:", normalizedTick);
+
       const balanceParams = {
         address,
-        tick: emojiToUnicodeEscape(String(tick)),
+        tick: normalizedTick,
         includePagination,
         limit: paginationParams.limit || DEFAULT_PAGINATION.limit,
         page: paginationParams.page || DEFAULT_PAGINATION.page,

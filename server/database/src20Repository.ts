@@ -284,6 +284,13 @@ export class SRC20Repository {
   static async getSrc20BalanceFromDb(
     params: Partial<SRC20BalanceRequestParams & SRC20SnapshotRequestParams>,
   ) {
+    // Log incoming parameters for debugging
+    console.log("getSrc20BalanceFromDb params:", {
+      address: params.address,
+      tick: params.tick,
+      limit: params.limit,
+      page: params.page
+    });
     const {
       address,
       tick,
