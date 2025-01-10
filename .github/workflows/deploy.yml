@@ -49,23 +49,35 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Run fmt and lint checks separately to avoid timeouts
+          # Set timeout for each reviewdog process
+          timeout_duration=60
+
+          # Run fmt and lint checks separately
           echo "Running deno fmt check..."
           deno fmt --check . 2>&1 | ./scripts/transform-deno-output.sh fmt > fmt.json
           echo "Running deno lint check..."
           deno lint --json . 2>&1 | ./scripts/transform-deno-output.sh lint > lint.json
           
-          # Process fmt results
-          echo "Processing fmt results..."
-          if [ -s fmt.json ]; then
-            cat fmt.json | reviewdog -f=rdjson -name=denofmt -reporter=github-pr-review || true
-          fi
+          # Function to run reviewdog with timeout
+          run_reviewdog() {
+            local file=$1
+            local name=$2
+            if [ -s "$file" ]; then
+              echo "Processing $name results..."
+              timeout $timeout_duration bash -c "cat $file | reviewdog -f=rdjson -name=$name -reporter=github-pr-review" || \
+              echo "Warning: $name check timed out but comments may have been posted"
+            else
+              echo "No $name issues found"
+            fi
+          }
           
-          # Process lint results
-          echo "Processing lint results..."
-          if [ -s lint.json ]; then
-            cat lint.json | reviewdog -f=rdjson -name=denolint -reporter=github-pr-review || true
-          fi
+          # Process results with timeouts
+          run_reviewdog fmt.json denofmt
+          run_reviewdog lint.json denolint
+          
+          # Clean up
+          rm -f fmt.json lint.json
+          exit 0
 
       # - name: Start Deno app
       #   run: deno run -A main.ts &
