@@ -31,9 +31,9 @@ export default function AboutDonate() {
   };
 
   const titlePurpleDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl desktop:text-6xl font-black purple-gradient1";
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
   const subTitlePurple =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
   const bodyTextLight =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
   const dataLabel =
@@ -97,7 +97,7 @@ export default function AboutDonate() {
             </p>
             <br />
 
-            <div className="flex gap-3 justify-start hidden mobileMd:flex">
+            <div className="hidden mobileMd:flex gap-3 justify-start">
               <p className="text-base mobileLg:text-lg font-bold text-stamp-purple mobileLg:block hidden">
                 {DONATE_ADDRESS}
               </p>
