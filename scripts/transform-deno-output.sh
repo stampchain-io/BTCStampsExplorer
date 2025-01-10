@@ -101,9 +101,17 @@ if [ "$MODE" = "lint" ]; then
   # Extract JSON from deno lint output
   json_content=$(grep -v '^Task\|^DEBUG' "$TEMP_FILE" | tr -d '\r' | sed -n '/^{/,/^}/p')
   
-  if [ -z "$json_content" ] || ! echo "$json_content" | jq empty 2>/dev/null; then
+  if [ -z "$json_content" ]; then
     create_empty_rdjson "denolint" "https://deno.land/manual/tools/linter"
     rm "$TEMP_FILE" 2>/dev/null
+    exit 0
+  fi
+  
+  # Validate and format JSON
+  if ! echo "$json_content" | jq empty 2>/dev/null; then
+    echo "{\"source\":{\"name\":\"denolint\",\"url\":\"https://deno.land/manual/tools/linter\"},\"diagnostics\":[]}" > "${TEMP_FILE}.json"
+    cat "${TEMP_FILE}.json"
+    rm "$TEMP_FILE" "${TEMP_FILE}.json" 2>/dev/null
     exit 0
   fi
 
