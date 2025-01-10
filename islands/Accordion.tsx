@@ -36,7 +36,7 @@ const Accordion = (
       </div>
       <div
         className={`${
-          isOpen ? "max-h-[300px]" : "max-h-0"
+          isOpen ? "max-h-[600px]" : "max-h-0"
         } transition-all duration-500 text-sm tablet:text-lg font-medium overflow-hidden mt-3`}
       >
         {children}

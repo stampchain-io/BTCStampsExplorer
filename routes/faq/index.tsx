@@ -2,8 +2,7 @@ import { Head as _Head } from "$fresh/runtime.ts";
 import Accordion from "$islands/Accordion.tsx";
 
 export default function FAQ() {
-  const slimBody =
-    "flex flex-col w-full tablet:max-w-[1080px] tablet:mx-auto gap-12 mobileLg:gap-24 desktop:gap-36";
+  const body = "flex flex-col gap-12 mobileLg:gap-[72px] desktop:gap-24";
   const titleGreyDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
   const titleGreyLD =
@@ -11,12 +10,12 @@ export default function FAQ() {
   const subTitleGrey =
     "text-2xl mobileLg:text-3xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const accordion =
-    "grid grid-cols-1 tablet:grid-cols-2 gap-3 mobileMd:gap-6 tablet:gap-9";
+    "grid grid-cols-1 tablet:grid-cols-2 mt-1.5 mobileMd:mt-3 tablet:mt-0 gap-3 mobileMd:gap-6 tablet:gap-9";
   const bodyTextLight =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
 
   return (
-    <div className={slimBody}>
+    <div className={body}>
       <section className="text-center max-w-full mt-12 mobileLg:mt-[60px] tablet:mt-[72px] mb-[18px] mobileLg:mb-[30px] tablet:mb-[42px] desktop:-mb-1.5 mx-auto">
         <h1 className={titleGreyLD}>
           YOU'VE GOT QUESTIONS
@@ -49,7 +48,7 @@ export default function FAQ() {
           </p>
         </div>
 
-        <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-6 tablet:gap-12">
+        <div class={accordion}>
           <Accordion title="CLASSIC STAMPS">
             <p className={bodyTextLight}>
               Classic Stamps are NFTs built on Counterparty standards from 2014.
@@ -154,7 +153,9 @@ export default function FAQ() {
             <p className={bodyTextLight}>
               To start creating, sending, and storing Bitcoin Stamps, you'll
               need a compatible wallet. Some options include:
-              <ul className="list-disc list-inside mt-2 space-y-1.5">
+              <ul
+                className={`${bodyTextLight} list-disc list-inside mt-2 space-y-1.5`}
+              >
                 <li>
                   <a
                     href="https://unisat.io/download"
@@ -204,7 +205,7 @@ export default function FAQ() {
               <br />
               <a
                 href="/howto/leathercreate"
-                className="animated-underline"
+                className={`${bodyTextLight} animated-underline`}
               >
                 Read our guide on how to create a wallet
               </a>

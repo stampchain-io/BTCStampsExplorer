@@ -8,8 +8,7 @@ export default function HowTo() {
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const bodyTextLight =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
-  const buttonGreyOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+
   return (
     <div className={body}>
       <section className="mb-3 mobileLg:mb-6">
@@ -40,21 +39,18 @@ export default function HowTo() {
           />
           <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
-              New to Bitcoin, Stamps, wallet and all the other fancy lingo?{" "}
-              <br />
+              New to Bitcoin, Stamps, wallet and all the other fancy
+              lingo?<br />
               No worries! We've got you covered. <br />
               <br />
-              <b>In this guide, you'll learn how to create a Leather wallet!</b>
-            </p>
-            <div className="flex justify-start">
               <a
                 href="/howto/leathercreate"
                 f-partial="/howto/leathercreate"
-                className={buttonGreyOutline}
+                className="animated-underline"
               >
-                READ
+                Start your stamps journey by creating a Leather wallet
               </a>
-            </div>
+            </p>
           </div>
         </div>
       </section>
@@ -70,20 +66,18 @@ export default function HowTo() {
           />
           <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
-              <b>
-                In this guide, you'll learn how connect your Leather wallet to
-                stampchain.io
-              </b>
-            </p>
-            <div className="flex justify-start">
+              To create and buy stamps, deploy, mint and transfer tokens or
+              interact with the Stamps protocol, you need to connect and verify
+              with your Leather wallet.<br />
+              <br />
               <a
                 href="/howto/leatherconnect"
                 f-partial="/howto/leatherconnect"
-                className={buttonGreyOutline}
+                className="animated-underline"
               >
-                READ
+                Learn how connect your Leather wallet to stampchain.io
               </a>
-            </div>
+            </p>
           </div>
         </div>
       </section>
@@ -98,24 +92,19 @@ export default function HowTo() {
           />
           <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
-              To deploy a SRC-20 token, stamp the transaction on Bitcoin with
-              the token's supply and metadata. This makes the token immutable
-              and secured by Bitcoin's blockchain.<br />
+              To deploy a SRC-20 token, you need to stamp the transaction on
+              Bitcoin with the token's supply and metadata. This makes the token
+              immutable and secured by Bitcoin's blockchain.<br />
               <br />
-              <b>
-                In this guide, you'll learn how to deploy your very own SRC-20
-                token!
-              </b>
-            </p>
-            <div className="flex justify-start">
+              <br />
               <a
                 href="/howto/deploytoken"
                 f-partial="/howto/deploytoken"
-                className={buttonGreyOutline}
+                className="animated-underline"
               >
-                READ
+                Read how to deploy your very own SRC-20 token
               </a>
-            </div>
+            </p>
           </div>
         </div>
       </section>
@@ -131,25 +120,24 @@ export default function HowTo() {
           />
           <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
-              After deployment, token holders can mint SRC-20 tokens based on
+              After deploying a token, anyone can mint SRC-20 tokens based on
               the initial supply set in the contract.<br />
               <br />
-              <b>In this guide, you'll learn how to mint a SRC-20 token!</b>
-            </p>
-            <div className="flex justify-start">
+              <br />
               <a
                 href="/howto/minttoken"
                 f-partial="/howto/minttoken"
-                className={buttonGreyOutline}
+                className="animated-underline"
               >
-                READ
+                Learn how to mint a SRC-20 token
               </a>
-            </div>
+            </p>
           </div>
         </div>
       </section>
 
-      <section>
+      {
+        /*<section>
         <h2 className={subTitleGrey}>TRANSFER TOKEN</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
           <img
@@ -168,18 +156,10 @@ export default function HowTo() {
                 hopefully have it ready for you soon!
               </b>
             </p>
-            <div className="flex justify-start">
-              <a
-                href="/howto/transfertoken"
-                f-partial="/howto/transfertoken"
-                className={buttonGreyOutline}
-              >
-                READ
-              </a>
-            </div>
           </div>
         </div>
-      </section>
+      </section>*/
+      }
 
       <section>
         <h2 className={subTitleGrey}>STAMPING ART</h2>
@@ -188,29 +168,28 @@ export default function HowTo() {
             src="/img/how-tos/stamping/00.png"
             width="100%"
             alt="Guide on how to create NFTs on Bitcoin using the stamps protocol"
-            class="block mobileLg:order-last"
           />
           <div className="flex flex-col desktop:col-span-2 gap-6">
             <p className={bodyTextLight}>
               Store your art permanently on Bitcoin - the most resilient
               blockchain in the world.<br />
+              With our state of the art stamping tools, we've made it smooth and
+              simple for you to immortalize your art on Bitcoin.<br />
               <br />
-              <b>In this guide, you'll learn how to stamp art!</b>
-            </p>
-            <div className="flex justify-start">
               <a
                 href="/howto/stamp"
                 f-partial="/howto/stamp"
-                className={buttonGreyOutline}
+                className="animated-underline"
               >
-                READ
+                Time to get stamping !
               </a>
-            </div>
+            </p>
           </div>
         </div>
       </section>
 
-      <section>
+      {
+        /*<section>
         <h2 className={subTitleGrey}>TRANSFER STAMP</h2>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-6 desktop:gap-9">
           <img
@@ -302,7 +281,8 @@ export default function HowTo() {
             </div>
           </div>
         </div>
-      </section>
+      </section>*/
+      }
     </div>
   );
 }
