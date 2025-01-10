@@ -516,7 +516,7 @@ body {
 }
 
 .animated-underline {
-  font-weight: 900;
+  font-weight: 700;
   text-decoration: none;
   background-image: linear-gradient(#CCCCCC, #CCCCCC);
   background-position: 0% 100%;
