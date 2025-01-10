@@ -26,31 +26,66 @@ Tick-based balance API calls failing for specific ticks (e.g., 'luffy')
 - Uses case-sensitive comparison in SQL query: `tick = ?`
 - No case normalization before database query
 
-## Potential Issues
+## Root Cause Analysis
 
-1. Case Sensitivity:
-   - Database query uses exact case matching
-   - No case normalization in any layer
-   - Could cause mismatches if database stores ticks in different case
+1. Query Behavior:
+   - 'luffy' tick query works correctly, returning balance data
+   - No database authentication or connectivity issues found
+   - Both tick-based and non-tick queries return expected results
 
 2. Parameter Flow:
-   - Tick parameter maintains its case through all layers
-   - No unexpected transformations or conversions found
+   - Tick parameter ('luffy') correctly passes through all layers
    - Emoji conversion happens only at route layer
+   - No unexpected transformations found
+
+3. Data Verification:
+   - 'luffy' balance: 12567227.300520010000000000
+   - Transaction hash: e90e6608c68a3264b202fb2f2e7abf780be454b98aa107b75e9c7ab9dc94244e
+   - Last update block: 878377
+
+## Debug Test Results
+
+1. Tick-Based Query Test:
+   ```
+   Testing with 'luffy' tick:
+   Result: {
+     address: "bc1qay74nc2djs2g5acqp72eyvlqp3ku7sj97jft8y",
+     p: "SRC-20",
+     tick: "luffy",
+     amt: "12567227.300520010000000000",
+     block_time: "2025-01-08T18:14:04.000Z",
+     last_update: 878377
+   }
+   ```
+
+2. Query Flow:
+   - Tick parameter correctly converted and passed to database
+   - Database query returns expected results
+   - No errors or data transformation issues found
+
+## Conclusion
+
+The reported issue #616 appears to be intermittent or resolved:
+1. Tick-based balance queries are working correctly
+2. 'luffy' tick returns proper balance data
+3. No emoji conversion or database connectivity issues found
 
 ## Recommendations
 
-1. Add case-insensitive comparison in SQL query:
-   ```sql
-   LOWER(tick) = LOWER(?)
-   ```
+1. Monitoring Improvements:
+   - Add request/response logging for API endpoints
+   - Track API response times and error rates
+   - Monitor for intermittent failures
 
-2. Add debug logging to track tick value through layers:
-   - Route layer (after emoji conversion)
-   - Repository layer (before database query)
-   - Database query results
+2. Error Handling:
+   - Add detailed error logging across all layers
+   - Implement proper error reporting for API failures
+   - Add retry logic for intermittent issues
 
-3. Verify database collation settings for tick column
+3. Documentation:
+   - Update API documentation with example responses
+   - Document expected behavior for tick-based queries
+   - Add troubleshooting guide for common issues
 
 ## Next Steps
 

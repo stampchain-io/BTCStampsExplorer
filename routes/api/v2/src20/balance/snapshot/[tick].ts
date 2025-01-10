@@ -3,6 +3,7 @@ import { AddressTickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { emojiToUnicodeEscape } from "$lib/utils/emojiUtils.ts";
 import {
   checkEmptyResult,
   DEFAULT_PAGINATION,
@@ -38,7 +39,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
       }
 
       const snapshotParams = {
-        tick: decodeURIComponent(String(tick)),
+        tick: emojiToUnicodeEscape(String(tick)),
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         amt: Number(url.searchParams.get("amt")) || 0,

@@ -4,12 +4,13 @@ import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 import { SRC20TickPageData } from "$lib/types/src20.d.ts";
+import { emojiToUnicodeEscape } from "$lib/utils/emojiUtils.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {
     try {
       const rawTick = ctx.params.tick; // Could be "%F0%9F%9B%B8" or "\U0001F6F8"
-      const decodedTick = decodeURIComponent(rawTick); // Could be "🛸" or "\U0001F6F8"
+      const decodedTick = emojiToUnicodeEscape(rawTick); // Convert to consistent Unicode escape format
 
       // Pass directly to controller - repository will handle format conversion
       const body = await Src20Controller.fetchSrc20TickPageData(decodedTick);

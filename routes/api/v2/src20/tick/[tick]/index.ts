@@ -4,6 +4,7 @@ import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { BigFloat } from "bigfloat/mod.ts";
+import { emojiToUnicodeEscape } from "$lib/utils/emojiUtils.ts";
 import {
   DEFAULT_PAGINATION,
   validateRequiredParams,
@@ -40,7 +41,7 @@ export const handler: Handlers = {
 
       // Ensure required pagination values
       const params = {
-        tick: decodeURIComponent(String(tick)),
+        tick: emojiToUnicodeEscape(String(tick)),
         limit: limit || DEFAULT_PAGINATION.limit,
         page: page || DEFAULT_PAGINATION.page,
         op: opParam,
