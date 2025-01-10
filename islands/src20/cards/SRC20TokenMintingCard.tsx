@@ -80,7 +80,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             <p class={dataLabelSm}>
               HOLDERS{" "}
               <span class={dataValueSm}>
-                {Number(src20.holders).toLocaleString()}
+                {Number(src20?.mint_progress?.total_mints).toLocaleString()}
               </span>
             </p>
             <p class={dataLabelSm}>
@@ -91,7 +91,10 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
             </p>
             <div class="flex flex-col gap-1">
               <p class={dataLabelSm}>
-                PROGRESS <span class={dataValueSm}>{src20.progress}</span>
+                PROGRESS{" "}
+                <span class={dataValueSm}>
+                  {src20?.mint_progress?.progress}
+                </span>
                 <span class="text-stamp-grey-light">%</span>
               </p>
             </div>

@@ -177,6 +177,16 @@ export interface SRC20Row {
   top_mints_percentage?: number;
   volume_7d?: number;
   value?: number;
+  mint_progress?: {
+    max_supply: string;
+    total_minted: string;
+    limit: string;
+    total_mints: number;
+    progress: string;
+    decimals: number;
+    tx_hash: string;
+    tick: string;
+  };
 }
 
 interface SendRow {
