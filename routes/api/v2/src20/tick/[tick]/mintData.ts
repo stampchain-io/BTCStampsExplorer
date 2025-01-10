@@ -4,7 +4,6 @@ import { logger } from "$lib/utils/logger.ts";
 import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import type { SRC20MintDataResponse } from "$lib/types/src20.d.ts";
 import { SRC20Service } from "$server/services/src20/index.ts";
-import { emojiToUnicodeEscape } from "$lib/utils/emojiUtils.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {
@@ -14,7 +13,7 @@ export const handler: Handlers = {
         return ApiResponseUtil.badRequest("Tick parameter is required");
       }
 
-      const normalizedTick = emojiToUnicodeEscape(tick);
+      const normalizedTick = String(tick);
 
       const [mintStatus, balanceData] = await Promise.all([
         SRC20Service.QueryService.fetchSrc20MintProgress(normalizedTick),

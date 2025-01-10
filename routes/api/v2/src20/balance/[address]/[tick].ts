@@ -2,7 +2,6 @@ import { Handlers } from "$fresh/server.ts";
 import { AddressTickHandlerContext } from "$globals";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
-import { emojiToUnicodeEscape } from "$lib/utils/emojiUtils.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
   checkEmptyResult,
@@ -48,7 +47,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 
       // Log tick parameter transformation for debugging
       console.log("Raw tick parameter:", tick);
-      const normalizedTick = emojiToUnicodeEscape(String(tick));
+      const normalizedTick = String(tick);
       console.log("Normalized tick parameter:", normalizedTick);
 
       const balanceParams = {
