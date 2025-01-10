@@ -16,24 +16,22 @@ process_fmt_diff() {
   local line_number=0
   local changes=""
   local in_diff=false
+  local has_diagnostics=false
   
   while IFS= read -r line; do
-    # Skip warning lines and empty lines
-    if [[ $line =~ ^Warning || -z $line ]]; then
+    # Skip warning lines, empty lines, and error summary
+    if [[ $line =~ ^Warning || -z $line || $line =~ ^error: ]]; then
       continue
     fi
-    
-    echo "Processing line: $line" >&2
     
     # Detect start of a new file diff
     if [[ $line =~ ^from[[:space:]](.+): ]]; then
       # Process previous file if exists
       if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
         local escaped_changes=$(echo "$changes" | jq -R -s .)
-        echo "Processing changes for $current_file" >&2
         diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
-                                            --arg changes "$escaped_changes" \
-                                            --arg line "$line_number" \
+                                         --arg changes "$escaped_changes" \
+                                         --arg line "$line_number" \
           '. + [{
             "message": "Formatting issues found:\n" + $changes,
             "location": {
@@ -49,6 +47,7 @@ process_fmt_diff() {
               "url": "https://deno.land/manual/tools/formatter"
             }
           }]')
+        has_diagnostics=true
       fi
       
       # Start new file
@@ -63,9 +62,9 @@ process_fmt_diff() {
     if [[ $in_diff == true && $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+] ]]; then
       if [[ $line_number == 0 ]]; then
         line_number="${BASH_REMATCH[1]}"
-        echo "Setting line number: $line_number" >&2
       fi
       changes+="$line"$'\n'
+      has_diagnostics=true
     fi
   done < "$TEMP_FILE"
   
@@ -73,8 +72,8 @@ process_fmt_diff() {
   if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
     local escaped_changes=$(echo "$changes" | jq -R -s .)
     diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
-                                        --arg changes "$escaped_changes" \
-                                        --arg line "$line_number" \
+                                       --arg changes "$escaped_changes" \
+                                       --arg line "$line_number" \
       '. + [{
         "message": "Formatting issues found:\n" + $changes,
         "location": {
@@ -90,9 +89,14 @@ process_fmt_diff() {
           "url": "https://deno.land/manual/tools/formatter"
         }
       }]')
+    has_diagnostics=true
   fi
   
-  echo "$diagnostics"
+  if [[ "$has_diagnostics" == "true" ]]; then
+    echo "$diagnostics"
+  else
+    echo "[]"
+  fi
 }
 
 if [ "$MODE" = "lint" ]; then
