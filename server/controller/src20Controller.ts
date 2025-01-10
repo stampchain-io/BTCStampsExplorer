@@ -70,9 +70,13 @@ export class Src20Controller {
         last_block: lastBlock,
       };
 
+      // Ensure rawData is properly handled whether it's an array or single object
+      let processedData = Array.isArray(rawData) 
+        ? rawData 
+        : (Object.keys(rawData).length ? [rawData] : []);
+
       // Process data with mint progress if requested
-      let processedData = [...rawData];
-      if (balanceParams.includeMintData) {
+      if (balanceParams.includeMintData && processedData.length > 0) {
         const ticks = processedData.map(row => row.tick).filter(Boolean);
         if (ticks.length > 0) {
           const mintProgressData = await Promise.all(
