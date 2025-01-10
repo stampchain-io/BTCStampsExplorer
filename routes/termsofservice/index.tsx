@@ -1,61 +1,74 @@
 import { CourierFontLoader } from "$islands/home/FontLoader.tsx";
 
 export default function TermsOfService() {
+  const titleGreyDL =
+    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
+  const subTitleGrey =
+    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
+  const bodyTextLight =
+    "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
   return (
     <>
       <CourierFontLoader />
-      <div className="text-[#CCCCCC] flex flex-col gap-16 tablet:gap-36 py-24 tablet:py-48">
-        <section className="text-center max-w-full mx-auto">
-          <h1 className="text-4xl tablet:text-7xl font-bold gray-gradient1">
-            TERMS OF SERVICE
-          </h1>
-        </section>
-
+      <div className="flex flex-col gap-16 tablet:gap-16 pt-0 mobileLg:pt-3 tablet:pt-3">
         <section className="flex flex-col gap-6">
-          <p className="text-3xl tablet:text-6xl font-black gray-gradient3">
-            AGREEMENT
-          </p>
-          <div className="flex justify-between items-end">
-            <p className="font-extralight text-2xl tablet:text-5xl">
-              TO OUR LEGAL TERMS
+          <h1 className={titleGreyDL}>TERMS OF SERVICE</h1>
+          <div className="flex flex-col tablet:flex-row tablet:justify-between tablet:items-end -mt-6">
+            <p className={subTitleGrey}>
+              AGREEMENT TO OUR LEGAL TERMS
             </p>
-            <p className="font-extralight text-xs tablet:text-base">
+            <p className="text-lg mobileLg:text-xl font-light text-stamp-grey mb-2 mobileLg:mb-[13px]">
               LAST UPDATED{" "}
-              <span className="font-medium">SEPTEMBER 11 2024</span>
+              <span className="font-medium text-stamp-grey-light">
+                SEPTEMBER 11 2024
+              </span>
             </p>
           </div>
-          <p className="font-courier-prime">
+          <p className={`${bodyTextLight} font-courier-prime`}>
             We are Stampchain ("Company," "we," "us," "our"). We operate the
             website https://stampchain.io (the "Site"), as well as any other
             related products and services that refer or link to these legal
-            terms (the "Legal Terms") (collectively, the "Services"). You can
-            contact us by email at stampchain.io@gmail.com or by mail to
-            __________, __________, United States. These Legal Terms constitute
-            a legally binding agreement made between you, whether personally or
-            on behalf of an entity ("you"), and Stampchain, concerning your
-            access to and use of the Services. You agree that by accessing the
-            Services, you have read, understood, and agreed to be bound by all
-            of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL
-            TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND
-            YOU MUST DISCONTINUE USE IMMEDIATELY . Supplemental terms and
-            conditions or documents that may be posted on the Services from time
-            to time are hereby expressly incorporated herein by reference. We
-            reserve the right, in our sole discretion, to make changes or
-            modifications to these Legal Terms from time to time. We will alert
-            you about any changes by updating the "Last updated" date of these
-            Legal Terms, and you waive any right to receive specific notice of
-            each such change. It is your responsibility to periodically review
-            these Legal Terms to stay informed of updates. You will be subject
-            to, and will be deemed to have been made aware of and to have
-            accepted, the changes in any revised Legal Terms by your continued
-            use of the Services after the date such revised Legal Terms are
-            posted. The Services are intended for users who are at least 18
-            years old. Persons under the age of 18 are not permitted to use or
-            register for the Services. We recommend that you print a copy of
-            these Legal Terms for your records.
+            terms (the "Legal Terms") (collectively, the "Services").
+            <br />
+            <br />
+            These Legal Terms constitute a legally binding agreement made
+            between you, whether personally or on behalf of an entity ("you"),
+            and Stampchain, concerning your access to and use of the Services.
+            You agree that by accessing the Services, you have read, understood,
+            and agreed to be bound by all of these Legal Terms.
+            <br />
+            <br />
+            <b className="text-lg mobileLg:text-xl">
+              IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE
+              EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST
+              DISCONTINUE USE IMMEDIATELY.
+            </b>
+            <br />
+            <br />
+            Supplemental terms and conditions or documents that may be posted on
+            the Services from time to time are hereby expressly incorporated
+            herein by reference. We reserve the right, in our sole discretion,
+            to make changes or modifications to these Legal Terms from time to
+            time. We will alert you about any changes by updating the "Last
+            updated" date of these Legal Terms, and you waive any right to
+            receive specific notice of each such change.
+            <br />
+            It is your responsibility to periodically review these Legal Terms
+            to stay informed of updates. You will be subject to, and will be
+            deemed to have been made aware of and to have accepted, the changes
+            in any revised Legal Terms by your continued use of the Services
+            after the date such revised Legal Terms are posted.
+            <br />
+            The Services are intended for users who are at least 18 years old.
+            Persons under the age of 18 are not permitted to use or register for
+            the Services.
+            <br />
+            <br />
+            We recommend that you print a copy of these Legal Terms for your
+            records.
           </p>
-          <p className="text-base tablet:text-2xl font-courier-prime">
-            <span className="text-xl tablet:text-4xl">
+          <p className="mt-3 mobileLg:mt-6 text-base mobileMd:text-lg mobileLg:text-xl text-stamp-grey-light font-courier-prime">
+            <span className="text-2xl mobileMd:text-3xl mobileLg:text-4xl">
               TABLE OF CONTENTS<br />
             </span>
             1. OUR SERVICES<br />
@@ -87,7 +100,9 @@ export default function TermsOfService() {
           </p>
         </section>
 
-        <div className="flex flex-col gap-5 text-xs tablet:text-lg font-courier-prime">
+        <div
+          className={`${bodyTextLight} flex flex-col space-y-12 font-courier-prime`}
+        >
           <section>
             1. OUR SERVICES<br />
             The information provided when using the Services is not intended for
@@ -718,16 +733,19 @@ export default function TermsOfService() {
           <section id="content-no.26">
             26. CONTACT US<br />
             In order to resolve a complaint regarding the Services or to receive
-            further information regarding use of the Services, please contact us
-            at:<br />
-            Stampchain<br />
-            __________<br />
-            United States<br />
-            contact@stampchain.io
+            further information regarding use of the Services, please{" "}
+            <a
+              href="/about/contact"
+              className={`${bodyTextLight} animated-underline`}
+            >
+              send us an email.
+            </a>
           </section>
 
-          These terms of use were created using Termly's Terms and Conditions
-          Generator.
+          <b className="mt-3">
+            These terms of use were created using Termly's Terms and Conditions
+            Generator.
+          </b>
         </div>
       </div>
     </>
