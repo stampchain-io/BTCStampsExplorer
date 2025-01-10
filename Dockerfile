@@ -1,4 +1,4 @@
-FROM denoland/deno:alpine-2.1.4
+FROM denoland/deno:alpine-2.1.5
 
 # Set environment variables
 ENV HOME=/app \
