@@ -24,9 +24,7 @@ const SUPPORTED_EMOJI_PATTERN = new RegExp(
  * @returns The Unicode escape sequence representation
  */
 export function emojiToUnicodeEscape(emoji: string): string {
-  console.log("[DEBUG] emojiToUnicodeEscape input:", emoji);
   if (!emoji) {
-    console.log("[DEBUG] emojiToUnicodeEscape empty input, returning:", emoji);
     return emoji;
   }
 
@@ -48,10 +46,8 @@ export function emojiToUnicodeEscape(emoji: string): string {
 
     // Join the characters back together
     const result = converted.join("");
-    console.log("[DEBUG] emojiToUnicodeEscape result:", result);
     return result;
   } catch (error) {
-    console.log("[DEBUG] emojiToUnicodeEscape error:", error);
     return emoji;
   }
 }
@@ -64,10 +60,8 @@ export function emojiToUnicodeEscape(emoji: string): string {
  * @returns The emoji character representation
  */
 export function unicodeEscapeToEmoji(unicodeStr: string): string {
-  console.log("[DEBUG] unicodeEscapeToEmoji input:", unicodeStr);
   // Check if the string is already a supported emoji
   if (SUPPORTED_EMOJI_PATTERN.test(unicodeStr)) {
-    console.log("[DEBUG] unicodeEscapeToEmoji already emoji, returning:", unicodeStr);
     return unicodeStr;
   }
 

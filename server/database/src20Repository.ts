@@ -334,15 +334,7 @@ export class SRC20Repository {
       ? sortField
       : "amt";
 
-    console.log("[DEBUG] getSrc20BalanceFromDb params:", {
-      address,
-      tick,
-      limit: safeLimit,
-      page: safePage,
-      sortBy: validOrder,
-      sortField: validSortField
-    });
-    
+
     const sqlQuery = `
       SELECT address, p, tick, amt, block_time, last_update
       FROM ${SRC20_BALANCE_TABLE}
@@ -386,7 +378,7 @@ export class SRC20Repository {
       }.svg`,
     }));
 
-    console.log("[DEBUG] getSrc20BalanceFromDb final results:", resultsWithDeployImg);
+
     return resultsWithDeployImg;
   }
 
