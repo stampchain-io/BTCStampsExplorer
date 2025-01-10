@@ -244,6 +244,17 @@ const manifest = {
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
     "./routes/api/internal/fees.ts": $api_internal_fees,
+<<<<<<< Updated upstream
+||||||| constructed merge base
+    "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
+    "./routes/api/internal/src20/details.ts": $api_internal_src20_details,
+    "./routes/api/internal/src20/recentTransactions.ts":
+      $api_internal_src20_recentTransactions,
+=======
+    "./routes/api/internal/src20/details.ts": $api_internal_src20_details,
+    "./routes/api/internal/src20/recentTransactions.ts":
+      $api_internal_src20_recentTransactions,
+>>>>>>> Stashed changes
     "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
     "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
