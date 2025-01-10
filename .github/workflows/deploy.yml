@@ -50,33 +50,57 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Set timeout for each reviewdog process
-          timeout_duration=60
+          timeout_duration=30
 
-          # Run fmt and lint checks separately
-          echo "Running deno fmt check..."
-          deno fmt --check . 2>&1 | ./scripts/transform-deno-output.sh fmt > fmt.json
-          echo "Running deno lint check..."
-          deno lint --json . 2>&1 | ./scripts/transform-deno-output.sh lint > lint.json
-          
-          # Function to run reviewdog with timeout
-          run_reviewdog() {
-            local file=$1
-            local name=$2
-            if [ -s "$file" ]; then
-              echo "Processing $name results..."
-              timeout $timeout_duration bash -c "cat $file | reviewdog -f=rdjson -name=$name -reporter=github-pr-review" || \
-              echo "Warning: $name check timed out but comments may have been posted"
+          # Function to process files in batches
+          process_files() {
+            local check_type=$1
+            local batch_size=50
+            local total_files=0
+            local batch_num=1
+
+            # Count total files
+            if [ "$check_type" = "fmt" ]; then
+              total_files=$(find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | wc -l)
             else
-              echo "No $name issues found"
+              total_files=$(find . -type f -name "*.ts" -o -name "*.tsx" | wc -l)
             fi
+
+            # Process in batches
+            for i in $(seq 1 $batch_size $total_files); do
+              echo "Processing $check_type batch $batch_num..."
+              
+              if [ "$check_type" = "fmt" ]; then
+                find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | \
+                  head -n $batch_size | \
+                  xargs deno fmt --check 2>&1 | \
+                  ./scripts/transform-deno-output.sh fmt > "fmt_${batch_num}.json"
+              else
+                find . -type f -name "*.ts" -o -name "*.tsx" | \
+                  head -n $batch_size | \
+                  xargs deno lint --json 2>&1 | \
+                  ./scripts/transform-deno-output.sh lint > "lint_${batch_num}.json"
+              fi
+
+              # Run reviewdog on batch
+              if [ -s "${check_type}_${batch_num}.json" ]; then
+                echo "Running reviewdog on ${check_type} batch $batch_num..."
+                timeout $timeout_duration bash -c "cat ${check_type}_${batch_num}.json | reviewdog -f=rdjson -name=${check_type} -reporter=github-pr-review" || \
+                echo "Warning: ${check_type} batch $batch_num timed out but comments may have been posted"
+              fi
+
+              rm -f "${check_type}_${batch_num}.json"
+              ((batch_num++))
+            done
           }
+
+          # Process fmt and lint separately
+          echo "Starting fmt checks..."
+          process_files fmt
           
-          # Process results with timeouts
-          run_reviewdog fmt.json denofmt
-          run_reviewdog lint.json denolint
+          echo "Starting lint checks..."
+          process_files lint
           
-          # Clean up
-          rm -f fmt.json lint.json
           exit 0
 
       # - name: Start Deno app
