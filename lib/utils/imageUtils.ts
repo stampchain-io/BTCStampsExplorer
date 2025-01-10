@@ -66,7 +66,9 @@ export const getStampImageSrc = (stamp: StampRow) => {
 
   // Extract filename from full URL if present
   const urlParts = stamp.stamp_url.split("/stamps/");
-  const filename = urlParts.length > 1 ? urlParts[1] : stamp.stamp_url;
+  const filename = urlParts.length > 1
+    ? urlParts[1].replace(".html", "")
+    : stamp.stamp_url;
 
   // Use relative path
   return `/content/${filename}`;
