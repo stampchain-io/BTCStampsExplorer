@@ -15,6 +15,7 @@ jobs:
     permissions:
       id-token: write # Needed for auth with Deno Deploy
       contents: read # Needed to clone the repository
+      pull-requests: write # Needed for reviewdog to comment on PRs
 
     steps:
       - name: Clone repository
@@ -38,6 +39,20 @@ jobs:
 
       - name: Build step
         run: deno task build
+
+      - name: Install reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Run reviewdog
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          deno fmt --check . 2>&1 | ./scripts/transform-deno-output.sh fmt > fmt.json
+          deno lint --json . 2>&1 | ./scripts/transform-deno-output.sh lint > lint.json
+          cat fmt.json | reviewdog -f=rdjson -name=denofmt -reporter=github-pr-review
+          cat lint.json | reviewdog -f=rdjson -name=denolint -reporter=github-pr-review
 
       # - name: Start Deno app
       #   run: deno run -A main.ts &
