@@ -1,6 +1,6 @@
 # Adding version control information for better AI context
 version_info:
-  deno: "2.1.4"
+  deno: "2.1.5"
   fresh: "1.7.3"
   project: "BTCStampsExplorer"
 
@@ -33,7 +33,7 @@ emoji_handling:
 
 # Expanding code style with project-specific patterns
 code_style:
-  framework: "Deno Fresh 2.1.4"
+  framework: "Deno Fresh 2.1.5"
   principles:
     - write_concise_typescript
     - use_functional_programming
