@@ -49,8 +49,25 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Enable debug output and error handling
+          set -x
+          set -e
+          
+          # Function to cleanup on error
+          cleanup() {
+            echo "Error occurred. Cleaning up..."
+            pkill -f reviewdog || true
+            exit 1
+          }
+          trap cleanup ERR
+          
           # Set timeout for each reviewdog process
-          timeout_duration=30
+          timeout_duration=60  # Increased timeout
+          
+          # Debug: Show environment
+          echo "Current directory: $(pwd)"
+          echo "Files in scripts directory:"
+          ls -la ./scripts/
 
           # Function to process files in batches
           process_files() {

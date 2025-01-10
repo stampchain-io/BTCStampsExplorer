@@ -1,8 +1,18 @@
 #!/bin/bash
 
+set -e  # Exit on error
+set -u  # Exit on undefined variables
+
+echo "Starting transform-deno-output.sh with mode: $1" >&2
+
 MODE=$1
 TEMP_FILE=$(mktemp)
+echo "Created temp file: $TEMP_FILE" >&2
 cat > "$TEMP_FILE"
+
+# Debug: Show input content
+echo "Input content preview:" >&2
+head -n 5 "$TEMP_FILE" >&2
 
 create_empty_rdjson() {
   local source_name=$1
@@ -17,8 +27,15 @@ process_fmt_diff() {
   local changes=""
   local in_diff=false
   local has_diagnostics=false
+  local processed_files=0
+  local start_time=$(date +%s)
   
-  while IFS= read -r line; do
+  echo "Starting process_fmt_diff function at $(date)" >&2
+  
+  # Trap errors and print debug info
+  trap 'echo "Error in process_fmt_diff at line $LINENO. Current file: $current_file" >&2' ERR
+  
+  while IFS= read -r line || [ -n "$line" ]; do  # Handle last line properly
     # Skip warning lines, empty lines, and error summary
     if [[ $line =~ ^Warning || -z $line || $line =~ ^error: ]]; then
       continue
@@ -28,7 +45,13 @@ process_fmt_diff() {
     if [[ $line =~ ^from[[:space:]](.+): ]]; then
       # Process previous file if exists
       if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
-        local escaped_changes=$(echo "$changes" | jq -R -s .)
+        echo "Processing file $((processed_files + 1)): $current_file" >&2
+        local escaped_changes
+        escaped_changes=$(echo "$changes" | jq -R -s . 2>&2) || {
+          echo "Error escaping changes for $current_file" >&2
+          return 1
+        }
+        echo "Updating diagnostics for $current_file" >&2
         diagnostics=$(echo "$diagnostics" | jq --arg file "$current_file" \
                                          --arg changes "$escaped_changes" \
                                          --arg line "$line_number" \
@@ -92,9 +115,15 @@ process_fmt_diff() {
     has_diagnostics=true
   fi
   
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  echo "Finished processing $processed_files files in $duration seconds" >&2
+  
   if [[ "$has_diagnostics" == "true" ]]; then
+    echo "Returning diagnostics array with findings" >&2
     echo "$diagnostics"
   else
+    echo "No diagnostics found, returning empty array" >&2
     echo "[]"
   fi
 }
