@@ -452,29 +452,37 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     if (titleRef.current) {
       const container = titleRef.current.parentElement;
       if (container) {
-        const containerWidth = container.clientWidth - 48; // Account for padding
+        const containerWidth = container.clientWidth;
+
+        // Set initial content to 50% to allow scaling up
+        titleRef.current.style.width = "50%";
         const contentWidth = titleRef.current.scrollWidth;
-        setScale(Math.min(1, containerWidth / contentWidth));
+
+        // Calculate base scale and limit to original size
+        const baseScale = containerWidth / contentWidth;
+        const maxScale = Math.min(baseScale, 1);
+        setScale(maxScale);
+
+        // Reset width to allow proper scaling
+        titleRef.current.style.width = "";
       }
     }
   };
 
   useEffect(() => {
+    updateScale();
     globalThis.addEventListener("resize", updateScale);
     return () => globalThis.removeEventListener("resize", updateScale);
   }, []);
 
-  // Move the showListings state to be preserved across dispenser data updates
-  const [showListings, setShowListings] = useState(false);
+  // Add another effect to recalculate when stamp data changes
+  useEffect(() => {
+    updateScale();
+  }, [stamp.cpid, stamp.stamp, htmlStampTitle]);
 
-  // Add state for dispensers and page info
+  const [showListings, setShowListings] = useState(false);
   const [dispensers, setDispensers] = useState<any[]>([]);
   const [isLoadingDispensers, setIsLoadingDispensers] = useState(false);
-
-  // Add state for filtered dispensers
-  const [activeDispensers, setActiveDispensers] = useState<any[]>([]);
-
-  // Modify the fetch function to filter active dispensers
   const fetchDispensers = async (page: number) => {
     if (isLoadingDispensers) return;
     setIsLoadingDispensers(true);
@@ -500,11 +508,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       const openDispensers = data.data.filter((d: any) => d.status === "open");
 
       setDispensers(openDispensers);
-      setActiveDispensers(openDispensers);
     } catch (error) {
       console.error("Error fetching dispensers:", error);
       setDispensers([]);
-      setActiveDispensers([]);
     } finally {
       setIsLoadingDispensers(false);
     }
@@ -673,7 +679,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               style={{
                 transform: `scale(${scale})`,
                 transformOrigin: "left",
-                maxWidth: scale === 1 ? "none" : `${(100 / scale)}%`,
+                width: `${(100 / scale)}%`,
                 marginTop: `${-0.2 * (1 / scale - 1)}em`,
                 marginBottom: `${-0.26 * (1 / scale - 1)}em`,
               }}
@@ -921,7 +927,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             <div className={`${dataColumn} flex-1 items-start`}>
               <p className={dataLabelSm}>SIZE</p>
               <p className={dataValueSm}>
-                {formatFileSize(fileSize)}
+                {fileSize !== null ? formatFileSize(fileSize) : "N/A"}
               </p>
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
