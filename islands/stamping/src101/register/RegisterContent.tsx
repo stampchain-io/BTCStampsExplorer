@@ -11,8 +11,7 @@ const titlePurpleLDCenter =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 w-full text-center";
 const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-const feeSelectorContainer =
-  "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
+const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 const buttonPurpleOutline =
   "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
 const animatedInputContainer = `
