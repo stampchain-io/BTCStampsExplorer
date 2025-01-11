@@ -49,7 +49,11 @@ export function Filter({
 
       if (e.key === "f") {
         e.preventDefault();
-        handleOpen(true);
+        if (!open) {
+          handleOpen(true);
+        } else {
+          handleOpen(false);
+        }
       }
       if (e.key === "Escape" && open) {
         handleOpen(false);
