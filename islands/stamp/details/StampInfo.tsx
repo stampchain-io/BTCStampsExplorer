@@ -213,12 +213,15 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   };
 
   useEffect(() => {
-    if (!stamp?.stamp_mimetype) {
-      console.log("Missing stamp_mimetype:", stamp?.stamp_mimetype);
+    if (!stamp?.stamp_mimetype && fileExtension !== "BMN") {
+      console.log("Missing stamp_mimetype and not BMN:", {
+        stamp_mimetype: stamp?.stamp_mimetype,
+        stamp_url: stamp?.stamp_url,
+      });
       return;
     }
 
-    if (stamp.stamp_mimetype.startsWith("image/")) {
+    if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
       const src = getStampImageSrc(stamp);
       const img = new Image();
@@ -308,7 +311,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           setImageDimensions(null);
         });
     } else if (stamp.stamp_mimetype === "text/plain") {
-      // Add handling for plain text files
+      // Handle plain text files
       fetch(stamp.stamp_url)
         .then((response) => response.text())
         .then((text) => {
@@ -320,7 +323,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       stamp.stamp_mimetype === "text/javascript" ||
       stamp.stamp_mimetype === "application/javascript"
     ) {
-      // Handle JS stamps - now checking for both common JS MIME types
+      // Handle JS stamps
       fetch(stamp.stamp_url)
         .then((response) => response.text())
         .then((js) => {
@@ -337,8 +340,33 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           setFileSize(blob.size);
         })
         .catch((error) => console.error("Failed to fetch GZIP size:", error));
+    } else if (fileExtension === "BMN") {
+      // Handle BMN files (lowest priority)
+      fetch(stamp.stamp_url)
+        .then((response) => {
+          // Get content length from headers first
+          const contentLength = response.headers.get("content-length");
+          if (contentLength) {
+            setFileSize(parseInt(contentLength, 10));
+            return;
+          }
+          // Fallback to reading the response
+          return response.text();
+        })
+        .then((content) => {
+          if (typeof content === "string") {
+            // Calculate size from the actual content if we didn't get content-length
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(content);
+            setFileSize(bytes.length);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch BMN size:", error);
+          setFileSize(0); // Set to 0 instead of null for better UX
+        });
     }
-  }, [stamp.stamp_mimetype, stamp.stamp_url]);
+  }, [stamp.stamp_mimetype, stamp.stamp_url, fileExtension]);
 
   // Format file size
   const formatFileSize = (size: number) => {
