@@ -123,7 +123,7 @@ export function Filter({
         ? prevFilters.filter((f) => f !== value)
         : [...prevFilters, value];
 
-      setFilterValue(newFilters);
+      setFilterValue?.(newFilters);
       updateURL({ filterBy: newFilters });
 
       const url = new URL(globalThis.location.href);
