@@ -604,6 +604,56 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     });
   }, [dispensers]);
 
+  // Add new state for media duration
+  const [mediaDuration, setMediaDuration] = useState<number | null>(null);
+
+  // Modify the format duration helper
+  const formatDuration = (seconds: number): string => {
+    // Less than 10 seconds - show milliseconds
+    if (seconds < 10) {
+      const milliseconds = Math.floor(seconds * 1000);
+      return `${milliseconds} MS`;
+    }
+
+    // 10-59 seconds - show seconds
+    if (seconds < 60) {
+      return `${Math.floor(seconds)} SECONDS`;
+    }
+
+    // 60+ seconds - show MM:SS format
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  // Modify the useEffect to include duration fetching for media files
+  useEffect(() => {
+    if (
+      stamp.stamp_mimetype?.startsWith("video/mpeg") ||
+      stamp.stamp_mimetype?.startsWith("audio/mpeg") ||
+      fileExtension === "MP3" ||
+      fileExtension === "MP4" ||
+      fileExtension === "MPEG"
+    ) {
+      const media = fileExtension === "MP3"
+        ? new Audio()
+        : document.createElement("video");
+      media.src = stamp.stamp_url;
+
+      media.onloadedmetadata = () => {
+        setMediaDuration(media.duration);
+      };
+
+      media.onerror = () => {
+        console.error("Failed to load media duration");
+        setMediaDuration(null);
+      };
+    }
+  }, [stamp.stamp_url, stamp.stamp_mimetype, fileExtension]);
+
+  // Update the dimensions/duration display section
+  const isMediaFile = ["MP3", "MP4", "MPEG"].includes(fileExtension);
+
   return (
     <>
       <StampSearchClient
@@ -762,9 +812,13 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </p>
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
-              <p className={dataLabelSm}>DIMENSIONS</p>
+              <p className={dataLabelSm}>
+                {isMediaFile ? "DURATION" : "DIMENSIONS"}
+              </p>
               <p className={dataValueSm}>
-                {getDimensionsDisplay(imageDimensions)}
+                {isMediaFile
+                  ? (mediaDuration ? formatDuration(mediaDuration) : "-")
+                  : getDimensionsDisplay(imageDimensions)}
               </p>
             </div>
             <div className="flex flex-1 justify-end items-end pb-1 space-x-[9px]">
