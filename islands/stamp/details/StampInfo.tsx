@@ -340,6 +340,34 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           setFileSize(blob.size);
         })
         .catch((error) => console.error("Failed to fetch GZIP size:", error));
+    } else if (
+      stamp.stamp_mimetype?.startsWith("video/mpeg") ||
+      stamp.stamp_mimetype?.startsWith("audio/mpeg") ||
+      fileExtension === "MP3" ||
+      fileExtension === "MP4" ||
+      fileExtension === "MPEG"
+    ) {
+      // Handle MPEG files
+      fetch(stamp.stamp_url)
+        .then((response) => {
+          // Try to get content length from headers first
+          const contentLength = response.headers.get("content-length");
+          if (contentLength) {
+            setFileSize(parseInt(contentLength, 10));
+            return;
+          }
+          // If no content length header, try to get the blob size
+          return response.blob();
+        })
+        .then((blob) => {
+          if (blob instanceof Blob) {
+            setFileSize(blob.size);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch MPEG size:", error);
+          setFileSize(0);
+        });
     } else if (fileExtension === "BMN") {
       // Handle BMN files (lowest priority)
       fetch(stamp.stamp_url)
@@ -381,7 +409,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   // Format dimensions display
   const getDimensionsDisplay = (dims: DimensionsType | null) => {
     if (stamp.stamp_mimetype === "text/plain") {
-      return "FLUID";
+      return "FIXED";
     }
     if (!dims) return "N/A";
     if (dims.unit === "responsive") return "RESPONSIVE";
