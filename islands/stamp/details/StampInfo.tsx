@@ -211,15 +211,12 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   };
 
   useEffect(() => {
-    if (!stamp?.stamp_mimetype && fileExtension !== "BMN") {
-      console.log("Missing stamp_mimetype and not BMN:", {
-        stamp_mimetype: stamp?.stamp_mimetype,
-        stamp_url: stamp?.stamp_url,
-      });
-      return;
-    }
-
-    if (stamp.stamp_mimetype?.startsWith("image/")) {
+    if (isSrc20Stamp()) {
+      // Calculate size of JSON data for SRC-20 stamps
+      const jsonData = stamp.stamp_base64;
+      const blob = new Blob([jsonData], { type: "application/json" });
+      setFileSize(blob.size);
+    } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
       const src = getStampImageSrc(stamp);
       const img = new Image();
@@ -237,6 +234,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         .then((blob) => setFileSize(blob.size))
         .catch((error) => console.error("Failed to fetch image size:", error));
     } else if (stamp.stamp_mimetype === "text/html") {
+      // Handle HTML
       fetch(stamp.stamp_url)
         .then((response) => response.text())
         .then((html) => {
@@ -247,7 +245,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           const doc = parser.parseFromString(html, "text/html");
 
           const hasViewportMeta = doc.querySelector('meta[name="viewport"]');
-
           const styleTag = doc.querySelector("style");
           const hasResponsiveUnits = styleTag?.textContent?.includes("vw") ||
             styleTag?.textContent?.includes("vh") ||
@@ -264,7 +261,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             const bodyStyle = doc.body.getAttribute("style");
             const divStyle = doc.querySelector("div")?.getAttribute("style");
 
-            // Parse dimensions from style
             const getDimension = (style: string | null | undefined) => {
               if (!style) return null;
               const widthMatch = style.match(/width:\s*(\d+)(px|rem|em)/);
@@ -279,8 +275,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
             const bodyDims = getDimension(bodyStyle);
             const divDims = getDimension(divStyle);
-
-            // Use first available dimensions
             const dims = bodyDims || divDims;
 
             if (dims && dims.width && dims.height) {
@@ -301,6 +295,32 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         .catch((error) => {
           console.error("Failed to fetch HTML content:", error);
           setImageDimensions(null);
+        });
+    } else if (
+      stamp.stamp_mimetype?.startsWith("video/mpeg") ||
+      stamp.stamp_mimetype?.startsWith("audio/mpeg") ||
+      fileExtension === "MP3" ||
+      fileExtension === "MP4" ||
+      fileExtension === "MPEG"
+    ) {
+      // Handle MPEG files
+      fetch(stamp.stamp_url)
+        .then((response) => {
+          const contentLength = response.headers.get("content-length");
+          if (contentLength) {
+            setFileSize(parseInt(contentLength, 10));
+            return;
+          }
+          return response.blob();
+        })
+        .then((blob) => {
+          if (blob instanceof Blob) {
+            setFileSize(blob.size);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch MPEG size:", error);
+          setFileSize(0);
         });
     } else if (stamp.stamp_mimetype === "text/plain") {
       // Handle plain text files
@@ -332,50 +352,19 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           setFileSize(blob.size);
         })
         .catch((error) => console.error("Failed to fetch GZIP size:", error));
-    } else if (
-      stamp.stamp_mimetype?.startsWith("video/mpeg") ||
-      stamp.stamp_mimetype?.startsWith("audio/mpeg") ||
-      fileExtension === "MP3" ||
-      fileExtension === "MP4" ||
-      fileExtension === "MPEG"
-    ) {
-      // Handle MPEG files
-      fetch(stamp.stamp_url)
-        .then((response) => {
-          // Try to get content length from headers first
-          const contentLength = response.headers.get("content-length");
-          if (contentLength) {
-            setFileSize(parseInt(contentLength, 10));
-            return;
-          }
-          // If no content length header, try to get the blob size
-          return response.blob();
-        })
-        .then((blob) => {
-          if (blob instanceof Blob) {
-            setFileSize(blob.size);
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to fetch MPEG size:", error);
-          setFileSize(0);
-        });
     } else if (fileExtension === "BMN") {
-      // Handle BMN files (lowest priority)
+      // Handle BMN files
       fetch(stamp.stamp_url)
         .then((response) => {
-          // Get content length from headers first
           const contentLength = response.headers.get("content-length");
           if (contentLength) {
             setFileSize(parseInt(contentLength, 10));
             return;
           }
-          // Fallback to reading the response
           return response.text();
         })
         .then((content) => {
           if (typeof content === "string") {
-            // Calculate size from the actual content if we didn't get content-length
             const encoder = new TextEncoder();
             const bytes = encoder.encode(content);
             setFileSize(bytes.length);
@@ -383,8 +372,14 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         })
         .catch((error) => {
           console.error("Failed to fetch BMN size:", error);
-          setFileSize(0); // Set to 0 instead of null for better UX
+          setFileSize(0);
         });
+    } else if (!stamp?.stamp_mimetype && fileExtension !== "BMN") {
+      console.log("Missing stamp_mimetype and not BMN:", {
+        stamp_mimetype: stamp?.stamp_mimetype,
+        stamp_url: stamp?.stamp_url,
+      });
+      return;
     }
   }, [stamp.stamp_mimetype, stamp.stamp_url, fileExtension]);
 
@@ -821,24 +816,36 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         </div>
 
         <div className="flex flex-col dark-gradient rounded-lg p-3 mobileLg:p-6">
-          <div className="flex flex-col">
-            <p className={dataLabel}>{editionLabel}</p>
-            <p className={dataValueXl}>{editionCount}{" "}</p>
-          </div>
+          {!isSrc20Stamp() && (
+            <div className="flex flex-col pb-3 mobileLg:pb-6">
+              <p className={dataLabel}>{editionLabel}</p>
+              <p className={dataValueXl}>{editionCount}{" "}</p>
+            </div>
+          )}
 
-          <div className="flex flex-row pt-3 mobileLg:pt-6">
+          <div className="flex flex-row">
             <div className={`${dataColumn} flex-1 items-start`}>
               <p className={dataLabelSm}>TYPE</p>
               <p className={dataValueSm}>
-                {fileExtension}
+                {isSrc20Stamp() ? "SRC-20" : fileExtension}
               </p>
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
               <p className={dataLabelSm}>
-                {isMediaFile ? "DURATION" : "DIMENSIONS"}
+                {isSrc20Stamp()
+                  ? "TRANSACTION"
+                  : isMediaFile
+                  ? "DURATION"
+                  : "DIMENSIONS"}
               </p>
               <p className={dataValueSm}>
-                {isMediaFile
+                {isSrc20Stamp()
+                  ? JSON.parse(stamp.stamp_base64)?.op === "DEPLOY"
+                    ? "DEPLOY"
+                    : JSON.parse(stamp.stamp_base64)?.op === "MINT"
+                    ? "MINT"
+                    : "TRANSFER"
+                  : isMediaFile
                   ? (mediaDuration ? formatDuration(mediaDuration) : "-")
                   : getDimensionsDisplay(imageDimensions)}
               </p>
@@ -947,7 +954,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </p>
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
-              <p className={dataLabelSm}>CREATED</p>
+              <p className={dataLabelSm}>
+                {isSrc20Stamp() ? "SENT" : "CREATED"}
+              </p>
               <p className={dataValueSm}>
                 {createdDate}
               </p>
