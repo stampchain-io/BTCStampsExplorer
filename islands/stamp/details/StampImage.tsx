@@ -20,6 +20,10 @@ function RightPanel(
     showCodeButton: boolean;
   },
 ) {
+  if (stamp.ident === "SRC-20") {
+    return null;
+  }
+
   const url = `https://stampchain.io/stamp/${stamp.stamp}`;
   const text = "Check out what I found @Stampchain";
 
