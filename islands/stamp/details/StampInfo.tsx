@@ -51,12 +51,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffHours < 24) {
-      // Show relative time for < 24 hours
       const hours = Math.floor(diffHours);
       return `${hours} ${hours === 1 ? "HOUR" : "HOURS"} AGO`;
     }
 
-    // Otherwise show numeric date
     return formatDate(date, {
       month: "numeric",
       day: "numeric",
@@ -234,28 +232,22 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       };
       img.src = src;
 
-      // Get image size
       fetch(src)
         .then((response) => response.blob())
         .then((blob) => setFileSize(blob.size))
         .catch((error) => console.error("Failed to fetch image size:", error));
     } else if (stamp.stamp_mimetype === "text/html") {
-      // Handle HTML stamps
       fetch(stamp.stamp_url)
         .then((response) => response.text())
         .then((html) => {
-          // Set HTML file size
           const blob = new Blob([html], { type: "text/html" });
           setFileSize(blob.size);
 
-          // Parse HTML
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, "text/html");
 
-          // Check for viewport meta tag
           const hasViewportMeta = doc.querySelector('meta[name="viewport"]');
 
-          // Check for responsive units in style
           const styleTag = doc.querySelector("style");
           const hasResponsiveUnits = styleTag?.textContent?.includes("vw") ||
             styleTag?.textContent?.includes("vh") ||
@@ -440,7 +432,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     }
   }, [stamp.stamp_mimetype, stamp.stamp_url]);
 
-  // Add this helper function near the top of the component
+  // Helper function to check if it's a POSH stamp (move near top of component)
   const isPoshStamp = (cpid: string) => {
     return !cpid.startsWith("A");
   };
@@ -657,8 +649,19 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     }
   }, [stamp.stamp_url, stamp.stamp_mimetype, fileExtension]);
 
-  // Update the dimensions/duration display section
   const isMediaFile = ["MP3", "MP4", "MPEG"].includes(fileExtension);
+
+  const isSrc20Stamp = () => {
+    return stamp.ident === "SRC-20";
+  };
+
+  // Effect to handle document title updates
+  useEffect(() => {
+    document.title = `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
+    return () => {
+      document.title = "stampchain.io";
+    };
+  }, [stamp.stamp]);
 
   return (
     <>
@@ -684,8 +687,15 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 marginBottom: `${-0.26 * (1 / scale - 1)}em`,
               }}
             >
-              {(isPoshStamp(stamp.cpid) ||
-                  (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
+              {isSrc20Stamp()
+                ? (
+                  <>
+                    <span className="font-light">#</span>
+                    <span className="font-black">{stamp.stamp}</span>
+                  </>
+                )
+                : (isPoshStamp(stamp.cpid) ||
+                    (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
                 ? (
                   <span className="font-black uppercase text-ellipsis overflow-hidden">
                     {isPoshStamp(stamp.cpid) ? stamp.cpid : htmlStampTitle}
@@ -699,9 +709,15 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 )}
             </p>
 
+            {isSrc20Stamp() && stamp.cpid && (
+              <p className="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+                {stamp.cpid}
+              </p>
+            )}
+
             <p className="-mt-1.5 text-xl mobileLg:text-2xl font-medium text-stamp-grey-light block">
-              {(isPoshStamp(stamp.cpid) ||
-                (htmlStampTitle && stamp.stamp_mimetype === "text/html")) && (
+              {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
+                (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
                 <>
                   <span className="font-light">#</span>
                   <span className="font-light">{stamp.stamp}</span>
@@ -709,7 +725,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               )}
             </p>
 
-            {!isPoshStamp(stamp.cpid) && (
+            {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
               <p className="text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
                 {stamp.cpid}
               </p>
