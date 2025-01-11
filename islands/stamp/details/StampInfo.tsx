@@ -439,9 +439,11 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       }
 
       const data = await response.json();
+
+      // Simply filter for open status dispensers only
       const openDispensers = data.data.filter((d: any) => d.status === "open");
 
-      setDispensers(data.data);
+      setDispensers(openDispensers);
       setActiveDispensers(openDispensers);
     } catch (error) {
       console.error("Error fetching dispensers:", error);
@@ -618,12 +620,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
                 <div
                   className={`flex w-full gap-3 mobileLg:gap-6 mb-3 mobileLg:mb-6 items-end ${
-                    activeDispensers?.length >= 2
-                      ? "justify-between"
-                      : "justify-end"
+                    dispensers?.length >= 2 ? "justify-between" : "justify-end"
                   }`}
                 >
-                  {activeDispensers?.length >= 2 && (
+                  {dispensers?.length >= 2 && (
                     <button
                       onClick={() => setShowListings(!showListings)}
                       className="pb-1.5"
@@ -657,7 +657,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   </div>
                 </div>
 
-                {(activeDispensers?.length >= 2)
+                {(dispensers?.length >= 2)
                   ? (
                     showListings && (
                       <div className="w-full mb-3 mobileLg:mb-6">
@@ -665,7 +665,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                           ? <p>Loading listings...</p>
                           : (
                             <StampListingsOpen
-                              dispensers={activeDispensers}
+                              dispensers={dispensers}
                               floorPrice={typeof stamp.floorPrice === "number"
                                 ? stamp.floorPrice
                                 : 0}
