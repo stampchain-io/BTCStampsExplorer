@@ -53,7 +53,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     if (diffHours < 24) {
       // Show relative time for < 24 hours
       const hours = Math.floor(diffHours);
-      return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+      return `${hours} ${hours === 1 ? "HOUR" : "HOURS"} AGO`;
     }
 
     // Otherwise show numeric date
