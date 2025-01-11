@@ -167,6 +167,30 @@ body {
   image-rendering: crisp-edges;
 }
 
+.bgGradientTopLeft{
+  width: 1728.553px;
+  height: 1000px;
+  transform: rotate(45deg);
+  border-radius: 1728.553px;
+  opacity: 0.2;
+  background: linear-gradient(113deg, #FA0 23.14%, #406 84.65%);
+  filter: blur(50px);
+  position: absolute;
+  left: -50%;
+  top: -4%;
+}
+.bgGradientTopRight{
+  position: absolute;
+    top: -350px;
+    right: -450px;
+    width: 1128px;
+    height: 720px;
+    transform: rotate(-45deg);
+    border-radius: 1128px;
+    background: linear-gradient(77deg, #000 9.15%, #493240 50.02%, #F09 90.89%);
+    filter: blur(50px);
+}
+
 .bgGradientTop {
   @apply absolute top-0 left-0 right-0;
   height: 2000px;

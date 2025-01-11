@@ -280,6 +280,8 @@ export function OlgaContent() {
 
   // Add new state and refs for tooltips
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
+  const uploadTooltipTimeoutRef = useRef<number | null>(null);
 
   // Add tooltip handlers
   const handleMouseMove = (e: MouseEvent) => {
@@ -287,6 +289,25 @@ export function OlgaContent() {
       x: e.clientX,
       y: e.clientY,
     });
+  };
+
+  const handleUploadMouseEnter = () => {
+    setIsUploadTooltipVisible(true);
+
+    if (uploadTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
+    }
+
+    uploadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsUploadTooltipVisible(false);
+    }, 1500);
+  };
+
+  const handleUploadMouseLeave = () => {
+    if (uploadTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
+    }
+    setIsUploadTooltipVisible(false);
   };
 
   useEffect(() => {
@@ -1038,7 +1059,7 @@ export function OlgaContent() {
         )}
       <div
         class={`${tooltipImage} ${
-          _isUploadTooltipVisible ? "opacity-100" : "opacity-0"
+          isUploadTooltipVisible ? "opacity-100" : "opacity-0"
         }`}
         style={{
           left: `${tooltipPosition.x}px`,
