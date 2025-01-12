@@ -8,9 +8,6 @@ interface Props {
   title?: string;
 }
 
-const tooltipIcon =
-  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
-
 function WalletReceiveModal({ onClose, address, title = "RECEIVE" }: Props) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [isCopyTooltipVisible, setIsCopyTooltipVisible] = useState(false);
@@ -88,6 +85,9 @@ function WalletReceiveModal({ onClose, address, title = "RECEIVE" }: Props) {
       }
     };
   }, []);
+
+  const tooltipIcon =
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
 
   return (
     <ModalLayout onClose={onClose} title={title}>

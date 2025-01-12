@@ -308,12 +308,19 @@ export default function AboutDonate() {
             <br />
 
             <div className="hidden mobileMd:flex justify-start gap-[18px] tablet:gap-6">
-              <p className="text-xl font-bold text-stamp-purple mobileLg:block hidden">
+              <a
+                href={`/wallet/${DONATE_ADDRESS}`}
+                class="hidden mobileLg:block text-xl font-bold text-stamp-purple hover:text-stamp-purple-bright"
+              >
                 {DONATE_ADDRESS}
-              </p>
-              <p className="text-lg font-bold text-stamp-purple mobileLg:hidden block">
+              </a>
+              <a
+                href={`/wallet/${DONATE_ADDRESS}`}
+                class="block mobileLg:hidden text-lg font-bold text-stamp-purple hover:text-stamp-purple-bright"
+              >
                 bc1qe5sz3mt4a3e5...74qe0xdrkzew203
-              </p>
+              </a>
+
               <div
                 ref={receiveButtonRef}
                 class="relative group mobileLg:-mt-0.5"
@@ -347,7 +354,7 @@ export default function AboutDonate() {
           <div className="mobileMd:col-span-4 col-span-12 flex flex-col gap-5 justify-center items-center">
             <div className="w-[134px] mobileLg:w-[174px] tablet:w-[204px]">
               <StampCard
-                stamp={DONATE_STAMP as StampRow}
+                stamp={DONATE_STAMP as unknown as StampRow}
                 showDetails={false}
                 showMinDetails={false}
               />
@@ -366,13 +373,16 @@ export default function AboutDonate() {
               dev wallet.
             </p>
 
-            <div className="flex justify-start gap-[18px]">
-              <p className="text-lg font-bold text-stamp-primary mobileLg:hidden block pt-1.5">
+            <div className="flex justify-start pt-3 gap-[18px]">
+              <a
+                href={`/wallet/${DONATE_ADDRESS}`}
+                class="text-xl font-bold text-stamp-purple hover:text-stamp-purple-bright"
+              >
                 bc1qe5sz3mt4...0xdrkzew203
-              </p>
+              </a>
               <div
                 ref={receiveButtonRef}
-                class="relative group mt-1.5"
+                class="relative group pt-0.5"
                 onMouseEnter={handleReceiveMouseEnter}
                 onMouseLeave={handleReceiveMouseLeave}
               >
