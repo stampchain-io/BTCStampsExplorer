@@ -1,5 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import WalletDonateModal from "$islands/Wallet/details/WalletDonateModal.tsx";
+import { StampCard } from "$islands/stamp/StampCard.tsx";
+import { StampRow } from "$globals";
 
 const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
 
@@ -14,6 +16,20 @@ interface Transaction {
   };
   vout: TxOutput[];
 }
+
+interface DonateStampData {
+  stamp: string;
+  stamp_mimetype: string;
+  stamp_url: string;
+  tx_hash: string;
+}
+
+const DONATE_STAMP: DonateStampData = {
+  stamp: "730380",
+  stamp_mimetype: "text/html",
+  stamp_url: "f3253cad40e047ad21d0e5905f9c4981a73150b1c9dc1c61352789c86d0409e8",
+  tx_hash: "f3253cad40e047ad21d0e5905f9c4981a73150b1c9dc1c61352789c86d0409e8",
+};
 
 export default function AboutDonate() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -293,10 +309,13 @@ export default function AboutDonate() {
           </div>
 
           <div className="mobileMd:col-span-4 col-span-12 flex flex-col gap-5 justify-center items-center">
-            <img
-              className="w-[134px] mobileLg:w-[174px] tablet:w-[204px]"
-              src="/img/home/carousel1.png"
-            />
+            <div className="w-[134px] mobileLg:w-[174px] tablet:w-[204px]">
+              <StampCard
+                stamp={DONATE_STAMP as StampRow}
+                showDetails={false}
+                showMinDetails={false}
+              />
+            </div>
             <button
               onClick={handleOpen}
               className={buttonPurpleOutline}
