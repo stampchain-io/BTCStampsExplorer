@@ -71,8 +71,7 @@ interface SearchResult {
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
   "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-const feeSelectorContainer =
-  "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
+const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 
