@@ -3,6 +3,18 @@ import WalletDonateModal from "$islands/Wallet/details/WalletDonateModal.tsx";
 
 const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
 
+interface TxOutput {
+  scriptpubkey_address: string;
+  value: number;
+}
+
+interface Transaction {
+  status: {
+    block_time: number;
+  };
+  vout: TxOutput[];
+}
+
 export default function AboutDonate() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [fee, setFee] = useState<number>(0);
@@ -42,18 +54,21 @@ export default function AboutDonate() {
         const calculateYearlyData = (year: number) => {
           console.log(`\n=== ${year} YEARLY TOTAL ===`);
 
-          const yearTxs = transactions.filter((tx) => {
+          const yearTxs = transactions.filter((tx: Transaction) => {
             const txDate = new Date(tx.status.block_time * 1000);
             return txDate.getFullYear() === year;
           });
 
-          const yearlyTotal = yearTxs.reduce((sum, tx) => {
-            const incomingValue = tx.vout.reduce((voutSum, output) => {
-              if (output.scriptpubkey_address === DONATE_ADDRESS) {
-                return voutSum + (output.value || 0);
-              }
-              return voutSum;
-            }, 0);
+          const yearlyTotal = yearTxs.reduce((sum: number, tx: Transaction) => {
+            const incomingValue = tx.vout.reduce(
+              (voutSum: number, output: TxOutput) => {
+                if (output.scriptpubkey_address === DONATE_ADDRESS) {
+                  return voutSum + (output.value || 0);
+                }
+                return voutSum;
+              },
+              0,
+            );
             return sum + incomingValue;
           }, 0);
 
@@ -66,20 +81,26 @@ export default function AboutDonate() {
           console.log("\n=== MONTHLY OVERVIEW ===");
           const months = Array.from({ length: 12 }, (_, i) => i);
           months.forEach((monthIndex) => {
-            const monthTxs = yearTxs.filter((tx) => {
+            const monthTxs = yearTxs.filter((tx: Transaction) => {
               const txDate = new Date(tx.status.block_time * 1000);
               return txDate.getMonth() === monthIndex;
             });
 
-            const monthSats = monthTxs.reduce((sum, tx) => {
-              const incomingValue = tx.vout.reduce((voutSum, output) => {
-                if (output.scriptpubkey_address === DONATE_ADDRESS) {
-                  return voutSum + (output.value || 0);
-                }
-                return voutSum;
-              }, 0);
-              return sum + incomingValue;
-            }, 0);
+            const monthSats = monthTxs.reduce(
+              (sum: number, tx: Transaction) => {
+                const incomingValue = tx.vout.reduce(
+                  (voutSum: number, output: TxOutput) => {
+                    if (output.scriptpubkey_address === DONATE_ADDRESS) {
+                      return voutSum + (output.value || 0);
+                    }
+                    return voutSum;
+                  },
+                  0,
+                );
+                return sum + incomingValue;
+              },
+              0,
+            );
 
             const monthBTC = formatBTC(monthSats);
             const monthUSD = ((monthSats / 100_000_000) * btcPrice).toFixed(2);
@@ -99,49 +120,52 @@ export default function AboutDonate() {
         // Calculate for each year
         [2023, 2024, 2025].forEach((year) => calculateYearlyData(year));
 
-        // Calculate last month's data for display
+        // Calculate this month's data for display
         const currentDate = new Date();
-        const lastMonth = new Date(currentDate);
-        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        const thisMonthYear = currentDate.getFullYear();
+        const thisMonthIndex = currentDate.getMonth();
 
-        const lastMonthYear = lastMonth.getFullYear();
-        const lastMonthIndex = lastMonth.getMonth();
-
-        console.log("\n=== LAST MONTH DETAILS ===");
-        console.log("Last month:", {
-          month: lastMonthIndex + 1,
-          year: lastMonthYear,
-          name: lastMonth.toLocaleString("default", { month: "long" }),
+        console.log("\n=== THIS MONTH DETAILS ===");
+        console.log("This month:", {
+          month: thisMonthIndex + 1,
+          year: thisMonthYear,
+          name: currentDate.toLocaleString("default", { month: "long" }),
         });
 
-        const lastMonthTxs = transactions.filter((tx) => {
+        const thisMonthTxs = transactions.filter((tx: Transaction) => {
           const txDate = new Date(tx.status.block_time * 1000);
-          return txDate.getFullYear() === lastMonthYear &&
-            txDate.getMonth() === lastMonthIndex;
+          return txDate.getFullYear() === thisMonthYear &&
+            txDate.getMonth() === thisMonthIndex;
         });
 
-        const lastMonthSats = lastMonthTxs.reduce((sum, tx) => {
-          const incomingValue = tx.vout.reduce((voutSum, output) => {
-            if (output.scriptpubkey_address === DONATE_ADDRESS) {
-              return voutSum + (output.value || 0);
-            }
-            return voutSum;
-          }, 0);
-          return sum + incomingValue;
-        }, 0);
-
-        const lastMonthBTC = formatBTC(lastMonthSats);
-        const lastMonthUSD = Math.round(
-          (lastMonthSats / 100_000_000) * btcPrice,
+        const thisMonthSats = thisMonthTxs.reduce(
+          (sum: number, tx: Transaction) => {
+            const incomingValue = tx.vout.reduce(
+              (voutSum: number, output: TxOutput) => {
+                if (output.scriptpubkey_address === DONATE_ADDRESS) {
+                  return voutSum + (output.value || 0);
+                }
+                return voutSum;
+              },
+              0,
+            );
+            return sum + incomingValue;
+          },
+          0,
         );
 
-        console.log("Last Month Summary:", {
-          transactions: lastMonthTxs.length,
-          btc: lastMonthBTC,
-          usd: lastMonthUSD.toLocaleString(),
+        const thisMonthBTC = formatBTC(thisMonthSats);
+        const thisMonthUSD = Math.round(
+          (thisMonthSats / 100_000_000) * btcPrice,
+        );
+
+        console.log("This Month Summary:", {
+          transactions: thisMonthTxs.length,
+          btc: thisMonthBTC,
+          usd: thisMonthUSD.toLocaleString(),
         });
 
-        setMonthlyDonations(lastMonthUSD);
+        setMonthlyDonations(thisMonthUSD);
       } catch (error) {
         console.error("Error fetching donations:", error);
         setMonthlyDonations(0);
@@ -222,7 +246,7 @@ export default function AboutDonate() {
               </div>
               <div className="col-span-6 flex flex-col justify-center items-center">
                 <p className={dataLabel}>
-                  DONATIONS LAST MONTH
+                  DONATIONS THIS MONTH
                 </p>
                 <p className={dataValueXl}>
                   {monthlyDonations}{" "}
