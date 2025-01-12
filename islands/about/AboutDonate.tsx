@@ -303,8 +303,8 @@ export default function AboutDonate() {
               </div>
             </div>
             <p className={bodyTextLight}>
-              Use the Donate button and you'll receive a unique stamp by Viva la
-              Vandal as thanks for your support.
+              Use the Donate button and you'll receive a unique stamp -
+              STAMPOORS - by babalicious as thanks for your support.
             </p>
             <br />
             <p className={`${bodyTextLight} mobileMd:block hidden`}>
