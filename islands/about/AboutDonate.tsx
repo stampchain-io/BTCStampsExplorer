@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import WalletDonateModal from "$islands/Wallet/details/WalletDonateModal.tsx";
 
 const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
@@ -7,6 +7,149 @@ export default function AboutDonate() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [fee, setFee] = useState<number>(0);
   const [showCopied, setShowCopied] = useState(false);
+  const [monthlyDonations, setMonthlyDonations] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchDonations = async () => {
+      try {
+        // Start with fetching message and address
+        console.log("Fetching donation history...");
+        console.log("➜ BTC Address:", DONATE_ADDRESS);
+
+        const txResponse = await fetch(
+          `https://mempool.space/api/address/${DONATE_ADDRESS}/txs/chain`,
+        );
+        if (!txResponse.ok) throw new Error("Failed to fetch transactions");
+
+        const transactions = await txResponse.json();
+
+        // Get current BTC price
+        const priceResponse = await fetch("/api/internal/btcPrice");
+        if (!priceResponse.ok) throw new Error("Failed to fetch BTC price");
+        const priceData = await priceResponse.json();
+        const btcPrice = priceData.data.price;
+        console.log("Current BTC price:", btcPrice);
+
+        // Helper function to format BTC value
+        const formatBTC = (sats: number) => {
+          const btc = sats / 100_000_000;
+          if (btc === 0) return "0";
+          // Remove trailing zeros after decimal point
+          return btc.toFixed(8).replace(/\.?0+$/, "");
+        };
+
+        // Helper function to calculate monthly data for a specific year
+        const calculateYearlyData = (year: number) => {
+          console.log(`\n=== ${year} YEARLY TOTAL ===`);
+
+          const yearTxs = transactions.filter((tx) => {
+            const txDate = new Date(tx.status.block_time * 1000);
+            return txDate.getFullYear() === year;
+          });
+
+          const yearlyTotal = yearTxs.reduce((sum, tx) => {
+            const incomingValue = tx.vout.reduce((voutSum, output) => {
+              if (output.scriptpubkey_address === DONATE_ADDRESS) {
+                return voutSum + (output.value || 0);
+              }
+              return voutSum;
+            }, 0);
+            return sum + incomingValue;
+          }, 0);
+
+          const yearlyBTC = formatBTC(yearlyTotal);
+          const yearlyUSD = ((yearlyTotal / 100_000_000) * btcPrice).toFixed(2);
+
+          console.log(`Total BTC: ${yearlyBTC}`);
+          console.log(`Total USD: ${Number(yearlyUSD).toLocaleString()}`);
+
+          console.log("\n=== MONTHLY OVERVIEW ===");
+          const months = Array.from({ length: 12 }, (_, i) => i);
+          months.forEach((monthIndex) => {
+            const monthTxs = yearTxs.filter((tx) => {
+              const txDate = new Date(tx.status.block_time * 1000);
+              return txDate.getMonth() === monthIndex;
+            });
+
+            const monthSats = monthTxs.reduce((sum, tx) => {
+              const incomingValue = tx.vout.reduce((voutSum, output) => {
+                if (output.scriptpubkey_address === DONATE_ADDRESS) {
+                  return voutSum + (output.value || 0);
+                }
+                return voutSum;
+              }, 0);
+              return sum + incomingValue;
+            }, 0);
+
+            const monthBTC = formatBTC(monthSats);
+            const monthUSD = ((monthSats / 100_000_000) * btcPrice).toFixed(2);
+            const monthName = new Date(year, monthIndex).toLocaleString(
+              "default",
+              { month: "long" },
+            );
+
+            console.log(
+              `${monthName} ${year}: {transactions: ${monthTxs.length}, btc: ${monthBTC}, usd: ${
+                Number(monthUSD).toLocaleString()
+              }}`,
+            );
+          });
+        };
+
+        // Calculate for each year
+        [2023, 2024, 2025].forEach((year) => calculateYearlyData(year));
+
+        // Calculate last month's data for display
+        const currentDate = new Date();
+        const lastMonth = new Date(currentDate);
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+        const lastMonthYear = lastMonth.getFullYear();
+        const lastMonthIndex = lastMonth.getMonth();
+
+        console.log("\n=== LAST MONTH DETAILS ===");
+        console.log("Last month:", {
+          month: lastMonthIndex + 1,
+          year: lastMonthYear,
+          name: lastMonth.toLocaleString("default", { month: "long" }),
+        });
+
+        const lastMonthTxs = transactions.filter((tx) => {
+          const txDate = new Date(tx.status.block_time * 1000);
+          return txDate.getFullYear() === lastMonthYear &&
+            txDate.getMonth() === lastMonthIndex;
+        });
+
+        const lastMonthSats = lastMonthTxs.reduce((sum, tx) => {
+          const incomingValue = tx.vout.reduce((voutSum, output) => {
+            if (output.scriptpubkey_address === DONATE_ADDRESS) {
+              return voutSum + (output.value || 0);
+            }
+            return voutSum;
+          }, 0);
+          return sum + incomingValue;
+        }, 0);
+
+        const lastMonthBTC = formatBTC(lastMonthSats);
+        const lastMonthUSD = Math.round(
+          (lastMonthSats / 100_000_000) * btcPrice,
+        );
+
+        console.log("Last Month Summary:", {
+          transactions: lastMonthTxs.length,
+          btc: lastMonthBTC,
+          usd: lastMonthUSD.toLocaleString(),
+        });
+
+        setMonthlyDonations(lastMonthUSD);
+      } catch (error) {
+        console.error("Error fetching donations:", error);
+        setMonthlyDonations(0);
+      }
+    };
+
+    fetchDonations();
+  }, []);
 
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
@@ -71,18 +214,19 @@ export default function AboutDonate() {
             <div className="grid grid-cols-12 mt-6 mb-6">
               <div className="col-span-6 flex flex-col justify-center items-center">
                 <p className={dataLabel}>
-                  MONTHLY DONATIONS
+                  MONTHLY EXPENSES
                 </p>
                 <p className={dataValueXl}>
-                  434 <span className="font-light">USD</span>
+                  2,500 <span className="font-extralight">USD</span>
                 </p>
               </div>
               <div className="col-span-6 flex flex-col justify-center items-center">
                 <p className={dataLabel}>
-                  EXPENSES
+                  DONATIONS LAST MONTH
                 </p>
                 <p className={dataValueXl}>
-                  3,234 <span className="font-light">USD</span>
+                  {monthlyDonations}{" "}
+                  <span className="font-extralight">USD</span>
                 </p>
               </div>
             </div>
