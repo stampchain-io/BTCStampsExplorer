@@ -5,12 +5,13 @@ import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 interface Props {
   onClose: () => void;
   address: string;
+  title?: string;
 }
 
 const tooltipIcon =
   "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
 
-function WalletReceiveModal({ onClose, address }: Props) {
+function WalletReceiveModal({ onClose, address, title = "RECEIVE" }: Props) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [isCopyTooltipVisible, setIsCopyTooltipVisible] = useState(false);
   const [allowCopyTooltip, setAllowCopyTooltip] = useState(true);
@@ -89,7 +90,7 @@ function WalletReceiveModal({ onClose, address }: Props) {
   }, []);
 
   return (
-    <ModalLayout onClose={onClose} title="RECEIVE">
+    <ModalLayout onClose={onClose} title={title}>
       <div class="flex flex-col -mt-3 mobileLg:-mt-4 items-center">
         {qrCodeDataUrl && (
           <img
@@ -140,7 +141,7 @@ function formatAddress(address: string): JSX.Element[] {
     index % 2 === 0 ? <span key={index}>{group}</span> : (
       <span
         key={index}
-        class="text-stamp-purple text-base mobileLg:text-xl"
+        class="text-base mobileLg:text-xl text-stamp-purple font-bold"
       >
         {group}
       </span>

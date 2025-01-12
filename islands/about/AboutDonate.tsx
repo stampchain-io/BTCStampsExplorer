@@ -415,6 +415,7 @@ export default function AboutDonate() {
           <WalletReceiveModal
             onClose={() => setIsReceiveModalOpen(false)}
             address={DONATE_ADDRESS}
+            title="DONATE"
           />
         )}
       </section>
