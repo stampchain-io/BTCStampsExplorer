@@ -41,6 +41,7 @@ export default function AboutDonate() {
   const receiveButtonRef = useRef<HTMLDivElement>(null);
   const receiveTooltipTimeoutRef = useRef<number | null>(null);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState<string>("");
 
   useEffect(() => {
     return () => {
@@ -218,6 +219,11 @@ export default function AboutDonate() {
         });
 
         setMonthlyDonations(thisMonthUSD);
+
+        const monthName = currentDate.toLocaleString("default", {
+          month: "long",
+        }).toUpperCase();
+        setCurrentMonth(monthName);
       } catch (error) {
         console.error("Error fetching donations:", error);
         setMonthlyDonations(0);
@@ -288,7 +294,7 @@ export default function AboutDonate() {
               </div>
               <div className="col-span-6 flex flex-col justify-center items-center">
                 <p className={dataLabel}>
-                  DONATIONS THIS MONTH
+                  {currentMonth} DONATIONS
                 </p>
                 <p className={dataValueXl}>
                   {monthlyDonations}{" "}
