@@ -108,12 +108,14 @@ export function StampCard({
   showDetails = true,
   showMinDetails = false,
   variant = "default",
+  fromPage,
 }: {
   stamp: StampWithSaleData;
   isRecentSale?: boolean;
   showDetails?: boolean;
   showMinDetails?: boolean;
   variant?: "default" | "grey";
+  fromPage?: string;
 }) {
   // Add window size hook
   const { width } = useWindowSize();
@@ -344,6 +346,11 @@ export function StampCard({
           bg-stamp-card-bg
         `}
       >
+        {fromPage && fromPage === "stamp" && (
+          <div className="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
+            <img className="" src="/img/stamp/atom.svg" />
+          </div>
+        )}
         <div class="relative w-full h-full">
           <div class="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
             {renderContent()}

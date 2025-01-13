@@ -40,6 +40,7 @@ export async function handler(
 ) {
   const startTime = performance.now();
   const url = new URL(req.url);
+  ctx.state.route = url.pathname;
   ctx.state.baseUrl = getBaseUrl(req);
 
   if (API_ROUTES.some((prefix) => url.pathname.startsWith(prefix))) {
