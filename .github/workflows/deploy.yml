@@ -85,11 +85,11 @@ jobs:
           # Function to process files in batches with rate limit handling
           process_files() {
             local check_type=$1
-            local batch_size=5  # Further reduced batch size for stability
+            local batch_size=3  # Minimal batch size for stability
             local total_files=0
             local batch_num=1
-            local retry_delay=30  # Reduced initial retry delay
-            local max_files=500  # Limit total files to process
+            local retry_delay=15  # Further reduced retry delay
+            local max_files=100  # Further reduced file limit for initial testing
             
             # Count total files with limit
             if [ "$check_type" = "fmt" ]; then
@@ -105,12 +105,12 @@ jobs:
               if [ "$check_type" = "fmt" ]; then
                 find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | head -n $max_files | \
                   tail -n +$i | head -n $batch_size | sort | \
-                  xargs -r deno fmt --check 2>&1 | \
+                  xargs -r -n 1 deno fmt --check 2>&1 | \
                   ./scripts/transform-deno-output.sh fmt > "${check_type}_${batch_num}.json"
               else
                 find . -type f -name "*.ts" -o -name "*.tsx" | head -n $max_files | \
                   tail -n +$i | head -n $batch_size | sort | \
-                  xargs -r deno lint --json 2>&1 | \
+                  xargs -r -n 1 deno lint --json 2>&1 | \
                   ./scripts/transform-deno-output.sh lint > "${check_type}_${batch_num}.json"
               fi
               
