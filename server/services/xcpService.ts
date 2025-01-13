@@ -9,11 +9,11 @@ import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 export const xcp_v2_nodes = [
-  {
-    name: "stampchain.io",
-    url:
-      "https://k6e0ufzq8h.execute-api.us-east-1.amazonaws.com/beta/counterpartyproxy/v2",
-  },
+  // {
+  //   name: "stampchain.io",
+  //   url:
+  //     "https://k6e0ufzq8h.execute-api.us-east-1.amazonaws.com/beta/counterpartyproxy/v2",
+  // },
   {
     name: "counterparty.io",
     url: "https://api.counterparty.io:4000/v2",
