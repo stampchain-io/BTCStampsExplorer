@@ -10,37 +10,11 @@ debug() {
   echo "DEBUG: $*" >&2
 }
 
-create_diagnostic() {
-  local file="$1"
-  local line_number="$2"
-  local changes="$3"
-  
-  jq -n \
-    --arg file "$file" \
-    --arg line "$line_number" \
-    --arg changes "$changes" \
-    '{
-      message: "Formatting issues found. Run `deno fmt` to fix:\n" + $changes,
-      location: {
-        path: $file,
-        range: {
-          start: {line: ($line|tonumber), column: 1},
-          end: {line: ($line|tonumber), column: 1}
-        }
-      },
-      severity: "WARNING",
-      code: {
-        value: "fmt",
-        url: "https://deno.land/manual/tools/formatter"
-      }
-    }'
-}
-
 process_fmt_diff() {
-  local file=""
+  local diagnostics="[]"
+  local current_file=""
   local line_number=""
   local changes=""
-  local diagnostics="[]"
   local in_diff=false
   
   while IFS= read -r line; do
@@ -48,52 +22,101 @@ process_fmt_diff() {
     
     # Skip empty lines and warning messages
     if [[ -z $line || $line =~ ^Warning ]]; then
+      debug "Skipping empty/warning line"
       continue
     fi
     
     # Handle file path lines
     if [[ $line =~ ^from[[:space:]]*(.+): ]]; then
+      debug "Found file header line"
       # Process previous file if we have changes
-      if [[ -n "$changes" && -n "$file" && -n "$line_number" ]]; then
-        debug "Creating diagnostic for $file"
-        local diagnostic
-        diagnostic=$(create_diagnostic "$file" "$line_number" "$changes")
-        debug "Created diagnostic: $diagnostic"
-        diagnostics=$(echo "$diagnostics" | jq --argjson diag "$diagnostic" '. + [$diag]')
+      if [[ -n $changes && -n $current_file && -n $line_number ]]; then
+        debug "Processing previous file: $current_file"
+        debug "Changes: $changes"
+        debug "Line number: $line_number"
+        
+        local escaped_changes
+        escaped_changes=$(echo -n "$changes" | jq -Rs .)
+        local new_diagnostic
+        new_diagnostic=$(jq -n \
+          --arg file "$current_file" \
+          --arg changes "$escaped_changes" \
+          --arg line "$line_number" \
+          '{
+            message: "Formatting issues found. Run `deno fmt` to fix:" + "\n" + $changes,
+            location: {
+              path: $file,
+              range: {
+                start: {line: ($line|tonumber), column: 1},
+                end: {line: ($line|tonumber), column: 1}
+              }
+            },
+            severity: "WARNING",
+            code: {
+              value: "fmt",
+              url: "https://deno.land/manual/tools/formatter"
+            }
+          }')
+        debug "Created diagnostic: $new_diagnostic"
+        diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
       fi
       
       # Start new file
       local full_path="${BASH_REMATCH[1]}"
-      file="${full_path#/home/ubuntu/repos/BTCStampsExplorer/}"
+      current_file="${full_path#/home/ubuntu/repos/BTCStampsExplorer/}"
       changes=""
       line_number=""
       in_diff=true
-      debug "New file: $file"
+      debug "New file: $current_file"
       continue
     fi
     
     # Handle diff lines
     if [[ $in_diff == true ]]; then
       if [[ $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+] ]]; then
-        if [[ -z "$line_number" ]]; then
+        if [[ -z $line_number ]]; then
           line_number="${BASH_REMATCH[1]}"
           debug "First line number: $line_number"
         fi
         changes+="$line"$'\n'
-        debug "Added line: $line"
+        debug "Added line to changes: $line"
       fi
     fi
   done < "$TEMP_FILE"
   
   # Process the last file
-  if [[ -n "$changes" && -n "$file" && -n "$line_number" ]]; then
-    debug "Creating diagnostic for last file: $file"
-    local diagnostic
-    diagnostic=$(create_diagnostic "$file" "$line_number" "$changes")
-    debug "Created diagnostic: $diagnostic"
-    diagnostics=$(echo "$diagnostics" | jq --argjson diag "$diagnostic" '. + [$diag]')
+  if [[ -n $changes && -n $current_file && -n $line_number ]]; then
+    debug "Processing final file: $current_file"
+    debug "Final changes: $changes"
+    debug "Final line number: $line_number"
+    
+    local escaped_changes
+    escaped_changes=$(echo -n "$changes" | jq -Rs .)
+    local new_diagnostic
+    new_diagnostic=$(jq -n \
+      --arg file "$current_file" \
+      --arg changes "$escaped_changes" \
+      --arg line "$line_number" \
+      '{
+        message: "Formatting issues found. Run `deno fmt` to fix:" + "\n" + $changes,
+        location: {
+          path: $file,
+          range: {
+            start: {line: ($line|tonumber), column: 1},
+            end: {line: ($line|tonumber), column: 1}
+          }
+        },
+        severity: "WARNING",
+        code: {
+          value: "fmt",
+          url: "https://deno.land/manual/tools/formatter"
+        }
+      }')
+    debug "Created final diagnostic: $new_diagnostic"
+    diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
   fi
   
+  debug "Final diagnostics array: $diagnostics"
   echo "$diagnostics"
 }
 
