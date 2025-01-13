@@ -30,6 +30,7 @@ import { getMimeType } from "$lib/utils/imageUtils.ts";
 import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { decodeBase64 } from "$lib/utils/formatUtils.ts";
 
 interface StampControllerOptions {
   cacheType: RouteType;
@@ -571,24 +572,9 @@ export class StampController {
     return this.handleBinaryContent(result, contentInfo);
   }
 
-  private static async decodeBase64(base64String:string) {
-    // Use atob to decode the base64 string to a binary string
-    const binaryString = atob(base64String);
-
-    // Convert the binary string to a Uint8Array
-    const utf8Array = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      utf8Array[i] = binaryString.charCodeAt(i);
-    }
-
-    // Decode the Uint8Array back to a UTF-8 string
-    const decodedText = new TextDecoder().decode(utf8Array);
-    return decodedText;
-  }
-
   private static async handleTextContent(result: any, contentInfo: any, identifier: string) {
     try {
-      const decodedContent = await this.decodeBase64(result.body);
+      const decodedContent = await decodeBase64(result.body);
 
       return WebResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
         binary: false,
