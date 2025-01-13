@@ -1,27 +1,30 @@
-import { api_get_block } from "$lib/controller/block.ts";
-import { isIntOr32ByteHex } from "utils/util.ts";
-import { BlockHandlerContext, BlockInfoResponseBody } from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
+import { Handlers } from "$fresh/server.ts";
+import { BlockController } from "$server/controller/blockController.ts";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { BlockHandlerContext } from "$globals";
 
-export const handler = async (
-  _req: Request,
-  ctx: BlockHandlerContext,
-): Promise<Response> => {
-  const block_index_or_hash = ctx.params.block_index;
+export const handler: Handlers<BlockHandlerContext> = {
+  async GET(req, ctx) {
+    try {
+      const { block_index } = ctx.params;
+      const url = new URL(req.url);
+      const type = url.pathname.includes("/cursed/")
+        ? "cursed"
+        : url.pathname.includes("/stamps/")
+        ? "stamps"
+        : "all";
 
-  if (!isIntOr32ByteHex(block_index_or_hash)) {
-    return ResponseUtil.error(
-      "Invalid argument provided. Must be an integer or 32 byte hex string.",
-      400,
-    );
-  }
-
-  try {
-    const response: BlockInfoResponseBody = await api_get_block(
-      block_index_or_hash,
-    );
-    return ResponseUtil.success(response);
-  } catch {
-    return ResponseUtil.error(`Block: ${block_index_or_hash} not found`, 404);
-  }
+      const response = await BlockController.getBlockInfoResponse(
+        block_index,
+        type,
+      );
+      return ResponseUtil.success(response);
+    } catch (error) {
+      console.error(`Error in block handler:`, error);
+      return ResponseUtil.internalError(
+        error,
+        "Error processing block request",
+      );
+    }
+  },
 };

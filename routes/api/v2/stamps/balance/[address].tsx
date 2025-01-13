@@ -1,45 +1,46 @@
-import { CommonClass, getClient, StampsClass } from "$lib/database/index.ts";
-import { paginate } from "$lib/utils/util.ts";
+import { Handlers } from "$fresh/server.ts";
+import { StampController } from "$server/controller/stampController.ts";
+import { AddressHandlerContext } from "$globals";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import {
-  AddressHandlerContext,
-  ErrorResponseBody,
-  PaginatedRequest,
-  PaginatedStampBalanceResponseBody,
-} from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
+  DEFAULT_PAGINATION,
+  validateRequiredParams,
+} from "$server/services/routeValidationService.ts";
 
-export const handler = async (
-  _req: PaginatedRequest,
-  ctx: AddressHandlerContext,
-): Promise<Response> => {
-  const { address } = ctx.params;
-  try {
-    const url = new URL(_req.url);
-    const limit = Number(url.searchParams.get("limit")) || 1000;
-    const page = Number(url.searchParams.get("page")) || 1;
+export const handler: Handlers<AddressHandlerContext> = {
+  async GET(req: Request, ctx) {
+    try {
+      const { address } = ctx.params;
 
-    const client = await getClient();
-    const data = await CommonClass.get_stamp_balances_by_address_with_client(
-      client,
-      address,
-      limit,
-      page,
-    );
-    const total =
-      (await CommonClass.get_total_stamp_balance_with_client(client, address))
-        .rows[0]["total"] || 0;
-    const last_block = await CommonClass.get_last_block_with_client(client);
+      // Validate required parameters
+      const paramsValidation = validateRequiredParams({ address });
+      if (!paramsValidation.isValid) {
+        return paramsValidation.error!;
+      }
 
-    const pagination = paginate(total, page, limit);
+      const url = new URL(req.url);
+      const pagination = getPaginationParams(url);
 
-    const body: PaginatedStampBalanceResponseBody = {
-      ...pagination,
-      last_block: last_block.rows[0]["last_block"],
-      data: data,
-    };
-    return ResponseUtil.success(body);
-  } catch (error) {
-    const body: ErrorResponseBody = { error: `Error: Internal server error` };
-    return ResponseUtil.error(body.error, 500);
-  }
+      // Check if pagination validation failed
+      if (pagination instanceof Response) {
+        return pagination;
+      }
+
+      const { limit, page } = pagination;
+
+      const body = await StampController.getStampBalancesByAddress(
+        address,
+        limit || DEFAULT_PAGINATION.limit,
+        page || DEFAULT_PAGINATION.page,
+      );
+      return ApiResponseUtil.success(body);
+    } catch (error) {
+      console.error("Error in stamp balance handler:", error);
+      return ApiResponseUtil.internalError(
+        error,
+        "Error fetching stamp balance",
+      );
+    }
+  },
 };

@@ -1,0 +1,54 @@
+
+.git/
+.vscode/
+.DS_Store
+*.log
+*.lock
+*.sqlite
+*.db
+
+# Deno specific
+.deno/
+deno.lock
+node_modules/*
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.*
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE specific files
+*.swp
+*.swo
+*.idea/
+*.vscode/
+
+# OS generated files
+Thumbs.db
+
+# Large media files
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
+
+# Compressed files
+*.zip
+*.rar
+*.7z
+*.gz
+
+# Dependency directories (if any)
+
+
+# Fresh specific 
+_fresh/
