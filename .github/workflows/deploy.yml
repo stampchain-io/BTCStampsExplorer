@@ -82,52 +82,99 @@ jobs:
           echo "Files in scripts directory:"
           ls -la ./scripts/
           
+          # Error handling function
+          error() {
+            echo "ERROR: $*" >&2
+            exit 1
+          }
+
           # Function to process files in batches with rate limit handling
           process_files() {
             local check_type=$1
             local batch_size=3  # Minimal batch size for stability
-            local total_files=0
             local batch_num=1
-            local retry_delay=15  # Further reduced retry delay
-            local max_files=100  # Further reduced file limit for initial testing
+            local retry_delay=15  # Retry delay for rate limits
+            local max_files=30   # Further reduced file limit for testing
             
-            # Count total files with limit
-            if [ "$check_type" = "fmt" ]; then
-              total_files=$(find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | head -n $max_files | wc -l)
-            else
-              total_files=$(find . -type f -name "*.ts" -o -name "*.tsx" | head -n $max_files | wc -l)
+            # Create temporary directory for file lists
+            temp_dir=$(mktemp -d) || error "Failed to create temp directory"
+            trap 'rm -rf "$temp_dir"' EXIT
+            
+            # Create file list using arrays to avoid pipe issues
+            declare -a files=()
+            while IFS= read -r -d $'\0' file; do
+              if [[ "$file" != *"/node_modules/"* && \
+                    "$file" != *"/_fresh/"* && \
+                    "$file" != */dist/* && \
+                    "$file" != */.git/* ]]; then
+                files+=("$file")
+              fi
+            done < <(
+              if [ "$check_type" = "fmt" ]; then
+                find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -print0
+              else
+                find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" \) -print0
+              fi
+            )
+            
+            # Limit the number of files if needed
+            if [ "$max_files" -gt 0 ]; then
+              head -n "$max_files" "$temp_file_list" > "${temp_file_list}.tmp" && \
+              mv "${temp_file_list}.tmp" "$temp_file_list" || error "Failed to limit file list"
             fi
             
-            # Process in batches
-            for i in $(seq 1 $batch_size $total_files); do
+            total_files=$(wc -l < "$temp_file_list")
+            
+            # Process files in small batches
+            total_files=${#files[@]}
+            if [ "$total_files" -gt "$max_files" ]; then
+              total_files=$max_files
+            fi
+            
+            for ((i = 0; i < total_files; i += batch_size)); do
               echo "Processing $check_type batch $batch_num..."
               
-              if [ "$check_type" = "fmt" ]; then
-                find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | head -n $max_files | \
-                  tail -n +$i | head -n $batch_size | sort | \
-                  xargs -r -n 1 deno fmt --check 2>&1 | \
-                  ./scripts/transform-deno-output.sh fmt > "${check_type}_${batch_num}.json"
-              else
-                find . -type f -name "*.ts" -o -name "*.tsx" | head -n $max_files | \
-                  tail -n +$i | head -n $batch_size | sort | \
-                  xargs -r -n 1 deno lint --json 2>&1 | \
-                  ./scripts/transform-deno-output.sh lint > "${check_type}_${batch_num}.json"
-              fi
+              # Create batch directory
+              batch_dir="$temp_dir/batch_$batch_num"
+              mkdir -p "$batch_dir"
+              
+              # Process current batch
+              for ((j = i; j < i + batch_size && j < total_files; j++)); do
+                file="${files[$j]}"
+                if [ -f "$file" ]; then
+                  if [ "$check_type" = "fmt" ]; then
+                    deno fmt --check "$file" > "$batch_dir/$j.out" 2>&1 || true
+                  else
+                    deno lint --json "$file" > "$batch_dir/$j.out" 2>&1 || true
+                  fi
+                fi
+              done
+              
+              # Combine batch outputs
+              {
+                for f in "$batch_dir"/*.out; do
+                  [ -f "$f" ] && cat "$f"
+                done
+              } | ./scripts/transform-deno-output.sh "$check_type" > "$temp_dir/${check_type}_${batch_num}.json"
               
               # Run reviewdog on batch with retries
-              if [ -s "${check_type}_${batch_num}.json" ]; then
+              if [ -s "$temp_dir/${check_type}_${batch_num}.json" ]; then
                 local attempts=0
                 local max_attempts=3
                 
                 while [ $attempts -lt $max_attempts ]; do
                   echo "Running reviewdog on ${check_type} batch $batch_num (attempt $((attempts + 1)))..."
                   
-                  if timeout $timeout_duration bash -c "cat ${check_type}_${batch_num}.json | reviewdog -f=rdjson -name=${check_type} -reporter=github-pr-review"; then
+                  if timeout $timeout_duration reviewdog \
+                    -f=rdjson \
+                    -name="${check_type}" \
+                    -reporter=github-pr-review \
+                    < "$temp_dir/${check_type}_${batch_num}.json"; then
                     break  # Success, exit retry loop
                   else
                     local exit_code=$?
                     # Check if it's a rate limit error
-                    if grep -q "API rate limit exceeded" "${check_type}_${batch_num}.json"; then
+                    if grep -q "API rate limit exceeded" "$temp_dir/${check_type}_${batch_num}.json"; then
                       echo "Rate limit exceeded. Waiting ${retry_delay} seconds before retry..."
                       sleep $retry_delay
                       retry_delay=$((retry_delay * 2))  # Exponential backoff
@@ -139,6 +186,10 @@ jobs:
                   ((attempts++))
                 done
               fi
+              
+              # Cleanup batch files
+              rm -rf "$batch_dir"
+              rm -f "$temp_dir/${check_type}_${batch_num}.json"
               
               rm -f "${check_type}_${batch_num}.json"
               ((batch_num++))
