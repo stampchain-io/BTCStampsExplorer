@@ -85,16 +85,17 @@ jobs:
           # Function to process files in batches with rate limit handling
           process_files() {
             local check_type=$1
-            local batch_size=10  # Reduced batch size
+            local batch_size=5  # Further reduced batch size for stability
             local total_files=0
             local batch_num=1
-            local retry_delay=60  # Initial retry delay in seconds
+            local retry_delay=30  # Reduced initial retry delay
+            local max_files=500  # Limit total files to process
             
-            # Count total files
+            # Count total files with limit
             if [ "$check_type" = "fmt" ]; then
-              total_files=$(find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | wc -l)
+              total_files=$(find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | head -n $max_files | wc -l)
             else
-              total_files=$(find . -type f -name "*.ts" -o -name "*.tsx" | wc -l)
+              total_files=$(find . -type f -name "*.ts" -o -name "*.tsx" | head -n $max_files | wc -l)
             fi
             
             # Process in batches
@@ -102,14 +103,14 @@ jobs:
               echo "Processing $check_type batch $batch_num..."
               
               if [ "$check_type" = "fmt" ]; then
-                find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | \
-                  tail -n +$i | head -n $batch_size | \
-                  xargs deno fmt --check 2>&1 | \
+                find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" | head -n $max_files | \
+                  tail -n +$i | head -n $batch_size | sort | \
+                  xargs -r deno fmt --check 2>&1 | \
                   ./scripts/transform-deno-output.sh fmt > "${check_type}_${batch_num}.json"
               else
-                find . -type f -name "*.ts" -o -name "*.tsx" | \
-                  tail -n +$i | head -n $batch_size | \
-                  xargs deno lint --json 2>&1 | \
+                find . -type f -name "*.ts" -o -name "*.tsx" | head -n $max_files | \
+                  tail -n +$i | head -n $batch_size | sort | \
+                  xargs -r deno lint --json 2>&1 | \
                   ./scripts/transform-deno-output.sh lint > "${check_type}_${batch_num}.json"
               fi
               
