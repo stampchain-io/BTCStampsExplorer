@@ -1,58 +1,54 @@
 import { ComponentChildren } from "preact";
+import { WALLET_PROVIDERS, WalletProviderKey } from "$lib/utils/constants.ts";
+import { WalletConnector } from "./connectors/Wallet.connector.tsx";
+import { showConnectWalletModal } from "$client/wallet/wallet.ts";
 
 interface Props {
   connectors: ComponentChildren[];
-  toggleModal: Function;
-  handleCloseModal: Function;
+  toggleModal: () => void;
+  handleCloseModal: (event: MouseEvent) => void;
 }
 
 export const ConnectorsModal = (
   { connectors, toggleModal, handleCloseModal }: Props,
 ) => {
+  console.log("Rendering ConnectorsModal with connectors:", connectors);
+
+  const closeModal = () => {
+    toggleModal();
+    showConnectWalletModal.value = false;
+  };
+
   return (
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-blackbg-[#181818] bg-opacity-50 backdrop-filter backdrop-blur-sm"
+      class={`fixed z-10 inset-0 z-90 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#000000] bg-opacity-60 backdrop-filter backdrop-blur-md ${
+        showConnectWalletModal.value ? "" : "hidden"
+      }`}
       onClick={handleCloseModal}
     >
-      <div class="relative p-4 w-full max-w-2xl h-auto">
-        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-          <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-              Connect your wallet
-            </h3>
-            <button
-              onClick={toggleModal}
-              type="button"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-              data-modal-hide="default-modal"
-            >
-              <svg
-                class="w-3 h-3"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 14"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                />
-              </svg>
-              <span class="sr-only">Close modal</span>
-            </button>
-          </div>
+      <div class="relative flex flex-col w-full max-w-2xl h-auto p-3 mobileMd:p-6 dark-gradient-modal rounded-lg overflow-hidden">
+        <img
+          onClick={closeModal}
+          src="/img/wallet/icon-close.svg"
+          class="w-6 h-6 absolute top-6 right-6 cursor-pointer"
+          alt="Close modal"
+        />
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-            {connectors.map((renderConnector, index) => {
-              if (typeof renderConnector === "function") {
-                return renderConnector({ key: index, toggleModal });
-              }
-              return null;
-            })}
-          </div>
+        <h3 class="text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center mobileLg:text-left">
+          CONNECT
+        </h3>
+        <h4 class="text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-highlight text-center mobileLg:text-left pb-1.5 mobileLg:pb-3 mobileMd:pb-6">
+          YOUR WALLLET
+        </h4>
+
+        <div class="grid grid-cols-1 mobileLg:grid-cols-2 gap-3 mobileMd:gap-6 items-center">
+          {Object.keys(WALLET_PROVIDERS).map((providerKey) => (
+            <WalletConnector
+              key={providerKey}
+              providerKey={providerKey as WalletProviderKey}
+              toggleModal={toggleModal}
+            />
+          ))}
         </div>
       </div>
     </div>

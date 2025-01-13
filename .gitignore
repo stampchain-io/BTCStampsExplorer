@@ -8,3 +8,10 @@
 # Fresh build directory
 _fresh/
 node_modules/
+
+db.log
+reports/
+openapitools.json
+package-lock.json
+app.log
+logs/

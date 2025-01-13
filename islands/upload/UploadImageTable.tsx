@@ -1,33 +1,19 @@
-import { useCallback, useEffect, useState } from "preact/hooks";
-
-import { convertToEmoji, short_address } from "utils/util.ts";
-
-interface SRC20Row {
-  tx_hash: string;
-  tx_index: number;
-  block_index: number;
-  p: string;
-  op: string;
-  tick: string;
-  tick_hash: string;
-  creator: string;
-  creator_name: string;
-  amt?: string | number;
-  deci?: number;
-  max?: string | number;
-  lim?: string | number;
-  destination: string;
-  destination_name?: string;
-  block_time: Date;
-  status: string;
-  row_num: number;
-}
+import { SRC20Row } from "$globals";
+import { useEffect, useState } from "preact/hooks";
+import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 
 type SRC20BalanceTableProps = {
   data: SRC20Row[];
 };
 
-const ImageModal = ({ imgSrc, isOpen, onClose }) => {
+interface ImageModalProps {
+  imgSrc: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const ImageModal = ({ imgSrc, isOpen, onClose }: ImageModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -78,7 +64,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
       />
       {wallet
         ? (
-          <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+          <div class="relative overflow-x-auto shadow-md mobileLg:rounded-lg">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                 SRC20
@@ -100,7 +86,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                 {data.filter((row) => row.creator === wallet.address).map(
                   // data.map(
                   (src20: SRC20Row) => {
-                    const href = `/upload/${convertToEmoji(src20.tick)}`;
+                    const href = `/upload/${unicodeEscapeToEmoji(src20.tick)}`;
                     return (
                       <tr class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                         <td class="px-6 py-4 uppercase">
@@ -118,7 +104,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                         </td>
                         <td class="px-6 py-4 uppercase">
                           <a href={href}>
-                            {convertToEmoji(src20.tick)}
+                            {unicodeEscapeToEmoji(src20.tick)}
                           </a>
                         </td>
                         <td class="px-6 py-4">
@@ -127,7 +113,7 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                         <td class="px-6 py-4">
                           {src20.creator
                             ? src20.creator
-                            : short_address(src20.creator)}
+                            : abbreviateAddress(src20.creator)}
                         </td>
                         <td class="px-6 py-4">
                           {typeof src20.max === "number"
@@ -143,13 +129,10 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                           {src20.deci}
                         </td>
                         <td class="px-6 py-4 text-sm">
-                          {new Date(src20.block_time).toLocaleString(
-                            "default",
-                            {
-                              month: "short",
-                              year: "numeric",
-                            },
-                          )}
+                          {formatDate(new Date(src20.block_time), {
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </td>
                       </tr>
                     );

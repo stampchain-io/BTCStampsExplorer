@@ -1,17 +1,27 @@
-// routes/block/[block_index]/[tick].ts
-import { handleSrc20TransactionsRequest } from "$lib/database/src20Transactions.ts";
-import { FreshContext } from "$fresh/server.ts";
-import { convertEmojiToTick } from "$lib/utils/util.ts"; // Adjust import path as necessary
+import { Handlers } from "$fresh/server.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 
-export const handler = (
-  req: Request,
-  ctx: FreshContext,
-): Promise<Response> => {
-  const { block_index, tick: emojiTick } = ctx.params;
-  const tick = convertEmojiToTick(emojiTick); // Convert emoji to tick here
-  const params = {
-    block_index: parseInt(block_index, 10),
-    tick,
-  };
-  return handleSrc20TransactionsRequest(req, params);
+export const handler: Handlers = {
+  async GET(req, ctx) {
+    try {
+      const { block_index, tick: rawTick } = ctx.params;
+      const params = {
+        block_index: parseInt(block_index, 10),
+        tick: decodeURIComponent(rawTick),
+      };
+
+      const result = await Src20Controller.handleSrc20TransactionsRequest(
+        req,
+        params,
+      );
+      return ApiResponseUtil.success(result);
+    } catch (error) {
+      console.error("Error in block/tick handler:", error);
+      return ApiResponseUtil.internalError(
+        error,
+        "Error processing block/tick request",
+      );
+    }
+  },
 };

@@ -1,37 +1,98 @@
-import { api_get_balance } from "$lib/controller/wallet.ts";
-import { CommonClass, getClient } from "$lib/database/index.ts";
+import { Handlers } from "$fresh/server.ts";
+import { AddressHandlerContext } from "$globals";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import {
-  AddressHandlerContext,
-  PaginatedBalanceResponseBody,
-  PaginatedRequest,
-} from "globals";
-// import { paginate } from "utils/util.ts";
+  checkEmptyResult,
+  DEFAULT_PAGINATION,
+  validateRequiredParams,
+} from "$server/services/routeValidationService.ts";
+import { RouteType } from "$server/services/cacheService.ts";
+import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 
-import { ResponseUtil } from "utils/responseUtil.ts";
+export const handler: Handlers<AddressHandlerContext> = {
+  async GET(req: Request, ctx): Promise<Response> {
+    try {
+      const { address } = ctx.params;
+      const url = new URL(req.url);
 
-export const handler = async (
-  _req: PaginatedRequest,
-  ctx: AddressHandlerContext,
-): Promise<Response> => {
-  const { address } = ctx.params;
-  try {
-    const url = new URL(_req.url);
-    const limit = Number(url.searchParams.get("limit")) || 1000;
-    const page = Number(url.searchParams.get("page")) || 1;
-    const client = await getClient();
-    const last_block = await CommonClass.get_last_block_with_client(client);
-    const body: PaginatedBalanceResponseBody = await api_get_balance(
-      address,
-      limit,
-      page,
-    );
+      const paramsValidation = validateRequiredParams({ address });
+      if (!paramsValidation.isValid) {
+        return paramsValidation.error ??
+          new Response("Invalid parameters", { status: 400 });
+      }
 
-    return ResponseUtil.success({
-      ...body,
-      last_block: last_block.rows[0]["last_block"],
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    return ResponseUtil.error("Internal server error", 500);
-  }
+      // Get pagination params
+      const pagination = getPaginationParams(url);
+      if (pagination instanceof Response) {
+        return pagination;
+      }
+
+      const {
+        limit = DEFAULT_PAGINATION.limit,
+        page = DEFAULT_PAGINATION.page,
+      } = pagination;
+
+      // Use full limit for both endpoints to ensure we get all available data
+      const [stampsRes, src20Res, btcInfo] = await Promise.all([
+        fetch(
+          `${url.origin}/api/v2/stamps/balance/${address}?limit=${limit}&page=${page}`,
+        ),
+        fetch(
+          `${url.origin}/api/v2/src20/balance/${address}?limit=${limit}&page=${page}`,
+        ),
+        getBTCBalanceInfo(address),
+      ]);
+
+      const [stamps, src20] = await Promise.all([
+        stampsRes.json(),
+        src20Res.json(),
+      ]);
+
+      // Check for empty results
+      if (!stamps.data?.length && !src20.data?.length) {
+        return checkEmptyResult(null, "balance data") ??
+          new Response("No data found", { status: 404 });
+      }
+
+      // Calculate combined totals
+      const totalItems = (stamps.total || 0) + (src20.total || 0);
+      const totalPages = Math.ceil(totalItems / limit);
+
+      // Format response to match old schema
+      const response = {
+        page: page,
+        limit: limit,
+        totalPages: totalPages,
+        total: totalItems,
+        last_block: Math.max(stamps.last_block || 0, src20.last_block || 0),
+        btc: {
+          address: address,
+          balance: btcInfo?.balance ?? 0,
+          txCount: btcInfo?.txCount ?? 0,
+          unconfirmedBalance: btcInfo?.unconfirmedBalance ?? 0,
+          unconfirmedTxCount: btcInfo?.unconfirmedTxCount ?? 0,
+        },
+        data: {
+          stamps: stamps.data || [],
+          src20: src20.data || [],
+        },
+      };
+
+      // Return with proper caching and informational headers
+      return ResponseUtil.success(response, {
+        routeType: RouteType.BALANCE,
+        headers: {
+          "X-Preferred-Endpoints":
+            "/api/v2/stamps/balance/[address], /api/v2/src20/balance/[address]",
+          "X-Info":
+            "Consider using dedicated endpoints for better performance and pagination control",
+        },
+      });
+    } catch (error) {
+      console.error("Error in balance/[address] handler:", error);
+      return ResponseUtil.internalError(error) ??
+        new Response("Internal server error", { status: 500 });
+    }
+  },
 };

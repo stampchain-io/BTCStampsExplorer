@@ -1,6 +1,6 @@
 color: true
 dry-run: null
-hookfiles: ./hooks/hooks.js
+hookfiles: ./hooks/hooks.cjs
 language: nodejs
 require: null
 server: npm start
@@ -9,17 +9,15 @@ init: false
 custom: {}
 names: false
 only: []
-reporter: apiary
-output: []
 header: []
 sorted: false
 user: null
-inline-errors: false
-details: false
+inline-errors: true
+details: true
 method: []
 loglevel: warning
 path: []
-hooks-worker-timeout: 5000
+hooks-worker-timeout: 10000
 hooks-worker-connect-timeout: 1500
 hooks-worker-connect-retry: 500
 hooks-worker-after-connect-wait: 100
@@ -28,7 +26,23 @@ hooks-worker-term-retry: 500
 hooks-worker-handler-host: 127.0.0.1
 hooks-worker-handler-port: 61321
 config: ./dredd.yml
-blueprint: schema.yml
-endpoint: 'http://localhost:8000/'
-# endpoint: 'https://stampchain.io'
-# endpoint: 'http://dev.bitcoinstamps.xyz'
+blueprint: ./schema.yml
+# endpoint: "http://localhost:8000/"
+# endpoint: "https://stampchain.io"
+endpoint: "https://dev.stampchain.io"
+reporters:
+  - apiary
+  - html
+  - dot
+  - markdown
+output:
+  - ./reports/dredd-report.html
+  - ./reports/comparison-report.html
+  - ./reports/apiary-report.txt
+  - ./reports/report.md
+reporter: apiary
+full-validation: true
+validate-swagger: true
+strict-validation: true
+resolve-references: true
+schema-validation: true

@@ -1,43 +1,33 @@
-import { HandlerContext } from "$fresh/server.ts";
-
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
-import { useEffect, useState } from "preact/hooks";
-import { paginate } from "utils/util.ts";
-import { initialWallet, walletContext } from "store/wallet/wallet.ts";
+import { useEffect as _useEffect, useState as _useState } from "preact/hooks";
+import { paginate } from "$lib/utils/paginationUtils.ts";
+import {
+  initialWallet as _initialWallet,
+  walletContext,
+} from "$client/wallet/wallet.ts";
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
+import { Handlers } from "$fresh/server.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
-//TODO: Add pagination
-
-export const handler = {
-  async GET(req: Request, ctx: HandlerContext) {
+export const handler: Handlers = {
+  async GET(req: Request, ctx) {
     try {
       const url = new URL(req.url);
-      const { wallet, isConnected } = walletContext;
+      const { wallet: _wallet, isConnected: _isConnected } = walletContext;
       const limit = Number(url.searchParams.get("limit")) || 1000;
       const page = Number(url.searchParams.get("page")) || 1;
 
-      const client = await getClient();
-      const data = await Src20Class.get_valid_src20_tx_with_client(
-        client,
-        null,
-        null,
-        "DEPLOY",
+      const { data, total, lastBlock } = await Src20Controller.getUploadData({
+        op: "DEPLOY",
         limit,
         page,
-      );
-      const total = await Src20Class.get_total_valid_src20_tx_with_client(
-        client,
-        null,
-        "DEPLOY",
-      );
-      const last_block = await CommonClass.get_last_block_with_client(client);
+      });
 
-      const pagination = paginate(total.rows[0]["total"], page, limit);
+      const pagination = paginate(total, page, limit);
 
       const body = {
         ...pagination,
-        last_block: last_block.rows[0]["last_block"],
-        data: data.rows.map((row) => {
+        last_block: lastBlock,
+        data: data.rows.map((row: any) => {
           return {
             ...row,
             max: row.max ? row.max.toString() : null,
@@ -56,7 +46,7 @@ export const handler = {
 };
 
 export function UploadBackground(props) {
-  const { data, total, page, pages, limit } = props.data;
+  const { data, _total, _page, _pages, _limit } = props.data;
 
   return (
     <>

@@ -1,31 +1,133 @@
+/* @tailwind is a valid directive for Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ensure html and body take full height without overflow */
+html,
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  /* Fallback color */
+  overflow-x: hidden;
+}
+
+.primary-gradient {
+  background: linear-gradient(to right, #1f002e00, #14001f7f, #1f002eff);
+}
+
 .image-rendering-pixelated {
-  image-rendering: pixelated;
+  position: relative;
+}
+
+.image-rendering-pixelated::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: url("/img/transparent-bg.png");
   background-size: 3px;
-  padding: 6px 12px;
+  z-index: 1;
+}
+
+.image-rendering-pixelated img,
+.image-rendering-pixelated iframe,
+.image-rendering-pixelated>div {
+  position: relative;
+  z-index: 2;
+}
+
+.image-rendering-pixelated img {
+  mix-blend-mode: multiply;
 }
 
 /* width */
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
+  border-radius: 14px;
+}
+
+@media (max-width: 768px) {
+
+  /* Adjust the max-width as needed */
+  ::-webkit-scrollbar {
+    width: 8px;
+    /* Smaller width for mobile */
+    height: 8px;
+    border-radius: 14px;
+  }
 }
 
 /* Track */
-::-webkit-scrollbar-track {
-  background: #343434;
+::-webkit-scrollbar {
+  border-radius: 3px;
+  height: 6px;
+  width: 6px;
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #262424;
-}
-
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #aa00ff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #660099;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: #333333;
+  border-radius: 3px;
+}
+
+/* New custom scrollbar styles for specific class */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 28px;
+  /* Custom width */
+  height: 20px;
+  border-radius: 0px;
+}
+
+@media (max-width: 768px) {
+
+  /* Adjust the max-width as needed */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 17px;
+    /* Smaller width for mobile */
+    height: 14px;
+    border-radius: 0px;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #2b0e49;
+  /* Custom track color */
+  padding: 4px;
+  border-radius: 0px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #b9b9b9;
+  /* Custom handle color */
+  border-radius: 0px;
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #d9d9d9;
+  /* Custom handle hover color */
+}
+
+.scrollbar-grey {
+  @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
+}
+
+.scrollbar-purple {
+  @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
 }
 
 .pixelart {
@@ -38,4 +140,426 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.stamp-container {
+  position: relative;
+  z-index: 1;
+}
+
+.stamp-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("/img/transparent-bg.png");
+  background-size: 3px;
+  z-index: 0;
+}
+
+.stamp-image {
+  position: relative;
+  z-index: 2;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.bgGradientTopLeft{
+  width: 1728.553px;
+  height: 1000px;
+  transform: rotate(45deg);
+  border-radius: 1728.553px;
+  opacity: 0.2;
+  background: linear-gradient(113deg, #FA0 23.14%, #406 84.65%);
+  filter: blur(50px);
+  position: absolute;
+  left: -50%;
+  top: -4%;
+}
+.bgGradientTopRight{
+  position: absolute;
+    top: -350px;
+    right: -450px;
+    width: 1128px;
+    height: 720px;
+    transform: rotate(-45deg);
+    border-radius: 1128px;
+    background: linear-gradient(77deg, #000 9.15%, #493240 50.02%, #F09 90.89%);
+    filter: blur(50px);
+}
+
+.bgGradientTop {
+  @apply absolute top-0 left-0 right-0;
+  height: 2000px;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 100% 25% at 0 5%,
+      rgba(1, 1, 1, 0.9),
+      transparent) 10%,
+    radial-gradient(ellipse 50% 30% at 70% 40%,
+      rgba(80, 0, 120, 0.1),
+      transparent 90%),
+    radial-gradient(ellipse 30% 100% at 70% 0,
+      var(--gradient-cyan),
+      transparent 80%),
+    radial-gradient(ellipse 40% 35% at 35% 5%,
+      rgba(120, 80, 0, 0.2),
+      transparent 90%),
+    radial-gradient(ellipse 20% 60% at 100% 12%,
+      var(--gradient-orange),
+      transparent 80%),
+    radial-gradient(ellipse 30% 30% at 15% 60%,
+      rgba(120, 80, 0, 0.1),
+      transparent 90%),
+    radial-gradient(ellipse 30% 30% at 15% 60%,
+      rgba(80, 0, 120, 0.1),
+      transparent 90%),
+    radial-gradient(ellipse 40% 5% at 120% 80%,
+      rgba(0, 120, 80, 0.1),
+      transparent 90%),
+    radial-gradient(ellipse 60% 15% at 100% 80%,
+      var(--gradient-orange),
+      transparent 90%),
+    radial-gradient(ellipse 80% 30% at 100% 80%,
+      var(--gradient-purple),
+      transparent 90%),
+    linear-gradient(rgba(80, 0, 120, 0.4),
+      rgba(0, 0, 0, 1) 60%);
+  mask-image: linear-gradient(to bottom,
+      black 0%,
+      black 80%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom,
+      black 0%,
+      black 60%,
+      transparent 100%);
+  animation:
+    fadeInOutOrange 4s linear infinite alternate,
+    fadeInOutCyan 4s linear infinite alternate 2s,
+    fadeInOutPurple 2s linear infinite alternate;
+}
+
+@layer base {
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.bgGradientBottom {
+  @apply absolute bottom-0 left-0 right-0;
+  height: 1000px;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 75% 100% at 20% 100%,
+      rgba(0, 0, 0, 0.9) 10%,
+      transparent 70%),
+    radial-gradient(ellipse 30% 40% at 30% 60%,
+      var(--gradient-orange),
+      transparent),
+    radial-gradient(ellipse 40% 60% at 30% 60%,
+      var(--gradient-purple),
+      transparent),
+    radial-gradient(ellipse 20% 60% at 0% 90%,
+      rgba(120, 80, 0, 0.4),
+      transparent),
+    radial-gradient(ellipse 40% 15% at 120% 25%,
+      var(--gradient-orange),
+      transparent),
+    radial-gradient(ellipse 80% 30% at 120% 25%,
+      rgba(80, 0, 120, 0.3),
+      transparent),
+    radial-gradient(ellipse 25% 30% at 70% 120%,
+      var(--gradient-orange),
+      transparent),
+    radial-gradient(ellipse 50% 60% at 70% 100%,
+      var(--gradient-purple),
+      transparent),
+    radial-gradient(ellipse 25% 80% at 70% 120%,
+      var(--gradient-cyan),
+      transparent 80%),
+    linear-gradient(rgba(0, 0, 0, 1),
+      rgba(120, 80, 0, 0.05));
+  mask-image: linear-gradient(to top,
+      black 0%,
+      black 80%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(to top,
+      black 0%,
+      black 60%,
+      transparent 100%);
+  animation:
+    fadeInOutOrange 4s linear infinite alternate,
+    fadeInOutCyan 4s linear infinite alternate 2s,
+    fadeInOutPurple 2s linear infinite alternate;
+}
+
+
+@media (max-width: 768px) {
+  .bgGradientTop {
+    height: 1000px;
+  }
+
+  .bgGradientBottom {
+    height: 500px;
+  }
+}
+
+:root {
+  --gradient-orange: rgba(120, 80, 0, 0.1);
+  --gradient-purple: rgba(80, 0, 120, 0.2);
+  --gradient-cyan: rgba(0, 120, 80, 0.2);
+}
+
+@keyframes fadeInOutPurple {
+  0% {
+    --gradient-purple: rgba(80, 0, 120, 0.2);
+  }
+
+  10% {
+    --gradient-purple: rgba(80, 0, 120, 0.21);
+  }
+
+  20% {
+    --gradient-purple: rgba(80, 0, 120, 0.22);
+  }
+
+  30% {
+    --gradient-purple: rgba(80, 0, 120, 0.23);
+  }
+
+  40% {
+    --gradient-purple: rgba(80, 0, 120, 0.24);
+  }
+
+  50% {
+    --gradient-purple: rgba(80, 0, 120, 0.25);
+  }
+
+  60% {
+    --gradient-purple: rgba(80, 0, 120, 0.26);
+  }
+
+  70% {
+    --gradient-purple: rgba(80, 0, 120, 0.27);
+  }
+
+  80% {
+    --gradient-purple: rgba(80, 0, 120, 0.28);
+  }
+
+  90% {
+    --gradient-purple: rgba(80, 0, 120, 0.29);
+  }
+
+  100% {
+    --gradient-purple: rgba(80, 0, 120, 0.3);
+  }
+}
+
+@keyframes fadeInOutOrange {
+  0% {
+    --gradient-orange: rgba(120, 80, 0, 0.1);
+  }
+
+  10% {
+    --gradient-orange: rgba(120, 80, 0, 0.105);
+  }
+
+  20% {
+    --gradient-orange: rgba(120, 80, 0, 0.11);
+  }
+
+  30% {
+    --gradient-orange: rgba(120, 80, 0, 0.115);
+  }
+
+  40% {
+    --gradient-orange: rgba(120, 80, 0, 0.12);
+  }
+
+  50% {
+    --gradient-orange: rgba(120, 80, 0, 0.125);
+  }
+
+  60% {
+    --gradient-orange: rgba(120, 80, 0, 0.13);
+  }
+
+  70% {
+    --gradient-orange: rgba(120, 80, 0, 0.135);
+  }
+
+  80% {
+    --gradient-orange: rgba(120, 80, 0, 0.14);
+  }
+
+  90% {
+    --gradient-orange: rgba(120, 80, 0, 0.145);
+  }
+
+  100% {
+    --gradient-orange: rgba(120, 80, 0, 0.15);
+  }
+}
+
+@keyframes fadeInOutCyan {
+  0% {
+    --gradient-cyan: rgba(0, 120, 80, 0.15);
+  }
+
+  10% {
+    --gradient-cyan: rgba(0, 120, 80, 0.155);
+  }
+
+  20% {
+    --gradient-cyan: rgba(0, 120, 80, 0.16);
+  }
+
+  30% {
+    --gradient-cyan: rgba(0, 120, 80, 0.165);
+  }
+
+  40% {
+    --gradient-cyan: rgba(0, 120, 80, 0.17);
+  }
+
+  50% {
+    --gradient-cyan: rgba(0, 120, 80, 0.175);
+  }
+
+  60% {
+    --gradient-cyan: rgba(0, 120, 80, 0.18);
+  }
+
+  70% {
+    --gradient-cyan: rgba(0, 120, 80, 0.185);
+  }
+
+  80% {
+    --gradient-cyan: rgba(0, 120, 80, 0.19);
+  }
+
+  90% {
+    --gradient-cyan: rgba(0, 120, 80, 0.195);
+  }
+
+  100% {
+    --gradient-cyan: rgba(0, 120, 80, 0.20);
+  }
+}
+
+/* Custom Audio Player Styles */
+.stamp-audio-player {
+  @apply w-full max-w-[90%] bg-transparent;
+}
+
+/* Audio player container */
+.stamp-audio-player::-webkit-media-controls-panel {
+  @apply bg-stamp-card-bg border-none;
+  background: linear-gradient(to right, #1f002e00, #14001f7f, #1f002eff);
+}
+
+/* Play button */
+.stamp-audio-player::-webkit-media-controls-play-button {
+  @apply text-stamp-purple-bright hover:text-stamp-purple-bright;
+  filter: hue-rotate(300deg) brightness(1.5);
+}
+
+/* Time slider (progress bar) */
+.stamp-audio-player::-webkit-media-controls-timeline {
+  @apply bg-stamp-purple-bright;
+}
+
+/* Current time and duration */
+.stamp-audio-player::-webkit-media-controls-current-time-display,
+.stamp-audio-player::-webkit-media-controls-time-remaining-display {
+  @apply text-stamp-grey-light;
+}
+
+/* Volume slider */
+.stamp-audio-player::-webkit-media-controls-volume-slider {
+  @apply bg-stamp-purple-bright;
+}
+
+/* Volume control */
+.stamp-audio-player::-webkit-media-controls-mute-button {
+  @apply text-stamp-purple-bright hover:text-stamp-purple-bright;
+  filter: hue-rotate(300deg) brightness(1.5);
+}
+
+/* Add pixelated background for audio container */
+.stamp-audio-container {
+  @apply relative w-full h-full;
+}
+
+.stamp-audio-container::before {
+  content: "";
+  @apply absolute inset-0;
+  background-image: url("/img/transparent-bg.png");
+  background-size: 3px;
+  z-index: 1;
+}
+
+.stamp-audio-container audio {
+  @apply relative z-20;
+}
+
+/* conic gradient for input field animated border */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* remove border radius for input field when dropdown is open */
+.input-open input {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Emoji ticker styling for SRC20 cards */
+.emoji-ticker {
+  @apply text-stamp-primary-hover;
+  font-family: system-ui;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Remove outline from input fields */
+.no-outline:focus-visible {
+  outline: 0px solid transparent !important;
+  outline-offset: 0 !important;
+  outline-style: none !important;
+}
+
+.animated-underline {
+  font-weight: 700;
+  text-decoration: none;
+  background-image: linear-gradient(#CCCCCC, #CCCCCC);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  transition: background-size .3s;
+  padding-bottom: 3px;
+  text-shadow:
+    -3px 0 #000,
+    /* Left */
+    3px 0 #000,
+    /* Right */
+    0 -3px #000,
+    /* Top */
+    0 3px #000;
+  /* Bottom */
+}
+
+.animated-underline:hover,
+.animated-underline:focus {
+  background-size: 0% 2px;
 }

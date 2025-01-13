@@ -1,78 +1,89 @@
-import { CommonClass, getClient, Src20Class } from "$lib/database/index.ts";
-import { paginate } from "utils/util.ts";
-import { convertEmojiToTick, convertToEmoji } from "utils/util.ts";
+import { Handlers } from "$fresh/server.ts";
+import { PaginatedTickResponseBody } from "$globals";
+import { ResponseUtil } from "$lib/utils/responseUtil.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
 import { BigFloat } from "bigfloat/mod.ts";
 import {
-  PaginatedRequest,
-  PaginatedTickResponseBody,
-  TickHandlerContext,
-} from "globals";
-import { ResponseUtil } from "utils/responseUtil.ts";
+  DEFAULT_PAGINATION,
+  validateRequiredParams,
+  validateSortParam,
+} from "$server/services/routeValidationService.ts";
 
-export const handler = async (
-  req: PaginatedRequest,
-  ctx: TickHandlerContext,
-): Promise<Response> => {
-  let { tick } = ctx.params;
-  try {
-    const url = new URL(req.url);
-    const limit = Number(url.searchParams.get("limit")) || 1000;
-    const page = Number(url.searchParams.get("page")) || 1;
-    const op = url.searchParams.get("op");
-    const sort = url.searchParams.get("sort") || "ASC";
-    const client = await getClient();
-    tick = convertEmojiToTick(String(tick));
-    const src20_txs = await Src20Class
-      .get_valid_src20_tx_with_client(
-        client,
-        null,
-        tick,
-        op,
-        limit,
-        page,
-        sort,
-      );
+export const handler: Handlers = {
+  async GET(req, ctx) {
+    try {
+      const { tick } = ctx.params;
 
-    const total = await Src20Class.get_total_valid_src20_tx_with_client(
-      client,
-      tick,
-      op,
-    );
-    const last_block = await CommonClass.get_last_block_with_client(client);
-    const pagination = paginate(total.rows[0]["total"], page, limit);
-    //TODO: review this
-    const mint_status = await Src20Class
-      .get_src20_minting_progress_by_tick_with_client(
-        client,
-        tick,
-      );
-    const body: PaginatedTickResponseBody = {
-      ...pagination,
-      last_block: last_block.rows[0]["last_block"],
-      mint_status: {
-        ...mint_status,
-        max_supply: (mint_status.max_supply
-          ? mint_status.max_supply.toString()
-          : null) as string,
-        total_minted: (mint_status.total_minted
-          ? mint_status.total_minted.toString()
-          : null) as string,
-        limit: mint_status.limit ? mint_status.limit : null,
-      },
-      data: src20_txs.rows.map((tx: any) => {
-        return {
-          ...tx,
-          tick: convertToEmoji(tx.tick),
-          max: tx.max ? new BigFloat(tx.max).toString() : null,
-          lim: tx.lim ? new BigFloat(tx.lim).toString() : null,
-          amt: tx.amt ? new BigFloat(tx.amt).toString() : null,
-        };
-      }),
-    };
+      // Validate required parameters
+      const paramsValidation = validateRequiredParams({ tick });
+      if (!paramsValidation.isValid) {
+        return paramsValidation.error!;
+      }
 
-    return ResponseUtil.success(body);
-  } catch (_error) {
-    console.log(_error);
-    return ResponseUtil.error("Error: Internal server error");
-  }
+      const url = new URL(req.url);
+      const pagination = getPaginationParams(url);
+
+      // Check if pagination validation failed
+      if (pagination instanceof Response) {
+        return pagination;
+      }
+
+      const { limit, page } = pagination;
+      const opParam = url.searchParams.get("op") || undefined;
+
+      // Validate sort parameter
+      const sortValidation = validateSortParam(url, "sortBy");
+      if (!sortValidation.isValid) {
+        return sortValidation.error!;
+      }
+
+      // Ensure required pagination values
+      const params = {
+        tick: decodeURIComponent(String(tick)),
+        limit: limit || DEFAULT_PAGINATION.limit,
+        page: page || DEFAULT_PAGINATION.page,
+        op: opParam,
+        sortBy: sortValidation.data,
+      };
+
+      // Fetch data using controller
+      const { src20_txs, total, lastBlock, mint_status } = await Src20Controller
+        .getTickData(params);
+
+      // Prepare pagination variables
+      const totalPages = Math.ceil(total / (limit || DEFAULT_PAGINATION.limit));
+
+      // Map data, ensuring all necessary fields are included
+      const data = src20_txs.rows.map((tx: any) => ({
+        ...tx,
+        max: tx.max ? new BigFloat(tx.max).toString() : null,
+        lim: tx.lim ? new BigFloat(tx.lim).toString() : null,
+        amt: tx.amt ? new BigFloat(tx.amt).toString() : null,
+      }));
+
+      // Construct response body
+      const body: PaginatedTickResponseBody = {
+        page: page || DEFAULT_PAGINATION.page,
+        limit: limit || DEFAULT_PAGINATION.limit,
+        total,
+        totalPages,
+        last_block: lastBlock,
+        mint_status: mint_status
+          ? {
+            ...mint_status,
+            max_supply: mint_status.max_supply?.toString() ?? null,
+            total_minted: mint_status.total_minted?.toString() ?? null,
+            limit: mint_status.limit ?? null,
+          }
+          : null,
+        data,
+      };
+
+      return ResponseUtil.success(body);
+    } catch (error) {
+      console.error(error);
+      return ResponseUtil.internalError(error, "Error processing request");
+    }
+  },
 };

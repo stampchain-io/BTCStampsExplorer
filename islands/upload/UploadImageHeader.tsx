@@ -1,7 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { StampSearchClient } from "../stamp/StampSearch.tsx";
-import { router } from "$fresh/src/server/router.ts";
-import { initialWallet } from "store/wallet/wallet.ts";
+import { initialWallet } from "$client/wallet/wallet.ts";
 
 export const UploadImageHeader = () => {
   const [wallet, setWallet] = useState(initialWallet);
@@ -20,7 +18,7 @@ export const UploadImageHeader = () => {
     console.log("wallet", wallet);
     if (
       wallet === null
-    ) window.location.href = "/upload";
+    ) globalThis.location.href = "/upload";
   }, [wallet]);
 
   return (

@@ -17,14 +17,14 @@ http:
   #   - name: v1.example.com
   #     hosted_zone: AN0THE9H05TED20NEID
   healthcheck: 
-    success_codes: '307'
-    path: '/'
+    success_codes: '200'
+    path: '/api/v2/health'
     port: 8000
-    # healthy_threshold: 3
-    # unhealthy_threshold: 2
-    # interval: 15s
-    # timeout: 10s
-    # grace_period: 60s
+    healthy_threshold: 2
+    unhealthy_threshold: 4
+    interval: 30s
+    timeout: 15s
+    grace_period: 180s
   # redirect_to_https: true # Redirect all HTTP traffic to HTTPS.
 
 # Configuration for your containers and service.
@@ -43,7 +43,7 @@ network:
 
 # storage:
   # readonly_fs: true       # Limit to read-only access to mounted root filesystems.
- 
+
 # Optional fields for more advanced use-cases.
 variables:                    # Pass environment variables as key value pairs.
  LOG_LEVEL: info
@@ -58,6 +58,26 @@ environments:
     variables:
       LOG_LEVEL: debug
       DB_HOST: copilot-test-rw.endpoint.proxy-cbdenncm0tno.us-east-1.rds.amazonaws.com
+      DENO_NO_PACKAGE_CACHE: "1"  # Only keep environment-specific variables
+    deployment:
+      rolling: 'recreate'
+      circuit_breaker:
+        rollback: true
+        maximum_percent: 150
+        minimum_healthy_percent: 25
+    logging:
+      retention: 1
+      enhanced: true
+    cpu: 256
+    memory: 512
+    count: 1
+    http:
+      healthcheck:
+        healthy_threshold: 2
+        unhealthy_threshold: 2
+        interval: 30s
+        timeout: 5s
+        grace_period: 60s
   prod:
     cpu: 512       # Number of CPU units for the task.
     memory: 1024    # Amount of memory in MiB used by the task.
@@ -69,11 +89,22 @@ environments:
       cpu_percentage: 70
       requests: 30
       response_time: 2s
-    deployment:            # The deployment strategy for the "test" environment.
-        rolling: 'default' # Stops existing tasks before new ones are started for faster deployments.
+    deployment:
+      rolling: 'default'
+      circuit_breaker:
+        rollback: true
+        maximum_percent: 200
+        minimum_healthy_percent: 50
     variables:
       LOG_LEVEL: info
       DB_HOST: stamps-prod.endpoint.proxy-cbdenncm0tno.us-east-1.rds.amazonaws.com
       CACHE: true
+    http:
+      healthcheck:
+        healthy_threshold: 3
+        unhealthy_threshold: 2
+        interval: 30s
+        timeout: 15s
+        grace_period: 180s
 
       
