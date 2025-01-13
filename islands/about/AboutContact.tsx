@@ -6,6 +6,7 @@ const AboutContact = () => {
   const [email, setEmail] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   const titleGreyDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
@@ -18,6 +19,13 @@ const AboutContact = () => {
     "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
   const buttonGreyOutline =
     "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+
+  const handleSubmit = (e: Event) => {
+    e.preventDefault();
+    setError(
+      "Contact form is not setup properly - leave a message on Telegram instead",
+    );
+  };
 
   return (
     <>
@@ -53,7 +61,10 @@ const AboutContact = () => {
             </p>
           </div>
           <div className="w-full mobileLg:w-1/2 pt-3 mobileLg:pt-0">
-            <form className="flex flex-col gap-3 mobileMd:gap-6 desktop:gap-9">
+            <form
+              className="flex flex-col gap-3 mobileMd:gap-6 desktop:gap-9"
+              onSubmit={handleSubmit}
+            >
               <div className={inputField2col}>
                 <InputField
                   type="text"
@@ -92,6 +103,7 @@ const AboutContact = () => {
                   SEND
                 </button>
               </div>
+              {error && <p className="text-red-500 mt-2">{error}</p>}
             </form>
           </div>
         </div>
