@@ -71,7 +71,7 @@ export class Src20Controller {
       };
 
       // Process data with mint progress if requested
-      let processedData = rawData.length > 1 ? [...rawData]: [rawData];
+      let processedData = rawData.length > 1 ? [...rawData]: rawData;
 
       if (balanceParams.includeMintData) {
         const ticks = processedData.map(row => row.tick).filter(Boolean);
