@@ -33,22 +33,23 @@ const AboutContact = () => {
         <div className="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
           <div className="w-full mobileLg:w-1/2 space-y-3 mobileMd:space-y-6">
             <p className={bodyTextLight}>
-              Get in contact if you have any questions about stamps, our tooling
-              and services - or you need assistance with stamping your
-              project.<br />
+              Reach out if you have any questions about stamps, our tooling and
+              services. <br />
               <br />
-              Got ideas for collaborations, improvements or protocol
+              Need guidance on deploying a community token or assistance with
+              stamping your future art project?<br />
+              Got ideas for a collaboration, improvements or protocol
               integration? <br />
-              Drop us a message and let's explore the possibilities
-              together!<br />
               <br />
+              Send us a message -{" "}
               <a
                 href="https://t.me/BitcoinStamps"
                 target="_blank"
                 className="animated-underline"
               >
-                You can also reach out to us on Telegram
-              </a>
+                or get in touch via Telegram
+              </a>{" "}
+              - and let's explore the infinite possibilities of stamps together!
             </p>
           </div>
           <div className="w-full mobileLg:w-1/2 pt-3 mobileLg:pt-0">
