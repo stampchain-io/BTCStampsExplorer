@@ -96,41 +96,39 @@ jobs:
             local retry_delay=15  # Retry delay for rate limits
             local max_files=30   # Further reduced file limit for testing
             
-            # Create temporary directory for file lists
+            # Create temporary directory
             temp_dir=$(mktemp -d) || error "Failed to create temp directory"
             trap 'rm -rf "$temp_dir"' EXIT
             
-            # Create file list using arrays to avoid pipe issues
-            declare -a files=()
-            while IFS= read -r -d $'\0' file; do
-              if [[ "$file" != *"/node_modules/"* && \
-                    "$file" != *"/_fresh/"* && \
-                    "$file" != */dist/* && \
-                    "$file" != */.git/* ]]; then
-                files+=("$file")
-              fi
-            done < <(
-              if [ "$check_type" = "fmt" ]; then
-                find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -print0
-              else
-                find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" \) -print0
-              fi
-            )
+            # Use shell globbing for file discovery
+            shopt -s globstar nullglob
+            local files=()
             
-            # Limit the number of files if needed
-            if [ "$max_files" -gt 0 ]; then
-              head -n "$max_files" "$temp_file_list" > "${temp_file_list}.tmp" && \
-              mv "${temp_file_list}.tmp" "$temp_file_list" || error "Failed to limit file list"
+            if [ "$check_type" = "fmt" ]; then
+              while IFS= read -r -d $'\0' file; do
+                [[ "$file" == *"/node_modules/"* ]] && continue
+                [[ "$file" == *"/_fresh/"* ]] && continue
+                [[ "$file" == */dist/* ]] && continue
+                [[ "$file" == */.git/* ]] && continue
+                files+=("$file")
+              done < <(find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -print0)
+            else
+              while IFS= read -r -d $'\0' file; do
+                [[ "$file" == *"/node_modules/"* ]] && continue
+                [[ "$file" == *"/_fresh/"* ]] && continue
+                [[ "$file" == */dist/* ]] && continue
+                [[ "$file" == */.git/* ]] && continue
+                files+=("$file")
+              done < <(find . -maxdepth 3 -type f \( -name "*.ts" -o -name "*.tsx" \) -print0)
             fi
             
-            total_files=$(wc -l < "$temp_file_list")
-            
-            # Process files in small batches
+            # Get total files and limit if needed
             total_files=${#files[@]}
             if [ "$total_files" -gt "$max_files" ]; then
               total_files=$max_files
             fi
             
+            # Process files in batches
             for ((i = 0; i < total_files; i += batch_size)); do
               echo "Processing $check_type batch $batch_num..."
               
@@ -142,10 +140,11 @@ jobs:
               for ((j = i; j < i + batch_size && j < total_files; j++)); do
                 file="${files[$j]}"
                 if [ -f "$file" ]; then
+                  out_file="$batch_dir/$(basename "$file").out"
                   if [ "$check_type" = "fmt" ]; then
-                    deno fmt --check "$file" > "$batch_dir/$j.out" 2>&1 || true
+                    deno fmt --check "$file" > "$out_file" 2>&1 || true
                   else
-                    deno lint --json "$file" > "$batch_dir/$j.out" 2>&1 || true
+                    deno lint --json "$file" > "$out_file" 2>&1 || true
                   fi
                 fi
               done
