@@ -240,8 +240,6 @@ export default function AboutDonate() {
   };
 
   const handleOpen = () => {
-    console.log("Opening donate modal with stamp:", DONATE_STAMP);
-    console.log("Current dispenser state:", dispenser);
     setIsOpen(!isOpen);
   };
 
@@ -267,7 +265,6 @@ export default function AboutDonate() {
   useEffect(() => {
     const fetchDispenser = async () => {
       try {
-        console.log("Fetching dispenser for stamp:", DONATE_STAMP.stamp);
         const response = await fetch(
           `/api/v2/stamps/${DONATE_STAMP.stamp}/dispensers?limit=1`,
         );
@@ -277,11 +274,9 @@ export default function AboutDonate() {
         }
 
         const data = await response.json();
-        console.log("Fetched dispenser data:", data);
 
         // Get first open dispenser
         const openDispenser = data.data.find((d: any) => d.status === "open");
-        console.log("Selected open dispenser:", openDispenser);
 
         setDispenser(openDispenser);
       } catch (error) {

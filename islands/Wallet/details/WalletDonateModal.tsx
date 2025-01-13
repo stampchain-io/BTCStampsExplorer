@@ -27,7 +27,6 @@ const WalletDonateModal = ({
   const { wallet } = walletContext;
   const [quantity, setQuantity] = useState(1);
   const [maxQuantity, setMaxQuantity] = useState(1);
-  const [_pricePerUnit, setPricePerUnit] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
 
   const {
@@ -36,7 +35,6 @@ const WalletDonateModal = ({
     handleSubmit,
     isSubmitting,
     error,
-    _setError,
     successMessage,
     setSuccessMessage,
   } = useTransactionForm({
@@ -55,57 +53,19 @@ const WalletDonateModal = ({
         dispenser.give_remaining / dispenser.give_quantity,
       );
       setMaxQuantity(maxQty);
-      setPricePerUnit(dispenser.satoshirate);
       setTotalPrice(quantity * dispenser.satoshirate);
     }
   }, [dispenser, quantity]);
-
-  const handleQuantityChange = (e: Event) => {
-    const value = parseInt((e.target as HTMLInputElement).value, 10);
-    if (value > maxQuantity) {
-      setQuantity(maxQuantity);
-    } else if (value < 1 || isNaN(value)) {
-      setQuantity(1);
-    } else {
-      setQuantity(value);
-    }
-  };
-
-  const handleSliderChange = (e: Event) => {
-    const value = parseInt((e.target as HTMLInputElement).value);
-    setQuantity(value);
-    // Add immediate update for smooth sliding
-    e.target.addEventListener("input", (event) => {
-      const target = event.target as HTMLInputElement;
-      setQuantity(parseInt(target.value));
-    });
-    logger.debug("ui", {
-      message: "Slider changed",
-      newValue: value,
-      component: "WalletDonateModal",
-    });
-  };
 
   const handleBuyClick = async () => {
     await handleSubmit(async () => {
       // Convert fee rate from sat/vB to sat/kB
       const feeRateKB = formState.fee * 1000;
-      console.log("Fee rate conversion:", {
-        satVB: formState.fee,
-        satKB: feeRateKB,
-      });
 
       const options = {
         return_psbt: true,
         fee_per_kb: feeRateKB,
       };
-
-      console.log("Creating dispense transaction:", {
-        address: wallet.address,
-        dispenser: dispenser.source,
-        quantity: quantity,
-        feeRate: options.fee_per_kb,
-      });
 
       const response = await fetch("/api/v2/create/dispense", {
         method: "POST",
@@ -126,7 +86,6 @@ const WalletDonateModal = ({
       }
 
       const responseData = await response.json();
-      console.log("Dispense response:", responseData);
 
       if (!responseData?.psbt || !responseData?.inputsToSign) {
         throw new Error("Invalid response: Missing PSBT or inputsToSign");
@@ -153,9 +112,6 @@ const WalletDonateModal = ({
     });
   };
 
-  const inputField =
-    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
-
   // Add debug logging
   useEffect(() => {
     logger.debug("ui", {
@@ -176,11 +132,6 @@ const WalletDonateModal = ({
     if (dispenser) {
       const price = quantity * dispenser.satoshirate;
       setTotalPrice(price);
-      console.log("Price updated:", {
-        quantity,
-        rate: dispenser.satoshirate,
-        total: price,
-      });
     }
   }, [quantity, dispenser]);
 
@@ -194,7 +145,6 @@ const WalletDonateModal = ({
         handleCloseModal();
       }}
       title="DONATE"
-      preventPropagation={false}
     >
       <div className="mb-6">
         <p className="text-3xl mobileLg:text-4xl font-bold text-stamp-grey-light text-center">
