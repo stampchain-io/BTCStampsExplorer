@@ -71,6 +71,21 @@ const WalletDonateModal = ({
     }
   };
 
+  const handleSliderChange = (e: Event) => {
+    const value = parseInt((e.target as HTMLInputElement).value);
+    setQuantity(value);
+    // Add immediate update for smooth sliding
+    e.target.addEventListener("input", (event) => {
+      const target = event.target as HTMLInputElement;
+      setQuantity(parseInt(target.value));
+    });
+    logger.debug("ui", {
+      message: "Slider changed",
+      newValue: value,
+      component: "WalletDonateModal",
+    });
+  };
+
   const handleBuyClick = async () => {
     await handleSubmit(async () => {
       // Convert fee rate from sat/vB to sat/kB
@@ -156,6 +171,19 @@ const WalletDonateModal = ({
     };
   }, []);
 
+  // Update total price when quantity or dispenser changes
+  useEffect(() => {
+    if (dispenser) {
+      const price = quantity * dispenser.satoshirate;
+      setTotalPrice(price);
+      console.log("Price updated:", {
+        quantity,
+        rate: dispenser.satoshirate,
+        total: price,
+      });
+    }
+  }, [quantity, dispenser]);
+
   return (
     <ModalLayout
       onClose={() => {
@@ -168,6 +196,13 @@ const WalletDonateModal = ({
       title="DONATE"
       preventPropagation={false}
     >
+      <div className="mb-6">
+        <p className="text-3xl mobileLg:text-4xl font-bold text-stamp-grey-light text-center">
+          {(totalPrice / 100000000).toFixed(8)}{" "}
+          <span className="font-extralight">BTC</span>
+        </p>
+      </div>
+
       <div className="flex flex-row gap-6">
         <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
           <StampImage
@@ -177,32 +212,29 @@ const WalletDonateModal = ({
           />
         </div>
         <div className="flex flex-col w-full">
-          <p className="text-3xl mobileLg:text-4xl gray-gradient1 font-black">
-            <span className="text-stamp-grey-light font-light">
-              #
-            </span>
-            {stamp.stamp}
-          </p>
+          <div className="flex flex-col items-start -space-y-0.5">
+            <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey-light">
+              <span className="font-light text-stamp-grey-darker">RECEIVE</span>
+              {" "}
+              {quantity} EDITION{quantity > 1 ? "S" : ""}
+            </p>
+            <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+              MAX {maxQuantity}
+            </p>
+          </div>
 
-          <div className="flex flex-row pt-3 w-full justify-between items-center">
-            <div className="flex flex-col items-start -space-y-0.5">
-              <p className="text-xl mobileLg:text-2xl font-bold text-stamp-grey">
-                EDITIONS
-              </p>
-              <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
-                MAX {maxQuantity}
-              </p>
-            </div>
-            <div className="flex flex-col items-end">
-              <input
-                type="number"
-                min="1"
-                max={maxQuantity}
-                value={quantity}
-                onChange={handleQuantityChange}
-                className={`${inputField} !w-[42px] mobileLg:!w-12 text-center`}
-              />
-            </div>
+          <div className="mt-6">
+            <input
+              type="range"
+              min="1"
+              max={maxQuantity}
+              value={quantity}
+              onInput={(e) => {
+                const target = e.target as HTMLInputElement;
+                setQuantity(parseInt(target.value));
+              }}
+              className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+            />
           </div>
         </div>
       </div>
