@@ -2,13 +2,32 @@
 
 set -e  # Exit on error
 set -u  # Exit on undefined variables
+set -o pipefail  # Exit on pipe failures
 
-echo "Starting transform-deno-output.sh with mode: $1" >&2
+# Debug function
+debug() {
+  echo "DEBUG: $*" >&2
+}
+
+# Error handling
+error() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+debug "Starting transform-deno-output.sh with mode: $1"
 
 MODE=$1
 TEMP_FILE=$(mktemp)
-echo "Created temp file: $TEMP_FILE" >&2
-cat > "$TEMP_FILE"
+debug "Created temp file: $TEMP_FILE"
+
+# Ensure cleanup on exit
+trap 'rm -f "$TEMP_FILE" "${TEMP_FILE}.json" 2>/dev/null || true' EXIT
+
+# Read input with error handling
+if ! cat > "$TEMP_FILE"; then
+  error "Failed to read input"
+fi
 
 # Debug: Show input content
 echo "Input content preview:" >&2
@@ -142,16 +161,35 @@ process_fmt_diff() {
   if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
     debug "Processing final file: $current_file"
     
+    local escaped_changes
+    escaped_changes=$(printf '%s' "$changes" | jq -Rs .)
     local new_diagnostic
-    if new_diagnostic=$(create_diagnostic "$current_file" "$line_number" "$changes"); then
-      debug "Valid diagnostic created for final file, adding to array"
-      diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
-      has_diagnostics=true
-      ((processed_files++))
-      debug "Final diagnostics array: $(echo "$diagnostics" | jq -c '.')"
-    else
-      debug "Failed to create diagnostic for final file"
-    fi
+    new_diagnostic=$(jq -n \
+      --arg file "$current_file" \
+      --arg message "Formatting issues found. Run \`deno fmt\` to fix:" \
+      --arg changes "$escaped_changes" \
+      --arg line "$line_number" \
+      '{
+        message: ($message + "\n" + $changes),
+        location: {
+          path: $file,
+          range: {
+            start: {line: ($line|tonumber), column: 1},
+            end: {line: ($line|tonumber), column: 1}
+          }
+        },
+        severity: "WARNING",
+        code: {
+          value: "fmt",
+          url: "https://deno.land/manual/tools/formatter"
+        }
+      }')
+    
+    debug "Adding diagnostic for final file: $current_file"
+    diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
+    has_diagnostics=true
+    ((processed_files++))
+    debug "Final diagnostics array: $(echo "$diagnostics" | jq -c '.')"
   fi
   
   debug "Processed $processed_files files"
