@@ -89,7 +89,7 @@ process_fmt_diff() {
         
         # Create diagnostic entry
         local escaped_changes
-        escaped_changes=$(printf '%s' "$changes" | jq -Rs .)
+        escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
         local new_diagnostic
         new_diagnostic=$(jq -n \
           --arg file "$current_file" \
@@ -97,7 +97,7 @@ process_fmt_diff() {
           --arg changes "$escaped_changes" \
           --arg line "$line_number" \
           '{
-            message: ($message + "\n" + $escaped_changes),
+            message: ($message + "\n" + $changes),
             location: {
               path: $file,
               range: {
@@ -150,6 +150,40 @@ process_fmt_diff() {
         debug "Added line without number to changes"
       fi
       
+      # If we have changes and hit a blank line or error message, process the current file
+      if [[ (-z $line || $line =~ ^error:) && -n $changes && -n $current_file ]]; then
+        debug "Processing changes for file: $current_file"
+        local escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
+        local new_diagnostic=$(jq -n \
+          --arg file "$current_file" \
+          --arg message "Formatting issues found. Run \`deno fmt\` to fix:" \
+          --arg changes "$escaped_changes" \
+          --arg line "$line_number" \
+          '{
+            message: ($message + "\n" + $changes),
+            location: {
+              path: $file,
+              range: {
+                start: {line: ($line|tonumber), column: 1},
+                end: {line: ($line|tonumber), column: 1}
+              }
+            },
+            severity: "WARNING",
+            code: {
+              value: "fmt",
+              url: "https://deno.land/manual/tools/formatter"
+            }
+          }')
+        debug "Adding diagnostic for $current_file"
+        diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
+        has_diagnostics=true
+        ((processed_files++))
+        
+        # Reset for next file
+        changes=""
+        line_number=0
+      fi
+      
       # If we have changes, log the current state
       if [[ -n "$changes" ]]; then
         debug "Current file: $current_file"
@@ -165,7 +199,7 @@ process_fmt_diff() {
     debug "Processing final file: $current_file"
     
     local escaped_changes
-    escaped_changes=$(printf '%s' "$changes" | jq -Rs .)
+    escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
     local new_diagnostic
     new_diagnostic=$(jq -n \
       --arg file "$current_file" \
@@ -173,7 +207,7 @@ process_fmt_diff() {
       --arg changes "$escaped_changes" \
       --arg line "$line_number" \
       '{
-        message: ($message + "\n" + $escaped_changes),
+        message: ($message + "\n" + $changes),
         location: {
           path: $file,
           range: {
