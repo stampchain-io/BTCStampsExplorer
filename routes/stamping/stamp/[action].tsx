@@ -5,41 +5,59 @@ import LatestTransfer from "$islands/stamping/stamp/transfer/LatestStampTransfer
 
 import { HowToTransferStampModule } from "$islands/modules/HowToTransferStamp.tsx";
 
+export const handler: Handlers = {
+  GET(req, ctx) {
+    console.log("Handler called for [action] route");
+    const data = {
+      selectedTab: "transfer", // Example data
+      trxType: "olga", // Example data
+    };
+    console.log("Data prepared:", data);
+    return ctx.render(data);
+  },
+};
+
 export default function StampingStampPage(
   { data }: PageProps<StampingStampPageProps>,
 ) {
+  console.log("StampingStampPage component rendered");
+
   const {
     selectedTab = "defaultTab",
     trxType = "defaultType",
   } = data || {};
 
+  console.log("Data received:", data);
   console.log("Selected Tab:", selectedTab);
   console.log("Transaction Type:", trxType);
 
   const renderContent = () => {
+    console.log("Rendering Content for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
         return <TransferStampContent trxType={trxType} />;
       default:
-        return null;
+        return <div>No content available for this tab.</div>;
     }
   };
 
   const renderLeftSidebar = () => {
+    console.log("Rendering Left Sidebar for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
         return <HowToTransferStampModule />;
       default:
-        return null;
+        return <div>No sidebar content available for this tab.</div>;
     }
   };
 
   const renderRightSidebar = () => {
+    console.log("Rendering Right Sidebar for Tab:", selectedTab);
     switch (selectedTab) {
       case "transfer":
         return <LatestTransfer />;
       default:
-        return null;
+        return <div>No sidebar content available for this tab.</div>;
     }
   };
 
