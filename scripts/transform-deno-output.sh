@@ -1,37 +1,15 @@
 #!/bin/bash
 
-set -e  # Exit on error
-set -u  # Exit on undefined variables
-set -o pipefail  # Exit on pipe failures
-
-# Debug function
-debug() {
-  echo "DEBUG: $*" >&2
-}
-
-# Error handling
-error() {
-  echo "ERROR: $*" >&2
-  exit 1
-}
-
-debug "Starting transform-deno-output.sh with mode: $1"
+set -e
+set -u
 
 MODE=$1
 TEMP_FILE=$(mktemp)
-debug "Created temp file: $TEMP_FILE"
+cat > "$TEMP_FILE"
 
-# Ensure cleanup on exit
-trap 'rm -f "$TEMP_FILE" "${TEMP_FILE}.json" 2>/dev/null || true' EXIT
-
-# Read input with error handling
-if ! cat > "$TEMP_FILE"; then
-  error "Failed to read input"
-fi
-
-# Debug: Show input content
-echo "Input content preview:" >&2
-head -n 5 "$TEMP_FILE" >&2
+debug() {
+  echo "DEBUG: $*" >&2
+}
 
 create_empty_rdjson() {
   local source_name=$1
@@ -42,58 +20,29 @@ create_empty_rdjson() {
 process_fmt_diff() {
   local diagnostics="[]"
   local current_file=""
-  local previous_file=""
   local line_number=0
   local changes=""
   local in_diff=false
-  local has_diagnostics=false
-  local processed_files=0
-  
-  # Debug function
-  debug() {
-    echo "DEBUG: $*" >&2
-  }
-  
-  debug "Starting process_fmt_diff"
   
   while IFS= read -r line || [ -n "$line" ]; do
     debug "Processing line: $line"
     
-    # Skip warning lines, empty lines, and "Checked X file" messages
-    if [[ $line =~ ^Warning || -z $line || $line =~ ^Checked[[:space:]]+[0-9]+[[:space:]]+file ]]; then
-      debug "Skipping line: $line"
+    # Skip empty lines and warning messages
+    if [[ -z $line || $line =~ ^Warning ]]; then
       continue
     fi
     
-    # Skip error summary only if it's not a formatting error
-    if [[ $line =~ ^error: && ! $line =~ ^error:[[:space:]]*Found[[:space:]]*[0-9]+[[:space:]]*not[[:space:]]*formatted ]]; then
-      debug "Skipping non-formatting error line: $line"
-      continue
-    fi
-    
-    # If we get here, log the line for debugging
-    debug "Processing significant line: $line"
-    
-    # Detect start of a new file diff
+    # Handle file path lines
     if [[ $line =~ ^from[[:space:]]*(.+): ]]; then
-      local full_path="${BASH_REMATCH[1]}"
-      # Remove the workspace prefix if present
-      current_file="${full_path#/home/ubuntu/repos/BTCStampsExplorer/}"
-      debug "Found file: $current_file"
-      
-      # If we already have a file being processed, create a diagnostic for it
-      if [[ -n $changes ]]; then
-        debug "Processing changes for file: $current_file"
-        debug "Changes to process:"
-        echo "$changes" >&2
-        
-        # Create diagnostic entry
+      # Process previous file if we have changes
+      if [[ -n $changes && -n $current_file ]]; then
+        debug "Creating diagnostic for $current_file"
         local escaped_changes
         escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
         local new_diagnostic
         new_diagnostic=$(jq -n \
           --arg file "$current_file" \
-          --arg message "Formatting issues found. Run \`deno fmt\` to fix:" \
+          --arg message "Formatting issues found:" \
           --arg changes "$escaped_changes" \
           --arg line "$line_number" \
           '{
@@ -102,7 +51,7 @@ process_fmt_diff() {
               path: $file,
               range: {
                 start: {line: ($line|tonumber), column: 1},
-                end: {line: ($line|tonumber), column: 1}
+                end: {line: ($line|tonumber), column: 80}
               }
             },
             severity: "WARNING",
@@ -111,52 +60,42 @@ process_fmt_diff() {
               url: "https://deno.land/manual/tools/formatter"
             }
           }')
-        
-        debug "Adding diagnostic for $current_file"
         diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
-        has_diagnostics=true
-        ((processed_files++))
       fi
       
-      # Reset for new file
+      # Start new file
+      local full_path="${BASH_REMATCH[1]}"
+      current_file="${full_path#/home/ubuntu/repos/BTCStampsExplorer/}"
       changes=""
-      in_diff=true
       line_number=0
+      in_diff=true
+      debug "New file: $current_file"
       continue
     fi
     
-    # Extract line number and capture diff lines
+    # Handle diff lines
     if [[ $in_diff == true ]]; then
-      # Match lines with line numbers and diff markers
       if [[ $line =~ ^[[:space:]]*([0-9]+)[[:space:]]*\|[[:space:]]*[-+] ]]; then
-        local current_line="${BASH_REMATCH[1]}"
-        debug "Found line with number: $current_line"
-        
-        # Set initial line number if not set
+        # Set initial line number
         if [[ $line_number == 0 ]]; then
-          line_number="$current_line"
-          debug "Setting first line number: $line_number"
+          line_number="${BASH_REMATCH[1]}"
+          debug "First line number: $line_number"
         fi
-        
-        # Add the line with proper formatting
         changes+="$line"$'\n'
-        has_diagnostics=true
-        debug "Added line with number to changes"
-      elif [[ $line =~ ^[[:space:]]*\|[[:space:]]*[-+] ]]; then
-        # Capture diff lines without line numbers
-        debug "Found diff line without line number"
-        changes+="$line"$'\n'
-        has_diagnostics=true
-        debug "Added line without number to changes"
+        debug "Added line: $line"
       fi
-      
-      # If we have changes and hit a blank line or error message, process the current file
-      if [[ (-z $line || $line =~ ^error:) && -n $changes && -n $current_file ]]; then
-        debug "Processing changes for file: $current_file"
-        local escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
-        local new_diagnostic=$(jq -n \
+    fi
+    
+    # Handle error message - create diagnostic for current file
+    if [[ $line =~ ^error:[[:space:]]*Found[[:space:]]*[0-9]+[[:space:]]*not[[:space:]]*formatted ]]; then
+      if [[ -n $changes && -n $current_file ]]; then
+        debug "Creating diagnostic for $current_file on error"
+        local escaped_changes
+        escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
+        local new_diagnostic
+        new_diagnostic=$(jq -n \
           --arg file "$current_file" \
-          --arg message "Formatting issues found. Run \`deno fmt\` to fix:" \
+          --arg message "Formatting issues found:" \
           --arg changes "$escaped_changes" \
           --arg line "$line_number" \
           '{
@@ -165,7 +104,7 @@ process_fmt_diff() {
               path: $file,
               range: {
                 start: {line: ($line|tonumber), column: 1},
-                end: {line: ($line|tonumber), column: 1}
+                end: {line: ($line|tonumber), column: 80}
               }
             },
             severity: "WARNING",
@@ -174,62 +113,11 @@ process_fmt_diff() {
               url: "https://deno.land/manual/tools/formatter"
             }
           }')
-        debug "Adding diagnostic for $current_file"
         diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
-        has_diagnostics=true
-        ((processed_files++))
-        
-        # Reset for next file
-        changes=""
-        line_number=0
-      fi
-      
-      # If we have changes, log the current state
-      if [[ -n "$changes" ]]; then
-        debug "Current file: $current_file"
-        debug "Current line number: $line_number"
-        debug "Current changes accumulated:"
-        echo "$changes" >&2
       fi
     fi
   done < "$TEMP_FILE"
   
-  # Process the last file
-  if [[ $in_diff == true && -n $current_file && -n $changes ]]; then
-    debug "Processing final file: $current_file"
-    
-    local escaped_changes
-    escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
-    local new_diagnostic
-    new_diagnostic=$(jq -n \
-      --arg file "$current_file" \
-      --arg message "Formatting issues found. Run \`deno fmt\` to fix:" \
-      --arg changes "$escaped_changes" \
-      --arg line "$line_number" \
-      '{
-        message: ($message + "\n" + $changes),
-        location: {
-          path: $file,
-          range: {
-            start: {line: ($line|tonumber), column: 1},
-            end: {line: ($line|tonumber), column: 1}
-          }
-        },
-        severity: "WARNING",
-        code: {
-          value: "fmt",
-          url: "https://deno.land/manual/tools/formatter"
-        }
-      }')
-    
-    debug "Adding diagnostic for final file: $current_file"
-    diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
-    has_diagnostics=true
-    ((processed_files++))
-    debug "Final diagnostics array: $(echo "$diagnostics" | jq -c '.')"
-  fi
-  
-  debug "Processed $processed_files files"
   echo "$diagnostics"
 }
 
@@ -275,52 +163,18 @@ if [ "$MODE" = "lint" ]; then
     }]'; \
    echo "}")
 
-
 elif [ "$MODE" = "fmt" ]; then
   # Transform fmt output to rdjson
-  # Capture process_fmt_diff output separately to avoid mixing with debug messages
-  debug "Running process_fmt_diff..."
-  debug "Input content for process_fmt_diff:"
-  cat "$TEMP_FILE" >&2
+  (
+    echo "{\"source\":{\"name\":\"denofmt\",\"url\":\"https://deno.land/manual/tools/formatter\"},\"diagnostics\":"
+    process_fmt_diff
+    echo "}"
+  ) | jq '.' > "${TEMP_FILE}.json"
   
-  diagnostics=$(process_fmt_diff)
-  debug "Raw diagnostics output:"
-  echo "$diagnostics" >&2
-  
-  # Validate diagnostics JSON array
-  if ! echo "$diagnostics" | jq -e 'if type == "array" then true else false end' >/dev/null 2>&1; then
-    debug "Invalid diagnostics array, defaulting to empty array"
-    debug "Invalid diagnostics content:"
-    echo "$diagnostics" >&2
-    diagnostics="[]"
-  fi
-  
-  # Create the complete JSON structure
-  debug "Creating JSON structure..."
-  json_output=$(jq -n \
-    --arg name "denofmt" \
-    --arg url "https://deno.land/manual/tools/formatter" \
-    --argjson diags "$diagnostics" \
-    '{
-      source: {name: $name, url: $url},
-      diagnostics: ($diags | if type == "array" then . else [] end)
-    }')
-  
-  debug "Initial JSON structure:"
-  echo "$json_output" | jq '.' >&2
-  
-  # Validate and format the JSON structure
-  debug "Validating final JSON output..."
-  if echo "$json_output" | jq -e 'type == "object" and (.source | type == "object") and (.diagnostics | type == "array")' >/dev/null 2>&1; then
-    debug "JSON validation successful"
-    formatted_output=$(echo "$json_output" | jq -c '.')
-    debug "Formatted output:"
-    echo "$formatted_output" >&2
-    echo "$formatted_output"
+  # Validate JSON and output
+  if jq empty "${TEMP_FILE}.json" 2>/dev/null; then
+    cat "${TEMP_FILE}.json"
   else
-    debug "Invalid JSON structure, falling back to empty result"
-    debug "Failed JSON:"
-    echo "$json_output" >&2
     create_empty_rdjson "denofmt" "https://deno.land/manual/tools/formatter"
   fi
 else
