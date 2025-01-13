@@ -118,8 +118,8 @@ import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $stamp_trade from "./routes/stamp/trade.tsx";
 import * as $stamping_src101_action_ from "./routes/stamping/src101/[action].tsx";
 import * as $stamping_src20 from "./routes/stamping/src20.tsx";
-import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
 import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
+import * as $stamping_stamp_action_ from "./routes/stamping/stamp/[action].tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
 import * as $test_design_system from "./routes/test/design-system.tsx";
 import * as $test_test_image from "./routes/test/test-image.ts";
@@ -231,6 +231,8 @@ import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
 import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
+import * as $stamping_stamp_transfer_LatestStampTransfer from "./islands/stamping/stamp/transfer/LatestStampTransfer.tsx";
+import * as $stamping_stamp_transfer_TransferStampContent from "./islands/stamping/stamp/transfer/TransferStampContent.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -380,8 +382,8 @@ const manifest = {
     "./routes/stamp/trade.tsx": $stamp_trade,
     "./routes/stamping/src101/[action].tsx": $stamping_src101_action_,
     "./routes/stamping/src20.tsx": $stamping_src20,
-    "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
     "./routes/stamping/stamp.tsx": $stamping_stamp,
+    "./routes/stamping/stamp/[action].tsx": $stamping_stamp_action_,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
     "./routes/test/design-system.tsx": $test_design_system,
     "./routes/test/test-image.ts": $test_test_image,
@@ -526,6 +528,10 @@ const manifest = {
     "./islands/stamping/src20/transfer/TransferContent.tsx":
       $stamping_src20_transfer_TransferContent,
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
+    "./islands/stamping/stamp/transfer/LatestStampTransfer.tsx":
+      $stamping_stamp_transfer_LatestStampTransfer,
+    "./islands/stamping/stamp/transfer/TransferStampContent.tsx":
+      $stamping_stamp_transfer_TransferStampContent,
     "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
