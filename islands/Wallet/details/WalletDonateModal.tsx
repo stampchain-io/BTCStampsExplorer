@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import type { StampRow } from "$globals";
 import StampImage from "$islands/stamp/details/StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
@@ -28,6 +28,9 @@ const WalletDonateModal = ({
   const [quantity, setQuantity] = useState(1);
   const [maxQuantity, setMaxQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isAmountTooltipVisible, setIsAmountTooltipVisible] = useState(false);
+  const amountTooltipTimeoutRef = useRef<number | null>(null);
 
   const {
     formState,
@@ -42,7 +45,6 @@ const WalletDonateModal = ({
     initialFee,
   });
 
-  // Sync external fee state with internal state
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
@@ -56,6 +58,45 @@ const WalletDonateModal = ({
       setTotalPrice(quantity * dispenser.satoshirate);
     }
   }, [dispenser, quantity]);
+
+  useEffect(() => {
+    return () => {
+      if (amountTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(amountTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    setTooltipPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleAmountMouseEnter = () => {
+    if (amountTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(amountTooltipTimeoutRef.current);
+    }
+
+    amountTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsAmountTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleAmountMouseLeave = () => {
+    if (amountTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(amountTooltipTimeoutRef.current);
+    }
+    setIsAmountTooltipVisible(false);
+  };
+
+  const handleMouseDown = () => {
+    if (amountTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(amountTooltipTimeoutRef.current);
+    }
+    setIsAmountTooltipVisible(false);
+  };
 
   const handleBuyClick = async () => {
     await handleSubmit(async () => {
@@ -96,7 +137,7 @@ const WalletDonateModal = ({
         wallet,
         responseData.psbt,
         responseData.inputsToSign,
-        true, // Enable RBF
+        true,
       );
 
       if (signResult.signed && signResult.txid) {
@@ -134,6 +175,9 @@ const WalletDonateModal = ({
       setTotalPrice(price);
     }
   }, [quantity, dispenser]);
+
+  const tooltipImage =
+    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
 
   return (
     <ModalLayout
@@ -174,17 +218,38 @@ const WalletDonateModal = ({
           </div>
 
           <div className="mt-6">
-            <input
-              type="range"
-              min="1"
-              max={maxQuantity}
-              value={quantity}
-              onInput={(e) => {
-                const target = e.target as HTMLInputElement;
-                setQuantity(parseInt(target.value));
-              }}
-              className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-            />
+            <div
+              className="relative w-full group"
+              onMouseMove={handleMouseMove}
+              onMouseEnter={handleAmountMouseEnter}
+              onMouseLeave={handleAmountMouseLeave}
+              onMouseDown={handleMouseDown}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <input
+                type="range"
+                min="1"
+                max={maxQuantity}
+                value={quantity}
+                onInput={(e) => {
+                  const target = e.target as HTMLInputElement;
+                  setQuantity(parseInt(target.value));
+                }}
+                className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+              />
+              <div
+                className={`${tooltipImage} ${
+                  isAmountTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  left: `${tooltipPosition.x}px`,
+                  top: `${tooltipPosition.y - 6}px`,
+                  transform: "translate(-50%, -100%)",
+                }}
+              >
+                SELECT AMOUNT
+              </div>
+            </div>
           </div>
         </div>
       </div>
