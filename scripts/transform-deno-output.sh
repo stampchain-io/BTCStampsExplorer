@@ -37,21 +37,23 @@ process_fmt_diff() {
       # Process previous file if we have changes
       if [[ -n $changes && -n $current_file ]]; then
         debug "Creating diagnostic for $current_file"
+        debug "Changes: $changes"
+        
+        # Create diagnostic entry
         local escaped_changes
-        escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
+        escaped_changes=$(printf '%s' "$changes" | jq -R -s .)
         local new_diagnostic
         new_diagnostic=$(jq -n \
           --arg file "$current_file" \
-          --arg message "Formatting issues found:" \
           --arg changes "$escaped_changes" \
           --arg line "$line_number" \
           '{
-            message: ($message + "\n" + $changes),
+            message: "Formatting issues found. Run `deno fmt` to fix:\n" + $changes,
             location: {
               path: $file,
               range: {
                 start: {line: ($line|tonumber), column: 1},
-                end: {line: ($line|tonumber), column: 80}
+                end: {line: ($line|tonumber), column: 1}
               }
             },
             severity: "WARNING",
@@ -60,6 +62,8 @@ process_fmt_diff() {
               url: "https://deno.land/manual/tools/formatter"
             }
           }')
+        
+        debug "New diagnostic: $new_diagnostic"
         diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
       fi
       
@@ -85,38 +89,39 @@ process_fmt_diff() {
         debug "Added line: $line"
       fi
     fi
-    
-    # Handle error message - create diagnostic for current file
-    if [[ $line =~ ^error:[[:space:]]*Found[[:space:]]*[0-9]+[[:space:]]*not[[:space:]]*formatted ]]; then
-      if [[ -n $changes && -n $current_file ]]; then
-        debug "Creating diagnostic for $current_file on error"
-        local escaped_changes
-        escaped_changes=$(printf '%s' "$changes" | sed 's/"/\\"/g')
-        local new_diagnostic
-        new_diagnostic=$(jq -n \
-          --arg file "$current_file" \
-          --arg message "Formatting issues found:" \
-          --arg changes "$escaped_changes" \
-          --arg line "$line_number" \
-          '{
-            message: ($message + "\n" + $changes),
-            location: {
-              path: $file,
-              range: {
-                start: {line: ($line|tonumber), column: 1},
-                end: {line: ($line|tonumber), column: 80}
-              }
-            },
-            severity: "WARNING",
-            code: {
-              value: "fmt",
-              url: "https://deno.land/manual/tools/formatter"
-            }
-          }')
-        diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
-      fi
-    fi
   done < "$TEMP_FILE"
+  
+  # Process the last file
+  if [[ -n $changes && -n $current_file ]]; then
+    debug "Creating diagnostic for final file: $current_file"
+    debug "Final changes: $changes"
+    
+    local escaped_changes
+    escaped_changes=$(printf '%s' "$changes" | jq -R -s .)
+    local new_diagnostic
+    new_diagnostic=$(jq -n \
+      --arg file "$current_file" \
+      --arg changes "$escaped_changes" \
+      --arg line "$line_number" \
+      '{
+        message: "Formatting issues found. Run `deno fmt` to fix:\n" + $changes,
+        location: {
+          path: $file,
+          range: {
+            start: {line: ($line|tonumber), column: 1},
+            end: {line: ($line|tonumber), column: 1}
+          }
+        },
+        severity: "WARNING",
+        code: {
+          value: "fmt",
+          url: "https://deno.land/manual/tools/formatter"
+        }
+      }')
+    
+    debug "New diagnostic: $new_diagnostic"
+    diagnostics=$(echo "$diagnostics" | jq --argjson diag "$new_diagnostic" '. + [$diag]')
+  fi
   
   echo "$diagnostics"
 }
@@ -165,22 +170,31 @@ if [ "$MODE" = "lint" ]; then
 
 elif [ "$MODE" = "fmt" ]; then
   # Transform fmt output to rdjson
-  (
-    echo "{\"source\":{\"name\":\"denofmt\",\"url\":\"https://deno.land/manual/tools/formatter\"},\"diagnostics\":"
-    process_fmt_diff
-    echo "}"
-  ) | jq '.' > "${TEMP_FILE}.json"
+  debug "Running process_fmt_diff..."
+  debug "Input content:"
+  cat "$TEMP_FILE" >&2
   
-  # Validate JSON and output
-  if jq empty "${TEMP_FILE}.json" 2>/dev/null; then
-    cat "${TEMP_FILE}.json"
-  else
-    create_empty_rdjson "denofmt" "https://deno.land/manual/tools/formatter"
-  fi
+  diagnostics=$(process_fmt_diff)
+  debug "Raw diagnostics output:"
+  echo "$diagnostics" >&2
+  
+  # Create the complete JSON structure
+  json_output=$(jq -n \
+    --arg name "denofmt" \
+    --arg url "https://deno.land/manual/tools/formatter" \
+    --argjson diags "$diagnostics" \
+    '{
+      source: {name: $name, url: $url},
+      diagnostics: $diags
+    }')
+  
+  debug "Final JSON output:"
+  echo "$json_output" | jq '.' >&2
+  echo "$json_output"
 else
   echo "Usage: $0 <lint|fmt>" >&2
   rm "$TEMP_FILE" 2>/dev/null
   exit 1
 fi
 
-rm "$TEMP_FILE" "${TEMP_FILE}.json" 2>/dev/null
+rm "$TEMP_FILE" 2>/dev/null
