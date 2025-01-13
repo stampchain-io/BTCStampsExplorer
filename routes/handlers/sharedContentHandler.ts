@@ -81,7 +81,7 @@ export async function handleContentRequest(
       // Preserve existing headers but ensure version headers are present
       const headers = {
         ...Object.fromEntries(response.headers),
-        "Content-Type": "text/html",
+        "Content-Type": "text/html; charset=utf-8",
         "Cache-Control": "public, max-age=2592000, immutable",
         "CDN-Cache-Control": "public, max-age=2592000, immutable",
         "Surrogate-Control": "public, max-age=2592000, immutable",
