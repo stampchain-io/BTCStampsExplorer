@@ -139,7 +139,15 @@ export default function App({ Component, state }: PageProps<unknown>) {
       </Head>
 
       <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden overflow-hidden">
-        <div class="bgGradientTop contain-layout" />
+        {state?.route !== "/"
+          ? <div class="bgGradientTop contain-layout" />
+          : (
+            <>
+              <div class="bgGradientTop contain-layout desktop:hidden block" />
+              <div class="bgGradientTopLeft desktop:block hidden" />
+              <div class="bgGradientTopRight desktop:block hidden" />
+            </>
+          )}
         <div class="bgGradientBottom contain-layout" />
 
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
