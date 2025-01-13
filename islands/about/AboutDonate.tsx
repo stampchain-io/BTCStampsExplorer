@@ -3,6 +3,7 @@ import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { StampRow } from "$globals";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import WalletDonateModal from "$islands/Wallet/details/WalletDonateModal.tsx";
+import { DONATE_STAMP } from "$constants";
 
 const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
 
@@ -26,10 +27,10 @@ interface DonateStampData {
 }
 
 const DONATE_STAMP: DonateStampData = {
-  stamp: "730380",
-  stamp_mimetype: "text/html",
-  stamp_url: "f3253cad40e047ad21d0e5905f9c4981a73150b1c9dc1c61352789c86d0409e8",
-  tx_hash: "f3253cad40e047ad21d0e5905f9c4981a73150b1c9dc1c61352789c86d0409e8",
+  stamp: "857772",
+  stamp_mimetype: "png",
+  stamp_url: "671692d78f357662cac27ae91d74ab14ba9e0dbe6643e28b80ea6d69425b9da1",
+  tx_hash: "671692d78f357662cac27ae91d74ab14ba9e0dbe6643e28b80ea6d69425b9da1",
 };
 
 export default function AboutDonate() {
@@ -42,6 +43,7 @@ export default function AboutDonate() {
   const receiveTooltipTimeoutRef = useRef<number | null>(null);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<string>("");
+  const [dispenser, setDispenser] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -238,6 +240,8 @@ export default function AboutDonate() {
   };
 
   const handleOpen = () => {
+    console.log("Opening donate modal with stamp:", DONATE_STAMP);
+    console.log("Current dispenser state:", dispenser);
     setIsOpen(!isOpen);
   };
 
@@ -259,6 +263,35 @@ export default function AboutDonate() {
     "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
   const tooltipIcon =
     "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
+
+  useEffect(() => {
+    const fetchDispenser = async () => {
+      try {
+        console.log("Fetching dispenser for stamp:", DONATE_STAMP.stamp);
+        const response = await fetch(
+          `/api/v2/stamps/${DONATE_STAMP.stamp}/dispensers?limit=1`,
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Fetched dispenser data:", data);
+
+        // Get first open dispenser
+        const openDispenser = data.data.find((d: any) => d.status === "open");
+        console.log("Selected open dispenser:", openDispenser);
+
+        setDispenser(openDispenser);
+      } catch (error) {
+        console.error("Error fetching dispenser:", error);
+        setDispenser(null);
+      }
+    };
+
+    fetchDispenser();
+  }, []);
 
   return (
     <>
@@ -419,11 +452,12 @@ export default function AboutDonate() {
 
         {isOpen && (
           <WalletDonateModal
+            stamp={DONATE_STAMP as unknown as StampRow}
             fee={fee}
             handleChangeFee={handleChangeFee}
             toggleModal={handleOpen}
             handleCloseModal={handleCloseModal}
-            donateAddress={DONATE_ADDRESS}
+            dispenser={dispenser}
           />
         )}
 
