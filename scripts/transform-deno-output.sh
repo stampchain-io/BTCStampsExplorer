@@ -59,17 +59,20 @@ process_fmt_diff() {
   while IFS= read -r line || [ -n "$line" ]; do
     debug "Processing line: $line"
     
-    # Skip warning lines and empty lines
-    if [[ $line =~ ^Warning || -z $line ]]; then
-      debug "Skipping warning/empty line"
+    # Skip warning lines, empty lines, and "Checked X file" messages
+    if [[ $line =~ ^Warning || -z $line || $line =~ ^Checked[[:space:]]+[0-9]+[[:space:]]+file ]]; then
+      debug "Skipping line: $line"
       continue
     fi
     
     # Skip error summary only if it's not a formatting error
     if [[ $line =~ ^error: && ! $line =~ ^error:[[:space:]]*Found[[:space:]]*[0-9]+[[:space:]]*not[[:space:]]*formatted ]]; then
-      debug "Skipping non-formatting error line"
+      debug "Skipping non-formatting error line: $line"
       continue
     fi
+    
+    # If we get here, log the line for debugging
+    debug "Processing significant line: $line"
     
     # Detect start of a new file diff
     if [[ $line =~ ^from[[:space:]]*(.+): ]]; then
@@ -94,7 +97,7 @@ process_fmt_diff() {
           --arg changes "$escaped_changes" \
           --arg line "$line_number" \
           '{
-            message: ($message + "\n" + $changes),
+            message: ($message + "\n" + $escaped_changes),
             location: {
               path: $file,
               range: {
@@ -170,7 +173,7 @@ process_fmt_diff() {
       --arg changes "$escaped_changes" \
       --arg line "$line_number" \
       '{
-        message: ($message + "\n" + $changes),
+        message: ($message + "\n" + $escaped_changes),
         location: {
           path: $file,
           range: {
@@ -242,23 +245,47 @@ if [ "$MODE" = "lint" ]; then
 elif [ "$MODE" = "fmt" ]; then
   # Transform fmt output to rdjson
   # Capture process_fmt_diff output separately to avoid mixing with debug messages
+  debug "Running process_fmt_diff..."
+  debug "Input content for process_fmt_diff:"
+  cat "$TEMP_FILE" >&2
+  
   diagnostics=$(process_fmt_diff)
+  debug "Raw diagnostics output:"
+  echo "$diagnostics" >&2
+  
+  # Validate diagnostics JSON array
+  if ! echo "$diagnostics" | jq -e 'if type == "array" then true else false end' >/dev/null 2>&1; then
+    debug "Invalid diagnostics array, defaulting to empty array"
+    debug "Invalid diagnostics content:"
+    echo "$diagnostics" >&2
+    diagnostics="[]"
+  fi
   
   # Create the complete JSON structure
+  debug "Creating JSON structure..."
   json_output=$(jq -n \
     --arg name "denofmt" \
     --arg url "https://deno.land/manual/tools/formatter" \
     --argjson diags "$diagnostics" \
     '{
       source: {name: $name, url: $url},
-      diagnostics: $diags
+      diagnostics: ($diags | if type == "array" then . else [] end)
     }')
   
-  # Validate the JSON structure
-  if echo "$json_output" | jq empty 2>/dev/null; then
-    echo "$json_output"
+  debug "Initial JSON structure:"
+  echo "$json_output" | jq '.' >&2
+  
+  # Validate and format the JSON structure
+  debug "Validating final JSON output..."
+  if echo "$json_output" | jq -e 'type == "object" and (.source | type == "object") and (.diagnostics | type == "array")' >/dev/null 2>&1; then
+    debug "JSON validation successful"
+    formatted_output=$(echo "$json_output" | jq -c '.')
+    debug "Formatted output:"
+    echo "$formatted_output" >&2
+    echo "$formatted_output"
   else
-    debug "Invalid JSON output:"
+    debug "Invalid JSON structure, falling back to empty result"
+    debug "Failed JSON:"
     echo "$json_output" >&2
     create_empty_rdjson "denofmt" "https://deno.land/manual/tools/formatter"
   fi
