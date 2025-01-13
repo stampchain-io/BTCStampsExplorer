@@ -28,42 +28,38 @@ export class BTCPriceService {
   private static readonly DEFAULT_SOURCE: PriceSource = "quicknode";
   private static readonly FALLBACK_MAP: Record<PriceSource, PriceSource> = {
     quicknode: "coingecko",
-    coingecko: "quicknode",
+    coingecko: "coingecko", // temporarily disable fallback to quicknode
   };
 
   static async getPrice(
     source: PriceSource = this.DEFAULT_SOURCE,
     attempted: PriceSource[] = []
   ): Promise<PriceResult> {
+    // Force source to be coingecko regardless of what's passed in
+    source = "coingecko";
+    
     const CACHE_KEY = `btc_price_${source}`;
 
     try {
       const price = await dbManager.handleCache<QuickNodePrice | CoinGeckoPrice>(
         CACHE_KEY,
         async () => {
-          switch (source) {
-            case "coingecko":
-              return await this.getCoingeckoPrice();
-            case "quicknode":
-            default:
-              return await this.getQuicknodePrice();
-          }
+          return await this.getCoingeckoPrice();
         },
         this.CACHE_DURATION,
       );
 
-      return { price, source };
+      return { price, source: "coingecko" };
     } catch (error) {
       console.error(`Error fetching BTC price from ${source}:`, error);
       
-      // Try fallback if we haven't tried this source yet
-      const fallbackSource = this.FALLBACK_MAP[source];
-      if (!attempted.includes(fallbackSource)) {
-        console.log(`${source} price fetch failed, attempting ${fallbackSource}`);
-        return this.getPrice(fallbackSource, [...attempted, source]);
+      // Simplify fallback logic to only retry coingecko once
+      if (!attempted.length) {
+        console.log('Retrying coingecko');
+        return this.getPrice("coingecko", ["coingecko"]);
       }
 
-      return { error: "All price sources failed" };
+      return { error: "CoinGecko price fetch failed" };
     }
   }
 
