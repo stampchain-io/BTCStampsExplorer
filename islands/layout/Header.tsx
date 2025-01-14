@@ -201,8 +201,8 @@ export function Header() {
               <div
                 className={`${
                   isMobile
-                    ? "hidden group-hover:flex flex-col z-90 w-full gap-1.5"
-                    : "hidden group-hover:flex flex-col absolute top-[100%] left-1/2 -translate-x-1/2 min-w-[calc(100%+24px)] min-[1180px]:min-w-[calc(100%+36px)] z-90 pt-[3px] pb-[15px] px-3 min-[1180px]:px-[18px] space-y-[3px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
+                    ? "hidden group-hover:flex flex-col z-10 w-full gap-1.5"
+                    : "hidden group-hover:flex flex-col absolute top-[100%] left-1/2 -translate-x-1/2 min-w-[calc(100%+24px)] min-[1180px]:min-w-[calc(100%+36px)] z-10 pt-[3px] pb-[15px] px-3 min-[1180px]:px-[18px] space-y-[3px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
                 }`}
               >
                 {link.subLinks?.map((subLink) => (
