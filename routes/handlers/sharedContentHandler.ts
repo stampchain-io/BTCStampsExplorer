@@ -8,7 +8,6 @@ import {
 } from "$lib/utils/identifierUtils.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { FreshContext } from "$fresh/server.ts";
-import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 
 export async function handleContentRequest(
@@ -57,39 +56,30 @@ export async function handleContentRequest(
     );
 
     if (
-      response.headers.get("content-type")?.toLowerCase().includes("text/html")
+      response.headers.get("content-type")?.toLowerCase().includes("html")
     ) {
       const html = await response.text();
 
-      // Clean up the HTML before sending to client
-      const cleanedHtml = html
-        // Remove Rocket Loader's type modification but preserve the src
-        .replace(
-          /<script src="(\/s\/[A-Z0-9]+)"([^>]*)>/g,
-          '<script src="$1"$2>',
-        )
-        // Clean up inline scripts (these we know are JavaScript)
-        .replace(
-          /<script type="[a-f0-9]+-text\/javascript">/g,
-          "<script>",
-        )
-        // Remove Rocket Loader's script if present
-        .replace(
-          /<script src="\/cdn-cgi\/scripts\/.*?rocket-loader\.min\.js".*?><\/script>/g,
-          "",
-        );
-      // Preserve existing headers but ensure version headers are present
+      // Serve as "text/plain" to avoid Rocket Loader completely
       const headers = {
         ...Object.fromEntries(response.headers),
-        "Content-Type": "text/html; charset=utf-8",
+        "Content-Type": "text/plain",
+        "X-Original-Content-Type": "text/html",
         "Cache-Control": "public, max-age=2592000, immutable",
         "CDN-Cache-Control": "public, max-age=2592000, immutable",
         "Surrogate-Control": "public, max-age=2592000, immutable",
-        "X-Content-Transformed": "true",
-        "X-API-Version": API_RESPONSE_VERSION,
       };
 
-      return new Response(cleanedHtml, {
+      // Add script to correct content type client-side
+      const finalHtml = `
+        <script>
+          document.contentType = 'text/html; charset=utf-8';
+          document.querySelector('html').innerHTML = document.querySelector('body').textContent;
+        </script>
+        ${html}
+      `;
+
+      return new Response(finalHtml, {
         headers: normalizeHeaders(headers),
       });
     }
