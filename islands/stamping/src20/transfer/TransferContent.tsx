@@ -5,7 +5,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { SRC20InputField } from "../SRC20InputField.tsx";
+import { SRC20InputField } from "$islands/stamping/src20/SRC20InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
