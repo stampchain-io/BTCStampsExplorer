@@ -118,6 +118,7 @@ import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $stamp_trade from "./routes/stamp/trade.tsx";
 import * as $stamping_src101_action_ from "./routes/stamping/src101/[action].tsx";
 import * as $stamping_src20 from "./routes/stamping/src20.tsx";
+import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
 import * as $stamping_stamp from "./routes/stamping/stamp.tsx";
 import * as $stamping_stamp_action_ from "./routes/stamping/stamp/[action].tsx";
 import * as $termsofservice_index from "./routes/termsofservice/index.tsx";
@@ -382,6 +383,7 @@ const manifest = {
     "./routes/stamp/trade.tsx": $stamp_trade,
     "./routes/stamping/src101/[action].tsx": $stamping_src101_action_,
     "./routes/stamping/src20.tsx": $stamping_src20,
+    "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
     "./routes/stamping/stamp.tsx": $stamping_stamp,
     "./routes/stamping/stamp/[action].tsx": $stamping_stamp_action_,
     "./routes/termsofservice/index.tsx": $termsofservice_index,
