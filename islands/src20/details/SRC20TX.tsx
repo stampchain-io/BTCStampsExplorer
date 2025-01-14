@@ -41,6 +41,10 @@ export function SRC20TX(props: SRC20TXProps) {
     }
   };
 
+  const copyText = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+  };
+
   useEffect(() => {
     // Reset data when txs prop changes
     setData(txs || []);
@@ -133,7 +137,14 @@ export function SRC20TX(props: SRC20TXProps) {
             <td class="px-6 py-3">{tx.block_index}</td>
             <td class="px-6 py-3">{abbreviateAddress(tx.destination)}</td>
             <td class="px-6 py-3">{formattedAmt}</td>
-            <td class="px-6 py-3 hidden mobileLg:table-cell">***</td>
+            <td class="px-6 py-3 hidden mobileLg:table-cell">
+              <p
+                class="truncate cursor-pointer"
+                onClick={() => copyText(tx.tx_hash)}
+              >
+                {tx.tx_hash}
+              </p>
+            </td>
             <td class="px-6 py-3 hidden mobileLg:table-cell">***</td>
           </tr>
         );
