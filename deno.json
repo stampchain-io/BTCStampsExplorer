@@ -137,7 +137,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "fmt": {
-    "include": ["**/*.ts", "**/*.tsx"],
+    "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
     "exclude": [
       "**/_fresh/**/*",
       "**/server/**/*",
