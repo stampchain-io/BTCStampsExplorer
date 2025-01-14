@@ -8,8 +8,8 @@ import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { NavigatorProvider } from "$islands/Navigator/NavigatorProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
 import FontLoader from "$islands/home/FontLoader.tsx";
-// import { LoadingProvider } from "$islands/loading/LoadingProvider.tsx";
-// import LoadingContent from "$islands/loading/LoadingContent.tsx";
+import { LoadingProvider } from "$islands/loading/LoadingProvider.tsx";
+import LoadingContent from "$islands/loading/LoadingContent.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {
   if (state?.skipAppLayout) {
@@ -155,8 +155,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           <ToastProvider>
             <NavigatorProvider>
-              {
-                /* <LoadingProvider>
+              <LoadingProvider>
                 <LoadingContent />
                 <div class="flex flex-col min-h-screen">
                   <Header />
@@ -170,8 +169,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
                   </main>
                   <Footer />
                 </div>
-              </LoadingProvider> */
-              }
+              </LoadingProvider>
             </NavigatorProvider>
           </ToastProvider>
         </div>
