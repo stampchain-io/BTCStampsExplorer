@@ -1,429 +1,445 @@
-import axiod from "axiod";
-import { useEffect, useRef, useState } from "preact/hooks";
-
-import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
+import { useEffect, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
-import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { SRC20InputField } from "$islands/stamping/src20/SRC20InputField.tsx";
-
+import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
+import { SelectField } from "$islands/stamping/SelectField.tsx";
+import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { logger } from "$lib/utils/logger.ts";
+import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import type { StampRow } from "$globals";
 
-interface MintProgressProps {
-  progress: string;
-  progressWidth: string;
-  maxSupply: string;
-  limit: string;
-  minters: string;
-}
-const MintProgress = (
-  { progress, progressWidth, maxSupply, limit, minters }: MintProgressProps,
-) => {
-  return (
-    <div class="flex justify-between text-stamp-grey items-end">
-      <div class="w-1/2 flex flex-col gap-[6px]">
-        <p class="text-xl mobileLg:text-2xl font-light text-stamp-grey-light">
-          <span class="text-stamp-grey-darker">PROGRESS</span>{" "}
-          <span class="font-bold">
-            {progress.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0]}
-          </span>
-          %
-        </p>
-        <div class="relative w-full max-w-[420px] h-1 mobileLg:h-1.5 bg-stamp-grey rounded-full">
-          <div
-            class="absolute left-0 top-0 h-1 mobileLg:h-1.5 bg-stamp-purple-dark rounded-full"
-            style={{ width: progressWidth }}
-          />
-        </div>
-      </div>
-      <div class="w-1/2 text-sm mobileLg:text-base font-light text-stamp-grey-darker text-right">
-        <p>
-          SUPPLY{" "}
-          <span class="text-stamp-grey-light font-bold">{maxSupply}</span>
-        </p>
-        <p>
-          LIMIT <span class="text-stamp-grey-light font-bold">{limit}</span>
-        </p>
-        <p class="-mb-[5px] mobileLg:-mb-[7px]">
-          MINTERS <span class="text-stamp-grey-light font-bold">{minters}</span>
-        </p>
-      </div>
-    </div>
-  );
-};
-
-interface MintContentProps {
-  trxType?: "olga" | "multisig";
-  tick?: string | null;
-  mintStatus?: any;
-  holders?: number;
+interface Props {
+  trxType: string;
 }
 
-// Add interface for search results
-interface SearchResult {
-  tick: string;
-  progress: number;
-  total_minted: string;
-  max_supply: number;
-}
-
-const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenter =
-  "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-const inputFieldContainer =
-  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-
-export function TransferStampContent({
-  trxType = "olga",
-  tick,
-  mintStatus: initialMintStatus,
-  holders: initialHolders,
-}: TransferStampContentProps = { trxType: "olga" }) {
-  const {
-    formState,
-    handleChangeFee,
-    handleInputChange,
-    handleSubmit,
-    fetchFees,
-    config,
-    isSubmitting,
-    submissionMessage,
-    walletError,
-    apiError,
-    setFormState,
-    handleInputBlur,
-  } = useSRC20Form("mint", trxType, tick ?? undefined);
-
-  const [mintStatus, setMintStatus] = useState<any>(initialMintStatus || null);
-  const [holders, setHolders] = useState<number>(initialHolders || 0);
-  const [error, setError] = useState<string | null>(null);
-  const [tosAgreed, setTosAgreed] = useState(false);
-
-  const { isConnected, wallet } = walletContext;
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [openDrop, setOpenDrop] = useState<boolean>(false);
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [selectedTokenImage, setSelectedTokenImage] = useState<string | null>(
-    null,
-  );
-  const [isImageLoading, setIsImageLoading] = useState(false);
-
-  // Add a ref to track if we're switching fields
-  const [isSwitchingFields, setIsSwitchingFields] = useState(false);
-
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const resetTokenData = () => {
-    setMintStatus(null);
-    setHolders(0);
-    setSelectedTokenImage(null);
-    setFormState((prevState) => ({
-      ...prevState,
-      amt: "",
-    }));
-  };
-
-  // Update the useEffect that handles URL params
-  useEffect(() => {
-    if (tick) {
-      setOpenDrop(false);
-      setSearchTerm(tick);
-      handleResultClick(tick).then(() => {
-        setOpenDrop(false);
-        setSearchResults([]);
-      });
-    }
-  }, [tick]);
-
-  // Update the search useEffect to respect switching fields state
-  useEffect(() => {
-    if (isSelecting || tick || isSwitchingFields) {
-      return;
-    }
-
-    // Don't show results if field is empty and not focused
-    if (!searchTerm.trim()) {
-      setSearchResults([]);
-      setOpenDrop(false);
-      return;
-    }
-
-    const delayDebounceFn = setTimeout(async () => {
-      try {
-        const response = await fetch(
-          `/api/v2/src20/search?q=${encodeURIComponent(searchTerm.trim())}`,
-        );
-        const data = await response.json();
-
-        if (data.data && Array.isArray(data.data)) {
-          setSearchResults(data.data);
-          setOpenDrop(!isSelecting && !isSwitchingFields);
-        }
-      } catch (error) {
-        logger.error("stamps", {
-          message: "Search error",
-          error,
-          searchTerm,
-        });
-        setSearchResults([]);
-        setOpenDrop(false);
-      }
-    }, 300);
-
-    return () => {
-      clearTimeout(delayDebounceFn);
-      setIsSearching(false);
+export function TransferStampContent({ trxType }: Props) {
+  const { wallet } = walletContext;
+  const [maxQuantity, setMaxQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
+  const [imgSrc, setImgSrc] = useState("");
+  const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
+  const [stamps, setStamps] = useState<{
+    data: StampRow[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
     };
-  }, [searchTerm, isSelecting, tick, isSwitchingFields]);
-
-  // Update handleResultClick to handle field switching
-  const handleResultClick = async (tick: string) => {
-    setOpenDrop(false);
-    setIsSelecting(true);
-    setIsSwitchingFields(true); // Set switching state when selecting
-    setSearchResults([]);
-    setSearchTerm(tick.toUpperCase());
-
-    try {
-      setIsImageLoading(true);
-      setError(null);
-
-      const response = await axiod.get(`/api/v2/src20/tick/${tick}/mintData`);
-      const data = response.data;
-
-      if (!data || data.error || !data.mintStatus) {
-        setError("Token not deployed");
-        resetTokenData();
-      } else {
-        setMintStatus(data.mintStatus);
-        setHolders(data.holders || 0);
-        setSelectedTokenImage(`/content/${data.mintStatus.tx_hash}.svg`);
-
-        setFormState((prevState) => ({
-          ...prevState,
-          token: tick,
-          amt: data.mintStatus.limit?.toString() || prevState.amt,
-        }));
-      }
-    } catch (err) {
-      logger.error("stamps", {
-        message: "Error fetching token data",
-        error: err,
-        tick,
-      });
-      setError("Error fetching token data");
-      resetTokenData();
-    } finally {
-      setIsImageLoading(false);
-      // Keep isSelecting and isSwitchingFields true until next focus
-    }
-  };
-
-  // Adjusted useEffect hook to always fetch data when token changes
-  useEffect(() => {
-    if (!searchTerm) {
-      setError(null);
-      resetTokenData();
-    }
-  }, [searchTerm]);
-
-  // Calculate progress and other values
-  const progress = mintStatus ? mintStatus.progress : "0";
-  const progressWidth = `${progress}%`;
-  const maxSupply = mintStatus
-    ? Number(mintStatus.max_supply).toLocaleString()
-    : "0";
-  const limit = mintStatus ? Number(mintStatus.limit).toLocaleString() : "0";
-  const minters = holders ? holders.toString() : "0";
-
-  useEffect(() => {
-    logger.debug("stamps", {
-      message: "MintContent formState updated",
-      data: {
-        fee: formState.fee,
-        psbtFees: formState.psbtFees,
-        hasFeesData: !!formState.psbtFees,
-      },
-    });
-  }, [formState.fee, formState.psbtFees]);
-
-  if (!config) {
-    return <div>Error: Failed to load configuration</div>;
-  }
-
-  // Before rendering ComplexFeeCalculator
-  const feeDetailsForCalculator = {
-    minerFee: formState.psbtFees?.estMinerFee || 0,
-    dustValue: formState.psbtFees?.totalDustValue || 0,
-    hasExactFees: true,
-    totalValue: formState.psbtFees?.totalValue || 0,
-    estimatedSize: formState.psbtFees?.est_tx_size || 0,
-  };
-
-  logger.debug("stamps", {
-    message: "Fee details for calculator",
-    data: {
-      psbtFees: formState.psbtFees,
-      calculatorInput: feeDetailsForCalculator,
-      formState: {
-        fee: formState.fee,
-        BTCPrice: formState.BTCPrice,
-      },
+  }>({
+    data: [],
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
     },
   });
+  const [stampImageUrl, setStampImageUrl] = useState<string>("");
+
+  const {
+    formState,
+    setFormState,
+    handleChangeFee: internalHandleChangeFee,
+    handleSubmit,
+    isSubmitting,
+    error,
+    setError,
+    successMessage,
+    setSuccessMessage,
+  } = useTransactionForm({
+    type: "transfer",
+    initialFee: 1, // Set an appropriate default value
+  });
+
+  useEffect(() => {
+    const fetchStamps = async () => {
+      try {
+        if (!wallet?.address) {
+          console.log("[DEBUG] No wallet address available");
+          return;
+        }
+
+        const endpoint = `/api/v2/stamps/balance/${wallet.address}`;
+        console.log("[DEBUG] Fetching stamps from:", endpoint);
+
+        const response = await fetch(endpoint);
+        console.log("[DEBUG] Response status:", response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("[DEBUG] Response not OK:", {
+            status: response.status,
+            text: errorText,
+          });
+          throw new Error(`Failed to fetch stamps: ${errorText}`);
+        }
+
+        const data = await response.json();
+        console.log("[DEBUG] Stamps data received:", data);
+
+        setStamps({
+          data: data.data || [],
+          pagination: {
+            page: 1,
+            limit: 10,
+            total: data.total || 0,
+            totalPages: Math.ceil((data.total || 0) / 10),
+          },
+        });
+      } catch (error) {
+        console.error("[DEBUG] Error in fetchStamps:", {
+          error,
+          message: error.message,
+        });
+      }
+    };
+
+    if (wallet?.address) {
+      console.log(
+        "[DEBUG] Initiating stamps fetch for address:",
+        wallet.address,
+      );
+      fetchStamps();
+    }
+  }, [wallet?.address]);
+
+  // Auto-select first stamp when data loads
+  useEffect(() => {
+    if (stamps.data.length > 0 && !selectedStamp) {
+      const firstStamp = stamps.data[0];
+      console.log("[DEBUG] Auto-selecting first stamp:", firstStamp);
+
+      const stampData: StampRow = {
+        stamp: firstStamp.stamp,
+        stamp_mimetype: firstStamp.stamp_mimetype || "image/png",
+        stamp_url: firstStamp.stamp_url,
+        tx_hash: firstStamp.tx_hash,
+        cpid: firstStamp.cpid,
+        creator: firstStamp.creator || "",
+        creator_name: firstStamp.creator_name || null,
+        divisible: firstStamp.divisible || 0,
+        locked: firstStamp.locked || 1,
+        supply: firstStamp.supply || 0,
+        unbound_quantity: firstStamp.unbound_quantity || 0,
+      };
+
+      setSelectedStamp(stampData);
+      setFormState((prev) => ({
+        ...prev,
+        stampId: stampData.stamp,
+        cpid: stampData.cpid,
+      }));
+    }
+  }, [stamps.data]);
+
+  const handleTransferSubmit = async () => {
+    try {
+      await logger.debug("stamps", {
+        message: "Starting transfer submit",
+        selectedStamp,
+        formState,
+        quantity,
+        recipientAddress: formState.recipientAddress,
+      });
+
+      // Validate required fields
+      if (!formState.recipientAddress) {
+        setError("Recipient address is required");
+        return;
+      }
+
+      if (!quantity || quantity <= 0) {
+        setError("Invalid quantity");
+        return;
+      }
+
+      await handleSubmit(async () => {
+        if (!selectedStamp) {
+          throw new Error("Please select a stamp to transfer");
+        }
+
+        if (!wallet?.address) {
+          throw new Error("No wallet connected");
+        }
+
+        // Convert fee rate from sat/vB to sat/kB
+        const feeRateKB = formState.fee * 1000;
+
+        const options = {
+          return_psbt: true,
+          fee_per_kb: feeRateKB,
+          allow_unconfirmed_inputs: true,
+          validate: true,
+        };
+
+        const requestBody = {
+          address: wallet.address,
+          destination: formState.recipientAddress,
+          asset: selectedStamp.cpid,
+          quantity: quantity,
+          options,
+        };
+
+        const response = await fetch("/api/v2/create/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error || "Failed to create send transaction.",
+          );
+        }
+
+        const responseData = await response.json();
+
+        if (!responseData?.psbt || !responseData?.inputsToSign) {
+          throw new Error("Invalid response: Missing PSBT or inputsToSign");
+        }
+
+        const signResult = await walletContext.signPSBT(
+          wallet,
+          responseData.psbt,
+          responseData.inputsToSign,
+          true,
+        );
+
+        if (signResult.signed && signResult.txid) {
+          setSuccessMessage(
+            `Transfer initiated successfully. TXID: ${signResult.txid}`,
+          );
+        } else if (signResult.cancelled) {
+          throw new Error("Transaction signing was cancelled.");
+        } else {
+          throw new Error(`Failed to sign PSBT: ${signResult.error}`);
+        }
+      });
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Unknown error");
+    }
+  };
+
+  const handleQuantityChange = (e: Event): void => {
+    const value = parseInt((e.target as HTMLInputElement).value, 10);
+    let tmpValue = value;
+    if (!isNaN(value)) {
+      if (value >= 1 && value <= maxQuantity) {
+        tmpValue = value;
+      } else if (value < 1) {
+        tmpValue = 1;
+      } else if (value > maxQuantity) {
+        tmpValue = maxQuantity;
+      }
+      setQuantity(tmpValue);
+      setFormState({
+        ...formState,
+        amount: tmpValue.toString(),
+      });
+    }
+  };
+
+  const handleStampSelect = (e: Event) => {
+    const value = (e.currentTarget as HTMLSelectElement).value;
+    console.log("[DEBUG] StampSelect - Selected value:", value);
+
+    if (!value) {
+      console.log("[DEBUG] No value selected");
+      return;
+    }
+
+    const selectedItem = stamps.data.find(
+      (item) => item.stamp.toString() === value,
+    );
+
+    console.log("[DEBUG] Found stamp:", selectedItem);
+
+    if (selectedItem) {
+      const stampData: StampRow = {
+        stamp: selectedItem.stamp,
+        stamp_mimetype: selectedItem.stamp_mimetype || "image/png",
+        stamp_url: selectedItem.stamp_url,
+        tx_hash: selectedItem.tx_hash,
+        cpid: selectedItem.cpid,
+        creator: selectedItem.creator || "",
+        creator_name: selectedItem.creator_name || null,
+        divisible: selectedItem.divisible || 0,
+        locked: selectedItem.locked || 1,
+        supply: selectedItem.supply || 0,
+        unbound_quantity: selectedItem.unbound_quantity || 0,
+      };
+
+      console.log("[DEBUG] Setting selected stamp:", stampData);
+      setSelectedStamp(stampData);
+      setFormState((prev) => ({
+        ...prev,
+        stampId: stampData.stamp,
+        cpid: stampData.cpid,
+      }));
+    }
+  };
+
+  // Monitor URL changes
+  useEffect(() => {
+    console.log("[DEBUG] stampImageUrl changed:", {
+      url: stampImageUrl,
+      selectedStamp: selectedStamp?.cpid,
+    });
+  }, [stampImageUrl]);
+
+  // Log initial stamps data
+  useEffect(() => {
+    console.log("[DEBUG] Initial stamps data:", {
+      data: stamps.data,
+      firstStamp: stamps.data[0],
+      totalStamps: stamps.data.length,
+      pagination: stamps.pagination,
+    });
+  }, [stamps.data]);
+
+  // Log when stamps data changes
+  useEffect(() => {
+    console.log("[DEBUG] Stamps data updated:", {
+      totalStamps: stamps.data.length,
+      firstStamp: stamps.data[0],
+      hasData: stamps.data.length > 0,
+    });
+  }, [stamps.data]);
+
+  // Log when selected stamp changes
+  useEffect(() => {
+    if (selectedStamp) {
+      console.log("[DEBUG] Selected stamp updated:", {
+        stamp: selectedStamp.stamp,
+        cpid: selectedStamp.cpid,
+        stamp_url: selectedStamp.stamp_url,
+        stamp_mimetype: selectedStamp.stamp_mimetype,
+        tx_hash: selectedStamp.tx_hash,
+      });
+    }
+  }, [selectedStamp]);
+
+  const renderStampContent = () => {
+    console.log("[DEBUG] renderStampContent - selectedStamp:", selectedStamp);
+
+    if (!selectedStamp) {
+      return (
+        <img
+          src="/img/stamping/image-upload.svg"
+          class="w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"
+          alt=""
+        />
+      );
+    }
+
+    // Construct stamp URL directly using tx_hash
+    const stampUrl = `https://stampchain.io/s/${selectedStamp.tx_hash}`;
+
+    return (
+      <img
+        src={stampUrl}
+        alt={`Stamp #${selectedStamp.stamp}`}
+        class="w-full h-full object-contain pixelart"
+        onError={(e) => {
+          console.error("Image load error:", e);
+          (e.target as HTMLImageElement).src = "/img/stamping/image-upload.svg";
+        }}
+      />
+    );
+  };
+
+  const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+  const titlePurpleLDCenter =
+    "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
+  const inputFieldContainer =
+    "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
+  const inputField2col =
+    "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
+  const feeSelectorContainer =
+    "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
+  const inputField =
+    "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
 
   return (
     <div class={bodyTools}>
       <h1 class={titlePurpleLDCenter}>TRANSFER</h1>
 
-      {error && (
-        <div class="w-full text-red-500 text-center font-bold">
-          {error}
-        </div>
-      )}
-
       <div class={inputFieldContainer}>
         <div class="w-full flex gap-3 mobileMd:gap-6">
-          <div
-            id="image-preview"
-            class="relative rounded items-center justify-center mx-auto text-center min-w-[96px] h-[96px] w-[96px] mobileMd:min-w-[108px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:w-[120px] mobileLg:h-[120px] content-center bg-stamp-purple-darker flex flex-col"
-          >
-            {isImageLoading
-              ? (
-                <div class="animate-spin rounded-full w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9 border-b-[3px] border-stamp-grey" />
-              )
-              : (
-                <img
-                  src={selectedTokenImage || `/img/stamping/image-upload.svg`}
-                  class={selectedTokenImage
-                    ? "w-full h-full"
-                    : "w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9"}
-                  alt=""
-                  loading="lazy"
-                  onLoad={() => setIsImageLoading(false)}
-                  onError={() => setIsImageLoading(false)}
-                />
-              )}
+          <div class="flex items-center justify-center rounded w-[96px] h-[96px] mobileMd:w-[108px] mobileMd:h-[108px] mobileLg:w-[120px] mobileLg:h-[120px] bg-stamp-purple-darker overflow-hidden">
+            {renderStampContent()}
           </div>
-          <div class="flex flex-col gap-3 mobileMd:gap-6 w-full relative">
-            <div
-              class={`relative ${
-                openDrop && searchResults.length > 0 && !isSelecting
-                  ? "input-open"
-                  : ""
-              }`}
-              ref={dropdownRef}
-            >
-              <SRC20InputField
-                type="text"
-                placeholder="Token"
-                value={searchTerm}
-                onChange={(e) => {
-                  const newValue = (e.target as HTMLInputElement).value
-                    .toUpperCase();
-                  if (newValue !== searchTerm) {
-                    if (!isSelecting && !isSwitchingFields) {
-                      setOpenDrop(true);
-                    }
-                    setIsSelecting(false);
-                    setSearchTerm(newValue);
-                  }
-                }}
-                onFocus={() => {
-                  if (
-                    !searchTerm.trim() && !isSwitchingFields && !isSelecting
-                  ) {
-                    setOpenDrop(true);
-                  }
-                  setIsSelecting(false);
-                }}
-                onBlur={() => {
-                  setIsSwitchingFields(true);
-                  setTimeout(() => {
-                    setOpenDrop(false);
-                    setIsSwitchingFields(false);
-                    if (!searchTerm.trim()) {
-                      setIsSelecting(false);
-                    }
-                  }, 150);
-                }}
-                error={formState.tokenError}
-                isUppercase
-              />
-              {openDrop && searchResults.length > 0 && !isSelecting && (
-                <ul class="absolute top-[100%] left-0 max-h-[168px] mobileLg:max-h-[208px] w-full bg-stamp-grey-light rounded-b-md text-stamp-grey-darkest text-sm mobileLg:text-base leading-none font-bold z-[11] overflow-y-auto scrollbar-grey">
-                  {searchResults.map((result: SearchResult) => (
-                    <li
-                      key={result.tick}
-                      onClick={() => handleResultClick(result.tick)}
-                      class="cursor-pointer p-1.5 pl-3 hover:bg-[#C3C3C3] uppercase"
-                    >
-                      {result.tick}
-                      <p class="text-xs mobileLg:text-sm text-stamp-grey-darker font-medium mobileLg:-mt-1">
-                        {(result.progress || 0).toFixed(1)}% minted
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
 
-            <SRC20InputField
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="Amount"
-              value={formState.amt}
-              onChange={(e) => handleInputChange(e, "amt")}
-              onBlur={() => handleInputBlur("amt")}
-              error={formState.amtError}
+          <div class="flex flex-col flex-1 gap-3 mobileMd:gap-6">
+            <SelectField
+              options={stamps.data}
+              value={selectedStamp?.stamp?.toString() || ""}
+              onChange={handleStampSelect}
             />
+
+            <div class="flex w-full justify-end items-center gap-[18px] mobileMd:gap-[30px]">
+              <div class="flex flex-col justify-start -space-y-0.5 -mt-[3px]">
+                <p class="text-xl mobileLg:text-2xl font-bold text-stamp-grey">
+                  EDITIONS
+                </p>
+                <p class="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+                  MAX {maxQuantity}
+                </p>
+              </div>
+              <input
+                type="number"
+                min="1"
+                max={maxQuantity}
+                value={quantity}
+                onChange={handleQuantityChange}
+                class={`${inputField} !w-[42px] mobileLg:!w-12 text-center`}
+              />
+            </div>
           </div>
         </div>
-        <MintProgress
-          progress={progress}
-          progressWidth={progressWidth}
-          maxSupply={maxSupply}
-          limit={limit}
-          minters={minters}
-        />
+        <div class="flex w-full -mt-[1px] mobileMd:-mt-[3px]">
+          <input
+            value={formState.recipientAddress}
+            onInput={(e) =>
+              setFormState({
+                ...formState,
+                recipientAddress: (e.target as HTMLInputElement).value,
+              })}
+            placeholder="Recipient address"
+            class={inputField}
+          />
+        </div>
       </div>
 
       <div class={feeSelectorContainer}>
-        <ComplexFeeCalculator
+        <BasicFeeCalculator
           fee={formState.fee}
-          handleChangeFee={handleChangeFee}
-          type="src20"
-          fileType="application/json"
-          fileSize={undefined}
-          issuance={undefined}
-          serviceFee={undefined}
+          handleChangeFee={internalHandleChangeFee}
+          type="transfer"
           BTCPrice={formState.BTCPrice}
-          onRefresh={fetchFees}
           isSubmitting={isSubmitting}
-          onSubmit={handleSubmit}
-          buttonName={isConnected ? "MINT" : "CONNECT WALLET"}
-          tosAgreed={tosAgreed}
-          onTosChange={setTosAgreed}
-          inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
-          outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
+          onSubmit={handleTransferSubmit}
+          buttonName={wallet?.address ? "TRANSFER" : "CONNECT WALLET"}
+          className="pt-9 mobileLg:pt-12"
           userAddress={wallet?.address}
-          disabled={undefined}
-          effectiveFeeRate={undefined}
-          utxoAncestors={undefined}
-          feeDetails={feeDetailsForCalculator}
-        />
-
-        <StatusMessages
-          submissionMessage={submissionMessage}
-          apiError={apiError}
-          walletError={walletError}
+          inputType="P2WPKH"
+          outputTypes={["P2WPKH"]}
+          tosAgreed={true}
         />
       </div>
+
+      {error && (
+        <div class="text-red-500 text-center mt-4 font-medium">
+          {error}
+        </div>
+      )}
+      {successMessage && (
+        <div class="text-green-500 text-center mt-4 font-medium">
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 }
