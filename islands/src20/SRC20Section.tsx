@@ -6,7 +6,6 @@ import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { useLoading } from "$islands/loading/LoadingProvider.tsx";
 
 interface SRC20SectionProps {
   title?: string;
@@ -58,7 +57,6 @@ export function SRC20Section({
   address,
   useClientFetch = fromPage === "home" || fromPage === "wallet",
 }: SRC20SectionProps) {
-  const { setLoading } = useLoading();
   const [data, setData] = useState<SRC20Row[]>(initialData || []);
   const [isLoading, setIsLoading] = useState(!initialData);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -69,7 +67,6 @@ export function SRC20Section({
     if (!initialData?.length && useClientFetch) {
       setIsTransitioning(true);
       setIsLoading(true);
-      setLoading(true);
       const fetchData = async () => {
         try {
           let endpoint = "";
@@ -103,7 +100,6 @@ export function SRC20Section({
         } finally {
           setIsLoading(false);
           setIsTransitioning(false);
-          setLoading(false);
         }
       };
 
