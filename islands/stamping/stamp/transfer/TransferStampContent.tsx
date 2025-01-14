@@ -13,7 +13,7 @@ interface Props {
 export function TransferStampContent({ trxType }: Props) {
   const { wallet } = walletContext;
   const [maxQuantity, setMaxQuantity] = useState(1);
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const [selectedStamp, setSelectedStamp] = useState<StampRow | null>(null);
   const [stamps, setStamps] = useState<{
     data: StampRow[];
@@ -111,8 +111,11 @@ export function TransferStampContent({ trxType }: Props) {
   };
 
   const handleQuantityChange = (e: Event) => {
-    const value = parseInt((e.target as HTMLInputElement).value);
-    setQuantity(isNaN(value) ? 0 : value);
+    const input = e.target as HTMLInputElement;
+    if (!input.value || input.value === "0") {
+      input.value = "1";
+    }
+    setQuantity(parseInt(input.value));
   };
 
   const handleTransferSubmit = async () => {
