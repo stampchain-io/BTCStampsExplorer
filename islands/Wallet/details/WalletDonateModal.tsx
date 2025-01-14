@@ -1,36 +1,43 @@
-import { useEffect } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
+import type { StampRow } from "$globals";
+import StampImage from "$islands/stamp/details/StampImage.tsx";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
-
-export const DONATE_ADDRESS = "bc1qe5sz3mt4a3e57n8e39pprval4qe0xdrkzew203";
+import { logger } from "$lib/utils/logger.ts";
 
 interface Props {
+  stamp: StampRow;
   fee: number;
   handleChangeFee: (fee: number) => void;
   toggleModal: () => void;
   handleCloseModal: () => void;
-  donateAddress?: string;
+  dispenser: any;
 }
 
-function WalletDonateModal({
+const WalletDonateModal = ({
+  stamp,
   fee: initialFee,
   handleChangeFee,
   toggleModal,
   handleCloseModal,
-  donateAddress = DONATE_ADDRESS,
-}: Props) {
+  dispenser,
+}: Props) => {
   const { wallet } = walletContext;
+  const [quantity, setQuantity] = useState(1);
+  const [maxQuantity, setMaxQuantity] = useState(1);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isAmountTooltipVisible, setIsAmountTooltipVisible] = useState(false);
+  const amountTooltipTimeoutRef = useRef<number | null>(null);
 
   const {
     formState,
-    setFormState,
     handleChangeFee: internalHandleChangeFee,
     handleSubmit,
     isSubmitting,
     error,
-    _setError,
     successMessage,
     setSuccessMessage,
   } = useTransactionForm({
@@ -38,43 +45,76 @@ function WalletDonateModal({
     initialFee,
   });
 
-  // Sync external fee state with internal state
   useEffect(() => {
     handleChangeFee(formState.fee);
   }, [formState.fee]);
 
-  const handleDonateSubmit = async () => {
-    await handleSubmit(async () => {
-      if (!donateAddress) {
-        throw new Error("No donate address provided");
-      }
+  useEffect(() => {
+    if (dispenser) {
+      const maxQty = Math.floor(
+        dispenser.give_remaining / dispenser.give_quantity,
+      );
+      setMaxQuantity(maxQty);
+      setTotalPrice(quantity * dispenser.satoshirate);
+    }
+  }, [dispenser, quantity]);
 
+  useEffect(() => {
+    return () => {
+      if (amountTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(amountTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    setTooltipPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleAmountMouseEnter = () => {
+    if (amountTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(amountTooltipTimeoutRef.current);
+    }
+
+    amountTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsAmountTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleAmountMouseLeave = () => {
+    if (amountTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(amountTooltipTimeoutRef.current);
+    }
+    setIsAmountTooltipVisible(false);
+  };
+
+  const handleMouseDown = () => {
+    if (amountTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(amountTooltipTimeoutRef.current);
+    }
+    setIsAmountTooltipVisible(false);
+  };
+
+  const handleBuyClick = async () => {
+    await handleSubmit(async () => {
       // Convert fee rate from sat/vB to sat/kB
       const feeRateKB = formState.fee * 1000;
-      console.log("Fee rate conversion:", {
-        satVB: formState.fee,
-        satKB: feeRateKB,
-      });
 
       const options = {
         return_psbt: true,
         fee_per_kb: feeRateKB,
       };
 
-      console.log("Creating dispense transaction:", {
-        address: wallet.address,
-        dispenser: donateAddress,
-        quantity: formState.amount ? parseFloat(formState.amount) : 0,
-        feeRate: options.fee_per_kb,
-      });
-
       const response = await fetch("/api/v2/create/dispense", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           address: wallet.address,
-          dispenser: donateAddress,
-          quantity: formState.amount ? parseFloat(formState.amount) : 0,
+          dispenser: dispenser.source,
+          quantity: totalPrice,
           options,
         }),
       });
@@ -82,27 +122,27 @@ function WalletDonateModal({
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || "Failed to create donation transaction.",
+          errorData.error || "Failed to create dispense transaction.",
         );
       }
 
       const responseData = await response.json();
-      console.log("Dispense response:", responseData);
 
       if (!responseData?.psbt || !responseData?.inputsToSign) {
         throw new Error("Invalid response: Missing PSBT or inputsToSign");
       }
 
+      // PSBT is already in hex format with witness data from backend
       const signResult = await walletContext.signPSBT(
         wallet,
         responseData.psbt,
         responseData.inputsToSign,
-        true, // Enable RBF
+        true,
       );
 
       if (signResult.signed && signResult.txid) {
         setSuccessMessage(
-          `Donation sent successfully. TXID: ${signResult.txid}`,
+          `Transaction broadcasted successfully. TXID: ${signResult.txid}`,
         );
         setTimeout(toggleModal, 5000);
       } else if (signResult.cancelled) {
@@ -113,112 +153,141 @@ function WalletDonateModal({
     });
   };
 
-  const dataColumn = "flex flex-col -space-y-1";
-  const dataLabelSm =
-    "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-  const dataValueXs =
-    "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
-  const _dataValueSm =
-    "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  const inputField =
-    "h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
+  // Add debug logging
+  useEffect(() => {
+    logger.debug("ui", {
+      message: "WalletDonateModal mounted",
+      component: "WalletDonateModal",
+    });
+
+    return () => {
+      logger.debug("ui", {
+        message: "WalletDonateModal unmounting",
+        component: "WalletDonateModal",
+      });
+    };
+  }, []);
+
+  // Update total price when quantity or dispenser changes
+  useEffect(() => {
+    if (dispenser) {
+      const price = quantity * dispenser.satoshirate;
+      setTotalPrice(price);
+    }
+  }, [quantity, dispenser]);
+
+  const tooltipImage =
+    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
 
   return (
-    <ModalLayout onClose={handleCloseModal} title="DONATE">
-      <div className="flex flex-col gap-6 -mt-3">
-        <div className="flex flex-col items-center text-center">
-          <div className="flex justify-center items-baseline w-full">
-            <div className="inline-flex items-baseline gap-1.5">
+    <ModalLayout
+      onClose={() => {
+        logger.debug("ui", {
+          message: "Modal closing",
+          component: "WalletDonateModal",
+        });
+        handleCloseModal();
+      }}
+      title="DONATE"
+    >
+      <div className="mb-6">
+        <p className="text-3xl mobileLg:text-4xl font-bold text-stamp-grey-light text-center">
+          {(totalPrice / 100000000).toFixed(8)}{" "}
+          <span className="font-extralight">BTC</span>
+        </p>
+      </div>
+
+      <div className="flex flex-row gap-6">
+        <div className="flex flex-col w-[156px] mobileLg:w-[164px]">
+          <StampImage
+            stamp={stamp}
+            className=""
+            flag={false}
+          />
+        </div>
+        <div className="flex flex-col w-full">
+          <div className="flex flex-col items-start -space-y-0.5">
+            <p className="text-lg mobileLg:text-xl font-bold text-stamp-grey-light">
+              <span className="font-light text-stamp-grey-darker">RECEIVE</span>
+              {" "}
+              {quantity} EDITION{quantity > 1 ? "S" : ""}
+            </p>
+            <p className="text-sm mobileLg:text-base font-medium text-stamp-grey-darker">
+              MAX {maxQuantity}
+            </p>
+          </div>
+
+          <div className="mt-6">
+            <div
+              className="relative w-full group"
+              onMouseMove={handleMouseMove}
+              onMouseEnter={handleAmountMouseEnter}
+              onMouseLeave={handleAmountMouseLeave}
+              onMouseDown={handleMouseDown}
+              onClick={(e) => e.stopPropagation()}
+            >
               <input
-                type="text"
-                value={formState.amount}
+                type="range"
+                min="1"
+                max={maxQuantity}
+                value={quantity}
                 onInput={(e) => {
-                  const value = (e.target as HTMLInputElement).value;
-                  // Only allow numbers and decimal point
-                  let sanitizedValue = value.replace(/[^0-9.]/g, "");
-
-                  // Ensure only one decimal point
-                  const parts = sanitizedValue.split(".");
-                  if (parts.length > 2) {
-                    sanitizedValue = parts[0] + "." + parts[1];
-                  }
-
-                  // Limit decimal places to 8
-                  if (parts.length === 2 && parts[1].length > 8) {
-                    sanitizedValue = parts[0] + "." + parts[1].slice(0, 8);
-                  }
-
-                  // Limit total length to 10
-                  sanitizedValue = sanitizedValue.slice(0, 10);
-
-                  setFormState({
-                    ...formState,
-                    amount: sanitizedValue,
-                  });
+                  const target = e.target as HTMLInputElement;
+                  setQuantity(parseInt(target.value));
                 }}
-                placeholder="0"
-                className={`${inputField} bg-transparent text-4xl mobileLg:text-5xl text-stamp-grey-light placeholder:text-stamp-grey font-black text-right -ms-1.5 mobileLg:-ms-0.75`}
-                style={{
-                  width: (() => {
-                    const value = formState.amount || "";
-                    const isSmallScreen =
-                      globalThis.matchMedia("(max-width: 767px)").matches;
-                    const { one, other } = isSmallScreen
-                      ? { one: 17, other: 23 }
-                      : { one: 22, other: 30 };
-                    const baseWidth = !value ? other : value.split("").reduce(
-                      (total, char) =>
-                        total + (char === "1" || char === "." ? one : other),
-                      0,
-                    );
-                    return `${baseWidth}px`;
-                  })(),
-                }}
+                className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
               />
-              <span className="text-4xl mobileLg:text-5xl text-stamp-grey-light font-extralight">
-                BTC
-              </span>
+              <div
+                className={`${tooltipImage} ${
+                  isAmountTooltipVisible ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  left: `${tooltipPosition.x}px`,
+                  top: `${tooltipPosition.y - 6}px`,
+                  transform: "translate(-50%, -100%)",
+                }}
+              >
+                SELECT AMOUNT
+              </div>
             </div>
           </div>
-          <div className="text-lg mobileLg:text-xl text-stamp-grey-darker font-light mt-0.75">
-            {formState.amount && formState.BTCPrice
-              ? (parseFloat(formState.amount) * formState.BTCPrice)
-                .toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-              : "0.00"} USD
-          </div>
         </div>
-
-        {donateAddress && (
-          <div className={dataColumn}>
-            <p className={dataLabelSm}>
-              TO
-            </p>
-            <p className={dataValueXs}>
-              {donateAddress}
-            </p>
-          </div>
-        )}
       </div>
 
       <BasicFeeCalculator
         isModal={true}
         fee={formState.fee}
-        handleChangeFee={internalHandleChangeFee}
+        handleChangeFee={(newFee) => {
+          logger.debug("ui", {
+            message: "Fee changing",
+            newFee,
+            component: "WalletDonateModal",
+          });
+          internalHandleChangeFee(newFee);
+        }}
         type="buy"
-        amount={formState.amount ? parseFloat(formState.amount) : 0}
+        amount={totalPrice}
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
-        onSubmit={handleDonateSubmit}
-        onCancel={toggleModal}
+        onSubmit={() => {
+          logger.debug("ui", {
+            message: "Submit clicked",
+            component: "WalletDonateModal",
+          });
+          handleBuyClick();
+        }}
+        onCancel={() => {
+          logger.debug("ui", {
+            message: "Cancel clicked",
+            component: "WalletDonateModal",
+          });
+          handleCloseModal();
+        }}
         buttonName="DONATE"
         className="pt-9 mobileLg:pt-12"
         userAddress={wallet?.address}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
-        tosAgreed={true}
       />
 
       {error && <div className="text-red-500 mt-2">{error}</div>}
@@ -227,6 +296,6 @@ function WalletDonateModal({
       )}
     </ModalLayout>
   );
-}
+};
 
 export default WalletDonateModal;
