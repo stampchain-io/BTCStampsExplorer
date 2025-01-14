@@ -147,7 +147,7 @@ export function TransferStampContent({ trxType }: Props) {
       <div class="relative w-full h-full">
         {isImageLoading && (
           <div class="absolute inset-0 flex items-center justify-center">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-stamp-purple-highlight" />
+            <div class="animate-spin rounded-full w-7 h-7 mobileMd:w-8 mobileMd:h-8 mobileLg:w-9 mobileLg:h-9 border-b-[3px] border-stamp-grey" />
           </div>
         )}
         <img
@@ -246,7 +246,7 @@ export function TransferStampContent({ trxType }: Props) {
           userAddress={wallet?.address}
           inputType="P2WPKH"
           outputTypes={["P2WPKH"]}
-          tosAgreed={true}
+          tosAgreed={false}
         />
       </div>
 
