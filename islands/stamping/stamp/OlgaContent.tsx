@@ -1395,7 +1395,7 @@ export function OlgaContent() {
                 {tooltipText}
               </div>
             </button>
-            <div className="flex gap-3 mobileMd:gap-6 items-center">
+            <div className="flex items-center gap-[18px] mobileMd:gap-[30px]">
               <p className="text-xl mobileLg:text-2xl font-semibold text-stamp-grey">
                 EDITIONS
               </p>
