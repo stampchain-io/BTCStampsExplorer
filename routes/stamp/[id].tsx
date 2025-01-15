@@ -7,8 +7,8 @@ import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 
 import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
-import { StampRelatedInfo } from "$islands/stamp/details/StampRelatedInfo.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
+import DetailsTable from "$islands/shared/DetailsTable.tsx";
 
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
@@ -17,6 +17,8 @@ import { StampController } from "$server/controller/stampController.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
+import { TABLE_STYLES } from "$components/shared/types.ts";
+const { dataValueXLlink } = TABLE_STYLES;
 
 interface StampData {
   stamp: StampRow & { name?: string };
@@ -189,6 +191,21 @@ export default function StampPage(props: StampDetailPageProps) {
     stamps_recent,
     lowestPriceDispenser = null,
   } = props.data;
+
+  console.log("Initial data:", {
+    dispensers: _dispensers,
+    dispenses: _dispenses,
+    sends: _sends,
+  });
+
+  const totalCounts = {
+    dispensers: _dispensers?.length || 0,
+    sales: _dispenses?.length || 0,
+    transfers: _sends?.length || 0,
+  };
+
+  console.log("Total counts:", totalCounts);
+
   const title = htmlTitle
     ? htmlTitle.toUpperCase()
     : stamp?.cpid?.startsWith("A")
@@ -260,6 +277,32 @@ export default function StampPage(props: StampDetailPageProps) {
     },
   };
 
+  const tableConfigs = [
+    {
+      id: "dispensers",
+      count: _dispensers?.length || 0,
+    },
+    {
+      id: "sales",
+      count: _dispenses?.length || 0,
+    },
+    {
+      id: "transfers",
+      count: _sends?.length || 0,
+    },
+  ];
+
+  // Debug log to verify data
+  console.log("Table data:", {
+    dispensers: _dispensers?.length,
+    dispenses: _dispenses?.length,
+    sends: _sends?.length,
+    // Raw data
+    _dispensers,
+    _dispenses,
+    _sends,
+  });
+
   return (
     <>
       <Head>
@@ -307,9 +350,10 @@ export default function StampPage(props: StampDetailPageProps) {
           <HoldersGraph holders={holders || []} />
         )}
 
-        <StampRelatedInfo
-          _stampId={stamp?.stamp?.toString() || ""}
-          cpid={stamp?.cpid || ""}
+        <DetailsTable
+          type="stamps"
+          configs={tableConfigs}
+          cpid={stamp.cpid}
         />
 
         <div class="pt-12 mobileLg:pt-24 desktop:pt-36">
