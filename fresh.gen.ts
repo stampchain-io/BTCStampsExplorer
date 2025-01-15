@@ -187,6 +187,7 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
+import * as $shared_DetailsTable from "./islands/shared/DetailsTable.tsx";
 import * as $src20_FilterModal from "./islands/src20/FilterModal.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
@@ -457,6 +458,7 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
+    "./islands/shared/DetailsTable.tsx": $shared_DetailsTable,
     "./islands/src20/FilterModal.tsx": $src20_FilterModal,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
