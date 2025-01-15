@@ -1,19 +1,20 @@
-import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
+import DetailModal from "$islands/stamping/src101/DetailModal.tsx";
+import { SRC101Balance } from "$globals";
+import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 
+// CSS Class Constants
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 w-full text-center";
 const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-const buttonPurpleOutline =
-  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
 const animatedInputContainer = `
   relative rounded-md !bg-[#100318]
   before:absolute before:inset-[-2px] before:rounded-md before:z-[1]
@@ -23,39 +24,76 @@ const animatedInputContainer = `
   focus-within:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
 `;
 
-export function RegisterBitnameContent(
-  { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
-) {
+// Props and State Types
+interface RegisterBitnameContentProps {
+  trxType?: "olga" | "multisig";
+}
+
+// Main Component
+export function RegisterBitnameContent({
+  trxType = "olga",
+}: RegisterBitnameContentProps) {
   const {
     formState,
     handleChangeFee,
     handleInputChange,
     handleSubmit,
     fetchFees,
-    isLoading,
     config,
     isSubmitting,
     submissionMessage,
-    walletError,
     apiError,
-  } = useSRC20Form("mint", trxType);
+  } = useSRC101Form("mint", trxType);
 
-  const [tosAgreed, setTosAgreed] = useState(false);
+  const [tosAgreed, setTosAgreed] = useState<boolean>(false);
   const { wallet } = walletContext;
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [modalData, setModalData] = useState<SRC101Balance | null>(null);
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
 
-  const handleTransferSubmit = async () => {
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleTransferSubmit = async (): Promise<void> => {
     try {
-      await handleSubmit();
+      if (!formState.toAddress) return;
+      const checkStatus = await checkAvailability();
+      console.log("status======>", checkStatus);
+      if (checkStatus) {
+        await handleSubmit();
+      }
     } catch (error) {
-      console.error("Transfer error:", error);
+      console.error("Transfer error:", (error as Error).message);
+    }
+  };
+
+  const checkAvailability = async (): Promise<boolean> => {
+    try {
+      const url =
+        `/api/v2/src101/77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed/${
+          btoa(formState.toAddress.replace(".btc", ""))
+        }`;
+      const res = await fetch(url);
+      const jsonData = await res.json();
+
+      if (res.status === 200) {
+        if (jsonData?.data.length) {
+          setIsOpen(true);
+          setModalData(jsonData.data[0]);
+          return false;
+        } else {
+          setIsOpen(false);
+          setModalData(null);
+          return true;
+        }
+      }
+      return false;
+    } catch (error: unknown) {
+      return false;
     }
   };
 
@@ -71,37 +109,26 @@ export function RegisterBitnameContent(
               placeholder="wannabe"
               value={formState.toAddress?.replace(".btc", "") || ""}
               onChange={(e) => {
-                const value = e.target.value.replace(".btc", "");
-                handleInputChange({
-                  target: {
-                    value: value ? `${value}.btc` : "",
+                const value = (e.target as HTMLInputElement).value.replace(
+                  ".btc",
+                  "",
+                );
+                handleInputChange(
+                  {
+                    target: {
+                      value: value ? `${value}.btc` : "",
+                    },
                   },
-                }, "toAddress");
+                  "toAddress",
+                );
               }}
               error={formState.toAddressError}
-              class="relative z-[2] h-[54px] mobileLg:h-[60px] w-full !bg-[#100318] rounded-md pl-6 text-base mobileLg:text-lg font-bold text-stamp-grey-light placeholder:!bg-[#100318] placeholder:!text-stamp-grey  placeholder:lowercase outline-none focus:!bg-[#100318]"
+              class="relative z-[2] h-[54px] mobileLg:h-[60px] w-full !bg-[#100318] rounded-md pl-6 text-base mobileLg:text-lg font-bold text-stamp-grey-light placeholder:!bg-[#100318] placeholder:!text-stamp-grey placeholder:lowercase outline-none focus:!bg-[#100318]"
             />
           </div>
           <span class="absolute z-[3] right-6 top-1/2 -translate-y-1/2 text-base mobileLg:text-lg font-black text-stamp-purple pointer-events-none">
             .btc
           </span>
-        </div>
-
-        <div className="flex flex-row justify-between w-full">
-          <div className="flex flex-col justify-center items-start">
-            {/* message - default:noDisplay / display on user input & onClick - either already registered or available */}
-            <p className="text-sm mobileLg:text-base font-medium text-[#999999]">
-              userinput.btc is already registered
-            </p>
-          </div>
-          <div className="flex flex-col items-end">
-            <button
-              type="submit"
-              className={buttonPurpleOutline}
-            >
-              AVAILABILITY
-            </button>
-          </div>
         </div>
       </div>
 
@@ -128,9 +155,17 @@ export function RegisterBitnameContent(
         <StatusMessages
           submissionMessage={submissionMessage}
           apiError={apiError}
-          walletError={walletError}
         />
       </div>
+
+      {isOpen && modalData && (
+        <DetailModal
+          handleClose={handleClose}
+          name={modalData.tokenid_utf8}
+          img={modalData.img}
+          owner={modalData.owner}
+        />
+      )}
     </div>
   );
 }
