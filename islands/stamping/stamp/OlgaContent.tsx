@@ -271,6 +271,9 @@ export function OlgaContent() {
     SubmissionMessage | null
   >(null);
 
+  // Add isSearching state
+  const [isSearching, setIsSearching] = useState(false);
+
   // Initialize addressError as undefined
   const [addressError, setAddressError] = useState<string | undefined>(
     undefined,
@@ -1283,6 +1286,12 @@ export function OlgaContent() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (isSearching) {
+      setIsSearching(false);
+    }
+  }, [isSearching]);
 
   return (
     <div class={bodyTools}>
