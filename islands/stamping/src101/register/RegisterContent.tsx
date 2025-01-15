@@ -15,6 +15,8 @@ const titlePurpleLDCenter =
 const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
+const buttonPurpleOutline =
+  "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
 const animatedInputContainer = `
   relative rounded-md !bg-[#100318]
   before:absolute before:inset-[-2px] before:rounded-md before:z-[1]
@@ -47,6 +49,7 @@ export function RegisterBitnameContent({
 
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
   const { wallet } = walletContext;
+  const [isExist, setIsExist] = useState(true);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [modalData, setModalData] = useState<SRC101Balance | null>(null);
 
@@ -62,7 +65,6 @@ export function RegisterBitnameContent({
     try {
       if (!formState.toAddress) return;
       const checkStatus = await checkAvailability();
-      console.log("status======>", checkStatus);
       if (checkStatus) {
         await handleSubmit();
       }
@@ -82,10 +84,12 @@ export function RegisterBitnameContent({
 
       if (res.status === 200) {
         if (jsonData?.data.length) {
+          setIsExist(true);
           setIsOpen(true);
-          setModalData(jsonData.data[0]);
+          // setModalData(jsonData.data[0]);
           return false;
         } else {
+          setIsExist(false);
           setIsOpen(false);
           setModalData(null);
           return true;
@@ -106,7 +110,7 @@ export function RegisterBitnameContent({
           <div className={animatedInputContainer}>
             <InputField
               type="text"
-              placeholder="wannabe"
+              placeholder="Please input your bitname"
               value={formState.toAddress?.replace(".btc", "") || ""}
               onChange={(e) => {
                 const value = (e.target as HTMLInputElement).value.replace(
@@ -129,6 +133,27 @@ export function RegisterBitnameContent({
           <span class="absolute z-[3] right-6 top-1/2 -translate-y-1/2 text-base mobileLg:text-lg font-black text-stamp-purple pointer-events-none">
             .btc
           </span>
+        </div>
+        <div className="flex flex-row justify-between w-full">
+          <div className="flex flex-col justify-center items-start">
+            {/* message - default:noDisplay / display on user input & onClick - either already registered or available */}
+            <p className="text-sm mobileLg:text-base font-medium text-[#999999]">
+              {formState.toAddress
+                ? isExist
+                  ? `${formState.toAddress} is already registered`
+                  : `${formState.toAddress} is available`
+                : ""}
+            </p>
+          </div>
+          <div className="flex flex-col items-end">
+            <button
+              type="button"
+              className={buttonPurpleOutline}
+              onClick={checkAvailability}
+            >
+              AVAILABILITY
+            </button>
+          </div>
         </div>
       </div>
 

@@ -240,6 +240,10 @@ export function useSRC101Form(
 
   const handleSubmit = async () => {
     try {
+      if (!wallet?.address) {
+        return setSubmissionMessage({ message: "Please connect your wallet" });
+      }
+
       setIsSubmitting(true);
       setApiError("");
 
@@ -357,14 +361,10 @@ export function useSRC101Form(
         details: error,
       });
 
-      if (error instanceof Error) {
-        const apiError = (error as any).response?.data?.error;
-        setApiError(
-          apiError || error.message || "An unexpected error occurred",
-        );
-      } else {
-        setApiError("An unexpected error occurred");
-      }
+      const apiError = (error as any).response?.data?.error;
+      setApiError(
+        apiError || error.message || "An unexpected error occurred",
+      );
     } finally {
       setIsSubmitting(false);
     }
