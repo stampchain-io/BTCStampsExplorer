@@ -1,6 +1,14 @@
 import { useEffect, useState } from "preact/hooks";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
-import { TabData, TABLE_STYLES, TableProps } from "$components/shared/types.ts";
+import {
+  dataLabel,
+  row,
+  TabData,
+  TABLE_STYLES,
+  tableLabel,
+  TableProps,
+  tableValue,
+} from "$components/shared/types.ts";
 
 import { TokenMints } from "$components/tokenDetails/TokenMints.tsx";
 import { TokenTransfers } from "$components/tokenDetails/TokenTransfers.tsx";
@@ -56,87 +64,50 @@ export default function DetailsTable(
           sort: "DESC",
         });
 
-        switch (tabId) {
-          case "dispensers": {
-            const response = await fetch(
-              `/api/v2/stamps/${encodedCpid}/dispensers?${params}`,
-            );
-            const data = await response.json();
-            setTabData((prev) => ({
-              ...prev,
-              dispensers: data.data || [],
-            }));
-            setHasMore(data.data?.length === PAGE_SIZE);
-            break;
-          }
-          case "sales": {
-            const [dispenseResponse, dispensersResponse] = await Promise.all([
-              fetch(`/api/v2/stamps/${encodedCpid}/dispenses?${params}`),
-              fetch(
-                `/api/v2/stamps/${encodedCpid}/dispensers?${new URLSearchParams(
-                  {
-                    limit: "1000",
-                    sort: "DESC",
-                  },
-                )}`,
-              ),
-            ]);
+        const operation = tabId === "dispensers"
+          ? "dispensers"
+          : tabId === "sales"
+          ? "dispenses"
+          : "sends";
 
-            const [dispenseData, dispensersData] = await Promise.all([
-              dispenseResponse.json(),
-              dispensersResponse.json(),
-            ]);
+        const response = await fetch(
+          `/api/v2/stamps/${encodedCpid}/${operation}?${params}`,
+        );
+        const data = await response.json();
 
-            setTabData((prev) => ({
-              ...prev,
-              dispenses: dispenseData.data || [],
-              dispensers: dispensersData.data || [],
-            }));
-            setHasMore(dispenseData.data?.length === PAGE_SIZE);
-            break;
-          }
-          case "transfers": {
-            const response = await fetch(
-              `/api/v2/stamps/${encodedCpid}/sends?${params}`,
-            );
-            const data = await response.json();
-            setTabData((prev) => ({
-              ...prev,
-              sends: data.data || [],
-            }));
-            setHasMore(data.data?.length === PAGE_SIZE);
-            break;
-          }
-        }
+        const mappedData = {
+          dispensers: operation === "dispensers" ? data.data : undefined,
+          dispenses: operation === "dispenses" ? data.data : undefined,
+          sends: operation === "sends" ? data.data : undefined,
+        };
+
+        setTabData((prev) => ({
+          ...prev,
+          ...mappedData,
+        }));
+
+        setHasMore(data.data?.length === PAGE_SIZE);
       } else if (type === "src20" && tick) {
-        const encodedTick = encodeURIComponent(tick);
         const params = new URLSearchParams({
           page: pageNum.toString(),
           limit: PAGE_SIZE.toString(),
           sort: "DESC",
         });
 
-        if (tabId === "mints") {
-          const response = await fetch(
-            `/api/v2/src20/tick/${encodedTick}/mints?${params}`,
-          );
-          const data = await response.json();
-          setTabData((prev) => ({
-            ...prev,
-            mints: data.data || [],
-          }));
-          setHasMore(data.data?.length === PAGE_SIZE);
-        } else if (tabId === "transfers") {
-          const response = await fetch(
-            `/api/v2/src20/tick/${encodedTick}/transfers?${params}`,
-          );
-          const data = await response.json();
-          setTabData((prev) => ({
-            ...prev,
-            transfers: data.data || [],
-          }));
-          setHasMore(data.data?.length === PAGE_SIZE);
-        }
+        const operation = tabId === "mints" ? "MINT" : "TRANSFER";
+        const response = await fetch(
+          `/api/v2/src20/tick/${tick}?op=${operation}&${params}`,
+        );
+        const data = await response.json();
+
+        setTabData((prev) => ({
+          ...prev,
+          [tabId]: isTabChange
+            ? data.data
+            : [...(prev[tabId] || []), ...data.data],
+        }));
+
+        setHasMore(data.data?.length === PAGE_SIZE);
       }
     } catch (error) {
       console.error(`Error fetching ${tabId} data:`, error);
@@ -184,11 +155,23 @@ export default function DetailsTable(
 
   const handleScroll = (e: Event) => {
     const target = e.target as HTMLDivElement;
+    const scrollPosition = target.scrollTop + target.clientHeight;
+    const scrollThreshold = target.scrollHeight - 20;
+
+    console.log({
+      scrollPosition,
+      scrollThreshold,
+      isLoading,
+      hasMore,
+      currentPage: page,
+    });
+
     if (
-      target.scrollHeight - target.scrollTop === target.clientHeight &&
+      scrollPosition >= scrollThreshold &&
       !isLoading &&
       hasMore
     ) {
+      console.log("Loading more data...");
       const nextPage = page + 1;
       setPage(nextPage);
       fetchData(nextPage, selectedTab);
@@ -325,11 +308,15 @@ export default function DetailsTable(
           );
         })}
       </div>
-      <ScrollContainer>
-        <div onScroll={handleScroll} class="overflow-auto overscroll-contain">
+      <ScrollContainer class="max-h-48" onScroll={handleScroll}>
+        <div class="overflow-auto overscroll-contain">
           {renderTabContent()}
           {isLoading && (
-            <div class="text-center p-6 text-stamp-grey-light">Loading...</div>
+            <div
+              class={`${tableLabel} text-center pt-3 pb-1.5`}
+            >
+              LOADING
+            </div>
           )}
         </div>
       </ScrollContainer>

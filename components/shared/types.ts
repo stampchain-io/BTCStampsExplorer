@@ -36,3 +36,10 @@ export const TABLE_STYLES = {
   dataValueXL: "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1",
   dataValueXLlink: "text-3xl mobileLg:text-4xl font-black -mt-1",
 };
+export const dataLabel =
+  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+export const tableLabel =
+  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase pb-1.5";
+export const tableValue =
+  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
+export const row = "h-8 hover:bg-stamp-purple/10";
