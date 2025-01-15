@@ -1,17 +1,16 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
-import { SRC20DetailsTab } from "$islands/src20/details/SRC20DetailsTab.tsx";
-import { Src20Controller } from "$server/controller/src20Controller.ts";
+import DetailsTable from "$islands/shared/DetailsTable.tsx";
 import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 import { SRC20TickPageData } from "$lib/types/src20.d.ts";
+import { Src20Controller } from "$server/controller/src20Controller.ts";
 
 export const handler: Handlers = {
   async GET(_req, ctx) {
     try {
-      const rawTick = ctx.params.tick; // Could be "%F0%9F%9B%B8" or "\U0001F6F8"
-      const decodedTick = decodeURIComponent(rawTick); // Could be "🛸" or "\U0001F6F8"
+      const rawTick = ctx.params.tick;
+      const decodedTick = decodeURIComponent(rawTick);
 
-      // Pass directly to controller - repository will handle format conversion
       const body = await Src20Controller.fetchSrc20TickPageData(decodedTick);
       if (!body) {
         return ctx.renderNotFound();
@@ -54,6 +53,11 @@ function SRC20TickPage(props: SRC20TickPageProps) {
 
   const tick = deployment.tick;
 
+  const tableConfigs = [
+    { id: "mints", label: "MINTS" },
+    { id: "transfers", label: "TRANSFERS" },
+  ];
+
   return (
     <div class="flex flex-col gap-6">
       <SRC20TickHeader
@@ -64,7 +68,11 @@ function SRC20TickPage(props: SRC20TickPageProps) {
         marketInfo={marketInfo}
       />
       <HoldersGraph holders={holders} />
-      <SRC20DetailsTab tick={tick} />
+      <DetailsTable
+        type="src20"
+        configs={tableConfigs}
+        tick={tick}
+      />
     </div>
   );
 }
