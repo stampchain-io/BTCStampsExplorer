@@ -426,24 +426,24 @@ export class SRC20Repository {
     return result.rows[0].total;
   }
 
-  static async fetchSrc20MintProgress(
-    tick: string,
-  ) {
+  static async fetchSrc20MintProgress(tick: string) {
     const unicodeTick = this.ensureUnicodeEscape(tick);
     const query = `
-        SELECT 
-            dep.max,
-            dep.deci,
-            dep.lim,
-            dep.tx_hash,
-            dep.tick,
-            (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints,
-            (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} WHERE tick = dep.tick) AS total_minted
-        FROM ${SRC20_TABLE} AS dep
-        WHERE 
-            dep.tick = ? AND
-            dep.op = 'DEPLOY'
-        LIMIT 1;
+      SELECT 
+        dep.max,
+        dep.deci,
+        dep.lim,
+        dep.tx_hash,
+        dep.tick,
+        COALESCE(stats.total_minted, 0) as total_minted,
+        COALESCE(stats.holders_count, 0) as holders_count,
+        (SELECT COUNT(*) FROM ${SRC20_TABLE} WHERE tick = dep.tick AND op = 'MINT') AS total_mints
+      FROM ${SRC20_TABLE} AS dep
+      LEFT JOIN src20_token_stats stats ON stats.tick = dep.tick
+      WHERE 
+        dep.tick = ? AND
+        dep.op = 'DEPLOY'
+      LIMIT 1;
     `;
 
     const data = await dbManager.executeQueryWithCache(
@@ -471,6 +471,7 @@ export class SRC20Repository {
       total_mints: total_mints,
       progress,
       decimals,
+      holders: row["holders_count"],
       tx_hash: row["tx_hash"],
       tick: row["tick"],
     });
@@ -492,20 +493,6 @@ export class SRC20Repository {
                (COUNT(*) * 100.0 / ?) as top_mints_percentage
         FROM latest_mint_transactions
         GROUP BY tick
-      ),
-      deploy_info AS (
-        SELECT 
-          d.tick,
-          d.max,
-          (SELECT COALESCE(SUM(amt), 0) FROM ${SRC20_BALANCE_TABLE} b WHERE b.tick = d.tick) as total_minted
-        FROM ${SRC20_TABLE} d
-        WHERE d.op = 'DEPLOY'
-      ),
-      holders_count AS (
-        SELECT tick, COUNT(*) as holders
-        FROM ${SRC20_BALANCE_TABLE}
-        WHERE amt > 0
-        GROUP BY tick
       )
       SELECT
         'data' as type,
@@ -524,13 +511,13 @@ export class SRC20Repository {
         src20_deploy.destination,
         src20_deploy.block_time,
         creator_info.creator as creator_name,
-        COALESCE(hc.holders, 0) as holders
+        COALESCE(stats.holders_count, 0) as holders,
+        COALESCE(stats.total_minted, 0) as total_minted
       FROM mint_counts mc
       JOIN ${SRC20_TABLE} src20_deploy ON mc.tick = src20_deploy.tick AND src20_deploy.op = 'DEPLOY'
-      JOIN deploy_info di ON mc.tick = di.tick
       LEFT JOIN creator creator_info ON src20_deploy.creator = creator_info.address
-      LEFT JOIN holders_count hc ON mc.tick = hc.tick
-      WHERE di.total_minted < di.max
+      LEFT JOIN src20_token_stats stats ON stats.tick = mc.tick
+      WHERE COALESCE(stats.total_minted, 0) < src20_deploy.max
       ORDER BY mc.mint_count DESC;
     `;
     const queryParams = [
