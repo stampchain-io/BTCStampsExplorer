@@ -269,24 +269,24 @@ export function StampCard({
         } BTC`,
         style: TEXT_STYLES.price,
       };
-    } else if (stamp.floorPrice !== "priceless") {
+    }
+
+    // Handle floor price or recent sale price
+    const price = stamp.floorPrice !== "priceless"
+      ? stamp.floorPrice
+      : stamp.recentSalePrice;
+    if (price !== "priceless" && !isNaN(Number(price))) {
       return {
-        text: `${stripTrailingZeros(Number(stamp.floorPrice).toFixed(8))} BTC`,
+        text: `${stripTrailingZeros(Number(price).toFixed(8))} BTC`,
         style: TEXT_STYLES.price,
-      };
-    } else if (stamp.recentSalePrice !== "priceless") {
-      return {
-        text: `${
-          stripTrailingZeros(Number(stamp.recentSalePrice).toFixed(8))
-        } BTC`,
-        style: TEXT_STYLES.price,
-      };
-    } else {
-      return {
-        text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
-        style: TEXT_STYLES.mimeType,
       };
     }
+
+    // Default to mime type if no valid price
+    return {
+      text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
+      style: TEXT_STYLES.mimeType,
+    };
   };
 
   const shouldDisplayHash = Number(stamp.stamp ?? 0) >= 0 ||

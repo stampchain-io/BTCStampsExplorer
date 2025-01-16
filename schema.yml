@@ -2096,7 +2096,15 @@ components:
         floorPrice:
           type: number
           nullable: true
-          description: "Current floor price in BTC, or 'priceless' if no open dispensers"
+          description: "Current floor price in BTC. Uses lowest open dispenser price, or most recent closed dispenser price if no open dispensers exist"
+        floorPriceUSD:
+          type: number
+          nullable: true
+          description: "Floor price converted to USD using current BTC/USD exchange rate"
+        marketCapUSD:
+          type: number
+          nullable: true
+          description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
     StampRowSummary:
       type: object
       properties:
@@ -2141,7 +2149,15 @@ components:
         floorPrice:
           type: number
           nullable: true
-          description: "Current floor price in BTC, or 'priceless' if no open dispensers"
+          description: "Current floor price in BTC. Uses lowest open dispenser price, or most recent closed dispenser price if no open dispensers exist"
+        floorPriceUSD:
+          type: number
+          nullable: true
+          description: "Floor price converted to USD using current BTC/USD exchange rate"
+        marketCapUSD:
+          type: number
+          nullable: true
+          description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
     BlockStampRow:
       type: object
       properties:

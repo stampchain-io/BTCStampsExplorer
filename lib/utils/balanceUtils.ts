@@ -8,12 +8,31 @@ import {
 import { BLOCKCYPHER_API_BASE_URL } from "$lib/utils/constants.ts";
 import { getBTCBalanceFromMempool } from "$lib/utils/mempool.ts";
 
+// Cache for BTC price with TTL
+let btcPriceCache: {
+  price: number;
+  timestamp: number;
+} | null = null;
+
+const CACHE_TTL = 10 * 60 * 1000; // 5 minutes in milliseconds
+
 export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
   const requestId = `btc-price-${Date.now()}-${
     Math.random().toString(36).substr(2, 9)
   }`;
+
+  // Check cache first
+  if (btcPriceCache && Date.now() - btcPriceCache.timestamp < CACHE_TTL) {
+    console.log(
+      `[${requestId}] Using cached BTC price: ${btcPriceCache.price}`,
+    );
+    return btcPriceCache.price;
+  }
+
   console.log(
-    `[${requestId}] Fetching BTC price, apiBaseUrl: ${apiBaseUrl || "none"}`,
+    `[${requestId}] Cache miss, fetching BTC price, apiBaseUrl: ${
+      apiBaseUrl || "none"
+    }`,
   );
 
   try {
@@ -33,7 +52,7 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
       console.warn(
         `[${requestId}] BTC price endpoint returned ${response.status}: ${response.statusText}`,
       );
-      return 0;
+      return btcPriceCache?.price || 0; // Return cached price if available, otherwise 0
     }
 
     const text = await response.text();
@@ -45,10 +64,16 @@ export async function fetchBTCPriceInUSD(apiBaseUrl?: string): Promise<number> {
     const price = formatUSDValue(data.data?.price || 0);
     console.log(`[${requestId}] Formatted price: ${price}`);
 
+    // Update cache
+    btcPriceCache = {
+      price,
+      timestamp: Date.now(),
+    };
+
     return price;
   } catch (error) {
     console.error(`[${requestId}] Error fetching BTC price:`, error);
-    return 0;
+    return btcPriceCache?.price || 0; // Return cached price if available, otherwise 0
   }
 }
 

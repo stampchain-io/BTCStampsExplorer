@@ -63,6 +63,7 @@ export const handler: Handlers = {
           filterBy,
           ident,
           collectionId,
+          url: url.origin,
         });
       }
 
