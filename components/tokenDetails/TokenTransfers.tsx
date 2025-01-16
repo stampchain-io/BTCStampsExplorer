@@ -40,15 +40,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                   <td class="text-center">
                     {formatDate(new Date(send.block_time))}
                   </td>
-                  <td class="text-right">
-                    <span
-                      class="cursor-pointer hover:text-white"
-                      onClick={() =>
-                        navigator.clipboard.writeText(send.tx_hash)}
-                    >
-                      {abbreviateAddress(send.tx_hash)}
-                    </span>
-                  </td>
+                  <td class="text-right">{abbreviateAddress(send.tx_hash)}</td>
                 </tr>
               ))}
             </tbody>
