@@ -49,7 +49,7 @@ export const handler: Handlers = {
             recAddress: effectiveRecAddress,
           },
         );
-
+      console.log("validate=====>", validationError);
       if (validationError) {
         return ResponseUtil.badRequest(
           validationError.error || "Validation error",

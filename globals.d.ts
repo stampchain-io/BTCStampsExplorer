@@ -351,7 +351,7 @@ interface SRC101DeployDetail {
   recipients: string[];
 }
 
-interface SRC101Balance {
+export interface SRC101Balance {
   address: string;
   p: string;
   deploy_hash: string;
@@ -363,6 +363,7 @@ interface SRC101Balance {
   address_eth: string;
   txt_data: string;
   img: string;
+  owner: string;
 }
 
 interface Src101Detail {
