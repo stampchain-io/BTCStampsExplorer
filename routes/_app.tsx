@@ -29,6 +29,7 @@ export default function App({ Component, state }: PageProps<unknown>) {
 
         {/* Critical CSS first */}
         <link rel="preload" href="/styles.css" as="style" />
+        <link rel="stylesheet" href="/styles.css" />
 
         {/* Main font loader */}
         <FontLoader />
@@ -52,8 +53,8 @@ export default function App({ Component, state }: PageProps<unknown>) {
         {/* Preload critical resources */}
         <link
           rel="preload"
-          href="/img/transparent-bg.png"
-          as="image"
+          href="/styles.css"
+          as="style"
         />
 
         {/* Add font-display swap to prevent FOUT */}

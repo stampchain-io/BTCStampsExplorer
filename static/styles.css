@@ -29,8 +29,9 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("/img/transparent-bg.png");
-  background-size: 3px;
+  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
+      rgba(128, 128, 128, 0.1) 25% 50%);
+  background-size: 4px 4px;
   z-index: 1;
 }
 
@@ -144,7 +145,10 @@ body {
 
 .stamp-container {
   position: relative;
+  width: 100%;
+  height: 100%;
   z-index: 1;
+  aspect-ratio: 1;
 }
 
 .stamp-container::before {
@@ -154,20 +158,24 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("/img/transparent-bg.png");
-  background-size: 3px;
+  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
+      rgba(128, 128, 128, 0.1) 25% 50%);
+  background-size: 4px 4px;
   z-index: 0;
 }
 
 .stamp-image {
   position: relative;
   z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
 }
 
-.bgGradientTopLeft{
+.bgGradientTopLeft {
   width: 1728.553px;
   height: 1000px;
   transform: rotate(45deg);
@@ -179,16 +187,17 @@ body {
   left: -50%;
   top: -4%;
 }
-.bgGradientTopRight{
+
+.bgGradientTopRight {
   position: absolute;
-    top: -350px;
-    right: -450px;
-    width: 1128px;
-    height: 720px;
-    transform: rotate(-45deg);
-    border-radius: 1128px;
-    background: linear-gradient(77deg, #000 9.15%, #493240 50.02%, #F09 90.89%);
-    filter: blur(50px);
+  top: -350px;
+  right: -450px;
+  width: 1128px;
+  height: 720px;
+  transform: rotate(-45deg);
+  border-radius: 1128px;
+  background: linear-gradient(77deg, #000 9.15%, #493240 50.02%, #F09 90.89%);
+  filter: blur(50px);
 }
 
 .bgGradientTop {
@@ -501,8 +510,9 @@ body {
 .stamp-audio-container::before {
   content: "";
   @apply absolute inset-0;
-  background-image: url("/img/transparent-bg.png");
-  background-size: 3px;
+  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
+      rgba(128, 128, 128, 0.1) 25% 50%);
+  background-size: 4px 4px;
   z-index: 1;
 }
 
