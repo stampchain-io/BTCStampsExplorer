@@ -17,8 +17,6 @@ import { StampController } from "$server/controller/stampController.ts";
 import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
-import { TABLE_STYLES } from "$components/shared/types.ts";
-const { dataValueXLlink } = TABLE_STYLES;
 
 interface StampData {
   stamp: StampRow & { name?: string };
