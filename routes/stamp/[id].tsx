@@ -18,39 +18,25 @@ import { DispenserManager } from "$server/services/xcpService.ts";
 import { RouteType } from "$server/services/cacheService.ts";
 import { DOMParser } from "dom";
 
-interface Holder {
-  address: string | null;
-  quantity: number;
-  amt: number;
-  percentage: number;
-}
-
-interface StampDetailPageProps {
-  data: {
-    stamp: StampRow;
-    htmlTitle: string | undefined;
-    total: number;
-    sends: any;
-    dispensers: any;
-    dispenses: any;
-    holders: any;
-    vaults: any;
-    last_block: number;
-    stamps_recent: any;
-    lowestPriceDispenser: any; // Add this property
-  };
-}
-
 interface StampData {
-  stamp: StampRow;
+  stamp: StampRow & { name?: string };
   total: number;
   sends: any;
   dispensers: any;
   dispenses: any;
-  holders: any;
+  holders: any[];
+  vaults: any;
   last_block: number;
   stamps_recent: any;
   lowestPriceDispenser: any;
+  htmlTitle?: string;
+  error?: string;
+  url: string;
+}
+
+interface StampDetailPageProps {
+  data: StampData;
+  url?: string;
 }
 
 export const handler: Handlers<StampData> = {
@@ -109,20 +95,6 @@ export const handler: Handlers<StampData> = {
         btcPrice,
       );
 
-      const calculateHoldersWithPercentage = (rawHolders: Holder[]) => {
-        const totalQuantity = rawHolders.reduce(
-          (sum, holder) => sum + holder.quantity,
-          0,
-        );
-        return rawHolders.map((holder) => ({
-          ...holder,
-          amt: holder.quantity,
-          percentage: Number(
-            ((holder.quantity / totalQuantity) * 100).toFixed(2),
-          ),
-        }));
-      };
-
       let htmlTitle = null;
       if (
         stampWithPrices.stamp_mimetype === "text/html" &&
@@ -142,8 +114,8 @@ export const handler: Handlers<StampData> = {
         stamp: stampWithPrices,
         htmlTitle: htmlTitle,
         last_block: stampData.last_block,
-        stamps_recent: mainCategories[0]?.stamps ?? [], // Use the stamps from mainCategories
-        holders: calculateHoldersWithPercentage(holders.data),
+        stamps_recent: mainCategories[0]?.stamps ?? [],
+        holders: holders.data,
         lowestPriceDispenser: lowestPriceDispenser,
         url: req.url,
       });
@@ -154,6 +126,17 @@ export const handler: Handlers<StampData> = {
       }
       return ctx.render({
         error: error instanceof Error ? error.message : "Internal server error",
+        stamp: {} as StampRow,
+        total: 0,
+        sends: [],
+        dispensers: [],
+        dispenses: [],
+        holders: [],
+        vaults: [],
+        last_block: 0,
+        stamps_recent: [],
+        lowestPriceDispenser: null,
+        url: req.url,
       });
     }
   },
@@ -203,20 +186,25 @@ export default function StampPage(props: StampDetailPageProps) {
     stamp,
     htmlTitle,
     holders,
-    _sends,
     stamps_recent,
-    _dispensers = [],
-    _dispenses = [],
     lowestPriceDispenser = null,
   } = props.data;
   const title = htmlTitle
     ? htmlTitle.toUpperCase()
-    : stamp.cpid.startsWith("A")
-    ? `Bitcoin Stamp #${stamp.stamp} - stampchain.io`
-    : stamp.cpid;
+    : stamp?.cpid?.startsWith("A")
+    ? `Bitcoin Stamp #${stamp?.stamp || ""} - stampchain.io`
+    : stamp?.cpid || "Stamp Not Found";
 
-  // Update the getMetaImageUrl and add dimension handling
-  const getMetaImageInfo = (stamp: StampRow, baseUrl: string) => {
+  // Update the getMetaImageInfo and add dimension handling
+  const getMetaImageInfo = (stamp: StampRow | undefined, baseUrl: string) => {
+    if (!stamp) {
+      return {
+        url: `${baseUrl}/default-stamp-image.png`, // You should add a default image
+        width: 1200,
+        height: 1200,
+      };
+    }
+
     // For HTML/SVG content, use preview endpoint with known dimensions
     if (
       stamp.stamp_mimetype === "text/html" ||
@@ -235,11 +223,11 @@ export default function StampPage(props: StampDetailPageProps) {
     };
   };
 
-  const baseUrl = new URL(props.url).origin;
+  const baseUrl = new URL(props.url || "").origin;
   const metaInfo = getMetaImageInfo(stamp, baseUrl);
-  const metaDescription = `Bitcoin Stamp #${stamp.stamp} - ${
-    stamp.name || "Unprunable UTXO Art"
-  }`;
+  const metaDescription = stamp
+    ? `Bitcoin Stamp #${stamp.stamp} - ${stamp.name || "Unprunable UTXO Art"}`
+    : "Bitcoin Stamp - Unprunable UTXO Art";
 
   const bodyClassName = "flex flex-col gap-6";
 
@@ -320,8 +308,8 @@ export default function StampPage(props: StampDetailPageProps) {
         )}
 
         <StampRelatedInfo
-          stampId={stamp.stamp?.toString() || ""}
-          cpid={stamp.cpid}
+          _stampId={stamp?.stamp?.toString() || ""}
+          cpid={stamp?.cpid || ""}
         />
 
         <div class="pt-12 mobileLg:pt-24 desktop:pt-36">
