@@ -8,11 +8,15 @@ export interface TableConfig {
 
 export interface TableProps {
   type: TableType;
-  configs: TableConfig[];
-  cpid?: string; // For stamps
-  tick?: string; // For src20
-  name?: string; // For bitname
-  address?: string; // For vault
+  configs: Array<{ id: string }>;
+  cpid?: string;
+  tick?: string;
+  initialCounts?: {
+    dispensers?: number;
+    sales?: number;
+    transfers?: number;
+    mints?: number;
+  };
 }
 
 export interface TabData {

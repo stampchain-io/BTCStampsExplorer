@@ -19,19 +19,19 @@ import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
 
 const PAGE_SIZE = 20;
 
-export default function DetailsTable(
-  { type, configs, cpid, tick }: TableProps,
-) {
+export default function DetailsTable({
+  type,
+  configs,
+  cpid,
+  tick,
+  initialCounts = {},
+}: TableProps) {
   const [selectedTab, setSelectedTab] = useState<string>(configs[0].id);
   const [tabData, setTabData] = useState<TabData>({});
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [totalCounts, setTotalCounts] = useState({
-    dispensers: 0,
-    sales: 0,
-    transfers: 0,
-  });
+  const [totalCounts, setTotalCounts] = useState(initialCounts);
 
   const mapDispensesWithRates = (dispenses: any[], dispensers: any[]) => {
     if (!dispenses || !dispensers) return [];
@@ -166,7 +166,9 @@ export default function DetailsTable(
   };
 
   useEffect(() => {
-    const fetchTotalCounts = async () => {
+    if (Object.keys(initialCounts).length > 0) return;
+
+    const fetchCounts = async () => {
       if (!tick && !cpid) return;
 
       try {
@@ -197,8 +199,6 @@ export default function DetailsTable(
           });
         } else if (type === "src20" && tick) {
           const encodedTick = encodeURIComponent(tick);
-
-          // Using the same API endpoints as SRC20DetailsTab
           const [transferCount, mintCount] = await Promise.all([
             fetch(`/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`),
             fetch(`/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`),
@@ -217,16 +217,11 @@ export default function DetailsTable(
         }
       } catch (error) {
         console.error("Error fetching counts:", error);
-        setTotalCounts((prev) => ({
-          ...prev,
-          mints: 0,
-          transfers: 0,
-        }));
       }
     };
 
-    fetchTotalCounts();
-  }, [type, cpid, tick]);
+    fetchCounts();
+  }, [type, cpid, tick, initialCounts]);
 
   const getTabAlignment = (type: TableType, id: string, totalTabs: number) => {
     // For 3 tabs

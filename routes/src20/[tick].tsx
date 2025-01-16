@@ -10,11 +10,28 @@ export const handler: Handlers = {
     try {
       const rawTick = ctx.params.tick;
       const decodedTick = decodeURIComponent(rawTick);
+      const encodedTick = encodeURIComponent(rawTick);
 
-      const body = await Src20Controller.fetchSrc20TickPageData(decodedTick);
+      // Get the base URL from the request
+      const url = new URL(_req.url);
+      const baseUrl = `${url.protocol}//${url.host}`;
+
+      const [body, transferCount, mintCount] = await Promise.all([
+        Src20Controller.fetchSrc20TickPageData(decodedTick),
+        fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=TRANSFER&limit=1`)
+          .then((r) => r.json()),
+        fetch(`${baseUrl}/api/v2/src20/tick/${encodedTick}?op=MINT&limit=1`)
+          .then((r) => r.json()),
+      ]);
+
       if (!body) {
         return ctx.renderNotFound();
       }
+
+      body.initialCounts = {
+        transfers: transferCount.total || 0,
+        mints: mintCount.total || 0,
+      };
 
       return await ctx.render(body);
     } catch (error) {
@@ -76,5 +93,4 @@ function SRC20TickPage(props: SRC20TickPageProps) {
     </div>
   );
 }
-
 export default SRC20TickPage;
