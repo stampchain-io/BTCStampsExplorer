@@ -88,6 +88,11 @@ export function formatDate(
   date: Date,
   options: DateFormatOptions = {},
 ): string {
+  // Check for invalid date
+  if (!date || isNaN(date.getTime())) {
+    return "INVALID";
+  }
+
   const locale = navigator.language || "en-US";
   const formatOptions: Intl.DateTimeFormatOptions = {};
 

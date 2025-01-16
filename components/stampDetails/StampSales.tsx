@@ -23,7 +23,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
   return (
     <div class="relative w-full">
       <ScrollContainer class="max-h-48">
-        <div class="w-[480px] min-[480px]:w-full">
+        <div class="w-[500px] min-[500px]:w-full">
           <table class={tableValue}>
             <colgroup>
               <col className="w-[20%]" />
@@ -87,7 +87,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
                       stripZeros: true,
                     })}
                   </td>
-                  <td class="text-right uppercase">
+                  <td class="text-right">
                     {formatDate(new Date(dispense.block_time))}
                   </td>
                 </tr>
