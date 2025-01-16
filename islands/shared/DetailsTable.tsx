@@ -1,13 +1,12 @@
 import { useEffect, useState } from "preact/hooks";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
 import {
+  container,
   dataLabel,
-  row,
+  dataValueXLlink,
   TabData,
-  TABLE_STYLES,
   tableLabel,
   TableProps,
-  tableValue,
 } from "$components/shared/types.ts";
 
 import { TokenMints } from "$components/tokenDetails/TokenMints.tsx";
@@ -250,7 +249,7 @@ export default function DetailsTable({
           : "TRANSFERS";
       case "src20":
         return id === "mints" ? "MINTS" : "TRANSFERS";
-      case "bitname":
+      case "src101":
         // Add bitname specific labels
         return id.toUpperCase();
       case "vault":
@@ -262,7 +261,7 @@ export default function DetailsTable({
   };
 
   return (
-    <div class={TABLE_STYLES.container}>
+    <div class={container}>
       <div class="flex justify-between items-start w-full mb-6">
         {configs.map(({ id }) => {
           const count = totalCounts[id as keyof typeof totalCounts];
@@ -275,12 +274,12 @@ export default function DetailsTable({
               onClick={() => setSelectedTab(id)}
             >
               <span
-                class={`${TABLE_STYLES.dataLabel} group-hover:text-stamp-grey-light`}
+                class={`${dataLabel} group-hover:text-stamp-grey-light`}
               >
                 {getTabLabel(type, id)}
               </span>
               <div
-                class={`${TABLE_STYLES.dataValueXLlink} text-stamp-grey-darker ${
+                class={`${dataValueXLlink} text-stamp-grey-darker ${
                   selectedTab === id ? "text-stamp-grey-light" : ""
                 } group-hover:text-stamp-grey-light`}
               >
