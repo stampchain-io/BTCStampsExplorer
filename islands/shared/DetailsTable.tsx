@@ -75,15 +75,11 @@ export default function DetailsTable(
         );
         const data = await response.json();
 
-        const mappedData = {
-          dispensers: operation === "dispensers" ? data.data : undefined,
-          dispenses: operation === "dispenses" ? data.data : undefined,
-          sends: operation === "sends" ? data.data : undefined,
-        };
-
         setTabData((prev) => ({
           ...prev,
-          ...mappedData,
+          [operation]: isTabChange
+            ? data.data
+            : [...(prev[operation] || []), ...data.data],
         }));
 
         setHasMore(data.data?.length === PAGE_SIZE);
@@ -158,20 +154,11 @@ export default function DetailsTable(
     const scrollPosition = target.scrollTop + target.clientHeight;
     const scrollThreshold = target.scrollHeight - 20;
 
-    console.log({
-      scrollPosition,
-      scrollThreshold,
-      isLoading,
-      hasMore,
-      currentPage: page,
-    });
-
     if (
       scrollPosition >= scrollThreshold &&
       !isLoading &&
       hasMore
     ) {
-      console.log("Loading more data...");
       const nextPage = page + 1;
       setPage(nextPage);
       fetchData(nextPage, selectedTab);
