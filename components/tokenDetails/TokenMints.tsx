@@ -34,12 +34,34 @@ export function TokenMints({ mints }: TokenMintsProps) {
                 <tr key={mint.tx_hash} class={row}>
                   <td class="text-left">{mint.amt}</td>
                   <td class="text-center">
-                    {abbreviateAddress(mint.destination)}
+                    <a
+                      href={`/wallet/${mint.destination}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        globalThis.location.href =
+                          `/wallet/${mint.destination}`;
+                      }}
+                      className="hover:text-stamp-purple-bright cursor-pointer"
+                    >
+                      <span class="tablet:hidden">
+                        {abbreviateAddress(mint.destination, 4)}
+                      </span>
+                      <span class="hidden tablet:inline">
+                        {abbreviateAddress(mint.destination, 8)}
+                      </span>
+                    </a>
                   </td>
                   <td class="text-center">
                     {formatDate(new Date(mint.block_time))}
                   </td>
-                  <td class="text-center">{abbreviateAddress(mint.tx_hash)}</td>
+                  <td class="text-center">
+                    <span class="tablet:hidden">
+                      {abbreviateAddress(mint.tx_hash, 4)}
+                    </span>
+                    <span class="hidden tablet:inline">
+                      {abbreviateAddress(mint.tx_hash, 8)}
+                    </span>
+                  </td>
                   <td class="text-right">{mint.block_index}</td>
                 </tr>
               ))}
