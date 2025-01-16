@@ -43,3 +43,26 @@ export const tableLabel =
 export const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 export const row = "h-8 hover:bg-stamp-purple/10";
+
+// Add default colgroup
+export const defaultColGroup = {
+  columns: 5, // Default number of columns
+  width: "w-[20%]", // Default width for each column
+};
+
+// Helper function to generate colgroup
+export const generateColGroup = (customColumns?: Array<{ width: string }>) => {
+  if (customColumns) {
+    return customColumns.map((col, i) => ({
+      key: i,
+      className: col.width,
+    }));
+  }
+
+  return Array(defaultColGroup.columns)
+    .fill(null)
+    .map((_, i) => ({
+      key: i,
+      className: defaultColGroup.width,
+    }));
+};
