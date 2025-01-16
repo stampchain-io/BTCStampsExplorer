@@ -11,7 +11,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
   return (
     <div class="relative w-full">
       <ScrollContainer>
-        <div class="w-[480px] min-[480px]:w-full">
+        <div class="w-[500px] min-[500px]:w-full">
           <table class={tableValue}>
             <colgroup>
               <col className="w-[20%]" />
