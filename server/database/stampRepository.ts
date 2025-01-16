@@ -116,6 +116,9 @@ export class StampRepository {
     if (type !== "all") {
       if (type === "cursed") {
         stampCondition = "st.stamp < 0";
+      } else if (type === "stamps" && !identifier) {
+        if (!isSearchQuery)
+          stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
       } else if (type === "posh") {
         stampCondition =
           "st.stamp < 0 AND st.cpid NOT LIKE 'A%' AND st.ident != 'SRC-20'";
@@ -133,12 +136,6 @@ export class StampRepository {
       // stampCondition = "st.ident != 'SRC-20'";
       // whereConditions.push(`(${stampCondition})`);
     }
-
-    // when type is stamps
-    //  else if (type === "stamps") {
-    //     if (!isSearchQuery)
-    //       stampCondition = "st.stamp >= 0 AND st.ident != 'SRC-20'";
-    //   }
 
     // Ident condition
     if (ident && ident.length > 0 && !isSearchQuery) {
