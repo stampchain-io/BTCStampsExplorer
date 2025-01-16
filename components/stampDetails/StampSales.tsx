@@ -11,8 +11,8 @@ interface Dispense {
   destination: string;
   dispense_quantity: number;
   satoshirate: number;
-  confirmed: boolean;
   tx_hash: string;
+  block_time: string;
 }
 
 interface StampSalesProps {
@@ -34,10 +34,10 @@ export function StampSales({ dispenses }: StampSalesProps) {
             </colgroup>
             <thead>
               <tr>
-                <th class={`${tableLabel} text-left`}>PRICE</th>
-                <th class={`${tableLabel} text-center`}>QUANTITY</th>
-                <th class={`${tableLabel} text-center`}>FROM</th>
+                <th class={`${tableLabel} text-left`}>FROM</th>
                 <th class={`${tableLabel} text-center`}>TO</th>
+                <th class={`${tableLabel} text-center`}>QUANTITY</th>
+                <th class={`${tableLabel} text-center`}>PRICE</th>
                 <th class={`${tableLabel} text-right`}>DATE</th>
               </tr>
             </thead>
@@ -45,16 +45,6 @@ export function StampSales({ dispenses }: StampSalesProps) {
               {dispenses?.map((dispense, index) => (
                 <tr key={`${dispense.tx_hash}-${index}`} class={row}>
                   <td class="text-left">
-                    {formatSatoshisToBTC(dispense.satoshirate, {
-                      includeSymbol: true,
-                      decimals: 8,
-                      stripZeros: true,
-                    })}
-                  </td>
-                  <td class="text-center">
-                    {dispense.dispense_quantity}
-                  </td>
-                  <td class="text-center">
                     <a
                       href={`/wallet/${dispense.source}`}
                       onClick={(e) => {
@@ -88,6 +78,14 @@ export function StampSales({ dispenses }: StampSalesProps) {
                         {abbreviateAddress(dispense.destination, 6)}
                       </span>
                     </a>
+                  </td>
+                  <td class="text-center">{dispense.dispense_quantity}</td>
+                  <td class="text-center">
+                    {formatSatoshisToBTC(dispense.satoshirate, {
+                      includeSymbol: true,
+                      decimals: 8,
+                      stripZeros: true,
+                    })}
                   </td>
                   <td class="text-right uppercase">
                     {formatDate(new Date(dispense.block_time))}
