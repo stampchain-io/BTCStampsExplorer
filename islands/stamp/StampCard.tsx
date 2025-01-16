@@ -143,13 +143,15 @@ export function StampCard({
         if (isValid) {
           setValidatedContent(
             <div class="stamp-container">
-              <img
-                src={src}
-                loading="lazy"
-                alt={`Stamp No. ${stamp.stamp}`}
-                class="absolute inset-0 w-full h-full object-contain pixelart stamp-image"
-                onError={handleImageError}
-              />
+              <div class="relative z-10 aspect-square">
+                <img
+                  src={src}
+                  loading="lazy"
+                  alt={`Stamp No. ${stamp.stamp}`}
+                  class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                  onError={handleImageError}
+                />
+              </div>
             </div>,
           );
         }
@@ -241,24 +243,30 @@ export function StampCard({
 
     if (stamp.stamp_mimetype === "image/svg+xml") {
       return validatedContent || (
-        <img
-          src={NOT_AVAILABLE_IMAGE}
-          alt="Loading..."
-          class="absolute inset-0 w-full h-full object-contain pixelart"
-        />
+        <div class="stamp-container">
+          <div class="relative z-10 aspect-square">
+            <img
+              src={NOT_AVAILABLE_IMAGE}
+              alt="Loading..."
+              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            />
+          </div>
+        </div>
       );
     }
 
     // Regular images
     return (
       <div class="stamp-container">
-        <img
-          src={src}
-          loading="lazy"
-          alt={`Stamp No. ${stamp.stamp}`}
-          class="absolute inset-0 w-full h-full object-contain pixelart stamp-image"
-          onError={handleImageError}
-        />
+        <div class="relative z-10 aspect-square">
+          <img
+            src={src}
+            loading="lazy"
+            alt={`Stamp No. ${stamp.stamp}`}
+            class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            onError={handleImageError}
+          />
+        </div>
       </div>
     );
   };
