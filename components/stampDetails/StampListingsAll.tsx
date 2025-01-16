@@ -1,9 +1,9 @@
 import {
   abbreviateAddress,
-  formatNumber,
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
-import { ScrollContainer } from "../shared/ScrollContainer.tsx";
+import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
+import { row, tableLabel, tableValue } from "$components/shared/types.ts";
 
 interface Dispenser {
   source: string;
@@ -11,112 +11,89 @@ interface Dispenser {
   escrow_quantity: number;
   give_quantity: number;
   satoshirate: number;
-  confirmed: boolean;
-  close_block_index: number;
+  tx_hash: string;
 }
 
 interface StampListingsAllProps {
   dispensers: Dispenser[];
 }
 
-const tableHeaders = [
-  { key: "price", label: "Price" },
-  { key: "escrow", label: "Escrow" },
-  { key: "give", label: "Give" },
-  { key: "remaining", label: "Remain" },
-  { key: "address", label: "Address" },
-  { key: "confirmed", label: "Confirmed" },
-  { key: "closeBlock", label: "Closed" },
-];
-
-const tableLabel =
-  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const tableValue =
-  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
-
-function DispenserRow({ dispenser }: { dispenser: Dispenser }) {
-  const isEmpty = dispenser.give_remaining === 0;
-  const rowDispensers = `${
-    isEmpty ? "text-stamp-grey-darker" : ""
-  } h-8 hover:bg-stamp-purple/10`;
-
-  return (
-    <tr class={rowDispensers}>
-      <td className="text-left">
-        {formatSatoshisToBTC(dispenser.satoshirate)}
-      </td>
-      <td className="text-center">
-        {formatNumber(dispenser.escrow_quantity, 0)}
-      </td>
-      <td className="text-center">
-        {formatNumber(dispenser.give_quantity, 0)}
-      </td>
-      <td className="text-center">
-        {formatNumber(dispenser.give_remaining, 0)}
-      </td>
-      <td className="text-center">
-        <span className="tablet:hidden">
-          {abbreviateAddress(dispenser.source, 4)}
-        </span>
-        <span className="hidden tablet:inline">
-          {abbreviateAddress(dispenser.source, 8)}
-        </span>
-      </td>
-      <td className="text-center">
-        {dispenser.confirmed ? "YES" : "NO"}
-      </td>
-      <td className="text-right">
-        {!dispenser.close_block_index || dispenser.close_block_index <= 0
-          ? "OPEN"
-          : dispenser.close_block_index}
-      </td>
-    </tr>
-  );
-}
-
 export function StampListingsAll({ dispensers }: StampListingsAllProps) {
   // TODO(@reinamora_137): the secondary sort should be by creation date
-  const sortedDispensers = [...dispensers].sort((a, b) =>
-    b.give_remaining - a.give_remaining
-  );
+  // const sortedDispensers = [...dispensers].sort((a, b) =>
+  //   b.give_remaining - a.give_remaining
+  // );
 
   return (
     <div class="relative w-full">
-      <ScrollContainer class="max-h-48">
+      <ScrollContainer>
         <div class="w-[660px] min-[660px]:w-full">
           <table class={tableValue}>
             <colgroup>
-              <col class="w-[16%]" /> {/* Price */}
-              <col class="w-[10%]" /> {/* Escrow */}
-              <col class="w-[10%]" /> {/* Give */}
-              <col class="w-[10%]" /> {/* Remain */}
-              <col class="w-[26%]" /> {/* Address column */}
-              <col class="w-[14%]" /> {/* Confirmed */}
-              <col class="w-[14%]" /> {/* Closed */}
+              <col class="w-[16%]" />
+              <col class="w-[12%]" />
+              <col class="w-[12%]" />
+              <col class="w-[12%]" />
+              <col class="w-[12%]" />
+              <col class="w-[24%]" />
+              <col class="w-[12%]" />
             </colgroup>
             <thead>
               <tr>
-                {tableHeaders.map(({ key, label }) => (
-                  <th
-                    key={key}
-                    scope="col"
-                    class={`${tableLabel} pb-1.5 ${
-                      key === "price"
-                        ? "text-left"
-                        : key === "closeBlock"
-                        ? "text-right"
-                        : "text-center"
-                    }`}
-                  >
-                    {label}
-                  </th>
-                ))}
+                <th class={`${tableLabel} text-left`}>PRICE</th>
+                <th class={`${tableLabel} text-center`}>ESCROW</th>
+                <th class={`${tableLabel} text-center`}>GIVE</th>
+                <th class={`${tableLabel} text-center`}>REMAIN</th>
+                <th class={`${tableLabel} text-center`}>SOURCE</th>
+                <th class={`${tableLabel} text-center`}>ADDRESS</th>
+                <th class={`${tableLabel} text-right`}>STATUS</th>
               </tr>
             </thead>
             <tbody>
-              {sortedDispensers.map((dispenser) => (
-                <DispenserRow key={dispenser.source} dispenser={dispenser} />
-              ))}
+              {dispensers?.map((dispenser, index) => {
+                const isEmpty = dispenser.give_remaining === 0;
+                const rowDispensersRemain = `${
+                  isEmpty ? "text-stamp-grey-darker" : ""
+                } ${row}`;
+
+                return (
+                  <tr
+                    key={`${dispenser.tx_hash}-${index}`}
+                    class={rowDispensersRemain}
+                  >
+                    <td class="text-left">
+                      {formatSatoshisToBTC(dispenser.satoshirate)}
+                    </td>
+                    <td class="text-center">{dispenser.escrow_quantity}</td>
+                    <td class="text-center">{dispenser.give_quantity}</td>
+                    <td class="text-center">{dispenser.give_remaining}</td>
+                    <td class="text-center">DISPENSER</td>
+                    <td class="text-center">
+                      <span class="tablet:hidden">
+                        {abbreviateAddress(dispenser.source, 4)}
+                      </span>
+                      <span class="hidden tablet:inline">
+                        {abbreviateAddress(dispenser.source, 8)}
+                      </span>
+                    </td>
+                    <td class="text-right">
+                      {!dispenser.close_block_index ||
+                          dispenser.close_block_index <= 0
+                        ? "OPEN"
+                        : (
+                          <a
+                            href={`https://www.blockchain.com/explorer/transactions/btc/${dispenser.tx_hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="hover:text-stamp-purple-bright"
+                          >
+                            CLOSED
+                          </a>
+                        )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
