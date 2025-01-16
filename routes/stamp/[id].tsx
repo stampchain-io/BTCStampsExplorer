@@ -46,6 +46,7 @@ export const handler: Handlers<StampData> = {
     try {
       const { id } = ctx.params;
       const url = new URL(req.url);
+      const baseUrl = `${url.protocol}//${url.host}`;
 
       // Get stamp details first
       const stampData = await StampController.getStampDetailsById(id);
@@ -53,8 +54,20 @@ export const handler: Handlers<StampData> = {
         return ctx.renderNotFound();
       }
 
+      const encodedCpid = encodeURIComponent(stampData.data.stamp.cpid);
+      const countParams = new URLSearchParams({
+        limit: "20",
+        sort: "DESC",
+      });
+
       // Use the CPID from stamp data for other queries
-      const [holders, mainCategories] = await Promise.all([
+      const [
+        holders,
+        mainCategories,
+        dispensersCount,
+        salesCount,
+        transfersCount,
+      ] = await Promise.all([
         StampController.getStampHolders(
           stampData.data.stamp.cpid,
           1,
@@ -70,6 +83,14 @@ export const handler: Handlers<StampData> = {
             sortBy: "DESC",
           },
         ]),
+        fetch(
+          `${baseUrl}/api/v2/stamps/${encodedCpid}/dispensers?${countParams}`,
+        ).then((r) => r.json()),
+        fetch(
+          `${baseUrl}/api/v2/stamps/${encodedCpid}/dispenses?${countParams}`,
+        ).then((r) => r.json()),
+        fetch(`${baseUrl}/api/v2/stamps/${encodedCpid}/sends?${countParams}`)
+          .then((r) => r.json()),
       ]);
 
       // Only fetch dispensers for STAMP or SRC-721
@@ -120,6 +141,11 @@ export const handler: Handlers<StampData> = {
         holders: holders.data,
         lowestPriceDispenser: lowestPriceDispenser,
         url: req.url,
+        initialCounts: {
+          dispensers: dispensersCount.total || 0,
+          sales: salesCount.total || 0,
+          transfers: transfersCount.total || 0,
+        },
       });
     } catch (error) {
       console.error("Error fetching stamp data:", error);
