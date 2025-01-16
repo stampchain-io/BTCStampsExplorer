@@ -21,7 +21,6 @@ export function MetaTags({
 
       {/* Stylesheets */}
       <link rel="stylesheet" href="/carousel.css" />
-      <link rel="stylesheet" href="/styles.css" />
       <link rel="stylesheet" href="/gradients.css" />
 
       {/* Icons */}

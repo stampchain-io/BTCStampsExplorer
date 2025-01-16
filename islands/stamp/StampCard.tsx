@@ -251,13 +251,15 @@ export function StampCard({
 
     // Regular images
     return (
-      <img
-        src={src}
-        loading="lazy"
-        alt={`Stamp No. ${stamp.stamp}`}
-        class="absolute inset-0 w-full h-full object-contain pixelart"
-        onError={handleImageError}
-      />
+      <div class="stamp-container">
+        <img
+          src={src}
+          loading="lazy"
+          alt={`Stamp No. ${stamp.stamp}`}
+          class="absolute inset-0 w-full h-full object-contain pixelart stamp-image"
+          onError={handleImageError}
+        />
+      </div>
     );
   };
 
