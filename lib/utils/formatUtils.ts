@@ -85,14 +85,9 @@ interface DateFormatOptions {
 }
 
 export function formatDate(
-  date: Date | string,
-  options: { includeRelative?: boolean } = {},
+  date: Date,
+  options: DateFormatOptions = {},
 ): string {
-  if (!date) return "INVALID DATE";
-
-  const dateObj = date instanceof Date ? date : new Date(date);
-  if (isNaN(dateObj.getTime())) return "INVALID DATE";
-
   const locale = navigator.language || "en-US";
   const formatOptions: Intl.DateTimeFormatOptions = {};
 
@@ -106,11 +101,11 @@ export function formatDate(
   if (options.year) formatOptions.year = options.year;
   if (options.day) formatOptions.day = options.day;
 
-  const formattedDate = dateObj.toLocaleDateString(locale, formatOptions);
+  const formattedDate = date.toLocaleDateString(locale, formatOptions);
 
   // Add relative time if requested
   if (options.includeRelative) {
-    return `${formattedDate} (${dayjs(dateObj).fromNow()})`;
+    return `${formattedDate} (${dayjs(date).fromNow()})`;
   }
 
   return formattedDate;
