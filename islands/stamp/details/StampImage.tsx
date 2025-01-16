@@ -462,7 +462,7 @@ export function StampImage(
   useEffect(() => {
     const validateContent = async () => {
       if (stamp.stamp_mimetype === "image/svg+xml") {
-        const { isValid } = await validateStampContent(src);
+        const { isValid, error } = await validateStampContent(src);
         if (isValid) {
           setValidatedContent(
             <div className="stamp-container">
@@ -472,6 +472,21 @@ export function StampImage(
                 alt={`Stamp No. ${stamp.stamp}`}
                 className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
                 onError={handleImageError}
+              />
+            </div>,
+          );
+        } else {
+          logger.debug("ui", {
+            message: "SVG validation failed",
+            error,
+            stamp: stamp.stamp,
+          });
+          setValidatedContent(
+            <div className="stamp-container">
+              <img
+                src={NOT_AVAILABLE_IMAGE}
+                alt="Invalid SVG"
+                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
               />
             </div>,
           );
@@ -508,6 +523,7 @@ export function StampImage(
         shareTooltipTimeoutRef,
         codeTooltipTimeoutRef,
         fullscreenTooltipTimeoutRef,
+        xTooltipTimeoutRef,
       ].forEach((ref) => {
         if (ref.current !== null) {
           globalThis.clearTimeout(ref.current);
@@ -517,10 +533,6 @@ export function StampImage(
     };
   }, []);
 
-  // Add these state declarations for X button
-  const [_isXTooltipVisible, setIsXTooltipVisible] = useState(false);
-  const [allowXTooltip, setAllowXTooltip] = useState(true);
-  const xButtonRef = useRef<HTMLDivElement>(null);
   const xTooltipTimeoutRef = useRef<number | null>(null);
 
   // Add to cleanup useEffect
@@ -534,41 +546,6 @@ export function StampImage(
       }
     };
   }, []);
-
-  // Add these handler functions
-  const _handleXMouseEnter = () => {
-    if (allowXTooltip) {
-      if (xTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(xTooltipTimeoutRef.current);
-      }
-
-      xTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        const buttonRect = xButtonRef.current?.getBoundingClientRect();
-        if (buttonRect) {
-          setIsXTooltipVisible(true);
-        }
-      }, 1500);
-    }
-  };
-
-  const _handleXMouseLeave = () => {
-    if (xTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(xTooltipTimeoutRef.current);
-    }
-    setIsXTooltipVisible(false);
-    setAllowXTooltip(true);
-  };
-
-  // Update shareToX function
-  const _shareToX = () => {
-    const url = `https://stampchain.io/stamp/${stamp.stamp}`;
-    const text = "Check out what I found @Stampchain";
-    const xShareUrl = `https://x.com/intent/post?text=${
-      encodeURIComponent(text)
-    }&url=${encodeURIComponent(url)}`;
-    setIsXTooltipVisible(false);
-    globalThis.open(xShareUrl, "_blank", "noopener,noreferrer");
-  };
 
   return (
     <>
@@ -625,7 +602,7 @@ export function StampImage(
           <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
             <div className="stamp-container">
               <div className="relative aspect-square">
-                <TextContentIsland src={src} className={className} />
+                <TextContentIsland src={src} />
               </div>
             </div>
           </div>
