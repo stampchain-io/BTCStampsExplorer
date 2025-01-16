@@ -44,10 +44,17 @@ export const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 export const row = "h-8 hover:bg-stamp-purple/10";
 
+// Add text alignment helpers
+export const tableAlign = {
+  first: "text-left",
+  middle: "text-center",
+  last: "text-right",
+};
+
 // Add default colgroup
 export const defaultColGroup = {
-  columns: 5, // Default number of columns
-  width: "w-[20%]", // Default width for each column
+  columns: 5,
+  width: "w-[20%]",
 };
 
 // Helper function to generate colgroup
@@ -65,4 +72,11 @@ export const generateColGroup = (customColumns?: Array<{ width: string }>) => {
       key: i,
       className: defaultColGroup.width,
     }));
+};
+
+// Helper function to get cell alignment
+export const getCellAlignment = (index: number, total: number) => {
+  if (index === 0) return tableAlign.first;
+  if (index === total - 1) return tableAlign.last;
+  return tableAlign.middle;
 };
