@@ -3,7 +3,12 @@ import {
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
-import { row, tableLabel, tableValue } from "$components/shared/types.ts";
+import {
+  generateColGroup,
+  row,
+  tableLabel,
+  tableValue,
+} from "$components/shared/types.ts";
 
 interface Dispenser {
   source: string;
@@ -26,17 +31,19 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
 
   return (
     <div class="relative w-full">
-      <ScrollContainer>
+      <ScrollContainer class="max-h-48">
         <div class="w-[660px] min-[660px]:w-full">
           <table class={tableValue}>
             <colgroup>
-              <col class="w-[16%]" />
-              <col class="w-[12%]" />
-              <col class="w-[12%]" />
-              <col class="w-[12%]" />
-              <col class="w-[16%]" />
-              <col class="w-[20%]" />
-              <col class="w-[12%]" />
+              {generateColGroup([
+                { width: "w-[16%]" },
+                { width: "w-[10%]" },
+                { width: "w-[10%]" },
+                { width: "w-[10%]" },
+                { width: "w-[26%]" },
+                { width: "w-[14%]" },
+                { width: "w-[14%]" },
+              ]).map((col) => <col key={col.key} className={col.className} />)}
             </colgroup>
             <thead>
               <tr>
