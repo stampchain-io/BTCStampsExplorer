@@ -32,15 +32,53 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
             <tbody>
               {sends?.map((send) => (
                 <tr key={send.tx_hash} class={row}>
-                  <td class="text-left">{abbreviateAddress(send.creator)}</td>
+                  <td class="text-left">
+                    <a
+                      href={`/wallet/${send.creator}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        globalThis.location.href = `/wallet/${send.creator}`;
+                      }}
+                      className="hover:text-stamp-purple-bright cursor-pointer"
+                    >
+                      <span class="tablet:hidden">
+                        {abbreviateAddress(send.creator, 4)}
+                      </span>
+                      <span class="hidden tablet:inline">
+                        {abbreviateAddress(send.creator, 8)}
+                      </span>
+                    </a>
+                  </td>
                   <td class="text-center">
-                    {abbreviateAddress(send.destination)}
+                    <a
+                      href={`/wallet/${send.destination}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        globalThis.location.href =
+                          `/wallet/${send.destination}`;
+                      }}
+                      className="hover:text-stamp-purple-bright cursor-pointer"
+                    >
+                      <span class="tablet:hidden">
+                        {abbreviateAddress(send.destination, 4)}
+                      </span>
+                      <span class="hidden tablet:inline">
+                        {abbreviateAddress(send.destination, 8)}
+                      </span>
+                    </a>
                   </td>
                   <td class="text-center">{send.amt}</td>
                   <td class="text-center">
                     {formatDate(new Date(send.block_time))}
                   </td>
-                  <td class="text-right">{abbreviateAddress(send.tx_hash)}</td>
+                  <td class="text-right">
+                    <span class="tablet:hidden">
+                      {abbreviateAddress(send.tx_hash, 4)}
+                    </span>
+                    <span class="hidden tablet:inline">
+                      {abbreviateAddress(send.tx_hash, 8)}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
