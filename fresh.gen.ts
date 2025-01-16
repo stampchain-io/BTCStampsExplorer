@@ -213,6 +213,7 @@ import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampT
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
+import * as $stamping_src101_DetailModal from "./islands/stamping/src101/DetailModal.tsx";
 import * as $stamping_src101_register_RecentRegister from "./islands/stamping/src101/register/RecentRegister.tsx";
 import * as $stamping_src101_register_RegisterContent from "./islands/stamping/src101/register/RegisterContent.tsx";
 import * as $stamping_src20_SRC20InputField from "./islands/stamping/src20/SRC20InputField.tsx";
@@ -489,6 +490,7 @@ const manifest = {
     "./islands/stamping/InputField.tsx": $stamping_InputField,
     "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
+    "./islands/stamping/src101/DetailModal.tsx": $stamping_src101_DetailModal,
     "./islands/stamping/src101/register/RecentRegister.tsx":
       $stamping_src101_register_RecentRegister,
     "./islands/stamping/src101/register/RegisterContent.tsx":
