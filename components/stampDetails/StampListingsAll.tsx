@@ -34,8 +34,8 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
               <col class="w-[12%]" />
               <col class="w-[12%]" />
               <col class="w-[12%]" />
-              <col class="w-[12%]" />
-              <col class="w-[24%]" />
+              <col class="w-[16%]" />
+              <col class="w-[20%]" />
               <col class="w-[12%]" />
             </colgroup>
             <thead>
