@@ -658,7 +658,7 @@ export interface Collection {
   collection_id: string;
   collection_name: string;
   collection_description: string;
-  creators: string;
+  creators: string[];
   stamp_count: number;
   total_editions: number;
   first_stamp_image?: string | null;
