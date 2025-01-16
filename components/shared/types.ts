@@ -1,4 +1,5 @@
-export type TableType = "stamps" | "src20" | "bitname" | "vault";
+// Table tabs
+export type TableType = "stamps" | "src20" | "src101" | "vault";
 
 export interface TableConfig {
   id: string;
@@ -32,36 +33,37 @@ export interface FetchResponse {
   total: number;
 }
 
-// Reusable table styling
-export const TABLE_STYLES = {
-  container: "dark-gradient rounded-lg p-3 mobileMd:p-6",
-  dataLabel:
-    "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase",
-  dataValueXL: "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1",
-  dataValueXLlink: "text-3xl mobileLg:text-4xl font-black -mt-1",
-};
+// Table styles
+export const container = "dark-gradient rounded-lg p-3 mobileMd:p-6";
 export const dataLabel =
   "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+export const dataValueXL =
+  "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
+export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
+
+// Table content
+// Table styles
 export const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase pb-1.5";
 export const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 export const row = "h-8 hover:bg-stamp-purple/10";
 
-// Add text alignment helpers
+// Cell alignment
 export const tableAlign = {
   first: "text-left",
   middle: "text-center",
   last: "text-right",
 };
 
-// Add default colgroup
+// Default column group
 export const defaultColGroup = {
   columns: 5,
   width: "w-[20%]",
 };
 
-// Helper function to generate colgroup
+// Helper functions
+// Column group
 export const generateColGroup = (customColumns?: Array<{ width: string }>) => {
   if (customColumns) {
     return customColumns.map((col, i) => ({
@@ -78,7 +80,7 @@ export const generateColGroup = (customColumns?: Array<{ width: string }>) => {
     }));
 };
 
-// Helper function to get cell alignment
+// Cell alignment
 export const getCellAlignment = (index: number, total: number) => {
   if (index === 0) return tableAlign.first;
   if (index === total - 1) return tableAlign.last;
