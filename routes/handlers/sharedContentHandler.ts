@@ -9,10 +9,16 @@ import {
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { FreshContext } from "$fresh/server.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { getRecursiveHeaders } from "$lib/utils/securityHeaders.ts";
+
+// Define the state type
+interface State {
+  baseUrl: string;
+}
 
 export async function handleContentRequest(
   identifier: string,
-  ctx: FreshContext,
+  ctx: FreshContext<State>,
 ) {
   logger.debug("content", {
     message: "Content request received",
@@ -60,26 +66,20 @@ export async function handleContentRequest(
     ) {
       const html = await response.text();
 
-      // Serve as "text/plain" to avoid Rocket Loader completely
+      // Add data-cfasync="false" to script tags that load recursive content
+      const modifiedHtml = html.replace(
+        /<script([^>]*?)src="\/s\/([A-Z0-9]+)"([^>]*?)>/g,
+        '<script$1src="/s/$2"$3 data-cfasync="false">',
+      );
+
+      // Use the recursive headers which include appropriate CSP and cache settings
       const headers = {
         ...Object.fromEntries(response.headers),
-        "Content-Type": "text/plain",
-        "X-Original-Content-Type": "text/html",
-        "Cache-Control": "public, max-age=2592000, immutable",
-        "CDN-Cache-Control": "public, max-age=2592000, immutable",
-        "Surrogate-Control": "public, max-age=2592000, immutable",
+        ...getRecursiveHeaders(),
+        "Content-Type": "text/html; charset=utf-8",
       };
 
-      // Add script to correct content type client-side
-      const finalHtml = `
-        <script>
-          document.contentType = 'text/html; charset=utf-8';
-          document.querySelector('html').innerHTML = document.querySelector('body').textContent;
-        </script>
-        ${html}
-      `;
-
-      return new Response(finalHtml, {
+      return new Response(modifiedHtml, {
         headers: normalizeHeaders(headers),
       });
     }

@@ -136,6 +136,25 @@ export function isValidSVG(svgContent: string): boolean {
   return true;
 }
 
+export function isValidDataUrl(url: string): boolean {
+  // Basic data URL format check
+  if (!url.startsWith("data:")) return false;
+
+  // Split into media type and data
+  const [header, ...rest] = url.split(",");
+  if (!header || rest.length === 0) return false;
+
+  // Check media type format
+  const [mediaType] = header.slice(5).split(";");
+  if (!mediaType) return false;
+
+  // Ensure only one media type declaration
+  const mediaTypeParts = mediaType.split("+");
+  if (mediaTypeParts.length > 2) return false;
+
+  return true;
+}
+
 // Keep validation logic without JSX
 export const validateStampContent = async (src: string): Promise<{
   isValid: boolean;
@@ -152,9 +171,39 @@ export const validateStampContent = async (src: string): Promise<{
       return { isValid: false, error: "Invalid content" };
     }
 
+    // For SVG content, do additional validation only if it contains data URLs
+    if (src.endsWith(".svg") || content.trim().startsWith("<svg")) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, "image/svg+xml");
+
+      // Check for parsing errors
+      const parserError = doc.querySelector("parsererror");
+      if (parserError) {
+        return { isValid: false, error: "Invalid SVG format" };
+      }
+
+      // Only validate data URLs if they exist in the SVG
+      const allElements = doc.getElementsByTagName("*");
+      for (const element of allElements) {
+        const attributes = element.attributes;
+        for (const attr of attributes) {
+          if (attr.value.startsWith("data:")) {
+            if (!isValidDataUrl(attr.value)) {
+              return { isValid: false, error: "Invalid data URL in SVG" };
+            }
+          }
+        }
+      }
+    }
+
     return { isValid: true };
-  } catch {
-    return { isValid: false, error: "Error validating content" };
+  } catch (error) {
+    return {
+      isValid: false,
+      error: error instanceof Error
+        ? error.message
+        : "Error validating content",
+    };
   }
 };
 

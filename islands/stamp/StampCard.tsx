@@ -15,7 +15,7 @@ import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-
+import { logger } from "$lib/utils/logger.ts";
 // Text style constants for different breakpoints
 
 // TODO(@reinamora_137): add a variant for the inline detail display
@@ -139,7 +139,7 @@ export function StampCard({
   useEffect(() => {
     const validateContent = async () => {
       if (stamp.stamp_mimetype === "image/svg+xml") {
-        const { isValid } = await validateStampContent(src);
+        const { isValid, error } = await validateStampContent(src);
         if (isValid) {
           setValidatedContent(
             <div class="stamp-container">
@@ -150,6 +150,23 @@ export function StampCard({
                   alt={`Stamp No. ${stamp.stamp}`}
                   class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
                   onError={handleImageError}
+                />
+              </div>
+            </div>,
+          );
+        } else {
+          logger.debug("stamps", {
+            message: "SVG validation failed",
+            error,
+            stamp: stamp.stamp,
+          });
+          setValidatedContent(
+            <div class="stamp-container">
+              <div class="relative z-10 aspect-square">
+                <img
+                  src={NOT_AVAILABLE_IMAGE}
+                  alt="Invalid SVG"
+                  class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
                 />
               </div>
             </div>,
