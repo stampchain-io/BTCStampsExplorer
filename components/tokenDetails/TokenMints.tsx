@@ -1,18 +1,21 @@
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
-import { SRC20Row } from "$globals";
 import {
   generateColGroup,
+  getCellAlignment,
   row,
   tableLabel,
   tableValue,
 } from "$components/shared/types.ts";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
+import { SRC20Row } from "$globals";
 
 interface TokenMintsProps {
   mints: SRC20Row[];
 }
 
 export function TokenMints({ mints }: TokenMintsProps) {
+  const headers = ["AMOUNT", "ADDRESS", "DATE", "TX HASH", "BLOCK"];
+
   return (
     <div class="relative w-full">
       <ScrollContainer>
@@ -25,18 +28,25 @@ export function TokenMints({ mints }: TokenMintsProps) {
             </colgroup>
             <thead>
               <tr>
-                <th class={`${tableLabel} text-left`}>AMOUNT</th>
-                <th class={`${tableLabel} text-center`}>ADDRESS</th>
-                <th class={`${tableLabel} text-center`}>DATE</th>
-                <th class={`${tableLabel} text-center`}>TX HASH</th>
-                <th class={`${tableLabel} text-right`}>BLOCK</th>
+                {headers.map((header, i) => (
+                  <th
+                    key={i}
+                    class={`${tableLabel} ${
+                      getCellAlignment(i, headers.length)
+                    }`}
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {mints?.map((mint) => (
                 <tr key={mint.tx_hash} class={row}>
-                  <td class="text-left">{mint.amt}</td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(0, headers.length)}>
+                    {mint.amt}
+                  </td>
+                  <td class={getCellAlignment(1, headers.length)}>
                     <a
                       href={`/wallet/${mint.destination}`}
                       onClick={(e) => {
@@ -54,10 +64,10 @@ export function TokenMints({ mints }: TokenMintsProps) {
                       </span>
                     </a>
                   </td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(2, headers.length)}>
                     {formatDate(new Date(mint.block_time))}
                   </td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(3, headers.length)}>
                     <span class="tablet:hidden">
                       {abbreviateAddress(mint.tx_hash, 4)}
                     </span>
@@ -65,7 +75,9 @@ export function TokenMints({ mints }: TokenMintsProps) {
                       {abbreviateAddress(mint.tx_hash, 8)}
                     </span>
                   </td>
-                  <td class="text-right">{mint.block_index}</td>
+                  <td class={getCellAlignment(4, headers.length)}>
+                    {mint.block_index}
+                  </td>
                 </tr>
               ))}
             </tbody>

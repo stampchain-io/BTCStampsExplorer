@@ -1,18 +1,21 @@
-import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
-import { SRC20Row } from "$globals";
 import {
   generateColGroup,
+  getCellAlignment,
   row,
   tableLabel,
   tableValue,
 } from "$components/shared/types.ts";
+import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
+import { SRC20Row } from "$globals";
 
 interface TokenTransfersProps {
   sends: SRC20Row[];
 }
 
 export function TokenTransfers({ sends }: TokenTransfersProps) {
+  const headers = ["FROM", "TO", "AMOUNT", "DATE", "TX HASH"];
+
   return (
     <div class="relative w-full">
       <ScrollContainer>
@@ -25,17 +28,22 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
             </colgroup>
             <thead>
               <tr>
-                <th class={`${tableLabel} text-left`}>FROM</th>
-                <th class={`${tableLabel} text-center`}>TO</th>
-                <th class={`${tableLabel} text-center`}>AMOUNT</th>
-                <th class={`${tableLabel} text-center`}>DATE</th>
-                <th class={`${tableLabel} text-right`}>TX HASH</th>
+                {headers.map((header, i) => (
+                  <th
+                    key={i}
+                    class={`${tableLabel} ${
+                      getCellAlignment(i, headers.length)
+                    }`}
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {sends?.map((send) => (
                 <tr key={send.tx_hash} class={row}>
-                  <td class="text-left">
+                  <td class={getCellAlignment(0, headers.length)}>
                     <a
                       href={`/wallet/${send.creator}`}
                       onClick={(e) => {
@@ -52,7 +60,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                       </span>
                     </a>
                   </td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(1, headers.length)}>
                     <a
                       href={`/wallet/${send.destination}`}
                       onClick={(e) => {
@@ -70,11 +78,13 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                       </span>
                     </a>
                   </td>
-                  <td class="text-center">{send.amt}</td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(2, headers.length)}>
+                    {send.amt}
+                  </td>
+                  <td class={getCellAlignment(3, headers.length)}>
                     {formatDate(new Date(send.block_time))}
                   </td>
-                  <td class="text-right">
+                  <td class={getCellAlignment(4, headers.length)}>
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.tx_hash, 4)}
                     </span>

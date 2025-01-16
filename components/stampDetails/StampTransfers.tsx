@@ -2,6 +2,7 @@ import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
 import {
   generateColGroup,
+  getCellAlignment,
   row,
   tableLabel,
   tableValue,
@@ -21,6 +22,8 @@ interface StampTransfersProps {
 }
 
 export function StampTransfers({ sends }: StampTransfersProps) {
+  const headers = ["FROM", "TO", "QUANTITY", "TX HASH", "DATE"];
+
   return (
     <div class="relative w-full">
       <ScrollContainer>
@@ -33,17 +36,22 @@ export function StampTransfers({ sends }: StampTransfersProps) {
             </colgroup>
             <thead>
               <tr>
-                <th class={`${tableLabel} text-left`}>FROM</th>
-                <th class={`${tableLabel} text-center`}>TO</th>
-                <th class={`${tableLabel} text-center`}>QUANTITY</th>
-                <th class={`${tableLabel} text-center`}>TX HASH</th>
-                <th class={`${tableLabel} text-right`}>DATE</th>
+                {headers.map((header, i) => (
+                  <th
+                    key={i}
+                    class={`${tableLabel} ${
+                      getCellAlignment(i, headers.length)
+                    }`}
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {sends?.map((send, index) => (
                 <tr key={`${send.tx_hash}-${index}`} class={row}>
-                  <td class="text-left">
+                  <td class={getCellAlignment(0, headers.length)}>
                     {send.source
                       ? (
                         <a
@@ -64,7 +72,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                       )
                       : "N/A"}
                   </td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(1, headers.length)}>
                     {send.destination
                       ? (
                         <a
@@ -86,8 +94,10 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                       )
                       : "N/A"}
                   </td>
-                  <td class="text-center">{send.quantity}</td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(2, headers.length)}>
+                    {send.quantity}
+                  </td>
+                  <td class={getCellAlignment(3, headers.length)}>
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.tx_hash, 4)}
                     </span>
@@ -95,7 +105,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                       {abbreviateAddress(send.tx_hash, 6)}
                     </span>
                   </td>
-                  <td class="text-right">
+                  <td class={getCellAlignment(4, headers.length)}>
                     {formatDate(new Date(send.block_time))}
                   </td>
                 </tr>

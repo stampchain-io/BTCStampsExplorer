@@ -6,6 +6,7 @@ import {
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
 import {
   generateColGroup,
+  getCellAlignment,
   row,
   tableLabel,
   tableValue,
@@ -25,9 +26,11 @@ interface StampSalesProps {
 }
 
 export function StampSales({ dispenses }: StampSalesProps) {
+  const headers = ["FROM", "TO", "QUANTITY", "PRICE", "DATE"];
+
   return (
     <div class="relative w-full">
-      <ScrollContainer class="max-h-48">
+      <ScrollContainer>
         <div class="w-[500px] min-[500px]:w-full">
           <table class={tableValue}>
             <colgroup>
@@ -37,17 +40,22 @@ export function StampSales({ dispenses }: StampSalesProps) {
             </colgroup>
             <thead>
               <tr>
-                <th class={`${tableLabel} text-left`}>FROM</th>
-                <th class={`${tableLabel} text-center`}>TO</th>
-                <th class={`${tableLabel} text-center`}>QUANTITY</th>
-                <th class={`${tableLabel} text-center`}>PRICE</th>
-                <th class={`${tableLabel} text-right`}>DATE</th>
+                {headers.map((header, i) => (
+                  <th
+                    key={i}
+                    class={`${tableLabel} ${
+                      getCellAlignment(i, headers.length)
+                    }`}
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {dispenses?.map((dispense, index) => (
                 <tr key={`${dispense.tx_hash}-${index}`} class={row}>
-                  <td class="text-left">
+                  <td class={getCellAlignment(0, headers.length)}>
                     <a
                       href={`/wallet/${dispense.source}`}
                       onClick={(e) => {
@@ -64,7 +72,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
                       </span>
                     </a>
                   </td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(1, headers.length)}>
                     <a
                       href={`/wallet/${dispense.destination}`}
                       onClick={(e) => {
@@ -82,15 +90,17 @@ export function StampSales({ dispenses }: StampSalesProps) {
                       </span>
                     </a>
                   </td>
-                  <td class="text-center">{dispense.dispense_quantity}</td>
-                  <td class="text-center">
+                  <td class={getCellAlignment(2, headers.length)}>
+                    {dispense.dispense_quantity}
+                  </td>
+                  <td class={getCellAlignment(3, headers.length)}>
                     {formatSatoshisToBTC(dispense.satoshirate, {
                       includeSymbol: true,
                       decimals: 8,
                       stripZeros: true,
                     })}
                   </td>
-                  <td class="text-right">
+                  <td class={getCellAlignment(4, headers.length)}>
                     {formatDate(new Date(dispense.block_time))}
                   </td>
                 </tr>
