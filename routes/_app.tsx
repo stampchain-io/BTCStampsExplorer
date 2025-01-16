@@ -30,6 +30,8 @@ export default function App({ Component, state }: PageProps<unknown>) {
         {/* Critical CSS first */}
         <link rel="preload" href="/styles.css" as="style" />
         <link rel="stylesheet" href="/styles.css" />
+        <link rel="preload" href="/gradients.css" as="style" />
+        <link rel="stylesheet" href="/gradients.css" />
 
         {/* Main font loader */}
         <FontLoader />
@@ -49,13 +51,6 @@ export default function App({ Component, state }: PageProps<unknown>) {
             }
           `}
         </style>
-
-        {/* Preload critical resources */}
-        <link
-          rel="preload"
-          href="/styles.css"
-          as="style"
-        />
 
         {/* Add font-display swap to prevent FOUT */}
         <style>

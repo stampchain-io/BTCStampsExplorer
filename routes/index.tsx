@@ -11,15 +11,7 @@ import { RecentSales } from "$islands/stamp/details/RecentSales.tsx";
 import { HomeCarousel } from "$components/home/HomeCarousel.tsx";
 import { StampController } from "$server/controller/stampController.ts";
 import { Micro5FontLoader } from "$islands/home/FontLoader.tsx";
-
-interface Collection {
-  collection_id: string;
-  collection_name: string;
-  collection_description: string;
-  creators: string[];
-  stamp_count: number;
-  total_editions: number;
-}
+import type { Collection } from "$globals";
 
 // Define the shape of pageData from StampController.getHomePageData()
 interface StampControllerData {
@@ -78,6 +70,10 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
   return (
     <>
+      {/* Preload carousel CSS for above-fold content */}
+      <link rel="preload" href="/carousel.css" as="style" />
+      <link rel="stylesheet" href="/carousel.css" />
+
       {/* Load Micro5 font only when needed */}
       <Micro5FontLoader />
 
