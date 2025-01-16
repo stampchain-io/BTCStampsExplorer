@@ -1,6 +1,11 @@
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { SRC20Row } from "$globals";
-import { row, tableLabel, tableValue } from "$components/shared/types.ts";
+import {
+  generateColGroup,
+  row,
+  tableLabel,
+  tableValue,
+} from "$components/shared/types.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
 
 interface TokenMintsProps {
@@ -14,11 +19,9 @@ export function TokenMints({ mints }: TokenMintsProps) {
         <div class="w-[500px] min-[500px]:w-full">
           <table class={tableValue}>
             <colgroup>
-              <col className="w-[20%]" />
-              <col className="w-[20%]" />
-              <col className="w-[20%]" />
-              <col className="w-[20%]" />
-              <col className="w-[20%]" />
+              {generateColGroup().map((col) => (
+                <col key={col.key} className={col.className} />
+              ))}
             </colgroup>
             <thead>
               <tr>
