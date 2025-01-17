@@ -6,6 +6,8 @@ export const dataLabel =
 export const dataValueXL =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
 export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
+export const textLoader =
+  "text-sm mobileLg:text-base font-medium text-stamp-grey uppercase text-center py-3 animated-text-loader";
 // Content styles
 export const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase pb-1.5";
