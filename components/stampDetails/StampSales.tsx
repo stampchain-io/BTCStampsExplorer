@@ -5,8 +5,8 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
 import {
-  generateColGroup,
-  getCellAlignment,
+  cellAlign,
+  colGroup,
   row,
   tableLabel,
   tableValue,
@@ -34,7 +34,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
         <div class="w-[500px] min-[500px]:w-full">
           <table class={tableValue}>
             <colgroup>
-              {generateColGroup().map((col) => (
+              {colGroup().map((col) => (
                 <col key={col.key} className={col.className} />
               ))}
             </colgroup>
@@ -43,9 +43,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
                 {headers.map((header, i) => (
                   <th
                     key={i}
-                    class={`${tableLabel} ${
-                      getCellAlignment(i, headers.length)
-                    }`}
+                    class={`${tableLabel} ${cellAlign(i, headers.length)}`}
                   >
                     {header}
                   </th>
@@ -55,7 +53,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
             <tbody>
               {dispenses?.map((dispense, index) => (
                 <tr key={`${dispense.tx_hash}-${index}`} class={row}>
-                  <td class={getCellAlignment(0, headers.length)}>
+                  <td class={cellAlign(0, headers.length)}>
                     <a
                       href={`/wallet/${dispense.source}`}
                       onClick={(e) => {
@@ -72,7 +70,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
                       </span>
                     </a>
                   </td>
-                  <td class={getCellAlignment(1, headers.length)}>
+                  <td class={cellAlign(1, headers.length)}>
                     <a
                       href={`/wallet/${dispense.destination}`}
                       onClick={(e) => {
@@ -90,17 +88,17 @@ export function StampSales({ dispenses }: StampSalesProps) {
                       </span>
                     </a>
                   </td>
-                  <td class={getCellAlignment(2, headers.length)}>
+                  <td class={cellAlign(2, headers.length)}>
                     {dispense.dispense_quantity}
                   </td>
-                  <td class={getCellAlignment(3, headers.length)}>
+                  <td class={cellAlign(3, headers.length)}>
                     {formatSatoshisToBTC(dispense.satoshirate, {
                       includeSymbol: true,
                       decimals: 8,
                       stripZeros: true,
                     })}
                   </td>
-                  <td class={getCellAlignment(4, headers.length)}>
+                  <td class={cellAlign(4, headers.length)}>
                     {formatDate(new Date(dispense.block_time))}
                   </td>
                 </tr>
