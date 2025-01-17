@@ -6,6 +6,7 @@ import {
   row,
   tableLabel,
   tableValue,
+  tableValueLink,
 } from "$components/shared/TableStyles.ts";
 
 interface SendRow {
@@ -58,7 +59,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                             e.preventDefault();
                             globalThis.location.href = `/wallet/${send.source}`;
                           }}
-                          className="hover:text-stamp-purple-bright cursor-pointer"
+                          className={tableValueLink}
                         >
                           <span className="tablet:hidden">
                             {abbreviateAddress(send.source, 4)}
@@ -80,7 +81,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                             globalThis.location.href =
                               `/wallet/${send.destination}`;
                           }}
-                          className="hover:text-stamp-purple-bright cursor-pointer"
+                          className={tableValueLink}
                         >
                           <span className="tablet:hidden">
                             {abbreviateAddress(send.destination, 4)}
@@ -96,12 +97,25 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                     {send.quantity}
                   </td>
                   <td class={cellAlign(3, headers.length)}>
-                    <span class="tablet:hidden">
-                      {abbreviateAddress(send.tx_hash, 4)}
-                    </span>
-                    <span class="hidden tablet:inline">
-                      {abbreviateAddress(send.tx_hash, 6)}
-                    </span>
+                    <a
+                      href={`https://www.blockchain.com/explorer/transactions/btc/${send.tx_hash}`}
+                      target="_blank"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        globalThis.open(
+                          `https://www.blockchain.com/explorer/transactions/btc/${send.tx_hash}`,
+                          "_blank",
+                        );
+                      }}
+                      className={tableValueLink}
+                    >
+                      <span class="tablet:hidden">
+                        {abbreviateAddress(send.tx_hash, 4)}
+                      </span>
+                      <span class="hidden tablet:inline">
+                        {abbreviateAddress(send.tx_hash, 6)}
+                      </span>
+                    </a>
                   </td>
                   <td class={cellAlign(4, headers.length)}>
                     {formatDate(new Date(send.block_time))}
