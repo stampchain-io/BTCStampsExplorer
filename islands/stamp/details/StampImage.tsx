@@ -393,6 +393,7 @@ export function StampImage(
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const imgScopeRef = useRef<HTMLDivElement | null>(null);
   const [transform, setTransform] = useState("");
+  const [src, setSrc] = useState(NOT_AVAILABLE_IMAGE);
 
   const updateTransform = () => {
     if (!imgScopeRef.current) return;
@@ -430,7 +431,17 @@ export function StampImage(
     setIsFullScreenModalOpen(!isFullScreenModalOpen);
   };
 
-  const src = getStampImageSrc(stamp);
+  const fetchStampImage = async () => {
+    const res = await getStampImageSrc(stamp);
+    if (res) {
+      setSrc(res);
+    } else setSrc(NOT_AVAILABLE_IMAGE);
+  };
+
+  useEffect(() => {
+    fetchStampImage();
+  }, []);
+
   const isHtml = stamp.stamp_mimetype === "text/html";
   const isPlainText = stamp.stamp_mimetype === "text/plain";
   const isAudio = stamp.stamp_mimetype?.startsWith("audio/");

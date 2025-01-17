@@ -119,7 +119,7 @@ export function StampCard({
 }) {
   // Add window size hook
   const { width } = useWindowSize();
-
+  const [src, setSrc] = useState<string>("");
   // Function to get current abbreviation length based on screen size
   const getAbbreviationLength = () => {
     if (width >= BREAKPOINTS.desktop) return ABBREVIATION_LENGTHS.desktop;
@@ -129,7 +129,16 @@ export function StampCard({
     return ABBREVIATION_LENGTHS.mobileSm;
   };
 
-  const src = getStampImageSrc(stamp as StampRow);
+  const fetchStampImage = async () => {
+    const res = await getStampImageSrc(stamp as StampRow);
+    if (res) {
+      setSrc(res);
+    } else setSrc(NOT_AVAILABLE_IMAGE);
+  };
+
+  useEffect(() => {
+    fetchStampImage();
+  }, []);
 
   // Add state for validated content
   const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
@@ -174,8 +183,9 @@ export function StampCard({
         }
       }
     };
-
-    validateContent();
+    if (src) {
+      validateContent();
+    }
   }, [src, stamp.stamp_mimetype]);
 
   const renderContent = () => {

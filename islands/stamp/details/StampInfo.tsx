@@ -210,7 +210,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     setAllowUnlockedTooltip(true);
   };
 
-  useEffect(() => {
+  const handleContent = async () => {
     if (isSrc20Stamp()) {
       // Calculate size of JSON data for SRC-20 stamps
       const jsonData = stamp.stamp_base64;
@@ -218,7 +218,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       setFileSize(blob.size);
     } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
-      const src = getStampImageSrc(stamp);
+      const src = await getStampImageSrc(stamp);
       const img = new Image();
       img.onload = () => {
         setImageDimensions({
@@ -381,6 +381,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       });
       return;
     }
+  };
+
+  useEffect(() => {
+    handleContent();
   }, [stamp.stamp_mimetype, stamp.stamp_url, fileExtension]);
 
   // Format file size
