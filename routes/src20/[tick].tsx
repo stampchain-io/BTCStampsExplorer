@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { SRC20TickHeader } from "$islands/src20/details/SRC20TickHeader.tsx";
-import DetailsTable from "$islands/shared/DetailsTable.tsx";
+import Table from "$islands/shared/Tables.tsx";
 import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 import { SRC20TickPageData } from "$lib/types/src20.d.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -85,7 +85,7 @@ function SRC20TickPage(props: SRC20TickPageProps) {
         marketInfo={marketInfo}
       />
       <HoldersGraph holders={holders} />
-      <DetailsTable
+      <Table
         type="src20"
         configs={tableConfigs}
         tick={tick}
