@@ -80,6 +80,16 @@ export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
   }
 };
 
+export const getSRC101Data = async (stamp: StampRow) => {
+  if (stamp.ident !== "SRC-101") {
+    return {};
+  }
+
+  const res = await fetch(stamp.stamp_url);
+  const jsonData = await res.json();
+  return jsonData;
+};
+
 export const getMimeType = (extension: string): string => {
   const normalizedExt = extension.toLowerCase().trim();
   return mimeTypes[normalizedExt] || "application/octet-stream";

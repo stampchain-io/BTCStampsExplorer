@@ -5,11 +5,12 @@ import {
   formatBTCAmount,
   formatDate,
 } from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { StampRow } from "$globals";
+import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { Src101Detail, StampRow } from "$globals";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.tsx";
 import type { Dispenser } from "$components/stampDetails/StampListingsOpen.tsx";
+import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 
 interface StampInfoProps {
   stamp: StampRow;
@@ -210,6 +211,9 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       const jsonData = stamp.stamp_base64;
       const blob = new Blob([jsonData], { type: "application/json" });
       setFileSize(blob.size);
+    } else if (isSrc101Stamp()) {
+      const res = await calculateTransactionSize(stamp.tx_hash);
+      setFileSize(res);
     } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
       const src = await getStampImageSrc(stamp);
@@ -465,6 +469,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     updateScale();
   }, [stamp.cpid, stamp.stamp, htmlStampTitle]);
 
+  const [src101, setSrc101] = useState<Src101Detail>({});
   const [showListings, setShowListings] = useState(false);
   const [dispensers, setDispensers] = useState<any[]>([]);
   const [isLoadingDispensers, setIsLoadingDispensers] = useState(false);
@@ -501,9 +506,20 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     }
   };
 
+  const fetchSRC101 = async () => {
+    try {
+      const res = await getSRC101Data(stamp as StampRow);
+      setSrc101(res);
+    } catch (error) {
+      console.log("Fetch SRC101 Error====>", error.message);
+      setSrc101({});
+    }
+  };
+
   // Fetch dispensers when expanded
   useEffect(() => {
     fetchDispensers(1);
+    fetchSRC101();
   }, []);
 
   // Add state for selected dispenser
@@ -648,6 +664,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     return stamp.ident === "SRC-20";
   };
 
+  const isSrc101Stamp = () => {
+    return stamp.ident === "SRC-101";
+  };
+
   // Effect to handle document title updates
   useEffect(() => {
     document.title = `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
@@ -680,7 +700,13 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 marginBottom: `${-0.26 * (1 / scale - 1)}em`,
               }}
             >
-              {isSrc20Stamp()
+              {isSrc101Stamp() && src101
+                ? (
+                  <span className="font-light">
+                    {src101?.tokenid?.length && atob(src101?.tokenid[0])}
+                  </span>
+                )
+                : isSrc20Stamp()
                 ? (
                   <>
                     <span className="font-light">#</span>
@@ -825,12 +851,16 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             <div className={`${dataColumn} flex-1 items-start`}>
               <p className={dataLabelSm}>TYPE</p>
               <p className={dataValueSm}>
-                {isSrc20Stamp() ? "SRC-20" : fileExtension}
+                {isSrc20Stamp()
+                  ? "SRC-20"
+                  : isSrc101Stamp()
+                  ? "SRC-101"
+                  : fileExtension}
               </p>
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
               <p className={dataLabelSm}>
-                {isSrc20Stamp()
+                {(isSrc20Stamp() || isSrc101Stamp())
                   ? "TRANSACTION"
                   : isMediaFile
                   ? "DURATION"
@@ -838,13 +868,23 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </p>
               <p className={dataValueSm}>
                 {isSrc20Stamp()
-                  ? JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+                  ? stamp.stamp_base64 &&
+                      JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
                     ? "DEPLOY"
-                    : JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+                    : stamp.stamp_base64 &&
+                        JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
                     ? "MINT"
                     : "TRANSFER"
                   : isMediaFile
                   ? (mediaDuration ? formatDuration(mediaDuration) : "-")
+                  : isSrc101Stamp()
+                  ? stamp.stamp_base64 &&
+                      JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+                    ? "SALE"
+                    : stamp.stamp_base64 &&
+                        JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+                    ? "REGISTER"
+                    : "TRANSFER"
                   : getDimensionsDisplay(imageDimensions)}
               </p>
             </div>
