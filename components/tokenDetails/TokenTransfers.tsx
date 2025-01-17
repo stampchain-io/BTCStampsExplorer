@@ -4,7 +4,7 @@ import {
   row,
   tableLabel,
   tableValue,
-} from "$components/shared/types.ts";
+} from "$components/shared/TableStyles.ts";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
 import { SRC20Row } from "$globals";

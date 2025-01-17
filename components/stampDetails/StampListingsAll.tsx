@@ -9,7 +9,7 @@ import {
   row,
   tableLabel,
   tableValue,
-} from "$components/shared/types.ts";
+} from "$components/shared/TableStyles.ts";
 
 interface Dispenser {
   source: string;
