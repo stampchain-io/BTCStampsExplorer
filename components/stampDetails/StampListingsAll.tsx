@@ -4,8 +4,8 @@ import {
 } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
 import {
-  generateColGroup,
-  getCellAlignment,
+  cellAlign,
+  colGroup,
   row,
   tableLabel,
   tableValue,
@@ -42,7 +42,7 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
         <div class="w-[660px] min-[660px]:w-full">
           <table class={tableValue}>
             <colgroup>
-              {generateColGroup([
+              {colGroup([
                 { width: "w-[16%]" },
                 { width: "w-[10%]" },
                 { width: "w-[10%]" },
@@ -57,9 +57,7 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
                 {headers.map((header, i) => (
                   <th
                     key={i}
-                    class={`${tableLabel} ${
-                      getCellAlignment(i, headers.length)
-                    }`}
+                    class={`${tableLabel} ${cellAlign(i, headers.length)}`}
                   >
                     {header}
                   </th>
@@ -78,22 +76,22 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
                     key={`${dispenser.tx_hash}-${index}`}
                     class={rowDispensersRemain}
                   >
-                    <td class={getCellAlignment(0, headers.length)}>
+                    <td class={cellAlign(0, headers.length)}>
                       {formatSatoshisToBTC(dispenser.satoshirate)}
                     </td>
-                    <td class={getCellAlignment(1, headers.length)}>
+                    <td class={cellAlign(1, headers.length)}>
                       {dispenser.escrow_quantity}
                     </td>
-                    <td class={getCellAlignment(2, headers.length)}>
+                    <td class={cellAlign(2, headers.length)}>
                       {dispenser.give_quantity}
                     </td>
-                    <td class={getCellAlignment(3, headers.length)}>
+                    <td class={cellAlign(3, headers.length)}>
                       {dispenser.give_remaining}
                     </td>
-                    <td class={getCellAlignment(4, headers.length)}>
+                    <td class={cellAlign(4, headers.length)}>
                       DISPENSER
                     </td>
-                    <td class={getCellAlignment(5, headers.length)}>
+                    <td class={cellAlign(5, headers.length)}>
                       <span class="tablet:hidden">
                         {abbreviateAddress(dispenser.source, 4)}
                       </span>
@@ -101,7 +99,7 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
                         {abbreviateAddress(dispenser.source, 8)}
                       </span>
                     </td>
-                    <td class={getCellAlignment(6, headers.length)}>
+                    <td class={cellAlign(6, headers.length)}>
                       {!dispenser.close_block_index ||
                           dispenser.close_block_index <= 0
                         ? (
