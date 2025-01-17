@@ -50,6 +50,7 @@ export function RegisterBitnameContent({
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
   const { wallet } = walletContext;
   const [isExist, setIsExist] = useState(true);
+  const [checkStatus, setCheckStatus] = useState(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [modalData, setModalData] = useState<SRC101Balance | null>(null);
 
@@ -74,14 +75,15 @@ export function RegisterBitnameContent({
   };
 
   const checkAvailability = async (): Promise<boolean> => {
+    setCheckStatus(false);
     try {
       const url =
         `/api/v2/src101/77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed/${
-          btoa(formState.toAddress.replace(".btc", ""))
+          btoa(formState.toAddress?.toLowerCase().replace(".btc", ""))
         }`;
       const res = await fetch(url);
       const jsonData = await res.json();
-
+      setCheckStatus(true);
       if (res.status === 200) {
         if (jsonData?.data.length) {
           setIsExist(true);
@@ -113,10 +115,11 @@ export function RegisterBitnameContent({
               placeholder="Please input your bitname"
               value={formState.toAddress?.replace(".btc", "") || ""}
               onChange={(e) => {
-                const value = (e.target as HTMLInputElement).value.replace(
-                  ".btc",
-                  "",
-                );
+                const value = (e.target as HTMLInputElement).value.toLowerCase()
+                  .replace(
+                    ".btc",
+                    "",
+                  );
                 handleInputChange(
                   {
                     target: {
@@ -138,7 +141,7 @@ export function RegisterBitnameContent({
           <div className="flex flex-col justify-center items-start">
             {/* message - default:noDisplay / display on user input & onClick - either already registered or available */}
             <p className="text-sm mobileLg:text-base font-medium text-[#999999]">
-              {formState.toAddress
+              {formState.toAddress && checkStatus
                 ? isExist
                   ? `${formState.toAddress} is already registered`
                   : `${formState.toAddress} is available`

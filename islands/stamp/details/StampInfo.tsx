@@ -23,12 +23,6 @@ interface DimensionsType {
 }
 
 export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
-  console.log("StampInfo received stamp:", {
-    stamp_mimetype: stamp.stamp_mimetype,
-    stamp_url: stamp.stamp_url,
-    full_stamp: stamp,
-  });
-
   const [fee, setFee] = useState<number>(0);
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
