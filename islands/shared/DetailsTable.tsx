@@ -7,7 +7,7 @@ import {
   TabData,
   tableLabel,
   TableProps,
-} from "$components/shared/types.ts";
+} from "$components/shared/TableStyles.ts";
 
 import { TokenMints } from "$components/tokenDetails/TokenMints.tsx";
 import { TokenTransfers } from "$components/tokenDetails/TokenTransfers.tsx";

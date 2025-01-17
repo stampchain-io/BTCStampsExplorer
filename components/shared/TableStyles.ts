@@ -1,12 +1,23 @@
-// Table tabs
+// Table styling
+// Title/counts tab styles
+export const container = "dark-gradient rounded-lg p-3 mobileMd:p-6";
+export const dataLabel =
+  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+export const dataValueXL =
+  "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
+export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
+// Content styles
+export const tableLabel =
+  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase pb-1.5";
+export const tableValue =
+  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
+export const row = "h-8 hover:bg-stamp-purple/10";
+
+// Table types
 export type TableType = "stamps" | "src20" | "src101" | "vault";
 
-export interface TableConfig {
-  id: string;
-  label: string | JSX.Element;
-  count: number;
-}
-
+// Table title tabs
+// Table type/counts
 export interface TableProps {
   type: TableType;
   configs: Array<{ id: string }>;
@@ -33,33 +44,18 @@ export interface FetchResponse {
   total: number;
 }
 
-// Table styles
-export const container = "dark-gradient rounded-lg p-3 mobileMd:p-6";
-export const dataLabel =
-  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-export const dataValueXL =
-  "text-3xl mobileLg:text-4xl font-black text-stamp-grey -mt-1";
-export const dataValueXLlink = "text-3xl mobileLg:text-4xl font-black -mt-1";
-
 // Table content
-// Table styles
-export const tableLabel =
-  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase pb-1.5";
-export const tableValue =
-  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
-export const row = "h-8 hover:bg-stamp-purple/10";
+// Default column group
+export const defaultColGroup = {
+  columns: 5,
+  width: "w-[20%]",
+};
 
 // Cell alignment
 export const tableAlign = {
   first: "text-left",
   middle: "text-center",
   last: "text-right",
-};
-
-// Default column group
-export const defaultColGroup = {
-  columns: 5,
-  width: "w-[20%]",
 };
 
 // Helper functions
