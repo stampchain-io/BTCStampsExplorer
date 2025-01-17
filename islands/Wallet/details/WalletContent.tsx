@@ -13,6 +13,7 @@ import { Dispenser } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { StampRow } from "$globals";
 
 const ItemHeader = ({
   title = "STAMP",
@@ -234,6 +235,18 @@ function DispenserRow(
   const imageSize = view === "mobile"
     ? "w-[146px] h-[146px]"
     : "w-[172px] h-[172px]";
+  const [src, setSrc] = useState(NOT_AVAILABLE_IMAGE);
+
+  const fetchStampImage = async () => {
+    const res = await getStampImageSrc(dispenser.stamp as StampRow);
+    if (res) {
+      setSrc(res);
+    } else setSrc(NOT_AVAILABLE_IMAGE);
+  };
+
+  useEffect(() => {
+    fetchStampImage();
+  }, []);
 
   if (!dispenser.stamp) {
     return null;
@@ -254,7 +267,7 @@ function DispenserRow(
                   height="100%"
                   loading="lazy"
                   class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                  src={getStampImageSrc(dispenser.stamp)}
+                  src={src}
                   alt={`Stamp ${dispenser.stamp.stamp}`}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;

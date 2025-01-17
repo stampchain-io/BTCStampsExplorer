@@ -1,6 +1,6 @@
 // General Types ---------------------------------------------------------------
 
-export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
+export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721" | "SRC-101";
 export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
   | "all"
   | "stamps"

@@ -105,7 +105,6 @@ export default function StampSection({
   const handlePageChange = (page: number) => {
     pagination?.onPageChange?.(page);
   };
-
   return (
     <div class="w-full">
       {title && (
