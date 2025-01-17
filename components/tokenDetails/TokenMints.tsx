@@ -1,6 +1,6 @@
 import {
-  generateColGroup,
-  getCellAlignment,
+  cellAlign,
+  colGroup,
   row,
   tableLabel,
   tableValue,
@@ -22,7 +22,7 @@ export function TokenMints({ mints }: TokenMintsProps) {
         <div class="w-[500px] min-[500px]:w-full">
           <table class={tableValue}>
             <colgroup>
-              {generateColGroup().map((col) => (
+              {colGroup().map((col) => (
                 <col key={col.key} className={col.className} />
               ))}
             </colgroup>
@@ -31,9 +31,7 @@ export function TokenMints({ mints }: TokenMintsProps) {
                 {headers.map((header, i) => (
                   <th
                     key={i}
-                    class={`${tableLabel} ${
-                      getCellAlignment(i, headers.length)
-                    }`}
+                    class={`${tableLabel} ${cellAlign(i, headers.length)}`}
                   >
                     {header}
                   </th>
@@ -43,10 +41,10 @@ export function TokenMints({ mints }: TokenMintsProps) {
             <tbody>
               {mints?.map((mint) => (
                 <tr key={mint.tx_hash} class={row}>
-                  <td class={getCellAlignment(0, headers.length)}>
+                  <td class={cellAlign(0, headers.length)}>
                     {mint.amt}
                   </td>
-                  <td class={getCellAlignment(1, headers.length)}>
+                  <td class={cellAlign(1, headers.length)}>
                     <a
                       href={`/wallet/${mint.destination}`}
                       onClick={(e) => {
@@ -64,10 +62,10 @@ export function TokenMints({ mints }: TokenMintsProps) {
                       </span>
                     </a>
                   </td>
-                  <td class={getCellAlignment(2, headers.length)}>
+                  <td class={cellAlign(2, headers.length)}>
                     {formatDate(new Date(mint.block_time))}
                   </td>
-                  <td class={getCellAlignment(3, headers.length)}>
+                  <td class={cellAlign(3, headers.length)}>
                     <span class="tablet:hidden">
                       {abbreviateAddress(mint.tx_hash, 4)}
                     </span>
@@ -75,7 +73,7 @@ export function TokenMints({ mints }: TokenMintsProps) {
                       {abbreviateAddress(mint.tx_hash, 8)}
                     </span>
                   </td>
-                  <td class={getCellAlignment(4, headers.length)}>
+                  <td class={cellAlign(4, headers.length)}>
                     {mint.block_index}
                   </td>
                 </tr>

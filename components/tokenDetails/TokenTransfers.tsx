@@ -1,6 +1,6 @@
 import {
-  generateColGroup,
-  getCellAlignment,
+  cellAlign,
+  colGroup,
   row,
   tableLabel,
   tableValue,
@@ -22,7 +22,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
         <div class="w-[500px] min-[500px]:w-full">
           <table class={tableValue}>
             <colgroup>
-              {generateColGroup().map((col) => (
+              {colGroup().map((col) => (
                 <col key={col.key} className={col.className} />
               ))}
             </colgroup>
@@ -31,9 +31,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                 {headers.map((header, i) => (
                   <th
                     key={i}
-                    class={`${tableLabel} ${
-                      getCellAlignment(i, headers.length)
-                    }`}
+                    class={`${tableLabel} ${cellAlign(i, headers.length)}`}
                   >
                     {header}
                   </th>
@@ -43,7 +41,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
             <tbody>
               {sends?.map((send) => (
                 <tr key={send.tx_hash} class={row}>
-                  <td class={getCellAlignment(0, headers.length)}>
+                  <td class={cellAlign(0, headers.length)}>
                     <a
                       href={`/wallet/${send.creator}`}
                       onClick={(e) => {
@@ -60,7 +58,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                       </span>
                     </a>
                   </td>
-                  <td class={getCellAlignment(1, headers.length)}>
+                  <td class={cellAlign(1, headers.length)}>
                     <a
                       href={`/wallet/${send.destination}`}
                       onClick={(e) => {
@@ -78,13 +76,13 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                       </span>
                     </a>
                   </td>
-                  <td class={getCellAlignment(2, headers.length)}>
+                  <td class={cellAlign(2, headers.length)}>
                     {send.amt}
                   </td>
-                  <td class={getCellAlignment(3, headers.length)}>
+                  <td class={cellAlign(3, headers.length)}>
                     {formatDate(new Date(send.block_time))}
                   </td>
-                  <td class={getCellAlignment(4, headers.length)}>
+                  <td class={cellAlign(4, headers.length)}>
                     <span class="tablet:hidden">
                       {abbreviateAddress(send.tx_hash, 4)}
                     </span>

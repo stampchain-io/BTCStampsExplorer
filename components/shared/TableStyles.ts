@@ -52,7 +52,7 @@ export const defaultColGroup = {
 };
 
 // Cell alignment
-export const tableAlign = {
+export const cellAlignment = {
   first: "text-left",
   middle: "text-center",
   last: "text-right",
@@ -60,7 +60,7 @@ export const tableAlign = {
 
 // Helper functions
 // Column group
-export const generateColGroup = (customColumns?: Array<{ width: string }>) => {
+export const colGroup = (customColumns?: Array<{ width: string }>) => {
   if (customColumns) {
     return customColumns.map((col, i) => ({
       key: i,
@@ -77,8 +77,8 @@ export const generateColGroup = (customColumns?: Array<{ width: string }>) => {
 };
 
 // Cell alignment
-export const getCellAlignment = (index: number, total: number) => {
-  if (index === 0) return tableAlign.first;
-  if (index === total - 1) return tableAlign.last;
-  return tableAlign.middle;
+export const cellAlign = (index: number, total: number) => {
+  if (index === 0) return cellAlignment.first;
+  if (index === total - 1) return cellAlignment.last;
+  return cellAlignment.middle;
 };
