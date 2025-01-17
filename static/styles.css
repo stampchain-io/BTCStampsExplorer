@@ -549,6 +549,7 @@ body {
   outline-style: none !important;
 }
 
+/* Animated underline for links */
 .animated-underline {
   font-weight: 700;
   text-decoration: none;
@@ -572,4 +573,53 @@ body {
 .animated-underline:hover,
 .animated-underline:focus {
   background-size: 0% 2px;
+}
+
+/* Animated loader text */
+.animated-text-loader span {
+  display: inline-block;
+  margin: 0 0;
+}
+
+
+.animated-text-loader span {
+  animation: fadeInOut 0.6s infinite alternate;
+}
+
+.animated-text-loader span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.animated-text-loader span:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.animated-text-loader span:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.animated-text-loader span:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.animated-text-loader span:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.animated-text-loader span:nth-child(6) {
+  animation-delay: 0.25s;
+}
+
+.animated-text-loader span:nth-child(7) {
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }

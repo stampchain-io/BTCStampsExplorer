@@ -67,9 +67,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
                     <th
                       key={i}
                       scope="col"
-                      class={`${tableLabel} pb-1.5 ${
-                        cellAlign(i, headers.length)
-                      }`}
+                      class={`${tableLabel} ${cellAlign(i, headers.length)}`}
                     >
                       {header}
                     </th>
