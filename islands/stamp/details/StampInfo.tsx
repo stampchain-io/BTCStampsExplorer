@@ -838,11 +838,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               </p>
               <p className={dataValueSm}>
                 {isSrc20Stamp()
-                  ? JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
-                    ? "DEPLOY"
-                    : JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
-                    ? "MINT"
-                    : "TRANSFER"
+                  ? "TRANSFER"
                   : isMediaFile
                   ? (mediaDuration ? formatDuration(mediaDuration) : "-")
                   : getDimensionsDisplay(imageDimensions)}
