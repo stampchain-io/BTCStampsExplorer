@@ -9,6 +9,7 @@ import {
   row,
   tableLabel,
   tableValue,
+  tableValueLink,
 } from "$components/shared/TableStyles.ts";
 
 interface Dispenser {
@@ -92,12 +93,22 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
                       DISPENSER
                     </td>
                     <td class={cellAlign(5, headers.length)}>
-                      <span class="tablet:hidden">
-                        {abbreviateAddress(dispenser.source, 4)}
-                      </span>
-                      <span class="hidden tablet:inline">
-                        {abbreviateAddress(dispenser.source, 8)}
-                      </span>
+                      <a
+                        href={`/wallet/${dispenser.source}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          globalThis.location.href =
+                            `/wallet/${dispenser.source}`;
+                        }}
+                        className={tableValueLink}
+                      >
+                        <span class="tablet:hidden">
+                          {abbreviateAddress(dispenser.source, 4)}
+                        </span>
+                        <span class="hidden tablet:inline">
+                          {abbreviateAddress(dispenser.source, 8)}
+                        </span>
+                      </a>
                     </td>
                     <td class={cellAlign(6, headers.length)}>
                       {!dispenser.close_block_index ||

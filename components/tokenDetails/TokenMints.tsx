@@ -4,6 +4,7 @@ import {
   row,
   tableLabel,
   tableValue,
+  tableValueLink,
 } from "$components/shared/TableStyles.ts";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
@@ -52,7 +53,7 @@ export function TokenMints({ mints }: TokenMintsProps) {
                         globalThis.location.href =
                           `/wallet/${mint.destination}`;
                       }}
-                      className="hover:text-stamp-purple-bright cursor-pointer"
+                      className={tableValueLink}
                     >
                       <span class="tablet:hidden">
                         {abbreviateAddress(mint.destination, 4)}
@@ -66,12 +67,25 @@ export function TokenMints({ mints }: TokenMintsProps) {
                     {formatDate(new Date(mint.block_time))}
                   </td>
                   <td class={cellAlign(3, headers.length)}>
-                    <span class="tablet:hidden">
-                      {abbreviateAddress(mint.tx_hash, 4)}
-                    </span>
-                    <span class="hidden tablet:inline">
-                      {abbreviateAddress(mint.tx_hash, 8)}
-                    </span>
+                    <a
+                      href={`https://www.blockchain.com/explorer/transactions/btc/${mint.tx_hash}`}
+                      target="_blank"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        globalThis.open(
+                          `https://www.blockchain.com/explorer/transactions/btc/${mint.tx_hash}`,
+                          "_blank",
+                        );
+                      }}
+                      className={tableValueLink}
+                    >
+                      <span class="tablet:hidden">
+                        {abbreviateAddress(mint.tx_hash, 4)}
+                      </span>
+                      <span class="hidden tablet:inline">
+                        {abbreviateAddress(mint.tx_hash, 8)}
+                      </span>
+                    </a>
                   </td>
                   <td class={cellAlign(4, headers.length)}>
                     {mint.block_index}

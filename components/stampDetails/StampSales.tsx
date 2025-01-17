@@ -10,6 +10,7 @@ import {
   row,
   tableLabel,
   tableValue,
+  tableValueLink,
 } from "$components/shared/TableStyles.ts";
 
 interface Dispense {
@@ -60,7 +61,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
                         e.preventDefault();
                         globalThis.location.href = `/wallet/${dispense.source}`;
                       }}
-                      className="hover:text-stamp-purple-bright cursor-pointer"
+                      className={tableValueLink}
                     >
                       <span className="tablet:hidden">
                         {abbreviateAddress(dispense.source, 4)}
@@ -78,7 +79,7 @@ export function StampSales({ dispenses }: StampSalesProps) {
                         globalThis.location.href =
                           `/wallet/${dispense.destination}`;
                       }}
-                      className="hover:text-stamp-purple-bright cursor-pointer"
+                      className={tableValueLink}
                     >
                       <span className="tablet:hidden">
                         {abbreviateAddress(dispense.destination, 4)}

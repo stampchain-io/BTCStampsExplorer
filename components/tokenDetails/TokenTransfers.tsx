@@ -4,6 +4,7 @@ import {
   row,
   tableLabel,
   tableValue,
+  tableValueLink,
 } from "$components/shared/TableStyles.ts";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
 import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
@@ -48,7 +49,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                         e.preventDefault();
                         globalThis.location.href = `/wallet/${send.creator}`;
                       }}
-                      className="hover:text-stamp-purple-bright cursor-pointer"
+                      className={tableValueLink}
                     >
                       <span class="tablet:hidden">
                         {abbreviateAddress(send.creator, 4)}
@@ -66,7 +67,7 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                         globalThis.location.href =
                           `/wallet/${send.destination}`;
                       }}
-                      className="hover:text-stamp-purple-bright cursor-pointer"
+                      className={tableValueLink}
                     >
                       <span class="tablet:hidden">
                         {abbreviateAddress(send.destination, 4)}
@@ -83,12 +84,25 @@ export function TokenTransfers({ sends }: TokenTransfersProps) {
                     {formatDate(new Date(send.block_time))}
                   </td>
                   <td class={cellAlign(4, headers.length)}>
-                    <span class="tablet:hidden">
-                      {abbreviateAddress(send.tx_hash, 4)}
-                    </span>
-                    <span class="hidden tablet:inline">
-                      {abbreviateAddress(send.tx_hash, 8)}
-                    </span>
+                    <a
+                      href={`https://www.blockchain.com/explorer/transactions/btc/${send.tx_hash}`}
+                      target="_blank"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        globalThis.open(
+                          `https://www.blockchain.com/explorer/transactions/btc/${send.tx_hash}`,
+                          "_blank",
+                        );
+                      }}
+                      className={tableValueLink}
+                    >
+                      <span class="tablet:hidden">
+                        {abbreviateAddress(send.tx_hash, 4)}
+                      </span>
+                      <span class="hidden tablet:inline">
+                        {abbreviateAddress(send.tx_hash, 8)}
+                      </span>
+                    </a>
                   </td>
                 </tr>
               ))}
