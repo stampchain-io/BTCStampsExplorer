@@ -237,7 +237,7 @@ export default function Table({
     }
 
     // For 1 tab
-    return "text-center";
+    return "text-left";
   };
 
   const getTabLabel = (type: TableType, id: string) => {
