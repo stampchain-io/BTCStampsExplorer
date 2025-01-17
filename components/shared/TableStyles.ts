@@ -13,7 +13,7 @@ export const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 export const tableValueLink =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full hover:text-stamp-purple-bright cursor-pointer";
-export const row = "h-8 hover:bg-stamp-purple/10";
+export const row = "h-8 hover:bg-stamp-purple-bright/15";
 
 // Table types
 export type TableType = "stamps" | "src20" | "src101" | "vault";
