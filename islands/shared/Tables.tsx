@@ -5,9 +5,9 @@ import {
   dataLabel,
   dataValueXLlink,
   TabData,
-  tableLabel,
   TableProps,
   TableType,
+  textLoader,
 } from "$components/shared/TableStyles.ts";
 
 import { TokenMints } from "$components/tokenDetails/TokenMints.tsx";
@@ -294,10 +294,14 @@ export default function Table({
         <div class="overflow-auto overscroll-contain">
           {renderTabContent()}
           {isLoading && (
-            <div
-              class={`${tableLabel} text-center pt-3 pb-1.5`}
-            >
-              LOADING
+            <div class={textLoader}>
+              <span>L</span>
+              <span>O</span>
+              <span>A</span>
+              <span>D</span>
+              <span>I</span>
+              <span>N</span>
+              <span>G</span>
             </div>
           )}
         </div>
