@@ -7,6 +7,7 @@ import {
   TabData,
   tableLabel,
   TableProps,
+  TableType,
 } from "$components/shared/TableStyles.ts";
 
 import { TokenMints } from "$components/tokenDetails/TokenMints.tsx";
@@ -222,7 +223,7 @@ export default function Table({
     fetchCounts();
   }, [type, cpid, tick, initialCounts]);
 
-  const getTabAlignment = (type: TableType, id: string, totalTabs: number) => {
+  const getTabAlignment = (id: string, totalTabs: number) => {
     // For 3 tabs
     if (totalTabs === 3) {
       if (id === configs[0].id) return "text-left";
@@ -265,7 +266,7 @@ export default function Table({
       <div class="flex justify-between items-start w-full mb-6">
         {configs.map(({ id }) => {
           const count = totalCounts[id as keyof typeof totalCounts];
-          const alignment = getTabAlignment(type, id, configs.length);
+          const alignment = getTabAlignment(id, configs.length);
 
           return (
             <div

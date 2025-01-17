@@ -37,6 +37,7 @@ export interface TabData {
   sends?: any[];
   mints?: any[];
   transfers?: any[];
+  [key: string]: any[] | undefined;
 }
 
 export interface FetchResponse {
