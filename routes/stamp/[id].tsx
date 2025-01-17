@@ -8,7 +8,7 @@ import { HoldersGraph } from "$components/shared/HoldersGraph.tsx";
 import { StampImage } from "$islands/stamp/details/StampImage.tsx";
 import { StampInfo } from "$islands/stamp/details/StampInfo.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
-import DetailsTable from "$islands/shared/DetailsTable.tsx";
+import Table from "$islands/shared/Tables.tsx";
 
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { formatSatoshisToBTC } from "$lib/utils/formatUtils.ts";
@@ -374,7 +374,7 @@ export default function StampPage(props: StampDetailPageProps) {
           <HoldersGraph holders={holders || []} />
         )}
 
-        <DetailsTable
+        <Table
           type="stamps"
           configs={tableConfigs}
           cpid={stamp.cpid}
