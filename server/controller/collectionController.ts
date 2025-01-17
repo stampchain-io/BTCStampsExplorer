@@ -75,7 +75,7 @@ export class CollectionController {
       const stampsByCollection = new Map<string, string[]>();
 
       // Group stamps by collection ID
-      stampResults.data.forEach((stamp: { 
+      stampResults.data.forEach(async (stamp: { 
         collection_id: string; 
         tx_hash: string;
         stamp_mimetype: string;
@@ -94,7 +94,7 @@ export class CollectionController {
         }
 
         const stamps = stampsByCollection.get(collectionId)!;
-        const imageUrl = getStampImageSrc(stamp);
+        const imageUrl = await getStampImageSrc(stamp);
         if (stamps.length < 12 && !stamps.includes(imageUrl)) {
           stamps.push(imageUrl);
         }

@@ -574,7 +574,7 @@ function TokenStats(
       class="flex justify-between w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-6"
       onClick={() => handleType("token")}
     >
-      <StatItem label="TOKENS" value={src20Total.toString()} />
+      <StatItem label="TOKENS" value={src20Total?.toString()} />
       <StatItem
         label="VALUE"
         value={

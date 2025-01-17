@@ -59,19 +59,25 @@ export const mimeTypeToSuffix = Object.entries(mimeTypes).reduce(
   {} as { [key: string]: string },
 );
 
-export const getStampImageSrc = (stamp: StampRow) => {
+export const getStampImageSrc = async (stamp: StampRow): Promise<string> => {
   if (!stamp.stamp_url) {
     return NOT_AVAILABLE_IMAGE;
   }
 
-  // Extract filename from full URL if present
-  const urlParts = stamp.stamp_url.split("/stamps/");
-  const filename = urlParts.length > 1
-    ? urlParts[1].replace(".html", "")
-    : stamp.stamp_url;
+  if (stamp.stamp_url.includes("json")) {
+    const res = await fetch(stamp.stamp_url);
+    const jsonData = await res.json();
+    return jsonData?.img.length ? jsonData.img[0] : "";
+  } else {
+    // Extract filename from full URL if present
+    const urlParts = stamp.stamp_url.split("/stamps/");
+    const filename = urlParts.length > 1
+      ? urlParts[1].replace(".html", "")
+      : stamp.stamp_url;
 
-  // Use relative path
-  return `/content/${filename}`;
+    // Use relative path
+    return `/content/${filename}`;
+  }
 };
 
 export const getMimeType = (extension: string): string => {
