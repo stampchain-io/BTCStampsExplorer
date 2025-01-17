@@ -11,6 +11,8 @@ export const tableLabel =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase pb-1.5";
 export const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
+export const tableValueLink =
+  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full hover:text-stamp-purple-bright cursor-pointer";
 export const row = "h-8 hover:bg-stamp-purple/10";
 
 // Table types
