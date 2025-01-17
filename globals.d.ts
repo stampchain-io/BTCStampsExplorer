@@ -366,7 +366,7 @@ export interface SRC101Balance {
   owner: string;
 }
 
-interface Src101Detail {
+export interface Src101Detail {
   tx_hash: string;
   block_index: number;
   p: string;
@@ -374,7 +374,7 @@ interface Src101Detail {
   tick: string | null;
   tick_hash: string | null;
   name: string | null;
-  tokenid: string | null;
+  tokenid: string[] | null;
   tokenid_utf8: string | null;
   description: string | null;
   wla: string | null;
