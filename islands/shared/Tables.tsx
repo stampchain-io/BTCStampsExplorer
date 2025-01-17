@@ -18,7 +18,7 @@ import { StampTransfers } from "$components/stampDetails/StampTransfers.tsx";
 
 const PAGE_SIZE = 20;
 
-export default function DetailsTable({
+export default function Table({
   type,
   configs,
   cpid,
