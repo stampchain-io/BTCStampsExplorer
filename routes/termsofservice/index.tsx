@@ -738,8 +738,8 @@ export default function TermsOfService() {
               href="/about#contact"
               className={`${bodyTextLight} animated-underline`}
             >
-              send us an email.
-            </a>
+              send us an email
+            </a>.
           </section>
 
           <b className="mt-3">
