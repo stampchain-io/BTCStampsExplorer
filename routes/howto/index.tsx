@@ -96,7 +96,6 @@ export default function HowTo() {
               Bitcoin with the token's supply and metadata. This makes the token
               immutable and secured by Bitcoin's blockchain.<br />
               <br />
-              <br />
               <a
                 href="/howto/deploytoken"
                 f-partial="/howto/deploytoken"
@@ -122,7 +121,6 @@ export default function HowTo() {
             <p className={bodyTextLight}>
               After deploying a token, anyone can mint SRC-20 tokens based on
               the initial supply set in the contract.<br />
-              <br />
               <br />
               <a
                 href="/howto/minttoken"
