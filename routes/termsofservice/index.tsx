@@ -735,7 +735,7 @@ export default function TermsOfService() {
             In order to resolve a complaint regarding the Services or to receive
             further information regarding use of the Services, please{" "}
             <a
-              href="/about/contact"
+              href="/about#contact"
               className={`${bodyTextLight} animated-underline`}
             >
               send us an email.
