@@ -15,6 +15,9 @@ export function useBreakpoints() {
     return size.width >= BREAKPOINTS[breakpoint];
   }
   function isBetween(start: Breakpoints, end: Breakpoints) {
+    if (BREAKPOINTS[start] > BREAKPOINTS[end]) {
+      throw new Error("Start breakpoint must be less than end breakpoint");
+    }
     return size.width >= BREAKPOINTS[start] && size.width < BREAKPOINTS[end];
   }
 
