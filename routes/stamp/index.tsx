@@ -5,6 +5,11 @@ import { StampContent } from "$islands/stamp/StampContent.tsx";
 import { StampHeader } from "$islands/stamp/StampHeader.tsx";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
+import {
+  queryParamsToFilters,
+  // StampFilters,
+} from "../../islands/filterpane/StampFilterPane.tsx";
+import { StampFilterWrapped } from "../../islands/filterpane/StampFilterWrapped.tsx";
 
 const MAX_PAGE_SIZE = 120;
 
@@ -75,6 +80,7 @@ export const handler: Handlers = {
         selectedTab: recentSales ? "recent_sales" : selectedTab,
         page,
         limit: page_size,
+        filters: queryParamsToFilters(url.search),
       };
 
       return ctx.render({
@@ -96,8 +102,8 @@ export function StampPage(props: StampPageProps) {
     filterBy,
     sortBy,
     selectedTab,
+    filters,
   } = props.data;
-
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
 
@@ -107,19 +113,33 @@ export function StampPage(props: StampPageProps) {
         filterBy={filterBy as STAMP_FILTER_TYPES[]}
         sortBy={sortBy}
       />
-      <StampContent
-        stamps={stampsArray}
-        isRecentSales={isRecentSales}
-        pagination={{
-          page,
-          totalPages,
-          onPageChange: (newPage: number) => {
-            const url = new URL(globalThis.location.href);
-            url.searchParams.set("page", newPage.toString());
-            globalThis.location.href = url.toString();
-          },
-        }}
-      />
+      <div class="flex gap-10">
+        <div class="pt-4">
+          <StampFilterWrapped
+            onFilterChange={(str) => {
+              // const url = new URL(globalThis.location.href);
+              console.log("hello");
+              globalThis.location.href = globalThis.location.pathname + "?" +
+                str;
+            }}
+            filters={filters}
+          />
+        </div>
+
+        <StampContent
+          stamps={stampsArray}
+          isRecentSales={isRecentSales}
+          pagination={{
+            page,
+            totalPages,
+            onPageChange: (newPage: number) => {
+              const url = new URL(globalThis.location.href);
+              url.searchParams.set("page", newPage.toString());
+              globalThis.location.href = url.toString();
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }
