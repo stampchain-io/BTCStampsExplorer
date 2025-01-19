@@ -211,21 +211,24 @@ export default function StampPage(props: StampDetailPageProps) {
   const {
     stamp,
     htmlTitle,
+    dispensers,
+    dispenses,
+    sends,
     holders,
     stamps_recent,
     lowestPriceDispenser = null,
   } = props.data;
 
   console.log("Initial data:", {
-    dispensers: _dispensers,
-    dispenses: _dispenses,
-    sends: _sends,
+    dispensers: dispensers,
+    dispenses: dispenses,
+    sends: sends,
   });
 
   const totalCounts = {
-    dispensers: _dispensers?.length || 0,
-    sales: _dispenses?.length || 0,
-    transfers: _sends?.length || 0,
+    dispensers: dispensers?.length || 0,
+    sales: dispenses?.length || 0,
+    transfers: sends?.length || 0,
   };
 
   console.log("Total counts:", totalCounts);
@@ -304,28 +307,17 @@ export default function StampPage(props: StampDetailPageProps) {
   const tableConfigs = [
     {
       id: "dispensers",
-      count: _dispensers?.length || 0,
+      count: dispensers?.length || 0,
     },
     {
       id: "sales",
-      count: _dispenses?.length || 0,
+      count: dispenses?.length || 0,
     },
     {
       id: "transfers",
-      count: _sends?.length || 0,
+      count: sends?.length || 0,
     },
   ];
-
-  // Debug log to verify data
-  console.log("Table data:", {
-    dispensers: _dispensers?.length,
-    dispenses: _dispenses?.length,
-    sends: _sends?.length,
-    // Raw data
-    _dispensers,
-    _dispenses,
-    _sends,
-  });
 
   return (
     <>
