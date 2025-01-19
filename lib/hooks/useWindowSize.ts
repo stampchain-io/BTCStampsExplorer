@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useLayoutEffect, useState } from "preact/hooks";
 
 export function useWindowSize() {
   const [windowSize, setWindowSize] = useState({
@@ -6,7 +6,7 @@ export function useWindowSize() {
     height: globalThis.innerHeight,
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handleResize = () => {
       setWindowSize({
         width: globalThis.innerWidth,
