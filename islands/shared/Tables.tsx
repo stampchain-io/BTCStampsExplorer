@@ -153,7 +153,6 @@ export default function Table({
     const target = e.target as HTMLDivElement;
     const scrollPosition = target.scrollTop + target.clientHeight;
     const scrollThreshold = target.scrollHeight - 20;
-
     if (
       scrollPosition >= scrollThreshold &&
       !isLoading &&
@@ -221,7 +220,7 @@ export default function Table({
     };
 
     fetchCounts();
-  }, [type, cpid, tick, initialCounts]);
+  }, [type, cpid, tick]);
 
   const getTabAlignment = (id: string, totalTabs: number) => {
     // For 3 tabs
@@ -291,7 +290,7 @@ export default function Table({
         })}
       </div>
       <ScrollContainer class="max-h-48" onScroll={handleScroll}>
-        <div class="overflow-auto overscroll-contain">
+        <div class="">
           {renderTabContent()}
           {isLoading && (
             <div class={textLoader}>
