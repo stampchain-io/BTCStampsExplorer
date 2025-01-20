@@ -475,7 +475,7 @@ export function StampImage(
 
   useEffect(() => {
     const validateContent = async () => {
-      if (stamp.stamp_mimetype === "image/svg+xml") {
+      if (stamp.stamp_mimetype === "image/svg+xml" && src) {
         const { isValid, error } = await validateStampContent(src);
         if (isValid) {
           setValidatedContent(
@@ -507,7 +507,6 @@ export function StampImage(
         }
       }
     };
-
     validateContent();
   }, [src, stamp.stamp_mimetype]);
 

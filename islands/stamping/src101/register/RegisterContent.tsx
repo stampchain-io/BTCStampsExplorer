@@ -5,8 +5,10 @@ import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { InputField } from "$islands/stamping/InputField.tsx";
 import DetailModal from "$islands/stamping/src101/DetailModal.tsx";
-import { SRC101Balance } from "$globals";
+import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
+import { SelectField } from "$islands/stamping/SelectField.tsx";
+import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
 
 // CSS Class Constants
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
@@ -79,7 +81,7 @@ export function RegisterBitnameContent({
     try {
       const url =
         `/api/v2/src101/77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed/${
-          btoa(formState.toAddress?.toLowerCase().replace(".btc", ""))
+          btoa((formState.toAddress + formState.root)?.toLowerCase())
         }`;
       const res = await fetch(url);
       const jsonData = await res.json();
@@ -108,8 +110,44 @@ export function RegisterBitnameContent({
       <h1 className={titlePurpleLDCenter}>REGISTER</h1>
 
       <div className={inputFieldContainer}>
-        <div class="relative w-full">
-          <div className={animatedInputContainer}>
+        <div class={animatedInputContainer}>
+          <div class="flex justify-between relative z-[2] !bg-[#100318] placeholder:!bg-[#100318] rounded-md">
+            <input
+              type="search"
+              id="search-dropdown"
+              class="h-[54px] mobileLg:h-[60px] w-full bg-transparent rounded-md pl-6 text-base mobileLg:text-lg font-bold text-stamp-grey-light placeholder:!text-stamp-grey placeholder:lowercase !outline-none focus-visible:!outline-none focus:!bg-[#100318]"
+              placeholder="Please input your bitname"
+              required
+              value={formState.toAddress || ""}
+              onChange={(e) => handleInputChange(e, "toAddress")}
+            />
+            <select
+              className="h-[54px] max-w-32 mobileLg:h-[60px] px-3 rounded-md bg-transparent text-stamp-grey-light placeholder:lowercase text-base focus-visible:!outline-none appearance-none"
+              onChange={(e) =>
+                handleInputChange(
+                  {
+                    target: {
+                      value: e.currentTarget.value,
+                    },
+                  },
+                  "root",
+                )}
+              value={formState.root}
+            >
+              {ROOT_DOMAINS.map((item: ROOT_DOMAIN_TYPES) => (
+                <option
+                  key={item}
+                  value={item}
+                  class="bg-[#100318]"
+                >
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {
+            /* <div className={animatedInputContainer}>
             <InputField
               type="text"
               placeholder="Please input your bitname"
@@ -135,7 +173,8 @@ export function RegisterBitnameContent({
           </div>
           <span class="absolute z-[3] right-6 top-1/2 -translate-y-1/2 text-base mobileLg:text-lg font-black text-stamp-purple pointer-events-none">
             .btc
-          </span>
+          </span> */
+          }
         </div>
         <div className="flex flex-row justify-between w-full">
           <div className="flex flex-col justify-center items-start">
@@ -143,8 +182,10 @@ export function RegisterBitnameContent({
             <p className="text-sm mobileLg:text-base font-medium text-[#999999]">
               {formState.toAddress && checkStatus
                 ? isExist
-                  ? `${formState.toAddress} is already registered`
-                  : `${formState.toAddress} is available`
+                  ? `${
+                    formState.toAddress + formState.root
+                  } is already registered`
+                  : `${formState.toAddress + formState.root} is available`
                 : ""}
             </p>
           </div>
