@@ -31,6 +31,7 @@ interface SRC101FormState {
   file: File | null;
   psbtFees?: PSBTFees;
   maxAmount?: string;
+  root: string;
 }
 
 export function useSRC101Form(
@@ -50,6 +51,7 @@ export function useSRC101Form(
   const [apiError, setApiError] = useState<string>("");
 
   const [formState, setFormState] = useState<SRC101FormState>({
+    root: ".btc",
     toAddress: "",
     token: initialToken || "",
     amt: "",

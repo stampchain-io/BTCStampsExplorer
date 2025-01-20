@@ -222,7 +222,7 @@ export function FeeCalculatorBase({
 
         {/* Sats Per Byte */}
         <p className={detailsText}>
-          <span className={detailsTitle}>SATS PER BYTE</span> {fee}
+          <span className={detailsTitle}>SATS PER BYTE</span> {/* {fee} */}
         </p>
 
         {/* Miner Fee */}

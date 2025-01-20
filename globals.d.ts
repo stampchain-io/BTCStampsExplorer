@@ -1,5 +1,5 @@
 // General Types ---------------------------------------------------------------
-
+export type ROOT_DOMAIN_TYPES = ".btc" | ".sats" | ".xbt" | ".x" | ".pink";
 export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721" | "SRC-101";
 export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
   | "all"
