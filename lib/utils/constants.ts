@@ -1,3 +1,5 @@
+import { ROOT_DOMAIN_TYPES } from "$globals";
+
 export const LOGO_STAMPCHAIN = "/img/stampchain.png";
 export const LOGO = LOGO_STAMPCHAIN;
 export const MAX_XCP_RETRIES = 5;
@@ -104,4 +106,12 @@ export const ARTICLE_LINKS: ArticleLink[] = [
   { title: "TRANSFER A STAMP", href: "/howto/transferstamp" },
   { title: "REGISTER BITNAME DOMAIN", href: "/howto/registerbitname" },
   { title: "TRANSFER A BITNAME DOMAIN", href: "/howto/transferbitname" },
+];
+
+export const ROOT_DOMAINS: ROOT_DOMAIN_TYPES[] = [
+  ".btc",
+  ".sats",
+  ".xbt",
+  ".x",
+  ".pink",
 ];

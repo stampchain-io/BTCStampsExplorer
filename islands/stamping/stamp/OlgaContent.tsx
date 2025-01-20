@@ -178,8 +178,23 @@ function extractErrorMessage(error: unknown): string {
           message?: string;
         };
       };
+      response?: {
+        data?: {
+          error?: string;
+        };
+      };
       message?: string;
     };
+
+    // Check for direct error message
+    if (err.response?.data?.error) {
+      logger.debug("stamps", {
+        message: "Found direct error message",
+        path: "error.message",
+        value: err.response?.data?.error,
+      });
+      return err.response?.data?.error;
+    }
 
     // Check for direct error message
     if (err.error?.message) {
