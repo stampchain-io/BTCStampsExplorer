@@ -560,6 +560,24 @@ export function StampImage(
     };
   }, []);
 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const togglePlayback = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleAudioEnded = () => {
+    setIsPlaying(false);
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col gap-3 mobileMd:gap-6">
@@ -658,14 +676,39 @@ export function StampImage(
         <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
           <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
             <div className="stamp-container">
-              <div className="stamp-audio-container relative pt-[100%] flex items-center justify-center">
+              <div className="relative pt-[100%] flex items-center justify-center">
                 <audio
-                  controls
-                  className="stamp-audio-player absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  ref={audioRef}
+                  className="hidden"
+                  onEnded={handleAudioEnded}
                 >
                   <source src={src} type={stamp.stamp_mimetype} />
-                  Your browser does not support the audio element.
                 </audio>
+                <button
+                  onClick={togglePlayback}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey-darker hover:text-stamp-grey-light"
+                >
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-stamp-grey-darker opacity-30 rounded-full" />
+                  {isPlaying
+                    ? (
+                      <svg
+                        viewBox="0 0 32 32"
+                        className="w-10 h-10"
+                        fill="currentColor"
+                      >
+                        <path d="M27 6V26C27 26.5304 26.7893 27.0391 26.4142 27.4142C26.0391 27.7893 25.5304 28 25 28H20C19.4696 28 18.9609 27.7893 18.5858 27.4142C18.2107 27.0391 18 26.5304 18 26V6C18 5.46957 18.2107 4.96086 18.5858 4.58579C18.9609 4.21071 19.4696 4 20 4H25C25.5304 4 26.0391 4.21071 26.4142 4.58579C26.7893 4.96086 27 5.46957 27 6ZM12 4H7C6.46957 4 5.96086 4.21071 5.58579 4.58579C5.21071 4.96086 5 5.46957 5 6V26C5 26.5304 5.21071 27.0391 5.58579 27.4142C5.96086 27.7893 6.46957 28 7 28H12C12.5304 28 13.0391 27.7893 13.4142 27.4142C13.7893 27.0391 14 26.5304 14 26V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4Z" />
+                      </svg>
+                    )
+                    : (
+                      <svg
+                        viewBox="0 0 32 32"
+                        className="w-10 h-10"
+                        fill="currentColor"
+                      >
+                        <path d="M30 16C30.0008 16.3395 29.9138 16.6735 29.7473 16.9694C29.5808 17.2654 29.3406 17.5132 29.05 17.6888L11.04 28.7063C10.7364 28.8922 10.3886 28.9937 10.0326 29.0003C9.67661 29.0069 9.32532 28.9183 9.015 28.7438C8.70764 28.5719 8.4516 28.3213 8.2732 28.0177C8.09481 27.7141 8.00051 27.3684 8 27.0163V4.98376C8.00051 4.63162 8.09481 4.28597 8.2732 3.98235C8.4516 3.67874 8.70764 3.42812 9.015 3.25626C9.32532 3.0817 9.67661 2.99314 10.0326 2.99973C10.3886 3.00632 10.7364 3.10783 11.04 3.29376L29.05 14.3113C29.3406 14.4869 29.5808 14.7347 29.7473 15.0306C29.9138 15.3265 30.0008 15.6605 30 16Z" />
+                      </svg>
+                    )}
+                </button>
               </div>
             </div>
           </div>
