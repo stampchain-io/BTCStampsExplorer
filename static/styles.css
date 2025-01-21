@@ -463,36 +463,6 @@ body {
   }
 }
 
-/* Remove old audio player styles */
-.stamp-audio-player,
-.stamp-audio-player::-webkit-media-controls-panel,
-.stamp-audio-player::-webkit-media-controls-play-button,
-.stamp-audio-player::-webkit-media-controls-timeline,
-.stamp-audio-player::-webkit-media-controls-current-time-display,
-.stamp-audio-player::-webkit-media-controls-time-remaining-display,
-.stamp-audio-player::-webkit-media-controls-volume-slider,
-.stamp-audio-player::-webkit-media-controls-mute-button {
-  display: none;
-}
-
-/* Add pixelated background for audio container */
-.stamp-audio-container {
-  @apply relative w-full h-full;
-}
-
-.stamp-audio-container::before {
-  content: "";
-  @apply absolute inset-0;
-  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
-      rgba(128, 128, 128, 0.1) 25% 50%);
-  background-size: 4px 4px;
-  z-index: 1;
-}
-
-.stamp-audio-container audio {
-  @apply relative z-20;
-}
-
 /* conic gradient for input field animated border */
 @property --angle {
   syntax: '<angle>';
