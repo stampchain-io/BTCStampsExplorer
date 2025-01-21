@@ -463,43 +463,16 @@ body {
   }
 }
 
-/* Custom Audio Player Styles */
-.stamp-audio-player {
-  @apply w-full max-w-[90%] bg-transparent;
-}
-
-/* Audio player container */
-.stamp-audio-player::-webkit-media-controls-panel {
-  @apply bg-stamp-card-bg border-none;
-  background: linear-gradient(to right, #1f002e00, #14001f7f, #1f002eff);
-}
-
-/* Play button */
-.stamp-audio-player::-webkit-media-controls-play-button {
-  @apply text-stamp-purple-bright hover:text-stamp-purple-bright;
-  filter: hue-rotate(300deg) brightness(1.5);
-}
-
-/* Time slider (progress bar) */
-.stamp-audio-player::-webkit-media-controls-timeline {
-  @apply bg-stamp-purple-bright;
-}
-
-/* Current time and duration */
+/* Remove old audio player styles */
+.stamp-audio-player,
+.stamp-audio-player::-webkit-media-controls-panel,
+.stamp-audio-player::-webkit-media-controls-play-button,
+.stamp-audio-player::-webkit-media-controls-timeline,
 .stamp-audio-player::-webkit-media-controls-current-time-display,
-.stamp-audio-player::-webkit-media-controls-time-remaining-display {
-  @apply text-stamp-grey-light;
-}
-
-/* Volume slider */
-.stamp-audio-player::-webkit-media-controls-volume-slider {
-  @apply bg-stamp-purple-bright;
-}
-
-/* Volume control */
+.stamp-audio-player::-webkit-media-controls-time-remaining-display,
+.stamp-audio-player::-webkit-media-controls-volume-slider,
 .stamp-audio-player::-webkit-media-controls-mute-button {
-  @apply text-stamp-purple-bright hover:text-stamp-purple-bright;
-  filter: hue-rotate(300deg) brightness(1.5);
+  display: none;
 }
 
 /* Add pixelated background for audio container */
