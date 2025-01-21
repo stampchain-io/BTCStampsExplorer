@@ -486,7 +486,8 @@ export class StampMintService {
         if (response.error.message?.includes('invalid base58')) {
           throw new Error(`Invalid wallet address format: ${sourceWallet}. Only P2PKH (1), P2WPKH (bc1q), and P2SH (3) addresses are supported.`);
         }
-        throw new Error(`API Error: ${response.error.message || 'Unknown error'}`);
+
+        throw new Error(`API Error: ${response.error || 'Unknown error'}`);
       }
 
       // Check for nested result and rawtransaction
