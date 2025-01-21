@@ -69,11 +69,9 @@ export class SRC101MultisigPSBTService {
 
       const transferData = JSON.parse(transferString);
       console.log("transferData:", transferData)
-      const msgpackData = msgpack.encode(transferData);
-      const { compressedData, compressed } = await SRC101Service.CompressionService
-        .compressWithCheck(msgpackData);
 
-      transferDataBytes = compressed ? compressedData : new TextEncoder().encode(JSON.stringify(transferData));
+      transferDataBytes = new TextEncoder().encode(JSON.stringify(transferData));
+      console.log("transferDataBytes:", bin2hex(transferDataBytes))
 
       // Add stamp prefix and length prefix
       const dataWithPrefix = new Uint8Array([...stampPrefixBytes, ...transferDataBytes]);
@@ -82,7 +80,6 @@ export class SRC101MultisigPSBTService {
 
       const lengthPrefix = new Uint8Array([(dataLength >> 8) & 0xff, dataLength & 0xff]);
       let payloadBytes = new Uint8Array([...lengthPrefix, ...dataWithPrefix]);
-
       // Pad data
       const padLength = (62 - (payloadBytes.length % 62)) % 62;
       if (padLength > 0) {
