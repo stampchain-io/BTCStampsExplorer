@@ -180,13 +180,14 @@ export const handler: Handlers<TX | TXError> = {
       } as NormalizedMintResponse, { forceNoCache: true });
     } catch (error: unknown) {
       console.error("Minting error:", error);
+
       const errorMessage = error instanceof Error
         ? error.message
-        : "An unexpected error occurred during minting";
+        : error as string || "An unexpected error occurred during minting";
 
       // Client errors (400)
       if (
-        errorMessage.includes("insufficient funds") ||
+        errorMessage.toLowerCase().includes("insufficient funds") ||
         errorMessage.includes("UTXO selection failed") ||
         errorMessage.includes("Invalid satsPerKB parameter")
       ) {

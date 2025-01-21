@@ -13,6 +13,7 @@ import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { handleImageError } from "$lib/utils/imageUtils.ts";
 
 const log = (message: string, data?: unknown) => {
   logger.debug("stamps", {
@@ -299,34 +300,6 @@ export function OlgaContent() {
   // Add new state and refs for tooltips
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
-  const uploadTooltipTimeoutRef = useRef<number | null>(null);
-
-  // Add tooltip handlers
-  const handleMouseMove = (e: MouseEvent) => {
-    setTooltipPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
-  };
-
-  const handleUploadMouseEnter = () => {
-    setIsUploadTooltipVisible(true);
-
-    if (uploadTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
-    }
-
-    uploadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-      setIsUploadTooltipVisible(false);
-    }, 1500);
-  };
-
-  const handleUploadMouseLeave = () => {
-    if (uploadTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
-    }
-    setIsUploadTooltipVisible(false);
-  };
 
   useEffect(() => {
     if (fees && !loading) {
@@ -882,7 +855,10 @@ export function OlgaContent() {
         message: "Unexpected minting error",
         error,
       });
-      setApiError("An unexpected error occurred");
+      setApiError(
+        error.message || error.response.data.error ||
+          "An unexpected error occurred",
+      );
       setSubmissionMessage(null);
     }
   };
@@ -1015,10 +991,6 @@ export function OlgaContent() {
     <div
       id="image-preview"
       class={`relative rounded items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300`}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleUploadMouseEnter}
-      onMouseLeave={handleUploadMouseLeave}
-      onMouseDown={() => setIsUploadTooltipVisible(false)}
       onClick={() => setIsUploadTooltipVisible(false)}
     >
       <input
@@ -1044,6 +1016,31 @@ export function OlgaContent() {
                       message: "Image preview failed to load",
                       error: e,
                     });
+                    handleImageError(e);
+                  }}
+                />
+              )
+              : file.name.match(/\.(html)$/i)
+              ? (
+                <iframe
+                  width="100%"
+                  height="100%"
+                  scrolling="no"
+                  loading="lazy"
+                  sandbox="allow-scripts allow-same-origin"
+                  src={URL.createObjectURL(file)}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-black [image-rendering:pixelated]`}
+                  onError={(e) => {
+                    console.error("iframe error (detailed):", {
+                      error: e,
+                      target: e.target,
+                      src: (e.target as HTMLIFrameElement).src,
+                      contentWindow:
+                        (e.target as HTMLIFrameElement).contentWindow
+                          ? "present"
+                          : "missing",
+                    });
+                    handleImageError(e);
                   }}
                 />
               )

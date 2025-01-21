@@ -90,7 +90,7 @@ export function formatDate(
 ): string {
   // Check for invalid date
   if (!date || isNaN(date.getTime())) {
-    return "Invalid Date";
+    return "INVALID";
   }
 
   const locale = navigator.language || "en-US";

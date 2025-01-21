@@ -83,9 +83,9 @@ export async function fetchXcpV2WithCache<T>(
   return await dbManager.handleCache(
     cacheKey,
     async () => {
+      let errorMessage = null;
       for (const node of xcp_v2_nodes) {
         const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-        
         await logger.debug("api", {
           message: "Attempting XCP node fetch",
           node: node.name,
@@ -114,6 +114,7 @@ export async function fetchXcpV2WithCache<T>(
               errorBody,
               url
             });
+            errorMessage = errorBody
             continue; // Try the next node
           }
 
@@ -132,6 +133,7 @@ export async function fetchXcpV2WithCache<T>(
             url,
             stack: error.stack
           });
+          errorMessage = error.message
           // Continue to the next node
         }
       }
@@ -140,13 +142,15 @@ export async function fetchXcpV2WithCache<T>(
       await logger.warn("api", {
         message: "All XCP nodes failed, returning minimal data structure",
         endpoint,
-        queryParams: queryParams.toString()
+        queryParams: queryParams.toString(),
+        error: errorMessage
       });
       
       return {
         result: [],
         next_cursor: null,
         result_count: 0,
+        error: errorMessage
       } as T;
     },
     cacheTimeout,
