@@ -280,7 +280,7 @@ export default function Wallet(props: WalletPageProps) {
   const { data } = props;
 
   return (
-    <div class="flex flex-col gap-8" f-client-nav>
+    <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
       <WalletHeader />
       <WalletDetails
         walletData={data.walletData}
