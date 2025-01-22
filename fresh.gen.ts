@@ -87,6 +87,7 @@ import * as $collection_index from "./routes/collection/index.tsx";
 import * as $collection_overview_overview_ from "./routes/collection/overview/[overview].tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
+import * as $dashboard_address_ from "./routes/dashboard/[address].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
@@ -126,6 +127,9 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
+import * as $Dashboard_details_DashboardContent from "./islands/Dashboard/details/DashboardContent.tsx";
+import * as $Dashboard_details_DashboardDetails from "./islands/Dashboard/details/DashboardDetails.tsx";
+import * as $Dashboard_details_DashboardHeader from "./islands/Dashboard/details/DashboardHeader.tsx";
 import * as $DateRangePicker from "./islands/DateRangePicker.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
@@ -340,6 +344,7 @@ const manifest = {
       $collection_overview_overview_,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
+    "./routes/dashboard/[address].tsx": $dashboard_address_,
     "./routes/docs/index.tsx": $docs_index,
     "./routes/fairmint.tsx": $fairmint,
     "./routes/faq/index.tsx": $faq_index,
@@ -383,6 +388,12 @@ const manifest = {
   islands: {
     "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
+    "./islands/Dashboard/details/DashboardHeader.tsx":
+      $Dashboard_details_DashboardHeader,
+    "./islands/Dashboard/details/DashboardDetails.tsx":
+      $Dashboard_details_DashboardDetails,
+    "./islands/Dashboard/details/DashboardContent.tsx":
+      $Dashboard_details_DashboardContent,
     "./islands/DateRangePicker.tsx": $DateRangePicker,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
