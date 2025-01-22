@@ -224,11 +224,11 @@ export function FeeCalculatorBase({
 
         {/* Sats Per Byte */}
         <p className={detailsText}>
-          <span className={detailsTitle}>SATS PER BYTE</span> {/* {fee} */}
+          <span className={detailsTitle}>SATS PER BYTE</span> {fee}
         </p>
 
         {/* Miner Fee */}
-        {feeDetails?.minerFee && (
+        {!!feeDetails?.minerFee && (
           <p className={detailsText}>
             <span className={detailsTitle}>MINER FEE</span> {coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.minerFee, {
@@ -263,7 +263,7 @@ export function FeeCalculatorBase({
         )}
 
         {/* Dust Value */}
-        {feeDetails?.dustValue && feeDetails.dustValue > 0 && (
+        {!!feeDetails?.dustValue && (
           <p className={detailsText}>
             <span className={detailsTitle}>DUST</span> {coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.dustValue, {
@@ -275,7 +275,7 @@ export function FeeCalculatorBase({
         )}
 
         {/* Total */}
-        {feeDetails?.totalValue && (
+        {!!feeDetails?.totalValue && (
           <p className={detailsText}>
             <span className={detailsTitle}>TOTAL</span> {coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.totalValue, {

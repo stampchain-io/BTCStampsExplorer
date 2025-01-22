@@ -35,6 +35,7 @@ export function TokenMints({ mints }: TokenMintsProps) {
                   {header}
                 </th>
               ))}
+              <th class="min-w-3 min-[660px]:hidden block" />
             </tr>
           </thead>
         )}

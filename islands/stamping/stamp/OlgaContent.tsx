@@ -194,6 +194,9 @@ function extractErrorMessage(error: unknown): string {
         path: "error.message",
         value: err.response?.data?.error,
       });
+      if (err.response?.data?.error?.includes("Insufficient funds")) {
+        return "Insufficient funds to cover outputs and fees";
+      }
       return err.response?.data?.error;
     }
 

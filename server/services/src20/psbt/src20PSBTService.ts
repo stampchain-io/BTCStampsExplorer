@@ -98,121 +98,124 @@ export class SRC20PSBTService {
         action: src20Action.op,
       }
     });
-
-    const effectiveChangeAddress = changeAddress || sourceAddress;
-    const network = networks.bitcoin;
-    
-    // 1. First prepare the action data and get CIP33 addresses
-    const { chunks } = await this.prepareActionData(src20Action);
-
-    // 2. Construct all outputs with their exact scripts and values
-    const outputs = [
-      // First output is the recipient
-      {
-        script: address.toOutputScript(toAddress, network),
-        value: this.DUST_SIZE,
-      },
-      // Then add all CIP33 data outputs
-      ...chunks.map((chunk, i) => ({
-        script: address.toOutputScript(chunk, network),
-        value: this.DUST_SIZE + i,
-      }))
-    ];
-
-    // 3. Calculate total output value needed
-    const totalOutputValue = outputs.reduce((sum, out) => sum + out.value, 0);
-
-    // 4. Select UTXOs with the target fee rate
-    const { inputs, change } = await TransactionService.UTXOService.selectUTXOsForTransaction(
-      sourceAddress,
-      outputs,
-      satsPerVB,
-      0,
-      1.5,
-      { filterStampUTXOs: true }
-    );
-
-    // 5. Create PSBT with actual inputs and outputs
-    const psbt = new Psbt({ network });
-
-    // Add inputs
-    for (const input of inputs) {
-      const txDetails = await QuicknodeService.getTransaction(input.txid);
-      if (!txDetails) {
-        throw new Error(`Failed to fetch transaction details for ${input.txid}`);
+    try {
+      const effectiveChangeAddress = changeAddress || sourceAddress;
+      const network = networks.bitcoin;
+      
+      // 1. First prepare the action data and get CIP33 addresses
+      const { chunks } = await this.prepareActionData(src20Action);
+  
+      // 2. Construct all outputs with their exact scripts and values
+      const outputs = [
+        // First output is the recipient
+        {
+          script: address.toOutputScript(toAddress, network),
+          value: this.DUST_SIZE,
+        },
+        // Then add all CIP33 data outputs
+        ...chunks.map((chunk, i) => ({
+          script: address.toOutputScript(chunk, network),
+          value: this.DUST_SIZE + i,
+        }))
+      ];
+  
+      // 3. Calculate total output value needed
+      const totalOutputValue = outputs.reduce((sum, out) => sum + out.value, 0);
+  
+      // 4. Select UTXOs with the target fee rate
+      const { inputs, change } = await TransactionService.UTXOService.selectUTXOsForTransaction(
+        sourceAddress,
+        outputs,
+        satsPerVB,
+        0,
+        1.5,
+        { filterStampUTXOs: true }
+      );
+  
+      // 5. Create PSBT with actual inputs and outputs
+      const psbt = new Psbt({ network });
+  
+      // Add inputs
+      for (const input of inputs) {
+        const txDetails = await QuicknodeService.getTransaction(input.txid);
+        if (!txDetails) {
+          throw new Error(`Failed to fetch transaction details for ${input.txid}`);
+        }
+        psbt.addInput(this.createPsbtInput(input, txDetails));
       }
-      psbt.addInput(this.createPsbtInput(input, txDetails));
-    }
-
-    // Add all outputs
-    outputs.forEach(output => {
-      psbt.addOutput({
-        script: output.script,
-        value: BigInt(output.value)
+  
+      // Add all outputs
+      outputs.forEach(output => {
+        psbt.addOutput({
+          script: output.script,
+          value: BigInt(output.value)
+        });
       });
-    });
-
-    // Add change output if needed
-    if (change > this.DUST_SIZE) {
-      psbt.addOutput({
-        script: address.toOutputScript(effectiveChangeAddress, network),
-        value: BigInt(change)
+  
+      // Add change output if needed
+      if (change > this.DUST_SIZE) {
+        psbt.addOutput({
+          script: address.toOutputScript(effectiveChangeAddress, network),
+          value: BigInt(change)
+        });
+      }
+  
+      // 6. Calculate actual transaction fee from input/output values
+      const totalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
+      const totalOutputAmount = outputs.reduce((sum, out) => sum + out.value, 0) + 
+                               (change > this.DUST_SIZE ? change : 0);
+      const actualFee = totalInputValue - totalOutputAmount;
+      const dustTotal = outputs.reduce((sum, out) => sum + out.value, 0);
+  
+      // Log exact values for debugging
+      logger.debug("stamps", {
+        message: "Transaction details",
+        data: {
+          totalInputValue,
+          totalOutputAmount,
+          actualFee,
+          dustTotal,
+          changeAmount: change,
+          feeBreakdown: {
+            minerFee: actualFee,
+            dustValue: dustTotal,
+            total: actualFee + dustTotal
+          },
+          outputs: outputs.map(o => o.value),
+          change,
+          inputValues: inputs.map(i => i.value)
+        }
       });
-    }
-
-    // 6. Calculate actual transaction fee from input/output values
-    const totalInputValue = inputs.reduce((sum, input) => sum + Number(input.value), 0);
-    const totalOutputAmount = outputs.reduce((sum, out) => sum + out.value, 0) + 
-                             (change > this.DUST_SIZE ? change : 0);
-    const actualFee = totalInputValue - totalOutputAmount;
-    const dustTotal = outputs.reduce((sum, out) => sum + out.value, 0);
-
-    // Log exact values for debugging
-    logger.debug("stamps", {
-      message: "Transaction details",
-      data: {
+  
+      return {
+        psbt,
+        estimatedTxSize: Math.ceil(actualFee / satsPerVB),
         totalInputValue,
-        totalOutputAmount,
-        actualFee,
-        dustTotal,
-        changeAmount: change,
-        feeBreakdown: {
+        totalOutputValue: totalOutputAmount,
+        totalChangeOutput: change,
+        totalDustValue: dustTotal,
+        estMinerFee: actualFee,
+        feeDetails: {
+          baseFee: actualFee,
+          ancestorFee: 0,
+          effectiveFeeRate: satsPerVB,
+          ancestorCount: 0,
+          totalVsize: Math.ceil(actualFee / satsPerVB),
+          total: actualFee + dustTotal,
           minerFee: actualFee,
           dustValue: dustTotal,
-          total: actualFee + dustTotal
+          totalValue: actualFee + dustTotal
         },
-        outputs: outputs.map(o => o.value),
-        change,
-        inputValues: inputs.map(i => i.value)
-      }
-    });
-
-    return {
-      psbt,
-      estimatedTxSize: Math.ceil(actualFee / satsPerVB),
-      totalInputValue,
-      totalOutputValue: totalOutputAmount,
-      totalChangeOutput: change,
-      totalDustValue: dustTotal,
-      estMinerFee: actualFee,
-      feeDetails: {
-        baseFee: actualFee,
-        ancestorFee: 0,
-        effectiveFeeRate: satsPerVB,
-        ancestorCount: 0,
-        totalVsize: Math.ceil(actualFee / satsPerVB),
-        total: actualFee + dustTotal,
-        minerFee: actualFee,
-        dustValue: dustTotal,
-        totalValue: actualFee + dustTotal
-      },
-      changeAddress: effectiveChangeAddress,
-      inputs: inputs.map((input, index) => ({
-        index,
-        address: input.address,
-        sighashType: 1
-      }))
-    };
+        changeAddress: effectiveChangeAddress,
+        inputs: inputs.map((input, index) => ({
+          index,
+          address: input.address,
+          sighashType: 1
+        }))
+      };
+    } catch (error) {
+      throw error.message
+    }
   }
 
   private static async prepareActionData(src20Action: string | object) {

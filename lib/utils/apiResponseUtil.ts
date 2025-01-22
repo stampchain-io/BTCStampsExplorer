@@ -231,7 +231,7 @@ export class ApiResponseUtil {
 
   static internalError(
     error: unknown,
-    message = "Internal server error",
+    message: string = "Internal server error",
     options: ApiResponseOptions = {},
   ): Response {
     console.error("Internal Error:", error);
