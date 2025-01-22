@@ -28,7 +28,7 @@ export default function Table({
 }: TableProps) {
   const [selectedTab, setSelectedTab] = useState<string>(configs[0].id);
   const [tabData, setTabData] = useState<TabData>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalCounts, setTotalCounts] = useState(initialCounts);
@@ -51,7 +51,6 @@ export default function Table({
     tabId: string,
     isTabChange = false,
   ) => {
-    if (isLoading) return;
     if (!isTabChange && !hasMore) return;
 
     setIsLoading(true);
