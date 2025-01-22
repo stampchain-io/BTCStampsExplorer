@@ -128,7 +128,7 @@ export const handler: Handlers<TX | TXError> = {
         message: "Error processing request",
         error: error instanceof Error ? error.message : String(error),
       });
-      return ApiResponseUtil.internalError(error);
+      return ApiResponseUtil.internalError(error, error as string);
     }
   },
 };

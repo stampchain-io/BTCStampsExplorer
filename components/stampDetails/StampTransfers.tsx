@@ -43,6 +43,7 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                   {header}
                 </th>
               ))}
+              <th class="min-w-3 min-[660px]:hidden block" />
             </tr>
           </thead>
         )}

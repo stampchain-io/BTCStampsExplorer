@@ -44,25 +44,29 @@ export function normalizeFeeRate(params: {
 } {
   let normalizedSatsPerVB: number;
   
-  if (params.satsPerVB !== undefined) {
-    normalizedSatsPerVB = params.satsPerVB;
-  } else if (params.satsPerKB !== undefined) {
-    // If satsPerKB/1000 < 1, assume it was intended as sats/vB
-    normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER 
-      ? params.satsPerKB 
-      : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
-  } else {
-    throw new Error("Either satsPerKB or satsPerVB must be provided");
-  }
+  try {
+    if (params.satsPerVB !== undefined) {
+      normalizedSatsPerVB = params.satsPerVB;
+    } else if (params.satsPerKB !== undefined) {
+      // If satsPerKB/1000 < 1, assume it was intended as sats/vB
+      normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER 
+        ? params.satsPerKB 
+        : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
+    } else {
+      throw new Error("Either satsPerKB or satsPerVB must be provided");
+    }
 
-  if (normalizedSatsPerVB <= 2) {
-    throw new Error("Fee rate must be greater than 2 sat/vB");
-  }
+    if (normalizedSatsPerVB <= 2) {
+      throw new Error("Fee rate must be greater than 2 sat/vB");
+    }
 
-  return {
-    normalizedSatsPerVB,
-    normalizedSatsPerKB: normalizedSatsPerVB * SATS_PER_KB_MULTIPLIER
-  };
+    return {
+      normalizedSatsPerVB,
+      normalizedSatsPerKB: normalizedSatsPerVB * SATS_PER_KB_MULTIPLIER
+    };
+  } catch (error) {
+    throw error.message
+  }
 }
 
 export async function fetchXcpV2WithCache<T>(
