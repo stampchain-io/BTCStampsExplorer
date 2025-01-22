@@ -50,7 +50,7 @@ const ItemHeader = ({
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full relative">
       <div class="flex items-end">
-        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight">
+        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-bright">
           {title}
         </p>
       </div>
@@ -565,7 +565,7 @@ export default function WalletContent({
           handleOpen={handleOpen}
           search={true}
           filter={false}
-          setting={true}
+          setting={false}
           isOpenFilter={false}
           isOpenSetting={openSetting}
           handleOpenFilter={() => {}}
