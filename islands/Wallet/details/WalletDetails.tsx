@@ -6,8 +6,12 @@ import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 
 const dataColumn = "flex flex-col -space-y-1";
+const dataLabelSm =
+  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
 const dataLabel =
   "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+const dataValueSm =
+  "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
 const dataValueXl =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
 const tooltipIcon =
@@ -517,13 +521,28 @@ function StampStats(
       class="w-full dark-gradient rounded-lg p-3 mobileMd:p-6 flex flex-col gap-6"
       onClick={() => handleType("stamp")}
     >
-      <div class="flex justify-between">
-        <StatItem label="STAMPS" value={stampsTotal.toString()} />
-        <StatItem
-          label="BY ME"
-          value={stampsCreated.toString()}
-          align="right"
-        />
+      <div class="flex flex-row">
+        <StatTitle label="STAMPS" value={stampsTotal.toString()} />
+      </div>
+      <div className="flex flex-row">
+        <div className={`${dataColumn} flex-1 items-start`}>
+          <StatItem label="UNIQUE" value="N/A" />
+        </div>
+
+        <div className={`${dataColumn} flex-1 items-end`}>
+          <StatItem label="EDITIONS" value="N/A" align="right" />
+        </div>
+      </div>
+      <div className="flex flex-row pt-1.5 mobileLg:pt-3">
+        <div className={`${dataColumn} flex-1 items-start`}>
+          <StatItem label="CREATED" value={stampsCreated.toString()} />
+        </div>
+        <div className={`${dataColumn} flex-1 items-center`}>
+          <StatItem label="TOTAL STAMPS" value="N/A" align="center" />
+        </div>
+        <div className={`${dataColumn} flex-1 items-end`}>
+          <StatItem label="EDITIONS" value="N/A" align="right" />
+        </div>
       </div>
     </div>
   );
@@ -590,6 +609,35 @@ function TokenStats(
   );
 }
 
+interface StatTitleProps {
+  label: string;
+  value: string | ComponentChildren;
+  align?: "left" | "center" | "right";
+}
+
+function StatTitle({ label, value, align = "left" }: StatTitleProps) {
+  const alignmentClass = {
+    left: "text-left",
+    center: "text-center",
+    right: "text-right",
+  }[align];
+
+  return (
+    <div class={`${dataColumn}`}>
+      <p
+        class={`${dataLabel} ${alignmentClass}`}
+      >
+        {label}
+      </p>
+      <p
+        class={`${dataValueXl} ${alignmentClass}`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
 interface StatItemProps {
   label: string;
   value: string | ComponentChildren;
@@ -606,12 +654,12 @@ function StatItem({ label, value, align = "left" }: StatItemProps) {
   return (
     <div class={`${dataColumn}`}>
       <p
-        class={`${dataLabel}  ${alignmentClass}`}
+        class={`${dataLabelSm}  ${alignmentClass}`}
       >
         {label}
       </p>
       <p
-        class={`${dataValueXl} ${alignmentClass}`}
+        class={`${dataValueSm} ${alignmentClass}`}
       >
         {value}
       </p>
