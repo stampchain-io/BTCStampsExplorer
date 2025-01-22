@@ -4,7 +4,10 @@ import WalletSendModal from "./WalletSendBTCModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { space } from "npm:postcss@8.4.35/lib/list";
 
+const walletDataContainer =
+  "flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-3 mobileMd:gap-6";
 const dataColumn = "flex flex-col -space-y-1";
 const dataLabelSm =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
@@ -490,6 +493,7 @@ function WalletStats(
         stampsTotal={stampsTotal}
         stampsCreated={stampsCreated}
         handleType={handleType}
+        stampValue={stampValue}
       />
       <DispenserStats
         dispensers={{
@@ -502,7 +506,6 @@ function WalletStats(
       <TokenStats
         src20Total={src20Total}
         handleType={handleType}
-        stampValue={stampValue}
         src20Value={src20Value}
       />
     </div>
@@ -510,39 +513,33 @@ function WalletStats(
 }
 
 function StampStats(
-  { stampsTotal, stampsCreated, handleType }: {
+  { stampsTotal, stampsCreated, handleType, stampValue = 0 }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;
+    stampValue?: number;
   },
 ) {
   return (
     <div
-      class="w-full dark-gradient rounded-lg p-3 mobileMd:p-6 flex flex-col gap-6"
+      className={walletDataContainer}
       onClick={() => handleType("stamp")}
     >
-      <div class="flex flex-row">
+      <div className="flex">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
       </div>
-      <div className="flex flex-row">
-        <div className={`${dataColumn} flex-1 items-start`}>
-          <StatItem label="UNIQUE" value="N/A" />
-        </div>
-
-        <div className={`${dataColumn} flex-1 items-end`}>
-          <StatItem label="EDITIONS" value="N/A" align="right" />
-        </div>
-      </div>
-      <div className="flex flex-row pt-1.5 mobileLg:pt-3">
-        <div className={`${dataColumn} flex-1 items-start`}>
-          <StatItem label="CREATED" value={stampsCreated.toString()} />
-        </div>
-        <div className={`${dataColumn} flex-1 items-center`}>
-          <StatItem label="TOTAL STAMPS" value="N/A" align="center" />
-        </div>
-        <div className={`${dataColumn} flex-1 items-end`}>
-          <StatItem label="EDITIONS" value="N/A" align="right" />
-        </div>
+      <div className="flex justify-between">
+        <StatItem label="CREATED" value={stampsCreated.toString()} />
+        <StatItem
+          label="VALUE"
+          value={
+            <>
+              {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
+              <span className="font-extralight">BTC</span>
+            </>
+          }
+          align="right"
+        />
       </div>
     </div>
   );
@@ -556,21 +553,17 @@ function DispenserStats(
 ) {
   return (
     <div
-      class="flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-6"
+      className={walletDataContainer}
       onClick={() => handleType("dispenser")}
     >
-      <div class="flex justify-between">
+      <div className="flex">
+        <StatTitle label="LISTINGS" value={dispensers.open.toString()} />
+      </div>
+      <div className="flex justify-between">
+        <StatItem label="ATOMIC" value="N/A" />
         <StatItem
-          label="LISTINGS"
-          value={dispensers.open.toString()}
-          align="left"
-        />
-        <div class="hidden">
-          <StatItem label="ATOMIC" value="N/A" align="center" />
-        </div>
-        <StatItem
-          label="SOLD"
-          value={dispensers.closed.toString()}
+          label="DISPENSERS"
+          value={dispensers.total.toString()}
           align="right"
         />
       </div>
@@ -579,32 +572,36 @@ function DispenserStats(
 }
 
 function TokenStats(
-  { src20Total, handleType, stampValue = 0, src20Value = 0 }: {
+  { src20Total, handleType, src20Value = 0 }: {
     src20Total: number;
     handleType: (type: string) => void;
-    stampValue?: number;
     src20Value?: number;
   },
 ) {
-  const totalValue = (stampValue || 0) + (src20Value || 0);
+  const totalValue = src20Value || 0;
 
   return (
     <div
-      class="flex justify-between w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-6"
+      className={walletDataContainer}
       onClick={() => handleType("token")}
     >
-      <StatItem label="TOKENS" value={src20Total?.toString()} />
-      <StatItem
-        label="VALUE"
-        value={
-          <>
-            <span class="font-black">
-              {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}
-            </span>&nbsp;<span class="font-extralight">BTC</span>
-          </>
-        }
-        align="right"
-      />
+      <div className="flex ">
+        <StatTitle label="TOKENS" value={src20Total?.toString()} />
+      </div>
+
+      <div className="flex justify-between">
+        <StatItem label="24H CHANGE" value="+/- 0.00%" />
+        <StatItem
+          label="VALUE"
+          value={
+            <>
+              {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
+              <span className="font-extralight">BTC</span>
+            </>
+          }
+          align="right"
+        />
+      </div>
     </div>
   );
 }
@@ -623,7 +620,7 @@ function StatTitle({ label, value, align = "left" }: StatTitleProps) {
   }[align];
 
   return (
-    <div class={`${dataColumn}`}>
+    <div class={`${dataColumn} `}>
       <p
         class={`${dataLabel} ${alignmentClass}`}
       >
