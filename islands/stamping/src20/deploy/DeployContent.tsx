@@ -127,7 +127,8 @@ export function DeployContent(
         });
 
         setFileUploadError(
-          `File upload failed: ${errorMessage}. The deployment will continue without the background image.`,
+          // `File upload failed: ${errorMessage}. The deployment will continue without the background image.`,
+          `File upload failed: The deployment will continue without the background image.`,
         );
       }
     };

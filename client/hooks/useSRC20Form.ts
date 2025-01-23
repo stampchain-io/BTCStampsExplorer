@@ -7,6 +7,7 @@ import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import { debounce } from "$lib/utils/debounce.ts";
+import { showNotification } from "$lib/utils/notificationUtils.ts";
 interface PSBTFees {
   estMinerFee: number;
   totalDustValue: number;
@@ -503,10 +504,11 @@ export function useSRC20Form(
         );
 
         if (walletResult.signed) {
-          setSubmissionMessage({
-            message: "Transaction broadcasted successfully.",
-            txid: walletResult.txid,
-          });
+          showNotification(
+            "Transaction Successfully.",
+            walletResult.txid,
+            "success",
+          );
         } else if (walletResult.cancelled) {
           setSubmissionMessage({
             message: "Transaction signing cancelled by user.",
