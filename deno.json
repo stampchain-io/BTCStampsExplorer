@@ -109,6 +109,7 @@
     "redis": "https://deno.land/x/redis@v0.32.4/mod.ts",
     "swiper/": "https://esm.sh/swiper@11.1.14/",
     "swiper": "https://esm.sh/swiper@11.1.14",
+    "sweetalert2": "https://esm.sh/sweetalert2@11.15.10",
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:tailwindcss@3.4.1/plugin.js",
