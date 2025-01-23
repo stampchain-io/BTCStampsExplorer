@@ -16,8 +16,6 @@ const dataValueSm =
   "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
 const dataValue =
   "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
-const dataValueLg =
-  "text-xl mobileLg:text-2xl font-medium text-stamp-grey-light uppercase";
 const dataValueXl =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
 const titleGreyDL =
@@ -45,8 +43,6 @@ function WalletDetails(
       <div class="flex flex-col gap-3 mobileMd:gap-6 items-stretch">
         <WalletOverview
           walletData={{ ...walletData, fee }}
-          onSend={() => setIsSendModalOpen(true)}
-          onReceive={() => setIsReceiveModalOpen(true)}
         />
         <WalletStats
           setShowItem={setShowItem}
@@ -80,10 +76,8 @@ function WalletDetails(
 }
 
 function WalletOverview(
-  { walletData, onSend, onReceive }: {
+  { walletData }: {
     walletData: WalletOverviewInfo;
-    onSend: () => void;
-    onReceive: () => void;
   },
 ) {
   const [showCopied, setShowCopied] = useState(false);
@@ -325,14 +319,7 @@ function WalletStats(
         stampsCreated={stampsCreated}
         handleType={handleType}
         stampValue={stampValue}
-      />
-      <DispenserStats
-        dispensers={{
-          open: dispensers?.open ?? 0,
-          closed: dispensers?.closed ?? 0,
-          total: dispensers?.total ?? 0,
-        }}
-        handleType={handleType}
+        dispensers={dispensers}
       />
       <TokenStats
         src20Total={src20Total}
@@ -345,11 +332,12 @@ function WalletStats(
 }
 
 function StampStats(
-  { stampsTotal, stampsCreated, handleType, stampValue = 0 }: {
+  { stampsTotal, stampsCreated, handleType, stampValue = 0, dispensers }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;
     stampValue?: number;
+    dispensers: { open: number; closed: number; total: number };
   },
 ) {
   return (
@@ -375,7 +363,7 @@ function StampStats(
         />
       </div>
       <div className="flex justify-between">
-        <StatItem label="LISTINGS" value="8" />
+        <StatItem label="LISTINGS" value={dispensers.open.toString()} />
         <StatItem
           label="VALUE"
           value={
@@ -384,32 +372,6 @@ function StampStats(
               <span className="font-light">BTC</span>
             </>
           }
-          align="right"
-        />
-      </div>
-    </div>
-  );
-}
-
-function DispenserStats(
-  { handleType, dispensers = { open: 0, closed: 0, total: 0 } }: {
-    handleType: (type: string) => void;
-    dispensers?: { open: number; closed: number; total: number };
-  },
-) {
-  return (
-    <div
-      className={walletDataContainer}
-      onClick={() => handleType("dispenser")}
-    >
-      <div className="flex">
-        <StatTitle label="LISTINGS" value={dispensers.open.toString()} />
-      </div>
-      <div className="flex justify-between">
-        <StatItem label="ATOMIC" value="N/A" />
-        <StatItem
-          label="DISPENSERS"
-          value={dispensers.total.toString()}
           align="right"
         />
       </div>

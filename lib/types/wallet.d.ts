@@ -78,10 +78,22 @@ export interface Wallet {
 }
 
 // Interface for wallet overview display that requires all fields
-export interface WalletOverviewInfo extends BTCBalanceInfo {
-  usdValue: number; // Required in UI (override optional)
-  btcPrice: number; // Required in UI (override optional)
-  fee: number; // Required for overview
+export interface WalletOverviewInfo {
+  address: string;
+  balance: number;
+  txCount: number;
+  unconfirmedBalance: number;
+  unconfirmedTxCount: number;
+  btcPrice: number;
+  usdValue: number;
+  fee: number;
+  dispensers: {
+    open: number;
+    closed: number;
+    total: number;
+  };
+  stampValue: number;
+  src20Value: number;
 }
 
 // Extended interface for wallet data that includes dispenser stats
