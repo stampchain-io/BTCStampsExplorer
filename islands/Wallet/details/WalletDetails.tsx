@@ -23,7 +23,7 @@ const dataValueXl =
 const titleGreyDL =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
 const subTitleGrey =
-  "inline-block text-lg mobileMd:text-xl mobileLg:text-2xl font-medium text-stamp-purple mb-1.5 mobileLg:mb-3";
+  "inline-block text-sm mobileMd:text-base mobileLg:text-lg font-medium text-stamp-grey";
 const tooltipIcon =
   "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
 
@@ -56,6 +56,7 @@ function WalletDetails(
           dispensers={walletData.dispensers}
           stampValue={walletData.stampValue}
           src20Value={walletData.src20Value}
+          walletData={walletData}
         />
       </div>
 
@@ -143,39 +144,37 @@ function WalletOverview(
   };
 
   return (
-    <div class="flex tablet:flex-row gap-3 mobileMd:gap-6">
-      <div class="flex flex-col w-full tablet:w-1/2 justify-between dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1">
-        <div class={dataColumn}>
-          <p class={`${dataLabel}`}>
-            {walletData.usdValue.toLocaleString()} USD
-          </p>
-          <p class={`${dataValueXl}`}>
-            {walletData.balance} <span class="font-extralight">BTC</span>
+    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
+      <div class="flex flex-col w-full mobileLg:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
+        <div class="flex">
+          <p class={titleGreyDL}>
+            ANONYMOUS
           </p>
         </div>
-        <div class="flex pt-3 gap-3 mobileMd:gap-6">
-          <div class="flex items-center">
-            <p class={`${subTitleGrey} hidden desktop:block`}>
-              {abbreviateAddress(walletData.address, 12)}
+        <div class="flex gap-3 mobileMd:gap-6">
+          <div class="flex">
+            <p
+              class={`${subTitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
+            >
+              {walletData.address}
             </p>
-            <p class={`${subTitleGrey} hidden mobileLg:block desktop:hidden`}>
-              {abbreviateAddress(walletData.address, 8)}
-            </p>
-            <p class={`${subTitleGrey} block mobileLg:hidden`}>
-              {abbreviateAddress(walletData.address, 6)}
+            <p
+              class={`${subTitleGrey} block mobileMd:hidden mobileLg:block desktop:hidden`}
+            >
+              {abbreviateAddress(walletData.address, 14)}
             </p>
           </div>
 
           <div
             ref={copyButtonRef}
-            class="relative pt-[3px] mobileMd:pt-1"
+            class="relative -pt-0.5"
             onMouseEnter={handleCopyMouseEnter}
             onMouseLeave={handleCopyMouseLeave}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
-              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-bright cursor-pointer"
+              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-grey hover:fill-stamp-grey-light cursor-pointer"
               role="button"
               aria-label="Copy"
               onClick={copy}
@@ -199,23 +198,36 @@ function WalletOverview(
           </div>
         </div>
 
-        <div class="flex justify-between">
-          <div>
-            <p class="text-stamp-grey-light font-light text-base mobileLg:text-lg">
-              kevin.btc
-            </p>
-            <p class="text-stamp-grey font-light text-sm mobileLg:text-base">
-              universe.btc
-            </p>
-          </div>
+        <div class="flex flex-col">
+          <p class="text-stamp-grey-light font-light text-base mobileLg:text-lg">
+            kevin.btc
+          </p>
+          <p class="text-stamp-grey font-light text-sm mobileLg:text-base">
+            universe.btc
+          </p>
         </div>
       </div>
 
-      <div class="flex flex-col w-full tablet:w-1/2 justify-between dark-gradient rounded-lg p-3 mobileMd:p-6">
+      <div class="flex flex-col w-full mobileLg:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6">
+        <div class={`${dataColumn} text-left mobileLg:text-right`}>
+          <p class={dataLabel}>
+            <span class="font-medium">
+              {walletData.usdValue.toFixed(2)}
+            </span>{" "}
+            USD
+          </p>
+          <p class={dataValueXl}>
+            {
+              <>
+                {walletData.balance} <span class="font-light">BTC</span>
+              </>
+            }
+          </p>
+        </div>
         <div class="flex justify-between">
           <div class={dataColumn}>
             <p class={`${dataLabel}`}>
-              TOKENS
+              STAMPS
             </p>
             <p class={`${dataValueXl}`}>
               0
@@ -223,7 +235,7 @@ function WalletOverview(
           </div>
           <div class={dataColumn}>
             <p class={`${dataLabel} text-right`}>
-              STAMPS
+              TOKENS
             </p>
             <p class={`${dataValueXl} text-right`}>
               0
@@ -290,6 +302,7 @@ function WalletStats(
     setShowItem = () => {},
     stampValue = 0,
     src20Value = 0,
+    walletData,
   }: {
     stampsTotal: number;
     src20Total: number;
@@ -298,6 +311,7 @@ function WalletStats(
     setShowItem?: (type: string) => void;
     stampValue?: number;
     src20Value?: number;
+    walletData: WalletOverviewInfo;
   },
 ) {
   const handleType = (type: string) => {
@@ -324,6 +338,7 @@ function WalletStats(
         src20Total={src20Total}
         handleType={handleType}
         src20Value={src20Value}
+        walletData={walletData}
       />
     </div>
   );
@@ -342,17 +357,31 @@ function StampStats(
       className={walletDataContainer}
       onClick={() => handleType("stamp")}
     >
-      <div className="flex">
+      <div className="flex justify-between">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
+        <StatItem
+          label="CREATED"
+          value={stampsCreated.toString()}
+          align="right"
+          class="self-end"
+        />
       </div>
       <div className="flex justify-between">
-        <StatItem label="CREATED" value={stampsCreated.toString()} />
+        <StatItem label="EDITIONS" value="239" />
+        <StatItem
+          label="COLLECTIONS"
+          value="N/A"
+          align="right"
+        />
+      </div>
+      <div className="flex justify-between">
+        <StatItem label="LISTINGS" value="8" />
         <StatItem
           label="VALUE"
           value={
             <>
               {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-extralight">BTC</span>
+              <span className="font-light">BTC</span>
             </>
           }
           align="right"
@@ -389,10 +418,11 @@ function DispenserStats(
 }
 
 function TokenStats(
-  { src20Total, handleType, src20Value = 0 }: {
+  { src20Total, handleType, src20Value = 0, walletData }: {
     src20Total: number;
     handleType: (type: string) => void;
     src20Value?: number;
+    walletData: WalletOverviewInfo;
   },
 ) {
   const totalValue = src20Value || 0;
@@ -402,8 +432,18 @@ function TokenStats(
       className={walletDataContainer}
       onClick={() => handleType("token")}
     >
-      <div className="flex ">
+      <div className="flex justify-between">
         <StatTitle label="TOKENS" value={src20Total?.toString()} />
+        <StatItem
+          label={`${walletData.usdValue.toFixed(2)} USD`}
+          value={
+            <>
+              {walletData.balance} <span class="font-light">BTC</span>
+            </>
+          }
+          align="right"
+          class="self-end"
+        />
       </div>
 
       <div className="flex justify-between">
@@ -413,7 +453,7 @@ function TokenStats(
           value={
             <>
               {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-extralight">BTC</span>
+              <span className="font-light">BTC</span>
             </>
           }
           align="right"
@@ -456,9 +496,12 @@ interface StatItemProps {
   label: string;
   value: string | ComponentChildren;
   align?: "left" | "center" | "right";
+  class?: string;
 }
 
-function StatItem({ label, value, align = "left" }: StatItemProps) {
+function StatItem(
+  { label, value, align = "left", class: customClass }: StatItemProps,
+) {
   const alignmentClass = {
     left: "text-left",
     center: "text-center",
@@ -466,7 +509,7 @@ function StatItem({ label, value, align = "left" }: StatItemProps) {
   }[align];
 
   return (
-    <div class={`${dataColumn}`}>
+    <div class={`${dataColumn} ${customClass || ""}`}>
       <p
         class={`${dataLabelSm}  ${alignmentClass}`}
       >
