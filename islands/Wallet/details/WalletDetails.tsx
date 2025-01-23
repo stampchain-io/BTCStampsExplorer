@@ -1,9 +1,7 @@
 import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
-import WalletSendModal from "$islands/Wallet/details/WalletSendBTCModal.tsx";
-import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
-import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 
 const walletDataContainer =
   "flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-3 mobileMd:gap-6";
@@ -16,12 +14,16 @@ const dataValueSm =
   "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
 const dataValue =
   "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
+const dataValueLg =
+  "text-xl mobileLg:text-2xl font-medium text-stamp-grey-light uppercase";
 const dataValueXl =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
 const titleGreyDL =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
 const subTitleGrey =
-  "inline-block text-sm mobileMd:text-base mobileLg:text-lg font-medium text-stamp-grey";
+  "inline-block text-sm mobileMd:text-base mobileLg:text-lg font-medium text-stamp-grey-darker";
+const buttonPurpleFlat =
+  "inline-flex items-center justify-center bg-stamp-purple border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:bg-stamp-purple-highlight transition-colors";
 const tooltipIcon =
   "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
 
@@ -34,43 +36,20 @@ function WalletDetails(
     setShowItem: (type: string) => void;
   },
 ) {
-  const [fee, setFee] = useState<number>(walletData.fee || 0);
-  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
-  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
-
   return (
     <div>
       <div class="flex flex-col gap-3 mobileMd:gap-6 items-stretch">
         <WalletOverview
-          walletData={{ ...walletData, fee }}
+          walletData={{ ...walletData }}
         />
         <WalletStats
           setShowItem={setShowItem}
           stampsTotal={stampsTotal}
           src20Total={src20Total}
           stampsCreated={stampsCreated}
-          dispensers={walletData.dispensers}
-          stampValue={walletData.stampValue}
-          src20Value={walletData.src20Value}
           walletData={walletData}
         />
       </div>
-
-      {isSendModalOpen && (
-        <WalletSendModal
-          fee={fee}
-          balance={walletData.balance}
-          handleChangeFee={setFee}
-          onClose={() => setIsSendModalOpen(false)}
-        />
-      )}
-
-      {isReceiveModalOpen && (
-        <WalletReceiveModal
-          onClose={() => setIsReceiveModalOpen(false)}
-          address={walletData.address}
-        />
-      )}
     </div>
   );
 }
@@ -137,12 +116,25 @@ function WalletOverview(
     }
   };
 
+  const displayPrice = walletData.dispensers?.items?.[0]?.satoshirate
+    ? parseInt(walletData.dispensers.items[0].satoshirate.toString(), 10) /
+      100000000
+    : 0;
+
+  const displayPriceUSD = displayPrice * walletData.btcPrice;
+
+  console.log("walletData:", walletData);
+  console.log("dispensers:", walletData.dispensers);
+
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <div class="flex flex-col w-full mobileLg:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
+      <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6 space-y-1.5 mobileLg:space-y-3">
         <div class="flex">
           <p class={titleGreyDL}>
-            ANONYMOUS
+            {walletData.address.startsWith("1D") ||
+                walletData.dispensers?.total > 0
+              ? "DISPENSER"
+              : "ANONYMOUS"}
           </p>
         </div>
         <div class="flex gap-3 mobileMd:gap-6">
@@ -168,7 +160,7 @@ function WalletOverview(
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
-              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-grey hover:fill-stamp-grey-light cursor-pointer"
+              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
               role="button"
               aria-label="Copy"
               onClick={copy}
@@ -192,95 +184,107 @@ function WalletOverview(
           </div>
         </div>
 
-        <div class="flex flex-col">
-          <p class="text-stamp-grey-light font-light text-base mobileLg:text-lg">
-            kevin.btc
+        <DispenserStats
+          dispensers={walletData.dispensers}
+          btcPrice={walletData.btcPrice}
+          walletData={walletData}
+        />
+      </div>
+    </div>
+  );
+}
+
+function DispenserStats({
+  dispensers,
+  btcPrice,
+  walletData,
+}: {
+  dispensers: WalletOverviewInfo["dispensers"];
+  btcPrice: number;
+  walletData: WalletOverviewInfo;
+}) {
+  if (!walletData.address.startsWith("1D") && !walletData.dispensers?.total) {
+    return null;
+  }
+
+  const firstDispenser = dispensers?.items?.[0];
+  const stampData = firstDispenser?.stamp;
+
+  if (!firstDispenser || !stampData) return null;
+
+  const creatorDisplay = stampData.creator_name
+    ? stampData.creator_name
+    : abbreviateAddress(stampData.creator, 8);
+
+  return (
+    <div className="flex flex-col pt-6">
+      {/* Stamp Info Section */}
+      <div>
+        <p className={`${dataValueLg} whitespace-nowrap overflow-hidden`}>
+          <>
+            <span className="font-light">STAMP #</span>
+            <span className="font-black">{stampData.stamp}</span>
+          </>
+        </p>
+
+        {stampData.cpid && (
+          <p className="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+            {stampData.cpid}
           </p>
-          <p class="text-stamp-grey font-light text-sm mobileLg:text-base">
-            universe.btc
-          </p>
+        )}
+
+        <div className="flex flex-col items-start pt-1.5 mobileLg:pt-3">
+          <p className={dataLabelSm}>BY</p>
+          <a
+            className="text-sm mobileLg:text-base font-black gray-gradient3-hover -mt-1"
+            href={`/wallet/${stampData.creator}`}
+            target="_parent"
+          >
+            {creatorDisplay}
+          </a>
         </div>
       </div>
 
-      <div class="flex flex-col w-full mobileLg:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6">
-        <div class={`${dataColumn} text-left mobileLg:text-right`}>
-          <p class={dataLabel}>
-            <span class="font-medium">
-              {walletData.usdValue.toFixed(2)}
-            </span>{" "}
-            USD
-          </p>
-          <p class={dataValueXl}>
-            {
-              <>
-                {walletData.balance} <span class="font-light">BTC</span>
-              </>
-            }
-          </p>
-        </div>
-        <div class="flex justify-between">
-          <div class={dataColumn}>
-            <p class={`${dataLabel}`}>
-              STAMPS
-            </p>
-            <p class={`${dataValueXl}`}>
-              0
-            </p>
-          </div>
-          <div class={dataColumn}>
-            <p class={`${dataLabel} text-right`}>
-              TOKENS
-            </p>
-            <p class={`${dataValueXl} text-right`}>
-              0
-            </p>
-          </div>
-        </div>
+      {/* Dispenser Stats */}
+      <div className="flex justify-between pt-6">
+        <StatItem
+          label="ESCROW"
+          value={firstDispenser.escrow_quantity.toString()}
+        />
+        <StatItem
+          label="GIVE"
+          value={firstDispenser.give_quantity.toString()}
+          align="center"
+        />
+        <StatItem
+          label="REMAIN"
+          value={firstDispenser.give_remaining.toString()}
+          align="right"
+        />
+      </div>
 
-        <div class="flex justify-between">
-          <div class={dataColumn}>
-            <p class={`${dataLabelSm}`}>
-              24H CHANGE
-            </p>
-            <p class={`${dataValue}`}>
-              +3.2%
-            </p>
-          </div>
-          <div class={dataColumn}>
-            <p class={`${dataLabelSm} text-right`}>
-              VALUE
-            </p>
-            <p class={`${dataValue} text-right`}>
-              0.00000 <span class="font-light">BTC</span>
-            </p>
-          </div>
-        </div>
-
-        <div class="flex justify-between">
-          <div class={dataColumn}>
-            <p class={`${dataLabelSm}`}>
-              LISTINGS
-            </p>
-            <p class={`${dataValue}`}>
-              2
-            </p>
-          </div>
-          <div class={dataColumn}>
-            <p class={`${dataLabelSm} text-center`}>
-              COLLECTIONS
-            </p>
-            <p class={`${dataValue} text-center`}>
-              4
-            </p>
-          </div>
-          <div class={dataColumn}>
-            <p class={`${dataLabelSm} text-right`}>
-              CREATED
-            </p>
-            <p class={`${dataValue} text-right`}>
-              4
-            </p>
-          </div>
+      {/* Price Display */}
+      <div className="flex flex-col justify-end pt-6">
+        <StatTitle
+          label={
+            <>
+              {((firstDispenser.satoshirate || 0) / 100000000 * btcPrice)
+                .toFixed(2)} <span className="font-light">USD</span>
+            </>
+          }
+          value={
+            <>
+              {formatBTCAmount((firstDispenser.satoshirate || 0) / 100000000, {
+                excludeSuffix: true,
+              })} <span className="font-extralight">BTC</span>
+            </>
+          }
+          align="right"
+        />
+        <div className="flex justify-end pt-6">
+          <button className={buttonPurpleFlat}>
+            BUY
+          </button>
         </div>
       </div>
     </div>
@@ -292,7 +296,6 @@ function WalletStats(
     stampsTotal,
     src20Total,
     stampsCreated,
-    dispensers,
     setShowItem = () => {},
     stampValue = 0,
     src20Value = 0,
@@ -301,7 +304,6 @@ function WalletStats(
     stampsTotal: number;
     src20Total: number;
     stampsCreated: number;
-    dispensers?: { open: number; closed: number; total: number };
     setShowItem?: (type: string) => void;
     stampValue?: number;
     src20Value?: number;
@@ -313,13 +315,13 @@ function WalletStats(
   };
 
   return (
-    <div class="w-full flex flex-col tablet:flex-row gap-3 mobileMd:gap-6">
+    <div class="flex flex-col mobileMd:flex-row w-full gap-3 mobileMd:gap-6">
       <StampStats
         stampsTotal={stampsTotal}
         stampsCreated={stampsCreated}
         handleType={handleType}
         stampValue={stampValue}
-        dispensers={dispensers}
+        dispensers={walletData.dispensers || { open: 0, closed: 0, total: 0 }}
       />
       <TokenStats
         src20Total={src20Total}
@@ -345,17 +347,14 @@ function StampStats(
       className={walletDataContainer}
       onClick={() => handleType("stamp")}
     >
-      <div className="flex justify-between">
+      <div className="flex">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
+      </div>
+      <div className="flex justify-between">
         <StatItem
           label="CREATED"
           value={stampsCreated.toString()}
-          align="right"
-          class="self-end"
         />
-      </div>
-      <div className="flex justify-between">
-        <StatItem label="EDITIONS" value="239" />
         <StatItem
           label="COLLECTIONS"
           value="N/A"
@@ -409,9 +408,58 @@ function TokenStats(
       </div>
 
       <div className="flex justify-between">
-        <StatItem label="24H CHANGE" value="+/- 0.00%" />
+        <StatItem
+          label="TOP HOLDINGS"
+          value={
+            <>
+              XCP<br />
+              STAMP<br />
+              KEVIN
+            </>
+          }
+        />
+        <StatItem
+          label="AMOUNT"
+          value={
+            <>
+              23.12<br />
+              100,000<br />
+              700,000
+            </>
+          }
+          align="center"
+          class="hidden tablet:block"
+        />
+        <StatItem
+          label="AMOUNT"
+          value={
+            <>
+              23.12<br />
+              100,000<br />
+              700,000
+            </>
+          }
+          align="right"
+          class="block tablet:hidden"
+        />
         <StatItem
           label="VALUE"
+          value={
+            <>
+              234.34 USD<br />
+              5,886.98 USD<br />
+              532.39 USD
+            </>
+          }
+          align="right"
+          class="hidden tablet:block"
+        />
+      </div>
+
+      <div className="flex justify-between">
+        <StatItem label="24H CHANGE" value="+/- 0.00%" />
+        <StatItem
+          label="TOTAL VALUE"
           value={
             <>
               {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
