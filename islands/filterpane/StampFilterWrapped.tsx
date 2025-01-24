@@ -11,7 +11,9 @@ export function StampFilterWrapped({
     window.location.search.includes("stamp-filter-open")
   ) {
     return (
-      <div class="fixed inset-y-0 left-0 w-64 bg-white overflow-y-auto z-50 shadow-xl">
+      <div
+        class={`fixed inset-y-0 left-0 w-screen bg-white overflow-y-auto z-50 shadow-xl`}
+      >
         <StampFilters
           onFilterChange={onFilterChange}
           initialFilters={filters}

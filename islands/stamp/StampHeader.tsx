@@ -10,7 +10,7 @@ import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
 
 export const StampHeader = (
-  { filterBy, sortBy }: {
+  { filterBy, sortBy, filters }: {
     filterBy: STAMP_FILTER_TYPES[];
     sortBy: "ASC" | "DESC" | undefined;
   },
@@ -62,7 +62,7 @@ export const StampHeader = (
         </button> */
         }
         {breakpoints.isMobile() && (
-          <FilterToggle />
+          <FilterToggle count={1} />
           // <Filter
           //   initFilter={filterBy}
           //   open={isOpen1}
