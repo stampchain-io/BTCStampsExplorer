@@ -299,23 +299,25 @@ export default function Wallet(props: WalletPageProps) {
           />
         )
         : (
-          <WalletProfileDetails
-            walletData={data.walletData}
-            stampsTotal={data.stampsTotal}
-            src20Total={data.src20Total}
-            stampsCreated={data.stampsCreated}
-            setShowItem={() => {}}
-          />
+          <>
+            <WalletProfileDetails
+              walletData={data.walletData}
+              stampsTotal={data.stampsTotal}
+              src20Total={data.src20Total}
+              stampsCreated={data.stampsCreated}
+              setShowItem={() => {}}
+            />
+            <WalletContent
+              stamps={data.data.stamps}
+              src20={data.data.src20}
+              dispensers={data.data.dispensers}
+              address={data.address}
+              anchor={data.anchor}
+              stampsSortBy={props.stampsSortBy ?? "DESC"}
+              src20SortBy={props.src20SortBy ?? "DESC"}
+            />
+          </>
         )}
-      <WalletContent
-        stamps={data.data.stamps}
-        src20={data.data.src20}
-        dispensers={data.data.dispensers}
-        address={data.address}
-        anchor={data.anchor}
-        stampsSortBy={props.stampsSortBy ?? "DESC"}
-        src20SortBy={props.src20SortBy ?? "DESC"}
-      />
     </div>
   );
 }
