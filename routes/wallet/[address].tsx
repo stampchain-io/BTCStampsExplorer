@@ -14,6 +14,8 @@ import {
   PaginationQueryParams,
 } from "$lib/types/pagination.d.ts";
 import { DispenserRow, SRC20Row, StampRow } from "$globals";
+import WalletProfileDetails from "$islands/Wallet/details/WalletProfileDetails.tsx";
+import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetails.tsx";
 
 /**
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
@@ -279,16 +281,32 @@ export const handler: Handlers = {
 export default function Wallet(props: WalletPageProps) {
   const { data } = props;
 
+  // Determine if address is a dispenser based on the criteria
+  const isDispenser = data.walletData.address.startsWith("1D") ||
+    (data.walletData.dispensers?.total ?? 0) > 0;
+
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
       <WalletHeader />
-      <WalletDetails
-        walletData={data.walletData}
-        stampsTotal={data.stampsTotal}
-        src20Total={data.src20Total}
-        stampsCreated={data.stampsCreated}
-        setShowItem={() => {}}
-      />
+      {isDispenser
+        ? (
+          <WalletDispenserDetails
+            walletData={data.walletData}
+            stampsTotal={data.stampsTotal}
+            src20Total={data.src20Total}
+            stampsCreated={data.stampsCreated}
+            setShowItem={() => {}}
+          />
+        )
+        : (
+          <WalletProfileDetails
+            walletData={data.walletData}
+            stampsTotal={data.stampsTotal}
+            src20Total={data.src20Total}
+            stampsCreated={data.stampsCreated}
+            setShowItem={() => {}}
+          />
+        )}
       <WalletContent
         stamps={data.data.stamps}
         src20={data.data.src20}
