@@ -17,6 +17,7 @@ import {
   tooltipIcon,
 } from "$components/shared/WalletStyles.ts";
 import { StampRow } from "$globals";
+import StampBuyModal from "$islands/stamp/details/StampBuyModal.tsx";
 
 interface WalletDispenserDetailsProps {
   walletData: WalletOverviewInfo;
@@ -284,8 +285,18 @@ function DispenserStats({
   dispensers: WalletOverviewInfo["dispensers"];
   btcPrice: number;
 }) {
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [fee, setFee] = useState(1); // Default fee
   const firstDispenser = dispensers?.items?.[0];
   if (!firstDispenser) return null;
+
+  const handleOpenBuyModal = () => {
+    setShowBuyModal(true);
+  };
+
+  const handleCloseBuyModal = () => {
+    setShowBuyModal(false);
+  };
 
   return (
     <div class="flex flex-col gap-1.5 mobileLg:gap-3 pt-3 mobileLg:pt-6">
@@ -361,13 +372,29 @@ function DispenserStats({
         />
       </div>
 
-      {/* Button */}
+      {/* Buy Button and Modal */}
       {firstDispenser?.give_remaining > 0 && (
-        <div class="flex justify-end pt-1.5">
-          <button class={buttonPurpleFlat}>
-            BUY
-          </button>
-        </div>
+        <>
+          <div class="flex justify-end pt-1.5">
+            <button
+              class={buttonPurpleFlat}
+              onClick={handleOpenBuyModal}
+            >
+              BUY
+            </button>
+          </div>
+
+          {showBuyModal && (
+            <StampBuyModal
+              stamp={firstDispenser.stamp}
+              fee={fee}
+              handleChangeFee={setFee}
+              toggleModal={handleCloseBuyModal}
+              handleCloseModal={handleCloseBuyModal}
+              dispenser={firstDispenser}
+            />
+          )}
+        </>
       )}
     </div>
   );
