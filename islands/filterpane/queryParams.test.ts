@@ -68,6 +68,38 @@ Deno.test("filterToQueryParams - encode string values", () => {
   })).toEqual("search=my+test&sortOrder=price_asc");
 });
 
+Deno.test("filterToQueryParams - encode boolean values", () => {
+  expect(filtersToQueryParams("", {
+    search: "",
+    buyNow: {
+      atomic: true,
+      dispenser: false,
+    },
+    status: {
+      locked: false,
+      oneOfOne: false,
+    },
+    fileType: {
+      svg: true,
+      pixel: false,
+      gif: false,
+      html: false,
+      olga: false,
+      src721: false,
+      src101: false,
+    },
+    stampRange: {
+      min: "",
+      max: "",
+    },
+    priceRange: {
+      min: "",
+      max: "",
+    },
+    sortOrder: "",
+  })).toEqual("buyNow%5Batomic%5D=true&fileType%5Bsvg%5D=true");
+});
+
 Deno.test("queryParamsToFilters", () => {
   expect(
     queryParamsToFilters(
