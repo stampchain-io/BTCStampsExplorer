@@ -6,15 +6,12 @@ import StampImage from "$islands/stamp/details/StampImage.tsx";
 import {
   alignmentClasses,
   type AlignmentType,
-  buttonGreyOutline,
   buttonPurpleFlat,
-  dataColumn,
   dataLabel,
   dataLabelSm,
-  dataValue,
-  dataValueLg,
   dataValueSm,
   dataValueXl,
+  dataValueXs,
   subTitleGrey,
   titleGreyDL,
   tooltipIcon,
@@ -127,15 +124,29 @@ function StampStats({
 
   if (!firstDispenser || !stampData) return null;
 
-  const creatorDisplay = stampData.creator_name
-    ? stampData.creator_name
-    : abbreviateAddress(stampData.creator, 8);
+  const creatorDisplay = (
+    <span>
+      <span className="hidden mobileMd:block mobileLg:hidden desktop:block">
+        {stampData.creator_name || stampData.creator}
+      </span>
+      <span className="hidden tablet:block desktop:hidden">
+        {abbreviateAddress(stampData.creator, 12)}
+      </span>
+      <span className="block mobileMd:hidden mobileLg:block tablet:hidden">
+        {abbreviateAddress(stampData.creator, 8)}
+      </span>
+    </span>
+  );
 
   const editionCount = stampData.divisible
     ? (stampData.supply / 100000000).toFixed(2)
     : stampData.supply > 100000
     ? "+100000"
     : stampData.supply.toFixed(2);
+
+  const editionCountFormatted = stampData.divisible
+    ? editionCount.toString()
+    : parseInt(editionCount.toString()).toString();
 
   return (
     <div class="flex flex-col gap-1.5 mobileMd:gap-3">
@@ -258,7 +269,7 @@ function StampStats({
         />
         <StatItem
           label="EDITIONS"
-          value={editionCount.toString()}
+          value={editionCountFormatted}
           align="right"
         />
       </div>
@@ -277,21 +288,56 @@ function DispenserStats({
   if (!firstDispenser) return null;
 
   return (
-    <div class="flex flex-col gap-3 mobileLg:gap-6 pt-3 mobileLg:pt-6">
+    <div class="flex flex-col gap-1.5 mobileLg:gap-3 pt-3 mobileLg:pt-6">
+      {/* Open / close */}
+      <div class="flex justify-between">
+        <StatItem
+          label="OPENED"
+          value={firstDispenser?.block_index
+            ? firstDispenser.block_index.toString()
+            : "N/A"}
+        />
+        <StatItem
+          label="CLOSED"
+          value={!firstDispenser?.close_block_index ||
+              firstDispenser.close_block_index <= 0
+            ? "OPEN"
+            : firstDispenser.close_block_index.toString()}
+          align="right"
+        />
+      </div>
       {/* Dispenser Stats / price display */}
       <div class="flex justify-between">
         <StatItem
           label="ESCROW"
-          value={firstDispenser.escrow_quantity.toString()}
+          value={
+            <>
+              <span class={dataValueXs}>
+                {firstDispenser.escrow_quantity.toString()}
+              </span>
+            </>
+          }
         />
         <StatItem
           label="GIVE"
-          value={firstDispenser.give_quantity.toString()}
+          value={
+            <>
+              <span class={dataValueXs}>
+                {firstDispenser.give_quantity.toString()}
+              </span>
+            </>
+          }
           align="center"
         />
         <StatItem
           label="REMAIN"
-          value={firstDispenser.give_remaining.toString()}
+          value={
+            <>
+              <span class={dataValueXs}>
+                {firstDispenser.give_remaining.toString()}
+              </span>
+            </>
+          }
           align="center"
         />
         <StatItem
@@ -316,29 +362,27 @@ function DispenserStats({
       </div>
 
       {/* Button */}
-      <div class="flex justify-end">
-        <button class={buttonPurpleFlat}>
-          BUY
-        </button>
-      </div>
+      {firstDispenser?.give_remaining > 0 && (
+        <div class="flex justify-end pt-1.5">
+          <button class={buttonPurpleFlat}>
+            BUY
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function WalletDispenserDetails({
   walletData,
-  stampsTotal,
-  src20Total,
-  stampsCreated,
-  setShowItem,
 }: WalletDispenserDetailsProps) {
   const firstDispenser = walletData.dispensers?.items?.[0];
   const stampData = firstDispenser?.stamp;
 
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3">
-        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
+      <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3 gap-3 mobileMd:gap-6">
+        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6 ">
           <div class="flex pb-[3px] mobileLg:pb-1.5">
             <p class={titleGreyDL}>DISPENSER</p>
           </div>
@@ -348,7 +392,7 @@ export default function WalletDispenserDetails({
             btcPrice={walletData.btcPrice}
           />
         </div>
-        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6 mt-3 mobileMd:mt-6">
+        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
           <StampStats
             dispensers={walletData.dispensers}
             walletData={walletData}
@@ -431,16 +475,17 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   return (
     <div class="flex gap-3 mobileMd:gap-6">
       <div class="flex">
-        {/* Base/desktop view - full address */}
-        <p class={`${subTitleGrey} block mobileLg:hidden desktop:block`}>
+        <p
+          class={`${subTitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
+        >
           {walletData.address}
         </p>
-        {/* tablet view - abbreviated 14 chars */}
         <p class={`${subTitleGrey} hidden tablet:block desktop:hidden`}>
           {abbreviateAddress(walletData.address, 14)}
         </p>
-        {/* mobileMd view - abbreviated 10 chars */}
-        <p class={`${subTitleGrey} hidden mobileLg:block tablet:hidden`}>
+        <p
+          class={`${subTitleGrey} block mobileMd:hidden mobileLg:block tablet:hidden`}
+        >
           {abbreviateAddress(walletData.address, 10)}
         </p>
       </div>
