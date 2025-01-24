@@ -1,7 +1,6 @@
-const WalletHeader = () => {
-  const titlePurpleDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
+import { titlePurpleDL } from "$components/shared/WalletStyles.ts";
 
+const WalletHeader = () => {
   return (
     <div class="flex justify-between items-center gap-3 w-full relative">
       <h1 className={titlePurpleDL}>WALLET</h1>

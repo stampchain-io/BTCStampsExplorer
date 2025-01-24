@@ -141,8 +141,10 @@ import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
 import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
 import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
+import * as $Wallet_details_WalletDispenserDetails from "./islands/Wallet/details/WalletDispenserDetails.tsx";
 import * as $Wallet_details_WalletDonateModal from "./islands/Wallet/details/WalletDonateModal.tsx";
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
+import * as $Wallet_details_WalletProfileDetails from "./islands/Wallet/details/WalletProfileDetails.tsx";
 import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
 import * as $Wallet_details_WalletSendBTCModal from "./islands/Wallet/details/WalletSendBTCModal.tsx";
 import * as $Wallet_details_WalletSendStampModal from "./islands/Wallet/details/WalletSendStampModal.tsx";
@@ -388,12 +390,12 @@ const manifest = {
   islands: {
     "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
-    "./islands/Dashboard/details/DashboardHeader.tsx":
-      $Dashboard_details_DashboardHeader,
-    "./islands/Dashboard/details/DashboardDetails.tsx":
-      $Dashboard_details_DashboardDetails,
     "./islands/Dashboard/details/DashboardContent.tsx":
       $Dashboard_details_DashboardContent,
+    "./islands/Dashboard/details/DashboardDetails.tsx":
+      $Dashboard_details_DashboardDetails,
+    "./islands/Dashboard/details/DashboardHeader.tsx":
+      $Dashboard_details_DashboardHeader,
     "./islands/DateRangePicker.tsx": $DateRangePicker,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
@@ -406,9 +408,13 @@ const manifest = {
       $Wallet_connectors_Wallet_connector,
     "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
     "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
+    "./islands/Wallet/details/WalletDispenserDetails.tsx":
+      $Wallet_details_WalletDispenserDetails,
     "./islands/Wallet/details/WalletDonateModal.tsx":
       $Wallet_details_WalletDonateModal,
     "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
+    "./islands/Wallet/details/WalletProfileDetails.tsx":
+      $Wallet_details_WalletProfileDetails,
     "./islands/Wallet/details/WalletReceiveModal.tsx":
       $Wallet_details_WalletReceiveModal,
     "./islands/Wallet/details/WalletSendBTCModal.tsx":
