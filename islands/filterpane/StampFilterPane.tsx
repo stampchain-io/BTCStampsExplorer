@@ -119,6 +119,7 @@ function useDebouncedCallback(callback: Function, delay: number) {
 }
 
 const defaultFilters = {
+  search: "",
   buyNow: {
     atomic: false,
     dispenser: false,
@@ -144,7 +145,7 @@ const defaultFilters = {
     min: "",
     max: "",
   },
-  sortOrder: "descending",
+  sortOrder: "",
 };
 
 export function filtersToQueryParams(
@@ -161,7 +162,7 @@ export function filtersToQueryParams(
           if (strVal !== "false") {
             queryParams.append(`${category}[${key}]`, strVal);
           }
-        } else {
+        } else if (val !== "") {
           queryParams.append(`${category}[${key}]`, strVal);
         }
       });
@@ -169,6 +170,9 @@ export function filtersToQueryParams(
       const strVal = value.toString();
       if (typeof value === "boolean" && strVal !== "false") {
         queryParams.append(category, value.toString());
+      }
+      if (strVal !== "") {
+        queryParams.append(category, strVal);
       }
     }
   });

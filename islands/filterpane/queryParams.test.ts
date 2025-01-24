@@ -6,6 +6,7 @@ import { expect } from "jsr:@std/expect";
 
 Deno.test("filterToQueryParams - does not encode false values", () => {
   expect(filtersToQueryParams("", {
+    search: "",
     buyNow: {
       atomic: false,
       dispenser: false,
@@ -24,18 +25,47 @@ Deno.test("filterToQueryParams - does not encode false values", () => {
       src101: false,
     },
     stampRange: {
-      preset: "",
-      custom: {
-        min: "",
-        max: "",
-      },
+      min: "",
+      max: "",
     },
     priceRange: {
       min: "",
       max: "",
     },
-    sortOrder: "descending",
+    sortOrder: "",
   })).toEqual("");
+});
+
+Deno.test("filterToQueryParams - encode string values", () => {
+  expect(filtersToQueryParams("", {
+    search: "my test",
+    buyNow: {
+      atomic: false,
+      dispenser: false,
+    },
+    status: {
+      locked: false,
+      oneOfOne: false,
+    },
+    fileType: {
+      svg: false,
+      pixel: false,
+      gif: false,
+      html: false,
+      olga: false,
+      src721: false,
+      src101: false,
+    },
+    stampRange: {
+      min: "",
+      max: "",
+    },
+    priceRange: {
+      min: "",
+      max: "",
+    },
+    sortOrder: "price_asc",
+  })).toEqual("search=my+test&sortOrder=price_asc");
 });
 
 Deno.test("queryParamsToFilters", () => {
