@@ -1,9 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
 
 import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
-import WalletDetails from "$islands/Wallet/details/WalletDetails.tsx";
+import WalletProfileDetails from "$islands/Wallet/details/WalletProfileDetails.tsx";
+import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetails.tsx";
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
-import { WalletPageProps } from "$lib/types/index.d.ts";
+import { WalletPageProps } from "$types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -12,10 +13,8 @@ import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
 import {
   PaginatedResponse,
   PaginationQueryParams,
-} from "$lib/types/pagination.d.ts";
+} from "$types/pagination.d.ts";
 import { DispenserRow, SRC20Row, StampRow } from "$globals";
-import WalletProfileDetails from "$islands/Wallet/details/WalletProfileDetails.tsx";
-import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetails.tsx";
 
 /**
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.

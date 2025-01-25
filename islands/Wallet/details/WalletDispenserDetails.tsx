@@ -27,6 +27,60 @@ interface WalletDispenserDetailsProps {
   setShowItem: (type: string) => void;
 }
 
+interface StatItemProps {
+  label: string;
+  value: string | ComponentChildren;
+  align?: AlignmentType;
+  class?: string;
+  href?: string;
+  target?: "_blank" | "_self" | "_parent" | "_top";
+}
+
+function StatItem({
+  label,
+  value,
+  align = "left",
+  class: customClass,
+  href,
+  target = "_self",
+}: StatItemProps) {
+  const alignmentClass = alignmentClasses[align];
+  const content = (
+    <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
+      <p class={`${dataLabelSm} ${alignmentClass}`}>{label}</p>
+      <p class={`${dataValueSm} ${alignmentClass}`}>{value}</p>
+    </div>
+  );
+
+  return href
+    ? (
+      <a
+        href={href}
+        target={target}
+        class="hover:text-stamp-grey-darker"
+      >
+        {content}
+      </a>
+    )
+    : content;
+}
+
+interface StatTitleProps {
+  label: string | ComponentChildren;
+  value: string | ComponentChildren;
+  align?: "left" | "center" | "right";
+}
+
+function StatTitle({ label, value, align = "left" }: StatTitleProps) {
+  const alignmentClass = alignmentClasses[align];
+  return (
+    <div class="flex flex-col -space-y-1">
+      <p class={`${dataLabel} ${alignmentClass}`}>{label}</p>
+      <p class={`${dataValueXl} ${alignmentClass}`}>{value}</p>
+    </div>
+  );
+}
+
 function StampStats({
   dispensers,
   walletData,
@@ -267,6 +321,7 @@ function StampStats({
         <StatItem
           label="BY"
           value={creatorDisplay}
+          href={`/wallet/${stampData.creator}`}
         />
         <StatItem
           label="EDITIONS"
@@ -400,47 +455,6 @@ function DispenserStats({
   );
 }
 
-export default function WalletDispenserDetails({
-  walletData,
-}: WalletDispenserDetailsProps) {
-  const firstDispenser = walletData.dispensers?.items?.[0];
-  const stampData = firstDispenser?.stamp;
-
-  return (
-    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3 gap-3 mobileMd:gap-6">
-        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6 ">
-          <div class="flex pb-[3px] mobileLg:pb-1.5">
-            <p class={titleGreyDL}>DISPENSER</p>
-          </div>
-          <WalletOverview walletData={walletData} />
-          <DispenserStats
-            dispensers={walletData.dispensers}
-            btcPrice={walletData.btcPrice}
-          />
-        </div>
-        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
-          <StampStats
-            dispensers={walletData.dispensers}
-            walletData={walletData}
-          />
-        </div>
-      </div>
-      {stampData && (
-        <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-1/3">
-          <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
-            <StampImage
-              stamp={stampData}
-              className="w-full h-full"
-              flag={false}
-            />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   const [showCopied, setShowCopied] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
@@ -550,47 +564,43 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   );
 }
 
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: AlignmentType;
-  class?: string;
-}
-
-function StatItem(
-  { label, value, align = "left", class: customClass }: StatItemProps,
-) {
-  const alignmentClass = alignmentClasses[align];
+export default function WalletDispenserDetails({
+  walletData,
+}: WalletDispenserDetailsProps) {
+  const firstDispenser = walletData.dispensers?.items?.[0];
+  const stampData = firstDispenser?.stamp;
 
   return (
-    <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
-      <p class={`${dataLabelSm} ${alignmentClass}`}>
-        {label}
-      </p>
-      <p class={`${dataValueSm} ${alignmentClass}`}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-interface StatTitleProps {
-  label: string | ComponentChildren;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-}
-
-function StatTitle({ label, value, align = "left" }: StatTitleProps) {
-  const alignmentClass = alignmentClasses[align];
-
-  return (
-    <div class="flex flex-col -space-y-1">
-      <p class={`${dataLabel} ${alignmentClass}`}>
-        {label}
-      </p>
-      <p class={`${dataValueXl} ${alignmentClass}`}>
-        {value}
-      </p>
+    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
+      <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3 gap-3 mobileMd:gap-6">
+        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6 ">
+          <div class="flex pb-[3px] mobileLg:pb-1.5">
+            <p class={titleGreyDL}>DISPENSER</p>
+          </div>
+          <WalletOverview walletData={walletData} />
+          <DispenserStats
+            dispensers={walletData.dispensers}
+            btcPrice={walletData.btcPrice}
+          />
+        </div>
+        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
+          <StampStats
+            dispensers={walletData.dispensers}
+            walletData={walletData}
+          />
+        </div>
+      </div>
+      {stampData && (
+        <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-1/3">
+          <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
+            <StampImage
+              stamp={stampData}
+              className="w-full h-full"
+              flag={false}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -16,6 +16,8 @@ const dataValueSm =
   "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
 const dataValueXl =
   "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
+const titleGreyDL =
+  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
 const tooltipIcon =
   "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
 
@@ -107,7 +109,6 @@ function WalletOverview(
   const [allowBalanceTooltip, setAllowBalanceTooltip] = useState(true);
   const balanceButtonRef = useRef<HTMLButtonElement>(null);
   const balanceTooltipTimeoutRef = useRef<number | null>(null);
-  // Add state to track the hover tooltip text separately from the hideBalance state
   const [tooltipText, setTooltipText] = useState("HIDE BALANCE");
 
   useEffect(() => {
@@ -363,7 +364,7 @@ function WalletOverview(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-bright cursor-pointer"
             role="button"
             aria-label="Copy"
             onClick={copy}
@@ -392,7 +393,7 @@ function WalletOverview(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-bright cursor-pointer"
             role="button"
             aria-label="Send"
             onClick={() => {
@@ -419,7 +420,7 @@ function WalletOverview(
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 32"
-            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 rotate-180 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 rotate-180 fill-stamp-purple hover:fill-stamp-purple-bright cursor-pointer"
             role="button"
             aria-label="Receive"
             onClick={() => {
@@ -451,7 +452,7 @@ function WalletOverview(
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
-              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-highlight cursor-pointer"
+              class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-purple hover:fill-stamp-purple-bright cursor-pointer"
               role="button"
               aria-label="History"
             >
@@ -474,10 +475,50 @@ function WalletOverview(
 function DashboardProfile() {
   return (
     <div class="w-full dark-gradient rounded-lg p-3 mobileMd:p-6">
-      <div class="flex justify-between items-center">
-        <h2 class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl">
-          Profile
-        </h2>
+      <div class="flex">
+        <div class="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-stamp-purple rounded-full">
+          <img
+            src="/img/home/carousel_default.png"
+            alt="Avatar"
+            class="w-[54px] h-[54px] mobileLg:w-[72px] mobileLg:h-[72px] rounded-full"
+          />
+        </div>
+        <div class="flex ml-1.5 mobileMd:ml-0 mt-1.5 mobileMd:-mt-2 mobileLg:mt-0">
+          <p class={titleGreyDL}>
+            ANONYMOUS
+          </p>
+        </div>
+      </div>
+      <div class="flex justify-between">
+        <p class="text-stamp-grey font-light text-base mobileLg:text-lg">
+          anonymous.btc
+        </p>
+        <p class="text-stamp-grey-darker font-medium text-sm mobileLg:text-base">
+          website // X
+        </p>
+      </div>
+      <div class="flex justify-end">
+        <div class="flex flex-col gap-1.5 mobileMd:gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 32 32"
+            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+            role="button"
+            aria-label="Profile"
+          >
+            <path d="M26 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V26C4 26.5304 4.21071 27.0391 4.58579 27.4142C4.96086 27.7893 5.46957 28 6 28H26C26.5304 28 27.0391 27.7893 27.4142 27.4142C27.7893 27.0391 28 26.5304 28 26V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4ZM12 15C12 14.2089 12.2346 13.4355 12.6741 12.7777C13.1136 12.1199 13.7384 11.6072 14.4693 11.3045C15.2002 11.0017 16.0044 10.9225 16.7804 11.0769C17.5563 11.2312 18.269 11.6122 18.8284 12.1716C19.3878 12.731 19.7688 13.4437 19.9231 14.2196C20.0775 14.9956 19.9983 15.7998 19.6955 16.5307C19.3928 17.2616 18.8801 17.8864 18.2223 18.3259C17.5645 18.7654 16.7911 19 16 19C14.9391 19 13.9217 18.5786 13.1716 17.8284C12.4214 17.0783 12 16.0609 12 15ZM8.58375 26C9.09548 24.7402 9.91818 23.6306 10.975 22.775C12.3979 21.6264 14.1714 20.9999 16 20.9999C17.8286 20.9999 19.6021 21.6264 21.025 22.775C22.0818 23.6306 22.9045 24.7402 23.4163 26H8.58375ZM26 26H25.5413C25.0966 24.5846 24.3422 23.286 23.3329 22.1986C22.3236 21.1112 21.0847 20.2624 19.7062 19.7138C20.6876 18.9429 21.4042 17.8853 21.7562 16.6882C22.1083 15.491 22.0784 14.2139 21.6706 13.0345C21.2628 11.8552 20.4974 10.8323 19.481 10.1083C18.4647 9.38438 17.2479 8.99531 16 8.99531C14.7521 8.99531 13.5353 9.38438 12.519 10.1083C11.5026 10.8323 10.7372 11.8552 10.3294 13.0345C9.92164 14.2139 9.89169 15.491 10.2438 16.6882C10.5958 17.8853 11.3124 18.9429 12.2937 19.7138C10.9153 20.2624 9.67641 21.1112 8.66709 22.1986C7.65777 23.286 6.90339 24.5846 6.45875 26H6V6H26V26Z" />
+          </svg>
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 32 32"
+            class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 fill-stamp-grey-darker hover:fill-stamp-grey-light cursor-pointer"
+            role="button"
+            aria-label="Collections"
+          >
+            <path d="M26 4H10C9.46957 4 8.96086 4.21071 8.58579 4.58579C8.21071 4.96086 8 5.46957 8 6V8H6C5.46957 8 4.96086 8.21071 4.58579 8.58579C4.21071 8.96086 4 9.46957 4 10V26C4 26.5304 4.21071 27.0391 4.58579 27.4142C4.96086 27.7893 5.46957 28 6 28H22C22.5304 28 23.0391 27.7893 23.4142 27.4142C23.7893 27.0391 24 26.5304 24 26V24H26C26.5304 24 27.0391 23.7893 27.4142 23.4142C27.7893 23.0391 28 22.5304 28 22V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4ZM10 6H26V14.6725L23.9125 12.585C23.5375 12.2102 23.029 11.9997 22.4988 11.9997C21.9685 11.9997 21.46 12.2102 21.085 12.585L11.6713 22H10V6ZM22 26H6V10H8V22C8 22.5304 8.21071 23.0391 8.58579 23.4142C8.96086 23.7893 9.46957 24 10 24H22V26ZM26 22H14.5L22.5 14L26 17.5V22ZM15 14C15.5933 14 16.1734 13.8241 16.6667 13.4944C17.1601 13.1648 17.5446 12.6962 17.7716 12.1481C17.9987 11.5999 18.0581 10.9967 17.9424 10.4147C17.8266 9.83279 17.5409 9.29824 17.1213 8.87868C16.7018 8.45912 16.1672 8.1734 15.5853 8.05764C15.0033 7.94189 14.4001 8.0013 13.8519 8.22836C13.3038 8.45542 12.8352 8.83994 12.5056 9.33329C12.1759 9.82664 12 10.4067 12 11C12 11.7956 12.3161 12.5587 12.8787 13.1213C13.4413 13.6839 14.2044 14 15 14ZM15 10C15.1978 10 15.3911 10.0586 15.5556 10.1685C15.72 10.2784 15.8482 10.4346 15.9239 10.6173C15.9996 10.8 16.0194 11.0011 15.9808 11.1951C15.9422 11.3891 15.847 11.5673 15.7071 11.7071C15.5673 11.847 15.3891 11.9422 15.1951 11.9808C15.0011 12.0194 14.8 11.9996 14.6173 11.9239C14.4346 11.8482 14.2784 11.72 14.1685 11.5556C14.0586 11.3911 14 11.1978 14 11C14 10.7348 14.1054 10.4804 14.2929 10.2929C14.4804 10.1054 14.7348 10 15 10Z" />
+          </svg>
+        </div>
       </div>
     </div>
   );
@@ -544,19 +585,28 @@ function StampStats(
       className={walletDataContainer}
       onClick={() => handleType("stamp")}
     >
-      <div className="flex">
+      <div className="flex justify-between">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
+        <StatItem label="CREATED" value={stampsCreated.toString()} />
       </div>
       <div className="flex justify-between">
-        <StatItem label="CREATED" value={stampsCreated.toString()} />
+        <StatItem label="EDITIONS" value="239" />
         <StatItem
           label="VALUE"
           value={
             <>
               {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-extralight">BTC</span>
+              <span className="font-light">BTC</span>
             </>
           }
+          align="right"
+        />
+      </div>
+      <div className="flex justify-between">
+        <StatItem label="COLLECTIONS" value="8" />
+        <StatItem
+          label="LISTINGS"
+          value="4"
           align="right"
         />
       </div>
@@ -609,17 +659,20 @@ function TokenStats(
       </div>
 
       <div className="flex justify-between">
-        <StatItem label="24H CHANGE" value="+/- 0.00%" />
         <StatItem
           label="VALUE"
           value={
             <>
               {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-extralight">BTC</span>
+              <span className="font-light">BTC</span>
             </>
           }
-          align="right"
         />
+        <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
+      </div>
+      <div className="flex justify-between">
+        <StatItem label="TOP 5" value="XCP\nSTAMP\nKEVIN\n$BALD\nPEPE" />
+        <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
       </div>
     </div>
   );
