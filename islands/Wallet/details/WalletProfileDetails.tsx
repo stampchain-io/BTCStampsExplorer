@@ -1,22 +1,18 @@
 import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { WalletData, WalletOverviewInfo } from "$lib/types/wallet.d.ts";
-import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
+import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
+import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import {
   alignmentClasses,
   type AlignmentType,
-  buttonPurpleFlat,
-  dataColumn,
+  backgroundContainer,
   dataLabel,
   dataLabelSm,
-  dataValue,
-  dataValueLg,
   dataValueSm,
   dataValueXl,
   subTitleGrey,
   titleGreyDL,
   tooltipIcon,
-  walletDataContainer,
 } from "$components/shared/WalletStyles.ts";
 
 interface WalletProfileDetailsProps {
@@ -35,22 +31,24 @@ export default function WalletProfileDetails({
   setShowItem,
 }: WalletProfileDetailsProps) {
   return (
-    <div class="flex flex-col gap-3 mobileMd:gap-6">
-      <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-        <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6">
-          <div class="flex pb-1.5 mobileLg:pb-3">
-            <p class={titleGreyDL}>ANONYMOUS</p>
-          </div>
-          <WalletOverview walletData={walletData} />
+    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
+      <div
+        className={`${backgroundContainer} h-fit w-full mobileLg:w-1/2 desktop:w-2/3`}
+      >
+        <div class="flex pb-1.5 mobileLg:pb-3">
+          <p class={titleGreyDL}>ANONYMOUS</p>
         </div>
+        <WalletOverview walletData={walletData} />
       </div>
-      <WalletStats
-        stampsTotal={stampsTotal}
-        src20Total={src20Total}
-        stampsCreated={stampsCreated}
-        setShowItem={setShowItem}
-        walletData={walletData}
-      />
+      <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-1/3">
+        <WalletStats
+          stampsTotal={stampsTotal}
+          src20Total={src20Total}
+          stampsCreated={stampsCreated}
+          setShowItem={setShowItem}
+          walletData={walletData}
+        />
+      </div>
     </div>
   );
 }
@@ -280,7 +278,13 @@ function WalletStats(
   };
 
   return (
-    <div class="flex flex-col mobileMd:flex-row w-full gap-3 mobileMd:gap-6">
+    <div class="flex flex-col gap-3 mobileMd:gap-6">
+      <TokenStats
+        src20Total={src20Total}
+        handleType={handleType}
+        src20Value={src20Value}
+        walletData={walletData}
+      />
       <StampStats
         stampsTotal={stampsTotal}
         stampsCreated={stampsCreated}
@@ -288,57 +292,6 @@ function WalletStats(
         stampValue={stampValue}
         dispensers={walletData.dispensers || { open: 0, closed: 0, total: 0 }}
       />
-      <TokenStats
-        src20Total={src20Total}
-        handleType={handleType}
-        src20Value={src20Value}
-        walletData={walletData}
-      />
-    </div>
-  );
-}
-
-function StampStats(
-  { stampsTotal, stampsCreated, handleType, stampValue = 0, dispensers }: {
-    stampsTotal: number;
-    stampsCreated: number;
-    handleType: (type: string) => void;
-    stampValue?: number;
-    dispensers: { open: number; closed: number; total: number };
-  },
-) {
-  return (
-    <div
-      className={walletDataContainer}
-      onClick={() => handleType("stamp")}
-    >
-      <div className="flex">
-        <StatTitle label="STAMPS" value={stampsTotal.toString()} />
-      </div>
-      <div className="flex justify-between">
-        <StatItem
-          label="CREATED"
-          value={stampsCreated.toString()}
-        />
-        <StatItem
-          label="COLLECTIONS"
-          value="N/A"
-          align="right"
-        />
-      </div>
-      <div className="flex justify-between">
-        <StatItem label="LISTINGS" value={dispensers.open.toString()} />
-        <StatItem
-          label="VALUE"
-          value={
-            <>
-              {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
-            </>
-          }
-          align="right"
-        />
-      </div>
     </div>
   );
 }
@@ -355,74 +308,19 @@ function TokenStats(
 
   return (
     <div
-      className={walletDataContainer}
+      className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}
       onClick={() => handleType("token")}
     >
-      <div className="flex justify-between">
-        <StatTitle label="TOKENS" value={src20Total?.toString()} />
-        <StatItem
-          label={`${walletData.usdValue.toFixed(2)} USD`}
-          value={
-            <>
-              {walletData.balance} <span class="font-light">BTC</span>
-            </>
-          }
+      <div className="flex justify-end pb-1.5 mobileLg:pb-3">
+        <StatTitle
+          label="TOKENS"
+          value={src20Total?.toString()}
           align="right"
-          class="self-end"
         />
       </div>
 
       <div className="flex justify-between">
-        <StatItem
-          label="TOP HOLDINGS"
-          value={
-            <>
-              XCP<br />
-              STAMP<br />
-              KEVIN
-            </>
-          }
-        />
-        <StatItem
-          label="AMOUNT"
-          value={
-            <>
-              23.12<br />
-              100,000<br />
-              700,000
-            </>
-          }
-          align="center"
-          class="hidden tablet:block"
-        />
-        <StatItem
-          label="AMOUNT"
-          value={
-            <>
-              23.12<br />
-              100,000<br />
-              700,000
-            </>
-          }
-          align="right"
-          class="block tablet:hidden"
-        />
-        <StatItem
-          label="VALUE"
-          value={
-            <>
-              234.34 USD<br />
-              5,886.98 USD<br />
-              532.39 USD
-            </>
-          }
-          align="right"
-          class="hidden tablet:block"
-        />
-      </div>
-
-      <div className="flex justify-between">
-        <StatItem label="24H CHANGE" value="+/- 0.00%" />
+        <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
         <StatItem
           label="TOTAL VALUE"
           value={
@@ -433,6 +331,35 @@ function TokenStats(
           }
           align="right"
         />
+      </div>
+    </div>
+  );
+}
+
+function StampStats(
+  { stampsTotal, stampsCreated, handleType, stampValue = 0, dispensers }: {
+    stampsTotal: number;
+    stampsCreated: number;
+    handleType: (type: string) => void;
+    stampValue?: number;
+    dispensers: { open: number; closed: number; total: number };
+  },
+) {
+  return (
+    <div
+      className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}
+      onClick={() => handleType("stamp")}
+    >
+      <div className="flex justify-end pb-1.5 mobileLg:pb-3">
+        <StatTitle
+          label="STAMPS"
+          value={stampsTotal.toString()}
+          align="right"
+        />
+      </div>
+      <div className="flex justify-between">
+        <StatItem label="LISTINGS" value="N/A" align="right" />
+        <StatItem label="CREATED" value="N/A" align="right" />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import StampImage from "$islands/stamp/details/StampImage.tsx";
 import {
   alignmentClasses,
   type AlignmentType,
+  backgroundContainer,
   buttonPurpleFlat,
   dataLabel,
   dataLabelSm,
@@ -240,8 +241,8 @@ function StampStats({
     : parseInt(editionCount.toString()).toString();
 
   return (
-    <div class="flex flex-col gap-1.5 mobileMd:gap-3">
-      <div class="flex pb-1.5 mobileMd:pb-3">
+    <div className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}>
+      <div class="flex pb-1.5 mobileLg:pb-3">
         <StatTitle
           label="STAMP"
           value={
@@ -609,7 +610,7 @@ export default function WalletDispenserDetails({
   return (
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3 gap-3 mobileMd:gap-6">
-        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6 ">
+        <div className={backgroundContainer}>
           <div class="flex pb-1.5 mobileLg:pb-3">
             <p class={titleGreyDL}>DISPENSER</p>
           </div>
@@ -619,16 +620,15 @@ export default function WalletDispenserDetails({
             btcPrice={walletData.btcPrice}
           />
         </div>
-        <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
-          <StampStats
-            dispensers={walletData.dispensers}
-            walletData={walletData}
-          />
-        </div>
+
+        <StampStats
+          dispensers={walletData.dispensers}
+          walletData={walletData}
+        />
       </div>
       {stampData && (
         <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-1/3">
-          <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
+          <div className={backgroundContainer}>
             <StampImage
               stamp={stampData}
               className="w-full h-full"
