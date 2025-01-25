@@ -179,16 +179,11 @@ export const handler: Handlers = {
       }, 0);
 
       const dispensersData = dispensersResponse.status === "fulfilled"
-        ? {
-          data: dispensersResponse.value.dispensers,
-          total: dispensersResponse.value.total,
-          page: dispensersParams.page,
-          limit: dispensersParams.limit,
-          totalPages: Math.ceil(
-            dispensersResponse.value.total / dispensersParams.limit,
-          ),
-        } as PaginatedResponse<DispenserRow>
-        : { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
+        ? dispensersResponse.value.dispensers
+        : [];
+
+      // Check if address has ever opened dispensers by looking at actual dispenser data
+      const isDispenserAddress = dispensersData.length > 0;
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
         ? btcInfoResponse.value
@@ -232,7 +227,7 @@ export const handler: Handlers = {
           open: openDispensers.length,
           closed: closedDispensers.length,
           total: allDispensers.length,
-          items: dispensersData.data,
+          items: dispensersData,
         },
         src101: src101Data,
       };
@@ -259,13 +254,13 @@ export const handler: Handlers = {
             },
           },
           dispensers: {
-            data: dispensersData.data,
+            data: dispensersData,
             pagination: {
               page: dispensersParams.page,
               limit: dispensersParams.limit,
-              total: dispensersData.total,
+              total: dispensersData.length,
               totalPages: Math.ceil(
-                dispensersData.total / dispensersParams.limit,
+                dispensersData.length / dispensersParams.limit,
               ),
             },
           },
@@ -331,14 +326,10 @@ export const handler: Handlers = {
 export default function Wallet(props: WalletPageProps) {
   const { data } = props;
 
-  // Determine if address is a dispenser based on the criteria
-  const isDispenser = data.walletData.address.startsWith("1D") ||
-    (data.walletData.dispensers?.total ?? 0) > 0;
-
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
       <WalletHeader />
-      {isDispenser
+      {data.data.dispensers.data.length > 0
         ? (
           <WalletDispenserDetails
             walletData={data.walletData}

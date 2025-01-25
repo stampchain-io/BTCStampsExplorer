@@ -47,8 +47,16 @@ function StatItem({
   const alignmentClass = alignmentClasses[align];
   const content = (
     <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
-      <p class={`${dataLabelSm} ${alignmentClass}`}>{label}</p>
-      <p class={`${dataValueSm} ${alignmentClass}`}>{value}</p>
+      <p
+        class={`${dataLabelSm} ${alignmentClass}`}
+      >
+        {label}
+      </p>
+      <p
+        class={`${dataValueSm} ${alignmentClass} group-hover:text-stamp-grey`}
+      >
+        {value}
+      </p>
     </div>
   );
 
@@ -57,7 +65,7 @@ function StatItem({
       <a
         href={href}
         target={target}
-        class="hover:text-stamp-grey-darker"
+        class="group"
       >
         {content}
       </a>
@@ -69,16 +77,44 @@ interface StatTitleProps {
   label: string | ComponentChildren;
   value: string | ComponentChildren;
   align?: "left" | "center" | "right";
+  href?: string;
+  target?: "_blank" | "_self" | "_parent" | "_top";
 }
 
-function StatTitle({ label, value, align = "left" }: StatTitleProps) {
+function StatTitle({
+  label,
+  value,
+  align = "left",
+  href,
+  target = "_self",
+}: StatTitleProps) {
   const alignmentClass = alignmentClasses[align];
-  return (
+  const content = (
     <div class="flex flex-col -space-y-1">
-      <p class={`${dataLabel} ${alignmentClass}`}>{label}</p>
-      <p class={`${dataValueXl} ${alignmentClass}`}>{value}</p>
+      <p
+        class={`${dataLabel} ${alignmentClass}`}
+      >
+        {label}
+      </p>
+      <p
+        class={`${dataValueXl} ${alignmentClass} group-hover:text-stamp-grey`}
+      >
+        {value}
+      </p>
     </div>
   );
+
+  return href
+    ? (
+      <a
+        href={href}
+        target={target}
+        class="group"
+      >
+        {content}
+      </a>
+    )
+    : content;
 }
 
 function StampStats({
@@ -214,7 +250,7 @@ function StampStats({
               {stampData.stamp}
             </>
           }
-          align="left"
+          href={`/stamp/${stampData.stamp}`}
         />
       </div>
       <div class="flex justify-between">
@@ -574,7 +610,7 @@ export default function WalletDispenserDetails({
     <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
       <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-2/3 gap-3 mobileMd:gap-6">
         <div class="flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6 ">
-          <div class="flex pb-[3px] mobileLg:pb-1.5">
+          <div class="flex pb-1.5 mobileLg:pb-3">
             <p class={titleGreyDL}>DISPENSER</p>
           </div>
           <WalletOverview walletData={walletData} />
