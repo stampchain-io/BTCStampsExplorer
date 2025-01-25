@@ -6,19 +6,8 @@ import { useFeePolling } from "$client/hooks/useFeePolling.ts";
 import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
-import { debounce } from "$lib/utils/debounce.ts";
-import { showNotification } from "$lib/utils/notificationUtils.ts";
-interface PSBTFees {
-  estMinerFee: number;
-  totalDustValue: number;
-  hasExactFees: boolean;
-  totalValue: number;
-  effectiveFeeRate: number;
-  estimatedSize?: number;
-  totalVsize?: number;
-}
 
-interface SRC20FormState {
+interface SRC101FormState {
   toAddress: string;
   token: string;
   amt: string;
@@ -42,186 +31,16 @@ interface SRC20FormState {
   file: File | null;
   psbtFees?: PSBTFees;
   maxAmount?: string;
+  root: string;
 }
 
-interface TxDetails {
-  hex: string;
-  est_tx_size: number;
-  input_value: number;
-  total_dust_value: number;
-  est_miner_fee: number;
-  fee: number;
-  change_value: number;
-  inputsToSign: number[];
-  sourceAddress: string;
-  changeAddress: string;
-}
-
-export class SRC20FormController {
-  private static prepareTxDebounced = debounce(async (
-    params: {
-      wallet: { address?: string };
-      formState: SRC20FormState;
-      action: string;
-      trxType: string;
-      canEstimateFees: (partial: boolean) => boolean;
-    },
-    callbacks: {
-      setFormState: (fn: (prev: SRC20FormState) => SRC20FormState) => void;
-      logger: typeof logger;
-    },
-  ) => {
-    const { wallet, formState, action, trxType } = params;
-    const { setFormState, logger } = callbacks;
-
-    if (!wallet.address) return;
-
-    try {
-      const response = await axiod.post("/api/v2/src20/create", {
-        sourceAddress: wallet.address,
-        toAddress: action === "transfer" ? formState.toAddress : wallet.address,
-        satsPerVB: formState.fee,
-        trxType,
-        op: action,
-        tick: formState.token || "TEST",
-        ...(action === "deploy" && {
-          max: formState.max || "1000",
-          lim: formState.lim || "1000",
-          dec: formState.dec || "18",
-          ...(formState.x && { x: formState.x }),
-          ...(formState.tg && { tg: formState.tg }),
-          ...(formState.web && { web: formState.web }),
-          ...(formState.email && { email: formState.email }),
-        }),
-        ...(["mint", "transfer"].includes(action) && {
-          amt: formState.amt || "1",
-        }),
-      });
-
-      if (response.data) {
-        // Log raw response for debugging
-        logger.debug("stamps", {
-          message: "Raw PSBT response",
-          data: {
-            feeDetails: response.data.feeDetails,
-            totalOutputValue: response.data.totalOutputValue,
-            estMinerFee: response.data.estMinerFee,
-            fullResponse: response.data,
-          },
-        });
-
-        // Extract fee values from response
-        const minerFee = Number(response.data.feeDetails?.total) || 0;
-        const dustValue = Number(response.data.totalOutputValue) || 1683; // Default to standard SRC20 dust
-        const totalValue = minerFee + dustValue;
-
-        logger.debug("stamps", {
-          message: "Extracted fee values",
-          data: {
-            minerFee,
-            dustValue,
-            totalValue,
-            feeDetails: response.data.feeDetails,
-            rawResponse: {
-              totalOutputValue: response.data.totalOutputValue,
-              feeDetails: response.data.feeDetails,
-            },
-          },
-        });
-
-        setFormState((prev) => {
-          const newState = {
-            ...prev,
-            psbtFees: {
-              estMinerFee: Number(response.data.est_miner_fee),
-              totalDustValue: Number(response.data.total_dust_value),
-              hasExactFees: true,
-              totalValue: Number(response.data.est_miner_fee) +
-                Number(response.data.total_dust_value),
-              effectiveFeeRate:
-                Number(response.data.feeDetails?.effectiveFeeRate) || 0,
-              estimatedSize: Number(response.data.est_tx_size),
-              totalVsize: Number(response.data.feeDetails?.totalVsize),
-              hex: response.data.hex,
-              inputsToSign: response.data.inputsToSign,
-            },
-          };
-
-          logger.debug("stamps", {
-            message: "Updated form state with fees",
-            data: {
-              oldPsbtFees: prev.psbtFees,
-              newPsbtFees: newState.psbtFees,
-              rawResponse: response.data,
-              calculatedTotal: totalValue,
-              responseTotal: response.data.fee,
-            },
-          });
-
-          return newState;
-        });
-      }
-    } catch (error) {
-      logger.error("stamps", {
-        message: "Fee calculation failed",
-        error,
-        data: {
-          action,
-          token: formState.token,
-          fee: formState.fee,
-        },
-      });
-    }
-  }, 500);
-
-  private static checkTokenExistenceDebounced = debounce(async (
-    token: string,
-    setFormState: (fn: (prev: SRC20FormState) => SRC20FormState) => void,
-  ) => {
-    try {
-      const response = await axiod.get(`/api/v2/src20/tick/${token}/deploy`);
-      if (response.data && response.data.data) {
-        setFormState((prev) => ({
-          ...prev,
-          tokenError: "This tick already exists.",
-        }));
-      } else {
-        setFormState((prev) => ({ ...prev, tokenError: "" }));
-      }
-    } catch (error) {
-      console.error("Error checking tick existence:", error);
-      setFormState((prev) => ({ ...prev, tokenError: "" }));
-    }
-  }, 800);
-
-  static prepareTx(
-    ...args: Parameters<typeof SRC20FormController.prepareTxDebounced>
-  ) {
-    return this.prepareTxDebounced(...args);
-  }
-
-  static checkTokenExistence(
-    ...args: Parameters<typeof SRC20FormController.checkTokenExistenceDebounced>
-  ) {
-    return this.checkTokenExistenceDebounced(...args);
-  }
-
-  static cancelPrepareTx() {
-    this.prepareTxDebounced.cancel();
-  }
-
-  static cancelTokenCheck() {
-    this.checkTokenExistenceDebounced.cancel();
-  }
-}
-
-export function useSRC20Form(
+export function useSRC101Form(
   action: string,
   trxType: "olga" | "multisig" = "multisig",
   initialToken?: string,
 ) {
   logger.debug("ui", {
-    message: "useSRC20Form initialized",
+    message: "useSRC101Form initialized",
     action,
     trxType,
     initialToken,
@@ -231,7 +50,8 @@ export function useSRC20Form(
   const { fees, fetchFees } = useFeePolling(300000); // 5 minutes
   const [apiError, setApiError] = useState<string>("");
 
-  const [formState, setFormState] = useState<SRC20FormState>({
+  const [formState, setFormState] = useState<SRC101FormState>({
+    root: ".btc",
     toAddress: "",
     token: initialToken || "",
     amt: "",
@@ -288,7 +108,7 @@ export function useSRC20Form(
   }, []);
 
   function validateFormState(
-    formState: SRC20FormState,
+    formState: SRC101FormState,
     action: string,
   ): { isValid: boolean; error?: string } {
     // Basic validations
@@ -338,67 +158,9 @@ export function useSRC20Form(
     return { isValid: true };
   }
 
-  // Update the effect to use validation
-  useEffect(() => {
-    const { isValid, error } = validateFormState(formState, action);
-
-    if (!wallet?.address || isSubmitting) return;
-
-    if (!isValid) {
-      setFormState((prev) => ({ ...prev, apiError: error || "" }));
-      return;
-    }
-
-    // Clear any previous errors
-    setFormState((prev) => ({ ...prev, apiError: "" }));
-
-    // Prepare transaction only if all validations pass
-    SRC20FormController.prepareTx(
-      {
-        wallet,
-        formState,
-        action,
-        trxType,
-        canEstimateFees: () => isValid,
-      },
-      {
-        setFormState,
-        logger,
-      },
-    );
-
-    return () => {
-      SRC20FormController.cancelPrepareTx();
-    };
-  }, [
-    wallet?.address,
-    formState.fee,
-    formState.token,
-    formState.amt,
-    formState.toAddress,
-    action,
-    trxType,
-    isSubmitting,
-  ]);
-
   const handleInputChange = (e: Event, field: string) => {
     const value = (e.target as HTMLInputElement).value;
     let newValue = value;
-
-    if (field === "token") {
-      newValue = value.toUpperCase().slice(0, 5);
-      setFormState((prev) => ({
-        ...prev,
-        [field]: newValue,
-        [`${field}Error`]: "",
-      }));
-
-      // Only check token existence if we're deploying and have a value
-      if (action === "deploy" && newValue) {
-        return SRC20FormController.checkTokenExistence(newValue, setFormState);
-      }
-      return; // Add explicit return for token field
-    }
 
     if (["lim", "max"].includes(field)) {
       newValue = handleIntegerInput(value, field);
@@ -480,6 +242,10 @@ export function useSRC20Form(
 
   const handleSubmit = async () => {
     try {
+      if (!wallet?.address) {
+        return setSubmissionMessage({ message: "Please connect your wallet" });
+      }
+
       setIsSubmitting(true);
       setApiError("");
 
@@ -504,11 +270,10 @@ export function useSRC20Form(
         );
 
         if (walletResult.signed) {
-          showNotification(
-            "Transaction Successfully.",
-            walletResult.txid,
-            "success",
-          );
+          setSubmissionMessage({
+            message: "Transaction broadcasted successfully.",
+            txid: walletResult.txid,
+          });
         } else if (walletResult.cancelled) {
           setSubmissionMessage({
             message: "Transaction signing cancelled by user.",
@@ -522,27 +287,23 @@ export function useSRC20Form(
         return walletResult;
       } else {
         // Create new PSBT only if we don't have one
-        const response = await axiod.post("/api/v2/src20/create", {
+        const response = await axiod.post("/api/v2/src101/create", {
           sourceAddress: wallet?.address,
-          toAddress: action === "transfer"
+          changeAddress: wallet?.address,
+          recAddress: wallet?.address,
+          op: action,
+          hash:
+            "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed",
+          toaddress: action === "transfer"
             ? formState.toAddress
             : wallet?.address,
-          satsPerVB: formState.fee,
-          trxType,
-          op: action,
-          tick: formState.token,
-          ...(action === "deploy" && {
-            max: formState.max,
-            lim: formState.lim,
-            dec: formState.dec,
-            ...(formState.x && { x: formState.x }),
-            ...(formState.tg && { tg: formState.tg }),
-            ...(formState.web && { web: formState.web }),
-            ...(formState.email && { email: formState.email }),
-          }),
-          ...(["mint", "transfer"].includes(action) && {
-            amt: formState.amt,
-          }),
+          tokenid: [btoa(formState.toAddress)],
+          dua: "999",
+          prim: "true",
+          coef: "1000",
+          sig: "",
+          img: [`https://img.bitname.pro/img/${formState.toAddress}.png`],
+          feeRate: formState.fee,
         });
 
         // Log the PSBT response
@@ -601,6 +362,7 @@ export function useSRC20Form(
         error: error instanceof Error ? error.message : String(error),
         details: error,
       });
+
       const apiError = (error as any).response?.data?.error;
       setApiError(
         apiError || error.message || "An unexpected error occurred",

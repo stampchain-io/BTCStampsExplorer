@@ -13,6 +13,7 @@ import { Dispenser } from "$types/index.d.ts";
 import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { StampRow } from "$globals";
 
 const ItemHeader = ({
   title = "STAMP",
@@ -234,6 +235,21 @@ function DispenserRow(
   const imageSize = view === "mobile"
     ? "w-[146px] h-[146px]"
     : "w-[172px] h-[172px]";
+  const [loading, setLoading] = useState(true);
+  const [src, setSrc] = useState("");
+
+  const fetchStampImage = async () => {
+    setLoading(true);
+    const res = await getStampImageSrc(dispenser.stamp as StampRow);
+    if (res) {
+      setSrc(res);
+    } else setSrc(NOT_AVAILABLE_IMAGE);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchStampImage();
+  }, []);
 
   if (!dispenser.stamp) {
     return null;
@@ -248,18 +264,39 @@ function DispenserRow(
         >
           <div class="relative p-[6px] mobileMd:p-3 bg-[#1F002E] rounded-lg aspect-square">
             <div class="stamp-container absolute inset-0 flex items-center justify-center">
-              <div class="relative z-10 w-full h-full">
-                <img
-                  width="100%"
-                  height="100%"
-                  loading="lazy"
-                  class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
-                  src={getStampImageSrc(dispenser.stamp)}
-                  alt={`Stamp ${dispenser.stamp.stamp}`}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = NOT_AVAILABLE_IMAGE;
-                  }}
-                />
+              <div
+                class={`relative z-10 w-full h-full ${
+                  loading && "animate-pulse"
+                }`}
+              >
+                {loading && !src
+                  ? (
+                    <div class="flex items-center justify-center bg-gray-700 max-w-none object-contain rounded pixelart stamp-image h-full w-full">
+                      <svg
+                        class="w-14 h-14 text-gray-600"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor"
+                        viewBox="0 0 20 18"
+                      >
+                        <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+                      </svg>
+                    </div>
+                  )
+                  : (
+                    <img
+                      width="100%"
+                      height="100%"
+                      loading="lazy"
+                      class="max-w-none w-full h-full object-contain rounded pixelart stamp-image"
+                      src={src}
+                      alt={`Stamp ${dispenser.stamp.stamp}`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          NOT_AVAILABLE_IMAGE;
+                      }}
+                    />
+                  )}
               </div>
             </div>
           </div>
@@ -536,7 +573,9 @@ export default function WalletContent({
           setOpenSettingModal={setOpenSettingModal}
         />
         <div class="mt-3 mobileLg:mt-6">
-          <StampSection {...stampSection} />
+          {stamps.data?.length
+            ? <StampSection {...stampSection} />
+            : <p class="text-gray-500">NO AVAILABLE STAMP</p>}
         </div>
       </div>
 
@@ -558,24 +597,28 @@ export default function WalletContent({
           handleOpenSetting={() => {}}
         />
         <div class="mt-3 mobileLg:mt-6">
-          <SRC20Section
-            type="all"
-            fromPage="wallet"
-            initialData={src20.data}
-            pagination={{
-              page: src20.pagination.page,
-              totalPages: src20.pagination.totalPages,
-              prefix: "src20",
-              onPageChange: (page: number) => {
-                const url = new URL(globalThis.location.href);
-                url.searchParams.set("src20_page", page.toString());
-                url.searchParams.set("anchor", "src20");
-                globalThis.location.href = url.toString();
-              },
-            }}
-            address={address}
-            sortBy={sortTokens}
-          />
+          {src20.data?.length
+            ? (
+              <SRC20Section
+                type="all"
+                fromPage="wallet"
+                initialData={src20.data}
+                pagination={{
+                  page: src20.pagination.page,
+                  totalPages: src20.pagination.totalPages,
+                  prefix: "src20",
+                  onPageChange: (page: number) => {
+                    const url = new URL(globalThis.location.href);
+                    url.searchParams.set("src20_page", page.toString());
+                    url.searchParams.set("anchor", "src20");
+                    globalThis.location.href = url.toString();
+                  },
+                }}
+                address={address}
+                sortBy={sortTokens}
+              />
+            )
+            : <p class="text-gray-500">NO AVAILABLE TOKEN</p>}
         </div>
       </div>
 

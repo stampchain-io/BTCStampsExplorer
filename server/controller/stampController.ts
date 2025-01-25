@@ -5,6 +5,7 @@ import { Src20Service } from "$server/services/src20/queryService.ts";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { BlockService } from "$server/services/blockService.ts";
 import { paginate } from "$lib/utils/paginationUtils.ts";
+import { fetchBTCPriceInUSD } from "$lib/utils/balanceUtils.ts";
 import {
   PaginatedStampBalanceResponseBody,
   ProcessedHolder,
@@ -30,6 +31,7 @@ import { getMimeType } from "$lib/utils/imageUtils.ts";
 import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
+import { decodeBase64 } from "$lib/utils/formatUtils.ts";
 
 interface StampControllerOptions {
   cacheType: RouteType;
@@ -58,7 +60,8 @@ export class StampController {
     skipTotalCount = false,
     cacheType = RouteType.STAMP_LIST,
     enrichWithAssetInfo = false,
-    isSearchQuery = false
+    isSearchQuery = false,
+    url,
   } = {}) {
     try {
       const filterByArray = typeof filterBy === "string"
@@ -130,17 +133,29 @@ export class StampController {
       });
 
       // Process stamps with floor prices and asset info if needed
+      const btcPrice = await fetchBTCPriceInUSD(url?.origin);
       const processedStamps = await Promise.all(
         stampResult.stamps.map(async (stamp) => {
           if (stamp.ident !== "STAMP" && stamp.ident !== "SRC-721") {
             return stamp;
           }
           
-          // Always fetch open dispensers for floor price
-          const openDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid, "open");
-          const floorPrice = openDispensers.length > 0 
-            ? this.calculateFloorPrice(openDispensers)
-            : "priceless";
+          // Get all dispensers to check both open and closed
+          const allDispensers = await DispenserManager.getDispensersByCpid(stamp.cpid);
+          const openDispensers = allDispensers.dispensers.filter(d => d.give_remaining > 0);
+          const closedDispensers = allDispensers.dispensers.filter(d => d.give_remaining === 0);
+          
+          let floorPrice: number | "priceless" = "priceless";
+          
+          if (openDispensers.length > 0) {
+            // Use floor price from open dispensers
+            floorPrice = this.calculateFloorPrice(openDispensers);
+          } else if (closedDispensers.length > 0) {
+            // If no open dispensers, use most recent closed dispenser price
+            const sortedClosedDispensers = closedDispensers.sort((a, b) => b.block_index - a.block_index);
+            const recentPrice = Number(formatSatoshisToBTC(sortedClosedDispensers[0].satoshirate, { includeSymbol: false }));
+            floorPrice = recentPrice || "priceless";
+          }
 
           // If enrichment is requested and it's a single stamp query
           if (enrichWithAssetInfo && identifier && !Array.isArray(identifier)) {
@@ -149,12 +164,16 @@ export class StampController {
             return {
               ...enrichedStamp,
               floorPrice,
+              floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
+              marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
             };
           }
           
           return {
             ...stamp,
             floorPrice,
+            floorPriceUSD: typeof floorPrice === 'number' ? floorPrice * btcPrice : null,
+            marketCapUSD: typeof stamp.marketCap === 'number' ? stamp.marketCap * btcPrice : null,
           };
         })
       );
@@ -221,12 +240,23 @@ export class StampController {
   }
 
   private static processHolders(holders: HolderRow[]): ProcessedHolder[] {
-    return holders.map((holder: HolderRow) => ({
-      address: holder.address,
-      quantity: holder.divisible
-        ? holder.quantity / 100000000
-        : holder.quantity,
-    }));
+    // Calculate total quantity first
+    const totalQuantity = holders.reduce((sum, holder) => {
+      const quantity = holder.divisible ? holder.quantity / 100000000 : holder.quantity;
+      return sum + quantity;
+    }, 0);
+
+    // Map holders with percentages
+    return holders.map((holder: HolderRow) => {
+      const quantity = holder.divisible ? holder.quantity / 100000000 : holder.quantity;
+      const percentage = totalQuantity > 0 ? (quantity / totalQuantity) * 100 : 0;
+
+      return {
+        address: holder.address,
+        amt: quantity,  // Renamed from quantity to amt to match HoldersGraph interface
+        percentage: Number(percentage.toFixed(2))  // Round to 2 decimal places
+      };
+    });
   }
 
   private static calculateFloorPrice(openDispensers: Dispenser[]): number | "priceless" {
@@ -573,7 +603,8 @@ export class StampController {
 
   private static async handleTextContent(result: any, contentInfo: any, identifier: string) {
     try {
-      const decodedContent = atob(result.body);
+      const decodedContent = await decodeBase64(result.body);
+
       return WebResponseUtil.stampResponse(decodedContent, contentInfo.mimeType, {
         binary: false,
         headers: normalizeHeaders({

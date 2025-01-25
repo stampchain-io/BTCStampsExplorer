@@ -1,125 +1,113 @@
 import {
   abbreviateAddress,
+  formatDate,
   formatSatoshisToBTC,
 } from "$lib/utils/formatUtils.ts";
-import { ScrollContainer } from "../shared/ScrollContainer.tsx";
+import {
+  cellAlign,
+  colGroup,
+  row,
+  tableLabel,
+  tableValue,
+  tableValueLink,
+} from "$components/shared/TableStyles.ts";
 
 interface Dispense {
   source: string;
   destination: string;
   dispense_quantity: number;
   satoshirate: number;
-  confirmed: boolean;
-  close_block_index: number;
+  tx_hash: string;
+  block_time: string;
 }
 
 interface StampSalesProps {
   dispenses: Dispense[];
 }
 
-const tableHeaders = [
-  { key: "from", label: "From" },
-  { key: "to", label: "To" },
-  { key: "quantity", label: "Quantity" },
-  { key: "price", label: "Price" },
-  { key: "confirmed", label: "Confirmed" },
-];
-
-const tableLabel =
-  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const tableValue =
-  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
-const row = "h-8 hover:bg-stamp-purple/10";
-
-function DispenseRow({ dispense }: { dispense: Dispense }) {
-  const handleClick = (e: MouseEvent, address: string) => {
-    e.preventDefault();
-    globalThis.location.href = `/wallet/${address}`;
-  };
-
-  return (
-    <tr class={row}>
-      <td className="text-left">
-        <a
-          href={`/wallet/${dispense.source}`}
-          onClick={(e) => handleClick(e, dispense.source)}
-          className="hover:text-stamp-purple-bright cursor-pointer"
-        >
-          <span className="tablet:hidden">
-            {abbreviateAddress(dispense.source, 4)}
-          </span>
-          <span className="hidden tablet:inline">
-            {abbreviateAddress(dispense.source, 6)}
-          </span>
-        </a>
-      </td>
-      <td className="text-center">
-        <a
-          href={`/wallet/${dispense.destination}`}
-          onClick={(e) => handleClick(e, dispense.destination)}
-          className="hover:text-stamp-purple-bright cursor-pointer"
-        >
-          <span className="tablet:hidden">
-            {abbreviateAddress(dispense.destination, 4)}
-          </span>
-          <span className="hidden tablet:inline">
-            {abbreviateAddress(dispense.destination, 6)}
-          </span>
-        </a>
-      </td>
-      <td className="text-center">
-        {dispense.dispense_quantity}
-      </td>
-      <td className="text-center">
-        {formatSatoshisToBTC(dispense.satoshirate)}
-      </td>
-      <td className="text-right">
-        {dispense.confirmed ? "YES" : "NO"}
-      </td>
-    </tr>
-  );
-}
-
 export function StampSales({ dispenses }: StampSalesProps) {
+  const headers = ["FROM", "TO", "QUANTITY", "PRICE", "DATE"];
+
   return (
-    <div class="relative w-full">
-      <ScrollContainer class="max-h-48">
-        <div class="w-[480px] min-[480px]:w-full">
-          <table className={tableValue}>
-            <colgroup>
-              <col className="w-[20%]" /> {/* From column */}
-              <col className="w-[20%]" /> {/* To */}
-              <col className="w-[20%]" /> {/* Quantity */}
-              <col className="w-[20%]" /> {/* Price */}
-              <col className="w-[20%]" /> {/* Confirmed */}
-            </colgroup>
-            <thead>
-              <tr>
-                {tableHeaders.map(({ key, label }) => (
-                  <th
-                    key={key}
-                    scope="col"
-                    class={`${tableLabel} pb-1.5 ${
-                      key === "from"
-                        ? "text-left"
-                        : key === "confirmed"
-                        ? "text-right"
-                        : "text-center"
-                    }`}
-                  >
-                    {label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {dispenses.map((dispense, index) => (
-                <DispenseRow key={index} dispense={dispense} />
+    <div class="w-[500px] min-[500px]:w-full">
+      <table class={tableValue}>
+        <colgroup>
+          {colGroup().map((col) => (
+            <col key={col.key} className={col.className} />
+          ))}
+        </colgroup>
+        {dispenses.length > 0 && (
+          <thead>
+            <tr>
+              {headers.map((header, i) => (
+                <th
+                  key={i}
+                  class={`${tableLabel} ${cellAlign(i, headers.length)}`}
+                >
+                  {header}
+                </th>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </ScrollContainer>
+              <th class="min-w-3 min-[660px]:hidden block" />
+            </tr>
+          </thead>
+        )}
+        <tbody>
+          {dispenses.length
+            ? dispenses?.map((dispense, index) => (
+              <tr key={`${dispense.tx_hash}-${index}`} class={row}>
+                <td class={cellAlign(0, headers.length)}>
+                  <a
+                    href={`/wallet/${dispense.source}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      globalThis.location.href = `/wallet/${dispense.source}`;
+                    }}
+                    className={tableValueLink}
+                  >
+                    <span className="tablet:hidden">
+                      {abbreviateAddress(dispense.source, 4)}
+                    </span>
+                    <span className="hidden tablet:inline">
+                      {abbreviateAddress(dispense.source, 6)}
+                    </span>
+                  </a>
+                </td>
+                <td class={cellAlign(1, headers.length)}>
+                  <a
+                    href={`/wallet/${dispense.destination}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      globalThis.location.href =
+                        `/wallet/${dispense.destination}`;
+                    }}
+                    className={tableValueLink}
+                  >
+                    <span className="tablet:hidden">
+                      {abbreviateAddress(dispense.destination, 4)}
+                    </span>
+                    <span className="hidden tablet:inline">
+                      {abbreviateAddress(dispense.destination, 6)}
+                    </span>
+                  </a>
+                </td>
+                <td class={cellAlign(2, headers.length)}>
+                  {dispense.dispense_quantity}
+                </td>
+                <td class={cellAlign(3, headers.length)}>
+                  {formatSatoshisToBTC(dispense.satoshirate, {
+                    includeSymbol: true,
+                    decimals: 8,
+                    stripZeros: true,
+                  })}
+                </td>
+                <td class={cellAlign(4, headers.length)}>
+                  {formatDate(new Date(dispense.block_time))}
+                </td>
+              </tr>
+            ))
+            : "NO SALES"}
+        </tbody>
+      </table>
     </div>
   );
 }

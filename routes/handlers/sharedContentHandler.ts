@@ -8,12 +8,17 @@ import {
 } from "$lib/utils/identifierUtils.ts";
 import { WebResponseUtil } from "$lib/utils/webResponseUtil.ts";
 import { FreshContext } from "$fresh/server.ts";
-import { API_RESPONSE_VERSION } from "$lib/utils/responseUtil.ts";
 import { normalizeHeaders } from "$lib/utils/headerUtils.ts";
+import { getRecursiveHeaders } from "$lib/utils/securityHeaders.ts";
+
+// Define the state type
+interface State {
+  baseUrl: string;
+}
 
 export async function handleContentRequest(
   identifier: string,
-  ctx: FreshContext,
+  ctx: FreshContext<State>,
 ) {
   logger.debug("content", {
     message: "Content request received",
@@ -57,39 +62,24 @@ export async function handleContentRequest(
     );
 
     if (
-      response.headers.get("content-type")?.toLowerCase().includes("text/html")
+      response.headers.get("content-type")?.toLowerCase().includes("html")
     ) {
       const html = await response.text();
 
-      // Clean up the HTML before sending to client
-      const cleanedHtml = html
-        // Remove Rocket Loader's type modification but preserve the src
-        .replace(
-          /<script src="(\/s\/[A-Z0-9]+)"([^>]*)>/g,
-          '<script src="$1"$2>',
-        )
-        // Clean up inline scripts (these we know are JavaScript)
-        .replace(
-          /<script type="[a-f0-9]+-text\/javascript">/g,
-          "<script>",
-        )
-        // Remove Rocket Loader's script if present
-        .replace(
-          /<script src="\/cdn-cgi\/scripts\/.*?rocket-loader\.min\.js".*?><\/script>/g,
-          "",
-        );
-      // Preserve existing headers but ensure version headers are present
+      // Add data-cfasync="false" to script tags that load recursive content
+      const modifiedHtml = html.replace(
+        /<script([^>]*?)src="\/s\/([A-Z0-9]+)"([^>]*?)>/g,
+        '<script$1src="/s/$2"$3 data-cfasync="false">',
+      );
+
+      // Use the recursive headers which include appropriate CSP and cache settings
       const headers = {
         ...Object.fromEntries(response.headers),
-        "Content-Type": "text/html",
-        "Cache-Control": "public, max-age=2592000, immutable",
-        "CDN-Cache-Control": "public, max-age=2592000, immutable",
-        "Surrogate-Control": "public, max-age=2592000, immutable",
-        "X-Content-Transformed": "true",
-        "X-API-Version": API_RESPONSE_VERSION,
+        ...getRecursiveHeaders(),
+        "Content-Type": "text/html; charset=utf-8",
       };
 
-      return new Response(cleanedHtml, {
+      return new Response(modifiedHtml, {
         headers: normalizeHeaders(headers),
       });
     }

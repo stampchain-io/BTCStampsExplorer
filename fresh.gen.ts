@@ -187,6 +187,7 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
+import * as $shared_Tables from "./islands/shared/Tables.tsx";
 import * as $src20_FilterModal from "./islands/src20/FilterModal.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
@@ -194,8 +195,6 @@ import * as $src20_SRC20Section from "./islands/src20/SRC20Section.tsx";
 import * as $src20_cards_SRC20BaseCard from "./islands/src20/cards/SRC20BaseCard.tsx";
 import * as $src20_cards_SRC20TokenMintingCard from "./islands/src20/cards/SRC20TokenMintingCard.tsx";
 import * as $src20_cards_SRC20TokenOutmintedCard from "./islands/src20/cards/SRC20TokenOutmintedCard.tsx";
-import * as $src20_details_SRC20DetailsTab from "./islands/src20/details/SRC20DetailsTab.tsx";
-import * as $src20_details_SRC20TX from "./islands/src20/details/SRC20TX.tsx";
 import * as $src20_details_SRC20TickHeader from "./islands/src20/details/SRC20TickHeader.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
@@ -208,11 +207,11 @@ import * as $stamp_details_StampCodeModal from "./islands/stamp/details/StampCod
 import * as $stamp_details_StampImage from "./islands/stamp/details/StampImage.tsx";
 import * as $stamp_details_StampImageFullScreen from "./islands/stamp/details/StampImageFullScreen.tsx";
 import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
-import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
+import * as $stamping_src101_DetailModal from "./islands/stamping/src101/DetailModal.tsx";
 import * as $stamping_src101_register_RecentRegister from "./islands/stamping/src101/register/RecentRegister.tsx";
 import * as $stamping_src101_register_RegisterContent from "./islands/stamping/src101/register/RegisterContent.tsx";
 import * as $stamping_src20_SRC20InputField from "./islands/stamping/src20/SRC20InputField.tsx";
@@ -224,6 +223,7 @@ import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/tr
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
+import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -455,6 +455,7 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
+    "./islands/shared/Tables.tsx": $shared_Tables,
     "./islands/src20/FilterModal.tsx": $src20_FilterModal,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
@@ -464,9 +465,6 @@ const manifest = {
       $src20_cards_SRC20TokenMintingCard,
     "./islands/src20/cards/SRC20TokenOutmintedCard.tsx":
       $src20_cards_SRC20TokenOutmintedCard,
-    "./islands/src20/details/SRC20DetailsTab.tsx":
-      $src20_details_SRC20DetailsTab,
-    "./islands/src20/details/SRC20TX.tsx": $src20_details_SRC20TX,
     "./islands/src20/details/SRC20TickHeader.tsx":
       $src20_details_SRC20TickHeader,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
@@ -481,13 +479,12 @@ const manifest = {
     "./islands/stamp/details/StampImageFullScreen.tsx":
       $stamp_details_StampImageFullScreen,
     "./islands/stamp/details/StampInfo.tsx": $stamp_details_StampInfo,
-    "./islands/stamp/details/StampRelatedInfo.tsx":
-      $stamp_details_StampRelatedInfo,
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
     "./islands/stamping/InputField.tsx": $stamping_InputField,
     "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,
+    "./islands/stamping/src101/DetailModal.tsx": $stamping_src101_DetailModal,
     "./islands/stamping/src101/register/RecentRegister.tsx":
       $stamping_src101_register_RecentRegister,
     "./islands/stamping/src101/register/RegisterContent.tsx":
@@ -509,6 +506,7 @@ const manifest = {
     "./islands/stamping/src20/transfer/TransferContent.tsx":
       $stamping_src20_transfer_TransferContent,
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
+    "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,
   },

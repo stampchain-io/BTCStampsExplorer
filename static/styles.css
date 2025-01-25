@@ -29,8 +29,9 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("/img/transparent-bg.png");
-  background-size: 3px;
+  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
+      rgba(128, 128, 128, 0.1) 25% 50%);
+  background-size: 4px 4px;
   z-index: 1;
 }
 
@@ -144,7 +145,10 @@ body {
 
 .stamp-container {
   position: relative;
+  width: 100%;
+  height: 100%;
   z-index: 1;
+  aspect-ratio: 1;
 }
 
 .stamp-container::before {
@@ -154,17 +158,46 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("/img/transparent-bg.png");
-  background-size: 3px;
+  background-image: repeating-conic-gradient(rgba(128, 128, 128, 0.2) 0% 25%,
+      rgba(128, 128, 128, 0.1) 25% 50%);
+  background-size: 4px 4px;
   z-index: 0;
 }
 
 .stamp-image {
   position: relative;
   z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+}
+
+.bgGradientTopLeft {
+  width: 1728.553px;
+  height: 1000px;
+  transform: rotate(45deg);
+  border-radius: 1728.553px;
+  opacity: 0.2;
+  background: linear-gradient(113deg, #FA0 23.14%, #406 84.65%);
+  filter: blur(50px);
+  position: absolute;
+  left: -50%;
+  top: -4%;
+}
+
+.bgGradientTopRight {
+  position: absolute;
+  top: -350px;
+  right: -450px;
+  width: 1128px;
+  height: 720px;
+  transform: rotate(-45deg);
+  border-radius: 1128px;
+  background: linear-gradient(77deg, #000 9.15%, #493240 50.02%, #F09 90.89%);
+  filter: blur(50px);
 }
 
 .bgGradientTop {
@@ -430,62 +463,6 @@ body {
   }
 }
 
-/* Custom Audio Player Styles */
-.stamp-audio-player {
-  @apply w-full max-w-[90%] bg-transparent;
-}
-
-/* Audio player container */
-.stamp-audio-player::-webkit-media-controls-panel {
-  @apply bg-stamp-card-bg border-none;
-  background: linear-gradient(to right, #1f002e00, #14001f7f, #1f002eff);
-}
-
-/* Play button */
-.stamp-audio-player::-webkit-media-controls-play-button {
-  @apply text-stamp-purple-bright hover:text-stamp-purple-bright;
-  filter: hue-rotate(300deg) brightness(1.5);
-}
-
-/* Time slider (progress bar) */
-.stamp-audio-player::-webkit-media-controls-timeline {
-  @apply bg-stamp-purple-bright;
-}
-
-/* Current time and duration */
-.stamp-audio-player::-webkit-media-controls-current-time-display,
-.stamp-audio-player::-webkit-media-controls-time-remaining-display {
-  @apply text-stamp-grey-light;
-}
-
-/* Volume slider */
-.stamp-audio-player::-webkit-media-controls-volume-slider {
-  @apply bg-stamp-purple-bright;
-}
-
-/* Volume control */
-.stamp-audio-player::-webkit-media-controls-mute-button {
-  @apply text-stamp-purple-bright hover:text-stamp-purple-bright;
-  filter: hue-rotate(300deg) brightness(1.5);
-}
-
-/* Add pixelated background for audio container */
-.stamp-audio-container {
-  @apply relative w-full h-full;
-}
-
-.stamp-audio-container::before {
-  content: "";
-  @apply absolute inset-0;
-  background-image: url("/img/transparent-bg.png");
-  background-size: 3px;
-  z-index: 1;
-}
-
-.stamp-audio-container audio {
-  @apply relative z-20;
-}
-
 /* conic gradient for input field animated border */
 @property --angle {
   syntax: '<angle>';
@@ -515,6 +492,7 @@ body {
   outline-style: none !important;
 }
 
+/* Animated underline for links */
 .animated-underline {
   font-weight: 700;
   text-decoration: none;
@@ -538,4 +516,53 @@ body {
 .animated-underline:hover,
 .animated-underline:focus {
   background-size: 0% 2px;
+}
+
+/* Animated loader text */
+.animated-text-loader span {
+  display: inline-block;
+  margin: 0 0;
+}
+
+
+.animated-text-loader span {
+  animation: fadeInOut 0.6s infinite alternate;
+}
+
+.animated-text-loader span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.animated-text-loader span:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.animated-text-loader span:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.animated-text-loader span:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.animated-text-loader span:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.animated-text-loader span:nth-child(6) {
+  animation-delay: 0.25s;
+}
+
+.animated-text-loader span:nth-child(7) {
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }

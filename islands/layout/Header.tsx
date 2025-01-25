@@ -201,8 +201,8 @@ export function Header() {
               <div
                 className={`${
                   isMobile
-                    ? "hidden group-hover:flex flex-col z-90 w-full gap-1.5"
-                    : "hidden group-hover:flex flex-col absolute top-[100%] left-0 z-90 pt-[3px] pb-[15px] space-y-[3px] w-full backdrop-blur-md bg-gradient-to-b from-transparent to-[#171717]/30 rounded-b-lg"
+                    ? "hidden group-hover:flex flex-col z-10 w-full gap-1.5"
+                    : "hidden group-hover:flex flex-col absolute top-[100%] left-1/2 -translate-x-1/2 min-w-[calc(100%+24px)] min-[1180px]:min-w-[calc(100%+36px)] z-10 pt-[3px] pb-[15px] px-3 min-[1180px]:px-[18px] space-y-[3px] whitespace-nowrap backdrop-blur-md bg-gradient-to-b from-transparent to-[#000000]/30 rounded-b-lg"
                 }`}
               >
                 {link.subLinks?.map((subLink) => (
@@ -214,7 +214,7 @@ export function Header() {
                       toggleMenu();
                       setCurrentPath(subLink?.href ? subLink?.href : null);
                     }}
-                    className={`hover:text-stamp-purple-bright text-base mobileLg:text-lg tablet:text-base ${
+                    className={`hover:text-stamp-purple-bright text-base text-center ${
                       currentPath === subLink.href
                         ? "text-stamp-purple-bright"
                         : ""
@@ -265,7 +265,7 @@ export function Header() {
       </div>
 
       {/* Tablet/Desktop Navbar */}
-      <div className="hidden tablet:flex justify-between items-center gap-9 desktop:gap-9 font-black text-stamp-purple">
+      <div className="hidden tablet:flex justify-between items-center gap-9 font-black text-stamp-purple">
         {renderNavLinks()}
         <ConnectWallet toggleModal={toggleWalletModal} />
       </div>

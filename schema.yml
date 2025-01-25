@@ -1227,14 +1227,14 @@ paths:
               deploy:
                 summary: Deploy example
                 value:
-                  sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
                   op: "deploy"
                   root: "btc"
                   name: "BitNameService"
                   lim: "10"
-                  owner: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  rec: ["bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"]
+                  owner: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  rec: ["bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"]
                   tick: "btc"
                   pri: { 0: 45000, 1: -1, 2: -1, 3: 900000, 4: 225000 }
                   desc: "Bitname Service powered by BTC stamp."
@@ -1244,54 +1244,56 @@ paths:
                   imglp: "https://img.bitname.pro/img/"
                   imgf: "png"
                   idua: "999"
-                  feeRate: 12
+                  feeRate: 96
               mint:
                 summary: Mint example
                 value:
-                  sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  recAddress: "bc1qkt6zxc6dl9xuf2wm8txna2g96yac3spukxvvtk"
                   op: "mint"
                   hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
-                  toaddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  toaddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
                   tokenid: ["YWJjZGVm"]
                   dua: "999"
                   prim: "true"
                   coef: "1000"
                   sig: ""
-                  img: ["https://img.bitname.pro/img/abcdef.png"]
-                  feeRate: 12
+                  feeRate: 24
               transfer:
                 summary: Transfer example
                 value:
-                  sourceAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
-                  toAddress: "bc1qazcm763858nkj2dj986etajv6wquslv8uxwczt"
-                  changeAddress: "bc1qdnksce7dgfsehtdxgz6fzdj2k6qfvmyf8uc2vv"
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  tokenid: "YWJjZGVm"
                   op: "transfer"
-                  tick: "STAMP"
-                  satsPerVB: 20
-                  amt: "100000"
+                  "hash": "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
+                  toaddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  tick: "bns"
+                  feeRate: 24
               setrecord:
                 summary: Set record example
                 value:
-                  sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
                   op: "setrecord"
                   hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
                   tokenid: "YWJjZGVm"
                   type: "address"
-                  data: { btc: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2" }
-                  prim: "false"
-                  feeRate: 12
+                  data: { "btc": "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9" }
+                  prim: "true"
+                  feeRate: 24
               renew:
                 summary: Renew example
                 value:
-                  sourceAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
-                  changeAddress: "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2"
+                  sourceAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  changeAddress: "bc1q7hfpkd39tqe7lske5uyhaj7y2adrjfuaufceu9"
+                  recAddress: "bc1qkt6zxc6dl9xuf2wm8txna2g96yac3spukxvvtk"
                   op: "renew"
                   hash: "77fb147b72a551cf1e2f0b37dccf9982a1c25623a7fe8b4d5efaac566cf63fed"
                   tokenid: "YWJjZGVm"
-                  dua: "2"
-                  feeRate: 12
+                  dua: "999"
+                  feeRate: 24
       responses:
         "200":
           description: Successful response with the hex value.
@@ -2096,7 +2098,15 @@ components:
         floorPrice:
           type: number
           nullable: true
-          description: "Current floor price in BTC, or 'priceless' if no open dispensers"
+          description: "Current floor price in BTC. Uses lowest open dispenser price, or most recent closed dispenser price if no open dispensers exist"
+        floorPriceUSD:
+          type: number
+          nullable: true
+          description: "Floor price converted to USD using current BTC/USD exchange rate"
+        marketCapUSD:
+          type: number
+          nullable: true
+          description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
     StampRowSummary:
       type: object
       properties:
@@ -2141,7 +2151,15 @@ components:
         floorPrice:
           type: number
           nullable: true
-          description: "Current floor price in BTC, or 'priceless' if no open dispensers"
+          description: "Current floor price in BTC. Uses lowest open dispenser price, or most recent closed dispenser price if no open dispensers exist"
+        floorPriceUSD:
+          type: number
+          nullable: true
+          description: "Floor price converted to USD using current BTC/USD exchange rate"
+        marketCapUSD:
+          type: number
+          nullable: true
+          description: "Market capitalization in USD (supply * floorPrice * BTC/USD rate)"
     BlockStampRow:
       type: object
       properties:

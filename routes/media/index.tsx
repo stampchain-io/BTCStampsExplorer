@@ -6,6 +6,8 @@ export default function Media() {
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const articleLink =
     "inline-block relative text-xl mobileLg:text-2xl font-bold gray-gradient1-hover";
+  const articleSource =
+    "text-base mobileLg:text-lg font-light text-stamp-grey-darker -space-y-1";
   const bodyTextLight =
     "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
   const buttonGreyOutline =
@@ -28,7 +30,7 @@ export default function Media() {
 
       <section>
         <h1 className={titleGreyDL}>INTERVIEWS</h1>
-        <div className="grid grid-cols-1 mobileLg:grid-cols-2 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
+        <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           <div className="flex flex-col">
             <h2 className={subTitleGrey}>RICE TVX</h2>
             <div className="relative w-full pt-[56.25%]">
@@ -75,31 +77,158 @@ export default function Media() {
               don't want to miss!
             </p>
           </div>
+          <div className="flex flex-col">
+            <h2 className={subTitleGrey}>UNIVERSE</h2>
+            <div className="relative w-full pt-[56.25%]">
+              {/* 16:9 aspect ratio wrapper */}
+              <iframe
+                className="absolute top-0 left-0 w-full h-full pb-3 mobileMd:pb-6"
+                src="https://www.youtube.com/embed/y07GjM0DqYs?si=bSAG-uFvhjMsSLtc"
+                title="The Origin of Bitcoin Stamps"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            <p className={bodyTextLight}>
+              Curious about the story behind Bitcoin Stamps?<br />
+              <br />
+              Join us for an exclusive episode of "Guess Who's Coming to the
+              Universe" as special guest @mikeinspace shares the origins and
+              vision that sparked the creation of Stamps! From inspiration to
+              innovation, he takes us through the journey of building secure,
+              transferable digital artifacts on Bitcoin.<br />
+              <br />
+              Don't miss this deep dive into all things Stamps and what's next
+              in the Bitcoin collectible space!
+            </p>
+          </div>
         </div>
       </section>
 
       <section>
         <h1 className={titleGreyDL}>IN THE NEWS</h1>
-        <h2 className={subTitleGrey}>BREAKING</h2>
-        <a
-          href="https://finance.yahoo.com/video/project-bitcoin-stamps-renews-debate-164902188.html?guccounter=1"
-          target="_blank"
-          className={articleLink}
-        >
-          NEW PROJECT RENEWS DEBATE OVER BITCOIN NFTS
-        </a>
-      </section>
-
-      <section>
-        <h1 className={titleGreyDL}>ARTICLES</h1>
-        <h2 className={subTitleGrey}>STAMP STORIES</h2>
-        <a
-          href="https://hackernoon.com/what-are-bitcoin-stamps"
-          target="_blank"
-          className={articleLink}
-        >
-          WHAT ARE BITCOIN STAMPS
-        </a>
+        <h2 className={subTitleGrey}>BREAKING STORIES</h2>
+        <div className="flex flex-col -space-y-[18px]">
+          <p className={articleSource}>
+            BINANCE
+            <br />
+            <a
+              href="https://academy.binance.com/en/articles/what-are-bitcoin-stamps"
+              target="_blank"
+              className={articleLink}
+            >
+              WHAT ARE BITCOIN STAMPS
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            YAHOO FINANCE
+            <br />
+            <a
+              href="https://finance.yahoo.com/video/project-bitcoin-stamps-renews-debate-164902188.html?guccounter=1"
+              target="_blank"
+              className={articleLink}
+            >
+              NEW PROJECT RENEWS DEBATE OVER BITCOIN NFTS
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            BINGX
+            <br />
+            <a
+              href="https://blog.bingx.com/bingx-insights/a-dive-into-bitcoin-stamps/"
+              target="_blank"
+              className={articleLink}
+            >
+              A DIVE INTO BITCOIN STAMPS
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            HACKERNOON
+            <br />
+            <a
+              href="https://hackernoon.com/what-are-bitcoin-stamps"
+              target="_blank"
+              className={articleLink}
+            >
+              WHAT ARE BITCOIN STAMPS
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            COINMARKETCAP
+            <br />
+            <a
+              href="https://coinmarketcap.com/community/articles/6554749e8f19ea588322c1ae/"
+              target="_blank"
+              className={articleLink}
+            >
+              BITCOIN STAMPS VS ORDINALS
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            M2
+            <br />
+            <a
+              href="https://explore.m2.com/learn/what-are-bitcoin-stamps"
+              target="_blank"
+              className={articleLink}
+            >
+              WHAT ARE BITCOIN STAMPS
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            GATE
+            <br />
+            <a
+              href="https://www.gate.io/learn/articles/what-are-bitcoin-stamps-and-src-20/1006"
+              target="_blank"
+              className={articleLink}
+            >
+              WHAT ARE BITCOIN STAMPS AND SRC-20
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            BITCOIN.COM
+            <br />
+            <a
+              href="https://news.bitcoin.com/study-src20-protocols-unmatched-data-permanence-makes-it-a-superior-choice-over-brc20-and-runes/"
+              target="_blank"
+              className={articleLink}
+            >
+              SRC20 PROTOCOL'S "UNMATCHED DATA PERMANENCE"
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            OKX
+            <br />
+            <a
+              href="https://www.okx.com/learn/what-is-src20-spurring-innovation-in-bitcoin-ecosystem"
+              target="_blank"
+              className={articleLink}
+            >
+              WHAT IS SRC-20
+            </a>
+          </p>
+          <br />
+          <p className={articleSource}>
+            COIN CODEX
+            <br />
+            <a
+              href="https://coincodex.com/article/44872/src-20-tokens/"
+              target="_blank"
+              className={articleLink}
+            >
+              WHAT ARE SRC-20 TOKENS
+            </a>
+          </p>
+        </div>
       </section>
 
       <section>

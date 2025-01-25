@@ -8,6 +8,7 @@ import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import type { StampRow } from "$globals";
 import { getStampImageSrc, handleImageError } from "$lib/utils/imageUtils.ts";
 import { logger } from "$lib/utils/logger.ts";
+import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 
 interface Props {
   fee: number;
@@ -243,9 +244,16 @@ function WalletSendStampModal({
     }
   };
 
+  const fetchStampImage = async () => {
+    const res = await getStampImageSrc(selectedStamp as StampRow);
+    if (res) {
+      setImgSrc(res);
+    } else setImgSrc(NOT_AVAILABLE_IMAGE);
+  };
+
   useEffect(() => {
     getMaxQuantity();
-    setImgSrc(getStampImageSrc(selectedStamp as StampRow));
+    fetchStampImage();
   }, [selectedStamp]);
 
   useEffect(() => {

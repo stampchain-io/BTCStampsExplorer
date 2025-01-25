@@ -15,7 +15,7 @@ import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { useEffect, useState } from "preact/hooks";
 import { useWindowSize } from "$lib/hooks/useWindowSize.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
-
+import { logger } from "$lib/utils/logger.ts";
 // Text style constants for different breakpoints
 
 // TODO(@reinamora_137): add a variant for the inline detail display
@@ -108,16 +108,19 @@ export function StampCard({
   showDetails = true,
   showMinDetails = false,
   variant = "default",
+  fromPage,
 }: {
   stamp: StampWithSaleData;
   isRecentSale?: boolean;
   showDetails?: boolean;
   showMinDetails?: boolean;
   variant?: "default" | "grey";
+  fromPage?: string;
 }) {
   // Add window size hook
   const { width } = useWindowSize();
-
+  const [loading, setLoading] = useState(true);
+  const [src, setSrc] = useState<string>("");
   // Function to get current abbreviation length based on screen size
   const getAbbreviationLength = () => {
     if (width >= BREAKPOINTS.desktop) return ABBREVIATION_LENGTHS.desktop;
@@ -127,7 +130,18 @@ export function StampCard({
     return ABBREVIATION_LENGTHS.mobileSm;
   };
 
-  const src = getStampImageSrc(stamp as StampRow);
+  const fetchStampImage = async () => {
+    setLoading(true);
+    const res = await getStampImageSrc(stamp as StampRow);
+    if (res) {
+      setSrc(res);
+    } else setSrc(NOT_AVAILABLE_IMAGE);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchStampImage();
+  }, []);
 
   // Add state for validated content
   const [validatedContent, setValidatedContent] = useState<preact.VNode | null>(
@@ -137,27 +151,67 @@ export function StampCard({
   useEffect(() => {
     const validateContent = async () => {
       if (stamp.stamp_mimetype === "image/svg+xml") {
-        const { isValid } = await validateStampContent(src);
+        const { isValid, error } = await validateStampContent(src);
         if (isValid) {
           setValidatedContent(
             <div class="stamp-container">
-              <img
-                src={src}
-                loading="lazy"
-                alt={`Stamp No. ${stamp.stamp}`}
-                class="absolute inset-0 w-full h-full object-contain pixelart stamp-image"
-                onError={handleImageError}
-              />
+              <div class="relative z-10 aspect-square">
+                <img
+                  src={src}
+                  loading="lazy"
+                  alt={`Stamp No. ${stamp.stamp}`}
+                  class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                  onError={handleImageError}
+                />
+              </div>
+            </div>,
+          );
+        } else {
+          logger.debug("stamps", {
+            message: "SVG validation failed",
+            error,
+            stamp: stamp.stamp,
+          });
+          setValidatedContent(
+            <div class="stamp-container">
+              <div class="relative z-10 aspect-square">
+                <img
+                  src={NOT_AVAILABLE_IMAGE}
+                  alt="Invalid SVG"
+                  class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+                />
+              </div>
             </div>,
           );
         }
       }
     };
-
-    validateContent();
+    if (src) {
+      validateContent();
+    }
   }, [src, stamp.stamp_mimetype]);
 
   const renderContent = () => {
+    if (loading && !src) {
+      return (
+        <div class="stamp-container">
+          <div class="relative z-10 aspect-square animate-pulse">
+            <div class="flex items-center justify-center bg-gray-700 max-w-none object-contain rounded pixelart stamp-image h-full w-full">
+              <svg
+                class="w-20 h-20 text-gray-600"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 18"
+              >
+                <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (stamp.stamp_mimetype?.startsWith("audio/")) {
       return (
         <div class="stamp-audio-container relative w-full h-full flex items-center justify-center">
@@ -239,23 +293,31 @@ export function StampCard({
 
     if (stamp.stamp_mimetype === "image/svg+xml") {
       return validatedContent || (
-        <img
-          src={NOT_AVAILABLE_IMAGE}
-          alt="Loading..."
-          class="absolute inset-0 w-full h-full object-contain pixelart"
-        />
+        <div class="stamp-container">
+          <div class="relative z-10 aspect-square">
+            <img
+              src={NOT_AVAILABLE_IMAGE}
+              alt="Loading..."
+              class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            />
+          </div>
+        </div>
       );
     }
 
     // Regular images
     return (
-      <img
-        src={src}
-        loading="lazy"
-        alt={`Stamp No. ${stamp.stamp}`}
-        class="absolute inset-0 w-full h-full object-contain pixelart"
-        onError={handleImageError}
-      />
+      <div class="stamp-container">
+        <div class="relative z-10 aspect-square">
+          <img
+            src={src}
+            loading="lazy"
+            alt={`Stamp No. ${stamp.stamp}`}
+            class="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+            onError={handleImageError}
+          />
+        </div>
+      </div>
     );
   };
 
@@ -267,24 +329,24 @@ export function StampCard({
         } BTC`,
         style: TEXT_STYLES.price,
       };
-    } else if (stamp.floorPrice !== "priceless") {
+    }
+
+    // Handle floor price or recent sale price
+    const price = stamp.floorPrice !== "priceless"
+      ? stamp.floorPrice
+      : stamp.recentSalePrice;
+    if (price !== "priceless" && !isNaN(Number(price))) {
       return {
-        text: `${stripTrailingZeros(Number(stamp.floorPrice).toFixed(8))} BTC`,
+        text: `${stripTrailingZeros(Number(price).toFixed(8))} BTC`,
         style: TEXT_STYLES.price,
-      };
-    } else if (stamp.recentSalePrice !== "priceless") {
-      return {
-        text: `${
-          stripTrailingZeros(Number(stamp.recentSalePrice).toFixed(8))
-        } BTC`,
-        style: TEXT_STYLES.price,
-      };
-    } else {
-      return {
-        text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
-        style: TEXT_STYLES.mimeType,
       };
     }
+
+    // Default to mime type if no valid price
+    return {
+      text: stamp.stamp_mimetype?.split("/")[1].toUpperCase() || "UNKNOWN",
+      style: TEXT_STYLES.mimeType,
+    };
   };
 
   const shouldDisplayHash = Number(stamp.stamp ?? 0) >= 0 ||
@@ -344,6 +406,11 @@ export function StampCard({
           bg-stamp-card-bg
         `}
       >
+        {fromPage && fromPage === "stamp" && (
+          <div className="absolute top-0 right-0 w-[31px] h-[31px] z-10 rounded-[3px] bg-[#1F002E] p-[3px] desktop:block hidden">
+            <img className="" src="/img/stamp/atom.svg" />
+          </div>
+        )}
         <div class="relative w-full h-full">
           <div class="aspect-stamp w-full h-full overflow-hidden flex items-center justify-center">
             {renderContent()}

@@ -63,3 +63,38 @@ export function getIdentifierType(
   if (isCpid(value)) return "cpid";
   return "invalid";
 }
+
+export async function calculateTransactionSize(
+  txHash: string,
+): Promise<number> {
+  const API_URL = `https://blockstream.info/api/tx/${txHash}`;
+
+  try {
+    // Fetch transaction details from Blockstream API
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch transaction details: ${response.statusText}`,
+      );
+    }
+
+    const txData = await response.json();
+
+    // Extract inputs and outputs
+    const inputs = txData.vin.length; // Number of inputs
+    const outputs = txData.vout.length; // Number of outputs
+
+    // Calculate the base transaction size
+    const inputSize = inputs * 148; // Each input is approx. 148 bytes
+    const outputSize = outputs * 34; // Each output is approx. 34 bytes
+    const overhead = 10; // Transaction overhead (version, locktime, etc.)
+
+    // Total size
+    const totalSize = inputSize + outputSize + overhead;
+
+    return totalSize;
+  } catch (error) {
+    console.error("Error calculating transaction size:", error);
+    throw error;
+  }
+}

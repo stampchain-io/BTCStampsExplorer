@@ -1,6 +1,16 @@
-import { HoldersPieChart } from "../../islands/charts/HoldersPieChart.tsx";
+import { HoldersPieChart } from "$islands/charts/HoldersPieChart.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
-import { ScrollContainer } from "./ScrollContainer.tsx";
+import { ScrollContainer } from "$components/shared/ScrollContainer.tsx";
+import {
+  cellAlign,
+  colGroup,
+  dataLabel,
+  dataValueXL,
+  row,
+  tableLabel,
+  tableValue,
+  tableValueLink,
+} from "$components/shared/TableStyles.ts";
 
 interface Holder {
   address: string | null;
@@ -12,57 +22,9 @@ interface HoldersGraphProps {
   holders?: Holder[];
 }
 
-const tableHeaders = [
-  { key: "address", label: "Address", width: "w-[50%]", align: "text-left" },
-  { key: "amount", label: "Amount", width: "w-[25%]", align: "text-center" },
-  { key: "percent", label: "Percent", width: "w-[25%]", align: "text-right" },
-];
-
-const dataLabel =
-  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-const dataValueXL =
-  "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
-const tableLabel =
-  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const tableValue =
-  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
-const row = "h-8 hover:bg-stamp-purple/10 group cursor-pointer";
-
-function HolderRow({ holder }: { holder: Holder }) {
-  if (!holder.address) {
-    return (
-      <tr className={row}>
-        <td className="text-left">Unknown</td>
-        <td className="text-center">{holder.amt}</td>
-        <td className="text-right">{holder.percentage}%</td>
-      </tr>
-    );
-  }
-
-  return (
-    <tr className={row}>
-      <td colSpan={3} className="p-0">
-        <a
-          href={`/wallet/${holder.address}`}
-          className="flex w-full"
-        >
-          <span className="w-[50%] text-left group-hover:text-stamp-purple-bright">
-            <span className="mobileLg:hidden">
-              {abbreviateAddress(holder.address, 8)}
-            </span>
-            <span className="hidden mobileLg:inline">
-              {holder.address}
-            </span>
-          </span>
-          <span className="w-[25%] text-center">{holder.amt}</span>
-          <span className="w-[25%] text-right">{holder.percentage}%</span>
-        </a>
-      </td>
-    </tr>
-  );
-}
-
 export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
+  const headers = ["ADDRESS", "AMOUNT", "PERCENT"];
+
   if (!holders.length) {
     return (
       <div className="flex flex-col bg-gradient-to-br primary-gradient p-6 relative rounded-lg">
@@ -86,24 +48,72 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
 
         <div className="relative w-full max-w-full">
           <ScrollContainer class="h-48 mobileLg:h-64 mt-3 mobileMd:mt-6">
-            <table className={`${tableValue} table-auto`}>
-              <thead className={tableLabel}>
+            <table className={tableValue}>
+              <colgroup>
+                {colGroup([
+                  { width: "w-[50%]" },
+                  { width: "w-[25%]" },
+                  { width: "w-[25%]" },
+                ]).map((col) => (
+                  <col
+                    key={col.key}
+                    className={col.className}
+                  />
+                ))}
+              </colgroup>
+              <thead>
                 <tr>
-                  {tableHeaders.map(({ key, label, width, align }) => (
+                  {headers.map((header, i) => (
                     <th
-                      key={key}
+                      key={i}
                       scope="col"
-                      className={`${tableLabel} pb-1.5 ${width} ${align}`}
+                      class={`${tableLabel} ${cellAlign(i, headers.length)}`}
                     >
-                      {label}
+                      {header}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody className={tableValue}>
-                {holders.map((holder, index) => (
-                  <HolderRow key={index} holder={holder} />
-                ))}
+                {holders.map((holder, index) => {
+                  if (!holder.address) {
+                    return (
+                      <tr className={row}>
+                        <td class={cellAlign(0, headers.length)}>Unknown</td>
+                        <td class={cellAlign(1, headers.length)}>
+                          {holder.amt}
+                        </td>
+                        <td class={cellAlign(2, headers.length)}>
+                          {holder.percentage}%
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  return (
+                    <tr key={index} className={row}>
+                      <td class={cellAlign(0, headers.length)}>
+                        <a
+                          href={`/wallet/${holder.address}`}
+                          className={tableValueLink}
+                        >
+                          <span className="mobileLg:hidden">
+                            {abbreviateAddress(holder.address, 8)}
+                          </span>
+                          <span className="hidden mobileLg:inline">
+                            {holder.address}
+                          </span>
+                        </a>
+                      </td>
+                      <td class={cellAlign(1, headers.length)}>
+                        {holder.amt}
+                      </td>
+                      <td class={cellAlign(2, headers.length)}>
+                        {holder.percentage}%
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </ScrollContainer>

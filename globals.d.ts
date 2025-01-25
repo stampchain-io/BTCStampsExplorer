@@ -1,6 +1,6 @@
 // General Types ---------------------------------------------------------------
-
-export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721";
+export type ROOT_DOMAIN_TYPES = ".btc" | ".sats" | ".xbt" | ".x" | ".pink";
+export type SUBPROTOCOLS = "STAMP" | "SRC-20" | "SRC-721" | "SRC-101";
 export type STAMP_TYPES = // These just reformat to variations of SUBPROTOCOLS
   | "all"
   | "stamps"
@@ -177,6 +177,16 @@ export interface SRC20Row {
   top_mints_percentage?: number;
   volume_7d?: number;
   value?: number;
+  mint_progress?: {
+    max_supply: string;
+    total_minted: string;
+    limit: string;
+    total_mints: number;
+    progress: string;
+    decimals: number;
+    tx_hash: string;
+    tick: string;
+  };
 }
 
 interface SendRow {
@@ -341,7 +351,7 @@ interface SRC101DeployDetail {
   recipients: string[];
 }
 
-interface SRC101Balance {
+export interface SRC101Balance {
   address: string;
   p: string;
   deploy_hash: string;
@@ -353,9 +363,10 @@ interface SRC101Balance {
   address_eth: string;
   txt_data: string;
   img: string;
+  owner: string;
 }
 
-interface Src101Detail {
+export interface Src101Detail {
   tx_hash: string;
   block_index: number;
   p: string;
@@ -363,7 +374,7 @@ interface Src101Detail {
   tick: string | null;
   tick_hash: string | null;
   name: string | null;
-  tokenid: string | null;
+  tokenid: string[] | null;
   tokenid_utf8: string | null;
   description: string | null;
   wla: string | null;
@@ -647,7 +658,7 @@ export interface Collection {
   collection_id: string;
   collection_name: string;
   collection_description: string;
-  creators: string;
+  creators: string[];
   stamp_count: number;
   total_editions: number;
   first_stamp_image?: string | null;

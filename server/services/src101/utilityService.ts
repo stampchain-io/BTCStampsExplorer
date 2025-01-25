@@ -1,5 +1,5 @@
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
-import { Src101Detail, TXError } from "$globals";
+import { TXError } from "$globals";
 import { crypto } from "@std/crypto";
 import { isValidBitcoinAddress } from "$lib/utils/utxoUtils.ts";
 import { SRC101QueryService } from "./queryService.ts";
@@ -173,12 +173,12 @@ export class SRC101UtilityService {
       if (typeof item !== "string") {
         return ResponseUtil.badRequest("Each item in tokenid array must be a string", 400);
       }
-      console.log("item", item)
+
       if (!SRC101UtilityService.checkValidBase64String(item)) {
         return ResponseUtil.badRequest(`Invalid Base64 string: ${item}`, 400);
       }
       const item_utf8 = SRC101UtilityService.base64ToUtf8(item);
-      if ( !item_utf8 || SRC101UtilityService.checkContainsSpecial(item_utf8)) {
+      if ( !item_utf8 || SRC101UtilityService.checkContainsSpecial(item_utf8.replace('.btc',''))) {
         return ResponseUtil.badRequest(`Contains special characters: ${item}`, 400);
       }
 

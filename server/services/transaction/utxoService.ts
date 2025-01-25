@@ -191,55 +191,58 @@ export class UTXOService {
     // Sort using BigInt comparison
     utxosWithValues.sort((a, b) => 
       Number(b.effectiveValue - a.effectiveValue)); // Convert back to number for sort comparison
-
-    for (const utxo of utxosWithValues) {
-      selectedInputs.push(utxo);
-      totalInputValue += BigInt(utxo.value);
-
-      // Calculate current fee with proper script type detection
-      const currentFee = BigInt(calculateMiningFee(
-        selectedInputs.map(input => {
-          const scriptType = getScriptTypeInfo(input.script);
-          return {
-            type: scriptType.type,
-            size: scriptType.size,
-            isWitness: scriptType.isWitness,
-            ancestor: input.ancestor
-          };
-        }),
-        vouts.map(output => {
-          const scriptType = output.script ? 
-            getScriptTypeInfo(output.script) : 
-            { type: "P2WPKH", size: TX_CONSTANTS.P2WPKH.size, isWitness: true };
-          return {
-            type: scriptType.type,
-            size: scriptType.size,
-            isWitness: scriptType.isWitness,
-            value: Number(output.value) // Keep as number for fee calculation
-          };
-        }),
-        feeRate,
-        {
-          includeChangeOutput: true,
-          changeOutputType: "P2WPKH"
-        }
-      ));
-
-      if (totalInputValue >= totalOutputValue + currentFee) {
-        const change = totalInputValue - totalOutputValue - currentFee;
-        const changeDust = BigInt(this.CHANGE_DUST);
-        
-        if (change >= changeDust || change === BigInt(0)) {
-          return {
-            inputs: selectedInputs,
-            change: change >= changeDust ? Number(change) : 0, // Convert back to number
-            fee: Number(currentFee), // Convert back to number
-          };
+    try {
+      for (const utxo of utxosWithValues) {
+        selectedInputs.push(utxo);
+        totalInputValue += BigInt(utxo.value);
+  
+        // Calculate current fee with proper script type detection
+        const currentFee = BigInt(calculateMiningFee(
+          selectedInputs.map(input => {
+            const scriptType = getScriptTypeInfo(input.script);
+            return {
+              type: scriptType.type,
+              size: scriptType.size,
+              isWitness: scriptType.isWitness,
+              ancestor: input.ancestor
+            };
+          }),
+          vouts.map(output => {
+            const scriptType = output.script ? 
+              getScriptTypeInfo(output.script) : 
+              { type: "P2WPKH", size: TX_CONSTANTS.P2WPKH.size, isWitness: true };
+            return {
+              type: scriptType.type,
+              size: scriptType.size,
+              isWitness: scriptType.isWitness,
+              value: Number(output.value) // Keep as number for fee calculation
+            };
+          }),
+          feeRate,
+          {
+            includeChangeOutput: true,
+            changeOutputType: "P2WPKH"
+          }
+        ));
+  
+        if (totalInputValue >= totalOutputValue + currentFee) {
+          const change = totalInputValue - totalOutputValue - currentFee;
+          const changeDust = BigInt(this.CHANGE_DUST);
+          
+          if (change >= changeDust || change === BigInt(0)) {
+            return {
+              inputs: selectedInputs,
+              change: change >= changeDust ? Number(change) : 0, // Convert back to number
+              fee: Number(currentFee), // Convert back to number
+            };
+          }
         }
       }
+  
+      throw new Error("Insufficient funds to cover outputs and fees");
+    } catch (error) {
+      throw error
     }
-
-    throw new Error("Insufficient funds to cover outputs and fees");
   }
 
   private static isWitnessInput(script: string): boolean {

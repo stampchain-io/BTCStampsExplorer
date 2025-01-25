@@ -8,8 +8,6 @@ import { ToastProvider } from "$islands/Toast/ToastProvider.tsx";
 import { NavigatorProvider } from "$islands/Navigator/NavigatorProvider.tsx";
 import { MetaTags } from "$components/layout/MetaTags.tsx";
 import FontLoader from "$islands/home/FontLoader.tsx";
-import { LoadingProvider } from "$islands/loading/LoadingProvider.tsx";
-import LoadingContent from "$islands/loading/LoadingContent.tsx";
 
 export default function App({ Component, state }: PageProps<unknown>) {
   if (state?.skipAppLayout) {
@@ -31,6 +29,9 @@ export default function App({ Component, state }: PageProps<unknown>) {
 
         {/* Critical CSS first */}
         <link rel="preload" href="/styles.css" as="style" />
+        <link rel="stylesheet" href="/styles.css" />
+        <link rel="preload" href="/gradients.css" as="style" />
+        <link rel="stylesheet" href="/gradients.css" />
 
         {/* Main font loader */}
         <FontLoader />
@@ -50,13 +51,6 @@ export default function App({ Component, state }: PageProps<unknown>) {
             }
           `}
         </style>
-
-        {/* Preload critical resources */}
-        <link
-          rel="preload"
-          href="/img/transparent-bg.png"
-          as="image"
-        />
 
         {/* Add font-display swap to prevent FOUT */}
         <style>
@@ -139,7 +133,15 @@ export default function App({ Component, state }: PageProps<unknown>) {
       </Head>
 
       <body class="relative bg-stamp-bg-grey-darkest min-h-screen overflow-x-hidden overflow-hidden">
-        <div class="bgGradientTop contain-layout" />
+        {state?.route !== "/"
+          ? <div class="bgGradientTop contain-layout" />
+          : (
+            <>
+              <div class="bgGradientTop contain-layout desktop:hidden block" />
+              <div class="bgGradientTopLeft desktop:block hidden" />
+              <div class="bgGradientTopRight desktop:block hidden" />
+            </>
+          )}
         <div class="bgGradientBottom contain-layout" />
 
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-stamp-dark-DEFAULT/50 to-transparent z-[1] contain-paint" />
@@ -147,21 +149,18 @@ export default function App({ Component, state }: PageProps<unknown>) {
         <div class="flex flex-col min-h-screen font-work-sans relative z-[2]">
           <ToastProvider>
             <NavigatorProvider>
-              <LoadingProvider>
-                <LoadingContent />
-                <div class="flex flex-col min-h-screen">
-                  <Header />
-                  <main
-                    class="flex flex-col flex-grow px-3 mobileMd:px-6 desktop:px-12 pt-0 mobileLg:pt-3 tablet:pt-3 pb-12 mobileLg:pb-24 desktop:pb-36 max-w-desktop mx-auto w-full"
-                    f-client-nav
-                  >
-                    <Partial name="body">
-                      <Component />
-                    </Partial>
-                  </main>
-                  <Footer />
-                </div>
-              </LoadingProvider>
+              <div class="flex flex-col min-h-screen">
+                <Header />
+                <main
+                  class="flex flex-col flex-grow px-3 mobileMd:px-6 desktop:px-12 pt-0 mobileLg:pt-3 tablet:pt-3 pb-12 mobileLg:pb-24 desktop:pb-36 max-w-desktop mx-auto w-full"
+                  f-client-nav
+                >
+                  <Partial name="body">
+                    <Component />
+                  </Partial>
+                </main>
+                <Footer />
+              </div>
             </NavigatorProvider>
           </ToastProvider>
         </div>

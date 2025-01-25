@@ -49,7 +49,11 @@ export function Filter({
 
       if (e.key === "f") {
         e.preventDefault();
-        handleOpen(true);
+        if (!open) {
+          handleOpen(true);
+        } else {
+          handleOpen(false);
+        }
       }
       if (e.key === "Escape" && open) {
         handleOpen(false);
@@ -119,7 +123,7 @@ export function Filter({
         ? prevFilters.filter((f) => f !== value)
         : [...prevFilters, value];
 
-      setFilterValue(newFilters);
+      setFilterValue?.(newFilters);
       updateURL({ filterBy: newFilters });
 
       const url = new URL(globalThis.location.href);

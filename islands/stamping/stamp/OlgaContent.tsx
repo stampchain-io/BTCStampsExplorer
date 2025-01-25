@@ -13,6 +13,7 @@ import { Config } from "$globals";
 import { logger } from "$lib/utils/logger.ts";
 import StampImageFullScreen from "$islands/stamp/details/StampImageFullScreen.tsx";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
+import { handleImageError } from "$lib/utils/imageUtils.ts";
 
 const log = (message: string, data?: unknown) => {
   logger.debug("stamps", {
@@ -178,8 +179,26 @@ function extractErrorMessage(error: unknown): string {
           message?: string;
         };
       };
+      response?: {
+        data?: {
+          error?: string;
+        };
+      };
       message?: string;
     };
+
+    // Check for direct error message
+    if (err.response?.data?.error) {
+      logger.debug("stamps", {
+        message: "Found direct error message",
+        path: "error.message",
+        value: err.response?.data?.error,
+      });
+      if (err.response?.data?.error?.includes("Insufficient funds")) {
+        return "Insufficient funds to cover outputs and fees";
+      }
+      return err.response?.data?.error;
+    }
 
     // Check for direct error message
     if (err.error?.message) {
@@ -271,6 +290,9 @@ export function OlgaContent() {
     SubmissionMessage | null
   >(null);
 
+  // Add isSearching state
+  const [isSearching, setIsSearching] = useState(false);
+
   // Initialize addressError as undefined
   const [addressError, setAddressError] = useState<string | undefined>(
     undefined,
@@ -280,14 +302,7 @@ export function OlgaContent() {
 
   // Add new state and refs for tooltips
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-
-  // Add tooltip handlers
-  const handleMouseMove = (e: MouseEvent) => {
-    setTooltipPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
-  };
+  const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
 
   useEffect(() => {
     if (fees && !loading) {
@@ -843,7 +858,10 @@ export function OlgaContent() {
         message: "Unexpected minting error",
         error,
       });
-      setApiError("An unexpected error occurred");
+      setApiError(
+        error.message || error.response.data.error ||
+          "An unexpected error occurred",
+      );
       setSubmissionMessage(null);
     }
   };
@@ -905,11 +923,11 @@ export function OlgaContent() {
   const titlePurpleLDCenter =
     "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
   const feeSelectorContainer =
-    "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
+    "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
   const tooltipButton =
     "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
   const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
+    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
   const tooltipButtonOverflow =
     "fixed bg-[#000000BF] px-2 py-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
 
@@ -976,10 +994,6 @@ export function OlgaContent() {
     <div
       id="image-preview"
       class={`relative rounded items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300`}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleUploadMouseEnter}
-      onMouseLeave={handleUploadMouseLeave}
-      onMouseDown={() => setIsUploadTooltipVisible(false)}
       onClick={() => setIsUploadTooltipVisible(false)}
     >
       <input
@@ -1005,6 +1019,31 @@ export function OlgaContent() {
                       message: "Image preview failed to load",
                       error: e,
                     });
+                    handleImageError(e);
+                  }}
+                />
+              )
+              : file.name.match(/\.(html)$/i)
+              ? (
+                <iframe
+                  width="100%"
+                  height="100%"
+                  scrolling="no"
+                  loading="lazy"
+                  sandbox="allow-scripts allow-same-origin"
+                  src={URL.createObjectURL(file)}
+                  class={`${PREVIEW_SIZE_CLASSES} object-contain rounded bg-black [image-rendering:pixelated]`}
+                  onError={(e) => {
+                    console.error("iframe error (detailed):", {
+                      error: e,
+                      target: e.target,
+                      src: (e.target as HTMLIFrameElement).src,
+                      contentWindow:
+                        (e.target as HTMLIFrameElement).contentWindow
+                          ? "present"
+                          : "missing",
+                    });
+                    handleImageError(e);
                   }}
                 />
               )
@@ -1038,7 +1077,7 @@ export function OlgaContent() {
         )}
       <div
         class={`${tooltipImage} ${
-          _isUploadTooltipVisible ? "opacity-100" : "opacity-0"
+          isUploadTooltipVisible ? "opacity-100" : "opacity-0"
         }`}
         style={{
           left: `${tooltipPosition.x}px`,
@@ -1262,6 +1301,12 @@ export function OlgaContent() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (isSearching) {
+      setIsSearching(false);
+    }
+  }, [isSearching]);
 
   return (
     <div class={bodyTools}>

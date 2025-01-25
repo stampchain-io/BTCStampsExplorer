@@ -5,6 +5,7 @@ import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 interface StampContentProps {
   stamps: StampRow[];
   isRecentSales?: boolean;
+  fromPage?: string;
   pagination?: {
     page: number;
     totalPages: number;
@@ -17,6 +18,7 @@ export function StampContent({
   stamps,
   isRecentSales = false,
   pagination,
+  fromPage,
 }: StampContentProps) {
   return (
     <div class="w-full pt-3 pb-12 mobileMd:pt-6 mobileMd:pb-[72px]">
@@ -30,6 +32,7 @@ export function StampContent({
             isRecentSale={isRecentSales}
             showDetails={true}
             variant="grey"
+            fromPage={fromPage}
           />
         ))}
       </div>

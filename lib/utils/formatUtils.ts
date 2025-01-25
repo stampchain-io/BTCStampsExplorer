@@ -88,6 +88,11 @@ export function formatDate(
   date: Date,
   options: DateFormatOptions = {},
 ): string {
+  // Check for invalid date
+  if (!date || isNaN(date.getTime())) {
+    return "INVALID";
+  }
+
   const locale = navigator.language || "en-US";
   const formatOptions: Intl.DateTimeFormatOptions = {};
 
@@ -209,4 +214,19 @@ export function formatAmount(value: string): string {
   const [whole, decimal = ""] = value.replace(/^0+/, "").split(".");
   const trimmedDecimal = decimal.replace(/0+$/, "");
   return trimmedDecimal ? `${whole}.${trimmedDecimal}` : whole;
+}
+
+export function decodeBase64(base64String: string) {
+  // Use atob to decode the base64 string to a binary string
+  const binaryString = atob(base64String);
+
+  // Convert the binary string to a Uint8Array
+  const utf8Array = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    utf8Array[i] = binaryString.charCodeAt(i);
+  }
+
+  // Decode the Uint8Array back to a UTF-8 string
+  const decodedText = new TextDecoder().decode(utf8Array);
+  return decodedText;
 }

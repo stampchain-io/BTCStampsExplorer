@@ -94,6 +94,9 @@
     "dayjs": "https://esm.sh/dayjs@1.11.10",
     "dayjs/": "https://esm.sh/dayjs@1.11.10/",
     "djwt/": "https://deno.land/x/djwt@v3.0.2/",
+    "dom": "https://deno.land/x/deno_dom@v0.1.49/deno-dom-wasm.ts",
+    "flatpickr": "https://esm.sh/flatpickr@4.6.13",
+    "flatpickr/": "https://esm.sh/flatpickr@4.6.13/",
     "$fresh/": "https://deno.land/x/fresh@1.7.3/",
     "fresh_charts/": "https://deno.land/x/fresh_charts@0.3.1/",
     "fresh/tests/": "https://deno.land/x/fresh@1.7.6/tests/",
@@ -106,6 +109,7 @@
     "redis": "https://deno.land/x/redis@v0.32.4/mod.ts",
     "swiper/": "https://esm.sh/swiper@11.1.14/",
     "swiper": "https://esm.sh/swiper@11.1.14",
+    "sweetalert2": "https://esm.sh/sweetalert2@11.15.10",
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:tailwindcss@3.4.1/plugin.js",
@@ -120,10 +124,7 @@
     "$lib/": "./lib/",
     "$routes/": "./routes/",
     "$server/": "./server/",
-    "$types/": "./lib/types/",
-    "flatpickr": "https://esm.sh/flatpickr@4.6.13",
-    "flatpickr/": "https://esm.sh/flatpickr@4.6.13/",
-    "dom": "https://deno.land/x/deno_dom/deno-dom-wasm.ts"
+    "$types/": "./lib/types/"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
@@ -137,7 +138,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "fmt": {
-    "include": ["**/*.ts", "**/*.tsx"],
+    "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.json"],
     "exclude": [
       "**/_fresh/**/*",
       "**/server/**/*",

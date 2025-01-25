@@ -20,6 +20,10 @@ function RightPanel(
     showCodeButton: boolean;
   },
 ) {
+  if (stamp.ident === "SRC-20") {
+    return null;
+  }
+
   const url = `https://stampchain.io/stamp/${stamp.stamp}`;
   const text = "Check out what I found @Stampchain";
 
@@ -386,9 +390,11 @@ export function StampImage(
     flag?: boolean;
   },
 ) {
+  const [loading, setLoading] = useState<boolean>(true);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const imgScopeRef = useRef<HTMLDivElement | null>(null);
   const [transform, setTransform] = useState("");
+  const [src, setSrc] = useState("");
 
   const updateTransform = () => {
     if (!imgScopeRef.current) return;
@@ -426,7 +432,19 @@ export function StampImage(
     setIsFullScreenModalOpen(!isFullScreenModalOpen);
   };
 
-  const src = getStampImageSrc(stamp);
+  const fetchStampImage = async () => {
+    setLoading(true);
+    const res = await getStampImageSrc(stamp);
+    if (res) {
+      setSrc(res);
+    } else setSrc(NOT_AVAILABLE_IMAGE);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchStampImage();
+  }, []);
+
   const isHtml = stamp.stamp_mimetype === "text/html";
   const isPlainText = stamp.stamp_mimetype === "text/plain";
   const isAudio = stamp.stamp_mimetype?.startsWith("audio/");
@@ -457,8 +475,8 @@ export function StampImage(
 
   useEffect(() => {
     const validateContent = async () => {
-      if (stamp.stamp_mimetype === "image/svg+xml") {
-        const { isValid } = await validateStampContent(src);
+      if (stamp.stamp_mimetype === "image/svg+xml" && src) {
+        const { isValid, error } = await validateStampContent(src);
         if (isValid) {
           setValidatedContent(
             <div className="stamp-container">
@@ -471,10 +489,24 @@ export function StampImage(
               />
             </div>,
           );
+        } else {
+          logger.debug("ui", {
+            message: "SVG validation failed",
+            error,
+            stamp: stamp.stamp,
+          });
+          setValidatedContent(
+            <div className="stamp-container">
+              <img
+                src={NOT_AVAILABLE_IMAGE}
+                alt="Invalid SVG"
+                className="max-w-none object-contain rounded pixelart stamp-image h-full w-full"
+              />
+            </div>,
+          );
         }
       }
     };
-
     validateContent();
   }, [src, stamp.stamp_mimetype]);
 
@@ -504,6 +536,7 @@ export function StampImage(
         shareTooltipTimeoutRef,
         codeTooltipTimeoutRef,
         fullscreenTooltipTimeoutRef,
+        xTooltipTimeoutRef,
       ].forEach((ref) => {
         if (ref.current !== null) {
           globalThis.clearTimeout(ref.current);
@@ -513,10 +546,6 @@ export function StampImage(
     };
   }, []);
 
-  // Add these state declarations for X button
-  const [_isXTooltipVisible, setIsXTooltipVisible] = useState(false);
-  const [allowXTooltip, setAllowXTooltip] = useState(true);
-  const xButtonRef = useRef<HTMLDivElement>(null);
   const xTooltipTimeoutRef = useRef<number | null>(null);
 
   // Add to cleanup useEffect
@@ -531,40 +560,47 @@ export function StampImage(
     };
   }, []);
 
-  // Add these handler functions
-  const _handleXMouseEnter = () => {
-    if (allowXTooltip) {
-      if (xTooltipTimeoutRef.current) {
-        globalThis.clearTimeout(xTooltipTimeoutRef.current);
-      }
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-      xTooltipTimeoutRef.current = globalThis.setTimeout(() => {
-        const buttonRect = xButtonRef.current?.getBoundingClientRect();
-        if (buttonRect) {
-          setIsXTooltipVisible(true);
-        }
-      }, 1500);
+  const togglePlayback = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
     }
+    setIsPlaying(!isPlaying);
   };
 
-  const _handleXMouseLeave = () => {
-    if (xTooltipTimeoutRef.current) {
-      globalThis.clearTimeout(xTooltipTimeoutRef.current);
-    }
-    setIsXTooltipVisible(false);
-    setAllowXTooltip(true);
+  const handleAudioEnded = () => {
+    setIsPlaying(false);
   };
 
-  // Update shareToX function
-  const _shareToX = () => {
-    const url = `https://stampchain.io/stamp/${stamp.stamp}`;
-    const text = "Check out what I found @Stampchain";
-    const xShareUrl = `https://x.com/intent/post?text=${
-      encodeURIComponent(text)
-    }&url=${encodeURIComponent(url)}`;
-    setIsXTooltipVisible(false);
-    globalThis.open(xShareUrl, "_blank", "noopener,noreferrer");
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-3 mobileMd:gap-6">
+        <div className="relative p-3 mobileMd:p-6 dark-gradient rounded-lg">
+          <div className="stamp-container">
+            <div className="relative z-10 aspect-square animate-pulse">
+              <div class="flex items-center justify-center bg-gray-700 max-w-none object-contain rounded pixelart stamp-image h-full w-full">
+                <svg
+                  class="w-40 h-40 text-gray-600"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 18"
+                >
+                  <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -621,7 +657,7 @@ export function StampImage(
           <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
             <div className="stamp-container">
               <div className="relative aspect-square">
-                <TextContentIsland src={src} className={className} />
+                <TextContentIsland src={src} />
               </div>
             </div>
           </div>
@@ -640,14 +676,39 @@ export function StampImage(
         <div className={`${className} flex flex-col gap-3 mobileMd:gap-6`}>
           <div className="relative dark-gradient rounded-lg p-3 mobileMd:p-6">
             <div className="stamp-container">
-              <div className="stamp-audio-container relative pt-[100%] flex items-center justify-center">
+              <div className="relative pt-[100%] flex items-center justify-center">
                 <audio
-                  controls
-                  className="stamp-audio-player absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  ref={audioRef}
+                  className="hidden"
+                  onEnded={handleAudioEnded}
                 >
                   <source src={src} type={stamp.stamp_mimetype} />
-                  Your browser does not support the audio element.
                 </audio>
+                <button
+                  onClick={togglePlayback}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-stamp-grey-darker hover:text-stamp-grey-light w-[10%] aspect-square"
+                >
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[170%] h-[170%] bg-stamp-grey-darker opacity-30 rounded-full" />
+                  {isPlaying
+                    ? (
+                      <svg
+                        className="w-full h-full"
+                        viewBox="0 0 32 32"
+                        fill="currentColor"
+                      >
+                        <path d="M27 6V26C27 26.5304 26.7893 27.0391 26.4142 27.4142C26.0391 27.7893 25.5304 28 25 28H20C19.4696 28 18.9609 27.7893 18.5858 27.4142C18.2107 27.0391 18 26.5304 18 26V6C18 5.46957 18.2107 4.96086 18.5858 4.58579C18.9609 4.21071 19.4696 4 20 4H25C25.5304 4 26.0391 4.21071 26.4142 4.58579C26.7893 4.96086 27 5.46957 27 6ZM12 4H7C6.46957 4 5.96086 4.21071 5.58579 4.58579C5.21071 4.96086 5 5.46957 5 6V26C5 26.5304 5.21071 27.0391 5.58579 27.4142C5.96086 27.7893 6.46957 28 7 28H12C12.5304 28 13.0391 27.7893 13.4142 27.4142C13.7893 27.0391 14 26.5304 14 26V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4Z" />
+                      </svg>
+                    )
+                    : (
+                      <svg
+                        className="w-full h-full"
+                        viewBox="0 0 32 32"
+                        fill="currentColor"
+                      >
+                        <path d="M30 16C30.0008 16.3395 29.9138 16.6735 29.7473 16.9694C29.5808 17.2654 29.3406 17.5132 29.05 17.6888L11.04 28.7063C10.7364 28.8922 10.3886 28.9937 10.0326 29.0003C9.67661 29.0069 9.32532 28.9183 9.015 28.7438C8.70764 28.5719 8.4516 28.3213 8.2732 28.0177C8.09481 27.7141 8.00051 27.3684 8 27.0163V4.98376C8.00051 4.63162 8.09481 4.28597 8.2732 3.98235C8.4516 3.67874 8.70764 3.42812 9.015 3.25626C9.32532 3.0817 9.67661 2.99314 10.0326 2.99973C10.3886 3.00632 10.7364 3.10783 11.04 3.29376L29.05 14.3113C29.3406 14.4869 29.5808 14.7347 29.7473 15.0306C29.9138 15.3265 30.0008 15.6605 30 16Z" />
+                      </svg>
+                    )}
+                </button>
               </div>
             </div>
           </div>

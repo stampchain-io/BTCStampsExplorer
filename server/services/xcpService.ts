@@ -9,11 +9,11 @@ import { SATS_PER_KB_MULTIPLIER } from "$lib/utils/constants.ts";
 import { logger } from "$lib/utils/logger.ts";
 
 export const xcp_v2_nodes = [
-  {
-    name: "stampchain.io",
-    url:
-      "https://k6e0ufzq8h.execute-api.us-east-1.amazonaws.com/beta/counterpartyproxy/v2",
-  },
+  // {
+  //   name: "stampchain.io",
+  //   url:
+  //     "https://k6e0ufzq8h.execute-api.us-east-1.amazonaws.com/beta/counterpartyproxy/v2",
+  // },
   {
     name: "counterparty.io",
     url: "https://api.counterparty.io:4000/v2",
@@ -44,25 +44,29 @@ export function normalizeFeeRate(params: {
 } {
   let normalizedSatsPerVB: number;
   
-  if (params.satsPerVB !== undefined) {
-    normalizedSatsPerVB = params.satsPerVB;
-  } else if (params.satsPerKB !== undefined) {
-    // If satsPerKB/1000 < 1, assume it was intended as sats/vB
-    normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER 
-      ? params.satsPerKB 
-      : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
-  } else {
-    throw new Error("Either satsPerKB or satsPerVB must be provided");
-  }
+  try {
+    if (params.satsPerVB !== undefined) {
+      normalizedSatsPerVB = params.satsPerVB;
+    } else if (params.satsPerKB !== undefined) {
+      // If satsPerKB/1000 < 1, assume it was intended as sats/vB
+      normalizedSatsPerVB = params.satsPerKB < SATS_PER_KB_MULTIPLIER 
+        ? params.satsPerKB 
+        : params.satsPerKB / SATS_PER_KB_MULTIPLIER;
+    } else {
+      throw new Error("Either satsPerKB or satsPerVB must be provided");
+    }
 
-  if (normalizedSatsPerVB <= 2) {
-    throw new Error("Fee rate must be greater than 2 sat/vB");
-  }
+    if (normalizedSatsPerVB <= 2) {
+      throw new Error("Fee rate must be greater than 2 sat/vB");
+    }
 
-  return {
-    normalizedSatsPerVB,
-    normalizedSatsPerKB: normalizedSatsPerVB * SATS_PER_KB_MULTIPLIER
-  };
+    return {
+      normalizedSatsPerVB,
+      normalizedSatsPerKB: normalizedSatsPerVB * SATS_PER_KB_MULTIPLIER
+    };
+  } catch (error) {
+    throw error.message
+  }
 }
 
 export async function fetchXcpV2WithCache<T>(
@@ -83,9 +87,9 @@ export async function fetchXcpV2WithCache<T>(
   return await dbManager.handleCache(
     cacheKey,
     async () => {
+      let errorMessage = null;
       for (const node of xcp_v2_nodes) {
         const url = `${node.url}${endpoint}?${queryParams.toString()}`;
-        
         await logger.debug("api", {
           message: "Attempting XCP node fetch",
           node: node.name,
@@ -114,6 +118,7 @@ export async function fetchXcpV2WithCache<T>(
               errorBody,
               url
             });
+            errorMessage = errorBody
             continue; // Try the next node
           }
 
@@ -132,6 +137,7 @@ export async function fetchXcpV2WithCache<T>(
             url,
             stack: error.stack
           });
+          errorMessage = error.message
           // Continue to the next node
         }
       }
@@ -140,13 +146,15 @@ export async function fetchXcpV2WithCache<T>(
       await logger.warn("api", {
         message: "All XCP nodes failed, returning minimal data structure",
         endpoint,
-        queryParams: queryParams.toString()
+        queryParams: queryParams.toString(),
+        error: errorMessage
       });
       
       return {
         result: [],
         next_cursor: null,
         result_count: 0,
+        error: errorMessage
       } as T;
     },
     cacheTimeout,

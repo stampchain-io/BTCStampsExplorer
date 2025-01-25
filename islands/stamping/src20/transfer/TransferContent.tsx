@@ -23,8 +23,7 @@ const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 const inputField2col =
   "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-const feeSelectorContainer =
-  "p-3 mobileMd:p-6 dark-gradient rounded-lg z-[10] w-full";
+const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },

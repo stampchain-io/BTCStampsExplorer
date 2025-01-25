@@ -5,11 +5,12 @@ import {
   formatBTCAmount,
   formatDate,
 } from "$lib/utils/formatUtils.ts";
-import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
-import { StampRow } from "$globals";
+import { getSRC101Data, getStampImageSrc } from "$lib/utils/imageUtils.ts";
+import { Src101Detail, StampRow } from "$globals";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { StampListingsOpen } from "$components/stampDetails/StampListingsOpen.tsx";
 import type { Dispenser } from "$components/stampDetails/StampListingsOpen.tsx";
+import { calculateTransactionSize } from "$lib/utils/identifierUtils.ts";
 
 interface StampInfoProps {
   stamp: StampRow;
@@ -23,12 +24,6 @@ interface DimensionsType {
 }
 
 export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
-  console.log("StampInfo received stamp:", {
-    stamp_mimetype: stamp.stamp_mimetype,
-    stamp_url: stamp.stamp_url,
-    full_stamp: stamp,
-  });
-
   const [fee, setFee] = useState<number>(0);
   const handleChangeFee = (newFee: number) => {
     setFee(newFee);
@@ -51,12 +46,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffHours < 24) {
-      // Show relative time for < 24 hours
       const hours = Math.floor(diffHours);
-      return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+      return `${hours} ${hours === 1 ? "HOUR" : "HOURS"} AGO`;
     }
 
-    // Otherwise show numeric date
     return formatDate(date, {
       month: "numeric",
       day: "numeric",
@@ -212,15 +205,18 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     setAllowUnlockedTooltip(true);
   };
 
-  useEffect(() => {
-    if (!stamp?.stamp_mimetype) {
-      console.log("Missing stamp_mimetype:", stamp?.stamp_mimetype);
-      return;
-    }
-
-    if (stamp.stamp_mimetype.startsWith("image/")) {
+  const handleContent = async () => {
+    if (isSrc20Stamp()) {
+      // Calculate size of JSON data for SRC-20 stamps
+      const jsonData = stamp.stamp_base64;
+      const blob = new Blob([jsonData], { type: "application/json" });
+      setFileSize(blob.size);
+    } else if (isSrc101Stamp()) {
+      const res = await calculateTransactionSize(stamp.tx_hash);
+      setFileSize(res);
+    } else if (stamp.stamp_mimetype?.startsWith("image/")) {
       // Handle images
-      const src = getStampImageSrc(stamp);
+      const src = await getStampImageSrc(stamp);
       const img = new Image();
       img.onload = () => {
         setImageDimensions({
@@ -231,28 +227,22 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       };
       img.src = src;
 
-      // Get image size
       fetch(src)
         .then((response) => response.blob())
         .then((blob) => setFileSize(blob.size))
         .catch((error) => console.error("Failed to fetch image size:", error));
     } else if (stamp.stamp_mimetype === "text/html") {
-      // Handle HTML stamps
+      // Handle HTML
       fetch(stamp.stamp_url)
         .then((response) => response.text())
         .then((html) => {
-          // Set HTML file size
           const blob = new Blob([html], { type: "text/html" });
           setFileSize(blob.size);
 
-          // Parse HTML
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, "text/html");
 
-          // Check for viewport meta tag
           const hasViewportMeta = doc.querySelector('meta[name="viewport"]');
-
-          // Check for responsive units in style
           const styleTag = doc.querySelector("style");
           const hasResponsiveUnits = styleTag?.textContent?.includes("vw") ||
             styleTag?.textContent?.includes("vh") ||
@@ -269,7 +259,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             const bodyStyle = doc.body.getAttribute("style");
             const divStyle = doc.querySelector("div")?.getAttribute("style");
 
-            // Parse dimensions from style
             const getDimension = (style: string | null | undefined) => {
               if (!style) return null;
               const widthMatch = style.match(/width:\s*(\d+)(px|rem|em)/);
@@ -284,8 +273,6 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
             const bodyDims = getDimension(bodyStyle);
             const divDims = getDimension(divStyle);
-
-            // Use first available dimensions
             const dims = bodyDims || divDims;
 
             if (dims && dims.width && dims.height) {
@@ -307,8 +294,34 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           console.error("Failed to fetch HTML content:", error);
           setImageDimensions(null);
         });
+    } else if (
+      stamp.stamp_mimetype?.startsWith("video/mpeg") ||
+      stamp.stamp_mimetype?.startsWith("audio/mpeg") ||
+      fileExtension === "MP3" ||
+      fileExtension === "MP4" ||
+      fileExtension === "MPEG"
+    ) {
+      // Handle MPEG files
+      fetch(stamp.stamp_url)
+        .then((response) => {
+          const contentLength = response.headers.get("content-length");
+          if (contentLength) {
+            setFileSize(parseInt(contentLength, 10));
+            return;
+          }
+          return response.blob();
+        })
+        .then((blob) => {
+          if (blob instanceof Blob) {
+            setFileSize(blob.size);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch MPEG size:", error);
+          setFileSize(0);
+        });
     } else if (stamp.stamp_mimetype === "text/plain") {
-      // Add handling for plain text files
+      // Handle plain text files
       fetch(stamp.stamp_url)
         .then((response) => response.text())
         .then((text) => {
@@ -320,7 +333,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       stamp.stamp_mimetype === "text/javascript" ||
       stamp.stamp_mimetype === "application/javascript"
     ) {
-      // Handle JS stamps - now checking for both common JS MIME types
+      // Handle JS stamps
       fetch(stamp.stamp_url)
         .then((response) => response.text())
         .then((js) => {
@@ -337,8 +350,40 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
           setFileSize(blob.size);
         })
         .catch((error) => console.error("Failed to fetch GZIP size:", error));
+    } else if (fileExtension === "BMN") {
+      // Handle BMN files
+      fetch(stamp.stamp_url)
+        .then((response) => {
+          const contentLength = response.headers.get("content-length");
+          if (contentLength) {
+            setFileSize(parseInt(contentLength, 10));
+            return;
+          }
+          return response.text();
+        })
+        .then((content) => {
+          if (typeof content === "string") {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(content);
+            setFileSize(bytes.length);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch BMN size:", error);
+          setFileSize(0);
+        });
+    } else if (!stamp?.stamp_mimetype && fileExtension !== "BMN") {
+      console.log("Missing stamp_mimetype and not BMN:", {
+        stamp_mimetype: stamp?.stamp_mimetype,
+        stamp_url: stamp?.stamp_url,
+      });
+      return;
     }
-  }, [stamp.stamp_mimetype, stamp.stamp_url]);
+  };
+
+  useEffect(() => {
+    handleContent();
+  }, [stamp.stamp_mimetype, stamp.stamp_url, fileExtension]);
 
   // Format file size
   const formatFileSize = (size: number) => {
@@ -353,7 +398,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
   // Format dimensions display
   const getDimensionsDisplay = (dims: DimensionsType | null) => {
     if (stamp.stamp_mimetype === "text/plain") {
-      return "FLUID";
+      return "FIXED";
     }
     if (!dims) return "N/A";
     if (dims.unit === "responsive") return "RESPONSIVE";
@@ -384,7 +429,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     }
   }, [stamp.stamp_mimetype, stamp.stamp_url]);
 
-  // Add this helper function near the top of the component
+  // Helper function to check if it's a POSH stamp (move near top of component)
   const isPoshStamp = (cpid: string) => {
     return !cpid.startsWith("A");
   };
@@ -396,29 +441,38 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     if (titleRef.current) {
       const container = titleRef.current.parentElement;
       if (container) {
-        const containerWidth = container.clientWidth - 48; // Account for padding
+        const containerWidth = container.clientWidth;
+
+        // Set initial content to 50% to allow scaling up
+        titleRef.current.style.width = "50%";
         const contentWidth = titleRef.current.scrollWidth;
-        setScale(Math.min(1, containerWidth / contentWidth));
+
+        // Calculate base scale and limit to original size
+        const baseScale = containerWidth / contentWidth;
+        const maxScale = Math.min(baseScale, 1);
+        setScale(maxScale);
+
+        // Reset width to allow proper scaling
+        titleRef.current.style.width = "";
       }
     }
   };
 
   useEffect(() => {
+    updateScale();
     globalThis.addEventListener("resize", updateScale);
     return () => globalThis.removeEventListener("resize", updateScale);
   }, []);
 
-  // Move the showListings state to be preserved across dispenser data updates
-  const [showListings, setShowListings] = useState(false);
+  // Add another effect to recalculate when stamp data changes
+  useEffect(() => {
+    updateScale();
+  }, [stamp.cpid, stamp.stamp, htmlStampTitle]);
 
-  // Add state for dispensers and page info
+  const [src101, setSrc101] = useState<Src101Detail>({});
+  const [showListings, setShowListings] = useState(false);
   const [dispensers, setDispensers] = useState<any[]>([]);
   const [isLoadingDispensers, setIsLoadingDispensers] = useState(false);
-
-  // Add state for filtered dispensers
-  const [activeDispensers, setActiveDispensers] = useState<any[]>([]);
-
-  // Modify the fetch function to filter active dispensers
   const fetchDispensers = async (page: number) => {
     if (isLoadingDispensers) return;
     setIsLoadingDispensers(true);
@@ -439,22 +493,33 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
       }
 
       const data = await response.json();
+
+      // Simply filter for open status dispensers only
       const openDispensers = data.data.filter((d: any) => d.status === "open");
 
-      setDispensers(data.data);
-      setActiveDispensers(openDispensers);
+      setDispensers(openDispensers);
     } catch (error) {
       console.error("Error fetching dispensers:", error);
       setDispensers([]);
-      setActiveDispensers([]);
     } finally {
       setIsLoadingDispensers(false);
+    }
+  };
+
+  const fetchSRC101 = async () => {
+    try {
+      const res = await getSRC101Data(stamp as StampRow);
+      setSrc101(res);
+    } catch (error) {
+      console.log("Fetch SRC101 Error====>", error.message);
+      setSrc101({});
     }
   };
 
   // Fetch dispensers when expanded
   useEffect(() => {
     fetchDispensers(1);
+    fetchSRC101();
   }, []);
 
   // Add state for selected dispenser
@@ -546,6 +611,71 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
     });
   }, [dispensers]);
 
+  // Add new state for media duration
+  const [mediaDuration, setMediaDuration] = useState<number | null>(null);
+
+  // Modify the format duration helper
+  const formatDuration = (seconds: number): string => {
+    // Less than 10 seconds - show milliseconds
+    if (seconds < 10) {
+      const milliseconds = Math.floor(seconds * 1000);
+      return `${milliseconds} MS`;
+    }
+
+    // 10-59 seconds - show seconds
+    if (seconds < 60) {
+      return `${Math.floor(seconds)} SECONDS`;
+    }
+
+    // 60+ seconds - show MM:SS format
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  // Modify the useEffect to include duration fetching for media files
+  useEffect(() => {
+    if (
+      stamp.stamp_mimetype?.startsWith("video/mpeg") ||
+      stamp.stamp_mimetype?.startsWith("audio/mpeg") ||
+      fileExtension === "MP3" ||
+      fileExtension === "MP4" ||
+      fileExtension === "MPEG"
+    ) {
+      const media = fileExtension === "MP3"
+        ? new Audio()
+        : document.createElement("video");
+      media.src = stamp.stamp_url;
+
+      media.onloadedmetadata = () => {
+        setMediaDuration(media.duration);
+      };
+
+      media.onerror = () => {
+        console.error("Failed to load media duration");
+        setMediaDuration(null);
+      };
+    }
+  }, [stamp.stamp_url, stamp.stamp_mimetype, fileExtension]);
+
+  const isMediaFile = ["MP3", "MP4", "MPEG"].includes(fileExtension);
+
+  const isSrc20Stamp = () => {
+    return stamp.ident === "SRC-20";
+  };
+
+  const isSrc101Stamp = () => {
+    return stamp.ident === "SRC-101";
+  };
+
+  // Effect to handle document title updates
+  useEffect(() => {
+    document.title = `Bitcoin Stamp #${stamp.stamp} - stampchain.io`;
+    return () => {
+      document.title = "stampchain.io";
+    };
+  }, [stamp.stamp]);
+
   return (
     <>
       <StampSearchClient
@@ -565,13 +695,26 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               style={{
                 transform: `scale(${scale})`,
                 transformOrigin: "left",
-                maxWidth: scale === 1 ? "none" : `${(100 / scale)}%`,
+                width: `${(100 / scale)}%`,
                 marginTop: `${-0.2 * (1 / scale - 1)}em`,
                 marginBottom: `${-0.26 * (1 / scale - 1)}em`,
               }}
             >
-              {(isPoshStamp(stamp.cpid) ||
-                  (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
+              {isSrc101Stamp() && src101
+                ? (
+                  <span className="font-light">
+                    {src101?.tokenid?.length && atob(src101?.tokenid[0])}
+                  </span>
+                )
+                : isSrc20Stamp()
+                ? (
+                  <>
+                    <span className="font-light">#</span>
+                    <span className="font-black">{stamp.stamp}</span>
+                  </>
+                )
+                : (isPoshStamp(stamp.cpid) ||
+                    (htmlStampTitle && stamp.stamp_mimetype === "text/html"))
                 ? (
                   <span className="font-black uppercase text-ellipsis overflow-hidden">
                     {isPoshStamp(stamp.cpid) ? stamp.cpid : htmlStampTitle}
@@ -585,9 +728,15 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                 )}
             </p>
 
+            {isSrc20Stamp() && stamp.cpid && (
+              <p className="-mt-1 pb-1 text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
+                {stamp.cpid}
+              </p>
+            )}
+
             <p className="-mt-1.5 text-xl mobileLg:text-2xl font-medium text-stamp-grey-light block">
-              {(isPoshStamp(stamp.cpid) ||
-                (htmlStampTitle && stamp.stamp_mimetype === "text/html")) && (
+              {(!isSrc20Stamp() && (isPoshStamp(stamp.cpid) ||
+                (htmlStampTitle && stamp.stamp_mimetype === "text/html"))) && (
                 <>
                   <span className="font-light">#</span>
                   <span className="font-light">{stamp.stamp}</span>
@@ -595,7 +744,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               )}
             </p>
 
-            {!isPoshStamp(stamp.cpid) && (
+            {(!isPoshStamp(stamp.cpid) && stamp.cpid) && (
               <p className="text-base mobileLg:text-lg font-bold text-stamp-grey-darker block">
                 {stamp.cpid}
               </p>
@@ -618,12 +767,10 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
               <div className="flex flex-col w-full pt-6 mobileLg:pt-12">
                 <div
                   className={`flex w-full gap-3 mobileLg:gap-6 mb-3 mobileLg:mb-6 items-end ${
-                    activeDispensers?.length >= 2
-                      ? "justify-between"
-                      : "justify-end"
+                    dispensers?.length >= 2 ? "justify-between" : "justify-end"
                   }`}
                 >
-                  {activeDispensers?.length >= 2 && (
+                  {dispensers?.length >= 2 && (
                     <button
                       onClick={() => setShowListings(!showListings)}
                       className="pb-1.5"
@@ -657,7 +804,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                   </div>
                 </div>
 
-                {(activeDispensers?.length >= 2)
+                {(dispensers?.length >= 2)
                   ? (
                     showListings && (
                       <div className="w-full mb-3 mobileLg:mb-6">
@@ -665,7 +812,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
                           ? <p>Loading listings...</p>
                           : (
                             <StampListingsOpen
-                              dispensers={activeDispensers}
+                              dispensers={dispensers}
                               floorPrice={typeof stamp.floorPrice === "number"
                                 ? stamp.floorPrice
                                 : 0}
@@ -693,22 +840,52 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
         </div>
 
         <div className="flex flex-col dark-gradient rounded-lg p-3 mobileLg:p-6">
-          <div className="flex flex-col">
-            <p className={dataLabel}>{editionLabel}</p>
-            <p className={dataValueXl}>{editionCount}{" "}</p>
-          </div>
+          {!isSrc20Stamp() && (
+            <div className="flex flex-col pb-3 mobileLg:pb-6">
+              <p className={dataLabel}>{editionLabel}</p>
+              <p className={dataValueXl}>{editionCount}{" "}</p>
+            </div>
+          )}
 
-          <div className="flex flex-row pt-3 mobileLg:pt-6">
+          <div className="flex flex-row">
             <div className={`${dataColumn} flex-1 items-start`}>
               <p className={dataLabelSm}>TYPE</p>
               <p className={dataValueSm}>
-                {fileExtension}
+                {isSrc20Stamp()
+                  ? "SRC-20"
+                  : isSrc101Stamp()
+                  ? "SRC-101"
+                  : fileExtension}
               </p>
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
-              <p className={dataLabelSm}>DIMENSIONS</p>
+              <p className={dataLabelSm}>
+                {(isSrc20Stamp() || isSrc101Stamp())
+                  ? "TRANSACTION"
+                  : isMediaFile
+                  ? "DURATION"
+                  : "DIMENSIONS"}
+              </p>
               <p className={dataValueSm}>
-                {getDimensionsDisplay(imageDimensions)}
+                {isSrc20Stamp()
+                  ? stamp.stamp_base64 &&
+                      JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+                    ? "DEPLOY"
+                    : stamp.stamp_base64 &&
+                        JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+                    ? "MINT"
+                    : "TRANSFER"
+                  : isMediaFile
+                  ? (mediaDuration ? formatDuration(mediaDuration) : "-")
+                  : isSrc101Stamp()
+                  ? stamp.stamp_base64 &&
+                      JSON.parse(atob(stamp.stamp_base64))?.op === "DEPLOY"
+                    ? "SALE"
+                    : stamp.stamp_base64 &&
+                        JSON.parse(atob(stamp.stamp_base64))?.op === "MINT"
+                    ? "REGISTER"
+                    : "TRANSFER"
+                  : getDimensionsDisplay(imageDimensions)}
               </p>
             </div>
             <div className="flex flex-1 justify-end items-end pb-1 space-x-[9px]">
@@ -811,11 +988,13 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
             <div className={`${dataColumn} flex-1 items-start`}>
               <p className={dataLabelSm}>SIZE</p>
               <p className={dataValueSm}>
-                {formatFileSize(fileSize)}
+                {fileSize !== null ? formatFileSize(fileSize) : "N/A"}
               </p>
             </div>
             <div className={`${dataColumn} flex-1 items-center`}>
-              <p className={dataLabelSm}>CREATED</p>
+              <p className={dataLabelSm}>
+                {isSrc20Stamp() ? "SENT" : "CREATED"}
+              </p>
               <p className={dataValueSm}>
                 {createdDate}
               </p>

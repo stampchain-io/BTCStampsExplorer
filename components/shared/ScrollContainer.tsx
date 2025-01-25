@@ -20,14 +20,15 @@ const scrollbarPadding = `
 interface ScrollContainerProps {
   children: preact.ComponentChildren;
   class?: string;
+  onScroll?: (e: Event) => void;
 }
 
 export function ScrollContainer(
-  { children, class: className = "" }: ScrollContainerProps,
+  { children, class: className = "", onScroll }: ScrollContainerProps,
 ) {
   return (
     <>
-      <div class={`overflow-auto ${className}`}>
+      <div class={`overflow-auto ${className}`} onScroll={onScroll}>
         {children}
       </div>
       <script dangerouslySetInnerHTML={{ __html: scrollbarPadding }} />

@@ -19,11 +19,6 @@ export function MetaTags({
       <meta name="keywords" content="Bitcoin, Stamps, UTXO, Art, Blockchain" />
       <meta name="author" content="Stampchain.io" />
 
-      {/* Stylesheets */}
-      <link rel="stylesheet" href="/carousel.css" />
-      <link rel="stylesheet" href="/styles.css" />
-      <link rel="stylesheet" href="/gradients.css" />
-
       {/* Icons */}
       <link rel="icon" type="image/jpeg" href="/img/icon.jpg" sizes="any" />
       <link rel="apple-touch-icon" href="/img/icon.jpg" />
