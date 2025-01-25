@@ -1,6 +1,6 @@
 // Container styles
-export const walletDataContainer =
-  "flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-3 mobileMd:gap-6";
+export const backgroundContainer =
+  "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
 
 // Data column and layout styles
 export const dataColumn = "flex flex-col -space-y-1";
