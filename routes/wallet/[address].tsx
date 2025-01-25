@@ -65,6 +65,7 @@ export const handler: Handlers = {
         dispensersResponse,
         stampsCreatedCount,
         marketDataResponse,
+        src101Response,
       ] = await Promise.allSettled([
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
@@ -102,6 +103,40 @@ export const handler: Handlers = {
 
         StampController.getStampsCreatedCount(address),
         SRC20MarketService.fetchMarketListingSummary(),
+        fetch(
+          `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=0`,
+        ).then(async (res) => {
+          if (!res.ok) {
+            console.error("SRC101 fetch failed:", res.status, res.statusText);
+            return null;
+          }
+          const data = await res.json();
+          console.log("Raw SRC-101 Response:", data);
+
+          // If we have pagination info and there's more data, fetch the rest
+          if (data.pagination?.total > 100) {
+            const remainingPages = Math.ceil(data.pagination.total / 100) - 1;
+            const additionalRequests = Array.from(
+              { length: remainingPages },
+              (_, i) =>
+                fetch(
+                  `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=${
+                    (i + 1) * 100
+                  }`,
+                )
+                  .then((r) => r.json()),
+            );
+
+            const additionalData = await Promise.all(additionalRequests);
+            // Combine all data
+            data.data = [
+              ...data.data,
+              ...additionalData.flatMap((d) => d.data || []),
+            ];
+          }
+
+          return data;
+        }),
       ]);
 
       // Process responses and handle errors
@@ -168,6 +203,19 @@ export const handler: Handlers = {
         d.give_remaining === 0
       );
 
+      // Process SRC-101 response to get all BitNames
+      const src101Data =
+        src101Response.status === "fulfilled" && src101Response.value
+          ? {
+            names: (src101Response.value.data || [])
+              .filter((item: any) => item?.tokenid_utf8)
+              .map((item: any) => item.tokenid_utf8),
+            total: src101Response.value.last_block || 0,
+          }
+          : { names: [], total: 0 };
+
+      console.log("Final Processed SRC-101 Data:", src101Data);
+
       // Build wallet data
       const walletData = {
         balance: btcInfo?.balance ?? 0,
@@ -186,7 +234,9 @@ export const handler: Handlers = {
           total: allDispensers.length,
           items: dispensersData.data,
         },
+        src101: src101Data,
       };
+      console.log("Final Wallet Data:", walletData);
 
       return ctx.render({
         data: {
@@ -264,6 +314,7 @@ export const handler: Handlers = {
             total: 0,
             items: [],
           },
+          src101: { names: [], total: 0 },
         },
         stampsTotal: 0,
         src20Total: 0,

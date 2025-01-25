@@ -94,6 +94,10 @@ export interface WalletOverviewInfo {
   };
   stampValue: number;
   src20Value: number;
+  src101?: {
+    names: string[];
+    total: number;
+  };
 }
 
 // Extended interface for wallet data that includes dispenser stats

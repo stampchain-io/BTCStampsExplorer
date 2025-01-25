@@ -38,7 +38,7 @@ export default function WalletProfileDetails({
     <div class="flex flex-col gap-3 mobileMd:gap-6">
       <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
         <div class="flex flex-col w-full tablet:w-1/2 dark-gradient rounded-lg p-3 mobileMd:p-6">
-          <div class="flex pb-[3px] mobileLg:pb-1.5">
+          <div class="flex pb-1.5 mobileLg:pb-3">
             <p class={titleGreyDL}>ANONYMOUS</p>
           </div>
           <WalletOverview walletData={walletData} />
@@ -113,6 +113,15 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
     }
   };
 
+  console.log("WalletOverview - Full Wallet Data:", walletData);
+  console.log("WalletOverview - SRC101 Data:", walletData.src101);
+
+  const bitNames = Array.isArray(walletData.src101?.names)
+    ? walletData.src101.names.filter((name): name is string =>
+      typeof name === "string"
+    )
+    : [];
+
   return (
     <div class="flex flex-col">
       <div class="flex gap-3 mobileMd:gap-6">
@@ -160,13 +169,26 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
         </div>
       </div>
 
-      <div className="flex justify-between pt-1.5 mobileLg:pt-3">
-        <p class="text-stamp-grey font-light text-base mobileLg:text-lg">
-          anonymous.btc
-        </p>
-        <p class="text-stamp-grey-darker font-medium text-sm mobileLg:text-base">
-          website // X
-        </p>
+      <div className="flex pt-1.5 mobileLg:pt-3">
+        {bitNames.length > 0
+          ? (
+            <div class="flex flex-col">
+              {bitNames.map((name) => (
+                <p
+                  key={name}
+                  class="text-stamp-grey font-light text-lg mobileLg:text-xl tracking-[0.05em]"
+                >
+                  {name}
+                  <span class="font-light">.btc</span>
+                </p>
+              ))}
+            </div>
+          )
+          : (
+            <p class="text-stamp-grey-darker font-light text-sm mobileLg:text-base">
+              NO BITNAMES
+            </p>
+          )}
       </div>
 
       <div class="flex justify-end pt-3 mobileLg:pt-6">
