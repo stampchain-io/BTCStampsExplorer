@@ -234,81 +234,184 @@ function StatTitle({ label, value, align = "left" }: StatTitleProps) {
   );
 }
 
-function WalletStats({
-  stampsTotal,
-  src20Total,
-  stampsCreated,
-  setShowItem,
-  walletData,
-}: {
-  stampsTotal: number;
-  src20Total: number;
-  stampsCreated: number;
-  setShowItem: (type: string) => void;
-  walletData: WalletOverviewInfo;
-}) {
+function WalletStats(
+  {
+    stampsTotal,
+    src20Total,
+    stampsCreated,
+    setShowItem = () => {},
+    stampValue = 0,
+    src20Value = 0,
+    walletData,
+  }: {
+    stampsTotal: number;
+    src20Total: number;
+    stampsCreated: number;
+    setShowItem?: (type: string) => void;
+    stampValue?: number;
+    src20Value?: number;
+    walletData: WalletOverviewInfo;
+  },
+) {
+  const handleType = (type: string) => {
+    setShowItem(type);
+  };
+
   return (
-    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <TokenStats
-        src20Total={src20Total}
-        setShowItem={setShowItem}
-      />
+    <div class="flex flex-col mobileMd:flex-row w-full gap-3 mobileMd:gap-6">
       <StampStats
         stampsTotal={stampsTotal}
         stampsCreated={stampsCreated}
-        setShowItem={setShowItem}
+        handleType={handleType}
+        stampValue={stampValue}
+        dispensers={walletData.dispensers || { open: 0, closed: 0, total: 0 }}
+      />
+      <TokenStats
+        src20Total={src20Total}
+        handleType={handleType}
+        src20Value={src20Value}
+        walletData={walletData}
       />
     </div>
   );
 }
 
-function TokenStats({
-  src20Total,
-  setShowItem,
-}: {
-  src20Total: number;
-  setShowItem: (type: string) => void;
-}) {
+function StampStats(
+  { stampsTotal, stampsCreated, handleType, stampValue = 0, dispensers }: {
+    stampsTotal: number;
+    stampsCreated: number;
+    handleType: (type: string) => void;
+    stampValue?: number;
+    dispensers: { open: number; closed: number; total: number };
+  },
+) {
   return (
     <div
-      class={`${walletDataContainer} cursor-pointer hover:bg-[#ffffff05]`}
-      onClick={() => setShowItem("src20")}
+      className={walletDataContainer}
+      onClick={() => handleType("stamp")}
     >
-      <StatTitle
-        label="TOKENS"
-        value={src20Total.toString()}
-      />
+      <div className="flex">
+        <StatTitle label="STAMPS" value={stampsTotal.toString()} />
+      </div>
+      <div className="flex justify-between">
+        <StatItem
+          label="CREATED"
+          value={stampsCreated.toString()}
+        />
+        <StatItem
+          label="COLLECTIONS"
+          value="N/A"
+          align="right"
+        />
+      </div>
+      <div className="flex justify-between">
+        <StatItem label="LISTINGS" value={dispensers.open.toString()} />
+        <StatItem
+          label="VALUE"
+          value={
+            <>
+              {stampValue > 0 ? stampValue.toFixed(8) : "N/A"}{" "}
+              <span className="font-light">BTC</span>
+            </>
+          }
+          align="right"
+        />
+      </div>
     </div>
   );
 }
 
-function StampStats({
-  stampsTotal,
-  stampsCreated,
-  setShowItem,
-}: {
-  stampsTotal: number;
-  stampsCreated: number;
-  setShowItem: (type: string) => void;
-}) {
+function TokenStats(
+  { src20Total, handleType, src20Value = 0, walletData }: {
+    src20Total: number;
+    handleType: (type: string) => void;
+    src20Value?: number;
+    walletData: WalletOverviewInfo;
+  },
+) {
+  const totalValue = src20Value || 0;
+
   return (
     <div
-      class={`${walletDataContainer} cursor-pointer hover:bg-[#ffffff05]`}
-      onClick={() => setShowItem("stamps")}
+      className={walletDataContainer}
+      onClick={() => handleType("token")}
     >
-      <StatTitle
-        label="STAMPS"
-        value={stampsTotal.toString()}
-      />
-      {stampsCreated > 0 && (
-        <div class="flex justify-end">
-          <StatItem
-            label="CREATED"
-            value={stampsCreated.toString()}
-            align="right"
-          />
-        </div>
-      )}
+      <div className="flex justify-between">
+        <StatTitle label="TOKENS" value={src20Total?.toString()} />
+        <StatItem
+          label={`${walletData.usdValue.toFixed(2)} USD`}
+          value={
+            <>
+              {walletData.balance} <span class="font-light">BTC</span>
+            </>
+          }
+          align="right"
+          class="self-end"
+        />
+      </div>
+
+      <div className="flex justify-between">
+        <StatItem
+          label="TOP HOLDINGS"
+          value={
+            <>
+              XCP<br />
+              STAMP<br />
+              KEVIN
+            </>
+          }
+        />
+        <StatItem
+          label="AMOUNT"
+          value={
+            <>
+              23.12<br />
+              100,000<br />
+              700,000
+            </>
+          }
+          align="center"
+          class="hidden tablet:block"
+        />
+        <StatItem
+          label="AMOUNT"
+          value={
+            <>
+              23.12<br />
+              100,000<br />
+              700,000
+            </>
+          }
+          align="right"
+          class="block tablet:hidden"
+        />
+        <StatItem
+          label="VALUE"
+          value={
+            <>
+              234.34 USD<br />
+              5,886.98 USD<br />
+              532.39 USD
+            </>
+          }
+          align="right"
+          class="hidden tablet:block"
+        />
+      </div>
+
+      <div className="flex justify-between">
+        <StatItem label="24H CHANGE" value="+/- 0.00%" />
+        <StatItem
+          label="TOTAL VALUE"
+          value={
+            <>
+              {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
+              <span className="font-light">BTC</span>
+            </>
+          }
+          align="right"
+        />
+      </div>
     </div>
   );
 }
