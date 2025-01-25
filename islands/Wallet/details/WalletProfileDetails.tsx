@@ -23,32 +23,47 @@ interface WalletProfileDetailsProps {
   setShowItem: (type: string) => void;
 }
 
-export default function WalletProfileDetails({
-  walletData,
-  stampsTotal,
-  src20Total,
-  stampsCreated,
-  setShowItem,
-}: WalletProfileDetailsProps) {
+interface StatItemProps {
+  label: string;
+  value: string | ComponentChildren;
+  align?: AlignmentType;
+  class?: string;
+}
+
+function StatItem(
+  { label, value, align = "left", class: customClass }: StatItemProps,
+) {
+  const alignmentClass = alignmentClasses[align];
+
   return (
-    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-      <div
-        className={`${backgroundContainer} h-fit w-full mobileLg:w-1/2 desktop:w-2/3`}
-      >
-        <div class="flex pb-1.5 mobileLg:pb-3">
-          <p class={titleGreyDL}>ANONYMOUS</p>
-        </div>
-        <WalletOverview walletData={walletData} />
-      </div>
-      <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-1/3">
-        <WalletStats
-          stampsTotal={stampsTotal}
-          src20Total={src20Total}
-          stampsCreated={stampsCreated}
-          setShowItem={setShowItem}
-          walletData={walletData}
-        />
-      </div>
+    <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
+      <p class={`${dataLabelSm} ${alignmentClass}`}>
+        {label}
+      </p>
+      <p class={`${dataValueSm} ${alignmentClass}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+interface StatTitleProps {
+  label: string | ComponentChildren;
+  value: string | ComponentChildren;
+  align?: "left" | "center" | "right";
+}
+
+function StatTitle({ label, value, align = "left" }: StatTitleProps) {
+  const alignmentClass = alignmentClasses[align];
+
+  return (
+    <div class="flex flex-col -space-y-1">
+      <p class={`${dataLabel} ${alignmentClass}`}>
+        {label}
+      </p>
+      <p class={`${dataValueXl} ${alignmentClass}`}>
+        {value}
+      </p>
     </div>
   );
 }
@@ -125,12 +140,17 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
       <div class="flex gap-3 mobileMd:gap-6">
         <div class="flex">
           <p
-            class={`${subTitleGrey} hidden mobileMd:block mobileLg:hidden desktop:block`}
+            class={`${subTitleGrey} hidden mobileMd:block mobileLg:hidden tablet:block`}
           >
             {walletData.address}
           </p>
           <p
-            class={`${subTitleGrey} block mobileMd:hidden mobileLg:block desktop:hidden`}
+            class={`${subTitleGrey} hidden mobileLg:block tablet:hidden`}
+          >
+            {abbreviateAddress(walletData.address, 10)}
+          </p>
+          <p
+            class={`${subTitleGrey} block mobileMd:hidden`}
           >
             {abbreviateAddress(walletData.address, 14)}
           </p>
@@ -209,47 +229,68 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
   );
 }
 
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: AlignmentType;
-  class?: string;
-}
-
-function StatItem(
-  { label, value, align = "left", class: customClass }: StatItemProps,
+function TokenStats(
+  { src20Total, handleType, src20Value = 0, _walletData }: {
+    src20Total: number;
+    handleType: (type: string) => void;
+    src20Value?: number;
+    walletData: WalletOverviewInfo;
+  },
 ) {
-  const alignmentClass = alignmentClasses[align];
+  const totalValue = src20Value || 0;
 
   return (
-    <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
-      <p class={`${dataLabelSm} ${alignmentClass}`}>
-        {label}
-      </p>
-      <p class={`${dataValueSm} ${alignmentClass}`}>
-        {value}
-      </p>
+    <div
+      className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}
+      onClick={() => handleType("token")}
+    >
+      <div className="flex pb-1.5 mobileLg:pb-3">
+        <StatTitle
+          label="TOKENS"
+          value={src20Total?.toString()}
+        />
+      </div>
+
+      <div className="flex justify-between">
+        <StatItem
+          label="TOTAL VALUE"
+          value={
+            <>
+              {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
+              <span className="font-light">BTC</span>
+            </>
+          }
+        />
+        <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
+      </div>
     </div>
   );
 }
 
-interface StatTitleProps {
-  label: string | ComponentChildren;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-}
-
-function StatTitle({ label, value, align = "left" }: StatTitleProps) {
-  const alignmentClass = alignmentClasses[align];
-
+function StampStats(
+  { stampsTotal, _stampsCreated, handleType, _stampValue = 0, _dispensers }: {
+    stampsTotal: number;
+    stampsCreated: number;
+    handleType: (type: string) => void;
+    stampValue?: number;
+    dispensers: { open: number; closed: number; total: number };
+  },
+) {
   return (
-    <div class="flex flex-col -space-y-1">
-      <p class={`${dataLabel} ${alignmentClass}`}>
-        {label}
-      </p>
-      <p class={`${dataValueXl} ${alignmentClass}`}>
-        {value}
-      </p>
+    <div
+      className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}
+      onClick={() => handleType("stamp")}
+    >
+      <div className="flex pb-1.5 mobileLg:pb-3">
+        <StatTitle
+          label="STAMPS"
+          value={stampsTotal.toString()}
+        />
+      </div>
+      <div className="flex justify-between">
+        <StatItem label="CREATED" value="N/A" />
+        <StatItem label="LISTINGS" value="N/A" align="right" />
+      </div>
     </div>
   );
 }
@@ -278,88 +319,53 @@ function WalletStats(
   };
 
   return (
-    <div class="flex flex-col gap-3 mobileMd:gap-6">
-      <TokenStats
-        src20Total={src20Total}
-        handleType={handleType}
-        src20Value={src20Value}
-        walletData={walletData}
-      />
-      <StampStats
-        stampsTotal={stampsTotal}
-        stampsCreated={stampsCreated}
-        handleType={handleType}
-        stampValue={stampValue}
-        dispensers={walletData.dispensers || { open: 0, closed: 0, total: 0 }}
-      />
-    </div>
-  );
-}
-
-function TokenStats(
-  { src20Total, handleType, src20Value = 0, walletData }: {
-    src20Total: number;
-    handleType: (type: string) => void;
-    src20Value?: number;
-    walletData: WalletOverviewInfo;
-  },
-) {
-  const totalValue = src20Value || 0;
-
-  return (
-    <div
-      className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}
-      onClick={() => handleType("token")}
-    >
-      <div className="flex justify-end pb-1.5 mobileLg:pb-3">
-        <StatTitle
-          label="TOKENS"
-          value={src20Total?.toString()}
-          align="right"
+    <div class="flex flex-col w-full mobileMd:flex-row tablet:flex-col gap-3 mobileMd:gap-6">
+      <div class="w-full mobileMd:w-1/2 tablet:w-full">
+        <TokenStats
+          src20Total={src20Total}
+          handleType={handleType}
+          src20Value={src20Value}
+          walletData={walletData}
         />
       </div>
-
-      <div className="flex justify-between">
-        <StatItem label="24H CHANGE" value="+/- 0.00%" align="right" />
-        <StatItem
-          label="TOTAL VALUE"
-          value={
-            <>
-              {totalValue > 0 ? totalValue.toFixed(8) : "N/A"}{" "}
-              <span className="font-light">BTC</span>
-            </>
-          }
-          align="right"
+      <div class="w-full mobileMd:w-1/2 tablet:w-full">
+        <StampStats
+          stampsTotal={stampsTotal}
+          stampsCreated={stampsCreated}
+          handleType={handleType}
+          stampValue={stampValue}
+          dispensers={walletData.dispensers || { open: 0, closed: 0, total: 0 }}
         />
       </div>
     </div>
   );
 }
 
-function StampStats(
-  { stampsTotal, stampsCreated, handleType, stampValue = 0, dispensers }: {
-    stampsTotal: number;
-    stampsCreated: number;
-    handleType: (type: string) => void;
-    stampValue?: number;
-    dispensers: { open: number; closed: number; total: number };
-  },
-) {
+export default function WalletProfileDetails({
+  walletData,
+  stampsTotal,
+  src20Total,
+  stampsCreated,
+  setShowItem,
+}: WalletProfileDetailsProps) {
   return (
-    <div
-      className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}
-      onClick={() => handleType("stamp")}
-    >
-      <div className="flex justify-end pb-1.5 mobileLg:pb-3">
-        <StatTitle
-          label="STAMPS"
-          value={stampsTotal.toString()}
-          align="right"
-        />
+    <div class="flex flex-col tablet:flex-row gap-3 mobileMd:gap-6">
+      <div
+        className={`${backgroundContainer} h-fit w-full tablet:w-2/3`}
+      >
+        <div class="flex pb-1.5 mobileLg:pb-3">
+          <p class={titleGreyDL}>ANONYMOUS</p>
+        </div>
+        <WalletOverview walletData={walletData} />
       </div>
-      <div className="flex justify-between">
-        <StatItem label="LISTINGS" value="N/A" align="right" />
-        <StatItem label="CREATED" value="N/A" align="right" />
+      <div class="flex flex-col w-full tablet:w-1/3">
+        <WalletStats
+          stampsTotal={stampsTotal}
+          src20Total={src20Total}
+          stampsCreated={stampsCreated}
+          setShowItem={setShowItem}
+          walletData={walletData}
+        />
       </div>
     </div>
   );
