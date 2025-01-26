@@ -13,6 +13,8 @@ import * as msgpack from "msgpack";
 import { estimateTransactionSize } from "$lib/utils/minting/transactionSizes.ts";
 import { QuicknodeService } from "$server/services/quicknode/quicknodeService.ts";
 
+bitcoin.initEccLib(ecc);
+
 export class SRC101MultisigPSBTService {
   private static readonly RECIPIENT_DUST = 789;
   private static readonly MULTISIG_DUST = 809;
