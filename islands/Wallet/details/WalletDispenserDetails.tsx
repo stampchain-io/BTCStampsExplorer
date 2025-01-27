@@ -19,6 +19,7 @@ import {
 } from "$components/shared/WalletStyles.ts";
 import { StampRow } from "$globals";
 import StampBuyModal from "$islands/stamp/details/StampBuyModal.tsx";
+import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
 
 interface WalletDispenserDetailsProps {
   walletData: WalletOverviewInfo;
@@ -26,96 +27,6 @@ interface WalletDispenserDetailsProps {
   src20Total: number;
   stampsCreated: number;
   setShowItem: (type: string) => void;
-}
-
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: AlignmentType;
-  class?: string;
-  href?: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-}
-
-function StatItem({
-  label,
-  value,
-  align = "left",
-  class: customClass,
-  href,
-  target = "_self",
-}: StatItemProps) {
-  const alignmentClass = alignmentClasses[align];
-  const content = (
-    <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
-      <p
-        class={`${dataLabelSm} ${alignmentClass}`}
-      >
-        {label}
-      </p>
-      <p
-        class={`${dataValueSm} ${alignmentClass} group-hover:text-stamp-purple-bright`}
-      >
-        {value}
-      </p>
-    </div>
-  );
-
-  return href
-    ? (
-      <a
-        href={href}
-        target={target}
-        class="group"
-      >
-        {content}
-      </a>
-    )
-    : content;
-}
-
-interface StatTitleProps {
-  label: string | ComponentChildren;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-  href?: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-}
-
-function StatTitle({
-  label,
-  value,
-  align = "left",
-  href,
-  target = "_self",
-}: StatTitleProps) {
-  const alignmentClass = alignmentClasses[align];
-  const content = (
-    <div class="flex flex-col -space-y-1">
-      <p
-        class={`${dataLabel} ${alignmentClass}`}
-      >
-        {label}
-      </p>
-      <p
-        class={`${dataValueXl} ${alignmentClass} group-hover:text-stamp-purple-bright`}
-      >
-        {value}
-      </p>
-    </div>
-  );
-
-  return href
-    ? (
-      <a
-        href={href}
-        target={target}
-        class="group"
-      >
-        {content}
-      </a>
-    )
-    : content;
 }
 
 function StampStats({
@@ -391,9 +302,9 @@ function DispenserStats({
   };
 
   return (
-    <div class="flex flex-col gap-1.5 mobileLg:gap-3 pt-3 mobileLg:pt-6">
+    <div className="flex flex-col gap-1.5 mobileLg:gap-3 pt-3 mobileLg:pt-6">
       {/* Open / close */}
-      <div class="flex justify-between">
+      <div className="flex justify-between">
         <StatItem
           label="OPENED"
           value={firstDispenser?.block_index
@@ -410,7 +321,7 @@ function DispenserStats({
         />
       </div>
       {/* Dispenser Stats / price display */}
-      <div class="flex justify-between">
+      <div className="flex justify-between">
         <StatItem
           label="ESCROW"
           value={
@@ -467,7 +378,7 @@ function DispenserStats({
       {/* Buy Button and Modal */}
       {firstDispenser?.give_remaining > 0 && (
         <>
-          <div class="flex justify-end pt-1.5">
+          <div className="flex justify-end pt-1.5">
             <button
               class={buttonPurpleFlat}
               onClick={handleOpenBuyModal}
