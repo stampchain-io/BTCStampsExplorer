@@ -4,20 +4,24 @@ import {
   SUBPROTOCOLS,
 } from "$globals";
 
-export const filterOptions: Record<STAMP_FILTER_TYPES, {
-  suffixFilters: STAMP_SUFFIX_FILTERS[];
-  ident: SUBPROTOCOLS[];
-}> = {
+export const filterOptions = {
   "vector": {
-    suffixFilters: ["svg", "html"],
-    ident: ["STAMP"],
+    suffixFilters: ["svg" as const, "html" as const],
+    ident: ["STAMP" as const],
   },
   "pixel": {
-    suffixFilters: ["gif", "jpg", "png", "webp", "bmp", "jpeg"],
-    ident: ["STAMP", "SRC-721"],
+    suffixFilters: [
+      "gif" as const,
+      "jpg" as const,
+      "png" as const,
+      "webp" as const,
+      "bmp" as const,
+      "jpeg" as const,
+    ],
+    ident: ["STAMP" as const, "SRC-721" as const],
   },
   "recursive": {
-    suffixFilters: ["svg", "html"],
-    ident: ["SRC-721"],
+    suffixFilters: ["svg" as const, "html" as const],
+    ident: ["SRC-721" as const],
   },
 };

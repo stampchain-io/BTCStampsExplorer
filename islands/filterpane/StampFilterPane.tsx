@@ -1,6 +1,15 @@
 import { useRef, useState } from "preact/hooks";
 // import { ChevronDown, ChevronUp, Search, Sliders, X } from "lucide-react";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
+import {
+  PaginatedStampBalanceResponseBody,
+  ProcessedHolder,
+  STAMP_FILTER_TYPES,
+  STAMP_SUFFIX_FILTERS,
+  STAMP_TYPES,
+  StampRow,
+} from "$globals";
+import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
 const ChevronUp = () => (
   <svg
@@ -132,11 +141,17 @@ const defaultFilters = {
     svg: false,
     pixel: false,
     gif: false,
+    jpg: false,
+    png: false,
+    webp: false,
+    bmp: false,
+    jpeg: false,
     html: false,
     olga: false,
     src721: false,
     src101: false,
   },
+  stampRangePreset: 10000,
   stampRange: {
     min: "",
     max: "",
@@ -154,34 +169,121 @@ export function filtersToQueryParams(
 ) {
   const queryParams = new URLSearchParams(search);
   Object.entries(filters).forEach(([category, value]) => {
-    if (typeof value === "object") {
+    if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
         const strVal = val.toString();
-        console.log(key, strVal);
         if (typeof val === "boolean") {
           if (strVal !== "false") {
-            queryParams.append(`${category}[${key}]`, strVal);
+            if (queryParams.has(`${category}[${key}]`)) {
+              queryParams.set(`${category}[${key}]`, strVal);
+            } else {
+              queryParams.append(`${category}[${key}]`, strVal);
+            }
+          } else {
+            if (queryParams.has(`${category}[${key}]`)) {
+              queryParams.delete(`${category}[${key}]`);
+            }
           }
         } else if (val !== "") {
-          queryParams.append(`${category}[${key}]`, strVal);
+          queryParams.set(`${category}[${key}]`, strVal);
         }
       });
     } else {
+      if (value === null) {
+        // continue on nulls
+        return;
+      }
       const strVal = value.toString();
       if (typeof value === "boolean" && strVal !== "false") {
-        queryParams.append(category, value.toString());
-      }
-      if (strVal !== "") {
-        queryParams.append(category, strVal);
+        queryParams.set(category, strVal);
+      } else if (typeof value === "number") {
+        queryParams.set(category, String(value));
+      } else {
+        queryParams.set(category, strVal);
       }
     }
   });
   return queryParams.toString();
 }
 
-function filtersToServicePayload(filters: typeof defaultFilters) {
+export function filtersToServicePayload(filters: typeof defaultFilters) {
+  // "pixel"
+  // "vector"
+  // "for sale"
+  // "trending sales"
+  // "sold"
+  const filterPayload = {
+    vector: {
+      suffixFilters: [] as Partial<
+        typeof filterOptions["vector"]["suffixFilters"]
+      >,
+      ident: ["STAMP"],
+    },
+    pixel: {
+      suffixFilters: [] as Partial<
+        typeof filterOptions["pixel"]["suffixFilters"]
+      >,
+      ident: ["STAMP, SRC-721"],
+    },
+    recursive: {
+      suffixFilters: [] as Partial<
+        typeof filterOptions["recursive"]["suffixFilters"]
+      >,
+      ident: ["SRC-721"],
+    },
+  };
+
+  if (filters.fileType.svg) {
+    filterPayload.vector.suffixFilters.push("svg");
+    filterPayload.recursive.suffixFilters.push("svg");
+  }
+
+  if (filters.fileType.gif) {
+    filterPayload.pixel.suffixFilters.push("gif");
+  }
+
+  if (filters.fileType.html) {
+    filterPayload.vector.suffixFilters.push("html");
+    filterPayload.recursive.suffixFilters.push("html");
+  }
+
+  // if (filters.fileType.olga) {
+  //   filterPayload.pixel.suffixFilters.push("olga");
+  // }
+
+  // if (filters.fileType.src721) {
+  //   filterPayload.pixel.suffixFilters.push("src721");
+  //   filterPayload.recursive.suffixFilters.push("src721");
+  // }
+
+  // if (filters.fileType.src101) {
+  //   filterPayload.pixel.suffixFilters.push("src101");
+  // }
+
   return {};
 }
+
+// export function queryParamsToServicePayload(query: URLSearchParams): {
+//   filterBy: STAMP_FILTER_TYPES[];
+// } {
+//   return {
+//     filterBy: [],
+//   };
+// }
+
+export const allQueryKeysFromFilters = Object.keys(defaultFilters).reduce(
+  (acc, key) => {
+    if (typeof defaultFilters[key] === "object") {
+      Object.keys(defaultFilters[key]).forEach((subKey) => {
+        acc.push(`${key}[${subKey}]`);
+      });
+    } else {
+      acc.push(key);
+    }
+    return acc;
+  },
+  [],
+);
 
 export function queryParamsToFilters(query: string) {
   const params = new URLSearchParams(query);
@@ -194,24 +296,31 @@ export function queryParamsToFilters(query: string) {
           const value = params.get(`${category}[${key}]`);
           if (value !== null) {
             if (!filtersPartial[category]) {
-              filtersPartial[category] = {};
+              filtersPartial[category] = { ...defaultFilters[category] };
             }
-            filtersPartial[category][key] = value;
+            const coercedValue =
+              typeof defaultFilters[category][key] === "boolean"
+                ? JSON.parse(value)
+                : typeof defaultFilters[category][key] === "number"
+                ? parseInt(value)
+                : value;
+            filtersPartial[category][key] = coercedValue;
           }
         });
       } else {
         const value = params.get(category);
         if (value !== null) {
-          filtersPartial[category] = value;
+          const coercedValue = typeof defaultFilters[category] === "boolean"
+            ? JSON.parse(value)
+            : typeof defaultFilters[category] === "number"
+            ? parseInt(value)
+            : value;
+          filtersPartial[category] = coercedValue;
         }
       }
     }
   });
-
-  return {
-    ...defaultFilters,
-    ...filtersPartial,
-  };
+  return { ...defaultFilters, ...filtersPartial };
 }
 
 export function queryParamsToServicePayload(query: string) {
@@ -227,7 +336,6 @@ export const StampFilters = (
     onClose,
   },
 ) => {
-  console.log(onFilterChange, initialFilters);
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState({
     buyNow: true,
@@ -238,7 +346,6 @@ export const StampFilters = (
   });
   const debouncedOnFilterChange = useDebouncedCallback(
     (str) => {
-      console.log("hello");
       globalThis.location.href = globalThis.location.pathname + "?" +
         str;
     },
@@ -258,12 +365,18 @@ export const StampFilters = (
     debouncedOnFilterChange?.(
       filtersToQueryParams(globalThis.location.search, newFilters),
     );
-    console.log(filtersToQueryParams(globalThis.location.search, newFilters));
   };
 
   const clearAllFilters = () => {
     setFilters(defaultFilters);
-    onFilterChange(defaultFilters);
+    // onFilterChange(defaultFilters);
+    const queryParams = new URLSearchParams(globalThis.location.search);
+    allQueryKeysFromFilters.forEach((key) => {
+      queryParams.delete(key);
+    });
+    debouncedOnFilterChange?.(
+      queryParams.toString(),
+    );
   };
 
   const toggleSection = (section) => {
@@ -374,6 +487,11 @@ export const StampFilters = (
           "Pixel": "pixel",
           "GIF": "gif",
           "HTML": "html",
+          "JPG": "jpg",
+          "PNG": "png",
+          "WEBP": "webp",
+          "BMP": "bmp",
+          "JPEG": "jpeg",
           "OLGA": "olga",
           "SRC-721": "src721",
           "SRC-101": "src101",
@@ -396,27 +514,33 @@ export const StampFilters = (
       >
         <div className="space-y-4">
           <div className="space-y-2">
-            {[100, 1000, 5000, 10000].map((value) => (
-              <label
-                key={value}
-                className="flex items-center space-x-2 py-1 cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="stampRange"
-                  value={`>${value}`}
-                  checked={filters.stampRange.preset === `>${value}`}
-                  onChange={(e) =>
-                    handleFilterChange("stampRange", {
-                      preset: e.target.value,
-                    })}
-                  className="text-stamp-grey focus:ring-purple-500"
-                />
-                <span className="text-sm text-stamp-grey">
-                  {`>${value.toLocaleString()}`}
-                </span>
-              </label>
-            ))}
+            {[100, 1000, 5000, 10000].map((value) => {
+              return (
+                <label
+                  key={value}
+                  className="flex items-center space-x-2 py-1 cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    name="stampRange"
+                    value={value}
+                    checked={filters.stampRange.min === "" &&
+                      filters.stampRange.max === "" &&
+                      filters.stampRangePreset === value}
+                    onChange={(e) => {
+                      handleFilterChange(
+                        "stampRangePreset",
+                        parseInt(e.target.value),
+                      );
+                    }}
+                    className="text-stamp-grey focus:ring-purple-500"
+                  />
+                  <span className="text-sm text-stamp-grey">
+                    {`>${value.toLocaleString()}`}
+                  </span>
+                </label>
+              );
+            })}
           </div>
 
           <div className="pt-2 border-t border-stamp-purple-highlight/20">
