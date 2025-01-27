@@ -14,6 +14,7 @@ import {
   titleGreyDL,
   tooltipIcon,
 } from "$components/shared/WalletStyles.ts";
+import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
 
 interface WalletProfileDetailsProps {
   walletData: WalletOverviewInfo;
@@ -21,51 +22,6 @@ interface WalletProfileDetailsProps {
   src20Total: number;
   stampsCreated: number;
   setShowItem: (type: string) => void;
-}
-
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: AlignmentType;
-  class?: string;
-}
-
-function StatItem(
-  { label, value, align = "left", class: customClass }: StatItemProps,
-) {
-  const alignmentClass = alignmentClasses[align];
-
-  return (
-    <div class={`flex flex-col -space-y-1 ${customClass || ""}`}>
-      <p class={`${dataLabelSm} ${alignmentClass}`}>
-        {label}
-      </p>
-      <p class={`${dataValueSm} ${alignmentClass}`}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-interface StatTitleProps {
-  label: string | ComponentChildren;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-}
-
-function StatTitle({ label, value, align = "left" }: StatTitleProps) {
-  const alignmentClass = alignmentClasses[align];
-
-  return (
-    <div class="flex flex-col -space-y-1">
-      <p class={`${dataLabel} ${alignmentClass}`}>
-        {label}
-      </p>
-      <p class={`${dataValueXl} ${alignmentClass}`}>
-        {value}
-      </p>
-    </div>
-  );
 }
 
 function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
