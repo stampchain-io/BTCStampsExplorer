@@ -137,6 +137,9 @@ const defaultFilters = {
     locked: false,
     oneOfOne: false,
   },
+  forSale: false,
+  trendingSales: false,
+  sold: false,
   fileType: {
     svg: false,
     pixel: false,
@@ -198,7 +201,7 @@ export function filtersToQueryParams(
         queryParams.set(category, strVal);
       } else if (typeof value === "number") {
         queryParams.set(category, String(value));
-      } else {
+      } else if (value !== "") {
         queryParams.set(category, strVal);
       }
     }
@@ -247,6 +250,31 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
     filterPayload.recursive.suffixFilters.push("html");
   }
 
+  if (filters.fileType.jpg) {
+    filterPayload.pixel.suffixFilters.push("jpg");
+  }
+
+  if (filters.fileType.jpeg) {
+    filterPayload.pixel.suffixFilters.push("jpeg");
+  }
+
+  if (filters.fileType.png) {
+    filterPayload.pixel.suffixFilters.push("png");
+  }
+
+  if (filters.fileType.webp) {
+    filterPayload.pixel.suffixFilters.push("webp");
+  }
+
+  if (filters.fileType.bmp) {
+    filterPayload.pixel.suffixFilters.push("bmp");
+  }
+  // jpg
+  // png
+  // webp
+  // bmp
+  // jpeg;
+
   // if (filters.fileType.olga) {
   //   filterPayload.pixel.suffixFilters.push("olga");
   // }
@@ -260,7 +288,27 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
   //   filterPayload.pixel.suffixFilters.push("src101");
   // }
 
-  return {};
+  const ident = Object.entries(filterPayload).reduce((acc, [key, value]) => {
+    if (value.suffixFilters.length > 0) {
+      acc.push(value.ident);
+    }
+    return acc;
+  }, [] as ("STAMP" | "SRC-721")[]);
+
+  const suffixFilters = Object.entries(filterPayload).reduce(
+    (acc, [key, value]) => {
+      if (value.suffixFilters.length > 0) {
+        acc.push(value.suffixFilters);
+      }
+      return acc;
+    },
+    [] as STAMP_SUFFIX_FILTERS[],
+  );
+
+  return {
+    ident,
+    suffixFilters,
+  };
 }
 
 // export function queryParamsToServicePayload(query: URLSearchParams): {
@@ -340,6 +388,7 @@ export const StampFilters = (
   const [expandedSections, setExpandedSections] = useState({
     buyNow: true,
     status: true,
+    market: true,
     fileType: true,
     stampRange: true,
     priceRange: true,
@@ -410,13 +459,16 @@ export const StampFilters = (
             size={20}
           /> */
       }
-      {
-        /* <input
-            type="text"
-            placeholder="Search stamps..."
-            className="w-full pl-10 pr-4 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
-          /> */
-      }
+      <input
+        type="text"
+        placeholder="Search stamps..."
+        className="w-full pl-10 pr-4 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
+        initialValue={filters.search}
+        value={filters.search}
+        onBlur={(ev) => {
+          handleFilterChange("search", ev.target.value);
+        }}
+      />
       {
         /* </div>
       </div> */
@@ -473,6 +525,30 @@ export const StampFilters = (
             handleFilterChange("status", {
               oneOfOne: !filters.status.oneOfOne,
             })}
+        />
+      </FilterSection>
+
+      <FilterSection
+        title="Market"
+        section="market"
+        expanded={expandedSections["market"]}
+        toggle={() => toggleSection("market")}
+      >
+        <Checkbox
+          label="For sale"
+          checked={filters.forSale}
+          onChange={() => handleFilterChange("forSale", !filters.forSale)}
+        />
+        <Checkbox
+          label="Trending sales"
+          checked={filters.trendingSales}
+          onChange={() =>
+            handleFilterChange("trendingSales", !filters.trendingSales)}
+        />
+        <Checkbox
+          label="Sold"
+          checked={filters.sold}
+          onChange={() => handleFilterChange("sold", !filters.sold)}
         />
       </FilterSection>
 

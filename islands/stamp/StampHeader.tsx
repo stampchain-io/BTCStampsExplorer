@@ -8,16 +8,25 @@ import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
+import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
+
+const FILTER_FLAG = "old";
 
 export const StampHeader = (
-  { filterBy, sortBy, filters }: {
+  { filterBy, sortBy, filters, search }: {
     filterBy: STAMP_FILTER_TYPES[];
     sortBy: "ASC" | "DESC" | undefined;
+    search: string;
   },
 ) => {
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
   const breakpoints = useBreakpoints();
+
+  const searchparams = new URLSearchParams(search);
+  const filterCount = allQueryKeysFromFilters.filter((key) => {
+    return searchparams.has(key);
+  }).length;
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
     setIsOpen2(false);
@@ -61,23 +70,27 @@ export const StampHeader = (
           Filter pane
         </button> */
         }
-        {breakpoints.isMobile() && (
-          <FilterToggle count={1} />
-          // <Filter
-          //   initFilter={filterBy}
-          //   open={isOpen1}
-          //   handleOpen={handleOpen1}
-          //   filterButtons={[
-          //     "pixel",
-          //     "vector",
-          //     "for sale",
-          //     "trending sales",
-          //     "sold",
-          //   ]}
-          //   dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
-          //   open2={isOpen2}
-          // />
+        {breakpoints.isMobile() && FILTER_FLAG !== "old" && (
+          <FilterToggle count={filterCount} />
         )}
+        {FILTER_FLAG === "old"
+          ? (
+            <Filter
+              initFilter={filterBy}
+              open={isOpen1}
+              handleOpen={handleOpen1}
+              filterButtons={[
+                "pixel",
+                "vector",
+                "for sale",
+                "trending sales",
+                "sold",
+              ]}
+              dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
+              open2={isOpen2}
+            />
+          )
+          : null}
 
         <div
           class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}

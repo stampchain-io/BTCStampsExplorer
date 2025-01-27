@@ -62,75 +62,92 @@ export class StampController {
     enrichWithAssetInfo = false,
     isSearchQuery = false,
     url,
+    // filtersV2,
+  }: {
+    page: number;
+    limit: number;
+    sortBy: "ASC" | "DESC";
+    /**
+     * If suffix filters and ident are provided, filterBy and type will be ignored
+     */
+    suffixFilters?: string[];
+    ident?: SUBPROTOCOLS[];
+    filterBy: STAMP_FILTER_TYPES[];
+    url: string;
+    isSearchQuery?: boolean;
+    enrichWithAssetInfo?: boolean;
+    skipTotalCount?: boolean;
+    collectionId?: string | undefined;
+    type: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
   } = {}) {
     try {
-      const filterByArray = typeof filterBy === "string"
-        ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
-        : filterBy;
+    const filterByArray = typeof filterBy === "string"
+      ? filterBy.split(",").filter(Boolean) as STAMP_FILTER_TYPES[]
+      : filterBy;
 
-      // Initialize ident based on type
-      let finalIdent: SUBPROTOCOLS[] = ident || [];
-      if ((!ident || ident.length === 0) && type) {
-        if (type === "classic") {
-          finalIdent = ["STAMP"];
-        } else if (type === "posh") {
-          finalIdent = [];
-        } else if (type === "stamps") {
-          finalIdent = ["STAMP", "SRC-721"];
-        } else if (type === "src20") {
-          finalIdent = ["SRC-20"];
-        } else if (type === "all") {
-          finalIdent = []; // We'll handle 'all' in the repository
-        } else {
-          finalIdent = [];
-        }
+    // Initialize ident based on type
+    let finalIdent: SUBPROTOCOLS[] = ident || [];
+    if ((!ident || ident.length === 0) && type) {
+      if (type === "classic") {
+        finalIdent = ["STAMP"];
+      } else if (type === "posh") {
+        finalIdent = [];
+      } else if (type === "stamps") {
+        finalIdent = ["STAMP", "SRC-721"];
+      } else if (type === "src20") {
+        finalIdent = ["SRC-20"];
+      } else if (type === "all") {
+        finalIdent = []; // We'll handle 'all' in the repository
+      } else {
+        finalIdent = [];
+      }
+    }
+
+    let filterSuffixFilters: STAMP_SUFFIX_FILTERS[] = [];
+    if (filterByArray.length > 0) {
+      // Extract ident and suffixFilters from filterBy
+      const identFromFilter = filterByArray.flatMap((filter) =>
+        filterOptions[filter]?.ident || []
+      );
+      filterSuffixFilters = filterByArray.flatMap((filter) =>
+        filterOptions[filter]?.suffixFilters || []
+      ) as STAMP_SUFFIX_FILTERS[];
+
+      // Combine ident from type and filterBy, removing duplicates
+      if (identFromFilter.length > 0) {
+        finalIdent = Array.from(new Set([...finalIdent, ...identFromFilter]));
       }
 
-      let filterSuffixFilters: STAMP_SUFFIX_FILTERS[] = [];
-      if (filterByArray.length > 0) {
-        // Extract ident and suffixFilters from filterBy
-        const identFromFilter = filterByArray.flatMap((filter) =>
-          filterOptions[filter]?.ident || []
-        );
-        filterSuffixFilters = filterByArray.flatMap((filter) =>
-          filterOptions[filter]?.suffixFilters || []
-        ) as STAMP_SUFFIX_FILTERS[];
+      // When filterBy is defined, suffixFilters are limited to those in filterOptions
+      suffixFilters = filterSuffixFilters;
+    } else if (!suffixFilters || suffixFilters.length === 0) {
+      // If suffixFilters are not provided, use all possible suffixes
+      suffixFilters = []; // No suffix filter applied
+    }
 
-        // Combine ident from type and filterBy, removing duplicates
-        if (identFromFilter.length > 0) {
-          finalIdent = Array.from(new Set([...finalIdent, ...identFromFilter]));
-        }
-
-        // When filterBy is defined, suffixFilters are limited to those in filterOptions
-        suffixFilters = filterSuffixFilters;
-      } else if (!suffixFilters || suffixFilters.length === 0) {
-        // If suffixFilters are not provided, use all possible suffixes
-        suffixFilters = []; // No suffix filter applied
-      }
-
-      const stampResult = await StampService.getStamps({
-        page,
-        limit,
-        sortBy,
-        type,
-        ident: finalIdent,
-        suffixFilters,
-        allColumns,
-        includeSecondary,
-        collectionId,
-        identifier,
-        blockIdentifier,
-        cacheDuration,
-        noPagination,
-        filterBy: filterByArray,
-        sortColumn,
-        collectionStampLimit,
-        groupBy,
-        groupBySubquery,
-        skipTotalCount,
-        cacheType,
-        isSearchQuery
-      });
+    const stampResult = await StampService.getStamps({
+      page,
+      limit,
+      sortBy,
+      type,
+      ident: finalIdent,
+      suffixFilters,
+      allColumns,
+      includeSecondary,
+      collectionId,
+      identifier,
+      blockIdentifier,
+      cacheDuration,
+      noPagination,
+      filterBy: filterByArray,
+      sortColumn,
+      collectionStampLimit,
+      groupBy,
+      groupBySubquery,
+      skipTotalCount,
+      cacheType,
+      isSearchQuery
+    });
 
       // Process stamps with floor prices and asset info if needed
       const btcPrice = await fetchBTCPriceInUSD(url?.origin);

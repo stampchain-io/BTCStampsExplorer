@@ -7,6 +7,7 @@ import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
 import {
   queryParamsToFilters,
+  queryParamsToServicePayload,
   // StampFilters,
 } from "../../islands/filterpane/StampFilterPane.tsx";
 import { StampFilterWrapped } from "../../islands/filterpane/StampFilterWrapped.tsx";
@@ -69,6 +70,7 @@ export const handler: Handlers = {
           ident,
           collectionId,
           url: url.origin,
+          ...queryParamsToServicePayload(url.search),
         });
       }
 
@@ -82,6 +84,7 @@ export const handler: Handlers = {
         page,
         limit: page_size,
         filters: queryParamsToFilters(url.search),
+        search: url.search,
       };
 
       return ctx.render({
@@ -104,6 +107,7 @@ export function StampPage(props: StampPageProps) {
     sortBy,
     selectedTab,
     filters,
+    search,
   } = props.data;
   const stampsArray = Array.isArray(stamps) ? stamps : [];
   const isRecentSales = selectedTab === "recent_sales";
@@ -111,8 +115,10 @@ export function StampPage(props: StampPageProps) {
   return (
     <div class="w-full" f-client-nav data-partial="/stamp">
       <StampHeader
+        filters={filters}
         filterBy={filterBy as STAMP_FILTER_TYPES[]}
         sortBy={sortBy}
+        search={search}
       />
       <div class="flex gap-10">
         <div class="pt-4">
