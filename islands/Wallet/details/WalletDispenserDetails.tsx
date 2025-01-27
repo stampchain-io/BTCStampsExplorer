@@ -241,8 +241,8 @@ function StampStats({
     : parseInt(editionCount.toString()).toString();
 
   return (
-    <div className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}>
-      <div class="flex pb-1.5 mobileLg:pb-3">
+    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div className="flex pb-1.5 mobileLg:pb-3">
         <StatTitle
           label="STAMP"
           value={
@@ -254,7 +254,7 @@ function StampStats({
           href={`/stamp/${stampData.stamp}`}
         />
       </div>
-      <div class="flex justify-between">
+      <div className="flex justify-between">
         <StatItem
           label="CPID"
           value={stampData.cpid}
@@ -622,11 +622,12 @@ export default function WalletDispenserDetails({
             btcPrice={walletData.btcPrice}
           />
         </div>
-
-        <StampStats
-          dispensers={walletData.dispensers}
-          walletData={walletData}
-        />
+        <div className={backgroundContainer}>
+          <StampStats
+            dispensers={walletData.dispensers}
+            walletData={walletData}
+          />
+        </div>
       </div>
       {stampData && (
         <div class="flex flex-col w-full mobileLg:w-1/2 desktop:w-1/3">
