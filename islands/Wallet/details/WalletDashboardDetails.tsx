@@ -1,18 +1,10 @@
-import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import WalletSendModal from "$islands/Wallet/details/WalletSendBTCModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import {
-  alignmentClasses,
-  type AlignmentType,
   backgroundContainer,
-  dataColumn,
-  dataLabel,
-  dataLabelSm,
-  dataValueSm,
-  dataValueXl,
   titleGreyDL,
   tooltipIcon,
 } from "$components/shared/WalletStyles.ts";
@@ -544,7 +536,7 @@ function WalletStats(
 }
 
 function StampStats(
-  { stampsTotal, stampsCreated, handleType, stampValue = 0 }: {
+  { stampsTotal, stampsCreated, _handleType, stampValue = 0 }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;
@@ -583,7 +575,7 @@ function StampStats(
 }
 
 function DispenserStats(
-  { handleType, dispensers = { open: 0, closed: 0, total: 0 } }: {
+  { _handleType, dispensers = { open: 0, closed: 0, total: 0 } }: {
     handleType: (type: string) => void;
     dispensers?: { open: number; closed: number; total: number };
   },
