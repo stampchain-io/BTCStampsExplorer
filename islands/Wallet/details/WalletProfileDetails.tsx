@@ -137,6 +137,9 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
 
   return (
     <div class="flex flex-col">
+      <div class="flex pb-1.5 mobileLg:pb-3">
+        <p class={titleGreyDL}>ANONYMOUS</p>
+      </div>
       <div class="flex gap-3 mobileMd:gap-6">
         <div class="flex">
           <p
@@ -353,9 +356,6 @@ export default function WalletProfileDetails({
       <div
         className={`${backgroundContainer} h-fit w-full tablet:w-2/3`}
       >
-        <div class="flex pb-1.5 mobileLg:pb-3">
-          <p class={titleGreyDL}>ANONYMOUS</p>
-        </div>
         <WalletOverview walletData={walletData} />
       </div>
       <div class="flex flex-col w-full tablet:w-1/3">
