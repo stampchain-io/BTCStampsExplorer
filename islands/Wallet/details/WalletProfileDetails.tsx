@@ -213,7 +213,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
         <StatTitle
           label={
             <>
-              {walletData.usdValue.toLocaleString()}{" "}
+              {walletData.usdValue.toFixed(2)}{" "}
               <span class="font-extralight">USD</span>
             </>
           }
