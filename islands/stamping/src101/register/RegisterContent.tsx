@@ -1,31 +1,25 @@
 import { useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
-
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
-import { InputField } from "$islands/stamping/InputField.tsx";
 import DetailModal from "$islands/stamping/src101/DetailModal.tsx";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
-import { SelectField } from "$islands/stamping/SelectField.tsx";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
 
-// CSS Class Constants
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
   "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 w-full text-center";
-const inputFieldContainer =
-  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
+const backgroundContainer =
+  "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
 const buttonPurpleOutline =
   "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
-const animatedInputContainer = `
-  relative rounded-md !bg-[#100318]
-  before:absolute before:inset-[-2px] before:rounded-md before:z-[1]
-  before:bg-[conic-gradient(from_var(--angle),#660099,#8800CC,#AA00FF,#8800CC,#660099)]
-  before:[--angle:0deg] before:animate-rotate
-  hover:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
-  focus-within:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
+const animatedBorderPurple = `
+  relative rounded-md !bg-[#080808] 
+  border-2 border-transparent bg-[conic-gradient(from_var(--angle),#660099,#8800CC,#AA00FF,#8800CC,#660099)]
+  [--angle:0deg] animate-rotate
+  hover:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
+  focus-within:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
 `;
 
 // Props and State Types
@@ -109,20 +103,20 @@ export function RegisterBitnameContent({
     <div className={bodyTools}>
       <h1 className={titlePurpleLDCenter}>REGISTER</h1>
 
-      <div className={inputFieldContainer}>
-        <div class={animatedInputContainer}>
+      <div className={`${backgroundContainer} w-full gap-3 mobileLg:gap-6`}>
+        <div class={animatedBorderPurple}>
           <div class="flex justify-between relative z-[2] !bg-[#100318] placeholder:!bg-[#100318] rounded-md">
             <input
               type="search"
               id="search-dropdown"
-              class="h-[54px] mobileLg:h-[60px] w-full bg-transparent rounded-md pl-6 text-base mobileLg:text-lg font-bold text-stamp-grey-light placeholder:!text-stamp-grey placeholder:lowercase !outline-none focus-visible:!outline-none focus:!bg-[#100318]"
-              placeholder="Please input your bitname"
+              class="h-[54px] mobileLg:h-[60px] w-full bg-transparent rounded-md pl-6 text-base mobileLg:text-lg font-medium text-stamp-grey-light placeholder:font-light placeholder:!text-stamp-grey placeholder:lowercase !outline-none focus-visible:!outline-none focus:!bg-[#100318]"
+              placeholder="bitname"
               required
               value={formState.toAddress || ""}
               onChange={(e) => handleInputChange(e, "toAddress")}
             />
             <select
-              className="h-[54px] max-w-32 mobileLg:h-[60px] px-3 rounded-md bg-transparent text-stamp-grey-light placeholder:lowercase text-base focus-visible:!outline-none appearance-none"
+              className="h-[54px] max-w-32 mobileLg:h-[60px] px-3 rounded-md bg-transparent text-base mobileLg:text-lg font-bold text-stamp-grey focus-visible:!outline-none appearance-none"
               onChange={(e) =>
                 handleInputChange(
                   {
@@ -201,7 +195,7 @@ export function RegisterBitnameContent({
         </div>
       </div>
 
-      <div className={feeSelectorContainer}>
+      <div className={`${backgroundContainer} w-full`}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
