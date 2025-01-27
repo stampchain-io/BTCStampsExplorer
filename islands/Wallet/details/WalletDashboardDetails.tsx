@@ -16,6 +16,7 @@ import {
   titleGreyDL,
   tooltipIcon,
 } from "$components/shared/WalletStyles.ts";
+import { StatItem, StatTitle } from "$components/shared/WalletComponents.tsx";
 
 interface WalletDashboardDetailsProps {
   walletData: WalletOverviewInfo;
@@ -23,48 +24,6 @@ interface WalletDashboardDetailsProps {
   src20Total: number;
   stampsCreated: number;
   setShowItem: (type: string) => void;
-}
-
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: AlignmentType;
-}
-
-interface StatTitleProps {
-  label: string;
-  value: string;
-  align?: AlignmentType;
-}
-
-function StatItem({ label, value, align = "left" }: StatItemProps) {
-  const alignmentClass = alignmentClasses[align];
-
-  return (
-    <div class={dataColumn}>
-      <p class={`${dataLabelSm} ${alignmentClass}`}>
-        {label}
-      </p>
-      <p class={`${dataValueSm} ${alignmentClass}`}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function StatTitle({ label, value, align = "left" }: StatTitleProps) {
-  const alignmentClass = alignmentClasses[align];
-
-  return (
-    <div class={dataColumn}>
-      <p class={`${dataLabel} ${alignmentClass}`}>
-        {label}
-      </p>
-      <p class={`${dataValueXl} ${alignmentClass}`}>
-        {value}
-      </p>
-    </div>
-  );
 }
 
 function WalletOverview(
@@ -585,7 +544,7 @@ function WalletStats(
 }
 
 function StampStats(
-  { stampsTotal, stampsCreated, _handleType, stampValue = 0 }: {
+  { stampsTotal, stampsCreated, handleType, stampValue = 0 }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;
