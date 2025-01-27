@@ -215,7 +215,7 @@ export function FeeCalculatorBase({
         )}
 
         {/* File Size */}
-        {fileSize && (
+        {!!fileSize && (
           <p className={detailsText}>
             <span className={detailsTitle}>SIZE</span> {fileSize}{" "}
             <span className="font-light">BYTES</span>
