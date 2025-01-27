@@ -7,6 +7,7 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
 import * as $about_index from "./routes/about/index.tsx";
+import * as $admin_music from "./routes/admin/music.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_internal_bitcoinNotifications from "./routes/api/internal/bitcoinNotifications.ts";
 import * as $api_internal_btcPrice from "./routes/api/internal/btcPrice.ts";
@@ -15,6 +16,8 @@ import * as $api_internal_creatorName from "./routes/api/internal/creatorName.ts
 import * as $api_internal_csrfToken from "./routes/api/internal/csrfToken.ts";
 import * as $api_internal_debug_headers from "./routes/api/internal/debug-headers.ts";
 import * as $api_internal_fees from "./routes/api/internal/fees.ts";
+import * as $api_internal_secure_audio_id_ from "./routes/api/internal/secure-audio/[id].ts";
+import * as $api_internal_secure_audio_upload from "./routes/api/internal/secure-audio/upload.ts";
 import * as $api_internal_src20_trending from "./routes/api/internal/src20/trending.ts";
 import * as $api_internal_src20Background from "./routes/api/internal/src20Background.ts";
 import * as $api_v2_path_ from "./routes/api/v2/[...path].ts";
@@ -106,6 +109,9 @@ import * as $howto_transferstamp_index from "./routes/howto/transferstamp/index.
 import * as $howto_transfertoken_index from "./routes/howto/transfertoken/index.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $media_index from "./routes/media/index.tsx";
+import * as $music from "./routes/music.tsx";
+import * as $music_index from "./routes/music/index.tsx";
+import * as $player_id_ from "./routes/player/[id].tsx";
 import * as $presskit_index from "./routes/presskit/index.tsx";
 import * as $s_id_ from "./routes/s/[...id].tsx";
 import * as $src20_tick_ from "./routes/src20/[tick].tsx";
@@ -115,6 +121,7 @@ import * as $stamp_art from "./routes/stamp/art.tsx";
 import * as $stamp_index from "./routes/stamp/index.tsx";
 import * as $stamp_posh from "./routes/stamp/posh.tsx";
 import * as $stamp_trade from "./routes/stamp/trade.tsx";
+import * as $stampify from "./routes/stampify.tsx";
 import * as $stamping_src101_action_ from "./routes/stamping/src101/[action].tsx";
 import * as $stamping_src20 from "./routes/stamping/src20.tsx";
 import * as $stamping_src20_action_ from "./routes/stamping/src20/[action].tsx";
@@ -128,6 +135,7 @@ import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
 import * as $DateRangePicker from "./islands/DateRangePicker.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
+import * as $Player from "./islands/Player.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
 import * as $Toast_ToastProvider from "./islands/Toast/ToastProvider.tsx";
 import * as $Wallet_ConnectWallet from "./islands/Wallet/ConnectWallet.tsx";
@@ -173,6 +181,7 @@ import * as $layout_Footer from "./islands/layout/Footer.tsx";
 import * as $layout_Header from "./islands/layout/Header.tsx";
 import * as $loading_LoadingContent from "./islands/loading/LoadingContent.tsx";
 import * as $loading_LoadingProvider from "./islands/loading/LoadingProvider.tsx";
+import * as $media_MusicSection from "./islands/media/MusicSection.tsx";
 import * as $modules_DeployMint from "./islands/modules/DeployMint.tsx";
 import * as $modules_GetStamping from "./islands/modules/GetStamping.tsx";
 import * as $modules_HowToDeployToken from "./islands/modules/HowToDeployToken.tsx";
@@ -210,6 +219,7 @@ import * as $stamp_details_StampImageFullScreen from "./islands/stamp/details/St
 import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
 import * as $stamp_details_StampRelatedInfo from "./islands/stamp/details/StampRelatedInfo.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
+import * as $stampify_StampifyPage from "./islands/stampify/StampifyPage.tsx";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
 import * as $stamping_StatusMessages from "./islands/stamping/StatusMessages.tsx";
@@ -235,6 +245,7 @@ const manifest = {
     "./routes/_app.tsx": $_app,
     "./routes/_middleware.ts": $_middleware,
     "./routes/about/index.tsx": $about_index,
+    "./routes/admin/music.tsx": $admin_music,
     "./routes/api/[...path].ts": $api_path_,
     "./routes/api/internal/bitcoinNotifications.ts":
       $api_internal_bitcoinNotifications,
@@ -244,6 +255,10 @@ const manifest = {
     "./routes/api/internal/csrfToken.ts": $api_internal_csrfToken,
     "./routes/api/internal/debug-headers.ts": $api_internal_debug_headers,
     "./routes/api/internal/fees.ts": $api_internal_fees,
+    "./routes/api/internal/secure-audio/[id].ts":
+      $api_internal_secure_audio_id_,
+    "./routes/api/internal/secure-audio/upload.ts":
+      $api_internal_secure_audio_upload,
     "./routes/api/internal/src20/trending.ts": $api_internal_src20_trending,
     "./routes/api/internal/src20Background.ts": $api_internal_src20Background,
     "./routes/api/v2/[...path].ts": $api_v2_path_,
@@ -361,6 +376,9 @@ const manifest = {
     "./routes/howto/transfertoken/index.tsx": $howto_transfertoken_index,
     "./routes/index.tsx": $index,
     "./routes/media/index.tsx": $media_index,
+    "./routes/music.tsx": $music,
+    "./routes/music/index.tsx": $music_index,
+    "./routes/player/[id].tsx": $player_id_,
     "./routes/presskit/index.tsx": $presskit_index,
     "./routes/s/[...id].tsx": $s_id_,
     "./routes/src20/[tick].tsx": $src20_tick_,
@@ -370,6 +388,7 @@ const manifest = {
     "./routes/stamp/index.tsx": $stamp_index,
     "./routes/stamp/posh.tsx": $stamp_posh,
     "./routes/stamp/trade.tsx": $stamp_trade,
+    "./routes/stampify.tsx": $stampify,
     "./routes/stamping/src101/[action].tsx": $stamping_src101_action_,
     "./routes/stamping/src20.tsx": $stamping_src20,
     "./routes/stamping/src20/[action].tsx": $stamping_src20_action_,
@@ -385,6 +404,7 @@ const manifest = {
     "./islands/Carousel.tsx": $Carousel,
     "./islands/DateRangePicker.tsx": $DateRangePicker,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
+    "./islands/Player.tsx": $Player,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
     "./islands/Toast/ToastProvider.tsx": $Toast_ToastProvider,
     "./islands/Wallet/ConnectWallet.tsx": $Wallet_ConnectWallet,
@@ -441,6 +461,7 @@ const manifest = {
     "./islands/layout/Header.tsx": $layout_Header,
     "./islands/loading/LoadingContent.tsx": $loading_LoadingContent,
     "./islands/loading/LoadingProvider.tsx": $loading_LoadingProvider,
+    "./islands/media/MusicSection.tsx": $media_MusicSection,
     "./islands/modules/DeployMint.tsx": $modules_DeployMint,
     "./islands/modules/GetStamping.tsx": $modules_GetStamping,
     "./islands/modules/HowToDeployToken.tsx": $modules_HowToDeployToken,
@@ -485,6 +506,7 @@ const manifest = {
       $stamp_details_StampRelatedInfo,
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
+    "./islands/stampify/StampifyPage.tsx": $stampify_StampifyPage,
     "./islands/stamping/InputField.tsx": $stamping_InputField,
     "./islands/stamping/SelectField.tsx": $stamping_SelectField,
     "./islands/stamping/StatusMessages.tsx": $stamping_StatusMessages,

@@ -8,6 +8,7 @@ interface NavLink {
   };
   href?: string;
   subLinks?: NavLink[];
+  "f-partial"?: string;
 }
 
 const desktopNavLinks: NavLink[] = [
@@ -48,6 +49,13 @@ const desktopNavLinks: NavLink[] = [
       { title: "REGISTER", href: "/stamping/src101/mint" },
     ],
   },
+  {
+    title: {
+      default: "MUSIC",
+      tablet: "MUSIC",
+    },
+    href: "/music",
+  },
 ];
 
 const mobileNavLinks: NavLink[] = [
@@ -66,6 +74,10 @@ const mobileNavLinks: NavLink[] = [
   {
     title: "TRENDING TOKENS",
     href: "/src20?type=trending",
+  },
+  {
+    title: "MUSIC",
+    href: "/music",
   },
   {
     title: "TOOLS",
@@ -169,7 +181,7 @@ export function Header() {
           >
             <a
               href={link.subLinks ? undefined : link.href}
-              f-partial={link.subLinks ? undefined : link.href}
+              {...(link.subLinks ? {} : { "f-partial": link.href })}
               onClick={() => {
                 if (link.subLinks) return;
                 if (!link?.href) return;
@@ -209,7 +221,7 @@ export function Header() {
                   <a
                     key={subLink.href}
                     href={subLink.href}
-                    f-partial={subLink.href}
+                    {...(subLink.href ? { "f-partial": subLink.href } : {})}
                     onClick={() => {
                       toggleMenu();
                       setCurrentPath(subLink?.href ? subLink?.href : null);
