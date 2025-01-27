@@ -54,7 +54,7 @@ function StatItem({
         {label}
       </p>
       <p
-        class={`${dataValueSm} ${alignmentClass} group-hover:text-stamp-grey`}
+        class={`${dataValueSm} ${alignmentClass} group-hover:text-stamp-purple-bright`}
       >
         {value}
       </p>
@@ -98,7 +98,7 @@ function StatTitle({
         {label}
       </p>
       <p
-        class={`${dataValueXl} ${alignmentClass} group-hover:text-stamp-grey`}
+        class={`${dataValueXl} ${alignmentClass} group-hover:text-stamp-purple-bright`}
       >
         {value}
       </p>
