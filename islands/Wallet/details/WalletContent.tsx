@@ -5,7 +5,6 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
-import WalletSendStampModal from "$islands/Wallet/details/WalletSendStampModal.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { WalletContentProps } from "$types/wallet.d.ts";
@@ -14,6 +13,10 @@ import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { StampRow } from "$globals";
+import {
+  backgroundContainer,
+  dataLabel,
+} from "$components/shared/WalletStyles.ts";
 
 const ItemHeader = ({
   title = "STAMP",
@@ -555,7 +558,7 @@ export default function WalletContent({
   return (
     <>
       {/* Stamps Section */}
-      <div class="mt-6 mobileLg:mt-12 desktop:mt-24" id="stamps-section">
+      <div class="mt-3 mobileLg:mt-6" id="stamps-section">
         <ItemHeader
           title="STAMPS"
           sort={true}
@@ -575,12 +578,16 @@ export default function WalletContent({
         <div class="mt-3 mobileLg:mt-6">
           {stamps.data?.length
             ? <StampSection {...stampSection} />
-            : <p class="text-gray-500">NO AVAILABLE STAMP</p>}
+            : (
+              <p class={`${dataLabel} -mt-1.5 mobileLg:-mt-3`}>
+                NO STAMPS IN THE WALLET
+              </p>
+            )}
         </div>
       </div>
 
       {/* SRC20 (TOKENS) Section */}
-      <div class="mt-12 mobileLg:mt-24 desktop:mt-36" id="src20-section">
+      <div class="mt-6 mobileLg:mt-12" id="src20-section">
         <ItemHeader
           title="TOKENS"
           sort={true}
@@ -618,13 +625,17 @@ export default function WalletContent({
                 sortBy={sortTokens}
               />
             )
-            : <p class="text-gray-500">NO AVAILABLE TOKEN</p>}
+            : (
+              <p class={`${dataLabel} -mt-1.5 mobileLg:-mt-3`}>
+                NO TOKENS IN THE WALLET
+              </p>
+            )}
         </div>
       </div>
 
       {/* Dispensers Section */}
       {dispensers.data.length > 0 && (
-        <div class="mt-48">
+        <div class="mt-3 mobileLg:mt-6" id="listings-section">
           <ItemHeader
             title="LISTINGS"
             sort={true}
@@ -659,7 +670,8 @@ export default function WalletContent({
         </div>
       )}
 
-      {/* Modal for sending stamps */}
+      {
+        /* Modal for sending stamps
       {openSettingModal && (
         <WalletSendStampModal
           stamps={stamps}
@@ -668,7 +680,8 @@ export default function WalletContent({
           toggleModal={handleOpenSettingModal}
           handleCloseModal={handleCloseSettingModal}
         />
-      )}
+      )} */
+      }
     </>
   );
 }

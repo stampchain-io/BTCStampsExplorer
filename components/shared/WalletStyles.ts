@@ -10,6 +10,8 @@ export const dataLabelSm =
   "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
 export const dataLabel =
   "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
+export const dataLabelLg =
+  "text-lg mobileLg:text-xl font-light text-stamp-grey-darker uppercase";
 
 // Text styles - Values
 export const dataValueXs =
