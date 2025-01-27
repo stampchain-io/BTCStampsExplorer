@@ -3,6 +3,7 @@ import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import {
   backgroundContainer,
+  dataLabelSm,
   subTitleGrey,
   titleGreyDL,
   tooltipIcon,
@@ -146,7 +147,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
               {bitNames.map((name) => (
                 <p
                   key={name}
-                  class="text-stamp-grey font-light text-lg mobileLg:text-xl tracking-[0.05em]"
+                  class="text-stamp-grey font-light text-base mobileLg:text-lg tracking-[0.05em]"
                 >
                   {name}
                   <span class="font-light">.btc</span>
@@ -155,7 +156,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
             </div>
           )
           : (
-            <p class="text-stamp-grey-darker font-light text-sm mobileLg:text-base">
+            <p class={dataLabelSm}>
               NO BITNAMES
             </p>
           )}
