@@ -1,17 +1,10 @@
-import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress, formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import StampImage from "$islands/stamp/details/StampImage.tsx";
 import {
-  alignmentClasses,
-  type AlignmentType,
   backgroundContainer,
   buttonPurpleFlat,
-  dataLabel,
-  dataLabelSm,
-  dataValueSm,
-  dataValueXl,
   dataValueXs,
   subTitleGrey,
   titleGreyDL,

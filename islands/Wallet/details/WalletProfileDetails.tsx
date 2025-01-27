@@ -1,15 +1,8 @@
-import { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WalletOverviewInfo } from "$lib/types/wallet.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import {
-  alignmentClasses,
-  type AlignmentType,
   backgroundContainer,
-  dataLabel,
-  dataLabelSm,
-  dataValueSm,
-  dataValueXl,
   subTitleGrey,
   titleGreyDL,
   tooltipIcon,
