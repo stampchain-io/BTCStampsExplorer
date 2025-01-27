@@ -127,9 +127,6 @@ import * as $upload_index from "./routes/upload/index.tsx";
 import * as $wallet_address_ from "./routes/wallet/[address].tsx";
 import * as $Accordion from "./islands/Accordion.tsx";
 import * as $Carousel from "./islands/Carousel.tsx";
-import * as $Dashboard_details_DashboardContent from "./islands/Dashboard/details/DashboardContent.tsx";
-import * as $Dashboard_details_DashboardDetails from "./islands/Dashboard/details/DashboardDetails.tsx";
-import * as $Dashboard_details_DashboardHeader from "./islands/Dashboard/details/DashboardHeader.tsx";
 import * as $DateRangePicker from "./islands/DateRangePicker.tsx";
 import * as $Navigator_NavigatorProvider from "./islands/Navigator/NavigatorProvider.tsx";
 import * as $Toast_ToastComponent from "./islands/Toast/ToastComponent.tsx";
@@ -139,6 +136,9 @@ import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
+import * as $Wallet_details_WalletDashboardContent from "./islands/Wallet/details/WalletDashboardContent.tsx";
+import * as $Wallet_details_WalletDashboardDetails from "./islands/Wallet/details/WalletDashboardDetails.tsx";
+import * as $Wallet_details_WalletDashboardHeader from "./islands/Wallet/details/WalletDashboardHeader.tsx";
 import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
 import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
 import * as $Wallet_details_WalletDispenserDetails from "./islands/Wallet/details/WalletDispenserDetails.tsx";
@@ -390,12 +390,6 @@ const manifest = {
   islands: {
     "./islands/Accordion.tsx": $Accordion,
     "./islands/Carousel.tsx": $Carousel,
-    "./islands/Dashboard/details/DashboardContent.tsx":
-      $Dashboard_details_DashboardContent,
-    "./islands/Dashboard/details/DashboardDetails.tsx":
-      $Dashboard_details_DashboardDetails,
-    "./islands/Dashboard/details/DashboardHeader.tsx":
-      $Dashboard_details_DashboardHeader,
     "./islands/DateRangePicker.tsx": $DateRangePicker,
     "./islands/Navigator/NavigatorProvider.tsx": $Navigator_NavigatorProvider,
     "./islands/Toast/ToastComponent.tsx": $Toast_ToastComponent,
@@ -406,6 +400,12 @@ const manifest = {
     "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
+    "./islands/Wallet/details/WalletDashboardContent.tsx":
+      $Wallet_details_WalletDashboardContent,
+    "./islands/Wallet/details/WalletDashboardDetails.tsx":
+      $Wallet_details_WalletDashboardDetails,
+    "./islands/Wallet/details/WalletDashboardHeader.tsx":
+      $Wallet_details_WalletDashboardHeader,
     "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
     "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
     "./islands/Wallet/details/WalletDispenserDetails.tsx":
