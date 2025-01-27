@@ -1,8 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 
-import DashboardHeader from "$islands/Dashboard/details/DashboardHeader.tsx";
-import DashboardDetails from "$islands/Dashboard/details/DashboardDetails.tsx";
-import DashboardContent from "$islands/Dashboard/details/DashboardContent.tsx";
+import WalletDashboardHeader from "$islands/Wallet/details/WalletDashboardHeader.tsx";
+import WalletDashboardDetails from "$islands/Wallet/details/WalletDashboardDetails.tsx";
+import WalletDashboardContent from "$islands/Wallet/details/WalletDashboardContent.tsx";
 import { WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
@@ -281,15 +281,15 @@ export default function Dashboard(props: WalletPageProps) {
 
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
-      <DashboardHeader />
-      <DashboardDetails
+      <WalletDashboardHeader />
+      <WalletDashboardDetails
         walletData={data.walletData}
         stampsTotal={data.stampsTotal}
         src20Total={data.src20Total}
         stampsCreated={data.stampsCreated}
         setShowItem={() => {}}
       />
-      <DashboardContent
+      <WalletDashboardContent
         stamps={data.data.stamps}
         src20={data.data.src20}
         dispensers={data.data.dispensers}
