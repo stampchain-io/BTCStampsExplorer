@@ -233,7 +233,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
 }
 
 function TokenStats(
-  { src20Total, handleType, src20Value = 0, _walletData }: {
+  { src20Total, _handleType, src20Value = 0, _walletData }: {
     src20Total: number;
     handleType: (type: string) => void;
     src20Value?: number;
@@ -243,10 +243,7 @@ function TokenStats(
   const totalValue = src20Value || 0;
 
   return (
-    <div
-      className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}
-      onClick={() => handleType("token")}
-    >
+    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
         <StatTitle
           label="TOKENS"
@@ -271,7 +268,7 @@ function TokenStats(
 }
 
 function StampStats(
-  { stampsTotal, _stampsCreated, handleType, _stampValue = 0, _dispensers }: {
+  { stampsTotal, _stampsCreated, _handleType, _stampValue = 0, _dispensers }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;
@@ -280,10 +277,7 @@ function StampStats(
   },
 ) {
   return (
-    <div
-      className={`${backgroundContainer} gap-1.5 mobileLg:gap-3`}
-      onClick={() => handleType("stamp")}
-    >
+    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
       <div className="flex pb-1.5 mobileLg:pb-3">
         <StatTitle
           label="STAMPS"
@@ -324,21 +318,26 @@ function WalletStats(
   return (
     <div class="flex flex-col w-full mobileMd:flex-row tablet:flex-col gap-3 mobileMd:gap-6">
       <div class="w-full mobileMd:w-1/2 tablet:w-full">
-        <TokenStats
-          src20Total={src20Total}
-          handleType={handleType}
-          src20Value={src20Value}
-          walletData={walletData}
-        />
+        <div className={backgroundContainer}>
+          <TokenStats
+            src20Total={src20Total}
+            handleType={handleType}
+            src20Value={src20Value}
+            walletData={walletData}
+          />
+        </div>
       </div>
       <div class="w-full mobileMd:w-1/2 tablet:w-full">
-        <StampStats
-          stampsTotal={stampsTotal}
-          stampsCreated={stampsCreated}
-          handleType={handleType}
-          stampValue={stampValue}
-          dispensers={walletData.dispensers || { open: 0, closed: 0, total: 0 }}
-        />
+        <div className={backgroundContainer}>
+          <StampStats
+            stampsTotal={stampsTotal}
+            stampsCreated={stampsCreated}
+            handleType={handleType}
+            stampValue={stampValue}
+            dispensers={walletData.dispensers ||
+              { open: 0, closed: 0, total: 0 }}
+          />
+        </div>
       </div>
     </div>
   );
@@ -353,10 +352,10 @@ export default function WalletProfileDetails({
 }: WalletProfileDetailsProps) {
   return (
     <div class="flex flex-col tablet:flex-row gap-3 mobileMd:gap-6">
-      <div
-        className={`${backgroundContainer} h-fit w-full tablet:w-2/3`}
-      >
-        <WalletOverview walletData={walletData} />
+      <div className="flex flex-col h-fit w-full tablet:w-2/3">
+        <div className={backgroundContainer}>
+          <WalletOverview walletData={walletData} />
+        </div>
       </div>
       <div class="flex flex-col w-full tablet:w-1/3">
         <WalletStats

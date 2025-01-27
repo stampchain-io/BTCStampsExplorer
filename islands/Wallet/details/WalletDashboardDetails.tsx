@@ -4,78 +4,65 @@ import WalletSendModal from "$islands/Wallet/details/WalletSendBTCModal.tsx";
 import WalletReceiveModal from "$islands/Wallet/details/WalletReceiveModal.tsx";
 import { WalletOverviewInfo } from "$lib/types/index.d.ts";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
+import {
+  alignmentClasses,
+  type AlignmentType,
+  backgroundContainer,
+  dataColumn,
+  dataLabel,
+  dataLabelSm,
+  dataValueSm,
+  dataValueXl,
+  titleGreyDL,
+  tooltipIcon,
+} from "$components/shared/WalletStyles.ts";
 
-const backgroundContainer =
-  "flex flex-col w-full dark-gradient rounded-lg p-3 mobileMd:p-6 gap-3 mobileMd:gap-6";
-const dataColumn = "flex flex-col -space-y-1";
-const dataLabelSm =
-  "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
-const dataLabel =
-  "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
-const dataValueSm =
-  "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-const dataValueXl =
-  "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light";
-const titleGreyDL =
-  "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
-const tooltipIcon =
-  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
+interface WalletDashboardDetailsProps {
+  walletData: WalletOverviewInfo;
+  stampsTotal: number;
+  src20Total: number;
+  stampsCreated: number;
+  setShowItem: (type: string) => void;
+}
 
-function WalletDashboardDetails(
-  { walletData, stampsTotal, src20Total, stampsCreated, setShowItem }: {
-    walletData: WalletOverviewInfo;
-    stampsTotal: number;
-    src20Total: number;
-    stampsCreated: number;
-    setShowItem: (type: string) => void;
-  },
-) {
-  const [fee, setFee] = useState<number>(walletData.fee || 0);
-  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
-  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
+interface StatItemProps {
+  label: string;
+  value: string | ComponentChildren;
+  align?: AlignmentType;
+}
+
+interface StatTitleProps {
+  label: string;
+  value: string;
+  align?: AlignmentType;
+}
+
+function StatItem({ label, value, align = "left" }: StatItemProps) {
+  const alignmentClass = alignmentClasses[align];
 
   return (
-    <div>
-      <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
-        <div class="flex mobileLg:w-1/2 tablet:w-2/3">
-          <DashboardProfile />
-        </div>
-        <div class="flex mobileLg:w-1/2 tablet:w-1/3">
-          <WalletOverview
-            walletData={{ ...walletData, fee }}
-            onSend={() => setIsSendModalOpen(true)}
-            onReceive={() => setIsReceiveModalOpen(true)}
-          />
-        </div>
-      </div>
+    <div class={dataColumn}>
+      <p class={`${dataLabelSm} ${alignmentClass}`}>
+        {label}
+      </p>
+      <p class={`${dataValueSm} ${alignmentClass}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
 
-      <div class="flex flex-col gap-3 mobileMd:gap-6 items-stretch mt-3 mobileMd:mt-6">
-        <WalletStats
-          setShowItem={setShowItem}
-          stampsTotal={stampsTotal}
-          src20Total={src20Total}
-          stampsCreated={stampsCreated}
-          dispensers={walletData.dispensers}
-          stampValue={walletData.stampValue}
-          src20Value={walletData.src20Value}
-        />
-      </div>
+function StatTitle({ label, value, align = "left" }: StatTitleProps) {
+  const alignmentClass = alignmentClasses[align];
 
-      {isSendModalOpen && (
-        <WalletSendModal
-          fee={fee}
-          balance={walletData.balance}
-          handleChangeFee={setFee}
-          onClose={() => setIsSendModalOpen(false)}
-        />
-      )}
-
-      {isReceiveModalOpen && (
-        <WalletReceiveModal
-          onClose={() => setIsReceiveModalOpen(false)}
-          address={walletData.address}
-        />
-      )}
+  return (
+    <div class={dataColumn}>
+      <p class={`${dataLabel} ${alignmentClass}`}>
+        {label}
+      </p>
+      <p class={`${dataValueXl} ${alignmentClass}`}>
+        {value}
+      </p>
     </div>
   );
 }
@@ -272,9 +259,9 @@ function WalletOverview(
   };
 
   return (
-    <div class="w-full dark-gradient rounded-lg flex flex-col justify-between p-3 mobileMd:p-6">
-      <div class="flex justify-between">
-        <div class={`${hideBalance ? "blur-sm" : ""}`}>
+    <div className="flex flex-col">
+      <div className="flex justify-between">
+        <div className={`${hideBalance ? "blur-sm" : ""}`}>
           <p class="text-stamp-grey-light font-extralight text-2xl mobileMd:text-3xl mobileLg:text-4xl select-none">
             <span class="font-bold">
               {hideBalance ? "*********" : walletData.balance}
@@ -428,7 +415,7 @@ function WalletOverview(
               onReceive();
             }}
           >
-            <path d="M16 17V25C16 25.2652 15.8946 25.5196 15.7071 25.7071C15.5196 25.8946 15.2652 26 15 26C14.7348 26 14.4804 25.8946 14.2929 25.7071C14.1054 25.5196 14 25.2652 14 25V19.415L5.70751 27.7075C5.6146 27.8004 5.5043 27.8741 5.3829 27.9244C5.26151 27.9747 5.1314 28.0006 5.00001 28.0006C4.86861 28.0006 4.7385 27.9747 4.61711 27.9244C4.49572 27.8741 4.38542 27.8004 4.29251 27.7075C4.1996 27.6146 4.1259 27.5043 4.07561 27.3829C4.02533 27.2615 3.99945 27.1314 3.99945 27C3.99945 26.8686 4.02533 26.7385 4.07561 26.6171C4.1259 26.4957 4.1996 26.3854 4.29251 26.2925L12.585 18H7.00001C6.73479 18 6.48044 17.8946 6.2929 17.7071C6.10536 17.5196 6.00001 17.2652 6.00001 17C6.00001 16.7348 6.10536 16.4804 6.2929 16.2929C6.48044 16.1054 6.73479 16 7.00001 16H15C15.2652 16 15.5196 16.1054 15.7071 16.2929C15.8946 16.4804 16 16.7348 16 17ZM26 4H10C9.46957 4 8.96087 4.21071 8.58579 4.58579C8.21072 4.96086 8.00001 5.46957 8.00001 6V12C8.00001 12.2652 8.10536 12.5196 8.2929 12.7071C8.48044 12.8946 8.73479 13 9.00001 13C9.26522 13 9.51958 12.8946 9.70711 12.7071C9.89465 12.5196 10 12.2652 10 12V6H26V22H20C19.7348 22 19.4804 22.1054 19.2929 22.2929C19.1054 22.4804 19 22.7348 19 23C19 23.2652 19.1054 23.5196 19.2929 23.7071C19.4804 23.8946 19.7348 24 20 24H26C26.5304 24 27.0391 23.7893 27.4142 23.4142C27.7893 23.0391 28 22.5304 28 22V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4Z" />
+            <path d="M16 17V25C16 25.2652 15.8946 25.5196 15.7071 25.7071C15.5196 25.8946 15.2652 26 15 26C14.7348 26 14.4804 25.8946 14.2929 25.7071C14.1054 25.5196 14 25.2652 14 25V19.415L5.70751 27.7075C5.6146 27.8004 5.5043 27.8741 5.3829 27.9244C5.26151 27.9747 5.1314 28.0006 5.00001 28.0006C4.86861 28.0006 4.7385 27.9747 4.61711 27.9244C4.49572 27.8741 4.38542 27.8004 4.29251 27.7075C4.1996 27.6146 4.1259 27.5043 4.07561 27.3829C4.02533 27.2615 3.99945 27.1314 3.99945 27C3.99945 26.8686 4.02533 26.7385 4.07561 26.6171C4.1259 26.4957 4.1996 26.3854 4.29251 26.2925L12.585 18H7.00001C6.73479 18 6.48044 17.8946 6.2929 17.7071C6.10536 17.5196 6.00001 17.2652 6.00001 17C6.00001 16.7348 6.10536 16.4804 6.2929 16.2929C6.48044 16.1054 6.73479 16 7.00001 16H15C15.2652 16 15.5196 16.1054 15.7071 16.2929C15.8946 16.4804 16 16.7348 16 17ZM26 4H10C9.46957 4 8.96087 4.21071 8.58579 4.58579C8.21072 4.96086 8.00001 5.46957 8.00001 6V12C8.00001 12.2652 8.10536 12.5196 8.2929 12.7071C8.48044 12.8946 8.73479 13 9.00001 13C9.26522 13 9.51958 12.8946 9.70711 12.7071C9.89465 12.5196 10 12.2653 10 13C10 13.2653 9.89464 13.5196 9.70711 13.7071C9.51957 13.8947 9.26522 14 9 14H4V6H26V22H20C19.7348 22 19.4804 22.1054 19.2929 22.2929C19.1054 22.4804 19 22.7348 19 23C19 23.2652 19.1054 23.5196 19.2929 23.7071C19.4804 23.8946 19.7348 24 20 24H26C26.5304 24 27.0391 23.7893 27.4142 23.4142C27.7893 23.0391 28 22.5304 28 22V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4Z" />
           </svg>
           <div
             class={`${tooltipIcon} ${
@@ -474,9 +461,9 @@ function WalletOverview(
 
 function DashboardProfile() {
   return (
-    <div class="w-full dark-gradient rounded-lg p-3 mobileMd:p-6">
-      <div class="flex">
-        <div class="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-stamp-purple rounded-full">
+    <div className="flex flex-col">
+      <div className="flex">
+        <div className="flex items-center justify-center relative -top-3 -left-3 mobileMd:-top-6 mobileMd:-left-6 w-[58px] h-[58px] mobileLg:w-[76px] mobileLg:h-[76px] bg-stamp-purple rounded-full">
           <img
             src="/img/home/carousel_default.png"
             alt="Avatar"
@@ -561,32 +548,44 @@ function WalletStats(
   };
 
   return (
-    <div class="w-full flex flex-col tablet:flex-row gap-3 mobileMd:gap-6">
-      <StampStats
-        stampsTotal={stampsTotal}
-        stampsCreated={stampsCreated}
-        handleType={handleType}
-        stampValue={stampValue}
-      />
-      <DispenserStats
-        dispensers={{
-          open: dispensers?.open ?? 0,
-          closed: dispensers?.closed ?? 0,
-          total: dispensers?.total ?? 0,
-        }}
-        handleType={handleType}
-      />
-      <TokenStats
-        src20Total={src20Total}
-        handleType={handleType}
-        src20Value={src20Value}
-      />
+    <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
+      <div class="flex flex-col w-full">
+        <div className={backgroundContainer}>
+          <StampStats
+            stampsTotal={stampsTotal}
+            stampsCreated={stampsCreated}
+            handleType={handleType}
+            stampValue={stampValue}
+          />
+        </div>
+      </div>
+      <div class="flex flex-col w-full">
+        <div className={backgroundContainer}>
+          <DispenserStats
+            dispensers={{
+              open: dispensers?.open ?? 0,
+              closed: dispensers?.closed ?? 0,
+              total: dispensers?.total ?? 0,
+            }}
+            handleType={handleType}
+          />
+        </div>
+      </div>
+      <div class="flex flex-col w-full">
+        <div className={backgroundContainer}>
+          <TokenStats
+            src20Total={src20Total}
+            handleType={handleType}
+            src20Value={src20Value}
+          />
+        </div>
+      </div>
     </div>
   );
 }
 
 function StampStats(
-  { stampsTotal, stampsCreated, handleType, stampValue = 0 }: {
+  { stampsTotal, stampsCreated, _handleType, stampValue = 0 }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;
@@ -594,16 +593,13 @@ function StampStats(
   },
 ) {
   return (
-    <div
-      className={backgroundContainer}
-      onClick={() => handleType("stamp")}
-    >
-      <div className="flex justify-between">
+    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div className="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="STAMPS" value={stampsTotal.toString()} />
-        <StatItem label="CREATED" value={stampsCreated.toString()} />
       </div>
       <div className="flex justify-between">
         <StatItem label="EDITIONS" value="239" />
+        <StatItem label="CREATED" value={stampsCreated.toString()} />
         <StatItem
           label="VALUE"
           value={
@@ -634,11 +630,8 @@ function DispenserStats(
   },
 ) {
   return (
-    <div
-      className={backgroundContainer}
-      onClick={() => handleType("dispenser")}
-    >
-      <div className="flex">
+    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div className="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="LISTINGS" value={dispensers.open.toString()} />
       </div>
       <div className="flex justify-between">
@@ -654,7 +647,7 @@ function DispenserStats(
 }
 
 function TokenStats(
-  { src20Total, handleType, src20Value = 0 }: {
+  { src20Total, _handleType, src20Value = 0 }: {
     src20Total: number;
     handleType: (type: string) => void;
     src20Value?: number;
@@ -663,11 +656,8 @@ function TokenStats(
   const totalValue = src20Value || 0;
 
   return (
-    <div
-      className={backgroundContainer}
-      onClick={() => handleType("token")}
-    >
-      <div className="flex ">
+    <div className="flex flex-col gap-1.5 mobileLg:gap-3">
+      <div className="flex pb-1.5 mobileLg:pb-3">
         <StatTitle label="TOKENS" value={src20Total?.toString()} />
       </div>
 
@@ -722,62 +712,63 @@ function TokenStats(
   );
 }
 
-interface StatTitleProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-}
-
-function StatTitle({ label, value, align = "left" }: StatTitleProps) {
-  const alignmentClass = {
-    left: "text-left",
-    center: "text-center",
-    right: "text-right",
-  }[align];
+export default function WalletDashboardDetails({
+  walletData,
+  stampsTotal,
+  src20Total,
+  stampsCreated,
+  setShowItem,
+}: WalletDashboardDetailsProps) {
+  const [fee, setFee] = useState<number>(walletData.fee || 0);
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
 
   return (
-    <div class={`${dataColumn} `}>
-      <p
-        class={`${dataLabel} ${alignmentClass}`}
-      >
-        {label}
-      </p>
-      <p
-        class={`${dataValueXl} ${alignmentClass}`}
-      >
-        {value}
-      </p>
+    <div class="flex flex-col w-full gap-3 mobileMd:gap-6">
+      <div class="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
+        <div class="flex flex-col w-full mobileLg:w-1/2 tablet:w-2/3">
+          <div className={backgroundContainer}>
+            <DashboardProfile />
+          </div>
+        </div>
+        <div class="flex flex-col w-full mobileLg:w-1/2 tablet:w-1/3">
+          <div className={backgroundContainer}>
+            <WalletOverview
+              walletData={walletData}
+              onSend={() => setIsSendModalOpen(true)}
+              onReceive={() => setIsReceiveModalOpen(true)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col w-full">
+        <WalletStats
+          setShowItem={setShowItem}
+          stampsTotal={stampsTotal}
+          src20Total={src20Total}
+          stampsCreated={stampsCreated}
+          dispensers={walletData.dispensers}
+          stampValue={walletData.stampValue}
+          src20Value={walletData.src20Value}
+        />
+      </div>
+
+      {isSendModalOpen && (
+        <WalletSendModal
+          fee={fee}
+          balance={walletData.balance}
+          handleChangeFee={setFee}
+          onClose={() => setIsSendModalOpen(false)}
+        />
+      )}
+
+      {isReceiveModalOpen && (
+        <WalletReceiveModal
+          onClose={() => setIsReceiveModalOpen(false)}
+          address={walletData.address}
+        />
+      )}
     </div>
   );
 }
-
-interface StatItemProps {
-  label: string;
-  value: string | ComponentChildren;
-  align?: "left" | "center" | "right";
-}
-
-function StatItem({ label, value, align = "left" }: StatItemProps) {
-  const alignmentClass = {
-    left: "text-left",
-    center: "text-center",
-    right: "text-right",
-  }[align];
-
-  return (
-    <div class={`${dataColumn}`}>
-      <p
-        class={`${dataLabelSm}  ${alignmentClass}`}
-      >
-        {label}
-      </p>
-      <p
-        class={`${dataValueSm} ${alignmentClass}`}
-      >
-        {value}
-      </p>
-    </div>
-  );
-}
-
-export default WalletDashboardDetails;
