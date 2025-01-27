@@ -15,19 +15,19 @@ const backgroundContainer =
 const buttonPurpleOutline =
   "inline-flex items-center justify-center border-2 border-stamp-purple rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-purple tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-purple-highlight hover:text-stamp-purple-highlight transition-colors";
 const animatedBorderPurple = `
-  relative rounded-md !bg-[#080808] 
-  border-2 border-transparent bg-[conic-gradient(from_var(--angle),#660099,#8800CC,#AA00FF,#8800CC,#660099)]
-  [--angle:0deg] animate-rotate
-  hover:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
-  focus-within:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
+  relative rounded-md !bg-[#100318] p-[2px]
+  before:absolute before:inset-0 before:rounded-md before:z-[1]
+  before:bg-[conic-gradient(from_var(--angle),#660099,#8800CC,#AA00FF,#8800CC,#660099)]
+  before:[--angle:0deg] before:animate-rotate
+  hover:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
+  focus-within:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#100318]
 `;
 
-// Props and State Types
 interface RegisterBitnameContentProps {
   trxType?: "olga" | "multisig";
 }
 
-// Main Component
 export function RegisterBitnameContent({
   trxType = "olga",
 }: RegisterBitnameContentProps) {
