@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS audio_files (
+  id VARCHAR(21) PRIMARY KEY,
+  file_name VARCHAR(255) NOT NULL,
+  mime_type VARCHAR(100) NOT NULL,
+  data MEDIUMBLOB NOT NULL,
+  size INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_created_at (created_at),
+  INDEX idx_updated_at (updated_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 

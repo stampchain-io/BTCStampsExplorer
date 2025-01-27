@@ -1,3 +1,5 @@
+import { MusicSection } from "$components/media/MusicSection.tsx";
+
 export default function Media() {
   const body = "flex flex-col gap-12 mobileLg:gap-[72px] desktop:gap-24";
   const titleGreyDL =
@@ -13,6 +15,8 @@ export default function Media() {
 
   return (
     <div className={body}>
+      <MusicSection />
+
       <section>
         <h1 className={titleGreyDL}>MEDIA MATTERS</h1>
         <h2 className={subTitleGrey}>HONOURABLE STAMP MENTIONS</h2>

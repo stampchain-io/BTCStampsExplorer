@@ -76,4 +76,23 @@ export class ResponseUtil {
     }
     return WebResponseUtil.internalError(error, message, options);
   }
+
+  static error(status: number, message: string) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: message,
+      }),
+      {
+        status,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }
+
+  static internalError(message = "Internal server error") {
+    return this.error(500, message);
+  }
 }
