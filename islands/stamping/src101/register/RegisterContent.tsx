@@ -297,6 +297,7 @@ export function RegisterBitnameContent({
           utxoAncestors={formState.utxoAncestors}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
+          bitname={formState.toAddress + formState.root}
         />
 
         <StatusMessages

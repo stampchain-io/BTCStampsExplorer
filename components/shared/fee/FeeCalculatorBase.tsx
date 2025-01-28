@@ -17,6 +17,7 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   fileSize?: number;
   issuance?: number;
   serviceFee?: number;
+  bitname?: string;
 }
 
 export function FeeCalculatorBase({
@@ -41,6 +42,7 @@ export function FeeCalculatorBase({
   fileSize,
   issuance,
   serviceFee,
+  bitname,
 }: ExtendedBaseFeeCalculatorProps) {
   const { fees } = useFeePolling();
   const [visible, setVisible] = useState(false);
@@ -283,6 +285,25 @@ export function FeeCalculatorBase({
               })
               : formatSatoshisToUSD(feeDetails.totalValue, BTCPrice)}{" "}
             <span className="font-light">{coinType}</span>
+          </p>
+        )}
+
+        {/* TLD */}
+        {!!bitname && bitname.split(
+          ".",
+        )[0] && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>TLD</span>&nbsp;&nbsp;{bitname.split(
+              ".",
+            )[0]}
+          </p>
+        )}
+
+        {/* Bitname name */}
+        {!!bitname && bitname.split(".")[1] && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>Name</span>&nbsp;&nbsp;
+            {`.${bitname.split(".")[1]}`}
           </p>
         )}
       </div>
