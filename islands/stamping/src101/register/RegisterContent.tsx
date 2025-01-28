@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { walletContext } from "$client/wallet/wallet.ts";
 import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
@@ -49,6 +49,37 @@ export function RegisterBitnameContent({
   const [checkStatus, setCheckStatus] = useState(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [modalData, setModalData] = useState<SRC101Balance | null>(null);
+  const [openTldDropdown, setOpenTldDropdown] = useState<boolean>(false);
+  const [isSelectingTld, setIsSelectingTld] = useState(false);
+  const tldDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        tldDropdownRef.current &&
+        !tldDropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpenTldDropdown(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleTldSelect = (tld: ROOT_DOMAIN_TYPES) => {
+    setOpenTldDropdown(false);
+    setIsSelectingTld(true);
+    handleInputChange(
+      {
+        target: { value: tld },
+      },
+      "root",
+    );
+    setIsSelectingTld(false);
+  };
 
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
@@ -104,40 +135,47 @@ export function RegisterBitnameContent({
       <h1 className={titlePurpleLDCenter}>REGISTER</h1>
 
       <div className={`${backgroundContainer} w-full gap-3 mobileLg:gap-6`}>
-        <div class={animatedBorderPurple}>
+        <div
+          class={`${animatedBorderPurple} ${
+            openTldDropdown && !isSelectingTld ? "input-open-right" : ""
+          }`}
+        >
           <div class="flex justify-between relative z-[2] !bg-[#100318] placeholder:!bg-[#100318] rounded-md">
             <input
               type="search"
               id="search-dropdown"
               class="h-[54px] mobileLg:h-[60px] w-full bg-transparent rounded-md pl-6 text-base mobileLg:text-lg font-medium text-stamp-grey-light placeholder:font-light placeholder:!text-stamp-grey placeholder:lowercase !outline-none focus-visible:!outline-none focus:!bg-[#100318]"
-              placeholder="bitname"
+              placeholder="bitnames"
               required
               value={formState.toAddress || ""}
               onChange={(e) => handleInputChange(e, "toAddress")}
             />
-            <select
-              className="h-[54px] max-w-32 mobileLg:h-[60px] px-3 rounded-md bg-transparent text-base mobileLg:text-lg font-bold text-stamp-grey focus-visible:!outline-none appearance-none"
-              onChange={(e) =>
-                handleInputChange(
-                  {
-                    target: {
-                      value: e.currentTarget.value,
-                    },
-                  },
-                  "root",
-                )}
-              value={formState.root}
+            <div
+              className="relative"
+              ref={tldDropdownRef}
             >
-              {ROOT_DOMAINS.map((item: ROOT_DOMAIN_TYPES) => (
-                <option
-                  key={item}
-                  value={item}
-                  class="bg-[#100318]"
-                >
-                  {item}
-                </option>
-              ))}
-            </select>
+              <button
+                type="button"
+                onClick={() => setOpenTldDropdown(!openTldDropdown)}
+                className="h-[54px] min-w-24 mobileLg:h-[60px] px-[18px] mobileLg:px-6 rounded-md bg-transparent text-base mobileLg:text-lg font-bold text-stamp-grey tracking-[0.05em] focus-visible:!outline-none"
+              >
+                {formState.root}
+              </button>
+              {openTldDropdown && (
+                <ul className="absolute top-[100%] right-[-2px] max-h-[134px] w-[88px] mobileLg:max-h-[162px] mobileLg:w-[96px] bg-[#100318] bg-opacity-70 backdrop-filter backdrop-blur-md border-2 border-t-0 border-stamp-purple-bright rounded-b-md z-[11] overflow-y-auto">
+                  {ROOT_DOMAINS.map((tld) => (
+                    <li
+                      key={tld}
+                      className="cursor-pointer py-1.5 mobileLg:py-1 px-5 mobileLg:px-[26px] text-sm mobileLg:text-base text-stamp-grey font-bold tracking-[0.05em] leading-none hover:bg-stamp-purple-bright/15 hover:text-stamp-grey-light transition-colors"
+                      onClick={() => handleTldSelect(tld)}
+                      onMouseDown={(e) => e.preventDefault()}
+                    >
+                      {tld}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
           {

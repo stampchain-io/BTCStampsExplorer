@@ -476,6 +476,12 @@ body {
   border-bottom-right-radius: 0 !important;
 }
 
+.input-open-right:before,
+.input-open-right>* {
+  @apply rounded-t-md rounded-bl-md rounded-br-[0px] !important;
+}
+
+
 /* Emoji ticker styling for SRC20 cards */
 .emoji-ticker {
   @apply text-stamp-primary-hover;
