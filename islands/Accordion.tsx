@@ -17,7 +17,7 @@ const Accordion = (
         onClick={toggleAccordion}
       >
         <h2
-          className={`text-xl mobileLg:text-2xl font-black gray-gradient1-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:#CCCCCC_!important] group-hover:[text-fill-color:#CCCCCC_!important]
+          className={`text-xl mobileLg:text-2xl font-black gray-gradient1-hover group-hover:[background:none_!important] group-hover:[-webkit-text-fill-color:#CCCCCC_!important] group-hover:[text-fill-color:#CCCCCC_!important] transition-colors duration-300
             ${
             isOpen
               ? "[background:none_!important] [-webkit-text-fill-color:#CCCCCC_!important] [text-fill-color:#CCCCCC_!important]"
@@ -27,7 +27,7 @@ const Accordion = (
           {title}
         </h2>
         <span
-          className={`text-2xl mobileLg:text-3xl text-stamp-grey-darker group-hover:text-stamp-grey-light transform transition-transform ${
+          className={`text-2xl mobileLg:text-3xl text-stamp-grey-darker group-hover:text-stamp-grey-light transition-transform transition-colors duration-300 ${
             isOpen ? "text-stamp-grey-light rotate-45" : ""
           }`}
         >

@@ -331,8 +331,8 @@ export default function AboutDonate() {
               </div>
             </div>
             <p className={bodyTextLight}>
-              Use the Donate button and you'll receive a unique stamp -
-              STAMPOORS - by babalicious as thanks for your support.
+              Use the Donate button and you'll receive a unique stamp - XXXXXXX
+              - by XXXXXXXXX as thanks for your support.
             </p>
             <br />
             <p className={`${bodyTextLight} mobileMd:block hidden`}>
@@ -344,13 +344,13 @@ export default function AboutDonate() {
             <div className="hidden mobileMd:flex justify-start gap-[18px] tablet:gap-6">
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="hidden mobileLg:block text-xl font-bold text-stamp-purple hover:text-stamp-purple-bright"
+                class="hidden mobileLg:block text-xl font-bold text-stamp-purple hover:text-stamp-purple-bright transition-colors duration-300"
               >
                 {DONATE_ADDRESS}
               </a>
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="block mobileLg:hidden text-lg font-bold text-stamp-purple hover:text-stamp-purple-bright"
+                class="block mobileLg:hidden text-lg font-bold text-stamp-purple hover:text-stamp-purple-bright transition-colors duration-300"
               >
                 bc1qe5sz3mt4a3e5...74qe0xdrkzew203
               </a>
@@ -410,7 +410,7 @@ export default function AboutDonate() {
             <div className="flex justify-start pt-3 gap-[18px]">
               <a
                 href={`/wallet/${DONATE_ADDRESS}`}
-                class="text-xl font-bold text-stamp-purple hover:text-stamp-purple-bright"
+                class="text-xl font-bold text-stamp-purple hover:text-stamp-purple-bright transition-colors duration-300"
               >
                 bc1qe5sz3mt4...0xdrkzew203
               </a>

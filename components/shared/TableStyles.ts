@@ -14,8 +14,9 @@ export const tableLabel =
 export const tableValue =
   "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full";
 export const tableValueLink =
-  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full hover:text-stamp-purple-bright cursor-pointer";
-export const row = "h-8 hover:bg-stamp-purple-bright/15";
+  "text-xs mobileLg:text-sm font-normal text-stamp-grey-light w-full hover:text-stamp-purple-bright transition-colors duration-300 cursor-pointer";
+export const row =
+  "h-8 hover:bg-stamp-purple-bright/15 transition-colors duration-100";
 
 // Table types
 export type TableType = "stamps" | "src20" | "src101" | "vault";

@@ -5,7 +5,7 @@ export default function Media() {
   const subTitleGrey =
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const articleLink =
-    "inline-block relative text-xl mobileLg:text-2xl font-bold gray-gradient1-hover";
+    "inline-block relative text-xl mobileLg:text-2xl font-bold gray-gradient1-hover transition-colors duration-1300";
   const articleSource =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker -space-y-1";
   const bodyTextLight =
