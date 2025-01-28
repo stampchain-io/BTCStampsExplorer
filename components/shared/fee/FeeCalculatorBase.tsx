@@ -454,7 +454,7 @@ export function FeeCalculatorBase({
             onClick={onSubmit}
             disabled={disabled || isSubmitting || (!isModal && !tosAgreed)}
           >
-            {isSubmitting ? "Processing..." : confirmText || buttonName}
+            {isSubmitting ? "PROCESSING" : confirmText || buttonName}
           </button>
         </div>
       </div>
