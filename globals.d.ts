@@ -572,6 +572,7 @@ export type StampPageProps = {
     selectedTab: "all" | "classic" | "posh" | "recent_sales";
     sortBy: "ASC" | "DESC";
     filterBy: STAMP_FILTER_TYPES[];
+    search: string;
   };
 };
 

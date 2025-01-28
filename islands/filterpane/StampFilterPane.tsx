@@ -288,17 +288,17 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
   //   filterPayload.pixel.suffixFilters.push("src101");
   // }
 
-  const ident = Object.entries(filterPayload).reduce((acc, [key, value]) => {
-    if (value.suffixFilters.length > 0) {
-      acc.push(value.ident);
-    }
-    return acc;
-  }, [] as ("STAMP" | "SRC-721")[]);
+  // const ident = Object.entries(filterPayload).reduce((acc, [key, value]) => {
+  //   if (value.suffixFilters.length > 0) {
+  //     acc.push(...value.ident);
+  //   }
+  //   return acc;
+  // }, [] as ("STAMP" | "SRC-721")[]);
 
   const suffixFilters = Object.entries(filterPayload).reduce(
     (acc, [key, value]) => {
       if (value.suffixFilters.length > 0) {
-        acc.push(value.suffixFilters);
+        acc.push(...value.suffixFilters);
       }
       return acc;
     },
@@ -306,8 +306,9 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
   );
 
   return {
-    ident,
-    suffixFilters,
+    // handle all for now
+    ident: [], // Array.from(new Set(ident)),
+    suffixFilters: Array.from(new Set(suffixFilters)),
   };
 }
 

@@ -11,6 +11,7 @@ import {
   // StampFilters,
 } from "../../islands/filterpane/StampFilterPane.tsx";
 import { StampFilterWrapped } from "../../islands/filterpane/StampFilterWrapped.tsx";
+import { flags } from "../../lib/flags/flags.ts";
 
 const MAX_PAGE_SIZE = 120;
 
@@ -61,7 +62,7 @@ export const handler: Handlers = {
           }
         }
 
-        result = await StampController.getStamps({
+        const payload = {
           page,
           limit: page_size,
           sortBy: sortBy as "DESC" | "ASC",
@@ -71,7 +72,10 @@ export const handler: Handlers = {
           collectionId,
           url: url.origin,
           ...queryParamsToServicePayload(url.search),
-        });
+        };
+        console.log("stamp controller payload", payload);
+
+        result = await StampController.getStamps(payload);
       }
 
       const { data: stamps = [], ...restResult } = result;
@@ -122,15 +126,17 @@ export function StampPage(props: StampPageProps) {
       />
       <div class="flex gap-10">
         <div class="pt-4">
-          <StampFilterWrapped
-            onFilterChange={(str) => {
-              // const url = new URL(globalThis.location.href);
-              console.log("hello");
-              globalThis.location.href = globalThis.location.pathname + "?" +
-                str;
-            }}
-            filters={filters}
-          />
+          {flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false) && (
+            <StampFilterWrapped
+              onFilterChange={(str) => {
+                // const url = new URL(globalThis.location.href);
+                console.log("hello");
+                globalThis.location.href = globalThis.location.pathname + "?" +
+                  str;
+              }}
+              filters={filters}
+            />
+          )}
         </div>
 
         <StampContent

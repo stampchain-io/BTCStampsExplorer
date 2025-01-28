@@ -64,21 +64,25 @@ export class StampController {
     url,
     // filtersV2,
   }: {
-    page: number;
-    limit: number;
-    sortBy: "ASC" | "DESC";
+    page?: number;
+    limit?: number;
+    sortBy?: "ASC" | "DESC";
     /**
      * If suffix filters and ident are provided, filterBy and type will be ignored
      */
     suffixFilters?: string[];
     ident?: SUBPROTOCOLS[];
-    filterBy: STAMP_FILTER_TYPES[];
-    url: string;
+    filterBy?: STAMP_FILTER_TYPES[];
+    url?: string;
     isSearchQuery?: boolean;
     enrichWithAssetInfo?: boolean;
     skipTotalCount?: boolean;
     collectionId?: string | undefined;
-    type: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
+    type?: "all" | "classic" | "cursed" | "posh" | "stamps" | "src20";
+    allColumns?: boolean
+    identifier?: string | number | (string | number)[];
+    noPagination?: boolean
+    cacheDuration?: number
   } = {}) {
     try {
     const filterByArray = typeof filterBy === "string"

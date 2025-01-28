@@ -9,8 +9,7 @@ import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
 import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
-
-const FILTER_FLAG = "old";
+import { flags } from "../../lib/flags/flags.ts";
 
 export const StampHeader = (
   { filterBy, sortBy, filters, search }: {
@@ -70,10 +69,11 @@ export const StampHeader = (
           Filter pane
         </button> */
         }
-        {breakpoints.isMobile() && FILTER_FLAG !== "old" && (
+        {breakpoints.isMobile() &&
+          flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false) && (
           <FilterToggle count={filterCount} />
         )}
-        {FILTER_FLAG === "old"
+        {!flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false)
           ? (
             <Filter
               initFilter={filterBy}
