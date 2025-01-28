@@ -94,6 +94,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
                     <tr key={index} className={row}>
                       <td class={cellAlign(0, headers.length)}>
                         <a
+                          target="_top"
                           href={`/wallet/${holder.address}`}
                           className={tableValueLink}
                         >

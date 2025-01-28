@@ -115,6 +115,7 @@ export interface ComplexFeeProps extends BaseFeeCalculatorProps {
   onRefresh: (() => Promise<void>) | undefined;
   disabled: boolean | undefined;
   inputType: string | undefined;
+  bitname: string | undefined;
 }
 
 interface PSBTFees extends FeeDetails {
