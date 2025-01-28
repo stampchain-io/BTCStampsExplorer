@@ -46,7 +46,8 @@ export function RegisterBitnameContent({
   } = useSRC101Form("mint", trxType);
 
   const [tosAgreed, setTosAgreed] = useState<boolean>(false);
-  const { wallet } = walletContext;
+
+  const { wallet, isConnected } = walletContext;
   const [isExist, setIsExist] = useState(true);
   const [checkStatus, setCheckStatus] = useState(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -289,7 +290,7 @@ export function RegisterBitnameContent({
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleTransferSubmit}
-          buttonName="REGISTER"
+          buttonName={isConnected ? "REGISTER" : "CONNECT WALLET"}
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           userAddress={wallet?.address}
