@@ -290,7 +290,7 @@ export default function Table({
       </div>
       <ScrollContainer class="max-h-48" onScroll={handleScroll}>
         <div class="">
-          {!isLoading && renderTabContent()}
+          {renderTabContent()}
           {isLoading && (
             <div class={textLoader}>
               <span>L</span>

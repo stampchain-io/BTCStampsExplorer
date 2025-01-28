@@ -87,6 +87,7 @@ import * as $collection_index from "./routes/collection/index.tsx";
 import * as $collection_overview_overview_ from "./routes/collection/overview/[overview].tsx";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
+import * as $dashboard_address_ from "./routes/dashboard/[address].tsx";
 import * as $docs_index from "./routes/docs/index.tsx";
 import * as $fairmint from "./routes/fairmint.tsx";
 import * as $faq_index from "./routes/faq/index.tsx";
@@ -135,10 +136,15 @@ import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
+import * as $Wallet_details_WalletDashboardContent from "./islands/Wallet/details/WalletDashboardContent.tsx";
+import * as $Wallet_details_WalletDashboardDetails from "./islands/Wallet/details/WalletDashboardDetails.tsx";
+import * as $Wallet_details_WalletDashboardHeader from "./islands/Wallet/details/WalletDashboardHeader.tsx";
 import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
 import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
+import * as $Wallet_details_WalletDispenserDetails from "./islands/Wallet/details/WalletDispenserDetails.tsx";
 import * as $Wallet_details_WalletDonateModal from "./islands/Wallet/details/WalletDonateModal.tsx";
 import * as $Wallet_details_WalletHeader from "./islands/Wallet/details/WalletHeader.tsx";
+import * as $Wallet_details_WalletProfileDetails from "./islands/Wallet/details/WalletProfileDetails.tsx";
 import * as $Wallet_details_WalletReceiveModal from "./islands/Wallet/details/WalletReceiveModal.tsx";
 import * as $Wallet_details_WalletSendBTCModal from "./islands/Wallet/details/WalletSendBTCModal.tsx";
 import * as $Wallet_details_WalletSendStampModal from "./islands/Wallet/details/WalletSendStampModal.tsx";
@@ -340,6 +346,7 @@ const manifest = {
       $collection_overview_overview_,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
+    "./routes/dashboard/[address].tsx": $dashboard_address_,
     "./routes/docs/index.tsx": $docs_index,
     "./routes/fairmint.tsx": $fairmint,
     "./routes/faq/index.tsx": $faq_index,
@@ -393,11 +400,21 @@ const manifest = {
     "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
+    "./islands/Wallet/details/WalletDashboardContent.tsx":
+      $Wallet_details_WalletDashboardContent,
+    "./islands/Wallet/details/WalletDashboardDetails.tsx":
+      $Wallet_details_WalletDashboardDetails,
+    "./islands/Wallet/details/WalletDashboardHeader.tsx":
+      $Wallet_details_WalletDashboardHeader,
     "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
     "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
+    "./islands/Wallet/details/WalletDispenserDetails.tsx":
+      $Wallet_details_WalletDispenserDetails,
     "./islands/Wallet/details/WalletDonateModal.tsx":
       $Wallet_details_WalletDonateModal,
     "./islands/Wallet/details/WalletHeader.tsx": $Wallet_details_WalletHeader,
+    "./islands/Wallet/details/WalletProfileDetails.tsx":
+      $Wallet_details_WalletProfileDetails,
     "./islands/Wallet/details/WalletReceiveModal.tsx":
       $Wallet_details_WalletReceiveModal,
     "./islands/Wallet/details/WalletSendBTCModal.tsx":
