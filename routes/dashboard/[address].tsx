@@ -1,13 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
 
-import WalletHeader from "$islands/Wallet/details/WalletHeader.tsx";
-import WalletProfileDetails from "$islands/Wallet/details/WalletProfileDetails.tsx";
-import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetails.tsx";
-import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
-import { WalletPageProps } from "$types/index.d.ts";
+import WalletDashboardHeader from "$islands/Wallet/details/WalletDashboardHeader.tsx";
+import WalletDashboardDetails from "$islands/Wallet/details/WalletDashboardDetails.tsx";
+import WalletDashboardContent from "$islands/Wallet/details/WalletDashboardContent.tsx";
+import { WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
-import { Src101Controller } from "$server/controller/src101Controller.ts";
-
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
@@ -15,7 +12,7 @@ import { enrichTokensWithMarketData } from "$server/services/src20Service.ts";
 import {
   PaginatedResponse,
   PaginationQueryParams,
-} from "$types/pagination.d.ts";
+} from "$lib/types/pagination.d.ts";
 import { DispenserRow, SRC20Row, StampRow } from "$globals";
 
 /**
@@ -67,7 +64,6 @@ export const handler: Handlers = {
         dispensersResponse,
         stampsCreatedCount,
         marketDataResponse,
-        src101Response,
       ] = await Promise.allSettled([
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
@@ -105,42 +101,6 @@ export const handler: Handlers = {
 
         StampController.getStampsCreatedCount(address),
         SRC20MarketService.fetchMarketListingSummary(),
-        // SRC101 Balance request
-        await Src101Controller.handleSrc101BalanceRequest(address),
-        fetch(
-          `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=0`,
-        ).then(async (res) => {
-          if (!res.ok) {
-            console.error("SRC101 fetch failed:", res.status, res.statusText);
-            return null;
-          }
-          const data = await res.json();
-          console.log("Raw SRC-101 Response:", data);
-
-          // If we have pagination info and there's more data, fetch the rest
-          if (data.pagination?.total > 100) {
-            const remainingPages = Math.ceil(data.pagination.total / 100) - 1;
-            const additionalRequests = Array.from(
-              { length: remainingPages },
-              (_, i) =>
-                fetch(
-                  `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=${
-                    (i + 1) * 100
-                  }`,
-                )
-                  .then((r) => r.json()),
-            );
-
-            const additionalData = await Promise.all(additionalRequests);
-            // Combine all data
-            data.data = [
-              ...data.data,
-              ...additionalData.flatMap((d) => d.data || []),
-            ];
-          }
-
-          return data;
-        }),
       ]);
 
       // Process responses and handle errors
@@ -183,11 +143,16 @@ export const handler: Handlers = {
       }, 0);
 
       const dispensersData = dispensersResponse.status === "fulfilled"
-        ? dispensersResponse.value.dispensers
-        : [];
-
-      // Check if address has ever opened dispensers by looking at actual dispenser data
-      const isDispenserAddress = dispensersData.length > 0;
+        ? {
+          data: dispensersResponse.value.dispensers,
+          total: dispensersResponse.value.total,
+          page: dispensersParams.page,
+          limit: dispensersParams.limit,
+          totalPages: Math.ceil(
+            dispensersResponse.value.total / dispensersParams.limit,
+          ),
+        } as PaginatedResponse<DispenserRow>
+        : { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
         ? btcInfoResponse.value
@@ -201,19 +166,6 @@ export const handler: Handlers = {
       const closedDispensers = allDispensers.filter((d) =>
         d.give_remaining === 0
       );
-
-      // Process SRC-101 response to get all BitNames
-      const src101Data =
-        src101Response.status === "fulfilled" && src101Response.value
-          ? {
-            names: (src101Response.value.data || [])
-              .filter((item: any) => item?.tokenid_utf8)
-              .map((item: any) => item.tokenid_utf8),
-            total: src101Response.value.last_block || 0,
-          }
-          : { names: [], total: 0 };
-
-      console.log("Final Processed SRC-101 Data:", src101Data);
 
       // Build wallet data
       const walletData = {
@@ -231,11 +183,9 @@ export const handler: Handlers = {
           open: openDispensers.length,
           closed: closedDispensers.length,
           total: allDispensers.length,
-          items: dispensersData,
+          items: dispensersData.data,
         },
-        src101: src101Data,
       };
-      console.log("Final Wallet Data:", walletData);
 
       return ctx.render({
         data: {
@@ -258,17 +208,16 @@ export const handler: Handlers = {
             },
           },
           dispensers: {
-            data: dispensersData,
+            data: dispensersData.data,
             pagination: {
               page: dispensersParams.page,
               limit: dispensersParams.limit,
-              total: dispensersData.length,
+              total: dispensersData.total,
               totalPages: Math.ceil(
-                dispensersData.length / dispensersParams.limit,
+                dispensersData.total / dispensersParams.limit,
               ),
             },
           },
-          src101: src101Response,
         },
         walletData,
         stampsTotal: stampsData.total,
@@ -314,7 +263,6 @@ export const handler: Handlers = {
             total: 0,
             items: [],
           },
-          src101: { names: [], total: 0 },
         },
         stampsTotal: 0,
         src20Total: 0,
@@ -328,42 +276,28 @@ export const handler: Handlers = {
   },
 };
 
-export default function Wallet(props: WalletPageProps) {
+export default function Dashboard(props: WalletPageProps) {
   const { data } = props;
 
   return (
     <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
-      <WalletHeader />
-      {data.data.dispensers.data.length > 0
-        ? (
-          <WalletDispenserDetails
-            walletData={data.walletData}
-            stampsTotal={data.stampsTotal}
-            src20Total={data.src20Total}
-            stampsCreated={data.stampsCreated}
-            setShowItem={() => {}}
-          />
-        )
-        : (
-          <>
-            <WalletProfileDetails
-              walletData={data.walletData}
-              stampsTotal={data.stampsTotal}
-              src20Total={data.src20Total}
-              stampsCreated={data.stampsCreated}
-              setShowItem={() => {}}
-            />
-            <WalletContent
-              stamps={data.data.stamps}
-              src20={data.data.src20}
-              dispensers={data.data.dispensers}
-              address={data.address}
-              anchor={data.anchor}
-              stampsSortBy={props.stampsSortBy ?? "DESC"}
-              src20SortBy={props.src20SortBy ?? "DESC"}
-            />
-          </>
-        )}
+      <WalletDashboardHeader />
+      <WalletDashboardDetails
+        walletData={data.walletData}
+        stampsTotal={data.stampsTotal}
+        src20Total={data.src20Total}
+        stampsCreated={data.stampsCreated}
+        setShowItem={() => {}}
+      />
+      <WalletDashboardContent
+        stamps={data.data.stamps}
+        src20={data.data.src20}
+        dispensers={data.data.dispensers}
+        address={data.walletData.address}
+        anchor={data.anchor}
+        stampsSortBy={props.stampsSortBy ?? "DESC"}
+        src20SortBy={props.src20SortBy ?? "DESC"}
+      />
     </div>
   );
 }
