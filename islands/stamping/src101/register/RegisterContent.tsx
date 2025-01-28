@@ -23,6 +23,8 @@ const animatedBorderPurple = `
   focus-within:before:bg-[conic-gradient(from_var(--angle),#AA00FF,#AA00FF,#AA00FF,#AA00FF,#AA00FF)]
   [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#100318]
 `;
+const tooltipButton =
+  "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 
 interface RegisterBitnameContentProps {
   trxType?: "olga" | "multisig";
@@ -52,6 +54,9 @@ export function RegisterBitnameContent({
   const [openTldDropdown, setOpenTldDropdown] = useState<boolean>(false);
   const [isSelectingTld, setIsSelectingTld] = useState(false);
   const tldDropdownRef = useRef<HTMLDivElement>(null);
+  const [isTldTooltipVisible, setIsTldTooltipVisible] = useState(false);
+  const [allowTldTooltip, setAllowTldTooltip] = useState(true);
+  const tldTooltipTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -69,6 +74,14 @@ export function RegisterBitnameContent({
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (tldTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tldTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleTldSelect = (tld: ROOT_DOMAIN_TYPES) => {
     setOpenTldDropdown(false);
     setIsSelectingTld(true);
@@ -79,6 +92,25 @@ export function RegisterBitnameContent({
       "root",
     );
     setIsSelectingTld(false);
+  };
+
+  const handleTldMouseEnter = () => {
+    if (allowTldTooltip) {
+      if (tldTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(tldTooltipTimeoutRef.current);
+      }
+      tldTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsTldTooltipVisible(true);
+      }, 1500);
+    }
+  };
+
+  const handleTldMouseLeave = () => {
+    if (tldTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(tldTooltipTimeoutRef.current);
+    }
+    setIsTldTooltipVisible(false);
+    setAllowTldTooltip(true);
   };
 
   if (!config) {
@@ -144,8 +176,8 @@ export function RegisterBitnameContent({
             <input
               type="search"
               id="search-dropdown"
-              class="h-[54px] mobileLg:h-[60px] w-full bg-transparent rounded-md pl-6 text-base mobileLg:text-lg font-medium text-stamp-grey-light placeholder:font-light placeholder:!text-stamp-grey placeholder:lowercase !outline-none focus-visible:!outline-none focus:!bg-[#100318]"
-              placeholder="bitnames"
+              class="h-[54px] mobileLg:h-[60px] w-full bg-transparent rounded-md pl-6 text-base mobileLg:text-lg font-medium text-stamp-grey-light placeholder:font-light placeholder:!text-stamp-grey !outline-none focus-visible:!outline-none focus:!bg-[#100318]"
+              placeholder="bitname"
               required
               value={formState.toAddress || ""}
               onChange={(e) => handleInputChange(e, "toAddress")}
@@ -156,9 +188,22 @@ export function RegisterBitnameContent({
             >
               <button
                 type="button"
-                onClick={() => setOpenTldDropdown(!openTldDropdown)}
-                className="h-[54px] min-w-24 mobileLg:h-[60px] px-[18px] mobileLg:px-6 rounded-md bg-transparent text-base mobileLg:text-lg font-bold text-stamp-grey tracking-[0.05em] focus-visible:!outline-none"
+                onClick={() => {
+                  setOpenTldDropdown(!openTldDropdown);
+                  setAllowTldTooltip(false);
+                  setIsTldTooltipVisible(false);
+                }}
+                className="h-[54px] min-w-24 mobileLg:h-[60px] px-[18px] mobileLg:px-6 rounded-md bg-transparent text-base mobileLg:text-lg font-bold text-stamp-grey hover:text-stamp-grey-light tracking-[0.05em] focus-visible:!outline-none"
+                onMouseEnter={handleTldMouseEnter}
+                onMouseLeave={handleTldMouseLeave}
               >
+                <div
+                  className={`${tooltipButton} tracking-normal ${
+                    isTldTooltipVisible ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  SELECT TOP LEVEL DOMAIN
+                </div>
                 {formState.root}
               </button>
               {openTldDropdown && (
