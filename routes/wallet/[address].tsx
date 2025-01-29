@@ -68,7 +68,6 @@ export const handler: Handlers = {
         stampsCreatedCount,
         marketDataResponse,
         src101Response,
-        src101Response,
       ] = await Promise.allSettled([
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
