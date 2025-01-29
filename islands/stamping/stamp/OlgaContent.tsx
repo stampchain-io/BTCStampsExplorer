@@ -631,13 +631,13 @@ export function OlgaContent() {
     }
 
     // Check if file is an image by extension
-    const isImage = /\.(jpg|jpeg|png|gif|webp|svg|avif)$/i.test(file.name);
+    const isImage = /\.(jpg|jpeg|png|gif|webp|svg|avif|html)$/i.test(file.name);
 
     return {
       isValid: true,
       warning: isImage
         ? undefined
-        : "Note: Non-image files may not become numbered stamps.",
+        : "Note: Non-image-html files may not become numbered stamps.",
     };
   };
 
