@@ -79,7 +79,7 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
                   if (!holder.address) {
                     return (
                       <tr className={row}>
-                        <td class={cellAlign(0, headers.length)}>Unknown</td>
+                        <td class={cellAlign(0, headers.length)}>UNKNOWN</td>
                         <td class={cellAlign(1, headers.length)}>
                           {holder.amt}
                         </td>

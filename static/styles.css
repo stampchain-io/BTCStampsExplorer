@@ -476,6 +476,12 @@ body {
   border-bottom-right-radius: 0 !important;
 }
 
+.input-open-right:before,
+.input-open-right>* {
+  @apply rounded-t-md rounded-bl-md rounded-br-[0px] !important;
+}
+
+
 /* Emoji ticker styling for SRC20 cards */
 .emoji-ticker {
   @apply text-stamp-primary-hover;
@@ -500,7 +506,7 @@ body {
   background-position: 0% 100%;
   background-repeat: no-repeat;
   background-size: 100% 2px;
-  transition: background-size .3s;
+  transition: background-size .3s, color .6s;
   padding-bottom: 3px;
   text-shadow:
     -3px 0 #000,
@@ -516,6 +522,7 @@ body {
 .animated-underline:hover,
 .animated-underline:focus {
   background-size: 0% 2px;
+  color: #999999;
 }
 
 /* Animated loader text */

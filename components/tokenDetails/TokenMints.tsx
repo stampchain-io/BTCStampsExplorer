@@ -3,6 +3,7 @@ import {
   colGroup,
   row,
   tableLabel,
+  tableStatus,
   tableValue,
   tableValueLink,
 } from "$components/shared/TableStyles.ts";
@@ -92,7 +93,15 @@ export function TokenMints({ mints }: TokenMintsProps) {
                 </td>
               </tr>
             ))
-            : "NO MINTS"}
+            : (
+              <tr>
+                <td
+                  class={`${tableStatus} w-full`}
+                >
+                  NO MINTS YET
+                </td>
+              </tr>
+            )}
         </tbody>
       </table>
     </div>

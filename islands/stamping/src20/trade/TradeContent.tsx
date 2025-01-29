@@ -533,7 +533,7 @@ export function TradeContent() {
             onClick={handleCreatePSBT}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : "CREATE PSBT"}
+            {isSubmitting ? "PROCESSING" : "CREATE PSBT"}
           </button>
         </div>
 
@@ -702,7 +702,7 @@ export function TradeContent() {
             onClick={handleUtxoAttach}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : "ATTACH"}
+            {isSubmitting ? "PROCESSING" : "ATTACH"}
           </button>
         </div>
 
@@ -762,7 +762,7 @@ export function TradeContent() {
             onClick={handleCompleteSwap}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : "Complete Swap"}
+            {isSubmitting ? "PROCESSING" : "Complete Swap"}
           </button>
         </div>
       </div>
