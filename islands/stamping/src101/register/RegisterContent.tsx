@@ -261,9 +261,11 @@ export function RegisterBitnameContent({
               {formState.toAddress && checkStatus
                 ? isExist
                   ? `${
-                    formState.toAddress + formState.root
+                    formState.toAddress.toLowerCase() + formState.root
                   } is already registered`
-                  : `${formState.toAddress + formState.root} is available`
+                  : `${
+                    formState.toAddress.toLowerCase() + formState.root
+                  } is available`
                 : ""}
             </p>
           </div>
@@ -297,6 +299,7 @@ export function RegisterBitnameContent({
           utxoAncestors={formState.utxoAncestors}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
+          bitname={formState.toAddress + formState.root}
         />
 
         <StatusMessages

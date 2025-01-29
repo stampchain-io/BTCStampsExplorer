@@ -6,6 +6,8 @@ import WalletDispenserDetails from "$islands/Wallet/details/WalletDispenserDetai
 import WalletContent from "$islands/Wallet/details/WalletContent.tsx";
 import { WalletPageProps } from "$types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
+import { Src101Controller } from "$server/controller/src101Controller.ts";
+
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
 import { SRC20MarketService } from "$server/services/src20/marketService.ts";
@@ -65,6 +67,7 @@ export const handler: Handlers = {
         dispensersResponse,
         stampsCreatedCount,
         marketDataResponse,
+        src101Response,
         src101Response,
       ] = await Promise.allSettled([
         // Stamps with sorting and pagination
@@ -264,6 +267,7 @@ export const handler: Handlers = {
               ),
             },
           },
+          src101: src101Response,
         },
         walletData,
         stampsTotal: stampsData.total,
