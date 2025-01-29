@@ -136,10 +136,10 @@ import * as $Wallet_ConnectedModal from "./islands/Wallet/ConnectedModal.tsx";
 import * as $Wallet_ConnectorsModal from "./islands/Wallet/ConnectorsModal.tsx";
 import * as $Wallet_WalletModal from "./islands/Wallet/WalletModal.tsx";
 import * as $Wallet_connectors_Wallet_connector from "./islands/Wallet/connectors/Wallet.connector.tsx";
+import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
 import * as $Wallet_details_WalletDashboardContent from "./islands/Wallet/details/WalletDashboardContent.tsx";
 import * as $Wallet_details_WalletDashboardDetails from "./islands/Wallet/details/WalletDashboardDetails.tsx";
 import * as $Wallet_details_WalletDashboardHeader from "./islands/Wallet/details/WalletDashboardHeader.tsx";
-import * as $Wallet_details_WalletContent from "./islands/Wallet/details/WalletContent.tsx";
 import * as $Wallet_details_WalletDetails from "./islands/Wallet/details/WalletDetails.tsx";
 import * as $Wallet_details_WalletDispenserDetails from "./islands/Wallet/details/WalletDispenserDetails.tsx";
 import * as $Wallet_details_WalletDonateModal from "./islands/Wallet/details/WalletDonateModal.tsx";
@@ -400,13 +400,13 @@ const manifest = {
     "./islands/Wallet/WalletModal.tsx": $Wallet_WalletModal,
     "./islands/Wallet/connectors/Wallet.connector.tsx":
       $Wallet_connectors_Wallet_connector,
+    "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
     "./islands/Wallet/details/WalletDashboardContent.tsx":
       $Wallet_details_WalletDashboardContent,
     "./islands/Wallet/details/WalletDashboardDetails.tsx":
       $Wallet_details_WalletDashboardDetails,
     "./islands/Wallet/details/WalletDashboardHeader.tsx":
       $Wallet_details_WalletDashboardHeader,
-    "./islands/Wallet/details/WalletContent.tsx": $Wallet_details_WalletContent,
     "./islands/Wallet/details/WalletDetails.tsx": $Wallet_details_WalletDetails,
     "./islands/Wallet/details/WalletDispenserDetails.tsx":
       $Wallet_details_WalletDispenserDetails,

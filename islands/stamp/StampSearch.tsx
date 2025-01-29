@@ -206,12 +206,13 @@ export function StampSearchClient(
     "fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-70 backdrop-filter backdrop-blur-md overflow-y-auto";
   const modalSearch =
     "w-[90%] max-w-[480px] mobileLg:max-w-[580px] my-12 mobileLg:my-[72px] tablet:my-24";
-  const animatedInputFieldSearch = `
-    relative rounded-md !bg-[#080808]
-    before:absolute before:inset-[-2px] before:rounded-md before:z-[1]
-    before:bg-[conic-gradient(from_var(--angle),#666666,#999999,#CCCCCC,#999999,#666666)]
-    before:[--angle:0deg] before:animate-rotate
-  `;
+  const animatedBorderGrey = `
+  relative rounded-md !bg-[#080808] p-[2px]
+  before:absolute before:inset-0 before:rounded-md before:z-[1]
+  before:bg-[conic-gradient(from_var(--angle),#666666,#999999,#CCCCCC,#999999,#666666)]
+  before:[--angle:0deg] before:animate-rotate
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#080808]
+`;
 
   useEffect(() => {
     if (!open2) {
@@ -250,7 +251,7 @@ export function StampSearchClient(
           }}
         >
           <div class={modalSearch}>
-            <div className={animatedInputFieldSearch}>
+            <div className={animatedBorderGrey}>
               <div
                 class={`relative flex flex-col max-h-[90%] overflow-hidden`}
               >
@@ -264,11 +265,11 @@ export function StampSearchClient(
                     setError("");
                   }}
                   onKeyPress={handleKeyPress}
-                  class={`relative z-[2] h-[42px] mobileLg:h-[48px] w-full !bg-[#080808] pl-[18px] pr-[52px] mobileLg:pr-[58px] text-sm mobileLg:text-base font-mediun text-stamp-grey-light placeholder:!bg-[#080808] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
+                  class={`relative z-[2] h-[48px] mobileLg:h-[54px] w-full !bg-[#080808] pl-[24px] pr-[52px] mobileLg:pr-[58px] text-sm mobileLg:text-base font-mediun text-stamp-grey-light placeholder:!bg-[#080808] placeholder:font-light placeholder:!text-stamp-grey no-outline ${
                     error ? "rounded-t-md" : "rounded-md"
                   }`}
                 />
-                <div class="absolute z-[3] right-4 mobileLg:right-[18px] top-[11px] mobileLg:top-[12px] pointer-events-none">
+                <div class="absolute z-[3] right-4 mobileLg:right-[18px] top-[14px] mobileLg:top-[15px] pointer-events-none">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 32 32"

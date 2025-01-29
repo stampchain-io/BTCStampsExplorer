@@ -7,6 +7,7 @@ import {
   colGroup,
   row,
   tableLabel,
+  tableStatus,
   tableValue,
   tableValueLink,
 } from "$components/shared/TableStyles.ts";
@@ -131,7 +132,15 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
                 </tr>
               );
             })
-            : "NO LISTINGS"}
+            : (
+              <tr>
+                <td
+                  class={`${tableStatus} w-full`}
+                >
+                  NO LISTINGS AT THE MOMENT
+                </td>
+              </tr>
+            )}
         </tbody>
       </table>
     </div>

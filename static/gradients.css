@@ -49,6 +49,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
+  transition: background 0.3s ease-in-out, -webkit-text-fill-color 0.3s ease-in-out, text-fill-color 0.3s ease-in-out;
 }
 
 .gray-gradient1-hover:hover {
@@ -79,6 +80,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
+  transition: background 0.3s ease-in-out, -webkit-text-fill-color 0.3s ease-in-out, text-fill-color 0.3s ease-in-out;
 }
 
 .gray-gradient3-hover:hover {
@@ -124,6 +126,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
+  transition: background 0.3s ease-in-out;
 }
 
 .purple-hover-gradient:hover {

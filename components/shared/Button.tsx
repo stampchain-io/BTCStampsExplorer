@@ -65,7 +65,7 @@ export function Button({
             </div>
           )
         : isSubmitting
-        ? "Processing..."
+        ? "PROCESSING"
         : props.children}
     </button>
   );
