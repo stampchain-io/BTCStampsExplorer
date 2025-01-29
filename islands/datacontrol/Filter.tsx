@@ -147,6 +147,13 @@ export function Filter({
     before:bg-[conic-gradient(from_var(--angle),#666666,#999999,#CCCCCC,#999999,#666666)]
     before:[--angle:0deg] before:animate-rotate
   `;
+  const animatedBorderGrey = `
+  relative rounded-md !bg-[#080808] p-[2px]
+  before:absolute before:inset-0 before:rounded-md before:z-[1]
+  before:bg-[conic-gradient(from_var(--angle),#666666,#999999,#CCCCCC,#999999,#666666)]
+  before:[--angle:0deg] before:animate-rotate
+  [&>*]:relative [&>*]:z-[2] [&>*]:rounded-md [&>*]:bg-[#080808]
+`;
 
   return (
     <>
@@ -209,7 +216,7 @@ export function Filter({
           }}
         >
           <div class={modalFilter}>
-            <div className={animatedFilterField}>
+            <div className={animatedBorderGrey}>
               <div class="relative flex flex-col max-h-[90%] overflow-hidden">
                 <div class="relative z-[2] !bg-[#080808] text-center rounded-md p-3">
                   <p className="text-lg text-stamp-grey font-light mb-2">

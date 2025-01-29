@@ -71,9 +71,10 @@ interface SearchResult {
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
   "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
+const backgroundContainer =
+  "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
 
 export function MintContent({
   trxType = "olga",
@@ -393,7 +394,7 @@ export function MintContent({
         />
       </div>
 
-      <div class={feeSelectorContainer}>
+      <div className={`${backgroundContainer} w-full`}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

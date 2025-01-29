@@ -304,6 +304,8 @@ export function OlgaContent() {
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isUploadTooltipVisible, setIsUploadTooltipVisible] = useState(false);
 
+  const uploadTooltipTimeoutRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (fees && !loading) {
       const recommendedFee = Math.round(fees.recommendedFee);
@@ -920,16 +922,16 @@ export function OlgaContent() {
   ]);
 
   const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
+  const backgroundContainer =
+    "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
   const titlePurpleLDCenter =
     "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-  const feeSelectorContainer =
-    "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
   const tooltipButton =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap transition-opacity duration-300";
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm mb-1 bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
   const tooltipImage =
-    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
+    "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
   const tooltipButtonOverflow =
-    "fixed bg-[#000000BF] px-2 py-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
+    "fixed bg-[#000000BF] px-2 py-1 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
 
   const isFormValid = isValidForMinting({
     file,
@@ -989,11 +991,47 @@ export function OlgaContent() {
     // ... rest of the effect
   }, [isConnected, wallet.address, file, fee]);
 
+  const handleMouseMove = (e: MouseEvent) => {
+    setTooltipPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleUploadMouseEnter = () => {
+    if (uploadTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
+    }
+
+    uploadTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+      setIsUploadTooltipVisible(true);
+    }, 1500);
+  };
+
+  const handleUploadMouseLeave = () => {
+    if (uploadTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
+    }
+    setIsUploadTooltipVisible(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (uploadTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(uploadTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Update the image preview div
   const imagePreviewDiv = (
     <div
       id="image-preview"
       class={`relative rounded items-center mx-auto text-center cursor-pointer ${PREVIEW_SIZE_CLASSES} content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300`}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleUploadMouseEnter}
+      onMouseLeave={handleUploadMouseLeave}
+      onMouseDown={() => setIsUploadTooltipVisible(false)}
       onClick={() => setIsUploadTooltipVisible(false)}
     >
       <input
@@ -1521,7 +1559,7 @@ export function OlgaContent() {
         </div> */
       }
 
-      <div className={feeSelectorContainer}>
+      <div className={`${backgroundContainer} w-full`}>
         <ComplexFeeCalculator
           fee={fee}
           handleChangeFee={handleChangeFee}

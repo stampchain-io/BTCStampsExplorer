@@ -8,6 +8,7 @@ import {
   colGroup,
   row,
   tableLabel,
+  tableStatus,
   tableValue,
   tableValueLink,
 } from "$components/shared/TableStyles.ts";
@@ -105,7 +106,15 @@ export function StampSales({ dispenses }: StampSalesProps) {
                 </td>
               </tr>
             ))
-            : "NO SALES"}
+            : (
+              <tr>
+                <td
+                  class={`${tableStatus} w-full`}
+                >
+                  NO SALES YET
+                </td>
+              </tr>
+            )}
         </tbody>
       </table>
     </div>

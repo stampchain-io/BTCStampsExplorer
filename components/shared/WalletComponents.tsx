@@ -40,7 +40,7 @@ export function StatItem({
         {label}
       </p>
       <p
-        class={`${dataValueSm} ${alignmentClass} group-hover:text-stamp-purple-bright`}
+        class={`${dataValueSm} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
       >
         {value}
       </p>
@@ -70,7 +70,7 @@ export function StatTitle({
         {label}
       </p>
       <p
-        class={`${dataValueXl} ${alignmentClass} group-hover:text-stamp-purple-bright`}
+        class={`${dataValueXl} ${alignmentClass} group-hover:text-stamp-grey transition-colors duration-300`}
       >
         {value}
       </p>
