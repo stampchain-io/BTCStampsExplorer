@@ -1,8 +1,10 @@
 import {
   CollectionOverviewSectionProps,
   CollectionSectionProps,
+  STAMP_FILTER_TYPES,
   StampRow,
   StampSectionProps,
+  SUBPROTOCOLS,
 } from "$globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
@@ -14,6 +16,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx";
 import { NamedAssetsModule } from "$islands/modules/NamedAssets.tsx";
 import CollectionOverviewSection from "$islands/collection/CollectionOverviewSection.tsx";
+import { CollectionRow } from "$server/types/collection.d.ts";
 
 type CollectionPageProps = {
   data: {
@@ -47,8 +50,29 @@ export const handler: Handlers = {
         page: page,
         creator: "",
       });
+
+      let collections: CollectionRow[] = [];
+      const type: "stamps" | "cursed" | "all" = "all";
+      const ident: SUBPROTOCOLS[] = selectedTab === "all"
+        ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]
+        : ["STAMP", "SRC-721"] as SUBPROTOCOLS[];
+
+      await Promise.all(
+        collectionsData?.data.map(async (item) => {
+          const result = await StampController.getStamps({
+            page,
+            limit: page_size,
+            sortBy,
+            type,
+            filterBy,
+            ident,
+            collectionId: item.collection_id,
+          });
+          collections.push({ ...item, img: result.data?.[0]?.stamp_url });
+        }),
+      );
       const data = {
-        collections: collectionsData.data,
+        collections: collections,
         page: collectionsData.page,
         pages: collectionsData.totalPages,
         page_size: collectionsData.limit,

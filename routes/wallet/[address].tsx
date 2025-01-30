@@ -105,6 +105,8 @@ export const handler: Handlers = {
 
         StampController.getStampsCreatedCount(address),
         SRC20MarketService.fetchMarketListingSummary(),
+        // SRC101 Balance request
+        await Src101Controller.handleSrc101BalanceRequest(address),
         fetch(
           `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=0`,
         ).then(async (res) => {
