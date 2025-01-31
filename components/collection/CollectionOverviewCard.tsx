@@ -13,7 +13,7 @@ export function CollectionOverviewCard(
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
   const dataValueSm =
     "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-
+  console.log("collection====>", collection);
   return (
     <a
       href={`/collection/details/${collection.collection_name}`}
@@ -23,7 +23,7 @@ export function CollectionOverviewCard(
         <div className="aspect-stamp min-w-[106px] min-h-[106px] max-w-[106px] max-h-[106px] mobileMd:min-w-[112px] mobileMd:min-h-[112px] mobileMd:max-w-[112px] mobileMd:max-h-[112px] mobileLg:min-w-[114px] mobileLg:min-h-[114px] mobileLg:max-w-[114px] mobileLg:max-h-[114px] overflow-hidden image-rendering-pixelated rounded">
           <div className="center relative w-full h-full">
             <img
-              src={collection.first_stamp_image}
+              src={collection.first_stamp_image || collection.img}
               alt=""
               className="w-full h-full"
             />

@@ -663,6 +663,7 @@ export interface Collection {
   total_editions: number;
   first_stamp_image?: string | null;
   stamp_images?: string[] | null;
+  img: string;
 }
 
 export interface SRC20SnapshotRequestParams {

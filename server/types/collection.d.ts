@@ -6,6 +6,7 @@ export interface CollectionRow {
   stamp_count: number;
   total_editions: number;
   stamps: number[];
+  img: string;
 }
 
 export interface CollectionQueryParams {
