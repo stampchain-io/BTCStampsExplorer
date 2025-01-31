@@ -1346,6 +1346,18 @@ export function OlgaContent() {
     }
   }, [isSearching]);
 
+  useEffect(() => {
+    const handleKeyboardShortcut = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isFullScreenModalOpen) {
+        handleCloseFullScreenModal();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyboardShortcut);
+    return () =>
+      document.removeEventListener("keydown", handleKeyboardShortcut);
+  }, [isFullScreenModalOpen]);
+
   return (
     <div class={bodyTools}>
       <h1 class={titlePurpleLDCenter}>STAMP</h1>
