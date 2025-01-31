@@ -54,7 +54,7 @@ const footerLogo =
 const footerTagline =
   "text-stamp-purple-bright text-sm leading-[16.8px] mobileLg:text-lg mobileLg:leading-[21.6px] font-light mb-3 mobileLg:mb-[18px]";
 const footerNavTitle =
-  "text-stamp-purple-dark hidden tablet:block text-lg leading-[23.4px] font-black";
+  "text-stamp-purple-dark hidden tablet:block text-lg leading-[23.4px] tracking-wide font-black";
 const navContent =
   "text-stamp-purple-dark text-xs leading-[14.4px] mobileLg:text-sm mobileLg:leading-[16.8px] tablet:text-base tablet:leading-[19.2px] font-medium hover:text-stamp-purple-bright";
 const copyright =
@@ -115,10 +115,10 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="flex flex-col tablet:flex-row justify-end tablet:justify-between w-full tablet:pt-3">
-        <div className="flex flex-col items-center tablet:items-start w-full tablet:w-1/2 gap-1.5">
+      <div className="flex flex-col tablet:flex-row w-full justify-end tablet:justify-between tablet:pt-3">
+        <div className="flex flex-col w-full tablet:w-1/2 items-center tablet:items-start gap-1.5">
           <p className={footerNavTitle}>RESOURCES</p>
-          <div className="flex flex-row tablet:flex-col justify-center w-full gap-[18px] mobileLg:gap-6 tablet:gap-1 leading-4">
+          <div className="flex flex-row tablet:flex-col w-full justify-center gap-[18px] mobileLg:gap-6 tablet:gap-1">
             {resourcesStampLinks.map((link, index) => (
               <a
                 key={index}
@@ -140,19 +140,22 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="hidden tablet:flex flex-col justify-center w-full tablet:w-1/2 gap-1.5 text-right">
+        <div className="hidden flex-col tablet:flex w-full tablet:w-1/2 justify-center gap-1.5 text-right">
           <p className={footerNavTitle}>STAMPCHAIN</p>
-          {stampChainLinks.map((link, index) => (
-            <a
-              key={index}
-              href={link.href}
-              f-partial={!link.isExternal ? link.href : undefined}
-              className={navContent}
-              target={link.isExternal ? "_blank" : undefined}
-            >
-              {link.title}
-            </a>
-          ))}
+          <div className="flex flex-col w-full gap-1">
+            {stampChainLinks.map((link, index) => (
+              <a
+                key={index}
+                href={link.href}
+                f-partial={!link.isExternal ? link.href : undefined}
+                className={navContent}
+                target={link.isExternal ? "_blank" : undefined}
+              >
+                {link.title}
+              </a>
+            ))}
+          </div>
+
           <p
             className={`${copyright} hidden tablet:block mt-[9px]`}
           >
