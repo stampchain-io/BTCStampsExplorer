@@ -140,7 +140,7 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
         </div>
       </div>
 
-      <div className="flex pt-1.5 mobileLg:pt-3">
+      <div className="flex pt-1.5 mobileLg:pt-3 h-[17vh] overflow-y-auto">
         {bitNames.length > 0
           ? (
             <div class="flex flex-col">
