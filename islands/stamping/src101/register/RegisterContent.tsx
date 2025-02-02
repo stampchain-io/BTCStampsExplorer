@@ -175,13 +175,15 @@ export function RegisterBitnameContent({
         >
           <div class="flex justify-between relative z-[2] !bg-[#100318] placeholder:!bg-[#100318] rounded-md">
             <input
-              type="search"
+              type="text"
               id="search-dropdown"
               class="h-[54px] mobileLg:h-[60px] w-full bg-transparent rounded-md pl-6 text-base mobileLg:text-lg font-medium text-stamp-grey-light placeholder:font-light placeholder:!text-stamp-grey !outline-none focus-visible:!outline-none focus:!bg-[#100318]"
               placeholder="bitname"
               required
               value={formState.toAddress || ""}
               onChange={(e) => handleInputChange(e, "toAddress")}
+              autocomplete="off"
+              autoCorrect="off"
             />
             <div
               className="relative"

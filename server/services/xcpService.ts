@@ -20,7 +20,7 @@ export const xcp_v2_nodes = [
   },
   {
     name: "dev.counterparty.io",
-    url: "https://dev.counterparty.io:4000/v2",
+    url: "https://api.counterparty.io:4000/v2",
   },
 ];
 
@@ -1720,7 +1720,7 @@ export class XcpManager {
           total: 0
         };
       }
-
+console.log("response====>", response)
       const dispensers = response.result.map((dispenser: any) => ({
         tx_hash: dispenser.tx_hash,
         block_index: dispenser.block_index,
