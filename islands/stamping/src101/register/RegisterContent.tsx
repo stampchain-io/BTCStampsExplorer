@@ -6,6 +6,7 @@ import DetailModal from "$islands/stamping/src101/DetailModal.tsx";
 import { ROOT_DOMAIN_TYPES, SRC101Balance } from "$globals";
 import { useSRC101Form } from "$client/hooks/userSRC101Form.ts";
 import { ROOT_DOMAINS } from "$lib/utils/constants.ts";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 
 const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
 const titlePurpleLDCenter =
@@ -284,7 +285,7 @@ export function RegisterBitnameContent({
       </div>
 
       <div className={`${backgroundContainer} w-full`}>
-        <ComplexFeeCalculator
+        <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src101"

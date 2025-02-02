@@ -230,7 +230,7 @@ export function FeeCalculatorBase({
         </p>
 
         {/* Miner Fee */}
-        {!!feeDetails?.minerFee && (
+        {!!feeDetails?.minerFee && !bitname && (
           <p className={detailsText}>
             <span className={detailsTitle}>MINER FEE</span> {coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.minerFee, {
