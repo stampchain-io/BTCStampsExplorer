@@ -102,7 +102,11 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
                         globalThis.location.href =
                           `/wallet/${dispenser.source}`;
                       }}
-                      className={tableValueLink}
+                      className={`${tableValueLink} ${
+                        isEmpty
+                          ? "!text-stamp-grey-darker hover:!text-stamp-purple-bright"
+                          : ""
+                      }`}
                     >
                       <span class="tablet:hidden">
                         {abbreviateAddress(dispenser.source, 4)}

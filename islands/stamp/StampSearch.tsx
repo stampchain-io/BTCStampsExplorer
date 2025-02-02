@@ -190,7 +190,11 @@ export function StampSearchClient(
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
-        handleOpen2(true);
+        if (!open2) {
+          handleOpen2(true);
+        } else {
+          handleOpen2(false);
+        }
       }
       if (e.key === "Escape" && open2) {
         handleOpen2(false);
