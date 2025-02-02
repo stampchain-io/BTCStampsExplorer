@@ -165,11 +165,7 @@ export default function StampSection({
         )}
       </div>
 
-      {viewAllLink && (
-        <div class="flex justify-end -mt-3 mobileMd:-mt-6">
-          <ViewAllButton href={seeAllLink} />
-        </div>
-      )}
+      {viewAllLink && <ViewAllButton href={seeAllLink} />}
 
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-9 mobileLg:mt-[72px]">

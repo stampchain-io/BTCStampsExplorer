@@ -39,7 +39,9 @@ export function HoldersGraph({ holders = [] }: HoldersGraphProps) {
     <div className="relative flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6">
       <div className="text-left tablet:text-right">
         <p className={dataLabel}>HOLDERS</p>
-        <p className={dataValueXL}>{totalHolders}</p>
+        <p className={`${dataValueXL} text-stamp-grey-light`}>
+          {totalHolders}
+        </p>
       </div>
       <div className="flex flex-col tablet:flex-row w-full gap-6">
         <div className="flex justify-center tablet:justify-start">

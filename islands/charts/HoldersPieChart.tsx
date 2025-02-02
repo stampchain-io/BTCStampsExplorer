@@ -51,8 +51,11 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
           },
           tooltip: {
             enabled: true,
+            backgroundColor: "#000000BF",
             titleColor: "#CCCCCC",
             bodyColor: "#CCCCCC",
+            position: "nearest",
+            yAlign: "bottom",
             callbacks: {
               label: (context: any) => {
                 const holder = holders[context.dataIndex];
@@ -62,6 +65,8 @@ export const HoldersPieChart = ({ holders }: PieChartProps) => {
                 ];
               },
             },
+            caretPadding: 12,
+            caretSize: 0,
           },
         },
       },
