@@ -323,14 +323,26 @@ export default function StampPage(props: StampDetailPageProps) {
     <>
       <Head>
         <title>{title}</title>
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={metaDescription} />
-        <meta property="og:image" content={metaInfo.url} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={metaDescription} />
-        <meta name="twitter:image" content={metaInfo.url} />
+        <meta property="og:title" content={title} key="og-title" />
+        <meta
+          property="og:description"
+          content={metaDescription}
+          key="og-description"
+        />
+        <meta property="og:image" content={stampImageUrl} key="og-image" />
+        <meta property="og:type" content="website" key="og-type" />
+        <meta
+          name="twitter:card"
+          content="summary_large_image"
+          key="twitter-card"
+        />
+        <meta name="twitter:title" content={title} key="twitter-title" />
+        <meta
+          name="twitter:description"
+          content={metaDescription}
+          key="twitter-description"
+        />
+        <meta name="twitter:image" content={metaInfo.url} key="twitter-image" />
         {/* Only add dimension meta tags if we have the dimensions */}
         {metaInfo.width && metaInfo.height && (
           <>
