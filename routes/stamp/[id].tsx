@@ -238,6 +238,7 @@ export default function StampPage(props: StampDetailPageProps) {
     : stamp?.cpid?.startsWith("A")
     ? `Bitcoin Stamp #${stamp?.stamp || ""} - stampchain.io`
     : stamp?.cpid || "Stamp Not Found";
+  const stampImageUrl = stamp.stamp_url;
 
   // Update the getMetaImageInfo and add dimension handling
   const getMetaImageInfo = (stamp: StampRow | undefined, baseUrl: string) => {
