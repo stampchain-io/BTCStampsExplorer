@@ -13,10 +13,7 @@ import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { StampRow } from "$globals";
-import {
-  backgroundContainer,
-  dataLabel,
-} from "$components/shared/WalletStyles.ts";
+import { dataLabel } from "$components/shared/WalletStyles.ts";
 
 const ItemHeader = ({
   title = "STAMP",

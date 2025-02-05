@@ -56,7 +56,7 @@ const StampImageFullScreen = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div class="h-[min(calc(100vh-48px),calc(100vw-48px))] w-[min(calc(100vh-48px),calc(100vw-48px))] mobileLg:h-[min(calc(100vh-96px),calc(100vw-96px))] mobileLg:w-[min(calc(100vh-96px),calc(100vw-96px))]">
-          <div class="flex flex-col h-full w-full">
+          <div class="flex flex-col h-full w-full stamp-container">
             {contentType === "html"
               ? (
                 <iframe

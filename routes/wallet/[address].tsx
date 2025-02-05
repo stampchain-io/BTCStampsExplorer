@@ -16,7 +16,7 @@ import {
   PaginatedResponse,
   PaginationQueryParams,
 } from "$types/pagination.d.ts";
-import { DispenserRow, SRC20Row, StampRow } from "$globals";
+import { SRC20Row, StampRow } from "$globals";
 
 /**
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
@@ -185,9 +185,6 @@ export const handler: Handlers = {
       const dispensersData = dispensersResponse.status === "fulfilled"
         ? dispensersResponse.value.dispensers
         : [];
-
-      // Check if address has ever opened dispensers by looking at actual dispenser data
-      const isDispenserAddress = dispensersData.length > 0;
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
         ? btcInfoResponse.value
