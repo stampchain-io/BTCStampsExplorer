@@ -13,7 +13,7 @@ export function CollectionOverviewCard(
     "text-sm mobileLg:text-base font-light text-stamp-grey-darker uppercase";
   const dataValueSm =
     "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  console.log("collection====>", collection);
+
   return (
     <a
       href={`/collection/details/${collection.collection_name}`}

@@ -439,13 +439,24 @@ export class StampController {
         });
         poshStamps = poshResult.data;
       }
+      const collectionData = []
+      await Promise.all(
+        collections?.data.map(async (item) => {
+          const result = await this.getStamps({
+            collectionId: item.collection_id,
+            ident: ["STAMP", "SRC-721", "SRC-20"],
+            sortBy: "DESC"
+          });
+          collectionData.push({ ...item, img: result.data?.[0]?.stamp_url });
+        }),
+      );
 
       return {
         carouselStamps: carouselData.data ?? [],
         stamps_src721: mainCategories[1]?.stamps ?? [],
         stamps_art: mainCategories[2]?.stamps ?? [], // Now at index 2
         stamps_posh: poshStamps,
-        collectionData: collections.data ?? [],
+        collectionData: collectionData ?? [],
       };
 
     } catch (error) {
