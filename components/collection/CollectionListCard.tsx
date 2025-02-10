@@ -32,7 +32,11 @@ export function CollectionListCard(
     >
       <div
         class={`${imageContentClassName} ${isHovered ? "grayscale-0" : ""}`}
-        style={{ backgroundImage: `url('${collection.first_stamp_image}')` }}
+        style={{
+          backgroundImage: `url('${
+            collection.first_stamp_image || collection.img
+          }')`,
+        }}
       >
       </div>
       <div
