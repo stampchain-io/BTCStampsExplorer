@@ -130,6 +130,7 @@ export interface StampSectionProps {
   variant?: "default" | "grey";
   viewAllLink?: string;
   alignRight?: boolean;
+  fromPage?: string;
 }
 
 export interface CollectionSectionProps {

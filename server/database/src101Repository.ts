@@ -454,7 +454,7 @@ export class SRC101Repository {
     const offset = params.limit && params.page ? Number(params.limit) * (Number(params.page) - 1) : 0;
     queryParams.push(params.limit, offset); // Add limit and offset at the end
 
-    const validOrder = ["ASC", "DESC"].includes(params.sort.toUpperCase())
+    const validOrder = ["ASC", "DESC"].includes(params.sort?.toUpperCase())
       ? params.sort.toUpperCase()
       : "ASC";
 
