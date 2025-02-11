@@ -204,7 +204,7 @@ export default function Collection(props: CollectionPageProps) {
 
   return (
     <div class="text-stamp-grey-light flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
-      <StampSection {...CollectionsSection[0]} />
+      <StampSection fromPage="collection" {...CollectionsSection[0]} />
       <div class="relative">
         <CollectionSection {...EspeciallyPoshSection} />
         <NamedAssetsModule />
