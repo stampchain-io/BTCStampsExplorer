@@ -16,7 +16,8 @@ import {
   PaginatedResponse,
   PaginationQueryParams,
 } from "$types/pagination.d.ts";
-import { DispenserRow, SRC20Row, StampRow } from "$globals";
+import { SRC20Row, StampRow } from "$globals";
+import { DEFAULT_PAGINATION } from "$server/services/routeValidationService.ts";
 
 /**
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
@@ -106,7 +107,12 @@ export const handler: Handlers = {
         StampController.getStampsCreatedCount(address),
         SRC20MarketService.fetchMarketListingSummary(),
         // SRC101 Balance request
-        await Src101Controller.handleSrc101BalanceRequest(address),
+        await Src101Controller.handleSrc101BalanceRequest({
+          address,
+          limit: DEFAULT_PAGINATION.limit,
+          page: DEFAULT_PAGINATION.page,
+          sort: "ASC",
+        }),
         fetch(
           `${url.origin}/api/v2/src101/balance/${address}?limit=100&offset=0`,
         ).then(async (res) => {
@@ -185,9 +191,6 @@ export const handler: Handlers = {
       const dispensersData = dispensersResponse.status === "fulfilled"
         ? dispensersResponse.value.dispensers
         : [];
-
-      // Check if address has ever opened dispensers by looking at actual dispenser data
-      const isDispenserAddress = dispensersData.length > 0;
 
       const btcInfo = btcInfoResponse.status === "fulfilled"
         ? btcInfoResponse.value
