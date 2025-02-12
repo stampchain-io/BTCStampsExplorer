@@ -25,6 +25,7 @@ export default function StampSection({
   viewAllLink,
   alignRight = false,
   fromPage = "",
+  sortBy = "ASC",
 }: StampSectionProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [displayCount, setDisplayCount] = useState(
@@ -165,7 +166,7 @@ export default function StampSection({
               <div
                 class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
               >
-                <Sort initSort="ASC" />
+                <Sort initSort={sortBy} />
               </div>
               <div
                 class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}

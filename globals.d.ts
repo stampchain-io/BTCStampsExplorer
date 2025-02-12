@@ -131,6 +131,7 @@ export interface StampSectionProps {
   viewAllLink?: string;
   alignRight?: boolean;
   fromPage?: string;
+  sortBy?: "ASC" | "DESC" | undefined;
 }
 
 export interface CollectionSectionProps {

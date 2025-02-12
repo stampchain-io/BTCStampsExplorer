@@ -457,13 +457,14 @@ export class StampController {
     }
   }
 
-  static async getCollectionPageData() {
+  static async getCollectionPageData(params) {
     try {
+      const {sortBy} = params
       const [
         stampCategories,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["SRC-721"], limit: 12, sortBy: "DESC" },
+          { idents: ["SRC-721"], limit: 12, sortBy: sortBy },
         ]),
       ]);
       // Fetch the "posh" collection to get its collection_id
@@ -478,7 +479,7 @@ export class StampController {
           collectionId: poshCollectionId,
           page: 1,
           limit: 12, // Limit to 8 stamps
-          sortBy: "DESC", // Adjust sort order if needed
+          sortBy: sortBy, // Adjust sort order if needed
         });
         stamps_posh = poshStampsResult.data; // Extract the stamps array
       } else {
