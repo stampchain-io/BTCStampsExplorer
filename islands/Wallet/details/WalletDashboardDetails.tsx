@@ -536,7 +536,7 @@ function WalletStats(
 }
 
 function StampStats(
-  { stampsTotal, stampsCreated, _handleType, stampValue = 0 }: {
+  { stampsTotal, stampsCreated, stampValue = 0 }: {
     stampsTotal: number;
     stampsCreated: number;
     handleType: (type: string) => void;
@@ -575,7 +575,7 @@ function StampStats(
 }
 
 function DispenserStats(
-  { _handleType, dispensers = { open: 0, closed: 0, total: 0 } }: {
+  { dispensers = { open: 0, closed: 0, total: 0 } }: {
     handleType: (type: string) => void;
     dispensers?: { open: number; closed: number; total: number };
   },
@@ -598,7 +598,7 @@ function DispenserStats(
 }
 
 function TokenStats(
-  { src20Total, _handleType, src20Value = 0 }: {
+  { src20Total, src20Value = 0 }: {
     src20Total: number;
     handleType: (type: string) => void;
     src20Value?: number;
