@@ -13,6 +13,7 @@ export interface CollectionQueryParams {
   limit?: number;
   page?: number;
   creator?: string;
+  sortBy?: string;
 }
 
 export interface PaginatedCollectionResponseBody {
