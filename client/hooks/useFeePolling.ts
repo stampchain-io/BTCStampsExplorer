@@ -32,7 +32,7 @@ export const useFeePolling = (intervalDuration = 300000) => {
           _hourFee: newFees.hourFee,
           economyFee: newFees.economyFee,
           fastestFee: newFees.fastestFee,
-          recommendedFee: newFees.fastestFee,
+          recommendedFee: newFees.minimumFee,
           block: block,
         };
         setFees(allFees);
@@ -55,7 +55,7 @@ export const useFeePolling = (intervalDuration = 300000) => {
     fees,
     loading,
     fetchFees,
-    satsPerVB: fees?.recommendedFee,
-    satsPerKB: fees?.recommendedFee * 1000,
+    satsPerVB: fees?.minimumFee,
+    satsPerKB: fees?.minimumFee * 1000,
   };
 };
