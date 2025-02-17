@@ -16,26 +16,27 @@ const Badge = ({
   );
 };
 
-export function FilterToggle({ count }) {
+export function FilterToggle({ count, open, setOpen }) {
   return (
     <div
       class={`relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright`}
     >
       <Badge text={count} />
       <Button
-        onClick={() => {
-          const url = new URL(globalThis.location.href);
-          if (url.searchParams.has("stamp-filter-open")) {
-            url.searchParams.delete("stamp-filter-open");
-          } else {
-            url.searchParams.set(
-              "stamp-filter-open",
-              "true",
-            );
-          }
-          globalThis.location.href = url.toString();
-        }}
+        // onClick={() => {
+        //   const url = new URL(globalThis.location.href);
+        //   if (url.searchParams.has("stamp-filter-open")) {
+        //     url.searchParams.delete("stamp-filter-open");
+        //   } else {
+        //     url.searchParams.set(
+        //       "stamp-filter-open",
+        //       "true",
+        //     );
+        //   }
+        //   globalThis.location.href = url.toString();
+        // }}
         variant="icon"
+        onClick={() => setOpen(!open)}
         icon={
           <svg
             // width="32"
@@ -50,6 +51,9 @@ export function FilterToggle({ count }) {
             />
           </svg>
         }
+        data-drawer-target="drawer-form"
+        data-drawer-show="drawer-form"
+        aria-controls="drawer-form"
       />
     </div>
   );

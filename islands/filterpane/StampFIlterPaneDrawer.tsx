@@ -44,8 +44,8 @@ const ChevronDown = () => (
 const CrossIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="32"
-    height="32"
+    width="24"
+    height="24"
     viewBox="0 0 32 32"
     fill="none"
   >
@@ -450,8 +450,7 @@ export const StampFilters = (
 
   return (
     <div
-      className={`${breakpoints.isMobile() ? "w-screen" : "w-64"
-        } bg-stamp-bg-purple-dark shadow-lg`}
+      class="w-full"
     >
       {showClose && (
         <div class="flex justify-end">
@@ -471,7 +470,19 @@ export const StampFilters = (
             size={20}
           /> */
       }
-      <input
+
+      <div className="border-b border-stamp-purple-highlight/20">
+        <button
+          onClick={clearAllFilters}
+          variant="outline"
+          className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-stamp-grey bg-stamp-purple rounded-lg hover:bg-stamp-primary-hover transition-colors"
+        >
+          {/* <X size={16} className="mr-2" /> */}
+          <CrossIcon /> Clear All Filters
+        </button>
+      </div>
+
+      {/* <input
         type="text"
         placeholder="Search stamps..."
         className="w-full pl-10 pr-4 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
@@ -480,21 +491,12 @@ export const StampFilters = (
         onBlur={(ev) => {
           handleFilterChange("search", ev.target.value);
         }}
-      />
+      /> */}
       {
         /* </div>
       </div> */
       }
 
-      <div className="p-4 border-b border-stamp-purple-highlight/20">
-        <button
-          onClick={clearAllFilters}
-          className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-black bg-stamp-purple rounded-lg hover:bg-stamp-primary-hover transition-colors"
-        >
-          {/* <X size={16} className="mr-2" /> */}
-          <CrossIcon /> Clear All Filters
-        </button>
-      </div>
 
       <FilterSection
         title="Buy Now"

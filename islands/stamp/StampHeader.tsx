@@ -9,6 +9,7 @@ import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
 import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
 import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
+import StampSearchDrawer from "$islands/stamp/details/StampSearchDrawer.tsx";
 import { flags } from "../../lib/flags/flags.ts";
 
 export const StampHeader = (
@@ -20,6 +21,7 @@ export const StampHeader = (
 ) => {
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
   const breakpoints = useBreakpoints();
 
   const searchparams = new URLSearchParams(search);
@@ -40,9 +42,8 @@ export const StampHeader = (
 
   return (
     <div
-      class={`relative flex flex-row justify-between items-start w-full gap-3 ${
-        isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
-      }`}
+      class={`relative flex flex-row justify-between items-start w-full gap-3 ${isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
+        }`}
     >
       <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>STAMPS</h1>
       <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
@@ -69,10 +70,10 @@ export const StampHeader = (
           Filter pane
         </button> */
         }
-        {breakpoints.isMobile() &&
+        {
           flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false) && (
-          <FilterToggle count={filterCount} />
-        )}
+            <FilterToggle open={openSearch} setOpen={setOpenSearch} count={filterCount} />
+          )}
         {!flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false)
           ? (
             <Filter
@@ -103,6 +104,7 @@ export const StampHeader = (
           <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
         </div>
       </div>
+      <StampSearchDrawer open={openSearch} setOpen={setOpenSearch} />
     </div>
   );
 };
