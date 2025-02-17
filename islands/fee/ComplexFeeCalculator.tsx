@@ -21,6 +21,7 @@ export function ComplexFeeCalculator({
   buttonName,
   tosAgreed,
   onTosChange,
+  bitname,
   ...baseProps
 }: ComplexFeeProps) {
   const feeDetails = providedFeeDetails?.hasExactFees
@@ -95,6 +96,7 @@ export function ComplexFeeCalculator({
       tosAgreed={tosAgreed}
       onTosChange={onTosChange}
       feeDetails={feeDetails}
+      bitname={bitname}
     />
   );
 }

@@ -460,13 +460,24 @@ export class StampController {
         });
         poshStamps = poshResult.data;
       }
+      const collectionData = []
+      await Promise.all(
+        collections?.data.map(async (item) => {
+          const result = await this.getStamps({
+            collectionId: item.collection_id,
+            ident: ["STAMP", "SRC-721", "SRC-20"],
+            sortBy: "DESC"
+          });
+          collectionData.push({ ...item, img: result.data?.[0]?.stamp_url });
+        }),
+      );
 
       return {
         carouselStamps: carouselData.data ?? [],
         stamps_src721: mainCategories[1]?.stamps ?? [],
         stamps_art: mainCategories[2]?.stamps ?? [], // Now at index 2
         stamps_posh: poshStamps,
-        collectionData: collections.data ?? [],
+        collectionData: collectionData ?? [],
       };
 
     } catch (error) {
@@ -478,13 +489,14 @@ export class StampController {
     }
   }
 
-  static async getCollectionPageData() {
+  static async getCollectionPageData(params) {
     try {
+      const {sortBy} = params
       const [
         stampCategories,
       ] = await Promise.all([
         this.getMultipleStampCategories([
-          { idents: ["SRC-721"], limit: 12, sortBy: "DESC" },
+          { idents: ["SRC-721"], limit: 12, sortBy: sortBy },
         ]),
       ]);
       // Fetch the "posh" collection to get its collection_id
@@ -499,7 +511,7 @@ export class StampController {
           collectionId: poshCollectionId,
           page: 1,
           limit: 12, // Limit to 8 stamps
-          sortBy: "DESC", // Adjust sort order if needed
+          sortBy: sortBy, // Adjust sort order if needed
         });
         stamps_posh = poshStampsResult.data; // Extract the stamps array
       } else {

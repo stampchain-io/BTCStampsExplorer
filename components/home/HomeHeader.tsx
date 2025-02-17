@@ -38,7 +38,7 @@ export function HomeHeader() {
           mobileMd:w-[520px]
           mobileLg:w-[720px]
           tablet:w-[976px]
-          desktop:w-[1368px]
+          
           flex flex-col justify-center
         ">
         <h1 class="text-center">
@@ -52,7 +52,7 @@ export function HomeHeader() {
               mobileMd:text-4xl
               mobileLg:text-5xl
               tablet:text-6xl
-              desktop:text-7xl
+              desktop:text-6xl
               !content-visibility: visible
             "
           >
@@ -71,7 +71,7 @@ export function HomeHeader() {
               mobileMd:text-3xl
               mobileLg:text-4xl
               tablet:text-5xl
-              desktop:text-6xl
+              
               -mt-1
               tablet:mt-0
             ">
@@ -91,7 +91,7 @@ export function HomeHeader() {
           mobileMd:max-w-[380px] mobileMd:text-lg
           mobileLg:max-w-[515px] mobileLg:text-xl
           tablet:max-w-[618px] tablet:text-2xl
-          desktop:max-w-[772px] desktop:text-3xl
+          
         "
         style="content-visibility: visible; contain: content;"
       >

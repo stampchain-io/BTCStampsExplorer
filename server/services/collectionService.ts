@@ -10,10 +10,10 @@ export class CollectionService {
   static async getCollectionDetails(
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
-    const { limit = 50, page = 1, creator } = params;
+    const { limit = 50, page = 1, creator, sortBy } = params;
 
     const [collectionsResult, totalCollections, lastBlock] = await Promise.all([
-      CollectionRepository.getCollectionDetails({ limit, page, creator }),
+      CollectionRepository.getCollectionDetails({ limit, page, creator, sortBy }),
       CollectionRepository.getTotalCollectionsByCreatorFromDb(creator),
       BlockController.getLastBlock(),
     ]);

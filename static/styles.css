@@ -149,6 +149,12 @@ body {
   height: 100%;
   z-index: 1;
   aspect-ratio: 1;
+  /* Force hardware acceleration on iOS */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Prevent iOS image stretching */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .stamp-container::before {
@@ -164,15 +170,33 @@ body {
   z-index: 0;
 }
 
+/* Add specific iOS handling for SVG */
+.stamp-container svg {
+  width: 100%;
+  height: 100%;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
 .stamp-image {
   position: relative;
   z-index: 2;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  /* Add webkit prefix for iOS */
+  -webkit-image-rendering: pixelated;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+  /* Force hardware acceleration on iOS */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Prevent iOS image stretching */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .bgGradientTopLeft {
@@ -476,6 +500,12 @@ body {
   border-bottom-right-radius: 0 !important;
 }
 
+.input-open-right:before,
+.input-open-right>* {
+  @apply rounded-t-md rounded-bl-md rounded-br-[0px] !important;
+}
+
+
 /* Emoji ticker styling for SRC20 cards */
 .emoji-ticker {
   @apply text-stamp-primary-hover;
@@ -500,7 +530,7 @@ body {
   background-position: 0% 100%;
   background-repeat: no-repeat;
   background-size: 100% 2px;
-  transition: background-size .3s;
+  transition: background-size .3s, color .6s;
   padding-bottom: 3px;
   text-shadow:
     -3px 0 #000,
@@ -516,6 +546,7 @@ body {
 .animated-underline:hover,
 .animated-underline:focus {
   background-size: 0% 2px;
+  color: #999999;
 }
 
 /* Animated loader text */

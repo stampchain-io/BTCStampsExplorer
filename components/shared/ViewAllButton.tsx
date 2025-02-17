@@ -7,7 +7,7 @@ const buttonPurpleOutline =
 
 export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (
-    <div className="flex justify-end w-full mt-3 mobileMd:mt-6">
+    <div className="flex justify-end w-full mt-[18px] mobileMd:mt-6 mobileLg:mt-9">
       <a
         href={href}
         class={buttonPurpleOutline}

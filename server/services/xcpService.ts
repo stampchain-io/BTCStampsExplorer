@@ -20,7 +20,7 @@ export const xcp_v2_nodes = [
   },
   {
     name: "dev.counterparty.io",
-    url: "https://dev.counterparty.io:4000/v2",
+    url: "https://api.counterparty.io:4000/v2",
   },
 ];
 
@@ -56,8 +56,8 @@ export function normalizeFeeRate(params: {
       throw new Error("Either satsPerKB or satsPerVB must be provided");
     }
 
-    if (normalizedSatsPerVB <= 2) {
-      throw new Error("Fee rate must be greater than 2 sat/vB");
+    if (normalizedSatsPerVB < 1) {
+      throw new Error("Fee rate must be greater than 1 sat/vB");
     }
 
     return {

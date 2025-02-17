@@ -25,18 +25,30 @@ export function MetaTags({
       <link rel="canonical" href="https://stampchain.io" />
 
       {/* OpenGraph tags */}
-      <meta property="og:title" content="Stampchain.io" />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://stampchain.io" />
-      <meta property="og:locale" content="en_US" />
+      <meta property="og:title" content="Stampchain.io" key="og-title" />
+      <meta
+        property="og:description"
+        content={description}
+        key="og-description"
+      />
+      <meta property="og:image" content={image} key="og-image" />
+      <meta property="og:type" content="website" key="og-type" />
+      <meta property="og:url" content="https://stampchain.io" key="og-url" />
+      <meta property="og:locale" content="en_US" key="og-locale" />
 
       {/* Twitter Card tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="stampchain.io" />
-      <meta name="twitter:image" content={image} />
-      <meta name="twitter:description" content={description} />
+      <meta
+        name="twitter:card"
+        content="summary_large_image"
+        key="twitter-card"
+      />
+      <meta name="twitter:title" content="stampchain.io" key="twitter-title" />
+      <meta name="twitter:image" content={image} key="twitter-image" />
+      <meta
+        name="twitter:description"
+        content={description}
+        key="twitter-description"
+      />
     </>
   );
 }

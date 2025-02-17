@@ -153,14 +153,14 @@ export function SRC20Section({
         </h2>
       )}
 
-      <div class="grid grid-cols-1 gap-3 mobileLg:gap-6 items-end max-w-desktop w-full mx-auto">
+      <div class="grid grid-cols-1 gap-3 mobileMd:gap-6 items-end max-w-desktop w-full mx-auto">
         <ImageModal
           imgSrc={modalImg}
           isOpen={isModalOpen}
           onClose={handleCloseModal}
         />
 
-        <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-3 mobileMd:gap-6">
           {data.map((src20) => (
             parseFloat(src20?.progress || "0") >= 100
               ? (

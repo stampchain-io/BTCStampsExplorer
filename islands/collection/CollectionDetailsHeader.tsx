@@ -15,11 +15,9 @@ export const CollectionDetailsHeader = (
   const dataLabel =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker uppercase";
   const dataValueXs =
-    "text-xs mobileLg:text-sm font-medium text-stamp-grey-light";
+    "text-xs mobileLg:text-sm font-normal text-stamp-grey-light";
   const dataValueSm =
     "text-sm mobileLg:text-base font-medium text-stamp-grey-light";
-  const _dataValue =
-    "text-base mobileLg:text-lg font-medium text-stamp-grey-light uppercase";
   const dataValueXl =
     "text-3xl mobileLg:text-4xl font-black text-stamp-grey-light -mt-1";
 

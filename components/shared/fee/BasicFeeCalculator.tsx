@@ -12,6 +12,7 @@ export function BasicFeeCalculator({
   _inputType = "P2WPKH",
   outputTypes = ["P2WPKH"],
   utxoAncestors,
+  bitname,
   ...baseProps
 }: BasicFeeProps) {
   const outputs: Output[] = outputTypes.map((type) => ({
@@ -26,6 +27,7 @@ export function BasicFeeCalculator({
     <FeeCalculatorBase
       {...baseProps}
       fee={fee}
+      bitname={bitname}
       feeDetails={{
         minerFee: estimatedFee,
         hasExactFees: true,

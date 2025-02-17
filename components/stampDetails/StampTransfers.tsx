@@ -4,6 +4,7 @@ import {
   colGroup,
   row,
   tableLabel,
+  tableStatus,
   tableValue,
   tableValueLink,
 } from "$components/shared/TableStyles.ts";
@@ -125,7 +126,15 @@ export function StampTransfers({ sends }: StampTransfersProps) {
                 </td>
               </tr>
             ))
-            : "NO TRANSFERS"}
+            : (
+              <tr>
+                <td
+                  class={`${tableStatus} w-full`}
+                >
+                  NO TRANSFERS
+                </td>
+              </tr>
+            )}
         </tbody>
       </table>
     </div>

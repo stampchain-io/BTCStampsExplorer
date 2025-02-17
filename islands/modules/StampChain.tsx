@@ -14,10 +14,12 @@ export const StampChainModule = () => {
         <p className={ModulesStyles.bodyTextLight}>
           <b>
             As the architects of the Bitcoin Stamps protocol, we've been at the
-            forefront of the ecosystem since its inception. Our platform
-            combines deep technical expertise with user-friendly tools to help
-            you create, collect, and trade Bitcoin Stamps with confidence.
-          </b>
+            forefront of the ecosystem since its inception.
+          </b>{" "}
+          Our platform combines deep technical expertise with user-friendly
+          tools to help you create, collect, and trade Bitcoin Stamps with
+          confidence.
+
           <br />
           <br />
           <b>We empower creators and collectors by:</b>
@@ -35,11 +37,11 @@ export const StampChainModule = () => {
 
       <div className="flex gap-3 mobileMd:gap-6 font-extrabold justify-end">
         <a
-          href="/about/#donate"
-          f-partial="/about/#donate"
+          href="/about/#contact"
+          f-partial="/about/#contact"
           className={ModulesStyles.buttonGreyOutline}
         >
-          DONATE
+          CONTACT
         </a>
         <a
           href="/about"
