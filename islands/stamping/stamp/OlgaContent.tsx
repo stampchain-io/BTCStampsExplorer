@@ -1466,7 +1466,7 @@ export function OlgaContent() {
                 placeholder={isPoshStamp
                   ? "Named Stamp (Requires XCP)"
                   : "Custom CPID"}
-                maxLength={13}
+                maxLength={isPoshStamp ? 13 : 21}
                 error={stampNameError}
               />
             </div>
