@@ -409,23 +409,25 @@ export function FeeCalculatorBase({
               className="flex items-center cursor-pointer"
             >
               <div
-                className={`w-3 h-3 border border-[#7F7979] mr-2 flex items-center justify-center bg-[#999999] rounded-[2px]`}
+                className={`w-3 h-3 mr-2 flex items-center justify-center transition-colors duration-300 ${
+                  tosAgreed ? "bg-stamp-grey-darker" : "bg-stamp-grey-light"
+                } rounded-[2px]`}
               >
                 {tosAgreed && (
                   <svg
                     viewBox="0 0 24 24"
-                    className="w-2 h-2 text-[#333333]"
+                    className="w-2 h-2"
                   >
                     <path
-                      fill="currentColor"
+                      fill="#333333"
                       d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"
                     />
                   </svg>
                 )}
               </div>
               <span
-                className={`text-xs mobileLg:text-sm font-medium ${
-                  tosAgreed ? "text-stamp-grey-light" : "text-stamp-grey"
+                className={`text-xs mobileLg:text-sm font-medium transition-colors duration-300 ${
+                  tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
                 }`}
               >
                 I AGREE TO THE{" "}
@@ -433,7 +435,11 @@ export function FeeCalculatorBase({
                   <span className="mobileLg:hidden">
                     <a
                       href="/termsofservice"
-                      className="hover:text-stamp-purple-highlight"
+                      className={`hover:text-stamp-purple-bright transition-colors duration-300 ${
+                        tosAgreed
+                          ? "text-stamp-purple-dark"
+                          : "text-stamp-purple"
+                      }`}
                     >
                       ToS
                     </a>
@@ -441,7 +447,11 @@ export function FeeCalculatorBase({
                   <span className="hidden mobileLg:inline">
                     <a
                       href="/termsofservice"
-                      className="hover:text-stamp-purple-highlight"
+                      className={`hover:text-stamp-purple-bright transition-colors duration-300 ${
+                        tosAgreed
+                          ? "text-stamp-purple-dark"
+                          : "text-stamp-purple"
+                      }`}
                     >
                       TERMS OF SERVICE
                     </a>
