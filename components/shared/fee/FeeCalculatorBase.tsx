@@ -144,6 +144,18 @@ export function FeeCalculatorBase({
     setAllowCurrencyTooltip(true);
   };
 
+  // Helper functions to convert between slider position and fee value
+  const feeToSliderPos = (fee: number) =>
+    fee <= 10 ? (fee / 10) * 33.33 : 33.33 + ((fee - 10) / 254) * 66.67;
+
+  const sliderPosToFee = (pos: number) => {
+    if (pos <= 33.33) {
+      return Math.round((pos / 33.33) * 10 * 2) / 2; // 0-10 with 0.5 steps
+    }
+    const value = 10 + ((pos - 33.33) / 66.67) * 254;
+    return Math.min(264, Math.round(value)); // 10-264 with 1.0 steps
+  };
+
   // Fee selector component
   const renderFeeSelector = () => (
     <div className={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
@@ -168,14 +180,18 @@ export function FeeCalculatorBase({
       >
         <input
           type="range"
-          value={fee}
-          min="1"
-          max="264"
-          step="1"
+          value={feeToSliderPos(fee)}
+          min="0"
+          max="100"
+          step="0.25"
           onChange={(e) =>
-            handleChangeFee(parseInt((e.target as HTMLInputElement).value, 10))}
-          // onInput={(e) =>
-          //   handleChangeFee(parseInt((e.target as HTMLInputElement).value, 10))}
+            handleChangeFee(
+              sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
+            )}
+          onInput={(e) =>
+            handleChangeFee(
+              sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
+            )}
           className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
         />
         <div
