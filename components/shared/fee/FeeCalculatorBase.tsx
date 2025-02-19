@@ -221,34 +221,38 @@ export function FeeCalculatorBase({
         {/* File Type - Only show for stamp type */}
         {type === "stamp" && fileType && (
           <p className={detailsText}>
-            <span className={detailsTitle}>FILE</span> {fileType.toUpperCase()}
+            <span className={detailsTitle}>FILE</span>&nbsp;&nbsp;{fileType
+              .toUpperCase()}
           </p>
         )}
 
         {/* Editions - Only show for stamp type */}
         {type === "stamp" && issuance && (
           <p className={detailsText}>
-            <span className={detailsTitle}>EDITIONS</span> {issuance}
+            <span className={detailsTitle}>EDITIONS</span>&nbsp;&nbsp;{issuance}
           </p>
         )}
 
         {/* File Size */}
         {!!fileSize && (
           <p className={detailsText}>
-            <span className={detailsTitle}>SIZE</span> {fileSize}{" "}
+            <span className={detailsTitle}>SIZE</span>&nbsp;&nbsp;{fileSize}
+            {" "}
             <span className="font-light">BYTES</span>
           </p>
         )}
 
         {/* Sats Per Byte */}
         <p className={detailsText}>
-          <span className={detailsTitle}>SATS PER BYTE</span> {fee}
+          <span className={detailsTitle}>SATS PER BYTE</span>&nbsp;&nbsp;{fee}
         </p>
 
         {/* Miner Fee */}
         {!!feeDetails?.minerFee && !bitname && (
           <p className={detailsText}>
-            <span className={detailsTitle}>MINER FEE</span> {coinType === "BTC"
+            <span className={detailsTitle}>
+              MINER FEE
+            </span>&nbsp;&nbsp;{coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.minerFee, {
                 includeSymbol: false,
               })
@@ -262,7 +266,7 @@ export function FeeCalculatorBase({
           <p className={detailsText}>
             <span className={detailsTitle}>
               {isModal ? "SERVICE FEE" : "MINTING FEE"}
-            </span>{" "}
+            </span>&nbsp;&nbsp;
             {coinType === "BTC"
               ? (
                 <>
@@ -283,7 +287,9 @@ export function FeeCalculatorBase({
         {/* Dust Value */}
         {!!feeDetails?.dustValue && (
           <p className={detailsText}>
-            <span className={detailsTitle}>DUST</span> {coinType === "BTC"
+            <span className={detailsTitle}>
+              DUST
+            </span>&nbsp;&nbsp;{coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.dustValue, {
                 includeSymbol: false,
               })
@@ -295,7 +301,9 @@ export function FeeCalculatorBase({
         {/* Total */}
         {!!feeDetails?.totalValue && (
           <p className={detailsText}>
-            <span className={detailsTitle}>TOTAL</span> {coinType === "BTC"
+            <span className={detailsTitle}>
+              TOTAL
+            </span>&nbsp;&nbsp;{coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.totalValue, {
                 includeSymbol: false,
               })
@@ -304,22 +312,23 @@ export function FeeCalculatorBase({
           </p>
         )}
 
-        {/* TLD */}
+        {/* Bitname TLD */}
+        {!!bitname && bitname.split(".")[1] && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>TLD</span>&nbsp;&nbsp;
+            {`.${bitname.split(".")[1]}`}
+          </p>
+        )}
+
+        {/* Bitname domain */}
         {!!bitname && bitname.split(
           ".",
         )[0] && (
           <p className={detailsText}>
-            <span className={detailsTitle}>TLD</span>&nbsp;&nbsp;{bitname.split(
-              ".",
-            )[0]}
-          </p>
-        )}
-
-        {/* Bitname name */}
-        {!!bitname && bitname.split(".")[1] && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>Name</span>&nbsp;&nbsp;
-            {`.${bitname.split(".")[1]}`}
+            <span className={detailsTitle}>NAME</span>&nbsp;&nbsp;{bitname
+              .split(
+                ".",
+              )[0]}
           </p>
         )}
       </div>
@@ -397,12 +406,18 @@ export function FeeCalculatorBase({
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center gap-1 uppercase mt-2 text-xs mobileLg:text-sm cursor-pointer text-stamp-grey-darker"
+        className="flex items-center gap-2 uppercase mt-2 text-xs mobileLg:text-sm cursor-pointer text-stamp-grey-darker hover:text-stamp-grey-light transition-colors duration-300 group"
       >
         DETAILS
-        {!visible
-          ? <img src="/img/stamping/CaretDown.svg" />
-          : <img src="/img/stamping/CaretDown.svg" class="rotate-180" />}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 32 32"
+          className={`w-3 h-3 fill-stamp-grey-darker group-hover:fill-stamp-grey-light transition-all duration-300 transform ${
+            visible ? "scale-y-[-1]" : ""
+          }`}
+        >
+          <path d="M27.0613 13.0612L17.0613 23.0612C16.9219 23.2011 16.7563 23.312 16.574 23.3877C16.3917 23.4634 16.1962 23.5024 15.9988 23.5024C15.8013 23.5024 15.6059 23.4634 15.4235 23.3877C15.2412 23.312 15.0756 23.2011 14.9363 23.0612L4.93626 13.0612C4.65446 12.7794 4.49615 12.3972 4.49615 11.9987C4.49615 11.6002 4.65446 11.218 4.93626 10.9362C5.21805 10.6544 5.60024 10.4961 5.99876 10.4961C6.39727 10.4961 6.77946 10.6544 7.06126 10.9362L16 19.875L24.9388 10.935C25.2205 10.6532 25.6027 10.4949 26.0013 10.4949C26.3998 10.4949 26.782 10.6532 27.0638 10.935C27.3455 11.2168 27.5039 11.599 27.5039 11.9975C27.5039 12.396 27.3455 12.7782 27.0638 13.06L27.0613 13.0612Z" />
+        </svg>
       </div>
 
       {renderDetails()}
