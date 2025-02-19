@@ -104,7 +104,7 @@ export const StampHeader = (
           <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
         </div>
       </div>
-      <StampSearchDrawer open={openSearch} setOpen={setOpenSearch} />
+      <StampSearchDrawer searchparams={searchparams} open={openSearch} setOpen={setOpenSearch} />
     </div>
   );
 };

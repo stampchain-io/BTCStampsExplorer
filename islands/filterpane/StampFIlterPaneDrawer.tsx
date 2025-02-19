@@ -102,13 +102,16 @@ const Checkbox = ({ label, checked, onChange }) => (
     <input
       className="relative float-left h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent dark:border-neutral-600 dark:checked:border-primary dark:checked:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
       type="checkbox"
+      checked={checked}
       value={checked}
       onChange={onChange}
     />
     <label
       className="inline-block pl-[0.15rem] hover:cursor-pointer text-stamp-grey ml-1 select-none"
       htmlFor="inlineCheckbox1"
-    >{label}</label>
+    >
+      {label}
+    </label>
   </div>
 );
 
@@ -363,8 +366,8 @@ export function queryParamsToFilters(query: string) {
               typeof defaultFilters[category][key] === "boolean"
                 ? JSON.parse(value)
                 : typeof defaultFilters[category][key] === "number"
-                  ? parseInt(value)
-                  : value;
+                ? parseInt(value)
+                : value;
             filtersPartial[category][key] = coercedValue;
           }
         });
@@ -374,8 +377,8 @@ export function queryParamsToFilters(query: string) {
           const coercedValue = typeof defaultFilters[category] === "boolean"
             ? JSON.parse(value)
             : typeof defaultFilters[category] === "number"
-              ? parseInt(value)
-              : value;
+            ? parseInt(value)
+            : value;
           filtersPartial[category] = coercedValue;
         }
       }
@@ -416,17 +419,34 @@ export const StampFilters = (
 
   const breakpoints = useBreakpoints();
 
+  // const handleFilterChange = (category, value) => {
+  //   const newFilters = {
+  //     ...filters,
+  //     [category]: typeof value === "object"
+  //       ? { ...filters[category], ...value }
+  //       : value,
+  //   };
+  //   console.log("new=====>", newFilters, "====",filtersToQueryParams(globalThis.location.search, newFilters))
+  // setFilters(newFilters);
+  // debouncedOnFilterChange?.(
+  //   filtersToQueryParams(globalThis.location.search, newFilters),
+  // );
+  // };
+
   const handleFilterChange = (category, value) => {
-    const newFilters = {
-      ...filters,
-      [category]: typeof value === "object"
-        ? { ...filters[category], ...value }
-        : value,
-    };
-    setFilters(newFilters);
-    debouncedOnFilterChange?.(
-      filtersToQueryParams(globalThis.location.search, newFilters),
-    );
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        [category]: typeof value === "object"
+          ? { ...prevFilters[category], ...value }
+          : value,
+      };
+
+      debouncedOnFilterChange?.(
+        filtersToQueryParams(globalThis.location.search, newFilters),
+      );
+      return newFilters;
+    });
   };
 
   const clearAllFilters = () => {
@@ -449,9 +469,7 @@ export const StampFilters = (
   };
 
   return (
-    <div
-      class="w-full"
-    >
+    <div class="w-full">
       {showClose && (
         <div class="flex justify-end">
           <button onClick={onClose} className="p-4 text-stamp-grey">
@@ -482,7 +500,8 @@ export const StampFilters = (
         </button>
       </div>
 
-      {/* <input
+      {
+        /* <input
         type="text"
         placeholder="Search stamps..."
         className="w-full pl-10 pr-4 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
@@ -491,12 +510,12 @@ export const StampFilters = (
         onBlur={(ev) => {
           handleFilterChange("search", ev.target.value);
         }}
-      /> */}
+      /> */
+      }
       {
         /* </div>
       </div> */
       }
-
 
       <FilterSection
         title="Buy Now"
@@ -589,7 +608,7 @@ export const StampFilters = (
           <Checkbox
             key={key}
             label={label}
-            checked={filters.fileType[key]}
+            checked={filters.fileType[key.toLowerCase()]}
             onChange={() =>
               handleFilterChange("fileType", { [key]: !filters.fileType[key] })}
           />
@@ -614,7 +633,7 @@ export const StampFilters = (
                     value={value}
                     checked={filters.stampRange.min === "" &&
                       filters.stampRange.max === "" &&
-                      filters.stampRangePreset === value}
+                      Number(filters.stampRangePreset) === Number(value)}
                     onChange={(e) => {
                       handleFilterChange(
                         "stampRangePreset",
