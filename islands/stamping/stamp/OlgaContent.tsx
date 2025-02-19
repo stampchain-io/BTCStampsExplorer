@@ -1467,6 +1467,7 @@ export function OlgaContent() {
                   ? "Named Stamp (Requires XCP)"
                   : "Custom CPID"}
                 maxLength={isPoshStamp ? 13 : 21}
+                minLength={isPoshStamp ? 1 : 15}
                 error={stampNameError}
               />
             </div>
