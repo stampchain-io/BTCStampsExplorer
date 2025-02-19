@@ -130,6 +130,8 @@ export interface StampSectionProps {
   variant?: "default" | "grey";
   viewAllLink?: string;
   alignRight?: boolean;
+  fromPage?: string;
+  sortBy?: "ASC" | "DESC" | undefined;
 }
 
 export interface CollectionSectionProps {
@@ -664,6 +666,7 @@ export interface Collection {
   total_editions: number;
   first_stamp_image?: string | null;
   stamp_images?: string[] | null;
+  img: string;
 }
 
 export interface SRC20SnapshotRequestParams {

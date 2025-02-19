@@ -93,12 +93,14 @@ export interface BaseFeeCalculatorProps {
 export interface BasicFeeProps
   extends Omit<BaseFeeCalculatorProps, "feeDetails"> {
   type: "send" | "transfer" | "buy";
+  _type?: string;
   amount?: number;
   recipientAddress?: string;
   userAddress?: string;
   inputType?: ScriptType;
   outputTypes?: ScriptType[];
   utxoAncestors?: AncestorInfo[];
+  bitname?: string;
 }
 
 export interface ComplexFeeProps extends BaseFeeCalculatorProps {
@@ -115,6 +117,7 @@ export interface ComplexFeeProps extends BaseFeeCalculatorProps {
   onRefresh: (() => Promise<void>) | undefined;
   disabled: boolean | undefined;
   inputType: string | undefined;
+  bitname: string | undefined;
 }
 
 interface PSBTFees extends FeeDetails {

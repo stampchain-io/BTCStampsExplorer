@@ -1,8 +1,10 @@
 import {
   CollectionOverviewSectionProps,
   CollectionSectionProps,
+  STAMP_FILTER_TYPES,
   StampRow,
   StampSectionProps,
+  SUBPROTOCOLS,
 } from "$globals";
 import { FreshContext, Handlers } from "$fresh/server.ts";
 
@@ -14,6 +16,7 @@ import { StampController } from "$server/controller/stampController.ts";
 import { RecursiveLayeringModule } from "$islands/modules/RecursiveLayering.tsx";
 import { NamedAssetsModule } from "$islands/modules/NamedAssets.tsx";
 import CollectionOverviewSection from "$islands/collection/CollectionOverviewSection.tsx";
+import { CollectionRow } from "$server/types/collection.d.ts";
 
 type CollectionPageProps = {
   data: {
@@ -23,6 +26,7 @@ type CollectionPageProps = {
     _pages: number;
     _page_size: number;
     _filterBy: string[];
+    sortBy: string;
     stamps_src721: StampRow[];
     stamps_posh: StampRow[];
   };
@@ -31,8 +35,6 @@ type CollectionPageProps = {
 export const handler: Handlers = {
   async GET(req: Request, ctx: FreshContext) {
     try {
-      const result = await StampController.getCollectionPageData();
-
       const url = new URL(req.url);
       const sortBy = url.searchParams.get("sortBy")?.toUpperCase() == "ASC"
         ? "ASC"
@@ -42,13 +44,39 @@ export const handler: Handlers = {
       const page = parseInt(url.searchParams.get("page") || "1");
       const page_size = parseInt(url.searchParams.get("limit") || "20");
 
+      const result = await StampController.getCollectionPageData({ sortBy });
       const collectionsData = await CollectionController.getCollectionStamps({
         limit: page_size,
         page: page,
         creator: "",
+        sortBy,
       });
+
+      let collections: CollectionRow[] = [];
+      const type: "stamps" | "cursed" | "all" = "all";
+      const ident: SUBPROTOCOLS[] = selectedTab === "all"
+        ? ["STAMP", "SRC-721", "SRC-20"] as SUBPROTOCOLS[]
+        : ["STAMP", "SRC-721"] as SUBPROTOCOLS[];
+
+      await Promise.all(
+        collectionsData?.data.map(async (item) => {
+          const collectionResult = await StampController.getStamps({
+            page,
+            limit: page_size,
+            sortBy,
+            type,
+            filterBy,
+            ident,
+            collectionId: item.collection_id,
+          });
+          collections.push({
+            ...item,
+            img: collectionResult.data?.[0]?.stamp_url,
+          });
+        }),
+      );
       const data = {
-        collections: collectionsData.data,
+        collections: collections,
         page: collectionsData.page,
         pages: collectionsData.totalPages,
         page_size: collectionsData.limit,
@@ -73,6 +101,7 @@ export default function Collection(props: CollectionPageProps) {
     _pages,
     _page_size,
     _filterBy,
+    sortBy,
     stamps_src721 = [],
     stamps_posh = [],
   } = props.data;
@@ -180,7 +209,11 @@ export default function Collection(props: CollectionPageProps) {
 
   return (
     <div class="text-stamp-grey-light flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
-      <StampSection {...CollectionsSection[0]} />
+      <StampSection
+        fromPage="collection"
+        sortBy={sortBy}
+        {...CollectionsSection[0]}
+      />
       <div class="relative">
         <CollectionSection {...EspeciallyPoshSection} />
         <NamedAssetsModule />

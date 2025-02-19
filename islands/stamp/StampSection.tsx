@@ -5,6 +5,8 @@ import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { useEffect, useState } from "preact/hooks";
 import { StampRow, StampSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
+import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 export default function StampSection({
   title,
@@ -22,11 +24,21 @@ export default function StampSection({
   variant = "default",
   viewAllLink,
   alignRight = false,
+  fromPage = "",
+  sortBy = "ASC",
 }: StampSectionProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [displayCount, setDisplayCount] = useState(
     displayCounts?.mobileSm || 16,
   );
+
+  const [isOpen1, setIsOpen1] = useState(false);
+  const [isOpen2, setIsOpen2] = useState(false);
+
+  const handleOpen2 = (open: boolean) => {
+    setIsOpen1(false);
+    setIsOpen2(open);
+  };
 
   // Filter stamps based on filterBy prop if provided
   const filteredStamps = filterBy
@@ -107,43 +119,63 @@ export default function StampSection({
   };
   return (
     <div class="w-full">
-      {title && (
-        <div
-          class={`flex flex-col items-start ${
-            alignRight && "tablet:items-end"
-          }`}
-        >
-          <h1
-            class={`${
-              alignRight
-                ? ModulesStyles.titlePurpleDL
-                : ModulesStyles.titlePurpleDL
-            } tablet:hidden`}
-          >
-            {title}
-          </h1>
-          <h1
-            class={`hidden tablet:block ${
-              alignRight
-                ? ModulesStyles.titlePurpleLD
-                : ModulesStyles.titlePurpleDL
-            }`}
-          >
-            {title}
-          </h1>
+      <div class="w-full flex justify-between items-center">
+        <div class="flex flex-col">
+          {title && (
+            <div
+              class={`flex flex-col items-start ${
+                alignRight && "tablet:items-end"
+              }`}
+            >
+              <h1
+                class={`${
+                  alignRight
+                    ? ModulesStyles.titlePurpleDL
+                    : ModulesStyles.titlePurpleDL
+                } tablet:hidden`}
+              >
+                {title}
+              </h1>
+              <h1
+                class={`hidden tablet:block ${
+                  alignRight
+                    ? ModulesStyles.titlePurpleLD
+                    : ModulesStyles.titlePurpleDL
+                }`}
+              >
+                {title}
+              </h1>
+            </div>
+          )}
+          {subTitle && (
+            <div
+              class={`flex flex-col items-start ${
+                alignRight && "tablet:items-end"
+              }`}
+            >
+              <h2 className={ModulesStyles.subTitlePurple}>
+                {subTitle}
+              </h2>
+            </div>
+          )}
         </div>
-      )}
-      {subTitle && (
-        <div
-          class={`flex flex-col items-start ${
-            alignRight && "tablet:items-end"
-          }`}
-        >
-          <h2 className={ModulesStyles.subTitlePurple}>
-            {subTitle}
-          </h2>
-        </div>
-      )}
+
+        {fromPage === "collection" &&
+          (
+            <div class="flex gap-1 items-center">
+              <div
+                class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
+              >
+                <Sort initSort={sortBy} />
+              </div>
+              <div
+                class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
+              >
+                <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
+              </div>
+            </div>
+          )}
+      </div>
 
       <div class={containerClass}>
         {isLoading ? <div>Loading...</div> : (
@@ -165,11 +197,7 @@ export default function StampSection({
         )}
       </div>
 
-      {viewAllLink && (
-        <div class="flex justify-end -mt-3 mobileMd:-mt-6">
-          <ViewAllButton href={seeAllLink} />
-        </div>
-      )}
+      {viewAllLink && <ViewAllButton href={seeAllLink} />}
 
       {pagination && pagination.totalPages > 1 && (
         <div class="mt-9 mobileLg:mt-[72px]">

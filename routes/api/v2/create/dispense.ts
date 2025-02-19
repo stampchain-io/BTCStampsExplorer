@@ -35,6 +35,7 @@ export const handler: Handlers = {
         regular_dust_size: 546,
         allow_unconfirmed_inputs: true,
         validate: true,
+        verbose: true,
       };
 
       try {

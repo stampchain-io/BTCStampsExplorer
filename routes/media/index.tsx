@@ -5,7 +5,7 @@ export default function Media() {
   const subTitleGrey =
     "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
   const articleLink =
-    "inline-block relative text-xl mobileLg:text-2xl font-bold gray-gradient1-hover";
+    "inline-block relative text-xl mobileLg:text-2xl font-bold gray-gradient1-hover transition-colors duration-1300";
   const articleSource =
     "text-base mobileLg:text-lg font-light text-stamp-grey-darker -space-y-1";
   const bodyTextLight =
@@ -19,12 +19,17 @@ export default function Media() {
         <h1 className={titleGreyDL}>MEDIA MATTERS</h1>
         <h2 className={subTitleGrey}>HONOURABLE STAMP MENTIONS</h2>
         <p className={bodyTextLight}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-          vulputate, lacus at faucibus fringilla, urna urna pretium magna, et
-          porttitor odio massa sit amet arcu. Curabitur dolor elit, ornare at
-          dolor in, interdum laoreet dolor. Pellentesque ut diam erat.
-          Pellentesque id gravida tortor. Praesent lacus diam, imperdiet at orci
-          at, venenatis vulputate velit.
+          Explore the world of Bitcoin Stamps with our curated list of news
+          coverage, in-depth articles, reports and video podcasts. <br />
+          <br />
+          We share articles worthwhile reading. From technical deep-dives into
+          the protocol, ecosystem formats and lingo explainers, to all things
+          stamp art. Catch up on the most important news coverage, or watch Mike
+          in Space share his vision behind stamps, break down the technology and
+          offer unique insights on where the technology is headed.<br />
+          <br />
+          Stay informed by regularly checking back. We're constantly adding new
+          interviews and articles about the space.
         </p>
       </section>
 

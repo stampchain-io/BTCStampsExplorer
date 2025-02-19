@@ -201,7 +201,7 @@ const StampBuyModal = ({
                 max={maxQuantity}
                 value={quantity}
                 onChange={handleQuantityChange}
-                className={`${inputField} !w-[42px] mobileLg:!w-12 text-center`}
+                className={`${inputField} !w-[42px] mobileLg:!w-12 !h-[42px] mobileLg:!h-12 text-center`}
               />
             </div>
           </div>

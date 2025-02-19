@@ -22,11 +22,12 @@ export class CollectionController {
     params: CollectionQueryParams,
   ): Promise<PaginatedCollectionResponseBody> {
     try {
-      const { limit = 50, page = 1, creator } = params;
+      const { limit = 50, page = 1, creator, sortBy } = params;
       const collectionsResult = await CollectionService.getCollectionDetails({
         limit,
         page,
         creator,
+        sortBy
       });
 
       if (!collectionsResult.data || !Array.isArray(collectionsResult.data)) {

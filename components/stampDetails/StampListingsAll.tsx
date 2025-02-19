@@ -7,6 +7,7 @@ import {
   colGroup,
   row,
   tableLabel,
+  tableStatus,
   tableValue,
   tableValueLink,
 } from "$components/shared/TableStyles.ts";
@@ -101,7 +102,11 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
                         globalThis.location.href =
                           `/wallet/${dispenser.source}`;
                       }}
-                      className={tableValueLink}
+                      className={`${tableValueLink} ${
+                        isEmpty
+                          ? "!text-stamp-grey-darker hover:!text-stamp-purple-bright"
+                          : ""
+                      }`}
                     >
                       <span class="tablet:hidden">
                         {abbreviateAddress(dispenser.source, 4)}
@@ -131,7 +136,15 @@ export function StampListingsAll({ dispensers }: StampListingsAllProps) {
                 </tr>
               );
             })
-            : "NO LISTINGS"}
+            : (
+              <tr>
+                <td
+                  class={`${tableStatus} w-full`}
+                >
+                  NO LISTINGS AT THE MOMENT
+                </td>
+              </tr>
+            )}
         </tbody>
       </table>
     </div>

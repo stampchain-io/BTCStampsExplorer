@@ -5,6 +5,7 @@ import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
+import WalletSendStampModal from "$islands/Wallet/details/WalletSendStampModal.tsx";
 import { SRC20Section } from "$islands/src20/SRC20Section.tsx";
 import StampSection from "$islands/stamp/StampSection.tsx";
 import { WalletContentProps } from "$types/wallet.d.ts";
@@ -13,7 +14,6 @@ import { formatBTCAmount } from "$lib/utils/formatUtils.ts";
 import { getStampImageSrc } from "$lib/utils/imageUtils.ts";
 import { NOT_AVAILABLE_IMAGE } from "$lib/utils/constants.ts";
 import { StampRow } from "$globals";
-import { dataLabel } from "$components/shared/WalletStyles.ts";
 
 const ItemHeader = ({
   title = "STAMP",
@@ -50,7 +50,7 @@ const ItemHeader = ({
   return (
     <div class="flex flex-row justify-between items-center gap-3 w-full relative">
       <div class="flex items-end">
-        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-bright">
+        <p class="text-2xl mobileMd:text-3xl mobileLg:text-4xl desktop:text-5xl font-extralight text-stamp-purple-highlight">
           {title}
         </p>
       </div>
@@ -400,7 +400,7 @@ function DispenserRow(
   );
 }
 
-export default function WalletContent({
+const WalletDashboardContent = ({
   stamps,
   src20,
   dispensers,
@@ -409,7 +409,7 @@ export default function WalletContent({
   stampsSortBy = "DESC",
   src20SortBy = "DESC",
   dispensersSortBy = "DESC",
-}: WalletContentProps) {
+}: WalletContentProps) => {
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
 
   // Track sorting state for all sections
@@ -555,7 +555,7 @@ export default function WalletContent({
   return (
     <>
       {/* Stamps Section */}
-      <div class="mt-3 mobileLg:mt-6" id="stamps-section">
+      <div class="mt-6 mobileLg:mt-12 desktop:mt-24" id="stamps-section">
         <ItemHeader
           title="STAMPS"
           sort={true}
@@ -565,7 +565,7 @@ export default function WalletContent({
           handleOpen={handleOpen}
           search={true}
           filter={false}
-          setting={false}
+          setting={true}
           isOpenFilter={false}
           isOpenSetting={openSetting}
           handleOpenFilter={() => {}}
@@ -575,16 +575,12 @@ export default function WalletContent({
         <div class="mt-3 mobileLg:mt-6">
           {stamps.data?.length
             ? <StampSection {...stampSection} />
-            : (
-              <p class={`${dataLabel} -mt-1.5 mobileLg:-mt-3`}>
-                NO STAMPS IN THE WALLET
-              </p>
-            )}
+            : <p class="text-gray-500">NO AVAILABLE STAMP</p>}
         </div>
       </div>
 
       {/* SRC20 (TOKENS) Section */}
-      <div class="mt-6 mobileLg:mt-12" id="src20-section">
+      <div class="mt-12 mobileLg:mt-24 desktop:mt-36" id="src20-section">
         <ItemHeader
           title="TOKENS"
           sort={true}
@@ -622,17 +618,13 @@ export default function WalletContent({
                 sortBy={sortTokens}
               />
             )
-            : (
-              <p class={`${dataLabel} -mt-1.5 mobileLg:-mt-3`}>
-                NO TOKENS IN THE WALLET
-              </p>
-            )}
+            : <p class="text-gray-500">NO AVAILABLE TOKEN</p>}
         </div>
       </div>
 
       {/* Dispensers Section */}
       {dispensers.data.length > 0 && (
-        <div class="mt-3 mobileLg:mt-6" id="listings-section">
+        <div class="mt-48">
           <ItemHeader
             title="LISTINGS"
             sort={true}
@@ -667,8 +659,7 @@ export default function WalletContent({
         </div>
       )}
 
-      {
-        /* Modal for sending stamps
+      {/* Modal for sending stamps */}
       {openSettingModal && (
         <WalletSendStampModal
           stamps={stamps}
@@ -677,8 +668,9 @@ export default function WalletContent({
           toggleModal={handleOpenSettingModal}
           handleCloseModal={handleCloseSettingModal}
         />
-      )} */
-      }
+      )}
     </>
   );
-}
+};
+
+export default WalletDashboardContent;

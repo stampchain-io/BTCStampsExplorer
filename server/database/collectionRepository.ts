@@ -7,9 +7,10 @@ export class CollectionRepository {
       limit?: number;
       page?: number;
       creator?: string;
+      sortBy?: string;
     },
   ) {
-    const { limit = SMALL_LIMIT, page = 1, creator } = options;
+    const { limit = SMALL_LIMIT, page = 1, creator, sortBy } = options;
     const offset = (page - 1) * limit;
 
     let query = `
@@ -42,7 +43,7 @@ export class CollectionRepository {
 
     query += `
       GROUP BY c.collection_id, c.collection_name, c.collection_description
-      ORDER BY c.collection_name
+      ORDER BY c.collection_name ${sortBy}
       LIMIT ? OFFSET ?
     `;
 

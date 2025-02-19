@@ -23,7 +23,8 @@ const inputFieldContainer =
   "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
 const inputField2col =
   "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-const feeSelectorContainer = "p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
+const backgroundContainer =
+  "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
 
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
@@ -245,7 +246,7 @@ export function TransferContent(
         </div>
       </div>
 
-      <div class={feeSelectorContainer}>
+      <div className={`${backgroundContainer} w-full`}>
         <ComplexFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}

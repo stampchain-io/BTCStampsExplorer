@@ -115,7 +115,7 @@ export function HomeStampPreview({
       "desktop": 3, // 3 columns x 1 rows
     },
   };
-
+  console.log(stamps_art, stamps_posh, stamps_src721, collectionData);
   return (
     <div className="
       flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36
