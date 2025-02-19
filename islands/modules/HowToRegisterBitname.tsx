@@ -52,14 +52,14 @@ export const HowToRegisterBitnameModule = () => {
           All fees are shown in BTC by default. You can view the costs in USDT
           by switching the toggle.<br />
           You can check the progress of the registration by viewing your tx hash
-          in a block explorer like{" "}
+          in a{" "}
           <a
             href="https://mempool.space/"
             target="_blank"
             rel="noopener noreferrer"
             class="animated-underline"
           >
-            mempool.space
+            blockchain explorer
           </a>.
         </p>
       </div>
