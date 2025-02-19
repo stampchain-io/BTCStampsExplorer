@@ -50,16 +50,16 @@ export default function StampingSrc101Page(
   };
 
   return (
-    <div class="flex flex-col gap-12 mobileLg:gap-24 desktop:gap-36">
+    <div class="flex flex-col gap-12 mobileLg:gap-24">
       <div class="self-center max-w-[680px] w-full mx-auto">
         {renderContent()}
       </div>
 
       <div class="flex flex-col gap-3 mobileMd:gap-6 w-full desktop:gap-9 tablet:flex-row">
-        <div class="w-full tablet:w-1/2">
+        <div class="w-full tablet:w-full">
           <HowToRegisterBitnameModule />
         </div>
-        <div class="w-full tablet:w-1/2">
+        <div class="w-full tablet:w-1/2 hidden">
           <RecentBitnameRegister />
         </div>
       </div>
