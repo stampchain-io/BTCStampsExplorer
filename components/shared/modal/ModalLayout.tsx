@@ -29,10 +29,7 @@ export function ModalLayout({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Trigger enter animation on mount
-    requestAnimationFrame(() => {
-      setIsVisible(true);
-    });
+    requestAnimationFrame(() => setIsVisible(true));
   }, []);
 
   const handleCloseMouseEnter = () => {
@@ -97,8 +94,7 @@ export function ModalLayout({
         fixed inset-0 z-50 
         flex items-center justify-center 
         bg-black/70 backdrop-blur-md
-        transition-opacity duration-100
-        ${isVisible ? "opacity-100" : "opacity-0"}
+        ${isVisible ? "animate-fade-in duration-100" : "opacity-0"}
       `}
       onClick={handleClose}
     >
@@ -108,11 +104,9 @@ export function ModalLayout({
           w-[360px] mobileLg:w-[420px] 
           p-6 rounded-lg 
           dark-gradient-modal
-          transition-all duration-300 delay-100
-          transform
           ${
           isVisible
-            ? "opacity-100 translate-y-0"
+            ? "animate-slide-up duration-300 delay-100"
             : "opacity-0 translate-y-[36px] mobileLg:translate-y-12"
         }
           ${className}
