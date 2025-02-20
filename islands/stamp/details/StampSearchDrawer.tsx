@@ -1,4 +1,4 @@
-import { StampFilters } from "$islands/filterpane/StampFilterPaneDrawer.tsx";
+import { StampDrawerFilters } from "./StampFilterPaneDrawer.tsx";
 
 const StampSearchDrawer = (
   { open, setOpen, searchparams }: {
@@ -19,7 +19,6 @@ const StampSearchDrawer = (
   const stampRangeMax = searchparams.get("stampRange[max]");
   const stampPriceMin = searchparams.get("priceRange[min]");
   const stampPriceMax = searchparams.get("priceRange[max]");
-  const stampFilterOpen = searchparams.get("stamp-filter-open") === "true";
   const fileTypeSvg = searchparams.get("fileType[svg]") === "true";
   const fileTypePixel = searchparams.get("fileType[pixel]") === "true";
   const fileTypeGif = searchparams.get("fileType[gif]") === "true";
@@ -34,7 +33,6 @@ const StampSearchDrawer = (
   const fileTypeSrc101 = searchparams.get("fileType[src101]") === "true";
 
   const defaultFilters = {
-    search: "",
     buyNow: {
       atomic: atomic || false,
       dispenser: dispenser || false,
@@ -79,7 +77,6 @@ const StampSearchDrawer = (
         class={`fixed top-0 left-0 z-40 h-screen p-4 bg-stamp-bg-purple-dark overflow-y-auto transition-transform w-80 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
-        tabindex="-1"
         aria-labelledby="drawer-form-label"
       >
         <p
@@ -110,7 +107,7 @@ const StampSearchDrawer = (
           <span class="sr-only">Close menu</span>
         </button>
         <div class="mb-6">
-          <StampFilters initialFilters={defaultFilters} />
+          <StampDrawerFilters initialFilters={defaultFilters} />
         </div>
       </div>
     </>

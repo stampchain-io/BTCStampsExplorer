@@ -135,7 +135,6 @@ function useDebouncedCallback(callback: Function, delay: number) {
 }
 
 const defaultFilters = {
-  search: "",
   buyNow: {
     atomic: false,
     dispenser: false,
