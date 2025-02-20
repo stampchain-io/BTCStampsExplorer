@@ -10,6 +10,7 @@ interface InputFieldProps {
   inputMode?: "text" | "numeric";
   pattern?: string;
   maxLength?: number;
+  minLength?: number;
   disabled?: boolean;
   textAlign?: "left" | "center" | "right";
   isUppercase?: boolean;
@@ -25,6 +26,7 @@ export function InputField({
   inputMode,
   pattern,
   maxLength,
+  minLength,
   disabled = false,
   textAlign = "left",
   isUppercase = false,
@@ -44,6 +46,7 @@ export function InputField({
         inputMode={inputMode}
         pattern={pattern}
         maxLength={maxLength}
+        minLength={minLength}
         disabled={disabled}
         style={{ textAlign }}
       />

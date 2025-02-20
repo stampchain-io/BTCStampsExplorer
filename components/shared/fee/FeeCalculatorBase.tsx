@@ -144,6 +144,18 @@ export function FeeCalculatorBase({
     setAllowCurrencyTooltip(true);
   };
 
+  // Helper functions to convert between slider position and fee value
+  const feeToSliderPos = (fee: number) =>
+    fee <= 10 ? (fee / 10) * 33.33 : 33.33 + ((fee - 10) / 254) * 66.67;
+
+  const sliderPosToFee = (pos: number) => {
+    if (pos <= 33.33) {
+      return Math.round((pos / 33.33) * 10 * 2) / 2; // 0-10 with 0.5 steps
+    }
+    const value = 10 + ((pos - 33.33) / 66.67) * 254;
+    return Math.min(264, Math.round(value)); // 10-264 with 1.0 steps
+  };
+
   // Fee selector component
   const renderFeeSelector = () => (
     <div className={`flex flex-col ${isModal ? "w-2/3" : "w-1/2"}`}>
@@ -168,14 +180,18 @@ export function FeeCalculatorBase({
       >
         <input
           type="range"
-          value={fee}
-          min="1"
-          max="264"
-          step="1"
+          value={feeToSliderPos(fee)}
+          min="0"
+          max="100"
+          step="0.25"
           onChange={(e) =>
-            handleChangeFee(parseInt((e.target as HTMLInputElement).value, 10))}
-          // onInput={(e) =>
-          //   handleChangeFee(parseInt((e.target as HTMLInputElement).value, 10))}
+            handleChangeFee(
+              sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
+            )}
+          onInput={(e) =>
+            handleChangeFee(
+              sliderPosToFee(parseFloat((e.target as HTMLInputElement).value)),
+            )}
           className="w-full h-1 mobileLg:h-1.5 rounded-lg appearance-none cursor-pointer bg-stamp-grey [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:mobileLg:w-[22px] [&::-webkit-slider-thumb]:mobileLg:h-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-stamp-purple-dark [&::-webkit-slider-thumb]:hover:bg-stamp-purple [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:mobileLg:w-[22px] [&::-moz-range-thumb]:mobileLg:h-[22px] [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-stamp-purple-dark [&::-moz-range-thumb]:hover:bg-stamp-purple-dark [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
         />
         <div
@@ -205,34 +221,38 @@ export function FeeCalculatorBase({
         {/* File Type - Only show for stamp type */}
         {type === "stamp" && fileType && (
           <p className={detailsText}>
-            <span className={detailsTitle}>FILE</span> {fileType.toUpperCase()}
+            <span className={detailsTitle}>FILE</span>&nbsp;&nbsp;{fileType
+              .toUpperCase()}
           </p>
         )}
 
         {/* Editions - Only show for stamp type */}
         {type === "stamp" && issuance && (
           <p className={detailsText}>
-            <span className={detailsTitle}>EDITIONS</span> {issuance}
+            <span className={detailsTitle}>EDITIONS</span>&nbsp;&nbsp;{issuance}
           </p>
         )}
 
         {/* File Size */}
         {!!fileSize && (
           <p className={detailsText}>
-            <span className={detailsTitle}>SIZE</span> {fileSize}{" "}
+            <span className={detailsTitle}>SIZE</span>&nbsp;&nbsp;{fileSize}
+            {" "}
             <span className="font-light">BYTES</span>
           </p>
         )}
 
         {/* Sats Per Byte */}
         <p className={detailsText}>
-          <span className={detailsTitle}>SATS PER BYTE</span> {fee}
+          <span className={detailsTitle}>SATS PER BYTE</span>&nbsp;&nbsp;{fee}
         </p>
 
         {/* Miner Fee */}
         {!!feeDetails?.minerFee && !bitname && (
           <p className={detailsText}>
-            <span className={detailsTitle}>MINER FEE</span> {coinType === "BTC"
+            <span className={detailsTitle}>
+              MINER FEE
+            </span>&nbsp;&nbsp;{coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.minerFee, {
                 includeSymbol: false,
               })
@@ -246,7 +266,7 @@ export function FeeCalculatorBase({
           <p className={detailsText}>
             <span className={detailsTitle}>
               {isModal ? "SERVICE FEE" : "MINTING FEE"}
-            </span>{" "}
+            </span>&nbsp;&nbsp;
             {coinType === "BTC"
               ? (
                 <>
@@ -267,7 +287,9 @@ export function FeeCalculatorBase({
         {/* Dust Value */}
         {!!feeDetails?.dustValue && (
           <p className={detailsText}>
-            <span className={detailsTitle}>DUST</span> {coinType === "BTC"
+            <span className={detailsTitle}>
+              DUST
+            </span>&nbsp;&nbsp;{coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.dustValue, {
                 includeSymbol: false,
               })
@@ -279,7 +301,9 @@ export function FeeCalculatorBase({
         {/* Total */}
         {!!feeDetails?.totalValue && (
           <p className={detailsText}>
-            <span className={detailsTitle}>TOTAL</span> {coinType === "BTC"
+            <span className={detailsTitle}>
+              TOTAL
+            </span>&nbsp;&nbsp;{coinType === "BTC"
               ? formatSatoshisToBTC(feeDetails.totalValue, {
                 includeSymbol: false,
               })
@@ -288,22 +312,23 @@ export function FeeCalculatorBase({
           </p>
         )}
 
-        {/* TLD */}
+        {/* Bitname TLD */}
+        {!!bitname && bitname.split(".")[1] && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>TLD</span>&nbsp;&nbsp;
+            {`.${bitname.split(".")[1]}`}
+          </p>
+        )}
+
+        {/* Bitname domain */}
         {!!bitname && bitname.split(
           ".",
         )[0] && (
           <p className={detailsText}>
-            <span className={detailsTitle}>TLD</span>&nbsp;&nbsp;{bitname.split(
-              ".",
-            )[0]}
-          </p>
-        )}
-
-        {/* Bitname name */}
-        {!!bitname && bitname.split(".")[1] && (
-          <p className={detailsText}>
-            <span className={detailsTitle}>Name</span>&nbsp;&nbsp;
-            {`.${bitname.split(".")[1]}`}
+            <span className={detailsTitle}>NAME</span>&nbsp;&nbsp;{bitname
+              .split(
+                ".",
+              )[0]}
           </p>
         )}
       </div>
@@ -381,12 +406,18 @@ export function FeeCalculatorBase({
 
       <div
         onClick={() => setVisible(!visible)}
-        className="flex items-center gap-1 uppercase mt-2 text-xs mobileLg:text-sm cursor-pointer text-stamp-grey-darker"
+        className="flex items-center gap-2 uppercase mt-2 text-xs mobileLg:text-sm cursor-pointer text-stamp-grey-darker hover:text-stamp-grey-light transition-colors duration-300 group"
       >
         DETAILS
-        {!visible
-          ? <img src="/img/stamping/CaretDown.svg" />
-          : <img src="/img/stamping/CaretDown.svg" class="rotate-180" />}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 32 32"
+          className={`w-3 h-3 fill-stamp-grey-darker group-hover:fill-stamp-grey-light transition-all duration-300 transform ${
+            visible ? "scale-y-[-1]" : ""
+          }`}
+        >
+          <path d="M27.0613 13.0612L17.0613 23.0612C16.9219 23.2011 16.7563 23.312 16.574 23.3877C16.3917 23.4634 16.1962 23.5024 15.9988 23.5024C15.8013 23.5024 15.6059 23.4634 15.4235 23.3877C15.2412 23.312 15.0756 23.2011 14.9363 23.0612L4.93626 13.0612C4.65446 12.7794 4.49615 12.3972 4.49615 11.9987C4.49615 11.6002 4.65446 11.218 4.93626 10.9362C5.21805 10.6544 5.60024 10.4961 5.99876 10.4961C6.39727 10.4961 6.77946 10.6544 7.06126 10.9362L16 19.875L24.9388 10.935C25.2205 10.6532 25.6027 10.4949 26.0013 10.4949C26.3998 10.4949 26.782 10.6532 27.0638 10.935C27.3455 11.2168 27.5039 11.599 27.5039 11.9975C27.5039 12.396 27.3455 12.7782 27.0638 13.06L27.0613 13.0612Z" />
+        </svg>
       </div>
 
       {renderDetails()}
@@ -409,23 +440,25 @@ export function FeeCalculatorBase({
               className="flex items-center cursor-pointer"
             >
               <div
-                className={`w-3 h-3 border border-[#7F7979] mr-2 flex items-center justify-center bg-[#999999] rounded-[2px]`}
+                className={`w-3 h-3 mr-2 flex items-center justify-center transition-colors duration-300 ${
+                  tosAgreed ? "bg-stamp-grey-darker" : "bg-stamp-grey-light"
+                } rounded-[2px]`}
               >
                 {tosAgreed && (
                   <svg
                     viewBox="0 0 24 24"
-                    className="w-2 h-2 text-[#333333]"
+                    className="w-2 h-2"
                   >
                     <path
-                      fill="currentColor"
+                      fill="#333333"
                       d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"
                     />
                   </svg>
                 )}
               </div>
               <span
-                className={`text-xs mobileLg:text-sm font-medium ${
-                  tosAgreed ? "text-stamp-grey-light" : "text-stamp-grey"
+                className={`text-xs mobileLg:text-sm font-medium transition-colors duration-300 ${
+                  tosAgreed ? "text-stamp-grey-darker" : "text-stamp-grey-light"
                 }`}
               >
                 I AGREE TO THE{" "}
@@ -433,7 +466,11 @@ export function FeeCalculatorBase({
                   <span className="mobileLg:hidden">
                     <a
                       href="/termsofservice"
-                      className="hover:text-stamp-purple-highlight"
+                      className={`hover:text-stamp-purple-bright transition-colors duration-300 ${
+                        tosAgreed
+                          ? "text-stamp-purple-dark"
+                          : "text-stamp-purple"
+                      }`}
                     >
                       ToS
                     </a>
@@ -441,7 +478,11 @@ export function FeeCalculatorBase({
                   <span className="hidden mobileLg:inline">
                     <a
                       href="/termsofservice"
-                      className="hover:text-stamp-purple-highlight"
+                      className={`hover:text-stamp-purple-bright transition-colors duration-300 ${
+                        tosAgreed
+                          ? "text-stamp-purple-dark"
+                          : "text-stamp-purple"
+                      }`}
                     >
                       TERMS OF SERVICE
                     </a>
