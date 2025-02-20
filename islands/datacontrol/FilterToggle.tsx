@@ -16,7 +16,13 @@ const Badge = ({
   );
 };
 
-export function FilterToggle({ count, open, setOpen }) {
+export function FilterToggle(
+  { count, open, setOpen }: {
+    count: string;
+    open: boolean;
+    setOpen: (status: boolean) => void;
+  },
+) {
   return (
     <div
       class={`relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright`}

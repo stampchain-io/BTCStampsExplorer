@@ -10,8 +10,6 @@ import {
   queryParamsToServicePayload,
   // StampFilters,
 } from "../../islands/filterpane/StampFilterPane.tsx";
-import { StampFilterWrapped } from "$islands/filterpane/StampFilterWrapped.tsx";
-import { flags } from "../../lib/flags/flags.ts";
 
 const MAX_PAGE_SIZE = 120;
 
@@ -125,7 +123,8 @@ export function StampPage(props: StampPageProps) {
         search={search}
       />
       <div class="flex gap-10">
-        {/* <div class="pt-4">
+        {
+          /* <div class="pt-4">
           {flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false) && (
             <StampFilterWrapped
               onFilterChange={(str) => {
@@ -137,7 +136,8 @@ export function StampPage(props: StampPageProps) {
               filters={filters}
             />
           )}
-        </div> */}
+        </div> */
+        }
 
         <StampContent
           stamps={stampsArray}

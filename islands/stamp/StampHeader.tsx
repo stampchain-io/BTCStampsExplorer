@@ -11,6 +11,7 @@ import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
 import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
 import StampSearchDrawer from "$islands/stamp/details/StampSearchDrawer.tsx";
 import { flags } from "../../lib/flags/flags.ts";
+import { MultiSort } from "$islands/datacontrol/MultiSort.tsx";
 
 export const StampHeader = (
   { filterBy, sortBy, filters, search }: {
@@ -26,7 +27,7 @@ export const StampHeader = (
 
   const searchparams = new URLSearchParams(search);
   const filterCount = allQueryKeysFromFilters.filter((key) => {
-    return searchparams.has(key);
+    return searchparams.has(key) && searchparams.get(key) != "false";
   }).length;
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
@@ -42,8 +43,9 @@ export const StampHeader = (
 
   return (
     <div
-      class={`relative flex flex-row justify-between items-start w-full gap-3 ${isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
-        }`}
+      class={`relative flex flex-row justify-between items-start w-full gap-3 ${
+        isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
+      }`}
     >
       <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>STAMPS</h1>
       <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
@@ -70,10 +72,13 @@ export const StampHeader = (
           Filter pane
         </button> */
         }
-        {
-          flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false) && (
-            <FilterToggle open={openSearch} setOpen={setOpenSearch} count={filterCount} />
-          )}
+        {flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false) && (
+          <FilterToggle
+            open={openSearch}
+            setOpen={setOpenSearch}
+            count={filterCount}
+          />
+        )}
         {!flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false)
           ? (
             <Filter
@@ -96,7 +101,7 @@ export const StampHeader = (
         <div
           class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
         >
-          <Sort initSort={sortBy} />
+          <MultiSort searchparams={searchparams} initSort={sortBy} />
         </div>
         <div
           class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
@@ -104,7 +109,11 @@ export const StampHeader = (
           <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
         </div>
       </div>
-      <StampSearchDrawer searchparams={searchparams} open={openSearch} setOpen={setOpenSearch} />
+      <StampSearchDrawer
+        searchparams={searchparams}
+        open={openSearch}
+        setOpen={setOpenSearch}
+      />
     </div>
   );
 };

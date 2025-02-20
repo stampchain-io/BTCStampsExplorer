@@ -108,7 +108,9 @@ const Checkbox = ({ label, checked, onChange }) => (
     <label
       className="inline-block pl-[0.15rem] hover:cursor-pointer text-stamp-grey ml-1 select-none"
       htmlFor="inlineCheckbox1"
-    >{label}</label>
+    >
+      {label}
+    </label>
   </div>
 );
 
@@ -140,7 +142,6 @@ function useDebouncedCallback(callback: Function, delay: number) {
 }
 
 const defaultFilters = {
-  search: "",
   buyNow: {
     atomic: false,
     dispenser: false,
@@ -363,8 +364,8 @@ export function queryParamsToFilters(query: string) {
               typeof defaultFilters[category][key] === "boolean"
                 ? JSON.parse(value)
                 : typeof defaultFilters[category][key] === "number"
-                  ? parseInt(value)
-                  : value;
+                ? parseInt(value)
+                : value;
             filtersPartial[category][key] = coercedValue;
           }
         });
@@ -374,8 +375,8 @@ export function queryParamsToFilters(query: string) {
           const coercedValue = typeof defaultFilters[category] === "boolean"
             ? JSON.parse(value)
             : typeof defaultFilters[category] === "number"
-              ? parseInt(value)
-              : value;
+            ? parseInt(value)
+            : value;
           filtersPartial[category] = coercedValue;
         }
       }
@@ -450,8 +451,9 @@ export const StampFilters = (
 
   return (
     <div
-      className={`${breakpoints.isMobile() ? "w-screen" : "w-64"
-        } bg-stamp-bg-purple-dark shadow-lg`}
+      className={`${
+        breakpoints.isMobile() ? "w-screen" : "w-64"
+      } bg-stamp-bg-purple-dark shadow-lg`}
     >
       {showClose && (
         <div class="flex justify-end">

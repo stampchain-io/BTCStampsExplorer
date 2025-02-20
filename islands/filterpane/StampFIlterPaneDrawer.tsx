@@ -1,14 +1,7 @@
 import { useRef, useState } from "preact/hooks";
 // import { ChevronDown, ChevronUp, Search, Sliders, X } from "lucide-react";
 import { useBreakpoints } from "$lib/hooks/useBreakpoints.ts";
-import {
-  PaginatedStampBalanceResponseBody,
-  ProcessedHolder,
-  STAMP_FILTER_TYPES,
-  STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
-  StampRow,
-} from "$globals";
+import { STAMP_SUFFIX_FILTERS } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
 const ChevronUp = () => (
@@ -393,7 +386,6 @@ export function queryParamsToServicePayload(query: string) {
 
 export const StampFilters = (
   {
-    onFilterChange,
     debounceTimeout,
     initialFilters = defaultFilters,
     showClose,
@@ -410,14 +402,12 @@ export const StampFilters = (
     priceRange: true,
   });
   const debouncedOnFilterChange = useDebouncedCallback(
-    (str) => {
+    (str: string) => {
       globalThis.location.href = globalThis.location.pathname + "?" +
         str;
     },
     debounceTimeout,
   );
-
-  const breakpoints = useBreakpoints();
 
   // const handleFilterChange = (category, value) => {
   //   const newFilters = {
@@ -634,7 +624,7 @@ export const StampFilters = (
                     checked={filters.stampRange.min === "" &&
                       filters.stampRange.max === "" &&
                       Number(filters.stampRangePreset) === Number(value)}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       handleFilterChange(
                         "stampRangePreset",
                         parseInt(e.target.value),
@@ -664,7 +654,7 @@ export const StampFilters = (
               <RangeInput
                 label="Min Stamp Number"
                 value={filters.stampRange.min}
-                onChange={(value) =>
+                onChange={(value: string) =>
                   handleFilterChange("stampRange", {
                     min: value,
                     preset: "",
@@ -674,7 +664,7 @@ export const StampFilters = (
               <RangeInput
                 label="Max Stamp Number"
                 value={filters.stampRange.max}
-                onChange={(value) =>
+                onChange={(value: string) =>
                   handleFilterChange("stampRange", {
                     max: value,
                     preset: "",
@@ -696,7 +686,7 @@ export const StampFilters = (
           <RangeInput
             label="Min Price"
             value={filters.priceRange.min}
-            onChange={(value) =>
+            onChange={(value: string) =>
               handleFilterChange("priceRange", {
                 ...filters.priceRange,
                 min: value,
@@ -705,7 +695,7 @@ export const StampFilters = (
           <RangeInput
             label="Max Price"
             value={filters.priceRange.max}
-            onChange={(value) =>
+            onChange={(value: string) =>
               handleFilterChange("priceRange", {
                 ...filters.priceRange,
                 max: value,
@@ -714,7 +704,8 @@ export const StampFilters = (
         </div>
       </FilterSection>
 
-      <div className="p-4 border-t border-stamp-purple-highlight/20">
+      {
+        /* <div className="p-4 border-t border-stamp-purple-highlight/20">
         <label className="block text-sm font-medium mb-2 text-stamp-grey">
           Sort By
         </label>
@@ -728,7 +719,8 @@ export const StampFilters = (
           <option value="price_desc">Price: High to Low</option>
           <option value="price_asc">Price: Low to High</option>
         </select>
-      </div>
+      </div> */
+      }
     </div>
   );
 };
