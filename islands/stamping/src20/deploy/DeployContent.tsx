@@ -462,6 +462,7 @@ export function DeployContent(
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmitWithUpload}
+          buttonName={isConnected ? "DEPLOY" : "CONNECT WALLET"}
           isConnected
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
