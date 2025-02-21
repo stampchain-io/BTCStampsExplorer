@@ -423,6 +423,7 @@ export class StampController {
         CollectionController.getCollectionStamps({
           limit: 4,
           page: 1,
+          sortBy: "DESC"
         })
       ]);
 
