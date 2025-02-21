@@ -10,7 +10,7 @@ export class CollectionRepository {
       sortBy?: string;
     },
   ) {
-    const { limit = SMALL_LIMIT, page = 1, creator, sortBy } = options;
+    const { limit = SMALL_LIMIT, page = 1, creator, sortBy = "DESC" } = options;
     const offset = (page - 1) * limit;
 
     let query = `
