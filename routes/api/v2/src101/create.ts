@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { TX, TXError } from "$globals";
+import { ApiResponseUtil } from "$lib/utils/apiResponseUtil.ts";
 import { ResponseUtil } from "$lib/utils/responseUtil.ts";
 import { SRC101Service } from "$server/services/src101/index.ts";
 import { SRC101InputData } from "$types/index.d.ts";
@@ -10,14 +10,13 @@ type TrxType = "multisig" | "olga";
 export const handler: Handlers = {
   async POST(req: Request): Promise<Response> {
     try {
-      let result: TX | TXError;
       let response: Response;
 
       const rawBody = await req.text();
       console.log("SRC-101 request body:", rawBody);
 
       const body: SRC101InputData & { trxType?: TrxType } = JSON.parse(rawBody);
-      const trxType = body.trxType || "multisig";
+      const trxType = body.trxType || "olga";
 
       // Handle backward compatibility for fromAddress
       const effectiveSourceAddress = body.sourceAddress || body.fromAddress ||
@@ -56,12 +55,12 @@ export const handler: Handlers = {
         );
       }
 
-      if (trxType === "multisig") {
+      if (trxType === "multisig" || trxType === "olga") {
         if (!effectiveSourceAddress || !effectiveChangeAddress) {
           return ResponseUtil.badRequest("Missing required addresses");
         }
 
-        result = await SRC101Service.TransactionService.handleOperation(
+        const result = await SRC101Service.TransactionService.handleOperation(
           body.op.toLowerCase() as
             | "deploy"
             | "mint"
@@ -74,7 +73,9 @@ export const handler: Handlers = {
             recAddress: effectiveRecAddress || effectiveSourceAddress,
             changeAddress: effectiveChangeAddress,
           },
+          trxType,
         );
+
         logger.debug("stamps", {
           message: "Multisig transaction result",
           result: JSON.stringify(result, null, 2),
@@ -85,9 +86,9 @@ export const handler: Handlers = {
             message: "Operation error",
             error: result.error,
           });
-          response = ResponseUtil.badRequest(result.error);
+          response = ApiResponseUtil.badRequest(result.error);
         } else {
-          response = ResponseUtil.success(result, { forceNoCache: true });
+          response = ApiResponseUtil.success(result);
         }
 
         console.log("response", response);
@@ -98,14 +99,14 @@ export const handler: Handlers = {
         });
         return response;
       } else {
-        return ResponseUtil.badRequest("Not supported yet");
+        return ApiResponseUtil.badRequest("Not supported yet");
       }
     } catch (error: unknown) {
       console.error("Error processing request:", error);
       if (error instanceof SyntaxError) {
-        return ResponseUtil.badRequest("Invalid JSON in request body");
+        return ApiResponseUtil.badRequest("Invalid JSON in request body");
       }
-      return ResponseUtil.badRequest(
+      return ApiResponseUtil.badRequest(
         error instanceof Error ? error.message : "Unknown error occurred",
       );
     }

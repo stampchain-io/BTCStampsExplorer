@@ -66,8 +66,8 @@ export class SRC101UtilityService {
       return ResponseUtil.badRequest("Invalid or missing sourceAddress", 400);
     }
 
-    if (!body.feeRate || isNaN(Number(body.feeRate))) {
-      return ResponseUtil.badRequest("Invalid or missing feeRate", 400);
+    if ((!body.feeRate || isNaN(Number(body.feeRate))) && (!body.satsPerVB || isNaN(Number(body.satsPerVB)))) {
+      return ResponseUtil.badRequest("Invalid or missing feeRate or satsPerVB", 400);
     }
 
     // Operation-specific validations
@@ -320,7 +320,7 @@ export class SRC101UtilityService {
   }
 
   static checkContainsSpecial(text: string): boolean {
-    const specialCharactersPattern = /[`~!@#$%\^\-\+&\*\(\)_\=＝\=|{}":;',\\\[\].·<>\/\?~！@#￥……&*（）——|{}【】《》'；：“”‘。，、？\s]/;
+    const specialCharactersPattern = /[`~!@#$%\^\-\+&\*\(\)_\=＝\=|{}":;',\\\[\].·<>\/\?~！@#￥……&*（）——|{}【】《》'；："":';',\\\[\].·<>\/\?~！@#￥……&*（）——|{}【】《》'；：""'。，、？\s]/;
     const specialCategories = ["Zs", "Cf"];  // Space separator (Zs) and format (Cf)
 
     // Check if there's any special character

@@ -9,6 +9,7 @@ export class SRC101TransactionService {
   static async handleOperation(
     operation: "deploy" | "mint" | "transfer" | "setrecord" | "renew",
     body: SRC101InputData,
+    trxType: "olga" | "multisig"
   ): Promise<TX | TXError> {
     logger.debug("stamps", {
       message: "Starting handleOperation",
@@ -22,8 +23,10 @@ export class SRC101TransactionService {
       network: "mainnet",
       changeAddress: body.changeAddress,
       sourceAddress: body.sourceAddress,
-      recAddress: body.recAddress,
-      feeRate: body.feeRate,
+      recAddress: body.recAddress,  
+      feeRate: body.feeRate || body.satsPerVB,
+      satsPerVB: body.satsPerVB || body.feeRate,
+      trxType: trxType,
     };
 
     logger.debug("stamps", {
@@ -66,19 +69,6 @@ export class SRC101TransactionService {
         return ResponseUtil.badRequest("Invalid operation", 400);
     }
 
-    logger.debug("stamps", {
-      message: "Operation result received",
-      result: JSON.stringify(result, null, 2)
-    });
-    // if ("error" in result) {
-    //   logger.error("stamps", {
-    //     message: "Operation error",
-    //     error: result.error
-    //   });
-    //   result = ResponseUtil.badRequest(result.error, 400);
-    //   console.log("result", result)
-    //   return result
-    // }
     return result;
   }
 

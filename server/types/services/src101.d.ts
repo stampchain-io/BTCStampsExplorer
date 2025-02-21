@@ -8,7 +8,9 @@ export interface IPrepareSRC101TX {
   changeAddress: string;
   recAddress: string;
   feeRate: number;
+  satsPerVB: number;
   transferString: string;
+  trxType: "olga" | "multisig";
 }
 
 export interface IMintSRC101 extends Omit<IPrepareSRC101TX, "transferString"> {

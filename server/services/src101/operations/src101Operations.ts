@@ -28,8 +28,13 @@ export class SRC101OperationService {
         transferString,
       };
       console.log("prepare",prepare);
-      const { psbtHex, inputsToSign } = await SRC101Service.MultisigPSBTService.preparePSBT(prepare);
-      return { hex: psbtHex, inputsToSign };
+      if(params.trxType === "multisig"){
+        const { psbtHex, inputsToSign } = await SRC101Service.MultisigPSBTService.preparePSBT(prepare);
+        return { hex: psbtHex, inputsToSign };
+      } else {
+        const result = await SRC101Service.PSBTService.preparePSBT(prepare);
+        return result;
+      }
     } catch (error) {
       console.error(error);
       return { error: error.message };

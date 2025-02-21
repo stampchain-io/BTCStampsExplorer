@@ -37,6 +37,7 @@ export interface SRC101InputData {
   coef?: number;
 
   feeRate: number;
+  satsPerVB: number;
 
   x?: string;
   web?: string;
