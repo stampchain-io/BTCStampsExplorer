@@ -42,6 +42,7 @@ export class StampController {
     page = 1,
     limit = BIG_LIMIT,
     sortBy = "ASC",
+    sortOrder = "index_asc",
     type = "all",
     filterBy = [],
     ident,
@@ -66,7 +67,8 @@ export class StampController {
   }: {
     page?: number;
     limit?: number;
-    sortBy?: "ASC" | "DESC";
+      sortBy?: "ASC" | "DESC";
+      sortOrder: string;
     /**
      * If suffix filters and ident are provided, filterBy and type will be ignored
      */
@@ -133,6 +135,7 @@ export class StampController {
       page,
       limit,
       sortBy,
+      sortOrder,
       type,
       ident: finalIdent,
       suffixFilters,

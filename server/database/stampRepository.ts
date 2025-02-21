@@ -474,6 +474,7 @@ export class StampRepository {
     limit?: number;
     page?: number;
     sortBy?: "ASC" | "DESC";
+    sortOrder?: string;
     type?: STAMP_TYPES;
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[] | string;
     identifier?: string | number | (string | number)[];
@@ -498,6 +499,7 @@ export class StampRepository {
       limit: SMALL_LIMIT,
       page: 1,
       sortBy: "ASC",
+      sortOrder: "index_asc",
       type: "stamps",
       includeSecondary: true,
       ...options,
@@ -513,6 +515,7 @@ export class StampRepository {
       limit,
       page,
       sortBy,
+      sortOrder,
       type,
       ident,
       identifier,
@@ -521,7 +524,7 @@ export class StampRepository {
       noPagination = false,
       cacheDuration = 1000 * 60 * 3,
       collectionId,
-      sortColumn = "tx_index",
+      sortColumn = sortOrder?.includes("index") ? "tx_index" : "tx_index",
       filterBy,
       suffixFilters,
       groupBy,
@@ -610,7 +613,8 @@ export class StampRepository {
         ? `WHERE ${whereConditions.join(" AND ")}`
         : "";
 
-    const order = sortBy.toUpperCase() === "DESC" ? "DESC" : "ASC";
+    const order = sortOrder?.includes("asc") ? "ASC" : "DESC"
+    // const order = sortBy.toUpperCase() === "DESC" ? "DESC" : "ASC";
     const orderClause = `ORDER BY st.${sortColumn} ${order}`;
 
     let limitClause = "";

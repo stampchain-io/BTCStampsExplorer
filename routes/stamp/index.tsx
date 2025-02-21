@@ -30,6 +30,7 @@ export const handler: Handlers = {
 
     try {
       const sortBy = url.searchParams.get("sortBy") || "DESC";
+      const sortOrder = url.searchParams.get("sortOrder") || "index_desc";
       const filterBy = url.searchParams.get("filterBy")
         ? (url.searchParams.get("filterBy")?.split(",").filter(
           Boolean,
@@ -64,6 +65,7 @@ export const handler: Handlers = {
           page,
           limit: page_size,
           sortBy: sortBy as "DESC" | "ASC",
+          sortOrder: sortOrder,
           type: selectedTab,
           filterBy,
           ident,

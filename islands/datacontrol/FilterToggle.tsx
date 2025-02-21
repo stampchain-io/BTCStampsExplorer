@@ -2,10 +2,10 @@ import { Button } from "$components/shared/Button.tsx";
 
 const Badge = ({
   text,
-  color = "bg-stamp-grey-bright", // Default color
+  color = "bg-stamp-grey-bright",
 }: {
   text: string;
-  color?: string; // Optional prop for background color customization
+  color?: string;
 }) => {
   return (
     <span
@@ -18,7 +18,7 @@ const Badge = ({
 
 export function FilterToggle(
   { count, open, setOpen }: {
-    count: string;
+    count: number;
     open: boolean;
     setOpen: (status: boolean) => void;
   },
@@ -27,7 +27,7 @@ export function FilterToggle(
     <div
       class={`relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright`}
     >
-      <Badge text={count} />
+      <Badge text={count.toString()} />
       <Button
         // onClick={() => {
         //   const url = new URL(globalThis.location.href);
