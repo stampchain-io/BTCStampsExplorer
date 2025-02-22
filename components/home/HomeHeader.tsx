@@ -20,7 +20,7 @@ function TitleText({
       `}
       style={`
         animation-delay: ${delay}ms;
-        animation-duration: 500ms;
+        animation-duration: 300ms;
         animation-fill-mode: forwards;
       `}
     >
@@ -31,7 +31,30 @@ function TitleText({
 
 export function HomeHeader() {
   return (
-    <header class="flex flex-col items-center justify-center gap-3 mobileMd:gap-6 w-full">
+    <header class="
+      flex flex-col items-center justify-center 
+      gap-1.5 mobileMd:gap-3 mobileLg:gap-[18px] 
+      w-full
+      h-[220px] tablet:h-[250px]
+      relative
+      overflow-hidden
+    ">
+      <img
+        src="/img/home/stamp-logo-1000-30.png"
+        alt=""
+        class="
+          fixed
+          w-[200px] h-[200px] mobileMd:w-[220px] mobileMd:h-[220px] mobileLg:w-[250px] mobileLg:h-[250px]
+          top-[110px] right-[63%] min-[420px]:right-[68%] mobileMd:top-[120px] mobileMd:right-[67%] mobileLg:top-[150px] mobileLg:right-[71%] min-[900px]:right-[69%] tablet:top-[190px] tablet:right-[66%] min-[1200px]:right-[63%] desktop:right-[61%]
+          pointer-events-none
+          opacity-0
+          animate-slide-down
+        "
+        style="
+          animation-duration: 300ms;
+          animation-fill-mode: forwards;
+        "
+      />
       <div class="
           w-[336px]
           min-[420px]:w-[376px]
@@ -39,6 +62,7 @@ export function HomeHeader() {
           mobileLg:w-[720px]
           tablet:w-[976px]
           flex flex-col justify-center
+          relative
         ">
         <h1 class="text-center">
           <TitleText
@@ -50,8 +74,8 @@ export function HomeHeader() {
               min-[420px]:text-3xl
               mobileMd:text-4xl
               mobileLg:text-5xl
-              tablet:text-6xl
-              desktop:text-6xl
+              tablet:text-5xl
+              desktop:text-5xl
               animate-slide-down
             "
           >
@@ -71,7 +95,7 @@ export function HomeHeader() {
               min-[420px]:text-2xl
               mobileMd:text-3xl
               mobileLg:text-4xl
-              tablet:text-5xl
+              tablet:text-4xl
               -mt-1
               tablet:mt-0
               animate-slide-up
@@ -86,19 +110,20 @@ export function HomeHeader() {
         class="
           mx-auto
           w-full
+          max-w-[310px]
           text-center
           font-medium 
           text-stamp-grey-light
-          mobileSm:max-w-[336px] mobileSm:text-base
-          mobileMd:max-w-[380px] mobileMd:text-lg
+          text-base
+          mobileMd:max-w-[380px]
           mobileLg:max-w-[515px] mobileLg:text-xl
-          tablet:max-w-[618px] tablet:text-2xl
+          tablet:max-w-[550px]
           opacity-0
           animate-fade-in
         "
         style="
           animation-delay: 700ms;
-          animation-duration: 700ms;
+          animation-duration: 500ms;
           animation-fill-mode: forwards;
         "
       >
