@@ -77,7 +77,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
       {/* Load Micro5 font only when needed */}
       <Micro5FontLoader />
 
-      <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 text-white mobileMd:mt-32 mt-20">
+      <div class="layout-container flex flex-col gap-24 mobileLg:gap-36 mobileMd:mt-8 mt-6">
         {/* Critical above-fold content */}
         <HomeHeader />
 
