@@ -221,12 +221,26 @@ export function StampSearchClient(
   }, [open2, handleOpen2]);
 
   const modalBgTop = `
-    fixed inset-0 z-50 
-    flex items-start justify-center 
-    bg-black/70 backdrop-blur-md overflow-y-auto
-    ${isVisible && !isClosing ? "animate-fade-in duration-100" : "opacity-0"}
-    ${isClosing ? "animate-fade-out duration-100" : ""}
-  `;
+  fixed inset-0 z-50 
+  flex items-start justify-center 
+  overflow-y-auto
+  ${
+    isVisible && !isClosing
+      ? "bg-black/70 backdrop-blur-md animate-fade-in duration-100"
+      : "animate-fade-out duration-100"
+  }
+`;
+
+  // const modalBgTop = `
+  //   fixed inset-0 z-50
+  //   flex items-start justify-center
+  //    overflow-y-auto
+  //   ${
+  //   isVisible && !isClosing
+  //     ? "bg-black/70 backdrop-blur-md animate-fade-in duration-100"
+  //     : "animate-fade-out duration-100"
+  // }
+  // `;
 
   const modalSearch = `
     w-[90%] max-w-[480px] 
@@ -279,7 +293,7 @@ export function StampSearchClient(
         />
       )}
 
-      {(open2 || isClosing) && (
+      {open2 && (
         <div
           class={modalBgTop}
           onClick={(e) => {
