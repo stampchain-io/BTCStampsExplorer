@@ -160,20 +160,20 @@ export default {
           "100%": { opacity: "0" },
         },
         slideUp: {
-          "0%": { transform: "translateY(36px)", opacity: "0" },
+          "0%": { transform: "translateY(30px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
         slideDown: {
-          "0%": { transform: "translateY(0)", opacity: "1" },
-          "100%": { transform: "translateY(36px)", opacity: "0" },
+          "0%": { transform: "translateY(-30px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
         },
         slideLeft: {
-          "0%": { transform: "translateX(36px)", opacity: "0" },
+          "0%": { transform: "translateX(30px)", opacity: "0" },
           "100%": { transform: "translateX(0)", opacity: "1" },
         },
         slideRight: {
-          "0%": { transform: "translateX(0)", opacity: "1" },
-          "100%": { transform: "translateX(36px)", opacity: "0" },
+          "0%": { transform: "translateX(0)", opacity: "0" },
+          "100%": { transform: "translateX(30px)", opacity: "1" },
         },
         rotate: {
           "0%": { "--angle": "0deg" },
