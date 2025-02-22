@@ -142,8 +142,12 @@ export default {
           "linear-gradient(to bottom, #080808 100%, #080808 80%)",
       },
       animation: {
-        "fade-in": "fadeIn 0.3s ease-in-out",
-        "slide-up": "slideUp 0.3s ease-in-out",
+        "fade-in": "fadeIn",
+        "fade-out": "fadeOut",
+        "slide-up": "slideUp",
+        "slide-down": "slideDown",
+        "slide-left": "slideLeft",
+        "slide-right": "slideRight",
         "rotate": "rotate 4s linear infinite",
       },
       keyframes: {
@@ -151,9 +155,25 @@ export default {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        fadeOut: {
+          "0%": { opacity: "1" },
+          "100%": { opacity: "0" },
+        },
         slideUp: {
-          "0%": { transform: "translateY(10px)", opacity: "0" },
+          "0%": { transform: "translateY(30px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        slideDown: {
+          "0%": { transform: "translateY(-30px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        slideLeft: {
+          "0%": { transform: "translateX(30px)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        slideRight: {
+          "0%": { transform: "translateX(0)", opacity: "0" },
+          "100%": { transform: "translateX(30px)", opacity: "1" },
         },
         rotate: {
           "0%": { "--angle": "0deg" },
