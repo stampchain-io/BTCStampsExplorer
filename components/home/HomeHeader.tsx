@@ -46,14 +46,14 @@ export function HomeHeader() {
           absolute
           w-[200px] mobileMd:w-[220px] mobileLg:w-[250px]
           h-[200px] mobileMd:h-[220px] mobileLg:h-[250px]
-          top-[10px] mobileMd:top-[0px] mobileLg:top-[-15px] tablet:top-[0px] 
-          right-[63%] min-[420px]:right-[68%] mobileMd:right-[67%] mobileLg:right-[71%] min-[900px]:right-[69%] tablet:right-[66%] min-[1200px]:right-[63%] desktop:right-[61%] min-[1700px]:right-[59%]
+          top-[10px] mobileMd:top-[0px] mobileLg:top-[-10px] tablet:top-[3px] 
+          left-[calc(50%+39px)] min-[420px]:left-[calc(50%+73px)] mobileMd:left-[calc(50%+98px)] mobileLg:left-[calc(50%+151px)]
           pointer-events-none
           opacity-0
           animate-slide-down
         "
         style="
-          animation-duration: 300ms;
+          animation-duration: 500ms;
           animation-fill-mode: forwards;
         "
       />
