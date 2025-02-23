@@ -68,6 +68,20 @@ export function Footer() {
       px-3 tablet:px-6 desktop:px-12 py-6 tablet:py-18
       max-w-desktop w-full mx-auto flex flex-col tablet:flex-row justify-between gap-2 mobileLg:gap-3 tablet:gap-4
     ">
+      <img
+        src="/img/home/stamp-logo-dark-600.png"
+        alt=""
+        class="
+          absolute
+          w-[210px] mobileLg:w-[270px] tablet:w-[180px]
+          h-[210px] mobileLg:h-[270px] tablet:h-[180px]
+          bottom-[30px] mobileLg:bottom-[27px] tablet:bottom-[4px]
+          left-[calc(50%+19px)] mobileLg:left-[calc(50%+13px)] tablet:left-[314px] desktop:left-[338px]
+          pointer-events-none
+          opacity-15 tablet:opacity-40
+          z-[-999]
+        "
+      />
       <div className="w-full flex flex-col gap-1 items-center tablet:items-start">
         <p className={footerLogo}>
           STAMPCHAIN
