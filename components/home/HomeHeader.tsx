@@ -37,15 +37,17 @@ export function HomeHeader() {
       w-full
       h-[220px] tablet:h-[250px]
       relative
-      overflow-hidden
+      overflow-visible
     ">
       <img
-        src="/img/home/stamp-logo-1000-30.png"
+        src="/img/home/stamp-logo-dark-600.png"
         alt=""
         class="
-          fixed
-          w-[200px] h-[200px] mobileMd:w-[220px] mobileMd:h-[220px] mobileLg:w-[250px] mobileLg:h-[250px]
-          top-[110px] right-[63%] min-[420px]:right-[68%] mobileMd:top-[120px] mobileMd:right-[67%] mobileLg:top-[150px] mobileLg:right-[71%] min-[900px]:right-[69%] tablet:top-[190px] tablet:right-[66%] min-[1200px]:right-[63%] desktop:right-[61%]
+          absolute
+          w-[200px] mobileMd:w-[220px] mobileLg:w-[250px]
+          h-[200px] mobileMd:h-[220px] mobileLg:h-[250px]
+          top-[10px] mobileMd:top-[0px] mobileLg:top-[-15px] tablet:top-[0px] 
+          right-[63%] min-[420px]:right-[68%] mobileMd:right-[67%] mobileLg:right-[71%] min-[900px]:right-[69%] tablet:right-[66%] min-[1200px]:right-[63%] desktop:right-[61%] min-[1700px]:right-[59%]
           pointer-events-none
           opacity-0
           animate-slide-down
