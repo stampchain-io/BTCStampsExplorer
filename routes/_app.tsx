@@ -137,9 +137,9 @@ export default function App({ Component, state }: PageProps<unknown>) {
           ? <div class="bgGradientTop contain-layout" />
           : (
             <>
-              <div class="bgGradientTop contain-layout desktop:hidden block" />
-              <div class="bgGradientTopLeft desktop:block hidden" />
-              <div class="bgGradientTopRight desktop:block hidden" />
+              <div class="bgGradientTop contain-layout block" />
+              {/* <div class="bgGradientTopLeft desktop:block hidden" /> */}
+              {/* <div class="bgGradientTopRight desktop:block hidden" /> */}
             </>
           )}
         <div class="bgGradientBottom contain-layout" />
