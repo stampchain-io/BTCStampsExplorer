@@ -88,7 +88,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
           w-full
           h-[450px] mobileMd:h-[500px] mobileLg:h-[600px] tablet:h-[700px] desktop:h-[850px]
           object-cover
-          opacity-60
+          opacity-50
           pointer-events-none
           z-[-999]
         "
