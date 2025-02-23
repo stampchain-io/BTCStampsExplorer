@@ -15,6 +15,21 @@ export default function Media() {
 
   return (
     <div className={body}>
+      <img
+        src="/img/home/stamps-collage-purpleTransparentGradient-4000.webp"
+        alt="About Bitcoin Stamps and contact Stampchain"
+        class="
+          absolute
+          top-[50%] mobileMd:top-[55%] mobileLg:top-[50%] tablet:top-[50%] desktop:top-[40%]
+          left-0
+          w-full
+          h-[1400px] mobileMd:h-[1100px] mobileLg:h-[1200px] tablet:h-[1200px] desktop:h-[1200px]
+          object-cover
+          opacity-50
+          pointer-events-none
+          z-[-999]
+        "
+      />
       <section>
         <h1 className={titleGreyDL}>MEDIA MATTERS</h1>
         <h2 className={subTitleGrey}>HONOURABLE STAMP MENTIONS</h2>
