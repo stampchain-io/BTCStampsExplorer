@@ -5,16 +5,27 @@ import { STAMP_FILTER_TYPES, STAMP_TYPES as _STAMP_TYPES } from "$globals";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { useNavigator as _useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
+import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
+import StampSearchDrawer from "$islands/stamp/details/StampSearchDrawer.tsx";
+import { flags } from "../../lib/flags/flags.ts";
+import { MultiSort } from "$islands/datacontrol/MultiSort.tsx";
 
 export const StampHeader = (
-  { filterBy, sortBy }: {
+  { filterBy, sortBy, search }: {
     filterBy: STAMP_FILTER_TYPES[];
     sortBy: "ASC" | "DESC" | undefined;
+    search: string;
   },
 ) => {
   const [isOpen1, setIsOpen1] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
+
+  const searchparams = new URLSearchParams(search);
+  const filterCount = allQueryKeysFromFilters.filter((key) => {
+    return searchparams.has(key) && searchparams.get(key) != "false";
+  }).length;
   const handleOpen1 = (open: boolean) => {
     setIsOpen1(open);
     setIsOpen2(false);
@@ -36,24 +47,36 @@ export const StampHeader = (
       <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>STAMPS</h1>
       <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
       <div className="flex relative items-start justify-between gap-3">
-        <Filter
-          initFilter={filterBy}
-          open={isOpen1}
-          handleOpen={handleOpen1}
-          filterButtons={[
-            "pixel",
-            "vector",
-            "for sale",
-            "trending sales",
-            "sold",
-          ]}
-          dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
-          open2={isOpen2}
-        />
+        {flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false) && (
+          <FilterToggle
+            open={openSearch}
+            setOpen={setOpenSearch}
+            count={filterCount}
+          />
+        )}
+        {!flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false)
+          ? (
+            <Filter
+              initFilter={filterBy}
+              open={isOpen1}
+              handleOpen={handleOpen1}
+              filterButtons={[
+                "pixel",
+                "vector",
+                "for sale",
+                "trending sales",
+                "sold",
+              ]}
+              dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
+              open2={isOpen2}
+            />
+          )
+          : null}
+
         <div
           class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
         >
-          <Sort initSort={sortBy} />
+          <MultiSort searchparams={searchparams} initSort={sortBy} />
         </div>
         <div
           class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
@@ -61,6 +84,11 @@ export const StampHeader = (
           <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
         </div>
       </div>
+      <StampSearchDrawer
+        searchparams={searchparams}
+        open={openSearch}
+        setOpen={setOpenSearch}
+      />
     </div>
   );
 };
