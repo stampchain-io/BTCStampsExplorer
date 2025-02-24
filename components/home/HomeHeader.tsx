@@ -40,14 +40,14 @@ export function HomeHeader() {
       overflow-visible
     ">
       <img
-        src="/img/home/stamp-logo-dark-600.png"
+        src="/img/home/stampchain-logo-480.svg"
         alt=""
         class="
           absolute
           w-[200px] mobileMd:w-[220px] mobileLg:w-[250px]
           h-[200px] mobileMd:h-[220px] mobileLg:h-[250px]
           top-[10px] mobileMd:top-[0px] mobileLg:top-[-10px] tablet:top-[3px] 
-          left-[calc(50%+39px)] min-[420px]:left-[calc(50%+73px)] mobileMd:left-[calc(50%+98px)] mobileLg:left-[calc(50%+151px)]
+          left-[calc(50%+39px)] min-[420px]:left-[calc(50%+73px)] mobileMd:left-[calc(50%+98px)] mobileLg:left-[calc(50%+153px)]
           pointer-events-none
           opacity-0
           animate-slide-down
