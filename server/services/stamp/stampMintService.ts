@@ -92,7 +92,7 @@ export class StampMintService {
         qty,
         locked,
         divisible,
-        description: `${prefix}:${filename}`,
+        description: "stamp:",
         satsPerKB: normalizedSatsPerKB,
       });
 
