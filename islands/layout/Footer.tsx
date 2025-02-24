@@ -69,16 +69,16 @@ export function Footer() {
       max-w-desktop w-full mx-auto flex flex-col tablet:flex-row justify-between gap-2 mobileLg:gap-3 tablet:gap-4
     ">
       <img
-        src="/img/home/stamp-logo-dark-600.png"
+        src="/img/home/stampchain-logo-480.svg"
         alt=""
         class="
           absolute
-          w-[210px] mobileLg:w-[270px] tablet:w-[180px]
-          h-[210px] mobileLg:h-[270px] tablet:h-[180px]
-          bottom-[30px] mobileLg:bottom-[27px] tablet:bottom-[4px]
-          left-[calc(50%+19px)] mobileLg:left-[calc(50%+13px)] tablet:left-[314px] desktop:left-[338px]
+          w-[210px] mobileLg:w-[270px] tablet:w-[190px]
+          h-[210px] mobileLg:h-[270px] tablet:h-[190px]
+          bottom-[31px] mobileLg:bottom-[28px] tablet:bottom-[4px]
+          left-[calc(50%+18px)] mobileLg:left-[calc(50%+69px)] tablet:left-[296px] desktop:left-[320px]
           pointer-events-none
-          opacity-15 tablet:opacity-40
+          opacity-25 tablet:opacity-50
           z-[-999]
         "
       />
