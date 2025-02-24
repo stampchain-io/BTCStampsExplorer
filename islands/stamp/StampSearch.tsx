@@ -227,7 +227,7 @@ export function StampSearchClient(
   ${
     isVisible && !isClosing
       ? "bg-black/70 backdrop-blur-md animate-fade-in duration-100"
-      : "animate-fade-out duration-100"
+      : "animate-fade-out duration-100 delay-500"
   }
 `;
 
@@ -299,6 +299,7 @@ export function StampSearchClient(
           onClick={(e) => {
             if (e.target === e.currentTarget) handleModalClose();
           }}
+          // onAnimationEnd={handleModalClose}
         >
           <div class={modalSearch}>
             <div className={animatedBorderGrey}>

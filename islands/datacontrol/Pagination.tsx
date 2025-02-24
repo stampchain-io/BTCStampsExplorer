@@ -10,7 +10,7 @@ const _navArrow = `
   w-7 h-7 mobileLg:h-9 mobileLg:w-9`;
 const navContent = `
   flex items-center justify-center
-  w-7 h-7 mobileLg:h-9 mobileLg:w-9 rounded-md hover:bg-stamp-primary-hover
+  w-7 h-7 mobileLg:h-12 mobileLg:w-12 mobileLg:px-3 px-0 rounded-md hover:bg-stamp-primary-hover
   text-sm leading-[16.5px] mobileLg:text-base mobileLg:leading-[19px]
   font-medium text-black`;
 
