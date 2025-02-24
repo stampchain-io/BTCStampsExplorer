@@ -120,7 +120,7 @@ export default function StampSection({
   return (
     <div class="w-full">
       <div class="w-full flex justify-between items-center">
-        <div class="flex flex-col">
+        <div class="flex flex-col w-full">
           {title && (
             <div
               class={`flex flex-col items-start ${
