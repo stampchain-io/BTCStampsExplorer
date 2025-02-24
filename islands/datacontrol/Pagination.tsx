@@ -109,7 +109,7 @@ export function Pagination({
         {/* Show ellipsis if there are pages before the range */}
         {startPage > 1 && (
           <>
-            {renderPageButton(1)}
+            {page < 1 && renderPageButton(1)}
             <span class="text-stamp-purple-dark">...</span>
           </>
         )}
@@ -125,7 +125,7 @@ export function Pagination({
         {endPage < totalPages && (
           <>
             <span class="text-stamp-purple-dark">...</span>
-            {renderPageButton(totalPages)}
+            {page > totalPages && renderPageButton(totalPages)}
           </>
         )}
 
