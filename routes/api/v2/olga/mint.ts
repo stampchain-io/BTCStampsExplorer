@@ -85,6 +85,7 @@ export const handler: Handlers<TX | TXError> = {
       assetName: assetName,
       satsPerKB: normalizedFees.normalizedSatsPerKB,
       satsPerVB: normalizedFees.normalizedSatsPerVB,
+      description: "stamp:",
       ...(body.service_fee && {
         service_fee: body.service_fee ||
           parseInt(serverConfig.MINTING_SERVICE_FEE_FIXED_SATS),
