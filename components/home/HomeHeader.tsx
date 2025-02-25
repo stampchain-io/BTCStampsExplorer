@@ -22,7 +22,7 @@ function TitleText({
         animation-delay: ${delay}ms;
         animation-duration: 300ms;
         animation-fill-mode: forwards;
-       filter: drop-shadow(0.05em 0.05em 0.05em rgba(0, 0, 0, 0.75));
+        filter: drop-shadow(0.05em 0.05em 0.05em rgba(0, 0, 0, 0.75));
       `}
     >
       {children}
