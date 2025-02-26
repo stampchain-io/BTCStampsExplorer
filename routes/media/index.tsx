@@ -16,7 +16,7 @@ export default function Media() {
   return (
     <div className={body}>
       <img
-        src="/img/home/stamps-collage-purpleGradient-4000.webp"
+        src="/img/home/stamps-collage-purpleTransparentGradient-4000.webp"
         alt="Read about Bitcoin Stamps and the media mentions of Stampchain"
         class="
           absolute
