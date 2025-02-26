@@ -8,7 +8,7 @@ export default function About() {
   return (
     <div>
       <img
-        src="/img/home/stamps-collage-purpleTransparentGradient-4000.webp"
+        src="/img/home/stamps-collage-purpleGradient-4000.webp"
         alt="About Bitcoin Stamps and contact Stampchain"
         class="
           absolute
@@ -17,9 +17,10 @@ export default function About() {
           w-full
           h-[1200px] min-[420px]:h-[1200px] mobileMd:h-[1200px] mobileLg:h-[1700px] tablet:h-[1600px] desktop:h-[1500px]
           object-cover
-          opacity-60
           pointer-events-none
           z-[-999]
+          [mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))]
+          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))]
         "
       />
 

@@ -16,7 +16,7 @@ export default function Media() {
   return (
     <div className={body}>
       <img
-        src="/img/home/stamps-collage-purpleTransparentGradient-4000.webp"
+        src="/img/home/stamps-collage-purpleGradient-4000.webp"
         alt="Read about Bitcoin Stamps and the media mentions of Stampchain"
         class="
           absolute
@@ -25,9 +25,10 @@ export default function Media() {
           w-full
           h-[1400px] mobileMd:h-[1100px] mobileLg:h-[1200px] tablet:h-[1200px] desktop:h-[1200px]
           object-cover
-          opacity-50
           pointer-events-none
           z-[-999]
+          [mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))]
+          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))]
         "
       />
       <section>

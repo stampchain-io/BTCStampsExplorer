@@ -131,7 +131,8 @@ export function HomeHeader() {
         "
       >
         Welcome to the forefront of digital collectibles, where each stamp is a
-        unique piece of art intertwined with the immutability of the blockchain.
+        unique piece of art intertwined with the immutability of the
+        blockchains.
       </p>
     </header>
   );

@@ -79,18 +79,19 @@ export default function Home({ data }: PageProps<HomePageData>) {
 
       <div>
         <img
-          src="/img/home/stamps-collage-purpleTransparentGradient-4000.webp"
+          src="/img/home/stamps-collage-purpleGradient-4000.webp"
           alt="About Bitcoin Stamps and contact Stampchain"
           class="
           absolute
-          top-[-50px]
+          top-[48px]
           left-0
           w-full
           h-[450px] mobileMd:h-[500px] mobileLg:h-[600px] tablet:h-[700px] desktop:h-[850px]
           object-cover
-          opacity-50
           pointer-events-none
           z-[-999]
+          [mask-image:linear-gradient(180deg,rgba(0,0,0,0.1),rgba(0,0,0,0.3),rgba(0,0,0,0.6),rgba(0,0,0,0.4),rgba(0,0,0,0))]
+          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.1),rgba(0,0,0,0.3),rgba(0,0,0,0.6),rgba(0,0,0,0.4),rgba(0,0,0,0))]
         "
         />
 
