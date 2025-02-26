@@ -12,18 +12,19 @@ export default function HowTo() {
   return (
     <div className={body}>
       <img
-        src="/img/home/stamps-collage-purpleTransparentGradient-4000.webp"
+        src="/img/home/stamps-collage-purpleGradient-4000.webp"
         alt="How to practical guides on Bitcoin Stamps and the stamping tools of Stampchain"
         class="
           absolute
-          top-[-50px]
+          top-0
           left-0
           w-full
-          h-[550px] mobileMd:h-[600px] mobileLg:h-[700px] tablet:h-[800px] desktop:h-[950px]
+          h-[550px] mobileMd:h-[600px] mobileLg:h-[700px] tablet:h-[800px]
           object-cover
-          opacity-50
           pointer-events-none
           z-[-999]
+          [mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))]
+          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))] 
         "
       />
       <section className="mb-3 mobileLg:mb-6">
