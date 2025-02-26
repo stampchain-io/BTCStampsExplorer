@@ -68,6 +68,20 @@ export function Footer() {
       px-3 tablet:px-6 desktop:px-12 py-6 tablet:py-18
       max-w-desktop w-full mx-auto flex flex-col tablet:flex-row justify-between gap-2 mobileLg:gap-3 tablet:gap-4
     ">
+      <img
+        src="/img/home/stampchain-logo-480.svg"
+        alt=""
+        class="
+          absolute
+          w-[210px] mobileLg:w-[270px] tablet:w-[190px]
+          h-[210px] mobileLg:h-[270px] tablet:h-[190px]
+          bottom-[31px] mobileLg:bottom-[28px] tablet:bottom-[4px]
+          left-[calc(50%+18px)] mobileLg:left-[calc(50%+69px)] tablet:left-[296px] desktop:left-[320px]
+          pointer-events-none
+          opacity-25 tablet:opacity-50
+          z-[-999]
+        "
+      />
       <div className="w-full flex flex-col gap-1 items-center tablet:items-start">
         <p className={footerLogo}>
           STAMPCHAIN
