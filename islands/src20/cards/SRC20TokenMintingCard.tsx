@@ -24,7 +24,7 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
 
   return (
     <SRC20BaseCard {...props}>
-      {(fromPage === "src20" || fromPage === "home") && (
+      {fromPage === "src20" && (
         <>
           {/* Holders & Deploy */}
           <div class="flex flex-col -mb-6 mobileLg:-mb-[44px]">
@@ -131,7 +131,9 @@ export function SRC20TokenMintingCard(props: SRC20BaseCardProps) {
       <Button
         variant="mint"
         onClick={handleMintClick}
-        class={fromPage != "stamping/src20" ? "hidden min-[480px]:block" : ""}
+        class={(fromPage != "stamping/src20" && fromPage != "home")
+          ? "hidden min-[480px]:block"
+          : ""}
       >
         MINT
       </Button>
