@@ -8,7 +8,7 @@ export default function About() {
   return (
     <div>
       <img
-        src="/img/home/stamps-collage-purpleGradient-4000.webp"
+        src="/img/home/stamps-collage-purpleTransparentGradient-4000.webp"
         alt="About Bitcoin Stamps and contact Stampchain"
         class="
           absolute

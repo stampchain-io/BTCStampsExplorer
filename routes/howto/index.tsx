@@ -12,7 +12,7 @@ export default function HowTo() {
   return (
     <div className={body}>
       <img
-        src="/img/home/stamps-collage-purpleGradient-4000.webp"
+        src="/img/home/stamps-collage-purpleTransparentGradient-4000.webp"
         alt="How to practical guides on Bitcoin Stamps and the stamping tools of Stampchain"
         class="
           absolute
