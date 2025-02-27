@@ -1,32 +1,32 @@
-import { AnimatePresence } from "framer-motion";
-import ModalContent from "$components/shared/animation/ModalContent.tsx";
-
-interface AnimationLayoutPropTypes {
-  open: boolean;
-  handleOpen: () => void;
-  handleClose: () => void;
-}
+import { useState } from "preact/hooks";
 
 const AnimationLayout = (
-  { open, handleOpen, handleClose }: AnimationLayoutPropTypes,
+  { handleClose, children }: {
+    handleClose: () => void;
+    children: preact.ComponentChildren;
+  },
 ) => {
+  const [status, setStatus] = useState<boolean>(false);
+
+  const handleClickOutside = () => {
+    setStatus(true);
+    setTimeout(() => {
+      handleClose();
+    }, 500);
+  };
   return (
     <>
-      <AnimatePresence
-        // Disable any initial animations on children that
-        // are present when the component is first rendered
-        initial={false}
-        // Only render one component at a time.
-        // The exiting component will finish its exit
-        // animation before entering component is rendered
-        exitBeforeEnter={true}
-        // Fires when all exiting nodes have completed animating out
-        onExitComplete={() => null}
+      <div
+        class={`unfolding ${status ? "out" : ""}`}
+        id="animation-modal-container"
+        onClick={handleClickOutside}
       >
-        {open && (
-          <ModalContent handleOpen={handleOpen} handleClose={handleClose} />
-        )}
-      </AnimatePresence>
+        <div class="animation-modal-background">
+          <div class="animation-modal">
+            {children}
+          </div>
+        </div>
+      </div>
     </>
   );
 };

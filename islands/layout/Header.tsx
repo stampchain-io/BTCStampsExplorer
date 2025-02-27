@@ -169,7 +169,6 @@ export function Header() {
           >
             <a
               href={link.subLinks ? undefined : link.href}
-              f-partial={link.subLinks ? undefined : link.href}
               onClick={() => {
                 if (link.subLinks) return;
                 if (!link?.href) return;
@@ -209,7 +208,6 @@ export function Header() {
                   <a
                     key={subLink.href}
                     href={subLink.href}
-                    f-partial={subLink.href}
                     onClick={() => {
                       toggleMenu();
                       setCurrentPath(subLink?.href ? subLink?.href : null);
