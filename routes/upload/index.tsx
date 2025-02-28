@@ -7,6 +7,7 @@ import {
 import { UploadImageTable } from "$islands/upload/UploadImageTable.tsx";
 import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
+import { SRC20Row } from "$globals";
 
 export const handler: Handlers = {
   async GET(req: Request, ctx) {
@@ -45,8 +46,14 @@ export const handler: Handlers = {
   },
 };
 
-export function UploadBackground(props) {
-  const { data, _total, _page, _pages, _limit } = props.data;
+interface PropTypes {
+  data: {
+    data: SRC20Row[];
+  };
+}
+
+export function UploadBackground(props: PropTypes) {
+  const { data } = props.data;
 
   return (
     <>

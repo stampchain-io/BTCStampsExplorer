@@ -265,7 +265,7 @@ export function Header() {
       {/* Tablet/Desktop Navbar */}
       <div className="hidden tablet:flex justify-between items-center gap-9 font-black text-stamp-purple">
         {renderNavLinks()}
-        <ConnectWallet toggleModal={toggleWalletModal} />
+        <ConnectWallet />
       </div>
 
       {/* Mobile Navbar */}
@@ -277,7 +277,7 @@ export function Header() {
       >
         <div className="flex flex-col items-center justify-between font-black text-center gap-3">
           {renderNavLinks(true)}
-          <ConnectWallet toggleModal={toggleWalletModal} />
+          <ConnectWallet />
         </div>
 
         <div className="flex justify-center items-center">

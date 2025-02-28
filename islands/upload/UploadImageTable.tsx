@@ -1,4 +1,4 @@
-import { SRC20Row } from "$globals";
+import { SRC20Row, WalletDataTypes } from "$globals";
 import { useEffect, useState } from "preact/hooks";
 import { unicodeEscapeToEmoji } from "$lib/utils/emojiUtils.ts";
 import { abbreviateAddress, formatDate } from "$lib/utils/formatUtils.ts";
@@ -31,15 +31,15 @@ const ImageModal = ({ imgSrc, isOpen, onClose }: ImageModalProps) => {
 export const UploadImageTable = (props: SRC20BalanceTableProps) => {
   const { data } = props;
 
-  const [modalImg, setModalImg] = useState(null);
+  const [modalImg, setModalImg] = useState<string>("");
   const [isModalOpen, setModalOpen] = useState(false);
-  const [wallet, setWallet] = useState(null);
+  const [wallet, setWallet] = useState<WalletDataTypes>({} as WalletDataTypes);
 
   const handleCloseModal = () => {
     setModalOpen(false);
   };
 
-  const handleImageInteraction = (imgSrc) => {
+  const handleImageInteraction = (imgSrc: string) => {
     setModalImg(imgSrc);
     setModalOpen(!isModalOpen);
   };
@@ -117,12 +117,12 @@ export const UploadImageTable = (props: SRC20BalanceTableProps) => {
                         </td>
                         <td class="px-6 py-4">
                           {typeof src20.max === "number"
-                            ? src20.max.toLocaleString()
+                            ? Number(src20.max).toLocaleString()
                             : Number(src20.max).toLocaleString()}
                         </td>
                         <td class="px-6 py-4">
                           {typeof src20.lim === "number"
-                            ? src20.lim.toLocaleString()
+                            ? Number(src20.lim).toLocaleString()
                             : Number(src20.lim).toLocaleString()}
                         </td>
                         <td class="px-6 py-4">
