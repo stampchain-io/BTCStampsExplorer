@@ -96,7 +96,7 @@ export function RecentSales({
 
   const defaultHomeGridClass = `
     grid w-full gap-3 mobileMd:gap-6
-    grid-cols-3 mobileMd:grid-cols-4 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7
+    grid-cols-3 mobileMd:grid-cols-3 mobileLg:grid-cols-5 tablet:grid-cols-6 desktop:grid-cols-7
     auto-rows-fr
   `;
 

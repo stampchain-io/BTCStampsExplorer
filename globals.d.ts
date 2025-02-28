@@ -682,6 +682,19 @@ export interface Config {
   MINTING_SERVICE_FEE_ADDRESS: string | null;
 }
 
+export interface WalletDataTypes {
+  accounts: string[];
+  address: string;
+  publicKey: string;
+  btcBalance: {
+    confirmed: number;
+    unconfirmed: number;
+    total: number;
+  };
+  network: "mainnet" | "testnet"; // Adjust if needed
+  provider: string;
+}
+
 declare global {
   interface GlobalThis {
     SKIP_REDIS_CONNECTION: boolean | undefined;

@@ -9,6 +9,7 @@ import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "../SRC20InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
+import { SRC20MintStatus } from "$types/src20.d.ts";
 
 interface MintProgressProps {
   progress: string;
@@ -55,8 +56,8 @@ const MintProgress = (
 
 interface MintContentProps {
   trxType?: "olga" | "multisig";
-  tick?: string | null;
-  mintStatus?: any;
+  tick?: string | undefined | null;
+  mintStatus?: SRC20MintStatus | null | undefined;
   holders?: number;
 }
 
@@ -91,7 +92,6 @@ export function MintContent({
     config,
     isSubmitting,
     submissionMessage,
-    walletError,
     apiError,
     setFormState,
     handleInputBlur,
@@ -177,7 +177,6 @@ export function MintContent({
 
     return () => {
       clearTimeout(delayDebounceFn);
-      setIsSearching(false);
     };
   }, [searchTerm, isSelecting, tick, isSwitchingFields]);
 
@@ -422,7 +421,6 @@ export function MintContent({
         <StatusMessages
           submissionMessage={submissionMessage}
           apiError={apiError}
-          walletError={walletError}
         />
       </div>
     </div>

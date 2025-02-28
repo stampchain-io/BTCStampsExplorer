@@ -1,7 +1,5 @@
 import { DispenserRow } from "$globals";
 
-import { DispenserRow } from "$globals";
-
 export * from "./services.d.ts";
 export * from "./quicknode.d.ts";
 export * from "./src20.d.ts";
