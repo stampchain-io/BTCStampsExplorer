@@ -1,12 +1,14 @@
+import { useEffect, useRef, useState } from "preact/hooks";
 import { Pagination } from "$islands/datacontrol/Pagination.tsx";
 import { ViewAllButton } from "$components/shared/ViewAllButton.tsx";
 import { StampCard } from "$islands/stamp/StampCard.tsx";
 import { ModulesStyles } from "$islands/modules/Styles.ts";
-import { useEffect, useState } from "preact/hooks";
 import { StampRow, StampSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
+import Swiper from "swiper";
+import { Autoplay, Navigation } from "swiper/modules";
 
 export default function StampSection({
   title,
@@ -27,6 +29,7 @@ export default function StampSection({
   fromPage = "",
   sortBy = "ASC",
 }: StampSectionProps) {
+  const swiperRef = useRef<Swiper | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [displayCount, setDisplayCount] = useState(
     displayCounts?.mobileSm || 16,
@@ -117,6 +120,33 @@ export default function StampSection({
   const handlePageChange = (page: number) => {
     pagination?.onPageChange?.(page);
   };
+
+  useEffect(() => {
+    swiperRef.current = new Swiper(".swiper-container", {
+      modules: [Navigation, Autoplay],
+      slidesPerView: 3,
+      spaceBetween: 20,
+      loop: true,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      breakpoints: {
+        360: { slidesPerView: 2 }, // mobileSm
+        568: { slidesPerView: 2 }, // mobileMd
+        768: { slidesPerView: 4 }, // mobileLg
+        1024: { slidesPerView: 4 }, // tablet
+        1440: { slidesPerView: 6 }, // desktop
+      },
+    });
+
+    return () => swiperRef.current?.destroy();
+  }, []);
+
   return (
     <div class="w-full">
       <div class="w-full flex justify-between items-center">
@@ -177,25 +207,52 @@ export default function StampSection({
           )}
       </div>
 
-      <div class={containerClass}>
-        {isLoading ? <div>Loading...</div> : (
-          filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
-            <div
-              key={isRecentSales && stamp.sale_data
-                ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
-                : stamp.tx_hash}
-            >
-              <StampCard
-                stamp={stamp}
-                isRecentSale={isRecentSales}
-                showDetails={showDetails}
-                showMinDetails={showMinDetails}
-                variant={variant}
-              />
+      {viewAllLink
+        ? (
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              {isLoading ? <div>Loading...</div> : (
+                filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
+                  <div
+                    class="swiper-slide"
+                    key={isRecentSales && stamp.sale_data
+                      ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
+                      : stamp.tx_hash}
+                  >
+                    <StampCard
+                      stamp={stamp}
+                      isRecentSale={isRecentSales}
+                      showDetails={showDetails}
+                      showMinDetails={showMinDetails}
+                      variant={variant}
+                    />
+                  </div>
+                ))
+              )}
             </div>
-          ))
+          </div>
+        )
+        : (
+          <div class={containerClass}>
+            {isLoading ? <div>Loading...</div> : (
+              filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
+                <div
+                  key={isRecentSales && stamp.sale_data
+                    ? `${stamp.tx_hash}-${stamp.sale_data.tx_hash}`
+                    : stamp.tx_hash}
+                >
+                  <StampCard
+                    stamp={stamp}
+                    isRecentSale={isRecentSales}
+                    showDetails={showDetails}
+                    showMinDetails={showMinDetails}
+                    variant={variant}
+                  />
+                </div>
+              ))
+            )}
+          </div>
         )}
-      </div>
 
       {viewAllLink && <ViewAllButton href={seeAllLink} />}
 

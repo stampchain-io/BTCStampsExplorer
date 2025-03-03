@@ -114,7 +114,6 @@
     "tailwindcss/": "npm:tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:tailwindcss@3.4.1/plugin.js",
     "tiny-secp256k1": "npm:tiny-secp256k1@2.2.3",
-    "framer-motion": "https://esm.sh/framer-motion@12.4.7",
     "$/": "./",
     "$client/": "./client/",
     "$components/": "./components/",
