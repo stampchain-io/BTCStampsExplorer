@@ -11,6 +11,22 @@ export default function HowTo() {
 
   return (
     <div className={body}>
+      <img
+        src="/img/stamps-collage-purpleOverlay-4000.webp"
+        alt="How to practical guides on Bitcoin Stamps and the stamping tools of Stampchain"
+        class="
+          absolute
+          top-0
+          left-0
+          w-full
+          h-[550px] mobileMd:h-[600px] mobileLg:h-[700px] tablet:h-[800px]
+          object-cover
+          pointer-events-none
+          z-[-999]
+          [mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))]
+          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.0),rgba(0,0,0,0.5),rgba(0,0,0,0))] 
+        "
+      />
       <section className="mb-3 mobileLg:mb-6">
         <h1 className={titleGreyDL}>HOW-TO</h1>
         <h2 className={subTitleGrey}>OUR STEP-BY-STEP GUIDES</h2>
