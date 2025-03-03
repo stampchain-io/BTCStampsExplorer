@@ -113,7 +113,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
               }}
             />
           </div>
-          <div class="flex flex-col pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
+          <div class="flex flex-col tablet:flex-row pt-12 mobileLg:pt-24 desktop:pt-36 gap-12 mobileLg:gap-[72px]">
             <SRC20Section
               title="SRC-20 TOKENS"
               subTitle="TOP TICKERS"
@@ -121,6 +121,7 @@ export default function Home({ data }: PageProps<HomePageData>) {
               fromPage="home"
             />
             <SRC20Section
+              title="SRC-20 TOKENS"
               subTitle="TRENDING MINTS"
               type="trending"
               fromPage="home"

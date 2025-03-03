@@ -3,7 +3,7 @@ import { Handlers } from "$fresh/server.ts";
 import WalletDashboardHeader from "$islands/Wallet/details/WalletDashboardHeader.tsx";
 import WalletDashboardDetails from "$islands/Wallet/details/WalletDashboardDetails.tsx";
 import WalletDashboardContent from "$islands/Wallet/details/WalletDashboardContent.tsx";
-import { WalletPageProps } from "$lib/types/index.d.ts";
+import { WalletOverviewInfo, WalletPageProps } from "$lib/types/index.d.ts";
 import { StampController } from "$server/controller/stampController.ts";
 import { getBTCBalanceInfo } from "$lib/utils/balanceUtils.ts";
 import { Src20Controller } from "$server/controller/src20Controller.ts";
@@ -283,7 +283,7 @@ export default function Dashboard(props: WalletPageProps) {
     <div class="flex flex-col gap-3 mobileMd:gap-6" f-client-nav>
       <WalletDashboardHeader />
       <WalletDashboardDetails
-        walletData={data.walletData}
+        walletData={data.walletData as WalletOverviewInfo}
         stampsTotal={data.stampsTotal}
         src20Total={data.src20Total}
         stampsCreated={data.stampsCreated}
@@ -293,7 +293,7 @@ export default function Dashboard(props: WalletPageProps) {
         stamps={data.data.stamps}
         src20={data.data.src20}
         dispensers={data.data.dispensers}
-        address={data.walletData.address}
+        address={data.walletData.address as string}
         anchor={data.anchor}
         stampsSortBy={props.stampsSortBy ?? "DESC"}
         src20SortBy={props.src20SortBy ?? "DESC"}

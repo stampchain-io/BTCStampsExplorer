@@ -597,3 +597,30 @@ body {
     opacity: 0;
   }
 }
+
+/* Stamp Items Marquee */
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-inner {
+  width: fit-content;
+  display: flex;
+  animation: marquee 200s linear infinite;
+  animation-play-state: running;
+}
+
+.marquee-inner:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}

@@ -18,6 +18,7 @@ import {
 } from "$types/pagination.d.ts";
 import { SRC20Row, StampRow } from "$globals";
 import { DEFAULT_PAGINATION } from "$server/services/routeValidationService.ts";
+import { WalletOverviewInfo } from "$types/wallet.d.ts";
 
 /**
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
@@ -340,7 +341,7 @@ export default function Wallet(props: WalletPageProps) {
       {data.data.dispensers.data.length > 0
         ? (
           <WalletDispenserDetails
-            walletData={data.walletData}
+            walletData={data.walletData as WalletOverviewInfo}
             stampsTotal={data.stampsTotal}
             src20Total={data.src20Total}
             stampsCreated={data.stampsCreated}
@@ -350,7 +351,7 @@ export default function Wallet(props: WalletPageProps) {
         : (
           <>
             <WalletProfileDetails
-              walletData={data.walletData}
+              walletData={data.walletData as WalletOverviewInfo}
               stampsTotal={data.stampsTotal}
               src20Total={data.src20Total}
               stampsCreated={data.stampsCreated}
