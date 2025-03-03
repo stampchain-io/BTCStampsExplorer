@@ -23,7 +23,7 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
 
   return (
     <SRC20BaseCard {...props}>
-      {(fromPage === "src20" || fromPage === "home") && (
+      {fromPage === "src20" && (
         <>
           {/* Price, Change, Volume group */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
@@ -50,6 +50,38 @@ export function SRC20TokenOutmintedCard(props: SRC20BaseCardProps) {
             </div>
           </div>
 
+          {/* Holders, Deploy, Creator group */}
+          <div class="flex flex-col -mb-3 mobileLg:-mb-6">
+            <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">
+              <p class={dataLabelSm}>
+                HOLDERS{" "}
+                <span class={dataValueSm}>
+                  {Number(src20.holders).toLocaleString()}
+                </span>
+              </p>
+              <p class={dataLabelSm}>
+                DEPLOY{" "}
+                <span class={dataValueSm}>
+                  {formatDate(new Date(src20.block_time), {
+                    month: "short",
+                    year: "numeric",
+                  }).toUpperCase()}
+                </span>
+              </p>
+              <p class={dataLabelSm}>
+                CREATOR{" "}
+                <span class={dataValueSm}>
+                  {src20.creator_name ||
+                    abbreviateAddress(src20.destination)}
+                </span>
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {fromPage === "home" && (
+        <>
           {/* Holders, Deploy, Creator group */}
           <div class="flex flex-col -mb-3 mobileLg:-mb-6">
             <div class="hidden min-[480px]:flex flex-col justify-center text-right -space-y-0.5 ">

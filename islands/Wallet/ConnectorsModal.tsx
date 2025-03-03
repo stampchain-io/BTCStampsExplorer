@@ -21,18 +21,20 @@ export const ConnectorsModal = (
 
   return (
     <div
-      class={`fixed z-[150] inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#000000] bg-opacity-60 backdrop-filter backdrop-blur-md ${
-        showConnectWalletModal.value ? "" : "hidden"
-      }`}
-      onClick={handleCloseModal}
+      // class={`fixed z-[150] inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-[#000000] bg-opacity-60 backdrop-filter backdrop-blur-md ${
+      //   showConnectWalletModal.value ? "" : "hidden"
+      // }`}
+      // onClick={handleCloseModal}
     >
       <div class="relative flex flex-col w-full max-w-2xl h-auto p-3 mobileMd:p-6 dark-gradient-modal rounded-lg overflow-hidden">
-        <img
+        {
+          /* <img
           onClick={closeModal}
           src="/img/wallet/icon-close.svg"
           class="w-6 h-6 absolute top-6 right-6 cursor-pointer"
           alt="Close modal"
-        />
+        /> */
+        }
 
         <h3 class="text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center mobileLg:text-left">
           CONNECT
