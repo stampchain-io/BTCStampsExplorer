@@ -78,8 +78,11 @@ export function Footer() {
           bottom-[31px] mobileLg:bottom-[28px] tablet:bottom-[4px]
           left-[calc(50%+18px)] mobileLg:left-[calc(50%+69px)] tablet:left-[296px] desktop:left-[320px]
           pointer-events-none
-          opacity-25 tablet:opacity-50
+          opacity-25 tablet:opacity-30
           z-[-999]
+          [mask-image:linear-gradient(180deg,rgba(0,0,0,0.5),rgba(0,0,0,1))]
+          [-webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0.5),rgba(0,0,0,1))]
+        
         "
       />
       <div className="w-full flex flex-col gap-1 items-center tablet:items-start">
