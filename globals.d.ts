@@ -123,6 +123,7 @@ export interface StampSectionProps {
   isRecentSales?: boolean;
   filterBy?: STAMP_FILTER_TYPES | STAMP_FILTER_TYPES[];
   showDetails?: boolean;
+  showEdition?: boolean;
   gridClass?: string;
   displayCounts?: DisplayCountBreakpoints;
   pagination?: Pagination;

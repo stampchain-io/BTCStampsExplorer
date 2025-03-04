@@ -1,20 +1,8 @@
-export default function Media() {
-  const body = "flex flex-col gap-12 mobileLg:gap-[72px] desktop:gap-24";
-  const titleGreyDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
-  const subTitleGrey =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
-  const articleLink =
-    "inline-block relative text-xl mobileLg:text-2xl font-bold gray-gradient1-hover transition-colors duration-1300";
-  const articleSource =
-    "text-base mobileLg:text-lg font-light text-stamp-grey-darker -space-y-1";
-  const bodyTextLight =
-    "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
-  const buttonGreyOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] leading-[42px] mobileLg:leading-[48px] px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+import { styles } from "./styles.ts";
 
+export default function Media() {
   return (
-    <div className={body}>
+    <div className={styles.body}>
       <img
         src="/img/stamps-collage-purpleOverlay-4000.webp"
         alt="Read about Bitcoin Stamps and the media mentions of Stampchain"
@@ -32,9 +20,9 @@ export default function Media() {
         "
       />
       <section>
-        <h1 className={titleGreyDL}>MEDIA MATTERS</h1>
-        <h2 className={subTitleGrey}>HONOURABLE STAMP MENTIONS</h2>
-        <p className={bodyTextLight}>
+        <h1 className={styles.titleGreyDL}>MEDIA MATTERS</h1>
+        <h2 className={styles.subTitleGrey}>HONOURABLE STAMP MENTIONS</h2>
+        <p className={styles.bodyTextLight}>
           Explore the world of Bitcoin Stamps with our curated list of news
           coverage, in-depth articles, reports and video podcasts. <br />
           <br />
@@ -50,10 +38,10 @@ export default function Media() {
       </section>
 
       <section>
-        <h1 className={titleGreyDL}>INTERVIEWS</h1>
+        <h1 className={styles.titleGreyDL}>INTERVIEWS</h1>
         <div className="grid grid-cols-1 mobileLg:grid-cols-2 desktop:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           <div className="flex flex-col">
-            <h2 className={subTitleGrey}>RICE TVX</h2>
+            <h2 className={styles.subTitleGrey}>RICE TVX</h2>
             <div className="relative w-full pt-[56.25%]">
               {/* 16:9 aspect ratio wrapper */}
               <iframe
@@ -64,7 +52,7 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={bodyTextLight}>
+            <p className={styles.bodyTextLight}>
               On this episode, I am joined by Mike In Space! He is the creator
               of Bitcoin Stamps & the SRC-20 protocol.<br />
               <br />
@@ -77,7 +65,7 @@ export default function Media() {
             </p>
           </div>
           <div className="flex flex-col">
-            <h2 className={subTitleGrey}>WAGE CUCKING</h2>
+            <h2 className={styles.subTitleGrey}>WAGE CUCKING</h2>
             <div className="relative w-full pt-[56.25%]">
               {/* 16:9 aspect ratio wrapper */}
               <iframe
@@ -88,7 +76,7 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={bodyTextLight}>
+            <p className={styles.bodyTextLight}>
               This week Jmo and Andreas were joined by the creator of Bitcoin
               STAMPS, Mike In Space!<br />
               <br />
@@ -99,7 +87,7 @@ export default function Media() {
             </p>
           </div>
           <div className="flex flex-col">
-            <h2 className={subTitleGrey}>UNIVERSE</h2>
+            <h2 className={styles.subTitleGrey}>UNIVERSE</h2>
             <div className="relative w-full pt-[56.25%]">
               {/* 16:9 aspect ratio wrapper */}
               <iframe
@@ -110,7 +98,7 @@ export default function Media() {
                 allowFullScreen
               />
             </div>
-            <p className={bodyTextLight}>
+            <p className={styles.bodyTextLight}>
               Curious about the story behind Bitcoin Stamps?<br />
               <br />
               Join us for an exclusive episode of "Guess Who's Coming to the
@@ -127,124 +115,124 @@ export default function Media() {
       </section>
 
       <section>
-        <h1 className={titleGreyDL}>IN THE NEWS</h1>
-        <h2 className={subTitleGrey}>BREAKING STORIES</h2>
+        <h1 className={styles.titleGreyDL}>IN THE NEWS</h1>
+        <h2 className={styles.subTitleGrey}>BREAKING STORIES</h2>
         <div className="flex flex-col -space-y-[18px]">
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             BINANCE
             <br />
             <a
               href="https://academy.binance.com/en/articles/what-are-bitcoin-stamps"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               WHAT ARE BITCOIN STAMPS
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             YAHOO FINANCE
             <br />
             <a
               href="https://finance.yahoo.com/video/project-bitcoin-stamps-renews-debate-164902188.html?guccounter=1"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               NEW PROJECT RENEWS DEBATE OVER BITCOIN NFTS
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             BINGX
             <br />
             <a
               href="https://blog.bingx.com/bingx-insights/a-dive-into-bitcoin-stamps/"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               A DIVE INTO BITCOIN STAMPS
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             HACKERNOON
             <br />
             <a
               href="https://hackernoon.com/what-are-bitcoin-stamps"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               WHAT ARE BITCOIN STAMPS
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             COINMARKETCAP
             <br />
             <a
               href="https://coinmarketcap.com/community/articles/6554749e8f19ea588322c1ae/"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               BITCOIN STAMPS VS ORDINALS
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             M2
             <br />
             <a
               href="https://explore.m2.com/learn/what-are-bitcoin-stamps"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               WHAT ARE BITCOIN STAMPS
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             GATE
             <br />
             <a
               href="https://www.gate.io/learn/articles/what-are-bitcoin-stamps-and-src-20/1006"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               WHAT ARE BITCOIN STAMPS AND SRC-20
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             BITCOIN.COM
             <br />
             <a
               href="https://news.bitcoin.com/study-src20-protocols-unmatched-data-permanence-makes-it-a-superior-choice-over-brc20-and-runes/"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               SRC20 PROTOCOL'S "UNMATCHED DATA PERMANENCE"
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             OKX
             <br />
             <a
               href="https://www.okx.com/learn/what-is-src20-spurring-innovation-in-bitcoin-ecosystem"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               WHAT IS SRC-20
             </a>
           </p>
           <br />
-          <p className={articleSource}>
+          <p className={styles.articleSource}>
             COIN CODEX
             <br />
             <a
               href="https://coincodex.com/article/44872/src-20-tokens/"
               target="_blank"
-              className={articleLink}
+              className={styles.articleLink}
             >
               WHAT ARE SRC-20 TOKENS
             </a>
@@ -253,11 +241,11 @@ export default function Media() {
       </section>
 
       <section>
-        <h1 className={titleGreyDL}>REPORTS</h1>
+        <h1 className={styles.titleGreyDL}>REPORTS</h1>
         <div className="grid grid-cols-1 mobileLg:grid-cols-3 gap-3 mobileMd:gap-6 mobileLg:gap-9 desktop:gap-12">
           <div className="col-span-1 mobileLg:col-span-2">
-            <h2 className={subTitleGrey}>SQRR - DEEP DIVE</h2>
-            <p className={bodyTextLight}>
+            <h2 className={styles.subTitleGrey}>SQRR - DEEP DIVE</h2>
+            <p className={styles.bodyTextLight}>
               Stamps is a blockchain protocol created by MikeInSpace that
               enables storing images on-chain on Bitcoin transaction
               outputs.<br />
@@ -272,13 +260,13 @@ export default function Media() {
                 href="https://sqrr.xyz/reports/docs/4/1/Stamps%20Protocol_Final_17_May_2023.pdf"
                 target="_blank"
               >
-                <button className={buttonGreyOutline}>DOWNLOAD</button>
+                <button className={styles.buttonGreyOutline}>DOWNLOAD</button>
               </a>
             </div>
           </div>
           <div className="col-span-1 mobileLg:text-right">
-            <h2 className={subTitleGrey}>INSIGHTS</h2>
-            <p className={bodyTextLight}>
+            <h2 className={styles.subTitleGrey}>INSIGHTS</h2>
+            <p className={styles.bodyTextLight}>
               <b>Detailed monthly reports about Bitcoin Stamps.</b>
               <br />
               A comprehensive research into the usage of the Stamps protocol,
@@ -287,7 +275,7 @@ export default function Media() {
             </p>
             <div className="flex justify-end">
               <a href="https://sqrr.xyz/reports/" target="_blank">
-                <button className={buttonGreyOutline}>READ</button>
+                <button className={styles.buttonGreyOutline}>READ</button>
               </a>
             </div>
           </div>
