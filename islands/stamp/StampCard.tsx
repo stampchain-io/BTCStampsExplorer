@@ -106,6 +106,7 @@ export function StampCard({
   stamp,
   isRecentSale = false,
   showDetails = true,
+  showEdition = false,
   showMinDetails = false,
   variant = "default",
   fromPage,
@@ -113,6 +114,7 @@ export function StampCard({
   stamp: StampWithSaleData;
   isRecentSale?: boolean;
   showDetails?: boolean;
+  showEdition?: boolean;
   showMinDetails?: boolean;
   variant?: "default" | "grey";
   fromPage?: string;
@@ -390,8 +392,14 @@ export function StampCard({
     ? `${stamp.stamp}`
     : `${stamp.cpid}`;
 
+  const editionCount = stamp.divisible
+    ? (stamp.supply / 100000000).toFixed(2)
+    : stamp.supply > 100000
+    ? "+100000"
+    : stamp.supply;
+
   return (
-    <div class="relative flex justify-center w-full h-full">
+    <div class="relative flex justify-center w-full h-full max-w-72">
       <a
         href={`/stamp/${stamp.tx_hash}`}
         target="_top"
@@ -462,6 +470,37 @@ export function StampCard({
               >
                 {supplyDisplay}
               </div>
+            </div>
+          </div>
+        )}
+
+        {showEdition && (
+          <div class="flex flex-col items-center px-1.5 mobileLg:px-3 pt-1.5 mobileLg:pt-3">
+            <div class="flex items-center justify-center">
+              {shouldDisplayHash && (
+                <span
+                  class={`${TEXT_STYLES.minimal.hashSymbol.base} ${TEXT_STYLES.minimal.hashSymbol.sizes}`}
+                >
+                  #
+                </span>
+              )}
+              <span
+                class={`${TEXT_STYLES.minimal.stampNumber.base} ${TEXT_STYLES.minimal.stampNumber.sizes}`}
+              >
+                {stampValue}
+              </span>
+            </div>
+            <div class="-mt-1 mobileLg:mt-0.5 w-full flex justify-between items-center">
+              <span
+                class={`${TEXT_STYLES.minimal.price.base} ${TEXT_STYLES.minimal.price.sizes}`}
+              >
+                {editionCount}
+              </span>
+              <span
+                class={`${TEXT_STYLES.minimal.price.base} ${TEXT_STYLES.minimal.price.sizes}`}
+              >
+                {renderPrice().text}
+              </span>
             </div>
           </div>
         )}

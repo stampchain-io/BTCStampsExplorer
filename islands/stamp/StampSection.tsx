@@ -19,6 +19,7 @@ export default function StampSection({
   isRecentSales = false,
   filterBy,
   showDetails = false,
+  showEdition = false,
   gridClass,
   displayCounts,
   pagination,
@@ -223,6 +224,7 @@ export default function StampSection({
                       stamp={stamp}
                       isRecentSale={isRecentSales}
                       showDetails={showDetails}
+                      showEdition={showEdition}
                       showMinDetails={showMinDetails}
                       variant={variant}
                     />
@@ -245,6 +247,7 @@ export default function StampSection({
                     stamp={stamp}
                     isRecentSale={isRecentSales}
                     showDetails={showDetails}
+                    showEdition={showEdition}
                     showMinDetails={showMinDetails}
                     variant={variant}
                   />
