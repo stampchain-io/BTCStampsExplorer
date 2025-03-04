@@ -9,7 +9,7 @@ export type WalletProvider =
 export const MESSAGES = {
   WALLET: {
     SUCCESS: {
-      CONNECTED: {
+      CONNECTION: {
         DEFAULT: "Wallet connected successfully",
         UNISAT: "UniSat Wallet connected successfully",
         OKX: "OKX Wallet connected successfully",
@@ -17,13 +17,11 @@ export const MESSAGES = {
         PHANTOM: "Phantom Wallet connected successfully",
         TAPWALLET: "Tap Wallet connected successfully",
       },
-      SIGNED: {
-        DEFAULT: "Transaction signed successfully",
-        UNISAT: "Transaction signed with UniSat Wallet",
-        OKX: "Transaction signed with OKX Wallet",
-        LEATHER: "Transaction signed with Leather Wallet",
-        PHANTOM: "Transaction signed with Phantom Wallet",
-        TAPWALLET: "Transaction signed with Tap Wallet",
+      TRANSACTION: {
+        BROADCAST: "Transaction has been broadcasted",
+        SIGNED: "Transaction has been signed successfully",
+        BROADCAST_TXID: (txid: string) =>
+          `Transaction has been broadcasted - (TXID: ${txid})`,
       },
     },
     ERROR: {
@@ -42,44 +40,35 @@ export const MESSAGES = {
         PHANTOM: "Phantom Wallet not installed",
         TAPWALLET: "Tap Wallet not installed",
       },
-      REJECTED: {
-        DEFAULT: "Transaction rejected by user",
-        UNISAT: "Transaction rejected in UniSat Wallet",
-        OKX: "Transaction rejected in OKX Wallet",
-        LEATHER: "Transaction rejected in Leather Wallet",
-        PHANTOM: "Transaction rejected in Phantom Wallet",
-        TAPWALLET: "Transaction rejected in Tap Wallet",
-      },
-      SIGNING: {
-        DEFAULT: "Failed to sign transaction",
-        UNISAT: "UniSat Wallet failed to sign transaction",
-        OKX: "OKX Wallet failed to sign transaction",
-        LEATHER: "Leather Wallet failed to sign transaction",
-        PHANTOM: "Phantom Wallet failed to sign transaction",
-        TAPWALLET: "Tap Wallet failed to sign transaction",
-      },
-      NETWORK: {
-        DEFAULT: "Network error occurred",
+      TRANSACTION: {
+        REJECTED: "Transaction rejected by user",
+        CANCELLED: "Transaction signing cancelled by user",
+        SIGNING: (error: string) => `Failed to sign transaction - ${error}`,
+        INSUFFICIENT_FUNDS: "Insufficient funds for transaction",
+        FEE: "Transaction fee is too low",
+        BROADCAST: "Broadcasting transaction...",
+        SIGNATURE: "Waiting for signature...",
+        NETWORK_ERROR: "Network error occurred",
         WRONG_NETWORK: "Please switch to the correct network",
       },
     },
-    TRANSACTION: {
-      SUCCESS: {
-        BROADCAST: "Transaction broadcasted successfully",
-        SIGNED: "Transaction signed successfully",
-        WITH_TXID: (txid: string) =>
-          `Transaction broadcasted successfully. (TXID: ${txid})`,
-      },
-      ERROR: {
-        CANCELLED: "Transaction signing cancelled by user",
-        SIGNING: (error: string) => `Transaction signing failed: ${error}`,
-        INSUFFICIENT_FUNDS: "Insufficient funds for transaction",
-        NETWORK_FEE: "Network fee too low",
-      },
-      PENDING: {
-        BROADCAST: "Broadcasting transaction...",
-        SIGNING: "Waiting for signature...",
-      },
+  },
+
+  GENERAL: {
+    SUCCESS: {
+      UPLOAD: "Image uploaded successfully",
+    },
+    ERROR: {
+      SOURCE_ADDRESS: "A source address is required",
+      RECIPIENT_ADDRESS: "A recipient address is required",
+      AMOUNT: "An amount is required",
+      FEE: "A fee must be set",
+      BALANCE: "Insufficient balance",
+      URL: "The website URL is invalid",
+      EMAIL: "The email address is invalid",
+      USERNAME_VALID: "The username is not valid",
+      USERNAME_EXISTS: "The username is already taken",
+      IMAGE_FORMAT: "Invalid image file format",
     },
   },
 
@@ -91,11 +80,12 @@ export const MESSAGES = {
       },
       ERROR: {
         IMAGE_SIZE: "Image must be exactly 420x420 pixels",
-        IMAGE_FORMAT: "Invalid image file format",
         UPLOAD: "Failed to upload stamp image",
         MINT: "Failed to mint stamp",
       },
+      PENDING: "Processing your stamp...",
     },
+
     TRANSFER: {
       SUCCESS: "Stamp transferred successfully",
       ERROR: "Failed to transfer stamp",
@@ -105,42 +95,44 @@ export const MESSAGES = {
 
   SRC20: {
     DEPLOY: {
-      SUCCESS: "Token deployed successfully",
+      SUCCESS: "Your token has been deployed successfully",
       ERROR: {
-        TICK_EXISTS: "Token tick already exists",
+        TICK_EXISTS: "Token ticker already exists",
         INVALID_PARAMS: "Invalid deployment parameters",
-      },
-      VALIDATION: {
         TICK: "Tick is required",
         MAX_SUPPLY: "Max supply is required",
         LIMIT_PER_MINT: "Limit per mint is required",
         DECIMALS: "Decimals must be between 0 and 18",
       },
+      PENDING: "Processing your token deployment...",
     },
+
     MINT: {
-      SUCCESS: "Token minted successfully",
+      SUCCESS: "Your token has been minted successfully",
       ERROR: {
         LIMIT_EXCEEDED: "Mint limit exceeded",
         NOT_ACTIVE: "Minting not active for this token",
       },
-      PENDING: "Processing mint transaction...",
+      PENDING: "Processing your token mint...",
     },
+
     TRANSFER: {
       SUCCESS: "Token transferred successfully",
       ERROR: {
+        TICK: "A token ticker is required",
         BALANCE_FETCH: "Failed to fetch token balances",
         INSUFFICIENT_BALANCE: "Insufficient token balance",
         INVALID_AMOUNT: "Invalid transfer amount",
       },
-      PENDING: "Processing token transfer...",
+      PENDING: "Processing your token transfer...",
     },
   },
 
   SRC101: {
     MINT: {
-      SUCCESS: "SRC-101 token minted successfully",
-      ERROR: "Failed to mint SRC-101 token",
-      PENDING: "Processing SRC-101 mint...",
+      SUCCESS: "Your bitname has been registered successfully",
+      ERROR: "Failed to register bitname",
+      PENDING: "Processing your bitname registration...",
     },
   },
 } as const;
