@@ -1,25 +1,21 @@
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { useEffect, useRef, useState } from "preact/hooks";
-
 import { walletContext } from "$client/wallet/wallet.ts";
-
-import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
-import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "$islands/stamping/src20/SRC20InputField.tsx";
-
 import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
-import { TransferStyles } from "./styles.ts";
+import { useToast } from "$islands/Toast/ToastProvider.tsx";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 
 interface Balance {
   tick: string;
   amt: string;
-  // Add other balance fields as needed
 }
 
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
 ) {
+  const { addToast } = useToast();
   const {
     formState,
     setFormState,
@@ -48,6 +44,28 @@ export function TransferContent(
   if (!config) {
     return <div>Error: Failed to load configuration</div>;
   }
+
+  useEffect(() => {
+    if (apiError) {
+      addToast(apiError, "error");
+    }
+  }, [apiError]);
+
+  useEffect(() => {
+    if (walletError) {
+      addToast(walletError, "error");
+    }
+  }, [walletError]);
+
+  useEffect(() => {
+    if (submissionMessage?.message) {
+      const message = submissionMessage.txid
+        ? `${submissionMessage.message} (TXID: ${submissionMessage.txid})`
+        : submissionMessage.message;
+
+      addToast(message, submissionMessage.txid ? "success" : "error");
+    }
+  }, [submissionMessage]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -263,7 +281,7 @@ export function TransferContent(
           transferDetails={{
             address: formState.toAddress,
             token: formState.token,
-            amount: formState.amt
+            amount: formState.amt,
           }}
           feeDetails={{
             minerFee: formState.psbtFees?.estMinerFee || 0,
@@ -272,12 +290,6 @@ export function TransferContent(
             totalValue: formState.psbtFees?.totalValue || 0,
             estimatedSize: formState.psbtFees?.est_tx_size || 0,
           }}
-        />
-
-        <StatusMessages
-          submissionMessage={submissionMessage}
-          apiError={apiError}
-          walletError={walletError}
         />
       </div>
     </div>
