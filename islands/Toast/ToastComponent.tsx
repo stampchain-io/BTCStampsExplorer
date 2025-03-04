@@ -1,19 +1,26 @@
 import { useToast } from "./ToastProvider.tsx";
 
-type ToastComponentProps = {
+interface ToastComponentProps {
+  id: string;
   message: string;
-  type: string;
-};
+  type: "success" | "error" | "info";
+}
 
-export const ToastComponent = ({ message, type }: ToastComponentProps) => {
+export const ToastComponent = ({ id, message, type }: ToastComponentProps) => {
   const { removeToast } = useToast();
 
-  const getIcon = (type) => {
+  const typeStyles = {
+    success: "text-green-500",
+    error: "text-red-500",
+    info: "text-stamp-grey-dark", // Using your grey color
+  };
+
+  const getIcon = (type: ToastComponentProps["type"]) => {
     switch (type) {
       case "error":
         return (
           <svg
-            className="w-5 h-5"
+            className={`w-5 h-5 ${typeStyles[type]}`}
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -25,7 +32,7 @@ export const ToastComponent = ({ message, type }: ToastComponentProps) => {
       case "success":
         return (
           <svg
-            className="w-5 h-5"
+            className={`w-5 h-5 ${typeStyles[type]}`}
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -38,7 +45,7 @@ export const ToastComponent = ({ message, type }: ToastComponentProps) => {
       default:
         return (
           <svg
-            className="w-5 h-5"
+            className={`w-5 h-5 ${typeStyles[type]}`}
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
@@ -52,16 +59,17 @@ export const ToastComponent = ({ message, type }: ToastComponentProps) => {
 
   return (
     <div
-      id="toast-top-left"
-      class="fixed flex items-center w-full max-w-xs p-4 space-x-4 text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow top-5 left-5 dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800"
+      class="flex items-center w-full max-w-xs p-4 space-x-4 bg-white divide-x divide-gray-200 rounded-lg shadow dark:text-gray-400 dark:divide-gray-700 space-x dark:bg-gray-800"
       role="alert"
     >
       <div className="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">
         {getIcon(type)}
       </div>
-      <div className="ml-3 text-sm font-normal">{message}</div>
+      <div className={`ml-3 text-sm font-normal ${typeStyles[type]}`}>
+        {message}
+      </div>
       <button
-        onClick={() => removeToast()}
+        onClick={() => removeToast(id)}
         type="button"
         className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
         aria-label="Close"
