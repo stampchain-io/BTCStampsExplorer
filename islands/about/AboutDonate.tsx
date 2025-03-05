@@ -27,10 +27,10 @@ interface DonateStampData {
 }
 
 const DONATE_STAMP: DonateStampData = {
-  stamp: "857772",
+  stamp: "-398",
   stamp_mimetype: "png",
-  stamp_url: "671692d78f357662cac27ae91d74ab14ba9e0dbe6643e28b80ea6d69425b9da1",
-  tx_hash: "671692d78f357662cac27ae91d74ab14ba9e0dbe6643e28b80ea6d69425b9da1",
+  stamp_url: "6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a",
+  tx_hash: "6df1763d2df70b21f5fb52c9a47347c7466dfdf8a87d1430f640d363f0efa37a",
 };
 
 export default function AboutDonate() {
@@ -331,10 +331,9 @@ export default function AboutDonate() {
               </div>
             </div>
             <p className={bodyTextLight}>
-              Use the Donate button and you'll receive a unique stamp - XXXXXXX
-              - by XXXXXXXXX as thanks for your support.
+              Use the Donate button and you'll receive some USDSTAMP posh OG
+              stamps as thanks for your support.
             </p>
-            <br />
             <p className={`${bodyTextLight} mobileMd:block hidden`}>
               Or you may send BTC, SRC-20 Tokens or Art Stamps directly to the
               dev wallet.
