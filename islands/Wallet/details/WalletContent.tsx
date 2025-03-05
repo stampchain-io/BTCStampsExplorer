@@ -449,16 +449,8 @@ export default function WalletContent({
     }
   }, [anchor, stamps, src20, dispensers]);
 
-  const handleOpenSettingModal = () => {
-    setOpenSettingModal(!openSettingModal);
-  };
-
   const handleOpenSetting = () => {
     setOpenSetting(!openSetting);
-  };
-
-  const handleCloseSettingModal = () => {
-    setOpenSettingModal(false);
   };
 
   const handleOpenFilter = () => {

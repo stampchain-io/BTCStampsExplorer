@@ -111,6 +111,7 @@ export function RecentSales({
       subTitle: subTitle || "HOT STAMPS",
       type: "recent",
       stamps: recentSales,
+      fromPage: "home",
       layout: "grid" as const,
       isRecentSales: true,
       showDetails: false,
