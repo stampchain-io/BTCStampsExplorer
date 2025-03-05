@@ -26,6 +26,11 @@ export function ModalLayout({
   const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
   const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
   const closeTooltipTimeoutRef = useRef<number | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setIsVisible(true));
+  }, []);
 
   const handleCloseMouseEnter = () => {
     if (allowCloseTooltip) {
@@ -49,15 +54,9 @@ export function ModalLayout({
     setAllowCloseTooltip(true);
   };
 
-  const handleClose = (e: MouseEvent) => {
-    // Only close if clicking the overlay itself, not its children
-    if (e.target === e.currentTarget) {
-      logger.debug("ui", {
-        message: "Modal closing via handleClose",
-        component: "ModalLayout",
-      });
-      onClose();
-    }
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(onClose, 1300); // Match your longest animation duration
   };
 
   useEffect(() => {
@@ -91,10 +90,29 @@ export function ModalLayout({
 
   return (
     <div
-      class={`${modalBgBlur} ${className}`}
+      className={`
+        fixed inset-0 z-50 
+        flex items-center justify-center 
+        bg-black/70 backdrop-blur-md
+        ${isVisible ? "animate-fade-in duration-100" : "opacity-0"}
+      `}
       onClick={handleClose}
     >
-      <div class="relative w-[360px] h-fit mobileLg:w-[420px] mobileLg:h-fit p-6 dark-gradient-modal rounded-lg overflow-hidden">
+      <div
+        className={`
+          relative 
+          w-[360px] mobileLg:w-[420px] 
+          p-6 rounded-lg 
+          dark-gradient-modal
+          ${
+          isVisible
+            ? "animate-slide-up duration-300 delay-100"
+            : "opacity-0 translate-y-[36px] mobileLg:translate-y-12"
+        }
+          ${className}
+        `}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div class={`relative ${contentClassName}`}>
           <div
             class="absolute top-0 right-0 -mr-1.5 -mt-1.5 ms-auto cursor-pointer"
@@ -103,8 +121,6 @@ export function ModalLayout({
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
               viewBox="0 0 32 32"
               class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 hover:fill-stamp-purple-bright"
               onClick={(e) => {

@@ -12,6 +12,8 @@ body {
   background-color: #000;
   /* Fallback color */
   overflow-x: hidden;
+  overflow-y: auto;
+  position: relative !important;
 }
 
 .primary-gradient {
