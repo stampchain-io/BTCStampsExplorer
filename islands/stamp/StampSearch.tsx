@@ -12,6 +12,7 @@ export function StampSearchClient(
     showButton?: boolean;
   },
 ) {
+  const [visible, setVisible] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
@@ -226,9 +227,11 @@ export function StampSearchClient(
   }, [open2]);
 
   return (
-    <>
+    <div class="relative">
       {showButton && (
         <Button
+          onMouseEnter={() => setVisible(true)}
+          onMouseLeave={() => setVisible(false)}
           variant="icon"
           icon={
             <svg
@@ -245,6 +248,16 @@ export function StampSearchClient(
           role="button"
           aria-label="Search"
         />
+      )}
+
+      {visible && (
+        <div
+          role="tooltip"
+          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
+        >
+          Filters
+          <div className="tooltip-arrow" />
+        </div>
       )}
 
       {open2 && (
@@ -317,6 +330,6 @@ export function StampSearchClient(
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

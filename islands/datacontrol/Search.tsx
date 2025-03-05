@@ -24,6 +24,7 @@ export function Search({
   onResultClick,
   resultDisplay,
 }: SearchProps) {
+  const [visible, setVisible] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -103,7 +104,19 @@ export function Search({
           </svg>
         </div>
       )}
+
+      {visible && (
+        <div
+          role="tooltip"
+          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
+        >
+          Search
+          <div className="tooltip-arrow" />
+        </div>
+      )}
       <Button
+        onMouseEnter={() => setVisible(true)}
+        onMouseLeave={() => setVisible(false)}
         variant="icon"
         icon={
           <svg

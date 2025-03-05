@@ -1,22 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import {
-  COLLECTION_FILTER_TYPES,
-  LISTING_FILTER_TYPES,
-  SRC20_FILTER_TYPES,
-  SRC20_TYPES,
-  STAMP_FILTER_TYPES,
-  WALLET_FILTER_TYPES,
-} from "$globals";
-import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
 import { Button } from "$components/shared/Button.tsx";
-
-type FilterTypes =
-  | SRC20_FILTER_TYPES
-  | STAMP_FILTER_TYPES
-  | WALLET_FILTER_TYPES
-  | COLLECTION_FILTER_TYPES
-  | LISTING_FILTER_TYPES
-  | SRC20_TYPES;
 
 interface SettingProps {
   initFilter: string[];
@@ -33,22 +16,12 @@ export function Setting({
   filterButtons,
   onFilterClick,
 }: SettingProps) {
+  const [visible, setVisible] = useState<boolean>(false);
   const [localFilters, setLocalFilters] = useState<string[]>(initFilter);
-  const { updateURL } = useURLUpdate();
 
   useEffect(() => {
     setLocalFilters(initFilter);
   }, [initFilter]);
-
-  const _handleFilterChange = (value: string) => {
-    setLocalFilters((prevFilters) => {
-      const newFilters = prevFilters.includes(value)
-        ? prevFilters.filter((f) => f !== value)
-        : [...prevFilters, value];
-      updateURL({ filterBy: newFilters });
-      return newFilters;
-    });
-  };
 
   const handleFilterClick = (filter: string) => {
     if (onFilterClick) {
@@ -90,6 +63,8 @@ export function Setting({
         )
         : (
           <Button
+            onMouseEnter={() => setVisible(true)}
+            onMouseLeave={() => setVisible(false)}
             variant="icon"
             icon="/img/wallet/icon_setting.svg"
             iconAlt="Tools icon"
@@ -97,6 +72,15 @@ export function Setting({
             onClick={() => handleOpen(true)}
           />
         )}
+      {visible && (
+        <div
+          role="tooltip"
+          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
+        >
+          Settings
+          <div className="tooltip-arrow" />
+        </div>
+      )}
     </div>
   );
 }

@@ -208,7 +208,7 @@ export default function StampSection({
           )}
       </div>
 
-      {viewAllLink
+      {(viewAllLink && fromPage == "home")
         ? (
           <div class="swiper-container">
             <div class="swiper-wrapper">
