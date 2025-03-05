@@ -1,5 +1,6 @@
 import { useState } from "preact/hooks";
 import { InputField } from "$islands/stamping/InputField.tsx";
+import { ContactStyles } from "$islands/about/styles.ts";
 
 const AboutContact = () => {
   const [name, setName] = useState<string>("");
@@ -7,18 +8,6 @@ const AboutContact = () => {
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-
-  const titleGreyDL =
-    "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black gray-gradient3";
-  const subTitleGrey =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-grey-light mb-1.5 mobileLg:mb-3";
-  const bodyTextLight =
-    "text-base mobileLg:text-lg font-medium text-stamp-grey-light";
-  const inputField1col = "flex gap-3 mobileMd:gap-6 w-full";
-  const inputField2col =
-    "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-  const buttonGreyOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-[48px] px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
@@ -31,16 +20,16 @@ const AboutContact = () => {
     <>
       <section>
         <div className="flex flex-col w-full mobileLg:w-1/2">
-          <h1 className={titleGreyDL}>
+          <h1 className={ContactStyles.titleGreyDL}>
             CONTACT
           </h1>
-          <h3 className={subTitleGrey}>
+          <h3 className={ContactStyles.subTitleGrey}>
             DROP US A MESSAGE
           </h3>
         </div>
         <div className="flex flex-col mobileLg:flex-row gap-3 mobileMd:gap-6">
           <div className="w-full mobileLg:w-1/2 space-y-3 mobileMd:space-y-6">
-            <p className={bodyTextLight}>
+            <p className={ContactStyles.bodyTextLight}>
               Reach out if you have any questions about stamps, our tooling and
               services. <br />
               <br />
@@ -65,7 +54,7 @@ const AboutContact = () => {
               className="flex flex-col gap-3 mobileMd:gap-6 desktop:gap-9"
               onSubmit={handleSubmit}
             >
-              <div className={inputField2col}>
+              <div className={ContactStyles.inputField2col}>
                 <InputField
                   type="text"
                   value={name}
@@ -79,7 +68,7 @@ const AboutContact = () => {
                   placeholder="Email"
                 />
               </div>
-              <div className={inputField1col}>
+              <div className={ContactStyles.inputField1col}>
                 <InputField
                   type="text"
                   value={subject}
@@ -87,7 +76,7 @@ const AboutContact = () => {
                   placeholder="Subject"
                 />
               </div>
-              <div className={inputField1col}>
+              <div className={ContactStyles.inputField1col}>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.currentTarget.value)}
@@ -98,7 +87,7 @@ const AboutContact = () => {
               <div className="w-full flex justify-end">
                 <button
                   type="submit"
-                  className={buttonGreyOutline}
+                  className={ContactStyles.buttonGreyOutline}
                 >
                   SEND
                 </button>

@@ -35,6 +35,7 @@ export function Filter({
   dropdownPosition,
   open2 = false,
 }: FilterProps) {
+  const [visible, setVisible] = useState<boolean>(false);
   const [localFilters, setLocalFilters] = useState<FilterTypes[]>(initFilter);
   const { updateURL } = useURLUpdate();
   const filterContainerRef = useRef<HTMLDivElement>(null);
@@ -156,7 +157,7 @@ export function Filter({
 `;
 
   return (
-    <>
+    <div class="relative">
       <div
         ref={filterContainerRef}
         class={`relative flex flex-col items-center gap-1 rounded-md z-20 transition-opacity duration-300 ${
@@ -168,6 +169,8 @@ export function Filter({
           if (open) return;
           handleOpen(true);
         }}
+        onMouseEnter={() => setVisible(true)}
+        onMouseLeave={() => setVisible(false)}
       >
         {open
           ? (
@@ -206,7 +209,15 @@ export function Filter({
             />
           )}
       </div>
-
+      {visible && (
+        <div
+          role="tooltip"
+          className="absolute bottom-full right-[0.3px] mb-2 z-10 px-3 py-2 text-sm font-medium text-white bg-stamp-bg-grey-darkest rounded-lg shadow-md"
+        >
+          Filters
+          <div className="tooltip-arrow" />
+        </div>
+      )}
       {/* Modal for mobile screens */}
       {open && (
         <div
@@ -241,6 +252,6 @@ export function Filter({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

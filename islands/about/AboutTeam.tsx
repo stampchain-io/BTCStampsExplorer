@@ -1,26 +1,21 @@
-export default function AboutTeam() {
-  const subTitlePurple =
-    "text-2xl mobileMd:text-3xl mobileLg:text-4xl font-extralight text-stamp-purple-highlight mb-1.5 mobileLg:mb-3";
-  const aboutTitlePurpleLD =
-    "inline-block text-sm mobileMd:text-lg mobileLg:text-xl font-black purple-gradient1 text-center mt-3 mobileLg:mt-[18px]";
-  const aboutSubTitlePurple =
-    "text-xs mobileMd:text-base mobileLg:text-lg font-medium text-stamp-purple text-center whitespace-nowrap";
+import { TeamStyles } from "$islands/about/styles.ts";
 
+export default function AboutTeam() {
   return (
     <>
       <section>
         <div className="w-full flex justify-start items-start pt-6">
           <div className="w-full">
-            <h2 className={subTitlePurple}>
+            <h2 className={TeamStyles.subTitlePurple}>
               THE TEAM
             </h2>
             <div className="flex justify-between items-start mx-0 mobileLg:mx-12 desktop:mx-16 gap-3 mobileMd:gap-6 mt-3">
               <div className="flex flex-col items-center">
                 <img src="/img/about/code.png" />
-                <p className={aboutTitlePurpleLD}>
+                <p className={TeamStyles.aboutTitlePurpleLD}>
                   MIKE IN SPACE
                 </p>
-                <p className={aboutSubTitlePurple}>
+                <p className={TeamStyles.aboutSubTitlePurple}>
                   CODE{" "}
                   <span className="mobileMd:hidden">
                     <br />
@@ -30,10 +25,10 @@ export default function AboutTeam() {
               </div>
               <div className="flex flex-col items-center">
                 <img src="/img/about/backend.png" />
-                <p className={aboutTitlePurpleLD}>
+                <p className={TeamStyles.aboutTitlePurpleLD}>
                   REINAMORA
                 </p>
-                <p className={aboutSubTitlePurple}>
+                <p className={TeamStyles.aboutSubTitlePurple}>
                   BACKEND{" "}
                   <span className="mobileMd:hidden">
                     <br />
@@ -43,10 +38,10 @@ export default function AboutTeam() {
               </div>
               <div className="flex flex-col items-center">
                 <img src="/img/about/memetic.png" />
-                <p className={aboutTitlePurpleLD}>
+                <p className={TeamStyles.aboutTitlePurpleLD}>
                   ARWYN
                 </p>
-                <p className={aboutSubTitlePurple}>
+                <p className={TeamStyles.aboutSubTitlePurple}>
                   MEMETIC{" "}
                   <span className="mobileMd:hidden">
                     <br />
