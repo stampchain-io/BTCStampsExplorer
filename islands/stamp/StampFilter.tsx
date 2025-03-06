@@ -1,6 +1,109 @@
 import { useRef, useState } from "preact/hooks";
 import { STAMP_SUFFIX_FILTERS } from "$globals";
 
+// Add queryParamsToFilters export
+export const queryParamsToFilters = (search: string) => {
+  const params = new URLSearchParams(search);
+  return {
+    buyNow: {
+      atomic: params.get("atomic") === "true",
+      dispenser: params.get("dispenser") === "true",
+    },
+    status: {
+      locked: params.get("locked") === "true",
+      oneOfOne: params.get("oneOfOne") === "true",
+    },
+    forSale: params.get("forSale") === "true",
+    trendingSales: params.get("trendingSales") === "true",
+    sold: params.get("sold") === "true",
+    fileType: {
+      svg: params.get("fileTypeSvg") === "true",
+      pixel: params.get("fileTypePixel") === "true",
+      gif: params.get("fileTypeGif") === "true",
+      jpg: params.get("fileTypeJpg") === "true",
+      png: params.get("fileTypePng") === "true",
+      webp: params.get("fileTypeWebp") === "true",
+      bmp: params.get("fileTypeBmp") === "true",
+      jpeg: params.get("fileTypeJpeg") === "true",
+      html: params.get("fileTypeHtml") === "true",
+      olga: params.get("fileTypeOlga") === "true",
+      src721: params.get("fileTypeSrc721") === "true",
+      src101: params.get("fileTypeSrc101") === "true",
+    },
+    stampRangePreset: parseInt(params.get("stampRangePreset") || "10000"),
+    stampRange: {
+      min: params.get("stampRangeMin") || "",
+      max: params.get("stampRangeMax") || "",
+    },
+    priceRange: {
+      min: params.get("stampPriceMin") || "",
+      max: params.get("stampPriceMax") || "",
+    },
+    search: "",
+    sortOrder: params.get("sortOrder") || "",
+  };
+};
+
+// Add queryParamsToServicePayload export
+export const queryParamsToServicePayload = (search: string) => {
+  const params = new URLSearchParams(search);
+  return {
+    atomic: params.get("atomic") === "true",
+    dispenser: params.get("dispenser") === "true",
+    locked: params.get("locked") === "true",
+    oneOfOne: params.get("oneOfOne") === "true",
+    forSale: params.get("forSale") === "true",
+    trendingSales: params.get("trendingSales") === "true",
+    sold: params.get("sold") === "true",
+    fileTypeSvg: params.get("fileTypeSvg") === "true",
+    fileTypePixel: params.get("fileTypePixel") === "true",
+    fileTypeGif: params.get("fileTypeGif") === "true",
+    fileTypeJpg: params.get("fileTypeJpg") === "true",
+    fileTypePng: params.get("fileTypePng") === "true",
+    fileTypeWebp: params.get("fileTypeWebp") === "true",
+    fileTypeBmp: params.get("fileTypeBmp") === "true",
+    fileTypeJpeg: params.get("fileTypeJpeg") === "true",
+    fileTypeHtml: params.get("fileTypeHtml") === "true",
+    fileTypeOlga: params.get("fileTypeOlga") === "true",
+    fileTypeSrc721: params.get("fileTypeSrc721") === "true",
+    fileTypeSrc101: params.get("fileTypeSrc101") === "true",
+    stampRangePreset: params.get("stampRangePreset"),
+    stampRangeMin: params.get("stampRangeMin"),
+    stampRangeMax: params.get("stampRangeMax"),
+    stampPriceMin: params.get("stampPriceMin"),
+    stampPriceMax: params.get("stampPriceMax"),
+  };
+};
+
+// Add the allQueryKeysFromFilters export
+export const allQueryKeysFromFilters = [
+  "atomic",
+  "dispenser",
+  "locked",
+  "oneOfOne",
+  "forSale",
+  "trendingSales",
+  "sold",
+  "fileTypeSvg",
+  "fileTypePixel",
+  "fileTypeGif",
+  "fileTypeJpg",
+  "fileTypePng",
+  "fileTypeWebp",
+  "fileTypeBmp",
+  "fileTypeJpeg",
+  "fileTypeHtml",
+  "fileTypeOlga",
+  "fileTypeSrc721",
+  "fileTypeSrc101",
+  "stampRangePreset",
+  "stampRangeMin",
+  "stampRangeMax",
+  "stampPriceMin",
+  "stampPriceMax",
+  "sortOrder",
+];
+
 interface StampFilterProps {
   open: boolean;
   setOpen: (status: boolean) => void;
@@ -70,7 +173,7 @@ const ChevronDown = () => (
   >
     <path
       d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z"
-      fill="currentColor"
+      fill="currentColo"
     />
   </svg>
 );

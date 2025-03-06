@@ -165,6 +165,8 @@ import * as $collection_CollectionOverviewHeader from "./islands/collection/Coll
 import * as $collection_CollectionOverviewSection from "./islands/collection/CollectionOverviewSection.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
+import * as $datacontrol_FilterToggle from "./islands/datacontrol/FilterToggle.tsx";
+import * as $datacontrol_MultiSort from "./islands/datacontrol/MultiSort.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
@@ -201,9 +203,11 @@ import * as $src20_SRC20Section from "./islands/src20/SRC20Section.tsx";
 import * as $src20_cards_SRC20BaseCard from "./islands/src20/cards/SRC20BaseCard.tsx";
 import * as $src20_cards_SRC20TokenMintingCard from "./islands/src20/cards/SRC20TokenMintingCard.tsx";
 import * as $src20_cards_SRC20TokenOutmintedCard from "./islands/src20/cards/SRC20TokenOutmintedCard.tsx";
+import * as $src20_details_SRC20HolderTable from "./islands/src20/details/SRC20HolderTable.tsx";
 import * as $src20_details_SRC20TickHeader from "./islands/src20/details/SRC20TickHeader.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
+import * as $stamp_StampFilter from "./islands/stamp/StampFilter.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
@@ -444,6 +448,8 @@ const manifest = {
       $collection_CollectionOverviewSection,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
+    "./islands/datacontrol/FilterToggle.tsx": $datacontrol_FilterToggle,
+    "./islands/datacontrol/MultiSort.tsx": $datacontrol_MultiSort,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
@@ -482,10 +488,13 @@ const manifest = {
       $src20_cards_SRC20TokenMintingCard,
     "./islands/src20/cards/SRC20TokenOutmintedCard.tsx":
       $src20_cards_SRC20TokenOutmintedCard,
+    "./islands/src20/details/SRC20HolderTable.tsx":
+      $src20_details_SRC20HolderTable,
     "./islands/src20/details/SRC20TickHeader.tsx":
       $src20_details_SRC20TickHeader,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
+    "./islands/stamp/StampFilter.tsx": $stamp_StampFilter,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/stamp/StampSection.tsx": $stamp_StampSection,

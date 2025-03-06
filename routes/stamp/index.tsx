@@ -6,10 +6,11 @@ import { StampHeader } from "$islands/stamp/StampHeader.tsx";
 import { CollectionService } from "$server/services/collectionService.ts";
 import { STAMP_FILTER_TYPES, STAMP_TYPES, SUBPROTOCOLS } from "$globals";
 import {
+  // StampFilters,
+  allQueryKeysFromFilters,
   queryParamsToFilters,
   queryParamsToServicePayload,
-  // StampFilters,
-} from "../../islands/filterpane/StampFilterPane.tsx";
+} from "$islands/stamp/StampFilter.tsx";
 
 const MAX_PAGE_SIZE = 120;
 
