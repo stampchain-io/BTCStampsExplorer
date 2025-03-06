@@ -32,6 +32,10 @@ export function Sort(
     // Update URL and reload page
     const url = new URL(globalThis.location.href);
     url.searchParams.set(sortParam, newSort);
+    url.searchParams.set(
+      "sortOrder",
+      newSort === "ASC" ? "index_asc" : "index_desc",
+    );
     globalThis.location.href = url.toString();
   };
 
