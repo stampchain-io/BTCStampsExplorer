@@ -206,48 +206,43 @@ const defaultFilters = {
 const ChevronUp = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="32"
-    height="32"
     viewBox="0 0 32 32"
-    fill="none"
+    class="w-5 h-5 mobileLg:w-6 mobileLg:h-6 fill-stamp-grey group-hover:fill-stamp-grey-light"
   >
-    <path
-      d="M26.7075 20.7076C26.6146 20.8005 26.5043 20.8743 26.3829 20.9246C26.2615 20.9749 26.1314 21.0008 26 21.0008C25.8686 21.0008 25.7385 20.9749 25.6171 20.9246C25.4957 20.8743 25.3854 20.8005 25.2925 20.7076L16 11.4138L6.70751 20.7076C6.51987 20.8952 6.26537 21.0006 6.00001 21.0006C5.73464 21.0006 5.48015 20.8952 5.29251 20.7076C5.10487 20.5199 4.99945 20.2654 4.99945 20.0001C4.99945 19.7347 5.10487 19.4802 5.29251 19.2926L15.2925 9.29255C15.3854 9.19958 15.4957 9.12582 15.6171 9.07549C15.7385 9.02517 15.8686 8.99927 16 8.99927C16.1314 8.99927 16.2615 9.02517 16.3829 9.07549C16.5043 9.12582 16.6146 9.19958 16.7075 9.29255L26.7075 19.2926C26.8005 19.3854 26.8742 19.4957 26.9246 19.6171C26.9749 19.7385 27.0008 19.8686 27.0008 20.0001C27.0008 20.1315 26.9749 20.2616 26.9246 20.383C26.8742 20.5044 26.8005 20.6147 26.7075 20.7076Z"
-      fill="currentColor"
-    />
+    <path d="M26.7075 20.7076C26.6146 20.8005 26.5043 20.8743 26.3829 20.9246C26.2615 20.9749 26.1314 21.0008 26 21.0008C25.8686 21.0008 25.7385 20.9749 25.6171 20.9246C25.4957 20.8743 25.3854 20.8005 25.2925 20.7076L16 11.4138L6.70751 20.7076C6.51987 20.8952 6.26537 21.0006 6.00001 21.0006C5.73464 21.0006 5.48015 20.8952 5.29251 20.7076C5.10487 20.5199 4.99945 20.2654 4.99945 20.0001C4.99945 19.7347 5.10487 19.4802 5.29251 19.2926L15.2925 9.29255C15.3854 9.19958 15.4957 9.12582 15.6171 9.07549C15.7385 9.02517 15.8686 8.99927 16 8.99927C16.1314 8.99927 16.2615 9.02517 16.3829 9.07549C16.5043 9.12582 16.6146 9.19958 16.7075 9.29255L26.7075 19.2926C26.8005 19.3854 26.8742 19.4957 26.9246 19.6171C26.9749 19.7385 27.0008 19.8686 27.0008 20.0001C27.0008 20.1315 26.9749 20.2616 26.9246 20.383C26.8742 20.5044 26.8005 20.6147 26.7075 20.7076Z" />
   </svg>
 );
 
 const ChevronDown = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="32"
-    height="32"
     viewBox="0 0 32 32"
-    fill="none"
+    class="w-5 h-5 mobileLg:w-6 mobileLg:h-6 fill-stamp-grey-light group-hover:fill-stamp-grey"
   >
-    <path
-      d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z"
-      fill="currentColo"
-    />
+    <path d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z" />
   </svg>
 );
 
 const CrossIcon = () => (
   <svg
-    class="w-3 h-3"
-    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 14 14"
+    viewBox="0 0 32 32"
+    class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 hover:fill-stamp-grey-light"
+    role="button"
+    aria-label="Close Filter"
+    fill="url(#closeFilterGradient)"
   >
-    <path
-      stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-    />
+    <defs>
+      <linearGradient
+        id="closeFilterGradient"
+        gradientTransform="rotate(-45)"
+      >
+        <stop offset="0%" stop-color="#666666" />
+        <stop offset="50%" stop-color="#999999" />
+        <stop offset="100%" stop-color="#CCCCCC" />
+      </linearGradient>
+    </defs>
+    <path d="M26.0612 23.9387C26.343 24.2205 26.5013 24.6027 26.5013 25.0012C26.5013 25.3997 26.343 25.7819 26.0612 26.0637C25.7794 26.3455 25.3972 26.5038 24.9987 26.5038C24.6002 26.5038 24.218 26.3455 23.9362 26.0637L15.9999 18.125L8.0612 26.0612C7.7794 26.343 7.39721 26.5013 6.9987 26.5013C6.60018 26.5013 6.21799 26.343 5.9362 26.0612C5.6544 25.7794 5.49609 25.3972 5.49609 24.9987C5.49609 24.6002 5.6544 24.218 5.9362 23.9362L13.8749 16L5.9387 8.06122C5.6569 7.77943 5.49859 7.39724 5.49859 6.99872C5.49859 6.60021 5.6569 6.21802 5.9387 5.93622C6.22049 5.65443 6.60268 5.49612 7.0012 5.49612C7.39971 5.49612 7.7819 5.65443 8.0637 5.93622L15.9999 13.875L23.9387 5.93497C24.2205 5.65318 24.6027 5.49487 25.0012 5.49487C25.3997 5.49487 25.7819 5.65318 26.0637 5.93497C26.3455 6.21677 26.5038 6.59896 26.5038 6.99747C26.5038 7.39599 26.3455 7.77818 26.0637 8.05998L18.1249 16L26.0612 23.9387Z" />
   </svg>
 );
 
@@ -276,16 +271,24 @@ interface RangeInputProps {
 const FilterSection = (
   { title, children, section, expanded, toggle }: FilterSectionProps,
 ) => (
-  <div className="border-b border-stamp-purple-highlight/20 py-4">
+  <div>
     <button
       onClick={toggle}
-      className="flex w-full items-center justify-between px-4 py-2 text-lg font-medium text-stamp-table-text"
+      className="flex w-full items-center justify-between px-3 py-3 text-lg mobileLg:text-xl font-light group"
     >
-      {title}
+      <span
+        className={`${
+          expanded
+            ? "text-stamp-grey group-hover:text-stamp-grey-light"
+            : "text-stamp-grey-light group-hover:text-stamp-grey"
+        } transition-colors`}
+      >
+        {title}
+      </span>
       {expanded ? <ChevronUp /> : <ChevronDown />}
     </button>
     {expanded && (
-      <div className="px-4 pt-2">
+      <div className="px-3 pt-1.5">
         {children}
       </div>
     )}
@@ -293,9 +296,14 @@ const FilterSection = (
 );
 
 const Checkbox = ({ label, checked, onChange }: CheckboxProps) => (
-  <div className="flex items-center cursor-pointer py-1">
+  <div className="flex items-center cursor-pointer py-1.5 group">
     <input
-      className="relative float-left h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:hover:before:opacity-[0.04] checked:hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)]"
+      className="appearance-none relative float-left
+       h-4 w-4 mobileLg:h-[18px] mobileLg:w-[18px]  
+       rounded border-2 border-solid border-stamp-grey group-hover:border-stamp-grey-light outline-none
+        before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] 
+        checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] 
+        hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:hover:before:opacity-[0.04] checked:hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)]"
       type="checkbox"
       checked={checked}
       onChange={(e) => {
@@ -303,7 +311,7 @@ const Checkbox = ({ label, checked, onChange }: CheckboxProps) => (
         onChange(isChecked);
       }}
     />
-    <label className="inline-block pl-[0.15rem] hover:cursor-pointer text-stamp-grey ml-1 select-none">
+    <label className="inline-block ml-[9px] text-sm mobileLg:text-base text-stamp-grey group-hover:text-stamp-grey-light font-semibold cursor-pointer transition-colors">
       {label}
     </label>
   </div>
@@ -320,7 +328,7 @@ const RangeInput = ({ label, value, onChange }: RangeInputProps) => (
       }}
       min="0"
       className="w-full px-2 py-1 border border-purple-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-      placeholder="Enter value"
+      placeholder="ENTER VALUE"
     />
   </div>
 );
@@ -345,11 +353,14 @@ function useDebouncedCallback(
 // Add interface for expanded sections
 interface ExpandedSections {
   buyNow: boolean;
-  status: boolean;
+  editions: boolean;
   fileType: boolean;
   stampRange: boolean;
   priceRange: boolean;
 }
+
+const buttonGreyOutline =
+  "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
 export const StampFilter = (
   { searchparams, open, setOpen, onFiltersChange }: StampFilterProps,
@@ -357,8 +368,11 @@ export const StampFilter = (
   // Parse URL parameters
   const atomic = searchparams.get("buyNow[atomic]") === "true";
   const dispenser = searchparams.get("buyNow[dispenser]") === "true";
-  const locked = searchparams.get("status[locked]") === "true";
-  const oneOfOne = searchparams.get("status[oneOfOne]") === "true";
+  const oneOfOne = searchparams.get("editions[oneOfOne]") === "true";
+  const multiple = searchparams.get("editions[multiple]") === "true";
+  const locked = searchparams.get("editions[locked]") === "true";
+  const unlocked = searchparams.get("editions[unlocked]") === "true";
+  const divisible = searchparams.get("editions[divisible]") === "true";
   const forSale = searchparams.get("forSale") === "true";
   const trendingSales = searchparams.get("trendingSales") === "true";
   const sold = searchparams.get("sold") === "true";
@@ -368,7 +382,6 @@ export const StampFilter = (
   const stampPriceMin = searchparams.get("priceRange[min]");
   const stampPriceMax = searchparams.get("priceRange[max]");
   const fileTypeSvg = searchparams.get("fileType[svg]") === "true";
-  const fileTypePixel = searchparams.get("fileType[pixel]") === "true";
   const fileTypeGif = searchparams.get("fileType[gif]") === "true";
   const fileTypeJpg = searchparams.get("fileType[jpg]") === "true";
   const fileTypePng = searchparams.get("fileType[png]") === "true";
@@ -385,16 +398,18 @@ export const StampFilter = (
       atomic: atomic || false,
       dispenser: dispenser || false,
     },
-    status: {
-      locked: locked || false,
+    editions: {
       oneOfOne: oneOfOne || false,
+      multiple: multiple || false,
+      locked: locked || false,
+      unlocked: unlocked || false,
+      divisible: divisible || false,
     },
     forSale: forSale || false,
     trendingSales: trendingSales || false,
     sold: sold || false,
     fileType: {
       svg: fileTypeSvg || false,
-      pixel: fileTypePixel || false,
       gif: fileTypeGif || false,
       jpg: fileTypeJpg || false,
       png: fileTypePng || false,
@@ -421,7 +436,7 @@ export const StampFilter = (
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState<ExpandedSections>({
     buyNow: true,
-    status: false,
+    editions: false,
     fileType: false,
     stampRange: false,
     priceRange: false,
@@ -518,7 +533,7 @@ export const StampFilter = (
     <div
       className={`
         fixed top-0 left-0 z-40 
-        w-full mobileMd:w-64 h-screen 
+        w-full mobileMd:w-64 mobileLg:w-72 h-screen 
         p-3 backdrop-blur-md 
         bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 
         overflow-y-auto transition-transform
@@ -526,131 +541,36 @@ export const StampFilter = (
       `}
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <p className="text-xl font-black text-stamp-grey">
-          FILTER
-        </p>
-        <button
-          onClick={handleClose}
-          className="text-red-500 hover:bg-gray-200 rounded-lg w-8 h-8 flex items-center justify-center"
-        >
-          <CrossIcon />
-          <span className="sr-only">Close menu</span>
-        </button>
+      <div className="flex flex-col p-3 space-y-3 mb-3 mobileLg:mb-[18px]">
+        <div className="flex justify-end">
+          <button onClick={handleClose}>
+            <CrossIcon />
+          </button>
+        </div>
+        <div className="flex justify-start">
+          <p className="text-2xl mobileLg:text-3xl font-black text-stamp-grey-darker">
+            FILTERS
+          </p>
+        </div>
       </div>
 
       {/* Filter Sections */}
-      <div className="space-y-4">
-        {/* Buy Now Section */}
-        <FilterSection
-          title="Buy Now"
-          section="buyNow"
-          expanded={expandedSections.buyNow}
-          toggle={() => toggleSection("buyNow")}
-        >
-          <div className="space-y-2">
-            <Checkbox
-              label="Atomic"
-              checked={filters.buyNow.atomic}
-              onChange={(checked) => {
-                handleFilterChange("buyNow", { atomic: checked });
-              }}
-            />
-            <Checkbox
-              label="Dispenser"
-              checked={filters.buyNow.dispenser}
-              onChange={(checked) => {
-                handleFilterChange("buyNow", { dispenser: checked });
-              }}
-            />
-          </div>
-        </FilterSection>
-
-        {/* Status Section */}
-        <FilterSection
-          title="Status"
-          section="status"
-          expanded={expandedSections.status}
-          toggle={() => toggleSection("status")}
-        >
-          <div className="space-y-2">
-            <Checkbox
-              label="Locked"
-              checked={filters.status.locked}
-              onChange={(checked) => {
-                handleFilterChange("status", { locked: checked });
-              }}
-            />
-            <Checkbox
-              label="1:1"
-              checked={filters.status.oneOfOne}
-              onChange={(checked) => {
-                handleFilterChange("status", { oneOfOne: checked });
-              }}
-            />
-          </div>
-        </FilterSection>
-
-        {/* Market Section */}
-        <FilterSection
-          title="Market"
-          section="market"
-          expanded={expandedSections.market}
-          toggle={() => toggleSection("market")}
-        >
-          <div className="space-y-2">
-            <Checkbox
-              label="For Sale"
-              checked={filters.forSale}
-              onChange={(checked) => handleFilterChange("forSale", checked)}
-            />
-            <Checkbox
-              label="Trending Sales"
-              checked={filters.trendingSales}
-              onChange={(checked) =>
-                handleFilterChange("trendingSales", checked)}
-            />
-            <Checkbox
-              label="Sold"
-              checked={filters.sold}
-              onChange={(checked) => handleFilterChange("sold", checked)}
-            />
-          </div>
-        </FilterSection>
-
+      <div className="space-y-1.5 mobileLg:space-y-3">
         {/* File Type Section */}
         <FilterSection
-          title="File Type"
+          title="FILE TYPE"
           section="fileType"
           expanded={expandedSections.fileType}
           toggle={() => toggleSection("fileType")}
         >
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Checkbox
-              label="SVG"
-              checked={filters.fileType.svg}
+              label="JPEG"
+              checked={filters.fileType.jpeg}
               onChange={(checked) =>
                 handleFilterChange("fileType", {
                   ...filters.fileType,
-                  svg: checked,
-                })}
-            />
-            <Checkbox
-              label="Pixel"
-              checked={filters.fileType.pixel}
-              onChange={(checked) =>
-                handleFilterChange("fileType", {
-                  ...filters.fileType,
-                  pixel: checked,
-                })}
-            />
-            <Checkbox
-              label="GIF"
-              checked={filters.fileType.gif}
-              onChange={(checked) =>
-                handleFilterChange("fileType", {
-                  ...filters.fileType,
-                  gif: checked,
+                  jpeg: checked,
                 })}
             />
             <Checkbox
@@ -672,6 +592,15 @@ export const StampFilter = (
                 })}
             />
             <Checkbox
+              label="GIF"
+              checked={filters.fileType.gif}
+              onChange={(checked) =>
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  gif: checked,
+                })}
+            />
+            <Checkbox
               label="WEBP"
               checked={filters.fileType.webp}
               onChange={(checked) =>
@@ -681,21 +610,12 @@ export const StampFilter = (
                 })}
             />
             <Checkbox
-              label="BMP"
-              checked={filters.fileType.bmp}
+              label="SVG"
+              checked={filters.fileType.svg}
               onChange={(checked) =>
                 handleFilterChange("fileType", {
                   ...filters.fileType,
-                  bmp: checked,
-                })}
-            />
-            <Checkbox
-              label="JPEG"
-              checked={filters.fileType.jpeg}
-              onChange={(checked) =>
-                handleFilterChange("fileType", {
-                  ...filters.fileType,
-                  jpeg: checked,
+                  svg: checked,
                 })}
             />
             <Checkbox
@@ -708,12 +628,12 @@ export const StampFilter = (
                 })}
             />
             <Checkbox
-              label="OLGA"
-              checked={filters.fileType.olga}
+              label="BMP"
+              checked={filters.fileType.bmp}
               onChange={(checked) =>
                 handleFilterChange("fileType", {
                   ...filters.fileType,
-                  olga: checked,
+                  bmp: checked,
                 })}
             />
             <Checkbox
@@ -734,19 +654,89 @@ export const StampFilter = (
                   src101: checked,
                 })}
             />
+            <Checkbox
+              label="OLGA"
+              checked={filters.fileType.olga}
+              onChange={(checked) =>
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  olga: checked,
+                })}
+            />
+          </div>
+        </FilterSection>
+
+        {/* Editions Section */}
+        <FilterSection
+          title="EDITIONS"
+          section="editions"
+          expanded={expandedSections.editions}
+          toggle={() => toggleSection("editions")}
+        >
+          <div className="space-y-1.5">
+            <Checkbox
+              label="1/1"
+              checked={filters.editions.oneOfOne}
+              onChange={(checked) => {
+                handleFilterChange("editions", {
+                  ...filters.editions,
+                  oneOfOne: checked,
+                });
+              }}
+            />
+            <Checkbox
+              label="MULTIPLE"
+              checked={filters.editions.multiple}
+              onChange={(checked) => {
+                handleFilterChange("editions", {
+                  ...filters.editions,
+                  multiple: checked,
+                });
+              }}
+            />
+            <Checkbox
+              label="LOCKED"
+              checked={filters.editions.locked}
+              onChange={(checked) => {
+                handleFilterChange("editions", {
+                  ...filters.editions,
+                  locked: checked,
+                });
+              }}
+            />
+            <Checkbox
+              label="UNLOCKED"
+              checked={filters.editions.unlocked}
+              onChange={(checked) => {
+                handleFilterChange("editions", {
+                  ...filters.editions,
+                  unlocked: checked,
+                });
+              }}
+            />
+            <Checkbox
+              label="DIVISIBLE"
+              checked={filters.editions.divisible}
+              onChange={(checked) => {
+                handleFilterChange("editions", {
+                  ...filters.editions,
+                  divisible: checked,
+                });
+              }}
+            />
           </div>
         </FilterSection>
 
         {/* Stamp Range Section */}
         <FilterSection
-          title="Stamp Range"
+          title="STAMP RANGE"
           section="stampRange"
           expanded={expandedSections.stampRange}
           toggle={() => toggleSection("stampRange")}
         >
-          <div className="space-y-4">
+          <div className="space-y-1.5 mobileLg:space-y-3">
             {/* Preset Ranges */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {[100, 1000, 5000, 10000].map((value) => (
                 <div key={value} className="flex items-center space-x-2">
                   <input
@@ -759,8 +749,8 @@ export const StampFilter = (
                     }}
                     className="text-purple-600 focus:ring-purple-500"
                   />
-                  <label className="text-sm text-stamp-grey">
-                    First {value} Stamps
+                  <label className="text-sm mobileLg:text-base text-stamp-grey">
+                    SUB {value}
                   </label>
                 </div>
               ))}
@@ -771,7 +761,7 @@ export const StampFilter = (
               <div className="flex items-center gap-2 mb-2 text-stamp-grey-light">
                 <span className="text-sm font-medium">Custom Range</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <RangeInput
                   label="Min Stamp Number"
                   value={filters.stampRange.min}
@@ -807,16 +797,43 @@ export const StampFilter = (
           </div>
         </FilterSection>
 
+        {/* Market Section */}
+        <FilterSection
+          title="MARKET"
+          section="market"
+          expanded={expandedSections.market}
+          toggle={() => toggleSection("market")}
+        >
+          <div className="space-y-1.5">
+            <Checkbox
+              label="FOR SALE"
+              checked={filters.forSale}
+              onChange={(checked) => handleFilterChange("forSale", checked)}
+            />
+            <Checkbox
+              label="TRENDING SALES"
+              checked={filters.trendingSales}
+              onChange={(checked) =>
+                handleFilterChange("trendingSales", checked)}
+            />
+            <Checkbox
+              label="SOLD"
+              checked={filters.sold}
+              onChange={(checked) => handleFilterChange("sold", checked)}
+            />
+          </div>
+        </FilterSection>
+
         {/* Price Range Section */}
         <FilterSection
-          title="Price Filter"
+          title="PRICE"
           section="priceRange"
           expanded={expandedSections.priceRange}
           toggle={() => toggleSection("priceRange")}
         >
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <RangeInput
-              label="Min Price"
+              label="MIN"
               value={filters.priceRange.min}
               onChange={(value: string) => {
                 handleFilterChange("priceRange", {
@@ -830,7 +847,7 @@ export const StampFilter = (
               }}
             />
             <RangeInput
-              label="Max Price"
+              label="MAX"
               value={filters.priceRange.max}
               onChange={(value: string) => {
                 handleFilterChange("priceRange", {
@@ -846,32 +863,68 @@ export const StampFilter = (
           </div>
         </FilterSection>
 
+        {/* Buy Now Section */}
+        {
+          /*
+        <FilterSection
+          title="BUY NOW"
+          section="buyNow"
+          expanded={expandedSections.buyNow}
+          toggle={() => toggleSection("buyNow")}
+        >
+          <div className="space-y-1.5">
+            <Checkbox
+              label="ATOMIC"
+              checked={filters.buyNow.atomic}
+              onChange={(checked) => {
+                handleFilterChange("buyNow", {
+                  ...filters.buyNow,
+                  atomic: checked
+                });
+              }}
+            />
+            <Checkbox
+              label="DISPENSER"
+              checked={filters.buyNow.dispenser}
+              onChange={(checked) => {
+                handleFilterChange("buyNow", {
+                  ...filters.buyNow,
+                  dispenser: checked
+                });
+              }}
+            />
+          </div>
+        </FilterSection>
+        */
+        }
         {
           /* Sort Order
-        <div className="p-4 border-t border-stamp-purple-highlight/20">
+        <div className="p-3 border-t border-stamp-purple-highlight/20">
           <label className="block text-sm font-medium mb-2 text-stamp-grey">
-            Sort By
+            SORT BY
           </label>
           <select
             value={filters.sortOrder}
             onChange={(e) => handleFilterChange("sortOrder", e.target.value)}
             className="w-full p-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-stamp-grey"
           >
-            <option value="index_desc">Stamp Index: High to Low</option>
-            <option value="index_asc">Stamp Index: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-            <option value="price_asc">Price: Low to High</option>
+            <option value="index_desc">STAMP INDEX: HIGH TO LOW</option>
+            <option value="index_asc">STAMP INDEX: LOW TO HIGH</option>
+            <option value="price_desc">PRICE: HIGH TO LOW</option>
+            <option value="price_asc">PRICE: LOW TO HIGH</option>
           </select>
         </div>*/
         }
 
         {/* Clear Filters Button */}
-        <button
-          onClick={handleClearFilters}
-          className="w-full p-2 mt-4 text-red-500 border border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
-        >
-          CLEAR FILTERS
-        </button>
+        <div className="!mt-6">
+          <button
+            onClick={handleClearFilters}
+            className={buttonGreyOutline}
+          >
+            CLEAR FILTERS
+          </button>
+        </div>
       </div>
     </div>
   );
