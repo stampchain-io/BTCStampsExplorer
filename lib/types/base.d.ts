@@ -105,19 +105,19 @@ export interface BasicFeeProps
 
 export interface ComplexFeeProps extends BaseFeeCalculatorProps {
   type: string;
-  fileType: string | undefined;
-  fileSize: number | undefined;
-  issuance: number | undefined;
-  serviceFee: number | undefined;
-  userAddress: string | undefined;
-  outputTypes: ScriptType[] | undefined;
-  utxoAncestors: AncestorInfo[] | undefined;
-  feeDetails: FeeDetails | undefined;
-  effectiveFeeRate: number | undefined;
-  onRefresh: (() => Promise<void>) | undefined;
-  disabled: boolean | undefined;
-  inputType: string | undefined;
-  bitname: string | undefined;
+  fileType?: string;
+  fileSize?: number;
+  issuance?: number;
+  serviceFee?: number;
+  userAddress?: string;
+  outputTypes?: ScriptType[];
+  utxoAncestors?: AncestorInfo[];
+  feeDetails?: FeeDetails;
+  effectiveFeeRate?: number;
+  onRefresh?: () => Promise<void>;
+  disabled?: boolean;
+  inputType?: string;
+  bitname?: string;
 }
 
 interface PSBTFees extends FeeDetails {

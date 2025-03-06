@@ -13,10 +13,10 @@ interface ExtendedBaseFeeCalculatorProps extends BaseFeeCalculatorProps {
   cancelText?: string;
   confirmText?: string;
   type?: string;
-  fileType?: string;
-  fileSize?: number;
-  issuance?: number;
-  serviceFee?: number;
+  fileType?: string | undefined;
+  fileSize?: number | undefined;
+  issuance?: number | undefined;
+  serviceFee?: number | undefined;
   bitname?: string;
 }
 
