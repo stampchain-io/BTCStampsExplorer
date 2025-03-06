@@ -1,5 +1,4 @@
 import { useRef, useState } from "preact/hooks";
-import { STAMP_SUFFIX_FILTERS } from "$globals";
 import { Button } from "$components/shared/Button.tsx";
 
 // Add queryParamsToFilters export
@@ -248,7 +247,31 @@ const CrossIcon = () => (
   </svg>
 );
 
-const FilterSection = ({ title, children, section, expanded, toggle }) => (
+// Add interfaces for component props
+interface FilterSectionProps {
+  title: string;
+  children: preact.ComponentChildren;
+  section: string;
+  expanded: boolean;
+  toggle: () => void;
+}
+
+interface CheckboxProps {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+interface RangeInputProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+// Update component declarations with proper types
+const FilterSection = (
+  { title, children, section, expanded, toggle }: FilterSectionProps,
+) => (
   <div className="border-b border-stamp-purple-highlight/20 py-4">
     <button
       onClick={toggle}
@@ -265,7 +288,7 @@ const FilterSection = ({ title, children, section, expanded, toggle }) => (
   </div>
 );
 
-const Checkbox = ({ label, checked, onChange }) => (
+const Checkbox = ({ label, checked, onChange }: CheckboxProps) => (
   <div className="flex items-center cursor-pointer py-1">
     <input
       className="relative float-left h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:hover:before:opacity-[0.04] checked:hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)]"
@@ -283,7 +306,7 @@ const Checkbox = ({ label, checked, onChange }) => (
   </div>
 );
 
-const RangeInput = ({ label, value, onChange }) => (
+const RangeInput = ({ label, value, onChange }: RangeInputProps) => (
   <div className="flex flex-col space-y-1">
     <label className="text-xs text-stamp-table-text">{label}</label>
     <input
@@ -297,8 +320,11 @@ const RangeInput = ({ label, value, onChange }) => (
   </div>
 );
 
-function useDebouncedCallback(callback: Function, delay: number) {
-  const timeoutRef = useRef(null);
+function useDebouncedCallback(
+  callback: (value: string) => void,
+  delay: number,
+) {
+  const timeoutRef = useRef<number | null>(null);
 
   return (str: string) => {
     if (timeoutRef.current) {
@@ -309,6 +335,15 @@ function useDebouncedCallback(callback: Function, delay: number) {
       callback(str);
     }, delay);
   };
+}
+
+// Add interface for expanded sections
+interface ExpandedSections {
+  buyNow: boolean;
+  status: boolean;
+  fileType: boolean;
+  stampRange: boolean;
+  priceRange: boolean;
 }
 
 export const StampFilter = (
@@ -379,7 +414,7 @@ export const StampFilter = (
   };
 
   const [filters, setFilters] = useState(initialFilters);
-  const [expandedSections, setExpandedSections] = useState({
+  const [expandedSections, setExpandedSections] = useState<ExpandedSections>({
     buyNow: true,
     status: false,
     fileType: false,
@@ -389,9 +424,9 @@ export const StampFilter = (
 
   const debouncedOnFilterChange = useDebouncedCallback(
     (queryString: string) => {
-      const url = new URL(window.location.href);
+      const url = new URL(globalThis.location.href);
       url.search = queryString;
-      window.history.pushState({}, "", url);
+      globalThis.history.pushState({}, "", url);
     },
     500,
   );
@@ -404,7 +439,7 @@ export const StampFilter = (
       };
 
       // Update URL with new filters
-      const url = new URL(window.location.href);
+      const url = new URL(globalThis.location.href);
       Object.entries(newFilters).forEach(([filterKey, filterValue]) => {
         if (typeof filterValue === "object") {
           Object.entries(filterValue).forEach(([subKey, subValue]) => {
@@ -421,12 +456,12 @@ export const StampFilter = (
         }
       });
 
-      window.history.pushState({}, "", url.toString());
+      globalThis.history.pushState({}, "", url.toString());
       return newFilters;
     });
   };
 
-  const toggleSection = (section: string) => {
+  const toggleSection = (section: keyof ExpandedSections) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
@@ -435,11 +470,11 @@ export const StampFilter = (
 
   const clearAllFilters = () => {
     setFilters(defaultFilters);
-    const url = new URL(window.location.href);
+    const url = new URL(globalThis.location.href);
     Array.from(url.searchParams.keys()).forEach((key) => {
       url.searchParams.delete(key);
     });
-    window.history.pushState({}, "", url.toString());
+    globalThis.history.pushState({}, "", url.toString());
   };
 
   return (
