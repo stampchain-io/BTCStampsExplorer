@@ -124,15 +124,13 @@ interface StampFilterProps {
   searchparams: URLSearchParams;
   open: boolean;
   setOpen: (open: boolean) => void;
+  filterCount?: number;
+  onFiltersChange?: () => void;
 }
 
 const StampFilterButton = (
-  { searchparams, open, setOpen }: StampFilterProps,
+  { searchparams, open, setOpen, filterCount = 0 }: StampFilterProps,
 ) => {
-  const filterCount = allQueryKeysFromFilters.filter((key) => {
-    return searchparams.has(key) && searchparams.get(key) != "false";
-  }).length;
-
   return (
     <div class="relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright">
       <Badge text={filterCount.toString()} />
@@ -294,13 +292,13 @@ const Checkbox = ({ label, checked, onChange }: CheckboxProps) => (
       className="relative float-left h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:hover:before:opacity-[0.04] checked:hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)]"
       type="checkbox"
       checked={checked}
-      value={checked}
-      onChange={onChange}
+      onChange={(e) => {
+        const isChecked = (e.target as HTMLInputElement).checked;
+        onChange(isChecked);
+        onFiltersChange?.(); // Trigger update immediately
+      }}
     />
-    <label
-      className="inline-block pl-[0.15rem] hover:cursor-pointer text-stamp-grey ml-1 select-none"
-      htmlFor="inlineCheckbox1"
-    >
+    <label className="inline-block pl-[0.15rem] hover:cursor-pointer text-stamp-grey ml-1 select-none">
       {label}
     </label>
   </div>
@@ -312,7 +310,10 @@ const RangeInput = ({ label, value, onChange }: RangeInputProps) => (
     <input
       type="number"
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => {
+        onChange(e.target.value);
+        // Don't trigger onFiltersChange here - let parent handle it
+      }}
       min="0"
       className="w-full px-2 py-1 border border-purple-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
       placeholder="Enter value"
@@ -347,7 +348,7 @@ interface ExpandedSections {
 }
 
 export const StampFilter = (
-  { open, setOpen, searchparams }: StampFilterProps,
+  { searchparams, open, setOpen, onFiltersChange }: StampFilterProps,
 ) => {
   // Parse URL parameters
   const atomic = searchparams.get("buyNow[atomic]") === "true";
@@ -401,7 +402,7 @@ export const StampFilter = (
       src721: fileTypeSrc721 || false,
       src101: fileTypeSrc101 || false,
     },
-    stampRangePreset: stampRangePreset || 10000,
+    stampRangePreset: stampRangePreset || "",
     stampRange: {
       min: stampRangeMin || "",
       max: stampRangeMax || "",
@@ -440,23 +441,32 @@ export const StampFilter = (
 
       // Update URL with new filters
       const url = new URL(globalThis.location.href);
-      Object.entries(newFilters).forEach(([filterKey, filterValue]) => {
-        if (typeof filterValue === "object") {
-          Object.entries(filterValue).forEach(([subKey, subValue]) => {
-            if (subValue) {
-              url.searchParams.set(`${filterKey}[${subKey}]`, String(subValue));
-            } else {
-              url.searchParams.delete(`${filterKey}[${subKey}]`);
-            }
-          });
-        } else if (filterValue) {
-          url.searchParams.set(filterKey, String(filterValue));
-        } else {
-          url.searchParams.delete(filterKey);
-        }
-      });
 
+      // Special handling for objects (like fileType)
+      if (typeof value === "object") {
+        // Clear existing params for this key
+        Array.from(url.searchParams.keys())
+          .filter((param) => param.startsWith(`${key}[`))
+          .forEach((param) => url.searchParams.delete(param));
+
+        // Set new params
+        Object.entries(value).forEach(([subKey, subValue]) => {
+          if (subValue) {
+            url.searchParams.set(`${key}[${subKey}]`, String(subValue));
+          }
+        });
+      } else {
+        // Handle non-object values (like radio buttons)
+        if (value) {
+          url.searchParams.set(key, String(value));
+        } else {
+          url.searchParams.delete(key);
+        }
+      }
+
+      // Update URL and trigger filter count update
       globalThis.history.pushState({}, "", url.toString());
+      onFiltersChange?.();
       return newFilters;
     });
   };
@@ -468,13 +478,24 @@ export const StampFilter = (
     }));
   };
 
-  const clearAllFilters = () => {
-    setFilters(defaultFilters);
-    const url = new URL(globalThis.location.href);
+  const handleClearFilters = () => {
+    // Reset all filters
+    setFilters(initialFilters);
+
+    // Clear URL parameters
+    const url = new URL(window.location.href);
     Array.from(url.searchParams.keys()).forEach((key) => {
       url.searchParams.delete(key);
     });
     globalThis.history.pushState({}, "", url.toString());
+
+    // Trigger immediate update of the badge count
+    onFiltersChange?.();
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    onFiltersChange?.();
   };
 
   return (
@@ -494,7 +515,7 @@ export const StampFilter = (
           FILTER
         </p>
         <button
-          onClick={() => setOpen(false)}
+          onClick={handleClose}
           className="text-red-500 hover:bg-gray-200 rounded-lg w-8 h-8 flex items-center justify-center"
         >
           <CrossIcon />
@@ -589,73 +610,109 @@ export const StampFilter = (
               label="SVG"
               checked={filters.fileType.svg}
               onChange={(checked) =>
-                handleFilterChange("fileType", { svg: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  svg: checked,
+                })}
             />
             <Checkbox
               label="Pixel"
               checked={filters.fileType.pixel}
               onChange={(checked) =>
-                handleFilterChange("fileType", { pixel: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  pixel: checked,
+                })}
             />
             <Checkbox
               label="GIF"
               checked={filters.fileType.gif}
               onChange={(checked) =>
-                handleFilterChange("fileType", { gif: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  gif: checked,
+                })}
             />
             <Checkbox
               label="JPG"
               checked={filters.fileType.jpg}
               onChange={(checked) =>
-                handleFilterChange("fileType", { jpg: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  jpg: checked,
+                })}
             />
             <Checkbox
               label="PNG"
               checked={filters.fileType.png}
               onChange={(checked) =>
-                handleFilterChange("fileType", { png: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  png: checked,
+                })}
             />
             <Checkbox
               label="WEBP"
               checked={filters.fileType.webp}
               onChange={(checked) =>
-                handleFilterChange("fileType", { webp: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  webp: checked,
+                })}
             />
             <Checkbox
               label="BMP"
               checked={filters.fileType.bmp}
               onChange={(checked) =>
-                handleFilterChange("fileType", { bmp: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  bmp: checked,
+                })}
             />
             <Checkbox
               label="JPEG"
               checked={filters.fileType.jpeg}
               onChange={(checked) =>
-                handleFilterChange("fileType", { jpeg: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  jpeg: checked,
+                })}
             />
             <Checkbox
               label="HTML"
               checked={filters.fileType.html}
               onChange={(checked) =>
-                handleFilterChange("fileType", { html: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  html: checked,
+                })}
             />
             <Checkbox
               label="OLGA"
               checked={filters.fileType.olga}
               onChange={(checked) =>
-                handleFilterChange("fileType", { olga: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  olga: checked,
+                })}
             />
             <Checkbox
               label="SRC-721"
               checked={filters.fileType.src721}
               onChange={(checked) =>
-                handleFilterChange("fileType", { src721: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  src721: checked,
+                })}
             />
             <Checkbox
               label="SRC-101"
               checked={filters.fileType.src101}
               onChange={(checked) =>
-                handleFilterChange("fileType", { src101: checked })}
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  src101: checked,
+                })}
             />
           </div>
         </FilterSection>
@@ -677,8 +734,10 @@ export const StampFilter = (
                     name="stampRange"
                     value={value}
                     checked={filters.stampRangePreset === value}
-                    onChange={() =>
-                      handleFilterChange("stampRangePreset", value)}
+                    onChange={() => {
+                      handleFilterChange("stampRangePreset", value);
+                      onFiltersChange?.();
+                    }}
                     className="text-purple-600 focus:ring-purple-500"
                   />
                   <label className="text-sm text-stamp-grey">
@@ -697,22 +756,32 @@ export const StampFilter = (
                 <RangeInput
                   label="Min Stamp Number"
                   value={filters.stampRange.min}
-                  onChange={(value) =>
+                  onChange={(value) => {
                     handleFilterChange("stampRange", {
                       ...filters.stampRange,
                       min: value,
                       preset: "",
-                    })}
+                    });
+                    // Only trigger once for the entire stamp range section
+                    if (!filters.stampRange.max) {
+                      onFiltersChange?.();
+                    }
+                  }}
                 />
                 <RangeInput
                   label="Max Stamp Number"
                   value={filters.stampRange.max}
-                  onChange={(value) =>
+                  onChange={(value) => {
                     handleFilterChange("stampRange", {
                       ...filters.stampRange,
                       max: value,
                       preset: "",
-                    })}
+                    });
+                    // Only trigger once for the entire stamp range section
+                    if (!filters.stampRange.min) {
+                      onFiltersChange?.();
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -730,20 +799,30 @@ export const StampFilter = (
             <RangeInput
               label="Min Price"
               value={filters.priceRange.min}
-              onChange={(value: string) =>
+              onChange={(value: string) => {
                 handleFilterChange("priceRange", {
                   ...filters.priceRange,
                   min: value,
-                })}
+                });
+                // Only trigger once for the entire price range section
+                if (!filters.priceRange.max) {
+                  onFiltersChange?.();
+                }
+              }}
             />
             <RangeInput
               label="Max Price"
               value={filters.priceRange.max}
-              onChange={(value: string) =>
+              onChange={(value: string) => {
                 handleFilterChange("priceRange", {
                   ...filters.priceRange,
                   max: value,
-                })}
+                });
+                // Only trigger once for the entire price range section
+                if (!filters.priceRange.min) {
+                  onFiltersChange?.();
+                }
+              }}
             />
           </div>
         </FilterSection>
@@ -769,7 +848,7 @@ export const StampFilter = (
 
         {/* Clear Filters Button */}
         <button
-          onClick={clearAllFilters}
+          onClick={handleClearFilters}
           className="w-full p-2 mt-4 text-red-500 border border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
         >
           Clear All Filters

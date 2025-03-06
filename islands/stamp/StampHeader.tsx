@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { STAMP_FILTER_TYPES } from "$globals";
 import {
   allQueryKeysFromFilters,
@@ -17,11 +17,45 @@ export const StampHeader = (
 ) => {
   const [isOpen2, setIsOpen2] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
+  const [filterCount, setFilterCount] = useState(0);
+
+  const updateFilterCount = () => {
+    const searchparams = new URLSearchParams(window.location.search);
+    let count = 0;
+    const processedRanges = new Set();
+
+    Array.from(searchparams.entries()).forEach(([key, value]) => {
+      if (value === "true" || (value !== "false" && value !== "")) {
+        // Handle price range parameters
+        if (key.startsWith("priceRange[")) {
+          if (!processedRanges.has("priceRange")) {
+            count++;
+            processedRanges.add("priceRange");
+          }
+        } // Handle stamp range parameters
+        else if (key.startsWith("stampRange[") || key === "stampRangePreset") {
+          if (!processedRanges.has("stampRange")) {
+            count++;
+            processedRanges.add("stampRange");
+          }
+        } // Handle file type parameters
+        else if (key.startsWith("fileType[")) {
+          count++;
+        } // Handle other filters
+        else if (!key.includes("[")) {
+          count++;
+        }
+      }
+    });
+
+    setFilterCount(count);
+  };
+
+  useEffect(() => {
+    updateFilterCount();
+  }, [search]);
 
   const searchparams = new URLSearchParams(search);
-  const filterCount = allQueryKeysFromFilters.filter((key) => {
-    return searchparams.has(key) && searchparams.get(key) != "false";
-  }).length;
 
   const handleOpen2 = (open: boolean) => {
     setIsOpen2(open);
@@ -39,6 +73,7 @@ export const StampHeader = (
           open={openSearch}
           setOpen={setOpenSearch}
           searchparams={searchparams}
+          filterCount={filterCount}
         />
         <div class="opacity-100">
           <Sort initSort={sortBy} />
@@ -51,6 +86,7 @@ export const StampHeader = (
         searchparams={searchparams}
         open={openSearch}
         setOpen={setOpenSearch}
+        onFiltersChange={updateFilterCount}
       />
     </div>
   );
