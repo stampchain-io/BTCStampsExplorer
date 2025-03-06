@@ -106,14 +106,12 @@ export const allQueryKeysFromFilters = [
 
 const Badge = ({
   text,
-  color = "bg-stamp-grey-bright",
 }: {
   text: string;
-  color?: string;
 }) => {
   return (
     <span
-      className={`absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 px-2 py-1 text-xs font-medium text-black ${color} rounded-full`}
+      className={`absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2 px-1.5 py-[3px] text-xs font-medium text-black bg-stamp-purple-bright rounded-full`}
     >
       {text}
     </span>
@@ -295,7 +293,6 @@ const Checkbox = ({ label, checked, onChange }: CheckboxProps) => (
       onChange={(e) => {
         const isChecked = (e.target as HTMLInputElement).checked;
         onChange(isChecked);
-        onFiltersChange?.(); // Trigger update immediately
       }}
     />
     <label className="inline-block pl-[0.15rem] hover:cursor-pointer text-stamp-grey ml-1 select-none">
@@ -312,7 +309,6 @@ const RangeInput = ({ label, value, onChange }: RangeInputProps) => (
       value={value}
       onChange={(e) => {
         onChange(e.target.value);
-        // Don't trigger onFiltersChange here - let parent handle it
       }}
       min="0"
       className="w-full px-2 py-1 border border-purple-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -442,7 +438,7 @@ export const StampFilter = (
       // Update URL with new filters
       const url = new URL(globalThis.location.href);
 
-      // Special handling for objects (like fileType)
+      // Special handling for objects
       if (typeof value === "object") {
         // Clear existing params for this key
         Array.from(url.searchParams.keys())
@@ -452,11 +448,23 @@ export const StampFilter = (
         // Set new params
         Object.entries(value).forEach(([subKey, subValue]) => {
           if (subValue) {
-            url.searchParams.set(`${key}[${subKey}]`, String(subValue));
+            // For buyNow and status, set the subKey directly
+            if (key === "buyNow" || key === "status") {
+              url.searchParams.set(subKey, String(subValue));
+            } else {
+              url.searchParams.set(`${key}[${subKey}]`, String(subValue));
+            }
+          } else {
+            // Remove parameter if value is false
+            if (key === "buyNow" || key === "status") {
+              url.searchParams.delete(subKey);
+            } else {
+              url.searchParams.delete(`${key}[${subKey}]`);
+            }
           }
         });
       } else {
-        // Handle non-object values (like radio buttons)
+        // Handle non-object values
         if (value) {
           url.searchParams.set(key, String(value));
         } else {
@@ -536,14 +544,16 @@ export const StampFilter = (
             <Checkbox
               label="Atomic"
               checked={filters.buyNow.atomic}
-              onChange={(checked) =>
-                handleFilterChange("buyNow", { atomic: checked })}
+              onChange={(checked) => {
+                handleFilterChange("buyNow", { atomic: checked });
+              }}
             />
             <Checkbox
               label="Dispenser"
               checked={filters.buyNow.dispenser}
-              onChange={(checked) =>
-                handleFilterChange("buyNow", { dispenser: checked })}
+              onChange={(checked) => {
+                handleFilterChange("buyNow", { dispenser: checked });
+              }}
             />
           </div>
         </FilterSection>
@@ -559,14 +569,16 @@ export const StampFilter = (
             <Checkbox
               label="Locked"
               checked={filters.status.locked}
-              onChange={(checked) =>
-                handleFilterChange("status", { locked: checked })}
+              onChange={(checked) => {
+                handleFilterChange("status", { locked: checked });
+              }}
             />
             <Checkbox
               label="1:1"
               checked={filters.status.oneOfOne}
-              onChange={(checked) =>
-                handleFilterChange("status", { oneOfOne: checked })}
+              onChange={(checked) => {
+                handleFilterChange("status", { oneOfOne: checked });
+              }}
             />
           </div>
         </FilterSection>
@@ -736,7 +748,6 @@ export const StampFilter = (
                     checked={filters.stampRangePreset === value}
                     onChange={() => {
                       handleFilterChange("stampRangePreset", value);
-                      onFiltersChange?.();
                     }}
                     className="text-purple-600 focus:ring-purple-500"
                   />
@@ -851,7 +862,7 @@ export const StampFilter = (
           onClick={handleClearFilters}
           className="w-full p-2 mt-4 text-red-500 border border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
         >
-          Clear All Filters
+          CLEAR FILTERS
         </button>
       </div>
     </div>

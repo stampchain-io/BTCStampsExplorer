@@ -38,9 +38,13 @@ export const StampHeader = (
             count++;
             processedRanges.add("stampRange");
           }
-        } // Handle file type parameters
-        else if (key.startsWith("fileType[")) {
-          count++;
+        } // Count each individual checkbox separately
+        else if (key.includes("[")) {
+          // Extract the parameter name and value
+          const paramMatch = key.match(/^([^[]+)\[([^\]]+)\]$/);
+          if (paramMatch && value === "true") {
+            count++;
+          }
         } // Handle other filters
         else if (!key.includes("[")) {
           count++;
