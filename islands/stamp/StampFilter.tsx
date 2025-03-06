@@ -111,7 +111,17 @@ const Badge = ({
 }) => {
   return (
     <span
-      className={`absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2 px-1.5 py-[3px] text-xs font-medium text-black bg-stamp-purple-bright rounded-full`}
+      className={`
+        absolute top-0 left-0 
+        transform -translate-x-1/2 -translate-y-1/2 
+        w-6 h-6
+        flex items-center justify-center
+        text-xs font-medium 
+        text-black 
+        bg-stamp-purple 
+        group-hover:bg-stamp-purple-bright
+        rounded-full
+      `}
     >
       {text}
     </span>
@@ -130,21 +140,19 @@ const StampFilterButton = (
   { searchparams, open, setOpen, filterCount = 0 }: StampFilterProps,
 ) => {
   return (
-    <div class="relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright">
-      <Badge text={filterCount.toString()} />
+    <div class="relative flex flex-col items-center gap-1 rounded-md h-fit border-stamp-purple-bright text-stamp-purple-bright group">
+      {filterCount > 0 && <Badge text={filterCount.toString()} />}
       <Button
         variant="icon"
         onClick={() => setOpen(!open)}
         icon={
           <svg
-            viewBox="0 0 32 32"
-            fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 32 32"
+            role="button"
+            aria-label="Filter"
           >
-            <path
-              d="M28.825 6.19122C28.6711 5.83561 28.416 5.53309 28.0915 5.32129C27.767 5.10949 27.3875 4.99775 27 4.99997H4.99997C4.61288 5.00073 4.23433 5.11381 3.91025 5.32548C3.58616 5.53715 3.33047 5.83832 3.17418 6.19245C3.01789 6.54658 2.96772 6.93846 3.02977 7.32054C3.09181 7.70262 3.2634 8.05849 3.52372 8.34497L3.53372 8.35622L12 17.3962V27C11.9999 27.3619 12.098 27.7172 12.284 28.0277C12.4699 28.3383 12.7366 28.5926 13.0557 28.7635C13.3748 28.9344 13.7343 29.0155 14.0958 28.9981C14.4574 28.9808 14.8075 28.8656 15.1087 28.665L19.1087 25.9975C19.3829 25.8148 19.6078 25.5673 19.7632 25.2768C19.9187 24.9863 20 24.6619 20 24.3325V17.3962L28.4675 8.35622L28.4775 8.34497C28.7405 8.0598 28.9138 7.70346 28.9756 7.32043C29.0374 6.93741 28.985 6.54466 28.825 6.19122ZM18.2725 16.3225C18.0995 16.5059 18.0021 16.7479 18 17V24.3325L14 27V17C14 16.746 13.9035 16.5016 13.73 16.3162L4.99997 6.99997H27L18.2725 16.3225Z"
-              fill="currentColor"
-            />
+            <path d="M29.2863 5.98875C29.0903 5.54581 28.77 5.16931 28.3641 4.90502C27.9582 4.64072 27.4843 4.50002 27 4.5H5C4.51575 4.50005 4.04193 4.64074 3.63611 4.90497C3.2303 5.16921 2.90997 5.54561 2.71403 5.98846C2.51809 6.43131 2.45499 6.92153 2.53238 7.39956C2.60978 7.87759 2.82434 8.32285 3.15 8.68125L3.165 8.69875L11.5 17.5938V27C11.4999 27.4526 11.6227 27.8967 11.8553 28.285C12.0879 28.6733 12.4215 28.9912 12.8206 29.2047C13.2197 29.4182 13.6692 29.5194 14.1213 29.4974C14.5734 29.4755 15.011 29.3312 15.3875 29.08L19.3875 26.4137C19.73 26.1853 20.0107 25.8757 20.2048 25.5127C20.3989 25.1496 20.5003 24.7442 20.5 24.3325V17.5938L28.8338 8.69875L28.8488 8.68125C29.1746 8.32304 29.3894 7.87791 29.4671 7.39993C29.5448 6.92195 29.4819 6.4317 29.2863 5.98875ZM17.9113 15.975C17.6488 16.2519 17.5017 16.6185 17.5 17V24.065L14.5 26.065V17C14.4996 16.6191 14.3544 16.2527 14.0938 15.975L6.15375 7.5H25.8463L17.9113 15.975Z" />
           </svg>
         }
         data-drawer-target="drawer-form"
