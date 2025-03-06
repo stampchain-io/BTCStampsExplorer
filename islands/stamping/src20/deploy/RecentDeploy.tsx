@@ -11,7 +11,9 @@ export default function RecentDeploy(): JSX.Element {
   useEffect(() => {
     const fetchRecentTransactions = async () => {
       try {
-        const response = await fetch("/api/internal/src20/recentTransactions");
+        const response = await fetch(
+          "/api/internal/src20/trending?type=deploy&limit=5&page=1&transactionCount=1000",
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch recent transactions");
         }
