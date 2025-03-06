@@ -10,6 +10,7 @@ import { SRC20InputField } from "../SRC20InputField.tsx";
 import { logger } from "$lib/utils/logger.ts";
 import { getCSRFToken } from "$lib/utils/clientSecurityUtils.ts";
 import { APIResponse } from "$lib/utils/apiResponseUtil.ts";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 
 interface UploadResponse extends APIResponse {
   url?: string;
@@ -273,7 +274,7 @@ export function DeployContent(
           <div className="flex flex-col gap-3 mobileMd:gap-6 !w-[108px] mobileMd:!w-[120px]">
             <div
               id="image-preview"
-              class="relative rounded items-center text-center cursor-pointer min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] content-center bg-stamp-purple-dark group hover:bg-[#8800CC] transition duration-300"
+              class="relative rounded items-center text-center cursor-pointer min-w-[96px] h-[96px] mobileMd:min-w-[108px] mobileMd:h-[108px] mobileLg:min-w-[120px] mobileLg:h-[120px] content-center transition duration-300"
               onMouseMove={handleMouseMove}
               onMouseEnter={handleUploadMouseEnter}
               onMouseLeave={handleUploadMouseLeave}
@@ -290,6 +291,7 @@ export function DeployContent(
               {formState.file !== null && (
                 <img
                   width={324}
+                  class="bg-conic-pattern bg-[length:4px_4px]"
                   style={{
                     height: "100%",
                     objectFit: "contain",
@@ -303,7 +305,7 @@ export function DeployContent(
               {formState.file === null && (
                 <label
                   for="upload"
-                  class="cursor-pointer h-full flex flex-col items-center justify-center gap-3"
+                  class="cursor-pointer bg-conic-pattern bg-[length:4px_4px] h-full flex flex-col items-center justify-center gap-3"
                 >
                   <img
                     src="/img/stamping/image-upload.svg"
@@ -450,28 +452,27 @@ export function DeployContent(
       </div>
 
       <div className={`${backgroundContainer} w-full`}>
-        <ComplexFeeCalculator
+        <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
           fileType="application/json"
-          fileSize={undefined}
-          issuance={undefined}
-          serviceFee={undefined}
+          fileSize={0}
+          issuance={0}
+          serviceFee={0}
           BTCPrice={formState.BTCPrice}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmitWithUpload}
           buttonName={isConnected ? "DEPLOY" : "CONNECT WALLET"}
-          isConnected
           tosAgreed={tosAgreed}
           onTosChange={setTosAgreed}
           inputType={trxType === "olga" ? "P2WSH" : "P2SH"}
           outputTypes={trxType === "olga" ? ["P2WSH"] : ["P2SH", "P2WSH"]}
-          userAddress={wallet?.address}
-          disabled={undefined}
-          effectiveFeeRate={undefined}
-          utxoAncestors={undefined}
+          userAddress={wallet?.address ?? ""}
+          disabled={false}
+          effectiveFeeRate={0}
+          utxoAncestors={[]}
           feeDetails={{
             minerFee: formState.psbtFees?.estMinerFee || 0,
             dustValue: formState.psbtFees?.totalDustValue || 0,
