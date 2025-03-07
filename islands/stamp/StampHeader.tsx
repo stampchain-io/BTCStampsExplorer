@@ -15,8 +15,8 @@ export const StampHeader = (
     search: string;
   },
 ) => {
-  const [isOpen2, setIsOpen2] = useState(false);
-  const [openSearch, setOpenSearch] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterCount, setFilterCount] = useState(0);
 
   const updateFilterCount = () => {
@@ -60,10 +60,6 @@ export const StampHeader = (
 
   const searchparams = new URLSearchParams(search);
 
-  const handleOpen2 = (open: boolean) => {
-    setIsOpen2(open);
-  };
-
   const titlePurpleDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
 
@@ -73,22 +69,21 @@ export const StampHeader = (
       <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
       <div className="flex relative items-start justify-between gap-3">
         <StampFilterButton
-          open={openSearch}
-          setOpen={setOpenSearch}
+          open={isFilterOpen}
+          setOpen={setIsFilterOpen}
           searchparams={searchparams}
           filterCount={filterCount}
         />
-        <div class="opacity-100">
-          <Sort initSort={sortBy} />
-        </div>
-        <div class="opacity-100">
-          <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
-        </div>
+        <Sort initSort={sortBy} />
+        <StampSearchClient
+          open2={isSearchOpen}
+          handleOpen2={setIsSearchOpen}
+        />
       </div>
       <StampFilter
         searchparams={searchparams}
-        open={openSearch}
-        setOpen={setOpenSearch}
+        open={isFilterOpen}
+        setOpen={setIsFilterOpen}
         onFiltersChange={updateFilterCount}
       />
     </div>

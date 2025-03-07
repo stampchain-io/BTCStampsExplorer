@@ -1,4 +1,4 @@
-import { useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "$components/shared/Button.tsx";
 
 // Add queryParamsToFilters export
@@ -257,7 +257,7 @@ const FilterSection = (
       <button
         onClick={handleClick}
         onMouseLeave={handleMouseLeave}
-        className="flex w-full items-center justify-between px-3 py-3 text-lg mobileLg:text-xl font-light group"
+        className="flex items-center justify-between w-full py-1.5 mobileLg:py-3 text-lg mobileLg:text-xl font-light group"
       >
         <span
           className={`${
@@ -297,7 +297,7 @@ const FilterSection = (
           expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="px-3 pt-1.5 pb-3">
+        <div className="pt-1.5 pb-3 pl-0.5">
           {children}
         </div>
       </div>
@@ -492,9 +492,37 @@ const RadioOption = ({ value, isChecked, onChange }: {
   );
 };
 
-export const StampFilter = (
-  { searchparams, open, setOpen, onFiltersChange }: StampFilterProps,
-) => {
+export const StampFilter = ({
+  searchparams,
+  open,
+  setOpen,
+  onFiltersChange,
+}: {
+  searchparams: URLSearchParams;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onFiltersChange?: () => void;
+}) => {
+  useEffect(() => {
+    const handleKeyboardShortcut = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "f") {
+        e.preventDefault(); // Prevent default browser find
+        if (!open) {
+          setOpen(true);
+        } else {
+          setOpen(false);
+        }
+      }
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyboardShortcut);
+    return () =>
+      document.removeEventListener("keydown", handleKeyboardShortcut);
+  }, [open, setOpen]);
+
   // Use queryParamsToFilters to get initial filters directly
   const initialFilters = queryParamsToFilters(searchparams.toString());
 
@@ -505,6 +533,46 @@ export const StampFilter = (
     rarity: false,
     market: false,
   });
+
+  // Add tooltip states
+  const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
+  const [allowCloseTooltip, setAllowCloseTooltip] = useState(true);
+  const [closeTooltipText, setCloseTooltipText] = useState("CLOSE");
+  const closeTooltipTimeoutRef = useRef<number | null>(null);
+
+  // Cleanup effect for tooltip timeout
+  useEffect(() => {
+    return () => {
+      if (closeTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleCloseMouseEnter = () => {
+    if (allowCloseTooltip) {
+      setCloseTooltipText("CLOSE");
+
+      if (closeTooltipTimeoutRef.current) {
+        globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+      }
+
+      closeTooltipTimeoutRef.current = globalThis.setTimeout(() => {
+        setIsCloseTooltipVisible(true);
+      }, 1500);
+    }
+  };
+
+  const handleCloseMouseLeave = () => {
+    if (closeTooltipTimeoutRef.current) {
+      globalThis.clearTimeout(closeTooltipTimeoutRef.current);
+    }
+    setIsCloseTooltipVisible(false);
+    setAllowCloseTooltip(true);
+  };
+
+  const tooltipIcon =
+    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters((prev) => {
@@ -593,16 +661,28 @@ export const StampFilter = (
       className={`
         fixed top-0 left-0 z-40 
         w-full min-[420px]:w-64 mobileLg:w-72 h-screen 
-        p-3 backdrop-blur-md 
+        p-6 backdrop-blur-md 
         bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 
         overflow-y-auto transition-transform scrollbar-black
         ${open ? "translate-x-0" : "-translate-x-full"}
       `}
     >
       {/* Header */}
-      <div className="flex flex-col p-3 space-y-3 mb-3 mobileLg:mb-[18px]">
+      <div className="flex flex-col space-y-3 mb-3 mobileLg:mb-[18px]">
         <div className="flex justify-end">
-          <button onClick={handleClose}>
+          <button
+            onClick={() => setOpen(false)}
+            onMouseEnter={handleCloseMouseEnter}
+            onMouseLeave={handleCloseMouseLeave}
+            className="relative top-0 right-0 w-8 h-8 flex items-center justify-center"
+          >
+            <div
+              className={`${tooltipIcon} ${
+                isCloseTooltipVisible ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {closeTooltipText}
+            </div>
             <CrossIcon />
           </button>
         </div>
@@ -956,7 +1036,7 @@ export const StampFilter = (
         </FilterSection>
 
         {/* Clear Filters Button */}
-        <div className="p-3 !mt-6">
+        <div className="!mt-6">
           <button
             onClick={handleClearFilters}
             className={`w-full ${buttonGreyOutline}`}
