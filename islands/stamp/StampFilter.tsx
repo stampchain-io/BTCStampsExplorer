@@ -321,33 +321,49 @@ const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
       onMouseLeave={handleMouseLeave}
     >
       <input
-        className={`appearance-none relative float-left
-         h-4 w-4 mobileLg:h-[18px] mobileLg:w-[18px]  
-         rounded-sm border-2 border-solid cursor-pointer
-         transition-colors duration-300
-         ${
+        className={`
+          appearance-none relative
+          w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
+          border-2 rounded-sm cursor-pointer
+          transition-colors duration-300
+          ${
           checked
-            ? `bg-stamp-grey-light border-stamp-grey-light ${
+            ? `border-stamp-grey-light before:bg-stamp-grey-light ${
               canHover
-                ? "group-hover:bg-stamp-grey group-hover:border-stamp-grey"
+                ? "hover:before:bg-stamp-grey hover:border-stamp-grey"
                 : ""
             }`
             : "border-stamp-grey group-hover:border-stamp-grey-light"
-        }`}
+        }
+          before:content-['']
+          before:block
+          before:w-1.5 before:h-1.5 mobileLg:before:w-2 mobileLg:before:h-2
+          before:rounded-[1px]
+          before:absolute
+          before:top-1/2 before:left-1/2
+          before:-translate-x-1/2 before:-translate-y-1/2
+          before:bg-stamp-grey-light
+          before:scale-0
+          checked:before:scale-100
+          before:transition-transform
+          before:duration-100
+        `}
         type="checkbox"
         checked={checked}
         onChange={handleChange}
       />
       <span
-        className={`inline-block ml-[9px] text-sm mobileLg:text-base font-semibold 
-        transition-colors duration-300
-        ${
+        className={`
+          inline-block ml-[9px] text-sm mobileLg:text-base font-semibold 
+          transition-colors duration-300
+          ${
           checked
             ? `text-stamp-grey-light ${
               canHover ? "group-hover:text-stamp-grey" : ""
             }`
             : "text-stamp-grey group-hover:text-stamp-grey-light"
-        }`}
+        }
+        `}
       >
         {label}
       </span>
@@ -712,7 +728,27 @@ export const StampFilter = (
                       });
                       onFiltersChange?.();
                     }}
-                    className="text-purple-600 focus:ring-purple-500"
+                    className="
+                      appearance-none
+                      w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
+                      border-2 border-stamp-grey
+                      rounded-full
+                      checked:border-stamp-grey-light
+                      hover:border-stamp-grey-light
+                      relative
+                      before:content-['']
+                      before:block
+                      before:w-1.5 before:h-1.5 mobileLg:before:w-2 mobileLg:before:h-2
+                      before:rounded-full
+                      before:absolute
+                      before:top-1/2 before:left-1/2
+                      before:-translate-x-1/2 before:-translate-y-1/2
+                      before:bg-stamp-grey-light
+                      before:scale-0
+                      checked:before:scale-100
+                      before:transition-transform
+                      before:duration-200
+                    "
                   />
                   <label className="text-sm mobileLg:text-base text-stamp-grey">
                     SUB {value}
