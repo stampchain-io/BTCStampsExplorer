@@ -101,6 +101,13 @@ export interface BasicFeeProps
   outputTypes?: ScriptType[];
   utxoAncestors?: AncestorInfo[];
   bitname?: string;
+  receive?: number;
+  fromPage?: string;
+  price?: number;
+  edition?: number;
+  ticker?: string;
+  limit?: number;
+  supply?: number;
 }
 
 export interface ComplexFeeProps extends BaseFeeCalculatorProps {

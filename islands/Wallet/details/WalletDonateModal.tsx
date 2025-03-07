@@ -26,7 +26,7 @@ const WalletDonateModal = ({
 }: Props) => {
   const { wallet } = walletContext;
   const [quantity, setQuantity] = useState(1);
-  const [maxQuantity, setMaxQuantity] = useState(1);
+  // const [maxQuantity, setMaxQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isAmountTooltipVisible, setIsAmountTooltipVisible] = useState(false);
@@ -51,10 +51,10 @@ const WalletDonateModal = ({
 
   useEffect(() => {
     if (dispenser) {
-      const maxQty = Math.floor(
-        dispenser.give_remaining / dispenser.give_quantity,
-      );
-      setMaxQuantity(maxQty);
+      // const maxQty = Math.floor(
+      //   dispenser.give_remaining / dispenser.give_quantity,
+      // );
+      // setMaxQuantity(maxQty);
       setTotalPrice(quantity * dispenser.satoshirate);
     }
   }, [dispenser, quantity]);
@@ -184,7 +184,7 @@ const WalletDonateModal = ({
 
   const tooltipImage =
     "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
-  console.log("formState=====>", formState);
+
   return (
     <ModalLayout
       onClose={() => {
@@ -199,7 +199,7 @@ const WalletDonateModal = ({
       <div className="mb-6">
         <p className="text-3xl mobileLg:text-4xl font-bold text-stamp-grey-light text-center">
           {(totalPrice / 100000000).toFixed(8)}{" "}
-          <span className="font-extralight">BTC</span>
+          <span className="font-extralight">BTCc</span>
         </p>
       </div>
 
@@ -265,7 +265,6 @@ const WalletDonateModal = ({
       </div>
 
       <BasicFeeCalculator
-        isModal={true}
         fee={formState.fee}
         handleChangeFee={(newFee) => {
           logger.debug("ui", {
@@ -276,7 +275,9 @@ const WalletDonateModal = ({
           internalHandleChangeFee(newFee);
         }}
         type="buy"
+        fromPage="donate"
         amount={totalPrice}
+        receive={quantity * 1000}
         BTCPrice={formState.BTCPrice}
         isSubmitting={isSubmitting}
         onSubmit={() => {
@@ -295,7 +296,7 @@ const WalletDonateModal = ({
         }}
         buttonName="DONATE"
         className="pt-9 mobileLg:pt-12"
-        userAddress={wallet?.address}
+        userAddress={wallet?.address ?? ""}
         inputType="P2WPKH"
         outputTypes={["P2WPKH"]}
       />
