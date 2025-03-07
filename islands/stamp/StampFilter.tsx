@@ -5,32 +5,6 @@ import { Button } from "$components/shared/Button.tsx";
 export const queryParamsToFilters = (search: string) => {
   const params = new URLSearchParams(search);
   return {
-    buyNow: {
-      atomic: params.get("atomic") === "true",
-      dispenser: params.get("dispenser") === "true",
-    },
-    editions: {
-      oneOfOne: params.get("editions[oneOfOne]") === "true",
-      multiple: params.get("editions[multiple]") === "true",
-      locked: params.get("editions[locked]") === "true",
-      unlocked: params.get("editions[unlocked]") === "true",
-      divisible: params.get("editions[divisible]") === "true",
-    },
-    market: {
-      forSale: params.get("market[forSale]") === "true",
-      trendingSales: params.get("market[trendingSales]") === "true",
-      sold: params.get("market[sold]") === "true",
-      priceRange: {
-        min: params.get("market[priceRange][min]") || "",
-        max: params.get("market[priceRange][max]") || "",
-      },
-    },
-    rarity: {
-      stampRange: {
-        min: params.get("rarity[stampRange][min]") || "",
-        max: params.get("rarity[stampRange][max]") || "",
-      },
-    },
     fileType: {
       svg: params.get("fileType[svg]") === "true",
       pixel: params.get("fileType[pixel]") === "true",
@@ -45,8 +19,28 @@ export const queryParamsToFilters = (search: string) => {
       src721: params.get("fileType[src721]") === "true",
       src101: params.get("fileType[src101]") === "true",
     },
-    search: "",
-    sortOrder: params.get("sortOrder") || "",
+    editions: {
+      oneOfOne: params.get("editions[oneOfOne]") === "true",
+      multiple: params.get("editions[multiple]") === "true",
+      locked: params.get("editions[locked]") === "true",
+      unlocked: params.get("editions[unlocked]") === "true",
+      divisible: params.get("editions[divisible]") === "true",
+    },
+    rarity: {
+      stampRange: {
+        min: params.get("rarity[stampRange][min]") || "",
+        max: params.get("rarity[stampRange][max]") || "",
+      },
+    },
+    market: {
+      forSale: params.get("market[forSale]") === "true",
+      trendingSales: params.get("market[trendingSales]") === "true",
+      sold: params.get("market[sold]") === "true",
+      priceRange: {
+        min: params.get("market[priceRange][min]") || "",
+        max: params.get("market[priceRange][max]") || "",
+      },
+    },
   };
 };
 
@@ -54,16 +48,6 @@ export const queryParamsToFilters = (search: string) => {
 export const queryParamsToServicePayload = (search: string) => {
   const params = new URLSearchParams(search);
   return {
-    atomic: params.get("atomic") === "true",
-    dispenser: params.get("dispenser") === "true",
-    editionsOneOfOne: params.get("editions[oneOfOne]") === "true",
-    editionsMultiple: params.get("editions[multiple]") === "true",
-    editionsLocked: params.get("editions[locked]") === "true",
-    editionsUnlocked: params.get("editions[unlocked]") === "true",
-    editionsDivisible: params.get("editions[divisible]") === "true",
-    marketForSale: params.get("market[forSale]") === "true",
-    marketTrendingSales: params.get("market[trendingSales]") === "true",
-    marketSold: params.get("market[sold]") === "true",
     fileTypeSvg: params.get("fileType[svg]") === "true",
     fileTypeGif: params.get("fileType[gif]") === "true",
     fileTypeJpg: params.get("fileType[jpg]") === "true",
@@ -75,28 +59,27 @@ export const queryParamsToServicePayload = (search: string) => {
     fileTypeOlga: params.get("fileType[olga]") === "true",
     fileTypeSrc721: params.get("fileType[src721]") === "true",
     fileTypeSrc101: params.get("fileType[src101]") === "true",
-    stampRangePreset: params.get("stampRangePreset"),
-    stampRangeMin: params.get("stampRangeMin"),
-    stampRangeMax: params.get("stampRangeMax"),
-    marketPriceMin: params.get("market[priceRange][min]") || "",
-    marketPriceMax: params.get("market[priceRange][max]") || "",
+
+    editionsOneOfOne: params.get("editions[oneOfOne]") === "true",
+    editionsMultiple: params.get("editions[multiple]") === "true",
+    editionsLocked: params.get("editions[locked]") === "true",
+    editionsUnlocked: params.get("editions[unlocked]") === "true",
+    editionsDivisible: params.get("editions[divisible]") === "true",
+
     rarityStampRangeMin: params.get("rarity[stampRange][min]") || "",
     rarityStampRangeMax: params.get("rarity[stampRange][max]") || "",
+
+    marketForSale: params.get("market[forSale]") === "true",
+    marketTrendingSales: params.get("market[trendingSales]") === "true",
+    marketSold: params.get("market[sold]") === "true",
+    marketPriceMin: params.get("market[priceRange][min]") || "",
+    marketPriceMax: params.get("market[priceRange][max]") || "",
   };
 };
 
 // Add the allQueryKeysFromFilters export
 export const allQueryKeysFromFilters = [
-  "atomic",
-  "dispenser",
-  "editions[oneOfOne]",
-  "editions[multiple]",
-  "editions[locked]",
-  "editions[unlocked]",
-  "editions[divisible]",
-  "market[forSale]",
-  "market[trendingSales]",
-  "market[sold]",
+  // File Type
   "fileType[svg]",
   "fileType[gif]",
   "fileType[jpg]",
@@ -108,13 +91,24 @@ export const allQueryKeysFromFilters = [
   "fileType[olga]",
   "fileType[src721]",
   "fileType[src101]",
-  "stampRange[min]",
-  "stampRange[max]",
-  "market[priceRange][min]",
-  "market[priceRange][max]",
+
+  // Editions
+  "editions[oneOfOne]",
+  "editions[multiple]",
+  "editions[locked]",
+  "editions[unlocked]",
+  "editions[divisible]",
+
+  // Rarity
   "rarity[stampRange][min]",
   "rarity[stampRange][max]",
-  "sortOrder",
+
+  // Market
+  "market[forSale]",
+  "market[trendingSales]",
+  "market[sold]",
+  "market[priceRange][min]",
+  "market[priceRange][max]",
 ];
 
 const Badge = ({
@@ -177,49 +171,6 @@ const StampFilterButton = (
 };
 
 export { StampFilterButton };
-
-const defaultFilters = {
-  buyNow: {
-    atomic: false,
-    dispenser: false,
-  },
-  editions: {
-    oneOfOne: false,
-    multiple: false,
-    locked: false,
-    unlocked: false,
-    divisible: false,
-  },
-  market: {
-    forSale: false,
-    trendingSales: false,
-    sold: false,
-  },
-  fileType: {
-    svg: false,
-    pixel: false,
-    gif: false,
-    jpg: false,
-    png: false,
-    webp: false,
-    bmp: false,
-    jpeg: false,
-    html: false,
-    olga: false,
-    src721: false,
-    src101: false,
-  },
-  stampRangePreset: 10000,
-  stampRange: {
-    min: "",
-    max: "",
-  },
-  priceRange: {
-    min: "",
-    max: "",
-  },
-  sortOrder: "",
-};
 
 const ChevronIcon = () => (
   <svg
@@ -412,28 +363,10 @@ const RangeInput = ({ label, value, onChange }: RangeInputProps) => (
   </div>
 );
 
-function useDebouncedCallback(
-  callback: (value: string) => void,
-  delay: number,
-) {
-  const timeoutRef = useRef<number | null>(null);
-
-  return (str: string) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(() => {
-      callback(str);
-    }, delay);
-  };
-}
-
 // Add interface for expanded sections
 interface ExpandedSections {
-  buyNow: boolean;
-  editions: boolean;
   fileType: boolean;
+  editions: boolean;
   rarity: boolean;
   market: boolean;
 }
@@ -444,93 +377,16 @@ const buttonGreyOutline =
 export const StampFilter = (
   { searchparams, open, setOpen, onFiltersChange }: StampFilterProps,
 ) => {
-  // Parse URL parameters
-  const atomic = searchparams.get("buyNow[atomic]") === "true";
-  const dispenser = searchparams.get("buyNow[dispenser]") === "true";
-  const oneOfOne = searchparams.get("editions[oneOfOne]") === "true";
-  const multiple = searchparams.get("editions[multiple]") === "true";
-  const locked = searchparams.get("editions[locked]") === "true";
-  const unlocked = searchparams.get("editions[unlocked]") === "true";
-  const divisible = searchparams.get("editions[divisible]") === "true";
-  const forSale = searchparams.get("market[forSale]") === "true";
-  const trendingSales = searchparams.get("market[trendingSales]") === "true";
-  const sold = searchparams.get("market[sold]") === "true";
-  const stampPriceMin = searchparams.get("market[priceRange][min]");
-  const stampPriceMax = searchparams.get("market[priceRange][max]");
-  const stampRangeMin = searchparams.get("rarity[stampRange][min]");
-  const stampRangeMax = searchparams.get("rarity[stampRange][max]");
-  const fileTypeSvg = searchparams.get("fileType[svg]") === "true";
-  const fileTypeGif = searchparams.get("fileType[gif]") === "true";
-  const fileTypeJpg = searchparams.get("fileType[jpg]") === "true";
-  const fileTypePng = searchparams.get("fileType[png]") === "true";
-  const fileTypeWebp = searchparams.get("fileType[webp]") === "true";
-  const fileTypeBmp = searchparams.get("fileType[bmp]") === "true";
-  const fileTypeJpeg = searchparams.get("fileType[jpeg]") === "true";
-  const fileTypeHtml = searchparams.get("fileType[html]") === "true";
-  const fileTypeOlga = searchparams.get("fileType[olga]") === "true";
-  const fileTypeSrc721 = searchparams.get("fileType[src721]") === "true";
-  const fileTypeSrc101 = searchparams.get("fileType[src101]") === "true";
-
-  const initialFilters = {
-    buyNow: {
-      atomic: atomic || false,
-      dispenser: dispenser || false,
-    },
-    editions: {
-      oneOfOne: oneOfOne || false,
-      multiple: multiple || false,
-      locked: locked || false,
-      unlocked: unlocked || false,
-      divisible: divisible || false,
-    },
-    market: {
-      forSale: forSale || false,
-      trendingSales: trendingSales || false,
-      sold: sold || false,
-      priceRange: {
-        min: stampPriceMin || "",
-        max: stampPriceMax || "",
-      },
-    },
-    rarity: {
-      stampRange: {
-        min: stampRangeMin || "",
-        max: stampRangeMax || "",
-      },
-    },
-    fileType: {
-      svg: fileTypeSvg || false,
-      gif: fileTypeGif || false,
-      jpg: fileTypeJpg || false,
-      png: fileTypePng || false,
-      webp: fileTypeWebp || false,
-      bmp: fileTypeBmp || false,
-      jpeg: fileTypeJpeg || false,
-      html: fileTypeHtml || false,
-      olga: fileTypeOlga || false,
-      src721: fileTypeSrc721 || false,
-      src101: fileTypeSrc101 || false,
-    },
-    sortOrder: "",
-  };
+  // Use queryParamsToFilters to get initial filters directly
+  const initialFilters = queryParamsToFilters(searchparams.toString());
 
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState<ExpandedSections>({
-    buyNow: true,
-    editions: false,
     fileType: false,
+    editions: false,
     rarity: false,
     market: false,
   });
-
-  const debouncedOnFilterChange = useDebouncedCallback(
-    (queryString: string) => {
-      const url = new URL(globalThis.location.href);
-      url.search = queryString;
-      globalThis.history.pushState({}, "", url);
-    },
-    500,
-  );
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters((prev) => {
@@ -812,7 +668,7 @@ export const StampFilter = (
           </div>
         </FilterSection>
 
-        {/* Stamp Range Section */}
+        {/* Rarity Section */}
         <FilterSection
           title="RARITY"
           section="rarity"
@@ -966,59 +822,6 @@ export const StampFilter = (
             </div>
           </div>
         </FilterSection>
-
-        {/* Buy Now Section */}
-        {
-          /*
-        <FilterSection
-          title="BUY NOW"
-          section="buyNow"
-          expanded={expandedSections.buyNow}
-          toggle={() => toggleSection("buyNow")}
-        >
-          <div className="space-y-1.5">
-            <Checkbox
-              label="ATOMIC"
-              checked={filters.buyNow.atomic}
-              onChange={(checked) => {
-                handleFilterChange("buyNow", {
-                  ...filters.buyNow,
-                  atomic: checked
-                });
-              }}
-            />
-            <Checkbox
-              label="DISPENSER"
-              checked={filters.buyNow.dispenser}
-              onChange={(checked) => {
-                handleFilterChange("buyNow", {
-                  ...filters.buyNow,
-                  dispenser: checked
-                });
-              }}
-            />
-          </div>
-        </FilterSection>
-        */
-        }
-        {
-          /* Sort Order
-        <div className="p-3 border-t border-stamp-purple-highlight/20">
-          <label className="block text-sm font-medium mb-2 text-stamp-grey">
-            SORT BY
-          </label>
-          <select
-            value={filters.sortOrder}
-            onChange={(e) => handleFilterChange("sortOrder", e.target.value)}
-            className="w-full p-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-stamp-grey"
-          >
-            <option value="index_desc">STAMP INDEX: HIGH TO LOW</option>
-            <option value="index_asc">STAMP INDEX: LOW TO HIGH</option>
-            <option value="price_desc">PRICE: HIGH TO LOW</option>
-            <option value="price_asc">PRICE: LOW TO HIGH</option>
-          </select>
-        </div>*/
-        }
 
         {/* Clear Filters Button */}
         <div className="!mt-6">
