@@ -203,21 +203,11 @@ const defaultFilters = {
   sortOrder: "",
 };
 
-const ChevronUp = () => (
+const ChevronIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 32 32"
-    class="w-5 h-5 mobileLg:w-6 mobileLg:h-6 fill-stamp-grey group-hover:fill-stamp-grey-light"
-  >
-    <path d="M26.7075 20.7076C26.6146 20.8005 26.5043 20.8743 26.3829 20.9246C26.2615 20.9749 26.1314 21.0008 26 21.0008C25.8686 21.0008 25.7385 20.9749 25.6171 20.9246C25.4957 20.8743 25.3854 20.8005 25.2925 20.7076L16 11.4138L6.70751 20.7076C6.51987 20.8952 6.26537 21.0006 6.00001 21.0006C5.73464 21.0006 5.48015 20.8952 5.29251 20.7076C5.10487 20.5199 4.99945 20.2654 4.99945 20.0001C4.99945 19.7347 5.10487 19.4802 5.29251 19.2926L15.2925 9.29255C15.3854 9.19958 15.4957 9.12582 15.6171 9.07549C15.7385 9.02517 15.8686 8.99927 16 8.99927C16.1314 8.99927 16.2615 9.02517 16.3829 9.07549C16.5043 9.12582 16.6146 9.19958 16.7075 9.29255L26.7075 19.2926C26.8005 19.3854 26.8742 19.4957 26.9246 19.6171C26.9749 19.7385 27.0008 19.8686 27.0008 20.0001C27.0008 20.1315 26.9749 20.2616 26.9246 20.383C26.8742 20.5044 26.8005 20.6147 26.7075 20.7076Z" />
-  </svg>
-);
-
-const ChevronDown = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 32 32"
-    class="w-5 h-5 mobileLg:w-6 mobileLg:h-6 fill-stamp-grey-light group-hover:fill-stamp-grey"
+    class="w-5 h-5 mobileLg:w-6 mobileLg:h-6"
   >
     <path d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z" />
   </svg>
@@ -270,52 +260,123 @@ interface RangeInputProps {
 // Update component declarations with proper types
 const FilterSection = (
   { title, children, section, expanded, toggle }: FilterSectionProps,
-) => (
-  <div>
-    <button
-      onClick={toggle}
-      className="flex w-full items-center justify-between px-3 py-3 text-lg mobileLg:text-xl font-light group"
-    >
-      <span
-        className={`${
-          expanded
-            ? "text-stamp-grey group-hover:text-stamp-grey-light"
-            : "text-stamp-grey-light group-hover:text-stamp-grey"
-        } transition-colors`}
-      >
-        {title}
-      </span>
-      {expanded ? <ChevronUp /> : <ChevronDown />}
-    </button>
-    {expanded && (
-      <div className="px-3 pt-1.5">
-        {children}
-      </div>
-    )}
-  </div>
-);
+) => {
+  const [canHover, setCanHover] = useState(true);
 
-const Checkbox = ({ label, checked, onChange }: CheckboxProps) => (
-  <div className="flex items-center cursor-pointer py-1.5 group">
-    <input
-      className="appearance-none relative float-left
-       h-4 w-4 mobileLg:h-[18px] mobileLg:w-[18px]  
-       rounded border-2 border-solid border-stamp-grey group-hover:border-stamp-grey-light outline-none
-        before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] 
-        checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] 
-        hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:hover:before:opacity-[0.04] checked:hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)]"
-      type="checkbox"
-      checked={checked}
-      onChange={(e) => {
-        const isChecked = (e.target as HTMLInputElement).checked;
-        onChange(isChecked);
-      }}
-    />
-    <label className="inline-block ml-[9px] text-sm mobileLg:text-base text-stamp-grey group-hover:text-stamp-grey-light font-semibold cursor-pointer transition-colors">
-      {label}
+  const handleClick = () => {
+    setCanHover(false);
+    toggle();
+  };
+
+  const handleMouseLeave = () => {
+    setCanHover(true);
+  };
+
+  return (
+    <div>
+      <button
+        onClick={handleClick}
+        onMouseLeave={handleMouseLeave}
+        className="flex w-full items-center justify-between px-3 py-3 text-lg mobileLg:text-xl font-light group"
+      >
+        <span
+          className={`${
+            expanded
+              ? `text-stamp-grey ${
+                canHover ? "group-hover:text-stamp-grey-light" : ""
+              }`
+              : `text-stamp-grey-light ${
+                canHover ? "group-hover:text-stamp-grey" : ""
+              }`
+          } transition-colors duration-300`}
+        >
+          {title}
+        </span>
+        <div
+          className={`transform transition-all duration-300 ${
+            expanded ? "scale-y-[-1]" : ""
+          }`}
+        >
+          <div
+            className={`${
+              expanded
+                ? `fill-stamp-grey ${
+                  canHover ? "group-hover:fill-stamp-grey-light" : ""
+                }`
+                : `fill-stamp-grey-light ${
+                  canHover ? "group-hover:fill-stamp-grey" : ""
+                }`
+            } transition-colors duration-300`}
+          >
+            <ChevronIcon />
+          </div>
+        </div>
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="px-3 pt-1.5 pb-3">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
+  const [canHover, setCanHover] = useState(true);
+
+  const handleChange = (e: Event) => {
+    const isChecked = (e.target as HTMLInputElement).checked;
+    setCanHover(false);
+    onChange(isChecked);
+  };
+
+  const handleMouseLeave = () => {
+    setCanHover(true);
+  };
+
+  return (
+    <label
+      className="flex items-center cursor-pointer py-1.5 group select-none"
+      onMouseLeave={handleMouseLeave}
+    >
+      <input
+        className={`appearance-none relative float-left
+         h-4 w-4 mobileLg:h-[18px] mobileLg:w-[18px]  
+         rounded-sm border-2 border-solid cursor-pointer
+         transition-colors duration-300
+         ${
+          checked
+            ? `bg-stamp-grey-light border-stamp-grey-light ${
+              canHover
+                ? "group-hover:bg-stamp-grey group-hover:border-stamp-grey"
+                : ""
+            }`
+            : "border-stamp-grey group-hover:border-stamp-grey-light"
+        }`}
+        type="checkbox"
+        checked={checked}
+        onChange={handleChange}
+      />
+      <span
+        className={`inline-block ml-[9px] text-sm mobileLg:text-base font-semibold 
+        transition-colors duration-300
+        ${
+          checked
+            ? `text-stamp-grey-light ${
+              canHover ? "group-hover:text-stamp-grey" : ""
+            }`
+            : "text-stamp-grey group-hover:text-stamp-grey-light"
+        }`}
+      >
+        {label}
+      </span>
     </label>
-  </div>
-);
+  );
+};
 
 const RangeInput = ({ label, value, onChange }: RangeInputProps) => (
   <div className="flex flex-col space-y-1">
