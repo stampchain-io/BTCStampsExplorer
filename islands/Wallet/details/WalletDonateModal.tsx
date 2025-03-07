@@ -168,14 +168,6 @@ const WalletDonateModal = ({
     };
   }, []);
 
-  // Update total price when quantity or dispenser changes
-  useEffect(() => {
-    if (dispenser) {
-      const price = quantity * dispenser.satoshirate;
-      setTotalPrice(price);
-    }
-  }, [quantity, dispenser]);
-
   // Helper functions to convert between slider position and amount value
   const amountToSliderPos = (amount: number) =>
     amount <= 20
@@ -192,7 +184,7 @@ const WalletDonateModal = ({
 
   const tooltipImage =
     "fixed bg-[#000000BF] px-2 py-1 mb-1.5 rounded-sm text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap pointer-events-none z-50 transition-opacity duration-300";
-
+  console.log("formState=====>", formState);
   return (
     <ModalLayout
       onClose={() => {
