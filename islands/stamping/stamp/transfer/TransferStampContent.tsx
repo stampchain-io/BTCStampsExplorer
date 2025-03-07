@@ -32,6 +32,7 @@ export function TransferStampContent({ trxType }: Props) {
       totalPages: 0,
     },
   });
+  const [tosAgreed, setTosAgreed] = useState<boolean>(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
 
   const {
@@ -249,7 +250,8 @@ export function TransferStampContent({ trxType }: Props) {
           userAddress={wallet?.address}
           inputType="P2WPKH"
           outputTypes={["P2WPKH"]}
-          tosAgreed={false}
+          tosAgreed={tosAgreed}
+          onTosChange={setTosAgreed}
         />
       </div>
 
