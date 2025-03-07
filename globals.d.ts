@@ -22,6 +22,7 @@ export type STAMP_SUFFIX_FILTERS =
   | "jpg"
   | "png"
   | "webp"
+  | "avif"
   | "bmp"
   | "jpeg"
   | "svg"
