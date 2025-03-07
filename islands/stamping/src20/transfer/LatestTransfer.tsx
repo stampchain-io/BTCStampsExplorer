@@ -50,7 +50,12 @@ export default function LatestTransfer(): JSX.Element {
         {transactions.map((stamp, index) => (
           <StampCard
             key={index}
-            stamp={stamp}
+            stamp={stamp.stamp_url
+              ? stamp
+              : {
+                ...stamp,
+                stamp_url: `https://stampchain.io/stamps/${stamp.tx_hash}.svg`,
+              }}
             isRecentSale={false}
             showDetails={false}
           />
