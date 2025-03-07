@@ -26,21 +26,20 @@ export const StampHeader = (
 
     Array.from(searchparams.entries()).forEach(([key, value]) => {
       if (value === "true" || (value !== "false" && value !== "")) {
-        // Handle price range parameters
-        if (key.startsWith("priceRange[")) {
-          if (!processedRanges.has("priceRange")) {
+        // Handle market price range parameters
+        if (key.startsWith("market[priceRange]")) {
+          if (!processedRanges.has("marketPriceRange")) {
             count++;
-            processedRanges.add("priceRange");
+            processedRanges.add("marketPriceRange");
           }
-        } // Handle stamp range parameters
-        else if (key.startsWith("stampRange[") || key === "stampRangePreset") {
-          if (!processedRanges.has("stampRange")) {
+        } // Handle rarity stamp range parameters
+        else if (key.startsWith("rarity[stampRange]")) {
+          if (!processedRanges.has("rarityStampRange")) {
             count++;
-            processedRanges.add("stampRange");
+            processedRanges.add("rarityStampRange");
           }
         } // Count each individual checkbox separately
         else if (key.includes("[")) {
-          // Extract the parameter name and value
           const paramMatch = key.match(/^([^[]+)\[([^\]]+)\]$/);
           if (paramMatch && value === "true") {
             count++;

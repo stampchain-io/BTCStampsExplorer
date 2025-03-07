@@ -9,35 +9,41 @@ export const queryParamsToFilters = (search: string) => {
       atomic: params.get("atomic") === "true",
       dispenser: params.get("dispenser") === "true",
     },
-    status: {
-      locked: params.get("locked") === "true",
-      oneOfOne: params.get("oneOfOne") === "true",
+    editions: {
+      oneOfOne: params.get("editions[oneOfOne]") === "true",
+      multiple: params.get("editions[multiple]") === "true",
+      locked: params.get("editions[locked]") === "true",
+      unlocked: params.get("editions[unlocked]") === "true",
+      divisible: params.get("editions[divisible]") === "true",
     },
-    forSale: params.get("forSale") === "true",
-    trendingSales: params.get("trendingSales") === "true",
-    sold: params.get("sold") === "true",
+    market: {
+      forSale: params.get("market[forSale]") === "true",
+      trendingSales: params.get("market[trendingSales]") === "true",
+      sold: params.get("market[sold]") === "true",
+      priceRange: {
+        min: params.get("market[priceRange][min]") || "",
+        max: params.get("market[priceRange][max]") || "",
+      },
+    },
+    rarity: {
+      stampRange: {
+        min: params.get("rarity[stampRange][min]") || "",
+        max: params.get("rarity[stampRange][max]") || "",
+      },
+    },
     fileType: {
-      svg: params.get("fileTypeSvg") === "true",
-      pixel: params.get("fileTypePixel") === "true",
-      gif: params.get("fileTypeGif") === "true",
-      jpg: params.get("fileTypeJpg") === "true",
-      png: params.get("fileTypePng") === "true",
-      webp: params.get("fileTypeWebp") === "true",
-      bmp: params.get("fileTypeBmp") === "true",
-      jpeg: params.get("fileTypeJpeg") === "true",
-      html: params.get("fileTypeHtml") === "true",
-      olga: params.get("fileTypeOlga") === "true",
-      src721: params.get("fileTypeSrc721") === "true",
-      src101: params.get("fileTypeSrc101") === "true",
-    },
-    stampRangePreset: parseInt(params.get("stampRangePreset") || "10000"),
-    stampRange: {
-      min: params.get("stampRangeMin") || "",
-      max: params.get("stampRangeMax") || "",
-    },
-    priceRange: {
-      min: params.get("stampPriceMin") || "",
-      max: params.get("stampPriceMax") || "",
+      svg: params.get("fileType[svg]") === "true",
+      pixel: params.get("fileType[pixel]") === "true",
+      gif: params.get("fileType[gif]") === "true",
+      jpg: params.get("fileType[jpg]") === "true",
+      png: params.get("fileType[png]") === "true",
+      webp: params.get("fileType[webp]") === "true",
+      bmp: params.get("fileType[bmp]") === "true",
+      jpeg: params.get("fileType[jpeg]") === "true",
+      html: params.get("fileType[html]") === "true",
+      olga: params.get("fileType[olga]") === "true",
+      src721: params.get("fileType[src721]") === "true",
+      src101: params.get("fileType[src101]") === "true",
     },
     search: "",
     sortOrder: params.get("sortOrder") || "",
@@ -50,28 +56,32 @@ export const queryParamsToServicePayload = (search: string) => {
   return {
     atomic: params.get("atomic") === "true",
     dispenser: params.get("dispenser") === "true",
-    locked: params.get("locked") === "true",
-    oneOfOne: params.get("oneOfOne") === "true",
-    forSale: params.get("forSale") === "true",
-    trendingSales: params.get("trendingSales") === "true",
-    sold: params.get("sold") === "true",
-    fileTypeSvg: params.get("fileTypeSvg") === "true",
-    fileTypePixel: params.get("fileTypePixel") === "true",
-    fileTypeGif: params.get("fileTypeGif") === "true",
-    fileTypeJpg: params.get("fileTypeJpg") === "true",
-    fileTypePng: params.get("fileTypePng") === "true",
-    fileTypeWebp: params.get("fileTypeWebp") === "true",
-    fileTypeBmp: params.get("fileTypeBmp") === "true",
-    fileTypeJpeg: params.get("fileTypeJpeg") === "true",
-    fileTypeHtml: params.get("fileTypeHtml") === "true",
-    fileTypeOlga: params.get("fileTypeOlga") === "true",
-    fileTypeSrc721: params.get("fileTypeSrc721") === "true",
-    fileTypeSrc101: params.get("fileTypeSrc101") === "true",
+    editionsOneOfOne: params.get("editions[oneOfOne]") === "true",
+    editionsMultiple: params.get("editions[multiple]") === "true",
+    editionsLocked: params.get("editions[locked]") === "true",
+    editionsUnlocked: params.get("editions[unlocked]") === "true",
+    editionsDivisible: params.get("editions[divisible]") === "true",
+    marketForSale: params.get("market[forSale]") === "true",
+    marketTrendingSales: params.get("market[trendingSales]") === "true",
+    marketSold: params.get("market[sold]") === "true",
+    fileTypeSvg: params.get("fileType[svg]") === "true",
+    fileTypeGif: params.get("fileType[gif]") === "true",
+    fileTypeJpg: params.get("fileType[jpg]") === "true",
+    fileTypePng: params.get("fileType[png]") === "true",
+    fileTypeWebp: params.get("fileType[webp]") === "true",
+    fileTypeBmp: params.get("fileType[bmp]") === "true",
+    fileTypeJpeg: params.get("fileType[jpeg]") === "true",
+    fileTypeHtml: params.get("fileType[html]") === "true",
+    fileTypeOlga: params.get("fileType[olga]") === "true",
+    fileTypeSrc721: params.get("fileType[src721]") === "true",
+    fileTypeSrc101: params.get("fileType[src101]") === "true",
     stampRangePreset: params.get("stampRangePreset"),
     stampRangeMin: params.get("stampRangeMin"),
     stampRangeMax: params.get("stampRangeMax"),
-    stampPriceMin: params.get("stampPriceMin"),
-    stampPriceMax: params.get("stampPriceMax"),
+    marketPriceMin: params.get("market[priceRange][min]") || "",
+    marketPriceMax: params.get("market[priceRange][max]") || "",
+    rarityStampRangeMin: params.get("rarity[stampRange][min]") || "",
+    rarityStampRangeMax: params.get("rarity[stampRange][max]") || "",
   };
 };
 
@@ -79,28 +89,31 @@ export const queryParamsToServicePayload = (search: string) => {
 export const allQueryKeysFromFilters = [
   "atomic",
   "dispenser",
-  "locked",
-  "oneOfOne",
-  "forSale",
-  "trendingSales",
-  "sold",
-  "fileTypeSvg",
-  "fileTypePixel",
-  "fileTypeGif",
-  "fileTypeJpg",
-  "fileTypePng",
-  "fileTypeWebp",
-  "fileTypeBmp",
-  "fileTypeJpeg",
-  "fileTypeHtml",
-  "fileTypeOlga",
-  "fileTypeSrc721",
-  "fileTypeSrc101",
-  "stampRangePreset",
-  "stampRangeMin",
-  "stampRangeMax",
-  "stampPriceMin",
-  "stampPriceMax",
+  "editions[oneOfOne]",
+  "editions[multiple]",
+  "editions[locked]",
+  "editions[unlocked]",
+  "editions[divisible]",
+  "market[forSale]",
+  "market[trendingSales]",
+  "market[sold]",
+  "fileType[svg]",
+  "fileType[gif]",
+  "fileType[jpg]",
+  "fileType[png]",
+  "fileType[webp]",
+  "fileType[bmp]",
+  "fileType[jpeg]",
+  "fileType[html]",
+  "fileType[olga]",
+  "fileType[src721]",
+  "fileType[src101]",
+  "stampRange[min]",
+  "stampRange[max]",
+  "market[priceRange][min]",
+  "market[priceRange][max]",
+  "rarity[stampRange][min]",
+  "rarity[stampRange][max]",
   "sortOrder",
 ];
 
@@ -170,13 +183,18 @@ const defaultFilters = {
     atomic: false,
     dispenser: false,
   },
-  status: {
-    locked: false,
+  editions: {
     oneOfOne: false,
+    multiple: false,
+    locked: false,
+    unlocked: false,
+    divisible: false,
   },
-  forSale: false,
-  trendingSales: false,
-  sold: false,
+  market: {
+    forSale: false,
+    trendingSales: false,
+    sold: false,
+  },
   fileType: {
     svg: false,
     pixel: false,
@@ -416,8 +434,8 @@ interface ExpandedSections {
   buyNow: boolean;
   editions: boolean;
   fileType: boolean;
-  stampRange: boolean;
-  priceRange: boolean;
+  rarity: boolean;
+  market: boolean;
 }
 
 const buttonGreyOutline =
@@ -434,14 +452,13 @@ export const StampFilter = (
   const locked = searchparams.get("editions[locked]") === "true";
   const unlocked = searchparams.get("editions[unlocked]") === "true";
   const divisible = searchparams.get("editions[divisible]") === "true";
-  const forSale = searchparams.get("forSale") === "true";
-  const trendingSales = searchparams.get("trendingSales") === "true";
-  const sold = searchparams.get("sold") === "true";
-  const stampRangePreset = searchparams.get("stampRangePreset");
-  const stampRangeMin = searchparams.get("stampRange[min]");
-  const stampRangeMax = searchparams.get("stampRange[max]");
-  const stampPriceMin = searchparams.get("priceRange[min]");
-  const stampPriceMax = searchparams.get("priceRange[max]");
+  const forSale = searchparams.get("market[forSale]") === "true";
+  const trendingSales = searchparams.get("market[trendingSales]") === "true";
+  const sold = searchparams.get("market[sold]") === "true";
+  const stampPriceMin = searchparams.get("market[priceRange][min]");
+  const stampPriceMax = searchparams.get("market[priceRange][max]");
+  const stampRangeMin = searchparams.get("rarity[stampRange][min]");
+  const stampRangeMax = searchparams.get("rarity[stampRange][max]");
   const fileTypeSvg = searchparams.get("fileType[svg]") === "true";
   const fileTypeGif = searchparams.get("fileType[gif]") === "true";
   const fileTypeJpg = searchparams.get("fileType[jpg]") === "true";
@@ -466,9 +483,21 @@ export const StampFilter = (
       unlocked: unlocked || false,
       divisible: divisible || false,
     },
-    forSale: forSale || false,
-    trendingSales: trendingSales || false,
-    sold: sold || false,
+    market: {
+      forSale: forSale || false,
+      trendingSales: trendingSales || false,
+      sold: sold || false,
+      priceRange: {
+        min: stampPriceMin || "",
+        max: stampPriceMax || "",
+      },
+    },
+    rarity: {
+      stampRange: {
+        min: stampRangeMin || "",
+        max: stampRangeMax || "",
+      },
+    },
     fileType: {
       svg: fileTypeSvg || false,
       gif: fileTypeGif || false,
@@ -482,15 +511,6 @@ export const StampFilter = (
       src721: fileTypeSrc721 || false,
       src101: fileTypeSrc101 || false,
     },
-    stampRangePreset: stampRangePreset || "",
-    stampRange: {
-      min: stampRangeMin || "",
-      max: stampRangeMax || "",
-    },
-    priceRange: {
-      min: stampPriceMin || "",
-      max: stampPriceMax || "",
-    },
     sortOrder: "",
   };
 
@@ -499,8 +519,8 @@ export const StampFilter = (
     buyNow: true,
     editions: false,
     fileType: false,
-    stampRange: false,
-    priceRange: false,
+    rarity: false,
+    market: false,
   });
 
   const debouncedOnFilterChange = useDebouncedCallback(
@@ -532,19 +552,23 @@ export const StampFilter = (
         // Set new params
         Object.entries(value).forEach(([subKey, subValue]) => {
           if (subValue) {
-            // For buyNow and status, set the subKey directly
-            if (key === "buyNow" || key === "status") {
-              url.searchParams.set(subKey, String(subValue));
+            // Handle nested objects like market.priceRange
+            if (typeof subValue === "object") {
+              Object.entries(subValue).forEach(([nestedKey, nestedValue]) => {
+                if (nestedValue) {
+                  url.searchParams.set(
+                    `${key}[${subKey}][${nestedKey}]`,
+                    String(nestedValue),
+                  );
+                } else {
+                  url.searchParams.delete(`${key}[${subKey}][${nestedKey}]`);
+                }
+              });
             } else {
               url.searchParams.set(`${key}[${subKey}]`, String(subValue));
             }
           } else {
-            // Remove parameter if value is false
-            if (key === "buyNow" || key === "status") {
-              url.searchParams.delete(subKey);
-            } else {
-              url.searchParams.delete(`${key}[${subKey}]`);
-            }
+            url.searchParams.delete(`${key}[${subKey}]`);
           }
         });
       } else {
@@ -790,10 +814,10 @@ export const StampFilter = (
 
         {/* Stamp Range Section */}
         <FilterSection
-          title="STAMP RANGE"
-          section="stampRange"
-          expanded={expandedSections.stampRange}
-          toggle={() => toggleSection("stampRange")}
+          title="RARITY"
+          section="rarity"
+          expanded={expandedSections.rarity}
+          toggle={() => toggleSection("rarity")}
         >
           <div className="space-y-1.5 mobileLg:space-y-3">
             {/* Preset Ranges */}
@@ -802,11 +826,18 @@ export const StampFilter = (
                 <div key={value} className="flex items-center space-x-2">
                   <input
                     type="radio"
-                    name="stampRange"
+                    name="rarityStampRange"
                     value={value}
-                    checked={filters.stampRangePreset === value}
+                    checked={filters.rarity.stampRange.max === String(value)}
                     onChange={() => {
-                      handleFilterChange("stampRangePreset", value);
+                      handleFilterChange("rarity", {
+                        ...filters.rarity,
+                        stampRange: {
+                          min: "",
+                          max: String(value),
+                        },
+                      });
+                      onFiltersChange?.();
                     }}
                     className="text-purple-600 focus:ring-purple-500"
                   />
@@ -825,32 +856,30 @@ export const StampFilter = (
               <div className="space-y-1.5">
                 <RangeInput
                   label="Min Stamp Number"
-                  value={filters.stampRange.min}
+                  value={filters.rarity.stampRange.min}
                   onChange={(value) => {
-                    handleFilterChange("stampRange", {
-                      ...filters.stampRange,
-                      min: value,
-                      preset: "",
+                    handleFilterChange("rarity", {
+                      ...filters.rarity,
+                      stampRange: {
+                        ...filters.rarity.stampRange,
+                        min: value,
+                      },
                     });
-                    // Only trigger once for the entire stamp range section
-                    if (!filters.stampRange.max) {
-                      onFiltersChange?.();
-                    }
+                    onFiltersChange?.();
                   }}
                 />
                 <RangeInput
                   label="Max Stamp Number"
-                  value={filters.stampRange.max}
+                  value={filters.rarity.stampRange.max}
                   onChange={(value) => {
-                    handleFilterChange("stampRange", {
-                      ...filters.stampRange,
-                      max: value,
-                      preset: "",
+                    handleFilterChange("rarity", {
+                      ...filters.rarity,
+                      stampRange: {
+                        ...filters.rarity.stampRange,
+                        max: value,
+                      },
                     });
-                    // Only trigger once for the entire stamp range section
-                    if (!filters.stampRange.min) {
-                      onFiltersChange?.();
-                    }
+                    onFiltersChange?.();
                   }}
                 />
               </div>
@@ -866,61 +895,75 @@ export const StampFilter = (
           toggle={() => toggleSection("market")}
         >
           <div className="space-y-1.5">
+            {/* Market Checkboxes */}
             <Checkbox
               label="FOR SALE"
-              checked={filters.forSale}
-              onChange={(checked) => handleFilterChange("forSale", checked)}
+              checked={filters.market.forSale}
+              onChange={(checked) =>
+                handleFilterChange("market", {
+                  ...filters.market,
+                  forSale: checked,
+                })}
             />
             <Checkbox
               label="TRENDING SALES"
-              checked={filters.trendingSales}
+              checked={filters.market.trendingSales}
               onChange={(checked) =>
-                handleFilterChange("trendingSales", checked)}
+                handleFilterChange("market", {
+                  ...filters.market,
+                  trendingSales: checked,
+                })}
             />
             <Checkbox
               label="SOLD"
-              checked={filters.sold}
-              onChange={(checked) => handleFilterChange("sold", checked)}
+              checked={filters.market.sold}
+              onChange={(checked) =>
+                handleFilterChange("market", {
+                  ...filters.market,
+                  sold: checked,
+                })}
             />
-          </div>
-        </FilterSection>
 
-        {/* Price Range Section */}
-        <FilterSection
-          title="PRICE"
-          section="priceRange"
-          expanded={expandedSections.priceRange}
-          toggle={() => toggleSection("priceRange")}
-        >
-          <div className="space-y-1.5">
-            <RangeInput
-              label="MIN"
-              value={filters.priceRange.min}
-              onChange={(value: string) => {
-                handleFilterChange("priceRange", {
-                  ...filters.priceRange,
-                  min: value,
-                });
-                // Only trigger once for the entire price range section
-                if (!filters.priceRange.max) {
-                  onFiltersChange?.();
-                }
-              }}
-            />
-            <RangeInput
-              label="MAX"
-              value={filters.priceRange.max}
-              onChange={(value: string) => {
-                handleFilterChange("priceRange", {
-                  ...filters.priceRange,
-                  max: value,
-                });
-                // Only trigger once for the entire price range section
-                if (!filters.priceRange.min) {
-                  onFiltersChange?.();
-                }
-              }}
-            />
+            {/* Price Range with separator */}
+            <div className="pt-2 border-t border-stamp-purple-highlight/20">
+              <div className="flex items-center gap-2 mb-2 text-stamp-grey-light">
+                <span className="text-sm font-medium">Price Range</span>
+              </div>
+              <div className="space-y-1.5">
+                <RangeInput
+                  label="Min Price"
+                  value={filters.market.priceRange.min}
+                  onChange={(value: string) => {
+                    handleFilterChange("market", {
+                      ...filters.market,
+                      priceRange: {
+                        ...filters.market.priceRange,
+                        min: value,
+                      },
+                    });
+                    if (!filters.market.priceRange.max) {
+                      onFiltersChange?.();
+                    }
+                  }}
+                />
+                <RangeInput
+                  label="Max Price"
+                  value={filters.market.priceRange.max}
+                  onChange={(value: string) => {
+                    handleFilterChange("market", {
+                      ...filters.market,
+                      priceRange: {
+                        ...filters.market.priceRange,
+                        max: value,
+                      },
+                    });
+                    if (!filters.market.priceRange.min) {
+                      onFiltersChange?.();
+                    }
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </FilterSection>
 
