@@ -136,6 +136,8 @@ const Badge = ({
         bg-stamp-purple 
         group-hover:bg-stamp-purple-bright
         rounded-full
+        transition-opacity duration-300 ease-in-out
+        ${text === "0" ? "opacity-0" : "opacity-100"}
       `}
     >
       {text}
@@ -232,7 +234,7 @@ interface RangeInputProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  placeholder?: "MIN" | "MAX";
+  placeholder: string;
 }
 
 // Update component declarations with proper types
@@ -380,10 +382,23 @@ const RangeInput = (
     <input
       type="number"
       value={value}
+      onKeyDown={(e) => {
+        // Prevent e, +, -, E, comma, and diaeresis
+        if (["e", "E", "+", "-", ",", "¨"].includes(e.key)) {
+          e.preventDefault();
+        }
+      }}
       onChange={(e) => {
-        onChange(e.target.value);
+        const value = e.target.value;
+        // Only allow digits
+        if (/^\d*$/.test(value)) {
+          onChange(value);
+        }
       }}
       min="0"
+      step="1"
+      inputMode="numeric"
+      pattern="[0-9]*"
       className="h-10 mobileLg:h-11 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
       placeholder={placeholder}
     />
@@ -577,7 +592,7 @@ export const StampFilter = (
     <div
       className={`
         fixed top-0 left-0 z-40 
-        w-full mobileMd:w-64 mobileLg:w-72 h-screen 
+        w-full min-[420px]:w-64 mobileLg:w-72 h-screen 
         p-3 backdrop-blur-md 
         bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 
         overflow-y-auto transition-transform scrollbar-black
@@ -607,7 +622,7 @@ export const StampFilter = (
           expanded={expandedSections.fileType}
           toggle={() => toggleSection("fileType")}
         >
-          <div className="space-y-1.5">
+          <div className="space-y-[3px] mobileLg:space-y-1.5">
             <Checkbox
               label="JPG/JPEG"
               checked={filters.fileType.jpg}
@@ -726,7 +741,7 @@ export const StampFilter = (
           expanded={expandedSections.editions}
           toggle={() => toggleSection("editions")}
         >
-          <div className="space-y-1.5">
+          <div className="space-y-[3px] mobileLg:space-y-1.5">
             <Checkbox
               label="1/1"
               checked={filters.editions.oneOfOne}
@@ -787,9 +802,9 @@ export const StampFilter = (
           expanded={expandedSections.rarity}
           toggle={() => toggleSection("rarity")}
         >
-          <div className="space-y-1.5 mobileLg:space-y-3">
-            {/* Preset Ranges */}
-            <div className="space-y-1.5">
+          {/* Preset Ranges */}
+          <div className="space-y-3">
+            <div className="space-y-[3px] mobileLg:space-y-1.5">
               {[100, 1000, 5000, 10000].map((value) => {
                 const isChecked =
                   filters.rarity.stampRange.max === String(value);
@@ -824,39 +839,41 @@ export const StampFilter = (
               })}
             </div>
 
-            {/* Custom Range Inputs */}
-            <div className="mt-3 space-y-2">
-              <div className="flex items-center gap-2 mb-2 ">
+            {/* Custom Stamp Range Inputs */}
+            <div>
+              <div className="flex items-center mb-[3px]">
                 <p className="text-sm text-stamp-grey font-medium">
                   STAMP RANGE
                 </p>
               </div>
-              <RangeInput
-                label=""
-                value={filters.rarity.stampRange.min}
-                onChange={(value) =>
-                  handleFilterChange("rarity", {
-                    ...filters.rarity,
-                    stampRange: {
-                      ...filters.rarity.stampRange,
-                      min: value,
-                    },
-                  })}
-                placeholder="MIN"
-              />
-              <RangeInput
-                label=""
-                value={filters.rarity.stampRange.max}
-                onChange={(value) =>
-                  handleFilterChange("rarity", {
-                    ...filters.rarity,
-                    stampRange: {
-                      ...filters.rarity.stampRange,
-                      max: value,
-                    },
-                  })}
-                placeholder="MAX"
-              />
+              <div className="flex gap-6">
+                <RangeInput
+                  label=""
+                  value={filters.rarity.stampRange.min}
+                  onChange={(value) =>
+                    handleFilterChange("rarity", {
+                      ...filters.rarity,
+                      stampRange: {
+                        ...filters.rarity.stampRange,
+                        min: value,
+                      },
+                    })}
+                  placeholder="0"
+                />
+                <RangeInput
+                  label=""
+                  value={filters.rarity.stampRange.max}
+                  onChange={(value) =>
+                    handleFilterChange("rarity", {
+                      ...filters.rarity,
+                      stampRange: {
+                        ...filters.rarity.stampRange,
+                        max: value,
+                      },
+                    })}
+                  placeholder="∞"
+                />
+              </div>
             </div>
           </div>
         </FilterSection>
@@ -868,44 +885,45 @@ export const StampFilter = (
           expanded={expandedSections.market}
           toggle={() => toggleSection("market")}
         >
-          <div className="space-y-1.5">
-            {/* Market Checkboxes */}
-            <Checkbox
-              label="FOR SALE"
-              checked={filters.market.forSale}
-              onChange={(checked) =>
-                handleFilterChange("market", {
-                  ...filters.market,
-                  forSale: checked,
-                })}
-            />
-            <Checkbox
-              label="TRENDING SALES"
-              checked={filters.market.trendingSales}
-              onChange={(checked) =>
-                handleFilterChange("market", {
-                  ...filters.market,
-                  trendingSales: checked,
-                })}
-            />
-            <Checkbox
-              label="SOLD"
-              checked={filters.market.sold}
-              onChange={(checked) =>
-                handleFilterChange("market", {
-                  ...filters.market,
-                  sold: checked,
-                })}
-            />
-
-            {/* Price Range with separator */}
-            <div className="pt-2">
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-stamp-grey">
+          <div className="space-y-3">
+            <div className="space-y-[3px] mobileLg:space-y-1.5">
+              {/* Market Checkboxes */}
+              <Checkbox
+                label="FOR SALE"
+                checked={filters.market.forSale}
+                onChange={(checked) =>
+                  handleFilterChange("market", {
+                    ...filters.market,
+                    forSale: checked,
+                  })}
+              />
+              <Checkbox
+                label="TRENDING SALES"
+                checked={filters.market.trendingSales}
+                onChange={(checked) =>
+                  handleFilterChange("market", {
+                    ...filters.market,
+                    trendingSales: checked,
+                  })}
+              />
+              <Checkbox
+                label="SOLD"
+                checked={filters.market.sold}
+                onChange={(checked) =>
+                  handleFilterChange("market", {
+                    ...filters.market,
+                    sold: checked,
+                  })}
+              />
+            </div>
+            {/* Price Range Inputs */}
+            <div>
+              <div className="flex items-center mb-[3px]">
+                <p className="text-sm text-stamp-grey font-medium">
                   PRICE RANGE
                 </p>
               </div>
-              <div className="space-y-1.5">
+              <div className="flex gap-6 placeholder:text-xs">
                 <RangeInput
                   label=""
                   value={filters.market.priceRange.min}
@@ -917,7 +935,7 @@ export const StampFilter = (
                         min: value,
                       },
                     })}
-                  placeholder="MIN"
+                  placeholder="0.000 BTC"
                 />
                 <RangeInput
                   label=""
@@ -930,7 +948,7 @@ export const StampFilter = (
                         max: value,
                       },
                     })}
-                  placeholder="MAX"
+                  placeholder="∞ BTC"
                 />
               </div>
             </div>
@@ -938,10 +956,10 @@ export const StampFilter = (
         </FilterSection>
 
         {/* Clear Filters Button */}
-        <div className="!mt-6">
+        <div className="p-3 !mt-6">
           <button
             onClick={handleClearFilters}
-            className={buttonGreyOutline}
+            className={`w-full ${buttonGreyOutline}`}
           >
             CLEAR FILTERS
           </button>
