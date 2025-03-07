@@ -6,41 +6,41 @@ export const queryParamsToFilters = (search: string) => {
   const params = new URLSearchParams(search);
   return {
     fileType: {
-      jpg: params.get("fileType[jpg]") === "true" ||
-        params.get("fileType[jpeg]") === "true",
-      png: params.get("fileType[png]") === "true",
-      gif: params.get("fileType[gif]") === "true",
-      webp: params.get("fileType[webp]") === "true",
-      avif: params.get("fileType[avif]") === "true",
-      bmp: params.get("fileType[bmp]") === "true",
-      mp3: params.get("fileType[mp3]") === "true" ||
-        params.get("fileType[mpeg]") === "true",
-      svg: params.get("fileType[svg]") === "true",
-      html: params.get("fileType[html]") === "true",
-      src721: params.get("fileType[src721]") === "true",
-      legacy: params.get("fileType[legacy]") === "true",
-      olga: params.get("fileType[olga]") === "true",
+      jpg: params.get("fileType-jpg") === "true" ||
+        params.get("fileType-jpeg") === "true",
+      png: params.get("fileType-png") === "true",
+      gif: params.get("fileType-gif") === "true",
+      webp: params.get("fileType-webp") === "true",
+      avif: params.get("fileType-avif") === "true",
+      bmp: params.get("fileType-bmp") === "true",
+      mp3: params.get("fileType-mp3") === "true" ||
+        params.get("fileType-mpeg") === "true",
+      svg: params.get("fileType-svg") === "true",
+      html: params.get("fileType-html") === "true",
+      src721: params.get("fileType-src721") === "true",
+      legacy: params.get("fileType-legacy") === "true",
+      olga: params.get("fileType-olga") === "true",
     },
     editions: {
-      oneOfOne: params.get("editions[oneOfOne]") === "true",
-      multiple: params.get("editions[multiple]") === "true",
-      locked: params.get("editions[locked]") === "true",
-      unlocked: params.get("editions[unlocked]") === "true",
-      divisible: params.get("editions[divisible]") === "true",
+      oneOfOne: params.get("editions-oneOfOne") === "true",
+      multiple: params.get("editions-multiple") === "true",
+      locked: params.get("editions-locked") === "true",
+      unlocked: params.get("editions-unlocked") === "true",
+      divisible: params.get("editions-divisible") === "true",
     },
     rarity: {
       stampRange: {
-        min: params.get("rarity[stampRange][min]") || "",
-        max: params.get("rarity[stampRange][max]") || "",
+        min: params.get("rarity-stampRange-min") || "",
+        max: params.get("rarity-stampRange-max") || "",
       },
     },
     market: {
-      forSale: params.get("market[forSale]") === "true",
-      trendingSales: params.get("market[trendingSales]") === "true",
-      sold: params.get("market[sold]") === "true",
+      forSale: params.get("market-forSale") === "true",
+      trendingSales: params.get("market-trendingSales") === "true",
+      sold: params.get("market-sold") === "true",
       priceRange: {
-        min: params.get("market[priceRange][min]") || "",
-        max: params.get("market[priceRange][max]") || "",
+        min: params.get("market-priceRange-min") || "",
+        max: params.get("market-priceRange-max") || "",
       },
     },
   };
@@ -50,73 +50,73 @@ export const queryParamsToFilters = (search: string) => {
 export const queryParamsToServicePayload = (search: string) => {
   const params = new URLSearchParams(search);
   return {
-    fileTypeJpg: params.get("fileType[jpg]") === "true" ||
-      params.get("fileType[jpeg]") === "true",
-    fileTypePng: params.get("fileType[png]") === "true",
-    fileTypeGif: params.get("fileType[gif]") === "true",
-    fileTypeWebp: params.get("fileType[webp]") === "true",
-    fileTypeAvif: params.get("fileType[avif]") === "true",
-    fileTypeBmp: params.get("fileType[bmp]") === "true",
-    fileTypeMp3: params.get("fileType[mp3]") === "true" ||
-      params.get("fileType[mpeg]") === "true",
-    fileTypeSvg: params.get("fileType[svg]") === "true",
-    fileTypeHtml: params.get("fileType[html]") === "true",
-    fileTypeSrc721: params.get("fileType[src721]") === "true",
-    fileTypeLegacy: params.get("fileType[legacy]") === "true",
-    fileTypeOlga: params.get("fileType[olga]") === "true",
+    fileTypeJpg: params.get("fileType-jpg") === "true" ||
+      params.get("fileType-jpeg") === "true",
+    fileTypePng: params.get("fileType-png") === "true",
+    fileTypeGif: params.get("fileType-gif") === "true",
+    fileTypeWebp: params.get("fileType-webp") === "true",
+    fileTypeAvif: params.get("fileType-avif") === "true",
+    fileTypeBmp: params.get("fileType-bmp") === "true",
+    fileTypeMp3: params.get("fileType-mp3") === "true" ||
+      params.get("fileType-mpeg") === "true",
+    fileTypeSvg: params.get("fileType-svg") === "true",
+    fileTypeHtml: params.get("fileType-html") === "true",
+    fileTypeSrc721: params.get("fileType-src721") === "true",
+    fileTypeLegacy: params.get("fileType-legacy") === "true",
+    fileTypeOlga: params.get("fileType-olga") === "true",
 
-    editionsOneOfOne: params.get("editions[oneOfOne]") === "true",
-    editionsMultiple: params.get("editions[multiple]") === "true",
-    editionsLocked: params.get("editions[locked]") === "true",
-    editionsUnlocked: params.get("editions[unlocked]") === "true",
-    editionsDivisible: params.get("editions[divisible]") === "true",
+    editionsOneOfOne: params.get("editions-oneOfOne") === "true",
+    editionsMultiple: params.get("editions-multiple") === "true",
+    editionsLocked: params.get("editions-locked") === "true",
+    editionsUnlocked: params.get("editions-unlocked") === "true",
+    editionsDivisible: params.get("editions-divisible") === "true",
 
-    rarityStampRangeMin: params.get("rarity[stampRange][min]") || "",
-    rarityStampRangeMax: params.get("rarity[stampRange][max]") || "",
+    rarityStampRangeMin: params.get("rarity-stampRange-min") || "",
+    rarityStampRangeMax: params.get("rarity-stampRange-max") || "",
 
-    marketForSale: params.get("market[forSale]") === "true",
-    marketTrendingSales: params.get("market[trendingSales]") === "true",
-    marketSold: params.get("market[sold]") === "true",
-    marketPriceMin: params.get("market[priceRange][min]") || "",
-    marketPriceMax: params.get("market[priceRange][max]") || "",
+    marketForSale: params.get("market-forSale") === "true",
+    marketTrendingSales: params.get("market-trendingSales") === "true",
+    marketSold: params.get("market-sold") === "true",
+    marketPriceMin: params.get("market-priceRange-min") || "",
+    marketPriceMax: params.get("market-priceRange-max") || "",
   };
 };
 
 // Add the allQueryKeysFromFilters export
 export const allQueryKeysFromFilters = [
   // File Type
-  "fileType[jpg]",
-  "fileType[jpeg]",
-  "fileType[png]",
-  "fileType[gif]",
-  "fileType[webp]",
-  "fileType[avif]",
-  "fileType[bmp]",
-  "fileType[mp3]",
-  "fileType[mpeg]",
-  "fileType[svg]",
-  "fileType[html]",
-  "fileType[src721]",
-  "fileType[legacy]",
-  "fileType[olga]",
+  "fileType-jpg",
+  "fileType-jpeg",
+  "fileType-png",
+  "fileType-gif",
+  "fileType-webp",
+  "fileType-avif",
+  "fileType-bmp",
+  "fileType-mp3",
+  "fileType-mpeg",
+  "fileType-svg",
+  "fileType-html",
+  "fileType-src721",
+  "fileType-legacy",
+  "fileType-olga",
 
   // Editions
-  "editions[oneOfOne]",
-  "editions[multiple]",
-  "editions[locked]",
-  "editions[unlocked]",
-  "editions[divisible]",
+  "editions-oneOfOne",
+  "editions-multiple",
+  "editions-locked",
+  "editions-unlocked",
+  "editions-divisible",
 
   // Rarity
-  "rarity[stampRange][min]",
-  "rarity[stampRange][max]",
+  "rarity-stampRange-min",
+  "rarity-stampRange-max",
 
   // Market
-  "market[forSale]",
-  "market[trendingSales]",
-  "market[sold]",
-  "market[priceRange][min]",
-  "market[priceRange][max]",
+  "market-forSale",
+  "market-trendingSales",
+  "market-sold",
+  "market-priceRange-min",
+  "market-priceRange-max",
 ];
 
 const Badge = ({
@@ -410,7 +410,7 @@ export const StampFilter = (
       if (typeof value === "object") {
         // Clear existing params for this key
         Array.from(url.searchParams.keys())
-          .filter((param) => param.startsWith(`${key}[`))
+          .filter((param) => param.startsWith(`${key}-`))
           .forEach((param) => url.searchParams.delete(param));
 
         // Set new params
@@ -421,18 +421,18 @@ export const StampFilter = (
               Object.entries(subValue).forEach(([nestedKey, nestedValue]) => {
                 if (nestedValue) {
                   url.searchParams.set(
-                    `${key}[${subKey}][${nestedKey}]`,
+                    `${key}-${subKey}-${nestedKey}`,
                     String(nestedValue),
                   );
                 } else {
-                  url.searchParams.delete(`${key}[${subKey}][${nestedKey}]`);
+                  url.searchParams.delete(`${key}-${subKey}-${nestedKey}`);
                 }
               });
             } else {
-              url.searchParams.set(`${key}[${subKey}]`, String(subValue));
+              url.searchParams.set(`${key}-${subKey}`, String(subValue));
             }
           } else {
-            url.searchParams.delete(`${key}[${subKey}]`);
+            url.searchParams.delete(`${key}-${subKey}`);
           }
         });
       } else {
@@ -485,7 +485,7 @@ export const StampFilter = (
         w-full mobileMd:w-64 mobileLg:w-72 h-screen 
         p-3 backdrop-blur-md 
         bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 
-        overflow-y-auto transition-transform
+        overflow-y-auto transition-transform scrollbar-black
         ${open ? "translate-x-0" : "-translate-x-full"}
       `}
     >
