@@ -454,6 +454,10 @@ export function DeployContent(
       <div className={`${backgroundContainer} w-full`}>
         <BasicFeeCalculator
           fee={formState.fee}
+          ticker={formState.token}
+          limit={formState.lim}
+          supply={formState.max}
+          fromPage="src20_deploy"
           handleChangeFee={handleChangeFee}
           type="src20"
           fileType="application/json"
