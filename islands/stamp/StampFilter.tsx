@@ -6,18 +6,20 @@ export const queryParamsToFilters = (search: string) => {
   const params = new URLSearchParams(search);
   return {
     fileType: {
-      svg: params.get("fileType[svg]") === "true",
-      pixel: params.get("fileType[pixel]") === "true",
-      gif: params.get("fileType[gif]") === "true",
-      jpg: params.get("fileType[jpg]") === "true",
+      jpg: params.get("fileType[jpg]") === "true" ||
+        params.get("fileType[jpeg]") === "true",
       png: params.get("fileType[png]") === "true",
+      gif: params.get("fileType[gif]") === "true",
       webp: params.get("fileType[webp]") === "true",
+      avif: params.get("fileType[avif]") === "true",
       bmp: params.get("fileType[bmp]") === "true",
-      jpeg: params.get("fileType[jpeg]") === "true",
+      mp3: params.get("fileType[mp3]") === "true" ||
+        params.get("fileType[mpeg]") === "true",
+      svg: params.get("fileType[svg]") === "true",
       html: params.get("fileType[html]") === "true",
-      olga: params.get("fileType[olga]") === "true",
       src721: params.get("fileType[src721]") === "true",
-      src101: params.get("fileType[src101]") === "true",
+      legacy: params.get("fileType[legacy]") === "true",
+      olga: params.get("fileType[olga]") === "true",
     },
     editions: {
       oneOfOne: params.get("editions[oneOfOne]") === "true",
@@ -48,17 +50,20 @@ export const queryParamsToFilters = (search: string) => {
 export const queryParamsToServicePayload = (search: string) => {
   const params = new URLSearchParams(search);
   return {
-    fileTypeSvg: params.get("fileType[svg]") === "true",
-    fileTypeGif: params.get("fileType[gif]") === "true",
-    fileTypeJpg: params.get("fileType[jpg]") === "true",
+    fileTypeJpg: params.get("fileType[jpg]") === "true" ||
+      params.get("fileType[jpeg]") === "true",
     fileTypePng: params.get("fileType[png]") === "true",
+    fileTypeGif: params.get("fileType[gif]") === "true",
     fileTypeWebp: params.get("fileType[webp]") === "true",
+    fileTypeAvif: params.get("fileType[avif]") === "true",
     fileTypeBmp: params.get("fileType[bmp]") === "true",
-    fileTypeJpeg: params.get("fileType[jpeg]") === "true",
+    fileTypeMp3: params.get("fileType[mp3]") === "true" ||
+      params.get("fileType[mpeg]") === "true",
+    fileTypeSvg: params.get("fileType[svg]") === "true",
     fileTypeHtml: params.get("fileType[html]") === "true",
-    fileTypeOlga: params.get("fileType[olga]") === "true",
     fileTypeSrc721: params.get("fileType[src721]") === "true",
-    fileTypeSrc101: params.get("fileType[src101]") === "true",
+    fileTypeLegacy: params.get("fileType[legacy]") === "true",
+    fileTypeOlga: params.get("fileType[olga]") === "true",
 
     editionsOneOfOne: params.get("editions[oneOfOne]") === "true",
     editionsMultiple: params.get("editions[multiple]") === "true",
@@ -80,17 +85,20 @@ export const queryParamsToServicePayload = (search: string) => {
 // Add the allQueryKeysFromFilters export
 export const allQueryKeysFromFilters = [
   // File Type
-  "fileType[svg]",
-  "fileType[gif]",
   "fileType[jpg]",
-  "fileType[png]",
-  "fileType[webp]",
-  "fileType[bmp]",
   "fileType[jpeg]",
+  "fileType[png]",
+  "fileType[gif]",
+  "fileType[webp]",
+  "fileType[avif]",
+  "fileType[bmp]",
+  "fileType[mp3]",
+  "fileType[mpeg]",
+  "fileType[svg]",
   "fileType[html]",
-  "fileType[olga]",
   "fileType[src721]",
-  "fileType[src101]",
+  "fileType[legacy]",
+  "fileType[olga]",
 
   // Editions
   "editions[oneOfOne]",
@@ -506,16 +514,7 @@ export const StampFilter = (
         >
           <div className="space-y-1.5">
             <Checkbox
-              label="JPEG"
-              checked={filters.fileType.jpeg}
-              onChange={(checked) =>
-                handleFilterChange("fileType", {
-                  ...filters.fileType,
-                  jpeg: checked,
-                })}
-            />
-            <Checkbox
-              label="JPG"
+              label="JPG/JPEG"
               checked={filters.fileType.jpg}
               onChange={(checked) =>
                 handleFilterChange("fileType", {
@@ -551,6 +550,33 @@ export const StampFilter = (
                 })}
             />
             <Checkbox
+              label="AVIF"
+              checked={filters.fileType.avif}
+              onChange={(checked) =>
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  avif: checked,
+                })}
+            />
+            <Checkbox
+              label="BMP"
+              checked={filters.fileType.bmp}
+              onChange={(checked) =>
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  bmp: checked,
+                })}
+            />
+            <Checkbox
+              label="MP3/MPEG"
+              checked={filters.fileType.mp3}
+              onChange={(checked) =>
+                handleFilterChange("fileType", {
+                  ...filters.fileType,
+                  mp3: checked,
+                })}
+            />
+            <Checkbox
               label="SVG"
               checked={filters.fileType.svg}
               onChange={(checked) =>
@@ -569,15 +595,6 @@ export const StampFilter = (
                 })}
             />
             <Checkbox
-              label="BMP"
-              checked={filters.fileType.bmp}
-              onChange={(checked) =>
-                handleFilterChange("fileType", {
-                  ...filters.fileType,
-                  bmp: checked,
-                })}
-            />
-            <Checkbox
               label="SRC-721"
               checked={filters.fileType.src721}
               onChange={(checked) =>
@@ -587,12 +604,12 @@ export const StampFilter = (
                 })}
             />
             <Checkbox
-              label="SRC-101"
-              checked={filters.fileType.src101}
+              label="LEGACY"
+              checked={filters.fileType.legacy}
               onChange={(checked) =>
                 handleFilterChange("fileType", {
                   ...filters.fileType,
-                  src101: checked,
+                  legacy: checked,
                 })}
             />
             <Checkbox
