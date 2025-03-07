@@ -72,7 +72,7 @@ export function HomeStampPreview({
       layout: "grid",
       showDetails: false,
       showEdition: true,
-      viewAllLink: "/stamp/posh",
+      viewAllLink: "/collection/overview/posh",
       gridClass: `
         grid w-full gap-3 mobileMd:gap-6
         grid-cols-2 mobileLg:grid-cols-3 tablet:grid-cols-4 desktop:grid-cols-5
