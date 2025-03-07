@@ -11,8 +11,6 @@ export function ComplexFeeCalculator({
   fileSize,
   issuance,
   serviceFee,
-  _userAddress,
-  _outputTypes,
   utxoAncestors = [],
   feeDetails: providedFeeDetails,
   BTCPrice,
@@ -21,7 +19,7 @@ export function ComplexFeeCalculator({
   buttonName,
   tosAgreed,
   onTosChange,
-  bitname,
+  bitname = "",
   ...baseProps
 }: ComplexFeeProps) {
   const feeDetails = providedFeeDetails?.hasExactFees
@@ -93,8 +91,8 @@ export function ComplexFeeCalculator({
       isSubmitting={isSubmitting}
       onSubmit={onSubmit}
       buttonName={buttonName}
-      tosAgreed={tosAgreed}
-      onTosChange={onTosChange}
+      tosAgreed={tosAgreed ?? false}
+      onTosChange={onTosChange || (() => {})}
       feeDetails={feeDetails}
       bitname={bitname}
     />

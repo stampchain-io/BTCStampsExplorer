@@ -11,12 +11,14 @@ export default function RecentDeploy(): JSX.Element {
   useEffect(() => {
     const fetchRecentTransactions = async () => {
       try {
-        const response = await fetch("/api/internal/src20/recentTransactions");
+        const response = await fetch(
+          "/api/internal/src20/trending?type=deploy&limit=5&page=1&transactionCount=1000",
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch recent transactions");
         }
         const data = await response.json();
-        setTransactions(data.deploy || []);
+        setTransactions(data.data || []);
       } catch (error) {
         console.error("Error fetching recent deploys:", error);
       } finally {
@@ -50,7 +52,10 @@ export default function RecentDeploy(): JSX.Element {
         {transactions.map((stamp, index) => (
           <StampCard
             key={index}
-            stamp={stamp}
+            stamp={stamp.stamp_url ? stamp : {
+              ...stamp,
+              stamp_url: `https://stampchain.io/stamps/${stamp.tx_hash}.svg`,
+            }}
             isRecentSale={false}
             showDetails={false}
           />
