@@ -232,6 +232,7 @@ interface RangeInputProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  placeholder?: "MIN" | "MAX";
 }
 
 // Update component declarations with proper types
@@ -371,7 +372,9 @@ const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
   );
 };
 
-const RangeInput = ({ label, value, onChange }: RangeInputProps) => (
+const RangeInput = (
+  { label, value, onChange, placeholder }: RangeInputProps,
+) => (
   <div className="flex flex-col space-y-1">
     <label className="text-xs text-stamp-table-text">{label}</label>
     <input
@@ -381,8 +384,8 @@ const RangeInput = ({ label, value, onChange }: RangeInputProps) => (
         onChange(e.target.value);
       }}
       min="0"
-      className="w-full px-2 py-1 border border-purple-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-      placeholder="ENTER VALUE"
+      className="h-10 mobileLg:h-11 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
+      placeholder={placeholder}
     />
   </div>
 );
@@ -397,6 +400,82 @@ interface ExpandedSections {
 
 const buttonGreyOutline =
   "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+
+const RadioOption = ({ value, isChecked, onChange }: {
+  value: number;
+  isChecked: boolean;
+  onChange: () => void;
+}) => {
+  const [canHover, setCanHover] = useState(true);
+
+  const handleChange = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    setCanHover(false);
+    onChange();
+  };
+
+  const handleMouseLeave = () => {
+    setCanHover(true);
+  };
+
+  return (
+    <label
+      className="flex items-center cursor-pointer py-1.5 group select-none w-full"
+      onMouseLeave={handleMouseLeave}
+    >
+      <input
+        type="checkbox"
+        checked={isChecked}
+        onChange={handleChange}
+        className={`
+          appearance-none
+          w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
+          border-2 border-stamp-grey
+          rounded-sm
+          cursor-pointer
+          relative
+          transition-colors duration-300
+          ${
+          isChecked
+            ? `border-stamp-grey-light before:bg-stamp-grey-light ${
+              canHover
+                ? "hover:before:bg-stamp-grey hover:border-stamp-grey"
+                : ""
+            }`
+            : "border-stamp-grey group-hover:border-stamp-grey-light"
+        }
+          before:content-['']
+          before:block
+          before:w-1.5 before:h-1.5 mobileLg:before:w-2 mobileLg:before:h-2
+          before:rounded-[1px]
+          before:absolute
+          before:top-1/2 before:left-1/2
+          before:-translate-x-1/2 before:-translate-y-1/2
+          before:bg-stamp-grey-light
+          before:scale-0
+          checked:before:scale-100
+          before:transition-all
+          before:duration-100
+        `}
+      />
+      <span
+        className={`
+          inline-block ml-[9px] text-sm mobileLg:text-base font-semibold 
+          transition-colors duration-300
+          ${
+          isChecked
+            ? `text-stamp-grey-light ${
+              canHover ? "group-hover:text-stamp-grey" : ""
+            }`
+            : "text-stamp-grey group-hover:text-stamp-grey-light"
+        }
+        `}
+      >
+        SUB {value}
+      </span>
+    </label>
+  );
+};
 
 export const StampFilter = (
   { searchparams, open, setOpen, onFiltersChange }: StampFilterProps,
@@ -711,87 +790,73 @@ export const StampFilter = (
           <div className="space-y-1.5 mobileLg:space-y-3">
             {/* Preset Ranges */}
             <div className="space-y-1.5">
-              {[100, 1000, 5000, 10000].map((value) => (
-                <div key={value} className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="rarityStampRange"
+              {[100, 1000, 5000, 10000].map((value) => {
+                const isChecked =
+                  filters.rarity.stampRange.max === String(value);
+                return (
+                  <RadioOption
+                    key={value}
                     value={value}
-                    checked={filters.rarity.stampRange.max === String(value)}
+                    isChecked={isChecked}
                     onChange={() => {
-                      handleFilterChange("rarity", {
-                        ...filters.rarity,
-                        stampRange: {
-                          min: "",
-                          max: String(value),
-                        },
-                      });
-                      onFiltersChange?.();
+                      if (isChecked) {
+                        // Uncheck if already selected
+                        handleFilterChange("rarity", {
+                          ...filters.rarity,
+                          stampRange: {
+                            min: filters.rarity.stampRange.min,
+                            max: "",
+                          },
+                        });
+                      } else {
+                        // Check this one and uncheck others
+                        handleFilterChange("rarity", {
+                          ...filters.rarity,
+                          stampRange: {
+                            min: filters.rarity.stampRange.min,
+                            max: String(value),
+                          },
+                        });
+                      }
                     }}
-                    className="
-                      appearance-none
-                      w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
-                      border-2 border-stamp-grey
-                      rounded-full
-                      checked:border-stamp-grey-light
-                      hover:border-stamp-grey-light
-                      relative
-                      before:content-['']
-                      before:block
-                      before:w-1.5 before:h-1.5 mobileLg:before:w-2 mobileLg:before:h-2
-                      before:rounded-full
-                      before:absolute
-                      before:top-1/2 before:left-1/2
-                      before:-translate-x-1/2 before:-translate-y-1/2
-                      before:bg-stamp-grey-light
-                      before:scale-0
-                      checked:before:scale-100
-                      before:transition-transform
-                      before:duration-200
-                    "
                   />
-                  <label className="text-sm mobileLg:text-base text-stamp-grey">
-                    SUB {value}
-                  </label>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* Custom Range */}
-            <div className="pt-2 border-t border-stamp-purple-highlight/20">
-              <div className="flex items-center gap-2 mb-2 text-stamp-grey-light">
-                <span className="text-sm font-medium">Custom Range</span>
+            {/* Custom Range Inputs */}
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center gap-2 mb-2 ">
+                <p className="text-sm text-stamp-grey font-medium">
+                  STAMP RANGE
+                </p>
               </div>
-              <div className="space-y-1.5">
-                <RangeInput
-                  label="Min Stamp Number"
-                  value={filters.rarity.stampRange.min}
-                  onChange={(value) => {
-                    handleFilterChange("rarity", {
-                      ...filters.rarity,
-                      stampRange: {
-                        ...filters.rarity.stampRange,
-                        min: value,
-                      },
-                    });
-                    onFiltersChange?.();
-                  }}
-                />
-                <RangeInput
-                  label="Max Stamp Number"
-                  value={filters.rarity.stampRange.max}
-                  onChange={(value) => {
-                    handleFilterChange("rarity", {
-                      ...filters.rarity,
-                      stampRange: {
-                        ...filters.rarity.stampRange,
-                        max: value,
-                      },
-                    });
-                    onFiltersChange?.();
-                  }}
-                />
-              </div>
+              <RangeInput
+                label=""
+                value={filters.rarity.stampRange.min}
+                onChange={(value) =>
+                  handleFilterChange("rarity", {
+                    ...filters.rarity,
+                    stampRange: {
+                      ...filters.rarity.stampRange,
+                      min: value,
+                    },
+                  })}
+                placeholder="MIN"
+              />
+              <RangeInput
+                label=""
+                value={filters.rarity.stampRange.max}
+                onChange={(value) =>
+                  handleFilterChange("rarity", {
+                    ...filters.rarity,
+                    stampRange: {
+                      ...filters.rarity.stampRange,
+                      max: value,
+                    },
+                  })}
+                placeholder="MAX"
+              />
             </div>
           </div>
         </FilterSection>
@@ -834,42 +899,38 @@ export const StampFilter = (
             />
 
             {/* Price Range with separator */}
-            <div className="pt-2 border-t border-stamp-purple-highlight/20">
-              <div className="flex items-center gap-2 mb-2 text-stamp-grey-light">
-                <span className="text-sm font-medium">Price Range</span>
+            <div className="pt-2">
+              <div className="flex items-center gap-2 mb-2">
+                <p className="text-sm font-medium text-stamp-grey">
+                  PRICE RANGE
+                </p>
               </div>
               <div className="space-y-1.5">
                 <RangeInput
-                  label="Min Price"
+                  label=""
                   value={filters.market.priceRange.min}
-                  onChange={(value: string) => {
+                  onChange={(value) =>
                     handleFilterChange("market", {
                       ...filters.market,
                       priceRange: {
                         ...filters.market.priceRange,
                         min: value,
                       },
-                    });
-                    if (!filters.market.priceRange.max) {
-                      onFiltersChange?.();
-                    }
-                  }}
+                    })}
+                  placeholder="MIN"
                 />
                 <RangeInput
-                  label="Max Price"
+                  label=""
                   value={filters.market.priceRange.max}
-                  onChange={(value: string) => {
+                  onChange={(value) =>
                     handleFilterChange("market", {
                       ...filters.market,
                       priceRange: {
                         ...filters.market.priceRange,
                         max: value,
                       },
-                    });
-                    if (!filters.market.priceRange.min) {
-                      onFiltersChange?.();
-                    }
-                  }}
+                    })}
+                  placeholder="MAX"
                 />
               </div>
             </div>
