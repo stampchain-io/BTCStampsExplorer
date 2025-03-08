@@ -1,7 +1,7 @@
 import {
   filtersToQueryParams,
   queryParamsToFilters,
-} from "./StampFilterPane.tsx";
+} from "../../islands/filterpane/StampFilterPane.tsx";
 import { expect } from "jsr:@std/expect";
 
 Deno.test("filterToQueryParams - does not encode false values", () => {

@@ -92,7 +92,7 @@ const Checkbox = ({ label, checked, onChange }) => (
   // </label>
   <div className="flex items-center cursor-pointer py-1">
     <input
-      className="relative float-left h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent dark:border-neutral-600 dark:checked:border-primary dark:checked:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
+      className="relative float-left h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent dark:border-neutral-600 dark:checked:border-primary dark:checked:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
       type="checkbox"
       checked={checked}
       value={checked}
@@ -326,60 +326,137 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
 //   };
 // }
 
-export const allQueryKeysFromFilters = Object.keys(defaultFilters).reduce(
-  (acc, key) => {
-    if (typeof defaultFilters[key] === "object") {
-      Object.keys(defaultFilters[key]).forEach((subKey) => {
-        acc.push(`${key}[${subKey}]`);
-      });
-    } else {
-      acc.push(key);
-    }
-    return acc;
-  },
-  [],
-);
+export const allQueryKeysFromFilters = [
+  "buyNow[atomic]",
+  "buyNow[dispenser]",
+  "status[locked]",
+  "status[oneOfOne]",
+  "forSale",
+  "trendingSales",
+  "sold",
+  "stampRangePreset",
+  "stampRange[min]",
+  "stampRange[max]",
+  "priceRange[min]",
+  "priceRange[max]",
+  // Add any other filter keys used in the application
+  // File type filters
+  "fileType[svg]",
+  "fileType[pixel]",
+  "fileType[gif]",
+  "fileType[jpg]",
+  "fileType[png]",
+  "fileType[webp]",
+  "fileType[bmp]",
+  "fileType[jpeg]",
+  "fileType[html]",
+  "fileType[olga]",
+  "fileType[src721]",
+  "fileType[src101]",
+];
 
-export function queryParamsToFilters(query: string) {
-  const params = new URLSearchParams(query);
-  const filtersPartial = {};
-  Object.keys(defaultFilters).forEach((category) => {
-    if (category in defaultFilters) {
-      const filter = defaultFilters[category];
-      if (typeof filter === "object") {
-        Object.keys(filter).forEach((key) => {
-          const value = params.get(`${category}[${key}]`);
-          if (value !== null) {
-            if (!filtersPartial[category]) {
-              filtersPartial[category] = { ...defaultFilters[category] };
-            }
-            const coercedValue =
-              typeof defaultFilters[category][key] === "boolean"
-                ? JSON.parse(value)
-                : typeof defaultFilters[category][key] === "number"
-                ? parseInt(value)
-                : value;
-            filtersPartial[category][key] = coercedValue;
-          }
-        });
-      } else {
-        const value = params.get(category);
-        if (value !== null) {
-          const coercedValue = typeof defaultFilters[category] === "boolean"
-            ? JSON.parse(value)
-            : typeof defaultFilters[category] === "number"
-            ? parseInt(value)
-            : value;
-          filtersPartial[category] = coercedValue;
-        }
-      }
+export function queryParamsToFilters(search: string) {
+  const queryParams = new URLSearchParams(search);
+  const filters = { ...defaultFilters };
+
+  // Parse search param
+  const searchParam = queryParams.get("search");
+  if (searchParam) {
+    filters.search = searchParam;
+  }
+
+  // Parse sort order
+  const sortOrderParam = queryParams.get("sortOrder");
+  if (sortOrderParam) {
+    filters.sortOrder = sortOrderParam;
+  }
+
+  // Parse boolean params
+  if (queryParams.get("forSale") === "true") {
+    filters.forSale = true;
+  }
+  if (queryParams.get("trendingSales") === "true") {
+    filters.trendingSales = true;
+  }
+  if (queryParams.get("sold") === "true") {
+    filters.sold = true;
+  }
+
+  // Parse buyNow params
+  if (queryParams.get("buyNow[atomic]") === "true") {
+    filters.buyNow.atomic = true;
+  }
+  if (queryParams.get("buyNow[dispenser]") === "true") {
+    filters.buyNow.dispenser = true;
+  }
+
+  // Parse status params
+  if (queryParams.get("status[locked]") === "true") {
+    filters.status.locked = true;
+  }
+  if (queryParams.get("status[oneOfOne]") === "true") {
+    filters.status.oneOfOne = true;
+  }
+
+  // Parse fileType params
+  Object.keys(filters.fileType).forEach((key) => {
+    if (queryParams.get(`fileType[${key}]`) === "true") {
+      filters.fileType[key] = true;
     }
   });
-  return { ...defaultFilters, ...filtersPartial };
+
+  // Parse stampRangePreset
+  const stampRangePresetParam = queryParams.get("stampRangePreset");
+  if (stampRangePresetParam) {
+    filters.stampRangePreset = parseInt(stampRangePresetParam, 10);
+  }
+
+  // Parse stampRange params
+  const stampRangeMinParam = queryParams.get("stampRange[min]");
+  if (stampRangeMinParam) {
+    filters.stampRange.min = stampRangeMinParam;
+  }
+  const stampRangeMaxParam = queryParams.get("stampRange[max]");
+  if (stampRangeMaxParam) {
+    filters.stampRange.max = stampRangeMaxParam;
+  }
+
+  // Parse priceRange params
+  const priceRangeMinParam = queryParams.get("priceRange[min]");
+  if (priceRangeMinParam) {
+    filters.priceRange.min = priceRangeMinParam;
+  }
+  const priceRangeMaxParam = queryParams.get("priceRange[max]");
+  if (priceRangeMaxParam) {
+    filters.priceRange.max = priceRangeMaxParam;
+  }
+
+  return filters;
 }
 
-export function queryParamsToServicePayload(query: string) {
-  return filtersToServicePayload(queryParamsToFilters(query));
+export function queryParamsToServicePayload(search: string) {
+  const filters = queryParamsToFilters(search);
+  // Convert filters to service payload format
+  // This will depend on what your service expects
+  return {
+    // Map the filters to the format expected by your service
+    // This is just an example - adjust based on your actual service requirements
+    fileTypes: Object.entries(filters.fileType)
+      .filter(([_, value]) => value)
+      .map(([key]) => key),
+    buyNow: Object.entries(filters.buyNow)
+      .filter(([_, value]) => value)
+      .map(([key]) => key),
+    status: Object.entries(filters.status)
+      .filter(([_, value]) => value)
+      .map(([key]) => key),
+    forSale: filters.forSale,
+    trendingSales: filters.trendingSales,
+    sold: filters.sold,
+    stampRange: filters.stampRange,
+    priceRange: filters.priceRange,
+    sortOrder: filters.sortOrder,
+  };
 }
 
 export const StampDrawerFilters = (
@@ -391,6 +468,7 @@ export const StampDrawerFilters = (
   },
 ) => {
   const [filters, setFilters] = useState(initialFilters);
+  console.log("[StampDrawerFilters] Initial filters:", initialFilters);
   const [expandedSections, setExpandedSections] = useState({
     buyNow: true,
     status: true,

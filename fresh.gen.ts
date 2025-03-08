@@ -165,12 +165,15 @@ import * as $collection_CollectionOverviewHeader from "./islands/collection/Coll
 import * as $collection_CollectionOverviewSection from "./islands/collection/CollectionOverviewSection.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
 import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
+import * as $datacontrol_FilterToggle from "./islands/datacontrol/FilterToggle.tsx";
+import * as $datacontrol_MultiSort from "./islands/datacontrol/MultiSort.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
+import * as $filterpane_StampFilterPane from "./islands/filterpane/StampFilterPane.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
@@ -201,18 +204,22 @@ import * as $src20_SRC20Section from "./islands/src20/SRC20Section.tsx";
 import * as $src20_cards_SRC20BaseCard from "./islands/src20/cards/SRC20BaseCard.tsx";
 import * as $src20_cards_SRC20TokenMintingCard from "./islands/src20/cards/SRC20TokenMintingCard.tsx";
 import * as $src20_cards_SRC20TokenOutmintedCard from "./islands/src20/cards/SRC20TokenOutmintedCard.tsx";
+import * as $src20_details_SRC20HolderTable from "./islands/src20/details/SRC20HolderTable.tsx";
 import * as $src20_details_SRC20TickHeader from "./islands/src20/details/SRC20TickHeader.tsx";
 import * as $stamp_StampCard from "./islands/stamp/StampCard.tsx";
 import * as $stamp_StampContent from "./islands/stamp/StampContent.tsx";
+import * as $stamp_StampFilter from "./islands/stamp/StampFilter.tsx";
 import * as $stamp_StampHeader from "./islands/stamp/StampHeader.tsx";
 import * as $stamp_StampSearch from "./islands/stamp/StampSearch.tsx";
 import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
 import * as $stamp_details_RecentSales from "./islands/stamp/details/RecentSales.tsx";
 import * as $stamp_details_StampBuyModal from "./islands/stamp/details/StampBuyModal.tsx";
 import * as $stamp_details_StampCodeModal from "./islands/stamp/details/StampCodeModal.tsx";
+import * as $stamp_details_StampFilterPaneDrawer from "./islands/stamp/details/StampFilterPaneDrawer.tsx";
 import * as $stamp_details_StampImage from "./islands/stamp/details/StampImage.tsx";
 import * as $stamp_details_StampImageFullScreen from "./islands/stamp/details/StampImageFullScreen.tsx";
 import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
+import * as $stamp_details_StampSearchDrawer from "./islands/stamp/details/StampSearchDrawer.tsx";
 import * as $stamp_details_StampTextContent from "./islands/stamp/details/StampTextContent.tsx";
 import * as $stamping_InputField from "./islands/stamping/InputField.tsx";
 import * as $stamping_SelectField from "./islands/stamping/SelectField.tsx";
@@ -444,12 +451,15 @@ const manifest = {
       $collection_CollectionOverviewSection,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
     "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
+    "./islands/datacontrol/FilterToggle.tsx": $datacontrol_FilterToggle,
+    "./islands/datacontrol/MultiSort.tsx": $datacontrol_MultiSort,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
+    "./islands/filterpane/StampFilterPane.tsx": $filterpane_StampFilterPane,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
@@ -482,20 +492,27 @@ const manifest = {
       $src20_cards_SRC20TokenMintingCard,
     "./islands/src20/cards/SRC20TokenOutmintedCard.tsx":
       $src20_cards_SRC20TokenOutmintedCard,
+    "./islands/src20/details/SRC20HolderTable.tsx":
+      $src20_details_SRC20HolderTable,
     "./islands/src20/details/SRC20TickHeader.tsx":
       $src20_details_SRC20TickHeader,
     "./islands/stamp/StampCard.tsx": $stamp_StampCard,
     "./islands/stamp/StampContent.tsx": $stamp_StampContent,
+    "./islands/stamp/StampFilter.tsx": $stamp_StampFilter,
     "./islands/stamp/StampHeader.tsx": $stamp_StampHeader,
     "./islands/stamp/StampSearch.tsx": $stamp_StampSearch,
     "./islands/stamp/StampSection.tsx": $stamp_StampSection,
     "./islands/stamp/details/RecentSales.tsx": $stamp_details_RecentSales,
     "./islands/stamp/details/StampBuyModal.tsx": $stamp_details_StampBuyModal,
     "./islands/stamp/details/StampCodeModal.tsx": $stamp_details_StampCodeModal,
+    "./islands/stamp/details/StampFilterPaneDrawer.tsx":
+      $stamp_details_StampFilterPaneDrawer,
     "./islands/stamp/details/StampImage.tsx": $stamp_details_StampImage,
     "./islands/stamp/details/StampImageFullScreen.tsx":
       $stamp_details_StampImageFullScreen,
     "./islands/stamp/details/StampInfo.tsx": $stamp_details_StampInfo,
+    "./islands/stamp/details/StampSearchDrawer.tsx":
+      $stamp_details_StampSearchDrawer,
     "./islands/stamp/details/StampTextContent.tsx":
       $stamp_details_StampTextContent,
     "./islands/stamping/InputField.tsx": $stamping_InputField,

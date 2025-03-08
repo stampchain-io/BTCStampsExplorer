@@ -1,14 +1,11 @@
 import { useState } from "preact/hooks";
 
-import { STAMP_FILTER_TYPES, STAMP_TYPES as _STAMP_TYPES } from "$globals";
+import { STAMP_FILTER_TYPES } from "$globals";
 
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { useNavigator as _useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
-import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
 import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
 import StampSearchDrawer from "$islands/stamp/details/StampSearchDrawer.tsx";
-import { flags } from "../../lib/flags/flags.ts";
 import { MultiSort } from "$islands/datacontrol/MultiSort.tsx";
 
 export const StampHeader = (
@@ -18,76 +15,38 @@ export const StampHeader = (
     search: string;
   },
 ) => {
-  const [isOpen1, setIsOpen1] = useState(false);
-  const [isOpen2, setIsOpen2] = useState(false);
-  const [openSearch, setOpenSearch] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const searchparams = new URLSearchParams(search);
   const filterCount = allQueryKeysFromFilters.filter((key) => {
     return searchparams.has(key) && searchparams.get(key) != "false";
   }).length;
-  const handleOpen1 = (open: boolean) => {
-    setIsOpen1(open);
-    setIsOpen2(false);
-  };
-  const handleOpen2 = (open: boolean) => {
-    setIsOpen1(false);
-    setIsOpen2(open);
+
+  const handleSearchOpen = (open: boolean) => {
+    setSearchOpen(open);
   };
 
   const titlePurpleDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
 
   return (
-    <div
-      class={`relative flex flex-row justify-between items-start w-full gap-3 ${
-        isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
-      }`}
-    >
+    <div class="relative flex flex-row justify-between items-start w-full gap-3">
       <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>STAMPS</h1>
       <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
       <div className="flex relative items-start justify-between gap-3">
-        {flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false) && (
-          <FilterToggle
-            open={openSearch}
-            setOpen={setOpenSearch}
-            count={filterCount}
-          />
-        )}
-        {!flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false)
-          ? (
-            <Filter
-              initFilter={filterBy}
-              open={isOpen1}
-              handleOpen={handleOpen1}
-              filterButtons={[
-                "pixel",
-                "vector",
-                "for sale",
-                "trending sales",
-                "sold",
-              ]}
-              dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
-              open2={isOpen2}
-            />
-          )
-          : null}
-
-        <div
-          class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
-        >
-          <MultiSort searchparams={searchparams} initSort={sortBy} />
-        </div>
-        <div
-          class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
-        >
-          <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
-        </div>
+        <FilterToggle
+          open={filterOpen}
+          setOpen={setFilterOpen}
+          count={filterCount}
+        />
+        <MultiSort searchparams={searchparams} initSort={sortBy} />
+        <StampSearchClient open2={searchOpen} handleOpen2={handleSearchOpen} />
       </div>
       <StampSearchDrawer
         searchparams={searchparams}
-        open={openSearch}
-        setOpen={setOpenSearch}
+        open={filterOpen}
+        setOpen={setFilterOpen}
       />
     </div>
   );
