@@ -19,18 +19,19 @@ const StampSearchDrawer = (
   const stampRangeMax = searchparams.get("stampRange[max]");
   const stampPriceMin = searchparams.get("priceRange[min]");
   const stampPriceMax = searchparams.get("priceRange[max]");
-  const fileTypeSvg = searchparams.get("fileType[svg]") === "true";
-  const fileTypePixel = searchparams.get("fileType[pixel]") === "true";
-  const fileTypeGif = searchparams.get("fileType[gif]") === "true";
-  const fileTypeJpg = searchparams.get("fileType[jpg]") === "true";
+  const fileTypeJpg = searchparams.get("fileType[jpg]") === "true" ||
+    searchparams.get("fileType[jpeg]") === "true";
   const fileTypePng = searchparams.get("fileType[png]") === "true";
+  const fileTypeGif = searchparams.get("fileType[gif]") === "true";
   const fileTypeWebp = searchparams.get("fileType[webp]") === "true";
+  const fileTypeAvif = searchparams.get("fileType[avif]") === "true";
   const fileTypeBmp = searchparams.get("fileType[bmp]") === "true";
-  const fileTypeJpeg = searchparams.get("fileType[jpeg]") === "true";
+  const fileTypeMp3 = searchparams.get("fileType[mp3]") === "true" ||
+    searchparams.get("fileType[mpeg]") === "true";
+  const fileTypeSvg = searchparams.get("fileType[svg]") === "true";
   const fileTypeHtml = searchparams.get("fileType[html]") === "true";
+  const fileTypeLegacy = searchparams.get("fileType[legacy]") === "true";
   const fileTypeOlga = searchparams.get("fileType[olga]") === "true";
-  const fileTypeSrc721 = searchparams.get("fileType[src721]") === "true";
-  const fileTypeSrc101 = searchparams.get("fileType[src101]") === "true";
   const multiple = searchparams.get("editions[multiple]") === "true";
   const unlocked = searchparams.get("editions[unlocked]") === "true";
   const divisible = searchparams.get("editions[divisible]") === "true";
@@ -51,18 +52,17 @@ const StampSearchDrawer = (
     trendingSales: trendingSales || false,
     sold: sold || false,
     fileType: {
-      svg: fileTypeSvg || false,
-      pixel: fileTypePixel || false,
-      gif: fileTypeGif || false,
       jpg: fileTypeJpg || false,
       png: fileTypePng || false,
+      gif: fileTypeGif || false,
       webp: fileTypeWebp || false,
+      avif: fileTypeAvif || false,
       bmp: fileTypeBmp || false,
-      jpeg: fileTypeJpeg || false,
+      mp3: fileTypeMp3 || false,
+      svg: fileTypeSvg || false,
       html: fileTypeHtml || false,
+      legacy: fileTypeLegacy || false,
       olga: fileTypeOlga || false,
-      src721: fileTypeSrc721 || false,
-      src101: fileTypeSrc101 || false,
     },
     stampRangePreset: stampRangePreset || 10000,
     stampRange: {

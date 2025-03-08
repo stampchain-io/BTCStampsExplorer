@@ -157,18 +157,17 @@ const defaultFilters = {
   trendingSales: false,
   sold: false,
   fileType: {
-    svg: false,
-    pixel: false,
-    gif: false,
     jpg: false,
     png: false,
+    gif: false,
     webp: false,
+    avif: false,
     bmp: false,
-    jpeg: false,
+    mp3: false,
+    svg: false,
     html: false,
+    legacy: false,
     olga: false,
-    src721: false,
-    src101: false,
   },
   stampRangePreset: 10000,
   stampRange: {
@@ -250,66 +249,78 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
       >,
       ident: ["SRC-721"],
     },
+    audio: {
+      suffixFilters: [] as Partial<
+        typeof filterOptions["audio"]["suffixFilters"]
+      >,
+      ident: ["STAMP"],
+    },
+    encoding: { // Combined category for Legacy and Olga
+      suffixFilters: [] as Partial<
+        typeof filterOptions["encoding"]["suffixFilters"]
+      >,
+      ident: ["STAMP"],
+    },
   };
 
+  // JPG/JPEG (combined)
+  if (filters.fileType.jpg) {
+    filterPayload.pixel.suffixFilters.push("jpg");
+    filterPayload.pixel.suffixFilters.push("jpeg");
+  }
+
+  // PNG
+  if (filters.fileType.png) {
+    filterPayload.pixel.suffixFilters.push("png");
+  }
+
+  // GIF
+  if (filters.fileType.gif) {
+    filterPayload.pixel.suffixFilters.push("gif");
+  }
+
+  // WEBP
+  if (filters.fileType.webp) {
+    filterPayload.pixel.suffixFilters.push("webp");
+  }
+
+  // AVIF
+  if (filters.fileType.avif) {
+    filterPayload.pixel.suffixFilters.push("avif");
+  }
+
+  // BMP
+  if (filters.fileType.bmp) {
+    filterPayload.pixel.suffixFilters.push("bmp");
+  }
+
+  // MP3/MPEG (combined)
+  if (filters.fileType.mp3) {
+    filterPayload.audio.suffixFilters.push("mp3");
+    filterPayload.audio.suffixFilters.push("mpeg");
+  }
+
+  // SVG
   if (filters.fileType.svg) {
     filterPayload.vector.suffixFilters.push("svg");
     filterPayload.recursive.suffixFilters.push("svg");
   }
 
-  if (filters.fileType.gif) {
-    filterPayload.pixel.suffixFilters.push("gif");
-  }
-
+  // HTML
   if (filters.fileType.html) {
     filterPayload.vector.suffixFilters.push("html");
     filterPayload.recursive.suffixFilters.push("html");
   }
 
-  if (filters.fileType.jpg) {
-    filterPayload.pixel.suffixFilters.push("jpg");
+  // LEGACY
+  if (filters.fileType.legacy) {
+    filterPayload.encoding.suffixFilters.push("legacy");
   }
 
-  if (filters.fileType.jpeg) {
-    filterPayload.pixel.suffixFilters.push("jpeg");
+  // OLGA
+  if (filters.fileType.olga) {
+    filterPayload.encoding.suffixFilters.push("olga");
   }
-
-  if (filters.fileType.png) {
-    filterPayload.pixel.suffixFilters.push("png");
-  }
-
-  if (filters.fileType.webp) {
-    filterPayload.pixel.suffixFilters.push("webp");
-  }
-
-  if (filters.fileType.bmp) {
-    filterPayload.pixel.suffixFilters.push("bmp");
-  }
-  // jpg
-  // png
-  // webp
-  // bmp
-  // jpeg;
-
-  // if (filters.fileType.olga) {
-  //   filterPayload.pixel.suffixFilters.push("olga");
-  // }
-
-  // if (filters.fileType.src721) {
-  //   filterPayload.pixel.suffixFilters.push("src721");
-  //   filterPayload.recursive.suffixFilters.push("src721");
-  // }
-
-  // if (filters.fileType.src101) {
-  //   filterPayload.pixel.suffixFilters.push("src101");
-  // }
-
-  // const ident = Object.entries(filterPayload).reduce((acc, [key, value]) => {
-  //   if (value.suffixFilters.length > 0) {
-  //     acc.push(...value.ident);
-  //   }
-  //   return acc;
-  // }, [] as ("STAMP" | "SRC-721")[]);
 
   const suffixFilters = Object.entries(filterPayload).reduce(
     (acc, [key, value]) => {

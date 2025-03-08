@@ -15,6 +15,7 @@ export const filterOptions = {
       "jpg" as const,
       "png" as const,
       "webp" as const,
+      "avif" as const,
       "bmp" as const,
       "jpeg" as const,
     ],
@@ -23,5 +24,13 @@ export const filterOptions = {
   "recursive": {
     suffixFilters: ["svg" as const, "html" as const],
     ident: ["SRC-721" as const],
+  },
+  "audio": {
+    suffixFilters: ["mp3" as const, "mpeg" as const],
+    ident: ["STAMP" as const],
+  },
+  "encoding": {
+    suffixFilters: ["legacy" as const, "olga" as const],
+    ident: ["STAMP" as const],
   },
 };
