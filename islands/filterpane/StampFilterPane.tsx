@@ -146,9 +146,12 @@ const defaultFilters = {
     atomic: false,
     dispenser: false,
   },
-  status: {
+  editions: {
     locked: false,
     oneOfOne: false,
+    multiple: false,
+    unlocked: false,
+    divisible: false,
   },
   forSale: false,
   trendingSales: false,

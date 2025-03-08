@@ -188,9 +188,12 @@ const defaultFilters = {
     atomic: false,
     dispenser: false,
   },
-  status: {
+  editions: {
     locked: false,
     oneOfOne: false,
+    multiple: false,
+    unlocked: false,
+    divisible: false,
   },
   forSale: false,
   trendingSales: false,
@@ -378,8 +381,11 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
 export const allQueryKeysFromFilters = [
   "buyNow[atomic]",
   "buyNow[dispenser]",
-  "status[locked]",
-  "status[oneOfOne]",
+  "editions[locked]",
+  "editions[oneOfOne]",
+  "editions[multiple]",
+  "editions[unlocked]",
+  "editions[divisible]",
   "forSale",
   "trendingSales",
   "sold",
@@ -439,12 +445,21 @@ export function queryParamsToFilters(search: string) {
     filters.buyNow.dispenser = true;
   }
 
-  // Parse status params
-  if (queryParams.get("status[locked]") === "true") {
-    filters.status.locked = true;
+  // Parse editions params
+  if (queryParams.get("editions[locked]") === "true") {
+    filters.editions.locked = true;
   }
-  if (queryParams.get("status[oneOfOne]") === "true") {
-    filters.status.oneOfOne = true;
+  if (queryParams.get("editions[oneOfOne]") === "true") {
+    filters.editions.oneOfOne = true;
+  }
+  if (queryParams.get("editions[multiple]") === "true") {
+    filters.editions.multiple = true;
+  }
+  if (queryParams.get("editions[unlocked]") === "true") {
+    filters.editions.unlocked = true;
+  }
+  if (queryParams.get("editions[divisible]") === "true") {
+    filters.editions.divisible = true;
   }
 
   // Parse fileType params
@@ -496,7 +511,7 @@ export function queryParamsToServicePayload(search: string) {
     buyNow: Object.entries(filters.buyNow)
       .filter(([_, value]) => value)
       .map(([key]) => key),
-    status: Object.entries(filters.status)
+    editions: Object.entries(filters.editions)
       .filter(([_, value]) => value)
       .map(([key]) => key),
     forSale: filters.forSale,
@@ -520,7 +535,7 @@ export const StampDrawerFilters = (
   console.log("[StampDrawerFilters] Initial filters:", initialFilters);
   const [expandedSections, setExpandedSections] = useState({
     buyNow: true,
-    status: true,
+    editions: true,
     market: true,
     fileType: true,
     stampRange: true,
@@ -674,75 +689,7 @@ export const StampDrawerFilters = (
       )}
 
       <FilterSection
-        title="Buy Now"
-        section="buyNow"
-        expanded={expandedSections["buyNow"]}
-        toggle={() => toggleSection("buyNow")}
-      >
-        <Checkbox
-          label="Atomic"
-          checked={filters.buyNow.atomic}
-          onChange={() =>
-            handleFilterChange("buyNow", { atomic: !filters.buyNow.atomic })}
-        />
-        <Checkbox
-          label="Dispenser"
-          checked={filters.buyNow.dispenser}
-          onChange={() =>
-            handleFilterChange("buyNow", {
-              dispenser: !filters.buyNow.dispenser,
-            })}
-        />
-      </FilterSection>
-
-      <FilterSection
-        title="Status"
-        section="status"
-        expanded={expandedSections["status"]}
-        toggle={() => toggleSection("status")}
-      >
-        <Checkbox
-          label="Locked"
-          checked={filters.status.locked}
-          onChange={() =>
-            handleFilterChange("status", { locked: !filters.status.locked })}
-        />
-        <Checkbox
-          label="1/1"
-          checked={filters.status.oneOfOne}
-          onChange={() =>
-            handleFilterChange("status", {
-              oneOfOne: !filters.status.oneOfOne,
-            })}
-        />
-      </FilterSection>
-
-      <FilterSection
-        title="Market"
-        section="market"
-        expanded={expandedSections["market"]}
-        toggle={() => toggleSection("market")}
-      >
-        <Checkbox
-          label="For sale"
-          checked={filters.forSale}
-          onChange={() => handleFilterChange("forSale", !filters.forSale)}
-        />
-        <Checkbox
-          label="Trending sales"
-          checked={filters.trendingSales}
-          onChange={() =>
-            handleFilterChange("trendingSales", !filters.trendingSales)}
-        />
-        <Checkbox
-          label="Sold"
-          checked={filters.sold}
-          onChange={() => handleFilterChange("sold", !filters.sold)}
-        />
-      </FilterSection>
-
-      <FilterSection
-        title="File Type"
+        title="FILE TYPE"
         section="fileType"
         expanded={expandedSections["fileType"]}
         toggle={() => toggleSection("fileType")}
@@ -769,6 +716,83 @@ export const StampDrawerFilters = (
               handleFilterChange("fileType", { [key]: !filters.fileType[key] })}
           />
         ))}
+      </FilterSection>
+
+      <FilterSection
+        title="EDITIONS"
+        section="editions"
+        expanded={expandedSections["editions"]}
+        toggle={() => toggleSection("editions")}
+      >
+        <div className="space-y-[3px] mobileLg:space-y-1.5">
+          <Checkbox
+            label="1/1"
+            checked={filters.editions.oneOfOne}
+            onChange={() =>
+              handleFilterChange("editions", {
+                oneOfOne: !filters.editions.oneOfOne,
+              })}
+          />
+          <Checkbox
+            label="MULTIPLE"
+            checked={filters.editions.multiple}
+            onChange={() =>
+              handleFilterChange("editions", {
+                ...filters.editions,
+                multiple: !filters.editions.multiple,
+              })}
+          />
+          <Checkbox
+            label="LOCKED"
+            checked={filters.editions.locked}
+            onChange={() =>
+              handleFilterChange("editions", {
+                locked: !filters.editions.locked,
+              })}
+          />
+          <Checkbox
+            label="UNLOCKED"
+            checked={filters.editions.unlocked}
+            onChange={() =>
+              handleFilterChange("editions", {
+                ...filters.editions,
+                unlocked: !filters.editions.unlocked,
+              })}
+          />
+          <Checkbox
+            label="DIVISIBLE"
+            checked={filters.editions.divisible}
+            onChange={() =>
+              handleFilterChange("editions", {
+                ...filters.editions,
+                divisible: !filters.editions.divisible,
+              })}
+          />
+        </div>
+      </FilterSection>
+
+      <FilterSection
+        title="Market"
+        section="market"
+        expanded={expandedSections["market"]}
+        toggle={() => toggleSection("market")}
+      >
+        <Checkbox
+          label="For sale"
+          checked={filters.forSale}
+          onChange={() => handleFilterChange("forSale", !filters.forSale)}
+        />
+        <Checkbox
+          label="Trending sales"
+          checked={filters.trendingSales}
+          onChange={() =>
+            handleFilterChange("trendingSales", !filters.trendingSales)}
+        />
+        <Checkbox
+          label="Sold"
+          checked={filters.sold}
+          onChange={() => handleFilterChange("sold", !filters.sold)}
+        />
       </FilterSection>
 
       <FilterSection

@@ -9,8 +9,8 @@ const StampSearchDrawer = (
 ) => {
   const atomic = searchparams.get("buyNow[atomic]") === "true";
   const dispenser = searchparams.get("buyNow[dispenser]") === "true";
-  const locked = searchparams.get("status[locked]") === "true";
-  const oneOfOne = searchparams.get("status[oneOfOne]") === "true";
+  const locked = searchparams.get("editions[locked]") === "true";
+  const oneOfOne = searchparams.get("editions[oneOfOne]") === "true";
   const forSale = searchparams.get("forSale") === "true";
   const trendingSales = searchparams.get("trendingSales") === "true";
   const sold = searchparams.get("sold") === "true";
@@ -31,15 +31,21 @@ const StampSearchDrawer = (
   const fileTypeOlga = searchparams.get("fileType[olga]") === "true";
   const fileTypeSrc721 = searchparams.get("fileType[src721]") === "true";
   const fileTypeSrc101 = searchparams.get("fileType[src101]") === "true";
+  const multiple = searchparams.get("editions[multiple]") === "true";
+  const unlocked = searchparams.get("editions[unlocked]") === "true";
+  const divisible = searchparams.get("editions[divisible]") === "true";
 
   const defaultFilters = {
     buyNow: {
       atomic: atomic || false,
       dispenser: dispenser || false,
     },
-    status: {
+    editions: {
       locked: locked || false,
       oneOfOne: oneOfOne || false,
+      multiple: multiple || false,
+      unlocked: unlocked || false,
+      divisible: divisible || false,
     },
     forSale: forSale || false,
     trendingSales: trendingSales || false,

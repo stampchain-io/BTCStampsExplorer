@@ -127,6 +127,10 @@ body {
   @apply [&::-webkit-scrollbar-track]:bg-[#CCCCCC] [&::-webkit-scrollbar-thumb]:bg-[#999999] [&::-webkit-scrollbar-thumb:hover]:bg-[#666666];
 }
 
+.scrollbar-black {
+  @apply [&::-webkit-scrollbar-track]:bg-[#000000]/20 [&::-webkit-scrollbar-thumb]:bg-[#666666] [&::-webkit-scrollbar-thumb:hover]:bg-[#999999];
+}
+
 .scrollbar-purple {
   @apply [&::-webkit-scrollbar-track]:bg-[#AA00FF] [&::-webkit-scrollbar-thumb]:bg-[#8800CC] [&::-webkit-scrollbar-thumb:hover]:bg-[#660099];
 }
