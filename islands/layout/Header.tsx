@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { ConnectWallet } from "$islands/Wallet/ConnectWallet.tsx";
+import { flags } from "$lib/flags/flags.ts";
 
 interface NavLink {
   title: string | {
@@ -8,6 +9,18 @@ interface NavLink {
   };
   href?: string;
   subLinks?: NavLink[];
+}
+
+const newStampLink = "/stamp";
+
+function applyFlagOverrideOnDesktop(desktopNavLinks) {
+  const linkObj = desktopNavLinks?.find((link) => link.title === "ART STAMPS")
+    ?.subLinks?.find((subLink) => subLink.title === "ALL");
+  if (linkObj) {
+    linkObj.href = newStampLink;
+  }
+
+  return desktopNavLinks;
 }
 
 const desktopNavLinks: NavLink[] = [
@@ -49,6 +62,15 @@ const desktopNavLinks: NavLink[] = [
     ],
   },
 ];
+
+function applyFlagOverrideOnMobile(mobileNavlinks) {
+  const linkObj = mobileNavlinks.find((link) => link.title === "ART_STAMPS");
+  if (linkObj) {
+    linkObj.href = newStampLink;
+  }
+
+  return mobileNavlinks;
+}
 
 const mobileNavLinks: NavLink[] = [
   {
@@ -155,7 +177,10 @@ export function Header() {
   };
 
   const renderNavLinks = (isMobile = false) => {
-    const filteredNavLinks = isMobile ? mobileNavLinks : desktopNavLinks;
+    const flag = flags.getBooleanFlag("NEW_ART_STAMP_FILTERS", false);
+    const filteredNavLinks = isMobile
+      ? (flag ? applyFlagOverrideOnMobile(mobileNavLinks) : mobileNavLinks)
+      : (flag ? applyFlagOverrideOnDesktop(desktopNavLinks) : desktopNavLinks);
     return (
       <>
         {filteredNavLinks.map((link) => (

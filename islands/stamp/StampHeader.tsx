@@ -1,66 +1,91 @@
-import { useState } from "preact/hooks";
-
-import { STAMP_FILTER_TYPES, STAMP_TYPES as _STAMP_TYPES } from "$globals";
-
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { useNavigator as _useNavigator } from "$islands/Navigator/NavigatorProvider.tsx";
-import { Filter } from "$islands/datacontrol/Filter.tsx";
+import { useEffect, useState } from "preact/hooks";
+import { STAMP_FILTER_TYPES } from "$globals";
+import {
+  allQueryKeysFromFilters,
+  StampFilterButton,
+} from "$islands/stamp/StampFilter.tsx";
+import { StampFilter } from "$islands/stamp/StampFilter.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 export const StampHeader = (
-  { filterBy, sortBy }: {
+  { filterBy, sortBy, search }: {
     filterBy: STAMP_FILTER_TYPES[];
     sortBy: "ASC" | "DESC" | undefined;
+    search: string;
   },
 ) => {
-  const [isOpen1, setIsOpen1] = useState(false);
-  const [isOpen2, setIsOpen2] = useState(false);
-  const handleOpen1 = (open: boolean) => {
-    setIsOpen1(open);
-    setIsOpen2(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterCount, setFilterCount] = useState(0);
+
+  const updateFilterCount = () => {
+    const searchparams = new URLSearchParams(window.location.search);
+    let count = 0;
+    const processedRanges = new Set();
+
+    Array.from(searchparams.entries()).forEach(([key, value]) => {
+      if (value === "true" || (value !== "false" && value !== "")) {
+        // Handle market price range parameters
+        if (key.startsWith("market[priceRange]")) {
+          if (!processedRanges.has("marketPriceRange")) {
+            count++;
+            processedRanges.add("marketPriceRange");
+          }
+        } // Handle rarity stamp range parameters
+        else if (key.startsWith("rarity[stampRange]")) {
+          if (!processedRanges.has("rarityStampRange")) {
+            count++;
+            processedRanges.add("rarityStampRange");
+          }
+        } // Count each individual checkbox separately
+        else if (key.includes("[")) {
+          const paramMatch = key.match(/^([^[]+)\[([^\]]+)\]$/);
+          if (paramMatch && value === "true") {
+            count++;
+          }
+        } // Handle other filters
+        else if (!key.includes("[")) {
+          count++;
+        }
+      }
+    });
+
+    setFilterCount(count);
   };
-  const handleOpen2 = (open: boolean) => {
-    setIsOpen1(false);
-    setIsOpen2(open);
-  };
+
+  useEffect(() => {
+    updateFilterCount();
+  }, [search]);
+
+  const searchparams = new URLSearchParams(search);
 
   const titlePurpleDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";
 
   return (
-    <div
-      class={`relative flex flex-row justify-between items-start w-full gap-3 ${
-        isOpen1 ? "-mb-[150px] mobileMd:-mb-[146px] mobileLg:-mb-[160px]" : ""
-      }`}
-    >
+    <div class="relative flex flex-row justify-between items-start w-full gap-3">
       <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>STAMPS</h1>
       <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
       <div className="flex relative items-start justify-between gap-3">
-        <Filter
-          initFilter={filterBy}
-          open={isOpen1}
-          handleOpen={handleOpen1}
-          filterButtons={[
-            "pixel",
-            "vector",
-            "for sale",
-            "trending sales",
-            "sold",
-          ]}
-          dropdownPosition="right-[-84px] mobileLg:right-[-96px]"
-          open2={isOpen2}
+        <StampFilterButton
+          open={isFilterOpen}
+          setOpen={setIsFilterOpen}
+          searchparams={searchparams}
+          filterCount={filterCount}
         />
-        <div
-          class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
-        >
-          <Sort initSort={sortBy} />
-        </div>
-        <div
-          class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
-        >
-          <StampSearchClient open2={isOpen2} handleOpen2={handleOpen2} />
-        </div>
+        <Sort initSort={sortBy} />
+        <StampSearchClient
+          open2={isSearchOpen}
+          handleOpen2={setIsSearchOpen}
+        />
       </div>
+      <StampFilter
+        searchparams={searchparams}
+        open={isFilterOpen}
+        setOpen={setIsFilterOpen}
+        onFiltersChange={updateFilterCount}
+      />
     </div>
   );
 };

@@ -22,6 +22,7 @@ export type STAMP_SUFFIX_FILTERS =
   | "jpg"
   | "png"
   | "webp"
+  | "avif"
   | "bmp"
   | "jpeg"
   | "svg"
@@ -575,6 +576,7 @@ export type StampPageProps = {
     selectedTab: "all" | "classic" | "posh" | "recent_sales";
     sortBy: "ASC" | "DESC";
     filterBy: STAMP_FILTER_TYPES[];
+    search: string;
   };
 };
 

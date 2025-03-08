@@ -108,6 +108,7 @@ export class StampService {
     page?: number;
     limit?: number;
     sortBy?: "ASC" | "DESC";
+    sortOrder?: string;
     type?: STAMP_TYPES;
     ident?: SUBPROTOCOLS | SUBPROTOCOLS[];
     identifier?: string | number | (string | number)[];
