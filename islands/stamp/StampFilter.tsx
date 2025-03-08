@@ -580,50 +580,12 @@ export const StampFilter = ({
         ...prev,
         [key]: value,
       };
-
-      // Update URL with new filters
-      const url = new URL(globalThis.location.href);
-
-      // Special handling for objects
-      if (typeof value === "object") {
-        // Clear existing params for this key
-        Array.from(url.searchParams.keys())
-          .filter((param) => param.startsWith(`${key}[`))
-          .forEach((param) => url.searchParams.delete(param));
-
-        // Set new params
-        Object.entries(value).forEach(([subKey, subValue]) => {
-          if (subValue) {
-            // Handle nested objects like market.priceRange
-            if (typeof subValue === "object") {
-              Object.entries(subValue).forEach(([nestedKey, nestedValue]) => {
-                if (nestedValue) {
-                  url.searchParams.set(
-                    `${key}[${subKey}][${nestedKey}]`,
-                    String(nestedValue),
-                  );
-                } else {
-                  url.searchParams.delete(`${key}[${subKey}][${nestedKey}]`);
-                }
-              });
-            } else {
-              url.searchParams.set(`${key}[${subKey}]`, String(subValue));
-            }
-          } else {
-            url.searchParams.delete(`${key}[${subKey}]`);
-          }
-        });
-      } else {
-        // Handle non-object values
-        if (value) {
-          url.searchParams.set(`${key}`, String(value));
-        } else {
-          url.searchParams.delete(`${key}`);
-        }
-      }
-
-      // Update URL without page reload
-      globalThis.history.pushState({}, "", url.toString());
+      const queryString = filtersToQueryParams(
+        globalThis.location.search,
+        newFilters,
+      );
+      globalThis.location.href = globalThis.location.pathname + "?" +
+        queryString;
       onFiltersChange?.();
       return newFilters;
     });
@@ -637,56 +599,22 @@ export const StampFilter = ({
   };
 
   const handleClearFilters = () => {
-    // Reset all filters
     setFilters(initialFilters);
-
-    // Clear URL parameters
-    const url = new URL(window.location.href);
-    Array.from(url.searchParams.keys()).forEach((key) => {
-      url.searchParams.delete(key);
-    });
-    globalThis.history.pushState({}, "", url.toString());
-
-    // Trigger immediate update of the badge count
+    const queryString = filtersToQueryParams(
+      globalThis.location.search,
+      initialFilters,
+    );
+    globalThis.location.href = globalThis.location.pathname + "?" + queryString;
     onFiltersChange?.();
   };
 
   const handleClose = () => {
     setOpen(false);
-
-    // Get current URL and update it with all active filters
-    const url = new URL(globalThis.location.href);
-
-    // Clear existing filter params
-    allQueryKeysFromFilters.forEach((key) => {
-      url.searchParams.delete(key);
-    });
-
-    // Add new filter params in the correct format using brackets
-    Object.entries(filters).forEach(([section, sectionFilters]) => {
-      Object.entries(sectionFilters).forEach(([key, value]) => {
-        if (typeof value === "object") {
-          Object.entries(value as Record<string, any>).forEach(
-            ([subKey, subValue]) => {
-              if (subValue) {
-                url.searchParams.set(
-                  `${section}[${key}][${subKey}]`,
-                  String(subValue),
-                );
-              }
-            },
-          );
-        } else if (value) {
-          url.searchParams.set(`${section}[${key}]`, String(value));
-        }
-      });
-    });
-
-    // Trigger Fresh navigation with updated URL
-    const event = new CustomEvent("fresh-navigate", {
-      detail: { url: url.toString() },
-    });
-    self.dispatchEvent(event);
+    const queryString = filtersToQueryParams(
+      globalThis.location.search,
+      filters,
+    );
+    globalThis.location.href = globalThis.location.pathname + "?" + queryString;
     onFiltersChange?.();
   };
 
