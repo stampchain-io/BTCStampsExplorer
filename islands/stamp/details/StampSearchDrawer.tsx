@@ -7,8 +7,8 @@ const StampSearchDrawer = (
     searchparams: URLSearchParams;
   },
 ) => {
-  const atomic = searchparams.get("buyNow[atomic]") === "true";
-  const dispenser = searchparams.get("buyNow[dispenser]") === "true";
+  const atomic = searchparams.get("market[atomic]") === "true";
+  const dispenser = searchparams.get("market[dispenser]") === "true";
   const locked = searchparams.get("editions[locked]") === "true";
   const oneOfOne = searchparams.get("editions[oneOfOne]") === "true";
   const forSale = searchparams.get("market[forSale]") === "true";
@@ -39,19 +39,9 @@ const StampSearchDrawer = (
   const divisible = searchparams.get("editions[divisible]") === "true";
 
   const defaultFilters = {
-    buyNow: {
+    market: {
       atomic: atomic || false,
       dispenser: dispenser || false,
-    },
-    editions: {
-      locked: locked || false,
-      oneOfOne: oneOfOne || false,
-      multiple: multiple || false,
-      unlocked: unlocked || false,
-      divisible: divisible || false,
-    },
-    market: {
-      forSale: forSale || false,
       trendingSales: trendingSales || false,
       sold: sold || false,
       priceRange: {
@@ -72,16 +62,18 @@ const StampSearchDrawer = (
       legacy: fileTypeLegacy || false,
       olga: fileTypeOlga || false,
     },
-    rarityPreset: rarityPreset || 10000,
+    editions: {
+      locked: locked || false,
+      oneOfOne: oneOfOne || false,
+      multiple: multiple || false,
+      unlocked: unlocked || false,
+      divisible: divisible || false,
+    },
+    rarityPreset: rarityPreset || "",
     rarity: {
       min: rarityMin || "",
       max: rarityMax || "",
     },
-    priceRange: {
-      min: stampPriceMin || "",
-      max: stampPriceMax || "",
-    },
-    sortOrder: "",
   };
 
   return (

@@ -7,19 +7,9 @@ import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
 // Define a type for the filters object
 export type StampFilters = {
-  buyNow: {
+  market: {
     atomic: boolean;
     dispenser: boolean;
-  };
-  editions: {
-    locked: boolean;
-    oneOfOne: boolean;
-    multiple: boolean;
-    unlocked: boolean;
-    divisible: boolean;
-  };
-  market: {
-    forSale: boolean;
     trendingSales: boolean;
     sold: boolean;
     priceRange: {
@@ -40,30 +30,26 @@ export type StampFilters = {
     legacy: boolean;
     olga: boolean;
   };
-  rarityPreset: number;
+  editions: {
+    locked: boolean;
+    oneOfOne: boolean;
+    multiple: boolean;
+    unlocked: boolean;
+    divisible: boolean;
+  };
+  rarityPreset: string;
   rarity: {
     min: string;
     max: string;
   };
-  sortOrder: string;
   [key: string]: any; // Add index signature to allow string indexing
 };
 
 // Update the defaultFilters declaration
 const defaultFilters: StampFilters = {
-  buyNow: {
+  market: {
     atomic: false,
     dispenser: false,
-  },
-  editions: {
-    locked: false,
-    oneOfOne: false,
-    multiple: false,
-    unlocked: false,
-    divisible: false,
-  },
-  market: {
-    forSale: false,
     trendingSales: false,
     sold: false,
     priceRange: {
@@ -84,12 +70,18 @@ const defaultFilters: StampFilters = {
     legacy: false,
     olga: false,
   },
-  rarityPreset: 10000,
+  editions: {
+    locked: false,
+    oneOfOne: false,
+    multiple: false,
+    unlocked: false,
+    divisible: false,
+  },
+  rarityPreset: "",
   rarity: {
     min: "",
     max: "",
   },
-  sortOrder: "",
 };
 
 export function filtersToQueryParams(
@@ -259,21 +251,14 @@ export function filtersToServicePayload(filters: StampFilters) {
 // }
 
 export const allQueryKeysFromFilters = [
-  "buyNow[atomic]",
-  "buyNow[dispenser]",
-  "editions[locked]",
-  "editions[oneOfOne]",
-  "editions[multiple]",
-  "editions[unlocked]",
-  "editions[divisible]",
-  "market[forSale]",
+  // Market filters
+  "market[atomic]",
+  "market[dispenser]",
   "market[trendingSales]",
   "market[sold]",
   "market[priceRange][min]",
   "market[priceRange][max]",
-  "rarityPreset",
-  "rarity[min]",
-  "rarity[max]",
+
   // File type filters
   "fileType[jpg]",
   "fileType[jpeg]",
@@ -288,6 +273,18 @@ export const allQueryKeysFromFilters = [
   "fileType[html]",
   "fileType[legacy]",
   "fileType[olga]",
+
+  // Editions filters
+  "editions[locked]",
+  "editions[oneOfOne]",
+  "editions[multiple]",
+  "editions[unlocked]",
+  "editions[divisible]",
+
+  // Rarity filters
+  "rarityPreset",
+  "rarity[min]",
+  "rarity[max]",
 ];
 
 export function queryParamsToFilters(query: string): StampFilters {

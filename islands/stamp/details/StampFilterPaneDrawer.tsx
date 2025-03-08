@@ -201,19 +201,9 @@ function useDebouncedCallback(callback: Function, delay: number) {
 }
 
 const defaultFilters = {
-  buyNow: {
+  market: {
     atomic: false,
     dispenser: false,
-  },
-  editions: {
-    locked: false,
-    oneOfOne: false,
-    multiple: false,
-    unlocked: false,
-    divisible: false,
-  },
-  market: {
-    forSale: false,
     trendingSales: false,
     sold: false,
     priceRange: {
@@ -234,12 +224,18 @@ const defaultFilters = {
     legacy: false,
     olga: false,
   },
-  rarityPreset: 10000,
+  editions: {
+    locked: false,
+    oneOfOne: false,
+    multiple: false,
+    unlocked: false,
+    divisible: false,
+  },
+  rarityPreset: "",
   rarity: {
     min: "",
     max: "",
   },
-  sortOrder: "",
 };
 
 export function filtersToQueryParams(
@@ -403,22 +399,14 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
 // }
 
 export const allQueryKeysFromFilters = [
-  "buyNow[atomic]",
-  "buyNow[dispenser]",
-  "editions[locked]",
-  "editions[oneOfOne]",
-  "editions[multiple]",
-  "editions[unlocked]",
-  "editions[divisible]",
-  "forSale",
-  "trendingSales",
-  "sold",
-  "rarityPreset",
-  "rarity[min]",
-  "rarity[max]",
-  "priceRange[min]",
-  "priceRange[max]",
-  // Add any other filter keys used in the application
+  // Market filters
+  "market[atomic]",
+  "market[dispenser]",
+  "market[trendingSales]",
+  "market[sold]",
+  "market[priceRange][min]",
+  "market[priceRange][max]",
+
   // File type filters
   "fileType[jpg]",
   "fileType[jpeg]",
@@ -433,6 +421,18 @@ export const allQueryKeysFromFilters = [
   "fileType[html]",
   "fileType[legacy]",
   "fileType[olga]",
+
+  // Editions filters
+  "editions[locked]",
+  "editions[oneOfOne]",
+  "editions[multiple]",
+  "editions[unlocked]",
+  "editions[divisible]",
+
+  // Rarity filters
+  "rarityPreset",
+  "rarity[min]",
+  "rarity[max]",
 ];
 
 export function queryParamsToFilters(search: string) {
@@ -443,12 +443,6 @@ export function queryParamsToFilters(search: string) {
   const searchParam = queryParams.get("search");
   if (searchParam) {
     filters.search = searchParam;
-  }
-
-  // Parse sort order
-  const sortOrderParam = queryParams.get("sortOrder");
-  if (sortOrderParam) {
-    filters.sortOrder = sortOrderParam;
   }
 
   // Parse boolean params
@@ -464,10 +458,10 @@ export function queryParamsToFilters(search: string) {
 
   // Parse buyNow params
   if (queryParams.get("buyNow[atomic]") === "true") {
-    filters.buyNow.atomic = true;
+    filters.market.atomic = true;
   }
   if (queryParams.get("buyNow[dispenser]") === "true") {
-    filters.buyNow.dispenser = true;
+    filters.market.dispenser = true;
   }
 
   // Parse editions params
@@ -531,7 +525,7 @@ export function queryParamsToFilters(search: string) {
   // Parse rarityPreset
   const rarityPresetParam = queryParams.get("rarityPreset");
   if (rarityPresetParam) {
-    filters.rarityPreset = parseInt(rarityPresetParam, 10);
+    filters.rarityPreset = rarityPresetParam;
   }
 
   // Parse rarity params
@@ -567,7 +561,7 @@ export function queryParamsToServicePayload(search: string) {
     fileTypes: Object.entries(filters.fileType)
       .filter(([_, value]) => value)
       .map(([key]) => key),
-    buyNow: Object.entries(filters.buyNow)
+    buyNow: Object.entries(filters.market)
       .filter(([_, value]) => value)
       .map(([key]) => key),
     editions: Object.entries(filters.editions)
@@ -578,7 +572,6 @@ export function queryParamsToServicePayload(search: string) {
     sold: filters.market.sold,
     rarity: filters.rarity,
     priceRange: filters.market.priceRange,
-    sortOrder: filters.sortOrder,
   };
 }
 
@@ -748,6 +741,87 @@ export const StampDrawerFilters = (
       )}
 
       <FilterSection
+        title="MARKET"
+        section="market"
+        expanded={expandedSections["market"]}
+        toggle={() => toggleSection("market")}
+      >
+        <div className="space-y-2">
+          <Checkbox
+            label="ATOMIC LISTINGS"
+            checked={filters.market.atomic}
+            onChange={() =>
+              handleFilterChange("market", {
+                ...filters.market,
+                atomic: !filters.market.atomic,
+              })}
+          />
+          <Checkbox
+            label="DISPENSERS"
+            checked={filters.market.dispenser}
+            onChange={() =>
+              handleFilterChange("market", {
+                ...filters.market,
+                dispenser: !filters.market.dispenser,
+              })}
+          />
+          <Checkbox
+            label="TRENDING SALES"
+            checked={filters.market.trendingSales}
+            onChange={() =>
+              handleFilterChange("market", {
+                ...filters.market,
+                trendingSales: !filters.market.trendingSales,
+              })}
+          />
+          <Checkbox
+            label="SOLD"
+            checked={filters.market.sold}
+            onChange={() =>
+              handleFilterChange("market", {
+                ...filters.market,
+                sold: !filters.market.sold,
+              })}
+          />
+
+          {/* Price Range Filter */}
+          <div>
+            <div className="flex items-center mb-[3px]">
+              <p className="text-sm text-stamp-grey font-medium">
+                PRICE RANGE
+              </p>
+            </div>
+            <div className="flex gap-6 placeholder:text-xs">
+              <RangeInput
+                label=""
+                value={filters.market.priceRange.min}
+                onChange={(value: string) =>
+                  handleFilterChange("market", {
+                    ...filters.market,
+                    priceRange: {
+                      ...filters.market.priceRange,
+                      min: value,
+                    },
+                  })}
+              />
+              <RangeInput
+                label=""
+                value={filters.market.priceRange.max}
+                onChange={(value: string) =>
+                  handleFilterChange("market", {
+                    ...filters.market,
+                    priceRange: {
+                      ...filters.market.priceRange,
+                      max: value,
+                    },
+                  })}
+              />
+            </div>
+          </div>
+        </div>
+      </FilterSection>
+
+      <FilterSection
         title="FILE TYPE"
         section="fileType"
         expanded={expandedSections["fileType"]}
@@ -826,78 +900,6 @@ export const StampDrawerFilters = (
                 divisible: !filters.editions.divisible,
               })}
           />
-        </div>
-      </FilterSection>
-
-      <FilterSection
-        title="MARKET"
-        section="market"
-        expanded={expandedSections["market"]}
-        toggle={() => toggleSection("market")}
-      >
-        <div className="space-y-2">
-          <Checkbox
-            label="FOR SALE"
-            checked={filters.market.forSale}
-            onChange={() =>
-              handleFilterChange("market", {
-                ...filters.market,
-                forSale: !filters.market.forSale,
-              })}
-          />
-          <Checkbox
-            label="TRENDING SALES"
-            checked={filters.market.trendingSales}
-            onChange={() =>
-              handleFilterChange("market", {
-                ...filters.market,
-                trendingSales: !filters.market.trendingSales,
-              })}
-          />
-          <Checkbox
-            label="SOLD"
-            checked={filters.market.sold}
-            onChange={() =>
-              handleFilterChange("market", {
-                ...filters.market,
-                sold: !filters.market.sold,
-              })}
-          />
-
-          {/* Price Range Filter */}
-          <div>
-            <div className="flex items-center mb-[3px]">
-              <p className="text-sm text-stamp-grey font-medium">
-                PRICE RANGE
-              </p>
-            </div>
-            <div className="flex gap-6 placeholder:text-xs">
-              <RangeInput
-                label=""
-                value={filters.market.priceRange.min}
-                onChange={(value: string) =>
-                  handleFilterChange("market", {
-                    ...filters.market,
-                    priceRange: {
-                      ...filters.market.priceRange,
-                      min: value,
-                    },
-                  })}
-              />
-              <RangeInput
-                label=""
-                value={filters.market.priceRange.max}
-                onChange={(value: string) =>
-                  handleFilterChange("market", {
-                    ...filters.market,
-                    priceRange: {
-                      ...filters.market.priceRange,
-                      max: value,
-                    },
-                  })}
-              />
-            </div>
-          </div>
         </div>
       </FilterSection>
 
