@@ -211,8 +211,8 @@ const defaultFilters = {
     legacy: false,
     olga: false,
   },
-  stampRangePreset: 10000,
-  stampRange: {
+  rarityPreset: 10000,
+  rarity: {
     min: "",
     max: "",
   },
@@ -394,9 +394,9 @@ export const allQueryKeysFromFilters = [
   "forSale",
   "trendingSales",
   "sold",
-  "stampRangePreset",
-  "stampRange[min]",
-  "stampRange[max]",
+  "rarityPreset",
+  "rarity[min]",
+  "rarity[max]",
   "priceRange[min]",
   "priceRange[max]",
   // Add any other filter keys used in the application
@@ -509,20 +509,20 @@ export function queryParamsToFilters(search: string) {
     filters.fileType.olga = true;
   }
 
-  // Parse stampRangePreset
-  const stampRangePresetParam = queryParams.get("stampRangePreset");
-  if (stampRangePresetParam) {
-    filters.stampRangePreset = parseInt(stampRangePresetParam, 10);
+  // Parse rarityPreset
+  const rarityPresetParam = queryParams.get("rarityPreset");
+  if (rarityPresetParam) {
+    filters.rarityPreset = parseInt(rarityPresetParam, 10);
   }
 
-  // Parse stampRange params
-  const stampRangeMinParam = queryParams.get("stampRange[min]");
-  if (stampRangeMinParam) {
-    filters.stampRange.min = stampRangeMinParam;
+  // Parse rarity params
+  const rarityMinParam = queryParams.get("rarity[min]");
+  if (rarityMinParam) {
+    filters.rarity.min = rarityMinParam;
   }
-  const stampRangeMaxParam = queryParams.get("stampRange[max]");
-  if (stampRangeMaxParam) {
-    filters.stampRange.max = stampRangeMaxParam;
+  const rarityMaxParam = queryParams.get("rarity[max]");
+  if (rarityMaxParam) {
+    filters.rarity.max = rarityMaxParam;
   }
 
   // Parse priceRange params
@@ -557,7 +557,7 @@ export function queryParamsToServicePayload(search: string) {
     forSale: filters.forSale,
     trendingSales: filters.trendingSales,
     sold: filters.sold,
-    stampRange: filters.stampRange,
+    rarity: filters.rarity,
     priceRange: filters.priceRange,
     sortOrder: filters.sortOrder,
   };
@@ -578,7 +578,7 @@ export const StampDrawerFilters = (
     editions: true,
     market: true,
     fileType: true,
-    stampRange: true,
+    rarity: true,
     priceRange: true,
   });
   const debouncedOnFilterChange = useDebouncedCallback(
@@ -835,10 +835,10 @@ export const StampDrawerFilters = (
       </FilterSection>
 
       <FilterSection
-        title="Stamp Range"
-        section="stampRange"
-        expanded={expandedSections["stampRange"]}
-        toggle={() => toggleSection("stampRange")}
+        title="RARITY"
+        section="rarity"
+        expanded={expandedSections["rarity"]}
+        toggle={() => toggleSection("rarity")}
       >
         <div className="space-y-4">
           <div className="space-y-2">
@@ -848,23 +848,24 @@ export const StampDrawerFilters = (
                   <input
                     className="relative float-left h-5 w-5 text-stamp-grey focus:ring-stamp-grey appearance-none rounded-full border-2 border-solid border-neutral-300 before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] after:absolute after:z-[1] after:block after:h-4 after:w-4 after:rounded-full after:content-[''] checked:border-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-[0.625rem] checked:after:w-[0.625rem] checked:after:rounded-full checked:after:border-white checked:after:bg-white checked:after:content-[''] checked:after:[transform:translate(-50%,-50%)] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:border-primary checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s]"
                     type="radio"
-                    name="stampRange"
+                    id={`rarity-${value}`}
+                    name="rarity"
                     value={value}
-                    checked={filters.stampRange.min === "" &&
-                      filters.stampRange.max === "" &&
-                      Number(filters.stampRangePreset) === Number(value)}
-                    onChange={(e: any) => {
-                      handleFilterChange(
-                        "stampRangePreset",
-                        parseInt(e.target.value),
-                      );
+                    checked={filters.rarity.min === "1" &&
+                      filters.rarity.max === value.toString()}
+                    onChange={() => {
+                      handleFilterChange("rarity", {
+                        min: "1",
+                        max: value.toString(),
+                      });
+                      handleFilterChange("rarityPreset", value);
                     }}
                   />
                   <label
+                    htmlFor={`rarity-${value}`}
                     className="text-sm text-stamp-grey select-none"
-                    htmlFor="inlineRadio1"
                   >
-                    {`>${value.toLocaleString()}`}
+                    1 - {value}
                   </label>
                 </div>
               );
@@ -882,22 +883,20 @@ export const StampDrawerFilters = (
             <div className="space-y-2">
               <RangeInput
                 label="Min Stamp Number"
-                value={filters.stampRange.min}
+                value={filters.rarity.min}
                 onChange={(value: string) =>
-                  handleFilterChange("stampRange", {
+                  handleFilterChange("rarity", {
                     min: value,
-                    preset: "",
-                    // custom: { ...filters.stampRange.custom,  },
+                    max: filters.rarity.max,
                   })}
               />
               <RangeInput
                 label="Max Stamp Number"
-                value={filters.stampRange.max}
+                value={filters.rarity.max}
                 onChange={(value: string) =>
-                  handleFilterChange("stampRange", {
+                  handleFilterChange("rarity", {
+                    min: filters.rarity.min,
                     max: value,
-                    preset: "",
-                    // custom: { ...filters.stampRange.custom,  },
                   })}
               />
             </div>

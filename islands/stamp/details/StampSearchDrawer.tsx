@@ -14,9 +14,9 @@ const StampSearchDrawer = (
   const forSale = searchparams.get("forSale") === "true";
   const trendingSales = searchparams.get("trendingSales") === "true";
   const sold = searchparams.get("sold") === "true";
-  const stampRangePreset = searchparams.get("stampRangePreset");
-  const stampRangeMin = searchparams.get("stampRange[min]");
-  const stampRangeMax = searchparams.get("stampRange[max]");
+  const rarityPreset = searchparams.get("rarityPreset");
+  const rarityMin = searchparams.get("rarity[min]");
+  const rarityMax = searchparams.get("rarity[max]");
   const stampPriceMin = searchparams.get("priceRange[min]");
   const stampPriceMax = searchparams.get("priceRange[max]");
   const fileTypeJpg = searchparams.get("fileType[jpg]") === "true" ||
@@ -64,10 +64,10 @@ const StampSearchDrawer = (
       legacy: fileTypeLegacy || false,
       olga: fileTypeOlga || false,
     },
-    stampRangePreset: stampRangePreset || 10000,
-    stampRange: {
-      min: stampRangeMin || "",
-      max: stampRangeMax || "",
+    rarityPreset: rarityPreset || 10000,
+    rarity: {
+      min: rarityMin || "",
+      max: rarityMax || "",
     },
     priceRange: {
       min: stampPriceMin || "",

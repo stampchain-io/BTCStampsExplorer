@@ -28,11 +28,10 @@ export const queryParamsToFilters = (search: string) => {
       unlocked: params.get("editions[unlocked]") === "true",
       divisible: params.get("editions[divisible]") === "true",
     },
+    rarityPreset: params.get("rarityPreset") || 10000,
     rarity: {
-      stampRange: {
-        min: params.get("rarity[stampRange][min]") || "",
-        max: params.get("rarity[stampRange][max]") || "",
-      },
+      min: params.get("rarity[min]") || "",
+      max: params.get("rarity[max]") || "",
     },
     market: {
       forSale: params.get("market[forSale]") === "true",
@@ -74,11 +73,11 @@ function filtersToQueryParams(search: string, filters: any) {
   });
 
   // Set rarity params
-  if (filters.rarity.stampRange.min) {
-    params.set("rarity[stampRange][min]", filters.rarity.stampRange.min);
+  if (filters.rarity.min) {
+    params.set("rarity[min]", filters.rarity.min);
   }
-  if (filters.rarity.stampRange.max) {
-    params.set("rarity[stampRange][max]", filters.rarity.stampRange.max);
+  if (filters.rarity.max) {
+    params.set("rarity[max]", filters.rarity.max);
   }
 
   // Set market params
@@ -119,8 +118,8 @@ export const queryParamsToServicePayload = (search: string) => {
     editionsUnlocked: params.get("editions[unlocked]") === "true",
     editionsDivisible: params.get("editions[divisible]") === "true",
 
-    rarityStampRangeMin: params.get("rarity[stampRange][min]") || "",
-    rarityStampRangeMax: params.get("rarity[stampRange][max]") || "",
+    rarityMin: params.get("rarity[min]") || "",
+    rarityMax: params.get("rarity[max]") || "",
 
     marketForSale: params.get("market[forSale]") === "true",
     marketTrendingSales: params.get("market[trendingSales]") === "true",
@@ -156,8 +155,8 @@ export const allQueryKeysFromFilters = [
   "editions[divisible]",
 
   // Rarity
-  "rarity[stampRange][min]",
-  "rarity[stampRange][max]",
+  "rarity[min]",
+  "rarity[max]",
 
   // Market
   "market[forSale]",
@@ -900,8 +899,7 @@ export const StampFilter = ({
           <div className="space-y-3">
             <div className="space-y-[3px] mobileLg:space-y-1.5">
               {[100, 1000, 5000, 10000].map((value) => {
-                const isChecked =
-                  filters.rarity.stampRange.max === String(value);
+                const isChecked = filters.rarity.max === String(value);
                 return (
                   <RadioOption
                     key={value}
@@ -912,19 +910,15 @@ export const StampFilter = ({
                         // Uncheck if already selected
                         handleFilterChange("rarity", {
                           ...filters.rarity,
-                          stampRange: {
-                            min: filters.rarity.stampRange.min,
-                            max: "",
-                          },
+                          min: filters.rarity.min,
+                          max: "",
                         });
                       } else {
                         // Check this one and uncheck others
                         handleFilterChange("rarity", {
                           ...filters.rarity,
-                          stampRange: {
-                            min: filters.rarity.stampRange.min,
-                            max: String(value),
-                          },
+                          min: filters.rarity.min,
+                          max: String(value),
                         });
                       }
                     }}
@@ -943,27 +937,21 @@ export const StampFilter = ({
               <div className="flex gap-6">
                 <RangeInput
                   label=""
-                  value={filters.rarity.stampRange.min}
+                  value={filters.rarity.min}
                   onChange={(value) =>
                     handleFilterChange("rarity", {
                       ...filters.rarity,
-                      stampRange: {
-                        ...filters.rarity.stampRange,
-                        min: value,
-                      },
+                      min: value,
                     })}
                   placeholder="0"
                 />
                 <RangeInput
                   label=""
-                  value={filters.rarity.stampRange.max}
+                  value={filters.rarity.max}
                   onChange={(value) =>
                     handleFilterChange("rarity", {
                       ...filters.rarity,
-                      stampRange: {
-                        ...filters.rarity.stampRange,
-                        max: value,
-                      },
+                      max: value,
                     })}
                   placeholder="∞"
                 />

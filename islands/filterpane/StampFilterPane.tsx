@@ -169,8 +169,8 @@ const defaultFilters = {
     legacy: false,
     olga: false,
   },
-  stampRangePreset: 10000,
-  stampRange: {
+  rarityPreset: 10000,
+  rarity: {
     min: "",
     max: "",
   },
