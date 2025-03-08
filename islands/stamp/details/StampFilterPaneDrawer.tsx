@@ -156,16 +156,33 @@ const Checkbox = ({ label, checked, onChange }) => (
   </div>
 );
 
-const RangeInput = ({ label, value, onChange }) => (
+const RangeInput = (
+  { label, value, onChange, placeholder = "Enter value" },
+) => (
   <div className="flex flex-col space-y-1">
     <label className="text-xs text-stamp-table-text">{label}</label>
     <input
       type="number"
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onKeyDown={(e) => {
+        // Prevent e, +, -, E, comma, and diaeresis
+        if (["e", "E", "+", "-", ",", "¨"].includes(e.key)) {
+          e.preventDefault();
+        }
+      }}
+      onChange={(e) => {
+        const value = e.target.value;
+        // Only allow digits
+        if (/^\d*$/.test(value)) {
+          onChange(value);
+        }
+      }}
       min="0"
-      className="w-full px-2 py-1 border border-purple-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-      placeholder="Enter value"
+      step="1"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      className="h-10 mobileLg:h-11 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
+      placeholder={placeholder}
     />
   </div>
 );
@@ -195,9 +212,15 @@ const defaultFilters = {
     unlocked: false,
     divisible: false,
   },
-  forSale: false,
-  trendingSales: false,
-  sold: false,
+  market: {
+    forSale: false,
+    trendingSales: false,
+    sold: false,
+    priceRange: {
+      min: "",
+      max: "",
+    },
+  },
   fileType: {
     jpg: false,
     png: false,
@@ -213,10 +236,6 @@ const defaultFilters = {
   },
   rarityPreset: 10000,
   rarity: {
-    min: "",
-    max: "",
-  },
-  priceRange: {
     min: "",
     max: "",
   },
@@ -434,13 +453,13 @@ export function queryParamsToFilters(search: string) {
 
   // Parse boolean params
   if (queryParams.get("forSale") === "true") {
-    filters.forSale = true;
+    filters.market.forSale = true;
   }
   if (queryParams.get("trendingSales") === "true") {
-    filters.trendingSales = true;
+    filters.market.trendingSales = true;
   }
   if (queryParams.get("sold") === "true") {
-    filters.sold = true;
+    filters.market.sold = true;
   }
 
   // Parse buyNow params
@@ -528,11 +547,11 @@ export function queryParamsToFilters(search: string) {
   // Parse priceRange params
   const priceRangeMinParam = queryParams.get("priceRange[min]");
   if (priceRangeMinParam) {
-    filters.priceRange.min = priceRangeMinParam;
+    filters.market.priceRange.min = priceRangeMinParam;
   }
   const priceRangeMaxParam = queryParams.get("priceRange[max]");
   if (priceRangeMaxParam) {
-    filters.priceRange.max = priceRangeMaxParam;
+    filters.market.priceRange.max = priceRangeMaxParam;
   }
 
   return filters;
@@ -554,11 +573,11 @@ export function queryParamsToServicePayload(search: string) {
     editions: Object.entries(filters.editions)
       .filter(([_, value]) => value)
       .map(([key]) => key),
-    forSale: filters.forSale,
-    trendingSales: filters.trendingSales,
-    sold: filters.sold,
+    forSale: filters.market.forSale,
+    trendingSales: filters.market.trendingSales,
+    sold: filters.market.sold,
     rarity: filters.rarity,
-    priceRange: filters.priceRange,
+    priceRange: filters.market.priceRange,
     sortOrder: filters.sortOrder,
   };
 }
@@ -811,27 +830,75 @@ export const StampDrawerFilters = (
       </FilterSection>
 
       <FilterSection
-        title="Market"
+        title="MARKET"
         section="market"
         expanded={expandedSections["market"]}
         toggle={() => toggleSection("market")}
       >
-        <Checkbox
-          label="For sale"
-          checked={filters.forSale}
-          onChange={() => handleFilterChange("forSale", !filters.forSale)}
-        />
-        <Checkbox
-          label="Trending sales"
-          checked={filters.trendingSales}
-          onChange={() =>
-            handleFilterChange("trendingSales", !filters.trendingSales)}
-        />
-        <Checkbox
-          label="Sold"
-          checked={filters.sold}
-          onChange={() => handleFilterChange("sold", !filters.sold)}
-        />
+        <div className="space-y-2">
+          <Checkbox
+            label="FOR SALE"
+            checked={filters.market.forSale}
+            onChange={() =>
+              handleFilterChange("market", {
+                ...filters.market,
+                forSale: !filters.market.forSale,
+              })}
+          />
+          <Checkbox
+            label="TRENDING SALES"
+            checked={filters.market.trendingSales}
+            onChange={() =>
+              handleFilterChange("market", {
+                ...filters.market,
+                trendingSales: !filters.market.trendingSales,
+              })}
+          />
+          <Checkbox
+            label="SOLD"
+            checked={filters.market.sold}
+            onChange={() =>
+              handleFilterChange("market", {
+                ...filters.market,
+                sold: !filters.market.sold,
+              })}
+          />
+
+          {/* Price Range Filter */}
+          <div>
+            <div className="flex items-center mb-[3px]">
+              <p className="text-sm text-stamp-grey font-medium">
+                PRICE RANGE
+              </p>
+            </div>
+            <div className="flex gap-6 placeholder:text-xs">
+              <RangeInput
+                label=""
+                value={filters.market.priceRange.min}
+                onChange={(value: string) =>
+                  handleFilterChange("market", {
+                    ...filters.market,
+                    priceRange: {
+                      ...filters.market.priceRange,
+                      min: value,
+                    },
+                  })}
+              />
+              <RangeInput
+                label=""
+                value={filters.market.priceRange.max}
+                onChange={(value: string) =>
+                  handleFilterChange("market", {
+                    ...filters.market,
+                    priceRange: {
+                      ...filters.market.priceRange,
+                      max: value,
+                    },
+                  })}
+              />
+            </div>
+          </div>
+        </div>
       </FilterSection>
 
       <FilterSection
@@ -872,17 +939,15 @@ export const StampDrawerFilters = (
             })}
           </div>
 
-          <div className="pt-2 border-t border-stamp-purple-highlight/20">
-            <div className="flex items-center gap-2 mb-2 text-stamp-grey-light">
-              {/* <Sliders size={16} className="text-black" /> */}
-              {/* <SlidersIcon /> */}
-              <span className="text-sm font-medium text-stamp-grey-light">
-                Custom Range
-              </span>
+          <div>
+            <div className="flex items-center mb-[3px]">
+              <p className="text-sm text-stamp-grey font-medium">
+                PRICE RANGE
+              </p>
             </div>
-            <div className="space-y-2">
+            <div className="flex gap-6 placeholder:text-xs">
               <RangeInput
-                label="Min Stamp Number"
+                label=""
                 value={filters.rarity.min}
                 onChange={(value: string) =>
                   handleFilterChange("rarity", {
@@ -891,7 +956,7 @@ export const StampDrawerFilters = (
                   })}
               />
               <RangeInput
-                label="Max Stamp Number"
+                label=""
                 value={filters.rarity.max}
                 onChange={(value: string) =>
                   handleFilterChange("rarity", {
@@ -903,52 +968,6 @@ export const StampDrawerFilters = (
           </div>
         </div>
       </FilterSection>
-
-      <FilterSection
-        title="Price Filter"
-        section="priceRange"
-        expanded={expandedSections["priceRange"]}
-        toggle={() => toggleSection("priceRange")}
-      >
-        <div className="space-y-2">
-          <RangeInput
-            label="Min Price"
-            value={filters.priceRange.min}
-            onChange={(value: string) =>
-              handleFilterChange("priceRange", {
-                ...filters.priceRange,
-                min: value,
-              })}
-          />
-          <RangeInput
-            label="Max Price"
-            value={filters.priceRange.max}
-            onChange={(value: string) =>
-              handleFilterChange("priceRange", {
-                ...filters.priceRange,
-                max: value,
-              })}
-          />
-        </div>
-      </FilterSection>
-
-      {
-        /* <div className="p-4 border-t border-stamp-purple-highlight/20">
-        <label className="block text-sm font-medium mb-2 text-stamp-grey">
-          Sort By
-        </label>
-        <select
-          value={filters.sortOrder}
-          onChange={(e) => handleFilterChange("sortOrder", e.target.value)}
-          className="w-full p-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-stamp-grey"
-        >
-          <option value="index_desc">Stamp Index: High to Low</option>
-          <option value="index_asc">Stamp Index: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
-          <option value="price_asc">Price: Low to High</option>
-        </select>
-      </div> */
-      }
 
       {/* Clear Filters Button */}
       <div className="!mt-6">

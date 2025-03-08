@@ -11,9 +11,11 @@ const StampSearchDrawer = (
   const dispenser = searchparams.get("buyNow[dispenser]") === "true";
   const locked = searchparams.get("editions[locked]") === "true";
   const oneOfOne = searchparams.get("editions[oneOfOne]") === "true";
-  const forSale = searchparams.get("forSale") === "true";
-  const trendingSales = searchparams.get("trendingSales") === "true";
-  const sold = searchparams.get("sold") === "true";
+  const forSale = searchparams.get("market[forSale]") === "true";
+  const trendingSales = searchparams.get("market[trendingSales]") === "true";
+  const sold = searchparams.get("market[sold]") === "true";
+  const marketPriceMin = searchparams.get("market[priceRange][min]");
+  const marketPriceMax = searchparams.get("market[priceRange][max]");
   const rarityPreset = searchparams.get("rarityPreset");
   const rarityMin = searchparams.get("rarity[min]");
   const rarityMax = searchparams.get("rarity[max]");
@@ -48,9 +50,15 @@ const StampSearchDrawer = (
       unlocked: unlocked || false,
       divisible: divisible || false,
     },
-    forSale: forSale || false,
-    trendingSales: trendingSales || false,
-    sold: sold || false,
+    market: {
+      forSale: forSale || false,
+      trendingSales: trendingSales || false,
+      sold: sold || false,
+      priceRange: {
+        min: marketPriceMin || "",
+        max: marketPriceMax || "",
+      },
+    },
     fileType: {
       jpg: fileTypeJpg || false,
       png: fileTypePng || false,
