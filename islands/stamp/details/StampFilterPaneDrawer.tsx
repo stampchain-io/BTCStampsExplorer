@@ -313,35 +313,41 @@ export function filtersToQueryParams(
   Object.entries(filters).forEach(([category, value]) => {
     if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
+        // Skip empty price range values
+        if (category === "market" && key === "priceRange") {
+          if (val.min || val.max) {
+            if (val.min) queryParams.set(`${category}[${key}][min]`, val.min);
+            if (val.max) queryParams.set(`${category}[${key}][max]`, val.max);
+          }
+          return;
+        }
+
         const strVal = val.toString();
         if (typeof val === "boolean") {
-          if (strVal !== "false") {
-            if (queryParams.has(`${category}[${key}]`)) {
-              queryParams.set(`${category}[${key}]`, strVal);
-            } else {
-              queryParams.append(`${category}[${key}]`, strVal);
-            }
+          if (strVal === "true") {
+            queryParams.set(`${category}[${key}]`, strVal);
           } else {
-            if (queryParams.has(`${category}[${key}]`)) {
-              queryParams.delete(`${category}[${key}]`);
-            }
+            queryParams.delete(`${category}[${key}]`);
           }
         } else if (val !== "") {
           queryParams.set(`${category}[${key}]`, strVal);
+        } else {
+          queryParams.delete(`${category}[${key}]`);
         }
       });
     } else {
       if (value === null) {
-        // continue on nulls
         return;
       }
       const strVal = value.toString();
-      if (typeof value === "boolean" && strVal !== "false") {
+      if (typeof value === "boolean" && strVal === "true") {
         queryParams.set(category, strVal);
       } else if (typeof value === "number") {
         queryParams.set(category, String(value));
       } else if (value !== "") {
         queryParams.set(category, strVal);
+      } else {
+        queryParams.delete(category);
       }
     }
   });
@@ -665,10 +671,9 @@ export const StampDrawerFilters = ({
   initialFilters,
 }) => {
   const [filters, setFilters] = useState(initialFilters);
-  console.log("[StampDrawerFilters] Initial filters:", initialFilters);
   const [expandedSections, setExpandedSections] = useState({
-    market: true,
-    fileType: false,
+    market: false,
+    fileType: true,
     editions: false,
     rarity: false,
     customRange: false,
@@ -700,14 +705,12 @@ export const StampDrawerFilters = ({
 
   const clearAllFilters = () => {
     setFilters(defaultFilters);
-    // onFilterChange(defaultFilters);
-    const queryParams = new URLSearchParams(globalThis.location.search);
-    allQueryKeysFromFilters.forEach((key) => {
-      queryParams.delete(key);
-    });
-    debouncedOnFilterChange?.(
-      queryParams.toString(),
-    );
+
+    // Construct the clean URL with just the type parameter
+    const cleanUrl = `${globalThis.location.pathname}?type=classic`;
+
+    // Update URL immediately without debouncing
+    globalThis.location.href = cleanUrl;
   };
 
   const toggleSection = (section) => {
