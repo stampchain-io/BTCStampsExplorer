@@ -1,37 +1,39 @@
 import { useEffect, useState } from "preact/hooks";
-import { useURLUpdate } from "$client/hooks/useURLUpdate.ts";
 import { Button } from "$components/shared/Button.tsx";
 
 interface SortProps {
-  initSort?: "ASC" | "DESC" | undefined;
-  onChangeSort?: (newSort: "ASC" | "DESC") => void;
-  sortParam?: string;
+  initSort?: "ASC" | "DESC";
+  searchParams?: URLSearchParams;
 }
 
-export function Sort(
-  { initSort = "ASC", onChangeSort, sortParam = "sortBy" }: SortProps,
-) {
-  const [sort, setSort] = useState<"ASC" | "DESC">(initSort || "ASC");
-  const { updateURL } = useURLUpdate();
+export function Sort({ initSort = "ASC", searchParams }: SortProps) {
+  // Initialize sort based on URL parameter
+  const [sort, setSort] = useState<"ASC" | "DESC">(
+    searchParams?.get("sortOrder")?.includes("asc") ? "ASC" : "DESC",
+  );
 
+  // Update sort state when URL changes
   useEffect(() => {
-    if (initSort) {
-      setSort(initSort);
+    if (typeof globalThis !== "undefined" && globalThis?.location) {
+      const currentSort = new URL(globalThis.location.href)
+        .searchParams.get("sortOrder");
+      setSort(currentSort?.includes("asc") ? "ASC" : "DESC");
     }
-  }, [initSort]);
-
-  useEffect(() => {
-    updateURL({ [sortParam]: sort });
-  }, [sort, sortParam]);
+  }, []);
 
   const handleSort = () => {
-    const newSort = sort === "ASC" ? "DESC" : "ASC";
+    const url = new URL(globalThis.location.href);
+    const currentSort = url.searchParams.get("sortOrder") || "index_desc";
+
+    // Toggle between index_asc and index_desc
+    const isAscending = currentSort === "index_asc";
+    const newParam = isAscending ? "index_desc" : "index_asc";
+    const newSort = isAscending ? "DESC" : "ASC";
+
     setSort(newSort);
-    onChangeSort?.(newSort);
 
     // Update URL and reload page
-    const url = new URL(globalThis.location.href);
-    url.searchParams.set(sortParam, newSort);
+    url.searchParams.set("sortOrder", newParam);
     globalThis.location.href = url.toString();
   };
 
