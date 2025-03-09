@@ -165,7 +165,7 @@ const Checkbox = ({ label, checked, onChange }) => {
 };
 
 const RangeInput = (
-  { label, value, onChange, placeholder = "Enter value" },
+  { label, placeholder, value, onChange },
 ) => (
   <div className="flex flex-col space-y-1">
     <label className="text-xs text-stamp-table-text">{label}</label>
@@ -732,6 +732,7 @@ export const StampDrawerFilters = ({
             <div className="flex gap-6 placeholder:text-xs">
               <RangeInput
                 label=""
+                placeholder="0.00000000"
                 value={filters.market.priceRange.min}
                 onChange={(value: string) =>
                   handleFilterChange("market", {
@@ -744,6 +745,7 @@ export const StampDrawerFilters = ({
               />
               <RangeInput
                 label=""
+                placeholder="∞ BTC"
                 value={filters.market.priceRange.max}
                 onChange={(value: string) =>
                   handleFilterChange("market", {
@@ -856,30 +858,54 @@ export const StampDrawerFilters = ({
             {[100, 1000, 5000, 10000].map((value) => (
               <Radio
                 key={value}
-                label={`SUB ${value}`}
+                label={`< ${value}`}
                 value={value}
-                checked={filters.rarity.min === "1" &&
+                checked={filters.rarity.min === "0" &&
                   filters.rarity.max === value.toString()}
                 onChange={() => {
-                  handleFilterChange("rarity", {
-                    min: "1",
-                    max: value.toString(),
-                  });
-                  handleFilterChange("rarityPreset", value);
+                  // If checked, uncheck by clearing the values
+                  if (
+                    filters.rarity.min === "0" &&
+                    filters.rarity.max === value.toString()
+                  ) {
+                    handleFilterChange("rarity", {
+                      min: "",
+                      max: "",
+                    });
+                    handleFilterChange("rarityPreset", "");
+
+                    // Update URL by removing rarity parameters
+                    const queryParams = new URLSearchParams(
+                      globalThis.location.search,
+                    );
+                    queryParams.delete("rarity[min]");
+                    queryParams.delete("rarity[max]");
+                    queryParams.delete("rarityPreset");
+                    debouncedOnFilterChange?.(queryParams.toString());
+                  } else {
+                    // If not checked, set the values
+                    handleFilterChange("rarity", {
+                      min: "0",
+                      max: value.toString(),
+                    });
+                    handleFilterChange("rarityPreset", value);
+                  }
                 }}
               />
             ))}
           </div>
 
+          {/* Stamp Range Filter */}
           <div className="!mt-3">
             <div className="flex items-center mb-[3px]">
-              <p className="text-sm text-stamp-grey font-medium">
-                PRICE RANGE
+              <p className="text-sm mobileLg:text-base text-stamp-grey font-light">
+                CUSTOM RANGE
               </p>
             </div>
             <div className="flex gap-6 placeholder:text-xs">
               <RangeInput
                 label=""
+                placeholder="MIN"
                 value={filters.rarity.min}
                 onChange={(value: string) =>
                   handleFilterChange("rarity", {
@@ -889,6 +915,7 @@ export const StampDrawerFilters = ({
               />
               <RangeInput
                 label=""
+                placeholder="MAX"
                 value={filters.rarity.max}
                 onChange={(value: string) =>
                   handleFilterChange("rarity", {
