@@ -50,7 +50,7 @@ const checkboxIcon = (checked: boolean, canHover: boolean): string => `
 `;
 
 const filterLabelSm = (checked: boolean, canHover: boolean): string => `
-  inline-block ml-[9px] mobileLg:ml-3 mt-0.5 text-sm mobileLg:text-base font-bold 
+  inline-block ml-[9px] mobileLg:ml-3 text-sm mobileLg:text-base font-bold 
   transition-colors duration-300
   cursor-pointer
   ${
@@ -98,11 +98,7 @@ const CollapsibleSection = ({
         onMouseLeave={handleMouseLeave}
         className={`
           flex items-center w-full group transition-colors duration-300
-          ${
-          isHeader
-            ? "justify-between py-1.5 mobileLg:py-3"
-            : "mt-2 mobileLg:mt-3"
-        }
+          ${isHeader ? "justify-between py-3" : "mt-2 mobileLg:mt-3"}
         `}
       >
         {!isHeader && (
@@ -172,7 +168,7 @@ const CollapsibleSection = ({
           expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="pt-1.5 pb-3 pl-0.5">
+        <div className="-mt-2 mobileLg:-mt-1.5 pb-3 pl-0.5">
           {children}
         </div>
       </div>
@@ -194,7 +190,7 @@ const Checkbox = ({ label, checked, onChange }) => {
 
   return (
     <div
-      className="flex items-center cursor-pointer py-1 group"
+      className="flex items-center py-1.5 mobileLg:py-1.5 cursor-pointer group"
       onMouseLeave={handleMouseLeave}
       onClick={handleChange}
     >
@@ -647,7 +643,7 @@ const Radio = ({ label, value, checked, onChange }) => {
 
   return (
     <div
-      className="flex items-center cursor-pointer py-1 group"
+      className="flex items-center py-1.5 mobileLg:py-1.5 cursor-pointer group"
       onMouseLeave={handleMouseLeave}
       onClick={handleChange}
     >
@@ -677,6 +673,7 @@ export const StampDrawerFilters = ({
     editions: false,
     rarity: false,
     customRange: false,
+    priceRange: false,
   });
   const debouncedOnFilterChange = useDebouncedCallback(
     (str: string) => {
@@ -725,123 +722,121 @@ export const StampDrawerFilters = ({
     "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-semibold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
   return (
-    <div className="space-y-1.5 mobileLg:space-y-3">
+    <div className="space-y-1 mobileLg:space-y-1.5">
       <CollapsibleSection
         title="MARKET"
         section="market"
-        expanded={expandedSections["market"]}
+        expanded={expandedSections.market}
         toggle={() => toggleSection("market")}
         variant="header"
       >
-        <div className="space-y-[3px] mobileLg:space-y-1.5">
-          <Checkbox
-            label="ATOMIC LISTINGS"
-            checked={filters.market.atomic}
-            onChange={() =>
-              handleFilterChange("market", {
-                ...filters.market,
-                atomic: !filters.market.atomic,
-              })}
-          />
-          <Checkbox
-            label="DISPENSERS"
-            checked={filters.market.dispenser}
-            onChange={() =>
-              handleFilterChange("market", {
-                ...filters.market,
-                dispenser: !filters.market.dispenser,
-              })}
-          />
-          <Checkbox
-            label="TRENDING SALES"
-            checked={filters.market.trendingSales}
-            onChange={() =>
-              handleFilterChange("market", {
-                ...filters.market,
-                trendingSales: !filters.market.trendingSales,
-              })}
-          />
-          <Checkbox
-            label="SOLD"
-            checked={filters.market.sold}
-            onChange={() =>
-              handleFilterChange("market", {
-                ...filters.market,
-                sold: !filters.market.sold,
-              })}
-          />
+        <Checkbox
+          label="ATOMIC LISTINGS"
+          checked={filters.market.atomic}
+          onChange={() =>
+            handleFilterChange("market", {
+              ...filters.market,
+              atomic: !filters.market.atomic,
+            })}
+        />
+        <Checkbox
+          label="DISPENSERS"
+          checked={filters.market.dispenser}
+          onChange={() =>
+            handleFilterChange("market", {
+              ...filters.market,
+              dispenser: !filters.market.dispenser,
+            })}
+        />
+        <Checkbox
+          label="TRENDING SALES"
+          checked={filters.market.trendingSales}
+          onChange={() =>
+            handleFilterChange("market", {
+              ...filters.market,
+              trendingSales: !filters.market.trendingSales,
+            })}
+        />
+        <Checkbox
+          label="SOLD"
+          checked={filters.market.sold}
+          onChange={() =>
+            handleFilterChange("market", {
+              ...filters.market,
+              sold: !filters.market.sold,
+            })}
+        />
 
-          {/* Price Range Filter */}
-          <div className="!mt-3">
-            <div className="flex items-center mb-[3px]">
-              <p className="text-sm text-stamp-grey font-medium">
-                PRICE RANGE
-              </p>
-            </div>
-            <div className="flex gap-6 placeholder:text-xs">
-              <RangeInput
-                label=""
-                placeholder="0.00000000"
-                value={filters.market.priceRange.min}
-                onChange={(value: string) =>
-                  handleFilterChange("market", {
-                    ...filters.market,
-                    priceRange: {
-                      ...filters.market.priceRange,
-                      min: value,
-                    },
-                  })}
-              />
-              <RangeInput
-                label=""
-                placeholder="∞ BTC"
-                value={filters.market.priceRange.max}
-                onChange={(value: string) =>
-                  handleFilterChange("market", {
-                    ...filters.market,
-                    priceRange: {
-                      ...filters.market.priceRange,
-                      max: value,
-                    },
-                  })}
-              />
-            </div>
+        {/* Price Range Filter */}
+        <CollapsibleSection
+          title="PRICE RANGE"
+          section="priceRange"
+          expanded={expandedSections.priceRange}
+          toggle={() => toggleSection("priceRange")}
+          variant="subheader"
+        >
+          <div className="flex gap-6 placeholder:text-xs">
+            <RangeInput
+              label=""
+              placeholder="0.00000000"
+              value={filters.market.priceRange.min}
+              onChange={(value: string) =>
+                handleFilterChange("market", {
+                  ...filters.market,
+                  priceRange: {
+                    ...filters.market.priceRange,
+                    min: value,
+                  },
+                })}
+            />
+            <RangeInput
+              label=""
+              placeholder="∞ BTC"
+              value={filters.market.priceRange.max}
+              onChange={(value: string) =>
+                handleFilterChange("market", {
+                  ...filters.market,
+                  priceRange: {
+                    ...filters.market.priceRange,
+                    max: value,
+                  },
+                })}
+            />
           </div>
-        </div>
+        </CollapsibleSection>
       </CollapsibleSection>
 
       <CollapsibleSection
         title="FILE TYPE"
         section="fileType"
-        expanded={expandedSections["fileType"]}
+        expanded={expandedSections.fileType}
         toggle={() => toggleSection("fileType")}
         variant="header"
       >
-        <div className="space-y-[3px] mobileLg:space-y-1.5">
-          {Object.entries({
-            "JPG/JPEG": "jpg",
-            "PNG": "png",
-            "GIF": "gif",
-            "WEBP": "webp",
-            "AVIF": "avif",
-            "BMP": "bmp",
-            "MP3/MPEG": "mp3",
-            "SVG": "svg",
-            "HTML": "html",
-            "LEGACY": "legacy",
-            "OLGA": "olga",
-          }).map(([label, key]) => (
-            <Checkbox
-              key={key}
-              label={label}
-              checked={filters.fileType[key.toLowerCase()]}
-              onChange={() =>
-                handleFilterChange("fileType", {
-                  [key]: !filters.fileType[key],
-                })}
-            />
-          ))}
-        </div>
+        {Object.entries({
+          "JPG/JPEG": "jpg",
+          "PNG": "png",
+          "GIF": "gif",
+          "WEBP": "webp",
+          "AVIF": "avif",
+          "BMP": "bmp",
+          "MP3/MPEG": "mp3",
+          "SVG": "svg",
+          "HTML": "html",
+          "LEGACY": "legacy",
+          "OLGA": "olga",
+        }).map(([label, key]) => (
+          <Checkbox
+            key={key}
+            label={label}
+            checked={filters.fileType[key]}
+            onChange={() =>
+              handleFilterChange("fileType", {
+                ...filters.fileType,
+                [key]: !filters.fileType[key],
+              })}
+          />
+        ))}
       </CollapsibleSection>
 
       <CollapsibleSection
@@ -851,51 +846,49 @@ export const StampDrawerFilters = ({
         toggle={() => toggleSection("editions")}
         variant="header"
       >
-        <div className="space-y-[3px] mobileLg:space-y-1.5">
-          <Checkbox
-            label="1/1"
-            checked={filters.editions.oneOfOne}
-            onChange={() =>
-              handleFilterChange("editions", {
-                oneOfOne: !filters.editions.oneOfOne,
-              })}
-          />
-          <Checkbox
-            label="MULTIPLE"
-            checked={filters.editions.multiple}
-            onChange={() =>
-              handleFilterChange("editions", {
-                ...filters.editions,
-                multiple: !filters.editions.multiple,
-              })}
-          />
-          <Checkbox
-            label="LOCKED"
-            checked={filters.editions.locked}
-            onChange={() =>
-              handleFilterChange("editions", {
-                locked: !filters.editions.locked,
-              })}
-          />
-          <Checkbox
-            label="UNLOCKED"
-            checked={filters.editions.unlocked}
-            onChange={() =>
-              handleFilterChange("editions", {
-                ...filters.editions,
-                unlocked: !filters.editions.unlocked,
-              })}
-          />
-          <Checkbox
-            label="DIVISIBLE"
-            checked={filters.editions.divisible}
-            onChange={() =>
-              handleFilterChange("editions", {
-                ...filters.editions,
-                divisible: !filters.editions.divisible,
-              })}
-          />
-        </div>
+        <Checkbox
+          label="1/1"
+          checked={filters.editions.oneOfOne}
+          onChange={() =>
+            handleFilterChange("editions", {
+              oneOfOne: !filters.editions.oneOfOne,
+            })}
+        />
+        <Checkbox
+          label="MULTIPLE"
+          checked={filters.editions.multiple}
+          onChange={() =>
+            handleFilterChange("editions", {
+              ...filters.editions,
+              multiple: !filters.editions.multiple,
+            })}
+        />
+        <Checkbox
+          label="LOCKED"
+          checked={filters.editions.locked}
+          onChange={() =>
+            handleFilterChange("editions", {
+              locked: !filters.editions.locked,
+            })}
+        />
+        <Checkbox
+          label="UNLOCKED"
+          checked={filters.editions.unlocked}
+          onChange={() =>
+            handleFilterChange("editions", {
+              ...filters.editions,
+              unlocked: !filters.editions.unlocked,
+            })}
+        />
+        <Checkbox
+          label="DIVISIBLE"
+          checked={filters.editions.divisible}
+          onChange={() =>
+            handleFilterChange("editions", {
+              ...filters.editions,
+              divisible: !filters.editions.divisible,
+            })}
+        />
       </CollapsibleSection>
 
       <CollapsibleSection
@@ -905,84 +898,80 @@ export const StampDrawerFilters = ({
         toggle={() => toggleSection("rarity")}
         variant="header"
       >
-        <div className="space-y-1.5">
-          <div className="space-y-[3px] mobileLg:space-y-1.5">
-            {[100, 1000, 5000, 10000].map((value) => (
-              <Radio
-                key={value}
-                label={`< ${value}`}
-                value={value}
-                checked={filters.rarity.min === "0" &&
-                  filters.rarity.max === value.toString()}
-                onChange={() => {
-                  // If checked, uncheck by clearing the values
-                  if (
-                    filters.rarity.min === "0" &&
-                    filters.rarity.max === value.toString()
-                  ) {
-                    handleFilterChange("rarity", {
-                      min: "",
-                      max: "",
-                    });
-                    handleFilterChange("rarityPreset", "");
+        {[100, 1000, 5000, 10000].map((value) => (
+          <Radio
+            key={value}
+            label={`< ${value}`}
+            value={value}
+            checked={filters.rarity.min === "0" &&
+              filters.rarity.max === value.toString()}
+            onChange={() => {
+              // If checked, uncheck by clearing the values
+              if (
+                filters.rarity.min === "0" &&
+                filters.rarity.max === value.toString()
+              ) {
+                handleFilterChange("rarity", {
+                  min: "",
+                  max: "",
+                });
+                handleFilterChange("rarityPreset", "");
 
-                    // Update URL by removing rarity parameters
-                    const queryParams = new URLSearchParams(
-                      globalThis.location.search,
-                    );
-                    queryParams.delete("rarity[min]");
-                    queryParams.delete("rarity[max]");
-                    queryParams.delete("rarityPreset");
-                    debouncedOnFilterChange?.(queryParams.toString());
-                  } else {
-                    // If not checked, set the values
-                    handleFilterChange("rarity", {
-                      min: "0",
-                      max: value.toString(),
-                    });
-                    handleFilterChange("rarityPreset", value);
-                  }
-                }}
-              />
-            ))}
+                // Update URL by removing rarity parameters
+                const queryParams = new URLSearchParams(
+                  globalThis.location.search,
+                );
+                queryParams.delete("rarity[min]");
+                queryParams.delete("rarity[max]");
+                queryParams.delete("rarityPreset");
+                debouncedOnFilterChange?.(queryParams.toString());
+              } else {
+                // If not checked, set the values
+                handleFilterChange("rarity", {
+                  min: "0",
+                  max: value.toString(),
+                });
+                handleFilterChange("rarityPreset", value);
+              }
+            }}
+          />
+        ))}
+
+        {/* Custom Range Section */}
+        <CollapsibleSection
+          title="CUSTOM RANGE"
+          section="customRange"
+          expanded={expandedSections.customRange}
+          toggle={() => toggleSection("customRange")}
+          variant="subheader"
+        >
+          <div className="flex gap-6 placeholder:text-xs">
+            <RangeInput
+              label=""
+              placeholder="MIN"
+              value={filters.rarity.min}
+              onChange={(value: string) =>
+                handleFilterChange("rarity", {
+                  min: value,
+                  max: filters.rarity.max,
+                })}
+            />
+            <RangeInput
+              label=""
+              placeholder="MAX"
+              value={filters.rarity.max}
+              onChange={(value: string) =>
+                handleFilterChange("rarity", {
+                  min: filters.rarity.min,
+                  max: value,
+                })}
+            />
           </div>
-
-          {/* Custom Range Section */}
-          <CollapsibleSection
-            title="CUSTOM RANGE"
-            section="customRange"
-            expanded={expandedSections.customRange}
-            toggle={() => toggleSection("customRange")}
-            variant="subheader"
-          >
-            <div className="flex gap-6 placeholder:text-xs">
-              <RangeInput
-                label=""
-                placeholder="MIN"
-                value={filters.rarity.min}
-                onChange={(value: string) =>
-                  handleFilterChange("rarity", {
-                    min: value,
-                    max: filters.rarity.max,
-                  })}
-              />
-              <RangeInput
-                label=""
-                placeholder="MAX"
-                value={filters.rarity.max}
-                onChange={(value: string) =>
-                  handleFilterChange("rarity", {
-                    min: filters.rarity.min,
-                    max: value,
-                  })}
-              />
-            </div>
-          </CollapsibleSection>
-        </div>
+        </CollapsibleSection>
       </CollapsibleSection>
 
       {/* Clear Filters Button */}
-      <div className="!mt-6">
+      <div className="!mt-6 mobileLg:!mt-9">
         <button
           onClick={clearAllFilters}
           className={`w-full ${buttonGreyOutline}`}
