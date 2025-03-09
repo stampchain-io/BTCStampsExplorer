@@ -6,7 +6,7 @@ import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
 import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
 import StampSearchDrawer from "$islands/stamp/details/StampSearchDrawer.tsx";
-import { MultiSort } from "$islands/datacontrol/MultiSort.tsx";
+import { Sort } from "$islands/datacontrol/Sort.tsx";
 
 export const StampHeader = (
   { filterBy, sortBy, search }: {
@@ -40,7 +40,7 @@ export const StampHeader = (
           setOpen={setFilterOpen}
           count={filterCount}
         />
-        <MultiSort searchparams={searchparams} initSort={sortBy} />
+        <Sort searchparams={searchparams} initSort={sortBy} />
         <StampSearchClient open2={searchOpen} handleOpen2={handleSearchOpen} />
       </div>
       <StampSearchDrawer
