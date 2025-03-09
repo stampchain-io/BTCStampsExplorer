@@ -88,53 +88,80 @@ const FilterSection = ({
   );
 };
 
-const Checkbox = ({ label, checked, onChange }) => (
-  // <label className="flex items-center space-x-2 py-1 cursor-pointer">
-  //   <input
-  //     type="checkbox"
-  //     checked={checked}
-  //     onChange={onChange}
-  //     className="rounded border-purple-300 text-stamp-table-text focus:ring-purple-500"
-  //   />
-  //   <span className="text-sm text-stamp-grey">{label}</span>
-  // </label>
-  <div className="flex items-center cursor-pointer py-1">
-    <input
-      className={`
-        appearance-none
-        w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
-        border-2 border-stamp-grey
-        rounded-sm
-        cursor-pointer
-        relative
-        transition-colors duration-300
-        
-        before:content-['']
-        before:block
-        before:w-1.5 before:h-1.5 mobileLg:before:w-2 mobileLg:before:h-2
-        before:rounded-[1px]
-        before:absolute
-        before:top-1/2 before:left-1/2
-        before:-translate-x-1/2 before:-translate-y-1/2
-        before:bg-stamp-grey-light
-        before:scale-0
-        checked:before:scale-100
-        before:transition-all
-        before:duration-100
-      `}
-      type="checkbox"
-      checked={checked}
-      value={checked}
-      onChange={onChange}
-    />
-    <label
-      className="inline-block pl-[0.15rem] hover:cursor-pointer text-stamp-grey ml-1 select-none"
-      htmlFor="inlineCheckbox1"
+const Checkbox = ({ label, checked, onChange }) => {
+  const [canHover, setCanHover] = useState(true);
+
+  const handleChange = () => {
+    // Call the onChange handler passed from parent
+    onChange();
+    setTimeout(() => setCanHover(false), 0);
+  };
+
+  const handleMouseLeave = () => {
+    setCanHover(true);
+  };
+
+  return (
+    <div
+      className="flex items-center cursor-pointer py-1 group"
+      onMouseLeave={handleMouseLeave}
+      onClick={handleChange}
     >
-      {label}
-    </label>
-  </div>
-);
+      <input
+        className={`
+          appearance-none
+          w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
+          border-2 
+          rounded-sm
+          cursor-pointer
+          relative
+          transition-colors duration-300
+          ${
+          checked
+            ? canHover
+              ? "border-stamp-grey-light before:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:before:bg-stamp-grey"
+              : "border-stamp-grey-light before:bg-stamp-grey-light"
+            : canHover
+            ? "border-stamp-grey group-hover:border-stamp-grey-light"
+            : "border-stamp-grey"
+        }
+          before:content-['']
+          before:block
+          before:w-1.5 before:h-1.5 mobileLg:before:w-2 mobileLg:before:h-2
+          before:rounded-[1px]
+          before:absolute
+          before:top-1/2 before:left-1/2
+          before:-translate-x-1/2 before:-translate-y-1/2
+          before:scale-0
+          checked:before:scale-100
+          before:transition-all
+          before:duration-100
+        `}
+        type="checkbox"
+        checked={checked}
+        readOnly
+      />
+      <label
+        className={`
+          inline-block ml-[9px] mobileLg:ml-3 mt-0.5 text-sm mobileLg:text-base font-semibold 
+          transition-colors duration-300
+          cursor-pointer
+          ${
+          checked
+            ? canHover
+              ? "text-stamp-grey-light group-hover:text-stamp-grey"
+              : "text-stamp-grey-light"
+            : canHover
+            ? "text-stamp-grey group-hover:text-stamp-grey-light"
+            : "text-stamp-grey"
+        }
+        `}
+      >
+        {label}
+      </label>
+    </div>
+  );
+};
 
 const RangeInput = (
   { label, value, onChange, placeholder = "Enter value" },
