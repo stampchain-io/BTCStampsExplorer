@@ -2,15 +2,22 @@ import { useRef, useState } from "preact/hooks";
 import { STAMP_SUFFIX_FILTERS } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
-const chevronIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 32 32"
-    class="w-5 h-5 mobileLg:w-6 mobileLg:h-6"
-  >
-    <path d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z" />
-  </svg>
-);
+const chevronIcon = (size: "sm" | "lg") => {
+  const iconSize = {
+    sm: "w-4 h-4 mobileLg:w-5 mobileLg:h-5",
+    lg: "w-5 h-5 mobileLg:w-6 mobileLg:h-6",
+  };
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 32 32"
+      className={iconSize[size]}
+    >
+      <path d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z" />
+    </svg>
+  );
+};
 
 const checkboxIcon = (checked: boolean, canHover: boolean): string => `
   appearance-none
@@ -57,18 +64,20 @@ const filterLabelSm = (checked: boolean, canHover: boolean): string => `
 }
 `;
 
-const FilterSection = ({
+const CollapsibleSection = ({
   title,
   section,
   expanded,
   toggle,
   children,
+  variant,
 }: {
   title: string;
   section: string;
   expanded: boolean;
   toggle: () => void;
   children: ComponentChildren;
+  variant: "header" | "subheader";
 }) => {
   const [canHover, setCanHover] = useState(true);
 
@@ -80,46 +89,84 @@ const FilterSection = ({
     setCanHover(true);
   };
 
+  const isHeader = variant === "header";
+
   return (
     <div>
       <button
         onClick={handleClick}
         onMouseLeave={handleMouseLeave}
-        className="flex items-center justify-between w-full py-1.5 mobileLg:py-3 text-lg mobileLg:text-xl font-light group"
+        className={`
+          flex items-center w-full group transition-colors duration-300
+          ${
+          isHeader
+            ? "justify-between py-1.5 mobileLg:py-3"
+            : "mt-2 mobileLg:mt-3"
+        }
+        `}
       >
-        <span
-          className={`${
-            expanded
-              ? `text-stamp-grey ${
-                canHover ? "group-hover:text-stamp-grey-light" : ""
-              }`
-              : `text-stamp-grey-light ${
-                canHover ? "group-hover:text-stamp-grey" : ""
-              }`
-          } transition-colors duration-300`}
-        >
-          {title}
-        </span>
-        <div
-          className={`transform transition-all duration-300 ${
-            expanded ? "scale-y-[-1]" : ""
-          }`}
-        >
+        {!isHeader && (
           <div
-            className={`${
+            className={`transform transition-all duration-300 ${
+              expanded ? "scale-y-[-1]" : ""
+            } ${
               expanded
-                ? `fill-stamp-grey ${
-                  canHover ? "group-hover:fill-stamp-grey-light" : ""
-                }`
-                : `fill-stamp-grey-light ${
+                ? `fill-stamp-grey-light ${
                   canHover ? "group-hover:fill-stamp-grey" : ""
+                }`
+                : `fill-stamp-grey ${
+                  canHover ? "group-hover:fill-stamp-grey-light" : ""
                 }`
             } transition-colors duration-300`}
           >
-            {chevronIcon()}
+            {chevronIcon("sm")}
           </div>
-        </div>
+        )}
+
+        <span
+          className={`
+            transition-colors duration-300 !font-light
+            ${
+            isHeader
+              ? `text-lg mobileLg:text-xl font-light ${
+                expanded
+                  ? `text-stamp-grey ${
+                    canHover ? "group-hover:text-stamp-grey-light" : ""
+                  }`
+                  : `text-stamp-grey-light ${
+                    canHover ? "group-hover:text-stamp-grey" : ""
+                  }`
+              }`
+              : filterLabelSm(expanded, canHover)
+          }
+          `}
+        >
+          {title}
+        </span>
+
+        {isHeader && (
+          <div
+            className={`transform transition-all duration-300 ${
+              expanded ? "scale-y-[-1]" : ""
+            }`}
+          >
+            <div
+              className={`${
+                expanded
+                  ? `fill-stamp-grey ${
+                    canHover ? "group-hover:fill-stamp-grey-light" : ""
+                  }`
+                  : `fill-stamp-grey-light ${
+                    canHover ? "group-hover:fill-stamp-grey" : ""
+                  }`
+              } transition-colors duration-300`}
+            >
+              {chevronIcon("lg")}
+            </div>
+          </div>
+        )}
       </button>
+
       <div
         className={`overflow-hidden transition-all duration-300 ${
           expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
@@ -629,6 +676,7 @@ export const StampDrawerFilters = ({
     fileType: false,
     editions: false,
     rarity: false,
+    customRange: false,
   });
   const debouncedOnFilterChange = useDebouncedCallback(
     (str: string) => {
@@ -678,11 +726,12 @@ export const StampDrawerFilters = ({
 
   return (
     <div className="space-y-1.5 mobileLg:space-y-3">
-      <FilterSection
+      <CollapsibleSection
         title="MARKET"
         section="market"
         expanded={expandedSections["market"]}
         toggle={() => toggleSection("market")}
+        variant="header"
       >
         <div className="space-y-[3px] mobileLg:space-y-1.5">
           <Checkbox
@@ -759,13 +808,14 @@ export const StampDrawerFilters = ({
             </div>
           </div>
         </div>
-      </FilterSection>
+      </CollapsibleSection>
 
-      <FilterSection
+      <CollapsibleSection
         title="FILE TYPE"
         section="fileType"
         expanded={expandedSections["fileType"]}
         toggle={() => toggleSection("fileType")}
+        variant="header"
       >
         <div className="space-y-[3px] mobileLg:space-y-1.5">
           {Object.entries({
@@ -792,13 +842,14 @@ export const StampDrawerFilters = ({
             />
           ))}
         </div>
-      </FilterSection>
+      </CollapsibleSection>
 
-      <FilterSection
+      <CollapsibleSection
         title="EDITIONS"
         section="editions"
         expanded={expandedSections["editions"]}
         toggle={() => toggleSection("editions")}
+        variant="header"
       >
         <div className="space-y-[3px] mobileLg:space-y-1.5">
           <Checkbox
@@ -845,15 +896,16 @@ export const StampDrawerFilters = ({
               })}
           />
         </div>
-      </FilterSection>
+      </CollapsibleSection>
 
-      <FilterSection
+      <CollapsibleSection
         title="RARITY"
         section="rarity"
         expanded={expandedSections["rarity"]}
         toggle={() => toggleSection("rarity")}
+        variant="header"
       >
-        <div className="space-y-4">
+        <div className="space-y-1.5">
           <div className="space-y-[3px] mobileLg:space-y-1.5">
             {[100, 1000, 5000, 10000].map((value) => (
               <Radio
@@ -895,13 +947,14 @@ export const StampDrawerFilters = ({
             ))}
           </div>
 
-          {/* Stamp Range Filter */}
-          <div className="!mt-3">
-            <div className="flex items-center mb-[3px]">
-              <p className="text-sm mobileLg:text-base text-stamp-grey font-light">
-                CUSTOM RANGE
-              </p>
-            </div>
+          {/* Custom Range Section */}
+          <CollapsibleSection
+            title="CUSTOM RANGE"
+            section="customRange"
+            expanded={expandedSections.customRange}
+            toggle={() => toggleSection("customRange")}
+            variant="subheader"
+          >
             <div className="flex gap-6 placeholder:text-xs">
               <RangeInput
                 label=""
@@ -924,9 +977,9 @@ export const StampDrawerFilters = ({
                   })}
               />
             </div>
-          </div>
+          </CollapsibleSection>
         </div>
-      </FilterSection>
+      </CollapsibleSection>
 
       {/* Clear Filters Button */}
       <div className="!mt-6">
