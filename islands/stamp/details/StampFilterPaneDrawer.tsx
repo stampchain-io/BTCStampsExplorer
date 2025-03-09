@@ -1,4 +1,4 @@
-import { useRef, useState } from "preact/hooks";
+import { ComponentChildren, useRef, useState } from "preact/hooks";
 import { STAMP_SUFFIX_FILTERS } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
@@ -176,7 +176,13 @@ const CollapsibleSection = ({
   );
 };
 
-const Checkbox = ({ label, checked, onChange }) => {
+interface CheckboxProps {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}
+
+const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
   const [canHover, setCanHover] = useState(true);
 
   const handleChange = () => {
@@ -207,8 +213,15 @@ const Checkbox = ({ label, checked, onChange }) => {
   );
 };
 
+interface RangeInputProps {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
 const RangeInput = (
-  { label, placeholder, value, onChange },
+  { label, placeholder, value, onChange }: RangeInputProps,
 ) => (
   <div className="flex flex-col space-y-1">
     <label className="text-xs text-stamp-table-text">{label}</label>
@@ -217,7 +230,7 @@ const RangeInput = (
       value={value}
       onKeyDown={(e) => {
         // Prevent e, +, -, E, comma, and diaeresis
-        if (["e", "E", "+", "-", ",", "¨"].includes(e.key)) {
+        if (["e", "E", "+", "-", ",", "."].includes(e.key)) {
           e.preventDefault();
         }
       }}
@@ -238,13 +251,16 @@ const RangeInput = (
   </div>
 );
 
-function useDebouncedCallback(callback: Function, delay: number) {
-  const timeoutRef = useRef(null);
+function useDebouncedCallback<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number,
+): (...args: Parameters<T>) => void {
+  const timeoutRef = useRef<number | null>(null);
 
-  function debouncedCallback(...args) {
-    clearTimeout(timeoutRef.current);
+  function debouncedCallback(...args: Parameters<T>) {
+    clearTimeout(timeoutRef.current!);
     timeoutRef.current = setTimeout(() => {
-      callback?.(...args);
+      callback(...args);
     }, delay);
   }
 
@@ -490,29 +506,18 @@ export function queryParamsToFilters(search: string) {
   const queryParams = new URLSearchParams(search);
   const filters = { ...defaultFilters };
 
-  // Parse search param
-  const searchParam = queryParams.get("search");
-  if (searchParam) {
-    filters.search = searchParam;
-  }
-
-  // Parse boolean params
-  if (queryParams.get("forSale") === "true") {
-    filters.market.forSale = true;
-  }
-  if (queryParams.get("trendingSales") === "true") {
-    filters.market.trendingSales = true;
-  }
-  if (queryParams.get("sold") === "true") {
-    filters.market.sold = true;
-  }
-
   // Parse market params
   if (queryParams.get("market[atomic]") === "true") {
     filters.market.atomic = true;
   }
   if (queryParams.get("market[dispenser]") === "true") {
     filters.market.dispenser = true;
+  }
+  if (queryParams.get("trendingSales") === "true") {
+    filters.market.trendingSales = true;
+  }
+  if (queryParams.get("sold") === "true") {
+    filters.market.sold = true;
   }
 
   // Parse market price range
@@ -613,17 +618,11 @@ export function queryParamsToServicePayload(search: string) {
       .filter(([_, value]) => value)
       .map(([key]) => key),
     market: Object.entries(filters.market)
-      .filter(([key, value]) =>
-        value && key !== "priceRange" && key !== "forSale" &&
-        key !== "trendingSales" && key !== "sold"
-      )
+      .filter(([_, value]) => value)
       .map(([key]) => key),
     editions: Object.entries(filters.editions)
       .filter(([_, value]) => value)
       .map(([key]) => key),
-    forSale: filters.market.forSale,
-    trendingSales: filters.market.trendingSales,
-    sold: filters.market.sold,
     rarity: filters.rarity,
     priceRange: filters.market.priceRange,
   };

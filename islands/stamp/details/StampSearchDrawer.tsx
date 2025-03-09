@@ -168,7 +168,7 @@ const StampSearchDrawer = (
         class={`fixed top-0 left-0 z-40 
         w-full min-[420px]:w-72 mobileLg:w-80 h-screen 
         p-6 backdrop-blur-md 
-        bg-gradient-to-b from-[#000000]/70 to-[#000000]/90 
+        bg-gradient-to-b from-[#000000]/80 to-[#000000]/90 
         overflow-y-auto transition-transform scrollbar-black
          ${open ? "translate-x-0" : "-translate-x-full"}`}
         aria-labelledby="drawer-form-label"
