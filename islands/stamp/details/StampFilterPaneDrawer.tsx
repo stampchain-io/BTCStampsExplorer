@@ -2,7 +2,7 @@ import { useRef, useState } from "preact/hooks";
 import { STAMP_SUFFIX_FILTERS } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
-const ChevronIcon = () => (
+const chevronIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 32 32"
@@ -11,6 +11,51 @@ const ChevronIcon = () => (
     <path d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z" />
   </svg>
 );
+
+const checkboxIcon = (checked: boolean, canHover: boolean): string => `
+  appearance-none
+  w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
+  border-2 
+  rounded-sm
+  cursor-pointer
+  relative
+  transition-colors duration-300
+  ${
+  checked
+    ? canHover
+      ? "border-stamp-grey-light after:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:after:bg-stamp-grey"
+      : "border-stamp-grey-light after:bg-stamp-grey-light"
+    : canHover
+    ? "border-stamp-grey group-hover:border-stamp-grey-light"
+    : "border-stamp-grey"
+}
+  after:content-['']
+  after:block
+  after:w-1.5 after:h-1.5 mobileLg:after:w-2 mobileLg:after:h-2
+  after:rounded-[1px]
+  after:absolute
+  after:top-1/2 after:left-1/2
+  after:-translate-x-1/2 after:-translate-y-1/2
+  after:scale-0
+  checked:after:scale-100
+  after:transition-all
+  after:duration-100
+`;
+
+const filterLabelSm = (checked: boolean, canHover: boolean): string => `
+  inline-block ml-[9px] mobileLg:ml-3 mt-0.5 text-sm mobileLg:text-base font-bold 
+  transition-colors duration-300
+  cursor-pointer
+  ${
+  checked
+    ? canHover
+      ? "text-stamp-grey-light group-hover:text-stamp-grey"
+      : "text-stamp-grey-light"
+    : canHover
+    ? "text-stamp-grey group-hover:text-stamp-grey-light"
+    : "text-stamp-grey"
+}
+`;
 
 const FilterSection = ({
   title,
@@ -71,7 +116,7 @@ const FilterSection = ({
                 }`
             } transition-colors duration-300`}
           >
-            <ChevronIcon />
+            {chevronIcon()}
           </div>
         </div>
       </button>
@@ -92,7 +137,6 @@ const Checkbox = ({ label, checked, onChange }) => {
   const [canHover, setCanHover] = useState(true);
 
   const handleChange = () => {
-    // Call the onChange handler passed from parent
     onChange();
     setTimeout(() => setCanHover(false), 0);
   };
@@ -108,55 +152,12 @@ const Checkbox = ({ label, checked, onChange }) => {
       onClick={handleChange}
     >
       <input
-        className={`
-          appearance-none
-          w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
-          border-2 
-          rounded-sm
-          cursor-pointer
-          relative
-          transition-colors duration-300
-          ${
-          checked
-            ? canHover
-              ? "border-stamp-grey-light before:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:before:bg-stamp-grey"
-              : "border-stamp-grey-light before:bg-stamp-grey-light"
-            : canHover
-            ? "border-stamp-grey group-hover:border-stamp-grey-light"
-            : "border-stamp-grey"
-        }
-          before:content-['']
-          before:block
-          before:w-1.5 before:h-1.5 mobileLg:before:w-2 mobileLg:before:h-2
-          before:rounded-[1px]
-          before:absolute
-          before:top-1/2 before:left-1/2
-          before:-translate-x-1/2 before:-translate-y-1/2
-          before:scale-0
-          checked:before:scale-100
-          before:transition-all
-          before:duration-100
-        `}
+        className={checkboxIcon(checked, canHover)}
         type="checkbox"
         checked={checked}
         readOnly
       />
-      <label
-        className={`
-          inline-block ml-[9px] mobileLg:ml-3 mt-0.5 text-sm mobileLg:text-base font-semibold 
-          transition-colors duration-300
-          cursor-pointer
-          ${
-          checked
-            ? canHover
-              ? "text-stamp-grey-light group-hover:text-stamp-grey"
-              : "text-stamp-grey-light"
-            : canHover
-            ? "text-stamp-grey group-hover:text-stamp-grey-light"
-            : "text-stamp-grey"
-        }
-        `}
-      >
+      <label className={filterLabelSm(checked, canHover)}>
         {label}
       </label>
     </div>
@@ -585,6 +586,39 @@ export function queryParamsToServicePayload(search: string) {
   };
 }
 
+const Radio = ({ label, value, checked, onChange }) => {
+  const [canHover, setCanHover] = useState(true);
+
+  const handleChange = () => {
+    onChange();
+    setTimeout(() => setCanHover(false), 0);
+  };
+
+  const handleMouseLeave = () => {
+    setCanHover(true);
+  };
+
+  return (
+    <div
+      className="flex items-center cursor-pointer py-1 group"
+      onMouseLeave={handleMouseLeave}
+      onClick={handleChange}
+    >
+      <input
+        className={checkboxIcon(checked, canHover)}
+        type="radio"
+        name="rarity"
+        value={value}
+        checked={checked}
+        readOnly
+      />
+      <label className={filterLabelSm(checked, canHover)}>
+        {label}
+      </label>
+    </div>
+  );
+};
+
 export const StampDrawerFilters = ({
   initialFilters,
 }) => {
@@ -640,7 +674,7 @@ export const StampDrawerFilters = ({
   };
 
   const buttonGreyOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-semibold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
   return (
     <div className="space-y-1.5 mobileLg:space-y-3">
@@ -819,34 +853,22 @@ export const StampDrawerFilters = ({
       >
         <div className="space-y-4">
           <div className="space-y-[3px] mobileLg:space-y-1.5">
-            {[100, 1000, 5000, 10000].map((value) => {
-              return (
-                <div className="flex items-center space-x-2 py-1 cursor-pointer">
-                  <input
-                    className="relative float-left h-5 w-5 text-stamp-grey focus:ring-stamp-grey appearance-none rounded-full border-2 border-solid border-neutral-300 before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] after:absolute after:z-[1] after:block after:h-4 after:w-4 after:rounded-full after:content-[''] checked:border-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-[0.625rem] checked:after:w-[0.625rem] checked:after:rounded-full checked:after:border-white checked:after:bg-white checked:after:content-[''] checked:after:[transform:translate(-50%,-50%)] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:border-primary checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s]"
-                    type="radio"
-                    id={`rarity-${value}`}
-                    name="rarity"
-                    value={value}
-                    checked={filters.rarity.min === "1" &&
-                      filters.rarity.max === value.toString()}
-                    onChange={() => {
-                      handleFilterChange("rarity", {
-                        min: "1",
-                        max: value.toString(),
-                      });
-                      handleFilterChange("rarityPreset", value);
-                    }}
-                  />
-                  <label
-                    htmlFor={`rarity-${value}`}
-                    className="text-sm text-stamp-grey select-none"
-                  >
-                    1 - {value}
-                  </label>
-                </div>
-              );
-            })}
+            {[100, 1000, 5000, 10000].map((value) => (
+              <Radio
+                key={value}
+                label={`SUB ${value}`}
+                value={value}
+                checked={filters.rarity.min === "1" &&
+                  filters.rarity.max === value.toString()}
+                onChange={() => {
+                  handleFilterChange("rarity", {
+                    min: "1",
+                    max: value.toString(),
+                  });
+                  handleFilterChange("rarityPreset", value);
+                }}
+              />
+            ))}
           </div>
 
           <div className="!mt-3">
