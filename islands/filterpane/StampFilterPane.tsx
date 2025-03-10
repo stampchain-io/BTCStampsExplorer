@@ -37,10 +37,12 @@ export type StampFilters = {
     unlocked: boolean;
     divisible: boolean;
   };
-  rarityPreset: string;
   rarity: {
-    min: string;
-    max: string;
+    sub: boolean;
+    stampRange: {
+      min: string;
+      max: string;
+    };
   };
   [key: string]: any; // Add index signature to allow string indexing
 };
@@ -77,10 +79,12 @@ const defaultFilters: StampFilters = {
     unlocked: false,
     divisible: false,
   },
-  rarityPreset: "",
   rarity: {
-    min: "",
-    max: "",
+    sub: false,
+    stampRange: {
+      min: "",
+      max: "",
+    },
   },
 };
 
@@ -282,9 +286,9 @@ export const allQueryKeysFromFilters = [
   "editions[divisible]",
 
   // Rarity filters
-  "rarityPreset",
-  "rarity[min]",
-  "rarity[max]",
+  "rarity[sub]",
+  "rarity[stampRange][min]",
+  "rarity[stampRange][max]",
 ];
 
 export function queryParamsToFilters(query: string): StampFilters {

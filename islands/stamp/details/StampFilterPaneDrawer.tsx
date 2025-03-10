@@ -300,10 +300,12 @@ const defaultFilters = {
     unlocked: false,
     divisible: false,
   },
-  rarityPreset: "",
   rarity: {
-    min: "",
-    max: "",
+    sub: false,
+    stampRange: {
+      min: "",
+      max: "",
+    },
   },
 };
 
@@ -315,8 +317,11 @@ export function filtersToQueryParams(
   Object.entries(filters).forEach(([category, value]) => {
     if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
-        // Skip empty price range values
-        if (category === "market" && key === "priceRange") {
+        // Handle nested objects (priceRange and stampRange)
+        if (
+          (category === "market" && key === "priceRange") ||
+          (category === "rarity" && key === "stampRange")
+        ) {
           if (val.min || val.max) {
             if (val.min) queryParams.set(`${category}[${key}][min]`, val.min);
             if (val.max) queryParams.set(`${category}[${key}][max]`, val.max);
@@ -505,9 +510,9 @@ export const allQueryKeysFromFilters = [
   "editions[divisible]",
 
   // Rarity filters
-  "rarityPreset",
-  "rarity[min]",
-  "rarity[max]",
+  "rarity[sub]",
+  "rarity[stampRange][min]",
+  "rarity[stampRange][max]",
 ];
 
 export function queryParamsToFilters(search: string) {
@@ -596,20 +601,20 @@ export function queryParamsToFilters(search: string) {
     filters.fileType.olga = true;
   }
 
-  // Parse rarityPreset
-  const rarityPresetParam = queryParams.get("rarityPreset");
-  if (rarityPresetParam) {
-    filters.rarityPreset = rarityPresetParam;
+  // Parse rarity params
+  const raritySubParam = queryParams.get("rarity[sub]");
+  if (raritySubParam) {
+    filters.rarity.sub = raritySubParam === "true";
   }
 
-  // Parse rarity params
-  const rarityMinParam = queryParams.get("rarity[min]");
+  // Parse rarity range params
+  const rarityMinParam = queryParams.get("rarity[stampRange][min]");
   if (rarityMinParam) {
-    filters.rarity.min = rarityMinParam;
+    filters.rarity.stampRange.min = rarityMinParam;
   }
-  const rarityMaxParam = queryParams.get("rarity[max]");
+  const rarityMaxParam = queryParams.get("rarity[stampRange][max]");
   if (rarityMaxParam) {
-    filters.rarity.max = rarityMaxParam;
+    filters.rarity.stampRange.max = rarityMaxParam;
   }
 
   return filters;
@@ -906,36 +911,30 @@ export const StampDrawerFilters = ({
           <Radio
             key={value}
             label={`< ${value}`}
-            value={value}
-            checked={filters.rarity.min === "0" &&
-              filters.rarity.max === value.toString()}
+            checked={filters.rarity?.sub &&
+              filters.rarity?.stampRange?.max === value.toString()}
             onChange={() => {
-              // If checked, uncheck by clearing the values
               if (
-                filters.rarity.min === "0" &&
-                filters.rarity.max === value.toString()
+                filters.rarity?.sub &&
+                filters.rarity?.stampRange?.max === value.toString()
               ) {
+                // Unselect the radio button
                 handleFilterChange("rarity", {
-                  min: "",
-                  max: "",
+                  sub: false,
+                  stampRange: {
+                    min: "",
+                    max: "",
+                  },
                 });
-                handleFilterChange("rarityPreset", "");
-
-                // Update URL by removing rarity parameters
-                const queryParams = new URLSearchParams(
-                  globalThis.location.search,
-                );
-                queryParams.delete("rarity[min]");
-                queryParams.delete("rarity[max]");
-                queryParams.delete("rarityPreset");
-                debouncedOnFilterChange?.(queryParams.toString());
               } else {
-                // If not checked, set the values
+                // Select the radio button
                 handleFilterChange("rarity", {
-                  min: "0",
-                  max: value.toString(),
+                  sub: true,
+                  stampRange: {
+                    min: "0",
+                    max: value.toString(),
+                  },
                 });
-                handleFilterChange("rarityPreset", value);
               }
             }}
           />
@@ -953,21 +952,27 @@ export const StampDrawerFilters = ({
             <RangeInput
               label=""
               placeholder="MIN"
-              value={filters.rarity.min}
+              value={filters.rarity?.stampRange?.min}
               onChange={(value: string) =>
                 handleFilterChange("rarity", {
-                  min: value,
-                  max: filters.rarity.max,
+                  ...filters.rarity,
+                  stampRange: {
+                    min: value,
+                    max: filters.rarity?.stampRange?.max || "",
+                  },
                 })}
             />
             <RangeInput
               label=""
               placeholder="MAX"
-              value={filters.rarity.max}
+              value={filters.rarity?.stampRange?.max}
               onChange={(value: string) =>
                 handleFilterChange("rarity", {
-                  min: filters.rarity.min,
-                  max: value,
+                  ...filters.rarity,
+                  stampRange: {
+                    min: filters.rarity?.stampRange?.min || "",
+                    max: value,
+                  },
                 })}
             />
           </div>

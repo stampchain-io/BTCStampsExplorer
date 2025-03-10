@@ -35,9 +35,9 @@ const StampSearchDrawer = (
   const unlocked = searchparams.get("editions[unlocked]") === "true";
   const divisible = searchparams.get("editions[divisible]") === "true";
 
-  const rarityPreset = searchparams.get("rarityPreset");
-  const rarityMin = searchparams.get("rarity[min]");
-  const rarityMax = searchparams.get("rarity[max]");
+  const raritySub = searchparams.get("rarity[sub]") === "true";
+  const rarityStampRangeMin = searchparams.get("rarity[stampRange][min]");
+  const rarityStampRangeMax = searchparams.get("rarity[stampRange][max]");
 
   const defaultFilters = {
     market: {
@@ -70,10 +70,12 @@ const StampSearchDrawer = (
       unlocked: unlocked || false,
       divisible: divisible || false,
     },
-    rarityPreset: rarityPreset || "",
     rarity: {
-      min: rarityMin || "",
-      max: rarityMax || "",
+      sub: raritySub || false,
+      stampRange: {
+        min: rarityStampRangeMin || "",
+        max: rarityStampRangeMax || "",
+      },
     },
   };
 
