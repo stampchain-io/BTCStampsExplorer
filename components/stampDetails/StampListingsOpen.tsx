@@ -8,7 +8,7 @@ import {
   tableValue,
 } from "$components/shared/TableStyles.ts";
 
-interface Dispenser {
+export interface Dispenser {
   source: string;
   give_remaining: number;
   escrow_quantity: number;

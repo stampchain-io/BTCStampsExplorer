@@ -9,6 +9,7 @@ export function ViewAllButton({ href }: ViewAllButtonProps) {
   return (
     <div className="flex justify-end w-full mt-[18px] mobileMd:mt-6 mobileLg:mt-9">
       <a
+        target="_top"
         href={href}
         class={buttonPurpleOutline}
       >

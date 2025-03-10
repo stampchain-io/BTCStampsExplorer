@@ -19,6 +19,14 @@ import { DispenserRow, SRC20Row, StampRow } from "$globals";
  * We add stampsSortBy to the query to handle the ASC / DESC sorting on stamps.
  * This is optional; if not provided, default to "DESC".
  */
+
+/** Utility function to extract query parameters with defaults */
+const getPaginationParams = (url: URL, prefix: string, defaultLimit = 10) => ({
+  page: Number(url.searchParams.get(`${prefix}_page`)) || 1,
+  limit: Number(url.searchParams.get(`${prefix}_limit`)) || defaultLimit,
+});
+
+
 export const handler: Handlers = {
   async GET(req, ctx) {
     const { address } = ctx.params;
@@ -39,21 +47,13 @@ export const handler: Handlers = {
         | "DESC";
 
     // Get pagination parameters for each section
-    const stampsParams = {
-      page: Number(url.searchParams.get("stamps_page")) || 1,
-      limit: Number(url.searchParams.get("stamps_limit")) || 32,
-    } as PaginationQueryParams;
-
-    const src20Params = {
-      page: Number(url.searchParams.get("src20_page")) || 1,
-      limit: Number(url.searchParams.get("src20_limit")) || 10,
-    } as PaginationQueryParams;
-
-    const dispensersParams = {
-      page: Number(url.searchParams.get("dispensers_page")) || 1,
-      limit: Number(url.searchParams.get("dispensers_limit")) || 10,
-    } as PaginationQueryParams;
-
+    // Extract pagination parameters
+    const paginationParams = {
+      stamps: getPaginationParams(url, "stamps", 32),
+      src20: getPaginationParams(url, "src20"),
+      dispensers: getPaginationParams(url, "dispensers"),
+    };
+  
     const anchor = url.searchParams.get("anchor");
 
     try {
@@ -68,8 +68,8 @@ export const handler: Handlers = {
         // Stamps with sorting and pagination
         StampController.getStampBalancesByAddress(
           address,
-          stampsParams.limit || 10,
-          stampsParams.page || 1,
+          paginationParams.stamps.limit || 10,
+          paginationParams.stamps.page || 1,
           stampsSortBy,
         ),
 
@@ -77,8 +77,8 @@ export const handler: Handlers = {
         Src20Controller.handleSrc20BalanceRequest({
           address,
           includePagination: true,
-          limit: src20Params.limit || 10,
-          page: src20Params.page || 1,
+          limit: paginationParams.src20.limit || 10,
+          page: paginationParams.src20.page || 1,
           includeMintData: true,
           sortBy: src20SortBy,
         }),
@@ -92,8 +92,8 @@ export const handler: Handlers = {
         // Dispensers with sorting and pagination
         StampController.getDispensersWithStampsByAddress(
           address,
-          dispensersParams.page || 1,
-          dispensersParams.limit || 10,
+          paginationParams.dispensers.page || 1,
+          paginationParams.dispensers.limit || 10,
           {
             sortBy: dispensersSortBy,
           },

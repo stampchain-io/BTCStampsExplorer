@@ -137,11 +137,11 @@ export default function StampSection({
         prevEl: ".swiper-button-prev",
       },
       breakpoints: {
-        360: { slidesPerView: 2 }, // mobileSm
-        568: { slidesPerView: 2 }, // mobileMd
-        768: { slidesPerView: 4 }, // mobileLg
-        1024: { slidesPerView: 4 }, // tablet
-        1440: { slidesPerView: 6 }, // desktop
+        360: { slidesPerView: displayCounts?.mobileSm || 3 }, // mobileSm
+        568: { slidesPerView: displayCounts?.mobileMd || 4 }, // mobileMd
+        768: { slidesPerView: displayCounts?.mobileLg || 5 }, // mobileLg
+        1024: { slidesPerView: displayCounts?.tablet || 6 }, // tablet
+        1440: { slidesPerView: displayCounts?.desktop || 8 }, // desktop
       },
     });
 
@@ -208,12 +208,12 @@ export default function StampSection({
           )}
       </div>
 
-      {(viewAllLink && fromPage == "home")
+      {((viewAllLink && fromPage == "home") || fromPage === "stamp_detail")
         ? (
-          <div class="swiper-container">
+          <div class="swiper-container overflow-hidden">
             <div class="swiper-wrapper">
               {isLoading ? <div>Loading...</div> : (
-                filteredStamps.slice(0, displayCount).map((stamp: StampRow) => (
+                filteredStamps.map((stamp: StampRow) => (
                   <div
                     class="swiper-slide"
                     key={isRecentSales && stamp.sale_data

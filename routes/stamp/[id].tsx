@@ -282,6 +282,7 @@ export default function StampPage(props: StampDetailPageProps) {
     type: "classic",
     stamps: stamps_recent,
     layout: "grid" as const,
+    fromPage: "stamp_detail",
     showDetails: false,
     alignRight: false,
     gridClass: `

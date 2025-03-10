@@ -1,6 +1,6 @@
 import { HowToLayout } from "$components/howto/HowToLayout.tsx";
 import { Step } from "$components/howto/Step.tsx";
-import { IMPORTANT_NOTES, STEPS } from "./config.ts";
+import { TRANSFER_TOKEN_IMPORTANT_NOTES, TRANSFER_TOKEN_STEPS } from "$islands/datacontrol/howto.ts";
 
 export default function TransferToken() {
   return (
@@ -8,7 +8,7 @@ export default function TransferToken() {
       title="HOW-TO"
       subtitle="TRANSFER TOKENS"
       headerImage="/img/how-tos/stamping/00.png"
-      importantNotes={IMPORTANT_NOTES}
+      importantNotes={TRANSFER_TOKEN_IMPORTANT_NOTES}
     >
       <p class="mb-6 mobileLg:mb-12">
         TRANSFER YOUR TOKENS
@@ -20,7 +20,7 @@ export default function TransferToken() {
       <br />
       <h2 class="text-xl mobileMd:text-2xl mobileLg:text-3xl desktop:text-4xl font-extralight text-stamp-grey-light">
         <ul class="space-y-9 mobileLg:space-y-12">
-          {STEPS.map((step, index) => <Step key={index} {...step} />)}
+          {TRANSFER_TOKEN_STEPS.map((step, index) => <Step key={index} {...step} />)}
         </ul>
       </h2>
     </HowToLayout>

@@ -32,6 +32,9 @@ export function MetaTags({
         key="og-description"
       />
       <meta property="og:image" content={image} key="og-image" />
+      <meta property="og:image:type" content={getImageType(image)} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:type" content="website" key="og-type" />
       <meta property="og:url" content="https://stampchain.io" key="og-url" />
       <meta property="og:locale" content="en_US" key="og-locale" />
@@ -51,4 +54,13 @@ export function MetaTags({
       />
     </>
   );
+}
+
+// Helper function to set the correct MIME type for OpenGraph
+function getImageType(image: string) {
+  if (image.endsWith(".jpg") || image.endsWith(".jpeg")) return "image/jpeg";
+  if (image.endsWith(".png")) return "image/png";
+  if (image.endsWith(".gif")) return "image/gif";
+  if (image.endsWith(".svg")) return "image/svg+xml";
+  return "image/png"; // Default
 }
