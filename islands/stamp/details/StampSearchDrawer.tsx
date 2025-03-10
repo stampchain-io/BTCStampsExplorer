@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { StampDrawerFilters } from "$islands/stamp/details/StampFilterPaneDrawer.tsx";
-import { filtersToQueryParams } from "$islands/filterpane/StampFilterPane.tsx";
+import {
+  defaultFilters,
+  filtersToQueryParams,
+  StampFilters,
+} from "$islands/filterpane/StampFilterPane.tsx";
+
+// Now we can use defaultFilters directly
+const emptyFilters = { ...defaultFilters };
 
 const StampSearchDrawer = (
   { open, setOpen, searchparams }: {
@@ -80,7 +87,9 @@ const StampSearchDrawer = (
     },
   };
 
-  const [currentFilters, setCurrentFilters] = useState(defaultFilters);
+  const [currentFilters, setCurrentFilters] = useState<StampFilters>(
+    defaultFilters,
+  );
 
   // Close the drawer, update the URL with the new filters and reload the page
   const handleCloseDrawerUpdate = () => {
@@ -248,7 +257,7 @@ const StampSearchDrawer = (
         {/* Filter content */}
         <div className="">
           <StampDrawerFilters
-            initialFilters={defaultFilters}
+            initialFilters={currentFilters}
             onFiltersChange={(filters) => {
               console.log("filters changed:", filters);
               setCurrentFilters(filters);
@@ -266,7 +275,7 @@ const StampSearchDrawer = (
         </button>
         <button
           onClick={() => {
-            setCurrentFilters(defaultFilters);
+            setCurrentFilters(emptyFilters);
           }}
           className={`w-full ${buttonGreyOutline}`}
         >

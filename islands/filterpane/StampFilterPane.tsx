@@ -47,8 +47,8 @@ export type StampFilters = {
   [key: string]: any; // Add index signature to allow string indexing
 };
 
-// Update the defaultFilters declaration
-const defaultFilters: StampFilters = {
+// Update the defaultFilters declaration to export it
+export const defaultFilters: StampFilters = {
   market: {
     atomic: false,
     dispenser: false,

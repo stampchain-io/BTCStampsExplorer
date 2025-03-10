@@ -1,4 +1,4 @@
-import { ComponentChildren, useRef, useState } from "preact/hooks";
+import { ComponentChildren, useEffect, useRef, useState } from "preact/hooks";
 import { STAMP_SUFFIX_FILTERS } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
@@ -746,6 +746,12 @@ export const StampDrawerFilters = ({
   onFiltersChange: (filters: typeof defaultFilters) => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
+
+  // Add this effect to watch for changes to initialFilters
+  useEffect(() => {
+    setFilters(initialFilters);
+  }, [initialFilters]);
+
   const [expandedSections, setExpandedSections] = useState({
     fileType: hasActiveFilters("fileType", filters),
     editions: hasActiveFilters("editions", filters),
