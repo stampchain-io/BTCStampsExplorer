@@ -79,15 +79,21 @@ const StampSearchDrawer = (
     },
   };
 
+  const [currentFilters, setCurrentFilters] = useState(defaultFilters);
+
   const handleClose = () => {
+    const queryString = filtersToQueryParams(
+      globalThis.location.search,
+      currentFilters,
+    );
+    globalThis.location.href = globalThis.location.pathname + "?" + queryString;
     setOpen(false);
   };
 
-  // Add keyboard shortcut handling
   useEffect(() => {
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "f") {
-        e.preventDefault(); // Prevent default browser find
+        e.preventDefault();
         setOpen(!open);
       }
       if (e.key === "Escape" && open) {
@@ -178,7 +184,7 @@ const StampSearchDrawer = (
         <div className="flex flex-col space-y-3 mb-3 mobileLg:mb-[18px]">
           <div className="flex justify-end">
             <button
-              onClick={handleClose}
+              onClick={() => setOpen(false)}
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
               className="relative top-0 right-0 w-8 h-8 flex items-center justify-center"
@@ -203,7 +209,7 @@ const StampSearchDrawer = (
         <div class="mb-6">
           <StampDrawerFilters
             initialFilters={defaultFilters}
-            onClose={handleClose}
+            onClose={() => setOpen(false)}
           />
         </div>
       </div>

@@ -753,8 +753,46 @@ function hasActiveFilters(section: string, filters: typeof defaultFilters) {
 
 export const StampDrawerFilters = ({
   initialFilters,
+  onClose,
 }) => {
   const [filters, setFilters] = useState(initialFilters);
+
+  const handleFilterChange = (category, value) => {
+    const newFilters = {
+      ...filters,
+      [category]: typeof value === "object"
+        ? { ...filters[category], ...value }
+        : value,
+    };
+    setFilters(newFilters);
+
+    // Calculate and update badge count via StampHeader
+    const queryString = filtersToQueryParams(
+      globalThis.location.search,
+      newFilters,
+    );
+    const params = new URLSearchParams(queryString);
+    const count =
+      allQueryKeysFromFilters.filter((key) =>
+        params.has(key) && params.get(key) !== "false"
+      ).length;
+
+    // Update badge without page reload
+    window.dispatchEvent(
+      new CustomEvent("filterCountUpdate", { detail: count }),
+    );
+  };
+
+  const handleClose = () => {
+    // Update URL and reload page before closing
+    const queryString = filtersToQueryParams(
+      globalThis.location.search,
+      filters,
+    );
+    window.location.href = window.location.pathname + "?" + queryString;
+    onClose?.();
+  };
+
   const [expandedSections, setExpandedSections] = useState({
     fileType: hasActiveFilters("fileType", filters),
     editions: hasActiveFilters("editions", filters),
@@ -770,32 +808,6 @@ export const StampDrawerFilters = ({
     },
     500,
   );
-
-  const handleFilterChange = (category, value) => {
-    setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        [category]: typeof value === "object"
-          ? { ...prevFilters[category], ...value }
-          : value,
-      };
-
-      debouncedOnFilterChange?.(
-        filtersToQueryParams(globalThis.location.search, newFilters),
-      );
-      return newFilters;
-    });
-  };
-
-  const clearAllFilters = () => {
-    setFilters(defaultFilters);
-
-    // Construct the clean URL with just the type parameter
-    const cleanUrl = `${globalThis.location.pathname}?type=classic`;
-
-    // Update URL immediately without debouncing
-    globalThis.location.href = cleanUrl;
-  };
 
   const toggleSection = (section) => {
     setExpandedSections({
@@ -1065,7 +1077,7 @@ export const StampDrawerFilters = ({
       {/* Clear Filters Button */}
       <div className="!mt-7 mobileLg:!mt-8">
         <button
-          onClick={clearAllFilters}
+          onClick={handleClose}
           className={`w-full ${buttonGreyOutline}`}
         >
           CLEAR FILTERS

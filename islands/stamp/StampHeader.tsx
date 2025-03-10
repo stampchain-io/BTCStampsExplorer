@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { STAMP_FILTER_TYPES } from "$globals";
 
@@ -18,10 +18,21 @@ export const StampHeader = (
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
 
+  const [filterCount, setFilterCount] = useState(() => {
+    const searchparams = new URLSearchParams(search);
+    return allQueryKeysFromFilters.filter((key) =>
+      searchparams.has(key) && searchparams.get(key) !== "false"
+    ).length;
+  });
+
+  useEffect(() => {
+    const updateFilterCount = (e) => setFilterCount(e.detail);
+    window.addEventListener("filterCountUpdate", updateFilterCount);
+    return () =>
+      window.removeEventListener("filterCountUpdate", updateFilterCount);
+  }, []);
+
   const searchparams = new URLSearchParams(search);
-  const filterCount = allQueryKeysFromFilters.filter((key) => {
-    return searchparams.has(key) && searchparams.get(key) != "false";
-  }).length;
 
   const handleSearchOpen = (open: boolean) => {
     setSearchOpen(open);
