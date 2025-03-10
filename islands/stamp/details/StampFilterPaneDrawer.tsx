@@ -753,6 +753,10 @@ function hasActiveFilters(section: string, filters: typeof defaultFilters) {
 
 export const StampDrawerFilters = ({
   initialFilters,
+  onFiltersChange,
+}: {
+  initialFilters: typeof defaultFilters;
+  onFiltersChange: (filters: typeof defaultFilters) => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState({
@@ -771,7 +775,7 @@ export const StampDrawerFilters = ({
     500,
   );
 
-  const handleFilterChange = (category, value) => {
+  const handleFilterChange = (category: string, value: unknown) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
@@ -779,10 +783,7 @@ export const StampDrawerFilters = ({
           ? { ...prevFilters[category], ...value }
           : value,
       };
-
-      debouncedOnFilterChange?.(
-        filtersToQueryParams(globalThis.location.search, newFilters),
-      );
+      onFiltersChange(newFilters);
       return newFilters;
     });
   };

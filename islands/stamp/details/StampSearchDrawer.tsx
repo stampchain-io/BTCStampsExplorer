@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { StampDrawerFilters } from "$islands/stamp/details/StampFilterPaneDrawer.tsx";
+import { filtersToQueryParams } from "$islands/filterpane/StampFilterPane.tsx";
 
 const StampSearchDrawer = (
   { open, setOpen, searchparams }: {
@@ -79,26 +80,44 @@ const StampSearchDrawer = (
     },
   };
 
+  const [currentFilters, setCurrentFilters] = useState(defaultFilters);
+
   const handleClose = () => {
+    console.log("handleClose called");
+    const queryString = filtersToQueryParams(
+      globalThis.location.search,
+      currentFilters,
+    );
+    globalThis.location.href = globalThis.location.pathname + "?" + queryString;
     setOpen(false);
   };
 
-  // Add keyboard shortcut handling
   useEffect(() => {
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
+      console.log("Key pressed:", e.key, "Open state:", open); // Debug log
+
       if ((e.metaKey || e.ctrlKey) && e.key === "f") {
-        e.preventDefault(); // Prevent default browser find
-        setOpen(!open);
+        e.preventDefault();
+        if (open) {
+          handleClose();
+        } else {
+          setOpen(true);
+        }
       }
-      if (e.key === "Escape" && open) {
-        setOpen(false);
+      // Simplified ESC handler
+      if (e.key === "Escape") {
+        console.log("ESC pressed, drawer open:", open); // Debug log
+        if (open) {
+          e.preventDefault();
+          handleClose();
+        }
       }
     };
 
     document.addEventListener("keydown", handleKeyboardShortcut);
     return () =>
       document.removeEventListener("keydown", handleKeyboardShortcut);
-  }, [open, setOpen]);
+  }, [open, currentFilters]);
 
   // Add tooltip state for close button
   const [isCloseTooltipVisible, setIsCloseTooltipVisible] = useState(false);
@@ -203,7 +222,10 @@ const StampSearchDrawer = (
         <div class="mb-6">
           <StampDrawerFilters
             initialFilters={defaultFilters}
-            onClose={handleClose}
+            onFiltersChange={(filters) => {
+              console.log("filters changed:", filters);
+              setCurrentFilters(filters);
+            }}
           />
         </div>
       </div>
