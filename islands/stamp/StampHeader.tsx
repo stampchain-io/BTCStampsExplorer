@@ -40,7 +40,7 @@ export const StampHeader = (
           setOpen={setFilterOpen}
           count={filterCount}
         />
-        <Sort searchparams={searchparams} initSort={sortBy} />
+        <Sort searchParams={searchparams} />
         <StampSearchClient open2={searchOpen} handleOpen2={handleSearchOpen} />
       </div>
       <StampSearchDrawer
