@@ -741,9 +741,11 @@ function hasActiveFilters(section: string, filters: typeof defaultFilters) {
 export const StampDrawerFilters = ({
   initialFilters,
   onFiltersChange,
+  handleClose,
 }: {
   initialFilters: typeof defaultFilters;
   onFiltersChange: (filters: typeof defaultFilters) => void;
+  handleClose: () => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState({
@@ -777,12 +779,7 @@ export const StampDrawerFilters = ({
 
   const clearAllFilters = () => {
     setFilters(defaultFilters);
-
-    // Construct the clean URL with just the type parameter
-    const cleanUrl = `${globalThis.location.pathname}?type=classic`;
-
-    // Update URL immediately without debouncing
-    globalThis.location.href = cleanUrl;
+    onFiltersChange(defaultFilters);
   };
 
   const toggleSection = (section) => {
@@ -794,6 +791,8 @@ export const StampDrawerFilters = ({
 
   const buttonGreyOutline =
     "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-semibold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+  const buttonGreyFlat =
+    "inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:bg-stamp-grey-light transition-colors";
 
   return (
     <div className="space-y-1 mobileLg:space-y-1.5">
@@ -1050,8 +1049,16 @@ export const StampDrawerFilters = ({
         </CollapsibleSection>
       </CollapsibleSection>
 
-      {/* Clear Filters Button */}
-      <div className="!mt-7 mobileLg:!mt-8">
+      {/* Apply and Clear Filters Buttons */}
+      <div className="!mt-7 mobileLg:!mt-8 flex flex-col gap-3">
+        <button
+          onClick={() => {
+            handleClose();
+          }}
+          className={`w-full ${buttonGreyFlat}`}
+        >
+          APPLY FILTERS
+        </button>
         <button
           onClick={clearAllFilters}
           className={`w-full ${buttonGreyOutline}`}

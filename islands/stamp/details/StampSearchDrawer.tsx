@@ -82,7 +82,8 @@ const StampSearchDrawer = (
 
   const [currentFilters, setCurrentFilters] = useState(defaultFilters);
 
-  const handleClose = () => {
+  // Close the drawer, update the URL with the new filters and reload the page
+  const handleCloseDrawerUpdate = () => {
     // Clean filters before converting to query params
     const cleanFilters = {
       ...currentFilters,
@@ -110,24 +111,25 @@ const StampSearchDrawer = (
     setOpen(false);
   };
 
+  // Close the drawer with no updates
+  const handleCloseDrawer = () => {
+    setOpen(false);
+  };
+
   useEffect(() => {
     const handleKeyboardShortcut = (e: KeyboardEvent) => {
-      console.log("Key pressed:", e.key, "Open state:", open); // Debug log
-
       if ((e.metaKey || e.ctrlKey) && e.key === "f") {
         e.preventDefault();
         if (open) {
-          handleClose();
+          handleCloseDrawer();
         } else {
           setOpen(true);
         }
       }
-      // Simplified ESC handler
       if (e.key === "Escape") {
-        console.log("ESC pressed, drawer open:", open); // Debug log
         if (open) {
           e.preventDefault();
-          handleClose();
+          handleCloseDrawer();
         }
       }
     };
@@ -215,7 +217,7 @@ const StampSearchDrawer = (
         <div className="flex flex-col space-y-3 mb-3 mobileLg:mb-[18px]">
           <div className="flex justify-end">
             <button
-              onClick={handleClose}
+              onClick={handleCloseDrawer}
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
               className="relative top-0 right-0 w-8 h-8 flex items-center justify-center"
@@ -244,6 +246,7 @@ const StampSearchDrawer = (
               console.log("filters changed:", filters);
               setCurrentFilters(filters);
             }}
+            handleClose={handleCloseDrawerUpdate}
           />
         </div>
       </div>
