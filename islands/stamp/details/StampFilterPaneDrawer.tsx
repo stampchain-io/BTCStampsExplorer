@@ -348,9 +348,19 @@ export function filtersToQueryParams(
 
         // Handle price range
         if (category === "market" && key === "priceRange") {
-          if (val.min || val.max) {
-            if (val.min) queryParams.set(`${category}[${key}][min]`, val.min);
-            if (val.max) queryParams.set(`${category}[${key}][max]`, val.max);
+          // Always clean up priceRange parameters first
+          queryParams.delete(`${category}[${key}][min]`);
+          queryParams.delete(`${category}[${key}][max]`);
+
+          const hasRangeValues = val.min || val.max;
+          if (hasRangeValues) {
+            // Only add parameters if we have values
+            if (val.min) {
+              queryParams.append(`${category}[${key}][min]`, val.min);
+            }
+            if (val.max) {
+              queryParams.append(`${category}[${key}][max]`, val.max);
+            }
           }
           return;
         }
