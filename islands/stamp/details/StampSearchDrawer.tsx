@@ -35,7 +35,7 @@ const StampSearchDrawer = (
   const unlocked = searchparams.get("editions[unlocked]") === "true";
   const divisible = searchparams.get("editions[divisible]") === "true";
 
-  const raritySub = searchparams.get("rarity[sub]") === "true";
+  const raritySub = searchparams.get("rarity[sub]");
   const rarityStampRangeMin = searchparams.get("rarity[stampRange][min]");
   const rarityStampRangeMax = searchparams.get("rarity[stampRange][max]");
 

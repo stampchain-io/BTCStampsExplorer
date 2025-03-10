@@ -317,11 +317,37 @@ export function filtersToQueryParams(
   Object.entries(filters).forEach(([category, value]) => {
     if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
-        // Handle nested objects (priceRange and stampRange)
-        if (
-          (category === "market" && key === "priceRange") ||
-          (category === "rarity" && key === "stampRange")
-        ) {
+        // Handle rarity parameters
+        if (category === "rarity") {
+          // If we have stampRange values, ignore sub
+          if (key === "stampRange") {
+            // Always clean up stampRange parameters first
+            queryParams.delete(`${category}[${key}][min]`);
+            queryParams.delete(`${category}[${key}][max]`);
+
+            const hasRangeValues = val.min || val.max;
+            if (hasRangeValues && !filters.rarity.sub) {
+              // Only add parameters if we have values
+              if (val.min) {
+                queryParams.append(`${category}[${key}][min]`, val.min);
+              }
+              if (val.max) {
+                queryParams.append(`${category}[${key}][max]`, val.max);
+              }
+              // Remove sub parameter if we have range values
+              queryParams.delete(`${category}[sub]`);
+            }
+          } else if (key === "sub" && val) {
+            // When sub is selected, set it and remove any stampRange params
+            queryParams.set(`${category}[${key}]`, val.toString());
+            queryParams.delete(`${category}[stampRange][min]`);
+            queryParams.delete(`${category}[stampRange][max]`);
+          }
+          return;
+        }
+
+        // Handle price range
+        if (category === "market" && key === "priceRange") {
           if (val.min || val.max) {
             if (val.min) queryParams.set(`${category}[${key}][min]`, val.min);
             if (val.max) queryParams.set(`${category}[${key}][max]`, val.max);
@@ -342,20 +368,6 @@ export function filtersToQueryParams(
           queryParams.delete(`${category}[${key}]`);
         }
       });
-    } else {
-      if (value === null) {
-        return;
-      }
-      const strVal = value.toString();
-      if (typeof value === "boolean" && strVal === "true") {
-        queryParams.set(category, strVal);
-      } else if (typeof value === "number") {
-        queryParams.set(category, String(value));
-      } else if (value !== "") {
-        queryParams.set(category, strVal);
-      } else {
-        queryParams.delete(category);
-      }
     }
   });
   return queryParams.toString();
@@ -911,28 +923,24 @@ export const StampDrawerFilters = ({
           <Radio
             key={value}
             label={`< ${value}`}
-            checked={filters.rarity?.sub &&
-              filters.rarity?.stampRange?.max === value.toString()}
+            checked={filters.rarity?.sub === value.toString()}
             onChange={() => {
-              if (
-                filters.rarity?.sub &&
-                filters.rarity?.stampRange?.max === value.toString()
-              ) {
+              if (filters.rarity?.sub === value.toString()) {
                 // Unselect the radio button
                 handleFilterChange("rarity", {
                   sub: false,
                   stampRange: {
-                    min: "",
-                    max: "",
+                    min: filters.rarity?.stampRange?.min || "",
+                    max: filters.rarity?.stampRange?.max || "",
                   },
                 });
               } else {
-                // Select the radio button
+                // Select the radio button and clear stampRange
                 handleFilterChange("rarity", {
-                  sub: true,
+                  sub: value.toString(),
                   stampRange: {
-                    min: "0",
-                    max: value.toString(),
+                    min: "", // Clear min
+                    max: "", // Clear max
                   },
                 });
               }
@@ -952,28 +960,38 @@ export const StampDrawerFilters = ({
             <RangeInput
               label=""
               placeholder="MIN"
-              value={filters.rarity?.stampRange?.min}
-              onChange={(value: string) =>
-                handleFilterChange("rarity", {
-                  ...filters.rarity,
-                  stampRange: {
-                    min: value,
-                    max: filters.rarity?.stampRange?.max || "",
+              value={filters.rarity?.stampRange?.min || ""}
+              onChange={(value: string) => {
+                const newFilters = {
+                  ...filters,
+                  rarity: {
+                    sub: false,
+                    stampRange: {
+                      min: value,
+                      max: filters.rarity?.stampRange?.max || "",
+                    },
                   },
-                })}
+                };
+                handleFilterChange("rarity", newFilters.rarity);
+              }}
             />
             <RangeInput
               label=""
               placeholder="MAX"
-              value={filters.rarity?.stampRange?.max}
-              onChange={(value: string) =>
-                handleFilterChange("rarity", {
-                  ...filters.rarity,
-                  stampRange: {
-                    min: filters.rarity?.stampRange?.min || "",
-                    max: value,
+              value={filters.rarity?.stampRange?.max || ""}
+              onChange={(value: string) => {
+                const newFilters = {
+                  ...filters,
+                  rarity: {
+                    sub: false,
+                    stampRange: {
+                      min: filters.rarity?.stampRange?.min || "",
+                      max: value,
+                    },
                   },
-                })}
+                };
+                handleFilterChange("rarity", newFilters.rarity);
+              }}
             />
           </div>
         </CollapsibleSection>

@@ -38,7 +38,7 @@ export type StampFilters = {
     divisible: boolean;
   };
   rarity: {
-    sub: boolean;
+    sub: string | false;
     stampRange: {
       min: string;
       max: string;
