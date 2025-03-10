@@ -696,17 +696,46 @@ const Radio = ({ label, value, checked, onChange }) => {
   );
 };
 
+// Helper function to check if a section has active filters
+function hasActiveFilters(section: string, filters: typeof defaultFilters) {
+  switch (section) {
+    case "fileType":
+      return Object.values(filters.fileType).some((value) => value === true);
+    case "editions":
+      return Object.values(filters.editions).some((value) => value === true);
+    case "rarity":
+      return filters.rarity.sub !== false ||
+        filters.rarity.stampRange.min !== "" ||
+        filters.rarity.stampRange.max !== "";
+    case "market":
+      return filters.market.atomic ||
+        filters.market.dispenser ||
+        filters.market.trendingSales ||
+        filters.market.sold ||
+        filters.market.priceRange.min !== "" ||
+        filters.market.priceRange.max !== "";
+    case "customRange": // For rarity custom range subsection
+      return filters.rarity.stampRange.min !== "" ||
+        filters.rarity.stampRange.max !== "";
+    case "priceRange": // For market price range subsection
+      return filters.market.priceRange.min !== "" ||
+        filters.market.priceRange.max !== "";
+    default:
+      return false;
+  }
+}
+
 export const StampDrawerFilters = ({
   initialFilters,
 }) => {
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState({
-    market: false,
-    fileType: true,
-    editions: false,
-    rarity: false,
-    customRange: false,
-    priceRange: false,
+    fileType: hasActiveFilters("fileType", filters),
+    editions: hasActiveFilters("editions", filters),
+    rarity: hasActiveFilters("rarity", filters),
+    market: hasActiveFilters("market", filters),
+    customRange: hasActiveFilters("customRange", filters),
+    priceRange: hasActiveFilters("priceRange", filters),
   });
   const debouncedOnFilterChange = useDebouncedCallback(
     (str: string) => {
