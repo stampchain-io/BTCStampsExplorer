@@ -83,10 +83,28 @@ const StampSearchDrawer = (
   const [currentFilters, setCurrentFilters] = useState(defaultFilters);
 
   const handleClose = () => {
-    console.log("handleClose called");
+    // Clean filters before converting to query params
+    const cleanFilters = {
+      ...currentFilters,
+      market: {
+        ...currentFilters.market,
+        priceRange: {
+          min: currentFilters.market.priceRange.min?.trim() || "",
+          max: currentFilters.market.priceRange.max?.trim() || "",
+        },
+      },
+      rarity: {
+        ...currentFilters.rarity,
+        stampRange: {
+          min: currentFilters.rarity.stampRange.min?.trim() || "",
+          max: currentFilters.rarity.stampRange.max?.trim() || "",
+        },
+      },
+    };
+
     const queryString = filtersToQueryParams(
       globalThis.location.search,
-      currentFilters,
+      cleanFilters,
     );
     globalThis.location.href = globalThis.location.pathname + "?" + queryString;
     setOpen(false);

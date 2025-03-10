@@ -96,36 +96,52 @@ export function filtersToQueryParams(
   Object.entries(filters).forEach(([category, value]) => {
     if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
+        // Handle rarity parameters
+        if (category === "rarity") {
+          // If we have stampRange values, ignore sub
+          if (key === "stampRange") {
+            // Always clean up stampRange parameters first
+            queryParams.delete(`${category}[${key}][min]`);
+            queryParams.delete(`${category}[${key}][max]`);
+
+            // Only add parameters if we have non-empty values
+            if (val.min && val.min.toString().trim() !== "") {
+              queryParams.append(`${category}[${key}][min]`, val.min);
+            }
+            if (val.max && val.max.toString().trim() !== "") {
+              queryParams.append(`${category}[${key}][max]`, val.max);
+            }
+            return;
+          }
+        }
+
+        // Handle price range
+        if (category === "market" && key === "priceRange") {
+          // Always clean up priceRange parameters first
+          queryParams.delete(`${category}[${key}][min]`);
+          queryParams.delete(`${category}[${key}][max]`);
+
+          // Only add parameters if we have non-empty values
+          if (val.min && val.min.toString().trim() !== "") {
+            queryParams.append(`${category}[${key}][min]`, val.min);
+          }
+          if (val.max && val.max.toString().trim() !== "") {
+            queryParams.append(`${category}[${key}][max]`, val.max);
+          }
+          return;
+        }
+
         const strVal = val.toString();
         if (typeof val === "boolean") {
           if (strVal !== "false") {
-            if (queryParams.has(`${category}[${key}]`)) {
-              queryParams.set(`${category}[${key}]`, strVal);
-            } else {
-              queryParams.append(`${category}[${key}]`, strVal);
-            }
+            queryParams.set(`${category}[${key}]`, strVal);
           } else {
-            if (queryParams.has(`${category}[${key}]`)) {
-              queryParams.delete(`${category}[${key}]`);
-            }
+            queryParams.delete(`${category}[${key}]`);
           }
         } else if (val !== "") {
           queryParams.set(`${category}[${key}]`, strVal);
         }
       });
-    } else {
-      if (value === null) {
-        // continue on nulls
-        return;
-      }
-      const strVal = value.toString();
-      if (typeof value === "boolean" && strVal !== "false") {
-        queryParams.set(category, strVal);
-      } else if (typeof value === "number") {
-        queryParams.set(category, String(value));
-      } else if (value !== "") {
-        queryParams.set(category, strVal);
-      }
     }
   });
   return queryParams.toString();

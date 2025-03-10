@@ -351,23 +351,15 @@ export function filtersToQueryParams(
             queryParams.delete(`${category}[${key}][min]`);
             queryParams.delete(`${category}[${key}][max]`);
 
-            const hasRangeValues = val.min || val.max;
-            if (hasRangeValues && !filters.rarity.sub) {
-              // Only add parameters if we have values
-              if (val.min) {
-                queryParams.append(`${category}[${key}][min]`, val.min);
-              }
-              if (val.max) {
-                queryParams.append(`${category}[${key}][max]`, val.max);
-              }
-              // Remove sub parameter if we have range values
-              queryParams.delete(`${category}[sub]`);
+            // Only add parameters if we have non-empty values
+            if (val.min && val.min.toString().trim() !== "") {
+              queryParams.append(`${category}[${key}][min]`, val.min);
+            }
+            if (val.max && val.max.toString().trim() !== "") {
+              queryParams.append(`${category}[${key}][max]`, val.max);
             }
           } else if (key === "sub" && val) {
-            // When sub is selected, set it and remove any stampRange params
             queryParams.set(`${category}[${key}]`, val.toString());
-            queryParams.delete(`${category}[stampRange][min]`);
-            queryParams.delete(`${category}[stampRange][max]`);
           }
           return;
         }
@@ -378,30 +370,25 @@ export function filtersToQueryParams(
           queryParams.delete(`${category}[${key}][min]`);
           queryParams.delete(`${category}[${key}][max]`);
 
-          const hasRangeValues = val.min || val.max;
-          if (hasRangeValues) {
-            // Only add parameters if we have values
-            if (val.min) {
-              queryParams.append(`${category}[${key}][min]`, val.min);
-            }
-            if (val.max) {
-              queryParams.append(`${category}[${key}][max]`, val.max);
-            }
+          // Only add parameters if we have non-empty values
+          if (val.min && val.min.toString().trim() !== "") {
+            queryParams.append(`${category}[${key}][min]`, val.min);
+          }
+          if (val.max && val.max.toString().trim() !== "") {
+            queryParams.append(`${category}[${key}][max]`, val.max);
           }
           return;
         }
 
         const strVal = val.toString();
         if (typeof val === "boolean") {
-          if (strVal === "true") {
+          if (strVal !== "false") {
             queryParams.set(`${category}[${key}]`, strVal);
           } else {
             queryParams.delete(`${category}[${key}]`);
           }
         } else if (val !== "") {
           queryParams.set(`${category}[${key}]`, strVal);
-        } else {
-          queryParams.delete(`${category}[${key}]`);
         }
       });
     }
