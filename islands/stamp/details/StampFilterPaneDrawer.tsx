@@ -741,11 +741,9 @@ function hasActiveFilters(section: string, filters: typeof defaultFilters) {
 export const StampDrawerFilters = ({
   initialFilters,
   onFiltersChange,
-  handleClose,
 }: {
   initialFilters: typeof defaultFilters;
   onFiltersChange: (filters: typeof defaultFilters) => void;
-  handleClose: () => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
   const [expandedSections, setExpandedSections] = useState({
@@ -788,11 +786,6 @@ export const StampDrawerFilters = ({
       [section]: !expandedSections[section],
     });
   };
-
-  const buttonGreyOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-semibold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
-  const buttonGreyFlat =
-    "inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:bg-stamp-grey-light transition-colors";
 
   return (
     <div className="space-y-1 mobileLg:space-y-1.5">
@@ -1048,24 +1041,6 @@ export const StampDrawerFilters = ({
           </div>
         </CollapsibleSection>
       </CollapsibleSection>
-
-      {/* Apply and Clear Filters Buttons */}
-      <div className="!mt-7 mobileLg:!mt-8 flex flex-col gap-3">
-        <button
-          onClick={() => {
-            handleClose();
-          }}
-          className={`w-full ${buttonGreyFlat}`}
-        >
-          APPLY FILTERS
-        </button>
-        <button
-          onClick={clearAllFilters}
-          className={`w-full ${buttonGreyOutline}`}
-        >
-          CLEAR FILTERS
-        </button>
-      </div>
     </div>
   );
 };

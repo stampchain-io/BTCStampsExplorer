@@ -202,18 +202,23 @@ const StampSearchDrawer = (
     </svg>
   );
 
+  const buttonGreyFlat =
+    "inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:bg-stamp-grey-light transition-colors";
+  const buttonGreyOutline =
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+
   return (
-    <>
-      <div
-        id="drawer-form"
-        class={`fixed top-0 left-0 z-40 
-        w-full min-[420px]:w-72 mobileLg:w-80 h-screen 
-        p-6 backdrop-blur-md 
-        bg-gradient-to-b from-[#000000]/80 to-[#000000]/90 
-        overflow-y-auto transition-transform scrollbar-black
-         ${open ? "translate-x-0" : "-translate-x-full"}`}
-        aria-labelledby="drawer-form-label"
-      >
+    <div
+      id="drawer-form"
+      class={`fixed top-0 left-0 z-40 
+      w-full min-[420px]:w-72 mobileLg:w-80 h-screen
+      bg-gradient-to-b from-[#000000]/80 to-[#000000] 
+      backdrop-blur-md transition-transform
+       ${open ? "translate-x-0" : "-translate-x-full"}`}
+      aria-labelledby="drawer-form-label"
+    >
+      {/* Scrollable content area */}
+      <div className="h-[calc(100vh-170px)] overflow-y-auto scrollbar-black p-6">
         <div className="flex flex-col space-y-3 mb-3 mobileLg:mb-[18px]">
           <div className="flex justify-end">
             <button
@@ -239,18 +244,36 @@ const StampSearchDrawer = (
             </p>
           </div>
         </div>
-        <div class="mb-6">
+
+        {/* Filter content */}
+        <div className="">
           <StampDrawerFilters
             initialFilters={defaultFilters}
             onFiltersChange={(filters) => {
               console.log("filters changed:", filters);
               setCurrentFilters(filters);
             }}
-            handleClose={handleCloseDrawerUpdate}
           />
         </div>
       </div>
-    </>
+      {/* Sticky buttons */}
+      <div className="flex flex-col sticky bottom-0 p-6 gap-6 bg-[#000000]/80 shadow-[0_-24px_48px_12px_rgba(0,0,0,1)]">
+        <button
+          onClick={handleCloseDrawerUpdate}
+          className={`w-full ${buttonGreyFlat}`}
+        >
+          APPLY FILTERS
+        </button>
+        <button
+          onClick={() => {
+            setCurrentFilters(defaultFilters);
+          }}
+          className={`w-full ${buttonGreyOutline}`}
+        >
+          CLEAR FILTERS
+        </button>
+      </div>
+    </div>
   );
 };
 
