@@ -220,33 +220,59 @@ interface RangeInputProps {
   placeholder: string;
   value: string;
   onChange: (value: string) => void;
+  type: "stamp" | "price";
 }
 
 const RangeInput = (
-  { label, placeholder, value, onChange }: RangeInputProps,
+  { label, placeholder, value, onChange, type }: RangeInputProps,
 ) => (
   <div className="flex flex-col space-y-1 pt-[9px]">
     <label className="text-xs text-stamp-table-text">{label}</label>
     <input
-      type="number"
+      type={type === "price" ? "text" : "number"}
       value={value}
       onKeyDown={(e) => {
-        // Prevent e, +, -, E, comma, and diaeresis
-        if (["e", "E", "+", "-", ",", "."].includes(e.key)) {
+        if (
+          ["e", "E", "+", "-"].includes(e.key) ||
+          (type === "stamp" && e.key === ".")
+        ) {
           e.preventDefault();
         }
       }}
       onChange={(e) => {
         const value = e.target.value;
-        // Only allow digits
-        if (/^\d*$/.test(value)) {
-          onChange(value);
+
+        if (type === "price") {
+          // For price, allow decimals with custom validation
+          let sanitized = value.replace(/[^0-9.]/g, "");
+          const parts = sanitized.split(".");
+
+          // Ensure only one decimal point
+          if (parts.length > 2) {
+            sanitized = parts[0] + "." + parts[1];
+          }
+
+          // Limit decimal places to 8
+          if (parts.length === 2 && parts[1].length > 8) {
+            sanitized = parts[0] + "." + parts[1].slice(0, 8);
+          }
+
+          if (sanitized !== value) {
+            onChange(sanitized);
+          } else {
+            onChange(value);
+          }
+        } else {
+          // For stamp, only allow integers
+          if (/^\d*$/.test(value)) {
+            onChange(value);
+          }
         }
       }}
       min="0"
-      step="1"
-      inputMode="numeric"
-      pattern="[0-9]*"
+      step={type === "price" ? "0.00000001" : "1"}
+      inputMode="decimal"
+      pattern={type === "price" ? "[0-9]*[.]?[0-9]*" : "[0-9]*"}
       className="h-10 mobileLg:h-11 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
       placeholder={placeholder}
     />
@@ -839,28 +865,32 @@ export const StampDrawerFilters = ({
             <RangeInput
               label=""
               placeholder="0.00000000"
-              value={filters.market.priceRange.min}
-              onChange={(value: string) =>
+              type="price"
+              value={filters.market.priceRange.min || ""}
+              onChange={(value) => {
                 handleFilterChange("market", {
                   ...filters.market,
                   priceRange: {
-                    ...filters.market.priceRange,
                     min: value,
+                    max: filters.market.priceRange.max || "",
                   },
-                })}
+                });
+              }}
             />
             <RangeInput
               label=""
               placeholder="∞ BTC"
-              value={filters.market.priceRange.max}
-              onChange={(value: string) =>
+              type="price"
+              value={filters.market.priceRange.max || ""}
+              onChange={(value) => {
                 handleFilterChange("market", {
                   ...filters.market,
                   priceRange: {
-                    ...filters.market.priceRange,
+                    min: filters.market.priceRange.min || "",
                     max: value,
                   },
-                })}
+                });
+              }}
             />
           </div>
         </CollapsibleSection>
@@ -999,37 +1029,33 @@ export const StampDrawerFilters = ({
             <RangeInput
               label=""
               placeholder="MIN"
-              value={filters.rarity?.stampRange?.min || ""}
-              onChange={(value: string) => {
-                const newFilters = {
-                  ...filters,
-                  rarity: {
-                    sub: false,
-                    stampRange: {
-                      min: value,
-                      max: filters.rarity?.stampRange?.max || "",
-                    },
+              type="stamp"
+              value={filters.rarity.stampRange.min || ""}
+              onChange={(value) => {
+                handleFilterChange("rarity", {
+                  ...filters.rarity,
+                  sub: false,
+                  stampRange: {
+                    min: value,
+                    max: filters.rarity.stampRange.max || "",
                   },
-                };
-                handleFilterChange("rarity", newFilters.rarity);
+                });
               }}
             />
             <RangeInput
               label=""
               placeholder="MAX"
-              value={filters.rarity?.stampRange?.max || ""}
-              onChange={(value: string) => {
-                const newFilters = {
-                  ...filters,
-                  rarity: {
-                    sub: false,
-                    stampRange: {
-                      min: filters.rarity?.stampRange?.min || "",
-                      max: value,
-                    },
+              type="stamp"
+              value={filters.rarity.stampRange.max || ""}
+              onChange={(value) => {
+                handleFilterChange("rarity", {
+                  ...filters.rarity,
+                  sub: false,
+                  stampRange: {
+                    min: filters.rarity.stampRange.min || "",
+                    max: value,
                   },
-                };
-                handleFilterChange("rarity", newFilters.rarity);
+                });
               }}
             />
           </div>
