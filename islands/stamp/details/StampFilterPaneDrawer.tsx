@@ -98,13 +98,15 @@ const CollapsibleSection = ({
         onMouseLeave={handleMouseLeave}
         className={`
           flex items-center w-full group transition-colors duration-300
-          ${isHeader ? "justify-between py-3" : "mt-2 mobileLg:mt-3"}
+          ${
+          isHeader ? "justify-between py-3 mobileLg:py-4" : "mt-2 mobileLg:mt-3"
+        }
         `}
       >
         {!isHeader && (
           <div
             className={`transform transition-all duration-300 ${
-              expanded ? "scale-y-[-1]" : ""
+              expanded ? "scale-y-[-1]" : "mb-0.5"
             } ${
               expanded
                 ? `fill-stamp-grey-light ${
@@ -223,7 +225,7 @@ interface RangeInputProps {
 const RangeInput = (
   { label, placeholder, value, onChange }: RangeInputProps,
 ) => (
-  <div className="flex flex-col space-y-1">
+  <div className="flex flex-col space-y-1 pt-[9px]">
     <label className="text-xs text-stamp-table-text">{label}</label>
     <input
       type="number"
@@ -973,7 +975,7 @@ export const StampDrawerFilters = ({
       </CollapsibleSection>
 
       {/* Clear Filters Button */}
-      <div className="!mt-6 mobileLg:!mt-9">
+      <div className="!mt-7 mobileLg:!mt-8">
         <button
           onClick={clearAllFilters}
           className={`w-full ${buttonGreyOutline}`}
