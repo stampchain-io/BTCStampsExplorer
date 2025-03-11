@@ -75,6 +75,17 @@ export interface FeeDetails {
   totalVsize?: number;
 }
 
+export interface TransferDetails {
+  address: string;
+  amount: number;
+  token: string;
+}
+
+export interface MintDetails {
+  amount: number;
+  token: string;
+}
+
 export interface BaseFeeCalculatorProps {
   fee: number;
   handleChangeFee: (fee: number) => void;
@@ -88,6 +99,8 @@ export interface BaseFeeCalculatorProps {
   tosAgreed?: boolean;
   onTosChange?: (agreed: boolean) => void;
   feeDetails?: FeeDetails;
+  transferDetails?: TransferDetails;
+  mintDetails?: MintDetails;
 }
 
 export interface BasicFeeProps

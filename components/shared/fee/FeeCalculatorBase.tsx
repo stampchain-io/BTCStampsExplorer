@@ -43,6 +43,8 @@ export function FeeCalculatorBase({
   tosAgreed = false,
   onTosChange = () => {},
   feeDetails,
+  transferDetails,
+  mintDetails,
   isModal = false,
   disabled = false,
   cancelText = "CANCEL",
@@ -266,7 +268,7 @@ export function FeeCalculatorBase({
         </p>
 
         {/* Miner Fee */}
-        {!!feeDetails?.minerFee && !bitname && (
+        {!!feeDetails?.minerFee && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               MINER FEE
@@ -418,6 +420,48 @@ export function FeeCalculatorBase({
               </span>&nbsp;&nbsp;{supply}
             </p>
           )}
+        
+        {/* Transfer Details */}
+        {transferDetails?.address && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              RECEIPIENT ADDY
+            </span>&nbsp;&nbsp;{ transferDetails?.address }
+          </p>
+        )}
+
+        {transferDetails?.token && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              TOKEN TICKER
+            </span>&nbsp;&nbsp;{ transferDetails?.token }
+          </p>
+        )}
+
+        {transferDetails?.amount && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              AMOUNT
+            </span>&nbsp;&nbsp;{ transferDetails?.amount }
+          </p>
+        )}
+
+        {/* Mint Details */}
+        {mintDetails?.token && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              TOKEN TICKER
+            </span>&nbsp;&nbsp;{ mintDetails?.token }
+          </p>
+        )}
+
+        {mintDetails?.amount && (
+          <p className={detailsText}>
+            <span className={detailsTitle}>
+              AMOUNT
+            </span>&nbsp;&nbsp;{ mintDetails?.amount }
+          </p>
+        )}
       </div>
     );
   };
