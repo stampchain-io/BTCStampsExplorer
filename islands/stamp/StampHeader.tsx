@@ -2,7 +2,7 @@ import { useState } from "preact/hooks";
 
 import { STAMP_FILTER_TYPES } from "$globals";
 
-import { Filter } from "$islands/datacontrol/Filter.tsx";
+import { FilterButton } from "$islands/filter/FilterButton.tsx";
 import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
 import { allQueryKeysFromFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
@@ -35,7 +35,7 @@ export const StampHeader = (
       <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>STAMPS</h1>
       <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
       <div className="flex relative items-start justify-between gap-3">
-        <Filter
+        <FilterButton
           open={filterOpen}
           setOpen={setFilterOpen}
           count={filterCount}

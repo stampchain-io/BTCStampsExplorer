@@ -164,7 +164,6 @@ import * as $collection_CollectionOverviewArtistContent from "./islands/collecti
 import * as $collection_CollectionOverviewHeader from "./islands/collection/CollectionOverviewHeader.tsx";
 import * as $collection_CollectionOverviewSection from "./islands/collection/CollectionOverviewSection.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
-import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_FilterOld from "./islands/datacontrol/FilterOld.tsx";
 import * as $datacontrol_MultiSort from "./islands/datacontrol/MultiSort.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
@@ -172,6 +171,10 @@ import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
+import * as $filter_FilterButton from "./islands/filter/FilterButton.tsx";
+import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp.tsx";
+import * as $filter_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
+import * as $filter_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
@@ -194,10 +197,6 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
-import * as $shared_FilterContentStamp from "./islands/filter/FilterContentStamp.tsx";
-import * as $shared_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
-import * as $shared_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp.tsx";
-import * as $shared_Tables from "./islands/table/Tables.tsx";
 import * as $src20_FilterModal from "./islands/src20/FilterModal.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
@@ -234,6 +233,7 @@ import * as $stamping_src20_trade_TradeContent from "./islands/stamping/src20/tr
 import * as $stamping_src20_transfer_LatestTransfer from "./islands/stamping/src20/transfer/LatestTransfer.tsx";
 import * as $stamping_src20_transfer_TransferContent from "./islands/stamping/src20/transfer/TransferContent.tsx";
 import * as $stamping_stamp_OlgaContent from "./islands/stamping/stamp/OlgaContent.tsx";
+import * as $table_Tables from "./islands/table/Tables.tsx";
 import * as $test_ReviewDogTest from "./islands/test/ReviewDogTest.tsx";
 import * as $upload_UploadImageHeader from "./islands/upload/UploadImageHeader.tsx";
 import * as $upload_UploadImageTable from "./islands/upload/UploadImageTable.tsx";
@@ -448,7 +448,6 @@ const manifest = {
     "./islands/collection/CollectionOverviewSection.tsx":
       $collection_CollectionOverviewSection,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
-    "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
     "./islands/datacontrol/FilterOld.tsx": $datacontrol_FilterOld,
     "./islands/datacontrol/MultiSort.tsx": $datacontrol_MultiSort,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
@@ -456,6 +455,10 @@ const manifest = {
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
+    "./islands/filter/FilterButton.tsx": $filter_FilterButton,
+    "./islands/filter/FilterContentStamp.tsx": $filter_FilterContentStamp,
+    "./islands/filter/FilterDrawer.tsx": $filter_FilterDrawer,
+    "./islands/filter/FilterOptionsStamp.tsx": $filter_FilterOptionsStamp,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,
@@ -478,10 +481,6 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
-    "./islands/filter/FilterContentStamp.tsx": $shared_FilterContentStamp,
-    "./islands/filter/FilterDrawer.tsx": $shared_FilterDrawer,
-    "./islands/filter/FilterOptionsStamp.tsx": $shared_FilterOptionsStamp,
-    "./islands/table/Tables.tsx": $shared_Tables,
     "./islands/src20/FilterModal.tsx": $src20_FilterModal,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,
@@ -534,6 +533,7 @@ const manifest = {
     "./islands/stamping/src20/transfer/TransferContent.tsx":
       $stamping_src20_transfer_TransferContent,
     "./islands/stamping/stamp/OlgaContent.tsx": $stamping_stamp_OlgaContent,
+    "./islands/table/Tables.tsx": $table_Tables,
     "./islands/test/ReviewDogTest.tsx": $test_ReviewDogTest,
     "./islands/upload/UploadImageHeader.tsx": $upload_UploadImageHeader,
     "./islands/upload/UploadImageTable.tsx": $upload_UploadImageTable,

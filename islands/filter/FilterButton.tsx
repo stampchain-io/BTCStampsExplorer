@@ -26,7 +26,7 @@ const Badge = ({
   );
 };
 
-export function Filter(
+export function FilterButton(
   { count, open, setOpen }: {
     count: number;
     open: boolean;
