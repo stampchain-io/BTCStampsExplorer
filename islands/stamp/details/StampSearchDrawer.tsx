@@ -212,29 +212,31 @@ const StampSearchDrawer = (
   );
 
   const buttonGreyFlat =
-    "inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-black tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:bg-stamp-grey-light transition-colors";
+    "inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-xs mobileLg:text-sm font-extrabold text-black tracking-[0.05em] h-10 mobileLg:h-11 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:bg-stamp-grey-light transition-colors";
   const buttonGreyOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm mobileLg:text-base font-extrabold text-stamp-grey tracking-[0.05em] h-[42px] mobileLg:h-12 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
-
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-xs mobileLg:text-sm font-extrabold text-stamp-grey tracking-[0.05em] h-10 mobileLg:h-11 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
   return (
     <div
       id="drawer-form"
       class={`fixed top-0 left-0 z-40 
-      w-full min-[420px]:w-72 mobileLg:w-80 h-screen
+      w-full min-[420px]:w-[300px] mobileLg:w-[340px] h-screen
       bg-gradient-to-b from-[#000000]/80 to-[#000000] 
       backdrop-blur-md transition-transform
        ${open ? "translate-x-0" : "-translate-x-full"}`}
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div className="h-[calc(100vh-170px)] overflow-y-auto scrollbar-black p-6">
-        <div className="flex flex-col space-y-3 mb-3 mobileLg:mb-[18px]">
-          <div className="flex justify-end">
+      <div className="h-[calc(100vh-88px)] mobileLg:h-[calc(100vh-92px)] p-6 overflow-y-auto scrollbar-black">
+        <div className="flex flex-col mb-3 mobileLg:mb-[18px] space-y-3">
+          <div className="flex justify-between">
+            <p className="text-2xl mobileLg:text-3xl font-black gray-gradient1">
+              FILTERS
+            </p>
             <button
               onClick={handleCloseDrawer}
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
-              className="relative top-0 right-0 w-8 h-8 flex items-center justify-center"
+              className="relative top-0 right-0 flex items-center justify-center"
               aria-label="Close filter menu"
             >
               <div
@@ -246,11 +248,6 @@ const StampSearchDrawer = (
               </div>
               <CrossIcon />
             </button>
-          </div>
-          <div className="flex justify-start">
-            <p className="text-2xl mobileLg:text-3xl font-black text-stamp-grey-darker">
-              FILTERS
-            </p>
           </div>
         </div>
 
@@ -266,20 +263,20 @@ const StampSearchDrawer = (
         </div>
       </div>
       {/* Sticky buttons */}
-      <div className="flex flex-col sticky bottom-0 p-6 gap-6 bg-[#000000]/80 shadow-[0_-24px_48px_12px_rgba(0,0,0,1)]">
-        <button
-          onClick={handleCloseDrawerUpdate}
-          className={`w-full ${buttonGreyFlat}`}
-        >
-          APPLY FILTERS
-        </button>
+      <div className="flex justify-between sticky bottom-0 p-6 gap-6 bg-[#000000]/80 shadow-[0_-24px_48px_12px_rgba(0,0,0,1)]">
         <button
           onClick={() => {
             setCurrentFilters(emptyFilters);
           }}
           className={`w-full ${buttonGreyOutline}`}
         >
-          CLEAR FILTERS
+          CLEAR
+        </button>
+        <button
+          onClick={handleCloseDrawerUpdate}
+          className={`w-full ${buttonGreyFlat}`}
+        >
+          APPLY
         </button>
       </div>
     </div>

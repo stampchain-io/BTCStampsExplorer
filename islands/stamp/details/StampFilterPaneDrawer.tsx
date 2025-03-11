@@ -273,7 +273,7 @@ const RangeInput = (
       step={type === "price" ? "0.00000001" : "1"}
       inputMode="decimal"
       pattern={type === "price" ? "[0-9]*[.]?[0-9]*" : "[0-9]*"}
-      className="h-10 mobileLg:h-11 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
+      className="h-10 mobileLg:h-11 px-3 mobileLg:px-4 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
       placeholder={placeholder}
     />
   </div>
