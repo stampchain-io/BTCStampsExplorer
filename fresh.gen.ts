@@ -194,7 +194,7 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
-import * as $shared_FilterContentStamp from "./islands/shared/FilterContentStamp.tsx";
+import * as $shared_FilterContentStamps from "./islands/shared/FilterContentStamp.tsx";
 import * as $shared_FilterDrawer from "./islands/shared/FilterDrawer.tsx";
 import * as $shared_FilterOptionsStamp from "./islands/shared/FilterOptionsStamp.tsx";
 import * as $shared_Tables from "./islands/shared/Tables.tsx";
@@ -478,7 +478,7 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
-    "./islands/shared/FilterContentStamp.tsx": $shared_FilterContentStamp,
+    "./islands/shared/FilterContentStamps.tsx": $shared_FilterContentStamps,
     "./islands/shared/FilterDrawer.tsx": $shared_FilterDrawer,
     "./islands/shared/FilterOptionsStamp.tsx": $shared_FilterOptionsStamp,
     "./islands/shared/Tables.tsx": $shared_Tables,

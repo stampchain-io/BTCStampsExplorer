@@ -1,6 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
-import { Search } from "$islands/datacontrol/Search.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { FilterOld } from "$islands/datacontrol/FilterOld.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
@@ -25,7 +24,6 @@ const ItemHeader = ({
   isOpenFilter = false,
   handleOpenFilter = () => {},
   sort = true,
-  search = true,
   filter = true,
   setting = false,
   setOpenSettingModal = () => {},
@@ -35,7 +33,6 @@ const ItemHeader = ({
   sortBy: "ASC" | "DESC";
   isOpen: boolean;
   sort: boolean;
-  search: boolean;
   filter: boolean;
   setting: boolean;
   isOpenFilter: boolean;
@@ -86,19 +83,6 @@ const ItemHeader = ({
               : title === "TOKENS"
               ? "src20SortBy"
               : "dispensersSortBy"}
-          />
-        )}
-        {search && (
-          <Search
-            open={isOpen}
-            handleOpen={() => handleOpen(title)}
-            placeholder="Stamp Name, Stamp Hash, or Address"
-            searchEndpoint="/wallet/search?q="
-            onResultClick={() => {}}
-            resultDisplay={(result) => {
-              console.log(result);
-              return result.toString();
-            }}
           />
         )}
       </div>
@@ -419,10 +403,7 @@ export default function WalletContent({
     dispensersSortBy,
   );
 
-  // Toggle states for search / filter / setting modals
-  const [openS, setOpenS] = useState<boolean>(false);
-  const [openT, setOpenT] = useState<boolean>(false);
-  const [openD, setOpenD] = useState<boolean>(false);
+  // Toggle states for filter / setting modals
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openSetting, setOpenSetting] = useState<boolean>(false);
 
@@ -466,13 +447,7 @@ export default function WalletContent({
   };
 
   const handleOpen = (type: string) => {
-    if (type === "STAMPS") {
-      setOpenS(!openS);
-    } else if (type === "TOKENS") {
-      setOpenT(!openT);
-    } else {
-      setOpenD(!openD);
-    }
+    // This function is kept for compatibility but no longer needs to handle search toggles
   };
 
   // Handle sort changes for each section
@@ -561,9 +536,8 @@ export default function WalletContent({
           sort={true}
           sortBy={sortStamps}
           onChangeSort={handleChangeSort}
-          isOpen={openS}
+          isOpen={false}
           handleOpen={handleOpen}
-          search={true}
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -590,9 +564,8 @@ export default function WalletContent({
           sort={true}
           sortBy={sortTokens}
           onChangeSort={handleTokenSort}
-          isOpen={openT}
+          isOpen={false}
           handleOpen={handleOpen}
-          search={true}
           filter={false}
           setting={false}
           isOpenFilter={false}
@@ -638,9 +611,8 @@ export default function WalletContent({
             sort={true}
             sortBy={sortDispensers}
             onChangeSort={handleDispenserSort}
-            isOpen={openD}
+            isOpen={false}
             handleOpen={handleOpen}
-            search={false}
             filter={false}
             setting={false}
             isOpenFilter={openFilter}
