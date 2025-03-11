@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { StampDrawerFilters } from "$islands/stamp/details/StampFilterPaneDrawer.tsx";
+import { FilterContentStamps } from "$islands/shared/FilterContentStamps.tsx";
 import {
   defaultFilters,
   filtersToQueryParams,
@@ -254,7 +254,7 @@ const FilterDrawer = (
 
         {/* Filter content */}
         <div className="">
-          <StampDrawerFilters
+          <FilterContentStamps
             initialFilters={currentFilters}
             onFiltersChange={(filters) => {
               console.log("filters changed:", filters);

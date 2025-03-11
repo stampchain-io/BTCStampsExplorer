@@ -738,7 +738,7 @@ function hasActiveFilters(section: string, filters: typeof defaultFilters) {
   }
 }
 
-export const StampDrawerFilters = ({
+export const FilterContentStamps = ({
   initialFilters,
   onFiltersChange,
 }: {
@@ -1167,4 +1167,4 @@ export const StampDrawerFilters = ({
   );
 };
 
-export default StampDrawerFilters;
+export default FilterContentStamps;

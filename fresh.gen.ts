@@ -195,6 +195,7 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
+import * as $shared_FilterContentStamps from "./islands/shared/FilterContentStamps.tsx";
 import * as $shared_FilterDrawer from "./islands/shared/FilterDrawer.tsx";
 import * as $shared_FilterOptionsStamp from "./islands/shared/FilterOptionsStamp.tsx";
 import * as $shared_Tables from "./islands/shared/Tables.tsx";
@@ -215,7 +216,6 @@ import * as $stamp_StampSection from "./islands/stamp/StampSection.tsx";
 import * as $stamp_details_RecentSales from "./islands/stamp/details/RecentSales.tsx";
 import * as $stamp_details_StampBuyModal from "./islands/stamp/details/StampBuyModal.tsx";
 import * as $stamp_details_StampCodeModal from "./islands/stamp/details/StampCodeModal.tsx";
-import * as $stamp_details_StampFilterPaneDrawer from "./islands/stamp/details/StampFilterPaneDrawer.tsx";
 import * as $stamp_details_StampImage from "./islands/stamp/details/StampImage.tsx";
 import * as $stamp_details_StampImageFullScreen from "./islands/stamp/details/StampImageFullScreen.tsx";
 import * as $stamp_details_StampInfo from "./islands/stamp/details/StampInfo.tsx";
@@ -480,6 +480,7 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
+    "./islands/shared/FilterContentStamps.tsx": $shared_FilterContentStamps,
     "./islands/shared/FilterDrawer.tsx": $shared_FilterDrawer,
     "./islands/shared/FilterOptionsStamp.tsx": $shared_FilterOptionsStamp,
     "./islands/shared/Tables.tsx": $shared_Tables,
@@ -504,8 +505,6 @@ const manifest = {
     "./islands/stamp/details/RecentSales.tsx": $stamp_details_RecentSales,
     "./islands/stamp/details/StampBuyModal.tsx": $stamp_details_StampBuyModal,
     "./islands/stamp/details/StampCodeModal.tsx": $stamp_details_StampCodeModal,
-    "./islands/stamp/details/StampFilterPaneDrawer.tsx":
-      $stamp_details_StampFilterPaneDrawer,
     "./islands/stamp/details/StampImage.tsx": $stamp_details_StampImage,
     "./islands/stamp/details/StampImageFullScreen.tsx":
       $stamp_details_StampImageFullScreen,
