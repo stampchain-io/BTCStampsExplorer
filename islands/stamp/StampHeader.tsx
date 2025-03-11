@@ -2,11 +2,11 @@ import { useState } from "preact/hooks";
 
 import { STAMP_FILTER_TYPES } from "$globals";
 
-import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 import { Filter } from "$islands/datacontrol/Filter.tsx";
-import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
-import StampSearchDrawer from "$islands/stamp/details/StampSearchDrawer.tsx";
+import FilterDrawer from "$islands/shared/FilterDrawer.tsx";
+import { allQueryKeysFromFilters } from "$islands/shared/FilterOptionsStamp.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 export const StampHeader = (
   { filterBy, sortBy, search }: {
@@ -43,7 +43,7 @@ export const StampHeader = (
         <Sort searchParams={searchparams} />
         <StampSearchClient open2={searchOpen} handleOpen2={handleSearchOpen} />
       </div>
-      <StampSearchDrawer
+      <FilterDrawer
         searchparams={searchparams}
         open={filterOpen}
         setOpen={setFilterOpen}
