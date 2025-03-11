@@ -26,7 +26,7 @@ const Badge = ({
   );
 };
 
-export function FilterToggle(
+export function Filter(
   { count, open, setOpen }: {
     count: number;
     open: boolean;

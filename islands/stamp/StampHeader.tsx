@@ -3,7 +3,7 @@ import { useState } from "preact/hooks";
 import { STAMP_FILTER_TYPES } from "$globals";
 
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
-import { FilterToggle } from "$islands/datacontrol/FilterToggle.tsx";
+import { Filter } from "$islands/datacontrol/Filter.tsx";
 import { allQueryKeysFromFilters } from "$islands/filterpane/StampFilterPane.tsx";
 import StampSearchDrawer from "$islands/stamp/details/StampSearchDrawer.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
@@ -35,7 +35,7 @@ export const StampHeader = (
       <h1 className={`${titlePurpleDL} block mobileLg:hidden`}>STAMPS</h1>
       <h1 className={`${titlePurpleDL} hidden mobileLg:block`}>ART STAMPS</h1>
       <div className="flex relative items-start justify-between gap-3">
-        <FilterToggle
+        <Filter
           open={filterOpen}
           setOpen={setFilterOpen}
           count={filterCount}
