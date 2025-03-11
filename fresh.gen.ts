@@ -164,7 +164,7 @@ import * as $collection_CollectionOverviewArtistContent from "./islands/collecti
 import * as $collection_CollectionOverviewHeader from "./islands/collection/CollectionOverviewHeader.tsx";
 import * as $collection_CollectionOverviewSection from "./islands/collection/CollectionOverviewSection.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
-import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
+import * as $datacontrol_FilterOld from "./islands/datacontrol/FilterOld.tsx";
 import * as $datacontrol_FilterToggle from "./islands/datacontrol/FilterToggle.tsx";
 import * as $datacontrol_MultiSort from "./islands/datacontrol/MultiSort.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
@@ -450,7 +450,7 @@ const manifest = {
     "./islands/collection/CollectionOverviewSection.tsx":
       $collection_CollectionOverviewSection,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
-    "./islands/datacontrol/Filter.tsx": $datacontrol_Filter,
+    "./islands/datacontrol/FilterOld.tsx": $datacontrol_FilterOld,
     "./islands/datacontrol/FilterToggle.tsx": $datacontrol_FilterToggle,
     "./islands/datacontrol/MultiSort.tsx": $datacontrol_MultiSort,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
