@@ -20,6 +20,8 @@ export function BasicFeeCalculator({
   outputTypes = ["P2WPKH"],
   utxoAncestors,
   bitname,
+  transferDetails,
+  mintDetails,
   ...baseProps
 }: BasicFeeProps) {
   const outputs: Output[] = outputTypes.map((type) => ({
@@ -43,6 +45,8 @@ export function BasicFeeCalculator({
       {...baseProps}
       fee={fee}
       bitname={bitname}
+      transferDetails={transferDetails}
+      mintDetails={mintDetails}
       feeDetails={{
         minerFee: estimatedFee,
         hasExactFees: true,
