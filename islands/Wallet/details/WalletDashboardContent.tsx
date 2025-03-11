@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { SortButton } from "$islands/sort/SortButton.tsx";
 import { abbreviateAddress } from "$lib/utils/formatUtils.ts";
 import { FilterOld } from "$islands/datacontrol/FilterOld.tsx";
 import { Setting } from "$islands/datacontrol/Setting.tsx";
@@ -75,7 +75,7 @@ const ItemHeader = ({
           />
         )}
         {sort && (
-          <Sort
+          <SortButton
             initSort={sortBy}
             onChangeSort={onChangeSort}
             sortParam={title === "STAMPS"

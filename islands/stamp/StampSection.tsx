@@ -5,7 +5,7 @@ import { ModulesStyles } from "$islands/modules/Styles.ts";
 import { useEffect, useState } from "preact/hooks";
 import { StampRow, StampSectionProps } from "$globals";
 import { BREAKPOINTS } from "$lib/utils/constants.ts";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { SortButton } from "$islands/sort/SortButton.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 export default function StampSection({
@@ -166,7 +166,7 @@ export default function StampSection({
               <div
                 class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}
               >
-                <Sort initSort={sortBy} />
+                <SortButton initSort={sortBy} />
               </div>
               <div
                 class={isOpen1 ? "opacity-0 invisible" : "opacity-100"}

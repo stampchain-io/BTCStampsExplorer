@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 
 import { SRC20_FILTER_TYPES } from "$globals";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { SortButton } from "$islands/sort/SortButton.tsx";
 import { SRC20SearchClient } from "$islands/src20/SRC20Search.tsx";
 
 export const SRC20Header = (
@@ -29,7 +29,7 @@ export const SRC20Header = (
         SRC-20 TOKENS
       </h1>
       <div class="flex relative items-start justify-between gap-3">
-        <Sort searchParams={searchparams} />
+        <SortButton searchParams={searchparams} />
         <SRC20SearchClient
           open2={searchOpen}
           handleOpen2={handleSearchOpen}

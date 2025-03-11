@@ -165,10 +165,8 @@ import * as $collection_CollectionOverviewHeader from "./islands/collection/Coll
 import * as $collection_CollectionOverviewSection from "./islands/collection/CollectionOverviewSection.tsx";
 import * as $collection_CollectionSection from "./islands/collection/CollectionSection.tsx";
 import * as $datacontrol_FilterOld from "./islands/datacontrol/FilterOld.tsx";
-import * as $datacontrol_MultiSort from "./islands/datacontrol/MultiSort.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
-import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $filter_FilterButton from "./islands/filter/FilterButton.tsx";
@@ -197,6 +195,8 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
+import * as $sort_MultiSort from "./islands/sort/MultiSort.tsx";
+import * as $sort_SortButton from "./islands/sort/SortButton.tsx";
 import * as $src20_FilterModal from "./islands/src20/FilterModal.tsx";
 import * as $src20_SRC20Header from "./islands/src20/SRC20Header.tsx";
 import * as $src20_SRC20Search from "./islands/src20/SRC20Search.tsx";
@@ -449,10 +449,8 @@ const manifest = {
       $collection_CollectionOverviewSection,
     "./islands/collection/CollectionSection.tsx": $collection_CollectionSection,
     "./islands/datacontrol/FilterOld.tsx": $datacontrol_FilterOld,
-    "./islands/datacontrol/MultiSort.tsx": $datacontrol_MultiSort,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
-    "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/filter/FilterButton.tsx": $filter_FilterButton,
@@ -481,6 +479,8 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
+    "./islands/sort/MultiSort.tsx": $sort_MultiSort,
+    "./islands/sort/SortButton.tsx": $sort_SortButton,
     "./islands/src20/FilterModal.tsx": $src20_FilterModal,
     "./islands/src20/SRC20Header.tsx": $src20_SRC20Header,
     "./islands/src20/SRC20Search.tsx": $src20_SRC20Search,

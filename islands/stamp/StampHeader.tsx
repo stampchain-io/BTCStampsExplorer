@@ -5,7 +5,7 @@ import { STAMP_FILTER_TYPES } from "$globals";
 import { FilterButton } from "$islands/filter/FilterButton.tsx";
 import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
 import { allQueryKeysFromFilters } from "$islands/filter/FilterOptionsStamp.tsx";
-import { Sort } from "$islands/datacontrol/Sort.tsx";
+import { SortButton } from "$islands/sort/SortButton.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 
 export const StampHeader = (
@@ -40,7 +40,7 @@ export const StampHeader = (
           setOpen={setFilterOpen}
           count={filterCount}
         />
-        <Sort searchParams={searchparams} />
+        <SortButton searchParams={searchparams} />
         <StampSearchClient open2={searchOpen} handleOpen2={handleSearchOpen} />
       </div>
       <FilterDrawer

@@ -5,7 +5,7 @@ interface SortProps {
   searchParams?: URLSearchParams | undefined;
 }
 
-export function Sort({ searchParams }: SortProps) {
+export function SortButton({ searchParams }: SortProps) {
   // Initialize sort based on URL parameter
   const [sort, setSort] = useState<"ASC" | "DESC">(
     searchParams?.get("sortOrder")?.includes("asc") ? "ASC" : "DESC",
