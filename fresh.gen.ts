@@ -168,7 +168,6 @@ import * as $datacontrol_Filter from "./islands/datacontrol/Filter.tsx";
 import * as $datacontrol_FilterOld from "./islands/datacontrol/FilterOld.tsx";
 import * as $datacontrol_MultiSort from "./islands/datacontrol/MultiSort.tsx";
 import * as $datacontrol_Pagination from "./islands/datacontrol/Pagination.tsx";
-import * as $datacontrol_Search from "./islands/datacontrol/Search.tsx";
 import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $datacontrol_Sort from "./islands/datacontrol/Sort.tsx";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
@@ -195,7 +194,7 @@ import * as $modules_Partners from "./islands/modules/Partners.tsx";
 import * as $modules_RecursiveLayering from "./islands/modules/RecursiveLayering.tsx";
 import * as $modules_StampChain from "./islands/modules/StampChain.tsx";
 import * as $modules_Styles from "./islands/modules/Styles.ts";
-import * as $shared_FilterContentStamps from "./islands/shared/FilterContentStamps.tsx";
+import * as $shared_FilterContentStamp from "./islands/shared/FilterContentStamp.tsx";
 import * as $shared_FilterDrawer from "./islands/shared/FilterDrawer.tsx";
 import * as $shared_FilterOptionsStamp from "./islands/shared/FilterOptionsStamp.tsx";
 import * as $shared_Tables from "./islands/shared/Tables.tsx";
@@ -453,7 +452,6 @@ const manifest = {
     "./islands/datacontrol/FilterOld.tsx": $datacontrol_FilterOld,
     "./islands/datacontrol/MultiSort.tsx": $datacontrol_MultiSort,
     "./islands/datacontrol/Pagination.tsx": $datacontrol_Pagination,
-    "./islands/datacontrol/Search.tsx": $datacontrol_Search,
     "./islands/datacontrol/Setting.tsx": $datacontrol_Setting,
     "./islands/datacontrol/Sort.tsx": $datacontrol_Sort,
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
@@ -480,7 +478,7 @@ const manifest = {
     "./islands/modules/RecursiveLayering.tsx": $modules_RecursiveLayering,
     "./islands/modules/StampChain.tsx": $modules_StampChain,
     "./islands/modules/Styles.ts": $modules_Styles,
-    "./islands/shared/FilterContentStamps.tsx": $shared_FilterContentStamps,
+    "./islands/shared/FilterContentStamp.tsx": $shared_FilterContentStamp,
     "./islands/shared/FilterDrawer.tsx": $shared_FilterDrawer,
     "./islands/shared/FilterOptionsStamp.tsx": $shared_FilterOptionsStamp,
     "./islands/shared/Tables.tsx": $shared_Tables,

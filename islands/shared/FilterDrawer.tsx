@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { FilterContentStamps } from "$islands/shared/FilterContentStamps.tsx";
+import { FilterContentStamp } from "$islands/shared/FilterContentStamp.tsx";
 import {
   defaultFilters,
   filtersToQueryParams,
@@ -254,7 +254,7 @@ const FilterDrawer = (
 
         {/* Filter content */}
         <div className="">
-          <FilterContentStamps
+          <FilterContentStamp
             initialFilters={currentFilters}
             onFiltersChange={(filters) => {
               console.log("filters changed:", filters);
