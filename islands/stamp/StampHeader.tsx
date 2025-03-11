@@ -39,6 +39,7 @@ export const StampHeader = (
           open={filterOpen}
           setOpen={setFilterOpen}
           count={filterCount}
+          type="stamp"
         />
         <SortButton searchParams={searchparams} />
         <StampSearchClient open2={searchOpen} handleOpen2={handleSearchOpen} />

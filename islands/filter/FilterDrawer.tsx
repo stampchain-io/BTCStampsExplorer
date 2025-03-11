@@ -1,120 +1,93 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { FilterContentStamp } from "$islands/filter/FilterContentStamp.tsx";
 import {
-  defaultFilters,
-  filtersToQueryParams,
+  defaultFilters as stampDefaultFilters,
+  filtersToQueryParams as stampFiltersToQueryParams,
+  queryParamsToFilters as stampQueryParamsToFilters,
   StampFilters,
 } from "$islands/filter/FilterOptionsStamp.tsx";
+// Import SRC20 filter options
+import {
+  defaultFilters as src20DefaultFilters,
+  filtersToQueryParams as src20FiltersToQueryParams,
+  queryParamsToFilters as src20QueryParamsToFilters,
+  SRC20Filters,
+} from "$islands/filter/FilterOptionsSRC20.tsx";
+// Import SRC20 filter content
+import { FilterContentSRC20 } from "$islands/filter/FilterContentSRC20.tsx";
+import { FilterType } from "$islands/filter/FilterButton.tsx";
 
-// Now we can use defaultFilters directly
-const emptyFilters = { ...defaultFilters };
+// Define a type for all possible filter types
+type AllFilters = StampFilters | SRC20Filters;
 
 const FilterDrawer = (
-  { open, setOpen, searchparams }: {
+  { open, setOpen, searchparams, type = "stamp" }: {
     open: boolean;
     setOpen: (status: boolean) => void;
     searchparams: URLSearchParams;
+    type?: FilterType;
   },
 ) => {
-  const atomic = searchparams.get("market[atomic]") === "true";
-  const dispenser = searchparams.get("market[dispenser]") === "true";
-  const trendingSales = searchparams.get("market[trendingSales]") === "true";
-  const sold = searchparams.get("market[sold]") === "true";
-  const marketPriceMin = searchparams.get("market[priceRange][min]");
-  const marketPriceMax = searchparams.get("market[priceRange][max]");
+  // Parse the current URL parameters to initialize filters
+  const getInitialFilters = (): AllFilters => {
+    const searchString = searchparams.toString();
 
-  const fileTypeJpg = searchparams.get("fileType[jpg]") === "true" ||
-    searchparams.get("fileType[jpeg]") === "true";
-  const fileTypePng = searchparams.get("fileType[png]") === "true";
-  const fileTypeGif = searchparams.get("fileType[gif]") === "true";
-  const fileTypeWebp = searchparams.get("fileType[webp]") === "true";
-  const fileTypeAvif = searchparams.get("fileType[avif]") === "true";
-  const fileTypeBmp = searchparams.get("fileType[bmp]") === "true";
-  const fileTypeMp3 = searchparams.get("fileType[mp3]") === "true" ||
-    searchparams.get("fileType[mpeg]") === "true";
-  const fileTypeSvg = searchparams.get("fileType[svg]") === "true";
-  const fileTypeHtml = searchparams.get("fileType[html]") === "true";
-  const fileTypeLegacy = searchparams.get("fileType[legacy]") === "true";
-  const fileTypeOlga = searchparams.get("fileType[olga]") === "true";
-
-  const oneOfOne = searchparams.get("editions[oneOfOne]") === "true";
-  const multiple = searchparams.get("editions[multiple]") === "true";
-  const locked = searchparams.get("editions[locked]") === "true";
-  const unlocked = searchparams.get("editions[unlocked]") === "true";
-  const divisible = searchparams.get("editions[divisible]") === "true";
-
-  const raritySub = searchparams.get("rarity[sub]");
-  const rarityStampRangeMin = searchparams.get("rarity[stampRange][min]");
-  const rarityStampRangeMax = searchparams.get("rarity[stampRange][max]");
-
-  const defaultFilters = {
-    market: {
-      atomic: atomic || false,
-      dispenser: dispenser || false,
-      trendingSales: trendingSales || false,
-      sold: sold || false,
-      priceRange: {
-        min: marketPriceMin || "",
-        max: marketPriceMax || "",
-      },
-    },
-    fileType: {
-      jpg: fileTypeJpg || false,
-      png: fileTypePng || false,
-      gif: fileTypeGif || false,
-      webp: fileTypeWebp || false,
-      avif: fileTypeAvif || false,
-      bmp: fileTypeBmp || false,
-      mp3: fileTypeMp3 || false,
-      svg: fileTypeSvg || false,
-      html: fileTypeHtml || false,
-      legacy: fileTypeLegacy || false,
-      olga: fileTypeOlga || false,
-    },
-    editions: {
-      locked: locked || false,
-      oneOfOne: oneOfOne || false,
-      multiple: multiple || false,
-      unlocked: unlocked || false,
-      divisible: divisible || false,
-    },
-    rarity: {
-      sub: raritySub || false,
-      stampRange: {
-        min: rarityStampRangeMin || "",
-        max: rarityStampRangeMax || "",
-      },
-    },
+    switch (type) {
+      case "src20":
+        return src20QueryParamsToFilters(searchString);
+      case "src101":
+        // For future implementation
+        return src20QueryParamsToFilters(searchString); // Temporary fallback
+      default:
+        return stampQueryParamsToFilters(searchString);
+    }
   };
 
-  const [currentFilters, setCurrentFilters] = useState<StampFilters>(
-    defaultFilters,
+  // Get empty filters for the CLEAR button
+  const getEmptyFilters = (): AllFilters => {
+    switch (type) {
+      case "src20":
+        return { ...src20DefaultFilters };
+      case "src101":
+        // For future implementation
+        return { ...src20DefaultFilters }; // Temporary fallback
+      default:
+        return { ...stampDefaultFilters };
+    }
+  };
+
+  // Get the appropriate filters to query params function based on type
+  const getFiltersToQueryParams = (
+    search: string,
+    filters: AllFilters,
+  ): string => {
+    switch (type) {
+      case "src20":
+        return src20FiltersToQueryParams(search, filters as SRC20Filters);
+      case "src101":
+        // For future implementation
+        return src20FiltersToQueryParams(search, filters as SRC20Filters); // Temporary fallback
+      default:
+        return stampFiltersToQueryParams(search, filters as StampFilters);
+    }
+  };
+
+  const emptyFilters = getEmptyFilters();
+  const [currentFilters, setCurrentFilters] = useState<AllFilters>(
+    getInitialFilters(),
   );
+
+  // Update filters when searchparams or type changes
+  useEffect(() => {
+    setCurrentFilters(getInitialFilters());
+  }, [searchparams.toString(), type]);
 
   // Close the drawer, update the URL with the new filters and reload the page
   const handleCloseDrawerUpdate = () => {
     // Clean filters before converting to query params
-    const cleanFilters = {
-      ...currentFilters,
-      market: {
-        ...currentFilters.market,
-        priceRange: {
-          min: currentFilters.market.priceRange.min?.trim() || "",
-          max: currentFilters.market.priceRange.max?.trim() || "",
-        },
-      },
-      rarity: {
-        ...currentFilters.rarity,
-        stampRange: {
-          min: currentFilters.rarity.stampRange.min?.trim() || "",
-          max: currentFilters.rarity.stampRange.max?.trim() || "",
-        },
-      },
-    };
-
-    const queryString = filtersToQueryParams(
+    const queryString = getFiltersToQueryParams(
       globalThis.location.search,
-      cleanFilters,
+      currentFilters,
     );
     globalThis.location.href = globalThis.location.pathname + "?" + queryString;
     setOpen(false);
@@ -216,9 +189,12 @@ const FilterDrawer = (
   const buttonGreyOutline =
     "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-xs mobileLg:text-sm font-extrabold text-stamp-grey tracking-[0.05em] h-10 mobileLg:h-11 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
+  // Get the appropriate drawer ID based on type
+  const drawerId = `drawer-form-${type}`;
+
   return (
     <div
-      id="drawer-form"
+      id={drawerId}
       class={`fixed top-0 left-0 z-40 
       w-full min-[420px]:w-[300px] mobileLg:w-[340px] h-screen
       bg-gradient-to-b from-[#000000]/80 to-[#000000] 
@@ -252,15 +228,27 @@ const FilterDrawer = (
           </div>
         </div>
 
-        {/* Filter content */}
+        {/* Filter content based on type */}
         <div className="">
-          <FilterContentStamp
-            initialFilters={currentFilters}
-            onFiltersChange={(filters) => {
-              console.log("filters changed:", filters);
-              setCurrentFilters(filters);
-            }}
-          />
+          {type === "stamp" && (
+            <FilterContentStamp
+              initialFilters={currentFilters as StampFilters}
+              onFiltersChange={(filters) => {
+                console.log("filters changed:", filters);
+                setCurrentFilters(filters);
+              }}
+            />
+          )}
+          {type === "src20" && (
+            <FilterContentSRC20
+              initialFilters={currentFilters as SRC20Filters}
+              onFiltersChange={(filters) => {
+                console.log("filters changed:", filters);
+                setCurrentFilters(filters);
+              }}
+            />
+          )}
+          {/* Add more filter content components for other types as needed */}
         </div>
       </div>
       {/* Sticky buttons */}
