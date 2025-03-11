@@ -227,7 +227,7 @@ const StampSearchDrawer = (
     >
       {/* Scrollable content area */}
       <div className="h-[calc(100vh-88px)] mobileLg:h-[calc(100vh-92px)] p-6 overflow-y-auto scrollbar-black">
-        <div className="flex flex-col mb-3 mobileLg:mb-[18px] space-y-3">
+        <div className="flex flex-col mb-3 mobileLg:mb-5 space-y-3">
           <div className="flex justify-between">
             <p className="text-2xl mobileLg:text-3xl font-black gray-gradient1">
               FILTERS

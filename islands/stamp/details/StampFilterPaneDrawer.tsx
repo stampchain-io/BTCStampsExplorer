@@ -99,7 +99,7 @@ const CollapsibleSection = ({
         className={`
           flex items-center w-full group transition-colors duration-300
           ${
-          isHeader ? "justify-between py-3 mobileLg:py-4" : "mt-2 mobileLg:mt-3"
+          isHeader ? "justify-between py-2 mobileLg:py-3" : "mt-2 mobileLg:mt-3"
         }
         `}
       >
@@ -793,6 +793,9 @@ export const StampDrawerFilters = ({
     });
   };
 
+  const filterCollectionSm =
+    "flex justify-end text-xs mobileLg:text-sm font-light text-stamp-grey-darker mt-1 mobileLg:mt-0 -mb-5 cursor-default";
+
   return (
     <div className="space-y-1 mobileLg:space-y-1.5">
       <CollapsibleSection
@@ -802,8 +805,12 @@ export const StampDrawerFilters = ({
         toggle={() => toggleSection("market")}
         variant="header"
       >
+        {/* Category: LISTINGS */}
+        <div className={filterCollectionSm}>
+          LISTINGS
+        </div>
         <Checkbox
-          label="ATOMIC LISTINGS"
+          label="ATOMIC"
           checked={filters.market.atomic}
           onChange={() =>
             handleFilterChange("market", {
@@ -820,8 +827,11 @@ export const StampDrawerFilters = ({
               dispenser: !filters.market.dispenser,
             })}
         />
+        <div className={filterCollectionSm}>
+          SALES
+        </div>
         <Checkbox
-          label="TRENDING SALES"
+          label="TRENDING"
           checked={filters.market.trendingSales}
           onChange={() =>
             handleFilterChange("market", {
@@ -889,30 +899,136 @@ export const StampDrawerFilters = ({
         toggle={() => toggleSection("fileType")}
         variant="header"
       >
-        {Object.entries({
-          "JPG/JPEG": "jpg",
-          "PNG": "png",
-          "GIF": "gif",
-          "WEBP": "webp",
-          "AVIF": "avif",
-          "BMP": "bmp",
-          "MP3/MPEG": "mp3",
-          "SVG": "svg",
-          "HTML": "html",
-          "LEGACY": "legacy",
-          "OLGA": "olga",
-        }).map(([label, key]) => (
-          <Checkbox
-            key={key}
-            label={label}
-            checked={filters.fileType[key]}
-            onChange={() =>
-              handleFilterChange("fileType", {
-                ...filters.fileType,
-                [key]: !filters.fileType[key],
-              })}
-          />
-        ))}
+        {/* Category: PIXEL */}
+        <div className={filterCollectionSm}>
+          PIXELS
+        </div>
+        <Checkbox
+          key="jpg"
+          label="JPG/JPEG"
+          checked={filters.fileType.jpg}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              jpg: !filters.fileType.jpg,
+            })}
+        />
+
+        <Checkbox
+          key="png"
+          label="PNG"
+          checked={filters.fileType.png}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              png: !filters.fileType.png,
+            })}
+        />
+        <Checkbox
+          key="gif"
+          label="GIF"
+          checked={filters.fileType.gif}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              gif: !filters.fileType.gif,
+            })}
+        />
+        <Checkbox
+          key="webp"
+          label="WEBP"
+          checked={filters.fileType.webp}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              webp: !filters.fileType.webp,
+            })}
+        />
+        <Checkbox
+          key="avif"
+          label="AVIF"
+          checked={filters.fileType.avif}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              avif: !filters.fileType.avif,
+            })}
+        />
+        <Checkbox
+          key="bmp"
+          label="BMP"
+          checked={filters.fileType.bmp}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              bmp: !filters.fileType.bmp,
+            })}
+        />
+
+        {/* Category: VECTOR */}
+        <div className={filterCollectionSm}>
+          VECTOR
+        </div>
+        <Checkbox
+          key="svg"
+          label="SVG"
+          checked={filters.fileType.svg}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              svg: !filters.fileType.svg,
+            })}
+        />
+        <Checkbox
+          key="html"
+          label="HTML"
+          checked={filters.fileType.html}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              html: !filters.fileType.html,
+            })}
+        />
+
+        {/* Category: AUDIO */}
+        <div className={filterCollectionSm}>
+          AUDIO
+        </div>
+        <Checkbox
+          key="mp3"
+          label="MP3/MPEG"
+          checked={filters.fileType.mp3}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              mp3: !filters.fileType.mp3,
+            })}
+        />
+
+        {/* Category: ENCODING */}
+        <div className={filterCollectionSm}>
+          ENCODING
+        </div>
+        <Checkbox
+          key="legacy"
+          label="LEGACY"
+          checked={filters.fileType.legacy}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              legacy: !filters.fileType.legacy,
+            })}
+        />
+        <Checkbox
+          key="olga"
+          label="OLGA"
+          checked={filters.fileType.olga}
+          onChange={() =>
+            handleFilterChange("fileType", {
+              ...filters.fileType,
+              olga: !filters.fileType.olga,
+            })}
+        />
       </CollapsibleSection>
 
       <CollapsibleSection
