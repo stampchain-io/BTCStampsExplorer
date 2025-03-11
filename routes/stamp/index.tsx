@@ -9,7 +9,7 @@ import {
   queryParamsToFilters,
   queryParamsToServicePayload,
   // StampFilters,
-} from "$islands/shared/FilterOptionsStamp.tsx";
+} from "$islands/filter/FilterOptionsStamp.tsx";
 
 const MAX_PAGE_SIZE = 120;
 

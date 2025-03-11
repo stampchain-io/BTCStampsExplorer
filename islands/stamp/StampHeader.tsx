@@ -3,8 +3,8 @@ import { useState } from "preact/hooks";
 import { STAMP_FILTER_TYPES } from "$globals";
 
 import { Filter } from "$islands/datacontrol/Filter.tsx";
-import FilterDrawer from "$islands/shared/FilterDrawer.tsx";
-import { allQueryKeysFromFilters } from "$islands/shared/FilterOptionsStamp.tsx";
+import FilterDrawer from "$islands/filter/FilterDrawer.tsx";
+import { allQueryKeysFromFilters } from "$islands/filter/FilterOptionsStamp.tsx";
 import { Sort } from "$islands/datacontrol/Sort.tsx";
 import { StampSearchClient } from "$islands/stamp/StampSearch.tsx";
 

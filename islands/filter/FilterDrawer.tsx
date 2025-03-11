@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { FilterContentStamp } from "$islands/shared/FilterContentStamp.tsx";
+import { FilterContentStamp } from "$islands/filter/FilterContentStamp.tsx";
 import {
   defaultFilters,
   filtersToQueryParams,
   StampFilters,
-} from "$islands/shared/FilterOptionsStamp.tsx";
+} from "$islands/filter/FilterOptionsStamp.tsx";
 
 // Now we can use defaultFilters directly
 const emptyFilters = { ...defaultFilters };
