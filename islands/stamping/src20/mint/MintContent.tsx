@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useSRC20Form } from "$client/hooks/useSRC20Form.ts";
 import { walletContext } from "$client/wallet/wallet.ts";
 
-import { ComplexFeeCalculator } from "$islands/fee/ComplexFeeCalculator.tsx";
+import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { StatusMessages } from "$islands/stamping/StatusMessages.tsx";
 import { SRC20InputField } from "../SRC20InputField.tsx";
 
@@ -394,7 +394,7 @@ export function MintContent({
       </div>
 
       <div className={`${backgroundContainer} w-full`}>
-        <ComplexFeeCalculator
+        <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src20"
@@ -403,6 +403,10 @@ export function MintContent({
           issuance={undefined}
           serviceFee={undefined}
           BTCPrice={formState.BTCPrice}
+          mintDetails={{
+            token: formState.token,
+            amount: formState.amt
+          }}
           onRefresh={fetchFees}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
