@@ -82,7 +82,7 @@ const CollapsibleSection = ({
   expanded: boolean;
   toggle: () => void;
   children: ComponentChildren;
-  variant: "header" | "subheader";
+  variant: "collapsibleTitle" | "collapsibleSubTitle" | "collapsibleLabel";
 }) => {
   const [canHover, setCanHover] = useState(true);
 
@@ -94,60 +94,31 @@ const CollapsibleSection = ({
     setCanHover(true);
   };
 
-  const isHeader = variant === "header";
-
-  return (
-    <div>
-      <button
-        onClick={handleClick}
-        onMouseLeave={handleMouseLeave}
-        className={`
-          flex items-center w-full group transition-colors duration-300
-          ${
-          isHeader ? "justify-between py-2 mobileLg:py-3" : "mt-2 mobileLg:mt-3"
-        }
-        `}
-      >
-        {!isHeader && (
-          <div
-            className={`transform transition-all duration-300 ${
-              expanded ? "scale-y-[-1]" : "mb-0.5"
-            } ${
-              expanded
-                ? `fill-stamp-grey-light ${
-                  canHover ? "group-hover:fill-stamp-grey" : ""
-                }`
-                : `fill-stamp-grey ${
-                  canHover ? "group-hover:fill-stamp-grey-light" : ""
-                }`
-            } transition-colors duration-300`}
-          >
-            {chevronIcon("sm")}
-          </div>
-        )}
-
-        <span
-          className={`
-            transition-colors duration-300 !font-light
-            ${
-            isHeader
-              ? `text-lg mobileLg:text-xl font-light ${
-                expanded
-                  ? `text-stamp-grey ${
-                    canHover ? "group-hover:text-stamp-grey-light" : ""
-                  }`
-                  : `text-stamp-grey-light ${
-                    canHover ? "group-hover:text-stamp-grey" : ""
-                  }`
-              }`
-              : filterLabelSm(expanded, canHover)
-          }
-          `}
+  // Handle collapsibleTitle variant
+  if (variant === "collapsibleTitle") {
+    return (
+      <div>
+        <button
+          onClick={handleClick}
+          onMouseLeave={handleMouseLeave}
+          className="flex items-center w-full justify-between py-2 mobileLg:py-3 group transition-colors duration-300"
         >
-          {title}
-        </span>
+          <span
+            className={`
+              text-lg mobileLg:text-xl font-light transition-colors duration-300
+              ${
+              expanded
+                ? `text-stamp-grey ${
+                  canHover ? "group-hover:text-stamp-grey-light" : ""
+                }`
+                : `text-stamp-grey-light ${
+                  canHover ? "group-hover:text-stamp-grey" : ""
+                }`
+            }`}
+          >
+            {title}
+          </span>
 
-        {isHeader && (
           <div
             className={`transform transition-all duration-300 ${
               expanded ? "scale-y-[-1]" : ""
@@ -167,20 +138,79 @@ const CollapsibleSection = ({
               {chevronIcon("lg")}
             </div>
           </div>
-        )}
-      </button>
+        </button>
 
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="-mt-2 mobileLg:-mt-1.5 pb-3 pl-0.5">
+            {children}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle collapsibleSubTitle variant
+  if (variant === "collapsibleSubTitle") {
+    return (
+      <div>
+        <button
+          onClick={handleClick}
+          onMouseLeave={handleMouseLeave}
+          className="flex items-center w-full mt-2 mobileLg:mt-3 group transition-colors duration-300"
+        >
+          <div
+            className={`transform transition-all duration-300 ${
+              expanded ? "scale-y-[-1]" : "mb-0.5"
+            } ${
+              expanded
+                ? `fill-stamp-grey-light ${
+                  canHover ? "group-hover:fill-stamp-grey" : ""
+                }`
+                : `fill-stamp-grey ${
+                  canHover ? "group-hover:fill-stamp-grey-light" : ""
+                }`
+            } transition-colors duration-300`}
+          >
+            {chevronIcon("sm")}
+          </div>
+
+          <span className={filterLabelSm(expanded, canHover)}>
+            {title}
+          </span>
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="-mt-2 mobileLg:-mt-1.5 pb-3 pl-0.5">
+            {children}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle collapsibleLabel variant
+  if (variant === "collapsibleLabel") {
+    return (
+      // Collapsible section
       <div
-        className={`overflow-hidden transition-all duration-300 ${
-          expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="-mt-2 mobileLg:-mt-1.5 pb-3 pl-0.5">
+        <div className="ml-0.5 mt-3 mb-2">
           {children}
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 interface CheckboxProps {
@@ -440,6 +470,9 @@ export const FilterContentSRC20 = ({
     mint: true,
     market: hasActiveFilters("market", filters),
     details: hasActiveFilters("details", filters),
+    holdersRange: false,
+    volumePeriod: false,
+    priceChangePeriod: false,
   });
 
   const debouncedOnFilterChange = useDebouncedCallback(
@@ -551,7 +584,7 @@ export const FilterContentSRC20 = ({
         section="mint"
         expanded={expandedSections.mint}
         toggle={() => toggleSection("mint")}
-        variant="header"
+        variant="collapsibleTitle"
       >
         <Radio
           label="OUTMINTED"
@@ -584,7 +617,7 @@ export const FilterContentSRC20 = ({
         section="details"
         expanded={expandedSections.details}
         toggle={() => toggleSection("details")}
-        variant="header"
+        variant="collapsibleTitle"
       >
         <Radio
           label="DEPLOY"
@@ -610,9 +643,15 @@ export const FilterContentSRC20 = ({
           name="specsAndMarket"
         />
 
-        {/* Show range slider only when HOLDERS is selected */}
+        {/* Wrap HOLDERS range slider in CollapsibleSection */}
         {filters.details.holders && (
-          <div className="ml-0.5 mt-1 mb-2">
+          <CollapsibleSection
+            title=""
+            section="holdersRange"
+            expanded={true}
+            toggle={() => {}}
+            variant="collapsibleLabel"
+          >
             <RangeSlider
               min={1}
               max={10000}
@@ -620,7 +659,7 @@ export const FilterContentSRC20 = ({
               initialMax={10000}
               onChange={handleHoldersRangeChange}
             />
-          </div>
+          </CollapsibleSection>
         )}
       </CollapsibleSection>
 
@@ -630,7 +669,7 @@ export const FilterContentSRC20 = ({
         section="market"
         expanded={expandedSections.market}
         toggle={() => toggleSection("market")}
-        variant="header"
+        variant="collapsibleTitle"
       >
         <Radio
           label="MARKET CAP"
@@ -656,24 +695,36 @@ export const FilterContentSRC20 = ({
           name="specsAndMarket"
         />
 
-        {/* Show time period buttons when volume is selected */}
+        {/* Wrap VOLUME time period buttons in CollapsibleSection */}
         {filters.market.volume && (
-          <div className="ml-0.5 mt-1 mb-2">
+          <CollapsibleSection
+            title=""
+            section="volumePeriod"
+            expanded={true}
+            toggle={() => {}}
+            variant="collapsibleLabel"
+          >
             <TimePeriodButtons
               selected={volumePeriod}
               onChange={setVolumePeriod}
             />
-          </div>
+          </CollapsibleSection>
         )}
 
-        {/* Show time period buttons when price change is selected */}
+        {/* Wrap PRICE CHANGE time period buttons in CollapsibleSection */}
         {filters.market.priceChange && (
-          <div className="ml-0.5 mt-1 mb-2">
+          <CollapsibleSection
+            title=""
+            section="priceChangePeriod"
+            expanded={true}
+            toggle={() => {}}
+            variant="collapsibleLabel"
+          >
             <TimePeriodButtons
               selected={priceChangePeriod}
               onChange={setPriceChangePeriod}
             />
-          </div>
+          </CollapsibleSection>
         )}
       </CollapsibleSection>
     </div>
