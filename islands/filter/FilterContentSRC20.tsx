@@ -324,45 +324,137 @@ const RangeSlider = ({
 }) => {
   const [minValue, setMinValue] = useState(initialMin);
   const [maxValue, setMaxValue] = useState(initialMax);
+  const [isDragging, setIsDragging] = useState<"min" | "max" | null>(null);
+  const [hoveredHandle, setHoveredHandle] = useState<"min" | "max" | null>(
+    null,
+  );
+  const sliderRef = useRef<HTMLDivElement>(null);
 
-  // For a real implementation, you would need to add the actual slider logic
-  // This is just a visual representation for now
+  const handleMinInput = (e: Event) => {
+    const value = parseInt((e.target as HTMLInputElement).value);
+    if (value < maxValue) {
+      setMinValue(value);
+      onChange?.(value, maxValue);
+    }
+  };
+
+  const handleMaxInput = (e: Event) => {
+    const value = parseInt((e.target as HTMLInputElement).value);
+    if (value > minValue) {
+      setMaxValue(value);
+      onChange?.(minValue, value);
+    }
+  };
+
+  // Define the gradient colors
+  const getTrackFillStyle = (hoveredHandle: "min" | "max" | null) => {
+    const baseStyle = {
+      left: `${((minValue - min) / (max - min)) * 100}%`,
+      width: `${((maxValue - minValue) / (max - min)) * 100}%`,
+    };
+
+    if (hoveredHandle === "min") {
+      return {
+        ...baseStyle,
+        background:
+          "linear-gradient(90deg, #CCCCCC 5%, #999999 50%, #666666 75%)",
+      };
+    } else if (hoveredHandle === "max") {
+      return {
+        ...baseStyle,
+        background:
+          "linear-gradient(90deg, #666666 25%, #999999 50%, #CCCCCC 95%)",
+      };
+    }
+
+    return {
+      ...baseStyle,
+      background:
+        "linear-gradient(90deg, #666666 5%, #333333 50%, #666666 95%)",
+    };
+  };
 
   return (
-    <div className="w-full px-1">
+    <div className="w-full">
       <div className="mb-3 flex w-full justify-center">
-        <div className="flex items-center text-sm">
-          <div className="min-w-16 text-center text-stamp-grey-light">
+        <div className="flex items-center text-xs mobileLg:text-sm">
+          <div
+            className={`min-w-12 text-right ${
+              hoveredHandle === "min"
+                ? "text-stamp-grey-light"
+                : "text-stamp-grey-darker"
+            } transition-colors duration-200`}
+          >
             {minValue}
           </div>
-          <span className="mx-2 text-stamp-grey">-</span>
-          <div className="min-w-16 text-center text-stamp-grey-light">
+          <span className="mx-2 text-stamp-grey-darkest">-</span>
+          <div
+            className={`min-w-12 text-left ${
+              hoveredHandle === "max"
+                ? "text-stamp-grey-light"
+                : "text-stamp-grey-darker"
+            } transition-colors duration-200`}
+          >
             {maxValue}
           </div>
         </div>
       </div>
 
-      <div className="relative h-2 rounded-full bg-stamp-grey/30">
+      <div
+        className="relative h-1.5 mobileLg:h-2 rounded-full bg-stamp-grey-darkest/50"
+        ref={sliderRef}
+      >
+        {/* Track fill with dynamic gradient */}
         <div
-          className="absolute top-0 h-2 bg-stamp-grey-light rounded-full"
-          style={{
-            left: `${((minValue - min) / (max - min)) * 100}%`,
-            width: `${((maxValue - minValue) / (max - min)) * 100}%`,
-          }}
-        >
-        </div>
+          className="absolute top-0 h-1.5 mobileLg:h-2 rounded-full transition-colors duration-200"
+          style={getTrackFillStyle(hoveredHandle)}
+        />
 
-        <div
-          className="absolute top-1/2 size-4 bg-black border-[3px] border-stamp-grey-light rounded-full -translate-y-1/2 cursor-grab"
-          style={{ left: `${((minValue - min) / (max - min)) * 100}%` }}
-        >
-        </div>
+        {/* Min handle input */}
+        <input
+          type="range"
+          min={min}
+          max={max}
+          value={minValue}
+          onChange={handleMinInput}
+          onInput={handleMinInput}
+          onMouseEnter={() => setHoveredHandle("min")}
+          onMouseLeave={() => setHoveredHandle(null)}
+          className="absolute w-full h-1.5 mobileLg:h-2 appearance-none bg-transparent pointer-events-none 
+            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
+            [&::-webkit-slider-thumb]:size-[18px] [&::-webkit-slider-thumb]:mobileLg:size-[22px]
+            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey-darker
+            [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
+            [&::-webkit-slider-thumb]:active:cursor-grabbing
+            [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
+            [&::-moz-range-thumb]:size-[18px] [&::-moz-range-thumb]:mobileLg:size-[22px]
+            [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey-darker
+            [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
+            [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0"
+        />
 
-        <div
-          className="absolute top-1/2 size-4 bg-black border-[3px] border-stamp-grey-light rounded-full -translate-y-1/2 cursor-grab"
-          style={{ left: `${((maxValue - min) / (max - min)) * 100}%` }}
-        >
-        </div>
+        {/* Max handle input */}
+        <input
+          type="range"
+          min={min}
+          max={max}
+          value={maxValue}
+          onChange={handleMaxInput}
+          onInput={handleMaxInput}
+          onMouseEnter={() => setHoveredHandle("max")}
+          onMouseLeave={() => setHoveredHandle(null)}
+          className="absolute w-full h-1.5 mobileLg:h-2 appearance-none bg-transparent pointer-events-none 
+            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
+            [&::-webkit-slider-thumb]:size-[18px] [&::-webkit-slider-thumb]:mobileLg:size-[22px]
+            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey-darker
+            [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
+            [&::-webkit-slider-thumb]:active:cursor-grabbing
+            [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
+            [&::-moz-range-thumb]:size-[18px] [&::-moz-range-thumb]:mobileLg:size-[22px]
+            [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey-darker
+            [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
+            [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0"
+        />
       </div>
     </div>
   );
