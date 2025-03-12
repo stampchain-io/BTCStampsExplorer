@@ -3,41 +3,25 @@ import { SRC20_FILTER_TYPES } from "$globals";
 // Define a type for the SRC20 filters object
 export type SRC20Filters = {
   market: {
-    marketcap: {
-      min: string;
-      max: string;
-    };
-    volume: {
-      min: string;
-      max: string;
-    };
-    priceChange: {
-      period: "24h" | "7d" | "";
-      direction: "up" | "down" | "";
-      percentage: string;
-    };
+    marketcap: boolean;
+    volume: boolean;
+    volumePeriod?: "24h" | "3d" | "7d";
+    priceChange: boolean;
+    priceChangePeriod?: "24h" | "3d" | "7d";
   };
   details: {
-    deploy: {
-      from: string; // Date string
-      to: string; // Date string
-    };
-    supply: {
-      min: string;
-      max: string;
-    };
-    holders: {
-      min: string;
-      max: string;
+    deploy: boolean;
+    supply: boolean;
+    holders: boolean;
+    holdersRange?: {
+      min: number;
+      max: number;
     };
   };
   mint: {
+    outminted: boolean;
     minting: boolean;
     trendingMints: boolean;
-    mintProgress: {
-      min: string;
-      max: string;
-    };
   };
   [key: string]: any; // Add index signature to allow string indexing
 };
@@ -45,41 +29,25 @@ export type SRC20Filters = {
 // Default filters for SRC20
 export const defaultFilters: SRC20Filters = {
   market: {
-    marketcap: {
-      min: "",
-      max: "",
-    },
-    volume: {
-      min: "",
-      max: "",
-    },
-    priceChange: {
-      period: "",
-      direction: "",
-      percentage: "",
-    },
+    marketcap: false,
+    volume: false,
+    volumePeriod: "24h",
+    priceChange: false,
+    priceChangePeriod: "24h",
   },
   details: {
-    deploy: {
-      from: "",
-      to: "",
-    },
-    supply: {
-      min: "",
-      max: "",
-    },
-    holders: {
-      min: "",
-      max: "",
+    deploy: false,
+    supply: false,
+    holders: false,
+    holdersRange: {
+      min: 1,
+      max: 10000,
     },
   },
   mint: {
+    outminted: false,
     minting: false,
     trendingMints: false,
-    mintProgress: {
-      min: "",
-      max: "",
-    },
   },
 };
 
@@ -90,95 +58,73 @@ export function filtersToQueryParams(
   const queryParams = new URLSearchParams(search);
 
   // Process market filters
-  if (filters.market.marketcap.min) {
-    queryParams.set("market[marketcap][min]", filters.market.marketcap.min);
+  if (filters.market.marketcap) {
+    queryParams.set("market[marketcap]", "true");
   } else {
-    queryParams.delete("market[marketcap][min]");
+    queryParams.delete("market[marketcap]");
   }
 
-  if (filters.market.marketcap.max) {
-    queryParams.set("market[marketcap][max]", filters.market.marketcap.max);
+  if (filters.market.volume) {
+    queryParams.set("market[volume]", "true");
+    if (filters.market.volumePeriod) {
+      queryParams.set("market[volumePeriod]", filters.market.volumePeriod);
+    }
   } else {
-    queryParams.delete("market[marketcap][max]");
+    queryParams.delete("market[volume]");
+    queryParams.delete("market[volumePeriod]");
   }
 
-  if (filters.market.volume.min) {
-    queryParams.set("market[volume][min]", filters.market.volume.min);
+  if (filters.market.priceChange) {
+    queryParams.set("market[priceChange]", "true");
+    if (filters.market.priceChangePeriod) {
+      queryParams.set(
+        "market[priceChangePeriod]",
+        filters.market.priceChangePeriod,
+      );
+    }
   } else {
-    queryParams.delete("market[volume][min]");
-  }
-
-  if (filters.market.volume.max) {
-    queryParams.set("market[volume][max]", filters.market.volume.max);
-  } else {
-    queryParams.delete("market[volume][max]");
-  }
-
-  if (filters.market.priceChange.period) {
-    queryParams.set(
-      "market[priceChange][period]",
-      filters.market.priceChange.period,
-    );
-  } else {
-    queryParams.delete("market[priceChange][period]");
-  }
-
-  if (filters.market.priceChange.direction) {
-    queryParams.set(
-      "market[priceChange][direction]",
-      filters.market.priceChange.direction,
-    );
-  } else {
-    queryParams.delete("market[priceChange][direction]");
-  }
-
-  if (filters.market.priceChange.percentage) {
-    queryParams.set(
-      "market[priceChange][percentage]",
-      filters.market.priceChange.percentage,
-    );
-  } else {
-    queryParams.delete("market[priceChange][percentage]");
+    queryParams.delete("market[priceChange]");
+    queryParams.delete("market[priceChangePeriod]");
   }
 
   // Process details filters
-  if (filters.details.deploy.from) {
-    queryParams.set("details[deploy][from]", filters.details.deploy.from);
+  if (filters.details.deploy) {
+    queryParams.set("details[deploy]", "true");
   } else {
-    queryParams.delete("details[deploy][from]");
+    queryParams.delete("details[deploy]");
   }
 
-  if (filters.details.deploy.to) {
-    queryParams.set("details[deploy][to]", filters.details.deploy.to);
+  if (filters.details.supply) {
+    queryParams.set("details[supply]", "true");
   } else {
-    queryParams.delete("details[deploy][to]");
+    queryParams.delete("details[supply]");
   }
 
-  if (filters.details.supply.min) {
-    queryParams.set("details[supply][min]", filters.details.supply.min);
+  if (filters.details.holders) {
+    queryParams.set("details[holders]", "true");
+    if (filters.details.holdersRange) {
+      queryParams.set(
+        "details[holdersRange][min]",
+        filters.details.holdersRange.min.toString(),
+      );
+      queryParams.set(
+        "details[holdersRange][max]",
+        filters.details.holdersRange.max.toString(),
+      );
+    }
   } else {
-    queryParams.delete("details[supply][min]");
-  }
-
-  if (filters.details.supply.max) {
-    queryParams.set("details[supply][max]", filters.details.supply.max);
-  } else {
-    queryParams.delete("details[supply][max]");
-  }
-
-  if (filters.details.holders.min) {
-    queryParams.set("details[holders][min]", filters.details.holders.min);
-  } else {
-    queryParams.delete("details[holders][min]");
-  }
-
-  if (filters.details.holders.max) {
-    queryParams.set("details[holders][max]", filters.details.holders.max);
-  } else {
-    queryParams.delete("details[holders][max]");
+    queryParams.delete("details[holders]");
+    queryParams.delete("details[holdersRange][min]");
+    queryParams.delete("details[holdersRange][max]");
   }
 
   // Process mint filters
+  if (filters.mint.outminted) {
+    queryParams.set("mint[outminted]", "true");
+  } else {
+    queryParams.delete("mint[outminted]");
+  }
+
   if (filters.mint.minting) {
     queryParams.set("mint[minting]", "true");
   } else {
@@ -191,18 +137,6 @@ export function filtersToQueryParams(
     queryParams.delete("mint[trendingMints]");
   }
 
-  if (filters.mint.mintProgress.min) {
-    queryParams.set("mint[mintProgress][min]", filters.mint.mintProgress.min);
-  } else {
-    queryParams.delete("mint[mintProgress][min]");
-  }
-
-  if (filters.mint.mintProgress.max) {
-    queryParams.set("mint[mintProgress][max]", filters.mint.mintProgress.max);
-  } else {
-    queryParams.delete("mint[mintProgress][max]");
-  }
-
   return queryParams.toString();
 }
 
@@ -211,97 +145,67 @@ export function queryParamsToFilters(query: string): SRC20Filters {
   const filters = { ...defaultFilters };
 
   // Parse market filters
-  const marketcapMin = params.get("market[marketcap][min]");
-  if (marketcapMin) {
-    filters.market.marketcap.min = marketcapMin;
+  if (params.get("market[marketcap]") === "true") {
+    filters.market.marketcap = true;
   }
 
-  const marketcapMax = params.get("market[marketcap][max]");
-  if (marketcapMax) {
-    filters.market.marketcap.max = marketcapMax;
+  if (params.get("market[volume]") === "true") {
+    filters.market.volume = true;
+    const volumePeriod = params.get("market[volumePeriod]") as
+      | "24h"
+      | "3d"
+      | "7d"
+      | null;
+    if (volumePeriod) {
+      filters.market.volumePeriod = volumePeriod;
+    }
   }
 
-  const volumeMin = params.get("market[volume][min]");
-  if (volumeMin) {
-    filters.market.volume.min = volumeMin;
-  }
-
-  const volumeMax = params.get("market[volume][max]");
-  if (volumeMax) {
-    filters.market.volume.max = volumeMax;
-  }
-
-  const priceChangePeriod = params.get("market[priceChange][period]") as
-    | "24h"
-    | "7d"
-    | "";
-  if (priceChangePeriod) {
-    filters.market.priceChange.period = priceChangePeriod;
-  }
-
-  const priceChangeDirection = params.get("market[priceChange][direction]") as
-    | "up"
-    | "down"
-    | "";
-  if (priceChangeDirection) {
-    filters.market.priceChange.direction = priceChangeDirection;
-  }
-
-  const priceChangePercentage = params.get("market[priceChange][percentage]");
-  if (priceChangePercentage) {
-    filters.market.priceChange.percentage = priceChangePercentage;
+  if (params.get("market[priceChange]") === "true") {
+    filters.market.priceChange = true;
+    const priceChangePeriod = params.get("market[priceChangePeriod]") as
+      | "24h"
+      | "3d"
+      | "7d"
+      | null;
+    if (priceChangePeriod) {
+      filters.market.priceChangePeriod = priceChangePeriod;
+    }
   }
 
   // Parse details filters
-  const deployFrom = params.get("details[deploy][from]");
-  if (deployFrom) {
-    filters.details.deploy.from = deployFrom;
+  if (params.get("details[deploy]") === "true") {
+    filters.details.deploy = true;
   }
 
-  const deployTo = params.get("details[deploy][to]");
-  if (deployTo) {
-    filters.details.deploy.to = deployTo;
+  if (params.get("details[supply]") === "true") {
+    filters.details.supply = true;
   }
 
-  const supplyMin = params.get("details[supply][min]");
-  if (supplyMin) {
-    filters.details.supply.min = supplyMin;
-  }
+  if (params.get("details[holders]") === "true") {
+    filters.details.holders = true;
+    const holdersRangeMin = params.get("details[holdersRange][min]");
+    const holdersRangeMax = params.get("details[holdersRange][max]");
 
-  const supplyMax = params.get("details[supply][max]");
-  if (supplyMax) {
-    filters.details.supply.max = supplyMax;
-  }
-
-  const holdersMin = params.get("details[holders][min]");
-  if (holdersMin) {
-    filters.details.holders.min = holdersMin;
-  }
-
-  const holdersMax = params.get("details[holders][max]");
-  if (holdersMax) {
-    filters.details.holders.max = holdersMax;
+    if (holdersRangeMin && holdersRangeMax) {
+      filters.details.holdersRange = {
+        min: parseInt(holdersRangeMin, 10),
+        max: parseInt(holdersRangeMax, 10),
+      };
+    }
   }
 
   // Parse mint filters
-  const minting = params.get("mint[minting]");
-  if (minting === "true") {
+  if (params.get("mint[outminted]") === "true") {
+    filters.mint.outminted = true;
+  }
+
+  if (params.get("mint[minting]") === "true") {
     filters.mint.minting = true;
   }
 
-  const trendingMints = params.get("mint[trendingMints]");
-  if (trendingMints === "true") {
+  if (params.get("mint[trendingMints]") === "true") {
     filters.mint.trendingMints = true;
-  }
-
-  const mintProgressMin = params.get("mint[mintProgress][min]");
-  if (mintProgressMin) {
-    filters.mint.mintProgress.min = mintProgressMin;
-  }
-
-  const mintProgressMax = params.get("mint[mintProgress][max]");
-  if (mintProgressMax) {
-    filters.mint.mintProgress.max = mintProgressMax;
   }
 
   return filters;
@@ -309,25 +213,21 @@ export function queryParamsToFilters(query: string): SRC20Filters {
 
 export const allQueryKeysFromFiltersSRC20 = [
   // Market filters
-  "market[marketcap][min]",
-  "market[marketcap][max]",
-  "market[volume][min]",
-  "market[volume][max]",
-  "market[priceChange][period]",
-  "market[priceChange][direction]",
-  "market[priceChange][percentage]",
+  "market[marketcap]",
+  "market[volume]",
+  "market[volumePeriod]",
+  "market[priceChange]",
+  "market[priceChangePeriod]",
 
   // Details filters
-  "details[deploy][from]",
-  "details[deploy][to]",
-  "details[supply][min]",
-  "details[supply][max]",
-  "details[holders][min]",
-  "details[holders][max]",
+  "details[deploy]",
+  "details[supply]",
+  "details[holders]",
+  "details[holdersRange][min]",
+  "details[holdersRange][max]",
 
   // Mint filters
+  "mint[outminted]",
   "mint[minting]",
   "mint[trendingMints]",
-  "mint[mintProgress][min]",
-  "mint[mintProgress][max]",
 ];

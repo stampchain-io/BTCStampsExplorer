@@ -63,6 +63,12 @@ const filterLabelSm = (checked: boolean, canHover: boolean): string => `
 }
 `;
 
+const buttonGreyOutline =
+  "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-xs mobileLg:text-sm font-extrabold text-stamp-grey tracking-[0.05em] h-8 mobileLg:h-9 px-3 mobileLg:px-4 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+
+const buttonGreyOutlineActive =
+  "inline-flex items-center justify-center border-2 border-stamp-grey-light rounded-md text-xs mobileLg:text-sm font-extrabold text-stamp-grey-light tracking-[0.05em] h-8 mobileLg:h-9 px-3 mobileLg:px-4 transition-colors";
+
 const CollapsibleSection = ({
   title,
   section,
@@ -181,9 +187,65 @@ interface CheckboxProps {
   label: string;
   checked: boolean;
   onChange: () => void;
+  hasDropdown?: boolean;
+  dropdownContent?: ComponentChildren;
 }
 
-const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
+const Checkbox = ({
+  label,
+  checked,
+  onChange,
+  hasDropdown = false,
+  dropdownContent = null,
+}: CheckboxProps) => {
+  const [canHover, setCanHover] = useState(true);
+
+  const handleChange = () => {
+    onChange();
+    setTimeout(() => setCanHover(false), 0);
+  };
+
+  const handleMouseLeave = () => {
+    setCanHover(true);
+  };
+
+  return (
+    <div className="flex flex-col">
+      <div
+        className="flex items-center py-1.5 mobileLg:py-1.5 cursor-pointer group"
+        onMouseLeave={handleMouseLeave}
+        onClick={handleChange}
+      >
+        <input
+          className={checkboxIcon(checked, canHover)}
+          type="checkbox"
+          checked={checked}
+          readOnly
+        />
+        <label className={filterLabelSm(checked, canHover)}>
+          {label}
+        </label>
+      </div>
+
+      {hasDropdown && checked && dropdownContent && (
+        <div className="ml-0.5 mt-1 mb-2">
+          {dropdownContent}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Add this Radio component after the Checkbox component
+interface RadioProps {
+  label: string;
+  value: string;
+  checked: boolean;
+  onChange: () => void;
+  name: string;
+}
+
+const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
   const [canHover, setCanHover] = useState(true);
 
   const handleChange = () => {
@@ -203,7 +265,9 @@ const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
     >
       <input
         className={checkboxIcon(checked, canHover)}
-        type="checkbox"
+        type="radio"
+        name={name}
+        value={value}
         checked={checked}
         readOnly
       />
@@ -214,100 +278,111 @@ const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
   );
 };
 
-interface RangeInputProps {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
-  type: "number" | "price" | "percentage" | "date";
-}
+// Range Slider Component
+const RangeSlider = ({
+  min = 1,
+  max = 10000,
+  initialMin = 1,
+  initialMax = 10000,
+  onChange,
+}: {
+  min?: number;
+  max?: number;
+  initialMin?: number;
+  initialMax?: number;
+  onChange?: (min: number, max: number) => void;
+}) => {
+  const [minValue, setMinValue] = useState(initialMin);
+  const [maxValue, setMaxValue] = useState(initialMax);
 
-const RangeInput = (
-  { label, placeholder, value, onChange, type }: RangeInputProps,
-) => (
-  <div className="flex flex-col space-y-1 pt-[9px]">
-    <label className="text-xs text-stamp-table-text">{label}</label>
-    <input
-      type={type === "date" ? "date" : "text"}
-      value={value}
-      onKeyDown={(e) => {
-        if (
-          ["e", "E", "+", "-"].includes(e.key) ||
-          (type === "number" && e.key === ".")
-        ) {
-          e.preventDefault();
-        }
-      }}
-      onChange={(e) => {
-        const value = e.target.value;
+  // For a real implementation, you would need to add the actual slider logic
+  // This is just a visual representation for now
 
-        if (type === "price") {
-          // For price, allow decimals with custom validation
-          let sanitized = value.replace(/[^0-9.]/g, "");
-          const parts = sanitized.split(".");
+  return (
+    <div className="w-full px-1">
+      <div className="mb-3 flex w-full justify-center">
+        <div className="flex items-center text-sm">
+          <div className="min-w-16 text-center text-stamp-grey-light">
+            {minValue}
+          </div>
+          <span className="mx-2 text-stamp-grey">-</span>
+          <div className="min-w-16 text-center text-stamp-grey-light">
+            {maxValue}
+          </div>
+        </div>
+      </div>
 
-          // Ensure only one decimal point
-          if (parts.length > 2) {
-            sanitized = parts[0] + "." + parts[1];
-          }
+      <div className="relative h-2 rounded-full bg-stamp-grey/30">
+        <div
+          className="absolute top-0 h-2 bg-stamp-grey-light rounded-full"
+          style={{
+            left: `${((minValue - min) / (max - min)) * 100}%`,
+            width: `${((maxValue - minValue) / (max - min)) * 100}%`,
+          }}
+        >
+        </div>
 
-          // Limit decimal places to 8
-          if (parts.length === 2 && parts[1].length > 8) {
-            sanitized = parts[0] + "." + parts[1].slice(0, 8);
-          }
+        <div
+          className="absolute top-1/2 size-4 bg-black border-[3px] border-stamp-grey-light rounded-full -translate-y-1/2 cursor-grab"
+          style={{ left: `${((minValue - min) / (max - min)) * 100}%` }}
+        >
+        </div>
 
-          if (sanitized !== value) {
-            onChange(sanitized);
-          } else {
-            onChange(value);
-          }
-        } else if (type === "percentage") {
-          // For percentage, allow decimals with custom validation
-          let sanitized = value.replace(/[^0-9.]/g, "");
-          const parts = sanitized.split(".");
+        <div
+          className="absolute top-1/2 size-4 bg-black border-[3px] border-stamp-grey-light rounded-full -translate-y-1/2 cursor-grab"
+          style={{ left: `${((maxValue - min) / (max - min)) * 100}%` }}
+        >
+        </div>
+      </div>
+    </div>
+  );
+};
 
-          // Ensure only one decimal point
-          if (parts.length > 2) {
-            sanitized = parts[0] + "." + parts[1];
-          }
-
-          // Limit decimal places to 2
-          if (parts.length === 2 && parts[1].length > 2) {
-            sanitized = parts[0] + "." + parts[1].slice(0, 2);
-          }
-
-          if (sanitized !== value) {
-            onChange(sanitized);
-          } else {
-            onChange(value);
-          }
-        } else if (type === "number") {
-          // For number, only allow integers
-          if (/^\d*$/.test(value)) {
-            onChange(value);
-          }
-        } else {
-          // For date or other types, pass through
-          onChange(value);
-        }
-      }}
-      min="0"
-      step={type === "price"
-        ? "0.00000001"
-        : type === "percentage"
-        ? "0.01"
-        : "1"}
-      inputMode={type === "date" ? "text" : "decimal"}
-      pattern={type === "price"
-        ? "[0-9]*[.]?[0-9]*"
-        : type === "percentage"
-        ? "[0-9]*[.]?[0-9]*"
-        : "[0-9]*"}
-      className="h-10 mobileLg:h-11 px-3 mobileLg:px-4 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
-      placeholder={placeholder}
-    />
-  </div>
-);
+// Time Period Button Group
+const TimePeriodButtons = ({
+  selected,
+  onChange,
+}: {
+  selected: string;
+  onChange: (period: string) => void;
+}) => {
+  return (
+    <div className="flex justify-between">
+      <button
+        className={selected === "24h"
+          ? buttonGreyOutlineActive
+          : buttonGreyOutline}
+        onClick={() => onChange("24h")}
+      >
+        24H
+      </button>
+      <button
+        className={selected === "3d"
+          ? buttonGreyOutlineActive
+          : buttonGreyOutline}
+        onClick={() => onChange("3d")}
+      >
+        3D
+      </button>
+      <button
+        className={selected === "7d"
+          ? buttonGreyOutlineActive
+          : buttonGreyOutline}
+        onClick={() => onChange("7d")}
+      >
+        7D
+      </button>
+      <button
+        className={selected === "1m"
+          ? buttonGreyOutlineActive
+          : buttonGreyOutline}
+        onClick={() => onChange("1m")}
+      >
+        1M
+      </button>
+    </div>
+  );
+};
 
 function useDebouncedCallback<T extends (...args: any[]) => void>(
   callback: T,
@@ -329,47 +404,17 @@ function useDebouncedCallback<T extends (...args: any[]) => void>(
 function hasActiveFilters(section: string, filters: SRC20Filters) {
   switch (section) {
     case "market":
-      return filters.market.marketcap.min !== "" ||
-        filters.market.marketcap.max !== "" ||
-        filters.market.volume.min !== "" ||
-        filters.market.volume.max !== "" ||
-        filters.market.priceChange.period !== "" ||
-        filters.market.priceChange.direction !== "" ||
-        filters.market.priceChange.percentage !== "";
+      return filters.market.marketcap ||
+        filters.market.volume ||
+        filters.market.priceChange;
     case "details":
-      return filters.details.deploy.from !== "" ||
-        filters.details.deploy.to !== "" ||
-        filters.details.supply.min !== "" ||
-        filters.details.supply.max !== "" ||
-        filters.details.holders.min !== "" ||
-        filters.details.holders.max !== "";
+      return filters.details.deploy ||
+        filters.details.supply ||
+        filters.details.holders;
     case "mint":
-      return filters.mint.minting ||
-        filters.mint.trendingMints ||
-        filters.mint.mintProgress.min !== "" ||
-        filters.mint.mintProgress.max !== "";
-    case "marketcap":
-      return filters.market.marketcap.min !== "" ||
-        filters.market.marketcap.max !== "";
-    case "volume":
-      return filters.market.volume.min !== "" ||
-        filters.market.volume.max !== "";
-    case "priceChange":
-      return filters.market.priceChange.period !== "" ||
-        filters.market.priceChange.direction !== "" ||
-        filters.market.priceChange.percentage !== "";
-    case "deploy":
-      return filters.details.deploy.from !== "" ||
-        filters.details.deploy.to !== "";
-    case "supply":
-      return filters.details.supply.min !== "" ||
-        filters.details.supply.max !== "";
-    case "holders":
-      return filters.details.holders.min !== "" ||
-        filters.details.holders.max !== "";
-    case "mintProgress":
-      return filters.mint.mintProgress.min !== "" ||
-        filters.mint.mintProgress.max !== "";
+      return filters.mint.outminted ||
+        filters.mint.minting ||
+        filters.mint.trendingMints;
     default:
       return false;
   }
@@ -383,6 +428,8 @@ export const FilterContentSRC20 = ({
   onFiltersChange: (filters: SRC20Filters) => void;
 }) => {
   const [filters, setFilters] = useState(initialFilters);
+  const [volumePeriod, setVolumePeriod] = useState("24h");
+  const [priceChangePeriod, setPriceChangePeriod] = useState("24h");
 
   // Add this effect to watch for changes to initialFilters
   useEffect(() => {
@@ -390,16 +437,9 @@ export const FilterContentSRC20 = ({
   }, [initialFilters]);
 
   const [expandedSections, setExpandedSections] = useState({
+    mint: true,
     market: hasActiveFilters("market", filters),
     details: hasActiveFilters("details", filters),
-    mint: hasActiveFilters("mint", filters),
-    marketcap: hasActiveFilters("marketcap", filters),
-    volume: hasActiveFilters("volume", filters),
-    priceChange: hasActiveFilters("priceChange", filters),
-    deploy: hasActiveFilters("deploy", filters),
-    supply: hasActiveFilters("supply", filters),
-    holders: hasActiveFilters("holders", filters),
-    mintProgress: hasActiveFilters("mintProgress", filters),
   });
 
   const debouncedOnFilterChange = useDebouncedCallback(
@@ -410,13 +450,18 @@ export const FilterContentSRC20 = ({
     500,
   );
 
-  const handleFilterChange = (category: string, value: unknown) => {
+  const handleFilterChange = (
+    category: string,
+    key: string,
+    value: boolean,
+  ) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
-        [category]: typeof value === "object"
-          ? { ...prevFilters[category], ...value }
-          : value,
+        [category]: {
+          ...prevFilters[category],
+          [key]: value,
+        },
       };
       onFiltersChange(newFilters);
       return newFilters;
@@ -430,12 +475,156 @@ export const FilterContentSRC20 = ({
     });
   };
 
-  const filterCollectionSm =
-    "flex justify-end text-xs mobileLg:text-sm font-light text-stamp-grey-darker mt-1 mobileLg:mt-0 -mb-5 cursor-default";
+  const handleHoldersRangeChange = (min: number, max: number) => {
+    // This would update the holders range in the actual implementation
+    console.log(`Holders range changed: ${min} - ${max}`);
+  };
+
+  // Update the handleStatusChange function to allow deselection
+  const handleStatusChange = (
+    status: "outminted" | "minting" | "trendingMints",
+  ) => {
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        mint: {
+          ...prevFilters.mint,
+          outminted: prevFilters.mint.outminted === true
+            ? false
+            : status === "outminted",
+          minting: prevFilters.mint.minting === true
+            ? false
+            : status === "minting",
+          trendingMints: prevFilters.mint.trendingMints === true
+            ? false
+            : status === "trendingMints",
+        },
+      };
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
+
+  // Modify the handler functions to handle the combined Specs + Market group
+  const handleSpecsAndMarketChange = (
+    category: "details" | "market",
+    option: string,
+  ) => {
+    setFilters((prevFilters) => {
+      const newFilters = {
+        ...prevFilters,
+        details: {
+          ...prevFilters.details,
+          deploy: category === "details" && option === "deploy"
+            ? (prevFilters.details.deploy === true ? false : true)
+            : false,
+          supply: category === "details" && option === "supply"
+            ? (prevFilters.details.supply === true ? false : true)
+            : false,
+          holders: category === "details" && option === "holders"
+            ? (prevFilters.details.holders === true ? false : true)
+            : false,
+        },
+        market: {
+          ...prevFilters.market,
+          marketcap: category === "market" && option === "marketcap"
+            ? (prevFilters.market.marketcap === true ? false : true)
+            : false,
+          volume: category === "market" && option === "volume"
+            ? (prevFilters.market.volume === true ? false : true)
+            : false,
+          priceChange: category === "market" && option === "priceChange"
+            ? (prevFilters.market.priceChange === true ? false : true)
+            : false,
+        },
+      };
+      onFiltersChange(newFilters);
+      return newFilters;
+    });
+  };
 
   return (
     <div className="space-y-1 mobileLg:space-y-1.5">
-      {/* MARKET SECTION */}
+      {/* STATUS SECTION - Independent group */}
+      <CollapsibleSection
+        title="STATUS"
+        section="mint"
+        expanded={expandedSections.mint}
+        toggle={() => toggleSection("mint")}
+        variant="header"
+      >
+        <Radio
+          label="OUTMINTED"
+          value="outminted"
+          checked={filters.mint.outminted}
+          onChange={() => handleStatusChange("outminted")}
+          name="status"
+        />
+
+        <Radio
+          label="MINTING"
+          value="minting"
+          checked={filters.mint.minting}
+          onChange={() => handleStatusChange("minting")}
+          name="status"
+        />
+
+        <Radio
+          label="TRENDING MINTS"
+          value="trendingMints"
+          checked={filters.mint.trendingMints}
+          onChange={() => handleStatusChange("trendingMints")}
+          name="status"
+        />
+      </CollapsibleSection>
+
+      {/* SPECIFICATIONS SECTION - Part of combined group */}
+      <CollapsibleSection
+        title="SPECS"
+        section="details"
+        expanded={expandedSections.details}
+        toggle={() => toggleSection("details")}
+        variant="header"
+      >
+        <Radio
+          label="DEPLOY"
+          value="deploy"
+          checked={filters.details.deploy}
+          onChange={() => handleSpecsAndMarketChange("details", "deploy")}
+          name="specsAndMarket"
+        />
+
+        <Radio
+          label="SUPPLY"
+          value="supply"
+          checked={filters.details.supply}
+          onChange={() => handleSpecsAndMarketChange("details", "supply")}
+          name="specsAndMarket"
+        />
+
+        <Radio
+          label="HOLDERS"
+          value="holders"
+          checked={filters.details.holders}
+          onChange={() => handleSpecsAndMarketChange("details", "holders")}
+          name="specsAndMarket"
+        />
+
+        {/* Show range slider only when HOLDERS is selected */}
+        {filters.details.holders && (
+          <div className="ml-0.5 mt-1 mb-2">
+            <RangeSlider
+              min={1}
+              max={10000}
+              initialMin={1}
+              initialMax={10000}
+              onChange={handleHoldersRangeChange}
+            />
+          </div>
+        )}
+      </CollapsibleSection>
+
+      {/* MARKET SECTION - Part of combined group */}
       <CollapsibleSection
         title="MARKET"
         section="market"
@@ -443,369 +632,49 @@ export const FilterContentSRC20 = ({
         toggle={() => toggleSection("market")}
         variant="header"
       >
-        {/* Market Cap Range */}
-        <CollapsibleSection
-          title="MARKET CAP"
-          section="marketcap"
-          expanded={expandedSections.marketcap}
-          toggle={() => toggleSection("marketcap")}
-          variant="subheader"
-        >
-          <div className="flex gap-6 placeholder:text-xs">
-            <RangeInput
-              label="MIN"
-              placeholder="0.00000000"
-              type="price"
-              value={filters.market.marketcap.min || ""}
-              onChange={(value) => {
-                handleFilterChange("market", {
-                  ...filters.market,
-                  marketcap: {
-                    ...filters.market.marketcap,
-                    min: value,
-                  },
-                });
-              }}
-            />
-            <RangeInput
-              label="MAX"
-              placeholder="∞ BTC"
-              type="price"
-              value={filters.market.marketcap.max || ""}
-              onChange={(value) => {
-                handleFilterChange("market", {
-                  ...filters.market,
-                  marketcap: {
-                    ...filters.market.marketcap,
-                    max: value,
-                  },
-                });
-              }}
-            />
-          </div>
-        </CollapsibleSection>
-
-        {/* Volume Range */}
-        <CollapsibleSection
-          title="VOLUME"
-          section="volume"
-          expanded={expandedSections.volume}
-          toggle={() => toggleSection("volume")}
-          variant="subheader"
-        >
-          <div className="flex gap-6 placeholder:text-xs">
-            <RangeInput
-              label="MIN"
-              placeholder="0.00000000"
-              type="price"
-              value={filters.market.volume.min || ""}
-              onChange={(value) => {
-                handleFilterChange("market", {
-                  ...filters.market,
-                  volume: {
-                    ...filters.market.volume,
-                    min: value,
-                  },
-                });
-              }}
-            />
-            <RangeInput
-              label="MAX"
-              placeholder="∞ BTC"
-              type="price"
-              value={filters.market.volume.max || ""}
-              onChange={(value) => {
-                handleFilterChange("market", {
-                  ...filters.market,
-                  volume: {
-                    ...filters.market.volume,
-                    max: value,
-                  },
-                });
-              }}
-            />
-          </div>
-        </CollapsibleSection>
-
-        {/* Price Change */}
-        <CollapsibleSection
-          title="PRICE CHANGE"
-          section="priceChange"
-          expanded={expandedSections.priceChange}
-          toggle={() => toggleSection("priceChange")}
-          variant="subheader"
-        >
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-6">
-              <div className="flex-1">
-                <label className="text-xs text-stamp-table-text mb-1 block">
-                  PERIOD
-                </label>
-                <select
-                  className="h-10 mobileLg:h-11 px-3 mobileLg:px-4 rounded-md bg-stamp-grey text-stamp-grey-darkest text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
-                  value={filters.market.priceChange.period}
-                  onChange={(e) => {
-                    handleFilterChange("market", {
-                      ...filters.market,
-                      priceChange: {
-                        ...filters.market.priceChange,
-                        period: e.target.value as "24h" | "7d" | "",
-                      },
-                    });
-                  }}
-                >
-                  <option value="">SELECT</option>
-                  <option value="24h">24 HOURS</option>
-                  <option value="7d">7 DAYS</option>
-                </select>
-              </div>
-              <div className="flex-1">
-                <label className="text-xs text-stamp-table-text mb-1 block">
-                  DIRECTION
-                </label>
-                <select
-                  className="h-10 mobileLg:h-11 px-3 mobileLg:px-4 rounded-md bg-stamp-grey text-stamp-grey-darkest text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
-                  value={filters.market.priceChange.direction}
-                  onChange={(e) => {
-                    handleFilterChange("market", {
-                      ...filters.market,
-                      priceChange: {
-                        ...filters.market.priceChange,
-                        direction: e.target.value as "up" | "down" | "",
-                      },
-                    });
-                  }}
-                >
-                  <option value="">SELECT</option>
-                  <option value="up">UP</option>
-                  <option value="down">DOWN</option>
-                </select>
-              </div>
-            </div>
-            <RangeInput
-              label="PERCENTAGE"
-              placeholder="0.00%"
-              type="percentage"
-              value={filters.market.priceChange.percentage || ""}
-              onChange={(value) => {
-                handleFilterChange("market", {
-                  ...filters.market,
-                  priceChange: {
-                    ...filters.market.priceChange,
-                    percentage: value,
-                  },
-                });
-              }}
-            />
-          </div>
-        </CollapsibleSection>
-      </CollapsibleSection>
-
-      {/* DETAILS SECTION */}
-      <CollapsibleSection
-        title="DETAILS"
-        section="details"
-        expanded={expandedSections.details}
-        toggle={() => toggleSection("details")}
-        variant="header"
-      >
-        {/* Deploy Date Range */}
-        <CollapsibleSection
-          title="DEPLOY DATE"
-          section="deploy"
-          expanded={expandedSections.deploy}
-          toggle={() => toggleSection("deploy")}
-          variant="subheader"
-        >
-          <div className="flex gap-6 placeholder:text-xs">
-            <RangeInput
-              label="FROM"
-              placeholder="SELECT DATE"
-              type="date"
-              value={filters.details.deploy.from || ""}
-              onChange={(value) => {
-                handleFilterChange("details", {
-                  ...filters.details,
-                  deploy: {
-                    ...filters.details.deploy,
-                    from: value,
-                  },
-                });
-              }}
-            />
-            <RangeInput
-              label="TO"
-              placeholder="SELECT DATE"
-              type="date"
-              value={filters.details.deploy.to || ""}
-              onChange={(value) => {
-                handleFilterChange("details", {
-                  ...filters.details,
-                  deploy: {
-                    ...filters.details.deploy,
-                    to: value,
-                  },
-                });
-              }}
-            />
-          </div>
-        </CollapsibleSection>
-
-        {/* Supply Range */}
-        <CollapsibleSection
-          title="SUPPLY"
-          section="supply"
-          expanded={expandedSections.supply}
-          toggle={() => toggleSection("supply")}
-          variant="subheader"
-        >
-          <div className="flex gap-6 placeholder:text-xs">
-            <RangeInput
-              label="MIN"
-              placeholder="0"
-              type="number"
-              value={filters.details.supply.min || ""}
-              onChange={(value) => {
-                handleFilterChange("details", {
-                  ...filters.details,
-                  supply: {
-                    ...filters.details.supply,
-                    min: value,
-                  },
-                });
-              }}
-            />
-            <RangeInput
-              label="MAX"
-              placeholder="∞"
-              type="number"
-              value={filters.details.supply.max || ""}
-              onChange={(value) => {
-                handleFilterChange("details", {
-                  ...filters.details,
-                  supply: {
-                    ...filters.details.supply,
-                    max: value,
-                  },
-                });
-              }}
-            />
-          </div>
-        </CollapsibleSection>
-
-        {/* Holders Range */}
-        <CollapsibleSection
-          title="HOLDERS"
-          section="holders"
-          expanded={expandedSections.holders}
-          toggle={() => toggleSection("holders")}
-          variant="subheader"
-        >
-          <div className="flex gap-6 placeholder:text-xs">
-            <RangeInput
-              label="MIN"
-              placeholder="0"
-              type="number"
-              value={filters.details.holders.min || ""}
-              onChange={(value) => {
-                handleFilterChange("details", {
-                  ...filters.details,
-                  holders: {
-                    ...filters.details.holders,
-                    min: value,
-                  },
-                });
-              }}
-            />
-            <RangeInput
-              label="MAX"
-              placeholder="∞"
-              type="number"
-              value={filters.details.holders.max || ""}
-              onChange={(value) => {
-                handleFilterChange("details", {
-                  ...filters.details,
-                  holders: {
-                    ...filters.details.holders,
-                    max: value,
-                  },
-                });
-              }}
-            />
-          </div>
-        </CollapsibleSection>
-      </CollapsibleSection>
-
-      {/* MINT SECTION */}
-      <CollapsibleSection
-        title="MINT"
-        section="mint"
-        expanded={expandedSections.mint}
-        toggle={() => toggleSection("mint")}
-        variant="header"
-      >
-        <Checkbox
-          label="MINTING"
-          checked={filters.mint.minting}
-          onChange={() => {
-            handleFilterChange("mint", {
-              ...filters.mint,
-              minting: !filters.mint.minting,
-            });
-          }}
-        />
-        <Checkbox
-          label="TRENDING MINTS"
-          checked={filters.mint.trendingMints}
-          onChange={() => {
-            handleFilterChange("mint", {
-              ...filters.mint,
-              trendingMints: !filters.mint.trendingMints,
-            });
-          }}
+        <Radio
+          label="MARKET CAP"
+          value="marketcap"
+          checked={filters.market.marketcap}
+          onChange={() => handleSpecsAndMarketChange("market", "marketcap")}
+          name="specsAndMarket"
         />
 
-        {/* Mint Progress Range */}
-        <CollapsibleSection
-          title="MINT PROGRESS"
-          section="mintProgress"
-          expanded={expandedSections.mintProgress}
-          toggle={() => toggleSection("mintProgress")}
-          variant="subheader"
-        >
-          <div className="flex gap-6 placeholder:text-xs">
-            <RangeInput
-              label="MIN %"
-              placeholder="0"
-              type="percentage"
-              value={filters.mint.mintProgress.min || ""}
-              onChange={(value) => {
-                handleFilterChange("mint", {
-                  ...filters.mint,
-                  mintProgress: {
-                    ...filters.mint.mintProgress,
-                    min: value,
-                  },
-                });
-              }}
-            />
-            <RangeInput
-              label="MAX %"
-              placeholder="100"
-              type="percentage"
-              value={filters.mint.mintProgress.max || ""}
-              onChange={(value) => {
-                handleFilterChange("mint", {
-                  ...filters.mint,
-                  mintProgress: {
-                    ...filters.mint.mintProgress,
-                    max: value,
-                  },
-                });
-              }}
+        <Radio
+          label="VOLUME"
+          value="volume"
+          checked={filters.market.volume}
+          onChange={() => handleSpecsAndMarketChange("market", "volume")}
+          name="specsAndMarket"
+        />
+
+        <Radio
+          label="PRICE CHANGE"
+          value="priceChange"
+          checked={filters.market.priceChange}
+          onChange={() => handleSpecsAndMarketChange("market", "priceChange")}
+          name="specsAndMarket"
+        />
+
+        {/* Show time period buttons when volume is selected */}
+        {filters.market.volume && (
+          <div className="ml-0.5 mt-1 mb-2">
+            <TimePeriodButtons
+              selected={volumePeriod}
+              onChange={setVolumePeriod}
             />
           </div>
-        </CollapsibleSection>
+        )}
+
+        {/* Show time period buttons when price change is selected */}
+        {filters.market.priceChange && (
+          <div className="ml-0.5 mt-1 mb-2">
+            <TimePeriodButtons
+              selected={priceChangePeriod}
+              onChange={setPriceChangePeriod}
+            />
+          </div>
+        )}
       </CollapsibleSection>
     </div>
   );
