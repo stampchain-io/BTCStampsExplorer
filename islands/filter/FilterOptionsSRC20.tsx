@@ -19,7 +19,7 @@ export type SRC20Filters = {
     };
   };
   mint: {
-    outminted: boolean;
+    fullyminted: boolean;
     minting: boolean;
     trendingMints: boolean;
   };
@@ -45,7 +45,7 @@ export const defaultFilters: SRC20Filters = {
     },
   },
   mint: {
-    outminted: false,
+    fullyminted: false,
     minting: false,
     trendingMints: false,
   },
@@ -119,10 +119,10 @@ export function filtersToQueryParams(
   }
 
   // Process mint filters
-  if (filters.mint.outminted) {
-    queryParams.set("mint[outminted]", "true");
+  if (filters.mint.fullyminted) {
+    queryParams.set("mint[fullyminted]", "true");
   } else {
-    queryParams.delete("mint[outminted]");
+    queryParams.delete("mint[fullyminted]");
   }
 
   if (filters.mint.minting) {
@@ -196,8 +196,8 @@ export function queryParamsToFilters(query: string): SRC20Filters {
   }
 
   // Parse mint filters
-  if (params.get("mint[outminted]") === "true") {
-    filters.mint.outminted = true;
+  if (params.get("mint[fullyminted]") === "true") {
+    filters.mint.fullyminted = true;
   }
 
   if (params.get("mint[minting]") === "true") {
@@ -227,7 +227,7 @@ export const allQueryKeysFromFiltersSRC20 = [
   "details[holdersRange][max]",
 
   // Mint filters
-  "mint[outminted]",
+  "mint[fullyminted]",
   "mint[minting]",
   "mint[trendingMints]",
 ];

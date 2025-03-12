@@ -324,26 +324,25 @@ const RangeSlider = ({
 }) => {
   const [minValue, setMinValue] = useState(initialMin);
   const [maxValue, setMaxValue] = useState(initialMax);
-  const [isDragging, setIsDragging] = useState<"min" | "max" | null>(null);
   const [hoveredHandle, setHoveredHandle] = useState<"min" | "max" | null>(
     null,
   );
   const sliderRef = useRef<HTMLDivElement>(null);
 
   const handleMinInput = (e: Event) => {
-    const value = parseInt((e.target as HTMLInputElement).value);
-    if (value < maxValue) {
-      setMinValue(value);
-      onChange?.(value, maxValue);
-    }
+    const newMin = parseInt((e.target as HTMLInputElement).value);
+    // Ensure new min value doesn't exceed max value - 1
+    const clampedMin = Math.min(newMin, maxValue - 1);
+    setMinValue(clampedMin);
+    onChange?.(clampedMin, maxValue);
   };
 
   const handleMaxInput = (e: Event) => {
-    const value = parseInt((e.target as HTMLInputElement).value);
-    if (value > minValue) {
-      setMaxValue(value);
-      onChange?.(minValue, value);
-    }
+    const newMax = parseInt((e.target as HTMLInputElement).value);
+    // Ensure new max value doesn't go below min value + 1
+    const clampedMax = Math.max(newMax, minValue + 1);
+    setMaxValue(clampedMax);
+    onChange?.(minValue, clampedMax);
   };
 
   // Define the gradient colors
@@ -376,7 +375,7 @@ const RangeSlider = ({
 
   return (
     <div className="w-full">
-      <div className="mb-3 flex w-full justify-center">
+      <div className="-mt-2 mb-3 flex w-full justify-center">
         <div className="flex items-center text-xs mobileLg:text-sm">
           <div
             className={`min-w-12 text-right ${
@@ -401,12 +400,12 @@ const RangeSlider = ({
       </div>
 
       <div
-        className="relative h-1.5 mobileLg:h-2 rounded-full bg-stamp-grey-darkest/50"
+        className="relative h-2 mobileLg:h-2.5 rounded-full bg-stamp-grey-darkest/50"
         ref={sliderRef}
       >
         {/* Track fill with dynamic gradient */}
         <div
-          className="absolute top-0 h-1.5 mobileLg:h-2 rounded-full transition-colors duration-200"
+          className="absolute top-0 mobileLg:top-0 h-2 mobileLg:h-2.5 rounded-full transition-colors duration-200"
           style={getTrackFillStyle(hoveredHandle)}
         />
 
@@ -420,7 +419,7 @@ const RangeSlider = ({
           onInput={handleMinInput}
           onMouseEnter={() => setHoveredHandle("min")}
           onMouseLeave={() => setHoveredHandle(null)}
-          className="absolute w-full h-1.5 mobileLg:h-2 appearance-none bg-transparent pointer-events-none 
+          className="absolute w-full h-2 mobileLg:h-2.5 appearance-none bg-transparent pointer-events-none 
             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
             [&::-webkit-slider-thumb]:size-[18px] [&::-webkit-slider-thumb]:mobileLg:size-[22px]
             [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey-darker
@@ -443,7 +442,7 @@ const RangeSlider = ({
           onInput={handleMaxInput}
           onMouseEnter={() => setHoveredHandle("max")}
           onMouseLeave={() => setHoveredHandle(null)}
-          className="absolute w-full h-1.5 mobileLg:h-2 appearance-none bg-transparent pointer-events-none 
+          className="absolute w-full h-2 mobileLg:h-2.5 appearance-none bg-transparent pointer-events-none 
             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
             [&::-webkit-slider-thumb]:size-[18px] [&::-webkit-slider-thumb]:mobileLg:size-[22px]
             [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey-darker
@@ -461,7 +460,7 @@ const RangeSlider = ({
 };
 
 // Time Period Button Group
-const TimePeriodButtons = ({
+const RangeButtons = ({
   selected,
   onChange,
 }: {
@@ -534,7 +533,7 @@ function hasActiveFilters(section: string, filters: SRC20Filters) {
         filters.details.supply ||
         filters.details.holders;
     case "mint":
-      return filters.mint.outminted ||
+      return filters.mint.fullyminted ||
         filters.mint.minting ||
         filters.mint.trendingMints;
     default:
@@ -607,16 +606,16 @@ export const FilterContentSRC20 = ({
 
   // Update the handleStatusChange function to allow deselection
   const handleStatusChange = (
-    status: "outminted" | "minting" | "trendingMints",
+    status: "fullyminted" | "minting" | "trendingMints",
   ) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
         mint: {
           ...prevFilters.mint,
-          outminted: prevFilters.mint.outminted === true
+          fullyminted: prevFilters.mint.fullyminted === true
             ? false
-            : status === "outminted",
+            : status === "fullyminted",
           minting: prevFilters.mint.minting === true
             ? false
             : status === "minting",
@@ -630,8 +629,8 @@ export const FilterContentSRC20 = ({
     });
   };
 
-  // Modify the handler functions to handle the combined Specs + Market group
-  const handleSpecsAndMarketChange = (
+  // Modify the handler functions to handle the combined Details + Market group
+  const handleDetailsAndMarketChange = (
     category: "details" | "market",
     option: string,
   ) => {
@@ -679,10 +678,10 @@ export const FilterContentSRC20 = ({
         variant="collapsibleTitle"
       >
         <Radio
-          label="OUTMINTED"
-          value="outminted"
-          checked={filters.mint.outminted}
-          onChange={() => handleStatusChange("outminted")}
+          label="FULLY MINTED"
+          value="fullyminted"
+          checked={filters.mint.fullyminted}
+          onChange={() => handleStatusChange("fullyminted")}
           name="status"
         />
 
@@ -705,17 +704,17 @@ export const FilterContentSRC20 = ({
 
       {/* SPECIFICATIONS SECTION - Part of combined group */}
       <CollapsibleSection
-        title="SPECS"
+        title="DETAILS"
         section="details"
         expanded={expandedSections.details}
         toggle={() => toggleSection("details")}
         variant="collapsibleTitle"
       >
         <Radio
-          label="DEPLOY"
+          label="DEPLOY DATE"
           value="deploy"
           checked={filters.details.deploy}
-          onChange={() => handleSpecsAndMarketChange("details", "deploy")}
+          onChange={() => handleDetailsAndMarketChange("details", "deploy")}
           name="specsAndMarket"
         />
 
@@ -723,7 +722,7 @@ export const FilterContentSRC20 = ({
           label="SUPPLY"
           value="supply"
           checked={filters.details.supply}
-          onChange={() => handleSpecsAndMarketChange("details", "supply")}
+          onChange={() => handleDetailsAndMarketChange("details", "supply")}
           name="specsAndMarket"
         />
 
@@ -731,11 +730,10 @@ export const FilterContentSRC20 = ({
           label="HOLDERS"
           value="holders"
           checked={filters.details.holders}
-          onChange={() => handleSpecsAndMarketChange("details", "holders")}
+          onChange={() => handleDetailsAndMarketChange("details", "holders")}
           name="specsAndMarket"
         />
 
-        {/* Wrap HOLDERS range slider in CollapsibleSection */}
         {filters.details.holders && (
           <CollapsibleSection
             title=""
@@ -767,7 +765,7 @@ export const FilterContentSRC20 = ({
           label="MARKET CAP"
           value="marketcap"
           checked={filters.market.marketcap}
-          onChange={() => handleSpecsAndMarketChange("market", "marketcap")}
+          onChange={() => handleDetailsAndMarketChange("market", "marketcap")}
           name="specsAndMarket"
         />
 
@@ -775,7 +773,7 @@ export const FilterContentSRC20 = ({
           label="VOLUME"
           value="volume"
           checked={filters.market.volume}
-          onChange={() => handleSpecsAndMarketChange("market", "volume")}
+          onChange={() => handleDetailsAndMarketChange("market", "volume")}
           name="specsAndMarket"
         />
 
@@ -783,7 +781,7 @@ export const FilterContentSRC20 = ({
           label="PRICE CHANGE"
           value="priceChange"
           checked={filters.market.priceChange}
-          onChange={() => handleSpecsAndMarketChange("market", "priceChange")}
+          onChange={() => handleDetailsAndMarketChange("market", "priceChange")}
           name="specsAndMarket"
         />
 
@@ -796,7 +794,7 @@ export const FilterContentSRC20 = ({
             toggle={() => {}}
             variant="collapsibleLabel"
           >
-            <TimePeriodButtons
+            <RangeButtons
               selected={volumePeriod}
               onChange={setVolumePeriod}
             />
@@ -812,7 +810,7 @@ export const FilterContentSRC20 = ({
             toggle={() => {}}
             variant="collapsibleLabel"
           >
-            <TimePeriodButtons
+            <RangeButtons
               selected={priceChangePeriod}
               onChange={setPriceChangePeriod}
             />
