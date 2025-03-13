@@ -269,7 +269,7 @@ export const RangeButtons = ({
 
     // Base button styles
     const customButtonClass =
-      "inline-flex items-center justify-center border-2 rounded-md text-sm tablet:text-xs font-extrabold tracking-wider transition-colors duration-300 h-9 tablet:h-8 px-4 tablet:px-3";
+      "inline-flex items-center justify-center border-2 rounded-md text-sm tablet:text-xs font-extrabold tracking-wider transition-colors duration-300 h-9 tablet:h-8 px-3.5 tablet:px-3";
 
     if (isSelected) {
       // Selected state - always disable pointer events to prevent hover effects
