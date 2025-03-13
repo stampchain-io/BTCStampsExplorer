@@ -20,50 +20,54 @@ export const handleIcon = `
 `;
 
 // Checkbox icon
-export const checkboxIcon = (checked: boolean, canHover: boolean): string => `
+export const checkboxIcon = (
+  checked: boolean,
+  canHoverSelected: boolean,
+): string => `
   appearance-none
+  relative
   size-5 tablet:size-4
   rounded-full
+  border-2
   cursor-pointer
-  relative
   transition-colors duration-300
-  bg-stamp-grey-darkest
   ${
   checked
-    ? canHover
-      ? "after:bg-stamp-grey-light group-hover:after:bg-stamp-grey"
-      : "after:bg-stamp-grey-light"
-    : canHover
-    ? "after:bg-stamp-grey group-hover:after:bg-stamp-grey-light"
-    : "after:bg-stamp-grey"
+    ? canHoverSelected
+      ? "border-stamp-grey-light after:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:after:bg-stamp-grey"
+      : "border-stamp-grey-light after:bg-stamp-grey-light"
+    : canHoverSelected
+    ? "border-stamp-grey group-hover:border-stamp-grey-light"
+    : "border-stamp-grey"
 }
-  after:content-['']
-  after:block
-  after:size-2.5 tablet:after:size-2
-  after:rounded-full
-  after:absolute
-  after:top-1/2 after:left-1/2
-  after:-translate-x-1/2 after:-translate-y-1/2
-  after:scale-100
-  after:transition-all
-  after:duration-100
-`;
+    after:content-['']
+    after:block
+    after:size-2 tablet:after:size-1.5
+    after:rounded-full
+    after:absolute
+    after:top-1/2 after:left-1/2
+    after:-translate-x-1/2 after:-translate-y-1/2
+    after:scale-0
+    checked:after:scale-100
+    after:transition-all
+    after:duration-100
+  `;
 
 // Text styles
 // Label - Filter
 export const labelGreyBaseFilter = (
   checked: boolean,
-  canHover: boolean,
+  canHoverSelected: boolean,
 ): string => `
   inline-block ml-3 tablet:ml-[9px] text-base tablet:text-sm font-bold 
   transition-colors duration-300
   cursor-pointer select-none
   ${
   checked
-    ? canHover
+    ? canHoverSelected
       ? "text-stamp-grey-light group-hover:text-stamp-grey"
       : "text-stamp-grey-light"
-    : canHover
+    : canHoverSelected
     ? "text-stamp-grey group-hover:text-stamp-grey-light"
     : "text-stamp-grey"
 }

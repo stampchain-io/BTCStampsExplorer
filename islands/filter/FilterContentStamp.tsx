@@ -1,299 +1,17 @@
 import { ComponentChildren, useEffect, useRef, useState } from "preact/hooks";
 import { STAMP_SUFFIX_FILTERS } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
-
-const chevronIcon = (size: "sm" | "lg") => {
-  const iconSize = {
-    sm: "w-4 h-4 mobileLg:w-5 mobileLg:h-5",
-    lg: "w-5 h-5 mobileLg:w-6 mobileLg:h-6",
-  };
-
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 32 32"
-      className={iconSize[size]}
-    >
-      <path d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z" />
-    </svg>
-  );
-};
-
-const checkboxIcon = (checked: boolean, canHover: boolean): string => `
-  appearance-none
-  w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
-  border-2 
-  rounded-sm
-  cursor-pointer
-  relative
-  transition-colors duration-300
-  ${
-  checked
-    ? canHover
-      ? "border-stamp-grey-light after:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:after:bg-stamp-grey"
-      : "border-stamp-grey-light after:bg-stamp-grey-light"
-    : canHover
-    ? "border-stamp-grey group-hover:border-stamp-grey-light"
-    : "border-stamp-grey"
-}
-  after:content-['']
-  after:block
-  after:w-1.5 after:h-1.5 mobileLg:after:w-2 mobileLg:after:h-2
-  after:rounded-[1px]
-  after:absolute
-  after:top-1/2 after:left-1/2
-  after:-translate-x-1/2 after:-translate-y-1/2
-  after:scale-0
-  checked:after:scale-100
-  after:transition-all
-  after:duration-100
-`;
-
-const filterLabelSm = (checked: boolean, canHover: boolean): string => `
-  inline-block ml-[9px] mobileLg:ml-3 text-sm mobileLg:text-base font-bold 
-  transition-colors duration-300
-  cursor-pointer
-  ${
-  checked
-    ? canHover
-      ? "text-stamp-grey-light group-hover:text-stamp-grey"
-      : "text-stamp-grey-light"
-    : canHover
-    ? "text-stamp-grey group-hover:text-stamp-grey-light"
-    : "text-stamp-grey"
-}
-`;
-
-const CollapsibleSection = ({
-  title,
-  section,
-  expanded,
-  toggle,
-  children,
-  variant,
-}: {
-  title: string;
-  section: string;
-  expanded: boolean;
-  toggle: () => void;
-  children: ComponentChildren;
-  variant: "header" | "subheader";
-}) => {
-  const [canHover, setCanHover] = useState(true);
-
-  const handleClick = () => {
-    toggle();
-  };
-
-  const handleMouseLeave = () => {
-    setCanHover(true);
-  };
-
-  const isHeader = variant === "header";
-
-  return (
-    <div>
-      <button
-        onClick={handleClick}
-        onMouseLeave={handleMouseLeave}
-        className={`
-          flex items-center w-full group transition-colors duration-300
-          ${
-          isHeader ? "justify-between py-2 mobileLg:py-3" : "mt-2 mobileLg:mt-3"
-        }
-        `}
-      >
-        {!isHeader && (
-          <div
-            className={`transform transition-all duration-300 ${
-              expanded ? "scale-y-[-1]" : "mb-0.5"
-            } ${
-              expanded
-                ? `fill-stamp-grey-light ${
-                  canHover ? "group-hover:fill-stamp-grey" : ""
-                }`
-                : `fill-stamp-grey ${
-                  canHover ? "group-hover:fill-stamp-grey-light" : ""
-                }`
-            } transition-colors duration-300`}
-          >
-            {chevronIcon("sm")}
-          </div>
-        )}
-
-        <span
-          className={`
-            transition-colors duration-300 !font-light
-            ${
-            isHeader
-              ? `text-lg mobileLg:text-xl font-light ${
-                expanded
-                  ? `text-stamp-grey ${
-                    canHover ? "group-hover:text-stamp-grey-light" : ""
-                  }`
-                  : `text-stamp-grey-light ${
-                    canHover ? "group-hover:text-stamp-grey" : ""
-                  }`
-              }`
-              : filterLabelSm(expanded, canHover)
-          }
-          `}
-        >
-          {title}
-        </span>
-
-        {isHeader && (
-          <div
-            className={`transform transition-all duration-300 ${
-              expanded ? "scale-y-[-1]" : ""
-            }`}
-          >
-            <div
-              className={`${
-                expanded
-                  ? `fill-stamp-grey ${
-                    canHover ? "group-hover:fill-stamp-grey-light" : ""
-                  }`
-                  : `fill-stamp-grey-light ${
-                    canHover ? "group-hover:fill-stamp-grey" : ""
-                  }`
-              } transition-colors duration-300`}
-            >
-              {chevronIcon("lg")}
-            </div>
-          </div>
-        )}
-      </button>
-
-      <div
-        className={`overflow-hidden transition-all duration-300 ${
-          expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="-mt-2 mobileLg:-mt-1.5 pb-3 pl-0.5">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface CheckboxProps {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
-}
-
-const Checkbox = ({ label, checked, onChange }: CheckboxProps) => {
-  const [canHover, setCanHover] = useState(true);
-
-  const handleChange = () => {
-    onChange();
-    setTimeout(() => setCanHover(false), 0);
-  };
-
-  const handleMouseLeave = () => {
-    setCanHover(true);
-  };
-
-  return (
-    <div
-      className="flex items-center py-1.5 mobileLg:py-1.5 cursor-pointer group"
-      onMouseLeave={handleMouseLeave}
-      onClick={handleChange}
-    >
-      <input
-        className={checkboxIcon(checked, canHover)}
-        type="checkbox"
-        checked={checked}
-        readOnly
-      />
-      <label className={filterLabelSm(checked, canHover)}>
-        {label}
-      </label>
-    </div>
-  );
-};
-
-interface RangeInputProps {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
-  type: "stamp" | "price";
-}
-
-const RangeInput = (
-  { label, placeholder, value, onChange, type }: RangeInputProps,
-) => (
-  <div className="flex flex-col space-y-1 pt-[9px]">
-    <label className="text-xs text-stamp-table-text">{label}</label>
-    <input
-      type={type === "price" ? "text" : "number"}
-      value={value}
-      onKeyDown={(e) => {
-        if (
-          ["e", "E", "+", "-"].includes(e.key) ||
-          (type === "stamp" && e.key === ".")
-        ) {
-          e.preventDefault();
-        }
-      }}
-      onChange={(e) => {
-        const value = e.target.value;
-
-        if (type === "price") {
-          // For price, allow decimals with custom validation
-          let sanitized = value.replace(/[^0-9.]/g, "");
-          const parts = sanitized.split(".");
-
-          // Ensure only one decimal point
-          if (parts.length > 2) {
-            sanitized = parts[0] + "." + parts[1];
-          }
-
-          // Limit decimal places to 8
-          if (parts.length === 2 && parts[1].length > 8) {
-            sanitized = parts[0] + "." + parts[1].slice(0, 8);
-          }
-
-          if (sanitized !== value) {
-            onChange(sanitized);
-          } else {
-            onChange(value);
-          }
-        } else {
-          // For stamp, only allow integers
-          if (/^\d*$/.test(value)) {
-            onChange(value);
-          }
-        }
-      }}
-      min="0"
-      step={type === "price" ? "0.00000001" : "1"}
-      inputMode="decimal"
-      pattern={type === "price" ? "[0-9]*[.]?[0-9]*" : "[0-9]*"}
-      className="h-10 mobileLg:h-11 px-3 mobileLg:px-4 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light"
-      placeholder={placeholder}
-    />
-  </div>
-);
-
-function useDebouncedCallback<T extends (...args: any[]) => void>(
-  callback: T,
-  delay: number,
-): (...args: Parameters<T>) => void {
-  const timeoutRef = useRef<number | null>(null);
-
-  function debouncedCallback(...args: Parameters<T>) {
-    clearTimeout(timeoutRef.current!);
-    timeoutRef.current = setTimeout(() => {
-      callback(...args);
-    }, delay);
-  }
-
-  return debouncedCallback;
-}
+import { useDebouncedCallback } from "$lib/utils/filterUtils.ts";
+import {
+  checkboxIcon,
+  labelGreyBaseFilter,
+} from "$islands/filter/FilterStyles.ts";
+import {
+  Checkbox,
+  CollapsibleSection,
+  RangeInput,
+  RangeSlider,
+} from "$islands/filter/FilterComponents.tsx";
 
 const defaultFilters = {
   market: {
@@ -702,7 +420,7 @@ const Radio = ({ label, value, checked, onChange }) => {
         checked={checked}
         readOnly
       />
-      <label className={filterLabelSm(checked, canHover)}>
+      <label className={labelGreyBaseFilter(checked, canHover)}>
         {label}
       </label>
     </div>
@@ -803,7 +521,7 @@ export const FilterContentStamp = ({
         section="market"
         expanded={expandedSections.market}
         toggle={() => toggleSection("market")}
-        variant="header"
+        variant="collapsibleTitle"
       >
         {/* Category: LISTINGS */}
         <div className={filterCollectionSm}>
@@ -855,40 +573,24 @@ export const FilterContentStamp = ({
           section="priceRange"
           expanded={expandedSections.priceRange}
           toggle={() => toggleSection("priceRange")}
-          variant="subheader"
+          variant="collapsibleSubTitle"
         >
-          <div className="flex gap-6 placeholder:text-xs">
-            <RangeInput
-              label=""
-              placeholder="0.00000000"
-              type="price"
-              value={filters.market.priceRange.min || ""}
-              onChange={(value) => {
-                handleFilterChange("market", {
-                  ...filters.market,
-                  priceRange: {
-                    min: value,
-                    max: filters.market.priceRange.max || "",
-                  },
-                });
-              }}
-            />
-            <RangeInput
-              label=""
-              placeholder="∞ BTC"
-              type="price"
-              value={filters.market.priceRange.max || ""}
-              onChange={(value) => {
-                handleFilterChange("market", {
-                  ...filters.market,
-                  priceRange: {
-                    min: filters.market.priceRange.min || "",
-                    max: value,
-                  },
-                });
-              }}
-            />
-          </div>
+          <RangeSlider
+            variant="price"
+            onChange={(min, max) => {
+              // Convert the numeric values to strings for the filter state
+              const minStr = min > 0 ? min.toString() : "";
+              const maxStr = max < 10 ? max.toString() : "";
+
+              handleFilterChange("market", {
+                ...filters.market,
+                priceRange: {
+                  min: minStr,
+                  max: maxStr,
+                },
+              });
+            }}
+          />
         </CollapsibleSection>
       </CollapsibleSection>
 
@@ -897,7 +599,7 @@ export const FilterContentStamp = ({
         section="fileType"
         expanded={expandedSections.fileType}
         toggle={() => toggleSection("fileType")}
-        variant="header"
+        variant="collapsibleTitle"
       >
         {/* Category: PIXEL */}
         <div className={filterCollectionSm}>
@@ -1036,7 +738,7 @@ export const FilterContentStamp = ({
         section="editions"
         expanded={expandedSections["editions"]}
         toggle={() => toggleSection("editions")}
-        variant="header"
+        variant="collapsibleTitle"
       >
         <Checkbox
           label="1/1"
@@ -1088,8 +790,9 @@ export const FilterContentStamp = ({
         section="rarity"
         expanded={expandedSections["rarity"]}
         toggle={() => toggleSection("rarity")}
-        variant="header"
+        variant="collapsibleTitle"
       >
+        {/* Standard Radio Buttons */}
         {[100, 1000, 5000, 10000].map((value) => (
           <Radio
             key={value}
@@ -1119,49 +822,89 @@ export const FilterContentStamp = ({
           />
         ))}
 
-        {/* Custom Range Section */}
-        <CollapsibleSection
-          title="CUSTOM RANGE"
-          section="customRange"
-          expanded={expandedSections.customRange}
-          toggle={() => toggleSection("customRange")}
-          variant="subheader"
-        >
-          <div className="flex gap-6 placeholder:text-xs">
-            <RangeInput
-              label=""
-              placeholder="MIN"
-              type="stamp"
-              value={filters.rarity.stampRange.min || ""}
-              onChange={(value) => {
-                handleFilterChange("rarity", {
-                  ...filters.rarity,
-                  sub: false,
-                  stampRange: {
-                    min: value,
-                    max: filters.rarity.stampRange.max || "",
-                  },
-                });
-              }}
-            />
-            <RangeInput
-              label=""
-              placeholder="MAX"
-              type="stamp"
-              value={filters.rarity.stampRange.max || ""}
-              onChange={(value) => {
-                handleFilterChange("rarity", {
-                  ...filters.rarity,
-                  sub: false,
-                  stampRange: {
-                    min: filters.rarity.stampRange.min || "",
-                    max: value,
-                  },
-                });
-              }}
-            />
-          </div>
-        </CollapsibleSection>
+        {/* Custom Range Radio Button with Collapsible Section */}
+        <Radio
+          label="CUSTOM RANGE"
+          checked={filters.rarity.stampRange.min !== "" ||
+            filters.rarity.stampRange.max !== ""}
+          onChange={() => {
+            // If already selected with values, clear it
+            if (
+              filters.rarity.stampRange.min !== "" ||
+              filters.rarity.stampRange.max !== ""
+            ) {
+              handleFilterChange("rarity", {
+                sub: false,
+                stampRange: {
+                  min: "",
+                  max: "",
+                },
+              });
+            } else {
+              // Otherwise, just select it (user will input values)
+              handleFilterChange("rarity", {
+                sub: false,
+                stampRange: {
+                  min: filters.rarity.stampRange.min,
+                  max: filters.rarity.stampRange.max,
+                },
+              });
+              // Expand the custom range section
+              setExpandedSections({
+                ...expandedSections,
+                customRange: true,
+              });
+            }
+          }}
+        />
+
+        {/* Custom Range Input Fields (only shown when custom range is selected) */}
+        {(filters.rarity.stampRange.min !== "" ||
+          filters.rarity.stampRange.max !== "" ||
+          (filters.rarity.sub === false && expandedSections.customRange)) && (
+          <CollapsibleSection
+            title=""
+            section="customRange"
+            expanded={true}
+            toggle={() => {}}
+            variant="collapsibleLabel"
+          >
+            <div className="flex gap-6">
+              <RangeInput
+                label=""
+                placeholder="MIN"
+                type="stamp"
+                value={filters.rarity.stampRange.min || ""}
+                onChange={(value) => {
+                  handleFilterChange("rarity", {
+                    ...filters.rarity,
+                    sub: false,
+                    stampRange: {
+                      min: value,
+                      max: filters.rarity.stampRange.max || "",
+                    },
+                  });
+                }}
+              />
+              <RangeInput
+                label=""
+                placeholder="MAX"
+                type="stamp"
+                value={filters.rarity.stampRange.max || ""}
+                onChange={(value) => {
+                  handleFilterChange("rarity", {
+                    ...filters.rarity,
+                    sub: false,
+                    stampRange: {
+                      min: filters.rarity.stampRange.min || "",
+                      max: value,
+                    },
+                  });
+                }}
+              />
+            </div>
+          </CollapsibleSection>
+        )}
       </CollapsibleSection>
     </div>
   );

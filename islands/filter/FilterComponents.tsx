@@ -217,7 +217,7 @@ export const CollapsibleSection = ({
             expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="-mt-1.5 tablet:-mt-2 pb-3 pl-0.5">
+          <div className="mt-0 tablet:mt-0 pb-3 pl-0.5">
             {children}
           </div>
         </div>
@@ -302,23 +302,52 @@ export const RangeButtons = ({
 
 // Range Slider Component
 export const RangeSlider = ({
+  variant,
   onChange,
 }: {
+  variant: "holders" | "price";
   onChange?: (min: number, max: number) => void;
 }) => {
-  // Define our range segments
-  const ranges = {
-    min: 0,
-    max: 100000,
-    segments: [
-      { end: 1000, proportion: 1 / 3 }, // First third covers 0-1000
-      { end: 10000, proportion: 1 / 3 }, // Second third covers 1000-10000
-      { end: 100000, proportion: 1 / 3 }, // Last third covers 10000-100000
-    ],
+  // Define range configurations for different variants
+  const rangeConfigs = {
+    // Holders configuration (existing)
+    holders: {
+      min: 0,
+      max: 100000,
+      segments: [
+        { end: 1000, proportion: 1 / 3 }, // First third covers 0-1000
+        { end: 10000, proportion: 1 / 3 }, // Second third covers 1000-10000
+        { end: 100000, proportion: 1 / 3 }, // Last third covers 10000-100000
+      ],
+      tickMarks: ["0", "1,000", "10,000", "100,000"],
+      tickMarkPositions: ["left-0", "left-[33%]", "left-[66%]", "right-0"],
+      formatValue: (value: number) => formatNumber(value),
+    },
+    // Price configuration (new)
+    price: {
+      min: 0,
+      max: 10.0,
+      segments: [
+        { end: 0.0001, proportion: 1 / 3 }, // First third covers 0-0.0001
+        { end: 0.01, proportion: 1 / 3 }, // Second third covers 0.0001-0.01
+        { end: 10.0, proportion: 1 / 3 }, // Last third covers 0.01-10.0
+      ],
+      tickMarks: ["0", "0.0001", "0.01", "10.0"],
+      tickMarkPositions: ["left-0", "left-[33%]", "left-[66%]", "right-0"],
+      formatValue: (value: number) =>
+        value.toFixed(
+          // Use appropriate decimal places based on value range
+          value < 0.0001 ? 6 : value < 0.01 ? 5 : 3,
+        ),
+    },
   };
 
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(100000);
+  // Get the configuration for the current variant
+  const config = rangeConfigs[variant];
+
+  // Initialize state with the min and max values from the config
+  const [minValue, setMinValue] = useState(config.min);
+  const [maxValue, setMaxValue] = useState(config.max);
   const [hoveredHandle, setHoveredHandle] = useState<"min" | "max" | null>(
     null,
   );
@@ -327,62 +356,71 @@ export const RangeSlider = ({
   // Convert actual value to slider position (0-100)
   const valueToPosition = (value: number): number => {
     // Find which segment the value falls into
-    if (value <= ranges.segments[0].end) {
-      // First segment (0-1000)
-      return (value / ranges.segments[0].end) *
-        (ranges.segments[0].proportion * 100);
-    } else if (value <= ranges.segments[1].end) {
-      // Second segment (1000-10000)
-      const segmentPosition = ranges.segments[0].proportion * 100;
-      const segmentValue = value - ranges.segments[0].end;
-      const segmentRange = ranges.segments[1].end - ranges.segments[0].end;
+    if (value <= config.segments[0].end) {
+      // First segment
+      return (value / config.segments[0].end) *
+        (config.segments[0].proportion * 100);
+    } else if (value <= config.segments[1].end) {
+      // Second segment
+      const segmentPosition = config.segments[0].proportion * 100;
+      const segmentValue = value - config.segments[0].end;
+      const segmentRange = config.segments[1].end - config.segments[0].end;
       return segmentPosition +
-        (segmentValue / segmentRange) * (ranges.segments[1].proportion * 100);
+        (segmentValue / segmentRange) * (config.segments[1].proportion * 100);
     } else {
-      // Third segment (10000-100000)
+      // Third segment
       const segmentPosition =
-        (ranges.segments[0].proportion + ranges.segments[1].proportion) * 100;
-      const segmentValue = value - ranges.segments[1].end;
-      const segmentRange = ranges.segments[2].end - ranges.segments[1].end;
+        (config.segments[0].proportion + config.segments[1].proportion) * 100;
+      const segmentValue = value - config.segments[1].end;
+      const segmentRange = config.segments[2].end - config.segments[1].end;
       return segmentPosition +
-        (segmentValue / segmentRange) * (ranges.segments[2].proportion * 100);
+        (segmentValue / segmentRange) * (config.segments[2].proportion * 100);
     }
   };
 
   // Convert slider position (0-100) to actual value
   const positionToValue = (position: number): number => {
     // Calculate which segment this position falls into
-    const segment0End = ranges.segments[0].proportion * 100;
-    const segment1End = segment0End + ranges.segments[1].proportion * 100;
+    const segment0End = config.segments[0].proportion * 100;
+    const segment1End = segment0End + config.segments[1].proportion * 100;
 
     if (position <= segment0End) {
-      // First segment (0-1000)
-      return Math.round((position / segment0End) * ranges.segments[0].end);
+      // First segment
+      return Number(
+        ((position / segment0End) * config.segments[0].end).toFixed(6),
+      );
     } else if (position <= segment1End) {
-      // Second segment (1000-10000)
+      // Second segment
       const segmentPosition = position - segment0End;
-      const segmentRange = ranges.segments[1].proportion * 100;
-      return Math.round(
-        ranges.segments[0].end + (segmentPosition / segmentRange) *
-            (ranges.segments[1].end - ranges.segments[0].end),
-      );
+      const segmentRange = config.segments[1].proportion * 100;
+      const value = config.segments[0].end + (segmentPosition / segmentRange) *
+          (config.segments[1].end - config.segments[0].end);
+      return Number(value.toFixed(5));
     } else {
-      // Third segment (10000-100000)
+      // Third segment
       const segmentPosition = position - segment1End;
-      const segmentRange = ranges.segments[2].proportion * 100;
-      return Math.round(
-        ranges.segments[1].end + (segmentPosition / segmentRange) *
-            (ranges.segments[2].end - ranges.segments[1].end),
-      );
+      const segmentRange = config.segments[2].proportion * 100;
+      const value = config.segments[1].end + (segmentPosition / segmentRange) *
+          (config.segments[2].end - config.segments[1].end);
+      return Number(value.toFixed(3));
     }
+  };
+
+  // Calculate minimum step size based on variant
+  const getMinStep = () => {
+    if (variant === "price") {
+      return 0.000001; // Smallest step for price
+    }
+    return 1; // Default step for holders
   };
 
   const handleMinInput = (e: Event) => {
     const sliderValue = parseInt((e.target as HTMLInputElement).value);
     const newMin = positionToValue(sliderValue);
 
-    // Ensure new min value doesn't exceed max value - 10
-    const clampedMin = Math.min(newMin, maxValue - 10);
+    // Ensure new min value doesn't exceed max value minus minimum step
+    const minStep = getMinStep();
+    const clampedMin = Math.min(newMin, maxValue - minStep * 10);
     setMinValue(clampedMin);
     onChange?.(clampedMin, maxValue);
   };
@@ -391,8 +429,9 @@ export const RangeSlider = ({
     const sliderValue = parseInt((e.target as HTMLInputElement).value);
     const newMax = positionToValue(sliderValue);
 
-    // Ensure new max value doesn't go below min value + 10
-    const clampedMax = Math.max(newMax, minValue + 10);
+    // Ensure new max value doesn't go below min value plus minimum step
+    const minStep = getMinStep();
+    const clampedMax = Math.max(newMax, minValue + minStep * 10);
     setMaxValue(clampedMax);
     onChange?.(minValue, clampedMax);
   };
@@ -443,7 +482,7 @@ export const RangeSlider = ({
                 : "text-stamp-grey-darker"
             } transition-colors duration-300`}
           >
-            {formatNumber(minValue)}
+            {config.formatValue(minValue)}
           </div>
           <span className="mx-2 text-stamp-grey-darker">-</span>
           <div
@@ -453,7 +492,7 @@ export const RangeSlider = ({
                 : "text-stamp-grey-darker"
             } transition-colors duration-300`}
           >
-            {formatNumber(maxValue)}
+            {config.formatValue(maxValue)}
           </div>
         </div>
       </div>
@@ -499,14 +538,77 @@ export const RangeSlider = ({
 
       {/* Tick marks for the segment boundaries */}
       <div className="relative w-full mt-1.5 tablet:mt-1 flex justify-between px-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker cursor-default select-none">
-        <p>0</p>
-        <p className="pl-11 pr-7">1,000</p>
-        <p>10,000</p>
-        <p>100,000</p>
+        {config.tickMarks.map((mark, index) => <p key={index}>{mark}</p>)}
       </div>
     </div>
   );
 };
+
+interface RangeInputProps {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  type: "stamp" | "price";
+}
+
+export const RangeInput = (
+  { label, placeholder, value, onChange, type }: RangeInputProps,
+) => (
+  <div className="flex flex-col space-y-1 pt-[9px]">
+    <label className="text-base tablet:text-xs text-stamp-grey-light">
+      {label}
+    </label>
+    <input
+      type={type === "price" ? "text" : "number"}
+      value={value}
+      onKeyDown={(e) => {
+        if (
+          ["e", "E", "+", "-"].includes(e.key) ||
+          (type === "stamp" && e.key === ".")
+        ) {
+          e.preventDefault();
+        }
+      }}
+      onChange={(e) => {
+        const value = e.target.value;
+
+        if (type === "price") {
+          // For price, allow decimals with custom validation
+          let sanitized = value.replace(/[^0-9.]/g, "");
+          const parts = sanitized.split(".");
+
+          // Ensure only one decimal point
+          if (parts.length > 2) {
+            sanitized = parts[0] + "." + parts[1];
+          }
+
+          // Limit decimal places to 8
+          if (parts.length === 2 && parts[1].length > 8) {
+            sanitized = parts[0] + "." + parts[1].slice(0, 8);
+          }
+
+          if (sanitized !== value) {
+            onChange(sanitized);
+          } else {
+            onChange(value);
+          }
+        } else {
+          // For stamp, only allow integers
+          if (/^\d*$/.test(value)) {
+            onChange(value);
+          }
+        }
+      }}
+      min="0"
+      step={type === "price" ? "0.00000001" : "1"}
+      inputMode="decimal"
+      pattern={type === "price" ? "[0-9]*[.]?[0-9]*" : "[0-9]*"}
+      className="h-10 tablet:h-9 px-3 tablet:px-4 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-base tablet:text-sm font-medium placeholder:text-xs w-full outline-none focus:bg-stamp-grey-light"
+      placeholder={placeholder}
+    />
+  </div>
+);
 
 // Checkbox Component
 interface CheckboxProps {

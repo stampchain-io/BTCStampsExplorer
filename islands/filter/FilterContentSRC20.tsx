@@ -1,27 +1,12 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
+import { useDebouncedCallback } from "$lib/utils/filterUtils.ts";
 import {
   CollapsibleSection,
   Radiobutton,
   RangeButtons,
   RangeSlider,
 } from "$islands/filter/FilterComponents.tsx";
-
-function useDebouncedCallback<T extends (...args: any[]) => void>(
-  callback: T,
-  delay: number,
-): (...args: Parameters<T>) => void {
-  const timeoutRef = useRef<number | null>(null);
-
-  function debouncedCallback(...args: Parameters<T>) {
-    clearTimeout(timeoutRef.current!);
-    timeoutRef.current = setTimeout(() => {
-      callback(...args);
-    }, delay);
-  }
-
-  return debouncedCallback;
-}
 
 // Helper function to check if a section has active filters
 function hasActiveFilters(section: string, filters: SRC20Filters) {
@@ -245,6 +230,7 @@ export const FilterContentSRC20 = ({
             variant="collapsibleLabel"
           >
             <RangeSlider
+              variant="holders"
               onChange={handleHoldersRangeChange}
             />
           </CollapsibleSection>
