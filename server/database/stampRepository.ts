@@ -958,4 +958,23 @@ export class StampRepository {
       total: result.rows[0]?.total || 0
     };
   }
+
+  static async getSpecificStamp(tx_index: string): Promise<{ stamp_url: string, stamp_mimetype: string }>{
+     const query = `
+      SELECT stamp_url, stamp_mimetype
+      FROM ${STAMP_TABLE}
+      WHERE stamp = ?
+    `;
+
+
+    const result = await dbManager.executeQueryWithCache(
+      query,
+      [tx_index],
+    );
+
+    return {
+      stamp_url: result.rows[0]?.stamp_url || 0,
+      stamp_mimetype: result.rows[0]?.stamp_mimetype || 0
+    };
+  }
 }

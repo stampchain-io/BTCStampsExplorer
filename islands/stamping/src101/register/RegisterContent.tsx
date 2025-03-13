@@ -289,6 +289,7 @@ export function RegisterBitnameContent({
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
           type="src101"
+          fromPage="src101_bitname"
           fileType="application/json"
           fileSize={formState.jsonSize}
           BTCPrice={formState.BTCPrice}

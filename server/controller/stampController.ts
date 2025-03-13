@@ -979,4 +979,8 @@ export class StampController {
       return { stampValues: {}, totalValue: 0 };
     }
   }
+
+  static async getSpecificStamp(tx_index: string): Promise<{ stamp_url: string, stamp_mimetype: string }> {
+    return await StampService.getSpecificStamp(tx_index);
+  }
 }
