@@ -170,12 +170,13 @@ import * as $datacontrol_Setting from "./islands/datacontrol/Setting.tsx";
 import * as $fairmint_FairmintContent from "./islands/fairmint/FairmintContent.tsx";
 import * as $fee_ComplexFeeCalculator from "./islands/fee/ComplexFeeCalculator.tsx";
 import * as $filter_FilterButton from "./islands/filter/FilterButton.tsx";
+import * as $filter_FilterComponents from "./islands/filter/FilterComponents.tsx";
 import * as $filter_FilterContentSRC20 from "./islands/filter/FilterContentSRC20.tsx";
 import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp.tsx";
 import * as $filter_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
 import * as $filter_FilterOptionsSRC20 from "./islands/filter/FilterOptionsSRC20.tsx";
 import * as $filter_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp.tsx";
-import * as $filter_FilterStyles from "./islands/filter/FilterStyles.tsx";
+import * as $filter_FilterStyles from "./islands/filter/FilterStyles.ts";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
@@ -457,12 +458,13 @@ const manifest = {
     "./islands/fairmint/FairmintContent.tsx": $fairmint_FairmintContent,
     "./islands/fee/ComplexFeeCalculator.tsx": $fee_ComplexFeeCalculator,
     "./islands/filter/FilterButton.tsx": $filter_FilterButton,
+    "./islands/filter/FilterComponents.tsx": $filter_FilterComponents,
     "./islands/filter/FilterContentSRC20.tsx": $filter_FilterContentSRC20,
     "./islands/filter/FilterContentStamp.tsx": $filter_FilterContentStamp,
     "./islands/filter/FilterDrawer.tsx": $filter_FilterDrawer,
     "./islands/filter/FilterOptionsSRC20.tsx": $filter_FilterOptionsSRC20,
     "./islands/filter/FilterOptionsStamp.tsx": $filter_FilterOptionsStamp,
-    "./islands/filter/FilterStyles.tsx": $filter_FilterStyles,
+    "./islands/filter/FilterStyles.ts": $filter_FilterStyles,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,

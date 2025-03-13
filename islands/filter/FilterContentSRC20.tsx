@@ -1,585 +1,11 @@
-import { ComponentChildren, useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
-
-const chevronIcon = (size: "sm" | "lg") => {
-  const iconSize = {
-    sm: "size-5 tablet:size-4",
-    lg: "size-6 tablet:size-5",
-  };
-
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 32 32"
-      className={iconSize[size]}
-    >
-      <path d="M26.7075 12.7074L16.7075 22.7074C16.6146 22.8004 16.5043 22.8742 16.3829 22.9245C16.2615 22.9748 16.1314 23.0007 16 23.0007C15.8686 23.0007 15.7385 22.9748 15.6171 22.9245C15.4957 22.8742 15.3854 22.8004 15.2925 22.7074L5.29251 12.7074C5.10487 12.5198 4.99945 12.2653 4.99945 11.9999C4.99945 11.7346 5.10487 11.4801 5.29251 11.2924C5.48015 11.1048 5.73464 10.9994 6.00001 10.9994C6.26537 10.9994 6.51987 11.1048 6.70751 11.2924L16 20.5862L25.2925 11.2924C25.3854 11.1995 25.4957 11.1258 25.6171 11.0756C25.7385 11.0253 25.8686 10.9994 26 10.9994C26.1314 10.9994 26.2615 11.0253 26.3829 11.0756C26.5043 11.1258 26.6146 11.1995 26.7075 11.2924C26.8004 11.3854 26.8741 11.4957 26.9244 11.617C26.9747 11.7384 27.0006 11.8686 27.0006 11.9999C27.0006 12.1313 26.9747 12.2614 26.9244 12.3828C26.8741 12.5042 26.8004 12.6145 26.7075 12.7074Z" />
-    </svg>
-  );
-};
-
-const checkboxIcon = (checked: boolean, canHover: boolean): string => `
-  appearance-none
-  size-[18px] tablet:size-4
-  border-2 
-  rounded-sm
-  cursor-pointer
-  relative
-  transition-colors duration-300
-  ${
-  checked
-    ? canHover
-      ? "border-stamp-grey-light after:bg-stamp-grey-light group-hover:border-stamp-grey group-hover:after:bg-stamp-grey"
-      : "border-stamp-grey-light after:bg-stamp-grey-light"
-    : canHover
-    ? "border-stamp-grey group-hover:border-stamp-grey-light"
-    : "border-stamp-grey"
-}
-  after:content-['']
-  after:block
-  after:size-2 tablet:after:size-1.5
-  after:rounded-[1px]
-  after:absolute
-  after:top-1/2 after:left-1/2
-  after:-translate-x-1/2 after:-translate-y-1/2
-  after:scale-0
-  checked:after:scale-100
-  after:transition-all
-  after:duration-100
-`;
-
-const handleIcon = `
-  absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none 
-  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
-  [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:tablet:size-3
-  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
-  [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
-  [&::-webkit-slider-thumb]:active:cursor-grabbing
-  [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
-  [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:tablet:size-3
-  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
-  [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
-  [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
-`;
-
-const filterLabelSm = (checked: boolean, canHover: boolean): string => `
-  inline-block ml-3 tablet:ml-[9px] text-base tablet:text-sm font-bold 
-  transition-colors duration-300
-  cursor-pointer
-  ${
-  checked
-    ? canHover
-      ? "text-stamp-grey-light group-hover:text-stamp-grey"
-      : "text-stamp-grey-light"
-    : canHover
-    ? "text-stamp-grey group-hover:text-stamp-grey-light"
-    : "text-stamp-grey"
-}
-`;
-
-const buttonGreyOutline =
-  "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm tablet:text-xs font-extrabold text-stamp-grey tracking-[0.05em] h-9 tablet:h-8 px-4 tablet:px-3 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
-
-const buttonGreyOutlineActive =
-  "inline-flex items-center justify-center border-2 border-stamp-grey-light rounded-md text-sm tablet:text-xs font-extrabold text-stamp-grey-light tracking-[0.05em] h-9 tablet:h-8 px-4 tablet:px-3 transition-colors";
-
-const CollapsibleSection = ({
-  title,
-  section,
-  expanded,
-  toggle,
-  children,
-  variant,
-}: {
-  title: string;
-  section: string;
-  expanded: boolean;
-  toggle: () => void;
-  children: ComponentChildren;
-  variant: "collapsibleTitle" | "collapsibleSubTitle" | "collapsibleLabel";
-}) => {
-  const [canHover, setCanHover] = useState(true);
-
-  const handleClick = () => {
-    toggle();
-  };
-
-  const handleMouseLeave = () => {
-    setCanHover(true);
-  };
-
-  // Handle collapsibleTitle variant
-  if (variant === "collapsibleTitle") {
-    return (
-      <div>
-        <button
-          onClick={handleClick}
-          onMouseLeave={handleMouseLeave}
-          className="flex items-center w-full justify-between py-3 tablet:py-2 group transition-colors duration-300"
-        >
-          <span
-            className={`
-              text-xl tablet:text-lg font-light transition-colors duration-300
-              ${
-              expanded
-                ? `text-stamp-grey ${
-                  canHover ? "group-hover:text-stamp-grey-light" : ""
-                }`
-                : `text-stamp-grey-light ${
-                  canHover ? "group-hover:text-stamp-grey" : ""
-                }`
-            }`}
-          >
-            {title}
-          </span>
-
-          <div
-            className={`transform transition-all duration-300 ${
-              expanded ? "scale-y-[-1]" : ""
-            }`}
-          >
-            <div
-              className={`${
-                expanded
-                  ? `fill-stamp-grey ${
-                    canHover ? "group-hover:fill-stamp-grey-light" : ""
-                  }`
-                  : `fill-stamp-grey-light ${
-                    canHover ? "group-hover:fill-stamp-grey" : ""
-                  }`
-              } transition-colors duration-300`}
-            >
-              {chevronIcon("lg")}
-            </div>
-          </div>
-        </button>
-
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="-mt-1.5 tablet:-mt-2 pb-3 pl-0.5">
-            {children}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Handle collapsibleSubTitle variant
-  if (variant === "collapsibleSubTitle") {
-    return (
-      <div>
-        <button
-          onClick={handleClick}
-          onMouseLeave={handleMouseLeave}
-          className="flex items-center w-full mt-3 tablet:mt-2 group transition-colors duration-300"
-        >
-          <div
-            className={`transform transition-all duration-300 ${
-              expanded ? "scale-y-[-1]" : "mb-0.5"
-            } ${
-              expanded
-                ? `fill-stamp-grey-light ${
-                  canHover ? "group-hover:fill-stamp-grey" : ""
-                }`
-                : `fill-stamp-grey ${
-                  canHover ? "group-hover:fill-stamp-grey-light" : ""
-                }`
-            } transition-colors duration-300`}
-          >
-            {chevronIcon("sm")}
-          </div>
-
-          <span className={filterLabelSm(expanded, canHover)}>
-            {title}
-          </span>
-        </button>
-
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="-mt-1.5 tablet:-mt-2 pb-3 pl-0.5">
-            {children}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Handle collapsibleLabel variant
-  if (variant === "collapsibleLabel") {
-    return (
-      // Collapsible section
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="ml-0.5 mt-3 mb-2">
-          {children}
-        </div>
-      </div>
-    );
-  }
-};
-
-interface CheckboxProps {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
-  hasDropdown?: boolean;
-  dropdownContent?: ComponentChildren;
-}
-
-const Checkbox = ({
-  label,
-  checked,
-  onChange,
-  hasDropdown = false,
-  dropdownContent = null,
-}: CheckboxProps) => {
-  const [canHover, setCanHover] = useState(true);
-
-  const handleChange = () => {
-    onChange();
-    setTimeout(() => setCanHover(false), 0);
-  };
-
-  const handleMouseLeave = () => {
-    setCanHover(true);
-  };
-
-  return (
-    <div className="flex flex-col">
-      <div
-        className="flex items-center py-1.5 cursor-pointer group"
-        onMouseLeave={handleMouseLeave}
-        onClick={handleChange}
-      >
-        <input
-          className={checkboxIcon(checked, canHover)}
-          type="checkbox"
-          checked={checked}
-          readOnly
-        />
-        <label className={filterLabelSm(checked, canHover)}>
-          {label}
-        </label>
-      </div>
-
-      {hasDropdown && checked && dropdownContent && (
-        <div className="ml-0.5 mt-1 mb-2">
-          {dropdownContent}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Add this Radio component after the Checkbox component
-interface RadioProps {
-  label: string;
-  value: string;
-  checked: boolean;
-  onChange: () => void;
-  name: string;
-}
-
-const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
-  const [canHover, setCanHover] = useState(true);
-
-  const handleChange = () => {
-    onChange();
-    setTimeout(() => setCanHover(false), 0);
-  };
-
-  const handleMouseLeave = () => {
-    setCanHover(true);
-  };
-
-  return (
-    <div
-      className="flex items-center py-1.5 cursor-pointer group"
-      onMouseLeave={handleMouseLeave}
-      onClick={handleChange}
-    >
-      <input
-        className={checkboxIcon(checked, canHover)}
-        type="radio"
-        name={name}
-        value={value}
-        checked={checked}
-        readOnly
-      />
-      <label className={filterLabelSm(checked, canHover)}>
-        {label}
-      </label>
-    </div>
-  );
-};
-
-// Range Slider Component
-const RangeSlider = ({
-  onChange,
-}: {
-  onChange?: (min: number, max: number) => void;
-}) => {
-  // Define our range segments
-  const ranges = {
-    min: 0,
-    max: 100000,
-    segments: [
-      { end: 1000, proportion: 1 / 3 }, // First third covers 0-1000
-      { end: 10000, proportion: 1 / 3 }, // Second third covers 1000-10000
-      { end: 100000, proportion: 1 / 3 }, // Last third covers 10000-100000
-    ],
-  };
-
-  const [minValue, setMinValue] = useState(0);
-  const [maxValue, setMaxValue] = useState(100000);
-  const [hoveredHandle, setHoveredHandle] = useState<"min" | "max" | null>(
-    null,
-  );
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  // Convert actual value to slider position (0-100)
-  const valueToPosition = (value: number): number => {
-    // Find which segment the value falls into
-    if (value <= ranges.segments[0].end) {
-      // First segment (0-1000)
-      return (value / ranges.segments[0].end) *
-        (ranges.segments[0].proportion * 100);
-    } else if (value <= ranges.segments[1].end) {
-      // Second segment (1000-10000)
-      const segmentPosition = ranges.segments[0].proportion * 100;
-      const segmentValue = value - ranges.segments[0].end;
-      const segmentRange = ranges.segments[1].end - ranges.segments[0].end;
-      return segmentPosition +
-        (segmentValue / segmentRange) * (ranges.segments[1].proportion * 100);
-    } else {
-      // Third segment (10000-100000)
-      const segmentPosition =
-        (ranges.segments[0].proportion + ranges.segments[1].proportion) * 100;
-      const segmentValue = value - ranges.segments[1].end;
-      const segmentRange = ranges.segments[2].end - ranges.segments[1].end;
-      return segmentPosition +
-        (segmentValue / segmentRange) * (ranges.segments[2].proportion * 100);
-    }
-  };
-
-  // Convert slider position (0-100) to actual value
-  const positionToValue = (position: number): number => {
-    // Calculate which segment this position falls into
-    const segment0End = ranges.segments[0].proportion * 100;
-    const segment1End = segment0End + ranges.segments[1].proportion * 100;
-
-    if (position <= segment0End) {
-      // First segment (0-1000)
-      return Math.round((position / segment0End) * ranges.segments[0].end);
-    } else if (position <= segment1End) {
-      // Second segment (1000-10000)
-      const segmentPosition = position - segment0End;
-      const segmentRange = ranges.segments[1].proportion * 100;
-      return Math.round(
-        ranges.segments[0].end + (segmentPosition / segmentRange) *
-            (ranges.segments[1].end - ranges.segments[0].end),
-      );
-    } else {
-      // Third segment (10000-100000)
-      const segmentPosition = position - segment1End;
-      const segmentRange = ranges.segments[2].proportion * 100;
-      return Math.round(
-        ranges.segments[1].end + (segmentPosition / segmentRange) *
-            (ranges.segments[2].end - ranges.segments[1].end),
-      );
-    }
-  };
-
-  const handleMinInput = (e: Event) => {
-    const sliderValue = parseInt((e.target as HTMLInputElement).value);
-    const newMin = positionToValue(sliderValue);
-
-    // Ensure new min value doesn't exceed max value - 10
-    const clampedMin = Math.min(newMin, maxValue - 10);
-    setMinValue(clampedMin);
-    onChange?.(clampedMin, maxValue);
-  };
-
-  const handleMaxInput = (e: Event) => {
-    const sliderValue = parseInt((e.target as HTMLInputElement).value);
-    const newMax = positionToValue(sliderValue);
-
-    // Ensure new max value doesn't go below min value + 10
-    const clampedMax = Math.max(newMax, minValue + 10);
-    setMaxValue(clampedMax);
-    onChange?.(minValue, clampedMax);
-  };
-
-  // Define the gradient colors
-  const trackGradientFill = (hoveredHandle: "min" | "max" | null) => {
-    // Calculate percentages based on our non-linear scale
-    const minPercent = valueToPosition(minValue);
-    const maxPercent = valueToPosition(maxValue);
-
-    // Calculate dynamic offsets based on handle positions
-    const minHandleOffset = (minPercent / 100) * 3; // 0% to 3% based on position
-    const maxHandleOffset = ((100 - maxPercent) / 100) * 3; // 0% to 3% based on position
-
-    const baseStyle = {
-      left: `calc(${minPercent}% - ${minHandleOffset}%)`,
-      right: `calc(${100 - maxPercent}% - ${maxHandleOffset}%)`,
-      width: "auto",
-    };
-
-    if (hoveredHandle === "min") {
-      return {
-        ...baseStyle,
-        background: "linear-gradient(90deg, #CCCCCC 5%, #999999 75%)",
-      };
-    } else if (hoveredHandle === "max") {
-      return {
-        ...baseStyle,
-        background: "linear-gradient(90deg, #999999 25%, #CCCCCC 95%)",
-      };
-    }
-
-    return {
-      ...baseStyle,
-      background:
-        "linear-gradient(90deg, #999999 5%, #666666 40%, #666666 60%, #999999 95%)",
-    };
-  };
-
-  // Format large numbers with commas
-  const formatNumber = (num: number): string => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
-  return (
-    <div className="w-full">
-      <div className="-mt-2 mb-3 flex w-full justify-center">
-        <div className="flex items-center text-sm tablet:text-xs font-regular">
-          <div
-            className={`min-w-12 text-right ${
-              hoveredHandle === "min"
-                ? "text-stamp-grey-light"
-                : "text-stamp-grey-darker"
-            } transition-colors duration-300`}
-          >
-            {formatNumber(minValue)}
-          </div>
-          <span className="mx-2 text-stamp-grey-darker">-</span>
-          <div
-            className={`min-w-12 text-left ${
-              hoveredHandle === "max"
-                ? "text-stamp-grey-light"
-                : "text-stamp-grey-darker"
-            } transition-colors duration-300`}
-          >
-            {formatNumber(maxValue)}
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="relative h-5 tablet:h-4 rounded-full bg-stamp-grey-darkest border-2 border-stamp-grey-darkest"
-        ref={sliderRef}
-      >
-        {/* Track fill with dynamic gradient */}
-        <div
-          className="absolute top-0 bottom-0 h-4 tablet:h-3 rounded-full transition-colors duration-300"
-          style={trackGradientFill(hoveredHandle)}
-        />
-
-        {/* Min handle input - using 0-100 range for the slider */}
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="1"
-          value={valueToPosition(minValue)}
-          onChange={handleMinInput}
-          onInput={handleMinInput}
-          onMouseEnter={() => setHoveredHandle("min")}
-          onMouseLeave={() => setHoveredHandle(null)}
-          className={handleIcon}
-        />
-
-        {/* Max handle input - using 0-100 range for the slider */}
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="1"
-          value={valueToPosition(maxValue)}
-          onChange={handleMaxInput}
-          onInput={handleMaxInput}
-          onMouseEnter={() => setHoveredHandle("max")}
-          onMouseLeave={() => setHoveredHandle(null)}
-          className={handleIcon}
-        />
-      </div>
-
-      {/* Optional: Add tick marks for the segment boundaries */}
-      <div className="relative w-full mt-1.5 tablet:mt-1 flex justify-between px-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker">
-        <p>0</p>
-        <p>1,000</p>
-        <p>10,000</p>
-        <p>100,000</p>
-      </div>
-    </div>
-  );
-};
-
-// Time Period Button Group
-const RangeButtons = ({
-  selected,
-  onChange,
-}: {
-  selected: string;
-  onChange: (period: string) => void;
-}) => {
-  return (
-    <div className="flex justify-between">
-      <button
-        className={selected === "24h"
-          ? buttonGreyOutlineActive
-          : buttonGreyOutline}
-        onClick={() => onChange("24h")}
-      >
-        24H
-      </button>
-      <button
-        className={selected === "3d"
-          ? buttonGreyOutlineActive
-          : buttonGreyOutline}
-        onClick={() => onChange("3d")}
-      >
-        3D
-      </button>
-      <button
-        className={selected === "7d"
-          ? buttonGreyOutlineActive
-          : buttonGreyOutline}
-        onClick={() => onChange("7d")}
-      >
-        7D
-      </button>
-      <button
-        className={selected === "1m"
-          ? buttonGreyOutlineActive
-          : buttonGreyOutline}
-        onClick={() => onChange("1m")}
-      >
-        1M
-      </button>
-    </div>
-  );
-};
+import {
+  CollapsibleSection,
+  Radiobutton,
+  RangeButtons,
+  RangeSlider,
+} from "$islands/filter/FilterComponents.tsx";
 
 function useDebouncedCallback<T extends (...args: any[]) => void>(
   callback: T,
@@ -753,7 +179,7 @@ export const FilterContentSRC20 = ({
         toggle={() => toggleSection("mint")}
         variant="collapsibleTitle"
       >
-        <Radio
+        <Radiobutton
           label="FULLY MINTED"
           value="fullyminted"
           checked={filters.mint.fullyminted}
@@ -761,7 +187,7 @@ export const FilterContentSRC20 = ({
           name="status"
         />
 
-        <Radio
+        <Radiobutton
           label="MINTING"
           value="minting"
           checked={filters.mint.minting}
@@ -769,7 +195,7 @@ export const FilterContentSRC20 = ({
           name="status"
         />
 
-        <Radio
+        <Radiobutton
           label="TRENDING MINTS"
           value="trendingMints"
           checked={filters.mint.trendingMints}
@@ -786,7 +212,7 @@ export const FilterContentSRC20 = ({
         toggle={() => toggleSection("details")}
         variant="collapsibleTitle"
       >
-        <Radio
+        <Radiobutton
           label="DEPLOY DATE"
           value="deploy"
           checked={filters.details.deploy}
@@ -794,7 +220,7 @@ export const FilterContentSRC20 = ({
           name="specsAndMarket"
         />
 
-        <Radio
+        <Radiobutton
           label="SUPPLY"
           value="supply"
           checked={filters.details.supply}
@@ -802,7 +228,7 @@ export const FilterContentSRC20 = ({
           name="specsAndMarket"
         />
 
-        <Radio
+        <Radiobutton
           label="HOLDERS"
           value="holders"
           checked={filters.details.holders}
@@ -833,7 +259,7 @@ export const FilterContentSRC20 = ({
         toggle={() => toggleSection("market")}
         variant="collapsibleTitle"
       >
-        <Radio
+        <Radiobutton
           label="MARKET CAP"
           value="marketcap"
           checked={filters.market.marketcap}
@@ -841,7 +267,7 @@ export const FilterContentSRC20 = ({
           name="specsAndMarket"
         />
 
-        <Radio
+        <Radiobutton
           label="VOLUME"
           value="volume"
           checked={filters.market.volume}
@@ -849,7 +275,7 @@ export const FilterContentSRC20 = ({
           name="specsAndMarket"
         />
 
-        <Radio
+        <Radiobutton
           label="PRICE CHANGE"
           value="priceChange"
           checked={filters.market.priceChange}
