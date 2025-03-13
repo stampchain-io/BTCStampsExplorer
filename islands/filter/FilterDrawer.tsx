@@ -232,7 +232,7 @@ const FilterDrawer = (
     >
       {/* Scrollable content area */}
       <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] p-6 overflow-y-auto scrollbar-black">
-        <div className="flex flex-col mb-5 tablet:mb-6">
+        <div className="flex flex-col mb-8 tablet:mb-6">
           <div className="flex justify-between">
             <button
               onClick={handleCloseDrawer}

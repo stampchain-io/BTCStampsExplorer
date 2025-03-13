@@ -48,6 +48,20 @@ const checkboxIcon = (checked: boolean, canHover: boolean): string => `
   after:duration-100
 `;
 
+const handleIcon = `
+  absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none 
+  [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
+  [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:tablet:size-3
+  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey
+  [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
+  [&::-webkit-slider-thumb]:active:cursor-grabbing
+  [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
+  [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:tablet:size-3
+  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey
+  [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
+  [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
+`;
+
 const filterLabelSm = (checked: boolean, canHover: boolean): string => `
   inline-block ml-3 tablet:ml-[9px] text-base tablet:text-sm font-bold 
   transition-colors duration-300
@@ -310,150 +324,212 @@ const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
 
 // Range Slider Component
 const RangeSlider = ({
-  min = 1,
-  max = 10000,
-  initialMin = 1,
-  initialMax = 10000,
   onChange,
 }: {
-  min?: number;
-  max?: number;
-  initialMin?: number;
-  initialMax?: number;
   onChange?: (min: number, max: number) => void;
 }) => {
-  const [minValue, setMinValue] = useState(initialMin);
-  const [maxValue, setMaxValue] = useState(initialMax);
+  // Define our range segments
+  const ranges = {
+    min: 0,
+    max: 100000,
+    segments: [
+      { end: 1000, proportion: 1 / 3 }, // First third covers 0-1000
+      { end: 10000, proportion: 1 / 3 }, // Second third covers 1000-10000
+      { end: 100000, proportion: 1 / 3 }, // Last third covers 10000-100000
+    ],
+  };
+
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(100000);
   const [hoveredHandle, setHoveredHandle] = useState<"min" | "max" | null>(
     null,
   );
   const sliderRef = useRef<HTMLDivElement>(null);
 
+  // Convert actual value to slider position (0-100)
+  const valueToPosition = (value: number): number => {
+    // Find which segment the value falls into
+    if (value <= ranges.segments[0].end) {
+      // First segment (0-1000)
+      return (value / ranges.segments[0].end) *
+        (ranges.segments[0].proportion * 100);
+    } else if (value <= ranges.segments[1].end) {
+      // Second segment (1000-10000)
+      const segmentPosition = ranges.segments[0].proportion * 100;
+      const segmentValue = value - ranges.segments[0].end;
+      const segmentRange = ranges.segments[1].end - ranges.segments[0].end;
+      return segmentPosition +
+        (segmentValue / segmentRange) * (ranges.segments[1].proportion * 100);
+    } else {
+      // Third segment (10000-100000)
+      const segmentPosition =
+        (ranges.segments[0].proportion + ranges.segments[1].proportion) * 100;
+      const segmentValue = value - ranges.segments[1].end;
+      const segmentRange = ranges.segments[2].end - ranges.segments[1].end;
+      return segmentPosition +
+        (segmentValue / segmentRange) * (ranges.segments[2].proportion * 100);
+    }
+  };
+
+  // Convert slider position (0-100) to actual value
+  const positionToValue = (position: number): number => {
+    // Calculate which segment this position falls into
+    const segment0End = ranges.segments[0].proportion * 100;
+    const segment1End = segment0End + ranges.segments[1].proportion * 100;
+
+    if (position <= segment0End) {
+      // First segment (0-1000)
+      return Math.round((position / segment0End) * ranges.segments[0].end);
+    } else if (position <= segment1End) {
+      // Second segment (1000-10000)
+      const segmentPosition = position - segment0End;
+      const segmentRange = ranges.segments[1].proportion * 100;
+      return Math.round(
+        ranges.segments[0].end + (segmentPosition / segmentRange) *
+            (ranges.segments[1].end - ranges.segments[0].end),
+      );
+    } else {
+      // Third segment (10000-100000)
+      const segmentPosition = position - segment1End;
+      const segmentRange = ranges.segments[2].proportion * 100;
+      return Math.round(
+        ranges.segments[1].end + (segmentPosition / segmentRange) *
+            (ranges.segments[2].end - ranges.segments[1].end),
+      );
+    }
+  };
+
   const handleMinInput = (e: Event) => {
-    const newMin = parseInt((e.target as HTMLInputElement).value);
-    // Ensure new min value doesn't exceed max value - 1
-    const clampedMin = Math.min(newMin, maxValue - 1);
+    const sliderValue = parseInt((e.target as HTMLInputElement).value);
+    const newMin = positionToValue(sliderValue);
+
+    // Ensure new min value doesn't exceed max value - 10
+    const clampedMin = Math.min(newMin, maxValue - 10);
     setMinValue(clampedMin);
     onChange?.(clampedMin, maxValue);
   };
 
   const handleMaxInput = (e: Event) => {
-    const newMax = parseInt((e.target as HTMLInputElement).value);
-    // Ensure new max value doesn't go below min value + 1
-    const clampedMax = Math.max(newMax, minValue + 1);
+    const sliderValue = parseInt((e.target as HTMLInputElement).value);
+    const newMax = positionToValue(sliderValue);
+
+    // Ensure new max value doesn't go below min value + 10
+    const clampedMax = Math.max(newMax, minValue + 10);
     setMaxValue(clampedMax);
     onChange?.(minValue, clampedMax);
   };
 
   // Define the gradient colors
-  const getTrackFillStyle = (hoveredHandle: "min" | "max" | null) => {
+  const trackGradientFill = (hoveredHandle: "min" | "max" | null) => {
+    // Calculate percentages based on our non-linear scale
+    const minPercent = valueToPosition(minValue);
+    const maxPercent = valueToPosition(maxValue);
+
+    // Calculate dynamic offsets based on handle positions
+    const minHandleOffset = (minPercent / 100) * 3; // 0% to 3% based on position
+    const maxHandleOffset = ((100 - maxPercent) / 100) * 3; // 0% to 3% based on position
+
     const baseStyle = {
-      left: `${((minValue - min) / (max - min)) * 100}%`,
-      width: `${((maxValue - minValue) / (max - min)) * 100}%`,
+      left: `calc(${minPercent}% - ${minHandleOffset}%)`,
+      right: `calc(${100 - maxPercent}% - ${maxHandleOffset}%)`,
+      width: "auto",
     };
 
     if (hoveredHandle === "min") {
       return {
         ...baseStyle,
-        background:
-          "linear-gradient(90deg, #CCCCCC 5%, #999999 50%, #666666 75%)",
+        background: "linear-gradient(90deg, #CCCCCC 5%, #999999 75%)",
       };
     } else if (hoveredHandle === "max") {
       return {
         ...baseStyle,
-        background:
-          "linear-gradient(90deg, #666666 25%, #999999 50%, #CCCCCC 95%)",
+        background: "linear-gradient(90deg, #999999 25%, #CCCCCC 95%)",
       };
     }
 
     return {
       ...baseStyle,
       background:
-        "linear-gradient(90deg, #666666 5%, #333333 40%, #333333 60%, #666666 95%)",
+        "linear-gradient(90deg, #999999 5%, #666666 40%, #666666 60%, #999999 95%)",
     };
+  };
+
+  // Format large numbers with commas
+  const formatNumber = (num: number): string => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
   return (
     <div className="w-full">
       <div className="-mt-2 mb-3 flex w-full justify-center">
-        <div className="flex items-center text-sm tablet:text-xs">
+        <div className="flex items-center text-sm tablet:text-xs font-regular">
           <div
             className={`min-w-12 text-right ${
               hoveredHandle === "min"
                 ? "text-stamp-grey-light"
-                : "text-stamp-grey-darkest"
-            } transition-colors duration-200`}
+                : "text-stamp-grey-darker"
+            } transition-colors duration-300`}
           >
-            {minValue}
+            {formatNumber(minValue)}
           </div>
-          <span className="mx-2 text-stamp-grey-darkest">-</span>
+          <span className="mx-2 text-stamp-grey-darker">-</span>
           <div
             className={`min-w-12 text-left ${
               hoveredHandle === "max"
                 ? "text-stamp-grey-light"
-                : "text-stamp-grey-darkest"
-            } transition-colors duration-200`}
+                : "text-stamp-grey-darker"
+            } transition-colors duration-300`}
           >
-            {maxValue}
+            {formatNumber(maxValue)}
           </div>
         </div>
       </div>
 
       <div
-        className="relative h-2.5 tablet:h-2 rounded-full bg-stamp-grey-darkest/50"
+        className="relative h-5 tablet:h-4 rounded-full bg-stamp-grey-darkest border-2 border-stamp-grey-darkest"
         ref={sliderRef}
       >
         {/* Track fill with dynamic gradient */}
         <div
-          className="absolute top-0 h-2.5 tablet:h-2 rounded-full transition-colors duration-200"
-          style={getTrackFillStyle(hoveredHandle)}
+          className="absolute top-0 bottom-0 h-4 tablet:h-3 rounded-full transition-colors duration-300"
+          style={trackGradientFill(hoveredHandle)}
         />
 
-        {/* Min handle input */}
+        {/* Min handle input - using 0-100 range for the slider */}
         <input
           type="range"
-          min={min}
-          max={max}
-          value={minValue}
+          min="0"
+          max="100"
+          step="1"
+          value={valueToPosition(minValue)}
           onChange={handleMinInput}
           onInput={handleMinInput}
           onMouseEnter={() => setHoveredHandle("min")}
           onMouseLeave={() => setHoveredHandle(null)}
-          className="absolute w-full h-2.5 tablet:h-2 rounded-full appearance-none bg-transparent pointer-events-none 
-            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
-            [&::-webkit-slider-thumb]:size-[22px] [&::-webkit-slider-thumb]:tablet:size-[18px]
-            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey-darker
-            [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
-            [&::-webkit-slider-thumb]:active:cursor-grabbing
-            [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
-            [&::-moz-range-thumb]:size-[22px] [&::-moz-range-thumb]:tablet:size-[18px]
-            [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey-darker
-            [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
-            [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0"
+          className={handleIcon}
         />
 
-        {/* Max handle input */}
+        {/* Max handle input - using 0-100 range for the slider */}
         <input
           type="range"
-          min={min}
-          max={max}
-          value={maxValue}
+          min="0"
+          max="100"
+          step="1"
+          value={valueToPosition(maxValue)}
           onChange={handleMaxInput}
           onInput={handleMaxInput}
           onMouseEnter={() => setHoveredHandle("max")}
           onMouseLeave={() => setHoveredHandle(null)}
-          className="absolute w-full h-2.5 tablet:h-2 rounded-full appearance-none bg-transparent pointer-events-none 
-            [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
-            [&::-webkit-slider-thumb]:size-[22px] [&::-webkit-slider-thumb]:tablet:size-[18px]
-            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey-darker
-            [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
-            [&::-webkit-slider-thumb]:active:cursor-grabbing
-            [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
-            [&::-moz-range-thumb]:size-[22px] [&::-moz-range-thumb]:tablet:size-[18px]
-            [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey-darker
-            [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
-            [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0"
+          className={handleIcon}
         />
+      </div>
+
+      {/* Optional: Add tick marks for the segment boundaries */}
+      <div className="relative w-full mt-1.5 tablet:mt-1 flex justify-between px-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker">
+        <p>0</p>
+        <p>1,000</p>
+        <p>10,000</p>
+        <p>100,000</p>
       </div>
     </div>
   );
@@ -743,10 +819,6 @@ export const FilterContentSRC20 = ({
             variant="collapsibleLabel"
           >
             <RangeSlider
-              min={1}
-              max={10000}
-              initialMin={1}
-              initialMax={10000}
               onChange={handleHoldersRangeChange}
             />
           </CollapsibleSection>
