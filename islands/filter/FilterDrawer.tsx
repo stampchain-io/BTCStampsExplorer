@@ -165,7 +165,7 @@ const FilterDrawer = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 32 32"
-      class="w-6 h-6 mobileLg:w-7 mobileLg:h-7 hover:fill-stamp-grey-light"
+      class="size-7 tablet:size-6 hover:fill-stamp-grey-light"
       role="button"
       aria-label="Close Filter"
       fill="url(#closeFilterGradient)"
@@ -173,7 +173,7 @@ const FilterDrawer = (
       <defs>
         <linearGradient
           id="closeFilterGradient"
-          gradientTransform="rotate(-45)"
+          gradientTransform="rotate(45)"
         >
           <stop offset="0%" stop-color="#666666" />
           <stop offset="50%" stop-color="#999999" />
@@ -185,9 +185,9 @@ const FilterDrawer = (
   );
 
   const buttonGreyFlat =
-    "inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-xs mobileLg:text-sm font-extrabold text-black tracking-[0.05em] h-10 mobileLg:h-11 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:bg-stamp-grey-light transition-colors";
+    "inline-flex items-center justify-center bg-stamp-grey border-2 border-stamp-grey rounded-md text-sm tablet:text-xs font-extrabold text-black tracking-[0.05em] h-11 tablet:h-10 px-5 tablet:px-4 hover:border-stamp-grey-light hover:bg-stamp-grey-light transition-colors";
   const buttonGreyOutline =
-    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-xs mobileLg:text-sm font-extrabold text-stamp-grey tracking-[0.05em] h-10 mobileLg:h-11 px-4 mobileLg:px-5 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+    "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm tablet:text-xs font-extrabold text-stamp-grey tracking-[0.05em] h-11 tablet:h-10 px-5 tablet:px-4 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
   // Get the appropriate drawer ID based on type
   const drawerId = `drawer-form-${type}`;
@@ -195,25 +195,22 @@ const FilterDrawer = (
   return (
     <div
       id={drawerId}
-      class={`fixed top-0 left-0 z-40 
-      w-full min-[420px]:w-[300px] mobileLg:w-[340px] h-screen
+      class={`fixed top-0 right-0 z-40 
+      w-full min-[420px]:w-[340px] tablet:w-[320px] h-screen
       bg-gradient-to-b from-[#000000]/80 to-[#000000] 
-      backdrop-blur-md transition-transform
-       ${open ? "translate-x-0" : "-translate-x-full"}`}
+      backdrop-blur-md transition-transform duration-300 ease-in-out
+       ${open ? "translate-x-0" : "translate-x-full"}`}
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
-      <div className="h-[calc(100vh-88px)] mobileLg:h-[calc(100vh-92px)] p-6 overflow-y-auto scrollbar-black">
-        <div className="flex flex-col mb-3 mobileLg:mb-5 space-y-3">
+      <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] p-6 overflow-y-auto scrollbar-black">
+        <div className="flex flex-col mb-5 tablet:mb-3 space-y-3">
           <div className="flex justify-between">
-            <p className="text-2xl mobileLg:text-3xl font-black gray-gradient1">
-              FILTERS
-            </p>
             <button
               onClick={handleCloseDrawer}
               onMouseEnter={handleCloseMouseEnter}
               onMouseLeave={handleCloseMouseLeave}
-              className="relative top-0 right-0 flex items-center justify-center"
+              className="relative top-0 left-0 flex items-center justify-center"
               aria-label="Close filter menu"
             >
               <div
@@ -225,6 +222,9 @@ const FilterDrawer = (
               </div>
               <CrossIcon />
             </button>
+            <p className="text-3xl tablet:text-2xl font-black gray-gradient1">
+              FILTERS
+            </p>
           </div>
         </div>
 

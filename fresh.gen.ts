@@ -175,6 +175,7 @@ import * as $filter_FilterContentStamp from "./islands/filter/FilterContentStamp
 import * as $filter_FilterDrawer from "./islands/filter/FilterDrawer.tsx";
 import * as $filter_FilterOptionsSRC20 from "./islands/filter/FilterOptionsSRC20.tsx";
 import * as $filter_FilterOptionsStamp from "./islands/filter/FilterOptionsStamp.tsx";
+import * as $filter_FilterStyles from "./islands/filter/FilterStyles.tsx";
 import * as $home_FontLoader from "./islands/home/FontLoader.tsx";
 import * as $home_HomeStampChainSelected from "./islands/home/HomeStampChainSelected.tsx";
 import * as $home_HomeStampPreview from "./islands/home/HomeStampPreview.tsx";
@@ -461,6 +462,7 @@ const manifest = {
     "./islands/filter/FilterDrawer.tsx": $filter_FilterDrawer,
     "./islands/filter/FilterOptionsSRC20.tsx": $filter_FilterOptionsSRC20,
     "./islands/filter/FilterOptionsStamp.tsx": $filter_FilterOptionsStamp,
+    "./islands/filter/FilterStyles.tsx": $filter_FilterStyles,
     "./islands/home/FontLoader.tsx": $home_FontLoader,
     "./islands/home/HomeStampChainSelected.tsx": $home_HomeStampChainSelected,
     "./islands/home/HomeStampPreview.tsx": $home_HomeStampPreview,

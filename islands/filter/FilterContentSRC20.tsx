@@ -3,8 +3,8 @@ import { SRC20Filters } from "$islands/filter/FilterOptionsSRC20.tsx";
 
 const chevronIcon = (size: "sm" | "lg") => {
   const iconSize = {
-    sm: "w-4 h-4 mobileLg:w-5 mobileLg:h-5",
-    lg: "w-5 h-5 mobileLg:w-6 mobileLg:h-6",
+    sm: "size-5 tablet:size-4",
+    lg: "size-6 tablet:size-5",
   };
 
   return (
@@ -20,7 +20,7 @@ const chevronIcon = (size: "sm" | "lg") => {
 
 const checkboxIcon = (checked: boolean, canHover: boolean): string => `
   appearance-none
-  w-4 h-4 mobileLg:w-[18px] mobileLg:h-[18px]
+  size-[18px] tablet:size-4
   border-2 
   rounded-sm
   cursor-pointer
@@ -37,7 +37,7 @@ const checkboxIcon = (checked: boolean, canHover: boolean): string => `
 }
   after:content-['']
   after:block
-  after:w-1.5 after:h-1.5 mobileLg:after:w-2 mobileLg:after:h-2
+  after:size-2 tablet:after:size-1.5
   after:rounded-[1px]
   after:absolute
   after:top-1/2 after:left-1/2
@@ -49,7 +49,7 @@ const checkboxIcon = (checked: boolean, canHover: boolean): string => `
 `;
 
 const filterLabelSm = (checked: boolean, canHover: boolean): string => `
-  inline-block ml-[9px] mobileLg:ml-3 text-sm mobileLg:text-base font-bold 
+  inline-block ml-3 tablet:ml-[9px] text-base tablet:text-sm font-bold 
   transition-colors duration-300
   cursor-pointer
   ${
@@ -64,10 +64,10 @@ const filterLabelSm = (checked: boolean, canHover: boolean): string => `
 `;
 
 const buttonGreyOutline =
-  "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-xs mobileLg:text-sm font-extrabold text-stamp-grey tracking-[0.05em] h-8 mobileLg:h-9 px-3 mobileLg:px-4 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+  "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm tablet:text-xs font-extrabold text-stamp-grey tracking-[0.05em] h-9 tablet:h-8 px-4 tablet:px-3 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
 
 const buttonGreyOutlineActive =
-  "inline-flex items-center justify-center border-2 border-stamp-grey-light rounded-md text-xs mobileLg:text-sm font-extrabold text-stamp-grey-light tracking-[0.05em] h-8 mobileLg:h-9 px-3 mobileLg:px-4 transition-colors";
+  "inline-flex items-center justify-center border-2 border-stamp-grey-light rounded-md text-sm tablet:text-xs font-extrabold text-stamp-grey-light tracking-[0.05em] h-9 tablet:h-8 px-4 tablet:px-3 transition-colors";
 
 const CollapsibleSection = ({
   title,
@@ -101,11 +101,11 @@ const CollapsibleSection = ({
         <button
           onClick={handleClick}
           onMouseLeave={handleMouseLeave}
-          className="flex items-center w-full justify-between py-2 mobileLg:py-3 group transition-colors duration-300"
+          className="flex items-center w-full justify-between py-3 tablet:py-2 group transition-colors duration-300"
         >
           <span
             className={`
-              text-lg mobileLg:text-xl font-light transition-colors duration-300
+              text-xl tablet:text-lg font-light transition-colors duration-300
               ${
               expanded
                 ? `text-stamp-grey ${
@@ -145,7 +145,7 @@ const CollapsibleSection = ({
             expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="-mt-2 mobileLg:-mt-1.5 pb-3 pl-0.5">
+          <div className="-mt-1.5 tablet:-mt-2 pb-3 pl-0.5">
             {children}
           </div>
         </div>
@@ -160,7 +160,7 @@ const CollapsibleSection = ({
         <button
           onClick={handleClick}
           onMouseLeave={handleMouseLeave}
-          className="flex items-center w-full mt-2 mobileLg:mt-3 group transition-colors duration-300"
+          className="flex items-center w-full mt-3 tablet:mt-2 group transition-colors duration-300"
         >
           <div
             className={`transform transition-all duration-300 ${
@@ -188,7 +188,7 @@ const CollapsibleSection = ({
             expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="-mt-2 mobileLg:-mt-1.5 pb-3 pl-0.5">
+          <div className="-mt-1.5 tablet:-mt-2 pb-3 pl-0.5">
             {children}
           </div>
         </div>
@@ -242,7 +242,7 @@ const Checkbox = ({
   return (
     <div className="flex flex-col">
       <div
-        className="flex items-center py-1.5 mobileLg:py-1.5 cursor-pointer group"
+        className="flex items-center py-1.5 cursor-pointer group"
         onMouseLeave={handleMouseLeave}
         onClick={handleChange}
       >
@@ -289,7 +289,7 @@ const Radio = ({ label, value, checked, onChange, name }: RadioProps) => {
 
   return (
     <div
-      className="flex items-center py-1.5 mobileLg:py-1.5 cursor-pointer group"
+      className="flex items-center py-1.5 cursor-pointer group"
       onMouseLeave={handleMouseLeave}
       onClick={handleChange}
     >
@@ -369,19 +369,19 @@ const RangeSlider = ({
     return {
       ...baseStyle,
       background:
-        "linear-gradient(90deg, #666666 5%, #333333 50%, #666666 95%)",
+        "linear-gradient(90deg, #666666 5%, #333333 40%, #333333 60%, #666666 95%)",
     };
   };
 
   return (
     <div className="w-full">
       <div className="-mt-2 mb-3 flex w-full justify-center">
-        <div className="flex items-center text-xs mobileLg:text-sm">
+        <div className="flex items-center text-sm tablet:text-xs">
           <div
             className={`min-w-12 text-right ${
               hoveredHandle === "min"
                 ? "text-stamp-grey-light"
-                : "text-stamp-grey-darker"
+                : "text-stamp-grey-darkest"
             } transition-colors duration-200`}
           >
             {minValue}
@@ -391,7 +391,7 @@ const RangeSlider = ({
             className={`min-w-12 text-left ${
               hoveredHandle === "max"
                 ? "text-stamp-grey-light"
-                : "text-stamp-grey-darker"
+                : "text-stamp-grey-darkest"
             } transition-colors duration-200`}
           >
             {maxValue}
@@ -400,12 +400,12 @@ const RangeSlider = ({
       </div>
 
       <div
-        className="relative h-2 mobileLg:h-2.5 rounded-full bg-stamp-grey-darkest/50"
+        className="relative h-2.5 tablet:h-2 rounded-full bg-stamp-grey-darkest/50"
         ref={sliderRef}
       >
         {/* Track fill with dynamic gradient */}
         <div
-          className="absolute top-0 mobileLg:top-0 h-2 mobileLg:h-2.5 rounded-full transition-colors duration-200"
+          className="absolute top-0 h-2.5 tablet:h-2 rounded-full transition-colors duration-200"
           style={getTrackFillStyle(hoveredHandle)}
         />
 
@@ -419,14 +419,14 @@ const RangeSlider = ({
           onInput={handleMinInput}
           onMouseEnter={() => setHoveredHandle("min")}
           onMouseLeave={() => setHoveredHandle(null)}
-          className="absolute w-full h-2 mobileLg:h-2.5 appearance-none bg-transparent pointer-events-none 
+          className="absolute w-full h-2.5 tablet:h-2 rounded-full appearance-none bg-transparent pointer-events-none 
             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
-            [&::-webkit-slider-thumb]:size-[18px] [&::-webkit-slider-thumb]:mobileLg:size-[22px]
+            [&::-webkit-slider-thumb]:size-[22px] [&::-webkit-slider-thumb]:tablet:size-[18px]
             [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey-darker
             [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
             [&::-webkit-slider-thumb]:active:cursor-grabbing
             [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
-            [&::-moz-range-thumb]:size-[18px] [&::-moz-range-thumb]:mobileLg:size-[22px]
+            [&::-moz-range-thumb]:size-[22px] [&::-moz-range-thumb]:tablet:size-[18px]
             [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey-darker
             [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
             [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0"
@@ -442,14 +442,14 @@ const RangeSlider = ({
           onInput={handleMaxInput}
           onMouseEnter={() => setHoveredHandle("max")}
           onMouseLeave={() => setHoveredHandle(null)}
-          className="absolute w-full h-2 mobileLg:h-2.5 appearance-none bg-transparent pointer-events-none 
+          className="absolute w-full h-2.5 tablet:h-2 rounded-full appearance-none bg-transparent pointer-events-none 
             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
-            [&::-webkit-slider-thumb]:size-[18px] [&::-webkit-slider-thumb]:mobileLg:size-[22px]
+            [&::-webkit-slider-thumb]:size-[22px] [&::-webkit-slider-thumb]:tablet:size-[18px]
             [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stamp-grey-darker
             [&::-webkit-slider-thumb]:hover:bg-stamp-grey-light [&::-webkit-slider-thumb]:cursor-grab
             [&::-webkit-slider-thumb]:active:cursor-grabbing
             [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto
-            [&::-moz-range-thumb]:size-[18px] [&::-moz-range-thumb]:mobileLg:size-[22px]
+            [&::-moz-range-thumb]:size-[22px] [&::-moz-range-thumb]:tablet:size-[18px]
             [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-stamp-grey-darker
             [&::-moz-range-thumb]:hover:bg-stamp-grey-light [&::-moz-range-thumb]:cursor-grab
             [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0"
@@ -668,7 +668,7 @@ export const FilterContentSRC20 = ({
   };
 
   return (
-    <div className="space-y-1 mobileLg:space-y-1.5">
+    <div className="space-y-1.5 tablet:space-y-1">
       {/* STATUS SECTION - Independent group */}
       <CollapsibleSection
         title="STATUS"
