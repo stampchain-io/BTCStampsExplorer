@@ -239,24 +239,24 @@ export function FeeCalculatorBase({
     return (
       <div className={`${visible ? "visible" : "invisible"} gap-1 mt-1.5`}>
         {/* File Type - Only show for stamp type */}
-        {type === "stamp" && fileType && (
+        {type === "stamp" && (
           <p className={detailsText}>
-            <span className={detailsTitle}>FILE</span>&nbsp;&nbsp;{fileType
-              .toUpperCase()}
+            <span className={detailsTitle}>FILE</span>&nbsp;&nbsp;{fileType ? fileType
+              .toUpperCase() : "***"}
           </p>
         )}
 
         {/* Editions - Only show for stamp type */}
-        {type === "stamp" && issuance && (
+        {type === "stamp" && (
           <p className={detailsText}>
-            <span className={detailsTitle}>EDITIONS</span>&nbsp;&nbsp;{issuance}
+            <span className={detailsTitle}>EDITIONS</span>&nbsp;&nbsp;{issuance || "***"}
           </p>
         )}
 
         {/* File Size */}
-        {!!fileSize && (
+        {type === "stamp" && (
           <p className={detailsText}>
-            <span className={detailsTitle}>SIZE</span>&nbsp;&nbsp;{fileSize}
+            <span className={detailsTitle}>SIZE</span>&nbsp;&nbsp;{fileSize || "***"}
             {" "}
             <span className="font-light">BYTES</span>
           </p>
@@ -341,125 +341,123 @@ export function FeeCalculatorBase({
         )}
 
         {/* Bitname domain */}
-        {!!bitname && bitname.split(
-          ".",
-        )[0] && (
+        {fromPage === "src101_bitname" && (
           <p className={detailsText}>
             <span className={detailsTitle}>NAME</span>&nbsp;&nbsp;{bitname
               .split(
                 ".",
-              )[0]}
+              )[0] || "***"}
           </p>
         )}
 
         {/* Donate amount */}
-        {(fromPage === "donate" && amount) &&
+        {fromPage === "donate" &&
           (
             <p className={detailsText}>
               <span className={detailsTitle}>
                 DONATION AMOUNT
-              </span>&nbsp;&nbsp;{(amount / 100000000).toFixed(8)} BTC
+              </span>&nbsp;&nbsp;{amount ? (amount / 100000000).toFixed(8) : "***"} BTC
             </p>
           )}
 
         {/* Receive amount on donate */}
-        {(fromPage === "donate" && receive) &&
+        {fromPage === "donate" &&
           (
             <p className={detailsText}>
               <span className={detailsTitle}>
                 RECEIVE
-              </span>&nbsp;&nbsp;{receive} USDSTAMPS
+              </span>&nbsp;&nbsp;{receive || "***"} USDSTAMPS
             </p>
           )}
 
         {/** Stamp Buy Modal */}
-        {(fromPage === "stamp_buy" && price) &&
+        {fromPage === "stamp_buy" &&
           (
             <p className={detailsText}>
               <span className={detailsTitle}>
                 STAMP PRICE
-              </span>&nbsp;&nbsp;{formatBTCAmount(
+              </span>&nbsp;&nbsp;{price ? formatBTCAmount(
                 typeof price === "number" ? price : 0,
                 { excludeSuffix: true },
-              )} BTC
+              ): "***"} BTC
             </p>
           )}
 
         {/** Stamp Buy Modal */}
-        {(fromPage === "stamp_buy" && edition) &&
+        {fromPage === "stamp_buy" &&
           (
             <p className={detailsText}>
               <span className={detailsTitle}>
                 EDITIONS
-              </span>&nbsp;&nbsp;{edition}
+              </span>&nbsp;&nbsp;{edition || "***"}
             </p>
           )}
 
         {/** SRC20 DEPLOY */}
-        {(fromPage === "src20_deploy" && ticker) &&
+        {fromPage === "src20_deploy" &&
           (
             <p className={detailsText}>
               <span className={detailsTitle}>
                 TICKER
-              </span>&nbsp;&nbsp;{ticker}
+              </span>&nbsp;&nbsp;{ticker || "***"}
             </p>
           )}
-        {(fromPage === "src20_deploy" && limit) &&
+        {fromPage === "src20_deploy" &&
           (
             <p className={detailsText}>
               <span className={detailsTitle}>
                 LIMIT
-              </span>&nbsp;&nbsp;{limit}
+              </span>&nbsp;&nbsp;{limit || "***"}
             </p>
           )}
-        {(fromPage === "src20_deploy" && supply) &&
+        {fromPage === "src20_deploy" &&
           (
             <p className={detailsText}>
               <span className={detailsTitle}>
                 SUPPLY
-              </span>&nbsp;&nbsp;{supply}
+              </span>&nbsp;&nbsp;{supply || "***"}
             </p>
           )}
         
         {/* Transfer Details */}
-        {transferDetails?.address && (
+        {fromPage==="src20_transfer" && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               RECEIPIENT ADDY
-            </span>&nbsp;&nbsp;{ transferDetails?.address }
+            </span>&nbsp;&nbsp;{ transferDetails?.address || "******" }
           </p>
         )}
 
-        {transferDetails?.token && (
+        {fromPage==="src20_transfer" && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               TOKEN TICKER
-            </span>&nbsp;&nbsp;{ transferDetails?.token }
+            </span>&nbsp;&nbsp;{ transferDetails?.token || "***" }
           </p>
         )}
 
-        {transferDetails?.amount && (
+        {fromPage==="src20_transfer" && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               AMOUNT
-            </span>&nbsp;&nbsp;{ transferDetails?.amount }
+            </span>&nbsp;&nbsp;{ transferDetails?.amount || "***" }
           </p>
         )}
 
         {/* Mint Details */}
-        {mintDetails?.token && (
+        {fromPage==="src20_mint" && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               TOKEN TICKER
-            </span>&nbsp;&nbsp;{ mintDetails?.token }
+            </span>&nbsp;&nbsp;{ mintDetails?.token || "***" }
           </p>
         )}
 
-        {mintDetails?.amount && (
+        {fromPage==="src20_mint" && (
           <p className={detailsText}>
             <span className={detailsTitle}>
               AMOUNT
-            </span>&nbsp;&nbsp;{ mintDetails?.amount }
+            </span>&nbsp;&nbsp;{ mintDetails?.amount || "***" }
           </p>
         )}
       </div>

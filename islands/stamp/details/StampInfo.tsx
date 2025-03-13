@@ -431,7 +431,7 @@ export function StampInfo({ stamp, lowestPriceDispenser }: StampInfoProps) {
 
   // Helper function to check if it's a POSH stamp (move near top of component)
   const isPoshStamp = (cpid: string) => {
-    return !cpid.startsWith("A");
+    return !cpid?.startsWith("A");
   };
 
   const titleRef = useRef<HTMLParagraphElement>(null);

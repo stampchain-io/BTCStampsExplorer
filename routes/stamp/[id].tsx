@@ -62,9 +62,6 @@ export const handler: Handlers<StampData> = {
       const [
         holders,
         mainCategories,
-        dispensersCount,
-        salesCount,
-        transfersCount,
       ] = await Promise.all([
         StampController.getStampHolders(
           stampData.data.stamp.cpid,
@@ -81,14 +78,6 @@ export const handler: Handlers<StampData> = {
             sortBy: "DESC",
           },
         ]),
-        fetch(
-          `${baseUrl}/api/v2/stamps/${encodedCpid}/dispensers?${countParams}`,
-        ).then((r) => r.json()),
-        fetch(
-          `${baseUrl}/api/v2/stamps/${encodedCpid}/dispenses?${countParams}`,
-        ).then((r) => r.json()),
-        fetch(`${baseUrl}/api/v2/stamps/${encodedCpid}/sends?${countParams}`)
-          .then((r) => r.json()),
       ]);
 
       // Only fetch dispensers for STAMP or SRC-721
@@ -140,9 +129,9 @@ export const handler: Handlers<StampData> = {
         lowestPriceDispenser: lowestPriceDispenser,
         url: req.url,
         initialCounts: {
-          dispensers: dispensersCount.total || 0,
-          sales: salesCount.total || 0,
-          transfers: transfersCount.total || 0,
+          dispensers:  0,
+          sales: 0,
+          transfers: 0,
         },
       });
     } catch (error) {
