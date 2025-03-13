@@ -3,7 +3,8 @@ export const formatNumber = (num: number): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-// Common styles for filter components
+// Icon styles
+// Handle icon - Slider
 export const handleIcon = `
   absolute w-full h-4 tablet:h-3 rounded-full appearance-none bg-transparent pointer-events-none 
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto
@@ -18,7 +19,7 @@ export const handleIcon = `
   [&::-moz-range-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:border-0
 `;
 
-// Add other style constants from FilterContentSRC20.tsx
+// Checkbox icon
 export const checkboxIcon = (checked: boolean, canHover: boolean): string => `
   appearance-none
   size-[18px] tablet:size-4
@@ -49,10 +50,15 @@ export const checkboxIcon = (checked: boolean, canHover: boolean): string => `
   after:duration-100
 `;
 
-export const filterLabelSm = (checked: boolean, canHover: boolean): string => `
+// Text styles
+// Label - Filter
+export const labelGreyBaseFilter = (
+  checked: boolean,
+  canHover: boolean,
+): string => `
   inline-block ml-3 tablet:ml-[9px] text-base tablet:text-sm font-bold 
   transition-colors duration-300
-  cursor-pointer
+  cursor-pointer select-none
   ${
   checked
     ? canHover
@@ -64,8 +70,44 @@ export const filterLabelSm = (checked: boolean, canHover: boolean): string => `
 }
 `;
 
-export const buttonGreyOutline =
-  "inline-flex items-center justify-center border-2 border-stamp-grey rounded-md text-sm tablet:text-xs font-extrabold text-stamp-grey tracking-[0.05em] h-9 tablet:h-8 px-4 tablet:px-3 hover:border-stamp-grey-light hover:text-stamp-grey-light transition-colors";
+// Button styles
+export const buttonStyles = {
+  base:
+    "inline-flex items-center justify-center border-2 rounded-md text-sm tablet:text-xs font-extrabold tracking-wider transition-colors duration-300",
 
-export const buttonGreyOutlineActive =
-  "inline-flex items-center justify-center border-2 border-stamp-grey-light rounded-md text-sm tablet:text-xs font-extrabold text-stamp-grey-light tracking-[0.05em] h-9 tablet:h-8 px-4 tablet:px-3 transition-colors";
+  // Variants
+  variant: {
+    outlineGrey:
+      "bg-transparent border-stamp-grey hover:border-stamp-grey-light text-stamp-grey hover:text-stamp-grey-light",
+    flatGrey:
+      "bg-stamp-grey hover:bg-stamp-grey-light border-stamp-grey hover:border-stamp-grey-light text-black",
+
+    flatOutlineGrey:
+      "bg-stamp-grey hover:bg-transparent border-stamp-grey hover:border-stamp-grey text-black hover:text-stamp-grey",
+    outlineFlatGrey:
+      "bg-transparent hover:bg-stamp-grey border-stamp-grey hover:border-stamp-grey text-stamp-grey hover:text-black",
+
+    flatTest:
+      "bg-red-500 hover:bg-green-500 border-red-500 hover:border-green-500  text-black",
+  },
+
+  // Sizes
+  size: {
+    sm: "h-9 tablet:h-8 px-4 tablet:px-3",
+    md: "h-10 tablet:h-9 px-4 tablet:px-3",
+    lg: "h-11 tablet:h-10 px-5 tablet:px-4",
+  },
+};
+
+// Helper function to combine button styles
+export const button = (
+  variant: keyof typeof buttonStyles.variant,
+  size: keyof typeof buttonStyles.size,
+) => {
+  return `${buttonStyles.base} ${buttonStyles.variant[variant]} ${
+    buttonStyles.size[size]
+  }`;
+};
+
+// Example usage:
+// className={button('outlineGrey', 'lg')}

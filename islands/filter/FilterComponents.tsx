@@ -1,12 +1,11 @@
 import { useRef, useState } from "preact/hooks";
 import { ComponentChildren } from "preact";
 import {
-  buttonGreyOutline,
-  buttonGreyOutlineActive,
+  button,
   checkboxIcon,
-  filterLabelSm,
   formatNumber,
   handleIcon,
+  labelGreyBaseFilter,
 } from "$islands/filter/FilterStyles.ts";
 
 // Chevron icon component - with three size variants
@@ -42,6 +41,30 @@ export const FilterIcon = () => {
     </svg>
   );
 };
+
+// Close icon component
+export const CloseIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 32 32"
+    class="size-7 tablet:size-6 hover:fill-stamp-grey-light"
+    role="button"
+    aria-label="Close Filter"
+    fill="url(#closeFilterGradient)"
+  >
+    <defs>
+      <linearGradient
+        id="closeFilterGradient"
+        gradientTransform="rotate(45)"
+      >
+        <stop offset="0%" stop-color="#666666" />
+        <stop offset="50%" stop-color="#999999" />
+        <stop offset="100%" stop-color="#CCCCCC" />
+      </linearGradient>
+    </defs>
+    <path d="M26.0612 23.9387C26.343 24.2205 26.5013 24.6027 26.5013 25.0012C26.5013 25.3997 26.343 25.7819 26.0612 26.0637C25.7794 26.3455 25.3972 26.5038 24.9987 26.5038C24.6002 26.5038 24.218 26.3455 23.9362 26.0637L15.9999 18.125L8.0612 26.0612C7.7794 26.343 7.39721 26.5013 6.9987 26.5013C6.60018 26.5013 6.21799 26.343 5.9362 26.0612C5.6544 25.7794 5.49609 25.3972 5.49609 24.9987C5.49609 24.6002 5.6544 24.218 5.9362 23.9362L13.8749 16L5.9387 8.06122C5.6569 7.77943 5.49859 7.39724 5.49859 6.99872C5.49859 6.60021 5.6569 6.21802 5.9387 5.93622C6.22049 5.65443 6.60268 5.49612 7.0012 5.49612C7.39971 5.49612 7.7819 5.65443 8.0637 5.93622L15.9999 13.875L23.9387 5.93497C24.2205 5.65318 24.6027 5.49487 25.0012 5.49487C25.3997 5.49487 25.7819 5.65318 26.0637 5.93497C26.3455 6.21677 26.5038 6.59896 26.5038 6.99747C26.5038 7.39599 26.3455 7.77818 26.0637 8.05998L18.1249 16L26.0612 23.9387Z" />
+  </svg>
+);
 
 // Badge Icon Component
 export const BadgeIcon = ({
@@ -89,14 +112,15 @@ export const CollapsibleSection = ({
   children: ComponentChildren;
   variant: "collapsibleTitle" | "collapsibleSubTitle" | "collapsibleLabel";
 }) => {
-  const [canHover, setCanHover] = useState(true);
+  const [canHoverSelected, setCanHoverSelected] = useState(true);
 
   const handleClick = () => {
     toggle();
+    setCanHoverSelected(false);
   };
 
   const handleMouseLeave = () => {
-    setCanHover(true);
+    setCanHoverSelected(true);
   };
 
   // Handle collapsibleTitle variant
@@ -114,10 +138,10 @@ export const CollapsibleSection = ({
               ${
               expanded
                 ? `text-stamp-grey ${
-                  canHover ? "group-hover:text-stamp-grey-light" : ""
+                  canHoverSelected ? "group-hover:text-stamp-grey-light" : ""
                 }`
                 : `text-stamp-grey-light ${
-                  canHover ? "group-hover:text-stamp-grey" : ""
+                  canHoverSelected ? "group-hover:text-stamp-grey" : ""
                 }`
             }`}
           >
@@ -133,10 +157,10 @@ export const CollapsibleSection = ({
               className={`${
                 expanded
                   ? `fill-stamp-grey ${
-                    canHover ? "group-hover:fill-stamp-grey-light" : ""
+                    canHoverSelected ? "group-hover:fill-stamp-grey-light" : ""
                   }`
                   : `fill-stamp-grey-light ${
-                    canHover ? "group-hover:fill-stamp-grey" : ""
+                    canHoverSelected ? "group-hover:fill-stamp-grey" : ""
                   }`
               } transition-colors duration-300`}
             >
@@ -150,7 +174,7 @@ export const CollapsibleSection = ({
             expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="-mt-1.5 tablet:-mt-2 pb-3 pl-0.5">
+          <div className="-mt-1.5 tablet:-mt-1 pb-3 pl-0.5">
             {children}
           </div>
         </div>
@@ -173,17 +197,17 @@ export const CollapsibleSection = ({
             } ${
               expanded
                 ? `fill-stamp-grey-light ${
-                  canHover ? "group-hover:fill-stamp-grey" : ""
+                  canHoverSelected ? "group-hover:fill-stamp-grey" : ""
                 }`
                 : `fill-stamp-grey ${
-                  canHover ? "group-hover:fill-stamp-grey-light" : ""
+                  canHoverSelected ? "group-hover:fill-stamp-grey-light" : ""
                 }`
             } transition-colors duration-300`}
           >
             {ChevronIcon("md")}
           </div>
 
-          <span className={filterLabelSm(expanded, canHover)}>
+          <span className={labelGreyBaseFilter(expanded, canHoverSelected)}>
             {title}
           </span>
         </button>
@@ -204,7 +228,6 @@ export const CollapsibleSection = ({
   // Handle collapsibleLabel variant
   if (variant === "collapsibleLabel") {
     return (
-      // Collapsible section
       <div
         className={`overflow-hidden transition-all duration-300 ease-in-out ${
           expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
@@ -226,40 +249,53 @@ export const RangeButtons = ({
   selected: string;
   onChange: (period: string) => void;
 }) => {
+  const [canHoverSelected, setCanHoverSelected] = useState(true);
+  const periods = ["24h", "3d", "7d", "1m"];
+
+  const handleClick = (period: string) => {
+    onChange(period);
+    // Disable hover effects after click
+    setCanHoverSelected(false);
+  };
+
+  const handleMouseLeave = () => {
+    // Re-enable hover effects when mouse leaves
+    setCanHoverSelected(true);
+  };
+
+  // Custom button class function
+  const getButtonClass = (period: string) => {
+    const isSelected = selected === period;
+
+    // Base button styles
+    const customButtonClass =
+      "inline-flex items-center justify-center border-2 rounded-md text-sm tablet:text-xs font-extrabold tracking-wider transition-colors duration-300 h-9 tablet:h-8 px-4 tablet:px-3";
+
+    if (isSelected) {
+      // Selected state - always disable pointer events to prevent hover effects
+      return `${customButtonClass} bg-stamp-grey-light border-stamp-grey-light text-black pointer-events-none`;
+    } else {
+      // Normal state - conditionally apply hover effects
+      return `${customButtonClass} bg-transparent border-stamp-grey text-stamp-grey ${
+        canHoverSelected
+          ? "hover:bg-stamp-grey-light hover:border-stamp-grey-light hover:text-black"
+          : ""
+      }`;
+    }
+  };
+
   return (
     <div className="flex justify-between">
-      <button
-        className={selected === "24h"
-          ? buttonGreyOutlineActive
-          : buttonGreyOutline}
-        onClick={() => onChange("24h")}
-      >
-        24H
-      </button>
-      <button
-        className={selected === "3d"
-          ? buttonGreyOutlineActive
-          : buttonGreyOutline}
-        onClick={() => onChange("3d")}
-      >
-        3D
-      </button>
-      <button
-        className={selected === "7d"
-          ? buttonGreyOutlineActive
-          : buttonGreyOutline}
-        onClick={() => onChange("7d")}
-      >
-        7D
-      </button>
-      <button
-        className={selected === "1m"
-          ? buttonGreyOutlineActive
-          : buttonGreyOutline}
-        onClick={() => onChange("1m")}
-      >
-        1M
-      </button>
+      {periods.map((period) => (
+        <button
+          key={period}
+          className={getButtonClass(period)}
+          onClick={() => handleClick(period)}
+          onMouseLeave={handleMouseLeave}
+        >
+          {period.toUpperCase()}
+        </button>
+      ))}
     </div>
   );
 };
@@ -399,7 +435,7 @@ export const RangeSlider = ({
   return (
     <div className="w-full">
       <div className="-mt-2 mb-3 flex w-full justify-center">
-        <div className="flex items-center text-sm tablet:text-xs font-regular">
+        <div className="flex items-center text-sm tablet:text-xs font-regular cursor-default select-none">
           <div
             className={`min-w-12 text-right ${
               hoveredHandle === "min"
@@ -462,9 +498,9 @@ export const RangeSlider = ({
       </div>
 
       {/* Tick marks for the segment boundaries */}
-      <div className="relative w-full mt-1.5 tablet:mt-1 flex justify-between px-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker">
+      <div className="relative w-full mt-1.5 tablet:mt-1 flex justify-between px-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker cursor-default select-none">
         <p>0</p>
-        <p>1,000</p>
+        <p className="pl-11 pr-7">1,000</p>
         <p>10,000</p>
         <p>100,000</p>
       </div>
@@ -488,15 +524,15 @@ export const Checkbox = ({
   hasDropdown = false,
   dropdownContent = null,
 }: CheckboxProps) => {
-  const [canHover, setCanHover] = useState(true);
+  const [canHoverSelected, setCanHoverSelected] = useState(true);
 
   const handleChange = () => {
     onChange();
-    setTimeout(() => setCanHover(false), 0);
+    setTimeout(() => setCanHoverSelected(false), 0);
   };
 
   const handleMouseLeave = () => {
-    setCanHover(true);
+    setCanHoverSelected(true);
   };
 
   return (
@@ -507,12 +543,12 @@ export const Checkbox = ({
         onClick={handleChange}
       >
         <input
-          className={checkboxIcon(checked, canHover)}
+          className={checkboxIcon(checked, canHoverSelected)}
           type="checkbox"
           checked={checked}
           readOnly
         />
-        <label className={filterLabelSm(checked, canHover)}>
+        <label className={labelGreyBaseFilter(checked, canHoverSelected)}>
           {label}
         </label>
       </div>
@@ -538,15 +574,15 @@ interface RadioProps {
 export const Radiobutton = (
   { label, value, checked, onChange, name }: RadioProps,
 ) => {
-  const [canHover, setCanHover] = useState(true);
+  const [canHoverSelected, setCanHoverSelected] = useState(true);
 
   const handleChange = () => {
     onChange();
-    setTimeout(() => setCanHover(false), 0);
+    setTimeout(() => setCanHoverSelected(false), 0);
   };
 
   const handleMouseLeave = () => {
-    setCanHover(true);
+    setCanHoverSelected(true);
   };
 
   return (
@@ -556,14 +592,14 @@ export const Radiobutton = (
       onClick={handleChange}
     >
       <input
-        className={checkboxIcon(checked, canHover)}
+        className={checkboxIcon(checked, canHoverSelected)}
         type="radio"
         name={name}
         value={value}
         checked={checked}
         readOnly
       />
-      <label className={filterLabelSm(checked, canHover)}>
+      <label className={labelGreyBaseFilter(checked, canHoverSelected)}>
         {label}
       </label>
     </div>
