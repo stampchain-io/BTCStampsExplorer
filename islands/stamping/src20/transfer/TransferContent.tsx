@@ -9,22 +9,13 @@ import { SRC20InputField } from "$islands/stamping/src20/SRC20InputField.tsx";
 
 import { logger } from "$lib/utils/logger.ts";
 import { stripTrailingZeros } from "$lib/utils/formatUtils.ts";
+import { TransferStyles } from "./styles.ts";
 
 interface Balance {
   tick: string;
   amt: string;
   // Add other balance fields as needed
 }
-
-const bodyTools = "flex flex-col w-full items-center gap-3 mobileMd:gap-6";
-const titlePurpleLDCenter =
-  "inline-block w-full mobileMd:-mb-3 mobileLg:mb-0 text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient3 text-center";
-const inputFieldContainer =
-  "flex flex-col gap-3 mobileMd:gap-6 p-3 mobileMd:p-6 dark-gradient rounded-lg w-full";
-const inputField2col =
-  "flex flex-col mobileMd:flex-row gap-3 mobileMd:gap-6 w-full";
-const backgroundContainer =
-  "flex flex-col dark-gradient rounded-lg p-3 mobileMd:p-6";
 
 export function TransferContent(
   { trxType = "olga" }: { trxType?: "olga" | "multisig" } = { trxType: "olga" },
@@ -174,10 +165,10 @@ export function TransferContent(
   };
 
   return (
-    <div class={bodyTools}>
-      <h1 class={titlePurpleLDCenter}>TRANSFER</h1>
+    <div class={TransferStyles.bodyTools}>
+      <h1 class={TransferStyles.titlePurpleLDCenter}>TRANSFER</h1>
 
-      <div class={inputFieldContainer}>
+      <div class={TransferStyles.inputFieldContainer}>
         <SRC20InputField
           type="text"
           placeholder="Recipient address"
@@ -187,7 +178,7 @@ export function TransferContent(
           error={formState.toAddressError}
         />
 
-        <div class={inputField2col}>
+        <div class={TransferStyles.inputField2col}>
           <div
             class={`relative ${
               openDrop && searchResults.length > 0 && !isSelecting
@@ -246,7 +237,7 @@ export function TransferContent(
         </div>
       </div>
 
-      <div className={`${backgroundContainer} w-full`}>
+      <div className={`${TransferStyles.backgroundContainer} w-full`}>
         <BasicFeeCalculator
           fee={formState.fee}
           handleChangeFee={handleChangeFee}
