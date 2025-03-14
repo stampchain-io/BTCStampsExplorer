@@ -59,7 +59,7 @@ export const labelGreyBaseFilter = (
   checked: boolean,
   canHoverSelected: boolean,
 ): string => `
-  inline-block ml-3 tablet:ml-[9px] text-base tablet:text-sm font-bold 
+  inline-block ml-3 mt-0.5 tablet:mt-[1px] text-base font-bold 
   transition-colors duration-300
   cursor-pointer select-none
   ${

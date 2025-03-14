@@ -524,11 +524,8 @@ export const FilterContentStamp = ({
         variant="collapsibleTitle"
       >
         {/* Category: LISTINGS */}
-        <div className={filterCollectionSm}>
-          LISTINGS
-        </div>
         <Checkbox
-          label="ATOMIC"
+          label="ATOMIC LISTINGS"
           checked={filters.market.atomic}
           onChange={() =>
             handleFilterChange("market", {
@@ -545,18 +542,6 @@ export const FilterContentStamp = ({
               dispenser: !filters.market.dispenser,
             })}
         />
-        <div className={filterCollectionSm}>
-          SALES
-        </div>
-        <Checkbox
-          label="TRENDING"
-          checked={filters.market.trendingSales}
-          onChange={() =>
-            handleFilterChange("market", {
-              ...filters.market,
-              trendingSales: !filters.market.trendingSales,
-            })}
-        />
         <Checkbox
           label="SOLD"
           checked={filters.market.sold}
@@ -566,31 +551,67 @@ export const FilterContentStamp = ({
               sold: !filters.market.sold,
             })}
         />
+        <Checkbox
+          label="TRENDING SALES"
+          checked={filters.market.trendingSales}
+          onChange={() =>
+            handleFilterChange("market", {
+              ...filters.market,
+              trendingSales: !filters.market.trendingSales,
+            })}
+        />
 
         {/* Price Range Filter */}
         <CollapsibleSection
           title="PRICE RANGE"
           section="priceRange"
-          expanded={expandedSections.priceRange}
-          toggle={() => toggleSection("priceRange")}
-          variant="collapsibleSubTitle"
-        >
-          <RangeSlider
-            variant="price"
-            onChange={(min, max) => {
-              // Convert the numeric values to strings for the filter state
-              const minStr = min > 0 ? min.toString() : "";
-              const maxStr = max < 10 ? max.toString() : "";
-
+          expanded={filters.market.priceRange.min !== "" ||
+            filters.market.priceRange.max !== ""}
+          toggle={() => {
+            // If already has values, clear them
+            if (
+              filters.market.priceRange.min !== "" ||
+              filters.market.priceRange.max !== ""
+            ) {
               handleFilterChange("market", {
                 ...filters.market,
                 priceRange: {
-                  min: minStr,
-                  max: maxStr,
+                  min: "",
+                  max: "",
                 },
               });
-            }}
-          />
+            } else {
+              // Otherwise, expand and set default values
+              handleFilterChange("market", {
+                ...filters.market,
+                priceRange: {
+                  min: "0", // Set a default min value
+                  max: "", // Leave max empty
+                },
+              });
+            }
+          }}
+          variant="collapsibleSubTitle"
+        >
+          {(filters.market.priceRange.min !== "" ||
+            filters.market.priceRange.max !== "") && (
+            <RangeSlider
+              variant="price"
+              onChange={(min, max) => {
+                // Convert the numeric values to strings for the filter state
+                const minStr = min > 0 ? min.toString() : "";
+                const maxStr = max < 10 ? max.toString() : "";
+
+                handleFilterChange("market", {
+                  ...filters.market,
+                  priceRange: {
+                    min: minStr,
+                    max: maxStr,
+                  },
+                });
+              }}
+            />
+          )}
         </CollapsibleSection>
       </CollapsibleSection>
 
@@ -833,6 +854,7 @@ export const FilterContentStamp = ({
               filters.rarity.stampRange.min !== "" ||
               filters.rarity.stampRange.max !== ""
             ) {
+              // Clear the values
               handleFilterChange("rarity", {
                 sub: false,
                 stampRange: {
@@ -841,27 +863,21 @@ export const FilterContentStamp = ({
                 },
               });
             } else {
-              // Otherwise, just select it (user will input values)
+              // Otherwise, just select it and set default values
               handleFilterChange("rarity", {
                 sub: false,
                 stampRange: {
-                  min: filters.rarity.stampRange.min,
-                  max: filters.rarity.stampRange.max,
+                  min: "0", // Set a default min value
+                  max: "", // Leave max empty
                 },
-              });
-              // Expand the custom range section
-              setExpandedSections({
-                ...expandedSections,
-                customRange: true,
               });
             }
           }}
         />
 
-        {/* Custom Range Input Fields (only shown when custom range is selected) */}
+        {/* Custom Range Slider (only shown when custom range has values) */}
         {(filters.rarity.stampRange.min !== "" ||
-          filters.rarity.stampRange.max !== "" ||
-          (filters.rarity.sub === false && expandedSections.customRange)) && (
+          filters.rarity.stampRange.max !== "") && (
           <CollapsibleSection
             title=""
             section="customRange"
@@ -869,40 +885,24 @@ export const FilterContentStamp = ({
             toggle={() => {}}
             variant="collapsibleLabel"
           >
-            <div className="flex gap-6">
-              <RangeInput
-                label=""
-                placeholder="MIN"
-                type="stamp"
-                value={filters.rarity.stampRange.min || ""}
-                onChange={(value) => {
-                  handleFilterChange("rarity", {
-                    ...filters.rarity,
-                    sub: false,
-                    stampRange: {
-                      min: value,
-                      max: filters.rarity.stampRange.max || "",
-                    },
-                  });
-                }}
-              />
-              <RangeInput
-                label=""
-                placeholder="MAX"
-                type="stamp"
-                value={filters.rarity.stampRange.max || ""}
-                onChange={(value) => {
-                  handleFilterChange("rarity", {
-                    ...filters.rarity,
-                    sub: false,
-                    stampRange: {
-                      min: filters.rarity.stampRange.min || "",
-                      max: value,
-                    },
-                  });
-                }}
-              />
-            </div>
+            <RangeSlider
+              variant="rarity"
+              onChange={(min, max) => {
+                // Convert values to strings for URL compatibility
+                // Handle Infinity as empty string for max (NO LIMIT)
+                const minStr = min.toString();
+                const maxStr = max === Infinity ? "" : max.toString();
+
+                handleFilterChange("rarity", {
+                  ...filters.rarity,
+                  sub: false, // Ensure sub is set to false when using custom range
+                  stampRange: {
+                    min: minStr,
+                    max: maxStr,
+                  },
+                });
+              }}
+            />
           </CollapsibleSection>
         )}
       </CollapsibleSection>

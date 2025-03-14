@@ -55,11 +55,11 @@ export const CloseIcon = () => (
     <defs>
       <linearGradient
         id="closeFilterGradient"
-        gradientTransform="rotate(45)"
+        gradientTransform="rotate(-45)"
       >
-        <stop offset="0%" stop-color="#666666" />
+        <stop offset="0%" stop-color="#CCCCCC" />
         <stop offset="50%" stop-color="#999999" />
-        <stop offset="100%" stop-color="#CCCCCC" />
+        <stop offset="100%" stop-color="#666666" />
       </linearGradient>
     </defs>
     <path d="M26.0612 23.9387C26.343 24.2205 26.5013 24.6027 26.5013 25.0012C26.5013 25.3997 26.343 25.7819 26.0612 26.0637C25.7794 26.3455 25.3972 26.5038 24.9987 26.5038C24.6002 26.5038 24.218 26.3455 23.9362 26.0637L15.9999 18.125L8.0612 26.0612C7.7794 26.343 7.39721 26.5013 6.9987 26.5013C6.60018 26.5013 6.21799 26.343 5.9362 26.0612C5.6544 25.7794 5.49609 25.3972 5.49609 24.9987C5.49609 24.6002 5.6544 24.218 5.9362 23.9362L13.8749 16L5.9387 8.06122C5.6569 7.77943 5.49859 7.39724 5.49859 6.99872C5.49859 6.60021 5.6569 6.21802 5.9387 5.93622C6.22049 5.65443 6.60268 5.49612 7.0012 5.49612C7.39971 5.49612 7.7819 5.65443 8.0637 5.93622L15.9999 13.875L23.9387 5.93497C24.2205 5.65318 24.6027 5.49487 25.0012 5.49487C25.3997 5.49487 25.7819 5.65318 26.0637 5.93497C26.3455 6.21677 26.5038 6.59896 26.5038 6.99747C26.5038 7.39599 26.3455 7.77818 26.0637 8.05998L18.1249 16L26.0612 23.9387Z" />
@@ -134,7 +134,7 @@ export const CollapsibleSection = ({
         >
           <span
             className={`
-              text-xl tablet:text-lg font-light transition-colors duration-300
+              text-xl font-light transition-colors duration-300
               ${
               expanded
                 ? `text-stamp-grey ${
@@ -174,7 +174,7 @@ export const CollapsibleSection = ({
             expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="-mt-1.5 tablet:-mt-1 pb-3 pl-0.5">
+          <div className="-mt-0.5 tablet:-mt-0 pb-3 pl-0.5">
             {children}
           </div>
         </div>
@@ -189,7 +189,7 @@ export const CollapsibleSection = ({
         <button
           onClick={handleClick}
           onMouseLeave={handleMouseLeave}
-          className="flex items-center w-full mt-3 tablet:mt-2 group transition-colors duration-300"
+          className="flex items-center w-full mt-2 tablet:mt-1.5 group transition-colors duration-300"
         >
           <div
             className={`transform transition-all duration-300 ${
@@ -207,7 +207,11 @@ export const CollapsibleSection = ({
             {ChevronIcon("md")}
           </div>
 
-          <span className={labelGreyBaseFilter(expanded, canHoverSelected)}>
+          <span
+            className={`${
+              labelGreyBaseFilter(expanded, canHoverSelected)
+            } font-light`}
+          >
             {title}
           </span>
         </button>
@@ -217,7 +221,7 @@ export const CollapsibleSection = ({
             expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="mt-0 tablet:mt-0 pb-3 pl-0.5">
+          <div className="pt-3.5 pl-0.5">
             {children}
           </div>
         </div>
@@ -233,7 +237,7 @@ export const CollapsibleSection = ({
           expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="ml-0.5 mt-3 mb-2">
+        <div className="pt-2 pl-0.5">
           {children}
         </div>
       </div>
@@ -305,12 +309,12 @@ export const RangeSlider = ({
   variant,
   onChange,
 }: {
-  variant: "holders" | "price";
+  variant: "holders" | "price" | "rarity";
   onChange?: (min: number, max: number) => void;
 }) => {
   // Define range configurations for different variants
   const rangeConfigs = {
-    // Holders configuration (existing)
+    // Holders configuration
     holders: {
       min: 0,
       max: 100000,
@@ -323,22 +327,50 @@ export const RangeSlider = ({
       tickMarkPositions: ["left-0", "left-[33%]", "left-[66%]", "right-0"],
       formatValue: (value: number) => formatNumber(value),
     },
-    // Price configuration (new)
+    // Price configuration
     price: {
       min: 0,
-      max: 10.0,
+      max: Infinity,
       segments: [
         { end: 0.0001, proportion: 1 / 3 }, // First third covers 0-0.0001
         { end: 0.01, proportion: 1 / 3 }, // Second third covers 0.0001-0.01
-        { end: 10.0, proportion: 1 / 3 }, // Last third covers 0.01-10.0
+        { end: 1.0, proportion: 1 / 3 }, // Last third covers 0.01-1.0
       ],
-      tickMarks: ["0", "0.0001", "0.01", "10.0"],
-      tickMarkPositions: ["left-0", "left-[33%]", "left-[66%]", "right-0"],
-      formatValue: (value: number) =>
-        value.toFixed(
+      tickMarks: ["0", "0.0001", "0.01", "∞"],
+      tickMarkPositions: [
+        "left-0",
+        "left-[33%]",
+        "left-[66%]",
+        "right-0",
+      ],
+      formatValue: (value: number) => {
+        if (value === Infinity) return "NO LIMIT";
+        return value.toFixed(
           // Use appropriate decimal places based on value range
           value < 0.0001 ? 6 : value < 0.01 ? 5 : 3,
-        ),
+        );
+      },
+    },
+    // Rarity configuration
+    rarity: {
+      min: 0,
+      max: Infinity,
+      segments: [
+        { end: 100, proportion: 1 / 3 }, // First third covers 0-100
+        { end: 10000, proportion: 1 / 3 }, // Second third covers 100-10000
+        { end: 100000, proportion: 1 / 3 }, // Last third covers 10000-100000
+      ],
+      tickMarks: ["0", "100", "10,000", "∞"],
+      tickMarkPositions: [
+        "left-0",
+        "left-[33%]",
+        "left-[66%]",
+        "right-0",
+      ],
+      formatValue: (value: number) => {
+        if (value === Infinity) return "NO LIMIT";
+        return formatNumber(value);
+      },
     },
   };
 
@@ -355,6 +387,9 @@ export const RangeSlider = ({
 
   // Convert actual value to slider position (0-100)
   const valueToPosition = (value: number): number => {
+    // Special case for Infinity
+    if (value === Infinity) return 100;
+
     // Find which segment the value falls into
     if (value <= config.segments[0].end) {
       // First segment
@@ -368,21 +403,30 @@ export const RangeSlider = ({
       return segmentPosition +
         (segmentValue / segmentRange) * (config.segments[1].proportion * 100);
     } else {
-      // Third segment
+      // Third segment (up to the end or position 99)
       const segmentPosition =
         (config.segments[0].proportion + config.segments[1].proportion) * 100;
-      const segmentValue = value - config.segments[1].end;
+      const segmentValue = Math.min(value, config.segments[2].end) -
+        config.segments[1].end;
       const segmentRange = config.segments[2].end - config.segments[1].end;
-      return segmentPosition +
+
+      // If value is exactly at the end of the third segment, cap at 99 to leave room for infinity
+      const position = segmentPosition +
         (segmentValue / segmentRange) * (config.segments[2].proportion * 100);
+
+      return Math.min(position, 99);
     }
   };
 
   // Convert slider position (0-100) to actual value
   const positionToValue = (position: number): number => {
+    // Special case for the last step (position 100 or very close to it)
+    if (position >= 99.5) return Infinity;
+
     // Calculate which segment this position falls into
     const segment0End = config.segments[0].proportion * 100;
     const segment1End = segment0End + config.segments[1].proportion * 100;
+    const segment2End = 99; // Cap at 99 to leave room for infinity at 100
 
     if (position <= segment0End) {
       // First segment
@@ -395,14 +439,17 @@ export const RangeSlider = ({
       const segmentRange = config.segments[1].proportion * 100;
       const value = config.segments[0].end + (segmentPosition / segmentRange) *
           (config.segments[1].end - config.segments[0].end);
-      return Number(value.toFixed(5));
-    } else {
+      return Number(value.toFixed(0)); // Integer values for rarity and holders
+    } else if (position <= segment2End) {
       // Third segment
       const segmentPosition = position - segment1End;
-      const segmentRange = config.segments[2].proportion * 100;
+      const segmentRange = segment2End - segment1End;
       const value = config.segments[1].end + (segmentPosition / segmentRange) *
           (config.segments[2].end - config.segments[1].end);
-      return Number(value.toFixed(3));
+      return Number(value.toFixed(0)); // Integer values for rarity and holders
+    } else {
+      // Beyond segment2End (should be handled by the special case above)
+      return Infinity;
     }
   };
 
@@ -411,7 +458,7 @@ export const RangeSlider = ({
     if (variant === "price") {
       return 0.000001; // Smallest step for price
     }
-    return 1; // Default step for holders
+    return 1; // Default step for holders and rarity
   };
 
   const handleMinInput = (e: Event) => {
@@ -440,7 +487,7 @@ export const RangeSlider = ({
   const trackGradientFill = (hoveredHandle: "min" | "max" | null) => {
     // Calculate percentages based on our non-linear scale
     const minPercent = valueToPosition(minValue);
-    const maxPercent = valueToPosition(maxValue);
+    const maxPercent = maxValue === Infinity ? 100 : valueToPosition(maxValue);
 
     // Calculate dynamic offsets based on handle positions
     const minHandleOffset = (minPercent / 100) * 3; // 0% to 3% based on position
@@ -473,23 +520,23 @@ export const RangeSlider = ({
 
   return (
     <div className="w-full">
-      <div className="-mt-2 mb-3 flex w-full justify-center">
+      <div className="flex w-full justify-center pb-1.5 tablet:pb-1">
         <div className="flex items-center text-sm tablet:text-xs font-regular cursor-default select-none">
           <div
             className={`min-w-12 text-right ${
               hoveredHandle === "min"
                 ? "text-stamp-grey-light"
-                : "text-stamp-grey-darker"
+                : "text-stamp-grey"
             } transition-colors duration-300`}
           >
             {config.formatValue(minValue)}
           </div>
-          <span className="mx-2 text-stamp-grey-darker">-</span>
+          <span className="mx-2 text-stamp-grey">-</span>
           <div
             className={`min-w-12 text-left ${
               hoveredHandle === "max"
                 ? "text-stamp-grey-light"
-                : "text-stamp-grey-darker"
+                : "text-stamp-grey"
             } transition-colors duration-300`}
           >
             {config.formatValue(maxValue)}
@@ -537,8 +584,27 @@ export const RangeSlider = ({
       </div>
 
       {/* Tick marks for the segment boundaries */}
-      <div className="relative w-full mt-1.5 tablet:mt-1 flex justify-between px-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker cursor-default select-none">
-        {config.tickMarks.map((mark, index) => <p key={index}>{mark}</p>)}
+      <div className="relative w-full h-6 pt-1.5 tablet:pt-1 text-xs tablet:text-[10px] font-regular text-stamp-grey-darker cursor-default select-none">
+        {config.tickMarks.map((mark, index) => {
+          const position = config.tickMarkPositions[index];
+          const isFirst = index === 0;
+          const isLast = index === config.tickMarks.length - 1;
+
+          return (
+            <p
+              key={index}
+              className={`absolute ${position} ${
+                isFirst
+                  ? "transform-none"
+                  : isLast
+                  ? "transform-none"
+                  : "transform -translate-x-1/2"
+              }`}
+            >
+              {mark}
+            </p>
+          );
+        })}
       </div>
     </div>
   );
@@ -555,8 +621,8 @@ interface RangeInputProps {
 export const RangeInput = (
   { label, placeholder, value, onChange, type }: RangeInputProps,
 ) => (
-  <div className="flex flex-col space-y-1 pt-[9px]">
-    <label className="text-base tablet:text-xs text-stamp-grey-light">
+  <div className="flex flex-col space-y-1">
+    <label className="text-base tablet:text-xs font-medium text-stamp-grey-light">
       {label}
     </label>
     <input

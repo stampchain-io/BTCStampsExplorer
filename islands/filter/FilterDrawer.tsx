@@ -84,9 +84,12 @@ const FilterDrawer = (
     setCurrentFilters(getInitialFilters());
   }, [searchparams.toString(), type]);
 
-  // Close the drawer, update the URL with the new filters and reload the page
+  // Add a new state to control when transitions should be applied
+  const [isResizing, setIsResizing] = useState(false);
+
+  // Modify the open/close handlers
   const handleCloseDrawerUpdate = () => {
-    // Clean filters before converting to query params
+    setIsResizing(true);
     const queryString = getFiltersToQueryParams(
       globalThis.location.search,
       currentFilters,
@@ -97,6 +100,7 @@ const FilterDrawer = (
 
   // Close the drawer with no updates
   const handleCloseDrawer = () => {
+    setIsResizing(true);
     setOpen(false);
   };
 
@@ -192,22 +196,46 @@ const FilterDrawer = (
   // Get the appropriate drawer ID based on type
   const drawerId = `drawer-form-${type}`;
 
+  // Handle browser resize and toggle open state
+  useEffect(() => {
+    const drawer = drawerRef.current;
+
+    const handleResized = () => setIsResizing(false);
+
+    if (drawer) {
+      drawer.addEventListener("transitionend", handleResized);
+      return () => drawer.removeEventListener("transitionend", handleResized);
+    }
+  }, []);
+
+  // Set resizing when opening
+  useEffect(() => {
+    if (open) setIsResizing(true);
+  }, [open]);
+
   return (
     <div
       id={drawerId}
       ref={drawerRef}
-      class={`fixed top-0 right-0 z-40 
-      w-full min-[420px]:w-[340px] tablet:w-[320px] h-screen
-      bg-gradient-to-b from-[#000000]/80 to-[#000000] 
-      backdrop-blur-md transition-transform
-      shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
-       ${open ? "translate-x-0" : "translate-x-full"}`}
+      class={`fixed top-0 z-40 h-screen
+        bg-gradient-to-b from-[#000000]/80 to-[#000000] 
+        ${isResizing ? "transition-transform duration-300" : ""}
+        
+        left-0 right-auto w-full min-[420px]:w-[340px] shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
+        tablet:right-0 tablet:left-auto tablet:w-[320px] tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]
+        
+        ${
+        open ? "translate-x-0" : "-translate-x-full tablet:translate-x-full"
+      }`}
       aria-labelledby="drawer-form-label"
     >
       {/* Scrollable content area */}
       <div className="h-[calc(100vh-92px)] tablet:h-[calc(100vh-88px)] p-6 overflow-y-auto scrollbar-black">
         <div className="flex flex-col mb-8 tablet:mb-6">
           <div className="flex justify-between ">
+            <p className="tablet:hidden text-3xl font-black gray-gradient1 cursor-default select-none">
+              FILTERS
+            </p>
             <button
               onClick={handleCloseDrawer}
               onMouseEnter={handleCloseMouseEnter}
@@ -224,7 +252,7 @@ const FilterDrawer = (
               </div>
               <CloseIcon />
             </button>
-            <p className="text-3xl tablet:text-2xl font-black gray-gradient1 cursor-default select-none">
+            <p className="hidden tablet:block text-3xl font-black gray-gradient1 cursor-default select-none">
               FILTERS
             </p>
           </div>
