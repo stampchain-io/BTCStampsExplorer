@@ -514,8 +514,137 @@ export const FilterContentStamp = ({
   const filterCollectionSm =
     "flex justify-end text-xs mobileLg:text-sm font-light text-stamp-grey-darker mt-1 mobileLg:mt-0 -mb-5 cursor-default";
 
+  const [isDraggingPrice, setIsDraggingPrice] = useState(false);
+  const [isDraggingRarity, setIsDraggingRarity] = useState(false);
+  const [pendingPriceMin, setPendingPriceMin] = useState<string>("");
+  const [pendingPriceMax, setPendingPriceMax] = useState<string>("");
+  const [pendingRarityMin, setPendingRarityMin] = useState<string>("");
+  const [pendingRarityMax, setPendingRarityMax] = useState<string>("");
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseUp = (e: MouseEvent) => {
+      // Check if we're currently dragging either slider
+      if (isDraggingPrice) {
+        // Check if the mouse up event occurred inside the drawer
+        let isInsideDrawer = false;
+
+        if (drawerRef.current) {
+          const rect = drawerRef.current.getBoundingClientRect();
+          isInsideDrawer = e.clientX >= rect.left &&
+            e.clientX <= rect.right &&
+            e.clientY >= rect.top &&
+            e.clientY <= rect.bottom;
+        }
+
+        // If mouse was released inside the drawer, update the state
+        if (
+          isInsideDrawer && pendingPriceMin !== "" && pendingPriceMax !== ""
+        ) {
+          handleFilterChange("market", {
+            ...filters.market,
+            priceRange: {
+              min: pendingPriceMin,
+              max: pendingPriceMax,
+            },
+          });
+        }
+
+        // Reset dragging state and pending values
+        setIsDraggingPrice(false);
+        setPendingPriceMin("");
+        setPendingPriceMax("");
+      }
+
+      if (isDraggingRarity) {
+        // Check if the mouse up event occurred inside the drawer
+        let isInsideDrawer = false;
+
+        if (drawerRef.current) {
+          const rect = drawerRef.current.getBoundingClientRect();
+          isInsideDrawer = e.clientX >= rect.left &&
+            e.clientX <= rect.right &&
+            e.clientY >= rect.top &&
+            e.clientY <= rect.bottom;
+        }
+
+        // If mouse was released inside the drawer, update the state
+        if (
+          isInsideDrawer && pendingRarityMin !== "" && pendingRarityMax !== ""
+        ) {
+          handleFilterChange("rarity", {
+            ...filters.rarity,
+            sub: false,
+            stampRange: {
+              min: pendingRarityMin,
+              max: pendingRarityMax,
+            },
+          });
+        }
+
+        // Reset dragging state and pending values
+        setIsDraggingRarity(false);
+        setPendingRarityMin("");
+        setPendingRarityMax("");
+      }
+    };
+
+    // Add event listener for mouse up
+    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mouseleave", handleMouseUp);
+
+    // Clean up
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mouseleave", handleMouseUp);
+    };
+  }, [
+    isDraggingPrice,
+    isDraggingRarity,
+    pendingPriceMin,
+    pendingPriceMax,
+    pendingRarityMin,
+    pendingRarityMax,
+    filters,
+    handleFilterChange,
+  ]);
+
+  const handlePriceRangeChange = (min: number, max: number) => {
+    // Only update if values are defined
+    if (min !== undefined && max !== undefined) {
+      // Convert values to strings for URL compatibility
+      // Handle Infinity as empty string for max (NO LIMIT)
+      const minStr = min > 0 ? min.toString() : "";
+      const maxStr = max === Infinity ? "" : max.toString();
+
+      // Store the pending values
+      setPendingPriceMin(minStr);
+      setPendingPriceMax(maxStr);
+
+      // Set dragging state
+      setIsDraggingPrice(true);
+    }
+  };
+
+  const handleRarityRangeChange = (min: number, max: number) => {
+    // Only update if values are defined
+    if (min !== undefined && max !== undefined) {
+      // Convert values to strings for URL compatibility
+      // Handle Infinity as empty string for max (NO LIMIT)
+      const minStr = min > 0 ? min.toString() : "";
+      const maxStr = max === Infinity ? "" : max.toString();
+
+      // Store the pending values
+      setPendingRarityMin(minStr);
+      setPendingRarityMax(maxStr);
+
+      // Set dragging state
+      setIsDraggingRarity(true);
+    }
+  };
+
   return (
-    <div className="space-y-1 mobileLg:space-y-1.5">
+    <div className="space-y-1 mobileLg:space-y-1.5" ref={drawerRef}>
       <CollapsibleSection
         title="MARKET"
         section="market"
@@ -597,19 +726,7 @@ export const FilterContentStamp = ({
             filters.market.priceRange.max !== "") && (
             <RangeSlider
               variant="price"
-              onChange={(min, max) => {
-                // Convert the numeric values to strings for the filter state
-                const minStr = min > 0 ? min.toString() : "";
-                const maxStr = max < 10 ? max.toString() : "";
-
-                handleFilterChange("market", {
-                  ...filters.market,
-                  priceRange: {
-                    min: minStr,
-                    max: maxStr,
-                  },
-                });
-              }}
+              onChange={handlePriceRangeChange}
             />
           )}
         </CollapsibleSection>
@@ -821,7 +938,6 @@ export const FilterContentStamp = ({
             checked={filters.rarity?.sub === value.toString()}
             onChange={() => {
               if (filters.rarity?.sub === value.toString()) {
-                // Unselect the radio button
                 handleFilterChange("rarity", {
                   sub: false,
                   stampRange: {
@@ -887,21 +1003,7 @@ export const FilterContentStamp = ({
           >
             <RangeSlider
               variant="rarity"
-              onChange={(min, max) => {
-                // Convert values to strings for URL compatibility
-                // Handle Infinity as empty string for max (NO LIMIT)
-                const minStr = min.toString();
-                const maxStr = max === Infinity ? "" : max.toString();
-
-                handleFilterChange("rarity", {
-                  ...filters.rarity,
-                  sub: false, // Ensure sub is set to false when using custom range
-                  stampRange: {
-                    min: minStr,
-                    max: maxStr,
-                  },
-                });
-              }}
+              onChange={handleRarityRangeChange}
             />
           </CollapsibleSection>
         )}

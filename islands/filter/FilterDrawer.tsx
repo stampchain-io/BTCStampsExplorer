@@ -84,25 +84,36 @@ const FilterDrawer = (
     setCurrentFilters(getInitialFilters());
   }, [searchparams.toString(), type]);
 
-  // Add a new state to control when transitions should be applied
-  const [isResizing, setIsResizing] = useState(false);
+  // Handle browser resize
+  useEffect(() => {
+    let resizeTimer: number | null = null;
 
-  // Modify the open/close handlers
-  const handleCloseDrawerUpdate = () => {
-    setIsResizing(true);
-    const queryString = getFiltersToQueryParams(
-      globalThis.location.search,
-      currentFilters,
-    );
-    globalThis.location.href = globalThis.location.pathname + "?" + queryString;
-    setOpen(false);
-  };
+    const handleResize = () => {
+      // Disable transitions during resize
+      if (drawerRef.current) {
+        drawerRef.current.style.transition = "none";
+      }
 
-  // Close the drawer with no updates
-  const handleCloseDrawer = () => {
-    setIsResizing(true);
-    setOpen(false);
-  };
+      // Re-enable transitions after resize is complete
+      if (resizeTimer) {
+        clearTimeout(resizeTimer);
+      }
+
+      resizeTimer = setTimeout(() => {
+        if (drawerRef.current) {
+          drawerRef.current.style.transition = "";
+        }
+      }, 100) as unknown as number;
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (resizeTimer) {
+        clearTimeout(resizeTimer);
+      }
+    };
+  }, []);
 
   // Handle open and close events
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -196,21 +207,69 @@ const FilterDrawer = (
   // Get the appropriate drawer ID based on type
   const drawerId = `drawer-form-${type}`;
 
-  // Handle browser resize and toggle open state
+  // Modify the open/close handlers
+  const handleCloseDrawerUpdate = () => {
+    const queryString = getFiltersToQueryParams(
+      globalThis.location.search,
+      currentFilters,
+    );
+    globalThis.location.href = globalThis.location.pathname + "?" + queryString;
+    setOpen(false);
+  };
+
+  // Close the drawer with no updates
+  const handleCloseDrawer = () => {
+    setOpen(false);
+  };
+
+  // Handle body scroll lock when drawer is open
   useEffect(() => {
-    const drawer = drawerRef.current;
+    // Function to lock scrolling
+    const lockScroll = () => {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
+    };
 
-    const handleResized = () => setIsResizing(false);
+    // Function to unlock scrolling
+    const unlockScroll = () => {
+      // Get the scroll position we saved
+      const scrollY = document.body.style.top;
 
-    if (drawer) {
-      drawer.addEventListener("transitionend", handleResized);
-      return () => drawer.removeEventListener("transitionend", handleResized);
+      // Restore body styles
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+
+      // Restore scroll position
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || "0") * -1);
+      }
+    };
+
+    if (open) {
+      // When opening, lock scrolling immediately
+      lockScroll();
+    } else {
+      // When closing, use a timeout to match the drawer animation
+      const timer = setTimeout(() => {
+        unlockScroll();
+      }, 400); // Match your drawer transition duration
+
+      // Clean up the timer if the component unmounts or open changes
+      return () => clearTimeout(timer);
     }
-  }, []);
 
-  // Set resizing when opening
-  useEffect(() => {
-    if (open) setIsResizing(true);
+    // Clean up when component unmounts or open changes to true
+    return () => {
+      if (!open) {
+        unlockScroll();
+      }
+    };
   }, [open]);
 
   return (
@@ -219,7 +278,8 @@ const FilterDrawer = (
       ref={drawerRef}
       class={`fixed top-0 z-40 h-screen
         bg-gradient-to-b from-[#000000]/80 to-[#000000] 
-        ${isResizing ? "transition-transform duration-300" : ""}
+        transition-transform duration-500 ease-in-out
+        will-change-transform
         
         left-0 right-auto w-full min-[420px]:w-[340px] shadow-[12px_0_12px_-6px_rgba(0,0,0,0.5)]
         tablet:right-0 tablet:left-auto tablet:w-[320px] tablet:shadow-[-12px_0_12px_-6px_rgba(0,0,0,0.5)]

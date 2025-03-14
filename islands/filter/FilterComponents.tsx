@@ -1,4 +1,4 @@
-import { useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { ComponentChildren } from "preact";
 import {
   button,
@@ -130,7 +130,7 @@ export const CollapsibleSection = ({
         <button
           onClick={handleClick}
           onMouseLeave={handleMouseLeave}
-          className="flex items-center w-full justify-between py-3 tablet:py-2 group transition-colors duration-300"
+          className="flex items-center w-full justify-between py-3 group transition-colors duration-300"
         >
           <span
             className={`
@@ -385,6 +385,58 @@ export const RangeSlider = ({
   );
   const sliderRef = useRef<HTMLDivElement>(null);
 
+  // Add this state to track which handle was last changed
+  const [lastChangedHandle, setLastChangedHandle] = useState<
+    "min" | "max" | null
+  >(null);
+
+  // Add these states while preserving existing ones
+  const [isDragging, setIsDragging] = useState(false);
+  const [pendingMin, setPendingMin] = useState<number>(config.min);
+  const [pendingMax, setPendingMax] = useState<number>(maxValue);
+
+  // Add event listeners for mouse up
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        // Preserve decimal precision when triggering onChange
+        if (variant === "price") {
+          // Use the same precision rules we established before
+          const finalMin = pendingMin < 0.0001
+            ? Number(pendingMin.toFixed(6))
+            : pendingMin < 0.01
+            ? Number(pendingMin.toFixed(5))
+            : Number(pendingMin.toFixed(3));
+
+          const finalMax = pendingMax === Infinity
+            ? Infinity
+            : pendingMax < 0.0001
+            ? Number(pendingMax.toFixed(6))
+            : pendingMax < 0.01
+            ? Number(pendingMax.toFixed(5))
+            : Number(pendingMax.toFixed(3));
+
+          onChange?.(finalMin, finalMax);
+        } else {
+          // For non-price variants (rarity, holders), use integer values
+          onChange?.(
+            Math.round(pendingMin),
+            pendingMax === Infinity ? Infinity : Math.round(pendingMax),
+          );
+        }
+      }
+    };
+
+    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("touchend", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchend", handleMouseUp);
+    };
+  }, [isDragging, pendingMin, pendingMax, onChange, variant]);
+
   // Convert actual value to slider position (0-100)
   const valueToPosition = (value: number): number => {
     // Special case for Infinity
@@ -418,7 +470,7 @@ export const RangeSlider = ({
     }
   };
 
-  // Convert slider position (0-100) to actual value
+  // Modify the positionToValue function to handle price variant better
   const positionToValue = (position: number): number => {
     // Special case for the last step (position 100 or very close to it)
     if (position >= 99.5) return Infinity;
@@ -430,23 +482,30 @@ export const RangeSlider = ({
 
     if (position <= segment0End) {
       // First segment
-      return Number(
-        ((position / segment0End) * config.segments[0].end).toFixed(6),
-      );
+      const value = (position / segment0End) * config.segments[0].end;
+      return variant === "price"
+        ? Number(value.toFixed(6))
+        : Number(value.toFixed(0));
     } else if (position <= segment1End) {
       // Second segment
       const segmentPosition = position - segment0End;
       const segmentRange = config.segments[1].proportion * 100;
       const value = config.segments[0].end + (segmentPosition / segmentRange) *
           (config.segments[1].end - config.segments[0].end);
-      return Number(value.toFixed(0)); // Integer values for rarity and holders
+
+      return variant === "price"
+        ? Number(value.toFixed(6))
+        : Number(value.toFixed(0));
     } else if (position <= segment2End) {
       // Third segment
       const segmentPosition = position - segment1End;
       const segmentRange = segment2End - segment1End;
       const value = config.segments[1].end + (segmentPosition / segmentRange) *
           (config.segments[2].end - config.segments[1].end);
-      return Number(value.toFixed(0)); // Integer values for rarity and holders
+
+      return variant === "price"
+        ? Number(value.toFixed(4))
+        : Number(value.toFixed(0));
     } else {
       // Beyond segment2End (should be handled by the special case above)
       return Infinity;
@@ -461,26 +520,44 @@ export const RangeSlider = ({
     return 1; // Default step for holders and rarity
   };
 
+  // Modify the handle functions while preserving decimal precision
   const handleMinInput = (e: Event) => {
+    setIsDragging(true);
     const sliderValue = parseInt((e.target as HTMLInputElement).value);
     const newMin = positionToValue(sliderValue);
 
     // Ensure new min value doesn't exceed max value minus minimum step
     const minStep = getMinStep();
-    const clampedMin = Math.min(newMin, maxValue - minStep * 10);
+    // Special handling for Infinity case
+    const clampedMin = maxValue === Infinity
+      ? newMin
+      : Math.min(newMin, maxValue - minStep * 10);
+
     setMinValue(clampedMin);
-    onChange?.(clampedMin, maxValue);
+    setPendingMin(clampedMin);
+    setLastChangedHandle("min");
   };
 
   const handleMaxInput = (e: Event) => {
+    setIsDragging(true);
     const sliderValue = parseInt((e.target as HTMLInputElement).value);
     const newMax = positionToValue(sliderValue);
+
+    // Special handling for Infinity and near-Infinity cases
+    if (sliderValue >= 99.5) {
+      setMaxValue(Infinity);
+      setPendingMax(Infinity);
+      setLastChangedHandle("max");
+      return;
+    }
 
     // Ensure new max value doesn't go below min value plus minimum step
     const minStep = getMinStep();
     const clampedMax = Math.max(newMax, minValue + minStep * 10);
+
     setMaxValue(clampedMax);
-    onChange?.(minValue, clampedMax);
+    setPendingMax(clampedMax);
+    setLastChangedHandle("max");
   };
 
   // Define the gradient colors
@@ -565,7 +642,9 @@ export const RangeSlider = ({
           onInput={handleMinInput}
           onMouseEnter={() => setHoveredHandle("min")}
           onMouseLeave={() => setHoveredHandle(null)}
-          className={handleIcon}
+          className={`${handleIcon} ${
+            lastChangedHandle === "min" ? "z-20" : "z-10"
+          }`}
         />
 
         {/* Max handle input - using 0-100 range for the slider */}
@@ -579,7 +658,9 @@ export const RangeSlider = ({
           onInput={handleMaxInput}
           onMouseEnter={() => setHoveredHandle("max")}
           onMouseLeave={() => setHoveredHandle(null)}
-          className={handleIcon}
+          className={`${handleIcon} ${
+            lastChangedHandle === "max" ? "z-20" : "z-10"
+          }`}
         />
       </div>
 
