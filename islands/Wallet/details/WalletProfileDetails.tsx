@@ -76,9 +76,6 @@ function WalletOverview({ walletData }: { walletData: WalletOverviewInfo }) {
     }
   };
 
-  console.log("WalletOverview - Full Wallet Data:", walletData);
-  console.log("WalletOverview - SRC101 Data:", walletData.src101);
-
   const bitNames = Array.isArray(walletData.src101?.names)
     ? walletData.src101.names.filter((name): name is string =>
       typeof name === "string"
