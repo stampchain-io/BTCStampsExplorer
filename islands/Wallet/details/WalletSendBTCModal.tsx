@@ -3,6 +3,7 @@ import { walletContext } from "$client/wallet/wallet.ts";
 import { BasicFeeCalculator } from "$components/shared/fee/BasicFeeCalculator.tsx";
 import { useTransactionForm } from "$client/hooks/useTransactionForm.ts";
 import { ModalLayout } from "$components/shared/modal/ModalLayout.tsx";
+import { BTCModalStyles } from "./styles.ts";
 
 interface WalletSendModalProps {
   fee: number;
@@ -264,11 +265,6 @@ function WalletSendModal(
     }));
   };
 
-  const inputField =
-    "h-[42px] mobileLg:h-12 px-3 rounded-md bg-stamp-grey text-stamp-grey-darkest placeholder:text-stamp-grey-darkest placeholder:uppercase placeholder:font-light text-sm mobileLg:text-base font-medium w-full outline-none focus:bg-stamp-grey-light";
-  const tooltipIcon =
-    "absolute left-1/2 -translate-x-1/2 bg-[#000000BF] px-2 py-1 rounded-sm bottom-full text-[10px] mobileLg:text-xs text-stamp-grey-light font-normal whitespace-nowrap transition-opacity duration-300";
-
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(globalThis.innerWidth);
@@ -348,7 +344,7 @@ function WalletSendModal(
           >
             MAX
             <div
-              className={`${tooltipIcon} ${
+              className={`${BTCModalStyles.tooltipIcon} ${
                 isMaxTooltipVisible ? "opacity-100" : "opacity-0"
               }`}
             >
@@ -365,7 +361,7 @@ function WalletSendModal(
               recipientAddress: (e.target as HTMLInputElement).value,
             })}
           placeholder="Recipient address"
-          class={inputField}
+          class={BTCModalStyles.inputField}
         />
       </div>
 
