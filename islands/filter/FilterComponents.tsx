@@ -323,15 +323,18 @@ export const RangeSlider = ({
     // Holders configuration
     holders: {
       min: 0,
-      max: 100000,
+      max: Infinity,
       segments: [
         { end: 1000, proportion: 1 / 3 }, // First third covers 0-1000
         { end: 10000, proportion: 1 / 3 }, // Second third covers 1000-10000
         { end: 100000, proportion: 1 / 3 }, // Last third covers 10000-100000
       ],
-      tickMarks: ["0", "1,000", "10,000", "100,000"],
+      tickMarks: ["0", "1,000", "10,000", "∞"],
       tickMarkPositions: ["left-0", "left-[33%]", "left-[66%]", "right-0"],
-      formatValue: (value: number) => formatNumber(value),
+      formatValue: (value: number) => {
+        if (value === Infinity) return "NO LIMIT";
+        return formatNumber(value);
+      },
     },
     // Price configuration
     price: {
@@ -428,7 +431,7 @@ export const RangeSlider = ({
           // For non-price variants (rarity, holders), use integer values
           onChange?.(
             Math.round(pendingMin),
-            pendingMax === Infinity ? Infinity : Math.round(pendingMax),
+            Math.round(pendingMax === Infinity ? Infinity : pendingMax),
           );
         }
       }
@@ -686,7 +689,11 @@ export const RangeSlider = ({
                   : isLast
                   ? "transform-none"
                   : "transform -translate-x-1/2"
-              }`}
+              } ${
+                hoveredHandle !== null
+                  ? "text-stamp-grey"
+                  : "text-stamp-grey-darker"
+              } transition-colors duration-100`}
             >
               {mark}
             </p>

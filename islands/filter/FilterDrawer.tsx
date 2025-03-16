@@ -85,9 +85,14 @@ const FilterDrawer = (
     getInitialFilters(),
   );
 
-  // Update filters when searchparams or type changes
+  // Add a ref to track if we're clearing filters
+  const isClearingRef = useRef(false);
+
+  // Modify the useEffect
   useEffect(() => {
-    setCurrentFilters(getInitialFilters());
+    if (!isClearingRef.current) {
+      setCurrentFilters(getInitialFilters());
+    }
   }, [searchparams.toString(), type]);
 
   // Handle browser resize
@@ -407,7 +412,13 @@ const FilterDrawer = (
       <div className="flex justify-between sticky bottom-0 p-6 gap-6 bg-[#000000]/80 shadow-[0_-12px_12px_-6px_rgba(0,0,0,1)]">
         <button
           onClick={() => {
+            isClearingRef.current = true; // Set the flag before clearing
             setCurrentFilters(emptyFilters);
+
+            // Reset the flag after a short delay
+            setTimeout(() => {
+              isClearingRef.current = false;
+            }, 100);
           }}
           className={`w-full ${button("outlineGrey", "lg")}`}
         >
