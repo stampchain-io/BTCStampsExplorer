@@ -1,7 +1,7 @@
-import { ComponentChildren, useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { STAMP_SUFFIX_FILTERS } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
-import { useDebouncedCallback } from "$lib/utils/filterUtils.ts";
+
 import {
   checkboxIcon,
   labelGreyBaseFilter,
@@ -9,7 +9,6 @@ import {
 import {
   Checkbox,
   CollapsibleSection,
-  RangeInput,
   RangeSlider,
 } from "$islands/filter/FilterComponents.tsx";
 
@@ -45,7 +44,7 @@ const defaultFilters = {
     divisible: false,
   },
   rarity: {
-    sub: false,
+    sub: false as boolean | string,
     stampRange: {
       min: "",
       max: "",
@@ -69,12 +68,18 @@ export function filtersToQueryParams(
             queryParams.delete(`${category}[${key}][min]`);
             queryParams.delete(`${category}[${key}][max]`);
 
-            // Only add parameters if we have non-empty values
-            if (val.min && val.min.toString().trim() !== "") {
-              queryParams.append(`${category}[${key}][min]`, val.min);
-            }
-            if (val.max && val.max.toString().trim() !== "") {
-              queryParams.append(`${category}[${key}][max]`, val.max);
+            // Type guard to ensure val has min and max properties
+            if (
+              typeof val === "object" && val !== null && "min" in val &&
+              "max" in val
+            ) {
+              // Only add parameters if we have non-empty values
+              if (val.min && val.min.toString().trim() !== "") {
+                queryParams.append(`${category}[${key}][min]`, val.min);
+              }
+              if (val.max && val.max.toString().trim() !== "") {
+                queryParams.append(`${category}[${key}][max]`, val.max);
+              }
             }
           } else if (key === "sub" && val) {
             queryParams.set(`${category}[${key}]`, val.toString());
@@ -88,24 +93,36 @@ export function filtersToQueryParams(
           queryParams.delete(`${category}[${key}][min]`);
           queryParams.delete(`${category}[${key}][max]`);
 
-          // Only add parameters if we have non-empty values
-          if (val.min && val.min.toString().trim() !== "") {
-            queryParams.append(`${category}[${key}][min]`, val.min);
-          }
-          if (val.max && val.max.toString().trim() !== "") {
-            queryParams.append(`${category}[${key}][max]`, val.max);
+          // Type guard to ensure val has min and max properties
+          if (
+            typeof val === "object" && val !== null && "min" in val &&
+            "max" in val
+          ) {
+            // Only add parameters if we have non-empty values
+            if (val.min && val.min.toString().trim() !== "") {
+              queryParams.append(`${category}[${key}][min]`, val.min);
+            }
+            if (val.max && val.max.toString().trim() !== "") {
+              queryParams.append(`${category}[${key}][max]`, val.max);
+            }
           }
           return;
         }
 
-        const strVal = val.toString();
+        const strVal = typeof val === "object"
+          ? JSON.stringify(val)
+          : val.toString();
         if (typeof val === "boolean") {
           if (strVal !== "false") {
             queryParams.set(`${category}[${key}]`, strVal);
           } else {
             queryParams.delete(`${category}[${key}]`);
           }
+        } else if (typeof val === "object") {
+          // Handle object values (like priceRange or stampRange) that weren't caught by the earlier conditions
+          // These are already handled by the specific conditions above, so we can skip them here
         } else if (val !== "") {
+          // This condition now only applies to string or number values
           queryParams.set(`${category}[${key}]`, strVal);
         }
       });
@@ -207,6 +224,7 @@ export function filtersToServicePayload(filters: typeof defaultFilters) {
     filterPayload.encoding.suffixFilters.push("olga");
   }
 
+  // DENO ERROR - this is a known issue that will be addressed in an upcoming update to the STAMP_SUFFIX_FILTERS
   const suffixFilters = Object.entries(filterPayload).reduce(
     (acc, [key, value]) => {
       if (value.suffixFilters.length > 0) {
@@ -394,7 +412,14 @@ export function queryParamsToServicePayload(search: string) {
   };
 }
 
-const Radio = ({ label, value, checked, onChange }) => {
+interface RadioProps {
+  label: string;
+  value: string;
+  checked: boolean;
+  onChange: () => void;
+}
+
+const Radio = ({ label, value, checked, onChange }: RadioProps) => {
   const [canHover, setCanHover] = useState(true);
 
   const handleChange = () => {
@@ -478,15 +503,11 @@ export const FilterContentStamp = ({
     customRange: hasActiveFilters("customRange", filters),
     priceRange: hasActiveFilters("priceRange", filters),
   });
-  const debouncedOnFilterChange = useDebouncedCallback(
-    (str: string) => {
-      globalThis.location.href = globalThis.location.pathname + "?" +
-        str;
-    },
-    500,
-  );
 
-  const handleFilterChange = (category: string, value: unknown) => {
+  const handleFilterChange = (
+    category: keyof typeof defaultFilters,
+    value: unknown,
+  ) => {
     setFilters((prevFilters) => {
       const newFilters = {
         ...prevFilters,
@@ -499,12 +520,7 @@ export const FilterContentStamp = ({
     });
   };
 
-  const clearAllFilters = () => {
-    setFilters(defaultFilters);
-    onFiltersChange(defaultFilters);
-  };
-
-  const toggleSection = (section) => {
+  const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections({
       ...expandedSections,
       [section]: !expandedSections[section],
@@ -516,14 +532,10 @@ export const FilterContentStamp = ({
 
   const [isDraggingPrice, setIsDraggingPrice] = useState(false);
   const [isDraggingRarity, setIsDraggingRarity] = useState(false);
-  const [pendingPriceMin, setPendingPriceMin] = useState<string>("");
-  const [pendingPriceMax, setPendingPriceMax] = useState<string>("");
-  const [pendingRarityMin, setPendingRarityMin] = useState<string>("");
-  const [pendingRarityMax, setPendingRarityMax] = useState<string>("");
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleMouseUp = (e: MouseEvent) => {
+    const handleMouseUp = (_e: MouseEvent) => {
       // Check if we're currently dragging either slider
       if (isDraggingPrice) {
         // Reset dragging state
@@ -537,13 +549,13 @@ export const FilterContentStamp = ({
     };
 
     // Add event listener for mouse up
-    window.addEventListener("mouseup", handleMouseUp);
-    window.addEventListener("mouseleave", handleMouseUp);
+    globalThis.addEventListener("mouseup", handleMouseUp);
+    globalThis.addEventListener("mouseleave", handleMouseUp);
 
     // Clean up
     return () => {
-      window.removeEventListener("mouseup", handleMouseUp);
-      window.removeEventListener("mouseleave", handleMouseUp);
+      globalThis.removeEventListener("mouseup", handleMouseUp);
+      globalThis.removeEventListener("mouseleave", handleMouseUp);
     };
   }, [isDraggingPrice, isDraggingRarity]);
 
@@ -640,41 +652,21 @@ export const FilterContentStamp = ({
         />
 
         {/* Price Range Filter */}
-        <CollapsibleSection
-          title="PRICE RANGE"
-          section="priceRange"
-          expanded={expandedSections.priceRange}
-          toggle={() => {
-            // If already expanded, collapse and clear values
-            if (expandedSections.priceRange) {
-              handleFilterChange("market", {
-                ...filters.market,
-                priceRange: {
-                  min: "",
-                  max: "",
-                },
-              });
-              setExpandedSections({
-                ...expandedSections,
-                priceRange: false,
-              });
-            } else {
-              // Otherwise, expand but don't set any default values yet
-              setExpandedSections({
-                ...expandedSections,
-                priceRange: true,
-              });
-            }
-          }}
-          variant="collapsibleSubTitle"
-        >
-          {expandedSections.priceRange && (
+        {(filters.market.atomic || filters.market.dispenser ||
+          filters.market.listings || filters.market.sales) && (
+          <CollapsibleSection
+            title="Price Range"
+            section="priceRange"
+            expanded={true}
+            toggle={() => {}}
+            variant="collapsibleLabel"
+          >
             <RangeSlider
               variant="price"
               onChange={handlePriceRangeChange}
             />
-          )}
-        </CollapsibleSection>
+          </CollapsibleSection>
+        )}
       </CollapsibleSection>
 
       <CollapsibleSection
@@ -880,6 +872,7 @@ export const FilterContentStamp = ({
           <Radio
             key={value}
             label={`< ${value}`}
+            value={value.toString()}
             checked={filters.rarity?.sub === value.toString()}
             onChange={() => {
               if (filters.rarity?.sub === value.toString()) {
@@ -891,13 +884,18 @@ export const FilterContentStamp = ({
                   },
                 });
               } else {
-                // Select the radio button and clear stampRange
+                // Select the radio button, clear stampRange and close the custom range section
                 handleFilterChange("rarity", {
                   sub: value.toString(),
                   stampRange: {
                     min: "", // Clear min
                     max: "", // Clear max
                   },
+                });
+                // Close the custom range collapsible when selecting a standard radio button
+                setExpandedSections({
+                  ...expandedSections,
+                  customRange: false,
                 });
               }
             }}
@@ -907,6 +905,7 @@ export const FilterContentStamp = ({
         {/* Custom Range Radio Button with Collapsible Section */}
         <Radio
           label="CUSTOM RANGE"
+          value="custom rarity range"
           checked={expandedSections.customRange}
           onChange={() => {
             // If already selected, deselect and clear values

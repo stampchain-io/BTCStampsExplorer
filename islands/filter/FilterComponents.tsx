@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { ComponentChildren } from "preact";
+import { ComponentChildren, JSX } from "preact";
 import {
-  button,
   checkboxIcon,
   formatNumber,
   handleIcon,
@@ -99,7 +98,7 @@ export const BadgeIcon = ({
 // CollapsibleSection Component
 export const CollapsibleSection = ({
   title,
-  section,
+
   expanded,
   toggle,
   children,
@@ -111,7 +110,7 @@ export const CollapsibleSection = ({
   toggle: () => void;
   children: ComponentChildren;
   variant: "collapsibleTitle" | "collapsibleSubTitle" | "collapsibleLabel";
-}) => {
+}): JSX.Element => {
   const [canHoverSelected, setCanHoverSelected] = useState(true);
 
   const handleClick = () => {
@@ -123,125 +122,132 @@ export const CollapsibleSection = ({
     setCanHoverSelected(true);
   };
 
-  // Handle collapsibleTitle variant
-  if (variant === "collapsibleTitle") {
-    return (
-      <div>
-        <button
-          onClick={handleClick}
-          onMouseLeave={handleMouseLeave}
-          className="flex items-center w-full justify-between py-3 group transition-colors duration-300"
-        >
-          <span
-            className={`
-              text-xl font-light transition-colors duration-300
-              ${
-              expanded
-                ? `text-stamp-grey ${
-                  canHoverSelected ? "group-hover:text-stamp-grey-light" : ""
-                }`
-                : `text-stamp-grey-light ${
-                  canHoverSelected ? "group-hover:text-stamp-grey" : ""
-                }`
-            }`}
+  switch (variant) {
+    case "collapsibleTitle": {
+      return (
+        <div>
+          <button
+            onClick={handleClick}
+            onMouseLeave={handleMouseLeave}
+            className="flex items-center w-full justify-between py-3 group transition-colors duration-300"
           >
-            {title}
-          </span>
+            <span
+              className={`
+                text-xl font-light transition-colors duration-300
+                ${
+                expanded
+                  ? `text-stamp-grey ${
+                    canHoverSelected ? "group-hover:text-stamp-grey-light" : ""
+                  }`
+                  : `text-stamp-grey-light ${
+                    canHoverSelected ? "group-hover:text-stamp-grey" : ""
+                  }`
+              }`}
+            >
+              {title}
+            </span>
+
+            <div
+              className={`transform transition-all duration-300 ${
+                expanded ? "scale-y-[-1]" : ""
+              }`}
+            >
+              <div
+                className={`${
+                  expanded
+                    ? `fill-stamp-grey ${
+                      canHoverSelected
+                        ? "group-hover:fill-stamp-grey-light"
+                        : ""
+                    }`
+                    : `fill-stamp-grey-light ${
+                      canHoverSelected ? "group-hover:fill-stamp-grey" : ""
+                    }`
+                } transition-colors duration-300`}
+              >
+                {ChevronIcon("lg")}
+              </div>
+            </div>
+          </button>
 
           <div
-            className={`transform transition-all duration-300 ${
-              expanded ? "scale-y-[-1]" : ""
+            className={`overflow-hidden transition-all duration-300 ${
+              expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
             }`}
           >
+            <div className="-mt-0.5 tablet:-mt-0 pb-3 pl-0.5">
+              {children}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    case "collapsibleSubTitle": {
+      return (
+        <div>
+          <button
+            onClick={handleClick}
+            onMouseLeave={handleMouseLeave}
+            className="flex items-center w-full mt-2 tablet:mt-1.5 group transition-colors duration-300"
+          >
             <div
-              className={`${
+              className={`transform transition-all duration-300 ${
+                expanded ? "scale-y-[-1]" : "mb-0.5"
+              } ${
                 expanded
-                  ? `fill-stamp-grey ${
-                    canHoverSelected ? "group-hover:fill-stamp-grey-light" : ""
-                  }`
-                  : `fill-stamp-grey-light ${
+                  ? `fill-stamp-grey-light ${
                     canHoverSelected ? "group-hover:fill-stamp-grey" : ""
+                  }`
+                  : `fill-stamp-grey ${
+                    canHoverSelected ? "group-hover:fill-stamp-grey-light" : ""
                   }`
               } transition-colors duration-300`}
             >
-              {ChevronIcon("lg")}
+              {ChevronIcon("md")}
+            </div>
+
+            <span
+              className={`${
+                labelGreyBaseFilter(expanded, canHoverSelected)
+              } font-light`}
+            >
+              {title}
+            </span>
+          </button>
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ${
+              expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="pt-3.5 pl-0.5">
+              {children}
             </div>
           </div>
-        </button>
+        </div>
+      );
+    }
 
+    case "collapsibleLabel": {
+      return (
         <div
-          className={`overflow-hidden transition-all duration-300 ${
-            expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="-mt-0.5 tablet:-mt-0 pb-3 pl-0.5">
+          <div className="pt-2 pl-0.5">
             {children}
           </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  // Handle collapsibleSubTitle variant
-  if (variant === "collapsibleSubTitle") {
-    return (
-      <div>
-        <button
-          onClick={handleClick}
-          onMouseLeave={handleMouseLeave}
-          className="flex items-center w-full mt-2 tablet:mt-1.5 group transition-colors duration-300"
-        >
-          <div
-            className={`transform transition-all duration-300 ${
-              expanded ? "scale-y-[-1]" : "mb-0.5"
-            } ${
-              expanded
-                ? `fill-stamp-grey-light ${
-                  canHoverSelected ? "group-hover:fill-stamp-grey" : ""
-                }`
-                : `fill-stamp-grey ${
-                  canHoverSelected ? "group-hover:fill-stamp-grey-light" : ""
-                }`
-            } transition-colors duration-300`}
-          >
-            {ChevronIcon("md")}
-          </div>
-
-          <span
-            className={`${
-              labelGreyBaseFilter(expanded, canHoverSelected)
-            } font-light`}
-          >
-            {title}
-          </span>
-        </button>
-
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            expanded ? "max-h-[999px] opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="pt-3.5 pl-0.5">
-            {children}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Handle collapsibleLabel variant
-  if (variant === "collapsibleLabel") {
-    return (
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          expanded ? "max-h-[100px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="pt-2 pl-0.5">
-          {children}
-        </div>
-      </div>
-    );
+    default: {
+      // This exhaustiveness check ensures all variants are handled
+      const _exhaustiveCheck: never = variant;
+      return _exhaustiveCheck;
+    }
   }
 };
 
@@ -428,12 +434,12 @@ export const RangeSlider = ({
       }
     };
 
-    window.addEventListener("mouseup", handleMouseUp);
-    window.addEventListener("touchend", handleMouseUp);
+    globalThis.addEventListener("mouseup", handleMouseUp);
+    globalThis.addEventListener("touchend", handleMouseUp);
 
     return () => {
-      window.removeEventListener("mouseup", handleMouseUp);
-      window.removeEventListener("touchend", handleMouseUp);
+      globalThis.removeEventListener("mouseup", handleMouseUp);
+      globalThis.removeEventListener("touchend", handleMouseUp);
     };
   }, [isDragging, pendingMin, pendingMax, onChange, variant]);
 
@@ -718,7 +724,11 @@ export const RangeInput = (
         }
       }}
       onChange={(e) => {
-        const value = e.target.value;
+        // Add type assertion to ensure e.target is an HTMLInputElement
+        const target = e.target as HTMLInputElement;
+        if (!target) return; // Guard against null target
+
+        const value = target.value;
 
         if (type === "price") {
           // For price, allow decimals with custom validation

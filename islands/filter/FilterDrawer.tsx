@@ -106,9 +106,9 @@ const FilterDrawer = (
       }, 100) as unknown as number;
     };
 
-    window.addEventListener("resize", handleResize);
+    globalThis.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      globalThis.removeEventListener("resize", handleResize);
       if (resizeTimer) {
         clearTimeout(resizeTimer);
       }
@@ -246,7 +246,7 @@ const FilterDrawer = (
     // Function to lock scrolling
     const lockScroll = () => {
       // Save current scroll position
-      const scrollY = window.scrollY;
+      const scrollY = globalThis.scrollY;
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = "100%";
@@ -266,7 +266,7 @@ const FilterDrawer = (
 
       // Restore scroll position
       if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || "0") * -1);
+        globalThis.scrollTo(0, parseInt(scrollY || "0") * -1);
       }
     };
 
