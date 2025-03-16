@@ -209,10 +209,29 @@ const FilterDrawer = (
 
   // Modify the open/close handlers
   const handleCloseDrawerUpdate = () => {
+    console.log("APPLY button clicked");
+    console.log(
+      "Current filters before query params:",
+      JSON.stringify(currentFilters, null, 2),
+    );
+    console.log(
+      "Price range min value before query params:",
+      (currentFilters as StampFilters).market.priceRange.min,
+    );
+    console.log(
+      "Price range min type before query params:",
+      typeof (currentFilters as StampFilters).market.priceRange.min,
+    );
+
     const queryString = getFiltersToQueryParams(
       globalThis.location.search,
       currentFilters,
     );
+
+    console.log("Generated query string:", queryString);
+    console.log("Current URL:", globalThis.location.href);
+    console.log("New URL:", globalThis.location.pathname + "?" + queryString);
+
     globalThis.location.href = globalThis.location.pathname + "?" + queryString;
     setOpen(false);
   };
@@ -323,7 +342,18 @@ const FilterDrawer = (
           <FilterContentStamp
             initialFilters={currentFilters as StampFilters}
             onFiltersChange={(filters) => {
-              console.log("filters changed:", filters);
+              console.log(
+                "filters changed in FilterDrawer:",
+                JSON.stringify(filters, null, 2),
+              );
+              console.log(
+                "Price range min value:",
+                filters.market.priceRange.min,
+              );
+              console.log(
+                "Price range min type:",
+                typeof filters.market.priceRange.min,
+              );
               setCurrentFilters(filters);
             }}
           />

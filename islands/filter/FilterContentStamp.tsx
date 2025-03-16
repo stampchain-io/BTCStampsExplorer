@@ -17,8 +17,8 @@ const defaultFilters = {
   market: {
     atomic: false,
     dispenser: false,
-    trendingSales: false,
-    sold: false,
+    listings: false,
+    sales: false,
     priceRange: {
       min: "",
       max: "",
@@ -235,8 +235,8 @@ export const allQueryKeysFromFilters = [
   // Market filters
   "market[atomic]",
   "market[dispenser]",
-  "market[trendingSales]",
-  "market[sold]",
+  "market[listings]",
+  "market[sales]",
   "market[priceRange][min]",
   "market[priceRange][max]",
 
@@ -279,11 +279,11 @@ export function queryParamsToFilters(search: string) {
   if (queryParams.get("market[dispenser]") === "true") {
     filters.market.dispenser = true;
   }
-  if (queryParams.get("trendingSales") === "true") {
-    filters.market.trendingSales = true;
+  if (queryParams.get("market[listings]") === "true") {
+    filters.market.listings = true;
   }
-  if (queryParams.get("sold") === "true") {
-    filters.market.sold = true;
+  if (queryParams.get("market[sales]") === "true") {
+    filters.market.sales = true;
   }
 
   // Parse market price range
@@ -441,8 +441,8 @@ function hasActiveFilters(section: string, filters: typeof defaultFilters) {
     case "market":
       return filters.market.atomic ||
         filters.market.dispenser ||
-        filters.market.trendingSales ||
-        filters.market.sold ||
+        filters.market.listings ||
+        filters.market.sales ||
         filters.market.priceRange.min !== "" ||
         filters.market.priceRange.max !== "";
     case "customRange": // For rarity custom range subsection
@@ -526,66 +526,13 @@ export const FilterContentStamp = ({
     const handleMouseUp = (e: MouseEvent) => {
       // Check if we're currently dragging either slider
       if (isDraggingPrice) {
-        // Check if the mouse up event occurred inside the drawer
-        let isInsideDrawer = false;
-
-        if (drawerRef.current) {
-          const rect = drawerRef.current.getBoundingClientRect();
-          isInsideDrawer = e.clientX >= rect.left &&
-            e.clientX <= rect.right &&
-            e.clientY >= rect.top &&
-            e.clientY <= rect.bottom;
-        }
-
-        // If mouse was released inside the drawer, update the state
-        if (
-          isInsideDrawer && pendingPriceMin !== "" && pendingPriceMax !== ""
-        ) {
-          handleFilterChange("market", {
-            ...filters.market,
-            priceRange: {
-              min: pendingPriceMin,
-              max: pendingPriceMax,
-            },
-          });
-        }
-
-        // Reset dragging state and pending values
+        // Reset dragging state
         setIsDraggingPrice(false);
-        setPendingPriceMin("");
-        setPendingPriceMax("");
       }
 
       if (isDraggingRarity) {
-        // Check if the mouse up event occurred inside the drawer
-        let isInsideDrawer = false;
-
-        if (drawerRef.current) {
-          const rect = drawerRef.current.getBoundingClientRect();
-          isInsideDrawer = e.clientX >= rect.left &&
-            e.clientX <= rect.right &&
-            e.clientY >= rect.top &&
-            e.clientY <= rect.bottom;
-        }
-
-        // If mouse was released inside the drawer, update the state
-        if (
-          isInsideDrawer && pendingRarityMin !== "" && pendingRarityMax !== ""
-        ) {
-          handleFilterChange("rarity", {
-            ...filters.rarity,
-            sub: false,
-            stampRange: {
-              min: pendingRarityMin,
-              max: pendingRarityMax,
-            },
-          });
-        }
-
-        // Reset dragging state and pending values
+        // Reset dragging state
         setIsDraggingRarity(false);
-        setPendingRarityMin("");
-        setPendingRarityMax("");
       }
     };
 
@@ -598,55 +545,57 @@ export const FilterContentStamp = ({
       window.removeEventListener("mouseup", handleMouseUp);
       window.removeEventListener("mouseleave", handleMouseUp);
     };
-  }, [
-    isDraggingPrice,
-    isDraggingRarity,
-    pendingPriceMin,
-    pendingPriceMax,
-    pendingRarityMin,
-    pendingRarityMax,
-    filters,
-    handleFilterChange,
-  ]);
+  }, [isDraggingPrice, isDraggingRarity]);
 
   const handlePriceRangeChange = (min: number, max: number) => {
     // Only update if values are defined
     if (min !== undefined && max !== undefined) {
-      // Convert values to strings for URL compatibility
-      // Handle Infinity as empty string for max (NO LIMIT)
-      const minStr = min > 0 ? min.toString() : "";
+      // Convert min to string, or empty string if it's 0
+      const minStr = min === 0 ? "" : min.toString();
+
+      // For max, if it's Infinity, use an empty string
       const maxStr = max === Infinity ? "" : max.toString();
 
-      // Store the pending values
-      setPendingPriceMin(minStr);
-      setPendingPriceMax(maxStr);
+      console.log("Price range changed:", { min, max, minStr, maxStr }); // Debug log
 
-      // Set dragging state
-      setIsDraggingPrice(true);
+      // Directly update the filters state with the new values
+      handleFilterChange("market", {
+        ...filters.market,
+        priceRange: {
+          min: minStr,
+          max: maxStr,
+        },
+      });
     }
   };
 
   const handleRarityRangeChange = (min: number, max: number) => {
     // Only update if values are defined
     if (min !== undefined && max !== undefined) {
-      // Convert values to strings for URL compatibility
-      // Handle Infinity as empty string for max (NO LIMIT)
-      const minStr = min > 0 ? min.toString() : "";
+      // Convert min to string, or empty string if it's 0
+      const minStr = min === 0 ? "" : min.toString();
+
+      // For max, if it's Infinity, use an empty string
       const maxStr = max === Infinity ? "" : max.toString();
 
-      // Store the pending values
-      setPendingRarityMin(minStr);
-      setPendingRarityMax(maxStr);
+      console.log("Rarity range changed:", { min, max, minStr, maxStr }); // Debug log
 
-      // Set dragging state
-      setIsDraggingRarity(true);
+      // Directly update the filters state with the new values
+      handleFilterChange("rarity", {
+        ...filters.rarity,
+        sub: false, // Disable the radio button when using custom range
+        stampRange: {
+          min: minStr,
+          max: maxStr,
+        },
+      });
     }
   };
 
   return (
     <div className="space-y-1 mobileLg:space-y-1.5" ref={drawerRef}>
       <CollapsibleSection
-        title="MARKET"
+        title="MARKET PLACE"
         section="market"
         expanded={expandedSections.market}
         toggle={() => toggleSection("market")}
@@ -654,7 +603,7 @@ export const FilterContentStamp = ({
       >
         {/* Category: LISTINGS */}
         <Checkbox
-          label="ATOMIC LISTINGS"
+          label="ATOMIC"
           checked={filters.market.atomic}
           onChange={() =>
             handleFilterChange("market", {
@@ -672,21 +621,21 @@ export const FilterContentStamp = ({
             })}
         />
         <Checkbox
-          label="SOLD"
-          checked={filters.market.sold}
+          label="LISTINGS"
+          checked={filters.market.listings}
           onChange={() =>
             handleFilterChange("market", {
               ...filters.market,
-              sold: !filters.market.sold,
+              listings: !filters.market.listings,
             })}
         />
         <Checkbox
-          label="TRENDING SALES"
-          checked={filters.market.trendingSales}
+          label="SALES"
+          checked={filters.market.sales}
           onChange={() =>
             handleFilterChange("market", {
               ...filters.market,
-              trendingSales: !filters.market.trendingSales,
+              sales: !filters.market.sales,
             })}
         />
 
@@ -694,14 +643,10 @@ export const FilterContentStamp = ({
         <CollapsibleSection
           title="PRICE RANGE"
           section="priceRange"
-          expanded={filters.market.priceRange.min !== "" ||
-            filters.market.priceRange.max !== ""}
+          expanded={expandedSections.priceRange}
           toggle={() => {
-            // If already has values, clear them
-            if (
-              filters.market.priceRange.min !== "" ||
-              filters.market.priceRange.max !== ""
-            ) {
+            // If already expanded, collapse and clear values
+            if (expandedSections.priceRange) {
               handleFilterChange("market", {
                 ...filters.market,
                 priceRange: {
@@ -709,21 +654,21 @@ export const FilterContentStamp = ({
                   max: "",
                 },
               });
+              setExpandedSections({
+                ...expandedSections,
+                priceRange: false,
+              });
             } else {
-              // Otherwise, expand and set default values
-              handleFilterChange("market", {
-                ...filters.market,
-                priceRange: {
-                  min: "0", // Set a default min value
-                  max: "", // Leave max empty
-                },
+              // Otherwise, expand but don't set any default values yet
+              setExpandedSections({
+                ...expandedSections,
+                priceRange: true,
               });
             }
           }}
           variant="collapsibleSubTitle"
         >
-          {(filters.market.priceRange.min !== "" ||
-            filters.market.priceRange.max !== "") && (
+          {expandedSections.priceRange && (
             <RangeSlider
               variant="price"
               onChange={handlePriceRangeChange}
@@ -962,15 +907,10 @@ export const FilterContentStamp = ({
         {/* Custom Range Radio Button with Collapsible Section */}
         <Radio
           label="CUSTOM RANGE"
-          checked={filters.rarity.stampRange.min !== "" ||
-            filters.rarity.stampRange.max !== ""}
+          checked={expandedSections.customRange}
           onChange={() => {
-            // If already selected with values, clear it
-            if (
-              filters.rarity.stampRange.min !== "" ||
-              filters.rarity.stampRange.max !== ""
-            ) {
-              // Clear the values
+            // If already selected, deselect and clear values
+            if (expandedSections.customRange) {
               handleFilterChange("rarity", {
                 sub: false,
                 stampRange: {
@@ -978,22 +918,29 @@ export const FilterContentStamp = ({
                   max: "",
                 },
               });
+              setExpandedSections({
+                ...expandedSections,
+                customRange: false,
+              });
             } else {
-              // Otherwise, just select it and set default values
+              // Otherwise, select it but don't set any default values yet
               handleFilterChange("rarity", {
                 sub: false,
                 stampRange: {
-                  min: "0", // Set a default min value
-                  max: "", // Leave max empty
+                  min: "",
+                  max: "",
                 },
+              });
+              setExpandedSections({
+                ...expandedSections,
+                customRange: true,
               });
             }
           }}
         />
 
-        {/* Custom Range Slider (only shown when custom range has values) */}
-        {(filters.rarity.stampRange.min !== "" ||
-          filters.rarity.stampRange.max !== "") && (
+        {/* Custom Range Slider (only shown when custom range is selected) */}
+        {expandedSections.customRange && (
           <CollapsibleSection
             title=""
             section="customRange"

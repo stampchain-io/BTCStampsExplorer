@@ -10,8 +10,8 @@ export type StampFilters = {
   market: {
     atomic: boolean;
     dispenser: boolean;
-    trendingSales: boolean;
-    sold: boolean;
+    listings: boolean;
+    sales: boolean;
     priceRange: {
       min: string;
       max: string;
@@ -52,8 +52,8 @@ export const defaultFilters: StampFilters = {
   market: {
     atomic: false,
     dispenser: false,
-    trendingSales: false,
-    sold: false,
+    listings: false,
+    sales: false,
     priceRange: {
       min: "",
       max: "",
@@ -92,7 +92,24 @@ export function filtersToQueryParams(
   search: string,
   filters: StampFilters,
 ) {
+  console.log(
+    "Converting filters to query params:",
+    JSON.stringify(filters, null, 2),
+  );
+  console.log(
+    "Price range min value in filtersToQueryParams:",
+    filters.market.priceRange.min,
+  );
+  console.log(
+    "Price range min type in filtersToQueryParams:",
+    typeof filters.market.priceRange.min,
+  );
+
   const queryParams = new URLSearchParams(search);
+
+  // Log existing query params
+  console.log("Existing query params:", search);
+
   Object.entries(filters).forEach(([category, value]) => {
     if (typeof value !== null && typeof value === "object") {
       Object.entries(value).forEach(([key, val]) => {
@@ -104,15 +121,23 @@ export function filtersToQueryParams(
             queryParams.delete(`${category}[${key}][min]`);
             queryParams.delete(`${category}[${key}][max]`);
 
-            // Only add parameters if we have non-empty values
-            if (val.min && val.min.toString().trim() !== "") {
+            console.log("Rarity range values:", JSON.stringify(val, null, 2));
+
+            // Only add min parameter if it has a non-empty value
+            if (val.min !== undefined && val.min !== null && val.min !== "") {
+              console.log(`Adding ${category}[${key}][min]=${val.min}`);
               queryParams.append(`${category}[${key}][min]`, val.min);
             }
-            if (val.max && val.max.toString().trim() !== "") {
+
+            // Only add max parameter if it has a non-empty value
+            if (val.max !== undefined && val.max !== null && val.max !== "") {
+              console.log(`Adding ${category}[${key}][max]=${val.max}`);
               queryParams.append(`${category}[${key}][max]`, val.max);
             }
-            return;
+          } else if (key === "sub" && val) {
+            queryParams.set(`${category}[${key}]`, val.toString());
           }
+          return;
         }
 
         // Handle price range
@@ -121,13 +146,20 @@ export function filtersToQueryParams(
           queryParams.delete(`${category}[${key}][min]`);
           queryParams.delete(`${category}[${key}][max]`);
 
-          // Only add parameters if we have non-empty values
-          if (val.min && val.min.toString().trim() !== "") {
+          console.log("Price range values:", JSON.stringify(val, null, 2));
+
+          // Only add min parameter if it has a non-empty value
+          if (val.min !== undefined && val.min !== null && val.min !== "") {
+            console.log(`Adding min to URL: ${val.min}`);
             queryParams.append(`${category}[${key}][min]`, val.min);
           }
-          if (val.max && val.max.toString().trim() !== "") {
+
+          // Only add max parameter if it has a non-empty value
+          if (val.max !== undefined && val.max !== null && val.max !== "") {
+            console.log(`Adding max to URL: ${val.max}`);
             queryParams.append(`${category}[${key}][max]`, val.max);
           }
+
           return;
         }
 
@@ -144,7 +176,10 @@ export function filtersToQueryParams(
       });
     }
   });
-  return queryParams.toString();
+
+  const result = queryParams.toString();
+  console.log("Final query params:", result);
+  return result;
 }
 
 export function filtersToServicePayload(filters: StampFilters) {
@@ -274,8 +309,8 @@ export const allQueryKeysFromFilters = [
   // Market filters
   "market[atomic]",
   "market[dispenser]",
-  "market[trendingSales]",
-  "market[sold]",
+  "market[listings]",
+  "market[sales]",
   "market[priceRange][min]",
   "market[priceRange][max]",
 
