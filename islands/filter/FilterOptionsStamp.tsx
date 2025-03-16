@@ -1,7 +1,7 @@
 import {
-  STAMP_FILTER_TYPES,
+  _STAMP_FILTER_TYPES,
+  _STAMP_TYPES,
   STAMP_SUFFIX_FILTERS,
-  STAMP_TYPES,
 } from "$globals";
 import type { filterOptions } from "$lib/utils/filterOptions.ts";
 
@@ -123,16 +123,27 @@ export function filtersToQueryParams(
 
             console.log("Rarity range values:", JSON.stringify(val, null, 2));
 
-            // Only add min parameter if it has a non-empty value
-            if (val.min !== undefined && val.min !== null && val.min !== "") {
-              console.log(`Adding ${category}[${key}][min]=${val.min}`);
-              queryParams.append(`${category}[${key}][min]`, val.min);
-            }
+            // Add type guard to ensure val has min and max properties
+            if (
+              val && typeof val === "object" && "min" in val && "max" in val
+            ) {
+              // Only add min parameter if it has a non-empty value
+              if (val.min !== undefined && val.min !== null && val.min !== "") {
+                console.log(`Adding ${category}[${key}][min]=${val.min}`);
+                queryParams.append(
+                  `${category}[${key}][min]`,
+                  val.min.toString(),
+                );
+              }
 
-            // Only add max parameter if it has a non-empty value
-            if (val.max !== undefined && val.max !== null && val.max !== "") {
-              console.log(`Adding ${category}[${key}][max]=${val.max}`);
-              queryParams.append(`${category}[${key}][max]`, val.max);
+              // Only add max parameter if it has a non-empty value
+              if (val.max !== undefined && val.max !== null && val.max !== "") {
+                console.log(`Adding ${category}[${key}][max]=${val.max}`);
+                queryParams.append(
+                  `${category}[${key}][max]`,
+                  val.max.toString(),
+                );
+              }
             }
           } else if (key === "sub" && val) {
             queryParams.set(`${category}[${key}]`, val.toString());
@@ -148,30 +159,46 @@ export function filtersToQueryParams(
 
           console.log("Price range values:", JSON.stringify(val, null, 2));
 
-          // Only add min parameter if it has a non-empty value
-          if (val.min !== undefined && val.min !== null && val.min !== "") {
-            console.log(`Adding min to URL: ${val.min}`);
-            queryParams.append(`${category}[${key}][min]`, val.min);
-          }
+          // Add type guard to ensure val has min and max properties
+          if (val && typeof val === "object" && "min" in val && "max" in val) {
+            // Only add min parameter if it has a non-empty value
+            if (val.min !== undefined && val.min !== null && val.min !== "") {
+              console.log(`Adding min to URL: ${val.min}`);
+              queryParams.append(
+                `${category}[${key}][min]`,
+                val.min.toString(),
+              );
+            }
 
-          // Only add max parameter if it has a non-empty value
-          if (val.max !== undefined && val.max !== null && val.max !== "") {
-            console.log(`Adding max to URL: ${val.max}`);
-            queryParams.append(`${category}[${key}][max]`, val.max);
+            // Only add max parameter if it has a non-empty value
+            if (val.max !== undefined && val.max !== null && val.max !== "") {
+              console.log(`Adding max to URL: ${val.max}`);
+              queryParams.append(
+                `${category}[${key}][max]`,
+                val.max.toString(),
+              );
+            }
           }
 
           return;
         }
 
-        const strVal = val.toString();
-        if (typeof val === "boolean") {
-          if (strVal !== "false") {
+        // Before trying to call toString(), check the type of val
+        if (val !== null && val !== undefined) {
+          const strVal = val.toString();
+
+          if (typeof val === "boolean") {
+            if (strVal !== "false") {
+              queryParams.set(`${category}[${key}]`, strVal);
+            } else {
+              queryParams.delete(`${category}[${key}]`);
+            }
+          } else if (typeof val === "object") {
+            // Skip objects as they're handled in the specific conditions above
+            // This prevents trying to compare an object with an empty string
+          } else if (val !== "") {
             queryParams.set(`${category}[${key}]`, strVal);
-          } else {
-            queryParams.delete(`${category}[${key}]`);
           }
-        } else if (val !== "") {
-          queryParams.set(`${category}[${key}]`, strVal);
         }
       });
     }
