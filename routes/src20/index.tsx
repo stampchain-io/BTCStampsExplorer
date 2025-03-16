@@ -36,6 +36,7 @@ export const handler: Handlers = {
           filterBy,
           sortBy,
           selectedTab,
+          search: url.search,
         };
       } else {
         const excludeFullyMinted = selectedTab === "minting";
@@ -155,6 +156,7 @@ export const handler: Handlers = {
           limit: resultData.limit || limit,
           filterBy,
           sortBy,
+          search: url.search,
         };
       }
 
@@ -179,6 +181,7 @@ export default function SRC20Page(props: any) {
     filterBy = [],
     sortBy = "ASC",
     selectedTab = "all",
+    search = "",
   } = data;
 
   if (!src20s || src20s.length === 0) {
@@ -191,6 +194,7 @@ export default function SRC20Page(props: any) {
         filterBy={filterBy}
         sortBy={sortBy}
         selectedTab={selectedTab}
+        search={search}
       />
       {selectedTab === "all" && (
         <SRC20Section

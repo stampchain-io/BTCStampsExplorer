@@ -22,9 +22,47 @@ export const SRC20Header = (
   };
 
   const searchparams = new URLSearchParams(search);
-  const filterCount = allQueryKeysFromFiltersSRC20.filter((key) => {
-    return searchparams.has(key) && searchparams.get(key) != "false";
-  }).length;
+
+  // Count filters with special handling for holders
+  let filterCount = 0;
+
+  // Check if holders is selected
+  const holdersSelected = searchparams.has("details[holders]") &&
+    searchparams.get("details[holders]") === "true";
+
+  // Check if min and max values are defined
+  const minDefined = searchparams.has("details[holdersRange][min]");
+  const maxDefined = searchparams.has("details[holdersRange][max]");
+
+  // Apply the special counting rules for holders
+  if (holdersSelected) {
+    // Base case: holders selected counts as 1
+    filterCount += 1;
+
+    // If both min and max are defined, add 1 more (total: 2)
+    if (minDefined && maxDefined) {
+      filterCount += 1;
+    }
+    // If only one of min or max is defined, don't add anything (total: 1)
+  }
+
+  // Count all other filters (excluding Period parameters and holders-related ones)
+  allQueryKeysFromFiltersSRC20.forEach((key) => {
+    // Skip holders-related keys as we've already counted them
+    if (key.includes("holders")) {
+      return;
+    }
+
+    // Skip Period parameters
+    if (key.includes("Period")) {
+      return;
+    }
+
+    // Count this filter if it exists and is not false
+    if (searchparams.has(key) && searchparams.get(key) !== "false") {
+      filterCount += 1;
+    }
+  });
 
   const titlePurpleDL =
     "inline-block text-3xl mobileMd:text-4xl mobileLg:text-5xl font-black purple-gradient1";

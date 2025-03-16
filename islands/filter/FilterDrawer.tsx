@@ -33,15 +33,21 @@ const FilterDrawer = (
   // Parse the current URL parameters to initialize filters
   const getInitialFilters = (): AllFilters => {
     const searchString = searchparams.toString();
+    console.log("FilterDrawer - searchString:", searchString);
 
     switch (type) {
-      case "src20":
-        return src20QueryParamsToFilters(searchString);
-      case "src101":
+      case "src20": {
+        const src20Filters = src20QueryParamsToFilters(searchString);
+        console.log("FilterDrawer - src20Filters:", src20Filters);
+        return src20Filters;
+      }
+      case "src101": {
         // For future implementation
         return src20QueryParamsToFilters(searchString); // Temporary fallback
-      default:
+      }
+      default: {
         return stampQueryParamsToFilters(searchString);
+      }
     }
   };
 
@@ -210,18 +216,40 @@ const FilterDrawer = (
   // Modify the open/close handlers
   const handleCloseDrawerUpdate = () => {
     console.log("APPLY button clicked");
+    console.log("Filter type:", type);
     console.log(
       "Current filters before query params:",
       JSON.stringify(currentFilters, null, 2),
     );
-    console.log(
-      "Price range min value before query params:",
-      (currentFilters as StampFilters).market.priceRange.min,
-    );
-    console.log(
-      "Price range min type before query params:",
-      typeof (currentFilters as StampFilters).market.priceRange.min,
-    );
+
+    // Add type-specific logging that handles both filter types
+    if (type === "src20") {
+      // Log SRC20-specific properties
+      const src20Filters = currentFilters as SRC20Filters;
+      console.log(
+        "SRC20 status filters:",
+        JSON.stringify(src20Filters.status, null, 2),
+      );
+      console.log(
+        "SRC20 details filters:",
+        JSON.stringify(src20Filters.details, null, 2),
+      );
+      console.log(
+        "SRC20 market filters:",
+        JSON.stringify(src20Filters.market, null, 2),
+      );
+    } else {
+      // Log Stamp-specific properties
+      const stampFilters = currentFilters as StampFilters;
+      console.log(
+        "Price range min value before query params:",
+        stampFilters.market.priceRange.min,
+      );
+      console.log(
+        "Price range min type before query params:",
+        typeof stampFilters.market.priceRange.min,
+      );
+    }
 
     const queryString = getFiltersToQueryParams(
       globalThis.location.search,
@@ -232,8 +260,14 @@ const FilterDrawer = (
     console.log("Current URL:", globalThis.location.href);
     console.log("New URL:", globalThis.location.pathname + "?" + queryString);
 
-    globalThis.location.href = globalThis.location.pathname + "?" + queryString;
-    setOpen(false);
+    // Add a try-catch to catch any errors during URL navigation
+    try {
+      globalThis.location.href = globalThis.location.pathname + "?" +
+        queryString;
+      setOpen(false);
+    } catch (error) {
+      console.error("Error navigating to new URL:", error);
+    }
   };
 
   // Close the drawer with no updates
@@ -362,7 +396,7 @@ const FilterDrawer = (
           <FilterContentSRC20
             initialFilters={currentFilters as SRC20Filters}
             onFiltersChange={(filters) => {
-              console.log("filters changed:", filters);
+              console.log("FilterDrawer - SRC20 filters changed:", filters);
               setCurrentFilters(filters);
             }}
           />

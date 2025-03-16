@@ -40,7 +40,7 @@ export const defaultFilters: SRC20Filters = {
     supply: false,
     holders: false,
     holdersRange: {
-      min: 1,
+      min: 0,
       max: 10000,
     },
   },
@@ -103,14 +103,23 @@ export function filtersToQueryParams(
   if (filters.details.holders) {
     queryParams.set("details[holders]", "true");
     if (filters.details.holdersRange) {
-      queryParams.set(
-        "details[holdersRange][min]",
-        filters.details.holdersRange.min.toString(),
-      );
-      queryParams.set(
-        "details[holdersRange][max]",
-        filters.details.holdersRange.max.toString(),
-      );
+      if (filters.details.holdersRange.min !== 0) {
+        queryParams.set(
+          "details[holdersRange][min]",
+          filters.details.holdersRange.min.toString(),
+        );
+      } else {
+        queryParams.delete("details[holdersRange][min]");
+      }
+
+      if (filters.details.holdersRange.max !== 10000) {
+        queryParams.set(
+          "details[holdersRange][max]",
+          filters.details.holdersRange.max.toString(),
+        );
+      } else {
+        queryParams.delete("details[holdersRange][max]");
+      }
     }
   } else {
     queryParams.delete("details[holders]");
@@ -118,7 +127,7 @@ export function filtersToQueryParams(
     queryParams.delete("details[holdersRange][max]");
   }
 
-  // Process mint filters
+  // Process status filters
   if (filters.status.fullyMinted) {
     queryParams.set("status[fullyMinted]", "true");
   } else {
@@ -142,6 +151,7 @@ export function filtersToQueryParams(
 
 export function queryParamsToFilters(query: string): SRC20Filters {
   const params = new URLSearchParams(query);
+  console.log("SRC20 queryParamsToFilters - URL params:", query);
   const filters = { ...defaultFilters };
 
   // Parse market filters
@@ -195,19 +205,32 @@ export function queryParamsToFilters(query: string): SRC20Filters {
     }
   }
 
-  // Parse mint filters
+  // Parse status filters
+  console.log(
+    "Checking status[fullyMinted]:",
+    params.get("status[fullyMinted]"),
+  );
   if (params.get("status[fullyMinted]") === "true") {
     filters.status.fullyMinted = true;
+    console.log("Setting status.fullyMinted to true");
   }
 
+  console.log("Checking status[minting]:", params.get("status[minting]"));
   if (params.get("status[minting]") === "true") {
     filters.status.minting = true;
+    console.log("Setting status.minting to true");
   }
 
+  console.log(
+    "Checking status[trendingMints]:",
+    params.get("status[trendingMints]"),
+  );
   if (params.get("status[trendingMints]") === "true") {
     filters.status.trendingMints = true;
+    console.log("Setting status.trendingMints to true");
   }
 
+  console.log("Final SRC20 filters:", filters);
   return filters;
 }
 

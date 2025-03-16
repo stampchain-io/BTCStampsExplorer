@@ -36,13 +36,30 @@ export const FilterContentSRC20 = ({
   initialFilters: SRC20Filters;
   onFiltersChange: (filters: SRC20Filters) => void;
 }) => {
+  console.log("FilterContentSRC20 - initialFilters:", initialFilters);
   const [filters, setFilters] = useState(initialFilters);
-  const [volumePeriod, setVolumePeriod] = useState("24h");
-  const [priceChangePeriod, setPriceChangePeriod] = useState("24h");
+  const [volumePeriod, setVolumePeriod] = useState(
+    initialFilters.market.volumePeriod || "24h",
+  );
+  const [priceChangePeriod, setPriceChangePeriod] = useState(
+    initialFilters.market.priceChangePeriod || "24h",
+  );
 
   // Add this effect to watch for changes to initialFilters
   useEffect(() => {
+    console.log("FilterContentSRC20 - initialFilters changed:", initialFilters);
     setFilters(initialFilters);
+  }, [initialFilters]);
+
+  // Add this effect to update the period states when initialFilters changes
+  useEffect(() => {
+    if (initialFilters.market.volumePeriod) {
+      setVolumePeriod(initialFilters.market.volumePeriod);
+    }
+
+    if (initialFilters.market.priceChangePeriod) {
+      setPriceChangePeriod(initialFilters.market.priceChangePeriod);
+    }
   }, [initialFilters]);
 
   const [expandedSections, setExpandedSections] = useState({
@@ -88,13 +105,37 @@ export const FilterContentSRC20 = ({
   };
 
   const handleHoldersRangeChange = (min: number, max: number) => {
-    // This would update the holders range in the actual implementation
-    console.log(`Holders range changed: ${min} - ${max}`);
+    // Only update if values are defined
+    if (min !== undefined && max !== undefined) {
+      // Convert min to number, or default if it's 0
+      const minVal = min === 0 ? 0 : min;
+
+      // For max, if it's Infinity, use a reasonable default
+      const maxVal = max === Infinity ? 10000 : max;
+
+      console.log(`Holders range changed: ${minVal} - ${maxVal}`); // Debug log
+
+      // Update the filters state with the new values
+      setFilters((prevFilters) => {
+        const newFilters = {
+          ...prevFilters,
+          details: {
+            ...prevFilters.details,
+            holdersRange: {
+              min: minVal,
+              max: maxVal,
+            },
+          },
+        };
+        onFiltersChange(newFilters);
+        return newFilters;
+      });
+    }
   };
 
   // Update the handleStatusChange function to allow deselection
   const handleStatusChange = (
-    status: "fullyMinted" | "minting" | "trendingMints",
+    statusType: "fullyMinted" | "minting" | "trendingMints",
   ) => {
     setFilters((prevFilters) => {
       const newFilters = {
@@ -103,13 +144,13 @@ export const FilterContentSRC20 = ({
           ...prevFilters.status,
           fullyMinted: prevFilters.status.fullyMinted === true
             ? false
-            : status === "fullyMinted",
+            : statusType === "fullyMinted",
           minting: prevFilters.status.minting === true
             ? false
-            : status === "minting",
+            : statusType === "minting",
           trendingMints: prevFilters.status.trendingMints === true
             ? false
-            : status === "trendingMints",
+            : statusType === "trendingMints",
         },
       };
       onFiltersChange(newFilters);
@@ -281,7 +322,22 @@ export const FilterContentSRC20 = ({
           >
             <RangeButtons
               selected={volumePeriod}
-              onChange={setVolumePeriod}
+              onChange={(newPeriod) => {
+                setVolumePeriod(newPeriod);
+
+                // Update the parent's filter state
+                setFilters((prevFilters) => {
+                  const newFilters = {
+                    ...prevFilters,
+                    market: {
+                      ...prevFilters.market,
+                      volumePeriod: newPeriod,
+                    },
+                  };
+                  onFiltersChange(newFilters);
+                  return newFilters;
+                });
+              }}
             />
           </CollapsibleSection>
         )}
@@ -297,7 +353,22 @@ export const FilterContentSRC20 = ({
           >
             <RangeButtons
               selected={priceChangePeriod}
-              onChange={setPriceChangePeriod}
+              onChange={(newPeriod) => {
+                setPriceChangePeriod(newPeriod);
+
+                // Update the parent's filter state
+                setFilters((prevFilters) => {
+                  const newFilters = {
+                    ...prevFilters,
+                    market: {
+                      ...prevFilters.market,
+                      priceChangePeriod: newPeriod,
+                    },
+                  };
+                  onFiltersChange(newFilters);
+                  return newFilters;
+                });
+              }}
             />
           </CollapsibleSection>
         )}
